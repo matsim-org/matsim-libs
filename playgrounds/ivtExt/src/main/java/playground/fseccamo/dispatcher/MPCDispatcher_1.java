@@ -49,6 +49,7 @@ import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.netdata.VirtualNode;
+import playground.clruch.prep.PopulationRequestSchedule;
 import playground.clruch.router.InstantPathFactory;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
@@ -123,7 +124,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                     container.add(doubleArray);
                 }
                 {
-                    Tensor matrix = Import.of(getRequestScheduleFileGlobal());
+                    
+                    Tensor matrix = PopulationRequestSchedule.importDefault();
                     double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
                     DoubleArray doubleArray = new DoubleArray("requestSchedule", new int[] { matrix.length(), 3 }, array);
                     container.add(doubleArray);

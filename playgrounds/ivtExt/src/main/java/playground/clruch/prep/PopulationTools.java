@@ -65,7 +65,7 @@ public class PopulationTools {
                     for (PlanElement pE1 : plan.getPlanElements()) {
                         if (pE1 instanceof Leg) {
                             Leg leg = (Leg) pE1;
-                            leg.setMode("av");
+                            leg.setMode("av"); // TODO magic const
                             leg.setRoute(null);
                         }
                     }

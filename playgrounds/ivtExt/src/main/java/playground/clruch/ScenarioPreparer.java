@@ -19,6 +19,7 @@ import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.prep.NetworkCutClean;
+import playground.clruch.prep.PopulationRequestSchedule;
 import playground.clruch.prep.PopulationTools;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveldata.TravelData;
@@ -131,7 +132,10 @@ public class ScenarioPreparer {
         VirtualNetworkIO.toXML(new File(vnDir, VIRTUALNETWORKFILENAME+".xml").toString(), virtualNetwork);
         System.out.println("saved virtual network byte format to : "+ new File(vnDir, VIRTUALNETWORKFILENAME));
         
+        PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);
+        prs.exportDefault();
         
+        System.exit(1);
         
         // 3) generate travelData
         TravelData travelData = new TravelData(virtualNetwork, network, scenario.getPopulation(), dtTravelData);
