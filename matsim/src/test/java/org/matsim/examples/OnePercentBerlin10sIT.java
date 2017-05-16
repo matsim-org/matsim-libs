@@ -28,13 +28,8 @@ import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -74,20 +69,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		EventWriterXML writer = new EventWriterXML(eventsFileName);
 		events.addHandler(writer);
 
-		QSim qSim = new QSim(scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
-		qSim.addMobsimEngine(teleportationEngine);
-		qSim.addDepartureHandler(teleportationEngine) ;
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-        qSim.addAgentSource(agentSource);
-
+		QSim qSim = QSimUtils.createDefaultQSim(scenario,events);
 
 		log.info("START testOnePercent10s SIM");
 		qSim.run();
@@ -127,20 +109,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		EventWriterXML writer = new EventWriterXML(eventsFileName);
 		eventsManager.addHandler(writer);
 
-		QSim qSim = new QSim(scenario, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
-		qSim.addMobsimEngine(teleportationEngine);
-		qSim.addDepartureHandler(teleportationEngine) ;
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-        qSim.addAgentSource(agentSource);
-
+		QSim qSim = QSimUtils.createDefaultQSim(scenario,eventsManager);
 
 		log.info("START testOnePercent10s SIM");
 		qSim.run();
