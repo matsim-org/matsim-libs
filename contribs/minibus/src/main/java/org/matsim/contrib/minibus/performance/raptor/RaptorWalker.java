@@ -126,10 +126,14 @@ public class RaptorWalker {
 
 		// init first stops
 		for (TransitStopFacility fromTransitStop : fromTransitStops.keySet()) {
+			// (these are all the transit stops initialized by the Multi-Node router)
+
 			double departureTime = fromTransitStops.get(fromTransitStop).initialTime;
+			// (get dp time from node (since they vary by multi-node))
 
 			int indexOfFromTransitStop = this.getIndexForTransitStop(fromTransitStop);
 			TransitStopEntry transitStopEntry = this.raptorSearchData.stops[indexOfFromTransitStop];
+			// (look up index and size of corresponding transit stop entry (fortran))
 
 			for (int indexOfTransferToCheck = transitStopEntry.indexOfFirstTransfer; indexOfTransferToCheck < transitStopEntry.indexOfFirstTransfer + transitStopEntry.numberOfTransfers; indexOfTransferToCheck++) {
 				// check all route stops that can be reached from this transit stop
@@ -150,13 +154,11 @@ public class RaptorWalker {
 
 		int graceTransfersLeft = this.graceTransfers;
 
+		// MAIN LOOP:
 		for (int nTransfers = 0; nTransfers <= this.maxTransfers; nTransfers++) {
 			Arrays.fill(transferTransitStopsToCheck, false);
 
-			this.checkRouteStops(earliestArrivalTimeAtRouteStop,
-					sourcePointerRouteStop, earliestArrivalTimeAtTransitStop,
-					sourcePointerTransitStops, routeStopsToCheck,
-					transferTransitStopsToCheck);
+			this.checkRouteStops();
 
 			RaptorRoute bestRouteOfThisRound = this.getBestRouteFoundSoFar(fromTransitStops, toTransitStops, sourcePointerTransitStops);
 			if (bestRouteOfThisRound != null) {
@@ -188,29 +190,24 @@ public class RaptorWalker {
 			if(nTransfers < this.maxTransfers){
 				nTransfers++;
 
-				this.checkTransferTransitStops(earliestArrivalTimeAtRouteStop, 
-						sourcePointerRouteStop,
-						earliestArrivalTimeAtTransitStop,
-						sourcePointerTransitStops, routeStopsToCheck,
-						transferTransitStopsToCheck);
+				// yyyy to me, this looks like in the end we are now going 0, 2, 4, 6, since we are incrementing both here and in
+				// the for loop.  ????  kai, jun'16
+
+				this.checkTransferTransitStops();
 			}
 		}
 
 		return bestRoute;
 	}
 
-	private void checkRouteStops(double[] earliestArrivalTimeAtRouteStop,
-			SourcePointer[] sourcePointerRouteStop,
-			double[] earliestArrivalTimeAtTransitStop,
-			SourcePointer[] sourcePointerTransitStops,
-			boolean[] routeStopsToCheck,
-			boolean[] transferTransitStopsToCheck) {
+	private void checkRouteStops() {
 
 		boolean atLeastOneRouteStopImproved = false;
 		int indexOfLastRouteProcessed = -1;
 
 		// process all start stops
 		for (int indexOfStartRouteStop = 0; indexOfStartRouteStop < routeStopsToCheck.length; indexOfStartRouteStop++) {
+			// I think that these are all route stops, and the "check" refers to the boolean
 
 			if (routeStopsToCheck[indexOfStartRouteStop] == true) {
 				RouteStopEntry startStop = this.raptorSearchData.routeStops[indexOfStartRouteStop];
@@ -270,13 +267,7 @@ public class RaptorWalker {
 		}
 	}
 
-	private void checkTransferTransitStops(
-			double[] earliestArrivalTimeAtRouteStop,
-			SourcePointer[] sourcePointerRouteStop,
-			double[] earliestArrivalTimeAtTransitStop,
-			SourcePointer[] sourcePointerTransitStops,
-			boolean[] routeStopsToCheck,
-			boolean[] transferTransitStopsToCheck) {
+	private void checkTransferTransitStops() {
 
 		// check all transfer stops
 		for (int indexOfTransitStopToCheck = 0; indexOfTransitStopToCheck < transferTransitStopsToCheck.length; indexOfTransitStopToCheck++) {
