@@ -133,10 +133,8 @@ public class ScenarioPreparer {
         System.out.println("saved virtual network byte format to : "+ new File(vnDir, VIRTUALNETWORKFILENAME));
         
         PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);
-        prs.exportDefault();
-        
-        System.exit(1);
-        
+        prs.exportCsv();
+                
         // 3) generate travelData
         TravelData travelData = new TravelData(virtualNetwork, network, scenario.getPopulation(), dtTravelData);
         TravelDataIO.toByte(new File(vnDir,TRAVELDATAFILENAME), travelData);

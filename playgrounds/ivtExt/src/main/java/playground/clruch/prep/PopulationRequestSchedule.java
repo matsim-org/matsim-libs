@@ -1,6 +1,7 @@
 package playground.clruch.prep;
 
 import java.io.File;
+import java.util.Comparator;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -13,8 +14,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 
+import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.alg.Sort;
 import ch.ethz.idsc.tensor.io.Export;
 import ch.ethz.idsc.tensor.io.Import;
 import playground.clruch.netdata.VirtualNetwork;
@@ -28,15 +31,22 @@ public class PopulationRequestSchedule {
     }
 
     public static File getRequestScheduleFileGlobal() {
-        return new File(VIRTUALNETWORK_DIRECTORYNAME, "mpcRequestScheduleGlobal.csv");
+        return new File(VIRTUALNETWORK_DIRECTORYNAME, "PopulationRequestSchedule.csv");
     }
 
+    private static Comparator<Tensor> FIRSTENTRYCOMPARATOR = new Comparator<Tensor>() {
+        @Override
+        public int compare(Tensor o1, Tensor o2) {
+            return Scalars.compare(o1.Get(0), o2.Get(0));
+        }
+    };
+
     final VirtualNetwork virtualNetwork;
-    final Tensor requestSchedule = Tensors.empty();
+    final Tensor requestScheduleSorted;
 
     public PopulationRequestSchedule(Network network, Population population, VirtualNetwork virtualNetwork) {
         this.virtualNetwork = virtualNetwork;
-
+        Tensor requestScheduleUnsorted = Tensors.empty();
         Map<Id<Link>, ? extends Link> linkMap = network.getLinks();
 
         int personCount = 0;
@@ -52,8 +62,8 @@ public class PopulationRequestSchedule {
                         Activity activity = (Activity) pE1;
                         Link link = linkMap.get(activity.getLinkId());
                         if (std != null) {
-                            std.to = link;
-                            append(std);
+                            std.post = link;
+                            requestScheduleUnsorted.append(requestRow(std));
                         }
                         std = new StdRequest(link);
                     }
@@ -71,21 +81,29 @@ public class PopulationRequestSchedule {
             }
             ++personCount;
         }
+        requestScheduleSorted = Sort.of(requestScheduleUnsorted, FIRSTENTRYCOMPARATOR);
         System.out.println("PopulationRequestSchedule ----");
         System.out.println("#Person: " + personCount);
-        System.out.println("#Trips : " + requestSchedule.length());
+        System.out.println("#Trips : " + requestScheduleUnsorted.length());
+        if (0 < requestScheduleSorted.length()) {
+            System.out.println(" \\- first = " + requestScheduleSorted.get(0));
+            System.out.println(" \\- last  = " + requestScheduleSorted.get(requestScheduleSorted.length() - 1));
+        }
     }
 
-    private void append(StdRequest std) {
+    private Tensor requestRow(StdRequest std) {
         long time = Math.round(std.departureTime);
-        int vnFrom = virtualNetwork.getVirtualNode(std.from).index + 1;
-        int vnTo = virtualNetwork.getVirtualNode(std.to).index + 1;
-        Tensor row = Tensors.vector(time, vnFrom, vnTo);
-        requestSchedule.append(row);
+        int vnAnte = virtualNetwork.getVirtualNode(std.ante).index + 1;
+        int vnPost = virtualNetwork.getVirtualNode(std.post).index + 1;
+        return Tensors.vector(time, vnAnte, vnPost);
+    }
+    
+    public Tensor get() {
+        return requestScheduleSorted.unmodifiable();
     }
 
-    public void exportDefault() throws Exception {
-        Export.of(getRequestScheduleFileGlobal(), requestSchedule);
+    public void exportCsv() throws Exception {
+        Export.of(getRequestScheduleFileGlobal(), requestScheduleSorted);
     }
 
     public static Tensor importDefault() throws Exception {
