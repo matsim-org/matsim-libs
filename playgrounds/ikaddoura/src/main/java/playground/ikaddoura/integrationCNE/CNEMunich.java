@@ -124,6 +124,8 @@ public class CNEMunich {
 				congestionTollingApproach = CongestionTollingApproach.QBPV9;
 			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.DecongestionPID.toString())) {
 				congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
+			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.DecongestionBangBang.toString())) {
+				congestionTollingApproach = CongestionTollingApproach.DecongestionBangBang;
 			} else {
 				throw new RuntimeException("Unknown congestion pricing approach. Aborting...");
 			}

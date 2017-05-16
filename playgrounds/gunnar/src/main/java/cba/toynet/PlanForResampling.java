@@ -26,6 +26,8 @@ class PlanForResampling implements Alternative {
 
 	private final EpsilonDistribution epsDistr;
 
+	private final double frozenEpsilon;
+
 	private Double epsilonRealization = null;
 
 	private Double matsimChoiceProba = null;
@@ -36,13 +38,21 @@ class PlanForResampling implements Alternative {
 
 	PlanForResampling(final Plan plan, final double activityModeOnlyUtility,
 			final double teleportationTravelTimeUtility, final double congestedTravelTimeUtility,
-			final double sampersChoiceProba, final EpsilonDistribution epsDistr) {
+			final double sampersChoiceProba, final EpsilonDistribution epsDistr, final double frozenEpsilon) {
 		this.plan = plan;
 		this.activityModeOnlyUtility = activityModeOnlyUtility;
 		this.teleportationTravelTimeUtility = teleportationTravelTimeUtility;
 		this.congestedTravelTimeUtility = congestedTravelTimeUtility;
 		this.sampersChoiceProba = sampersChoiceProba;
 		this.epsDistr = epsDistr;
+		this.frozenEpsilon = frozenEpsilon;
+	}
+
+	PlanForResampling(final Plan plan, final double activityModeOnlyUtility,
+			final double teleportationTravelTimeUtility, final double congestedTravelTimeUtility,
+			final double sampersChoiceProba, final EpsilonDistribution epsDistr) {
+		this(plan, activityModeOnlyUtility, teleportationTravelTimeUtility, congestedTravelTimeUtility,
+				sampersChoiceProba, epsDistr, epsDistr.nextEpsilon());
 	}
 
 	// -------------------- FOR TESTING --------------------
@@ -100,9 +110,24 @@ class PlanForResampling implements Alternative {
 		this.epsilonRealization = eps;
 	}
 
-	@Override
+//	@Override
 	public void setMATSimTimeScore(double score) {
 		this.congestedTravelTimeUtility = score;
+	}
+
+	// TODO NEW
+	public double getFrozenEpsilon() {
+		return this.frozenEpsilon;
+	}
+
+	@Override
+	public Plan getMATSimPlan() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void updateMATSimTimeScore(double score, double innovationWeight) {
+		throw new UnsupportedOperationException();
 	}
 
 	// -------------------- OVERRIDING OF Object --------------------
@@ -118,12 +143,6 @@ class PlanForResampling implements Alternative {
 		result.append("P_sampers(this)   = " + this.sampersChoiceProba + "\n");
 		result.append("P_MATSim(this)    = " + this.matsimChoiceProba);
 		return result.toString();
-	}
-
-	@Override
-	public Plan getMATSimPlan() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

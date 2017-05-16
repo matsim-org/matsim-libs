@@ -66,6 +66,9 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 		final double timeBinSize = (double) this.congestionInfo.getScenario().getConfig().travelTimeCalculator().getTraveltimeBinSize();
 		final double capacityPeriod = this.congestionInfo.getScenario().getNetwork().getCapacityPeriod();
 		final double flowCapacityFactor = this.congestionInfo.getScenario().getConfig().qsim().getFlowCapFactor();
+		final double toleratedAvgDelay = this.congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC();
+		final boolean msa = this.congestionInfo.getDecongestionConfigGroup().isMsa();
+		final double blendFactorFromConfig = this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR();
 		
 		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
 			
@@ -74,11 +77,13 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 				flowCapacityHeadwaySec = capacityPeriod / ( this.congestionInfo.getScenario().getNetwork().getLinks().get(linkId).getCapacity() * flowCapacityFactor);
 			}
 
-			for (Integer intervalNr : this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().keySet()) {
+			LinkInfo linkInfo = this.congestionInfo.getlinkInfos().get(linkId);
+			for (Integer intervalNr : linkInfo.getTime2avgDelay().keySet()) {
 				
-				// 0) compute e(t) = average delay
-				double averageDelay = this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().get(intervalNr);	
-				if (averageDelay <= this.congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
+				// 0) average delay
+				
+				double averageDelay = linkInfo.getTime2avgDelay().get(intervalNr);	
+				if (averageDelay <= toleratedAvgDelay) {
 					averageDelay = 0.0;
 				}
 								
@@ -98,9 +103,10 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 				// --> \propto * (1/flow - 1/cap, so etwas wie die "headway reserve" oder "unused time headway") --> DONE
 
 				if (K_i != 0.) {
+					
+					// 2a) average approach
+					
 					double avgDelayAllIterations = 0.;
-					double unusedHeadway = 0.;
-
 					if (integralApproach.equals(IntegralApproach.Average.toString())) {
 						if (averageDelay > congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
 							if (this.linkId2time2avgDelayAllIterations.get(linkId) == null) {
@@ -118,6 +124,9 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 						}	
 					}
 					
+					// 2b) unused headway approach
+					
+					double unusedHeadway = 0.;
 					if (integralApproach.equals(IntegralApproach.UnusedHeadway.toString())) {
 						double flowHeadwaySec = timeBinSize;
 						if (this.linkId2time2leavingAgents.get(linkId) != null && this.linkId2time2leavingAgents.get(linkId).get(intervalNr) != null) {
@@ -178,49 +187,37 @@ public class DecongestionTollingPID implements DecongestionTollSetting, LinkLeav
 				}
 				
 				// 4) prevent negative tolls
+				
 				if (toll < 0) {
 					toll = 0;
 				}
 				
 				// 5) smoothen the tolls
 				
-				double previousToll = Double.NEGATIVE_INFINITY;
-				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr) != null) {
-					previousToll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr);
-				}
+				Double previousToll = linkInfo.getTime2toll().get(intervalNr);
 
-				double blendFactor = Double.NEGATIVE_INFINITY;
-				if (this.congestionInfo.getDecongestionConfigGroup().isMsa()) {
+				double blendFactor;
+				if (msa) {
 					if (this.tollUpdateCounter > 0) {
 						blendFactor = 1.0 / (double) this.tollUpdateCounter;
 					} else {
 						blendFactor = 1.0;
 					}
 				} else {
-					blendFactor = this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR();
+					blendFactor = blendFactorFromConfig;
 				}
 				
-				double smoothedToll = Double.NEGATIVE_INFINITY;
-				if (previousToll >= 0.) {
+				double smoothedToll;
+				if (previousToll != null && previousToll >= 0.) {
 					smoothedToll = toll * blendFactor + previousToll * (1 - blendFactor);
 				} else {
 					smoothedToll = toll;
 				}
 								
 				// 6) store the updated toll
-				if (smoothedToll > 0.) this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().put(intervalNr, smoothedToll);
 				
-				
-//				if (averageDelay == 0. && avgDelayAllIterations > 0.) {
-//					log.warn("link: " + linkId + " / time interval: " + intervalNr);
-//					log.warn("average delay: " + averageDelay);
-//					log.warn("total delay: " + totalDelayAllIterations);
-//					log.warn("avgDelayAllIterations: " + avgDelayAllIterations);
-//					log.warn("previous delay: " + previousDelay);			
-//					log.warn("delta delay: " + deltaDelay);		
-//					log.warn("toll: " + smoothedToll);
-//					log.warn("------------------------");
-//				}
+				linkInfo.getTime2toll().put(intervalNr, smoothedToll);
+
 			}	
 		}
 		

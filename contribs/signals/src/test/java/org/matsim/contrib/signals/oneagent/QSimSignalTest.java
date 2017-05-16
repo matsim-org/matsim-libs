@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -82,7 +83,7 @@ public class QSimSignalTest implements
 		Scenario scenario = new Fixture().createAndLoadTestScenario(true);
 		
 		this.link2EnterTime = 38.0;
-		runQSimWithSignals(scenario, false);
+		runQSimWithSignals(scenario, true);
 	}
 
 
@@ -105,14 +106,14 @@ public class QSimSignalTest implements
 		groupData.setOnset(100);
 
 		this.link2EnterTime = 100.0;
-		runQSimWithSignals(scenario, false);
+		runQSimWithSignals(scenario, true);
 	}
 	
 	/**
 	 * Tests the setup with a traffic light that shows red less than the specified intergreen time of five seconds.
 	 */
-	@Test
-	public void testIntergreensAbortOneAgentDriving() {
+	@Test(expected = RuntimeException.class)
+	public void testIntergreensAbortOneAgentDriving() { // throws RuntimeException {
 		//configure and load standard scenario
 		Scenario scenario = new Fixture().createAndLoadTestScenario(true);
 		// modify scenario
@@ -125,8 +126,11 @@ public class QSimSignalTest implements
 		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(Fixture.signalGroupId100);
 		groupData.setOnset(0);
 		groupData.setDropping(59);	
+
+		runQSimWithSignals(scenario, false);
 		
-		runQSimWithSignals(scenario, true);
+		// if this code is reached, no exception has been thrown
+		Assert.fail("The simulation should abort because of intergreens violation.");
 	}
 	
 	/**
@@ -148,12 +152,12 @@ public class QSimSignalTest implements
 		groupData.setDropping(25);	
 		
 		this.link2EnterTime = 38.0;
-		runQSimWithSignals(scenario, false);
+		runQSimWithSignals(scenario, true);
 	}
 
 	
 	
-	private void runQSimWithSignals(final Scenario scenario, boolean abort){
+	private void runQSimWithSignals(final Scenario scenario, boolean handleEvents) throws RuntimeException{
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
 			public void install() {
@@ -169,7 +173,7 @@ public class QSimSignalTest implements
 	
 		EventsManager events = injector.getInstance(EventsManager.class);
 		events.initProcessing();
-		if (!abort){
+		if (handleEvents){
 			events.addHandler(this);
 		}
 		
@@ -180,18 +184,7 @@ public class QSimSignalTest implements
 			((ObservableMobsim) mobsim).addQueueSimulationListeners(provider.get());
 		}
 		
-		Exception ex = null;
-		try{
-			mobsim.run();
-		} catch (Exception e){
-			log.info(e.getMessage());
-			ex = e;
-		}
-		if (abort) {
-			Assert.assertNotNull(ex);
-		} else {
-			Assert.assertNull(ex);
-		}
+		mobsim.run();
 	}
 
 

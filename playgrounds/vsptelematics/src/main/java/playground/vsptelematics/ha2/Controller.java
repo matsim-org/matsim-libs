@@ -19,18 +19,15 @@
  * *********************************************************************** */
 package playground.vsptelematics.ha2;
 
-import com.google.inject.Singleton;
-
-import playground.vsptelematics.common.TelematicsConfigGroup;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioUtils;
+
+import com.google.inject.Singleton;
+
+import playground.vsptelematics.common.TelematicsConfigGroup;
 
 
 /**
@@ -39,21 +36,12 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class Controller {
 	public static void run(Config config){
-		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
-		TelematicsConfigGroup telematicsConfigGroup = ConfigUtils.addOrGetModule(config,
-				TelematicsConfigGroup.GROUPNAME, TelematicsConfigGroup.class);
-		Controler c = new Controler(scenario);
-		c.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
-		c.getConfig().controler().setCreateGraphs(false);
-        addListener(c);
-		c.run();
-	}
-
-	private static void addListener(Controler c){
-		c.addOverridingModule(new AbstractModule() {
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setCreateGraphs(false);
+		ConfigUtils.addOrGetModule(config,TelematicsConfigGroup.GROUPNAME, TelematicsConfigGroup.class);
+		
+		Controler c = new Controler(config);
+        c.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				bind(GuidanceRouteTTObserver.class).in(Singleton.class); // only create one instance of these
@@ -64,6 +52,7 @@ public class Controller {
 				addEventHandlerBinding().to(GuidanceRouteTTObserver.class);
 			}
 		});
+		c.run();
 	}
 
 	public static void main(String[] args) {

@@ -11,7 +11,6 @@ import java.util.Set;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 
-import cba.resampling.Alternative;
 import cba.resampling.ChoiceSetFactory;
 import cba.resampling.MyGumbelDistribution;
 import floetteroed.utilities.math.MultinomialLogit;
@@ -21,7 +20,7 @@ import floetteroed.utilities.math.MultinomialLogit;
  * @author Gunnar Flötteröd
  *
  */
-class VanillaChoiceSetFactory implements ChoiceSetFactory {
+class VanillaChoiceSetFactory implements ChoiceSetFactory<PlanForResampling> {
 
 	// -------------------- MEMBERS --------------------
 
@@ -33,20 +32,23 @@ class VanillaChoiceSetFactory implements ChoiceSetFactory {
 
 	private final UtilityFunction sampersUtilityFunction;
 
+	private final int numberOfDraws;
+
 	// -------------------- CONSTRUCTION --------------------
 
 	VanillaChoiceSetFactory(final double sampersLogitScale, final double sampersDefaultDestModeUtil,
-			final double sampersDefaultTimeUtil, final Random rnd, final Scenario scenario) {
+			final double sampersDefaultTimeUtil, final Random rnd, final Scenario scenario, final int numberOfDraws) {
 		this.sampersLogitScale = sampersLogitScale;
 		this.rnd = rnd;
 		this.scenario = scenario;
 		this.sampersUtilityFunction = new UtilityFunction(sampersDefaultDestModeUtil, sampersDefaultTimeUtil);
+		this.numberOfDraws = numberOfDraws;
 	}
 
 	// --------------- IMPLEMENTATION OF ChoiceSetProvider ---------------
 
 	@Override
-	public Set<Alternative> newChoiceSet(final Person person, final int numberOfDraws) {
+	public Set<PlanForResampling> newChoiceSet(final Person person) {
 
 		final MultinomialLogit sampersMNL = new MultinomialLogit(TourSequence.Type.values().length, 1);
 		sampersMNL.setUtilityScale(this.sampersLogitScale);
@@ -68,8 +70,8 @@ class VanillaChoiceSetFactory implements ChoiceSetFactory {
 
 		// sample choice set
 
-		final Map<Integer, Alternative> plansForResampling = new LinkedHashMap<>();
-		for (int i = 0; i < numberOfDraws; i++) {
+		final Map<Integer, PlanForResampling> plansForResampling = new LinkedHashMap<>();
+		for (int i = 0; i < this.numberOfDraws; i++) {
 			final int planIndex = sampersMNL.draw(this.rnd);
 			if (!plansForResampling.containsKey(planIndex)) {
 				final TourSequence tourSequence = new TourSequence(TourSequence.Type.values()[planIndex]);

@@ -42,8 +42,8 @@ public class FilterSelectedPlansAndRemoveNetworkInfo {
 	
 	private static final Logger log = Logger.getLogger(FilterSelectedPlansAndRemoveNetworkInfo.class);
 	
-	private final static String inputPlans = "/Users/ihab/Documents/workspace/runs-svn/berlin_scenario_2016/be_117j/be_117j.output_plans.xml.gz";
-	private final static String outputPlans = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct/input/be_117j.output_plans_selected_noNetworkInfo.xml.gz";
+	private final static String inputPlans = "/Users/ihab/Documents/workspace/runs-svn/berlin_scenario_2016/be_122/be_122.output_plans.xml.gz";
+	private final static String outputPlans = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-10pct/input/be_122.output_plans_selected_noNetworkInfo.xml.gz";
 	
 	public static void main(String[] args) {
 		

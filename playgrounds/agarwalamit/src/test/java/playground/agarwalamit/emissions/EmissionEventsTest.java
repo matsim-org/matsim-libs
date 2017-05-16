@@ -88,7 +88,7 @@ public class EmissionEventsTest {
 
     @Test
     public void eventsOfflineTest(){
-        String inputEventsFile = helper.getPackageInputDirectory()+"/CombinedEventsReaderTest/0.events.xml.gz";
+        String inputEventsFile = helper.getClassInputDirectory()+"/0.events.xml.gz";
         new File(helper.getOutputDirectory()+"/ignoreingEmissionFromEventsFile="+this.isWritingEmissionsEvents).mkdir();
         String outputEventsFile = helper.getOutputDirectory()+"/ignoreingEmissionFromEventsFile="+this.isWritingEmissionsEvents +"/outputEvents.xml.gz";
 

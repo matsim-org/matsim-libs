@@ -22,6 +22,7 @@
 package tutorial.converter.completeEventFilesRegardingVehicleInformation;
 
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsConverterXML;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 

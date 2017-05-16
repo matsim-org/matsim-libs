@@ -102,23 +102,7 @@ public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHand
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
-		//TODO : following would be gone as soon as I will be able to fix the reading of two events file.
-// 	Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
-		Id<Person> driverId ;
-		String vehicleIdString = event.getVehicleId().toString();
-
-		if( vehicleIdString.endsWith("motorbike") ){
-			int lastIndex = vehicleIdString.indexOf("_motorbike");
-			driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
-		} else if ( vehicleIdString.endsWith("bike") ){
-			int lastIndex = vehicleIdString.indexOf("_bike");
-			driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
-		} else if ( vehicleIdString.endsWith("truck") ){
-			int lastIndex = vehicleIdString.indexOf("_truck");
-			driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
-		} else {
-			driverId = Id.createPersonId(vehicleIdString);
-		}
+ 		Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 
 		if (this.af!=null) { // area filtering
 			Link link = network.getLinks().get(event.getLinkId());
@@ -141,23 +125,7 @@ public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHand
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
-//		Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
-//TODO : following would be gone as soon as I will be able to fix the reading of two events file.
-		Id<Person> driverId ;
-		String vehicleIdString = event.getVehicleId().toString();
-
-		if( vehicleIdString.endsWith("motorbike") ){
-			int lastIndex = vehicleIdString.indexOf("_motorbike");
-			driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
-		} else if ( vehicleIdString.endsWith("bike") ){
-			int lastIndex = vehicleIdString.indexOf("_bike");
-			driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
-		} else if ( vehicleIdString.endsWith("truck") ){
-			int lastIndex = vehicleIdString.indexOf("_truck");
-			driverId = Id.createPersonId(vehicleIdString.substring(0, lastIndex));
-		} else {
-			driverId = Id.createPersonId(vehicleIdString);
-		}
+		Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
 
 		if (this.af!=null) { // area filtering
 			Link link = network.getLinks().get(event.getLinkId());

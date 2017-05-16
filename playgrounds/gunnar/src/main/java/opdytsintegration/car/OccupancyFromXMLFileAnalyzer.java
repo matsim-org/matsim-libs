@@ -56,7 +56,8 @@ public class OccupancyFromXMLFileAnalyzer {
 		final int binCnt = 24;
 		final OccupancyFromXMLFileAnalyzer analyzer = new OccupancyFromXMLFileAnalyzer(
 				new TimeDiscretization(startTime_s, binSize_s, binCnt));
-		analyzer.run("/Nobackup/Profilen/git/matsim/playgrounds/gunnar/output/"
-				+ "cba/toynet/output/ITERS/it.100/100.events.xml.gz");
+		analyzer.run("./100.events.xml.gz");
+//		analyzer.run("/Nobackup/Profilen/git/matsim/playgrounds/gunnar/output/"
+//				+ "cba/toynet/output/ITERS/it.100/100.events.xml.gz");
 	}
 }

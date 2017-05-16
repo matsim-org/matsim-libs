@@ -10,7 +10,7 @@ import java.util.Set;
  * @author Gunnar Flötteröd
  *
  */
-public class Sampers2MATSimResampler implements Runnable {
+public class Sampers2MATSimResampler<A extends Alternative> implements Runnable {
 
 	// -------------------- CONSTANTS --------------------
 
@@ -18,7 +18,7 @@ public class Sampers2MATSimResampler implements Runnable {
 
 	private final Random rnd;
 
-	private final List<Alternative> alternatives;
+	private final List<A> alternatives;
 
 	private final List<Double> acceptanceProbas;
 
@@ -26,16 +26,15 @@ public class Sampers2MATSimResampler implements Runnable {
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public Sampers2MATSimResampler(final Random rnd, final Set<? extends Alternative> choiceSet,
-			final int drawsWithReplacement) {
-		
+	public Sampers2MATSimResampler(final Random rnd, final Set<A> choiceSet, final int drawsWithReplacement) {
+
 		this.rnd = new Random(rnd.nextLong());
 		this.alternatives = new ArrayList<>(choiceSet.size());
 		this.acceptanceProbas = new ArrayList<>(choiceSet.size());
 
 		final List<Double> acceptanceWeights = new ArrayList<>(choiceSet.size());
 		double maxAcceptanceWeight = Double.NEGATIVE_INFINITY;
-		for (Alternative alt : choiceSet) {
+		for (A alt : choiceSet) {
 			final double acceptanceWeight = 1.0
 					/ (1.0 - Math.pow(1.0 - alt.getSampersChoiceProbability(), drawsWithReplacement));
 			maxAcceptanceWeight = Math.max(maxAcceptanceWeight, acceptanceWeight);
@@ -73,7 +72,7 @@ public class Sampers2MATSimResampler implements Runnable {
 		return result;
 	}
 
-	public Alternative next() {
+	public A next() {
 		int resample = 0;
 		while (true) {
 			final int candidateIndex = this.drawMATSimRUChoiceIndex();
@@ -84,15 +83,15 @@ public class Sampers2MATSimResampler implements Runnable {
 			}
 		}
 	}
-	
+
 	// -------------------- IMPLEMENTATION OF Runnable --------------------
-	
-	private Alternative result = null;
-	
-	public Alternative getResult() {
+
+	private A result = null;
+
+	public A getResult() {
 		return this.result;
 	}
-	
+
 	@Override
 	public void run() {
 		System.out.println("Simulating a choice");

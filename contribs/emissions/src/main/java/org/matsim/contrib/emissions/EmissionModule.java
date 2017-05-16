@@ -36,6 +36,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 
 
@@ -105,6 +106,15 @@ public class EmissionModule {
 		if( vehicles == null || vehicles.getVehicleTypes().isEmpty()) {
 			throw new RuntimeException("For emissions calculations, at least vehicle type information is necessary." +
 					"However, no information is provided. Aborting...");
+		} else {
+			for(VehicleType vehicleType : vehicles.getVehicleTypes().values()) {
+				if (vehicleType.getMaximumVelocity() < 4.0/3.6 ) {
+					// Historically, many emission vehicles file have maximum speed set to 1 m/s which was not used by mobsim before.
+					// However, this should be removed if not set intentionally. Amit May'17
+					logger.warn("The maximum speed of vehicle type "+ vehicleType+ " is less than 4 km/h. " +
+							"\n Please make sure, this is really what you want because this will affect the mobility simulation.");
+				}
+			}
 		}
 
 		if(scenario.getConfig().qsim().getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.defaultVehicle)) {

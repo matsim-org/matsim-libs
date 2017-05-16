@@ -83,8 +83,8 @@ public class AirPollutionExposureAnalysisControlerListener implements  ShutdownL
 
         responsibilityGridTools.resetAndcaluculateRelativeDurationFactors(intervalHandler.getDuration());
 
-        String emissionEventsFile = controlerIO.getIterationFilename(lastIt, "emission.events.xml.gz");
-        if (! new File(emissionEventsFile).exists()) {
+//        String emissionEventsFile = controlerIO.getIterationFilename(lastIt, ".events.xml.gz");
+        if (! new File(eventsFile).exists()) {
             LOG.error("The emission events file for last iteration does not exists.");
             return;
         }
@@ -95,7 +95,7 @@ public class AirPollutionExposureAnalysisControlerListener implements  ShutdownL
             EventsManager events = EventsUtils.createEventsManager();
             events.addHandler(this.emissionCostHandler);
             EmissionEventsReader reader = new EmissionEventsReader(events);
-            reader.readFile(emissionEventsFile);
+            reader.readFile(eventsFile);
         }
 
         Map<String, Double> userGrp2cost = this.emissionCostHandler.getUserGroup2TotalEmissionCosts();

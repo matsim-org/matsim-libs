@@ -113,10 +113,9 @@ public final class RunBraessSimulation {
 	private static final double SIMULATION_START_TIME = 0.0; // seconds from midnight
 	
 	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.NONE;
-	// initial score for all initial plans
+	// initial score for all initial plans (if to low, to many agents switch to outer routes simultaneously)
 	private static final Double INIT_PLAN_SCORE = null;
-	// TODO try with null - nicht alle wechseln auf mitte, weil alle zusammen außen ausprobieren, 100+105- geht nicht, 110 - noch zu klein... lieber zu hoch als zu niedrig?
-
+	
 	// defines which kind of signals should be used. use 'SIGNAL_LOGIC = SignalControlLogic.NONE' if signals should not be used
 	private static final SignalBasePlan SIGNAL_BASE_PLAN = SignalBasePlan.NONE;
 	// if SignalBasePlan SIGNAL4_X_Seconds_Z.. is used, SECONDS_Z_GREEN gives the green time for Z
@@ -166,16 +165,15 @@ public final class RunBraessSimulation {
 
 		// set number of iterations
 		config.controler().setLastIteration(100);
-		// TODO try 100 vs 500
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes(LANE_TYPE.equals(LaneType.NONE) ? false : true);
 		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		signalConfigGroup.setUseSignalSystems(SIGNAL_LOGIC.equals(SignalControlLogic.NONE) ? false : true);
+		config.qsim().setUsingFastCapacityUpdate(false);
 
 		// set brain exp beta
 		config.planCalcScore().setBrainExpBeta(2);
-		// TODO try 20 vs 2
 
 		// choose between link to link and node to node routing
 		// (only has effect if lanes are used)
@@ -187,7 +185,6 @@ public final class RunBraessSimulation {
 
 		// set travelTimeBinSize (only has effect if reRoute is used)
 		config.travelTimeCalculator().setTraveltimeBinSize(10);
-		// TODO try with 10 vs 900
 //		config.travelTimeCalculator().setMaxTime((int) (3600 * (SIMULATION_START_TIME + SIMULATION_PERIOD + 2)));
 		config.travelTimeCalculator().setMaxTime(3600 * 24);
 
@@ -244,7 +241,7 @@ public final class RunBraessSimulation {
 		config.strategy().setMaxAgentPlanMemorySize(5);
 
 		config.qsim().setStuckTime(3600 * 10.);
-//		config.qsim().setRemoveStuckVehicles(true);
+		config.qsim().setRemoveStuckVehicles(false);
 
 		config.qsim().setStartTime(3600 * SIMULATION_START_TIME);
 		// set end time to shorten simulation run time: 2 hours after the last agent departs
