@@ -42,6 +42,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -107,6 +108,8 @@ public class PassingTest {
 		VehicleLinkTravelTimeEventHandler handler = new VehicleLinkTravelTimeEventHandler();
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(handler);
+
+		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario,manager).run();
 
 		QSim qSim = createQSim(net,manager);
 		qSim.run();
