@@ -93,11 +93,11 @@ public class PopulationRequestSchedule {
 
     private Tensor requestRow(StdRequest std) {
         long time = Math.round(std.departureTime);
-        int vnAnte = virtualNetwork.getVirtualNode(std.ante).index + 1;
+        int vnAnte = virtualNetwork.getVirtualNode(std.ante).index + 1; // +1 for indexing in matlab
         int vnPost = virtualNetwork.getVirtualNode(std.post).index + 1;
         return Tensors.vector(time, vnAnte, vnPost);
     }
-    
+
     public Tensor get() {
         return requestScheduleSorted.unmodifiable();
     }

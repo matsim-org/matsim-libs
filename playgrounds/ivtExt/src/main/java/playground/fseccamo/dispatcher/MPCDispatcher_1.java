@@ -1,6 +1,5 @@
 package playground.fseccamo.dispatcher;
 
-import java.io.File;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +33,6 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.ExtractPrimitives;
-import ch.ethz.idsc.tensor.io.Import;
 import ch.ethz.idsc.tensor.red.KroneckerDelta;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Increment;
@@ -124,16 +122,23 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                     container.add(doubleArray);
                 }
                 {
-                    
-                    Tensor matrix = PopulationRequestSchedule.importDefault();
-                    double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
-                    DoubleArray doubleArray = new DoubleArray("requestSchedule", new int[] { matrix.length(), 3 }, array);
-                    container.add(doubleArray);
-                }
-                {
                     double[] array = new double[] { numberOfVehicles };
                     GlobalAssert.that(0 < numberOfVehicles);
                     DoubleArray doubleArray = new DoubleArray("N_cars", new int[] { 1 }, array);
+                    container.add(doubleArray);
+                }
+                final Tensor populationRequestSchedule = PopulationRequestSchedule.importDefault();
+                // TODO in the future use to tune:
+                final int expectedRequestCount = populationRequestSchedule.length();
+                {
+                    double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(populationRequestSchedule));
+                    DoubleArray doubleArray = new DoubleArray("requestSchedule", new int[] { populationRequestSchedule.length(), 3 }, array);
+                    container.add(doubleArray);
+                }
+                {
+                    double[] array = new double[] { expectedRequestCount };
+                    GlobalAssert.that(0 < expectedRequestCount);
+                    DoubleArray doubleArray = new DoubleArray("expectedRequestCount", new int[] { 1 }, array);
                     container.add(doubleArray);
                 }
                 javaContainerSocket.writeContainer(container);
