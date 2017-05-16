@@ -63,7 +63,9 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
                 }
             }
             if (task instanceof AVDropoffTask) {
-                // don't do anything
+                // consider the vehicle on the self loop of current virtual node 
+                VirtualNode vnode = virtualNetwork.getVirtualNode(current);
+                vector.set(Increment.ONE, m + vnode.index); // self loop
             }
         }
         return vector;

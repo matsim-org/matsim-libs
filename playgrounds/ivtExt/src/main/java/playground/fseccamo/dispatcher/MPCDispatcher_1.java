@@ -28,13 +28,17 @@ import ch.ethz.idsc.jmex.Container;
 import ch.ethz.idsc.jmex.DoubleArray;
 import ch.ethz.idsc.jmex.java.JavaContainerSocket;
 import ch.ethz.idsc.jmex.matlab.MfileContainerServer;
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.ExtractPrimitives;
 import ch.ethz.idsc.tensor.red.KroneckerDelta;
 import ch.ethz.idsc.tensor.red.Total;
+import ch.ethz.idsc.tensor.sca.Chop;
 import ch.ethz.idsc.tensor.sca.Increment;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
@@ -236,6 +240,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         container.add(doubleArray);
                         System.out.println("waitCustomersPerVLink=" + Total.of(Tensors.vectorDouble(array)));
                     }
+                    Scalar vehicleTotal = ZeroScalar.get();
                     { // done
                         /**
                          * STAY vehicles + vehicles without task inside VirtualNode
@@ -248,6 +253,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
                         DoubleArray doubleArray = new DoubleArray("availableVehiclesPerVNode", new int[] { array.length }, array);
                         container.add(doubleArray);
+                        vehicleTotal = vehicleTotal.add(Total.of(Tensors.vectorDouble(array)));
                         System.out.println("availableVehiclesPerVNode=" + Total.of(Tensors.vectorDouble(array)));
                     }
                     { // done
@@ -259,6 +265,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         double[] array = ExtractPrimitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("movingVehiclesWithCustomersPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
+                        vehicleTotal = vehicleTotal.add(Total.of(Tensors.vectorDouble(array)));
                         System.out.println("movingVehiclesWithCustomersPerVLink=" + Total.of(Tensors.vectorDouble(array)));
                     }
                     { // done
@@ -269,7 +276,11 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         double[] array = ExtractPrimitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("movingRebalancingVehiclesPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
+                        vehicleTotal = vehicleTotal.add(Total.of(Tensors.vectorDouble(array)));
                         System.out.println("movingRebalancingVehiclesPerVLink=" + Total.of(Tensors.vectorDouble(array)));
+                    }
+                    if (!Chop.of(vehicleTotal.subtract(RealScalar.of(numberOfVehicles))).equals(ZeroScalar.get())) {
+                        new RuntimeException("#vehiclesTotal=" + vehicleTotal).printStackTrace();
                     }
                     javaContainerSocket.writeContainer(container);
                 }
