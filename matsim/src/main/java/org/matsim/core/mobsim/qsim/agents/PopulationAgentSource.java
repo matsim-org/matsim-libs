@@ -81,9 +81,6 @@ public final class PopulationAgentSource implements AgentSource {
 			break;
 		
 		}
-		
-		
-		
 	}
 
 	@Override
@@ -181,6 +178,7 @@ public final class PopulationAgentSource implements AgentSource {
 		throw new RuntimeException("Don't know where to put a vehicle for this agent.");
 	}
 
+	// not sure, how this would fit after moving vehicles in prepare for sim.
 	public void setModeVehicleTypes(Map<String, VehicleType> modeVehicleTypes) {
 		this.modeVehicleTypes = modeVehicleTypes;
 	}

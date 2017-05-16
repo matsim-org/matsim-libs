@@ -41,8 +41,6 @@ class PrepareForSimImpl implements PrepareForSim {
 	private final Provider<TripRouter> tripRouterProvider;
 	private final QSimConfigGroup qSimConfigGroup;
 
-	private final Map<String, VehicleType> modeVehicleTypes;
-
 	@Inject
 	PrepareForSimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network, Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider, QSimConfigGroup qSimConfigGroup) {
 		this.globalConfigGroup = globalConfigGroup;
@@ -52,7 +50,6 @@ class PrepareForSimImpl implements PrepareForSim {
 		this.activityFacilities = activityFacilities;
 		this.tripRouterProvider = tripRouterProvider;
 		this.qSimConfigGroup = qSimConfigGroup;
-		this.modeVehicleTypes = new HashMap<>();
 	}
 
 
@@ -76,7 +73,7 @@ class PrepareForSimImpl implements PrepareForSim {
 		}
 
 		// vehicles should be created (if not available) before a route is created. Amit May'17
-		storeMode2VehicleType();
+		Map<String, VehicleType> modeVehicleTypes = getMode2VehicleType();
 
 		for(Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
@@ -98,7 +95,7 @@ class PrepareForSimImpl implements PrepareForSim {
 							}
 
 							// so here we have a vehicle id, now try to find or create a physical vehicle:
-							Vehicle vehicle = createVehicle(leg, vehicleId);
+							Vehicle vehicle = createVehicle(leg, vehicleId, modeVehicleTypes.get(leg.getMode()));
 							seenModes.put(leg.getMode(),vehicleId);
 						} else {
 							if (vehicleId==null && route!=null) {
@@ -111,7 +108,6 @@ class PrepareForSimImpl implements PrepareForSim {
 				}
 			}
 		}
-
 
 		// make sure all routes are calculated.
 		ParallelPersonAlgorithmRunner.run(population, globalConfigGroup.getNumberOfThreads(),
@@ -139,12 +135,17 @@ class PrepareForSimImpl implements PrepareForSim {
 
 	}
 
-	private void storeMode2VehicleType(){
+	private  Map<String, VehicleType> getMode2VehicleType(){
+		Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
 		switch ( this.qSimConfigGroup.getVehiclesSource() ) {
 			case defaultVehicle:
 				for (String mode : this.qSimConfigGroup.getMainModes()) {
 					// initialize each mode with default vehicle type:
-					modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
+					VehicleType defaultVehicleType = VehicleUtils.getDefaultVehicleType();
+					modeVehicleTypes.put(mode, defaultVehicleType);
+						if( scenario.getVehicles().getVehicleTypes().get(defaultVehicleType.getId())==null) {
+						scenario.getVehicles().addVehicleType(defaultVehicleType); // adding default vehicle type to vehicles container
+					}
 				}
 				break;
 			case modeVehicleTypesFromVehiclesData:
@@ -160,9 +161,10 @@ class PrepareForSimImpl implements PrepareForSim {
 			default:
 				throw new RuntimeException("not implemented yet.");
 		}
+		return modeVehicleTypes;
 	}
 
-	private Vehicle createVehicle(Leg leg, Id<Vehicle> vehicleId) {
+	private Vehicle createVehicle(Leg leg, Id<Vehicle> vehicleId, VehicleType vehicleType) {
 		// try to get vehicle from the vehicles container:
 		Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
 
@@ -171,11 +173,13 @@ class PrepareForSimImpl implements PrepareForSim {
 			switch ( qSimConfigGroup.getVehiclesSource() ) {
 				case defaultVehicle:
 					// create vehicle but don't add it to the container. Amit Apr'17
-					vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
+					// I think, we should add vehicle to vehicles container. Amit May'17
+					vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, vehicleType);
+					scenario.getVehicles().addVehicle(vehicle);
 					break;
 				case modeVehicleTypesFromVehiclesData:
 					// if config says mode vehicles, then create and add it:
-					vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
+					vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, vehicleType);
 					scenario.getVehicles().addVehicle(vehicle);
 					break;
 				case fromVehiclesData:
