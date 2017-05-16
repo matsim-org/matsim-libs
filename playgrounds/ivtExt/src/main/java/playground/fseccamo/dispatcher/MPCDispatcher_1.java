@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -54,6 +53,7 @@ import playground.clruch.netdata.VirtualNode;
 import playground.clruch.prep.PopulationRequestSchedule;
 import playground.clruch.router.InstantPathFactory;
 import playground.clruch.utils.GlobalAssert;
+import playground.clruch.utils.ScheduleUtils;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
@@ -156,20 +156,27 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
     // requests that haven't received a pickup order yet
     final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
     // requests that have received a pickup order
-    final Collection<AVRequest> considerItDone = new HashSet<>();
+    final Map<AVRequest, AVVehicle> considerItDone = new HashMap<>();
     // vehicles that have been dispatched to customers, and haven't reached stay task yet
-    final Collection<AVVehicle> pickupAndCustomerVehicle = new HashSet<>();
+    final Map<AVVehicle, AVRequest> pickupAndCustomerVehicle = new HashMap<>();
+
+    final Map<AVRequest, Double> effectivePickupTime = new HashMap<>();
 
     Map<VirtualNode, List<VehicleLinkPair>> getDivertableNotRebalancingNotPickupVehicles() {
         Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
         Map<VirtualNode, List<VehicleLinkPair>> map = new HashMap<>();
         for (Entry<VirtualNode, List<VehicleLinkPair>> entry : availableVehicles.entrySet()) {
             List<VehicleLinkPair> list = entry.getValue().stream() //
-                    .filter(vlp -> !pickupAndCustomerVehicle.contains(vlp.avVehicle)) //
+                    .filter(vlp -> !pickupAndCustomerVehicle.containsKey(vlp.avVehicle)) //
                     .collect(Collectors.toList());
             map.put(entry.getKey(), list);
         }
         return map;
+    }
+
+    private final Map<Link, List<AVRequest>> getAVRequestsAtLinks2() {
+        return getAVRequests().stream().filter(r -> considerItDone.containsKey(r)) // <- intentionally not parallel to guarantee ordering of requests
+                .collect(Collectors.groupingBy(AVRequest::getFromLink));
     }
 
     @Override
@@ -177,10 +184,48 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
         // PART 0: match vehicles at a customer link
         new InOrderOfArrivalMatcher(this::setAcceptRequest) //
-                .match(getStayVehicles(), getAVRequestsAtLinks());
+                .match(getStayVehicles(), getAVRequestsAtLinks2());
 
-        getStayVehicles().values().stream() //
-                .flatMap(Queue::stream).forEach(pickupAndCustomerVehicle::remove);
+        {
+            Collection<AVRequest> collection = getAVRequests();
+            getStayVehicles().values().stream() //
+                    .flatMap(Queue::stream).forEach(v -> {
+                        if (pickupAndCustomerVehicle.containsKey(v)) {
+                            AVRequest avr = pickupAndCustomerVehicle.get(v);
+                            if (!collection.contains(avr)) {
+                                pickupAndCustomerVehicle.remove(v);
+                            } else {
+                                System.out.println("customer waiting but pickup vehicle in stay task: " + now);
+                                System.out.println(avr);
+                                System.out.println(avr.getFromLink());
+                                System.out.println(ScheduleUtils.scheduleOf(v));
+                                System.out.println(avr.getFromLink().getId());
+                            }
+                        }
+                    });
+        }
+
+        for (AVRequest avRequest : getAVRequests()) {
+            if (considerItDone.containsKey(avRequest)) {
+                AVVehicle v = considerItDone.get(avRequest);
+                long waitingTime = (long) (now - effectivePickupTime.get(avRequest));
+                if (waitingTime > 20 * 60) {
+                    System.out.println("serving: " + avRequest + " " + avRequest.getFromLink().getId());
+                    System.out.println(ScheduleUtils.scheduleOf(v));
+                    System.out.println(waitingTime);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+                // System.out.println(now + " vs. " + avRequest.getSubmissionTime());
+                // System.out.println("waitingTime=" + waitingTime);
+                // throw new RuntimeException("waiting for more than 20 minutes despite pickup order");
+                // }
+            }
+        }
 
         final long round_now = Math.round(now);
         if (round_now % samplingPeriod == 0) {
@@ -207,7 +252,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                          * number of waiting customers that begin their journey on link_k = (node_i, node_j)
                          */
                         for (AVRequest avRequest : getAVRequests()) // all current requests
-                            if (!considerItDone.contains(avRequest) && !mpcRequestsMap.containsKey(avRequest)) { // if request has been seen/computed before
+                            if (!considerItDone.containsKey(avRequest) && !mpcRequestsMap.containsKey(avRequest)) { // if request has been seen/computed before
                                 // check if origin and dest are from same virtualNode
                                 final VirtualNode vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
                                 final VirtualNode vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
@@ -379,11 +424,12 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                             MpcRequest mpcRequest = requests.get(count);
                                             Link pickupLocation = mpcRequest.avRequest.getFromLink(); // where the customer is waiting right now
                                             System.out.println("set diversion for pickup");
-                                            setVehicleDiversion(vehicleLinkPair, pickupLocation); // send car to customer
+                                            setVehicleRebalance(vehicleLinkPair, pickupLocation); // send car to customer
                                             ++totalPickupEffective;
-                                            considerItDone.add(mpcRequest.avRequest);
-                                            GlobalAssert.that(!pickupAndCustomerVehicle.contains(vehicleLinkPair.avVehicle));
-                                            pickupAndCustomerVehicle.add(vehicleLinkPair.avVehicle);
+                                            considerItDone.put(mpcRequest.avRequest, vehicleLinkPair.avVehicle);
+                                            GlobalAssert.that(!pickupAndCustomerVehicle.containsKey(vehicleLinkPair.avVehicle));
+                                            pickupAndCustomerVehicle.put(vehicleLinkPair.avVehicle, mpcRequest.avRequest);
+                                            effectivePickupTime.put(mpcRequest.avRequest, now);
                                             mpcRequestsMap.remove(mpcRequest.avRequest);
                                         }
                                     }
