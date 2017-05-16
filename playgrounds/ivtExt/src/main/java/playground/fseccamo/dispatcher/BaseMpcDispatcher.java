@@ -1,6 +1,5 @@
 package playground.fseccamo.dispatcher;
 
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,7 +25,7 @@ import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 abstract class BaseMpcDispatcher extends PartitionedDispatcher {
-    static final String VIRTUALNETWORK_DIRECTORYNAME = "virtualNetwork";
+    protected final int samplingPeriod;
 
     BaseMpcDispatcher( //
             AVDispatcherConfig config, //
@@ -35,6 +34,8 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
             EventsManager eventsManager, //
             VirtualNetwork virtualNetwork) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
+
+        samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod")); // period between calls to MPC
     }
 
     protected Tensor countVehiclesPerVLink(Map<AVVehicle, Link> map) {
@@ -98,15 +99,6 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
         // we can reach this point if vehicle is in last virtual node of path
         // System.out.println("failed to find virtual link of transition.");
         return -1;
-    }
-
-    @Deprecated
-    static File getRequestScheduleFileNext() { // not needed for MPC
-        return new File(VIRTUALNETWORK_DIRECTORYNAME, "mpcRequestScheduleNext.tensor");
-    }
-
-    static File getRequestScheduleFileGlobal() {
-        return new File(VIRTUALNETWORK_DIRECTORYNAME, "mpcRequestScheduleGlobal.tensor");
     }
 
 }

@@ -19,6 +19,7 @@ import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.prep.NetworkCutClean;
+import playground.clruch.prep.PopulationRequestSchedule;
 import playground.clruch.prep.PopulationTools;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveldata.TravelData;
@@ -38,12 +39,12 @@ public class ScenarioPreparer {
 
         // BEGIN: CUSTOMIZE ----------------------------------------------- 
         // set manually depending on the scenario:
-        final int maxPopulationSize = 3000;
+        final int maxPopulationSize = 5000;
         final int numVirtualNodes = 40;
         final int dtTravelData = 500;
         final boolean completeGraph = false;
 
-        LocationSpec ls = LocationSpec.BASEL_CITY;
+        LocationSpec ls = LocationSpec.SIOUXFALLS_CITY;
         
         final boolean populationeliminateFreight = true;
         final boolean populationchangeModeToAV = true;
@@ -131,8 +132,9 @@ public class ScenarioPreparer {
         VirtualNetworkIO.toXML(new File(vnDir, VIRTUALNETWORKFILENAME+".xml").toString(), virtualNetwork);
         System.out.println("saved virtual network byte format to : "+ new File(vnDir, VIRTUALNETWORKFILENAME));
         
-        
-        
+        PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);
+        prs.exportCsv();
+                
         // 3) generate travelData
         TravelData travelData = new TravelData(virtualNetwork, network, scenario.getPopulation(), dtTravelData);
         TravelDataIO.toByte(new File(vnDir,TRAVELDATAFILENAME), travelData);
