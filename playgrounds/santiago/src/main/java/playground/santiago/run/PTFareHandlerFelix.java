@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -81,8 +82,10 @@ public class PTFareHandlerFelix implements ActivityStartEventHandler, PersonDepa
 	private Population population;
 	private Set<String> ptModes;
 	private Set<Id<Person>> personsOnPtTrip = new HashSet<Id<Person>>();
+	private double colectivoConstantUtils;
+	private double ptConstantMonetaryUnits;
 	
-	public PTFareHandlerFelix(final MatsimServices controler, boolean doModeChoice, Population population){
+	public PTFareHandlerFelix(final MatsimServices controler, boolean doModeChoice, Population population, double colectivoASC){
 		this.controler = controler;
 		this.doModeChoice = doModeChoice;
 		if(this.doModeChoice){
@@ -92,12 +95,17 @@ public class PTFareHandlerFelix implements ActivityStartEventHandler, PersonDepa
 		} else {
 			this.ptModes = definePtModes();
 		}
+		this.colectivoConstantUtils = colectivoASC;
+		
+		this.ptConstantMonetaryUnits = controler.getConfig().planCalcScore().getModes().get(TransportMode.pt).getConstant() / controler.getConfig().planCalcScore().getMarginalUtilityOfMoney();
+		log.warn("This approach throws money events to account for a colectivo ASC. This needs to be considered when computing fare revenues.");
+		log.info("colectivoASC: " + colectivoASC);
 	}
 
 	@Override
 	public void reset(int iteration) {
 		personsOnPtTrip.clear();
-		Logger.getLogger(getClass()).info("Iteration :" + iteration + " Collectivo Rides: "+ colectivoRides );
+		Logger.getLogger(getClass()).info("Iteration :" + iteration + " Colectivo Rides: "+ colectivoRides );
 		colectivoRides = 0;
 	}
 
@@ -137,7 +145,12 @@ public class PTFareHandlerFelix implements ActivityStartEventHandler, PersonDepa
 						colectivoRides++;
 						Double fare = (Double) this.transitSchedule.getTransitLinesAttributes().getAttribute(line, "fare");
 						if (fare!=null){
+							
+						
 						this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, -fare));
+						//ASC of the pt is replaced by colectivo ASC converted to money.
+						this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, -ptConstantMonetaryUnits));
+						this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, colectivoConstantUtils/controler.getConfig().planCalcScore().getMarginalUtilityOfMoney()));
 						}
 						else{
 							this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, -800));

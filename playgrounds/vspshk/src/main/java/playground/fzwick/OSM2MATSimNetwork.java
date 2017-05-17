@@ -56,11 +56,11 @@ public class OSM2MATSimNetwork {
 		 * to every other link. This may not be the case in the initial network converted from OpenStreetMap.
 		 */
 		new NetworkCleaner().run(network);
-//		reduceSpeedKN(network);
+		reduceSpeedSantiago(network);
 		/*
 		 * Write the Network to a MATSim network file.
 		 */
-		new NetworkWriter(network).write("C:/Users/Felix/Documents/VSP/Berlin-Netz/merged-filtered.xml");
+		new NetworkWriter(network).write("C:/Users/Felix/Documents/VSP/Berlin-Netz/mergedFilteredReducedSpeedSantiago.xml");
 		
 	}
 	
@@ -82,7 +82,7 @@ public class OSM2MATSimNetwork {
 	}
 	
 	
-	private static void reduceSpeedAndAdjustCapacity(Network network){
+	private static void reduceSpeedSantiago(Network network){
 		for(Link ll : network.getLinks().values()){
 			double fs = ll.getFreespeed();
 			if(fs <= 8.333333334){ //30kmh
