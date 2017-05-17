@@ -17,6 +17,13 @@ public class MpcRequest {
         nodeTo = virtualLink.getTo();
     }
 
+    /**
+     * constructor when request is on self loop
+     * 
+     * @param avRequest
+     * @param m
+     * @param virtualNode
+     */
     public MpcRequest(AVRequest avRequest, int m, VirtualNode virtualNode) {
         this.avRequest = avRequest;
         vectorIndex = m + virtualNode.index;
