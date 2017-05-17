@@ -34,7 +34,7 @@ import com.google.inject.Inject;
  * @author dgrether
  * 
  */
-public class NetworkTurnInfoBuilder {
+public final class NetworkTurnInfoBuilder implements NetworkTurnInfoBuilderI {
 
     protected final Scenario scenario;
 
@@ -45,7 +45,11 @@ public class NetworkTurnInfoBuilder {
     }
     
     
-    public Map<Id<Link>, List<TurnInfo>> createAllowedTurnInfos(){
+    /* (non-Javadoc)
+ * @see org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI#createAllowedTurnInfos()
+ */
+@Override
+public Map<Id<Link>, List<TurnInfo>> createAllowedTurnInfos(){
         Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = new HashMap<>();
     
         createAndAddTurnInfo(TransportMode.car, allowedInLinkTurnInfoMap);
@@ -125,7 +129,7 @@ public class NetworkTurnInfoBuilder {
 	 * or mode is not contained in the restriction, the corresponding TurnInfo or mode is removed or modified in the first
 	 * map.
 	 */
-	protected void mergeTurnInfoMaps(Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap,
+	public final void mergeTurnInfoMaps(Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap,
 			Map<Id<Link>, List<TurnInfo>> restrictingTurnInfoMap) {
 		for (Map.Entry<Id<Link>, List<TurnInfo>> e : allowedInLinkTurnInfoMap.entrySet()) {
             Id<Link> inLinkId = e.getKey();

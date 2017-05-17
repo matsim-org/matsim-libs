@@ -45,7 +45,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  *
  * @author mrieser
  */
-public class NetworkUtils {
+public final class NetworkUtils {
 
     private static Logger log = Logger.getLogger(NetworkUtils.class);
 

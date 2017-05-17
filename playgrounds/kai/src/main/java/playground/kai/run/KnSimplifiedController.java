@@ -36,7 +36,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.corelisteners.PlansScoring;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.core.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.PlanStrategy;
@@ -164,8 +164,8 @@ public class KnSimplifiedController extends AbstractController {
 	@Override
 	protected void prepareForSim() {
 		ControlerUtils.checkConfigConsistencyAndWriteToLog(this.config, "Config dump before doIterations:");
-		ParallelPersonAlgorithmRunner.run(this.population, this.config.global().getNumberOfThreads(),
-				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+		ParallelPersonAlgorithmUtils.run(this.population, this.config.global().getNumberOfThreads(),
+				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
 				return new PersonPrepareForSim(createRoutingAlgorithm(), KnSimplifiedController.this.scenario);

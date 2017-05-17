@@ -33,7 +33,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.core.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -104,7 +104,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 			//			this.pTransitRouterFactory.updateTransitSchedule();
 
 			if(this.agentsStuckHandler != null){
-				ParallelPersonAlgorithmRunner.run(controler.getScenario().getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+				ParallelPersonAlgorithmUtils.run(controler.getScenario().getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
 						return stuckFactory.getReRouteStuck(new PlanRouter(

@@ -39,7 +39,7 @@ import org.matsim.core.network.NetworkUtils;
  * 
  * @author dgrether
  */
-public class NetworkFilterManager {
+public final class NetworkFilterManager {
 
 	private static final Logger log = Logger
 			.getLogger(NetworkFilterManager.class);

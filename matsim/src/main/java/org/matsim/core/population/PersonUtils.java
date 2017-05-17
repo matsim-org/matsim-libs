@@ -7,7 +7,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 
-public class PersonUtils {
+public final class PersonUtils {
+	private PersonUtils(){} // do not instantiate
+	
 	private final static String SEX_ATTRIBUTE="sex";
 	private final static String HAS_LICENSE= "hasLicense";
 	private static final String CAR_AVAIL = "carAvail";

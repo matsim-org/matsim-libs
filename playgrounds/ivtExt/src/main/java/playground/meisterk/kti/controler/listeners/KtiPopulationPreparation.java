@@ -25,7 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.core.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.population.algorithms.PersonDeleteNonKtiCompatibleRoutes;
@@ -49,10 +49,10 @@ public class KtiPopulationPreparation implements StartupListener {
 		 * make sure every pt leg has a kti pt route when the kti pt router is used
 		 */
 		if (this.ktiConfigGroup.isUsePlansCalcRouteKti()) {
-			ParallelPersonAlgorithmRunner.run(
+			ParallelPersonAlgorithmUtils.run(
 					pop, 
 					config.global().getNumberOfThreads(),
-					new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+					new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
 						public AbstractPersonAlgorithm getPersonAlgorithm() {
 							return new PersonDeleteNonKtiCompatibleRoutes();
 						}
@@ -63,10 +63,10 @@ public class KtiPopulationPreparation implements StartupListener {
 		 * for an explanation, see the element comment of the kti config parameter
 		 */
 		if (this.ktiConfigGroup.isInvalidateScores()) {
-			ParallelPersonAlgorithmRunner.run(
+			ParallelPersonAlgorithmUtils.run(
 					pop, 
 					config.global().getNumberOfThreads(),
-					new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+					new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
 						public AbstractPersonAlgorithm getPersonAlgorithm() {
 							return new PersonInvalidateScores();
 						}

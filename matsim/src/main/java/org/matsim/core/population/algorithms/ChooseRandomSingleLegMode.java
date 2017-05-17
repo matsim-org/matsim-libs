@@ -38,7 +38,7 @@ import org.matsim.core.population.routes.NetworkRoute;
  *
  * @author mrieser
  */
-public class ChooseRandomSingleLegMode implements PlanAlgorithm {
+public final class ChooseRandomSingleLegMode implements PlanAlgorithm {
 
 	private final String[] possibleModes;
 	private boolean ignoreCarAvailability = true;

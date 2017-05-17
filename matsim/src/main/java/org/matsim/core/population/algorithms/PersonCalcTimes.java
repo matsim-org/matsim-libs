@@ -43,7 +43,7 @@ import org.matsim.core.utils.misc.Time;
  * </ul>
  * If a leg has no travel-time set, 0 will be used instead.
  */
-public class PersonCalcTimes extends AbstractPersonAlgorithm {
+public final class PersonCalcTimes extends AbstractPersonAlgorithm {
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors

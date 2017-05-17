@@ -35,6 +35,7 @@ import org.matsim.core.population.PersonUtils;
  * @author balmermi
  */
 abstract class AbstractPopulationWriterHandler implements PopulationWriterHandler {
+	// all public non-final methods are empty. 
 
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(AbstractPopulationWriterHandler.class);
