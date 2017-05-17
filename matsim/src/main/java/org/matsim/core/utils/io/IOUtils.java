@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -396,6 +397,27 @@ public class IOUtils {
 				return new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(filename)));
 			} else {
 				return new BufferedOutputStream(new FileOutputStream (filename));
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+	
+	/**
+	 * Copy of getOutputStream and then changed to correspond to the PrintStream signature.  Device to hopefully reduce FindBugs warnings.  kai, may'17
+	 * 
+	 * @param filename
+	 * @return
+	 */
+	public static PrintStream getPrintStream( final String filename ) {
+		if (filename == null) {
+			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
+		}
+		try {
+			if (filename.toLowerCase(Locale.ROOT).endsWith(GZ)) {
+				return new PrintStream(new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(filename))));
+			} else {
+				return new PrintStream(new BufferedOutputStream(new FileOutputStream (filename))) ;
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
