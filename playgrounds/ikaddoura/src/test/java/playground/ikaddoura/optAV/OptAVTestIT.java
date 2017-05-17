@@ -22,16 +22,26 @@
  */
 package playground.ikaddoura.optAV;
 
-import org.junit.*;
-import org.matsim.api.core.v01.*;
+import org.junit.Assert;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.noise.*;
+import org.matsim.contrib.noise.NoiseCalculationOnline;
+import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
-import org.matsim.contrib.taxi.run.*;
-import org.matsim.core.config.*;
-import org.matsim.core.controler.*;
+import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.contrib.taxi.run.TaxiOutputModule;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -39,11 +49,10 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.PersonTripAnalysisModule;
 import playground.ikaddoura.analysis.linkDemand.LinkDemandEventHandler;
-import playground.ikaddoura.decongestion.*;
-import playground.ikaddoura.decongestion.data.DecongestionInfo;
-import playground.ikaddoura.decongestion.handler.*;
-import playground.ikaddoura.decongestion.tollSetting.*;
-import playground.ikaddoura.moneyTravelDisutility.*;
+import playground.ikaddoura.decongestion.DecongestionConfigGroup;
+import playground.ikaddoura.decongestion.DecongestionModule;
+import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
+import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
 
 /**
@@ -280,26 +289,7 @@ public class OptAVTestIT {
 		
 		// congestion pricing
 		
-		controler2.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				
-				this.bind(DecongestionInfo.class).asEagerSingleton();
-				
-				this.bind(AgentFilter.class).to(AVAgentFilter.class);
-				this.bind(DecongestionTollSetting.class).to(DecongestionTollingPID.class);			
-				this.bind(IntervalBasedTolling.class).to(IntervalBasedTollingAV.class);
-
-				this.bind(IntervalBasedTollingAV.class).asEagerSingleton();
-				this.bind(PersonVehicleTracker.class).asEagerSingleton();
-								
-				this.addEventHandlerBinding().to(IntervalBasedTollingAV.class);
-				this.addEventHandlerBinding().to(PersonVehicleTracker.class);
-				
-				this.addControlerListenerBinding().to(DecongestionControlerListener.class);				
-
-			}
-		});
+		controler2.addOverridingModule(new DecongestionModule(scenario2));
 		
 		// taxi
 
