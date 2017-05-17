@@ -30,6 +30,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.agarwalamit.pt.connectionScan.ConnectionScanRouter;
 
 /**
+ * The idea is to keep the core test in place and still able to test other two transit router types.
+ *
  * Created by amit on 16.05.17.
  */
 
