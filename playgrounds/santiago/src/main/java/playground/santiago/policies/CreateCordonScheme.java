@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 import org.opengis.feature.simple.SimpleFeature;
@@ -39,6 +40,8 @@ import org.opengis.feature.simple.SimpleFeature;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+
+import playground.santiago.network.AddTollToTollways;
 
 /**
  * @author benjamin
@@ -48,20 +51,21 @@ public class CreateCordonScheme {
 	private static final Logger log = Logger.getLogger(CreateCordonScheme.class);
 	
 	String netFile = "../../../shared-svn/projects/santiago/scenario/inputForMATSim/network/network_merged_cl.xml.gz";
+	String gantriesShapeFile = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/toll/gantriesWithFares/gantriesAndFares2012.shp";
 	
-//	String cordonShapeFile = "../../../shared-svn/projects/santiago/scenario/inputForMATSim/policies/cordon_triangle/triangleEPSG32719.shp";
-//	String schemeName = "triangleCordon";
-	
-	String cordonShapeFile = "../../../shared-svn/projects/santiago/scenario/inputForMATSim/policies/cordon_outer/cordonEPSG32719.shp";
-	String schemeName = "outerCordon";
-	
+	String cordonShapeFile = "../../../shared-svn/projects/santiago/scenario/inputForMATSim/policies/cordon_triangle/modifiedCordon/modifiedTriangleEPSG32719.shp";
+	String schemeName = "triangleCordonWithTolledTollways";
+	RoadPricingSchemeImpl initialScheme;
+
 	String outFile = "../../../shared-svn/projects/santiago/scenario/inputForMATSim/policies/" + schemeName + ".xml";
 
 	Network net;
 	Collection<SimpleFeature> featuresInCordon;
 	Set<Id<Link>> cordonInLinks;
 	Set<Id<Link>> cordonOutLinks;
-	
+	//Be aware of this.
+	boolean includeTolledTollways = true;
+	//
 	double morningStartTime = 7.5 * 3600.;
 	double morningEndTime = 10.0 * 3600.;
 	double afternoonStartTime = 18.0 * 3600.;
@@ -71,6 +75,17 @@ public class CreateCordonScheme {
 	double amountOut = 2650.;
 	
 	private void run() {
+		
+		//should always be called if includeTolledTollways = true.
+		if(includeTolledTollways){		
+		AddTollToTollways att = new AddTollToTollways(gantriesShapeFile,netFile,schemeName);
+		att.createNetworkFeatures();
+		att.collectInformation();
+		this.initialScheme = att.createGantriesFile();
+		} else {
+		this.initialScheme = new RoadPricingSchemeImpl();
+		}
+		
 		ShapeFileReader shapeReader = new ShapeFileReader();
 		shapeReader.readFileAndInitialize(cordonShapeFile);
 		featuresInCordon = shapeReader.getFeatureSet();
@@ -79,7 +94,8 @@ public class CreateCordonScheme {
 		new MatsimNetworkReader(net).readFile(netFile);
 		
 		fillCordonLinkSet();
-		createLinkPricingFile();
+		removeAndAddSomeLinksFromCordonLinkSet();
+		createLinkPricingFile(initialScheme);
 	}
 
 	private void fillCordonLinkSet() {
@@ -120,25 +136,39 @@ public class CreateCordonScheme {
 		return isInShape;
 	}
 	
-	private void createLinkPricingFile() {
-		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
-		scheme.setName(schemeName);
-		scheme.setType(scheme.TOLL_TYPE_LINK);
-		scheme.setDescription("No description available");
-		
+	//Be aware of this special method! It will not work with another net file
+	private void removeAndAddSomeLinksFromCordonLinkSet(){
+		if(schemeName.substring(0,1).equals("o")){
+			//removing...
+			cordonOutLinks.remove(Id.createLinkId("18442"));
+			cordonOutLinks.remove(Id.createLinkId("5244")); //Following fig. 5-3 (SteerDaviesGleave, 2009)...
+			cordonInLinks.remove(Id.createLinkId("18441"));
+			cordonInLinks.remove(Id.createLinkId("2863")); //Following fig. 5-3 (SteerDaviesGleave, 2009)...
+			//adding...
+			cordonOutLinks.add(Id.createLinkId("14132"));
+			//done.
+		} else if(schemeName.substring(0,1).equals("t")) {
+		//nothing to do (yet).
+		} else {
+		//something went wrong with the names.
+		}
+	}
+	
+	private void createLinkPricingFile(RoadPricingSchemeImpl initialScheme) {
+
 		for(Id<Link> linkId : cordonOutLinks){
-			scheme.addLink(linkId);
-			scheme.addLinkCost(linkId, morningStartTime, morningEndTime, amountOut);
-			scheme.addLinkCost(linkId, afternoonStartTime, afternoonEndTime, amountOut);
+			initialScheme.addLink(linkId);
+			initialScheme.addLinkCost(linkId, morningStartTime, morningEndTime, amountOut);
+			initialScheme.addLinkCost(linkId, afternoonStartTime, afternoonEndTime, amountOut);
 		}
 		
 		for(Id<Link> linkId : cordonInLinks){
-			scheme.addLink(linkId);
-			scheme.addLinkCost(linkId, morningStartTime, morningEndTime, amountIn);
-			scheme.addLinkCost(linkId, afternoonStartTime, afternoonEndTime, amountIn);
+			initialScheme.addLink(linkId);
+			initialScheme.addLinkCost(linkId, morningStartTime, morningEndTime, amountIn);
+			initialScheme.addLinkCost(linkId, afternoonStartTime, afternoonEndTime, amountIn);
 		}
 				
-		RoadPricingWriterXMLv1 rpw = new RoadPricingWriterXMLv1(scheme);
+		RoadPricingWriterXMLv1 rpw = new RoadPricingWriterXMLv1(initialScheme);
 		rpw.writeFile(outFile);
 	}
 
