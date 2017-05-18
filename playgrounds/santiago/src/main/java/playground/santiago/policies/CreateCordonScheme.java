@@ -53,8 +53,8 @@ public class CreateCordonScheme {
 	String netFile = "../../../shared-svn/projects/santiago/scenario/inputForMATSim/network/network_merged_cl.xml.gz";
 	String gantriesShapeFile = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/toll/gantriesWithFares/gantriesAndFares2012.shp";
 	
-	String cordonShapeFile = "../../../shared-svn/projects/santiago/scenario/inputForMATSim/policies/cordon_triangle/modifiedCordon/modifiedTriangleEPSG32719.shp";
-	String schemeName = "triangleCordonWithTolledTollways";
+	String cordonShapeFile = "../../../shared-svn/projects/santiago/scenario/inputForMATSim/policies/cordon_outer/modifiedCordon/modifiedCordonEPSG32719.shp";
+	String schemeName = "outerCordonWithTolledTollways";
 	RoadPricingSchemeImpl initialScheme;
 
 	String outFile = "../../../shared-svn/projects/santiago/scenario/inputForMATSim/policies/" + schemeName + ".xml";
@@ -71,12 +71,12 @@ public class CreateCordonScheme {
 	double afternoonStartTime = 18.0 * 3600.;
 	double afternoonEndTime = 20.0 * 3600.;
 	
-	double amountIn = 6000.;
-	double amountOut = 2650.;
+	double amountIn;
+	double amountOut;
 	
 	private void run() {
 		
-		//should always be called if includeTolledTollways = true.
+		//should always be called...
 		if(includeTolledTollways){		
 		AddTollToTollways att = new AddTollToTollways(gantriesShapeFile,netFile,schemeName);
 		att.createNetworkFeatures();
@@ -85,6 +85,17 @@ public class CreateCordonScheme {
 		} else {
 		this.initialScheme = new RoadPricingSchemeImpl();
 		}
+		
+		//fares are different for each scheme (see page 5-13 for outerCordon, 5-14 for triangleCordon)
+		if(schemeName.substring(0,1).equals("o")){
+			this.amountIn=6000;
+			this.amountOut=3600;
+		} else if(schemeName.substring(0,1).equals("t")) {
+			this.amountIn=6000;
+			this.amountOut=2650;
+		}
+		
+		
 		
 		ShapeFileReader shapeReader = new ShapeFileReader();
 		shapeReader.readFileAndInitialize(cordonShapeFile);
@@ -141,16 +152,13 @@ public class CreateCordonScheme {
 		if(schemeName.substring(0,1).equals("o")){
 			//removing...
 			cordonOutLinks.remove(Id.createLinkId("18442"));
-			cordonOutLinks.remove(Id.createLinkId("5244")); //Following fig. 5-3 (SteerDaviesGleave, 2009)...
 			cordonInLinks.remove(Id.createLinkId("18441"));
-			cordonInLinks.remove(Id.createLinkId("2863")); //Following fig. 5-3 (SteerDaviesGleave, 2009)...
 			//adding...
 			cordonOutLinks.add(Id.createLinkId("14132"));
 			//done.
 		} else if(schemeName.substring(0,1).equals("t")) {
-		//nothing to do (yet).
-		} else {
-		//something went wrong with the names.
+		//Everything is ok.
+
 		}
 	}
 	
