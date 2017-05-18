@@ -5,5 +5,8 @@ public enum VirtualNodeShader {
     VehicleCount, //
     RequestCount, // 
     MeanRequestDistance, //
+    MeanRequestWaiting, //
+    MedianRequestWaiting, //
+    MaxRequestWaiting, //
     ;
 }

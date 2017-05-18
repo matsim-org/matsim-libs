@@ -24,6 +24,8 @@ import playground.joel.data.TotalData;
  * Created by Joel on 05.04.2017.
  */
 public class AnalyzeAll {
+    public static final File RELATIVE_DIRECTORY = new File("output", "data");
+
     public static void main(String[] args) throws Exception {
         analyze(args);
     }
@@ -41,8 +43,7 @@ public class AnalyzeAll {
         table = Transpose.of(table);
 
         try {
-            File dir = new File("output/data");
-            DiagramCreator.createDiagram(dir, name, title, table.get(0), table.extract(from, to), maxRange);
+            DiagramCreator.createDiagram(RELATIVE_DIRECTORY, name, title, table.get(0), table.extract(from, to), maxRange);
         } catch (Exception e) {
             System.out.println("Error creating the diagrams");
         }
@@ -81,7 +82,7 @@ public class AnalyzeAll {
 
         TotalData totalData = new TotalData();
         totalData.generate(String.valueOf(timeRatio), String.valueOf(distanceRatio), String.valueOf(mean), String.valueOf(quantile50), String.valueOf(quantile95),
-                new File("output/data/totalData.xml"));
+                new File(RELATIVE_DIRECTORY, "totalData.xml"));
     }
 
     public static void analyze(String[] args) throws Exception {
