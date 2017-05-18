@@ -65,6 +65,7 @@
 		<param name="earlyDeparture" value="-0" />
 		<param name="performing" value="+6" />
 		<param name="traveling" value="-6" />
+		<param name="traveling_taxi" value="-6" />
 		<param name="waiting" value="-0" />
 		
 		<param name="activityType_0"            value="h" /> <!-- home -->
