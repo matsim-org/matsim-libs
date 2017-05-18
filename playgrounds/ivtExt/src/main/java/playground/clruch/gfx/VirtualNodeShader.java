@@ -7,5 +7,6 @@ public enum VirtualNodeShader {
     MeanRequestDistance, //
     MeanRequestWaiting, //
     MedianRequestWaiting, //
+    MaxRequestWaiting, //
     ;
 }

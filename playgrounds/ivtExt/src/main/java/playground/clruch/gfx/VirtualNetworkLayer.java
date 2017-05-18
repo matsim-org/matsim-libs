@@ -104,7 +104,29 @@ public class VirtualNetworkLayer extends ViewerLayer {
             case MeanRequestWaiting: {
                 Tensor count = new RequestWaitingVirtualNodeFunction( //
                         matsimMapComponent.db, virtualNetwork, //
+                        RequestWaitingVirtualNodeFunction::meanOrZero).evaluate(ref);
+                Tensor prob = normalize1Norm(count);
+                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
+                    graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
+                    graphics.fill(entry.getValue());
+                }
+                break;
+            }
+            case MedianRequestWaiting: {
+                Tensor count = new RequestWaitingVirtualNodeFunction( //
+                        matsimMapComponent.db, virtualNetwork, //
                         RequestWaitingVirtualNodeFunction::medianOrZero).evaluate(ref);
+                Tensor prob = normalize1Norm(count);
+                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
+                    graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
+                    graphics.fill(entry.getValue());
+                }
+                break;
+            }
+            case MaxRequestWaiting: {
+                Tensor count = new RequestWaitingVirtualNodeFunction( //
+                        matsimMapComponent.db, virtualNetwork, //
+                        RequestWaitingVirtualNodeFunction::maxOrZero).evaluate(ref);
                 Tensor prob = normalize1Norm(count);
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));

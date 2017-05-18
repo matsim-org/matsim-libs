@@ -9,6 +9,7 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.ZeroScalar;
+import ch.ethz.idsc.tensor.red.Max;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Median;
 import playground.clruch.net.MatsimStaticDatabase;
@@ -22,7 +23,7 @@ import playground.clruch.netdata.VirtualNode;
  */
 public class RequestWaitingVirtualNodeFunction extends AbstractVirtualNodeFunction {
 
-    final Function<Tensor, Scalar> function;
+    private final Function<Tensor, Scalar> function;
 
     public RequestWaitingVirtualNodeFunction( //
             MatsimStaticDatabase db, VirtualNetwork virtualNetwork, Function<Tensor, Scalar> function) {
@@ -40,9 +41,13 @@ public class RequestWaitingVirtualNodeFunction extends AbstractVirtualNodeFuncti
             VirtualNode vn = virtualNetwork.getVirtualNode(linkAnte);
             collect.set(s -> s.append(DoubleScalar.of(duration)), vn.index);
         }
-        return Tensors.vector(i -> meanOrZero(collect.get(i)), virtualNetwork.getvNodesCount());
+        return Tensors.vector(i -> function.apply(collect.get(i)), virtualNetwork.getvNodesCount());
     }
 
+    /************************************************************/
+
+    // THESE FUNCTIONS SHOULD BE EXTRACTED IF THEY TURN OUT TO BE USEFUL
+    // -----------------------------------------------------------------
     public static Scalar meanOrZero(Tensor vector) {
         if (vector.length() == 0)
             return ZeroScalar.get();
@@ -53,5 +58,11 @@ public class RequestWaitingVirtualNodeFunction extends AbstractVirtualNodeFuncti
         if (vector.length() == 0)
             return ZeroScalar.get();
         return Median.of(vector).Get();
+    }
+
+    public static Scalar maxOrZero(Tensor vector) {
+        return vector.flatten(0) //
+                .map(Scalar.class::cast) //
+                .reduce(Max::of).orElse(ZeroScalar.get());
     }
 }

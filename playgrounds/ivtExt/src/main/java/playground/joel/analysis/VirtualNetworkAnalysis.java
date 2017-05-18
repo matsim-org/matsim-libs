@@ -5,10 +5,12 @@ import java.io.File;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.io.Export;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Quantile;
 import playground.clruch.gfx.RequestWaitingVirtualNodeFunction;
+import playground.clruch.gfx.VirtualNodeFunction;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
@@ -48,16 +50,30 @@ class VirtualNetworkAnalysis {
     }
 
     public void analyze() throws Exception {
-        Tensor table = Tensors.empty();
-        MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
+        final MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
+        // ---
+        final Tensor tableMean = Tensors.empty();
+        final VirtualNodeFunction vnf_mean = new RequestWaitingVirtualNodeFunction(db, virtualNetwork, //
+                RequestWaitingVirtualNodeFunction::meanOrZero);
+        // ---
+        final Tensor tableMedian = Tensors.empty();
+        final VirtualNodeFunction vnf_median = new RequestWaitingVirtualNodeFunction(db, virtualNetwork, //
+                RequestWaitingVirtualNodeFunction::medianOrZero);
+        // ---
+        final Tensor tableMax = Tensors.empty();
+        final VirtualNodeFunction vnf_max = new RequestWaitingVirtualNodeFunction(db, virtualNetwork, //
+                RequestWaitingVirtualNodeFunction::maxOrZero);
+        // ---
         for (int index = 0; index < size; ++index) {
             SimulationObject ref = storageSupplier.getSimulationObject(index);
-            Tensor eval = new RequestWaitingVirtualNodeFunction(db, virtualNetwork, //
-                    RequestWaitingVirtualNodeFunction::meanOrZero).evaluate(ref);
-            table.append(eval);
+            tableMean.append(Join.of(Tensors.vector(ref.now), vnf_mean.evaluate(ref)));
+            tableMedian.append(Join.of(Tensors.vector(ref.now), vnf_median.evaluate(ref)));
+            tableMax.append(Join.of(Tensors.vector(ref.now), vnf_max.evaluate(ref)));
             if (ref.now % 10000 == 0)
                 System.out.println(ref.now);
         }
-        Export.of(new File(AnalyzeAll.RELATIVE_DIRECTORY, "customerWaitingPerVNode.csv"), table);
+        Export.of(new File(AnalyzeAll.RELATIVE_DIRECTORY, "RequestWaitingVirtualNode_Mean.csv"), tableMean);
+        Export.of(new File(AnalyzeAll.RELATIVE_DIRECTORY, "RequestWaitingVirtualNode_Median.csv"), tableMedian);
+        Export.of(new File(AnalyzeAll.RELATIVE_DIRECTORY, "RequestWaitingVirtualNode_Max.csv"), tableMax);
     }
 }
