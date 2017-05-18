@@ -34,12 +34,12 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
     private final Scenario scenario;
     private final Random rnd;
     private final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser;
-    private final double randomVariance;
+    private final double scalingParameterForDecisionVariableVariability;
     private final String subPopName;
     private final OpdytsScenario opdytsScenario;
 
 //    public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser,
-//                                final double randomVariance, final OpdytsScenario opdytsScenario, final String subPopName) {
+//                                final double scalingParameterForDecisionVariableVariability, final OpdytsScenario opdytsScenario, final String subPopName) {
 //        this.scenario = scenario;
 //        this.rnd = new Random();
 //        //        this.rnd = new Random(4711);
@@ -47,13 +47,13 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
 //        // That's not good; the parametrized runs are then all conditional on the 4711 random seed.
 //        // (careful with using matsim-random since it is always the same sequence in one run)
 //        this.randomizedUtilityParametersChoser = randomizedUtilityParametersChoser;
-//        this.randomVariance = randomVariance;
+//        this.scalingParameterForDecisionVariableVariability = scalingParameterForDecisionVariableVariability;
 //        this.subPopName = subPopName;
 //        this.opdytsScenario = opdytsScenario;
 //    }
 
     public ModeChoiceRandomizer(final Scenario scenario, final RandomizedUtilityParametersChoser randomizedUtilityParametersChoser,
-                                final double randomVariance, final OpdytsScenario opdytsScenario, final String subPopName, final int randomSeedForDecisionVariableRandomizer) {
+                                final double scalingParameterForDecisionVariableVariability, final OpdytsScenario opdytsScenario, final String subPopName, final int randomSeedForDecisionVariableRandomizer) {
         this.scenario = scenario;
         this.rnd = new Random(randomSeedForDecisionVariableRandomizer);
         log.warn("The random seed to randomizing decision variable is :"+randomSeedForDecisionVariableRandomizer);
@@ -62,7 +62,7 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
         // That's not good; the parametrized runs are then all conditional on the 4711 random seed.
         // (careful with using matsim-random since it is always the same sequence in one run)
         this.randomizedUtilityParametersChoser = randomizedUtilityParametersChoser;
-        this.randomVariance = randomVariance;
+        this.scalingParameterForDecisionVariableVariability = scalingParameterForDecisionVariableVariability;
         this.subPopName = subPopName;
         this.opdytsScenario = opdytsScenario;
     }
@@ -90,7 +90,7 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
                     PlanCalcScoreConfigGroup.ModeParams newModeParams1 = new PlanCalcScoreConfigGroup.ModeParams(mode) ;
                     PlanCalcScoreConfigGroup.ModeParams newModeParams2 = new PlanCalcScoreConfigGroup.ModeParams(mode) ;
 
-                    double rnd1 = randomVariance * rnd.nextDouble();
+                    double rnd1 = scalingParameterForDecisionVariableVariability * rnd.nextDouble();
                     double rnd2 = 1. * rnd.nextDouble();
                     double rnd3 = 1. * rnd.nextDouble();
 

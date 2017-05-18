@@ -75,14 +75,14 @@ public class PatnaJointOpdytsCalibrator {
 		String configFile;
 		int iterationsToConvergence = 300; //
 		int averagingIterations = 100;
-		double randomVariance = 0.1;
+		double scalingParameterForDecisionVariableVariability = 0.1;
 
 		if ( args.length>0 ) {
 			OUT_DIR = args[0];
 			configFile = args[1];
 			averagingIterations = Integer.valueOf(args[2]);
 			iterationsToConvergence = Integer.valueOf(args[3]);
-			randomVariance = Double.valueOf(args[4]);
+			scalingParameterForDecisionVariableVariability = Double.valueOf(args[4]);
 		} else {
 			configFile = configDir+"/config_urban_1pct.xml";
 		}
@@ -149,7 +149,7 @@ public class PatnaJointOpdytsCalibrator {
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC, randomVariance, PATNA_10_PCT, SUB_POP_NAME);
+				RandomizedUtilityParametersChoser.ONLY_ASC, scalingParameterForDecisionVariableVariability, PATNA_10_PCT, SUB_POP_NAME);
 
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, PATNA_10_PCT, SUB_POP_NAME);

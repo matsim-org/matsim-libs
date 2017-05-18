@@ -65,7 +65,7 @@ public class PatnaNetworkModesCalibrator {
 		int iterationsToConvergence = 10; //
 		int averagingIterations = 10;
 		boolean isRunningOnCluster = false;
-		double randomVariance = 0.1;
+		double scalingParameterForDecisionVariableVariability = 0.1;
 
 		if (args.length>0) isRunningOnCluster = true;
 
@@ -74,9 +74,9 @@ public class PatnaNetworkModesCalibrator {
 			configFile = args[1];
 			averagingIterations = Integer.valueOf(args[2]);
 			iterationsToConvergence = Integer.valueOf(args[3]);
-			randomVariance = Double.valueOf(args[4]);
+			scalingParameterForDecisionVariableVariability = Double.valueOf(args[4]);
 
-			OUT_DIR = args[0]+"_"+randomVariance+"_"+averagingIterations+"its/";
+			OUT_DIR = args[0]+"_"+scalingParameterForDecisionVariableVariability+"_"+averagingIterations+"its/";
 
 		} else {
 			configFile = configDir+"/config_networkModesOnly.xml";
@@ -148,7 +148,7 @@ public class PatnaNetworkModesCalibrator {
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC, randomVariance, PATNA_1_PCT, null);
+				RandomizedUtilityParametersChoser.ONLY_ASC, scalingParameterForDecisionVariableVariability, PATNA_1_PCT, null);
 
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, PATNA_1_PCT);

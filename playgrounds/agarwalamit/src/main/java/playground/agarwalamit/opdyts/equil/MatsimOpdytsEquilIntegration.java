@@ -68,7 +68,7 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class MatsimOpdytsEquilIntegration {
 
-	private static double randomVariance = 3;
+	private static double scalingParameterForDecisionVariableVariability = 3;
 	private static int iterationsToConvergence = 600;
 
 	private static String EQUIL_DIR = "./examples/scenarios/equil/";
@@ -80,10 +80,10 @@ public class MatsimOpdytsEquilIntegration {
 	public static void main(String[] args) {
 
 		if (args.length > 0) {
-			randomVariance = Double.valueOf(args[0]);
+			scalingParameterForDecisionVariableVariability = Double.valueOf(args[0]);
 			iterationsToConvergence = Integer.valueOf(args[1]);
 			EQUIL_DIR = args[2];
-			OUT_DIR = args[3]+"/equil_car,pt_holes_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
+			OUT_DIR = args[3]+"/equil_car,pt_holes_variance"+ scalingParameterForDecisionVariableVariability +"_"+iterationsToConvergence+"its/";
 		}
 
 		Set<String> modes2consider = new HashSet<>();
@@ -216,7 +216,8 @@ public class MatsimOpdytsEquilIntegration {
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC, Double.valueOf(randomVariance), EQUIL,null);
+				RandomizedUtilityParametersChoser.ONLY_ASC, Double.valueOf(
+				scalingParameterForDecisionVariableVariability), EQUIL,null);
 
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, EQUIL);

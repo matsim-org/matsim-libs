@@ -62,30 +62,33 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class MatsimOpdytsEquilMixedTrafficIntegration {
 
-	private static double randomVariance = 1;
+	private static double scalingParameterForDecisionVariableVariability = 1;
 	private static int iterationsToConvergence = 1;
 	private static int averagingIterations = 10;
 	private static double selfTunerWeight = 0.95;
 
 	private static String EQUIL_DIR = "./examples/scenarios/equil-mixedTraffic/";
-	private static String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
+	private static String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+ scalingParameterForDecisionVariableVariability +"_"+iterationsToConvergence+"its/";
 	private static final OpdytsScenario EQUIL_MIXEDTRAFFIC = OpdytsScenario.EQUIL_MIXEDTRAFFIC;
 
 	private static boolean isPlansRelaxed = true;
 
 	private static int randomSeedForDecisionVariableRandomizer;
 
+	private static double startingASCforBicycle = 0.;
+
 	public static void main(String[] args) {
 
 		if (args.length > 0) {
-			randomVariance = Double.valueOf(args[0]);
+			scalingParameterForDecisionVariableVariability = Double.valueOf(args[0]);
 			iterationsToConvergence = Integer.valueOf(args[1]);
 			EQUIL_DIR = args[2];
-			OUT_DIR = args[3]+"/equil_car,bicycle_holes_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
+			OUT_DIR = args[3]+"/equil_car,bicycle_holes_variance"+ scalingParameterForDecisionVariableVariability +"_"+iterationsToConvergence+"its/";
 			averagingIterations = Integer.valueOf(args[4]);
 			selfTunerWeight = Double.valueOf(args[5]);
 			isPlansRelaxed = Boolean.valueOf(args[6]);
 			randomSeedForDecisionVariableRandomizer = Integer.valueOf(args[7]);
+			startingASCforBicycle = Double.valueOf(args[8]);
 		}
 
 		Set<String> modes2consider = new HashSet<>();
@@ -94,6 +97,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
 		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
+		config.planCalcScore().getOrCreateModeParams("bicycle").setConstant(startingASCforBicycle);
 
 		config.plans().setInputFile("plans2000.xml.gz");
 
@@ -233,7 +237,8 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC,  Double.valueOf(randomVariance),  EQUIL_MIXEDTRAFFIC, null, randomSeedForDecisionVariableRandomizer);
+				RandomizedUtilityParametersChoser.ONLY_ASC,
+				scalingParameterForDecisionVariableVariability,  EQUIL_MIXEDTRAFFIC, null, randomSeedForDecisionVariableRandomizer);
 
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, EQUIL_MIXEDTRAFFIC);
