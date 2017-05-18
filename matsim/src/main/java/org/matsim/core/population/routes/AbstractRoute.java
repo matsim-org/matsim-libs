@@ -31,6 +31,9 @@ import org.matsim.core.utils.misc.Time;
  * @author mrieser
  */
 public abstract class AbstractRoute implements Route, Cloneable {
+	// This has a public non-final non-empty method, which is "clone".  But in the end this is how it is designed.
+	// So we leave it as is; if we ever want to re-design it in the core, we will have to copy it and start
+	// from the copy.  kai, may'17
 
 	private double dist = Double.NaN;
 
