@@ -267,12 +267,12 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                 AVVehicle avVehicle = entry.getKey();
                                 AVRequest avRequest = entry.getValue();
                                 if (!accountedVehicles.contains(avVehicle)) {
-                                	// request 
+                                    // request
                                     int index = -1;
                                     if (mpcRequestsMap.containsKey(avRequest))
-                                    	index = mpcRequestsMap.get(avRequest).vectorIndex;
+                                        index = mpcRequestsMap.get(avRequest).vectorIndex;
                                     else
-                                    	index = m+virtualNetwork.getVirtualNode(avRequest.getFromLink()).index;
+                                        index = m + virtualNetwork.getVirtualNode(avRequest.getFromLink()).index;
                                     vector.set(Increment.ONE, index);
                                     accountedVehicles.add(avVehicle);
                                 }
@@ -355,8 +355,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                         ++pickupPerNode;
                                     }
                                 }
-                                if (pickupPerNode!=desiredRebalance)
-                                	new RuntimeException("rebalance inconsistent:" + pickupPerNode +" != "+ desiredRebalance).printStackTrace();
+                                if (pickupPerNode != desiredRebalance)
+                                    new RuntimeException("rebalance inconsistent:" + pickupPerNode + " != " + desiredRebalance).printStackTrace();
                             } else {
                                 System.out.println("no available vehicles inside vnode " + vectorIndex + " " + vnFrom.index);
                             }
@@ -384,7 +384,6 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                     { // handle requests
                                         final List<MpcRequest> requests = virtualLinkRequestsMap.containsKey(vectorIndex) ? //
                                                 virtualLinkRequestsMap.get(vectorIndex) : Collections.emptyList();
-
                                         int min = Math.min(Math.min(desiredPickup, requests.size()), cars.size());
                                         for (int count = 0; count < min; ++count) {
                                             VehicleLinkPair vehicleLinkPair = cars.get(0);
@@ -403,8 +402,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                         }
                                     }
                                 }
-                                if (pickupPerNode!=desiredPickup)
-                                	new RuntimeException("pickup inconsistent:" + pickupPerNode +" != "+ desiredPickup).printStackTrace();
+                                if (pickupPerNode != desiredPickup)
+                                    new RuntimeException("pickup inconsistent:" + pickupPerNode + " != " + desiredPickup).printStackTrace();
                             } else {
                                 System.out.println("no available vehicles inside vnode " + vectorIndex + " " + vnFrom.index);
                             }
