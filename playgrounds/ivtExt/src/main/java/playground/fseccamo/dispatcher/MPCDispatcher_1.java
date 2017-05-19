@@ -1,8 +1,8 @@
 package playground.fseccamo.dispatcher;
 
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +67,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
     final Map<VirtualLink, Double> travelTimes;
     final int numberOfVehicles;
     private final double[] networkBounds;
+    final Map<VirtualNode, Link> centerLink = new HashMap<>();
 
     final JavaContainerSocket javaContainerSocket;
 
@@ -87,6 +88,14 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
         travelTimes = travelTimesIn;
         networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         numberOfVehicles = (int) generatorConfig.getNumberOfVehicles();
+
+        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+            final QuadTree<Link> quadTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
+            for (Link link : virtualNode.getLinks())
+                quadTree.put(link.getCoord().getX(), link.getCoord().getY(), link);
+            Link center = quadTree.getClosest(virtualNode.getCoord().getX(), virtualNode.getCoord().getY());
+            centerLink.put(virtualNode, center);
+        }
 
         try {
             javaContainerSocket = new JavaContainerSocket(new Socket("localhost", MfileContainerServer.DEFAULT_PORT));
@@ -256,12 +265,12 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
                     {
                         int totalRebalanceEffective = 0;
-                        final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
                         for (int vectorIndex = 0; vectorIndex < m + n; ++vectorIndex) {
                             final VirtualNode vnFrom = vectorIndex < m ? //
                                     virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
                             final VirtualNode vnTo = vectorIndex < m ? //
                                     virtualNetwork.getVirtualLink(vectorIndex).getTo() : virtualNetwork.getVirtualNode(vectorIndex - m);
+                            final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
                             // ---
                             if (availableVehicles.containsKey(vnFrom)) {
                                 final List<VehicleLinkPair> cars = availableVehicles.get(vnFrom); // find cars
@@ -276,16 +285,16 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                     for (int count = 0; count < min; ++count) {
                                         VehicleLinkPair vehicleLinkPair = cars.get(0);
                                         cars.remove(0);
-                                        // TODO choose better link
-                                        Link rebalanceDest = new ArrayList<>( //
-                                                vnTo.getLinks()).get(random.nextInt(vnTo.getLinks().size()));
+                                        Link rebalanceDest = centerLink.get(vnTo);
+                                        // new ArrayList<>( //
+                                        // vnTo.getLinks()).get(random.nextInt(vnTo.getLinks().size()));
                                         setVehicleRebalance(vehicleLinkPair, rebalanceDest); // send car to adjacent virtual node
                                         ++totalRebalanceEffective;
                                         ++pickupPerNode;
                                     }
                                 }
-                                if (pickupPerNode != desiredRebalance)
-                                    new RuntimeException("rebalance inconsistent:" + pickupPerNode + " != " + desiredRebalance).printStackTrace();
+                                // if (pickupPerNode != desiredRebalance)
+                                // new RuntimeException("rebalance inconsistent:" + pickupPerNode + " != " + desiredRebalance).printStackTrace();
                             } else {
                                 System.out.println("no available vehicles inside vnode " + vectorIndex + " " + vnFrom.index);
                             }

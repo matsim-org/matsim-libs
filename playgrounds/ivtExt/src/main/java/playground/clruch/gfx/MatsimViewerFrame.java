@@ -223,7 +223,6 @@ public class MatsimViewerFrame implements Runnable {
             exception.printStackTrace();
             System.out.println("cannot load: " + index);
         }
-
     }
 
     private JMapViewer getJMapViewer() {
