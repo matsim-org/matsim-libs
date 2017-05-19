@@ -27,7 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.core.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 
 public class KtiPopulationPreparation implements StartupListener {
 
@@ -46,10 +46,10 @@ public class KtiPopulationPreparation implements StartupListener {
 		 * for an explanation, see the element comment of the kti config parameter
 		 */
 		if (this.ktiConfigGroup.isInvalidateScores()) {
-			ParallelPersonAlgorithmRunner.run(
+			ParallelPersonAlgorithmUtils.run(
 					pop, 
 					config.global().getNumberOfThreads(),
-					new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+					new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
 						public AbstractPersonAlgorithm getPersonAlgorithm() {
 							return new PersonInvalidateScores();
 						}

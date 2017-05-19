@@ -31,12 +31,12 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.core.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * Tests the class {@link ParallelPersonAlgorithmRunner}.
+ * Tests the class {@link ParallelPersonAlgorithmUtils}.
  *
  * @author mrieser
  */
@@ -52,11 +52,11 @@ public class ParallelPersonAlgorithmRunnerTest {
 		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		PersonAlgorithmTester algo = new PersonAlgorithmTester();
 		PersonAlgoProviderTester tester = new PersonAlgoProviderTester(algo);
-		ParallelPersonAlgorithmRunner.run(population, 2, tester);
+		ParallelPersonAlgorithmUtils.run(population, 2, tester);
 		Assert.assertEquals(2, tester.counter);
 
 		PersonAlgoProviderTester tester2 = new PersonAlgoProviderTester(algo);
-		ParallelPersonAlgorithmRunner.run(population, 4, tester2);
+		ParallelPersonAlgorithmUtils.run(population, 4, tester2);
 		Assert.assertEquals(4, tester2.counter);
 	}
 
@@ -74,7 +74,7 @@ public class ParallelPersonAlgorithmRunnerTest {
 			population.addPerson(person);
 		}
 		final PersonAlgorithmTester tester = new PersonAlgorithmTester();
-		ParallelPersonAlgorithmRunner.run(population, 2, tester);
+		ParallelPersonAlgorithmUtils.run(population, 2, tester);
 
 		Assert.assertEquals(100, tester.personIds.size());
 
@@ -98,7 +98,7 @@ public class ParallelPersonAlgorithmRunnerTest {
 				Person person = PopulationUtils.getFactory().createPerson(Id.create(i, Person.class));
 				population.addPerson(person);
 			}
-			ParallelPersonAlgorithmRunner.run(population, 2, new AbstractPersonAlgorithm() {
+			ParallelPersonAlgorithmUtils.run(population, 2, new AbstractPersonAlgorithm() {
 				@Override
 				public void run(Person person) {
 					person.getPlans().get(0).setScore(null); // this will result in an IndexOutOfBoundsException
@@ -115,7 +115,7 @@ public class ParallelPersonAlgorithmRunnerTest {
 	 *
 	 * @author mrieser
 	 */
-	private static class PersonAlgoProviderTester implements ParallelPersonAlgorithmRunner.PersonAlgorithmProvider {
+	private static class PersonAlgoProviderTester implements ParallelPersonAlgorithmUtils.PersonAlgorithmProvider {
 		protected int counter = 0;
 		private final AbstractPersonAlgorithm algo;
 

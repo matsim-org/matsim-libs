@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
 import javax.inject.Inject;
@@ -126,10 +127,8 @@ public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalE
 	 * @param filename The name of a file where to write the gathered data.
 	 */
 	public void write(final String filename) {
-		try (PrintStream stream = new PrintStream(new File(filename))) {
+		try (PrintStream stream = IOUtils.getPrintStream(filename) ) {
 			write(stream);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		}
 	}
 

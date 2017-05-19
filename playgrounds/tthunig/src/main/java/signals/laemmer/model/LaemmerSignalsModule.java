@@ -34,6 +34,7 @@ import org.matsim.contrib.signals.router.NetworkWithSignalsTurnInfoBuilder;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
+import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 import org.matsim.core.replanning.ReplanningContext;
 import playground.dgrether.koehlerstrehlersignal.analysis.TtTotalDelay;
 import signals.CombinedSignalsModule;
@@ -85,7 +86,7 @@ public class LaemmerSignalsModule extends AbstractModule{
 		if (getConfig().controler().isLinkToLinkRoutingEnabled()){
             //use the extended NetworkWithSignalsTurnInfoBuilder (instead of NetworkTurnInfoBuilder)
             //michalm, jan'17
-            bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class);
+            bind(NetworkTurnInfoBuilderI.class).to(NetworkWithSignalsTurnInfoBuilder.class);
         }
 	}
 	

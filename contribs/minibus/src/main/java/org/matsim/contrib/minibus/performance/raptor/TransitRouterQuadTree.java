@@ -129,7 +129,7 @@ public final class TransitRouterQuadTree {
 		
 		this.quadTree = this.createTransitStopFacilityQuadTree(transitStopFacilities2RouteIdsServed.keySet());
 		Map<TransitStopFacility, HashMap<WrappedTransitRouteStop, TransferEntryPointer>> stop2TransitRouteStop2Transfers = this.createTransfers(transitStopFacilities2RouteIdsServed, routeStop2routeId, maxBeelineWalkConnectionDistance);
-		stop2TransitRouteStop2Transfers = this.filterTransfers(transitSchedule, stop2TransitRouteStop2Transfers, routeStop2routeId);
+		stop2TransitRouteStop2Transfers = filterTransfers(transitSchedule, stop2TransitRouteStop2Transfers, routeStop2routeId);
 
 		for (TransitStopFacility transitStopFacility : stop2TransitRouteStop2Transfers.keySet()) {
 			this.transitStopFacility2Index.put(transitStopFacility, transitStopsInRightOrder.size());
@@ -145,13 +145,13 @@ public final class TransitRouterQuadTree {
 				final int indexOfFirstDeparture = departureTimesList.size();
 				final int numberOfDepartures = route.getDepartures().size();
 				double[] departureTimes = new double[numberOfDepartures];
-				
+
 				int i = 0;
 				for (Departure dep : route.getDepartures().values()) {
 					departureTimes[i++] = dep.getDepartureTime();
 				}
 				Arrays.sort(departureTimes);
-				
+
 				for (TransitRouteStop stop : route.getStops()) {
 					for (int j = 0; j < departureTimes.length; j++) {
 						if (stop.getArrivalOffset() == Double.NEGATIVE_INFINITY) {
@@ -165,6 +165,9 @@ public final class TransitRouterQuadTree {
 						departureTimesList.add(departureTimes[j] + stop.getDepartureOffset());
 					}
 				}
+				// So the arrivalTimesList contains | stop1ar1 stop1ar2 ... stop1arLast stop2ar1 stop2ar2 stop2arLast ... |,
+				// and this in addition flattened for all routes.
+				// It seems that it can reconstruct everything from "indexOfFirstDeparture", "numberOfDepartures", "numberOfRouteSteps".
 				
 				final int indexOfFirstStop = routeStopList.size();
 				final int numberOfRouteStops = route.getStops().size();
@@ -179,7 +182,7 @@ public final class TransitRouterQuadTree {
 				// fill route stops
 				int placeOfCurrentStop = 0;
 				for (TransitRouteStop routeStop : route.getStops()) {
-					String routeStopHash = this.getHash(line, route, routeStop, placeOfCurrentStop);
+					String routeStopHash = getHash(line, route, routeStop, placeOfCurrentStop);
 					WrappedTransitRouteStop wrappedRouteStop = hash2routeStop.get(routeStopHash);
 					
 					placeOfCurrentStop++;
@@ -234,11 +237,16 @@ public final class TransitRouterQuadTree {
 		
 		// create transfers for all transit route stops if they're located less than beelineWalkConnectionDistance from each other
 		for (TransitStopFacility sourceStop : transitStopFacilities2RouteIdsServed.keySet()) {
+			// (just goes through all stops)
+
 			HashMap<WrappedTransitRouteStop, TransferEntryPointer> transfersFromThis = new HashMap<WrappedTransitRouteStop, TransferEntryPointer>();
 			
 			for (WrappedTransitRouteStop destinationStop : transitRouteStopQuadTree.getDisk(sourceStop.getCoord().getX(), sourceStop.getCoord().getY(), maxBeelineWalkConnectionDistance)) {
+				// (goes through all stops within walkConnectionDistance)
+
 				double transferTime = this.raptorDisutility.getTransferTime(sourceStop.getCoord(), destinationStop.transitRouteStop.getStopFacility().getCoord());
 				transfersFromThis.put(destinationStop, new TransferEntryPointer(-1, transferTime, destinationStop, routeStop2routeId.get(destinationStop)));
+				// (memorize: (1) which stop the walk goes to; (2) route id associated with that stop (presumably one stop per route even at same location)
 			}
 			
 			stop2TransitRouteStop2Transfers.put(sourceStop, transfersFromThis);
@@ -374,7 +382,7 @@ public final class TransitRouterQuadTree {
 		return quadTree;
 	}
 	
-	private double[] getPrimitiveArrayFromList(List<Double> list) {
+	private static double[] getPrimitiveArrayFromList(List<Double> list) {
 	    double[] array = new double[list.size()];
 	    int i = 0;
 	    for (Double entry : list) {
@@ -383,7 +391,7 @@ public final class TransitRouterQuadTree {
 	    return array;
 	}
 	
-	private String getHash(TransitLine transitLine, TransitRoute transitRoute, TransitRouteStop transitRouteStop, int position){
+	private static String getHash(TransitLine transitLine, TransitRoute transitRoute, TransitRouteStop transitRouteStop, int position){
 		return transitLine.getId().toString() + "-" + transitRoute.getId().toString() + "-" + transitRouteStop.getStopFacility().getId().toString() + "-" + position;
 	}
 }

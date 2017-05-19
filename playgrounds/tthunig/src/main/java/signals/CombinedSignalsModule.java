@@ -36,6 +36,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
+import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 import org.matsim.core.replanning.ReplanningContext;
 
 import com.google.inject.Provides;
@@ -100,7 +101,7 @@ public class CombinedSignalsModule extends AbstractModule {
 		if (getConfig().controler().isLinkToLinkRoutingEnabled()){
             //use the extended NetworkWithSignalsTurnInfoBuilder (instead of NetworkTurnInfoBuilder)
             //michalm, jan'17
-            bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class);
+            bind(NetworkTurnInfoBuilderI.class).to(NetworkWithSignalsTurnInfoBuilder.class);
         }        
 	}
 

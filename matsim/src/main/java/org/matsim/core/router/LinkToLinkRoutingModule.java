@@ -52,7 +52,7 @@ class LinkToLinkRoutingModule
     LinkToLinkRoutingModule(final String mode, final PopulationFactory populationFactory,
             Network network, LeastCostPathCalculatorFactory leastCostPathCalcFactory,
             TravelDisutilityFactory travelCostCalculatorFactory,
-            LinkToLinkTravelTime l2ltravelTimes, NetworkTurnInfoBuilder turnInfoBuilder)
+            LinkToLinkTravelTime l2ltravelTimes, NetworkTurnInfoBuilderI turnInfoBuilder)
     {
         Map<Id<Link>, List<TurnInfo>> allowedInLinkTurnInfoMap = turnInfoBuilder
                 .createAllowedTurnInfos();

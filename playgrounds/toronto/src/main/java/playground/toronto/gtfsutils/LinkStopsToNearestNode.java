@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.LinkFactoryImpl;
+import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -72,7 +72,7 @@ public class LinkStopsToNearestNode {
 		
 		String line;
 		ArrayList<Id> loopedNodes = new ArrayList<Id>();
-		LinkFactoryImpl factory = NetworkUtils.createLinkFactory();
+		LinkFactory factory = NetworkUtils.createLinkFactory();
 		while ((line = reader.readLine()) != null){
 			String[] cells = line.split(",");
 			double stopLon = Double.parseDouble(cells[loncol]);

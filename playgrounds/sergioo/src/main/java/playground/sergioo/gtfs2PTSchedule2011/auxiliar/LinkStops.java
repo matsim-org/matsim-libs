@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkFactoryImpl;
+import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -90,7 +90,7 @@ public class LinkStops {
 			length=link.getLength()*CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), toNode.getCoord())/CoordUtils.calcEuclideanDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
 		else
 			length = CoordUtils.calcEuclideanDistance(coordinateTransformation.transform(link.getFromNode().getCoord()),coordinateTransformation.transform(toNode.getCoord()));
-		LinkFactoryImpl r = NetworkUtils.createLinkFactory();
+		LinkFactory r = NetworkUtils.createLinkFactory();
 		Link newLink = NetworkUtils.createLink(Id.createLinkId(link.getId().toString()+"_"+i), link.getFromNode(), toNode, network, length, link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 		if(NetworkUtils.getOrigId( ((Link)link) )!=null)
 			NetworkUtils.setOrigId( ((Link)newLink), (String) NetworkUtils.getOrigId( ((Link)link) ) ) ;

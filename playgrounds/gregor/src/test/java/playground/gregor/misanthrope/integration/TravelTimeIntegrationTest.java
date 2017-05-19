@@ -41,6 +41,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -342,11 +343,16 @@ public class TravelTimeIntegrationTest extends MatsimTestCase {
 		post.setEarliestEndTime(49);
 		post.setLatestStartTime(49);
 		post.setOpeningTime(49);
+
 		sc.getConfig().planCalcScore().addActivityParams(pre);
 		sc.getConfig().planCalcScore().addActivityParams(post);
 
 		sc.getConfig().planCalcScore().setLateArrival_utils_hr(0.);
 		sc.getConfig().planCalcScore().setPerforming_utils_hr(0.);
+		
+		ModeParams walkct = new ModeParams("walkct") ;
+		walkct.setMarginalUtilityOfTraveling(-6.);
+		sc.getConfig().planCalcScore().addModeParams(walkct);
 
 		QSimConfigGroup qsim = sc.getConfig().qsim();
 		// qsim.setEndTime(20 * 60);
