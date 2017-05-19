@@ -316,8 +316,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                             final Map<VirtualNode, List<AVVehicle>> availableVehicles = getVirtualNodeStayVehicles();
 
                             final List<AVVehicle> cars = availableVehicles.get(vnFrom); // find cars
-                            int pickupOffset = 1;
-                            final int desiredPickup = requestVector.Get(vectorIndex).number().intValue() + pickupOffset; // FIXME
+                            final int pickupOffset = 0; // should be 0
+                            final int desiredPickup = requestVector.Get(vectorIndex).number().intValue() + pickupOffset;
                             int pickupPerNode = 0;
                             if (0 < desiredPickup) {
                                 if (pickupOffset < desiredPickup)
