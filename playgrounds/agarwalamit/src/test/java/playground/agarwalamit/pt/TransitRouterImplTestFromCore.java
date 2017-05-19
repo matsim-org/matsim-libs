@@ -53,7 +53,7 @@ public class TransitRouterImplTestFromCore extends TransitRouterImplTest {
 	public static Collection<Object> createRouterTypes() {
 		Object[] router = new Object [] { 
 				TransitRouterType.standard,
-				TransitRouterType.raptor
+//				TransitRouterType.raptor
 		};
 		return Arrays.asList(router);
 	}
