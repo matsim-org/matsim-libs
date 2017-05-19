@@ -37,23 +37,15 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -63,6 +55,7 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 
 /**
@@ -109,102 +102,23 @@ public class PassingTest {
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(handler);
 
+		storeVehicleTypeInfo(net);
+
 		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario,manager).run();
 
-		QSim qSim = createQSim(net,manager);
+		QSim qSim = QSimUtils.createDefaultQSim(net.scenario,manager);
 		qSim.run();
 
 		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes =  handler.getVehicleId2LinkTravelTime();
 
-		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTimes.get(Id.create("0", Vehicle.class));
+		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTimes.get(Id.create("0_bike", Vehicle.class));
 		Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));
 
-		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
+		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue();
 		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
 
 		Assert.assertEquals("Wrong car travel time", 51, carTravelTime);
 		Assert.assertEquals("Wrong bike travel time", 201, bikeTravelTime);
-		Assert.assertEquals("Passing is not implemented", 150, bikeTravelTime-carTravelTime);
-
-	}
-
-	/**
-	 * This is the same test as above. The only difference is way of inserting vehicle type info. 
-	 * Here, vehicle types are inserted into scenario.
-	 */
-	@Test 
-	public void test4VehicleTypesInScenario(){
-
-		SimpleNetwork net = new SimpleNetwork();
-
-		net.scenario.getConfig().qsim().setVehiclesSource(VehiclesSource.fromVehiclesData);
-
-		Map<String, VehicleType> mode2VehType = getVehicleTypeInfo();
-
-		for(String str:mode2VehType.keySet()){
-			net.scenario.getVehicles().addVehicleType(mode2VehType.get(str));
-		}
-
-		//=== build plans; two persons; one with car and another with bike; car leave 5 secs after bike
-		String transportModes [] = new String [] {"bike","car"};
-
-		for(int i=0;i<2;i++){
-			Id<Person> id = Id.create(i, Person.class);
-			Person p = net.population.getFactory().createPerson(id);
-			Plan plan = net.population.getFactory().createPlan();
-			p.addPlan(plan);
-			Activity a1 = net.population.getFactory().createActivityFromLinkId("h", net.link1.getId());
-			a1.setEndTime(8*3600+i*5);
-			Leg leg = net.population.getFactory().createLeg(transportModes[i]);
-			plan.addActivity(a1);
-			plan.addLeg(leg);
-			LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-			NetworkRoute route = (NetworkRoute) factory.createRoute(net.link1.getId(), net.link3.getId());
-			route.setLinkIds(net.link1.getId(), Arrays.asList(net.link2.getId()), net.link3.getId());
-			leg.setRoute(route);
-
-			Activity a2 = net.population.getFactory().createActivityFromLinkId("w", net.link3.getId());
-			plan.addActivity(a2);
-			net.population.addPerson(p);
-
-			Id<Vehicle> vehId = Id.create(i,Vehicle.class);
-			Vehicle veh = VehicleUtils.getFactory().createVehicle(vehId, mode2VehType.get(transportModes[i]));
-			net.scenario.getVehicles().addVehicle(veh);
-
-		}
-
-		ActivityParams ap_h = new ActivityParams("h");
-		ActivityParams ap_w = new ActivityParams("w");
-		ap_h.setTypicalDuration(1*3600);
-		ap_w.setTypicalDuration(1*3600);
-		net.scenario.getConfig().planCalcScore().addActivityParams(ap_h);
-		net.scenario.getConfig().planCalcScore().addActivityParams(ap_w);
-		net.scenario.getConfig().controler().setWriteEventsInterval(0);
-		net.scenario.getConfig().controler().setLastIteration(0);
-		net.scenario.getConfig().controler().setOutputDirectory(helper.getOutputDirectory());
-		
-		Controler cntrlr = new Controler(net.scenario);
-		cntrlr.getConfig().controler().setOverwriteFileSetting(
-				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		cntrlr.getConfig().controler().setCreateGraphs(false);
-		cntrlr.getConfig().controler().setDumpDataAtEnd(false);
-
-		TravelTimeControlerListener travelTimeCntrlrListner = new TravelTimeControlerListener();
-
-		cntrlr.addControlerListener(travelTimeCntrlrListner); 
-		cntrlr.run();
-
-		Map<Id<Vehicle>, Map<Id<Link>, Double>> vehicleLinkTravelTimes = travelTimeCntrlrListner.getVehicleId2Time();
-
-		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTimes.get(Id.create("0", Vehicle.class));
-		Map<Id<Link>, Double> travelTime2 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));
-
-		int bikeTravelTime = travelTime1.get(Id.create("2", Link.class)).intValue(); 
-		int carTravelTime = travelTime2.get(Id.create("2", Link.class)).intValue();
-
-		Assert.assertEquals("Wrong car travel time", 51, carTravelTime);
-		Assert.assertEquals("Wrong bike travel time", 201, bikeTravelTime);
-
 		Assert.assertEquals("Passing is not implemented", 150, bikeTravelTime-carTravelTime);
 
 	}
@@ -232,41 +146,20 @@ public class PassingTest {
 		}
 	}
 
-	private QSim createQSim (SimpleNetwork net, EventsManager eventsManager){
-		Scenario scenario = net.scenario;
-		QSim qSim1 = new QSim(scenario, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim1.getAgentCounter());
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
+	private void storeVehicleTypeInfo(SimpleNetwork net) {
+		net.scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
-		qSim1.addMobsimEngine(netsimEngine);
-		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
-		qSim1.addMobsimEngine(teleportationEngine);
-		QSim qSim = qSim1;
-		
-
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-		agentSource.setModeVehicleTypes(getVehicleTypeInfo());
-		qSim.addAgentSource(agentSource);
-		return qSim;
-	}
-
-	private Map<String, VehicleType> getVehicleTypeInfo() {
-		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
+		Vehicles vehicles = net.scenario.getVehicles();
 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
 		car.setMaximumVelocity(20);
 		car.setPcuEquivalents(1.0);
-		modeVehicleTypes.put("car", car);
+		vehicles.addVehicleType(car);
 
 		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
 		bike.setMaximumVelocity(5);
 		bike.setPcuEquivalents(0.25);
-		modeVehicleTypes.put("bike", bike);
-		return modeVehicleTypes;
+		vehicles.addVehicleType(bike);
 	}
 
 
