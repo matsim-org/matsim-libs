@@ -111,28 +111,26 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
     @Override
     public void redispatch(double now) {
 
-        // PART 0: match vehicles at a customer link only if the request has received a pickup order
-        {
-            Map<AVVehicle, Link> stayVehiclesAtLinks = DispatcherUtils.vehicleMapper(getStayVehicles());
-            // match all matched av/request pairs which are at same link
-
-            final int pendingSize = getAVRequests().size();
-            final int matchingSize = getMatchings().size();
-
-            new PredefinedMatchingMatcher(this::setAcceptRequest).matchPredefined(getMatchings(), stayVehiclesAtLinks);
-
-            final int delta = pendingSize - getAVRequests().size();
-
-            // at this point, the same number of requests should have disappeared as matchings
-            GlobalAssert.that(delta == matchingSize - getMatchings().size());
-        }
-
-        // managePickupVehicles();
-
-        // checkServedButWaitingCustomers(now);
-
         final long round_now = Math.round(now);
-        if (round_now % samplingPeriod == 0) {
+        if (round_now % samplingPeriod != 0) {
+
+            // PART 0: match vehicles at a customer link only if the request has received a pickup order
+            {
+                Map<AVVehicle, Link> stayVehiclesAtLinks = DispatcherUtils.vehicleMapper(getStayVehicles());
+                // match all matched av/request pairs which are at same link
+
+                final int pendingSize = getAVRequests().size();
+                final int matchingSize = getMatchings().size();
+
+                new PredefinedMatchingMatcher(this::setAcceptRequest).matchPredefined(getMatchings(), stayVehiclesAtLinks);
+
+                final int delta = pendingSize - getAVRequests().size();
+
+                // at this point, the same number of requests should have disappeared as matchings
+                GlobalAssert.that(delta == matchingSize - getMatchings().size());
+            }
+
+        } else {
 
             manageIncomingRequests(now);
 
@@ -316,49 +314,50 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                             final Map<VirtualNode, List<AVVehicle>> availableVehicles = getVirtualNodeStayVehicles();
 
                             final List<AVVehicle> cars = availableVehicles.get(vnFrom); // find cars
-                            final int pickupOffset = 0; // should be 0
+                            cars.removeAll(getAVVehicleInMatching());
+                            final int pickupOffset = 0; // <- should be 0 !!! only 1 for testing
                             final int desiredPickup = requestVector.Get(vectorIndex).number().intValue() + pickupOffset;
                             int pickupPerNode = 0;
                             if (0 < desiredPickup) {
                                 if (pickupOffset < desiredPickup)
                                     System.out.println(String.format("vl=%3d  cars=%3d  pick=%3d  ", //
                                             vectorIndex, cars.size(), desiredPickup));
-                                { // handle requests
-                                    final List<MpcRequest> requests = virtualLinkRequestsMap.containsKey(vectorIndex) ? //
-                                            virtualLinkRequestsMap.get(vectorIndex) : Collections.emptyList();
+                                // handle requests
+                                final List<MpcRequest> requests = virtualLinkRequestsMap.containsKey(vectorIndex) ? //
+                                        virtualLinkRequestsMap.get(vectorIndex) : Collections.emptyList();
 
-                                    // final QuadTree<AVRequest> pendingRequestsTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2],
-                                    // networkBounds[3]);
+                                // final QuadTree<AVRequest> pendingRequestsTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2],
+                                // networkBounds[3]);
 
-                                    int min = Math.min(Math.min(desiredPickup, requests.size()), cars.size());
-                                    for (int count = 0; count < min; ++count) {
+                                int min = Math.min(Math.min(desiredPickup, requests.size()), cars.size());
+                                for (int count = 0; count < min; ++count) {
 
-                                        final MpcRequest mpcRequest = requests.get(count);
+                                    final MpcRequest mpcRequest = requests.get(count);
 
-                                        final QuadTree<AVVehicle> unassignedVehiclesTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
+                                    final QuadTree<AVVehicle> unassignedVehiclesTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
 
-                                        for (AVVehicle avVehicle : cars) {
-                                            Link link = getVehicleLocation(avVehicle);
-                                            unassignedVehiclesTree.put(link.getCoord().getX(), link.getCoord().getY(), avVehicle);
-                                        }
-
-                                        AVVehicle avVehicle = unassignedVehiclesTree.getClosest( //
-                                                mpcRequest.avRequest.getFromLink().getCoord().getX(), //
-                                                mpcRequest.avRequest.getFromLink().getCoord().getY());
-
-                                        GlobalAssert.that(!getAVVehicleInMatching().contains(avVehicle));
-                                        {
-                                            boolean removed = cars.remove(avVehicle);
-                                            GlobalAssert.that(removed);
-                                        }
-                                        Link pickupLocation = mpcRequest.avRequest.getFromLink(); // where the customer is waiting right now
-                                        // System.out.println("set diversion for pickup");
-                                        setStayVehicleDiversion(avVehicle, pickupLocation); // send car to customer
-                                        ++totalPickupEffective;
-                                        ++pickupPerNode;
-                                        matchings.put(mpcRequest.avRequest, avVehicle);
+                                    for (AVVehicle avVehicle : cars) {
+                                        Link link = getVehicleLocation(avVehicle);
+                                        unassignedVehiclesTree.put(link.getCoord().getX(), link.getCoord().getY(), avVehicle);
                                     }
+
+                                    AVVehicle avVehicle = unassignedVehiclesTree.getClosest( //
+                                            mpcRequest.avRequest.getFromLink().getCoord().getX(), //
+                                            mpcRequest.avRequest.getFromLink().getCoord().getY());
+                                    // TODO THIS THROWS!!!
+                                    GlobalAssert.that(!getAVVehicleInMatching().contains(avVehicle));
+                                    {
+                                        boolean removed = cars.remove(avVehicle);
+                                        GlobalAssert.that(removed);
+                                    }
+                                    Link pickupLocation = mpcRequest.avRequest.getFromLink(); // where the customer is waiting right now
+                                    // System.out.println("set diversion for pickup");
+                                    setStayVehicleDiversion(avVehicle, pickupLocation); // send car to customer
+                                    ++totalPickupEffective;
+                                    ++pickupPerNode;
+                                    matchings.put(mpcRequest.avRequest, avVehicle);
                                 }
+
                             }
                             // if (pickupPerNode != desiredPickup)
                             // new RuntimeException("pickup inconsistent:" + pickupPerNode + " != " + desiredPickup).printStackTrace();
