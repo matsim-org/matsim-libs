@@ -33,9 +33,10 @@ public class PredefinedMatchingMatcher extends AbstractVehicleRequestMatcher {
         return 0;
     }
 
-    public int matchPredefined(Map<AVVehicle, Link> stayVehicles, Map<AVRequest, AVVehicle> matchings) {
+    public int matchPredefined(Map<AVRequest, AVVehicle> matchings, Map<AVVehicle, Link> stayVehicles) {
         int num_matchedRequests = 0;
         // match vehicles which have arrived at origin of request
+        // copy of map is deliberate
         for (Entry<AVRequest, AVVehicle> entry : new HashMap<>(matchings).entrySet()) {
             final AVRequest avRequest = entry.getKey();
             final AVVehicle avVehicle = entry.getValue();

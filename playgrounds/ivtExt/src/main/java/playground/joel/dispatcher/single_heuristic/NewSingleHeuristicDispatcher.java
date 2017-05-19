@@ -61,7 +61,7 @@ public class NewSingleHeuristicDispatcher extends BindingUniversalDispatcher {
 
         // match all matched av/request pairs which are at same link
         new PredefinedMatchingMatcher(this::setAcceptRequest) //
-                .matchPredefined(stayVehiclesAtLinks, getMatchings());
+                .matchPredefined(getMatchings(), stayVehiclesAtLinks);
 
         if (round_now % dispatchPeriod == 0) {
 

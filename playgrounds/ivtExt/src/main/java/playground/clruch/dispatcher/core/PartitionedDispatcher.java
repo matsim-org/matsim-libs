@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.NavigableMap;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
@@ -37,7 +39,7 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
             VirtualNetwork virtualNetwork) {
         super(config, travelTime, router, eventsManager);
         this.virtualNetwork = virtualNetwork;
-        GlobalAssert.that(virtualNetwork!=null);
+        GlobalAssert.that(virtualNetwork != null);
     }
 
     /**
@@ -48,11 +50,26 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
                 .parallel() //
                 .collect(Collectors.groupingBy(vlp -> virtualNetwork.getVirtualNode(vlp.getDivertableLocation())));
 
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) 
-            if (!returnMap.containsKey(virtualNode)) 
+        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
+            if (!returnMap.containsKey(virtualNode))
                 returnMap.put(virtualNode, Collections.emptyList());
-        
+
         GlobalAssert.that(returnMap.size() == virtualNetwork.getvNodesCount());
+        return returnMap;
+    }
+
+    /**
+     * @return returns the stay vehicles per virtualNode
+     */
+    protected Map<VirtualNode, List<AVVehicle>> getVirtualNodeStayVehicles() {
+        Map<VirtualNode, List<AVVehicle>> returnMap = new HashMap<>();
+        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
+            returnMap.put(virtualNode, new ArrayList<>());
+        for (Entry<Link, Queue<AVVehicle>> entry : getStayVehicles().entrySet()) {
+            Link link = entry.getKey();
+            VirtualNode virtualNode = virtualNetwork.getVirtualNode(link);
+            returnMap.get(virtualNode).addAll(entry.getValue());
+        }
         return returnMap;
     }
 
@@ -111,9 +128,10 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
         final Map<AVVehicle, Link> rebalancingVehicles = getRebalancingVehicles();
         Map<VirtualNode, List<VehicleLinkPair>> returnMap = getVirtualNodeAvailableVehicles();
         for (Map.Entry<VirtualNode, List<VehicleLinkPair>> entry : returnMap.entrySet()) {
-            nonRebalanceMap.put(entry.getKey(), entry.getValue().stream() //
-                    .filter(v -> !rebalancingVehicles.containsKey(v.avVehicle)) //
-                    .collect(Collectors.toList()));
+            nonRebalanceMap.put(entry.getKey(),
+                    entry.getValue().stream() //
+                            .filter(v -> !rebalancingVehicles.containsKey(v.avVehicle)) //
+                            .collect(Collectors.toList()));
         }
 
         return nonRebalanceMap;

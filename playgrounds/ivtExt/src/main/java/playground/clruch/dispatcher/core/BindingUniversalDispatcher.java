@@ -26,6 +26,7 @@ public abstract class BindingUniversalDispatcher extends UniversalDispatcher {
     private final Set<AVRequest> assignedRequests = new HashSet<>(); // pending requests which are assigned to an AV
     private final Set<AVRequest> unassignedRequests = new HashSet<>(); // pending requests which are still unassigned
     private final Set<AVVehicle> assignedVehicles = new HashSet<>(); // vehicles which are currently assigned to a request
+    
     private final Map<AVRequest, AVVehicle> matchings = new HashMap<>(); // history of customer/AV matchings
 
     protected BindingUniversalDispatcher( //

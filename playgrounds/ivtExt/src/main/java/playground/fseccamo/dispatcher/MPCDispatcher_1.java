@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
-import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
@@ -16,7 +15,6 @@ import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
@@ -33,24 +31,22 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.alg.Array;
-import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.ExtractPrimitives;
-import ch.ethz.idsc.tensor.red.KroneckerDelta;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Chop;
 import ch.ethz.idsc.tensor.sca.Increment;
 import ch.ethz.idsc.tensor.sca.Round;
+import playground.clruch.dispatcher.core.DispatcherUtils;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
+import playground.clruch.dispatcher.utils.PredefinedMatchingMatcher;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.netdata.VirtualNode;
-import playground.clruch.prep.PopulationRequestSchedule;
-import playground.clruch.router.InstantPathFactory;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -68,9 +64,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
     final AbstractVehicleDestMatcher vehicleDestMatcher;
     final Map<VirtualLink, Double> travelTimes;
     final int numberOfVehicles;
-    final InstantPathFactory instantPathFactory;
 
-    JavaContainerSocket javaContainerSocket;
+    final JavaContainerSocket javaContainerSocket;
 
     public MPCDispatcher_1( //
             AVDispatcherConfig config, //
@@ -84,67 +79,15 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
             Map<VirtualLink, Double> travelTimesIn) {
         super(config, travelTime, parallelLeastCostPathCalculator, eventsManager, virtualNetwork);
         this.virtualNodeDest = abstractVirtualNodeDest;
-        this.instantPathFactory = new InstantPathFactory(parallelLeastCostPathCalculator, travelTime);
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         travelTimes = travelTimesIn;
         numberOfVehicles = (int) generatorConfig.getNumberOfVehicles();
 
         try {
-            final int n = virtualNetwork.getvNodesCount();
-            final int m = virtualNetwork.getvLinksCount();
             javaContainerSocket = new JavaContainerSocket(new Socket("localhost", MfileContainerServer.DEFAULT_PORT));
-            // ---
-            {
-                Container container = new Container("init");
-                { // directed graph incidence matrix
-                    Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getTo().index, i), n, m);
-                    double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
-                    DoubleArray doubleArray = new DoubleArray("E_in", new int[] { n, m }, array);
-                    container.add(doubleArray);
-                }
-                {
-                    Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getFrom().index, i), n, m);
-                    double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
-                    DoubleArray doubleArray = new DoubleArray("E_out", new int[] { n, m }, array);
-                    container.add(doubleArray);
-                }
-                {
-                    double[] array = new double[] { samplingPeriod };
-                    DoubleArray doubleArray = new DoubleArray("Ts", new int[] { 1 }, array);
-                    container.add(doubleArray);
-                }
-                {
-                    Tensor matrix = Tensors.vector(i -> Tensors.vector( //
-                            virtualNetwork.getVirtualNode(i).getCoord().getX(), //
-                            virtualNetwork.getVirtualNode(i).getCoord().getY() //
-                    ), n);
-                    // System.out.println(Pretty.of(matrix));
-                    double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
-                    DoubleArray doubleArray = new DoubleArray("voronoiCenter", new int[] { n, 2 }, array);
-                    container.add(doubleArray);
-                }
-                {
-                    double[] array = new double[] { numberOfVehicles };
-                    GlobalAssert.that(0 < numberOfVehicles);
-                    DoubleArray doubleArray = new DoubleArray("N_cars", new int[] { 1 }, array);
-                    container.add(doubleArray);
-                }
-                final Tensor populationRequestSchedule = PopulationRequestSchedule.importDefault();
-                // TODO in the future use to tune:
-                final int expectedRequestCount = populationRequestSchedule.length();
-                {
-                    double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(populationRequestSchedule));
-                    DoubleArray doubleArray = new DoubleArray("requestSchedule", new int[] { populationRequestSchedule.length(), 3 }, array);
-                    container.add(doubleArray);
-                }
-                {
-                    double[] array = new double[] { expectedRequestCount };
-                    GlobalAssert.that(0 < expectedRequestCount);
-                    DoubleArray doubleArray = new DoubleArray("expectedRequestCount", new int[] { 1 }, array);
-                    container.add(doubleArray);
-                }
-                javaContainerSocket.writeContainer(container);
-            }
+
+            Container container = MpcUtils.getContainerInit(virtualNetwork, samplingPeriod, numberOfVehicles);
+            javaContainerSocket.writeContainer(container);
         } catch (Exception exception) {
             exception.printStackTrace();
             throw new RuntimeException(); // dispatcher will not work if constructor has issues
@@ -154,32 +97,36 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
     @Override
     public void redispatch(double now) {
 
-        // PART 0: match vehicles at a customer link
-        // only if the request has received a pickup order
-        // new InOrderOfArrivalMatcher(this::setAcceptRequest) //
-        // .match(getStayVehicles(), override_getAVRequestsAtLinks());
+        // PART 0: match vehicles at a customer link only if the request has received a pickup order
         {
-            Set<AVVehicle> stayVehicles = getStayVehicles().values().stream().flatMap(Queue::stream).collect(Collectors.toSet());
-            for (AVVehicle avVehicle : stayVehicles) {
-                if (considerItDone.containsKey(avVehicle)) {
-                    // setAcceptRequest(avVehicle, avRequest);
-                    // override_getAVRequestsAtLinks();
-                }
-            }
+            Map<AVVehicle, Link> stayVehiclesAtLinks = DispatcherUtils.vehicleMapper(getStayVehicles());
+            // match all matched av/request pairs which are at same link
+
+            final int pendingSize = getAVRequests().size();
+            final int matchingSize = getMatchings().size();
+
+            new PredefinedMatchingMatcher(this::setAcceptRequest).matchPredefined(getMatchings(), stayVehiclesAtLinks);
+
+            final int delta = pendingSize - getAVRequests().size();
+
+            // at this point, the same number of requests should have disappeared as matchings
+            GlobalAssert.that(delta == matchingSize - getMatchings().size());
         }
 
-        managePickupVehicles();
+        // managePickupVehicles();
 
-        checkServedButWaitingCustomers(now);
+        // checkServedButWaitingCustomers(now);
 
         final long round_now = Math.round(now);
         if (round_now % samplingPeriod == 0) {
+
+            manageIncomingRequests(now);
 
             {
                 final int m = virtualNetwork.getvLinksCount();
                 final int n = virtualNetwork.getvNodesCount();
 
-                System.out.println("open requests: " + getAVRequests().size() + "  not served yet: " + mpcRequestsMap.size());
+                System.out.println("open requests: " + getAVRequests().size() + "  in the process of pickup: " + getMatchings().size());
 
                 { // build and send problem description to MATLAB as input to MPC
                     Container container = new Container(String.format("problem@%06d", Math.round(now)));
@@ -187,45 +134,11 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         /**
                          * number of waiting customers that begin their journey on link_k = (node_i, node_j)
                          */
-                        for (AVRequest avRequest : getAVRequests()) // all current requests
-                            // only count request that haven't received a pickup order yet
-                            // or haven't been processed yet, i.e. if request has been seen/computed before
-                            if (!considerItDone.containsKey(avRequest) && !mpcRequestsMap.containsKey(avRequest)) {
-                                // check if origin and dest are from same virtualNode
-                                final VirtualNode vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
-                                final VirtualNode vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
-                                GlobalAssert.that(vnFrom.equals(vnTo) == (vnFrom.index == vnTo.index));
-                                if (vnFrom.equals(vnTo)) {
-                                    // self loop
-                                    mpcRequestsMap.put(avRequest, new MpcRequest(avRequest, m, vnFrom));
-                                } else {
-                                    // non-self loop
-                                    boolean success = false;
-                                    VrpPath vrpPath = instantPathFactory.getVrpPathWithTravelData( //
-                                            avRequest.getFromLink(), avRequest.getToLink(), now); // TODO perhaps add expected waitTime
-                                    VirtualNode fromIn = null;
-                                    for (Link link : vrpPath) {
-                                        final VirtualNode toIn = virtualNetwork.getVirtualNode(link);
-                                        if (fromIn == null)
-                                            fromIn = toIn;
-                                        else //
-                                        if (fromIn != toIn) { // found adjacent node
-                                            VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
-                                            mpcRequestsMap.put(avRequest, new MpcRequest(avRequest, virtualLink));
-                                            success = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!success) {
-                                        new RuntimeException("VirtualLink of request could not be identified") //
-                                                .printStackTrace();
-                                    }
-                                }
-                            }
-
                         Tensor waitCustomersPerVLink = Array.zeros(m + n); // +n accounts for self loop
-                        for (MpcRequest mpcRequest : mpcRequestsMap.values()) // requests that haven't received a dispatch yet
+                        for (AVRequest avRequest : getAVRequestsUnserved()) { // requests that haven't received a dispatch yet
+                            MpcRequest mpcRequest = mpcRequestsMap.get(avRequest); // must not be null
                             waitCustomersPerVLink.set(Increment.ONE, mpcRequest.vectorIndex);
+                        }
                         double[] array = ExtractPrimitives.toArrayDouble(waitCustomersPerVLink);
                         DoubleArray doubleArray = new DoubleArray("waitCustomersPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
@@ -272,16 +185,18 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         accountedVehicles.addAll(map.keySet());
                         {
                             // vehicles on pickup drive appear here
-                            for (Entry<AVVehicle, AVRequest> entry : pickupAndCustomerVehicle.entrySet()) {
-                                AVVehicle avVehicle = entry.getKey();
-                                AVRequest avRequest = entry.getValue();
+                            for (Entry<AVRequest, AVVehicle> entry : matchings.entrySet()) {
+                                AVRequest avRequest = entry.getKey();
+                                AVVehicle avVehicle = entry.getValue();
                                 if (!accountedVehicles.contains(avVehicle)) {
                                     // request
                                     int index = -1;
                                     if (mpcRequestsMap.containsKey(avRequest))
                                         index = mpcRequestsMap.get(avRequest).vectorIndex;
-                                    else
+                                    else {
                                         index = m + virtualNetwork.getVirtualNode(avRequest.getFromLink()).index;
+                                        new RuntimeException("map should provide request info").printStackTrace();
+                                    }
                                     vector.set(Increment.ONE, index);
                                     accountedVehicles.add(avVehicle);
                                 }
@@ -376,7 +291,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
                     {
                         int totalPickupEffective = 0;
-                        final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
+                        final Map<VirtualNode, List<AVVehicle>> availableVehicles = getVirtualNodeStayVehicles();
+                        
                         final NavigableMap<Integer, List<MpcRequest>> virtualLinkRequestsMap = new TreeMap<>(mpcRequestsMap.values().stream() //
                                 .collect(Collectors.groupingBy(mpcRequest -> mpcRequest.vectorIndex)));
                         for (int vectorIndex = 0; vectorIndex < m + n; ++vectorIndex) {
@@ -384,7 +300,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                             final VirtualNode vnFrom = vectorIndex < m ? //
                                     virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
                             if (availableVehicles.containsKey(vnFrom)) {
-                                final List<VehicleLinkPair> cars = availableVehicles.get(vnFrom); // find cars
+                                final List<AVVehicle> cars = availableVehicles.get(vnFrom); // find cars
                                 final int desiredPickup = requestVector.Get(vectorIndex).number().intValue();
                                 int pickupPerNode = 0;
                                 if (0 < desiredPickup) {
@@ -395,19 +311,19 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                                 virtualLinkRequestsMap.get(vectorIndex) : Collections.emptyList();
                                         int min = Math.min(Math.min(desiredPickup, requests.size()), cars.size());
                                         for (int count = 0; count < min; ++count) {
-                                            VehicleLinkPair vehicleLinkPair = cars.get(0);
-                                            cars.remove(0);
+                                            AVVehicle avVehicle = cars.get(0);
+                                            GlobalAssert.that(!getAVVehicleInMatching().contains(avVehicle));
+                                            {
+                                                AVVehicle former = cars.remove(0);
+                                                GlobalAssert.that(former == avVehicle);
+                                            }
                                             MpcRequest mpcRequest = requests.get(count);
                                             Link pickupLocation = mpcRequest.avRequest.getFromLink(); // where the customer is waiting right now
                                             System.out.println("set diversion for pickup");
-                                            setVehicleDiversion(vehicleLinkPair, pickupLocation); // send car to customer
+                                            setStayVehicleDiversion(avVehicle, pickupLocation); // send car to customer
                                             ++totalPickupEffective;
                                             ++pickupPerNode;
-                                            considerItDone.put(mpcRequest.avRequest, vehicleLinkPair.avVehicle);
-                                            GlobalAssert.that(!pickupAndCustomerVehicle.containsKey(vehicleLinkPair.avVehicle));
-                                            pickupAndCustomerVehicle.put(vehicleLinkPair.avVehicle, mpcRequest.avRequest);
-                                            effectivePickupTime.put(mpcRequest.avRequest, now);
-                                            mpcRequestsMap.remove(mpcRequest.avRequest);
+                                            matchings.put(mpcRequest.avRequest, avVehicle);
                                         }
                                     }
                                 }
