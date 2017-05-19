@@ -146,7 +146,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		//==
 
 		//
-		config.controler().setOutputDirectory(OUT_DIR+"/relaxingPlans/");
+		config.controler().setOutputDirectory(OUT_DIR+"/relaxingPlans_"+startingASCforBicycle+"asc/");
 
 		if(! isPlansRelaxed) {
 			config.controler().setLastIteration(50);
@@ -178,7 +178,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		// set back settings for opdyts
 		File file = new File(config.controler().getOutputDirectory()+"/output_plans.xml.gz");
 		config.plans().setInputFile(file.getAbsoluteFile().getAbsolutePath());
-		OUT_DIR = OUT_DIR+"/calibration_"+ averagingIterations +"Its_"+selfTunerWeight+"weight/";
+		OUT_DIR = OUT_DIR+"/calibration_"+ averagingIterations +"Its_"+selfTunerWeight+"weight_"+startingASCforBicycle+"asc/";
 
 		config.controler().setOutputDirectory(OUT_DIR);
 		config.strategy().setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
