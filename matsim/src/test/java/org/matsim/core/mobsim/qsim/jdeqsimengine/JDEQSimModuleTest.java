@@ -3,6 +3,7 @@ package org.matsim.core.mobsim.qsim.jdeqsimengine;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -19,6 +20,7 @@ public class JDEQSimModuleTest extends MatsimTestCase {
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
         eventsManager.initProcessing();
+        PrepareForSimUtils.createDefaultPrepareForSim(scenario,eventsManager).run();
         QSim qsim = new QSim(scenario, eventsManager);
         JDEQSimModule.configure(qsim);
         qsim.run();
@@ -28,6 +30,7 @@ public class JDEQSimModuleTest extends MatsimTestCase {
         Scenario scenario = ScenarioUtils.loadScenario(loadConfig("test/scenarios/equil/config.xml"));
         EventsManager eventsManager = EventsUtils.createEventsManager(scenario.getConfig());
         eventsManager.initProcessing();
+        PrepareForSimUtils.createDefaultPrepareForSim(scenario,eventsManager).run();
         QSim qsim = new QSim(scenario, eventsManager);
         JDEQSimModule.configure(qsim);
         PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), new DefaultAgentFactory(qsim), qsim);
