@@ -1,6 +1,13 @@
 package playground.clruch.dispatcher;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Coord;
@@ -14,7 +21,6 @@ import com.google.inject.name.Named;
 
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
-import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.simonton.Cluster;
@@ -36,16 +42,16 @@ public class NotAsDumbDispatcher extends UniversalDispatcher {
     final Collection<Link> linkReferences; // <- for verifying link references
 
     private NotAsDumbDispatcher( //
-                                 AVDispatcherConfig avDispatcherConfig, //
-                                 TravelTime travelTime, //
-                                 ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
-                                 EventsManager eventsManager, //
-                                 Network network) {
+            AVDispatcherConfig avDispatcherConfig, //
+            TravelTime travelTime, //
+            ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
+            EventsManager eventsManager, //
+            Network network) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         this.network = network;
         linkReferences = new HashSet<>(network.getLinks().values());
-//        vehicleRequestMatcher = ;
+        // vehicleRequestMatcher = ;
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
     }
 
@@ -86,50 +92,49 @@ public class NotAsDumbDispatcher extends UniversalDispatcher {
                 while (requestIterator.hasNext()) {
                     Link reqLink = requestIterator.next().getFromLink();
                     VehicleLinkPair vehicletoMatch = null;
-                    if (round_now % dispatchPeriod*3 == 0) {
+                    if (round_now % dispatchPeriod * 3 == 0) {
                         vehicletoMatch = someCloseVehicleReturner(getDivertableVehicles(), reqLink, 2);
                     } else {
                         vehicletoMatch = closeVehicleReturner(getDivertableVehicles(), reqLink, 2000.0);
                     }
 
                     /*
-                    if (round_now % 600 == 0) {
-                        vehicletoMatch = closeVehicleReturner(getDivertableVehicles(), reqLink, 100000000000.0);
-                    } else {
-                        vehicletoMatch = closeVehicleReturner(getDivertableVehicles(), reqLink, 2000.0);
-                    }
-                    */
+                     * if (round_now % 600 == 0) {
+                     * vehicletoMatch = closeVehicleReturner(getDivertableVehicles(), reqLink, 100000000000.0);
+                     * } else {
+                     * vehicletoMatch = closeVehicleReturner(getDivertableVehicles(), reqLink, 2000.0);
+                     * }
+                     */
                     if (vehicletoMatch != null) {
                         setVehicleDiversion(vehicletoMatch, reqLink);
                         ++total_driveOrder;
                     }
                 }
 
-
                 /*
-
-
-
-                for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
-                    Iterator<AVRequest> requestIterator = getAVRequests().iterator();
-                    Link dest = vehicleLinkPair.getCurrentDriveDestination();
-                    Link avloc = vehicleLinkPair.getDivertableLocation();
-                    if (dest == null && requestIterator.hasNext()) { // vehicle in stay task
-                        Link closestLink = requestIterator.next().getFromLink();
-                        double closestDist = LinkDistance(closestLink, avloc);
-                        while (requestIterator.hasNext()) {
-                            Link newLink = requestIterator.next().getFromLink();
-                            if (LinkDistance(newLink, avloc) < closestDist) {
-                                closestLink = newLink;
-                            }
-                        }
-                        setVehicleDiversion(vehicleLinkPair, closestLink);
-                        ++total_driveOrder;
-                    } else
-                        break;
-                }
-
-                */
+                 * 
+                 * 
+                 * 
+                 * for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+                 * Iterator<AVRequest> requestIterator = getAVRequests().iterator();
+                 * Link dest = vehicleLinkPair.getCurrentDriveDestination();
+                 * Link avloc = vehicleLinkPair.getDivertableLocation();
+                 * if (dest == null && requestIterator.hasNext()) { // vehicle in stay task
+                 * Link closestLink = requestIterator.next().getFromLink();
+                 * double closestDist = LinkDistance(closestLink, avloc);
+                 * while (requestIterator.hasNext()) {
+                 * Link newLink = requestIterator.next().getFromLink();
+                 * if (LinkDistance(newLink, avloc) < closestDist) {
+                 * closestLink = newLink;
+                 * }
+                 * }
+                 * setVehicleDiversion(vehicleLinkPair, closestLink);
+                 * ++total_driveOrder;
+                 * } else
+                 * break;
+                 * }
+                 * 
+                 */
             }
         }
 
@@ -145,9 +150,9 @@ public class NotAsDumbDispatcher extends UniversalDispatcher {
         Optional<Map.Entry<VehicleLinkPair, Double>> totake = distanceMap.entrySet().stream().filter(v -> v.getValue() < MaxDist).findAny();
         if (totake.isPresent()) {
             return totake.get().getKey();
-        } else return null;
+        } else
+            return null;
     }
-
 
     /**
      *
@@ -172,16 +177,17 @@ public class NotAsDumbDispatcher extends UniversalDispatcher {
             double d2 = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord().getY();
             GlobalAssert.that(Double.isFinite(d1));
             GlobalAssert.that(Double.isFinite(d2));
-            KDTree.add(new double[]{d1, d2}, vehicleLinkPair);
+            KDTree.add(new double[] { d1, d2 }, vehicleLinkPair);
         }
 
-        double[] vehLoc = new double[] { reqlink.getToNode().getCoord().getX(),
-                reqlink.getToNode().getCoord().getY() };
+        double[] vehLoc = new double[] { reqlink.getToNode().getCoord().getX(), reqlink.getToNode().getCoord().getY() };
 
         Cluster<VehicleLinkPair> nearestCluster = KDTree.buildCluster(vehLoc, numbNeigh, new EuclideanDistancer());
         Optional<VehicleLinkPair> optional = nearestCluster.getValues().stream().findAny();
-        if(optional.isPresent()) return  optional.get();
-        else return null;
+        if (optional.isPresent())
+            return optional.get();
+        else
+            return null;
     }
 
     // TODO replace by MATSim internal function?
@@ -192,7 +198,6 @@ public class NotAsDumbDispatcher extends UniversalDispatcher {
         double dy = c1.getY() - c2.getY();
         return Math.hypot(dx, dy);
     }
-
 
     @Override
     public String getInfoLine() {
