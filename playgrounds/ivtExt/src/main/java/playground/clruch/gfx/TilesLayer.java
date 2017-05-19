@@ -37,6 +37,7 @@ public class TilesLayer extends ViewerLayer {
             {
                 SpinnerLabel<Blend> spinnerLabel = new SpinnerLabel<>();
                 spinnerLabel.setArray(Blend.values());
+                spinnerLabel.setMenuHover(true);
                 spinnerLabel.setValueSafe(matsimMapComponent.mapGrayCover == 255 ? Blend.Light : Blend.Dark);
                 spinnerLabel.addSpinnerListener(i -> {
                     matsimMapComponent.mapGrayCover = i.rgb;
@@ -50,6 +51,7 @@ public class TilesLayer extends ViewerLayer {
             {
                 SpinnerLabel<Integer> spinnerLabel = new SpinnerLabel<>();
                 spinnerLabel.setArray(0, 32, 64, 96, 128, 160, 192, 224, 255);
+                spinnerLabel.setMenuHover(true);
                 spinnerLabel.setValueSafe(matsimMapComponent.mapAlphaCover);
                 spinnerLabel.addSpinnerListener(i -> matsimMapComponent.setMapAlphaCover(i));
                 spinnerLabel.getLabelComponent().setPreferredSize(new Dimension(55, DEFAULT_HEIGHT));

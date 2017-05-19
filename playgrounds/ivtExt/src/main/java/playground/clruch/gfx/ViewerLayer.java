@@ -62,17 +62,17 @@ public abstract class ViewerLayer {
         });
         rowPanel.add(jCheckBox);
         {
-            SpinnerLabel<ColorSchemes> spinner = new SpinnerLabel<>();
-            spinner.setToolTipText("color scheme of heatmap");
-            spinner.setArray(ColorSchemes.values());
-            spinner.setValue(matsimHeatMap.colorSchemes);
-            spinner.addSpinnerListener(cs -> {
+            SpinnerLabel<ColorSchemes> spinnerLabel = new SpinnerLabel<>();
+            spinnerLabel.setToolTipText("color scheme of heatmap");
+            spinnerLabel.setArray(ColorSchemes.values());            
+            spinnerLabel.setValue(matsimHeatMap.colorSchemes);
+            spinnerLabel.addSpinnerListener(cs -> {
                 matsimHeatMap.colorSchemes = cs;
                 matsimMapComponent.repaint();
             });
-            spinner.getLabelComponent().setPreferredSize(new Dimension(100, DEFAULT_HEIGHT));
-            spinner.setMenuHover(true);
-            rowPanel.add(spinner.getLabelComponent());
+            spinnerLabel.getLabelComponent().setPreferredSize(new Dimension(100, DEFAULT_HEIGHT));
+            spinnerLabel.setMenuHover(true);
+            rowPanel.add(spinnerLabel.getLabelComponent());
         }
     }
 

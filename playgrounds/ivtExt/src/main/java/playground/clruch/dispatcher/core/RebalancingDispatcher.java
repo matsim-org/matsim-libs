@@ -14,6 +14,9 @@ import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
+/**
+ * rebalancing capability (without virtual network)
+ */
 public abstract class RebalancingDispatcher extends UniversalDispatcher {
     
     private final Map<AVVehicle, Link> rebalancingVehicles = new HashMap<>();
@@ -22,7 +25,6 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
     protected RebalancingDispatcher(AVDispatcherConfig avDispatcherConfig, TravelTime travelTime,
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, EventsManager eventsManager) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
-        // TODO Auto-generated constructor stub
     }
     
     @Override

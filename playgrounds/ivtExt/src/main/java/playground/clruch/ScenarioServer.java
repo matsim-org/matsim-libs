@@ -41,7 +41,7 @@ public class ScenarioServer {
 
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
-        int maxPopulationSize = 3000;
+        int maxPopulationSize = 5000;
 
 
         // set to true in order to make server wait for at least 1 client, for instance viewer client

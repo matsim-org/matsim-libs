@@ -183,10 +183,7 @@ public class LPVehicleRebalancing {
         int ret = GLPK.glp_simplex(lp, parm); // ret==0 indicates of the algorithm ran correctly
         GlobalAssert.that(ret==0);
         int stat = GLPK.glp_get_status(lp);
-        if (stat == GLPK.GLP_INFEAS){
-            System.out.println("infeasible problem, no solution found.");
-            GlobalAssert.that(false);
-        }
+        GlobalAssert.that(stat != GLPK.GLP_NOFEAS);
 
 
         // fill result vector, rebalance from i to j is equal to variable  (i*n)+ j +1

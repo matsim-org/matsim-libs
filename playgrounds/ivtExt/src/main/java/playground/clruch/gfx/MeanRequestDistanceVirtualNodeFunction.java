@@ -43,8 +43,4 @@ class MeanRequestDistanceVirtualNodeFunction extends AbstractVirtualNodeFunction
             return ZeroScalar.get();
         return Mean.of(vector).Get();
     }
-
-    public static void main(String[] args) {
-        System.out.println(Tensors.vector(i -> Tensors.empty(), 4));
-    }
 }

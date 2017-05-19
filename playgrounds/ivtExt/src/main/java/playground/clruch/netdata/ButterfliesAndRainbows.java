@@ -2,9 +2,9 @@ package playground.clruch.netdata;
 
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -29,8 +29,9 @@ class ButterfliesAndRainbows {
         map.get(node).add(virtualNode);
     }
 
-    public Collection<Point> allPairs() {
-        Set<Point> collection = new HashSet<>();
+    public List<Point> allPairs() {
+        // some algorithms assume that an edge is adjacent in the list to the opposite edge
+        List<Point> list = new LinkedList<>();
         for (Entry<Node, Set<VirtualNode>> entry : map.entrySet()) {
             Set<VirtualNode> set = entry.getValue();
             if (1 < set.size()) {
@@ -39,11 +40,11 @@ class ButterfliesAndRainbows {
                 List<VirtualNode> some = new ArrayList<>(set);
                 for (int i = 0; i < some.size() - 1; ++i)
                     for (int j = i + 1; j < some.size(); ++j) {
-                        collection.add(new Point(some.get(i).index, some.get(j).index));
-                        collection.add(new Point(some.get(j).index, some.get(i).index));
+                        list.add(new Point(some.get(i).index, some.get(j).index));
+                        list.add(new Point(some.get(j).index, some.get(i).index));
                     }
             }
         }
-        return collection;
+        return list;
     }
 }
