@@ -105,10 +105,10 @@ public class ScenarioPreparer {
             if (populationeliminateWalking)
                 PopulationTools.eliminateWalking(population);
             System.out.println("Population size after removing walking people: " + population.getPersons().values().size());
-            if (populationchangeModeToAV) // FIXME not sure if this is still required
+            if (populationchangeModeToAV) { // FIXME not sure if this is still required, or should always happen !?
+                System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
                 PopulationTools.changeModesOfTransportToAV(population);
-            System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
-            PopulationTools.changeModesOfTransportToAV(population);
+            }
             System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
             TheApocalypse.decimatesThe(population).toNoMoreThan(maxPopulationSize).people();
             System.out.println("Population after decimation:" + population.getPersons().values().size());
