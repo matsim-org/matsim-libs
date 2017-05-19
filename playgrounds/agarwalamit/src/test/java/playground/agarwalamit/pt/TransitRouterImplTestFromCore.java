@@ -19,6 +19,11 @@
 
 package playground.agarwalamit.pt;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import org.apache.log4j.Logger;
+import org.junit.runners.Parameterized.Parameters;
 import org.matsim.contrib.minibus.performance.raptor.Raptor;
 import org.matsim.contrib.minibus.performance.raptor.RaptorDisutility;
 import org.matsim.contrib.minibus.performance.raptor.TransitRouterQuadTree;
@@ -27,6 +32,7 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterImplTest;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
 import playground.agarwalamit.pt.connectionScan.ConnectionScanRouter;
 
 /**
@@ -37,8 +43,29 @@ import playground.agarwalamit.pt.connectionScan.ConnectionScanRouter;
 
 
 public class TransitRouterImplTestFromCore extends TransitRouterImplTest {
+	private static final Logger log = Logger.getLogger(TransitRouterImplTestFromCore.class) ;
+	
+	private TransitRouterType routerType ;
+	// yyyyyy probably better make type a String ... no point to have an enum in the core that needs to be touched every time a new router is
+	// pulled underneath this test.
 
-    private static TransitRouter createTransitRouter(TransitSchedule schedule, TransitRouterConfig trConfig, TransitRouterType routerType) {
+	@Parameters(name = "{index}: TransitRouter == {0}")
+	public static Collection<Object> createRouterTypes() {
+		Object[] router = new Object [] { 
+				TransitRouterType.standard,
+				TransitRouterType.raptor
+		};
+		return Arrays.asList(router);
+	}
+
+	public TransitRouterImplTestFromCore( TransitRouterType routerType ) {
+		super( routerType ) ;
+		log.warn( "using router=" + routerType ) ;
+		this.routerType = routerType;
+	}
+
+
+    protected TransitRouter createTransitRouter(TransitSchedule schedule, TransitRouterConfig trConfig, TransitRouterType routerType) {
         TransitRouter router = null ;
         switch( routerType ) {
             case raptor:
