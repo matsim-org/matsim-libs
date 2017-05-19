@@ -23,6 +23,7 @@ import java.util.*;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -93,7 +94,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 	}
 	
 	@SuppressWarnings("static-method")
-	@Test
+	@Test@Ignore
 	public void testIntegration_Slow() {
 		Fixture f = new Fixture();
 
@@ -145,7 +146,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 	}
 	
 	@SuppressWarnings("static-method")
-	@Test
+	@Test@Ignore
 	public void testIntegration_Fast() {
 		Fixture f = new Fixture();
 

@@ -24,6 +24,7 @@ import java.net.MalformedURLException;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.events.Event;
@@ -62,7 +63,7 @@ public class PtTutorialTest {
 	
 	public @Rule MatsimTestUtils utils = new MatsimTestUtils();
 	
-	@Test
+	@Test@Ignore
 	public void ensure_tutorial_runs() throws MalformedURLException {
 		Config config = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "0.config.xml"));
 		config.controler().setLastIteration(1);
