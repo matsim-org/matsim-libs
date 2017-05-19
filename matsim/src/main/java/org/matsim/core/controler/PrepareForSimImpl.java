@@ -86,36 +86,38 @@ class PrepareForSimImpl implements PrepareForSim {
 
 		Map<String, VehicleType> modeVehicleTypes = getMode2VehicleType();
 		for(Person person : scenario.getPopulation().getPersons().values()) {
-			Plan plan = person.getSelectedPlan();
-			Map<String,Id<Vehicle>> seenModes = new HashMap<>();
-			for(PlanElement planElement : plan.getPlanElements()) {
-				if( planElement instanceof Leg) {
-					Leg leg =  (Leg) planElement;
-					if (qSimConfigGroup.getMainModes().contains(leg.getMode())) {// only simulated modes get vehicles
-						NetworkRoute route = (NetworkRoute) leg.getRoute();
-						Id<Vehicle> vehicleId = null ;
-						if (route != null) {
-							vehicleId = route.getVehicleId(); // may be null!
-						} else {
-							throw new RuntimeException("Route not found.");
-						}
-
-						if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
-
-							if (vehicleId == null) {
-								vehicleId = createAutomaticVehicleId(person, leg, route);
+			for (Plan plan : person.getPlans()) { // go through with all plans ( when it was in population agent source, then going through only with selected plan was sufficient.) Amit May'17
+				Map<String, Id<Vehicle>> seenModes = new HashMap<>();
+				for (PlanElement planElement : plan.getPlanElements()) {
+					if (planElement instanceof Leg) {
+						Leg leg = (Leg) planElement;
+						if (qSimConfigGroup.getMainModes().contains(leg.getMode())) {// only simulated modes get vehicles
+							NetworkRoute route = (NetworkRoute) leg.getRoute();
+							Id<Vehicle> vehicleId = null;
+							if (route != null) {
+								vehicleId = route.getVehicleId(); // may be null!
+							} else {
+								throw new RuntimeException("Route not found.");
 							}
 
-							// so here we have a vehicle id, now try to find or create a physical vehicle:
-							Vehicle vehicle = createVehicle(leg, vehicleId, modeVehicleTypes.get(leg.getMode()));
-							seenModes.put(leg.getMode(),vehicleId);
-						} else {
-							if (vehicleId==null && route!=null) {
-								vehicleId = seenModes.get(leg.getMode());
-								route.setVehicleId( vehicleId );
-							}
-						}
+							if (!seenModes.keySet()
+										  .contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
 
+								if (vehicleId == null) {
+									vehicleId = createAutomaticVehicleId(person, leg, route);
+								}
+
+								// so here we have a vehicle id, now try to find or create a physical vehicle:
+								Vehicle vehicle = createVehicle(leg, vehicleId, modeVehicleTypes.get(leg.getMode()));
+								seenModes.put(leg.getMode(), vehicleId);
+							} else {
+								if (vehicleId == null && route != null) {
+									vehicleId = seenModes.get(leg.getMode());
+									route.setVehicleId(vehicleId);
+								}
+							}
+
+						}
 					}
 				}
 			}
