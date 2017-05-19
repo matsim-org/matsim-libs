@@ -1,24 +1,17 @@
 package playground.clruch.dispatcher.utils;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.utils.collections.QuadTree;
 
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
-
-import playground.clruch.dispatcher.core.UniversalDispatcher;
 
 /**
  * if a vehicle is in stay more and there is a request at the link of where the car is the vehicle
@@ -39,25 +32,21 @@ public class PredefinedMatchingMatcher extends AbstractVehicleRequestMatcher {
         GlobalAssert.that(false);
         return 0;
     }
-    
-    
-    
-    public int matchPredefined(HashMap<AVVehicle, Link> stayVehicles, HashMap<AVRequest, AVVehicle> matchings) {
-            int num_matchedRequests = 0;
-            HashMap<AVRequest, AVVehicle> matchingsIter = new HashMap<>(matchings);
-            // match vehicles which have arrived at origin of request
-            for(Entry<AVRequest,AVVehicle> entry : matchingsIter.entrySet()){
-                if(stayVehicles.containsKey(entry.getValue()) && stayVehicles.get(entry.getValue()) == entry.getKey().getFromLink()){
-                    biConsumer.accept(entry.getValue(), entry.getKey());
+
+    public int matchPredefined(Map<AVVehicle, Link> stayVehicles, Map<AVRequest, AVVehicle> matchings) {
+        int num_matchedRequests = 0;
+        // match vehicles which have arrived at origin of request
+        for (Entry<AVRequest, AVVehicle> entry : new HashMap<>(matchings).entrySet()) {
+            final AVRequest avRequest = entry.getKey();
+            final AVVehicle avVehicle = entry.getValue();
+            if (stayVehicles.containsKey(avVehicle)) {
+                Link link = stayVehicles.get(avVehicle);
+                if (link.equals(avRequest.getFromLink())) {
+                    biConsumer.accept(avVehicle, avRequest);
                     ++num_matchedRequests;
-                };
+                }
             }
-            
-            return num_matchedRequests;
-        
-        
+        }
+        return num_matchedRequests;
     }
-        
-
-
 }

@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -17,8 +16,6 @@ import org.matsim.core.utils.collections.QuadTree;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
-
-import playground.clruch.dispatcher.core.UniversalDispatcher;
 
 /**
  * if a vehicle is in stay more and there is a request at the link of where the car is the vehicle

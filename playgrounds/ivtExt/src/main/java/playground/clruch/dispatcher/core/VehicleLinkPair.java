@@ -8,8 +8,14 @@ import playground.sebhoerl.avtaxi.data.AVVehicle;
 public class VehicleLinkPair {
     public final AVVehicle avVehicle;
     public final LinkTimePair linkTimePair;
-    private final Link currentDriveDestination;
+    private final Link currentDriveDestination; // null for stay task
 
+    /**
+     * @param avVehicle
+     * @param linkTimePair
+     * @param currentDriveDestination
+     *            null if the vehicle is in stay task
+     */
     public VehicleLinkPair(AVVehicle avVehicle, LinkTimePair linkTimePair, Link currentDriveDestination) {
         this.avVehicle = avVehicle;
         this.linkTimePair = linkTimePair;

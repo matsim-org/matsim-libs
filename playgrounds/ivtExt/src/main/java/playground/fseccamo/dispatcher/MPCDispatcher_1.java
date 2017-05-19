@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
@@ -43,7 +44,6 @@ import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
-import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
@@ -156,8 +156,17 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
         // PART 0: match vehicles at a customer link
         // only if the request has received a pickup order
-        new InOrderOfArrivalMatcher(this::setAcceptRequest) //
-                .match(getStayVehicles(), override_getAVRequestsAtLinks());
+        // new InOrderOfArrivalMatcher(this::setAcceptRequest) //
+        // .match(getStayVehicles(), override_getAVRequestsAtLinks());
+        {
+            Set<AVVehicle> stayVehicles = getStayVehicles().values().stream().flatMap(Queue::stream).collect(Collectors.toSet());
+            for (AVVehicle avVehicle : stayVehicles) {
+                if (considerItDone.containsKey(avVehicle)) {
+                    // setAcceptRequest(avVehicle, avRequest);
+                    // override_getAVRequestsAtLinks();
+                }
+            }
+        }
 
         managePickupVehicles();
 

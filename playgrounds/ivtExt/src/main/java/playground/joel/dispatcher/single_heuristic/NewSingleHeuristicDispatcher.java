@@ -13,7 +13,8 @@ import org.matsim.core.utils.collections.QuadTree;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import playground.clruch.dispatcher.core.UniversalBindingDispatcher;
+import playground.clruch.dispatcher.core.DispatcherUtils;
+import playground.clruch.dispatcher.core.BindingUniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
@@ -28,7 +29,7 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-public class NewSingleHeuristicDispatcher extends UniversalBindingDispatcher {
+public class NewSingleHeuristicDispatcher extends BindingUniversalDispatcher {
 
     private final int dispatchPeriod;
     private final double[] networkBounds;
@@ -56,7 +57,7 @@ public class NewSingleHeuristicDispatcher extends UniversalBindingDispatcher {
         final long round_now = Math.round(now);
 
         // get Map for Matcher
-        HashMap<AVVehicle, Link> stayVehiclesAtLinks = vehicleMapper();
+        Map<AVVehicle, Link> stayVehiclesAtLinks = DispatcherUtils.vehicleMapper(getStayVehicles());
 
         // match all matched av/request pairs which are at same link
         new PredefinedMatchingMatcher(this::setAcceptRequest) //
@@ -119,23 +120,6 @@ public class NewSingleHeuristicDispatcher extends UniversalBindingDispatcher {
         Coord requestCoord = avRequest.getFromLink().getCoord();
         // System.out.println("treesize " + unassignedVehiclesTree.size());
         return unassignedVehiclesTree.getClosest(requestCoord.getX(), requestCoord.getY());
-    }
-
-    /**
-     *
-     * @return map containing all staying vehicles and their respective links needed for the matcher
-     */
-    private HashMap<AVVehicle, Link> vehicleMapper() {
-        // get Map for Matcher
-        HashMap<AVVehicle, Link> stayVehiclesAtLinks = new HashMap<>();
-        Map<Link, Queue<AVVehicle>> stayVehicles = getStayVehicles();
-        for (Link link : stayVehicles.keySet()) {
-            Queue<AVVehicle> queue = stayVehicles.get(link);
-            for (AVVehicle avVehicle : queue) {
-                stayVehiclesAtLinks.put(avVehicle, link);
-            }
-        }
-        return stayVehiclesAtLinks;
     }
 
     /**

@@ -90,9 +90,9 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     /**
-     * @return collection of all vehicles available to {@link VehicleMaintainer} 
+     * @return collection of all vehicles available to {@link VehicleMaintainer}
      */
-    protected Collection<AVVehicle> getMaintainedVehicles() {
+    protected final Collection<AVVehicle> getMaintainedVehicles() {
         return Collections.unmodifiableList(vehicles);
     }
 
@@ -168,57 +168,6 @@ abstract class VehicleMaintainer implements AVDispatcher {
             }
         return collection;
     }
-    
-    
-//    /**
-//     * @return collection of cars that are in the stay task.
-//     *         if a vehicle is given a directive for instance by setVehicleDiversion(...) or setAcceptRequest(...)
-//     *         that invoke assignDirective(...), the vehicle is not included in the successive call to
-//     *         getDivertableVehicles() until it becomes <i>divertable</i> again.
-//     */
-//    protected final Collection<VehicleLinkPair> getStayVehicleLinkPairs() {
-//        Collection<VehicleLinkPair> collection = new LinkedList<>();
-//        for (AVVehicle avVehicle : getFunctioningVehicles())
-//            if (isWithoutDirective(avVehicle)) {
-//                Schedule schedule = avVehicle.getSchedule();
-//                new AVTaskAdapter(schedule.getCurrentTask()) {
-//                    @Override
-//                    public void handle(AVDriveTask avDriveTask) {
-//                        // for driving vehicles don't do anything
-//                        
-////                        // for empty cars the drive task is second to last task
-////                        if (Schedules.isNextToLastTask(avDriveTask)) {
-////                            TaskTracker taskTracker = avDriveTask.getTaskTracker();
-////                            OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
-////                            LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
-////                            if (linkTimePair != null)
-////                                collection.add(new VehicleLinkPair(avVehicle, linkTimePair, avDriveTask.getPath().getToLink()));
-////                        }
-//                    }
-//
-//                    @Override
-//                    public void handle(AVStayTask avStayTask) {
-//                        // for empty vehicles the current task has to be the last task
-//                        if (Schedules.isLastTask(avStayTask)) {
-//                            GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow()); // <- self evident?
-//                            LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
-//                            collection.add(new VehicleLinkPair(avVehicle, linkTimePair, null));
-//                        }
-//                    }
-//                };
-//            }
-//        return collection;
-//    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
     @Override
     public final void registerVehicle(AVVehicle vehicle) {

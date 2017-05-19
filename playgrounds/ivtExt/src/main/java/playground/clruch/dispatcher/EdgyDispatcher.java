@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Coord;
@@ -19,7 +18,6 @@ import com.google.inject.name.Named;
 
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
-import playground.clruch.dispatcher.utils.AbstractVehicleRequestMatcher;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.utils.SafeConfig;
