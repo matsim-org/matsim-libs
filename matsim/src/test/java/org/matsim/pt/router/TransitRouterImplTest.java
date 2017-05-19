@@ -74,20 +74,20 @@ import org.matsim.testcases.MatsimTestCase;
 public class TransitRouterImplTest {
 	private static final Logger log = Logger.getLogger(TransitRouterImplTest.class) ;
 	
-	protected static enum TransitRouterType { standard, raptor, connectionScan } ;
+//	protected static enum TransitRouterType { standard, raptor, connectionScan } ;
 
-	private TransitRouterType routerType ;
+	private String routerType ;
 
 	@Parameters(name = "{index}: TransitRouter == {0}")
 	public static Collection<Object> createRouterTypes() {
 		Object[] router = new Object [] { 
-				TransitRouterType.standard,
-//				TransitRouterType.raptor
+				"standard"
+//				,TransitRouterType.raptor
 		};
 		return Arrays.asList(router);
 	}
 
-	public TransitRouterImplTest( TransitRouterType routerType ) {
+	public TransitRouterImplTest( String routerType ) {
 		log.warn( "using router=" + routerType ) ;
 		this.routerType = routerType;
 	}
@@ -120,7 +120,7 @@ public class TransitRouterImplTest {
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
-	protected TransitRouter createTransitRouter(TransitSchedule schedule, TransitRouterConfig trConfig, TransitRouterType routerType) {
+	protected TransitRouter createTransitRouter(TransitSchedule schedule, TransitRouterConfig trConfig, String routerType) {
 		TransitRouter router = null ;
 		switch( routerType ) { 
 //		case raptor:
@@ -131,7 +131,7 @@ public class TransitRouterImplTest {
 //			transitRouterQuadTree.initializeFromSchedule(schedule, trConfig.getBeelineWalkConnectionDistance());
 //			router = new Raptor(transitRouterQuadTree, raptorDisutility, trConfig) ;
 //			break;
-		case standard:
+		case "standard":
 			router = new TransitRouterImpl(trConfig, schedule);
 			break;
 		default:
