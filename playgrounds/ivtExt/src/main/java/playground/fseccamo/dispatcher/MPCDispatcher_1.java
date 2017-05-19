@@ -1,6 +1,7 @@
 package playground.fseccamo.dispatcher;
 
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -265,7 +266,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                     // System.out.println("rebalancingPerVLink: TOTAL " + totalRebalanceDesired);
 
                     stringBuilder.append(" effective: ");
-                    
+
                     {
                         int totalPickupEffective = 0;
 
@@ -361,9 +362,10 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                     for (int count = 0; count < min; ++count) {
                                         VehicleLinkPair vehicleLinkPair = cars.get(0);
                                         cars.remove(0);
-                                        Link rebalanceDest = centerLink.get(vnTo);
-                                        // new ArrayList<>( //
-                                        // vnTo.getLinks()).get(random.nextInt(vnTo.getLinks().size()));
+                                        Link rebalanceDest =
+                                                // centerLink.get(vnTo);
+                                                new ArrayList<>( //
+                                                        vnTo.getLinks()).get(random.nextInt(vnTo.getLinks().size()));
                                         setVehicleRebalance(vehicleLinkPair, rebalanceDest); // send car to adjacent virtual node
                                         ++totalRebalanceEffective;
                                         if (vnFrom.equals(vnTo))
@@ -379,7 +381,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         }
                         if (totalRebalanceEffective != totalRebalanceDesired)
                             System.out.println(" !!! rebalance delta: " + totalRebalanceEffective + " < " + totalRebalanceDesired);
-                        
+
                         stringBuilder.append(String.format("%2dr (self=%d)", totalRebalanceEffective, selfRebalanceEffective));
                     }
 
