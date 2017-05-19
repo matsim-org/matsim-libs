@@ -325,6 +325,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                 // handle requests
                                 final List<MpcRequest> requests = virtualLinkRequestsMap.containsKey(vectorIndex) ? //
                                         virtualLinkRequestsMap.get(vectorIndex) : Collections.emptyList();
+                                Collections.sort(requests, MpcRequestComparator.INSTANCE);
 
                                 // final QuadTree<AVRequest> pendingRequestsTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2],
                                 // networkBounds[3]);
