@@ -348,6 +348,16 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                             final VirtualNode vnTo = vectorIndex < m ? //
                                     virtualNetwork.getVirtualLink(vectorIndex).getTo() : virtualNetwork.getVirtualNode(vectorIndex - m);
                             final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
+
+                            List<Link> candidateLinks = new ArrayList<>();
+                            for (AVRequest avRequest : getAVRequestsUnserved()) {
+                                Link link = avRequest.getFromLink();
+                                if (vnTo.getLinks().contains(link))
+                                    candidateLinks.add(link);
+                            }
+                            if (candidateLinks.isEmpty())
+                                candidateLinks.addAll(vnTo.getLinks());
+
                             // ---
                             if (availableVehicles.containsKey(vnFrom)) {
                                 final List<VehicleLinkPair> cars = availableVehicles.get(vnFrom); // find cars
@@ -365,7 +375,9 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                         Link rebalanceDest =
                                                 // centerLink.get(vnTo);
                                                 new ArrayList<>( //
-                                                        vnTo.getLinks()).get(random.nextInt(vnTo.getLinks().size()));
+                                                        // vnTo.getLinks() //
+                                                        candidateLinks //
+                                                ).get(random.nextInt(candidateLinks.size()));
                                         setVehicleRebalance(vehicleLinkPair, rebalanceDest); // send car to adjacent virtual node
                                         ++totalRebalanceEffective;
                                         if (vnFrom.equals(vnTo))
