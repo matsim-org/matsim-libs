@@ -20,12 +20,7 @@
 
 package playground.telaviv.core.mobsim.qsim.agents;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -33,9 +28,6 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-
 import playground.telaviv.config.TelAvivConfig;
 
 public class TTAAgentSource implements AgentSource {
@@ -86,29 +78,30 @@ public class TTAAgentSource implements AgentSource {
 		log.info("external car population size:\t" + carPopulation.getPersons().size());
 		log.info("external truck population size:\t" + truckPopulation.getPersons().size());
 		log.info("external commercial population size:\t" + commercialPopulation.getPersons().size());
-		
-		Map<String, VehicleType> modeVehicleTypes;
-		
-		modeVehicleTypes = new HashMap<String, VehicleType>();
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
-		car.setPcuEquivalents(TelAvivConfig.carPcuEquivalents);
-		car.setMaximumVelocity(TelAvivConfig.carMaximumVelocity);
-		modeVehicleTypes.put(TransportMode.car, car);
-		this.truckPopulationAgentSource.setModeVehicleTypes(modeVehicleTypes);
-		
-		modeVehicleTypes = new HashMap<String, VehicleType>();
-		VehicleType truck = VehicleUtils.getFactory().createVehicleType(Id.create("truck", VehicleType.class));
-		truck.setPcuEquivalents(TelAvivConfig.truckPcuEquivalents);
-		truck.setMaximumVelocity(TelAvivConfig.truckMaximumVelocity);
-		modeVehicleTypes.put(TransportMode.car, truck);
-		this.truckPopulationAgentSource.setModeVehicleTypes(modeVehicleTypes);
-		
-		modeVehicleTypes = new HashMap<String, VehicleType>();
-		VehicleType commercial = VehicleUtils.getFactory().createVehicleType(Id.create("commercial", VehicleType.class));
-		commercial.setPcuEquivalents(TelAvivConfig.commercialPcuEquivalents);
-		commercial.setMaximumVelocity(TelAvivConfig.commercialMaximumVelocity);
-		modeVehicleTypes.put(TransportMode.car, commercial);
-		this.commercialPopulationAgentSource.setModeVehicleTypes(modeVehicleTypes);
+//		setter for mode vehicle types in agent source is not available any more. set vehicle type info to scenario.getVehicles and then use QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData. Amit May'17
+
+//		Map<String, VehicleType> modeVehicleTypes;
+//
+//		modeVehicleTypes = new HashMap<String, VehicleType>();
+//		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
+//		car.setPcuEquivalents(TelAvivConfig.carPcuEquivalents);
+//		car.setMaximumVelocity(TelAvivConfig.carMaximumVelocity);
+//		modeVehicleTypes.put(TransportMode.car, car);
+//		this.truckPopulationAgentSource.setModeVehicleTypes(modeVehicleTypes);
+//
+//		modeVehicleTypes = new HashMap<String, VehicleType>();
+//		VehicleType truck = VehicleUtils.getFactory().createVehicleType(Id.create("truck", VehicleType.class));
+//		truck.setPcuEquivalents(TelAvivConfig.truckPcuEquivalents);
+//		truck.setMaximumVelocity(TelAvivConfig.truckMaximumVelocity);
+//		modeVehicleTypes.put(TransportMode.car, truck);
+//		this.truckPopulationAgentSource.setModeVehicleTypes(modeVehicleTypes);
+//
+//		modeVehicleTypes = new HashMap<String, VehicleType>();
+//		VehicleType commercial = VehicleUtils.getFactory().createVehicleType(Id.create("commercial", VehicleType.class));
+//		commercial.setPcuEquivalents(TelAvivConfig.commercialPcuEquivalents);
+//		commercial.setMaximumVelocity(TelAvivConfig.commercialMaximumVelocity);
+//		modeVehicleTypes.put(TransportMode.car, commercial);
+//		this.commercialPopulationAgentSource.setModeVehicleTypes(modeVehicleTypes);
 	}
 	
 	@Override

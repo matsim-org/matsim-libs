@@ -129,6 +129,8 @@ public class GfipQueuePassingControler {
 		// ---
 
 		Scenario sc = ScenarioUtils.loadScenario(config);
+//		since setter for modeVehicleTypes from agent souce is removed and vehicles are already present in scenario.getVehicles, it should work by setting desired vehicle source as follows. Amit May'17
+		sc.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		// ---
 

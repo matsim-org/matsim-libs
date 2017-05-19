@@ -46,7 +46,6 @@ public final class PopulationAgentSource implements AgentSource {
 	private final Population population;
 	private final AgentFactory agentFactory;
 	private final QSim qsim;
-	private Map<String, VehicleType> modeVehicleTypes;
 	private final Collection<String> mainModes;
 	private Map<Id<Vehicle>,Id<Link>> seenVehicleIds = new HashMap<>() ;
 
@@ -58,29 +57,7 @@ public final class PopulationAgentSource implements AgentSource {
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
-		this.modeVehicleTypes = new HashMap<>();
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
-		switch ( qsimConfig.getVehiclesSource() ) {
-		case defaultVehicle:
-			for (String mode : mainModes) {
-				// initialize each mode with default vehicle type:
-				modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
-			}
-			break;
-		case fromVehiclesData:
-			// don't do anything
-			break;
-		case modeVehicleTypesFromVehiclesData:
-			for (String mode : mainModes) {
-				VehicleType vehicleType = vehicles.getVehicleTypes().get( Id.create(mode, VehicleType.class) ) ;
-				Gbl.assertNotNull(vehicleType);
-				modeVehicleTypes.put(mode, vehicleType );
-			}
-			break;
-		default:
-			break;
-		
-		}
 	}
 
 	@Override
@@ -177,10 +154,4 @@ public final class PopulationAgentSource implements AgentSource {
 		}
 		throw new RuntimeException("Don't know where to put a vehicle for this agent.");
 	}
-
-	// not sure, how this would fit after moving vehicles in prepare for sim.
-	public void setModeVehicleTypes(Map<String, VehicleType> modeVehicleTypes) {
-		this.modeVehicleTypes = modeVehicleTypes;
-	}
-
 }

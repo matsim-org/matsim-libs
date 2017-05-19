@@ -1,10 +1,6 @@
 package playground.kai.usecases;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
@@ -27,10 +23,7 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
@@ -116,29 +109,30 @@ class MyControler {
 //			}
 
 	        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-	        Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
-
-	        VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
-	        car.setMaximumVelocity(60.0/3.6);
-	        car.setPcuEquivalents(1.0);
-	        modeVehicleTypes.put("car", car);
-	        
-	        VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
-	        bike.setMaximumVelocity(60.0/3.6);
-	        bike.setPcuEquivalents(0.25);
-	        modeVehicleTypes.put("bike", bike);
-	        
-	        VehicleType bicycles = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
-	        bicycles.setMaximumVelocity(15.0/3.6);
-	        bicycles.setPcuEquivalents(0.05);
-	        modeVehicleTypes.put("bicycle", bicycles);
-
-	        VehicleType walks = VehicleUtils.getFactory().createVehicleType(Id.create("walk", VehicleType.class));
-	        walks.setMaximumVelocity(1.5);
-	        walks.setPcuEquivalents(0.10);  			// assumed pcu for walks is 0.1
-	        modeVehicleTypes.put("walk", walks);
-	        
-			agentSource.setModeVehicleTypes(modeVehicleTypes);
+			//	        setter for ModeVehicleTypes to agent source is gone now. Amit May'17
+//	        Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
+//
+//	        VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
+//	        car.setMaximumVelocity(60.0/3.6);
+//	        car.setPcuEquivalents(1.0);
+//	        modeVehicleTypes.put("car", car);
+//
+//	        VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
+//	        bike.setMaximumVelocity(60.0/3.6);
+//	        bike.setPcuEquivalents(0.25);
+//	        modeVehicleTypes.put("bike", bike);
+//
+//	        VehicleType bicycles = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
+//	        bicycles.setMaximumVelocity(15.0/3.6);
+//	        bicycles.setPcuEquivalents(0.05);
+//	        modeVehicleTypes.put("bicycle", bicycles);
+//
+//	        VehicleType walks = VehicleUtils.getFactory().createVehicleType(Id.create("walk", VehicleType.class));
+//	        walks.setMaximumVelocity(1.5);
+//	        walks.setPcuEquivalents(0.10);  			// assumed pcu for walks is 0.1
+//	        modeVehicleTypes.put("walk", walks);
+//
+//			agentSource.setModeVehicleTypes(modeVehicleTypes);
 	        
 	        qSim.addAgentSource(agentSource);
 			

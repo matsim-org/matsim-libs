@@ -101,9 +101,4 @@ public class PopulationAgentSource implements AgentSource {
 		}
 		throw new RuntimeException("Don't know where to put a vehicle for this agent.");
 	}
-
-	public void setModeVehicleTypes(Map<String, VehicleType> modeVehicleTypes) {
-		this.modeVehicleTypes = modeVehicleTypes;
-	}
-
 }

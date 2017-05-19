@@ -21,16 +21,20 @@
 package playground.telaviv.controler;
 
 import com.google.inject.Provider;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.core.mobsim.qsim.TTAQSimFactory;
 import playground.telaviv.locationchoice.matsimdc.DCScoringFunctionFactory;
@@ -42,6 +46,24 @@ public class TelAvivRunner {
 		if (basePath != null) TelAvivConfig.basePath = basePath;
 		
 		Config config = scenario.getConfig();
+
+		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
+		car.setPcuEquivalents(TelAvivConfig.carPcuEquivalents);
+		car.setMaximumVelocity(TelAvivConfig.carMaximumVelocity);
+		scenario.getVehicles().addVehicleType(car);
+
+		VehicleType truck = VehicleUtils.getFactory().createVehicleType(Id.create("truck", VehicleType.class));
+		truck.setPcuEquivalents(TelAvivConfig.truckPcuEquivalents);
+		truck.setMaximumVelocity(TelAvivConfig.truckMaximumVelocity);
+		scenario.getVehicles().addVehicleType(truck);
+
+		VehicleType commercial = VehicleUtils.getFactory().createVehicleType(Id.create("commercial", VehicleType.class));
+		commercial.setPcuEquivalents(TelAvivConfig.commercialPcuEquivalents);
+		commercial.setMaximumVelocity(TelAvivConfig.commercialMaximumVelocity);
+		scenario.getVehicles().addVehicleType(commercial);
+
+		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+
 		final Controler controler = new Controler(scenario);
 		
 		/*

@@ -23,11 +23,9 @@
  */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -49,12 +47,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCa
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
-import org.matsim.vehicles.VehicleType;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 /**
  * Class to set up (provide) the Mobsim for the Gauteng Freeway Improvement 
@@ -200,11 +194,13 @@ public class GfipMultimodalQSimFactory implements Provider<Mobsim> {
 		/* ..Update the PopulationAgentSource to ensure the correct vehicle is 
 		 * passed to the mobsim, not some default-per-mode vehicle. */		
 		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
-		for(Id<VehicleType> id : scenario.getVehicles().getVehicleTypes().keySet()){
-			modeVehicleTypes.put(id.toString(), scenario.getVehicles().getVehicleTypes().get(id));
-		}
-		agentSource.setModeVehicleTypes(modeVehicleTypes);
+
+		//     	since the vehicles are already in scenario.getVehicles, they are not required to add again here. setter for modeVehicleTypes to agent source is gone. Amit May'17
+// 		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
+//		for(Id<VehicleType> id : scenario.getVehicles().getVehicleTypes().keySet()){
+//			modeVehicleTypes.put(id.toString(), scenario.getVehicles().getVehicleTypes().get(id));
+//		}
+//		agentSource.setModeVehicleTypes(modeVehicleTypes);
 		qSim.addAgentSource(agentSource);
 
 		return qSim;		

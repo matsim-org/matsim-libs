@@ -1,14 +1,16 @@
 package playground.smetzler.bike;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 public class RunBikes {
 	
@@ -42,8 +44,20 @@ public class RunBikes {
 //		config.qsim().setLinkDynamics( LinkDynamics.PassingQ.name() );
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		
+//		 BEGIN_NEW : following is added to use the functionality using scenario vehicles rather than adding to population agent source. If something doesnot work, let me know. Amit May'17
+		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
+		car.setMaximumVelocity(60.0/3.6);
+		car.setPcuEquivalents(1.0);
+		scenario.getVehicles().addVehicleType(car);
+
+		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
+		bike.setMaximumVelocity(30.0/3.6);
+		bike.setPcuEquivalents(0.0);
+		scenario.getVehicles().addVehicleType(bike);
+
+		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
+//		END_NEW
+
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new BikeModule());
 		controler.run();
