@@ -86,7 +86,7 @@ public final class PopulationAgentSource implements AgentSource {
 					if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
 						// yyyy this is already getting rather messy; need to consider simplifications ...  kai/amit, sep'16
 						
-						if (vehicleId == null) {
+						if (vehicleId == null) { // not sure, but probably if a person uses more than one vehicle, problem may arise: see putVehicleFromOldTripIntoNewTripIfMeaningful in org.matsim.core.router.PlanRouter
 							throw new RuntimeException("Vehicle id should not be null since they are already created in prepareForSim if was not available on the first place.");
 						}
 
