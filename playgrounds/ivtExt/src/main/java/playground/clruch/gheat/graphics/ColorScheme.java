@@ -19,4 +19,14 @@ public class ColorScheme {
         int rgb = bufferedImage.getRGB(0, i);
         GlobalAssert.that(rgb == color.getRGB());
     }
+
+    /**
+     * 
+     * @param i
+     *            ranges from 0 to 255 inclusive
+     * @return color corresponding to value i in range [0, 255]
+     */
+    public Color get(int i) {
+        return new Color(bufferedImage.getRGB(0, i), true);
+    }
 }

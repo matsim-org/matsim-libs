@@ -1,6 +1,7 @@
 package playground.fseccamo.dispatcher;
 
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,6 +69,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
     final int numberOfVehicles;
     private final double[] networkBounds;
     final Map<VirtualNode, Link> centerLink = new HashMap<>();
+    private String infoLineExtension = "";
 
     final JavaContainerSocket javaContainerSocket;
 
@@ -111,8 +113,11 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
     @Override
     public void redispatch(double now) {
 
-        // PART 0: match vehicles at a customer link only if the request has received a pickup order
-        {
+        final long round_now = Math.round(now);
+        if (round_now % samplingPeriod != 0) {
+
+            // PART 0: match vehicles at a customer link only if the request has received a pickup order
+
             Map<AVVehicle, Link> stayVehiclesAtLinks = DispatcherUtils.vehicleMapper(getStayVehicles());
             // match all matched av/request pairs which are at same link
 
@@ -125,14 +130,10 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
             // at this point, the same number of requests should have disappeared as matchings
             GlobalAssert.that(delta == matchingSize - getMatchings().size());
-        }
 
-        // managePickupVehicles();
+        } else {
 
-        // checkServedButWaitingCustomers(now);
-
-        final long round_now = Math.round(now);
-        if (round_now % samplingPeriod == 0) {
+            final StringBuilder stringBuilder = new StringBuilder();
 
             manageIncomingRequests(now);
 
@@ -199,7 +200,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         accountedVehicles.addAll(map.keySet());
                         {
                             // vehicles on pickup drive appear here
-                            for (Entry<AVRequest, AVVehicle> entry : matchings.entrySet()) {
+                            for (Entry<AVRequest, AVVehicle> entry : getMatchings().entrySet()) {
                                 AVRequest avRequest = entry.getKey();
                                 AVVehicle avVehicle = entry.getValue();
                                 if (!accountedVehicles.contains(avVehicle)) {
@@ -232,10 +233,11 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                 // COMPUTE MPC OUTSIDE OF MATSIM:
 
                 { // recv
-                  // USE THE RETURN VALUE TO MAKE COMMANDS IN MATSIM:
-                  // 1) <VirtualLink, Integer> pickupPerVLink: the number of vehicles at VirtualLink ij which should take a request and
-                  // transport the person to a virtualNode
-                  // for all these u_ij select u_ij customers in vNode i which have any shortest path that with sequence (vN1i, vNj, whatever, ... )
+
+                    // USE THE RETURN VALUE TO MAKE COMMANDS IN MATSIM:
+                    // 1) <VirtualLink, Integer> pickupPerVLink: the number of vehicles at VirtualLink ij which should take a request and
+                    // transport the person to a virtualNode
+                    // for all these u_ij select u_ij customers in vNode i which have any shortest path that with sequence (vN1i, vNj, , ... )
 
                     // 2) <VirtualLink, Integer> rebalancingPerVLink : for every VirtualLink select this number of vehicles vehicle in the fromVNode and
                     // send it to the to VNode / use existing commands
@@ -245,7 +247,6 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                     System.out.println("received: " + container);
 
                     // container.id == 'solution'
-                    // TODO perhaps consider requests and rebalancing simultaneously instead of consecutively
                     Tensor requestVector = null;
                     Tensor rebalanceVector = null;
                     {
@@ -260,48 +261,11 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                     }
                     final int totalRebalanceDesired = Total.of(rebalanceVector).Get().number().intValue();
                     final int totalPickupDesired = Total.of(requestVector).Get().number().intValue();
-                    System.out.println("pickupPerVLink     : TOTAL " + totalPickupDesired);
-                    System.out.println("rebalancingPerVLink: TOTAL " + totalRebalanceDesired);
+                    stringBuilder.append(String.format("%2dp, %2dr ", totalPickupDesired, totalRebalanceDesired));
+                    // System.out.println("pickupPerVLink : TOTAL " + totalPickupDesired);
+                    // System.out.println("rebalancingPerVLink: TOTAL " + totalRebalanceDesired);
 
-                    {
-                        int totalRebalanceEffective = 0;
-                        for (int vectorIndex = 0; vectorIndex < m + n; ++vectorIndex) {
-                            final VirtualNode vnFrom = vectorIndex < m ? //
-                                    virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
-                            final VirtualNode vnTo = vectorIndex < m ? //
-                                    virtualNetwork.getVirtualLink(vectorIndex).getTo() : virtualNetwork.getVirtualNode(vectorIndex - m);
-                            final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
-                            // ---
-                            if (availableVehicles.containsKey(vnFrom)) {
-                                final List<VehicleLinkPair> cars = availableVehicles.get(vnFrom); // find cars
-                                final int desiredRebalance = rebalanceVector.Get(vectorIndex).number().intValue();
-                                int pickupPerNode = 0;
-                                if (0 < desiredRebalance) {
-                                    String infoString = vnFrom.equals(vnTo) ? "DEST==ORIG" : "";
-                                    if (vnFrom.equals(vnTo))
-                                        System.out.println(String.format("vl=%3d  cars=%3d  reb=%3d  %s", vectorIndex, cars.size(), desiredRebalance, infoString));
-                                    Random random = new Random();
-                                    int min = Math.min(desiredRebalance, cars.size());
-                                    for (int count = 0; count < min; ++count) {
-                                        VehicleLinkPair vehicleLinkPair = cars.get(0);
-                                        cars.remove(0);
-                                        Link rebalanceDest = centerLink.get(vnTo);
-                                        // new ArrayList<>( //
-                                        // vnTo.getLinks()).get(random.nextInt(vnTo.getLinks().size()));
-                                        setVehicleRebalance(vehicleLinkPair, rebalanceDest); // send car to adjacent virtual node
-                                        ++totalRebalanceEffective;
-                                        ++pickupPerNode;
-                                    }
-                                }
-                                // if (pickupPerNode != desiredRebalance)
-                                // new RuntimeException("rebalance inconsistent:" + pickupPerNode + " != " + desiredRebalance).printStackTrace();
-                            } else {
-                                System.out.println("no available vehicles inside vnode " + vectorIndex + " " + vnFrom.index);
-                            }
-                        }
-                        if (totalRebalanceEffective != totalRebalanceDesired)
-                            System.out.println(" !!! rebalance delta: " + totalRebalanceEffective + " < " + totalRebalanceDesired);
-                    }
+                    stringBuilder.append(" effective: ");
 
                     {
                         int totalPickupEffective = 0;
@@ -316,49 +280,54 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                             final Map<VirtualNode, List<AVVehicle>> availableVehicles = getVirtualNodeStayVehicles();
 
                             final List<AVVehicle> cars = availableVehicles.get(vnFrom); // find cars
-                            int pickupOffset = 1;
-                            final int desiredPickup = requestVector.Get(vectorIndex).number().intValue() + pickupOffset; // FIXME
-                            int pickupPerNode = 0;
+                            cars.removeAll(getAVVehicleInMatching());
+                            final int pickupOffset = 0; // <- should be 0 !!! only 1 for testing
+                            final int desiredPickup = requestVector.Get(vectorIndex).number().intValue() + pickupOffset;
+                            // int pickupPerNode = 0;
                             if (0 < desiredPickup) {
-                                if (pickupOffset < desiredPickup)
-                                    System.out.println(String.format("vl=%3d  cars=%3d  pick=%3d  ", //
-                                            vectorIndex, cars.size(), desiredPickup));
-                                { // handle requests
-                                    final List<MpcRequest> requests = virtualLinkRequestsMap.containsKey(vectorIndex) ? //
-                                            virtualLinkRequestsMap.get(vectorIndex) : Collections.emptyList();
+                                // if (pickupOffset < desiredPickup)
+                                // System.out.println(String.format("vl=%3d cars=%3d pick=%3d ", //
+                                // vectorIndex, cars.size(), desiredPickup));
+                                // handle requests
+                                final List<MpcRequest> requests = virtualLinkRequestsMap.containsKey(vectorIndex) ? //
+                                        virtualLinkRequestsMap.get(vectorIndex) : Collections.emptyList();
+                                Collections.sort(requests, MpcRequestComparator.INSTANCE);
 
-                                    // final QuadTree<AVRequest> pendingRequestsTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2],
-                                    // networkBounds[3]);
-
-                                    int min = Math.min(Math.min(desiredPickup, requests.size()), cars.size());
-                                    for (int count = 0; count < min; ++count) {
-
-                                        final MpcRequest mpcRequest = requests.get(count);
-
-                                        final QuadTree<AVVehicle> unassignedVehiclesTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
-
-                                        for (AVVehicle avVehicle : cars) {
-                                            Link link = getVehicleLocation(avVehicle);
-                                            unassignedVehiclesTree.put(link.getCoord().getX(), link.getCoord().getY(), avVehicle);
-                                        }
-
-                                        AVVehicle avVehicle = unassignedVehiclesTree.getClosest( //
-                                                mpcRequest.avRequest.getFromLink().getCoord().getX(), //
-                                                mpcRequest.avRequest.getFromLink().getCoord().getY());
-
-                                        GlobalAssert.that(!getAVVehicleInMatching().contains(avVehicle));
-                                        {
-                                            boolean removed = cars.remove(avVehicle);
-                                            GlobalAssert.that(removed);
-                                        }
-                                        Link pickupLocation = mpcRequest.avRequest.getFromLink(); // where the customer is waiting right now
-                                        // System.out.println("set diversion for pickup");
-                                        setStayVehicleDiversion(avVehicle, pickupLocation); // send car to customer
-                                        ++totalPickupEffective;
-                                        ++pickupPerNode;
-                                        matchings.put(mpcRequest.avRequest, avVehicle);
+                                { // assert that requests are sorted, oldest requests are served first
+                                    double last = 0;
+                                    for (MpcRequest mpcRequest : requests) {
+                                        GlobalAssert.that(last <= mpcRequest.avRequest.getSubmissionTime());
+                                        last = mpcRequest.avRequest.getSubmissionTime();
                                     }
                                 }
+
+                                int min = Math.min(Math.min(desiredPickup, requests.size()), cars.size());
+                                for (int count = 0; count < min; ++count) {
+
+                                    final MpcRequest mpcRequest = requests.get(count);
+
+                                    final QuadTree<AVVehicle> unassignedVehiclesTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
+
+                                    for (AVVehicle avVehicle : cars) {
+                                        Link link = getVehicleLocation(avVehicle);
+                                        unassignedVehiclesTree.put(link.getCoord().getX(), link.getCoord().getY(), avVehicle);
+                                    }
+
+                                    AVVehicle avVehicle = unassignedVehiclesTree.getClosest( //
+                                            mpcRequest.avRequest.getFromLink().getCoord().getX(), //
+                                            mpcRequest.avRequest.getFromLink().getCoord().getY());
+                                    GlobalAssert.that(!getAVVehicleInMatching().contains(avVehicle));
+                                    {
+                                        boolean removed = cars.remove(avVehicle);
+                                        GlobalAssert.that(removed);
+                                    }
+                                    Link pickupLocation = mpcRequest.avRequest.getFromLink(); // where the customer is waiting right now
+                                    setStayVehicleDiversion(avVehicle, pickupLocation); // send car to customer
+                                    ++totalPickupEffective;
+                                    // ++pickupPerNode;
+                                    getMatchings().put(mpcRequest.avRequest, avVehicle);
+                                }
+
                             }
                             // if (pickupPerNode != desiredPickup)
                             // new RuntimeException("pickup inconsistent:" + pickupPerNode + " != " + desiredPickup).printStackTrace();
@@ -367,17 +336,76 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         if (totalPickupEffective != totalPickupDesired)
                             System.out.println(" !!! pickup delta: " + totalPickupEffective + " < " + totalPickupDesired);
 
+                        stringBuilder.append(String.format("%2dp, ", totalPickupEffective));
                     }
+
+                    {
+                        int totalRebalanceEffective = 0;
+                        int selfRebalanceEffective = 0;
+                        for (int vectorIndex = 0; vectorIndex < m + n; ++vectorIndex) {
+                            final VirtualNode vnFrom = vectorIndex < m ? //
+                                    virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
+                            final VirtualNode vnTo = vectorIndex < m ? //
+                                    virtualNetwork.getVirtualLink(vectorIndex).getTo() : virtualNetwork.getVirtualNode(vectorIndex - m);
+                            final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
+
+                            List<Link> candidateLinks = new ArrayList<>();
+                            for (AVRequest avRequest : getAVRequestsUnserved()) {
+                                Link link = avRequest.getFromLink();
+                                if (vnTo.getLinks().contains(link))
+                                    candidateLinks.add(link);
+                            }
+                            if (candidateLinks.isEmpty())
+                                candidateLinks.addAll(vnTo.getLinks());
+
+                            // ---
+                            if (availableVehicles.containsKey(vnFrom)) {
+                                final List<VehicleLinkPair> cars = availableVehicles.get(vnFrom); // find cars
+                                final int desiredRebalance = rebalanceVector.Get(vectorIndex).number().intValue();
+                                int pickupPerNode = 0;
+                                if (0 < desiredRebalance) {
+                                    String infoString = vnFrom.equals(vnTo) ? "DEST==ORIG" : "";
+                                    if (vnFrom.equals(vnTo))
+                                        System.out.println(String.format("vl=%3d  cars=%3d  reb=%3d  %s", vectorIndex, cars.size(), desiredRebalance, infoString));
+                                    Random random = new Random();
+                                    int min = Math.min(desiredRebalance, cars.size());
+                                    for (int count = 0; count < min; ++count) {
+                                        VehicleLinkPair vehicleLinkPair = cars.get(0);
+                                        cars.remove(0);
+                                        Link rebalanceDest =
+                                                // centerLink.get(vnTo);
+                                                new ArrayList<>( //
+                                                        // vnTo.getLinks() //
+                                                        candidateLinks //
+                                                ).get(random.nextInt(candidateLinks.size()));
+                                        setVehicleRebalance(vehicleLinkPair, rebalanceDest); // send car to adjacent virtual node
+                                        ++totalRebalanceEffective;
+                                        if (vnFrom.equals(vnTo))
+                                            ++selfRebalanceEffective;
+                                        ++pickupPerNode;
+                                    }
+                                }
+                                // if (pickupPerNode != desiredRebalance)
+                                // new RuntimeException("rebalance inconsistent:" + pickupPerNode + " != " + desiredRebalance).printStackTrace();
+                            } else {
+                                System.out.println("no available vehicles inside vnode " + vectorIndex + " " + vnFrom.index);
+                            }
+                        }
+                        if (totalRebalanceEffective != totalRebalanceDesired)
+                            System.out.println(" !!! rebalance delta: " + totalRebalanceEffective + " < " + totalRebalanceDesired);
+
+                        stringBuilder.append(String.format("%2dr (self=%d)", totalRebalanceEffective, selfRebalanceEffective));
+                    }
+
                 }
             }
+            infoLineExtension = stringBuilder.toString();
         }
     }
 
     @Override
     public String getInfoLine() {
-        return String.format("%s", //
-                super.getInfoLine() //
-        );
+        return String.format("%s %s", super.getInfoLine(), infoLineExtension);
     }
 
     public static class Factory implements AVDispatcherFactory {
