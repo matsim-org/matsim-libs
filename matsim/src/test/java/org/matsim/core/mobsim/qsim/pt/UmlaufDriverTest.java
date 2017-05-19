@@ -104,7 +104,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		PrepareForSimUtils.createDefaultPrepareForSim(sc,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario,eventsManager).run();
 		QSim tqsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
