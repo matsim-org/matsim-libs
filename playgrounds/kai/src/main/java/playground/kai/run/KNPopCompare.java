@@ -225,28 +225,44 @@ public class KNPopCompare {
 			bbox = BoundingBox.createBoundingBox( 300000., -2.95e6, 500000., -2.7e6 );
 		}
 		
+		double resolution = 2000.;
 		{
-			SpatialGrid spatialGrid = new SpatialGrid( bbox, 2000., 0. ) ; 
-			SpatialGrid spatialGridCnt = new SpatialGrid( bbox, 2000., 0. ) ; 
-			GridUtils.aggregateFacilitiesIntoSpatialGrid(homesWithScoreDifferences, spatialGrid, spatialGridCnt);
+			SpatialGrid spatialGrid = new SpatialGrid( bbox, resolution, 0. ) ; 
+			spatialGrid.setLabel("scoreDiffSum");
+			SpatialGrid spatialGridCnt = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGridCnt.setLabel("scoreDiffCnt");
+			SpatialGrid spatialGridAv = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGridAv.setLabel("scoreDiffAv");
+			GridUtils.aggregateFacilitiesIntoSpatialGrid(homesWithScoreDifferences, spatialGrid, spatialGridCnt, spatialGridAv);
 			spatialGrids.add( spatialGrid ) ;
 			spatialGrids.add( spatialGridCnt ) ;
+			spatialGrids.add( spatialGridAv ) ;
 		}
 
 		{
-			SpatialGrid spatialGrid = new SpatialGrid( bbox, 2000., 0. ) ; 
-			SpatialGrid spatialGridCnt = new SpatialGrid( bbox, 2000., 0. ) ; 
-			GridUtils.aggregateFacilitiesIntoSpatialGrid(homesWithMoneyDifferences, spatialGrid, spatialGridCnt);
+			SpatialGrid spatialGrid = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGrid.setLabel("moneyDiffSum");
+			SpatialGrid spatialGridCnt = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGridCnt.setLabel("moneyDiffCnt");
+			SpatialGrid spatialGridAv = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGridAv.setLabel("moneyDiffAv");
+			GridUtils.aggregateFacilitiesIntoSpatialGrid(homesWithMoneyDifferences, spatialGrid, spatialGridCnt, spatialGridAv );
 			spatialGrids.add( spatialGrid ) ;
 			spatialGrids.add( spatialGridCnt ) ;
+			spatialGrids.add( spatialGridAv ) ;
 		}
 
 		{
-			SpatialGrid spatialGrid = new SpatialGrid( bbox, 4000., 0. ) ; 
-			SpatialGrid spatialGridCnt = new SpatialGrid( bbox, 4000., 0. ) ; 
-			GridUtils.aggregateFacilitiesIntoSpatialGrid(homesWithTtimeDifferences, spatialGrid, spatialGridCnt);
+			SpatialGrid spatialGrid = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGrid.setLabel("ttimeDiffSum");
+			SpatialGrid spatialGridCnt = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGridCnt.setLabel("ttimeDiffCnt");
+			SpatialGrid spatialGridAv = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGridAv.setLabel("ttimeDiffAv");
+			GridUtils.aggregateFacilitiesIntoSpatialGrid(homesWithTtimeDifferences, spatialGrid, spatialGridCnt, spatialGridAv );
 			spatialGrids.add( spatialGrid ) ;
 			spatialGrids.add( spatialGridCnt ) ;
+			spatialGrids.add( spatialGridAv ) ;
 		}
 
 		GridUtils.writeSpatialGrids(spatialGrids, "popcompare_grid.csv");

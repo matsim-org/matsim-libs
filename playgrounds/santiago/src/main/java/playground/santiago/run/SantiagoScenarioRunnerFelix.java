@@ -79,8 +79,7 @@ public class SantiagoScenarioRunnerFelix {
 
 	private static String caseName = "v3";
 	private static String inputPath = "C:/Users/Felix/Documents/Bachelor/Santiago de Chile/v3/input/";
-	
-	
+	private static double colectivoASC;
 	
 	public static void main(String args[]){		
 
@@ -92,6 +91,7 @@ public class SantiagoScenarioRunnerFelix {
 			sigma = Integer.parseInt(args[3]); //SIGMA. 
 			doModeChoice = Boolean.parseBoolean(args[4]); //DOMODECHOICE?
 			mapActs2Links = Boolean.parseBoolean(args[5]); //MAPACTS2LINKS?
+			colectivoASC = Double.parseDouble(args[6]);
 			
 		} else {
 		
@@ -100,8 +100,8 @@ public class SantiagoScenarioRunnerFelix {
 			policy=0;    
 			sigma=3 ;    
 			doModeChoice=true ; 
-			mapActs2Links=false; 
-		
+			mapActs2Links=false;
+			colectivoASC = -0.3781;
 		}	
 			
 			if(policy == 1){
@@ -120,7 +120,7 @@ public class SantiagoScenarioRunnerFelix {
 			controler.addOverridingModule(new ColectivoModule());
 			
 			// adding pt fare
-			controler.getEvents().addHandler(new PTFareHandlerFelix(controler, doModeChoice, scenario.getPopulation()));
+			controler.getEvents().addHandler(new PTFareHandlerFelix(controler, doModeChoice, scenario.getPopulation(), colectivoASC));
 			
 			// adding basic strategies for car and non-car users
 			setBasicStrategiesForSubpopulations(controler);

@@ -30,6 +30,10 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
 
+/**
+ * @author nagel
+ *
+ */
 public final class QSimConfigGroup extends ReflectiveConfigGroup {
 
 
@@ -562,11 +566,16 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		return this.usingTravelTimeCheckInTeleportation = val ;
 	}
 	
+	static final String PCU_THRESHOLD_FOR_FLOW_CAPACITY_EASING="documentation not yet available" ;
+	
 	
 	public double getPcuThresholdForFlowCapacityEasing() {
 		return pcuThresholdForFlowCapacityEasing;
 	}
 	
+	/**
+	 * @param pcuThresholdForFlowCapacityEasing -- {@value #PCU_THRESHOLD_FOR_FLOW_CAPACITY_EASING}
+	 */
 	public void setPcuThresholdForFlowCapacityEasing(double pcuThresholdForFlowCapacityEasing) {
 		this.pcuThresholdForFlowCapacityEasing = pcuThresholdForFlowCapacityEasing;
 	}

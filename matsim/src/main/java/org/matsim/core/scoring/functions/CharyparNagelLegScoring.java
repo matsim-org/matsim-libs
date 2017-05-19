@@ -77,10 +77,12 @@ public class CharyparNagelLegScoring implements org.matsim.core.scoring.SumScori
 		double travelTime = arrivalTime - departureTime; // travel time in seconds	
 		ModeUtilityParameters modeParams = this.params.modeParams.get(leg.getMode());
 		if (modeParams == null) {
-			if (leg.getMode().equals(TransportMode.transit_walk)) {
+			if (leg.getMode().equals(TransportMode.transit_walk) || leg.getMode().equals(TransportMode.access_walk) 
+					|| leg.getMode().equals(TransportMode.egress_walk) ) {
 				modeParams = this.params.modeParams.get(TransportMode.walk);
 			} else {
-				modeParams = this.params.modeParams.get(TransportMode.other);
+//				modeParams = this.params.modeParams.get(TransportMode.other);
+				throw new RuntimeException("just encountered mode for which no scoring parameters are defined: " + leg.getMode().toString() ) ;
 			}
 		}
 		tmpScore += travelTime * modeParams.marginalUtilityOfTraveling_s;

@@ -35,15 +35,15 @@ public final class MergeNoiseDataFilesIK {
 	private static final double timeBinSize = 3600.;
 	private static final double endTime = 30. * 3600.;
 
-	private static final String outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn3/ITERS/it.100/damages_receiverPoint/";
+	private static final String outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct/output/r_output_run0_bln_bc/ITERS/it.300/immissions/";
 
-	private static final String[] workingDirectories = { "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn3/ITERS/it.100/damages_receiverPoint/"};
-	private static final String[] labels = { "damages_receiverPoint" };
+	private static final String[] workingDirectories = { outputDirectory };
+	private static final String[] labels = { "immission" };
 
-	private static final String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cn2/output/cn3/receiverPoints/receiverPoints.csv";
+	private static final String receiverPointsFile = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct/output/r_output_run0_bln_bc/receiverPoints/receiverPoints.csv";
 	private static final String separator = ";";
 
-	private static final OutputFormat outputFormat = OutputFormat.xyt ;
+	private static final OutputFormat outputFormat = OutputFormat.xyt1t2t3etc ;
 
 	private static final double threshold = -1. ;
 

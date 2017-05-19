@@ -14,8 +14,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.network.LinkFactoryImpl;
+import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.NetworkWriter;
@@ -288,7 +287,7 @@ public class oldEmme2MatsimConverter {
 				double lanes = Double.parseDouble(cells[6]);
 				if (lanes == 0.0) lanes = 1.0; //ensures that transit-only links have at least one lane.
 				
-				LinkFactoryImpl factory = NetworkUtils.createLinkFactory();
+				LinkFactory factory = NetworkUtils.createLinkFactory();
 				
 				Link l = (Link) NetworkUtils.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), i, j, network, length, speed, cap, lanes);
 				Link L = NetworkUtils.createLink(Id.create(cells[1] + ">" + cells[2], Link.class), i, j, network, length, speed, cap, lanes);

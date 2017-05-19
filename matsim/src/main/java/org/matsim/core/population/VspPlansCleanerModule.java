@@ -25,7 +25,7 @@ package org.matsim.core.population;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 
-public class VspPlansCleanerModule extends AbstractModule {
+public final class VspPlansCleanerModule extends AbstractModule {
     @Override
     public void install() {
         PlansConfigGroup.ActivityDurationInterpretation actDurInterpr = getConfig().plans().getActivityDurationInterpretation() ;

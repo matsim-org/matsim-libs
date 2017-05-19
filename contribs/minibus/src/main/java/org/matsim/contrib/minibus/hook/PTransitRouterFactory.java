@@ -21,7 +21,8 @@ package org.matsim.contrib.minibus.hook;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
+import javax.inject.Inject;
+import javax.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.performance.raptor.Raptor;
@@ -37,15 +38,14 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.router.*;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 /**
  * 
  * @author aneumann
  *
  */
 class PTransitRouterFactory implements Provider<TransitRouter>, StartupListener, IterationStartsListener {
+	// How is this working if nothing is injected?  But presumably it uses "Provider" only as a syntax clarifier, but the class
+	// is not injectable. kai, jun'16
 	
 	private final static Logger log = Logger.getLogger(PTransitRouterFactory.class);
 	private TransitRouterConfig transitRouterConfig;

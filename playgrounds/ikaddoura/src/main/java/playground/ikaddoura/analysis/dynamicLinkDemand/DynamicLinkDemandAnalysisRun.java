@@ -46,7 +46,7 @@ public class DynamicLinkDemandAnalysisRun {
 			log.info("Output base directory: " + OUTPUT_BASE_DIR);
 			
 		} else {
-			OUTPUT_BASE_DIR = "/Users/ihab/Documents/workspace/runs-svn/incidents/output/2016-03-15_baseCase/";		
+			OUTPUT_BASE_DIR = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct/output/r_output_run0_bln_bc/";		
 		}
 
 		DynamicLinkDemandAnalysisRun analysis = new DynamicLinkDemandAnalysisRun(OUTPUT_BASE_DIR);
@@ -65,6 +65,7 @@ public class DynamicLinkDemandAnalysisRun {
 		config.transit().setVehiclesFile(null);
 		config.plans().setInputFile(null);
 		config.network().setChangeEventsInputFile(null);
+		config.vehicles().setVehiclesFile(null);
 		config.network().setInputFile(outputDirectory + "output_network.xml.gz");
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);

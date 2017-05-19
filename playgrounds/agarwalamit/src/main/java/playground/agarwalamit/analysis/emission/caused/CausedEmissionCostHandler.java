@@ -23,6 +23,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.*;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
@@ -41,7 +45,7 @@ import playground.vsp.airPollution.flatEmissions.EmissionCostModule;
  * @author amit
  */
 
-public class CausedEmissionCostHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler, EmissionCostHandler{
+public class CausedEmissionCostHandler implements VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, WarmEmissionEventHandler, ColdEmissionEventHandler, EmissionCostHandler{
 
 	private static final Logger LOG = Logger.getLogger(CausedEmissionCostHandler.class);
 
@@ -49,7 +53,9 @@ public class CausedEmissionCostHandler implements WarmEmissionEventHandler, Cold
 	private final Map<Id<Vehicle>, Double> vehicleId2ColdEmissCosts = new HashMap<>();
 	private final Map<Id<Vehicle>, Double> vehicleId2WarmEmissCosts = new HashMap<>();
 
-	private final PersonFilter pf ; // what if no person filter is available..?
+	private final PersonFilter pf ;
+
+	private final Map<Id<Vehicle>,Id<Person>> vehicle2Person = new HashMap<>(); // technically, a person may have more than one vehicle.
 
 	public CausedEmissionCostHandler(final EmissionCostModule emissionCostModule) {
 		this(emissionCostModule, null);
@@ -81,6 +87,7 @@ public class CausedEmissionCostHandler implements WarmEmissionEventHandler, Cold
 	public void reset(int iteration) {
 		this.vehicleId2ColdEmissCosts.clear();
 		this.vehicleId2WarmEmissCosts.clear();
+		this.vehicle2Person.clear();
 	}
 
 	@Override
@@ -109,15 +116,25 @@ public class CausedEmissionCostHandler implements WarmEmissionEventHandler, Cold
 		}
 	}
 
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.vehicle2Person.put(event.getVehicleId(),event.getPersonId());
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.vehicle2Person.remove(event.getVehicleId());
+	}
+
 	public Map<Id<Person>, Double> getPersonId2ColdEmissionCosts() {
 		return this.vehicleId2ColdEmissCosts.entrySet().stream().collect(
-				Collectors.toMap(entry -> Id.createPersonId(entry.getKey().toString()), entry -> entry.getValue())
+				Collectors.toMap(entry -> this.vehicle2Person.get(entry.getKey()), entry -> entry.getValue())
 		);
 	}
 
 	public Map<Id<Person>, Double> getPersonId2WarmEmissionCosts() {
 		return this.vehicleId2WarmEmissCosts.entrySet().stream().collect(
-				Collectors.toMap(entry -> Id.createPersonId(entry.getKey().toString()), entry -> entry.getValue())
+				Collectors.toMap(entry -> this.vehicle2Person.get(entry.getKey()), entry -> entry.getValue())
 		);
 	}
 
@@ -171,11 +188,11 @@ public class CausedEmissionCostHandler implements WarmEmissionEventHandler, Cold
 		);
 	}
 
+
 	@Override
 	public boolean isFiltering() {
 		return ! (pf==null);
 	}
-
 
 	public Map<Id<Vehicle>, Double> getVehicleId2ColdEmissionCosts() {
 		return this.vehicleId2ColdEmissCosts;

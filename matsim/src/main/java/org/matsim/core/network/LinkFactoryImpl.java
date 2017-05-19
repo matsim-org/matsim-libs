@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 
-public final class LinkFactoryImpl implements LinkFactory {
-	
+final class LinkFactoryImpl implements LinkFactory {
+
 	/*deliberately package*/ LinkFactoryImpl() {}
 
 	@Override

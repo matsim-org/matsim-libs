@@ -45,7 +45,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  *
  * @author mrieser
  */
-public class NetworkUtils {
+public final class NetworkUtils {
 
     private static Logger log = Logger.getLogger(NetworkUtils.class);
 
@@ -768,6 +768,8 @@ public class NetworkUtils {
 	@Deprecated // use network.getFactory() instead
 	public static LinkFactoryImpl createLinkFactory() {
 		// yyyyyy Make LinkFactoryImpl invisible outside package.  Does the LinkFactory interface have to be public at all?  kai, aug'16
+		// the different factory types need to be visible, or at least configurable, during initialization: User needs to be able to select which factory to
+		// insert into NetworkFactory.  kai, may'17
 		return new LinkFactoryImpl();
 	}
 

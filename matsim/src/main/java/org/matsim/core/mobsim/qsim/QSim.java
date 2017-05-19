@@ -251,10 +251,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	 * Prepare the simulation and get all the settings from the configuration.
 	 */
 	/*package*/ void prepareSim() {
-		if (events == null) {
-			throw new RuntimeException(
-					"No valid Events Object (events == null)");
-		}
+		events.initProcessing();
 
 		createAgents();
 		this.initSimTimer();
@@ -319,7 +316,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 
 		if (gotException) throw new RuntimeException( "got exception while cleaning up the QSim. Please check the error messages above for details.");
-		
+		events.finishProcessing();
 		if (analyzeRunTimes) {
 			log.info("qsim internal cpu time (nanos): " + qSimInternalTime);
 			for (Entry<MobsimEngine, AtomicLong> entry : this.mobsimEngineRunTimes.entrySet()) {

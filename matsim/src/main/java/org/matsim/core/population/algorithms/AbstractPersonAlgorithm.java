@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.utils.misc.Counter;
 
 public abstract class AbstractPersonAlgorithm implements PersonAlgorithm {
+	// this is ok as non-final since methods that contain code are final. kai, may'17
 
 	private final static Logger log = Logger.getLogger(AbstractPersonAlgorithm.class);
 

@@ -30,11 +30,9 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -46,7 +44,7 @@ import com.google.inject.Singleton;
 
 @Singleton
 final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
-	AfterMobsimListener, IterationEndsListener, ShutdownListener {
+	IterationEndsListener, ShutdownListener {
 
 	final static private Logger log = Logger.getLogger(EventsHandlingImpl.class);
 	
@@ -94,36 +92,8 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 				eventsManager.addHandler(writer);
 			}
 		}
-
-		// init for event processing of new iteration
-		eventsManager.initProcessing();
 	}
 	
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		
-		/*
-		 * cdobler, nov'10
-		 * Moved this code here from Controler.CoreControlerListener.notifyAfterMobsim(...).
-		 * It ensures, that if a ParallelEventsManager is used, all events are processed before
-		 * the AfterMobSimListeners are informed. Otherwise e.g. usage of ParallelEventsManager and
-		 * RoadPricing was not possible - MATSim crashed.
-		 * After this command, the ParallelEventsManager behaves like the non-parallel
-		 * implementation, therefore the main thread will have to wait until a created event has
-		 * been handled.
-		 * 
-		 * This means, this thing prevents _two_ different bad things from happening:
-		 * 1.) Road pricing (for example) from starting to calculate road prices 
-		 *      while Mobsim-Events are still coming in (and crashing)
-		 * 2.) Later things which happen in the Controler (e.g. Scoring) from starting
-		 * 	    to score while (for example) road pricing events are still coming in
-		 *      (and crashing).
-		 * michaz (talking to cdobler), jun'13
-		 */
-		eventsManager.finishProcessing();
-
-	}
-
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		/*

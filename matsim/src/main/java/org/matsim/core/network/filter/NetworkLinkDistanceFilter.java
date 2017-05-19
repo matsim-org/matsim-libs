@@ -26,7 +26,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 /**
  * @author dgrether
  */
-public class NetworkLinkDistanceFilter implements NetworkLinkFilter {
+public final class NetworkLinkDistanceFilter implements NetworkLinkFilter {
 
 	private final double distanceFilter;
 	private final Node distanceFilterNode;

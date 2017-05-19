@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -102,7 +103,9 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 		Person driverPerson = PopulationUtils.getFactory().createPerson(Id.create("pt_" + umlauf.getId(), Person.class)); // we use the non-wrapped route for efficiency, but the leg has to return the wrapped one.
 		PlanBuilder planBuilder = new PlanBuilder();
 		for (UmlaufStueckI umlaufStueck : umlauf.getUmlaufStuecke()) {
-			planBuilder.addTrip(getWrappedCarRoute(umlaufStueck.getCarRoute()), transportMode);
+			NetworkRoute carRoute2 = umlaufStueck.getCarRoute();
+			Gbl.assertNotNull(carRoute2);
+			planBuilder.addTrip(getWrappedCarRoute(carRoute2), transportMode);
 		}
 		Plan plan = planBuilder.build();
 		driverPerson.addPlan(plan);

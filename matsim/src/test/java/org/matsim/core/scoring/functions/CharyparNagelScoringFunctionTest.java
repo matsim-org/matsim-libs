@@ -21,6 +21,7 @@
 package org.matsim.core.scoring.functions;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 
@@ -574,7 +575,15 @@ public class CharyparNagelScoringFunctionTest {
 		Fixture f = new Fixture();
 		Leg leg = (Leg) f.plan.getPlanElements().get(1);
 		leg.setMode("sackhuepfen");
-		assertEquals(-3.0, calcScore(f), EPSILON); // default for unknown modes
+		boolean exception = false ;
+		try {
+			assertEquals(-3.0, calcScore(f), EPSILON); // default for unknown modes
+			// no longer allowed.  kai, may'17
+		} catch ( Exception ee ) {
+			// this is expected
+			exception = true ;
+		}
+		assertTrue( exception ) ;
 		f.config.planCalcScore().addParam("traveling_sackhuepfen", "-30.0");
 		assertEquals(-15.0, calcScore(f), EPSILON);
 	}

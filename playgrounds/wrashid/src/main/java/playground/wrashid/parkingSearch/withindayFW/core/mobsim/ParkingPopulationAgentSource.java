@@ -34,7 +34,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.core.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
@@ -72,7 +72,7 @@ public class ParkingPopulationAgentSource implements AgentSource {
 	public void insertAgentsIntoMobsim() {
 		parkingInfrastructure.resetParkingFacilityForNewIteration();
 		
-		ParallelPersonAlgorithmRunner.run(population, numOfThreads, new ParkingAgentInsertParkingActs(this.agentFactory));
+		ParallelPersonAlgorithmUtils.run(population, numOfThreads, new ParkingAgentInsertParkingActs(this.agentFactory));
 		
 		
 //		for (Person p : population.getPersons().values()) {

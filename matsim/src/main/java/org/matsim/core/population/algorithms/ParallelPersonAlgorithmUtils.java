@@ -35,9 +35,10 @@ import org.matsim.core.utils.misc.Counter;
  *
  * @author mrieser
  */
-public abstract class ParallelPersonAlgorithmRunner {
+public final class ParallelPersonAlgorithmUtils {
+	private ParallelPersonAlgorithmUtils(){} // do not instantiate
 
-	private final static Logger log = Logger.getLogger(ParallelPersonAlgorithmRunner.class);
+	private final static Logger log = Logger.getLogger(ParallelPersonAlgorithmUtils.class);
 	
 	public interface PersonAlgorithmProvider {
 		public PersonAlgorithm getPersonAlgorithm();

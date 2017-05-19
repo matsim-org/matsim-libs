@@ -39,7 +39,7 @@ import org.matsim.facilities.ActivityFacility;
  *
  * @author mrieser
  */
-public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
+public final class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private final Network network;
 	private final ActivityFacilities facilities;
