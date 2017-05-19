@@ -121,7 +121,7 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
     // requests that haven't received a pickup order yet
     final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
     // requests that have received a pickup order but are not yet "pickedup"
-    final Map<AVRequest, AVVehicle> matchings = new HashMap<>();
+    private final Map<AVRequest, AVVehicle> matchings = new HashMap<>();
 
     protected Map<AVRequest, AVVehicle> getMatchings() {
         return matchings;
@@ -140,13 +140,6 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
             GlobalAssert.that(former != null);
         }
     }
-
-    // vehicles that have been dispatched to customers, and haven't reached stay task yet
-    // @Deprecated
-    // final Map<AVVehicle, AVRequest> pickupAndCustomerVehicle = new HashMap<>();
-
-    // @Deprecated
-    // final Map<AVRequest, Double> effectivePickupTime = new HashMap<>();
 
     Map<VirtualNode, List<VehicleLinkPair>> getDivertableNotRebalancingNotPickupVehicles() {
         Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
@@ -185,6 +178,11 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
         return getMatchings().values().stream().collect(Collectors.toSet());
     }
 
+    /**
+     * function computes mpcRequest objects for unserved requests
+     * 
+     * @param now
+     */
     void manageIncomingRequests(double now) {
         final int m = virtualNetwork.getvLinksCount();
 
@@ -224,54 +222,5 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
                 }
             }
     }
-
-    /**
-     * call to function mandatory: function updates pickupAndCustomerVehicle
-     */
-    // void managePickupVehicles() {
-    // final Collection<AVRequest> avRequests = getAVRequests();
-    // // inspect all vehicles in stay task
-    // getStayVehicles().values().stream() //
-    // .flatMap(Queue::stream) //
-    // .forEach(avVehicle -> {
-    // // check if the vehicle has been assigned a pickup request
-    // if (pickupAndCustomerVehicle.containsKey(avVehicle)) {
-    // // check if the request is still active
-    // AVRequest avRequest = pickupAndCustomerVehicle.get(avVehicle);
-    // if (!avRequests.contains(avRequest)) {
-    // pickupAndCustomerVehicle.remove(avVehicle);
-    // } else {
-    // new RuntimeException("request active but pickup vehicle in stay task").printStackTrace();
-    // System.out.println("PROBLEM SUMMARY:");
-    // System.out.println(avRequest);
-    // System.out.println(avRequest.getFromLink().getId());
-    // System.out.println(ScheduleUtils.scheduleOf(avVehicle));
-    // }
-    // }
-    // });
-    // }
-
-    private static final int UNACCEPTABLE_WAITINGTIME_SINCE_PICKUP = 30 * 60;
-
-    /**
-     * call to function optional: detects customers that should have been picked up
-     * but instead have been waiting a long time since the pickup order was issued
-     * 
-     * @param now
-     */
-    // void checkServedButWaitingCustomers(double now) {
-    // for (AVRequest avRequest : getAVRequests())
-    // if (matchings.containsKey(avRequest)) {
-    // AVVehicle avVehicle = matchings.get(avRequest);
-    // final long waitingTime = (long) (now - effectivePickupTime.get(avRequest));
-    // if (waitingTime > UNACCEPTABLE_WAITINGTIME_SINCE_PICKUP) {
-    // new RuntimeException("unacceptable wait time since pickup").printStackTrace();
-    // System.out.println("PROBLEM SUMMARY:");
-    // System.out.println(avRequest + " " + avRequest.getFromLink().getId());
-    // System.out.println("waitingTimeSincePickupOrder=" + waitingTime + " sec");
-    // System.out.println(ScheduleUtils.scheduleOf(avVehicle));
-    // }
-    // }
-    // }
 
 }
