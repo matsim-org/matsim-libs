@@ -72,9 +72,19 @@ class PrepareForSimImpl implements PrepareForSim {
 			net = network;
 		}
 
-		// vehicles should be created (if not available) before a route is created. Amit May'17
-		Map<String, VehicleType> modeVehicleTypes = getMode2VehicleType();
+		// make sure all routes are calculated.
+		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
+				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
+					@Override
+					public AbstractPersonAlgorithm getPersonAlgorithm() {
+						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, net);
+					}
+				});
 
+		// though the vehicles should be created before creating a route, however,
+		// as of now, it is not clear how to provide (store) vehicle id to the route afterwards. Amit may'17
+
+		Map<String, VehicleType> modeVehicleTypes = getMode2VehicleType();
 		for(Person person : scenario.getPopulation().getPersons().values()) {
 			Plan plan = person.getSelectedPlan();
 			Map<String,Id<Vehicle>> seenModes = new HashMap<>();
@@ -108,15 +118,6 @@ class PrepareForSimImpl implements PrepareForSim {
 				}
 			}
 		}
-
-		// make sure all routes are calculated.
-		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
-				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
-					@Override
-					public AbstractPersonAlgorithm getPersonAlgorithm() {
-						return new PersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, net);
-					}
-				});
 
 		if (scenario instanceof Lockable) {
 			((Lockable)scenario).setLocked();
