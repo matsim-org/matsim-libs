@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -124,8 +125,8 @@ public class FlowStorageSpillbackTest {
 				vehicleOfPerson.put(event.getPersonId(), event.getVehicleId());
 			}
 		});
-		
-		
+
+		PrepareForSimUtils.createDefaultPrepareForSim(sc,events).run();
 		QSim sim = QSimUtils.createDefaultQSim(sc, events);
 		sim.run();
 

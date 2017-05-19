@@ -35,6 +35,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -116,7 +117,8 @@ public class DeparturesOnSameLinkSameTimeTest {
 				}
 			}
 		});
-		
+
+		PrepareForSimUtils.createDefaultPrepareForSim(inputs.scenario,events).run();
 		QSim qsim = QSimUtils.createDefaultQSim(inputs.scenario,events);
 		qsim.run();
 

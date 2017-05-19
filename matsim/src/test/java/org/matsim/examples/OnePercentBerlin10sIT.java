@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
@@ -69,6 +70,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		EventWriterXML writer = new EventWriterXML(eventsFileName);
 		events.addHandler(writer);
 
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
 		QSim qSim = QSimUtils.createDefaultQSim(scenario,events);
 
 		log.info("START testOnePercent10s SIM");
@@ -109,6 +111,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		EventWriterXML writer = new EventWriterXML(eventsFileName);
 		eventsManager.addHandler(writer);
 
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario,eventsManager).run();
 		QSim qSim = QSimUtils.createDefaultQSim(scenario,eventsManager);
 
 		log.info("START testOnePercent10s SIM");

@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -76,6 +77,8 @@ public class MatsimFreeSpeedTravelTimeTest {
 		EventsManager manager = EventsUtils.createEventsManager();
 		TravelTimeHandler tth = new TravelTimeHandler();
 		manager.addHandler(tth);
+
+		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario,manager).run();
 		QSim qsim = QSimUtils.createDefaultQSim(net.scenario, manager);
 		qsim.run();
 		return tth.travelTime;

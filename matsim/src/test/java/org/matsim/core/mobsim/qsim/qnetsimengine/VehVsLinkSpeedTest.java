@@ -40,6 +40,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -109,6 +110,7 @@ public class VehVsLinkSpeedTest {
 		car.setPcuEquivalents(1.0);
 		net.scenario.getVehicles().addVehicleType(car);
 
+		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario,manager).run();
 		QSim qSim = QSimUtils.createDefaultQSim(net.scenario, manager);
 		qSim.run();
 

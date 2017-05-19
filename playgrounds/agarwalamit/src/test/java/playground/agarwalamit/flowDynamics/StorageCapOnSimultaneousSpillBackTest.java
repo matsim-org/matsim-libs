@@ -18,13 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.flowDynamics;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import java.util.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,14 +35,11 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -153,6 +144,8 @@ public class StorageCapOnSimultaneousSpillBackTest {
 
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new VehicleLinkEnterLeaveTime(vehicle2LinkEnterTime));
+
+		PrepareForSimUtils.createDefaultPrepareForSim(sc,events).run();
 		QSim sim = QSimUtils.createDefaultQSim(sc, events);
 		sim.run();
 		return vehicle2LinkEnterTime;

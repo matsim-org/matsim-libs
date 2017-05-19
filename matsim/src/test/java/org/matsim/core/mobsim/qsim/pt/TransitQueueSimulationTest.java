@@ -20,6 +20,12 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -29,12 +35,12 @@ import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ExternalMobimConfigGroup;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -59,14 +65,6 @@ import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.utils.EventsCollector;
 import org.matsim.vehicles.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -186,7 +184,9 @@ public class TransitQueueSimulationTest {
         scenario.getConfig().addModule( new ExternalMobimConfigGroup() );
         scenario.getConfig().qsim().setEndTime(1.0*3600); // prevent running the actual simulation
 
-        QSim sim = QSimUtils.createDefaultQSim(scenario, EventsUtils.createEventsManager());
+        EventsManager eventsManager = EventsUtils.createEventsManager();
+        PrepareForSimUtils.createDefaultPrepareForSim(scenario,eventsManager).run();
+        QSim sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
         sim.run();
         List<MobsimAgent> agents = new ArrayList<>(sim.getAgents().values());
         Collections.sort(agents, new Comparator<MobsimAgent>() {
@@ -342,6 +342,7 @@ public class TransitQueueSimulationTest {
 
         // run simulation
         EventsManager events = EventsUtils.createEventsManager();
+        PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
         QSim simulation = QSimUtils.createDefaultQSim(scenario, events);
         simulation.run();
     }
@@ -671,6 +672,7 @@ public class TransitQueueSimulationTest {
         events.addHandler(collector);
 
         // first test without special settings
+        PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
         QSim sim = QSimUtils.createDefaultQSim(scenario, events);
         sim.run();
         assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
@@ -680,6 +682,8 @@ public class TransitQueueSimulationTest {
         // second test with special start/end times
         config.qsim().setStartTime(depTime + 20.0);
         config.qsim().setEndTime(depTime + 90.0);
+
+        PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
         sim = QSimUtils.createDefaultQSim(scenario, events);
         sim.run();
         assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
@@ -796,6 +800,7 @@ public class TransitQueueSimulationTest {
         EventsManager events = EventsUtils.createEventsManager();
         EventsCollector collector = new EventsCollector();
         events.addHandler(collector);
+        PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
         QSimUtils.createDefaultQSim(scenario, events).run();
         List<Event> allEvents = collector.getEvents();
 

@@ -48,6 +48,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -306,6 +307,7 @@ public class PedestrianWithPTTest {
 			EventsManager events = EventsUtils.createEventsManager();
 			events.addHandler(eventHandler);
 
+			PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
 			QSim qSim = QSimUtils.createDefaultQSim(this.scenario,events);
 			qSim.run();
 		}
