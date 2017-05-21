@@ -38,9 +38,9 @@ public class ScenarioPreparer {
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
         final int maxPopulationSize = 5000;
-        final int numVirtualNodes = 33;
+        final int numVirtualNodes = 25;
         final int dtTravelData = 500;
-        final boolean completeGraph = false;
+        final boolean completeGraph = false; // ;
 
         LocationSpec ls = LocationSpec.SIOUXFALLS_CITY;
 
