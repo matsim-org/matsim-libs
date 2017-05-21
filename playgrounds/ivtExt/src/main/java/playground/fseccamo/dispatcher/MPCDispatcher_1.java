@@ -35,6 +35,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.io.ExtractPrimitives;
+import ch.ethz.idsc.tensor.red.Min;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Chop;
 import ch.ethz.idsc.tensor.sca.Increment;
@@ -258,6 +259,35 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         DoubleArray doubleArray = container.get("rebalancingPerVLink");
                         rebalanceVector = Round.of(Tensors.vectorDouble(doubleArray.value));
                         GlobalAssert.that(rebalanceVector.length() == m + n);
+
+                        {
+                            for (int vl = 0; vl < m; vl += 2) {
+                                Scalar d1 = rebalanceVector.Get(vl + 0);
+                                Scalar d2 = rebalanceVector.Get(vl + 1);
+
+                                if (!d1.multiply(d2).equals(ZeroScalar.get())) {
+                                    System.out.println("double rebalance");
+                                    System.out.print("" + virtualNetwork.getVirtualLink(vl + 0).getFrom().index);
+                                    System.out.println(" -> " + virtualNetwork.getVirtualLink(vl + 0).getTo().index);
+                                    System.out.print("" + virtualNetwork.getVirtualLink(vl + 1).getFrom().index);
+                                    System.out.println("-> " + virtualNetwork.getVirtualLink(vl + 1).getTo().index);
+                                    System.out.println(d1 + " " + d2);
+
+                                    Scalar surplus = Min.of(d1, d2);
+
+                                    rebalanceVector.set(s -> s.subtract(surplus), vl + 0);
+                                    rebalanceVector.set(s -> s.subtract(surplus), vl + 1);
+                                    
+                                    {
+                                        Scalar c1 = rebalanceVector.Get(vl + 0);
+                                        Scalar c2 = rebalanceVector.Get(vl + 1);
+                                        
+                                        System.out.println(c1 + " " + c2);
+                                    }
+                                }
+
+                            }
+                        }
                     }
                     final int totalRebalanceDesired = Total.of(rebalanceVector).Get().number().intValue();
                     final int totalPickupDesired = Total.of(requestVector).Get().number().intValue();
