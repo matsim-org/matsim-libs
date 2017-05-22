@@ -20,9 +20,14 @@
 package playground.vsptelematics.ha2;
 
 import com.google.inject.Provider;
+
+import playground.vsptelematics.common.TelematicsConfigGroup;
+import playground.vsptelematics.common.TelematicsConfigGroup.Infotype;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -49,7 +54,7 @@ public class GuidanceMobsimFactory implements Provider<Mobsim>, ShutdownListener
 
 	private double equipmentFraction;
 	private Guidance guidance = null;
-	private String type;
+	private Infotype type;
 	private String outfile;
 	private GuidanceRouteTTObserver ttObserver;
 	private Scenario scenario;
@@ -57,8 +62,9 @@ public class GuidanceMobsimFactory implements Provider<Mobsim>, ShutdownListener
 
 	@Inject
 	GuidanceMobsimFactory(GuidanceRouteTTObserver ttObserver, Scenario scenario, EventsManager eventsManager, OutputDirectoryHierarchy outputDirectoryHierarchy) {
-		this.equipmentFraction = Double.parseDouble(scenario.getConfig().getParam("telematics", "equipmentRate"));
-		this.type = scenario.getConfig().getParam("telematics", "infotype");
+		TelematicsConfigGroup tcg = ConfigUtils.addOrGetModule(scenario.getConfig(), TelematicsConfigGroup.GROUPNAME, TelematicsConfigGroup.class);
+		this.equipmentFraction = tcg.getEquipmentRate();
+		this.type = tcg.getInfotype();
 		this.outfile = outputDirectoryHierarchy.getOutputFilename("guidance.txt");
 		this.ttObserver = ttObserver;
 		this.scenario = scenario;
@@ -66,13 +72,14 @@ public class GuidanceMobsimFactory implements Provider<Mobsim>, ShutdownListener
 	}
 	
 	private void initGuidance(Network network){
-		if ("reactive".equalsIgnoreCase(type)){
+		switch (type){
+		case reactive:
 			this.guidance = new ReactiveGuidance(network, outfile);
-		}
-		else if ("estimated".equalsIgnoreCase(type)){
+			break;
+		case estimated:
 			this.guidance = new EstimatedGuidance(network, outfile);
-		}
-		else {
+			break;
+		default:
 			throw new IllegalStateException("Guidance type " + type + " is not known!");
 		}
 	}

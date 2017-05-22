@@ -40,14 +40,14 @@ import org.matsim.vehicles.Vehicles;
 
 public class EmissionVehicleGenerator {
 
-	private final String populationFile = "../../../runs-svn/cne/berlin-dz-1pct/input/be_117j.output_plans_selected_noNetworkInfo.xml.gz";
-	private final String outputVehicleFile = "../../../runs-svn/cne/berlin-dz-1pct/input/be_117j.output_plans_selected_noNetworkInfo_vehicles.xml";
+	private final String populationFile = "/Users/ihab/Desktop/ils4/kaddoura/cne/berlin-dz-1pct-simpleNetwork/input/be_117j.output_plans_selected.xml.gz";
+	private final String outputVehicleFile = "/Users/ihab/Desktop/ils4/kaddoura/cne/berlin-dz-1pct-simpleNetwork/input/be_117j.output_plans_selected_vehicles.xml";
 	
 	public static void main(String[] args) {
 		EmissionVehicleGenerator generator = new EmissionVehicleGenerator();
 		generator.run();		
 	}
-
+  
 	private void run() {
 		
 		Config config = ConfigUtils.createConfig();

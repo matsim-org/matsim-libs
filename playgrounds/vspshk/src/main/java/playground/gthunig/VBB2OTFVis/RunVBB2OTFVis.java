@@ -16,7 +16,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -145,7 +145,7 @@ public class RunVBB2OTFVis {
 
         StopWatch stopWatch = new StopWatch();
 
-        ParallelPersonAlgorithmRunner.run(population, config.global().getNumberOfThreads(),
+        ParallelPersonAlgorithmUtils.run(population, config.global().getNumberOfThreads(),
                 () -> new PersonPrepareForSim(new PlanRouter(trf.get(), scenario.getActivityFacilities()), scenario));
 
         System.out.println(stopWatch.getElapsedTime());

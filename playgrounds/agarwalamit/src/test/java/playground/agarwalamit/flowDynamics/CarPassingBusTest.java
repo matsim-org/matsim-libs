@@ -45,15 +45,8 @@ import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.config.groups.QSimConfigGroup.VehiclesSource;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
-import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -176,31 +169,31 @@ public class CarPassingBusTest {
 	}
 
 	private void createVehicles() {
-		Vehicles vehicles = this.scenario.getTransitVehicles();
-		VehiclesFactory vb = vehicles.getFactory();
+		{
+			Vehicles vehicles = this.scenario.getTransitVehicles();
+			VehiclesFactory vb = vehicles.getFactory();
 
-		// bus like
-		VehicleType busType = vb.createVehicleType(Id.create("bus", VehicleType.class));
-		busType.setMaximumVelocity(5.0);
-		busType.setPcuEquivalents(3.);
-		VehicleCapacity capacity = vb.createVehicleCapacity();
-		capacity.setSeats(Integer.valueOf(9999));
-		capacity.setStandingRoom(Integer.valueOf(0));
-		busType.setCapacity(capacity);
-		vehicles.addVehicleType(busType);
+			// bus like
+			VehicleType busType = vb.createVehicleType(Id.create("bus", VehicleType.class));
+			busType.setMaximumVelocity(5.0);
+			busType.setPcuEquivalents(3.);
+			VehicleCapacity capacity = vb.createVehicleCapacity();
+			capacity.setSeats(Integer.valueOf(9999));
+			capacity.setStandingRoom(Integer.valueOf(0));
+			busType.setCapacity(capacity);
+			vehicles.addVehicleType(busType);
+			vehicles.addVehicle( vb.createVehicle(Id.create("bus_1", Vehicle.class), busType));
+		}
 
-		vehicles.addVehicle( vb.createVehicle(Id.create("bus_1", Vehicle.class), busType));
+		{
+			Vehicles vehs = this.scenario.getVehicles();
+			VehicleType carType = vehs.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
+			carType.setMaximumVelocity(10.);
+			carType.setPcuEquivalents(1.);
+			vehs.addVehicleType(carType);
 
-		Vehicles vehs = this.scenario.getVehicles();
-		vehs.addVehicleType(busType);
-
-		VehicleType carType = vehs.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
-		carType.setMaximumVelocity(10.);
-		carType.setCapacity(capacity);
-		carType.setPcuEquivalents(1.);
-		vehs.addVehicleType(carType);
-
-		vehs.addVehicle(vehs.getFactory().createVehicle(Id.create("carUser", Vehicle.class), carType) );
+			vehs.addVehicle(vehs.getFactory().createVehicle(Id.create("carUser", Vehicle.class), carType) );
+		}
 	}
 
 	private void createPopulation() {
@@ -240,35 +233,15 @@ public class CarPassingBusTest {
 	private void runSim(LinkEnterLeaveTimeEventHandler eventHandler) {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(eventHandler);
-		
-		QSim qSim1 = new QSim(this.scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim1);
-		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
-		qSim1.addMobsimEngine(teleportationEngine);
 
-		QSim qSim = qSim1;
-		AgentFactory agentFactory;
-		agentFactory = new TransitAgentFactory(qSim);
-		TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
-		transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
-		qSim.addDepartureHandler(transitEngine);
-		qSim.addAgentSource(transitEngine);
-		qSim.addMobsimEngine(transitEngine);
-		PopulationAgentSource agentSource = new PopulationAgentSource(this.scenario.getPopulation(), agentFactory, qSim);
-		qSim.addAgentSource(agentSource);
-		final QSim sim = qSim;
-
-		transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
+		QSim qSim = QSimUtils.createDefaultQSim(this.scenario,events);
 
 		if (isUsingOTFVis) {
-			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
 			OTFClientLive.run(scenario.getConfig(), server);
 		}
-		
-		sim.run();
+
+		qSim.run();
 	}
 	
 	private static class LinkEnterLeaveTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {

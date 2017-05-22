@@ -90,8 +90,8 @@ public class SantiagoScenarioRunner {
 	private static boolean cadyts;
 	/***/
 
-	private static String simulationStep = "Step0_3";
-	private static String caseName = "baseCase1pct";
+	private static String simulationStep = "OriginalLocations";
+	private static String caseName = "baseCase10pct";
 	private static String inputPath = "../../../runs-svn/santiago/"+caseName+"/";
 
 	

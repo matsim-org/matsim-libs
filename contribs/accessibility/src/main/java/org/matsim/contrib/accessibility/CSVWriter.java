@@ -16,6 +16,8 @@ public final class CSVWriter {
 
 	private BufferedWriter writer ;
 
+	private boolean first = true ;
+
 	/**
 	 * writes the header of accessibility data csv file
 	 */
@@ -37,7 +39,12 @@ public final class CSVWriter {
 
 	public final void writeField( double val ) {
 		try {
-			writer.write( val + SEPARATOR ) ;
+			if ( first ) {
+				writer.write( val + SEPARATOR ) ;
+				first = false ;
+			} else {
+				writer.write( SEPARATOR + val ) ;
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("could not write");
@@ -46,7 +53,12 @@ public final class CSVWriter {
 	
 	public final void writeField( String val ) {
 		try {
-			writer.write( val + SEPARATOR ) ;
+			if ( first ) {
+				writer.write( val + SEPARATOR ) ;
+				first = false ;
+			} else {
+				writer.write( SEPARATOR + val ) ;
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 			throw new RuntimeException("could not write");
@@ -60,6 +72,7 @@ public final class CSVWriter {
 			e.printStackTrace();
 			throw new RuntimeException("i/o failure") ;
 		}
+		first = true ;
 	}
 
 	/**

@@ -39,7 +39,7 @@ import org.xml.sax.Attributes;
  *
  * @author mrieser
  */
-public class PopulationReader extends MatsimXmlParser {
+public final class PopulationReader extends MatsimXmlParser {
 
 	private final static String PLANS    = "plans.dtd"; // a special, inofficial case, handle it like plans_v0
 	private final static String PLANS_V0 = "plans_v0.dtd";

@@ -35,7 +35,7 @@ import org.matsim.withinday.controller.ExecutedPlansServiceImpl;
  * @author nagel
  *
  */
-public class KeepLastExecuted implements Provider<PlanStrategy> {
+public class KeepLastExecutedAsPlanStrategy implements Provider<PlanStrategy> {
 	@Inject Config config ;
 	@Inject ControlerListenerManager cm ;
 	@Inject ExecutedPlansServiceImpl executedPlans ;

@@ -19,9 +19,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkFactory;
-import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.NetworkWriter;
@@ -285,7 +283,7 @@ public class VisumFile2MatsimNetwork {
 			double capacity = Double.parseDouble(parts[columnsIndices[5]]);
 			double nOfLanes = Double.parseDouble(parts[columnsIndices[6]]);
 			if(capacity!=0 && !from.getId().equals(to.getId())) {
-				LinkFactoryImpl r = NetworkUtils.createLinkFactory();
+				LinkFactory r = NetworkUtils.createLinkFactory();
 				Link link = NetworkUtils.createLink(Id.createLinkId(id), from, to, network, length, freeSpeed, capacity, nOfLanes);
 				final String id1 = origId;
 				NetworkUtils.setOrigId( ((Link)link), id1 ) ;

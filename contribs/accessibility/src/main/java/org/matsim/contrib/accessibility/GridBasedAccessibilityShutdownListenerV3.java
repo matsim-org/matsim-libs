@@ -160,7 +160,7 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		// prepare the additional columns:
 		for ( ActivityFacilities facilities : this.additionalFacilityData ) {
 			Tuple<SpatialGrid,SpatialGrid> spatialGrids = this.additionalSpatialGrids.get( facilities.getName() ) ;
-			GridUtils.aggregateFacilitiesIntoSpatialGrid(facilities, spatialGrids.getFirst(), spatialGrids.getSecond());
+			GridUtils.aggregateFacilitiesIntoSpatialGrid(facilities, spatialGrids.getFirst(), spatialGrids.getSecond(), null);
 		}
 
 		log.info("Computing and writing cell based accessibility measures ...");

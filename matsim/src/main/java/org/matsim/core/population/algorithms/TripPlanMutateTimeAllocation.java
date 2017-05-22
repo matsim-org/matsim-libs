@@ -38,7 +38,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  *
  * @author mrieser
  */
-public class TripPlanMutateTimeAllocation implements PlanAlgorithm {
+public final class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 
 	private final  StageActivityTypes stageActivities;
 	private final double mutationRange;

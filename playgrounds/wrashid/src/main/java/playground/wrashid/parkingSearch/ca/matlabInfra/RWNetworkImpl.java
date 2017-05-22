@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
-import org.matsim.core.network.LinkFactoryImpl;
+import org.matsim.core.network.LinkFactory;
 import org.matsim.core.network.NetworkUtils;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
@@ -81,7 +81,7 @@ public class RWNetworkImpl {
 	}
 	
 	private Link generateReturnLink(Link link, String inout) {
-		LinkFactoryImpl linkFactory = NetworkUtils.createLinkFactory();
+		LinkFactory linkFactory = NetworkUtils.createLinkFactory();
 		
 		Link returnLink = NetworkUtils.createLink(Id.create(link.getId().toString() + inout +"_back", Link.class), link.getToNode(), link.getFromNode(), network, link.getLength(), link.getFreespeed(), link.getCapacity(), link.getNumberOfLanes());
 		
@@ -118,7 +118,7 @@ public class RWNetworkImpl {
 		}
 		
 		// add 4 jelmoli links
-		LinkFactoryImpl linkFactory = NetworkUtils.createLinkFactory();
+		LinkFactory linkFactory = NetworkUtils.createLinkFactory();
 		Id<Link> id1 = Id.create("jelmoli-1", Link.class);
 		Link jLink1 = NetworkUtils.createLink(id1, this.network.getNodes().get(Id.create("17560200460795", Node.class)), this.network.getNodes().get(Id.create("17560200463426", Node.class)), network, 1.0, 50.0 / 3.6, 1000.0, (double) 1);
 		this.selectedLinks.put(id1, jLink1);

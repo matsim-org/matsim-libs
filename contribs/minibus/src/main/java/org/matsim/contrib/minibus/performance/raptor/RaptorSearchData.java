@@ -30,6 +30,9 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  *
  */
 public class RaptorSearchData {
+	// yy It is not clear to me what a "block" is in the following description.  Possibly, if we have routes a and b, and stops a1, a2, ..., b1, b2, ...,
+	// then they are just consecutively put into an array, so that the next entry is either the next bus stop downstream, or the
+	// starting point of the next route.  ??  kai, jun'16
 	
 	// Each block contains data for one route. Each route block holds sub-blocks for each departure. Each sub-block holds arrival and departure times sorted in increasing order.  
 	final double[] arrivalTimes;

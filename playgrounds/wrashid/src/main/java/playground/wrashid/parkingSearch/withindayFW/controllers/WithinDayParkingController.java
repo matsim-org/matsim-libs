@@ -26,7 +26,7 @@ import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.facilities.ActivityFacility;
 
@@ -238,7 +238,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		//	legModeChecker.run(person.getSelectedPlan());
 		//}
 		
-		ParallelPersonAlgorithmRunner.run(controler.getScenario().getPopulation(), numReplanningThreads, legModeChecker);
+		ParallelPersonAlgorithmUtils.run(controler.getScenario().getPopulation(), numReplanningThreads, legModeChecker);
 	}
 
 	/*

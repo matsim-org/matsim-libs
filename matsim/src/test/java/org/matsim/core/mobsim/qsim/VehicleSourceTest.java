@@ -211,8 +211,6 @@ public class VehicleSourceTest {
 
 		VehicleType [] vehTypes = {bike, car};
 
-		System.out.println(vehicleSource);
-
 		for(int i=0;i<2;i++){
 			Id<Person> id = Id.create(i, Person.class);
 			Person p = population.getFactory().createPerson(id);
@@ -234,16 +232,29 @@ public class VehicleSourceTest {
 
 			//adding vehicle type and vehicle to scenario if vehicleSource is not modeVehicleTypesFromVehiclesData
 
-			if(! scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
-				scenario.getVehicles().addVehicleType(vehTypes[i]);
-			}
+			switch (this.vehicleSource) {
+				case defaultVehicle:
+					//don't add anything
+					break;
+				case modeVehicleTypesFromVehiclesData:
+					// only vehicle type is necessary
+					if(! scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
+						scenario.getVehicles().addVehicleType(vehTypes[i]);
+					}
+					break;
+				case fromVehiclesData:
+					// vehicle type as well as vehicle info is necessary
+					if(! scenario.getVehicles().getVehicleTypes().containsKey(vehTypes[i].getId())) {
+						scenario.getVehicles().addVehicleType(vehTypes[i]);
+					}
 
-			if(vehicleSource == VehiclesSource.modeVehicleTypesFromVehiclesData) {
-				//vehicles ids are not necessary, however, if added, the simulation will work without any problem.
-			} else {
-				Id<Vehicle> vId = Id.create(p.getId(),Vehicle.class);
-				Vehicle v = VehicleUtils.getFactory().createVehicle(vId, vehTypes[i]);
-				scenario.getVehicles().addVehicle(v);
+					Id<Vehicle> vId = Id.create(p.getId(),Vehicle.class);
+					Vehicle v = VehicleUtils.getFactory().createVehicle(vId, vehTypes[i]);
+					scenario.getVehicles().addVehicle(v);
+
+					break;
+					default:
+						throw new RuntimeException("not implemented yet.");
 			}
 		}
 	}

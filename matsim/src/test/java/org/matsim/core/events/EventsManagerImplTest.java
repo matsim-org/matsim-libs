@@ -59,7 +59,7 @@ public class EventsManagerImplTest {
 		} catch (final RuntimeException e) {
 			log.info("Catched expected exception.", e);
 			Assert.assertEquals(1, handler.counter);
-			Assert.assertTrue(e.getCause().getCause() instanceof ArithmeticException);
+			Assert.assertTrue(e.getCause() instanceof ArithmeticException);
 		}
 	}
 

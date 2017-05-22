@@ -37,7 +37,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
  *
  * @author thibautd
  */
-public class TripsToLegsAlgorithm implements PlanAlgorithm {
+public final class TripsToLegsAlgorithm implements PlanAlgorithm {
 	private final StageActivityTypes blackList;
 	private final MainModeIdentifier mainModeIdentifier;
 

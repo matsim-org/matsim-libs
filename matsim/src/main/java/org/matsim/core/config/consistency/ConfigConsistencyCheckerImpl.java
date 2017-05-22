@@ -26,6 +26,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -53,19 +54,23 @@ public final class ConfigConsistencyCheckerImpl implements ConfigConsistencyChec
 	}
 
 	/*package*/ static void checkPlanCalcScore(final Config c) {
-		if (c.planCalcScore().getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() > 0) {
+		ModeParams ptModeParams = c.planCalcScore().getModes().get(TransportMode.pt);
+		if (ptModeParams!=null && ptModeParams.getMarginalUtilityOfTraveling() > 0) {
 			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingPt is > 0. This values specifies a utility. " +
 					"Typically, this should be a disutility, i.e. have a negative value.");
 		}
-		if (c.planCalcScore().getModes().get(TransportMode.car).getMarginalUtilityOfTraveling() > 0) {
+		ModeParams carModeParams = c.planCalcScore().getModes().get(TransportMode.car);
+		if (carModeParams!=null && carModeParams.getMarginalUtilityOfTraveling() > 0) {
 			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".traveling is > 0. This values specifies a utility. " +
 			"Typically, this should be a disutility, i.e. have a negative value.");
 		}
-		if (c.planCalcScore().getModes().get(TransportMode.bike).getMarginalUtilityOfTraveling() > 0) {
+		ModeParams bikeModeParams = c.planCalcScore().getModes().get(TransportMode.bike);
+		if (bikeModeParams!=null && bikeModeParams.getMarginalUtilityOfTraveling() > 0) {
 			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingBike is > 0. This values specifies a utility. " +
 			"Typically, this should be a disutility, i.e. have a negative value.");
 		}
-		if (c.planCalcScore().getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() > 0) {
+		ModeParams walkModeParams = c.planCalcScore().getModes().get(TransportMode.walk);
+		if (walkModeParams!=null && walkModeParams.getMarginalUtilityOfTraveling() > 0) {
 			log.warn(PlanCalcScoreConfigGroup.GROUP_NAME + ".travelingWalk is > 0. This values specifies a utility. " +
 			"Typically, this should be a disutility, i.e. have a negative value.");
 		}

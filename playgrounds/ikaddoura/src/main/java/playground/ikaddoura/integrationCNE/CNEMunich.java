@@ -124,6 +124,8 @@ public class CNEMunich {
 				congestionTollingApproach = CongestionTollingApproach.QBPV9;
 			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.DecongestionPID.toString())) {
 				congestionTollingApproach = CongestionTollingApproach.DecongestionPID;
+			} else if (congestionTollingApproachString.equals(CongestionTollingApproach.DecongestionBangBang.toString())) {
+				congestionTollingApproach = CongestionTollingApproach.DecongestionBangBang;
 			} else {
 				throw new RuntimeException("Unknown congestion pricing approach. Aborting...");
 			}
@@ -153,9 +155,6 @@ public class CNEMunich {
 		if (outputDirectory != null) {
 			controler.getScenario().getConfig().controler().setOutputDirectory(outputDirectory);
 		}
-		
-		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
-		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
 		
 		// scenario-specific settings
 		
@@ -302,6 +301,14 @@ public class CNEMunich {
 		} else {
 			// for V3, V9 and V10: no additional settings
 		}
+
+		// air pollution Munich settings
+		
+		GridTools gt = new GridTools(scenario.getNetwork().getLinks(), xMin, xMax, yMin, yMax, noOfXCells, noOfYCells);
+		ResponsibilityGridTools rgt = new ResponsibilityGridTools(timeBinSize, noOfTimeBins, gt);
+		
+		EmissionsConfigGroup emissionsConfigGroup =  (EmissionsConfigGroup) controler.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
+		emissionsConfigGroup.setConsideringCO2Costs(true);
 		
 		// CNE Integration
 		

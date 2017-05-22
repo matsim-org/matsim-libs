@@ -26,7 +26,7 @@ import org.matsim.core.population.algorithms.PersonAlgorithm;
  * @author nagel
  *
  */
-public class StreamingDeprecated {
+public final class StreamingDeprecated {
 	private static final Logger log = Logger.getLogger( StreamingDeprecated.class ) ;
 	
 	@SuppressWarnings("unused")

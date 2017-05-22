@@ -58,6 +58,7 @@
 	<module name="planCalcScore">
 		<param name="activityType_0" value="dummy" />
 		<param name="activityTypicalDuration_0" value="24:00:00" />
+		<param name="traveling_taxi" value="-6" />
 	</module>
 
 	<module name="strategy">

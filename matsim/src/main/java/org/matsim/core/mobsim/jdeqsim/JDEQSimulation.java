@@ -46,6 +46,7 @@ public class JDEQSimulation implements Mobsim {
 
 	private final JDEQSimConfigGroup config;
 	protected Scenario scenario;
+	private final EventsManager events;
 
 	protected final PlansConfigGroup.ActivityDurationInterpretation activityDurationInterpretation;
 
@@ -55,11 +56,13 @@ public class JDEQSimulation implements Mobsim {
 		Message.setEventsManager(events);
 		this.config = config;
 		this.scenario = scenario;
+		this.events = events;
 		this.activityDurationInterpretation = this.scenario.getConfig().plans().getActivityDurationInterpretation();
 	}
 
 	@Override
 	public void run() {
+		events.initProcessing();
 		Timer t = new Timer();
 		t.startTimer();
 
@@ -81,5 +84,6 @@ public class JDEQSimulation implements Mobsim {
 
 		t.endTimer();
 		log.info("Time needed for one iteration (only JDEQSimulation part): " + t.getMeasuredTime() + "[ms]");
+		events.finishProcessing();
 	}
 }

@@ -111,7 +111,7 @@ public class EquilEmissionTest {
 		equilTestSetUp.createActiveAgents(sc);
 		equilTestSetUp.createPassiveAgents(sc);
 
-		emissionSettings(sc, this.isConsideringCO2Costs, this.emissionCostMultiplicationFactor, this.emissionEfficiencyFactor);
+		emissionSettings(sc);
 		ScenarioUtils.loadScenario(sc); // need to load vehicles. Amit Sep 2016
 
 		Controler controler = new Controler(sc);
@@ -205,7 +205,7 @@ public class EquilEmissionTest {
 		}
 	}
 	
-	private void emissionSettings(Scenario scenario, boolean isConsideringCO2Costs, double emissionCostMultiplicationFactor, double emissionEfficiencyFactor){
+	private void emissionSettings(Scenario scenario){
 		
 		// since same files are used for multiple test, files are added to ONE MORE level up then the test package directory
 		String packageInputDir = helper.getPackageInputDirectory();

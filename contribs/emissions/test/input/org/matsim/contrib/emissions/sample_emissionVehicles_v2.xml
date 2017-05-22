@@ -9,7 +9,7 @@
 		</description>
 		<length meter="7.5"/>
 		<width meter="1.0"/>
-		<maximumVelocity meterPerSecond="1.0"/>
+		
 		<accessTime secondsPerPerson="1.0"/>
 		<egressTime secondsPerPerson="1.0"/>
 		<doorOperation mode="serial"/>
@@ -20,7 +20,7 @@
 		</description>
 		<length meter="7.5"/>
 		<width meter="1.0"/>
-		<maximumVelocity meterPerSecond="1.0"/>
+		
 		<accessTime secondsPerPerson="1.0"/>
 		<egressTime secondsPerPerson="1.0"/>
 		<doorOperation mode="serial"/>
@@ -31,7 +31,7 @@
 		</description>
 		<length meter="7.5"/>
 		<width meter="1.0"/>
-		<maximumVelocity meterPerSecond="1.0"/>
+		
 		<accessTime secondsPerPerson="1.0"/>
 		<egressTime secondsPerPerson="1.0"/>
 		<doorOperation mode="serial"/>
@@ -42,7 +42,7 @@
 		</description>
 		<length meter="7.5"/>
 		<width meter="1.0"/>
-		<maximumVelocity meterPerSecond="1.0"/>
+		
 		<accessTime secondsPerPerson="1.0"/>
 		<egressTime secondsPerPerson="1.0"/>
 		<doorOperation mode="serial"/>

@@ -140,10 +140,20 @@ public class InsertionCostCalculator {
 		double driveToPickupStartTime = (insertion.pickupIdx == 0) ? vEntry.start.time //
 				: vEntry.stops.get(insertion.pickupIdx - 1).task.getEndTime();
 
-		double pickupTime = driveToPickupStartTime + insertion.pathToPickup.path.travelTime
-				+ insertion.pathToPickup.firstAndLastLinkTT;
+		double pickupEndTime = driveToPickupStartTime + insertion.pathToPickup.path.travelTime
+				+ insertion.pathToPickup.firstAndLastLinkTT + stopDuration;
 
-		if (pickupTime > drtRequest.getEarliestStartTime() + maxWaitTime) {
+		if (pickupEndTime > drtRequest.getEarliestStartTime() + maxWaitTime) {
+			return false;
+		}
+
+		// reject solutions when latestArrivalTime for the new request is violated
+		double dropoffStartTime = insertion.pickupIdx == insertion.dropoffIdx
+				? pickupEndTime + insertion.pathFromPickup.path.travelTime + insertion.pathFromPickup.firstAndLastLinkTT
+				: vEntry.stops.get(insertion.dropoffIdx - 1).task.getEndTime() + insertion.pathToDropoff.path.travelTime
+						+ insertion.pathToDropoff.firstAndLastLinkTT;
+		
+		if (dropoffStartTime > drtRequest.getLatestArrivalTime()) {
 			return false;
 		}
 

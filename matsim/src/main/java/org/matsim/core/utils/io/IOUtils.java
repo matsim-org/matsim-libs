@@ -33,6 +33,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
@@ -88,7 +89,7 @@ public class IOUtils {
 	 * @return BufferedReader for the specified file.
 	 * @throws UncheckedIOException
 	 *
-	 * @author mrieser
+	 * <br> author mrieser
 	 */
 	public static BufferedReader getBufferedReader(final String filename) throws UncheckedIOException {
 		return getBufferedReader(filename, Charset.forName("UTF8"));
@@ -105,7 +106,7 @@ public class IOUtils {
 	 * @return BufferedReader for the specified file.
 	 * @throws UncheckedIOException
 	 *
-	 * @author mrieser
+	 * <br> author mrieser
 	 */
 	public static BufferedReader getBufferedReader(final String filename, final Charset charset) throws UncheckedIOException {
 		BufferedReader infile = null;
@@ -273,7 +274,7 @@ public class IOUtils {
 	 * @param toStream The stream the data should be written to
 	 * @throws IOException
 	 *
-	 * @author mrieser
+	 * <br> author mrieser
 	 */
 	public static void copyStream(final InputStream fromStream, final OutputStream toStream) throws IOException {
 		byte[] buffer = new byte[4096];
@@ -320,7 +321,7 @@ public class IOUtils {
    * @return InputStream for the specified file.
    * @throws UncheckedIOException
    *
-   * @author dgrether
+   * <br> author dgrether
    */
 	public static InputStream getInputStream(final String filename) throws UncheckedIOException {
 		InputStream inputStream = null;
@@ -385,7 +386,7 @@ public class IOUtils {
 	 * 
 	 * @throws UncheckedIOException if the file cannot be created.
 	 * 
-	 * @author mrieser
+	 * <br> author mrieser
 	 */
 	public static OutputStream getOutputStream(final String filename) throws UncheckedIOException {
 		if (filename == null) {
@@ -396,6 +397,27 @@ public class IOUtils {
 				return new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(filename)));
 			} else {
 				return new BufferedOutputStream(new FileOutputStream (filename));
+			}
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+	
+	/**
+	 * Copy of getOutputStream and then changed to correspond to the PrintStream signature.  Device to hopefully reduce FindBugs warnings.  kai, may'17
+	 * 
+	 * @param filename
+	 * @return
+	 */
+	public static PrintStream getPrintStream( final String filename ) {
+		if (filename == null) {
+			throw new UncheckedIOException(new FileNotFoundException("No filename given (filename == null)"));
+		}
+		try {
+			if (filename.toLowerCase(Locale.ROOT).endsWith(GZ)) {
+				return new PrintStream(new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(filename))));
+			} else {
+				return new PrintStream(new BufferedOutputStream(new FileOutputStream (filename))) ;
 			}
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);

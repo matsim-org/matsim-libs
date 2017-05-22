@@ -152,6 +152,10 @@
 		<param name="traveling" value="-6.0" />
 		<param name="travelingPt" value="-6.0" />
 		<param name="travelingBike" value="-26.0" />
+		<param name="traveling_access_walk_tw" value="-6"/>
+		<param name="traveling_egress_walk_tw" value="-6"/>
+		<param name="traveling_twoway_vehicle" value="-6"/>
+		
 		<param name="constantCar" value="-0.4" />
 
 		<param name="constantBike" value="-0.4" />

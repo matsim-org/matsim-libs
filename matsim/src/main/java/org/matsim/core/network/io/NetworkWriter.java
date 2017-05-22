@@ -36,7 +36,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.utils.objectattributes.AttributeConverter;
 
-public class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
+public final class NetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 	
 	private static final Logger log = Logger.getLogger(NetworkWriter.class);
 	
