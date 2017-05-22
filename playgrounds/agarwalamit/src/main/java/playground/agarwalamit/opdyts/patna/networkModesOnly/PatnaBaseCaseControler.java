@@ -76,9 +76,9 @@ public class PatnaBaseCaseControler {
         int lastIteration = 2;
 
         Config config = ConfigUtils.loadConfig(configFile);
-        String outDir = baseDir+"/"+patnaBestDecisionVariable+"/plainRun2GetPlansFile/";
-        if (! new File(outDir).exists() ) new File(outDir).mkdirs();
-        config.controler().setOutputDirectory(outDir);
+        String tempOutDir = baseDir+"/"+patnaBestDecisionVariable+"/plainRun2GetPlansFile/";
+        if (! new File(tempOutDir).exists() ) new File(tempOutDir).mkdirs();
+        config.controler().setOutputDirectory(tempOutDir);
         config.controler().setFirstIteration(firstIteration);
         config.controler().setLastIteration(lastIteration);
 
@@ -96,8 +96,8 @@ public class PatnaBaseCaseControler {
         for(int plansFileIndex : plansFileIndexes) {
             for (int firstIt : firstIterations) {
                 int lastIt = firstIt + 1000;
-                String plansFile = outDir + "/ITERS/it."+plansFileIndex+"/"+plansFileIndex+".plans.xml.gz";
-                outDir = baseDir+"/"+patnaBestDecisionVariable+"/"+plansFileIndex+"thPlans_"+firstIt+"thFirstIt_"+lastIt+"thLastIt/";
+                String plansFile = tempOutDir + "/ITERS/it."+plansFileIndex+"/"+plansFileIndex+".plans.xml.gz";
+                String outDir = baseDir+"/"+patnaBestDecisionVariable+"/"+plansFileIndex+"thPlans_"+firstIt+"thFirstIt_"+lastIt+"thLastIt/";
                 if (! new File(outDir).exists() ) new File(outDir).mkdirs();
 
                 config.plans().setInputFile(plansFile);
