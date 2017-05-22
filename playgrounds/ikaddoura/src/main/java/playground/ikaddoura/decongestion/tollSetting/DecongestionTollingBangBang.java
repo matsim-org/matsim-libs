@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.network.Link;
 import com.google.inject.Inject;
 
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
+import playground.ikaddoura.decongestion.data.LinkInfo;
 
 /**
  * 
@@ -47,22 +48,25 @@ public class DecongestionTollingBangBang implements DecongestionTollSetting {
 	public void updateTolls() {
 	
 		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
-			for (Integer intervalNr : this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().keySet()) {
 
-				double averageDelay = this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().get(intervalNr);	
+            LinkInfo linkInfo = this.congestionInfo.getlinkInfos().get(linkId);
+            for (Integer intervalNr : linkInfo.getTime2avgDelay().keySet()) {
+
+				double averageDelay = linkInfo.getTime2avgDelay().get(intervalNr);
 				
 				double toll = 0.;
 				
 				// 1) increase / decrease the toll per link and time bin
-				
-				if (averageDelay <= this.congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {	
-					if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr) != null) {
-						toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr) 
+
+                Double aDouble = linkInfo.getTime2toll().get(intervalNr);
+                if (averageDelay <= this.congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {
+					if (aDouble != null) {
+						toll = aDouble
 								- this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT();
 					}					
 				} else {
-					if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr) != null) {
-						toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr) 
+					if (aDouble != null) {
+						toll = aDouble
 								+ this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT();
 					} else {
 						toll = this.congestionInfo.getDecongestionConfigGroup().getINITIAL_TOLL();
@@ -78,8 +82,8 @@ public class DecongestionTollingBangBang implements DecongestionTollSetting {
 				// 3) smoothen the tolls
 				
 				double previousToll = Double.NEGATIVE_INFINITY;
-				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr) != null) {
-					previousToll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr);
+				if (aDouble != null) {
+					previousToll = aDouble;
 				}
 				
 				double blendFactor = Double.NEGATIVE_INFINITY;
@@ -102,7 +106,7 @@ public class DecongestionTollingBangBang implements DecongestionTollSetting {
 				
 				// 4) store the updated toll
 				
-				if (toll > 0) this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().put(intervalNr, smoothedToll);
+				if (toll > 0) linkInfo.getTime2toll().put(intervalNr, smoothedToll);
 			}
 		}
 		

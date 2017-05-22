@@ -22,13 +22,9 @@
  */
 package playground.ikaddoura.noise;
 
-import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
-import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
-import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.NoiseRenderer;
-import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-
 import com.vividsolutions.jts.geom.Envelope;
+import org.matsim.contrib.analysis.vsp.qgis.*;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 /**
  * @author ikaddoura
@@ -52,8 +48,8 @@ public static void main(String args[]){
 		noiseLayer.setDelimiter(";");
 		noiseLayer.setXField("x");
 		noiseLayer.setYField("y");
-		
-		NoiseRenderer renderer = new NoiseRenderer(noiseLayer, 100.);
+
+        GraduatedSymbolRenderer renderer = RendererFactory.createNoiseRenderer(noiseLayer, 100);
 		renderer.setRenderingAttribute("Immission " + time);
 		
 		writer.addLayer(noiseLayer);
