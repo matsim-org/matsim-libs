@@ -143,6 +143,7 @@ public class EquilControler {
                 }
             });
             FileUtils.deleteIntermediateIterations(config.controler().getOutputDirectory(),controler.getConfig().controler().getFirstIteration(), controler.getConfig().controler().getLastIteration());
+            controler.run();
         }
 
         // set back settings for opdyts
