@@ -22,52 +22,59 @@
 
 package org.matsim.contrib.signals.controler;
 
-import com.google.inject.Provides;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
+import org.matsim.contrib.signals.builder.DefaultSignalModelFactory;
 import org.matsim.contrib.signals.builder.FromDataBuilder;
+import org.matsim.contrib.signals.builder.SignalModelFactory;
+import org.matsim.contrib.signals.builder.SignalSystemsModelBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
 import org.matsim.contrib.signals.router.*;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
+import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 import org.matsim.core.replanning.ReplanningContext;
 
+import com.google.inject.Provides;
+
+/**
+ * Add this module if you want to simulate fixed-time signals. It also works without signals.
+ * 
+ * @author tthunig
+ */
 public class SignalsModule extends AbstractModule {
-    @Override
-    public void install() {
-        if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
-            bind(SignalsControllerListener.class).to(DefaultSignalsControllerListener.class);
-            addControlerListenerBinding().to(SignalsControllerListener.class);
-            addMobsimListenerBinding().to(QSimSignalEngine.class);
-            // bind tool to write information about signal states for via
+	@Override
+	public void install() {
+		if ((boolean) ConfigUtils.addOrGetModule(getConfig(), SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).isUseSignalSystems()) {
+			// bindings for fixed-time signals
+			bind(SignalModelFactory.class).to(DefaultSignalModelFactory.class);
+			addControlerListenerBinding().to(DefaultSignalControlerListener.class);
+
+			// general signal bindings
+			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
+			addMobsimListenerBinding().to(QSimSignalEngine.class);
+
+			// bind tool to write information about signal states for via
 			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
-            addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
-            addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
+			/* asEagerSingleton is necessary to force creation of the SignalEvents2ViaCSVWriter class as it is never used somewhere else. theresa dec'16 */
 
-            if (getConfig().controler().isLinkToLinkRoutingEnabled()){
-                //use the extended NetworkWithSignalsTurnInfoBuilder (instead of NetworkTurnInfoBuilder)
-                //michalm, jan'17
-                bind(NetworkTurnInfoBuilder.class).to(NetworkWithSignalsTurnInfoBuilder.class);
-            }
-            
-            if (getConfig().qsim().isUsingFastCapacityUpdate()) {
-                throw new RuntimeException("Fast flow capacity update does not support signals");
-            }
-        }
-    }
+			if (getConfig().qsim().isUsingFastCapacityUpdate()) {
+				throw new RuntimeException("Fast flow capacity update does not support signals");
+			}
+		}
+		if (getConfig().controler().isLinkToLinkRoutingEnabled()){
+			//use the extended NetworkWithSignalsTurnInfoBuilder (instead of NetworkTurnInfoBuilder)
+			//michalm, jan'17
+			bind(NetworkTurnInfoBuilderI.class).to(NetworkWithSignalsTurnInfoBuilder.class);
+		}
+	}
 
-    @Provides SignalSystemsManager provideSignalSystemsManager(Scenario scenario, EventsManager eventsManager, ReplanningContext replanningContext) {
-        FromDataBuilder modelBuilder = new FromDataBuilder(scenario, eventsManager);
-        SignalSystemsManager signalSystemsManager = modelBuilder.createAndInitializeSignalSystemsManager();
-        signalSystemsManager.resetModel(replanningContext.getIteration());
-        return signalSystemsManager;
-    }
-
-    @Provides QSimSignalEngine provideQSimSignalEngine(SignalSystemsManager signalManager) {
-        return new QSimSignalEngine(signalManager);
-    }
+	@Provides
+	SignalSystemsManager provideSignalSystemsManager(ReplanningContext replanningContext, SignalSystemsModelBuilder modelBuilder) {
+		SignalSystemsManager signalSystemsManager = modelBuilder.createAndInitializeSignalSystemsManager();
+		signalSystemsManager.resetModel(replanningContext.getIteration());
+		return signalSystemsManager;
+	}
 }

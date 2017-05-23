@@ -47,8 +47,9 @@ public final class FileUtils {
     public static void deleteIntermediateIterations(final String outputDir, final int firstIteration, final int lastIteration) {
         for (int index =firstIteration+1; index <lastIteration; index ++){
             String dirToDel = outputDir+"/ITERS/it."+index;
+            if (! new File(dirToDel).exists()) continue;
             Logger.getLogger(JointCalibrationControler.class).info("Deleting the directory "+dirToDel);
-            IOUtils.deleteDirectory(new File(dirToDel),false);
+            IOUtils.deleteDirectoryRecursively(new File(dirToDel).toPath());
         }
     }
 }

@@ -183,8 +183,6 @@ public class TestExposurePricing {
 				bindCarTravelDisutilityFactory().toInstance(emfac);
 				bind(ExperiencedEmissionCostHandler.class);
 				bind(PersonFilter.class).to(MunichPersonFilter.class);
-//				bind(ExperiencedEmissionCostHandler.class).toInstance(new ExperiencedEmissionCostHandler(emissionCostModule,null));
-				addControlerListenerBinding().to(AirPollutionExposureAnalysisControlerListener.class);
 			}
 		});
 

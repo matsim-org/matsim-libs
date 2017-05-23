@@ -36,7 +36,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.dziemke.utils.LogToOutputSaver;
 
 /**
- * @author dziemke
+ * @author dziemke, ikaddoura
  */
 public class RunCombinedOsmReaderCottbus {
 	final private static Logger log = Logger.getLogger(RunCombinedOsmReaderCottbus.class);
@@ -58,46 +58,22 @@ public class RunCombinedOsmReaderCottbus {
 	 */
 	public static void main(String[] args) {
 				
-		// Input and output
-//		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/2015-06-24_schlesische_str.osm";
-//		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/kreuzberg/2015-09-13_kreuzberg.osm";
-//		String osmFile = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/2015-09-13_berlin.osm";
-//		String osmFile = "/Users/dominik/Accessibility/Data/OSM/2015-10-15_nairobi.osm.xml";
-		String osmFile = "/Users/ihab/Documents/workspace/public-svn/matsim/scenarios/countries/de/cottbus/planet_cottbus.osm";
+
+		String osmFile = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/berlin-2017-05-10.osm";
+		String outputBase = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/berlin-2017-05-10_facilities/";
 		
-//		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/schlesische_str/07/";
-//		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/kreuzberg/02/";
-//		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/09/";
-//		String outputBase = "/Users/dominik/Workspace/shared-svn/projects/accessibility_berlin/osm/berlin/combined/01/";
-//		String outputBase = "/Users/dominik/Accessibility/Data/nairobi/combined/02/";
-		String outputBase = "../../../../Workspace/data/accessibility/capetown/facilities/01/";
+		String facilityFile = "berlin-2017-05-10_facilities_DHDN_GK4.xml";
+		String attributeFile = "berlin-2017-05-10_facilities_amenities_DHDN_GK4.xml";
 		
-		String facilityFile = "/Users/ihab/Documents/workspace/public-svn/matsim/scenarios/countries/de/cottbus/facilities_final_WGS84_UTM33N.xml";
-		String attributeFile = "/Users/ihab/Documents/workspace/public-svn/matsim/scenarios/countries/de/cottbus/facilitiy_final_amenities_WGS84_UTM33N.xml";
-		
-		// Logging
 		log.info("Parsing land use from OpenStreetMap.");
 		LogToOutputSaver.setOutputDirectory(outputBase);
 		
-		// Parameters
-//		String outputCRS = "EPSG:31468"; // = DHDN GK4, for Berlin
-//		String outputCRS = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		String outputCRS = TransformationFactory.WGS84_UTM33N;
+		String outputCRS = TransformationFactory.DHDN_GK4;
 		
 		// building types are either taken from the building itself and, if building does not have a type, taken from
 		// the type of land use of the area which the build belongs to.
 		double buildingTypeFromVicinityRange = 0.;
-		
-		
-//		String osmFile = args[0];
-//		String facilityFile = args[1];
-//		String attributeFile = args[2];
-//		String outputCRS = "WGS84";
-//		if(args.length > 3){
-//			outputCRS = args[3];
-//		}
-		
-
+	
 		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(outputCRS,
 				buildOsmLandUseToMatsimTypeMap(), buildOsmBuildingToMatsimTypeMap(),
 				buildOsmAmenityToMatsimTypeMap(), buildOsmLeisureToMatsimTypeMap(),
@@ -105,8 +81,8 @@ public class RunCombinedOsmReaderCottbus {
 				buildingTypeFromVicinityRange);
 		try {
 			combinedOsmReader.parseFile(osmFile);
-			combinedOsmReader.writeFacilities(facilityFile);
-			combinedOsmReader.writeFacilityAttributes(attributeFile);
+			combinedOsmReader.writeFacilities(outputBase + facilityFile);
+			combinedOsmReader.writeFacilityAttributes(outputBase + attributeFile);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}		

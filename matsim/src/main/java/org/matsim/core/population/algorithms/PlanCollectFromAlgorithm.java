@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Plan;
 /**
  * @author dgrether
  */
-public class PlanCollectFromAlgorithm implements PlanAlgorithm {
+public final class PlanCollectFromAlgorithm implements PlanAlgorithm {
 
 	private Set<Plan> plans;
 

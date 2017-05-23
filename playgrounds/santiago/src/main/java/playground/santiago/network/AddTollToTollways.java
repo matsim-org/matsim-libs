@@ -20,6 +20,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.gis.ShapeFileWriter;
+import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
 import org.opengis.feature.simple.SimpleFeature;
@@ -34,10 +35,10 @@ import playground.santiago.SantiagoScenarioConstants;
 public class AddTollToTollways {
 
 	private static final Logger log = Logger.getLogger(AddTollToTollways.class);
-	String originalNetFile = "../../../shared-svn/projects/santiago/scenario/inputForMATSim/network/network_merged_cl.xml.gz";	
-	String gantriesFile = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/toll/gantriesWithFares/gantriesAndFares2012.shp";
-	String schemeName = "gantries";
-	String outFile = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/toll/" + schemeName + ".xml";
+	String netFile;	
+	String gantriesFile;
+	String schemeName;
+	String outFile;
 	String crs = SantiagoScenarioConstants.toCRS;
 	Collection<SimpleFeature> networkFeatures;
 	Collection<SimpleFeature> gantriesFeatures;
@@ -45,13 +46,27 @@ public class AddTollToTollways {
 	double dayStartTime = 0;
 	double dayEndTime = 24*60*60;
 	
+	//Providing a new constructor to use this class in the CreateCordonScheme class.
+	public AddTollToTollways(String gantriesFile, String netFile, String schemeName){
+		this.gantriesFile = gantriesFile;
+		this.netFile = netFile;
+		this.schemeName = schemeName;
+		//do not use the writeScheme method if the class is called from outside.
+	}
+	
+	public AddTollToTollways(){
+		this.gantriesFile = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/toll/gantriesWithFares/gantriesAndFares2012.shp";
+		this.netFile = "../../../shared-svn/projects/santiago/scenario/inputForMATSim/network/network_merged_cl.xml.gz";
+		this.schemeName = "gantries"; //default name if the class is called from inside.
+		this.outFile = "../../../shared-svn/projects/santiago/scenario/inputFromElsewhere/toll/" + schemeName + ".xml";
+	}
 	
 
-	private void createNetworkFeatures (){
+	public void createNetworkFeatures (){
 		
 
 		Network net = NetworkUtils.createNetwork();		
-		new MatsimNetworkReader(net).readFile(originalNetFile);
+		new MatsimNetworkReader(net).readFile(netFile);
 		
 		PolylineFeatureFactory linkFactory = new PolylineFeatureFactory.Builder().
 				setCrs(MGC.getCRS(crs)).
@@ -83,7 +98,7 @@ public class AddTollToTollways {
 	}
 	
 	
-	private void collectInformation() {
+	public void collectInformation() {
 	
 		this.pricedLinksInfo = new HashMap<>();
 		ShapeFileReader shapeReader = new ShapeFileReader();
@@ -96,10 +111,7 @@ public class AddTollToTollways {
 					for (int i=5; i<=25; ++i){					
 						faresInfo.add((String) gantrie.getAttribute(i));
 					}
-					pricedLinksInfo.put(Id.createLinkId((String) link.getAttribute("ID")), faresInfo );
-
-					
-					
+					pricedLinksInfo.put(Id.createLinkId((String) link.getAttribute("ID")), faresInfo );					
 					}
 				}
 			}
@@ -107,7 +119,7 @@ public class AddTollToTollways {
 		}
 		
 
-	private void createGantriesFile() {
+	public RoadPricingSchemeImpl createGantriesFile() {
 		RoadPricingSchemeImpl scheme = new RoadPricingSchemeImpl();
 		scheme.setName(schemeName);
 		scheme.setType(scheme.TOLL_TYPE_LINK);
@@ -224,7 +236,10 @@ public class AddTollToTollways {
 
 		}
 
-				
+		return scheme;
+	}
+	
+	private void writeScheme (RoadPricingScheme scheme){
 	
 		RoadPricingWriterXMLv1 rpw = new RoadPricingWriterXMLv1(scheme);
 		rpw.writeFile(outFile);
@@ -237,7 +252,8 @@ public class AddTollToTollways {
 
 		createNetworkFeatures();
 		collectInformation();
-		createGantriesFile();
+		RoadPricingScheme linksWithGantries = createGantriesFile();
+		writeScheme(linksWithGantries);
 		
 	}
 	

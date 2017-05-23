@@ -62,10 +62,10 @@ public class PatnaNetworkModesCalibrator {
 	public static void main(String[] args) {
 
 		String configFile;
-		int iterationsToConvergence = 10; //
-		int averagingIterations = 10;
+		int iterationsToConvergence = 800; //
+		int averagingIterations = 50;
 		boolean isRunningOnCluster = false;
-		double randomVariance = 0.1;
+		double randomVariance = 1.0;
 
 		if (args.length>0) isRunningOnCluster = true;
 
@@ -181,7 +181,7 @@ public class PatnaNetworkModesCalibrator {
 		// remove the unused iterations
 		for (int index =0; index < maxIterations; index++) {
 			String dir2remove = OUT_DIR+"_"+index+"/ITERS/";
-			IOUtils.deleteDirectory(new File(dir2remove));
+			IOUtils.deleteDirectoryRecursively(new File(dir2remove).toPath());
 		}
 	}
 }

@@ -44,6 +44,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -87,7 +88,7 @@ public class EmissionEventsTest {
 
     @Test
     public void eventsOfflineTest(){
-        String inputEventsFile = helper.getPackageInputDirectory()+"/CombinedEventsReaderTest/0.events.xml.gz";
+        String inputEventsFile = helper.getClassInputDirectory()+"/0.events.xml.gz";
         new File(helper.getOutputDirectory()+"/ignoreingEmissionFromEventsFile="+this.isWritingEmissionsEvents).mkdir();
         String outputEventsFile = helper.getOutputDirectory()+"/ignoreingEmissionFromEventsFile="+this.isWritingEmissionsEvents +"/outputEvents.xml.gz";
 
@@ -213,7 +214,7 @@ public class EmissionEventsTest {
 
                 addControlerListenerBinding().to(InternalizeEmissionsControlerListener.class);
 
-                bindCarTravelDisutilityFactory().to(EmissionModalTravelDisutilityCalculatorFactory.class);
+                bindCarTravelDisutilityFactory().toInstance(new EmissionModalTravelDisutilityCalculatorFactory(new RandomizingTimeDistanceTravelDisutilityFactory("car", sc.getConfig().planCalcScore())));
             }
         });
         controler.run();

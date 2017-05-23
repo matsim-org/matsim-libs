@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PersonUtils;
 
-public class PermissibleModesCalculatorImpl implements PermissibleModesCalculator {
+public final class PermissibleModesCalculatorImpl implements PermissibleModesCalculator {
 	private final List<String> availableModes;
 	private final List<String> availableModesWithoutCar;
 	private final boolean considerCarAvailability;

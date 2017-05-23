@@ -63,6 +63,7 @@
 		<param name="emissionRoadTypeMappingFile" value="roadTypeMapping.txt" />
 		<param name="isUsingVehicleTypeIdAsVehicleDescription" value="false" />
 		<param name="usingDetailedEmissionCalculation" value="false" />
+		<param name="consideringCO2Costs" value="true" />
 	</module>
 
 	<module name="qsim">

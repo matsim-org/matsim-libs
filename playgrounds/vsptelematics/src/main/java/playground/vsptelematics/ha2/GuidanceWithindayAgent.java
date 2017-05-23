@@ -34,7 +34,6 @@ import org.matsim.vehicles.Vehicle;
  * @author dgrether
  *
  */
-//public class GuidanceWithindayAgent extends PersonDriverAgentImpl {
 public class GuidanceWithindayAgent implements MobsimDriverAgent {
 
 	private Id<Link> id1 = Id.create("1", Link.class);
@@ -49,16 +48,9 @@ public class GuidanceWithindayAgent implements MobsimDriverAgent {
 	private MobsimDriverAgent delegate ;
 	
 	protected GuidanceWithindayAgent(Person p, Netsim simulation, Guidance guidance) {
-//		super(p.getSelectedPlan(), simulation);
-		// (not sure if this will work; this class used to extend from ExperimentalWithindayAgent. kai, feb'14)
-		
-
 		this.simulation = simulation;
 		this.guidance = guidance;
-
 		this.delegate = new PersonDriverAgentImpl(p.getSelectedPlan(), simulation) ;
-		throw new RuntimeException("I replaced inheritance by delegation; pls chk carefully if this is still working "
-				+ "as expected. kai, nov'14") ;
 	}
 
 	@Override

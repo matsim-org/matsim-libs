@@ -64,7 +64,6 @@ public class ModeChoiceDecisionVariable implements DecisionVariable {
         switch (this.opdytsScenario){
             case EQUIL:
             case EQUIL_MIXEDTRAFFIC:
-                return delegate.toString();
             case PATNA_1Pct:
             case PATNA_10Pct:
             StringBuilder str = new StringBuilder();

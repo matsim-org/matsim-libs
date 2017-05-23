@@ -86,8 +86,12 @@ public final class TtGeneralAnalysis implements PersonDepartureEventHandler, Per
 	// in 100 s steps
 	private Map<Double, Integer> numberOfArrivalsPerTimeInterval = new TreeMap<>();
 	
-	@Inject
 	private Scenario scenario;
+	
+	@Inject
+	public TtGeneralAnalysis(Scenario scenario) {
+		this.scenario = scenario;
+	}
 	
 	@Override
 	public void reset(int iteration) {

@@ -39,7 +39,7 @@ import org.matsim.core.population.PersonUtils;
  * Plans which do not fulfill the filter criteria are removed from a person, Persons with
  * no plans are removed from the population.
  */
-public class PlansFilterByLegMode {
+public final class PlansFilterByLegMode {
 	private static final Logger log = Logger.getLogger(PlansFilterByLegMode.class);
 
 	private String legMode;

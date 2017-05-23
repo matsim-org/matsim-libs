@@ -59,6 +59,14 @@ public final class SpatialGrid{
 	
 	private final double resolution;
 	
+	private String label = "" ;
+	public void setLabel( String str ) {
+		label = str ;
+	}
+	public String getLabel() {
+		return label ;
+	}
+	
 	/**
 	 * @param xmin
 	 * @param ymin
@@ -282,7 +290,8 @@ public final class SpatialGrid{
 	 * @return the initial data as a matrix
 	 */
 	public double[][] getMatrix(){
-		return flip(matrix);
+//		return flip(matrix);
+		return matrix;
 	}
 	
 	/**

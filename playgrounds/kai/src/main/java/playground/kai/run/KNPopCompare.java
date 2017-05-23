@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -66,6 +67,7 @@ public class KNPopCompare {
 	// container that contains the statistics containers:
 	final Map<StatType,DataMap<String>> sumsContainer = new TreeMap<>() ;
 	final Map<StatType,DataMap<String>> cntsContainer = new TreeMap<>() ;
+	private Network network;
 
 	public static void main(String[] args) {
 		if ( args.length != 4 && args.length != 5 ) {
@@ -102,7 +104,7 @@ public class KNPopCompare {
 
 			Scenario scenario1 = ScenarioUtils.loadScenario( config ) ;
 			pop1 = scenario1.getPopulation() ;
-			//			network = scenario1.getNetwork() ;
+			network = scenario1.getNetwork() ;
 			ff = ((MutableScenario)scenario1).getActivityFacilities().getFactory() ;
 		}
 
@@ -216,30 +218,51 @@ public class KNPopCompare {
 				}
 //			}
 		}
-
-		final BoundingBox bbox = BoundingBox.createBoundingBox( 300000., -2.95e6, 500000., -2.7e6 );
+		BoundingBox bbox = null ;
+		if ( network != null ) {
+			bbox = BoundingBox.createBoundingBox( network );
+		} else {
+			bbox = BoundingBox.createBoundingBox( 300000., -2.95e6, 500000., -2.7e6 );
+		}
+		
+		double resolution = 2000.;
 		{
-			SpatialGrid spatialGrid = new SpatialGrid( bbox, 2000., 0. ) ; 
-			SpatialGrid spatialGridCnt = new SpatialGrid( bbox, 2000., 0. ) ; 
-			GridUtils.aggregateFacilitiesIntoSpatialGrid(homesWithScoreDifferences, spatialGrid, spatialGridCnt);
+			SpatialGrid spatialGrid = new SpatialGrid( bbox, resolution, 0. ) ; 
+			spatialGrid.setLabel("scoreDiffSum");
+			SpatialGrid spatialGridCnt = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGridCnt.setLabel("scoreDiffCnt");
+			SpatialGrid spatialGridAv = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGridAv.setLabel("scoreDiffAv");
+			GridUtils.aggregateFacilitiesIntoSpatialGrid(homesWithScoreDifferences, spatialGrid, spatialGridCnt, spatialGridAv);
 			spatialGrids.add( spatialGrid ) ;
 			spatialGrids.add( spatialGridCnt ) ;
+			spatialGrids.add( spatialGridAv ) ;
 		}
 
 		{
-			SpatialGrid spatialGrid = new SpatialGrid( bbox, 2000., 0. ) ; 
-			SpatialGrid spatialGridCnt = new SpatialGrid( bbox, 2000., 0. ) ; 
-			GridUtils.aggregateFacilitiesIntoSpatialGrid(homesWithMoneyDifferences, spatialGrid, spatialGridCnt);
+			SpatialGrid spatialGrid = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGrid.setLabel("moneyDiffSum");
+			SpatialGrid spatialGridCnt = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGridCnt.setLabel("moneyDiffCnt");
+			SpatialGrid spatialGridAv = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGridAv.setLabel("moneyDiffAv");
+			GridUtils.aggregateFacilitiesIntoSpatialGrid(homesWithMoneyDifferences, spatialGrid, spatialGridCnt, spatialGridAv );
 			spatialGrids.add( spatialGrid ) ;
 			spatialGrids.add( spatialGridCnt ) ;
+			spatialGrids.add( spatialGridAv ) ;
 		}
 
 		{
-			SpatialGrid spatialGrid = new SpatialGrid( bbox, 4000., 0. ) ; 
-			SpatialGrid spatialGridCnt = new SpatialGrid( bbox, 4000., 0. ) ; 
-			GridUtils.aggregateFacilitiesIntoSpatialGrid(homesWithTtimeDifferences, spatialGrid, spatialGridCnt);
+			SpatialGrid spatialGrid = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGrid.setLabel("ttimeDiffSum");
+			SpatialGrid spatialGridCnt = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGridCnt.setLabel("ttimeDiffCnt");
+			SpatialGrid spatialGridAv = new SpatialGrid( bbox, resolution, 0. ) ;
+			spatialGridAv.setLabel("ttimeDiffAv");
+			GridUtils.aggregateFacilitiesIntoSpatialGrid(homesWithTtimeDifferences, spatialGrid, spatialGridCnt, spatialGridAv );
 			spatialGrids.add( spatialGrid ) ;
 			spatialGrids.add( spatialGridCnt ) ;
+			spatialGrids.add( spatialGridAv ) ;
 		}
 
 		GridUtils.writeSpatialGrids(spatialGrids, "popcompare_grid.csv");

@@ -129,8 +129,9 @@ class PopulationAnalyzer {
 			assert tourSequence != null;
 			this.add(tourSequence.type, 1.0, tourSeqType2cnt);
 
-			final double locationModeUtility = planForResampling.getSampersOnlyScore()
-					+ planForResampling.getSampersEpsilonRealization();
+			final double locationModeUtility = planForResampling.getSampersOnlyScore();
+			// TODO NEW
+			// + planForResampling.getSampersEpsilonRealization();
 			final double sampersUtl = locationModeUtility + planForResampling.getSampersTimeScore();
 			final double predMATSimUtl = locationModeUtility + planForResampling.getMATSimTimeScore();
 			final double realMATSimUtl = locationModeUtility + this.personId2experiencedMatsimScore.get(personId);

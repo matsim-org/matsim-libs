@@ -33,6 +33,8 @@ public interface SignalGroup {
 
 	public Id<SignalGroup> getId();
 
+	/* do not call this directly. Use scheduleDropping/Onset in the SignalSystem implementation instead.
+	 * visibility can't be restricted because it is an interface. theresa, apr'17 */
 	public void setState(SignalGroupState state);
 
 	public SignalGroupState getState();

@@ -37,8 +37,8 @@ import playground.tschlenther.parkingSearch.utils.ZoneParkingManager;
 public class RunBenensonParking {
 
 	private static final String inputDir = "C:/Users/Work/Bachelor Arbeit/input/GridNet/";
-//	private static String outputDir = "C:/Users/Work/Bachelor Arbeit/RUNS/SERIOUS_BUGFIX/Benenson/GridNet/";
-	private static String outputDir = "C:/Users/Work/Bachelor Arbeit/RUNS/Fix_Visualiser/Benenson/GridNet/";
+	private static String outputDir = "C:/Users/Work/Bachelor Arbeit/RUNS/SERIOUS_BUGFIX/Benenson/Neues_GridNet/";
+//	private static String outputDir = "C:/Users/Work/Bachelor Arbeit/RUNS/Fix_Visualiser/Benenson/GridNet/";
 	private final static String ZONE1 = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Links.txt";
 	private final static String ZONE2 = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Rechts.txt";
 	
@@ -65,9 +65,11 @@ public class RunBenensonParking {
 	public void run(boolean otfvis) {
 		
 		Config config = ConfigUtils.loadConfig(inputDir + "config_links_rechts.xml", new DvrpConfigGroup());
-		config.plans().setInputFile(inputDir + "population_links_rechts_V3.xml");
-		config.facilities().setInputFile(inputDir + "Facilites_links_rechts_V2.xml");
+//		config.plans().setInputFile(inputDir + "population_links_rechts_V3.xml");
+		config.plans().setInputFile(inputDir + "population_60_8h_9.30h.xml");
+//		config.facilities().setInputFile(inputDir + "Facilites_links_rechts_V2.xml");
 //		config.facilities().setInputFile(inputDir + "parkingFacilities_full_workNames.xml");
+		config.facilities().setInputFile(inputDir + "Facilites_links_rechts_OHNE_EINGANG.xml");
 		config.network().setInputFile(inputDir + "grid_network_length200.xml");
 
 //		Config config = ConfigUtils.loadConfig(inputDir + "configBCParking.xml", new DvrpConfigGroup());
@@ -77,7 +79,7 @@ public class RunBenensonParking {
 //		config.network().setChangeEventsInputFile(inputDir + "changeEvents.xml.gz");
 		
 		String runID = new SimpleDateFormat("ddMMyy_HH.mm").format(new Date());
-		runID +=  "_1_3_250_100_400_P.B.2.BUGFIX";
+		runID +=  "_2_4_1000_500_100_100_600_PS5";
 		outputDir += "RUN_" + runID;
 		
 		config.controler().setOutputDirectory(outputDir);
@@ -111,22 +113,22 @@ public class RunBenensonParking {
 		
 //		controler.getEvents().addHandler(visualiser);
 		controler.run();
-//		TSParkingSearchEvaluation eval = new TSParkingSearchEvaluation(zonen);
-//		eval.analyseRun(outputDir + "/ITERS", config.controler().getLastIteration());
-//		
-//		String scriptPath = 	"C:/Users/Work/Bachelor Arbeit/Analysis.vbs";
-//		
-//		String zone1 = ZONE1.substring(ZONE1.lastIndexOf("/")+1, ZONE1.lastIndexOf("."));
-//		String zone2 = ZONE2.substring(ZONE2.lastIndexOf("/")+1, ZONE2.lastIndexOf("."));
-//		
-//		String[] arguments = new String[] {
-//				"wscript.exe", scriptPath , outputDir, ""+maxIter, zone1 , zone2, runID
-//		};
-//		
-//		System.out.println("START");
-//		runVBScript(arguments);
-//		System.out.println("STARTED");
-//		
+		TSParkingSearchEvaluation eval = new TSParkingSearchEvaluation(zonen);
+		eval.analyseRun(outputDir + "/ITERS", config.controler().getLastIteration());
+		
+		String scriptPath = 	"C:/Users/Work/Bachelor Arbeit/Analysis.vbs";
+		
+		String zone1 = ZONE1.substring(ZONE1.lastIndexOf("/")+1, ZONE1.lastIndexOf("."));
+		String zone2 = ZONE2.substring(ZONE2.lastIndexOf("/")+1, ZONE2.lastIndexOf("."));
+		
+		String[] arguments = new String[] {
+				"wscript.exe", scriptPath , outputDir, ""+maxIter, zone1 , zone2, runID
+		};
+		
+		System.out.println("START");
+		runVBScript(arguments);
+		System.out.println("STARTED");
+		
 //		visualiser.finishDay();
 //		visualiser.plotSlotOccupation(outputDir + "/parkingSlotXY.csv");
 	}

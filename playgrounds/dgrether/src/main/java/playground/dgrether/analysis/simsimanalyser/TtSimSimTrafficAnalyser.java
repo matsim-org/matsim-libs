@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.dgrether.analysis.simsimanalyser;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -86,7 +87,8 @@ public class TtSimSimTrafficAnalyser {
 		
 		CoordinateReferenceSystem networkSrs = MGC.getCRS(srs);
 		
-		Network filteredNetwork = this.applyNetworkFilter(network, networkSrs);
+//		Network filteredNetwork = this.applyNetworkFilter(network, networkSrs);
+		Network filteredNetwork = network;
 		
 		SimSimAnalysis countsAnalysis = new SimSimAnalysis();
 		Map<Id<Link>, List<CountSimComparison>> countSimLinkLeaveCompMap = countsAnalysis.createCountSimComparisonByLinkId(filteredNetwork, vaCounts, vaSim);
@@ -134,10 +136,36 @@ public class TtSimSimTrafficAnalyser {
 //			String runNr2 = "1912"; // commodities > 50
 //			String runNr2 = "1913"; // sylvia
 			
-			net = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/"+runNr1+".output_network.xml.gz";
-			eventsFileCountValues = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/ITERS/it.2000/"+runNr1+".2000.events.xml.gz";
-			eventsFileSimValues = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr2+"/ITERS/it.2000/"+runNr2+".2000.events.xml.gz";
-			outfile = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/shapefiles/"+runNr2+".2000-"+runNr1+".2000_morningPeakAnalysis";
+//			net = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/"+runNr1+".output_network.xml.gz";
+//			eventsFileCountValues = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/ITERS/it.2000/"+runNr1+".2000.events.xml.gz";
+//			eventsFileSimValues = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr2+"/ITERS/it.2000/"+runNr2+".2000.events.xml.gz";
+//			outfile = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/shapefiles/"+runNr2+".2000-"+runNr1+".2000_morningPeakAnalysis";
+			
+			final String BASE_DIR = "../../../runs-svn/cottbus/createGridLock/";
+			final String RUN1 = 
+					"2017-02-3_100it_cap0.5_ReRoute0.1_tbs10_ChExp0.9_beta2_lanes_2link_ALL_GREEN_INSIDE_ENVELOPE_5plans_WoMines_V1/";
+//					"2017-02-15_100it_cap0.5_ReRoute0.1_tbs900_ChExp0.9_beta2_lanes_2link_CORDON_INNERCITY_5plans_WoMines_V1/";
+//					"2017-02-15_100it_cap0.5_ReRoute0.1_tbs900_ChExp0.9_beta2_lanes_2link_CORDON_INNERCITY_5plans_WoMines_V1/";
+			final String RUN2 = 
+//					"2017-02-13_100it_cap0.5_ReRoute0.1_tbs900_ChExp0.9_beta2_lanes_2link_ALL_DOWNSTREAM_INSIDE_ENVELOPE_5plans_WoMines_V1/";
+//					"2017-02-15_100it_cap0.5_ReRoute0.1_tbs900_ChExp0.9_beta2_lanes_2link_CORDON_RING_5plans_WoMines_V1/";
+//					"2017-02-15_100it_cap0.5_ReRoute0.1_tbs900_ChExp0.9_beta2_lanes_2link_CORDON_INNERCITY_5plans_WoMines_V1/";
+					"2017-02-15_100it_cap0.7_ReRoute0.1_tbs10_ChExp0.9_beta2_lanes_2link_MS_SYLVIA_5plans_WoMines_V1/";
+			net = BASE_DIR + RUN1 + "output_network.xml.gz";
+			eventsFileCountValues = BASE_DIR + RUN1 + "output_events.xml.gz";
+			eventsFileSimValues = BASE_DIR + RUN2 + "output_events.xml.gz";
+			
+			// get the current date in format "yyyy-mm-dd"
+			Calendar cal = Calendar.getInstance ();
+			// this class counts months from 0, but days from 1
+			int month = cal.get(Calendar.MONTH) + 1;
+			String monthStr = month + "";
+			if (month < 10)
+				monthStr = "0" + month;
+			String date = cal.get(Calendar.YEAR) + "-" 
+					+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
+			
+			outfile = BASE_DIR + "diffNets/" + date + "_cap0.5-7_greenEnvelopeVsCordonTollInnercity100_100it_0-24h";
 
 			srs = TransformationFactory.WGS84_UTM33N;			
 		}

@@ -1,12 +1,14 @@
 package playground.smeintjes;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.IOUtils;
 
+import org.matsim.core.utils.io.UncheckedIOException;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
@@ -88,8 +90,12 @@ private final static Logger LOG = Logger.getLogger(SampleValidationVehicles.clas
 			for (File file : validationList) {
 				String fileName  = file.getName();
 				File newFile = new File(outputFolder + "\\" + fileName);
-				IOUtils.copyFile(file, newFile);
-			}
+                try {
+                    Files.copy(file.toPath(), newFile.toPath());
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
 		}else{
 			LOG.error("There are no files in the sampled list to be written.");
 		}
@@ -150,9 +156,13 @@ private final static Logger LOG = Logger.getLogger(SampleValidationVehicles.clas
 		for (File file : remainingFileList) {
 			String fileName  = file.getName();
 			File newFile = new File(outputRemainingFolder + "\\" + fileName);
-			IOUtils.copyFile(file, newFile);
-				
-		}
+            try {
+                Files.copy(file.toPath(), newFile.toPath());
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+
+        }
 		return remainingFileList;
 		
 	}

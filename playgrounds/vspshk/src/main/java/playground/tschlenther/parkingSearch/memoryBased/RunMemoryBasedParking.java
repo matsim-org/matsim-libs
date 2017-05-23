@@ -33,7 +33,8 @@ import playground.tschlenther.parkingSearch.utils.ZoneParkingManager;
 
 public class RunMemoryBasedParking {
 	private static final String inputDir = "C:/Users/Work/Bachelor Arbeit/input/GridNet/";
-	private static String outputDir = "C:/Users/Work/Bachelor Arbeit/RUNS/SERIOUS/Memory/GridNet/";
+//	private static String outputDir = "C:/Users/Work/Bachelor Arbeit/RUNS/SERIOUS_BUGFIX/Memory/Neues_GridNet/";
+	private static String outputDir = "C:/Users/Work/Bachelor Arbeit/RUNS/maleBild/GridNet/";
 	private final static String ZONE1 = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Links.txt";
 	private final static String ZONE2 = "C:/Users/Work/Bachelor Arbeit/input/GridNet/Zonen/Rechts.txt";
 	
@@ -45,9 +46,13 @@ public class RunMemoryBasedParking {
 	public static void main(String[] args) {
 		
 		Config config = ConfigUtils.loadConfig(inputDir + "config_links_rechts.xml", new DvrpConfigGroup());
-		config.plans().setInputFile(inputDir + "population_links_rechts_V3.xml");
-		config.facilities().setInputFile(inputDir + "Facilites_links_rechts_V2.xml");
+//		config.plans().setInputFile(inputDir + "population_links_rechts_V3.xml");
+		config.plans().setInputFile(inputDir + "population_60_8h_9.30h.xml");
+		
+//		config.facilities().setInputFile(inputDir + "Facilites_links_rechts_V2.xml");
 //		config.facilities().setInputFile(inputDir + "parkingFacilities_full_workNames.xml");
+		config.facilities().setInputFile(inputDir + "Facilites_links_rechts_OHNE_EINGANG.xml");
+		
 		config.network().setInputFile(inputDir + "grid_network_length200.xml");
 
 //		Config config = ConfigUtils.loadConfig(inputDir + "configBCParking.xml", new DvrpConfigGroup());
@@ -58,12 +63,12 @@ public class RunMemoryBasedParking {
 //		config.network().setChangeEventsInputFile(inputDir + "changeEvents.xml.gz");
 		
 		String runID = new SimpleDateFormat("ddMMyy_HH.mm").format(new Date());
-		runID +=  "_MEMORY_RANDOM_IF_ALL_KNOWN";
+		runID +=  "_MEMORY_X.S.1";
 //		String runID = "050417_19.46_MEMORY";
 		outputDir += "RUN_" + runID;
 		
 		
-		int maxIter = 50;
+		int maxIter = 10;
 		config.controler().setOutputDirectory(outputDir);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.controler().setLastIteration(maxIter);
@@ -81,18 +86,18 @@ public class RunMemoryBasedParking {
 		zonen[0] = ZONE2;
 		zonen[1] = ZONE1;
 		ZoneParkingManager manager = new ZoneParkingManager(scenario,zonen);
-		
+		ParkingSlotVisualiser visualiser = new ParkingSlotVisualiser(scenario);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				
 				addMobsimListenerBinding().to(ZoneParkingOccupationListenerV2.class).asEagerSingleton();
 				bind(ParkingSearchManager.class).toInstance(manager);
+				addEventHandlerBinding().toInstance(visualiser);
+				addControlerListenerBinding().toInstance(visualiser);
 			}
 		});
 		
-		ParkingSlotVisualiser visualiser = new ParkingSlotVisualiser(scenario);
-		controler.getEvents().addHandler(visualiser);
+//		controler.getEvents().addHandler(visualiser);
 		controler.run();
 		
 		TSParkingSearchEvaluation eval = new TSParkingSearchEvaluation(zonen);
@@ -112,8 +117,8 @@ public class RunMemoryBasedParking {
 		runVBScript(arguments);
 		System.out.println("STARTED");
 		
-		visualiser.finishDay();
-		visualiser.plotSlotOccupation(outputDir + "/parkingSlotXY.csv");
+//		visualiser.finishDay();
+//		visualiser.plotSlotOccupation(outputDir + "/parkingSlotXY.csv");
 	}
 	
 	private static void runVBScript(String[] cmds){

@@ -24,17 +24,22 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -65,18 +70,36 @@ import org.matsim.testcases.MatsimTestCase;
 /**
  * @author mrieser
  */
+@RunWith(Parameterized.class)
 public class TransitRouterImplTest {
+	private static final Logger log = Logger.getLogger(TransitRouterImplTest.class) ;
+	
+//	protected static enum TransitRouterType { standard, raptor, connectionScan } ;
 
+	private String routerType ;
+
+	@Parameters(name = "{index}: TransitRouter == {0}")
+	public static Collection<Object> createRouterTypes() {
+		Object[] router = new Object [] { 
+				"standard"
+//				,TransitRouterType.raptor
+		};
+		return Arrays.asList(router);
+	}
+
+	public TransitRouterImplTest( String routerType ) {
+		log.warn( "using router=" + routerType ) ;
+		this.routerType = routerType;
+	}
+	
 	@Test
 	public void testSingleLine() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
-				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
-				f.scenario.getConfig().vspExperimental());
-		TransitRouterImpl router = new TransitRouterImpl(config, f.schedule);
-		Coord fromCoord = new Coord((double) 3800, (double) 5100);
-		Coord toCoord = new Coord((double) 16100, (double) 5050);
+		TransitRouterConfig trConfig = new TransitRouterConfig(f.scenario.getConfig());
+		TransitRouter router = createTransitRouter(f.schedule, trConfig, routerType);
+		Coord fromCoord = new Coord(3800, 5100);
+		Coord toCoord = new Coord(16100, 5050);
 		List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 5.0*3600, null);
 		assertEquals(3, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
@@ -93,18 +116,36 @@ public class TransitRouterImplTest {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 29.0 * 60 + // agent takes the *:06 course, arriving in D at *:29
-				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
+				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / trConfig.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
+	}
+
+	protected TransitRouter createTransitRouter(TransitSchedule schedule, TransitRouterConfig trConfig, String routerType) {
+		TransitRouter router = null ;
+		switch( routerType ) { 
+//		case raptor:
+//			double costPerMeterTraveled = 0. ;
+//			double costPerBoarding = 0. ;
+//			RaptorDisutility raptorDisutility = new RaptorDisutility(trConfig, costPerBoarding, costPerMeterTraveled);
+//			TransitRouterQuadTree transitRouterQuadTree = new TransitRouterQuadTree(raptorDisutility);
+//			transitRouterQuadTree.initializeFromSchedule(schedule, trConfig.getBeelineWalkConnectionDistance());
+//			router = new Raptor(transitRouterQuadTree, raptorDisutility, trConfig) ;
+//			break;
+		case "standard":
+			router = new TransitRouterImpl(trConfig, schedule);
+			break;
+		default:
+			break;
+		}
+		return router;
 	}
 
 	@Test
 	public void testFromToSameStop() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
-				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
-				f.scenario.getConfig().vspExperimental());
-		TransitRouterImpl router = new TransitRouterImpl(config, f.schedule);
+		TransitRouterConfig trConfig = new TransitRouterConfig(f.scenario.getConfig());
+		TransitRouter router = createTransitRouter(f.schedule, trConfig, routerType);
 		Coord fromCoord = new Coord((double) 3800, (double) 5100);
 		Coord toCoord = new Coord((double) 4100, (double) 5050);
 		List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 5.0*3600, null);
@@ -114,7 +155,7 @@ public class TransitRouterImplTest {
 		for (Leg leg : legs) {
 			actualTravelTime += leg.getTravelTime();
 		}
-		double expectedTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / config.getBeelineWalkSpeed();
+		double expectedTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / trConfig.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -122,10 +163,10 @@ public class TransitRouterImplTest {
 	public void testDirectWalkCheaper() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		TransitRouterConfig trConfig = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		TransitRouterImpl router = new TransitRouterImpl(config, f.schedule);
+		TransitRouter router = createTransitRouter(f.schedule, trConfig, routerType);
 		Coord fromCoord = new Coord((double) 4000, (double) 3000);
 		Coord toCoord = new Coord((double) 8000, (double) 3000);
 		List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 5.0*3600, null);
@@ -135,7 +176,7 @@ public class TransitRouterImplTest {
 		for (Leg leg : legs) {
 			actualTravelTime += leg.getTravelTime();
 		}
-		double expectedTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / config.getBeelineWalkSpeed();
+		double expectedTravelTime = CoordUtils.calcEuclideanDistance(fromCoord, toCoord) / trConfig.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -143,10 +184,10 @@ public class TransitRouterImplTest {
 	public void testSingleLine_DifferentWaitingTime() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		TransitRouterConfig trConfig = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		TransitRouterImpl router = new TransitRouterImpl(config, f.schedule);
+		TransitRouter router = createTransitRouter(f.schedule, trConfig, routerType);
 		Coord fromCoord = new Coord((double) 4000, (double) 5002);
 		Coord toCoord = new Coord((double) 8000, (double) 5002);
 
@@ -167,10 +208,10 @@ public class TransitRouterImplTest {
 	public void testLineChange() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		TransitRouterConfig trConfig = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		TransitRouterImpl router = new TransitRouterImpl(config, f.schedule);
+		TransitRouter router = createTransitRouter(f.schedule, trConfig, routerType);
 		Coord toCoord = new Coord((double) 16100, (double) 10050);
 		List<Leg> legs = router.calcRoute(new FakeFacility(new Coord((double) 3800, (double) 5100)), new FakeFacility(toCoord), 6.0*3600, null);
 		assertEquals(5, legs.size());
@@ -196,40 +237,18 @@ public class TransitRouterImplTest {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 31.0 * 60 + // agent takes the *:06 course, arriving in C at *:18, departing at *:21, arriving in K at*:31
-				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("19", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
+				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("19", TransitStopFacility.class)).getCoord(), toCoord) / trConfig.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
-	}
-	
-	@Test
-	public void testTransferWalkDistance(){
-		Fixture f = new Fixture();
-		f.init();
-		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
-				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
-				f.scenario.getConfig().vspExperimental());
-		TransitRouterImpl router = new TransitRouterImpl(config, f.schedule);
-		Coord fromCoord = new Coord((double) 3800, (double) 5100);
-		Coord toCoord = new Coord((double) 16100, (double) 10050);
-		List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0*3600, null);
-		Leg leg1 = legs.get(1);
-		ExperimentalTransitRoute route1 = (ExperimentalTransitRoute) leg1.getRoute();
-		Coord coord1 = f.schedule.getFacilities().get(route1.getEgressStopId()).getCoord();
-		Leg leg3 = legs.get(3);
-		ExperimentalTransitRoute route3 = (ExperimentalTransitRoute) leg3.getRoute();
-		Coord coord3 = f.schedule.getFacilities().get(route3.getAccessStopId()).getCoord();
-		double beelineFactor = f.scenario.getConfig().plansCalcRoute().getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor();
-		assertEquals(CoordUtils.calcEuclideanDistance(coord1, coord3) * beelineFactor, 
-							legs.get(2).getRoute().getDistance(), MatsimTestCase.EPSILON);
 	}
 
 	@Test
 	public void testFasterAlternative() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		TransitRouterConfig trConfig = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		TransitRouterImpl router = new TransitRouterImpl(config, f.schedule);
+		TransitRouter router = createTransitRouter(f.schedule, trConfig, routerType);
 		Coord toCoord = new Coord((double) 28100, (double) 4950);
 		List<Leg> legs = router.calcRoute(new FakeFacility( new Coord((double) 3800, (double) 5100)), new FakeFacility(toCoord), 5.0*3600 + 40.0*60, null);
 		assertEquals(4, legs.size());
@@ -254,7 +273,7 @@ public class TransitRouterImplTest {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 29.0 * 60 + // agent takes the *:46 course, arriving in C at *:58, departing at *:00, arriving in G at*:09
-				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("12", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
+				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("12", TransitStopFacility.class)).getCoord(), toCoord) / trConfig.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -269,11 +288,11 @@ public class TransitRouterImplTest {
 		 */
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		TransitRouterConfig trConfig = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		config.setUtilityOfLineSwitch_utl(0);
-		TransitRouterImpl router = new TransitRouterImpl(config, f.schedule);
+		trConfig.setUtilityOfLineSwitch_utl(0);
+		TransitRouter router = createTransitRouter(f.schedule, trConfig, routerType);
 		List<Leg> legs = router.calcRoute(new FakeFacility(new Coord((double) 11900, (double) 5100)), new FakeFacility(new Coord((double) 24100, (double) 4950)), 6.0*3600 - 5.0*60, null);
 		assertEquals(5, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
@@ -284,7 +303,7 @@ public class TransitRouterImplTest {
 		assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getLineId());
 		assertEquals(TransportMode.transit_walk, legs.get(4).getMode());
 
-		config.setUtilityOfLineSwitch_utl(300.0 * config.getMarginalUtilityOfTravelTimePt_utl_s()); // corresponds to 5 minutes transit travel time
+		trConfig.setUtilityOfLineSwitch_utl(300.0 * trConfig.getMarginalUtilityOfTravelTimePt_utl_s()); // corresponds to 5 minutes transit travel time
 		legs = router.calcRoute(new FakeFacility(new Coord((double) 11900, (double) 5100)), new FakeFacility(new Coord((double) 24100, (double) 4950)), 6.0*3600 - 5.0*60, null);
 		assertEquals(3, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
@@ -305,12 +324,12 @@ public class TransitRouterImplTest {
 		 */
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		TransitRouterConfig trConfig = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		config.setUtilityOfLineSwitch_utl(0);
-		assertEquals(0, config.getAdditionalTransferTime(), 1e-8);
-		TransitRouterImpl router = new TransitRouterImpl(config, f.schedule);
+		trConfig.setUtilityOfLineSwitch_utl(0);
+		assertEquals(0, trConfig.getAdditionalTransferTime(), 1e-8);
+		TransitRouter router = createTransitRouter(f.schedule, trConfig, routerType);
 		List<Leg> legs = router.calcRoute(new FakeFacility(new Coord((double) 11900, (double) 5100)), new FakeFacility(new Coord((double) 24100, (double) 4950)), 6.0*3600 - 5.0*60, null);
 		assertEquals(5, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
@@ -321,7 +340,7 @@ public class TransitRouterImplTest {
 		assertEquals(f.blueLine.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getLineId());
 		assertEquals(TransportMode.transit_walk, legs.get(4).getMode());
 
-		config.setAdditionalTransferTime(3.0*60); // 3 mins already enough, as there is a small distance to walk anyway which adds some time
+		trConfig.setAdditionalTransferTime(3.0*60); // 3 mins already enough, as there is a small distance to walk anyway which adds some time
 		legs = router.calcRoute(new FakeFacility(new Coord((double) 11900, (double) 5100)), new FakeFacility(new Coord((double) 24100, (double) 4950)), 6.0*3600 - 5.0*60, null);
 		assertEquals(3, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
@@ -334,11 +353,11 @@ public class TransitRouterImplTest {
 	public void testAfterMidnight() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		TransitRouterConfig trConfig = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
 				f.scenario.getConfig().vspExperimental());
-		config.setBeelineWalkSpeed(0.1); // something very slow, so the agent does not walk over night
-		TransitRouterImpl router = new TransitRouterImpl(config, f.schedule);
+		trConfig.setBeelineWalkSpeed(0.1); // something very slow, so the agent does not walk over night
+		TransitRouter router = createTransitRouter(f.schedule, trConfig, routerType);
 		Coord toCoord = new Coord((double) 16100, (double) 5050);
 		List<Leg> legs = router.calcRoute(new FakeFacility(new Coord((double) 3800, (double) 5100)), new FakeFacility(toCoord), 25.0*3600, null);
 		assertEquals(3, legs.size());
@@ -356,7 +375,7 @@ public class TransitRouterImplTest {
 			actualTravelTime += leg.getTravelTime();
 		}
 		double expectedTravelTime = 4*3600 + 29.0 * 60 + // arrival at 05:29 at D
-				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / config.getBeelineWalkSpeed();
+				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("6", TransitStopFacility.class)).getCoord(), toCoord) / trConfig.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
@@ -364,9 +383,10 @@ public class TransitRouterImplTest {
 	public void testCoordFarAway() {
 		Fixture f = new Fixture();
 		f.init();
-		TransitRouterImpl router = new TransitRouterImpl( new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+		final TransitRouterConfig trConfig = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
 				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
-				f.scenario.getConfig().vspExperimental() ), f.schedule ) ;
+				f.scenario.getConfig().vspExperimental() );
+		TransitRouter router = createTransitRouter(f.schedule, trConfig, routerType);
 		double x = +42000;
 		double x1 = -2000;
 		List<Leg> legs = router.calcRoute(new FakeFacility(new Coord(x1, (double) 0)), new FakeFacility(new Coord(x, (double) 0)), 5.5*3600, null); // should map to stops A and I
@@ -391,7 +411,7 @@ public class TransitRouterImplTest {
 		WalkFixture f = new WalkFixture();
 		f.routerConfig.setMarginalUtilityOfTravelTimePt_utl_s(-1.0 / 3600.0 - 6.0/3600.0);
 		f.routerConfig.setUtilityOfLineSwitch_utl(0.2); // must be relatively low in this example, otherwise it's cheaper to walk the whole distance...
-		TransitRouterImpl router = new TransitRouterImpl(f.routerConfig, f.schedule);
+		TransitRouter router = createTransitRouter(f.schedule, f.routerConfig, routerType);
 		List<Leg> legs = router.calcRoute(new FakeFacility(f.coord1), new FakeFacility(f.coord7), 990, null);
 		assertEquals(5, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
@@ -421,7 +441,7 @@ public class TransitRouterImplTest {
 		f.routerConfig.setSearchRadius(0.8 * CoordUtils.calcEuclideanDistance(f.coord2, f.coord4));
 		f.routerConfig.setExtensionRadius(0.0);
 
-		TransitRouterImpl router = new TransitRouterImpl(f.routerConfig, f.schedule);
+		TransitRouter router = createTransitRouter(f.schedule, f.routerConfig, routerType);
 		List<Leg> legs = router.calcRoute(new FakeFacility(f.coord2), new FakeFacility(f.coord4), 990, null);
 		assertEquals(1, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
@@ -438,7 +458,7 @@ public class TransitRouterImplTest {
 		f.routerConfig.setSearchRadius(0.8 * CoordUtils.calcEuclideanDistance(f.coord2, f.coord4));
 		f.routerConfig.setExtensionRadius(0.0);
 
-		TransitRouterImpl router = new TransitRouterImpl(f.routerConfig, f.schedule);
+		TransitRouter router = createTransitRouter(f.schedule, f.routerConfig, routerType);
 		List<Leg> legs = router.calcRoute(new FakeFacility(f.coord2), new FakeFacility(f.coord6), 990, null);
 		assertEquals(1, legs.size());
 		assertEquals(TransportMode.transit_walk, legs.get(0).getMode());
@@ -450,7 +470,7 @@ public class TransitRouterImplTest {
 		// 5 minutes additional transfer time
 		{	
 			TransferFixture f = new TransferFixture(5 * 60.0);
-			TransitRouterImpl router = new TransitRouterImpl(f.routerConfig, f.schedule);
+			TransitRouter router = createTransitRouter(f.schedule, f.routerConfig, routerType);
 			Coord fromCoord = f.fromFacility.getCoord();
 			Coord toCoord = f.toFacility.getCoord();
 			List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 7.0*3600 + 50*60, null);
@@ -487,7 +507,7 @@ public class TransitRouterImplTest {
 		// 65 minutes additional transfer time - miss one departure
 		{
 			TransferFixture f = new TransferFixture(65 * 60.0);
-			TransitRouterImpl router = new TransitRouterImpl(f.routerConfig, f.schedule);
+			TransitRouter router = createTransitRouter(f.schedule, f.routerConfig, routerType);
 			Coord fromCoord = f.fromFacility.getCoord();
 			Coord toCoord = f.toFacility.getCoord();
 			List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 7.0*3600 + 50*60, null);
@@ -524,7 +544,7 @@ public class TransitRouterImplTest {
 		// 600 minutes additional transfer time - miss all departures
 		{
 			TransferFixture f = new TransferFixture(600 * 60.0);
-			TransitRouterImpl router = new TransitRouterImpl(f.routerConfig, f.schedule);
+			TransitRouter router = createTransitRouter(f.schedule, f.routerConfig, routerType);
 			Coord fromCoord = f.fromFacility.getCoord();
 			Coord toCoord = f.toFacility.getCoord();
 			List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 7.0*3600 + 50*60, null);
@@ -632,7 +652,7 @@ public class TransitRouterImplTest {
 			this.coord7 = new Coord(x, (double) 0);
 
 			// network
-			Network network = (Network) this.scenario.getNetwork();
+			Network network = this.scenario.getNetwork();
 			Node node1 = network.getFactory().createNode(Id.create("1", Node.class), this.coord1);
 			Node node2 = network.getFactory().createNode(Id.create("2", Node.class), this.coord2);
 			Node node3 = network.getFactory().createNode(Id.create("3", Node.class), this.coord3);

@@ -25,7 +25,7 @@ package org.matsim.contrib.minibus.performance.raptor;
  * @author aneumann
  *
  */
-public class TransferEntry {
+class TransferEntry {
 
 	final int indexOfRouteStop;
 	final double transferTime;

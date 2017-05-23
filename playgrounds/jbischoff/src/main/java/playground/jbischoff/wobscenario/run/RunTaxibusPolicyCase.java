@@ -45,7 +45,7 @@ public class RunTaxibusPolicyCase {
 
 	public static void main(String[] args) {
 
-		String configFileName = "../../../shared-svn/projects/vw_rufbus/projekt2/input/ConfigPC108_jso.xml";
+		String configFileName = "../../../shared-svn/projects/vw_rufbus/projekt2/input/ConfigPC112.xml";
 		if (args.length>0){
 			configFileName = args[0];
 		}
@@ -57,7 +57,7 @@ public class RunTaxibusPolicyCase {
 
 		Controler controler = new Controler(scenario);
 
-		new ConfigBasedTaxibusLaunchUtils(controler).initiateTaxibusses();
+		new TaxibusControlerCreator(controler).initiateTaxibusses();
 
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory(){
 			@Override

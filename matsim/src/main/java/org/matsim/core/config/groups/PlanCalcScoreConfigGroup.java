@@ -76,8 +76,9 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		this.addParameterSet( new ModeParams( TransportMode.pt ) );
 		this.addParameterSet( new ModeParams( TransportMode.walk ) );
 		this.addParameterSet( new ModeParams( TransportMode.bike ) );
-		this.addParameterSet( new ModeParams( TransportMode.other ) );
-		
+		this.addParameterSet( new ModeParams( TransportMode.ride ) ); 
+		this.addParameterSet( new ModeParams( TransportMode.other ) ); 
+
 		// yyyyyy find better solution for this. kai, dec'15
 		{
 			ActivityParams params = new ActivityParams("car interaction") ;

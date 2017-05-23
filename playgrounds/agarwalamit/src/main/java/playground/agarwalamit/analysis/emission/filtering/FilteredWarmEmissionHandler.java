@@ -18,17 +18,21 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.emission.filtering;
 
+import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
 import org.matsim.contrib.emissions.types.WarmPollutant;
-
+import org.matsim.vehicles.Vehicle;
 import playground.agarwalamit.munich.analysis.userGroup.EmissionsPerPersonPerUserGroup;
 import playground.agarwalamit.utils.AreaFilter;
 import playground.agarwalamit.utils.PersonFilter;
@@ -38,7 +42,7 @@ import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarm
  * @author amit
  */
 
-public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
+public class FilteredWarmEmissionHandler implements VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, WarmEmissionEventHandler {
 	private static final Logger LOGGER = Logger.getLogger(FilteredWarmEmissionHandler.class.getName());
 
 	private final EmissionsPerLinkWarmEventHandler delegate;
@@ -46,6 +50,8 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	private final Network network;
 	private final String ug ;
 	private final AreaFilter af;
+
+	private final Map<Id<Vehicle>,Id<Person>> vehicle2Person = new HashMap<>();
 
 	/**
 	 * Area and user group filtering will be used, links fall inside the given shape and persons belongs to the given user group will be considered.
@@ -98,7 +104,7 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
 
-		Id<Person> driverId = Id.createPersonId(event.getVehicleId());// TODO [AA]: either it should be mapped to vehicle id or read events file too to get driver id
+		Id<Person> driverId = this.vehicle2Person.get(event.getVehicleId());
 
 		if (this.af!=null) { // area filtering
 			Link link = network.getLinks().get(event.getLinkId());
@@ -131,5 +137,17 @@ public class FilteredWarmEmissionHandler implements WarmEmissionEventHandler {
 	@Override
 	public void reset(int iteration) {
 		delegate.reset(iteration);
+		this.vehicle2Person.clear();
 	}
+
+	@Override
+	public void handleEvent(VehicleEntersTrafficEvent event) {
+		this.vehicle2Person.put(event.getVehicleId(),event.getPersonId());
+	}
+
+	@Override
+	public void handleEvent(VehicleLeavesTrafficEvent event) {
+		this.vehicle2Person.remove(event.getVehicleId());
+	}
+
 }

@@ -49,7 +49,7 @@ import org.opengis.geometry.BoundingBox;
  * 
  * @author balmermi
  */
-public class NetworkReaderTeleatlas implements MatsimSomeReader {
+public final class NetworkReaderTeleatlas implements MatsimSomeReader {
 
 	// ////////////////////////////////////////////////////////////////////
 	// member variables

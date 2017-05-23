@@ -25,7 +25,7 @@ import javax.inject.*;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
+import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.*;
 
@@ -50,7 +50,7 @@ public class LinkToLinkRouting
     LinkToLinkTravelTime travelTimes;
 
     @Inject
-    NetworkTurnInfoBuilder networkTurnInfoBuilder;
+    NetworkTurnInfoBuilderI networkTurnInfoBuilder;
 
 
     public LinkToLinkRouting(String mode)

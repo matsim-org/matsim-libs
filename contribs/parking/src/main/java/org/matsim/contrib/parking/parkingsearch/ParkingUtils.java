@@ -70,8 +70,8 @@ public class ParkingUtils {
 			double x;
 			double yDistance = tY-fY;
 			
-			if(tY > fY) x = tX+5;
-			else x = tX -5;
+			if(tY > fY) x = tX+10;
+			else x = tX -10;
 			
 			List<Coord> points = new ArrayList<Coord>();
 			if(numberOfCoords == 1){

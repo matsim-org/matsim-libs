@@ -578,8 +578,8 @@ public class FundamentalDiagramDataGenerator {
 
 	private void cleanOutputDir(){
 		String outputDir = scenario.getConfig().controler().getOutputDirectory();
-		IOUtils.deleteDirectory(new File(outputDir+"/ITERS/"), false);
-		IOUtils.deleteDirectory(new File(outputDir+"/tmp/"), false);
+		IOUtils.deleteDirectoryRecursively(new File(outputDir+"/ITERS/").toPath());
+		IOUtils.deleteDirectoryRecursively(new File(outputDir+"/tmp/").toPath());
 		new File(outputDir+"/logfile.log").delete();
 		new File(outputDir+"/logfileWarningsErrors.log").delete();
 		new File(outputDir+"/scorestats.txt").delete();

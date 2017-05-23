@@ -21,13 +21,18 @@ package utils;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import analysis.TtAnalyzedGeneralResultsWriter;
+import analysis.TtGeneralAnalysis;
+import analysis.TtListenerToBindGeneralAnalysis;
+import signals.CombinedSignalsModule;
 
 
 /**
@@ -49,17 +54,28 @@ public class TtBasicController {
 				SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 		
 		if (signalsConfigGroup.isUseSignalSystems()) {
-			scenario.addScenarioElement(SignalsData.ELEMENT_NAME,
-					new SignalsDataLoader(config).loadSignalsData());
+			scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		}
 		
 		Controler controler = new Controler( scenario );
         
 		// add the signals module if signal systems are used
 		if (signalsConfigGroup.isUseSignalSystems()) {
-			controler.addOverridingModule(new SignalsModule());
+			// the combined signals module works for a lot of different signal controller, e.g. planbased, sylvia, downstream, laemmer...
+			controler.addOverridingModule(new CombinedSignalsModule());
 		}
 				
+		// add analysis tools
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+				this.bind(TtGeneralAnalysis.class).asEagerSingleton();
+				this.addEventHandlerBinding().to(TtGeneralAnalysis.class);
+				this.bind(TtAnalyzedGeneralResultsWriter.class);
+				this.addControlerListenerBinding().to(TtListenerToBindGeneralAnalysis.class);
+			}
+		});
+		
 		controler.run();
 	}
 

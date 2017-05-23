@@ -49,11 +49,6 @@ public class IOUtilsTest {
 
 	private final static Logger log = Logger.getLogger(IOUtilsTest.class);
 
-	/**
-	 * Simple test that checks the creation of logfiles and the filter for the errorLogFile
-	 * @throws IOException
-	 * @author dgrether
-	 */
 	@Test
 	public void testInitOutputDirLogging() throws IOException {
 		System.out.println(utils.getOutputDirectory());
@@ -70,104 +65,6 @@ public class IOUtilsTest {
 	 * @author mrieser
 	 */
 	@Test
-	public void testRenameFile() throws IOException {
-		System.out.println(utils.getOutputDirectory());
-		String outputDir = utils.getOutputDirectory();
-		String fromFileName = outputDir + "a.txt";
-		String toFileName = outputDir + "b.txt";
-		Assert.assertTrue(new File(fromFileName).createNewFile());
-		Assert.assertTrue(IOUtils.renameFile(fromFileName, toFileName));
-		Assert.assertFalse(new File(fromFileName).exists());
-		Assert.assertTrue(new File(toFileName).exists());
-	}
-
-	/**
-	 * @author mrieser
-	 */
-	@Test
-	public void testRenameFile_ToDirectory() throws IOException {
-		String outputDir = utils.getOutputDirectory();
-		String fromFileName = outputDir + "a.txt";
-		String toFileName = outputDir + "b";
-		Assert.assertTrue(new File(fromFileName).createNewFile());
-		Assert.assertTrue(new File(toFileName).mkdir());
-		Assert.assertTrue(IOUtils.renameFile(fromFileName, toFileName));
-		Assert.assertFalse(new File(fromFileName).exists());
-		Assert.assertTrue(new File(toFileName).isDirectory());
-		Assert.assertTrue(new File(toFileName + "/a.txt").exists());
-	}
-
-	/**
-	 * @author mrieser
-	 */
-	@Test
-	public void testRenameFile_MissingFromFile() {
-		String outputDir = utils.getOutputDirectory();
-		String fromFileName = outputDir + "c.txt";
-		String toFileName = outputDir + "b.txt";
-		Assert.assertFalse(IOUtils.renameFile(fromFileName, toFileName));
-		Assert.assertFalse(new File(fromFileName).exists());
-		Assert.assertFalse(new File(toFileName).exists());
-	}
-
-	/**
-	 * @author mrieser
-	 */
-	@Test
-	public void testRenameFile_UnreadableFromFile() throws IOException {
-		String outputDir = utils.getOutputDirectory();
-		String fromDirName = outputDir + "a";
-		String fromFileName = fromDirName + "/a.txt";
-		String toFileName = outputDir + "b.txt";
-		File fromDir = new File(fromDirName);
-		Assert.assertTrue(fromDir.mkdir());
-		File fromFile = new File(fromFileName);
-		Assert.assertTrue(fromFile.createNewFile());
-		Assert.assertTrue(fromFile.setReadable(false));
-		Assert.assertTrue(fromDir.setWritable(false)); // lock from directory, so the created file cannot be moved away
-		Assert.assertFalse(IOUtils.renameFile(fromFileName, toFileName));
-		Assert.assertTrue(fromDir.setWritable(true)); // make it writable again, or we may have problems when we run the test again
-		Assert.assertTrue(new File(fromFileName).exists());
-		Assert.assertFalse(new File(toFileName).exists());
-	}
-
-	/**
-	 * @author mrieser
-	 */
-	@Test
-	public void testRenameFile_BadDestinationFile() throws IOException {
-		String outputDir = utils.getOutputDirectory();
-		String fromFileName = outputDir + "a.txt";
-		String toFileName = outputDir + "not/existing/path/b.txt";
-		Assert.assertTrue(new File(fromFileName).createNewFile());
-		Assert.assertFalse(IOUtils.renameFile(fromFileName, toFileName));
-		Assert.assertTrue(new File(fromFileName).exists());
-		Assert.assertFalse(new File(toFileName).exists());
-	}
-
-	/**
-	 * @author mrieser
-	 */
-	@Test
-	public void testRenameFile_LockedDestinationDirectory() throws IOException {
-		String outputDir = utils.getOutputDirectory();
-		String fromFileName = outputDir + "a.txt";
-		String toFileName = outputDir + "locked";
-		File dir = new File(toFileName);
-		Assert.assertTrue(dir.mkdir());
-		Assert.assertTrue(dir.setWritable(false));
-
-		Assert.assertTrue(new File(fromFileName).createNewFile());
-		Assert.assertFalse(IOUtils.renameFile(fromFileName, toFileName));
-		Assert.assertTrue(new File(fromFileName).exists());
-		Assert.assertTrue(new File(toFileName).exists());
-		Assert.assertFalse(new File(toFileName + "/a.txt").exists());
-	}
-
-	/**
-	 * @author mrieser
-	 */
-	@Test
 	public void testDeleteDir() throws IOException {
 		String outputDir = utils.getOutputDirectory();
 		String testDir = outputDir + "a";
@@ -177,7 +74,7 @@ public class IOUtilsTest {
 		File someFile = new File(someFilename);
 		Assert.assertTrue(someFile.createNewFile());
 
-		IOUtils.deleteDirectory(dir);
+		IOUtils.deleteDirectoryRecursively(dir.toPath());
 
 		Assert.assertFalse(someFile.exists());
 		Assert.assertFalse(dir.exists());
@@ -186,19 +83,12 @@ public class IOUtilsTest {
 	/**
 	 * @author mrieser
 	 */
-	@Test
+	@Test(expected = UncheckedIOException.class)
 	public void testDeleteDir_InexistentDir() {
 		String outputDir = utils.getOutputDirectory();
 		String testDir = outputDir + "a";
 		File dir = new File(testDir);
-
-		try {
-			IOUtils.deleteDirectory(dir);
-			Assert.fail("expected Exception.");
-		}
-		catch (IllegalArgumentException e) {
-			log.info("catched expected exception: " + e.getMessage());
-		}
+		IOUtils.deleteDirectoryRecursively(dir.toPath());
 		Assert.assertFalse(dir.exists());
 	}
 

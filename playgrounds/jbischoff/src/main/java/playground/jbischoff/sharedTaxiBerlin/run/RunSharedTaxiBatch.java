@@ -41,12 +41,12 @@ public class RunSharedTaxiBatch {
 
 	public static void main(String[] args) {
 
-		int capacity[] = {2,3,4};
+		int capacity[] = {1,2,3,4};
 //		int capacity[] = {1};
-		for (int i = 50; i<=100; i=i+25){
+		for (int i = 50; i<=125; i=i+25){
 		for (int c = 0; c<capacity.length; c++){
 			String runId = "v"+i+"c"+capacity[c];
-			String configFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/config.xml";
+			String configFile = "../../../shared-svn/projects/bvg_sharedTaxi/input/config0.1.xml";
 			Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new DrtConfigGroup(),
 					new OTFVisConfigGroup(), new TaxiFareConfigGroup());
 			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);

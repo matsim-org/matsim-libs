@@ -24,12 +24,16 @@ package org.matsim.contrib.parking.parkingsearch;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
+import org.matsim.contrib.parking.parkingsearch.evaluation.ParkingSlotVisualiser;
 import org.matsim.contrib.parking.parkingsearch.sim.SetupParking;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import com.google.inject.Binder;
 
 /**
  * @author jbischoff An example how to use parking search in MATSim.
@@ -64,10 +68,21 @@ public class RunParkingSearchExample {
 	 *            turns otfvis visualisation on or off
 	 */
 	public void run(Config config, boolean otfvis) {
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		config.qsim().setSnapshotStyle(SnapshotStyle.withHoles);
 
+		
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				ParkingSlotVisualiser visualiser = new ParkingSlotVisualiser(scenario);
+				addEventHandlerBinding().toInstance(visualiser);
+				addControlerListenerBinding().toInstance(visualiser);
+			}
+		});
+		
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}

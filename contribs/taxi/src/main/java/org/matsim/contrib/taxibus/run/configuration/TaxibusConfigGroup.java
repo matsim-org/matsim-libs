@@ -30,16 +30,15 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 	private static final String SERVICE_AREA_2_RADIUS = "serviceArea_2_Radius_m";
 
 	private static final String RETURN_TO_DEPOT = "ReturnToDepot";
+	private static final String STOPSFILE = "stopsFile";
+	private static final String MAXWALK = "maxWalkDistance";
 
-	// SharedTaxi
-	private static final String DETOURFACTOR = "detourFactor";
-
-	// StateBased
-	private static final String DESTINATIONID = "commonDestinationLinkId";
 
 	// general
 	private String taxiIdentifier = "taxibus";
 	private String vehiclesFile = null;
+	private String stopsfile = null;
+	private double maxWalkDistance = 500;
 	private double pickupDuration = 60.0;
 	private double dropoffDuration = 120.0;
 	private String algorithm;
@@ -55,11 +54,8 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 	private double serviceArea_2_Radius_m = 20000;
 	private double serviceArea_1_Radius_m = 20000;
 	private boolean returnToDepot = false;
-	// SharedTaxi
-	private double detourFactor = 1.2;
-
-	// State
-	private String destinationLinkId = null;
+	
+	
 
 	public TaxibusConfigGroup() {
 		super(GROUP_NAME);
@@ -75,10 +71,9 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 		Map<String, String> map = super.getComments();
 
 		map.put(VEHICLES_FILE, "Taxi Vehicles file");
-		map.put(ALGORITHM, "Taxibus algorithms: Possible parameters are clustered_jsprit, jsprit, sharedTaxi");
+		map.put(ALGORITHM, "Taxibus algorithms: Possible parameters are clustered_jsprit, jsprit");
 
-		map.put(DETOURFACTOR, "[SharedTaxi] shared Taxi detour factor. Default = 1.2");
-
+		map.put(STOPSFILE, "Stop locations. If set, stops will be used for routing, otherwise remove line or set to null");
 		map.put(VEHICLESONDISPATCH, "[Clustered_jsprit] Number of vehicles dispatched at the same time");
 		map.put(VEHCAP, "[Clustered_jsprit] Vehicle capacity per vehicle.");
 		map.put(CLUSTERING_PERIOD_MIN,
@@ -122,13 +117,6 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 		this.returnToDepot = returnToDepot;
 	}
 
-	/**
-	 * @return the destinationLinkId
-	 */
-	@StringGetter(DESTINATIONID)
-	public String getDestinationLinkId() {
-		return destinationLinkId;
-	}
 
 	public URL getVehiclesFileUrl(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.vehiclesFile);
@@ -139,10 +127,7 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 		return algorithm;
 	}
 
-	@StringGetter(DETOURFACTOR)
-	public double getDetourFactor() {
-		return detourFactor;
-	}
+	
 
 	@StringGetter(PICKUP_DURATION)
 	public double getPickupDuration() {
@@ -194,15 +179,7 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 		this.numberOfVehiclesDispatchedAtSameTime = numberOfVehiclesDispatchedAtSameTime;
 	}
 
-	@StringSetter(DETOURFACTOR)
-	public void setDetourFactor(double detourFactor) {
-		this.detourFactor = detourFactor;
-	}
 
-	@StringSetter(DESTINATIONID)
-	public void setDestinationLinkId(String destinationLinkId) {
-		this.destinationLinkId = destinationLinkId;
-	}
 
 	@StringGetter(CLUSTERING_PERIOD_MIN)
 	public double getClustering_period_min() {
@@ -288,5 +265,31 @@ public class TaxibusConfigGroup extends ReflectiveConfigGroup {
 	public void setServiceArea_1_Radius_m(double serviceArea_1_Radius_m) {
 		this.serviceArea_1_Radius_m = serviceArea_1_Radius_m;
 	}
+
+	@StringGetter(STOPSFILE)
+	public String getStopsfile() {
+		return stopsfile;
+	}
+
+	@StringSetter(STOPSFILE)
+	public void setStopsfile(String stopsfile) {
+		this.stopsfile = stopsfile;
+	}
+
+	@StringGetter(MAXWALK)
+	public double getMaxWalkDistance() {
+		return maxWalkDistance;
+	}
+
+	@StringSetter(MAXWALK)
+	public void setMaxWalkDistance(double maxWalkDistance) {
+		this.maxWalkDistance = maxWalkDistance;
+	}
+	
+	public URL getTransitStopsFileUrl(URL context) {
+		return ConfigGroup.getInputFileURL(context, this.stopsfile);
+	}
+
+
 
 }

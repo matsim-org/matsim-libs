@@ -165,12 +165,12 @@ public class KNAccidentScenario {
 //				addControlerListenerBinding().to( ExecutedPlansServiceImpl.class ) ;
 //				
 //				addPlanStrategyBinding(KEEP_LAST_EXECUTED).toProvider(KeepLastExecuted.class) ;
-//
+
 				this.bind( MyIterationCounter.class ).asEagerSingleton();
 
 				// ---
 				
-//				this.addMobsimListenerBinding().to( WithinDayBangBangMobsimListener.class );
+				this.addMobsimListenerBinding().to( WithinDayBangBangMobsimListener.class );
 //				this.addMobsimListenerBinding().to( WithinDayBestRouteMobsimListener.class );
 				
 				// ---

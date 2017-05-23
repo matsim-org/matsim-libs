@@ -20,12 +20,11 @@
 package playground.ikaddoura.decongestion.tollSetting;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 
 import com.google.inject.Inject;
 
 import playground.ikaddoura.decongestion.data.DecongestionInfo;
+import playground.ikaddoura.decongestion.data.LinkInfo;
 
 /**
  * 
@@ -46,26 +45,32 @@ public class DecongestionTollingBangBang implements DecongestionTollSetting {
 	@Override
 	public void updateTolls() {
 	
-		for (Id<Link> linkId : this.congestionInfo.getlinkInfos().keySet()) {
-			for (Integer intervalNr : this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().keySet()) {
+		log.info("Number of links: " + this.congestionInfo.getlinkInfos().size());
+		
+		final double toleratedAverageDelay = this.congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC();
+		final double tollAdjustment = this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT();
+		final double initialToll = this.congestionInfo.getDecongestionConfigGroup().getINITIAL_TOLL();
+		final boolean msa = this.congestionInfo.getDecongestionConfigGroup().isMsa();
+		final double blendFactorFromConfig = this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR();
+		
+		for (LinkInfo linkInfo : this.congestionInfo.getlinkInfos().values()) {
+			for (Integer intervalNr : linkInfo.getTime2avgDelay().keySet()) {
 
-				double averageDelay = this.congestionInfo.getlinkInfos().get(linkId).getTime2avgDelay().get(intervalNr);	
-				
+				Double previousToll = linkInfo.getTime2toll().get(intervalNr);
 				double toll = 0.;
 				
 				// 1) increase / decrease the toll per link and time bin
 				
-				if (averageDelay <= this.congestionInfo.getDecongestionConfigGroup().getTOLERATED_AVERAGE_DELAY_SEC()) {	
-					if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr) != null) {
-						toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr) 
-								- this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT();
-					}					
+				if (linkInfo.getTime2avgDelay().get(intervalNr) <= toleratedAverageDelay ) {	
+					if (previousToll != null) {
+						toll = previousToll - tollAdjustment;
+					}		
+					
 				} else {
-					if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr) != null) {
-						toll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr) 
-								+ this.congestionInfo.getDecongestionConfigGroup().getTOLL_ADJUSTMENT();
+					if (previousToll != null) {
+						toll = previousToll + tollAdjustment;
 					} else {
-						toll = this.congestionInfo.getDecongestionConfigGroup().getINITIAL_TOLL();
+						toll = initialToll;
 					}
 				}
 
@@ -77,24 +82,19 @@ public class DecongestionTollingBangBang implements DecongestionTollSetting {
 				
 				// 3) smoothen the tolls
 				
-				double previousToll = Double.NEGATIVE_INFINITY;
-				if (this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr) != null) {
-					previousToll = this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().get(intervalNr);
-				}
-				
-				double blendFactor = Double.NEGATIVE_INFINITY;
-				if (this.congestionInfo.getDecongestionConfigGroup().isMsa()) {
+				double blendFactor;
+				if (msa) {
 					if (this.tollUpdateCounter > 0) {
 						blendFactor = 1.0 / (double) this.tollUpdateCounter;
 					} else {
 						blendFactor = 1.0;
 					}
 				} else {
-					blendFactor = this.congestionInfo.getDecongestionConfigGroup().getTOLL_BLEND_FACTOR();
+					blendFactor = blendFactorFromConfig;
 				}
 				
-				double smoothedToll = Double.NEGATIVE_INFINITY;
-				if (previousToll >= 0.) {
+				double smoothedToll;
+				if (previousToll != null) {
 					smoothedToll = toll * blendFactor + previousToll * (1 - blendFactor);
 				} else {
 					smoothedToll = toll;
@@ -102,7 +102,7 @@ public class DecongestionTollingBangBang implements DecongestionTollSetting {
 				
 				// 4) store the updated toll
 				
-				if (toll > 0) this.congestionInfo.getlinkInfos().get(linkId).getTime2toll().put(intervalNr, smoothedToll);
+				linkInfo.getTime2toll().put(intervalNr, smoothedToll);
 			}
 		}
 		

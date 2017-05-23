@@ -44,7 +44,8 @@ public class CreateNetwork {
 		// Input and output
 //		String osmFile = "/Users/dominik/Accessibility/Data/OSM/2015-10-15_nairobi.osm.xml";
 //		String osmFile = "/Users/dominik/Accessibility/Data/OSM/2015-11-05_kibera.osm.xml";
-		String osmFile = "../../../shared-svn/projects/maxess/data/kibera/osm/2016-12-18_kibera.osm";
+//		String osmFile = "../../../shared-svn/projects/maxess/data/kibera/osm/2016-12-18_kibera.osm";
+		String osmFile = "../../../shared-svn/projects/maxess/data/nairobi/osm/2017-04-25_nairobi_central_and_kibera";
 //		String osmFile = "../../../../Workspace/data/accessibility/osm/2015-10-15_capetown_central.osm.xml";
 //		String osmFile = "../../../shared-svn/projects/accessibility_berlin/osm/berlin/2015-05-26_berlin.osm";
 		
@@ -61,10 +62,12 @@ public class CreateNetwork {
 //		String outputBase = "../../../../SVN/shared-svn/projects/tum-with-moeckel/data/mstm/siloMatsim/network/";
 //		String outputBase = "../../../../LandUseTransport/Data/OSM/network_04";
 //		String outputBase = "../../../shared-svn/projects/maxess/data/kenya/network";
-		String outputBase = "../../../shared-svn/projects/maxess/data/kibera/network/2016-12-18/";
+//		String outputBase = "../../../shared-svn/projects/maxess/data/kibera/network/2016-12-18/";
+		String outputBase = "../../../shared-svn/projects/maxess/data/nairobi/network/";
 		
 //		String networkFile = outputBase + "/2016-10-19_network_detailed.xml";
-		String networkFile = outputBase + "2016-12-18_kibera_paths_detailed.xml";
+//		String networkFile = outputBase + "2016-12-18_kibera_paths_detailed.xml";
+		String networkFile = outputBase + "2017-04-25_nairobi_central_and_kibera_no_paths.xml";
 //		String networkFile = outputBase + "network.xml";
 
 		
@@ -83,7 +86,7 @@ public class CreateNetwork {
 //		LogToOutputSaver.setOutputDirectory(outputBase);
 		LOG.info("Input CRS is " + inputCRS + "; output CRS is " + outputCRS);
 		
-		boolean keepPaths = true;
+		boolean keepPaths = false;
 		boolean includeLowHierarchyWays = true;
 		boolean onlyBiggerRoads = false; // "thinner" network; do not use this together with "includeLowHierarchyWays"
 		LOG.info("Settings: includeLowHierarchyWays = " + includeLowHierarchyWays + "; keepPaths = " + keepPaths);

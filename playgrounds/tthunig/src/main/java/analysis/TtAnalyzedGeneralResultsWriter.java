@@ -179,34 +179,35 @@ public final class TtAnalyzedGeneralResultsWriter {
 		this.overallItWritingStream.close();
 	}
 
-	public void writeSpatialAnaylsis(int iteration) {		
-		PolygonFeatureFactory factory = createFeatureType(this.crs);
-		GeometryFactory geofac = new GeometryFactory();
-		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
-		
-		Map<Id<Link>, Double> totalDelayPerLink = handler.getTotalDelayPerLink();
-		Map<Id<Link>, Double> avgDelayPerLink = handler.getAvgDelayPerLink();
-		Map<Id<Link>, Integer> numberOfVehPerLink = handler.getNumberOfVehPerLink();
-		
-		for (Link link : scenario.getNetwork().getLinks().values()) {
-			Id<Link> linkId = link.getId();
-			
-			double linkTotalDelay = 0.0;
-			if (totalDelayPerLink.containsKey(linkId))
-				linkTotalDelay = totalDelayPerLink.get(linkId);
-			
-			double linkAvgDelay = 0.0;
-			if (avgDelayPerLink.containsKey(linkId))
-				linkAvgDelay = avgDelayPerLink.get(linkId);
-			
-			int linkNumberOfVeh = 0;
-			if (numberOfVehPerLink.containsKey(linkId))
-				linkNumberOfVeh = numberOfVehPerLink.get(linkId);
-			
-			features.add(createFeature(link, geofac, factory, linkTotalDelay, linkAvgDelay, linkNumberOfVeh));
-		}
-		
-		ShapeFileWriter.writeGeometries(features, this.outputDirBase + "ITERS/it." + iteration + "/analysis/spatialAnalysis.shp");
+	public void writeSpatialAnaylsis(int iteration) {
+		// TODO skip to save time
+//		PolygonFeatureFactory factory = createFeatureType(this.crs);
+//		GeometryFactory geofac = new GeometryFactory();
+//		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+//		
+//		Map<Id<Link>, Double> totalDelayPerLink = handler.getTotalDelayPerLink();
+//		Map<Id<Link>, Double> avgDelayPerLink = handler.getAvgDelayPerLink();
+//		Map<Id<Link>, Integer> numberOfVehPerLink = handler.getNumberOfVehPerLink();
+//		
+//		for (Link link : scenario.getNetwork().getLinks().values()) {
+//			Id<Link> linkId = link.getId();
+//			
+//			double linkTotalDelay = 0.0;
+//			if (totalDelayPerLink.containsKey(linkId))
+//				linkTotalDelay = totalDelayPerLink.get(linkId);
+//			
+//			double linkAvgDelay = 0.0;
+//			if (avgDelayPerLink.containsKey(linkId))
+//				linkAvgDelay = avgDelayPerLink.get(linkId);
+//			
+//			int linkNumberOfVeh = 0;
+//			if (numberOfVehPerLink.containsKey(linkId))
+//				linkNumberOfVeh = numberOfVehPerLink.get(linkId);
+//			
+//			features.add(createFeature(link, geofac, factory, linkTotalDelay, linkAvgDelay, linkNumberOfVeh));
+//		}
+//		
+//		ShapeFileWriter.writeGeometries(features, this.outputDirBase + "ITERS/it." + iteration + "/analysis/spatialAnalysis.shp");
 	}
 	
 	private PolygonFeatureFactory createFeatureType(CoordinateReferenceSystem crs) {

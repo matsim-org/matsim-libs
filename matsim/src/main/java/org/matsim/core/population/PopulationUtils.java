@@ -68,7 +68,6 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
-import org.w3c.dom.Attr;
 
 /**
  * @author nagel, ikaddoura

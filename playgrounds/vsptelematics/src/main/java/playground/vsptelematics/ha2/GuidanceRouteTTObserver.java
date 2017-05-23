@@ -19,6 +19,17 @@
  * *********************************************************************** */
 package playground.vsptelematics.ha2;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Singleton;
+
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -32,6 +43,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -39,51 +51,38 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 
-import playground.vsptelematics.common.ListUtils;
+import com.google.inject.Inject;
 
-import javax.inject.Singleton;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
+import playground.vsptelematics.common.ListUtils;
 
 @Singleton
 public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, PersonArrivalEventHandler,
 		LinkEnterEventHandler, IterationEndsListener, AfterMobsimListener, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 
-	private Set<Id> route1;
-
-	private Set<Id> route2;
-
-	private Map<Id, Double> personTTs;
-
-	private Map<Id, Double> departureTimes;
+	private Set<Id<Person>> route1;
+	private Set<Id<Person>> route2;
+	private Map<Id<Person>, Double> personTTs;
+	private Map<Id<Person>, Double> departureTimes;
 
 	private BufferedWriter writer;
 
 	public double avr_route1TTs;
-
 	public double avr_route2TTs;
-	
 	private double avgGuidedTTs;
-	
 	private double avgUnGuidedTTs;
-
 	private double sumRoute1TTs;
-
 	private double sumRoute2TTs;
 
 	private String filename;
 
-	private Set<Id> guidedAgentIds;
-	
-	private Set<Id> unGuidedAgentIds;
-
-	private HashMap<Id, Double> unGuidedPersonTTs;
-
-	private HashMap<Id, Double> guidedPersonTTs;
+	private Set<Id<Person>> guidedAgentIds;
+	private Set<Id<Person>> unGuidedAgentIds;
+	private HashMap<Id<Person>, Double> unGuidedPersonTTs;
+	private HashMap<Id<Person>, Double> guidedPersonTTs;
 	
 	Vehicle2DriverEventHandler vehicle2driver = new Vehicle2DriverEventHandler();
 
+	@Inject
 	public GuidanceRouteTTObserver(OutputDirectoryHierarchy controlerIO) {
 		this.filename = controlerIO.getOutputFilename("routeTravelTimes.txt");
 		this.reset(0);
@@ -96,14 +95,14 @@ public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, Per
 
 	@Override
 	public void reset(int iteration) {
-		route1 = new HashSet<Id>();
-		route2 = new HashSet<Id>();
-		personTTs = new HashMap<Id, Double>();
-		unGuidedPersonTTs = new HashMap<Id, Double>();
-		guidedPersonTTs = new HashMap<Id, Double>();
-		departureTimes = new HashMap<Id, Double>();
-		unGuidedAgentIds = new HashSet<Id>();
-		guidedAgentIds = new HashSet<Id>();
+		route1 = new HashSet<>();
+		route2 = new HashSet<>();
+		personTTs = new HashMap<>();
+		unGuidedPersonTTs = new HashMap<>();
+		guidedPersonTTs = new HashMap<>();
+		departureTimes = new HashMap<>();
+		unGuidedAgentIds = new HashSet<>();
+		guidedAgentIds = new HashSet<>();
 	}
 
 	@Override
@@ -177,13 +176,13 @@ public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, Per
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		List<Double> route1TTs = new ArrayList<Double>();
-		List<Double> route2TTs = new ArrayList<Double>();
+		List<Double> route1TTs = new ArrayList<>();
+		List<Double> route2TTs = new ArrayList<>();
 
-		for (Id p : route1) {
+		for (Id<Person> p : route1) {
 			route1TTs.add(personTTs.get(p));
 		}
-		for (Id p : route2) {
+		for (Id<Person> p : route2) {
 			route2TTs.add(personTTs.get(p));
 		}
 
@@ -233,11 +232,11 @@ public class GuidanceRouteTTObserver implements PersonDepartureEventHandler, Per
 		return link.getLength() / link.getFreespeed();
 	}
 
-	public void addUnGuidedAgentId(Id id) {
-		this.unGuidedAgentIds .add(id);
+	public void addUnGuidedAgentId(Id<Person> id) {
+		this.unGuidedAgentIds.add(id);
 	}
 
-	public void addGuidedAgentId(Id id) {
+	public void addGuidedAgentId(Id<Person> id) {
 		this.guidedAgentIds.add(id);
 	}
 	

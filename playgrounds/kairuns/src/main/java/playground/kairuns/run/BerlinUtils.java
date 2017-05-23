@@ -64,7 +64,8 @@ final class BerlinUtils {
 
 	static class BikeTravelTime implements TravelTime {
 		@Override public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-			return link.getLength() / Math.min( link.getFreespeed(time) , 15./3.6 ) ; // google maps assumes an average speed of 15km/h but I think that's unrealistic
+			return link.getLength() / Math.min( link.getFreespeed(time) , 15./3.6 ) ; 
+			// google maps ass	umes an average speed of 15km/h but I think that's unrealistic
 			// 12.3 see http://www.urbanist-magazin.de/2015/06/das-konzept-der-effektiven-geschwindigkeit/
 			// which points to http://www.stadtentwicklung.berlin.de/verkehr/politik_planung/zahlen_fakten/download/Mobilitaet_dt_komplett.pdf
 			// Setting this to 15 after all since we are stuck in car congestion.

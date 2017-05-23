@@ -33,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
 import org.matsim.core.config.ConfigUtils;
@@ -43,7 +44,6 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFanCreator;
 import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFootballStrings;
 import playground.dgrether.signalsystems.cottbus.footballdemand.SimpleCottbusFanCreator;
-import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 
 
 /**
@@ -99,7 +99,9 @@ public class CottbusFootballBatch {
 			CottbusFootballAnalysisControllerListener cbfbControllerListener = new CottbusFootballAnalysisControllerListener();
 			controler.addControlerListener(cbfbControllerListener);
 			//add the signals module
-			controler.addOverridingModule(new SylviaSignalsModule());
+//			controler.addOverridingModule(new SylviaSignalsModule());
+			/* sylvia moved to playground tthunig. If you want to use sylvia use e.g. TtBasicController in playground tthunig. theresa, apr'17 */
+			controler.addOverridingModule(new SignalsModule());
 			
 			controler.run();
 			if (cbfbControllerListener.getAverageTraveltime() != null){

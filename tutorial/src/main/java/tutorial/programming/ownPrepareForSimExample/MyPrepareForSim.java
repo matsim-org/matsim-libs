@@ -36,7 +36,7 @@ import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
-import org.matsim.core.population.algorithms.ParallelPersonAlgorithmRunner;
+import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.Lockable;
@@ -96,8 +96,8 @@ public class MyPrepareForSim implements PrepareForSim {
 		}
 
 		// make sure all routes are calculated.
-		ParallelPersonAlgorithmRunner.run(population, globalConfigGroup.getNumberOfThreads(),
-				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
+		ParallelPersonAlgorithmUtils.run(population, globalConfigGroup.getNumberOfThreads(),
+				new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
 					@Override
 					public AbstractPersonAlgorithm getPersonAlgorithm() {
 						return new MyPersonPrepareForSim(new PlanRouter(tripRouterProvider.get(), activityFacilities), scenario, net);

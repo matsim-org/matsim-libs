@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
-import org.matsim.contrib.signals.analysis.SignalEvents2ViaCSVWriter;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlWriter20;
@@ -61,11 +60,6 @@ import org.matsim.lanes.data.LanesWriter;
 import analysis.signals.TtSignalAnalysisListener;
 import analysis.signals.TtSignalAnalysisTool;
 import analysis.signals.TtSignalAnalysisWriter;
-//import matsimConnector.congestionpricing.MSACongestionHandler;
-//import matsimConnector.congestionpricing.MSAMarginalCongestionPricingContolerListener;
-//import matsimConnector.congestionpricing.MSATollDisutilityCalculatorFactory;
-//import matsimConnector.congestionpricing.MSATollHandler;
-import playground.dgrether.signalsystems.sylvia.controler.SylviaSignalsModule;
 import playground.ikaddoura.analysis.pngSequence2Video.MATSimVideoUtils;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
 import playground.ikaddoura.decongestion.DecongestionControlerListener;
@@ -95,8 +89,10 @@ import scenarios.illustrative.braess.createInput.TtCreateBraessNetworkAndLanes.L
 import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation;
 import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation.InitRoutes;
 import scenarios.illustrative.braess.createInput.TtCreateBraessSignals;
-import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalControlType;
+import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalBasePlan;
+import scenarios.illustrative.braess.createInput.TtCreateBraessSignals.SignalControlLogic;
 import scenarios.illustrative.braess.signals.ResponsiveLocalDelayMinimizingSignal;
+import signals.CombinedSignalsModule;
 
 /**
  * Class to run a simulation of the braess scenario with or without signals. 
@@ -112,18 +108,19 @@ public final class RunBraessSimulation {
 
 	/* population parameter */
 	
-	private static final int NUMBER_OF_PERSONS = 1000; // per hour
+	private static final int NUMBER_OF_PERSONS = 3600; // per hour
 	private static final int SIMULATION_PERIOD = 1; // in hours
 	private static final double SIMULATION_START_TIME = 0.0; // seconds from midnight
 	
-	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.ALL;
-	// initial score for all initial plans
+	private static final InitRoutes INIT_ROUTES_TYPE = InitRoutes.NONE;
+	// initial score for all initial plans (if to low, to many agents switch to outer routes simultaneously)
 	private static final Double INIT_PLAN_SCORE = null;
-
-	// defines which kind of signals should be used
-	private static final SignalControlType SIGNAL_TYPE = SignalControlType.SIGNAL4_X_SECOND_Z;
-	// if SignalControlType SIGNAL4_X_Seconds_Z or SIGNAL4_RESPONSIVE is used, SECONDS_Z_GREEN gives the green time for Z
-	private static final int SECONDS_Z_GREEN = 5;
+	
+	// defines which kind of signals should be used. use 'SIGNAL_LOGIC = SignalControlLogic.NONE' if signals should not be used
+	private static final SignalBasePlan SIGNAL_BASE_PLAN = SignalBasePlan.NONE;
+	// if SignalBasePlan SIGNAL4_X_Seconds_Z.. is used, SECONDS_Z_GREEN gives the green time for Z
+	private static final int SECONDS_Z_GREEN = 59;
+	private static final SignalControlLogic SIGNAL_LOGIC = SignalControlLogic.NONE;
 	
 	// defines which kind of lanes should be used
 	private static final LaneType LANE_TYPE = LaneType.NONE;
@@ -140,7 +137,7 @@ public final class RunBraessSimulation {
 		
 	private static final boolean WRITE_INITIAL_FILES = true;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/test/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/braess/hEART_congestionPricing/";
 	
 	public static void main(String[] args) {
 		Config config = defineConfig();
@@ -167,12 +164,13 @@ public final class RunBraessSimulation {
 		Config config = ConfigUtils.createConfig();
 
 		// set number of iterations
-		config.controler().setLastIteration(1);
+		config.controler().setLastIteration(100);
 
 		// able or enable signals and lanes
 		config.qsim().setUseLanes(LANE_TYPE.equals(LaneType.NONE) ? false : true);
 		SignalSystemsConfigGroup signalConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
-		signalConfigGroup.setUseSignalSystems(SIGNAL_TYPE.equals(SignalControlType.NONE) ? false : true);
+		signalConfigGroup.setUseSignalSystems(SIGNAL_LOGIC.equals(SignalControlLogic.NONE) ? false : true);
+		config.qsim().setUsingFastCapacityUpdate(false);
 
 		// set brain exp beta
 		config.planCalcScore().setBrainExpBeta(2);
@@ -186,7 +184,7 @@ public final class RunBraessSimulation {
 		config.travelTimeCalculator().setCalculateLinkTravelTimes(true);
 
 		// set travelTimeBinSize (only has effect if reRoute is used)
-		config.travelTimeCalculator().setTraveltimeBinSize(600);
+		config.travelTimeCalculator().setTraveltimeBinSize(10);
 //		config.travelTimeCalculator().setMaxTime((int) (3600 * (SIMULATION_START_TIME + SIMULATION_PERIOD + 2)));
 		config.travelTimeCalculator().setMaxTime(3600 * 24);
 
@@ -200,7 +198,7 @@ public final class RunBraessSimulation {
 		{
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultStrategy.ReRoute.toString());
-			strat.setWeight(0.0);
+			strat.setWeight(0.1);
 			strat.setDisableAfter(config.controler().getLastIteration() - 50);
 			config.strategy().addStrategySettings(strat);
 		}
@@ -243,7 +241,7 @@ public final class RunBraessSimulation {
 		config.strategy().setMaxAgentPlanMemorySize(5);
 
 		config.qsim().setStuckTime(3600 * 10.);
-//		config.qsim().setRemoveStuckVehicles(true);
+		config.qsim().setRemoveStuckVehicles(false);
 
 		config.qsim().setStartTime(3600 * SIMULATION_START_TIME);
 		// set end time to shorten simulation run time: 2 hours after the last agent departs
@@ -306,27 +304,27 @@ public final class RunBraessSimulation {
 	private static Controler prepareController(Scenario scenario) {
 		Config config = scenario.getConfig();
 		Controler controler = new Controler(scenario);
-
-		// add the signals module
-		boolean alwaysSameMobsimSeed = false;
-		SylviaSignalsModule sylviaSignalsModule = new SylviaSignalsModule();
-		sylviaSignalsModule.setAlwaysSameMobsimSeed(alwaysSameMobsimSeed);
-		controler.addOverridingModule(sylviaSignalsModule);
-		
-		// add responsive signal controler if enabled
-		// TODO does this work together with the SylviaSignalsModule?!
-		if (SIGNAL_TYPE.equals(SignalControlType.SIGNAL4_RESPONSIVE)){
+	
+		switch (SIGNAL_LOGIC){
+		case NONE:
+			break;
+		case SIMPLE_RESPONSIVE:
+			// add responsive signal controler if enabled
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					bind(ResponsiveLocalDelayMinimizingSignal.class).asEagerSingleton();
 					addControlerListenerBinding().to(ResponsiveLocalDelayMinimizingSignal.class);
-		            // bind tool to write information about signal states for via
-					bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();
-		            addEventHandlerBinding().to(SignalEvents2ViaCSVWriter.class);
-		            addControlerListenerBinding().to(SignalEvents2ViaCSVWriter.class);
 				}
 			});
+			break;
+		default:
+			// add combined signals module (works for different signal types as sylvia, downstream or planbased)
+			boolean alwaysSameMobsimSeed = false;
+			CombinedSignalsModule signalsModule = new CombinedSignalsModule();
+			signalsModule.setAlwaysSameMobsimSeed(alwaysSameMobsimSeed);
+			controler.addOverridingModule(signalsModule);
+			break;
 		}
 		
 		if (!PRICING_TYPE.equals(PricingType.NONE) && !PRICING_TYPE.equals(PricingType.FLOWBASED) && !PRICING_TYPE.equals(PricingType.GREGOR) && !PRICING_TYPE.equals(PricingType.INTERVALBASED)){
@@ -473,6 +471,7 @@ public final class RunBraessSimulation {
 				SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config,
 						SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
 				if (signalsConfigGroup.isUseSignalSystems()) {
+					// bind tool to analyze signals
 					this.bind(TtSignalAnalysisTool.class).asEagerSingleton();
 					this.addEventHandlerBinding().to(TtSignalAnalysisTool.class);
 					this.addControlerListenerBinding().to(TtSignalAnalysisTool.class);
@@ -518,7 +517,8 @@ public final class RunBraessSimulation {
 
 		TtCreateBraessSignals signalsCreator = new TtCreateBraessSignals(scenario);
 		signalsCreator.setLaneType(LANE_TYPE);
-		signalsCreator.setSignalType(SIGNAL_TYPE);
+		signalsCreator.setSignalControlLogic(SIGNAL_LOGIC);
+		signalsCreator.setBasePlanType(SIGNAL_BASE_PLAN);
 		signalsCreator.setSecondsZGreen(SECONDS_Z_GREEN);
 		signalsCreator.createSignals();
 	}
@@ -660,27 +660,41 @@ public final class RunBraessSimulation {
 
 		if (ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME,
 				SignalSystemsConfigGroup.class).isUseSignalSystems()) {
-			switch (SIGNAL_TYPE){
-			case ONE_SECOND_Z:
-				runName += "_1sZ";
+			switch (SIGNAL_LOGIC){
+			case SIMPLE_RESPONSIVE:
+				runName += "_simpleResp";
 				break;
-			case ONE_SECOND_SO:
-				runName += "_1sSO";
-				break;
-			case SIGNAL4_X_SECOND_Z:
-				runName += "_S4_" + SECONDS_Z_GREEN + "sZ";
-				break;
-			case SIGNAL4_RESPONSIVE:
-				runName += "_S4resp_init" + SECONDS_Z_GREEN + "sZ";
-				break;
-			case SIGNAL4_SYLVIA_V2Z:
-				runName += "_S4_Sylvia_V2Z";
-				break;
-			case SIGNAL4_SYLVIA_Z2V:
-				runName += "_S4_Sylvia_Z2V";
+			case DOWNSTREAM_RESPONSIVE:
+				runName += "_downstream";
 				break;
 			default:
-				runName += "_" + SIGNAL_TYPE;
+				runName += "_" + SIGNAL_LOGIC;
+				break;
+			}
+			switch (SIGNAL_BASE_PLAN){
+			case ALL_NODES_ALL_GREEN:
+				runName += "_allGreen";
+				break;
+			case ALL_NODES_GREEN_WAVE_SO:
+				runName += "_greenWaveSO";
+				break;
+			case ALL_NODES_GREEN_WAVE_Z:
+				runName += "_greenWaveZ";
+				break;
+			case ALL_NODES_ONE_SECOND_SO:
+				runName += "_1sSO";
+				break;
+			case ALL_NODES_ONE_SECOND_Z:
+				runName += "_1sZ";
+				break;
+			case SIGNAL4_X_SECOND_Z_V2Z:
+				runName += "_S4_" + SECONDS_Z_GREEN + "sZ_V2Z";
+				break;
+			case SIGNAL4_X_SECOND_Z_Z2V:
+				runName += "_S4_" + SECONDS_Z_GREEN + "sZ_Z2V";
+				break;
+			default:
+				runName += "_" + SIGNAL_BASE_PLAN;
 				break;
 			}			
 		}
@@ -730,7 +744,7 @@ public final class RunBraessSimulation {
 		new PopulationWriter(scenario.getPopulation()).write(outputDir + "plans.xml");
 		
 		// write signal files
-		if (!SIGNAL_TYPE.equals(SignalControlType.NONE)) {
+		if (!SIGNAL_LOGIC.equals(SignalControlLogic.NONE)) {
 			SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 			new SignalSystemsWriter20(signalsData.getSignalSystemsData()).write(outputDir + "signalSystems.xml");
 			new SignalControlWriter20(signalsData.getSignalControlData()).write(outputDir + "signalControl.xml");

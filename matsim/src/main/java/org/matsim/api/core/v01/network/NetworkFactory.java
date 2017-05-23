@@ -45,5 +45,8 @@ public interface NetworkFactory extends MatsimFactory {
 	public Link createLink(final Id<Link> id, final Node fromNode, final Node toNode);
 
 	void setLinkFactory(LinkFactory factory);
+	// yyyyyy I think that this method should not be here, since it allows to change the factory during the run.  Should be set at 
+	// construction.  Would best be done by guice, but if one loads the scenario before instantiating the controler, we don't 
+	// have that.  kai, may'17
 
 }

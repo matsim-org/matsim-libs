@@ -46,6 +46,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacilitiesImpl;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.matrices.Entry;
@@ -58,6 +59,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 
 /**
@@ -268,9 +270,13 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 			
 			// copy the zones file to the outputfolder...
 			log.info("Copying " + module.getMATSim4OpusTemp() + FILE_NAME + " to " + module.getMATSim4OpusOutput() + FILE_NAME);
-			IOUtils.copyFile(new File( module.getMATSim4OpusTemp() + FILE_NAME),	new File( module.getMATSim4OpusOutput() + FILE_NAME));
-			
-			log.info("... done with writing travel_data.csv" );
+            try {
+                Files.copy(new File( module.getMATSim4OpusTemp() + FILE_NAME).toPath(), new File( module.getMATSim4OpusOutput() + FILE_NAME).toPath());
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+
+            log.info("... done with writing travel_data.csv" );
 			
 			if (this.benchmark != null && benchmarkID > 0) {
 				this.benchmark.stoppMeasurement(benchmarkID);
