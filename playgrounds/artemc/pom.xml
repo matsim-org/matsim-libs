@@ -2,7 +2,7 @@
   <parent>
     <groupId>org.matsim</groupId>
     <artifactId>playgrounds</artifactId>
-    <version>0.9.0-SNAPSHOT</version>
+    <version>0.10.0-SNAPSHOT</version>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
@@ -14,7 +14,7 @@
       <dependency>
           <groupId>org.matsim</groupId>
           <artifactId>matsim-examples</artifactId>
-          <version>0.9.0-SNAPSHOT</version>
+          <version>0.10.0-SNAPSHOT</version>
       </dependency>
     <dependency>
   	<groupId>org.apache.commons</groupId>
@@ -24,7 +24,7 @@
     <dependency>
       <groupId>org.matsim.contrib</groupId>
       <artifactId>pseudosimulation</artifactId>
-      <version>0.9.0-SNAPSHOT</version>
+      <version>0.10.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -35,7 +35,7 @@
   <dependency>
   	<groupId>playground</groupId>
   	<artifactId>vsp</artifactId>
-  	<version>0.9.0-SNAPSHOT</version>
+  	<version>0.10.0-SNAPSHOT</version>
   </dependency>
   <dependency>
   	<groupId>commons-io</groupId>
@@ -60,17 +60,17 @@
     <dependency>
     	<groupId>org.matsim.contrib</groupId>
     	<artifactId>eventsBasedPTRouter</artifactId>
-    	<version>0.9.0-SNAPSHOT</version>
+    	<version>0.10.0-SNAPSHOT</version>
     </dependency>
     <dependency>
     	<groupId>org.matsim.contrib</groupId>
     	<artifactId>pseudosimulation</artifactId>
-    	<version>0.9.0-SNAPSHOT</version>
+    	<version>0.10.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.matsim.contrib</groupId>
       <artifactId>travelsummary</artifactId>
-      <version>0.9.0-SNAPSHOT</version>
+      <version>0.10.0-SNAPSHOT</version>
     </dependency>
   </dependencies>
   
