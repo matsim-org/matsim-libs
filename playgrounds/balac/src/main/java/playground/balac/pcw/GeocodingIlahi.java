@@ -12,23 +12,23 @@ public class GeocodingIlahi {
 
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-		 BufferedReader readLink = IOUtils.getBufferedReader("C:\\LocalDocuments\\Projects\\Geocoding\\Ilahi\\Work_School Location_170317_semi.txt");
+		 BufferedReader readLink = IOUtils.getBufferedReader("C:\\LocalDocuments\\Projects\\Geocoding\\Ilahi\\Work_School Location_170317.txt");
 		 
-		BufferedWriter outLink = IOUtils.getBufferedWriter("C:\\LocalDocuments\\Projects\\Geocoding\\Ilahi\\Work_School Location_170317_geocoded_1_2000.txt");
+		BufferedWriter outLink = IOUtils.getBufferedWriter("C:\\LocalDocuments\\Projects\\Geocoding\\Ilahi\\Work_School Location_170317_geocoded_300000_350000.txt");
 		outLink.write("id;xcoord;ycoord");
 		outLink.newLine();
 		
 		 readLink.readLine();
 		 String s = readLink.readLine();
 		 int i = 1;
-		 while(s!= null && i <= 2000) {
-			 if (i > 0) {
+		 while(s!= null && i <= 350000) {
+			 if (i > 300000) {
 				 String[] arr = s.split(";");			
-				 if (arr.length == 7) {
+				 if (arr.length == 6) {
 					 GeoApiContext context = new GeoApiContext().setApiKey(args[0]);
 					 GeocodingResult[] results =  GeocodingApi.geocode(context,
 					    arr[1]
-					    + " " +	 arr[2] + " " +	 arr[3] + " " +	 arr[4] + " " +	 arr[5] + " " +	 arr[6] + " " +	 arr[6]).await();
+					    + " " +	 arr[2] + " " +	 arr[3] + " " +	 arr[4] + " " +	 arr[5]).await();
 					
 					
 					 if (results.length > 0) {			

@@ -139,19 +139,19 @@ public class PTRouting {
 		double timeStep = 60;
 		
 		Config config = ConfigUtils.createConfig();
-		config.global().setNumberOfThreads(16);	// for parallel population reading
+		config.global().setNumberOfThreads(8);	// for parallel population reading
 	
 		
 	//	config.network().setInputFile("C:/Users/balacm/Desktop/InputPt/network_multimodal.xml.gz");
 
 	  //  config.facilities().setInputFile("C:/Users/balacm/Desktop/InputPt/facilities.xml.gz");
-	    config.network().setInputFile("./mmNetwork.xml.gz");
+	    config.network().setInputFile("C:\\LocalDocuments\\Projects\\Geocoding\\Felix\\mmNetwork.xml.gz");
 
-	    config.transit().setTransitScheduleFile("./mmSchedule.xml.gz");
-	    config.transit().setVehiclesFile("./mmVehicles.xml.gz");
+	    config.transit().setTransitScheduleFile("C:\\LocalDocuments\\Projects\\Geocoding\\Felix\\mmSchedule.xml.gz");
+	    config.transit().setVehiclesFile("C:\\LocalDocuments\\Projects\\Geocoding\\Felix\\mmVehicles.xml.gz");
 		
 	    config.transit().setUseTransit(true);
-		config.transitRouter().setSearchRadius(2000.0);
+		config.transitRouter().setSearchRadius(1000.0);
 		config.transitRouter().setMaxBeelineWalkConnectionDistance(300.0);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
 				
@@ -171,15 +171,15 @@ public class PTRouting {
 
 	//	transitRouterFactory = new FastTransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
 		transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, routerNetwork);
-		 BufferedReader readLink = IOUtils.getBufferedReader("./clean_weg_geocoded.csv");
+		 BufferedReader readLink = IOUtils.getBufferedReader("C:\\LocalDocuments\\Projects\\Geocoding\\Felix\\frequencytable_geocoded_rest.csv");
 
 //		    BufferedWriter outLink = IOUtils.getBufferedWriter("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/travelTimesPT_"+args[0] +".txt");
 //	final BufferedReader readLink = IOUtils.getBufferedReader("C:/Users/balacm/Desktop/InputPt/PTWithoutSimulation/coord_"+args[0]+".txt");
-			final BufferedWriter outLinkF = IOUtils.getBufferedWriter("./clean_weg_pt_routes.txt");
+			final BufferedWriter outLinkF = IOUtils.getBufferedWriter("C:\\LocalDocuments\\Projects\\Geocoding\\Felix\\clean_weg_pt_routes_rest_t.txt");
 
-			final BufferedWriter outFrequency = IOUtils.getBufferedWriter("./clean_weg_frequency.txt");
-			final BufferedWriter outWalk = IOUtils.getBufferedWriter("./clean_weg_walk.txt");
-
+			final BufferedWriter outFrequency = IOUtils.getBufferedWriter("C:\\LocalDocuments\\Projects\\Geocoding\\Felix\\clean_weg_frequency_rest_t.txt");
+			final BufferedWriter outWalk = IOUtils.getBufferedWriter("C:\\LocalDocuments\\Projects\\Geocoding\\Felix\\clean_weg_walk_rest_t.txt");
+		readLink.readLine();
 			
 		String s = readLink.readLine();
 		
@@ -224,7 +224,7 @@ public class PTRouting {
 					
 					Person person = scenario.getPopulation().getFactory().createPerson(Id.createPersonId(arr[0]));
 					
-					double m = Integer.parseInt(arr[12]);
+					double m = Integer.parseInt(arr[12])/60;
 					
 					
 					TwoWayCSFacilityImpl startFacility = new TwoWayCSFacilityImpl(Id.create("100", TwoWayCSFacility.class), coordStart, lStart.getId());
