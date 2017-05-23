@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -47,7 +46,7 @@ import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
  */
 
 
-public class ExperiencedEMissionCostCalculatorExample {
+public class ExperiencedEmissionCostCalculatorExample {
 
     public static void main (String args []) {
 
@@ -81,7 +80,7 @@ public class ExperiencedEMissionCostCalculatorExample {
                 ,"output_run2_muc_c_QBPV9","output_run2b_muc_c_QBPV9"
                 ,"output_run3_muc_c_DecongestionPID","output_run3b_muc_c_DecongestionPID"
                 ,"output_run3_muc_c_DecongestionPID","output_run3b_muc_c_DecongestionPID"
-                ,"output_run3-BB_muc_c_DecongestionBangBang","output_run3b-BB_muc_c_DecongestionBangBang" 
+                ,"output_run3-BB_muc_c_DecongestionBangBang","output_run3b-BB_muc_c_DecongestionBangBang"
                 ,"output_run4_muc_cne_DecongestionPID","output_run4b_muc_cne_DecongestionPID"
                 ,"output_run4-BB_muc_cne_DecongestionBangBang","output_run4b-BB_muc_cne_DecongestionBangBang"
                 ,"output_run5_muc_cne_QBPV3","output_run5b_muc_cne_QBPV3"
@@ -96,12 +95,11 @@ public class ExperiencedEMissionCostCalculatorExample {
 
             for(String str : cases) {
                 for(int itr : its) {
-                    String emissionEventsFile = dir + str + "/ITERS/it." + itr + "/" + itr + ".events.xml.gz";
                     String networkFile = dir+str+"/output_network.xml.gz";
                     String configFile = dir+str+"/output_config.xml.gz";
                     String eventsFile = dir + str + "/ITERS/it." + itr + "/" + itr + ".events.xml.gz";
 
-                    if(! new File(emissionEventsFile).exists() || ! new File(networkFile).exists() || ! new File(configFile).exists() || ! new File(eventsFile).exists() ) {
+                    if(! new File(eventsFile).exists() || ! new File(networkFile).exists() || ! new File(configFile).exists() ) {
                         continue;
                     }
 
@@ -141,8 +139,8 @@ public class ExperiencedEMissionCostCalculatorExample {
 
                     EventsManager events = EventsUtils.createEventsManager();
                     events.addHandler(handler);
-                    EmissionEventsReader reader = new EmissionEventsReader(events);
-                    reader.readFile(emissionEventsFile);
+                    MatsimEventsReader reader = new MatsimEventsReader(events);
+                    reader.readFile(eventsFile);
 
                     handler.getUserGroup2TotalEmissionCosts().entrySet().forEach(e -> System.out.println(e.getKey()+"\t"+e.getValue()));
                     writer.write(str+"\t"+itr+"\t"+ MapUtils.doubleValueSum(handler.getUserGroup2TotalEmissionCosts())+"\t");
