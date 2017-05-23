@@ -22,7 +22,6 @@ import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.Labels;
 import org.matsim.contrib.analysis.vsp.qgis.*;
-import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityRuleBasedRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityXmlRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.utils.ColorRangeUtils;
 import org.matsim.core.utils.misc.ExeRunner;
@@ -87,15 +86,10 @@ public class VisualizationUtils {
 		accessibilityLayer.setYField(Labels.Y_COORDINATE);
 //		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, lowerBound, upperBound,
 //				range, symbolSize);
-        AccessibilityRuleBasedRenderer renderer = new AccessibilityRuleBasedRenderer(accessibilityLayer, range, symbolSize, colorRange);
+        RuleBasedRenderer renderer = new RuleBasedRenderer(accessibilityLayer, lowerBound, upperBound, range,
+                symbolSize, colorRange,mode.toString() + "_accessibility",
+                Labels.POPULATION_DENSITIY, populationThreshold);
 			renderer.setRenderingAttribute(mode.toString() + "_accessibility");
-			renderer.setNameOfAccessibilityLayer(mode.toString() + "_accessibility");
-			renderer.setFirstBound(lowerBound);
-			renderer.setBinWidth((upperBound-lowerBound)/(range-2));
-			renderer.setNameOfDensityLayer(Labels.POPULATION_DENSITIY);
-			renderer.setMinimumDensity(populationThreshold);
-			renderer.createRules();
-
 		writer.addLayer(accessibilityLayer);
 
 		// write the project file

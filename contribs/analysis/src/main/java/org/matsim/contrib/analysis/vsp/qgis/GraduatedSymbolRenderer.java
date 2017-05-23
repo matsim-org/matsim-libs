@@ -25,24 +25,24 @@ public class GraduatedSymbolRenderer extends QGisRenderer {
     private double lowerBound;
     private double upperBound;
     private int range;
-    private ColorRangeUtils.ColorRange colorRange;
     private int symbolSize;
+    private ColorRangeUtils.ColorRange colorRange;
 
     public GraduatedSymbolRenderer(VectorLayer layer, Double lowerBound, Double upperBound,
                                  Integer range, int symbolSize) {
-        this(layer, lowerBound, upperBound, range, ColorRangeUtils.ColorRange.RED_TO_GREEN, symbolSize);
+        this(layer, lowerBound, upperBound, range, symbolSize, ColorRangeUtils.ColorRange.RED_TO_GREEN);
     }
 
     public GraduatedSymbolRenderer(VectorLayer layer, Double lowerBound, Double upperBound,
-                                   Integer range, ColorRangeUtils.ColorRange colorRange, int symbolSize) {
+                                   Integer range, int symbolSize, ColorRangeUtils.ColorRange colorRange) {
         super(QGisConstants.renderingType.graduatedSymbol, layer);
         this.fileHeader = layer.getHeader();
         this.useHeader = fileHeader != null;
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
         this.range = range;
-        this.colorRange = colorRange;
         this.symbolSize = symbolSize;
+        this.colorRange = colorRange;
         init();
     }
 	

@@ -384,7 +384,7 @@ public class QGisFileWriter {
 			
 		} else if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.RuleRenderer)){
 			
-            RuleRenderer renderer = (RuleRenderer)qRenderer;
+            RuleBasedRenderer renderer = (RuleBasedRenderer)qRenderer;
 
             out.write("\t\t\t<renderer-v2 attr=\"" + renderer.getRenderingAttribute() + "\" symbollevels=\"0\" type=\"" + renderer.getRenderingType().toString() + "\">\n");
 
