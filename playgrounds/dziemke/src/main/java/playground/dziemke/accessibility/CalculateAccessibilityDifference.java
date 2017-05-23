@@ -48,10 +48,13 @@ public class CalculateAccessibilityDifference {
 
 	
 	public static void main(String[] args) {
-		String directoryRootBase = "../../../shared-svn/projects/maxess/data/nmb/output/17compRestricted500/";
-		String directoryRootPolicy = "../../../shared-svn/projects/maxess/data/nmb/output/nwChange8hRestricted/";
+//		String directoryRootBase = "../../../shared-svn/projects/maxess/data/nmb/output/17compRestricted500/";
+//		String directoryRootPolicy = "../../../shared-svn/projects/maxess/data/nmb/output/nwChange8hRestricted/";
+		String directoryRootBase = "/Users/dominik/Workspace/matsim/contribs/integration/test/output/org/matsim/integration/daily/accessibility/AccessibilityComputationNairobiTest_minibus/runAccessibilityComputation/";
+		String directoryRootPolicy = "/Users/dominik/Workspace/matsim/contribs/integration/test/output/org/matsim/integration/daily/accessibility/AccessibilityComputationNairobiTest_minibus_pt-only/runAccessibilityComputation/";
 //		String directoryRoot = "../../../shared-svn/projects/maxess/data/nmb/output/17compRestricted500/";
-		String activityType = FacilityTypes.EDUCATION;
+//		String activityType = FacilityTypes.EDUCATION;
+		String activityType = FacilityTypes.WORK;
 //		String[] activityTypes = {FacilityTypes.SHOPPING, FacilityTypes.LEISURE, FacilityTypes.OTHER, FacilityTypes.EDUCATION};
 
 		setHeader(directoryRootBase, activityType);
