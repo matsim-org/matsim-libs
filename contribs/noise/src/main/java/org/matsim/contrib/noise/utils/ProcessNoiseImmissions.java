@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
 import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
 import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
-import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.NoiseRenderer;
+//import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.NoiseRenderer;
 import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -254,8 +254,9 @@ public class ProcessNoiseImmissions {
 		noiseLayer.setXField("x");
 		noiseLayer.setYField("y");
 		
-		NoiseRenderer renderer = new NoiseRenderer(noiseLayer, this.receiverPointGap);
-		renderer.setRenderingAttribute("Lden");
+//		NoiseRenderer renderer = new NoiseRenderer(noiseLayer, this.receiverPointGap);
+//		renderer.setRenderingAttribute("Lden");
+		// TODO: Fix this.
 		
 		writer.addLayer(noiseLayer);
 		
