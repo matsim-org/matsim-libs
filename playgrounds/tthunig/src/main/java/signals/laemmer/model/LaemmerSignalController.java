@@ -220,6 +220,7 @@ public class LaemmerSignalController extends AbstractSignalController implements
             tIdle -= (signal.determiningLoad * DESIRED_PERIOD + DEFAULT_INTERGREEN);
             flowSum += signal.determiningOutflow;
         }
+        tIdle = Math.max(0, tIdle);
     }
 
     private int getNumberOfExpectedVehiclesOnLink(double now, Id<Link> linkId) {

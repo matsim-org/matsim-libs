@@ -1,28 +1,50 @@
 package org.matsim.contrib.analysis.vsp.qgis;
 
 public class Range {
-	
+
 	private double lowerBound;
-	private double upperBound;
-	private String label;
-	
+    boolean lowerBoundSet;
+    private double upperBound;
+    boolean upperBoundSet;
+    private String label;
+
 	public Range(double lowerBound, double upperBound, String label){
-		
-		this.lowerBound = lowerBound;
-		this.upperBound = upperBound;
+		this.setLowerBound(lowerBound);
+		this.setUpperBound(upperBound);
 		this.label = label;
-		
 	}
 
-	public double getLowerBound() {
+    public Range(String label){
+        this.label = label;
+    }
+
+    public void setLowerBound(double lowerBound) {
+        this.lowerBound = lowerBound;
+        this.lowerBoundSet = true;
+    }
+
+    public double getLowerBound() {
 		return lowerBound;
 	}
 
-	public double getUpperBound() {
+    public boolean isLowerBoundSet() {
+        return lowerBoundSet;
+    }
+
+    public void setUpperBound(double upperBound) {
+        this.upperBound = upperBound;
+        this.upperBoundSet = true;
+    }
+
+    public double getUpperBound() {
 		return upperBound;
 	}
 
-	public String getLabel() {
+    public boolean isUpperBoundSet() {
+        return upperBoundSet;
+    }
+
+    public String getLabel() {
 		return label;
 	}
 

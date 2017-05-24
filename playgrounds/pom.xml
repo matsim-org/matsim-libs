@@ -5,7 +5,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>playgrounds</artifactId>
 	<packaging>pom</packaging>
-	<version>0.9.0-SNAPSHOT</version>
+	<version>0.10.0-SNAPSHOT</version>
 	<name>MATSim-Playgrounds</name>
 
 	<scm>
@@ -171,21 +171,21 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.10.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.10.0-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.10.0-SNAPSHOT</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

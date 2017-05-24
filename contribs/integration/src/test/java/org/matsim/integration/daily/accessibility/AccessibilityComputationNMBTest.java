@@ -25,6 +25,7 @@ import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityModule;
@@ -34,6 +35,7 @@ import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -54,8 +56,8 @@ public class AccessibilityComputationNMBTest {
 	@Test
 	public void runAccessibilityComputation() {
 		Double cellSize = 1000.;
-		boolean push2Geoserver = true; // set true for run on server
-		boolean createQGisOutput = false; // set false for run on server
+		boolean push2Geoserver = false; // set true for run on server
+		boolean createQGisOutput = true; // set false for run on server
 
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
 		Envelope envelope = new Envelope(100000,180000,-3720000,-3675000); // Notation: minX, maxX, minY, maxY
@@ -99,6 +101,7 @@ public class AccessibilityComputationNMBTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.car, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false);
 		acg.setOutputCrs(TransformationFactory.WGS84_SA_Albers);
 		
 		// ---------- Experiment: Change Events
@@ -130,10 +133,25 @@ public class AccessibilityComputationNMBTest {
 //		mbpcg.setUsingTravelTimesAndDistances(true);
 //		mbpcg.setPtTravelDistancesInputFile(travelDistanceMatrixFile);
 //		mbpcg.setPtTravelTimesInputFile(travelTimeMatrixFile);
-		// ---------- 
+		// ----------
+		
+		// ---------- Schedule-based pt
+//		config.transit().setUseTransit(true);
+//		config.transit().setInputScheduleCRS(TransformationFactory.WGS84_SA_Albers);
+//		config.transit().setTransitScheduleFile("../../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14b/ITERS/it.300/jtlu14b.300.transitScheduleScored.xml.gz");
+//		config.transit().setVehiclesFile("../../../runs-svn/nmbm_minibuses/nmbm/output/jtlu14b/jtlu14b.0.vehicles.xml");
+//		// config.qsim().setEndTime(100*3600.);
+//		ModeParams ptParams = new ModeParams(TransportMode.transit_walk);
+//		config.planCalcScore().addModeParams(ptParams);
+//
+//		config.transitRouter().setMaxBeelineWalkConnectionDistance(0.); // default: 100.0
+//		config.transitRouter().setExtensionRadius(0.); // default: 200.0
+//		config.transitRouter().setSearchRadius(0.); // default: 1000.0
+		// ----------
 		
 		// Activity types
 		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING, FacilityTypes.LEISURE, FacilityTypes.OTHER, FacilityTypes.EDUCATION});
+//		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.EDUCATION});
 		log.info("Using activity types: " + activityTypes);
 		
 		// Combine certain activity options into one combined computation

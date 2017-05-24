@@ -99,7 +99,7 @@ public class SrvTripParser {
         //leg
         trip.setDuration_s(getDurationSec());
         trip.setDistanceBeeline_m(getDistanceBeelineM());
-        trip.setDistanceRouted_m(getDistanceRoutedM());
+        trip.setDistanceRouted_m(getDistanceRoutedFastestM());
         trip.setSpeed_m_s(getSpeedMS());
         trip.setWeight(getWeight());
         //startingActivity
@@ -165,8 +165,8 @@ public class SrvTripParser {
         return Double.parseDouble(entries[columnNumbers.get(SrvTripUtils.DISTANCE_BEELINE_KM)]) * 1000;
     }
 
-    private double getDistanceRoutedM() {
-        return Double.parseDouble(entries[columnNumbers.get(SrvTripUtils.DISTANCE_ROUTED_SHORTEST_KM)]) * 1000;
+    private double getDistanceRoutedFastestM() {
+        return Double.parseDouble(entries[columnNumbers.get(SrvTripUtils.DISTANCE_ROUTED_FASTEST_KM)]) * 1000;
     }
 
     private double getSpeedMS() {

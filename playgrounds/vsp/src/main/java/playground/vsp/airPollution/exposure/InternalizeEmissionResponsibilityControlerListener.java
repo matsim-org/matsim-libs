@@ -20,10 +20,6 @@
 
 package playground.vsp.airPollution.exposure;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.emissions.EmissionModule;
@@ -37,8 +33,6 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.events.algorithms.EventWriterXML;
-import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author benjamin
@@ -60,12 +54,6 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 	private EmissionResponsibilityInternalizationHandler emissionInternalizationHandler;
 	private IntervalHandler intervalHandler;
 
-	private String emissionEventOutputFile;
-	private EventWriterXML emissionEventWriter;
-
-	private int firstIt;
-	private int lastIt;
-
 	@Inject
 	private InternalizeEmissionResponsibilityControlerListener(EmissionModule emissionModule, EmissionResponsibilityCostModule emissionCostModule, ResponsibilityGridTools rgt, GridTools gridTools) {
 		this.timeBinSize = rgt.getTimeBinSize();
@@ -82,9 +70,6 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 		Double simulationEndtime = controler.getConfig().qsim().getEndTime();
 		intervalHandler = new IntervalHandler(timeBinSize, simulationEndtime, gridTools);
 		eventsManager.addHandler(intervalHandler);
-		
-		firstIt = controler.getConfig().controler().getFirstIteration();
-		lastIt = controler.getConfig().controler().getLastIteration();
 	}
 
 	@Override
@@ -95,14 +80,6 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 		emissionInternalizationHandler = new EmissionResponsibilityInternalizationHandler(controler, emissionCostModule);
 		logger.info("adding emission internalization module to emission events stream...");
 		emissionModule.getEmissionEventsManager().addHandler(emissionInternalizationHandler);
-
-		if(iteration == firstIt || iteration == lastIt){
-			emissionEventOutputFile = controler.getControlerIO().getIterationFilename(iteration, "emission.events.xml.gz");
-			logger.info("creating new emission events writer...");
-			emissionEventWriter = new EventWriterXML(emissionEventOutputFile);
-			logger.info("adding emission events writer to emission events stream...");
-			emissionModule.getEmissionEventsManager().addHandler(emissionEventWriter);
-		}
 	}
 
 	@Override
@@ -112,13 +89,6 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 		logger.info("removing emission internalization module from emission events stream...");
 		emissionModule.getEmissionEventsManager().removeHandler(emissionInternalizationHandler);
 
-		if(iteration == firstIt || iteration == lastIt){
-			logger.info("removing emission events writer from emission events stream...");
-			emissionModule.getEmissionEventsManager().removeHandler(emissionEventWriter);
-			logger.info("closing emission events file...");
-			emissionEventWriter.closeFile();
-		}
-		
 		logger.info("calculating relative duration factors from this/last iteration...");
 		// calc relative duration factors/density from last iteration
 		responsibilityGridTools.resetAndcaluculateRelativeDurationFactors(intervalHandler.getDuration());
@@ -128,25 +98,5 @@ public class InternalizeEmissionResponsibilityControlerListener implements Start
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		emissionModule.writeEmissionInformation();
-
-		boolean isWritingOutputEvents = event.getServices().getConfig().vspExperimental().isWritingOutputEvents();
-		if( isWritingOutputEvents) {
-			dumpOutputEvents();
-		}
-	}
-
-	private void dumpOutputEvents() {
-		try {
-			File toFile = new File(	controler.getControlerIO().getOutputFilename("output_emission.events.xml.gz"));
-			File fromFile = new File(controler.getControlerIO().getIterationFilename(controler.getConfig().controler().getLastIteration(), "emission.events.xml.gz"));
-            try {
-                Files.copy(fromFile.toPath(), toFile.toPath());
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
-        } catch ( Exception ee ) {
-			Logger.getLogger(this.getClass()).error("writing output emissions events did not work; probably parameters were such that no events were "
-					+ "generated in the final iteration") ;
-		}
 	}
 }
