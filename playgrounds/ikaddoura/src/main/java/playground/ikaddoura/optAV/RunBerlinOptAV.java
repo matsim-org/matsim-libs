@@ -73,11 +73,11 @@ public class RunBerlinOptAV {
 			outputDirectory = args[1];
 			log.info("outputDirectory: "+ outputDirectory);
 			
-			internalizeNoise = Boolean.parseBoolean(args[2]);
-			log.info("internalizeNoise: "+ internalizeNoise);
-			
-			internalizeCongestion = Boolean.parseBoolean(args[3]);
+			internalizeCongestion = Boolean.parseBoolean(args[2]);
 			log.info("internalizeCongestion: "+ internalizeCongestion);
+			
+			internalizeNoise = Boolean.parseBoolean(args[3]);
+			log.info("internalizeNoise: "+ internalizeNoise);
 			
 			minExtCost = Boolean.parseBoolean(args[4]);
 			log.info("minExtCost: " + minExtCost);
