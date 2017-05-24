@@ -20,8 +20,8 @@
 package playground.agarwalamit.opdyts.patna.networkModesOnly;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -133,10 +133,7 @@ public class PatnaBaseCaseControler {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         scenario.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
-        Set<String> modes2consider = new HashSet<>();
-        modes2consider.add("car");
-        modes2consider.add("bike");
-        modes2consider.add("motorbike");
+        List<String> modes2consider = Arrays.asList("car","bike","motorbike");
         DistanceDistribution referenceStudyDistri = new PatnaNetworkModesOneBinDistanceDistribution(OPDYTS_SCENARIO_PATNA);
         OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,referenceStudyDistri);
 
