@@ -119,7 +119,7 @@ public final class LinkQuadTree {
 
 		public boolean remove(final LinkWrapper w) {
 			ChildPosition pos = getChildPosition(w);
-			if (pos == ChildPosition.NO_CHILD) {
+			if (pos == ChildPosition.NO_CHILD || this.children == null) {
 				for (int i = 0, n = this.links.size(); i < n; i++) {
 					LinkWrapper w2 = this.links.get(i);
 					if (w2.link.equals(w.link)) {
@@ -127,6 +127,8 @@ public final class LinkQuadTree {
 						return true;
 					}
 				}
+			} else {
+				return this.children[pos.ordinal()].remove(w);
 			}
 			return false;
 		}

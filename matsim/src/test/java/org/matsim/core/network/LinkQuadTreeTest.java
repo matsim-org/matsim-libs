@@ -141,7 +141,25 @@ public class LinkQuadTreeTest {
 
 		qt.remove(l13);
 		Assert.assertEquals(l23, qt.getNearest(100, 800));
+	}
 
+	/**
+	 * Test for MATSIM-687: links not stored in top-node are not removed
+	 */
+	@Test
+	public void testRemove_inSubNode() {
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+
+		LinkQuadTree qt = new LinkQuadTree(0, 0, 1000, 1000);
+		Link lInTop1 = createLink(s, 400, 400, 600, 600);
+		Link lInChildSW1 = createLink(s, 0, 0, 400, 400);
+		qt.put(lInTop1);
+		qt.put(lInChildSW1);
+
+		Assert.assertEquals(lInChildSW1, qt.getNearest(100, 80));
+
+		qt.remove(lInChildSW1);
+		Assert.assertEquals(lInTop1, qt.getNearest(100, 80));
 	}
 
 	private Link createLink(Scenario s, double fromX, double fromY, double toX, double toY) {
