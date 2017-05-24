@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -113,6 +114,7 @@ public class ReconstructingUmlaufBuilder implements UmlaufBuilder {
 		int cnt = 0;
 		for (TransitLine line : transitLines) {
 			for (TransitRoute route : line.getRoutes().values()) {
+				Gbl.assertNotNull(route.getRoute()); // will fail much later if this is null.  kai, may'17
 				for (Departure departure : route.getDepartures().values()) {
 					UmlaufStueck umlaufStueck = new UmlaufStueck(line, route, departure);
 					umlaufStuecke.add(umlaufStueck);
