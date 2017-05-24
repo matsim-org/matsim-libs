@@ -39,6 +39,7 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
@@ -53,6 +54,8 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.replanning.modules.KeepLastExecuted;
+import org.matsim.core.replanning.strategies.KeepLastExecutedAsPlanStrategy;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -117,6 +120,10 @@ public class KNAccidentScenario {
 		for ( ActivityParams params : config.planCalcScore().getActivityParams() ) {
 			params.setTypicalDurationScoreComputation( TypicalDurationScoreComputation.relative );
 		}
+		{
+			ModeParams params = new ModeParams( "undefined" ) ;
+			config.planCalcScore().addModeParams(params);
+		}
 
 //		StrategySettings stratSets = new StrategySettings() ;
 //		//		stratSets.setStrategyName(DefaultSelector.KeepLastSelected.name());
@@ -153,7 +160,7 @@ public class KNAccidentScenario {
 		analyzedModes.add( TransportMode.car ) ;
 		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
 
-		controler.addOverridingModule( new OTFVisLiveModule() );
+//		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install() {
@@ -164,13 +171,13 @@ public class KNAccidentScenario {
 //				bind( ExecutedPlansServiceImpl.class ).asEagerSingleton(); 
 //				addControlerListenerBinding().to( ExecutedPlansServiceImpl.class ) ;
 //				
-//				addPlanStrategyBinding(KEEP_LAST_EXECUTED).toProvider(KeepLastExecuted.class) ;
+//				addPlanStrategyBinding(KEEP_LAST_EXECUTED).toProvider(KeepLastExecutedAsPlanStrategy.class) ;
 
-				this.bind( MyIterationCounter.class ).asEagerSingleton();
+//				this.bind( MyIterationCounter.class ).asEagerSingleton();
 
 				// ---
 				
-				this.addMobsimListenerBinding().to( WithinDayBangBangMobsimListener.class );
+//				this.addMobsimListenerBinding().to( WithinDayBangBangMobsimListener.class );
 //				this.addMobsimListenerBinding().to( WithinDayBestRouteMobsimListener.class );
 				
 				// ---

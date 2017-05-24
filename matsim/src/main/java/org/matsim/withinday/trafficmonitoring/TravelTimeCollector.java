@@ -174,6 +174,7 @@ public class TravelTimeCollector implements TravelTime,
 		init();
 		int resetCnt = 0;
 		if ( resetCnt >=1 ) {
+			// yyyy this can never be reached, or can it?  kai, may'17
 			if ( problem ) {
 				throw new RuntimeException("using TravelTimeCollector, but mobsim notifications not called between two resets.  "
 						+ "Did you really add this as a mobsim listener?") ;
