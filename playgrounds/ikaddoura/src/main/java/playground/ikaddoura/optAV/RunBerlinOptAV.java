@@ -60,6 +60,7 @@ public class RunBerlinOptAV {
 	private static String outputDirectory;
 	private static boolean internalizeNoise;
 	private static boolean internalizeCongestion;
+	private static boolean minExtCost;
 		
 	private static boolean otfvis;
 	
@@ -78,6 +79,9 @@ public class RunBerlinOptAV {
 			internalizeCongestion = Boolean.parseBoolean(args[3]);
 			log.info("internalizeCongestion: "+ internalizeCongestion);
 			
+			minExtCost = Boolean.parseBoolean(args[4]);
+			log.info("minExtCost: " + minExtCost);
+			
 			otfvis = false;
 			
 		} else {
@@ -85,6 +89,7 @@ public class RunBerlinOptAV {
 			outputDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_test_2taxiTrips/";
 			internalizeNoise = false;
 			internalizeCongestion = false;
+			minExtCost = false;
 			otfvis = false;
 		}
 		
@@ -141,9 +146,15 @@ public class RunBerlinOptAV {
         // travel disutility
         // #############################
 
-        final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
-				new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER,
-						controler.getConfig().planCalcScore()));
+        final MoneyTimeDistanceTravelDisutilityFactory dvrpTravelDisutilityFactory;
+        
+        if (minExtCost) {
+        	dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(null);        	
+        
+        } else {
+        	dvrpTravelDisutilityFactory = new MoneyTimeDistanceTravelDisutilityFactory(
+				new RandomizingTimeDistanceTravelDisutilityFactory(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER, controler.getConfig().planCalcScore()));
+        }
 		
         controler.addOverridingModule(new MoneyTravelDisutilityModule(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER, dvrpTravelDisutilityFactory));
 		
