@@ -17,14 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
+package playground.ikaddoura.utils.prepare;
 
-package playground.agarwalamit.pt;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.algorithms.NetworkSimplifier;
+import org.matsim.core.network.io.NetworkWriter;
+
+import playground.agarwalamit.utils.LoadMyScenarios;
 
 /**
- * Created by amit on 16.05.17.
- */
-public enum TransitRouterType {
+* @author ikaddoura
+*/
 
-    standard, raptor, connectionScan
+public class SimplifyFZberlinNetwork {
+
+	public static void main(String[] args) {
+		
+		Network network = LoadMyScenarios.loadScenarioFromNetwork("/Users/ihab/Documents/workspace/shared-svn/studies/fzwick/BerlinNetworkV0_GK4.xml").getNetwork();
+		
+		for (Link link : network.getLinks().values()) {
+			link.getAttributes().clear();
+		}
+		
+//		new NetworkWriter(network).write("/Users/ihab/Documents/workspace/shared-svn/studies/fzwick/BerlinNetworkV0_GK4_noLinkAttributes.xml.gz");
+
+		NetworkSimplifier nn = new NetworkSimplifier();
+		nn.run(network);
+		
+		new NetworkWriter(network).write("/Users/ihab/Documents/workspace/shared-svn/studies/fzwick/BerlinNetworkV0_GK4_simplified-0.xml.gz");
+	}
 
 }
+

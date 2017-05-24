@@ -54,6 +54,8 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 
 	private final Map<Id<Vehicle>,Id<Person>> vehicle2Person = new HashMap<>();
 
+	private boolean catchedAtLeastOneEmissionEvents = false;
+
 	@Inject
 	private EmissionResponsibilityCostModule emissionCostModule;
 	@Inject(optional=true) private PersonFilter pf  ;
@@ -74,6 +76,7 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
+		catchedAtLeastOneEmissionEvents= true;
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		double warmEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(event.getWarmEmissions(), event.getLinkId(), event.getTime());
 		double amount2Pay =  warmEmissionCosts;
@@ -88,6 +91,7 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
+		catchedAtLeastOneEmissionEvents= true;
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		double coldEmissionCosts = this.emissionCostModule.calculateColdEmissionCosts(event.getColdEmissions(), event.getLinkId(), event.getTime());
 		double amount2Pay =  coldEmissionCosts;
@@ -111,14 +115,16 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 	}
 
 	public Map<Id<Person>, Double> getPersonId2ColdEmissionCosts() {
-		final Map<Id<Person>, Double> personId2ColdEmissCosts =	this.vehicleId2ColdEmissCosts.entrySet().stream().collect(
+		if (vehicle2Person.isEmpty()) throw new RuntimeException("Vehicle to person map is empty, dont know how to find person for corresponding vehicle id.");
+		final Map<Id<Person>, Double> personId2ColdEmissCosts =	getVehicleId2ColdEmissionCosts().entrySet().stream().collect(
 				Collectors.toMap(entry -> this.vehicle2Person.get(entry.getKey()), entry -> entry.getValue())
 		);
 		return personId2ColdEmissCosts;
 	}
 
 	public Map<Id<Person>, Double> getPersonId2WarmEmissionCosts() {
-		final Map<Id<Person>, Double> personId2WarmEmissCosts =	this.vehicleId2WarmEmissCosts.entrySet().stream().collect(
+		if (vehicle2Person.isEmpty()) throw new RuntimeException("Vehicle to person map is empty, dont know how to find person for corresponding vehicle id.");
+		final Map<Id<Person>, Double> personId2WarmEmissCosts =	getVehicleId2WarmEmissionCosts().entrySet().stream().collect(
 				Collectors.toMap(entry -> this.vehicle2Person.get(entry.getKey()), entry -> entry.getValue())
 		);
 		return personId2WarmEmissCosts;
@@ -133,8 +139,8 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 
 	@Override
 	public Map<Id<Vehicle>, Double> getVehicleId2TotalEmissionCosts(){
-		return this.vehicleId2ColdEmissCosts.entrySet().stream().collect(
-				Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue() + this.vehicleId2WarmEmissCosts.get(entry.getKey()))
+		return getVehicleId2ColdEmissionCosts().entrySet().stream().collect(
+				Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue() + getVehicleId2WarmEmissionCosts().get(entry.getKey()))
 		);
 	}
 
@@ -147,7 +153,7 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 			}
 		} else {
 			LOG.warn("The person filter is null, still, trying to get emission costs per user group. Returning emission costs for all persons.");
-			usrGrp2Cost.put("AllPersons", MapUtils.doubleValueSum(this.vehicleId2WarmEmissCosts));
+			usrGrp2Cost.put("AllPersons", MapUtils.doubleValueSum(getVehicleId2WarmEmissionCosts()));
 		}
 		return usrGrp2Cost;
 	}
@@ -161,7 +167,7 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 			}
 		} else {
 			LOG.warn("The person filter is null, still, trying to get emission costs per user group. Returning emission costs for all persons.");
-			usrGrp2Cost.put("AllPersons", MapUtils.doubleValueSum(this.vehicleId2ColdEmissCosts));
+			usrGrp2Cost.put("AllPersons", MapUtils.doubleValueSum(getVehicleId2ColdEmissionCosts()));
 		}
 		return usrGrp2Cost;
 	}
@@ -174,16 +180,27 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 		);
 	}
 
+	// a check which should go away in future (End of 2017 or so) amit may'17
+	private void checkForEmissionEvents(final boolean catchedAtLeastOneEmissionEvents){
+		if (! catchedAtLeastOneEmissionEvents) {
+			throw new RuntimeException("Read events file does not have any emission events, please check. " +
+					"This may be due to the recent merging of emission events to the normal events channel.");
+		}
+
+	}
+
 	@Override
 	public boolean isFiltering() {
 		return ! (pf==null);
 	}
 
 	public Map<Id<Vehicle>, Double> getVehicleId2ColdEmissionCosts() {
+		checkForEmissionEvents(catchedAtLeastOneEmissionEvents);
 		return this.vehicleId2ColdEmissCosts;
 	}
 
 	public Map<Id<Vehicle>, Double> getVehicleId2WarmEmissionCosts() {
+		checkForEmissionEvents(catchedAtLeastOneEmissionEvents);
 		return this.vehicleId2WarmEmissCosts;
 	}
 

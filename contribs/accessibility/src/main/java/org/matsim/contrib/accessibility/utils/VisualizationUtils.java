@@ -18,19 +18,13 @@
  * *********************************************************************** */
 package org.matsim.contrib.accessibility.utils;
 
+import com.vividsolutions.jts.geom.Envelope;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.Labels;
-import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
-import org.matsim.contrib.analysis.vsp.qgis.QGisMapnikFileCreator;
-import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
-import org.matsim.contrib.analysis.vsp.qgis.RasterLayer;
-import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
-import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityDensitiesRenderer;
-import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityRenderer;
+import org.matsim.contrib.analysis.vsp.qgis.*;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityXmlRenderer;
+import org.matsim.contrib.analysis.vsp.qgis.utils.ColorRangeUtils;
 import org.matsim.core.utils.misc.ExeRunner;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * @author nagel, dziemke
@@ -39,10 +33,16 @@ public class VisualizationUtils {
 	public static final Logger log = Logger.getLogger(VisualizationUtils.class);
 	private VisualizationUtils(){} // do not instantiate
 
+    public static void createQGisOutput(String actType, String mode, Envelope envelope,
+                                        String workingDirectory, String crs, boolean includeDensityLayer, Double lowerBound,
+                                        Double upperBound, Integer range, int symbolSize, int populationThreshold) {
+	    createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer, lowerBound, upperBound,
+                range, ColorRangeUtils.ColorRange.RED_TO_GREEN, symbolSize, populationThreshold);
+    }
 	
 	public static void createQGisOutput(String actType, String mode, Envelope envelope,
-			String workingDirectory, String crs, boolean includeDensityLayer, Double lowerBound,
-			Double upperBound, Integer range, int symbolSize, int populationThreshold) {
+                                        String workingDirectory, String crs, boolean includeDensityLayer, Double lowerBound,
+                                        Double upperBound, Integer range, ColorRangeUtils.ColorRange colorRange, int symbolSize, int populationThreshold) {
 		
 		// create Mapnik file that is needed to have OSM layer in QGis project
 		QGisMapnikFileCreator.writeMapnikFile(workingDirectory + "osm_mapnik.xml");
@@ -66,12 +66,12 @@ public class VisualizationUtils {
 		writer.changeWorkingDirectory(actSpecificWorkingDirectory);
 
 		// density layer
-		if (includeDensityLayer == true) {
+		if (includeDensityLayer) {
 			VectorLayer densityLayer = new VectorLayer(
 					"density", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
 			densityLayer.setXField(Labels.X_COORDINATE);
 			densityLayer.setYField(Labels.Y_COORDINATE);
-			AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer, populationThreshold, symbolSize);
+			GraduatedSymbolRenderer dRenderer = RendererFactory.createDensitiesRenderer(densityLayer, populationThreshold, symbolSize);
 			dRenderer.setRenderingAttribute(Labels.POPULATION_DENSITIY);
 			writer.addLayer(densityLayer);
 		}
@@ -84,8 +84,11 @@ public class VisualizationUtils {
 		// 2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
 		accessibilityLayer.setXField(Labels.X_COORDINATE);
 		accessibilityLayer.setYField(Labels.Y_COORDINATE);
-		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, lowerBound, upperBound,
-				range, symbolSize);
+//		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, lowerBound, upperBound,
+//				range, symbolSize);
+        RuleBasedRenderer renderer = new RuleBasedRenderer(accessibilityLayer, lowerBound, upperBound, range,
+                symbolSize, colorRange,mode.toString() + "_accessibility",
+                Labels.POPULATION_DENSITIY, populationThreshold);
 			renderer.setRenderingAttribute(mode.toString() + "_accessibility");
 		writer.addLayer(accessibilityLayer);
 
@@ -138,4 +141,5 @@ public class VisualizationUtils {
 			log.warn("generating png files not implemented for os.arch=" + System.getProperty("os.arch") );
 		}
 	}
+
 }

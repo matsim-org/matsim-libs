@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 /**
  * This class does the actual "writing" of the qgis project file.
  * 
- * @author dhosse
+ * @author dhosse, gthunig
  *
  */
 
@@ -369,8 +369,14 @@ public class QGisFileWriter {
 			out.write("\t\t\t\t<ranges>\n");
 			
 			for(int i = 0; i < renderer.getRanges().length; i++){
-				
-				out.write("\t\t\t\t\t<range symbol=\"" + i + "\" lower=\"" + renderer.getRanges()[i].getLowerBound() + "\" upper=\"" + renderer.getRanges()[i].getUpperBound() + "\" label=\"" + renderer.getRanges()[i].getLabel() + "\"/>\n");
+
+			    Range currentRange = renderer.getRanges()[i];
+				out.write("\t\t\t\t\t<range symbol=\"" + i);
+				if (currentRange.isLowerBoundSet())
+                    out.write("\" lower=\"" + currentRange.getLowerBound());
+                if (currentRange.isUpperBoundSet())
+                    out.write("\" upper=\"" + currentRange.getUpperBound());
+                out.write("\" label=\"" + renderer.getRanges()[i].getLabel() + "\"/>\n");
 				
 			}
 			
@@ -378,7 +384,20 @@ public class QGisFileWriter {
 			
 		} else if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.RuleRenderer)){
 			
-			//TODO no classes for rule renderer created so far...
+            RuleBasedRenderer renderer = (RuleBasedRenderer)qRenderer;
+
+            out.write("\t\t\t<renderer-v2 attr=\"" + renderer.getRenderingAttribute() + "\" symbollevels=\"0\" type=\"" + renderer.getRenderingType().toString() + "\">\n");
+
+            out.write("\t\t\t\t<rules>\n");
+
+            for(Rule rule : renderer.getRules()) {
+
+                out.write("\t\t\t\t\t<rule filter=\"" + rule.getFilter()
+                        + "\" symbol=\"" + rule.getSymbol() + "\" label=\"" + rule.getLabel() + "\"/>\n");
+
+            }
+
+            out.write("\t\t\t\t</rules>\n");
 			
 		} else if(qRenderer.getRenderingType().equals(QGisConstants.renderingType.singleSymbol)){
 			

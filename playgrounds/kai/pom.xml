@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.matsim</groupId>
 		<artifactId>playgrounds</artifactId>
-		<version>0.9.0-SNAPSHOT</version>
+		<version>0.10.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>playground</groupId>
@@ -60,12 +60,12 @@
         <dependency>
             <groupId>org.matsim</groupId>
             <artifactId>matsim-tutorial</artifactId>
-            <version>0.9.0-SNAPSHOT</version>
+            <version>0.10.0-SNAPSHOT</version>
         </dependency>
         <dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>otfvis</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -85,22 +85,22 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>analysis</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>noise</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>matsim4urbansim</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>kairuns</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>com.github.gunnarfloetteroed</groupId>
@@ -111,32 +111,32 @@
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>signals</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>gunnar</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>emissions</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>minibus</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>playground</groupId>
 			<artifactId>ivtExt</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
+			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

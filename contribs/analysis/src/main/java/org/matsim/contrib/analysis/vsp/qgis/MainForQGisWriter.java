@@ -1,9 +1,6 @@
 package org.matsim.contrib.analysis.vsp.qgis;
 
 import com.vividsolutions.jts.geom.Envelope;
-
-import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityDensitiesRenderer;
-import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityRenderer;
 import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.AccessibilityXmlRenderer;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
@@ -84,7 +81,7 @@ public class MainForQGisWriter {
 				QGisConstants.geometryType.Point);
 		densityLayer.setXField(1);
 		densityLayer.setYField(2);
-		AccessibilityDensitiesRenderer dRenderer = new AccessibilityDensitiesRenderer(densityLayer, populationThreshold, symbolSize);
+		GraduatedSymbolRenderer dRenderer = RendererFactory.createDensitiesRenderer(densityLayer, populationThreshold, symbolSize);
 		dRenderer.setRenderingAttribute(8);
 		writer.addLayer(densityLayer);
 		
@@ -96,7 +93,7 @@ public class MainForQGisWriter {
 		accessibilityLayer.setXField(1);
 		accessibilityLayer.setYField(2);
 //		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer);
-		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, upperBound, lowerBound,
+		GraduatedSymbolRenderer renderer = new GraduatedSymbolRenderer(accessibilityLayer, upperBound, lowerBound,
 				range, symbolSize);
 		renderer.setRenderingAttribute(3); // choose column/header to visualize
 		writer.addLayer(accessibilityLayer);

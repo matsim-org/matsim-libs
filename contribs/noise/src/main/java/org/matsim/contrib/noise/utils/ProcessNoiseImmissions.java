@@ -22,26 +22,22 @@
  */
 package org.matsim.contrib.noise.utils;
 
+import com.vividsolutions.jts.geom.Envelope;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.analysis.vsp.qgis.*;
+import org.matsim.contrib.noise.data.ReceiverPoint;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Time;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.analysis.vsp.qgis.QGisConstants;
-import org.matsim.contrib.analysis.vsp.qgis.QGisWriter;
-import org.matsim.contrib.analysis.vsp.qgis.VectorLayer;
-import org.matsim.contrib.analysis.vsp.qgis.layerTemplates.NoiseRenderer;
-import org.matsim.contrib.noise.data.ReceiverPoint;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Time;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * @author ikaddoura
@@ -253,8 +249,8 @@ public class ProcessNoiseImmissions {
 		noiseLayer.setDelimiter(";");
 		noiseLayer.setXField("x");
 		noiseLayer.setYField("y");
-		
-		NoiseRenderer renderer = new NoiseRenderer(noiseLayer, this.receiverPointGap);
+
+        GraduatedSymbolRenderer renderer = RendererFactory.createNoiseRenderer(noiseLayer, this.receiverPointGap);
 		renderer.setRenderingAttribute("Lden");
 		
 		writer.addLayer(noiseLayer);

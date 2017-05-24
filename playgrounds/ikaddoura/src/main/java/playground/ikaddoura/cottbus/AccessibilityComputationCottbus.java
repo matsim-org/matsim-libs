@@ -54,7 +54,7 @@ public class AccessibilityComputationCottbus {
 	
 	public static void main(String[] args) {
 		// Input and output
-		String runOutputFolder = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct/output/r_output_run0_bln_bc/";
+		String runOutputFolder = "/Users/ihab/Documents/workspace/lehre-svn/lehrveranstaltungen/L011_abv/2017_ss/UE/Daten/UE04/Rohdaten/baseCase/";
 		String networkFile = runOutputFolder + "output_network.xml.gz";
 		String facilitiesFile = "/Users/ihab/Documents/workspace/shared-svn/studies/ihab/berlin/berlin-2017-05-10_facilities/berlin-2017-05-10_facilities_DHDN_GK4.xml";
 		String configFile = runOutputFolder + "output_config.xml.gz";
@@ -113,7 +113,7 @@ public class AccessibilityComputationCottbus {
 		List<String> activityTypes = new ArrayList<String>();
 		activityTypes.add("work"); 
 		activityTypes.add("education"); 
-		activityTypes.add("grave_yard");
+//		activityTypes.add("grave_yard");
 		activityTypes.add("police");
 		activityTypes.add("medical");
 		activityTypes.add("fire_station");

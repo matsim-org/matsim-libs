@@ -104,10 +104,10 @@ public class FromSrvTripFilterImpl implements TripFilter {
                 }
             }
 
-            if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeeline_m() / 1000.) >= maxDistance_km) {
+            if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeeline_m() / 1000.) > maxDistance_km) {
                 continue;
             }
-            if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeeline_m() / 1000.) <= minDistance_km) {
+            if (onlyAnalyzeTripsInDistanceRange && (trip.getDistanceBeeline_m() / 1000.) < minDistance_km) {
                 continue;
             }
 

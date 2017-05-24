@@ -57,20 +57,20 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
     private final SortedMap<String, SortedMap<Double, Integer>> initialMode2DistanceClass2LegCount = new TreeMap<>();
 
     private BufferedWriter writer;
-    private final Set<String> mode2consider;
+    private final List<String> mode2consider;
 
     /*
      * after every 10/20/50 iterations, distance distribution will be written out.
      */
     private final int distriEveryItr = 50;
 
-    public OpdytsModalStatsControlerListener(final Set<String> modes2consider, final DistanceDistribution referenceStudyDistri) {
+    public OpdytsModalStatsControlerListener(final List<String> modes2consider, final DistanceDistribution referenceStudyDistri) {
         this.mode2consider = modes2consider;
         this.referenceStudyDistri = referenceStudyDistri;
     }
 
     public OpdytsModalStatsControlerListener() {
-        this(new HashSet<>(Arrays.asList(TransportMode.car, TransportMode.pt)), null);
+        this(Arrays.asList(TransportMode.car, TransportMode.pt), null);
     }
 
     @Override
@@ -78,15 +78,14 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
         String outFile = event.getServices().getConfig().controler().getOutputDirectory() + "/opdyts_modalStats.txt";
         writer = IOUtils.getBufferedWriter(outFile);
         try {
-            writer.write("iterationNr" + "\t" +
-                    "modes" + "\t" +
-                    "numberOfLegs" + "\t" +
-                    "modes" + "\t" +
-                    "ascs" + "\t" +
-                    "util_trav" + "\t" +
-                    "util_dist" + "\t" +
-                    "money_dist_rate" + "\t" +
-                    "objectiveFunctionValue");
+            StringBuilder stringBuilder = new StringBuilder("iterationNr" + "\t");
+            mode2consider.stream().forEach(mode -> stringBuilder.append("legs_"+mode+ "\t"));
+            mode2consider.stream().forEach(mode -> stringBuilder.append("asc_"+mode+ "\t"));
+            mode2consider.stream().forEach(mode -> stringBuilder.append("util_trav_"+mode+ "\t"));
+            mode2consider.stream().forEach(mode -> stringBuilder.append("util_dist_"+mode+ "\t"));
+            mode2consider.stream().forEach(mode -> stringBuilder.append("money_dist_rate_"+mode+ "\t"));
+            stringBuilder.append("valueOfObjectiveFunction");
+            writer.write(stringBuilder.toString());
             writer.newLine();
         } catch (IOException e) {
             throw new RuntimeException("File not found.");
@@ -140,36 +139,18 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
         }
 
         try {
-            writer.write(iteration + "\t" +
-                    mode2Legs.keySet().toString() + "\t" +
-                    mode2Legs.values().toString() + "\t");
-
             // write modalParams
-            Map<String, PlanCalcScoreConfigGroup.ModeParams> mode2Params = config
-                                                                                .planCalcScore()
-                                                                                .getModes();
+            Map<String, PlanCalcScoreConfigGroup.ModeParams> mode2Params = config.planCalcScore().getModes();
 
-            SortedMap<String, Double> ascs = new TreeMap<>();
-            SortedMap<String, Double> travs = new TreeMap<>();
-            SortedMap<String, Double> dists = new TreeMap<>();
-            SortedMap<String, Double> moneyRates = new TreeMap<>();
+            StringBuilder stringBuilder = new StringBuilder(iteration + "\t");
+            mode2consider.stream().forEach(mode-> stringBuilder.append(mode2Legs.get(mode)+"\t"));
+            mode2consider.stream().forEach(mode -> stringBuilder.append(mode2Params.get(mode).getConstant()+"\t"));
+            mode2consider.stream().forEach(mode -> stringBuilder.append(mode2Params.get(mode).getMarginalUtilityOfTraveling()+"\t"));
+            mode2consider.stream().forEach(mode -> stringBuilder.append(mode2Params.get(mode).getMarginalUtilityOfDistance()+"\t"));
+            mode2consider.stream().forEach(mode -> stringBuilder.append(mode2Params.get(mode).getMonetaryDistanceRate()+"\t"));
+            stringBuilder.append(objectiveFunctionEvaluator.getObjectiveFunctionValue(simCounts,realCounts));
 
-            for (String mode : mode2Params.keySet()) {
-                if (mode2consider.contains(mode)) {
-                    ascs.put(mode, mode2Params.get(mode).getConstant());
-                    travs.put(mode, mode2Params.get(mode).getMarginalUtilityOfTraveling());
-                    dists.put(mode, mode2Params.get(mode).getMarginalUtilityOfDistance());
-                    moneyRates.put(mode, mode2Params.get(mode).getMonetaryDistanceRate());
-                }
-            }
-
-            writer.write(ascs.keySet().toString() + "\t" +
-                    ascs.values().toString() + "\t" +
-                    travs.values().toString() + "\t" +
-                    dists.values().toString() + "\t" +
-                    moneyRates.values().toString());
-
-            writer.write("\t" + objectiveFunctionEvaluator.getObjectiveFunctionValue(realCounts, simCounts));
+            writer.write(stringBuilder.toString());
             writer.newLine();
             writer.flush();
         } catch (IOException e) {

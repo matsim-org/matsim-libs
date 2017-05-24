@@ -20,9 +20,17 @@
 package playground.agarwalamit.opdyts.equil;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
-
+import java.util.Arrays;
+import java.util.List;
+import floetteroed.opdyts.DecisionVariableRandomizer;
+import floetteroed.opdyts.ObjectiveFunction;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
+import floetteroed.opdyts.searchalgorithms.RandomSearch;
+import floetteroed.opdyts.searchalgorithms.SelfTuner;
+import opdytsintegration.MATSimSimulator;
+import opdytsintegration.MATSimStateFactoryImpl;
+import opdytsintegration.utils.TimeDiscretization;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -42,23 +50,7 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.io.IOUtils;
-
-import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.ObjectiveFunction;
-import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
-import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
-import floetteroed.opdyts.searchalgorithms.RandomSearch;
-import floetteroed.opdyts.searchalgorithms.SelfTuner;
-import opdytsintegration.MATSimSimulator;
-import opdytsintegration.MATSimStateFactoryImpl;
-import opdytsintegration.utils.TimeDiscretization;
-import playground.agarwalamit.opdyts.DistanceDistribution;
-import playground.agarwalamit.opdyts.ModeChoiceDecisionVariable;
-import playground.agarwalamit.opdyts.ModeChoiceObjectiveFunction;
-import playground.agarwalamit.opdyts.ModeChoiceRandomizer;
-import playground.agarwalamit.opdyts.OpdytsModalStatsControlerListener;
-import playground.agarwalamit.opdyts.OpdytsScenario;
-import playground.agarwalamit.opdyts.RandomizedUtilityParametersChoser;
+import playground.agarwalamit.opdyts.*;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
 
@@ -86,9 +78,7 @@ public class MatsimOpdytsEquilIntegration {
 			OUT_DIR = args[3]+"/equil_car,pt_holes_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
 		}
 
-		Set<String> modes2consider = new HashSet<>();
-		modes2consider.add("car");
-		modes2consider.add("pt");
+		List<String> modes2consider = Arrays.asList("car","pt");
 
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
 		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");

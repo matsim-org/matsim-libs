@@ -19,8 +19,8 @@
 
 package playground.agarwalamit.opdyts.patna;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.config.Config;
@@ -56,12 +56,7 @@ class PatnaPlansRelaxor {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		Set<String> modes2consider = new HashSet<>();
-		modes2consider.add("car");
-		modes2consider.add("bike");
-		modes2consider.add("motorbike");
-		modes2consider.add("pt");
-		modes2consider.add("walk");
+		List<String> modes2consider = Arrays.asList("car","bike","motorbike","pt","walk");
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {

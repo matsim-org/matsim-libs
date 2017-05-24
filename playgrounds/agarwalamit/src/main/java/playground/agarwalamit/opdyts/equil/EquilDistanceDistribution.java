@@ -32,7 +32,7 @@ import playground.agarwalamit.opdyts.patna.PatnaCMPDistanceDistribution;
  */
 
 @SuppressWarnings("ALL")
-public class EquilDistanceDistribution implements DistanceDistribution {
+public final class EquilDistanceDistribution implements DistanceDistribution {
 
     private final Map<String, double []> mode2legs = new TreeMap<>();
     private final double [] distClasses = new double[] {0., 100., 200., 500., 1000., 2000., 5000., 10000., 20000., 50000., 100000.};

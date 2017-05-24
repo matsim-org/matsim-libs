@@ -27,7 +27,7 @@ public class SelectedPlansAnalyzer {
 	public static final Logger log = Logger.getLogger(SelectedPlansAnalyzer.class);
 
 	// Parameters
-	private static String runId = "be_119b"; // <----------
+	private static String runId = "be_117ja"; // <----------
 	private static int numberOfIterations = 300; // <----------
 	private static int plansFileInterval = 300; // <----------
 	private static boolean useInterimPlans = false;
@@ -101,7 +101,7 @@ public class SelectedPlansAnalyzer {
 		int counterOtherPlans = 0;
 		int counterCarPlans = 0;
 		int counterPtPlans = 0;
-		int counterSlowPtPlans = 0;
+		int counterPtSlowPlans = 0;
 		int counterWalkPlans = 0;
 		String mode;
 		
@@ -130,8 +130,8 @@ public class SelectedPlansAnalyzer {
 							case "pt":
 								counterPtPlans++;
 								break;
-							case "slowPt":
-								counterSlowPtPlans++;
+							case "ptSlow":
+								counterPtSlowPlans++;
 								break;
 							case "walk":
 								counterWalkPlans++;
@@ -157,7 +157,7 @@ public class SelectedPlansAnalyzer {
 		otherPlansMap.put(iteration, counterOtherPlans);
 		carPlansMap.put(iteration, counterCarPlans);
 		ptPlansMap.put(iteration, counterPtPlans);
-		slowPtPlansMap.put(iteration, counterSlowPtPlans);
+		slowPtPlansMap.put(iteration, counterPtSlowPlans);
 		walkPlansMap.put(iteration, counterWalkPlans);
 	}
 

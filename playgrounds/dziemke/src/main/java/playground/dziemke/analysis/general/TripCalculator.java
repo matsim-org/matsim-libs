@@ -120,8 +120,8 @@ class TripCalculator {
         return sumOfAllDistancesRouted_km / sumOfAllWeights;
     }
 
-    static int countWeightOfTripsWithCalculableSpeedBeeline(List<Trip> trips) {
-        int aggregatedWeight = 0;
+    static double countWeightOfTripsWithCalculableSpeedBeeline(List<Trip> trips) {
+        double aggregatedWeight = 0;
         for (Trip trip : trips) {
             if ((trip.getDuration_s() > 0.) && (trip.getDistanceBeeline_m()) >= 0.) {
                 aggregatedWeight += trip.getWeight();
@@ -156,8 +156,8 @@ class TripCalculator {
         return sumOfAllAverageSpeedsBeeline_km_h / sumOfAllWeights;
     }
 
-    static int countWeightOfTripsWithCalculableSpeedRouted(List<Trip> trips) {
-        int aggregatedWeight = 0;
+    static double countWeightOfTripsWithCalculableSpeedRouted(List<Trip> trips) {
+        double aggregatedWeight = 0;
         for (Trip trip : trips) {
             if ((trip.getDuration_s() > 0.) && (trip.getDistanceRouted_m()) >= 0.) {
                 aggregatedWeight += trip.getWeight();
