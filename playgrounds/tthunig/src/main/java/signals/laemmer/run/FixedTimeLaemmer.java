@@ -50,8 +50,6 @@ import java.util.*;
  */
 public class FixedTimeLaemmer {
     private static final Logger log = Logger.getLogger(LaemmerMain.class);
-    private static final double T_CYC = 120;
-    private static final double TAU_SUM = 20;
     private static final int LANE_CAPACITY = 1800;
 
 
@@ -61,12 +59,12 @@ public class FixedTimeLaemmer {
     public static void main(String[] args) {
         log.info("Running Laemmer main method...");
 
-        for (int i = 0; i <= 1200; i += 60) {
-            run(180, i, false, true, true);
-        }
+//        for (int i = 0; i <= 1200; i += 60) {
+            run(180, 600, true, false, true, true);
+//        }
     }
 
-    private static void run(double flowNS, double flowWE, boolean vis, boolean stochastic, boolean lanes) {
+    private static void run(double flowNS, double flowWE, boolean vis, boolean stochastic, boolean lanes, boolean grouped) {
 
         String outputPath;
         if (stochastic) {
@@ -86,7 +84,7 @@ public class FixedTimeLaemmer {
 
         CombinedSignalsModule module = new CombinedSignalsModule();
 
-        final Scenario scenario = defineScenario(config, flowNS, flowWE, stochastic, lanes);
+        final Scenario scenario = defineScenario(config, flowNS, flowWE, stochastic, lanes, grouped);
         Controler controler = new Controler(scenario);
 
 
@@ -114,7 +112,7 @@ public class FixedTimeLaemmer {
         config.travelTimeCalculator().setMaxTime(60 * 120);
         config.qsim().setStartTime(0);
         config.qsim().setEndTime(60 * 120);
-        config.qsim().setUsingFastCapacityUpdate(true);
+        config.qsim().setUsingFastCapacityUpdate(false);
 
         if(lanes) {
             config.qsim().setUseLanes(true);
@@ -140,7 +138,7 @@ public class FixedTimeLaemmer {
 
 
 
-    private static Scenario defineScenario(Config config, double flowNS, double flowWE, boolean stochastic, boolean lanes) {
+    private static Scenario defineScenario(Config config, double flowNS, double flowWE, boolean stochastic, boolean lanes, boolean grouped) {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         // add missing scenario elements
         SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
@@ -150,7 +148,7 @@ public class FixedTimeLaemmer {
             createLanes(scenario);
         }
         createPopulation(scenario, flowNS, flowWE, stochastic);
-        createSignals(scenario, flowNS, flowWE, lanes);
+        createSignals(scenario, flowNS, flowWE, lanes, grouped);
         return scenario;
     }
 
@@ -376,75 +374,8 @@ public class FixedTimeLaemmer {
         }
     }
 
-    private static void createSignals(Scenario scenario, double lambda1, double lambda2, double lambda3, double lambda4) {
-        SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
-        SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
-        SignalSystemsDataFactory sysFac = new SignalSystemsDataFactoryImpl();
-        SignalGroupsData signalGroups = signalsData.getSignalGroupsData();
-        SignalControlData signalControl = signalsData.getSignalControlData();
-        SignalControlDataFactory conFac = new SignalControlDataFactoryImpl();
 
-        // create signal system
-        Id<SignalSystem> signalSystemId = Id.create("SignalSystem1", SignalSystem.class);
-        SignalSystemData signalSystem = sysFac.createSignalSystemData(signalSystemId);
-        signalSystems.addSignalSystemData(signalSystem);
-
-        // create a signal for every inLink
-        for (Id<Link> inLinkId : scenario.getNetwork().getNodes().get(Id.createNodeId(3)).getInLinks().keySet()) {
-            SignalData signal = sysFac.createSignalData(Id.create("Signal" + inLinkId, Signal.class));
-            signalSystem.addSignalData(signal);
-            signal.setLinkId(inLinkId);
-        }
-
-        // group signals with non conflicting streams
-        Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
-        SignalGroupData signalGroup1 = signalGroups.getFactory()
-                .createSignalGroupData(signalSystemId, signalGroupId1);
-        signalGroup1.addSignalId(Id.create("Signal7_3", Signal.class));
-        signalGroups.addSignalGroupData(signalGroup1);
-
-        Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
-        SignalGroupData signalGroup2 = signalGroups.getFactory()
-                .createSignalGroupData(signalSystemId, signalGroupId2);
-        signalGroup2.addSignalId(Id.create("Signal4_3", Signal.class));
-        signalGroups.addSignalGroupData(signalGroup2);
-
-        Id<SignalGroup> signalGroupId3 = Id.create("SignalGroup3", SignalGroup.class);
-        SignalGroupData signalGroup3 = signalGroups.getFactory()
-                .createSignalGroupData(signalSystemId, signalGroupId3);
-        signalGroup3.addSignalId(Id.create("Signal8_3", Signal.class));
-        signalGroups.addSignalGroupData(signalGroup3);
-
-        Id<SignalGroup> signalGroupId4 = Id.create("SignalGroup4", SignalGroup.class);
-        SignalGroupData signalGroup4 = signalGroups.getFactory()
-                .createSignalGroupData(signalSystemId, signalGroupId4);
-        signalGroup4.addSignalId(Id.create("Signal2_3", Signal.class));
-        signalGroups.addSignalGroupData(signalGroup4);
-
-        // create the signal control
-        SignalSystemControllerData signalSystemControl = conFac.createSignalSystemControllerData(signalSystemId);
-        signalSystemControl.setControllerIdentifier(AdvancedPlanBasedSignalSystemController.IDENTIFIER);
-        signalControl.addSignalSystemControllerData(signalSystemControl);
-
-        // create a plan for the signal system (with defined cycle time and offset 0)
-        SignalPlanData signalPlan = SignalUtils.createSignalPlan(conFac, 120, 0, Id.create("SignalPlan1", SignalPlan.class));
-        signalSystemControl.addSignalPlanData(signalPlan);
-
-        double lambdaSum = lambda1 + lambda2 + lambda3 + lambda4;
-        int g1 = (int) Math.rint((lambda1 / lambdaSum) * ((T_CYC) - TAU_SUM));
-        int g2 = (int) Math.rint((lambda2 / lambdaSum) * ((T_CYC) - TAU_SUM));
-        int g3 = (int) Math.rint((lambda3 / lambdaSum) * ((T_CYC) - TAU_SUM));
-        int g4 = (int) Math.rint((lambda4 / lambdaSum) * ((T_CYC) - TAU_SUM));
-
-        // specify signal group settings for all signal groups
-        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, g1));
-        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId2, g1 + 5, g1 + 5 + g2));
-        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId3, g1 + g2 + 10, g1 + g2 + 10 + g3));
-        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId4, g1 + g2 + g3 + 15, g1 + g2 + g3 + 15 + g4));
-        signalPlan.setOffset(0);
-    }
-
-    private static void createSignals(Scenario scenario, double flowNS, double flowWE, boolean useLanes) {
+    private static void createSignals(Scenario scenario, double flowNS, double flowWE, boolean useLanes, boolean grouped) {
 
         SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
         SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
@@ -485,29 +416,43 @@ public class FixedTimeLaemmer {
                 .createSignalGroupData(signalSystemId, signalGroupId1);
         Id<Signal> id2_3 = Id.create("Signal2_3", Signal.class);
         signalGroup1.addSignalId(id2_3);
-        signalGroups.addSignalGroupData(signalGroup1);
+
 
         Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
         SignalGroupData signalGroup2 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId2);
         Id<Signal> id7_3 = Id.create("Signal7_3", Signal.class);
         signalGroup2.addSignalId(id7_3);
-        signalGroups.addSignalGroupData(signalGroup2);
 
         Id<SignalGroup> signalGroupId3 = Id.create("SignalGroup3", SignalGroup.class);
         SignalGroupData signalGroup3 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId3);
-        Id<Signal> id4_3 = Id.create("Signal4_3", Signal.class);
-        signalGroup3.addSignalId(id4_3);
-        signalGroups.addSignalGroupData(signalGroup3);
+        if(grouped) {
+            Id<Signal> id4_3 = Id.create("Signal4_3", Signal.class);
+            signalGroup1.addSignalId(id4_3);
+        } else{
 
+            Id<Signal> id4_3 = Id.create("Signal4_3", Signal.class);
+            signalGroup3.addSignalId(id4_3);
+        }
         Id<SignalGroup> signalGroupId4 = Id.create("SignalGroup4", SignalGroup.class);
-        SignalGroupData signalGroup4 = signalGroups.getFactory()
-                .createSignalGroupData(signalSystemId, signalGroupId4);
-        Id<Signal> id8_3 = Id.create("Signal8_3", Signal.class);
-        signalGroup4.addSignalId(id8_3);
+        SignalGroupData signalGroup4 = signalGroups.getFactory().createSignalGroupData(signalSystemId, signalGroupId4);
 
-        signalGroups.addSignalGroupData(signalGroup4);
+        if(grouped) {
+            Id<Signal> id8_3 = Id.create("Signal8_3", Signal.class);
+            signalGroup2.addSignalId(id8_3);
+        }
+        else {
+            Id<Signal> id8_3 = Id.create("Signal8_3", Signal.class);
+            signalGroup4.addSignalId(id8_3);
+        }
+
+        signalGroups.addSignalGroupData(signalGroup1);
+        signalGroups.addSignalGroupData(signalGroup2);
+        if(!grouped) {
+            signalGroups.addSignalGroupData(signalGroup3);
+            signalGroups.addSignalGroupData(signalGroup4);
+        }
 
         // create the signal control
         SignalSystemControllerData signalSystemControl = conFac.createSignalSystemControllerData(signalSystemId);
@@ -515,25 +460,46 @@ public class FixedTimeLaemmer {
         signalControl.addSignalSystemControllerData(signalSystemControl);
 
         // create a plan for the signal system (with defined cycle time and offset 0)
-        SignalPlanData signalPlan = SignalUtils.createSignalPlan(conFac, 120, 0, Id.create("SignalPlan1", SignalPlan.class));
+        SignalPlanData signalPlan;
+        if(grouped) {
+            signalPlan =  SignalUtils.createSignalPlan(conFac, 60, 0, Id.create("SignalPlan1", SignalPlan.class));
+        }  else {
+            signalPlan = SignalUtils.createSignalPlan(conFac, 120, 0, Id.create("SignalPlan1", SignalPlan.class));
+        }
         signalSystemControl.addSignalPlanData(signalPlan);
 
         double lambda1 = flowWE / 3600;
         double lambda2 = flowNS / 1800;
-        double lambda3 = flowWE / 3600;
-        double lambda4 = flowNS / 1800;
 
-        double lambdaSum = lambda1 + lambda2 + lambda3 + lambda4;
-        int g1 = (int) Math.rint((lambda1 / lambdaSum) * ((T_CYC) - TAU_SUM));
-        int g2 = (int) Math.rint((lambda2 / lambdaSum) * ((T_CYC) - TAU_SUM));
-        int g3 = (int) Math.rint((lambda3 / lambdaSum) * ((T_CYC) - TAU_SUM));
-        int g4 = (int) Math.rint((lambda4 / lambdaSum) * ((T_CYC) - TAU_SUM));
+        if(grouped) {
+            int T_CYC = 60;
+            int TAU_SUM = 10;
+            double lambdaSum = lambda1 + lambda2;
+            int g1 = (int) Math.rint((lambda1 / lambdaSum) * ((T_CYC) - TAU_SUM));
+            int g2 = (int) Math.rint((lambda2 / lambdaSum) * ((T_CYC) - TAU_SUM));
 
-        // specify signal group settings for all signal groups
-        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, g1));
-        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId2, g1 + 5, g1 + 5 + g2));
-        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId3, g1 + g2 + 10, g1 + g2 + 10 + g3));
-        signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId4, g1 + g2 + g3 + 15, g1 + g2 + g3 + 15 + g4));
+            // specify signal group settings for all signal groups
+            signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, g1));
+            signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId2, g1 + 5, g1 + 5 + g2));
+        } else {
+            int T_CYC = 120;
+            int TAU_SUM = 20;
+
+            double lambda3 = flowWE / 3600;
+            double lambda4 = flowNS / 1800;
+
+            double lambdaSum = lambda1 + lambda2 + lambda3 + lambda4;
+            int g1 = (int) Math.rint((lambda1 / lambdaSum) * ((T_CYC) - TAU_SUM));
+            int g2 = (int) Math.rint((lambda2 / lambdaSum) * ((T_CYC) - TAU_SUM));
+            int g3 = (int) Math.rint((lambda3 / lambdaSum) * ((T_CYC) - TAU_SUM));
+            int g4 = (int) Math.rint((lambda4 / lambdaSum) * ((T_CYC) - TAU_SUM));
+
+            // specify signal group settings for all signal groups
+            signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId1, 0, g1));
+            signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId2, g1 + 5, g1 + 5 + g2));
+            signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId3, g1 + g2 + 10, g1 + g2 + 10 + g3));
+            signalPlan.addSignalGroupSettings(SignalUtils.createSetting4SignalGroup(conFac, signalGroupId4, g1 + g2 + g3 + 15, g1 + g2 + g3 + 15 + g4));
+        }
         signalPlan.setOffset(0);
     }
 }
