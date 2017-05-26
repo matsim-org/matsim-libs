@@ -30,7 +30,9 @@ import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
-import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.*;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.*;
@@ -45,15 +47,19 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	private final DrtConfigGroup drtCfg;
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
+	private final EventsManager eventsManager;
+	private final MobsimTimer timer;
 
 	@Inject(optional = true)
 	private @Named(DefaultDrtOptimizerProvider.DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory;
 
 	@Inject
 	public DrtRequestCreator(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
-			@Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime) {
+			@Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim) {
 		this.drtCfg = drtCfg;
 		this.travelTime = travelTime;
+		this.eventsManager = qSim.getEventsManager();
+		this.timer = qSim.getSimTimer();
 
 		TravelDisutility travelDisutility = travelDisutilityFactory == null ? new TimeAsTravelDisutility(travelTime)
 				: travelDisutilityFactory.createTravelDisutility(travelTime);
@@ -80,6 +86,9 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		double optimisticTravelTime = unsharedRidePath.getTravelTime();
 		double maxTravelTime = drtCfg.getMaxTravelTimeAlpha() * optimisticTravelTime + drtCfg.getMaxTravelTimeBeta();
 		double latestArrivalTime = departureTime + maxTravelTime;
+
+		eventsManager.processEvent(new DrtRequestSubmittedEvent(timer.getTimeOfDay(), id, passenger.getId(),
+				fromLink.getId(), toLink.getId(), unsharedRidePath.getTravelTime()));
 
 		return new DrtRequest(id, passenger, fromLink, toLink, departureTime, latestDepartureTime, latestArrivalTime,
 				submissionTime, unsharedRidePath);
