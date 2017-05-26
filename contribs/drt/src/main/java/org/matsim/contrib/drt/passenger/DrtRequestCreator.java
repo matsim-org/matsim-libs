@@ -20,25 +20,53 @@
 package org.matsim.contrib.drt.passenger;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.drt.data.DrtRequest;
+import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizerProvider;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
-import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.router.*;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.*;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * @author michalm
  */
 public class DrtRequestCreator implements PassengerRequestCreator {
 	private final DrtConfigGroup drtCfg;
+	private final TravelTime travelTime;
+	private final LeastCostPathCalculator router;
+
+	@Inject(optional = true)
+	private @Named(DefaultDrtOptimizerProvider.DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory;
 
 	@Inject
-	public DrtRequestCreator(DrtConfigGroup drtCfg) {
+	public DrtRequestCreator(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
+			@Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime) {
 		this.drtCfg = drtCfg;
+		this.travelTime = travelTime;
+
+		TravelDisutility travelDisutility = travelDisutilityFactory == null ? new TimeAsTravelDisutility(travelTime)
+				: travelDisutilityFactory.createTravelDisutility(travelTime);
+
+		PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(travelDisutility);
+		preProcessEuclidean.run(network);
+
+		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
+		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessEuclidean)
+				.createRoutingNetwork(network);
+
+		router = new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelDisutility, travelTime,
+				drtCfg.getAStarEuclideanOverdoFactor(), fastRouterFactory);
 	}
 
 	@Override
@@ -46,13 +74,14 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 			double departureTime, double submissionTime) {
 		double latestDepartureTime = departureTime + drtCfg.getMaxWaitTime();
 
-		double estimatedDistance = drtCfg.getEstimatedBeelineDistanceFactor()
-				* CoordUtils.calcEuclideanDistance(fromLink.getCoord(), toLink.getCoord());
-		double estimatedTravelTime = estimatedDistance / drtCfg.getEstimatedDrtSpeed();
-		double maxTravelTime = drtCfg.getMaxTravelTimeAlpha() * estimatedTravelTime + drtCfg.getMaxTravelTimeBeta();
+		VrpPathWithTravelData unsharedRidePath = VrpPaths.calcAndCreatePath(fromLink, toLink, departureTime, router,
+				travelTime);
+
+		double optimisticTravelTime = unsharedRidePath.getTravelTime();
+		double maxTravelTime = drtCfg.getMaxTravelTimeAlpha() * optimisticTravelTime + drtCfg.getMaxTravelTimeBeta();
 		double latestArrivalTime = departureTime + maxTravelTime;
 
 		return new DrtRequest(id, passenger, fromLink, toLink, departureTime, latestDepartureTime, latestArrivalTime,
-				submissionTime);
+				submissionTime, unsharedRidePath);
 	}
 }
