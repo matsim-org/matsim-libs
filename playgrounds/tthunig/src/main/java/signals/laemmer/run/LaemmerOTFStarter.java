@@ -19,8 +19,11 @@
  * *********************************************************************** */
 package signals.laemmer.run;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.contrib.signals.otfvis.OTFClientLiveWithSignals;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
@@ -28,14 +31,17 @@ import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
-import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
+
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.util.Types;
 
 import playground.dgrether.utils.DgOTFVisUtils;
 import signals.CombinedSignalsModule;
-import signals.laemmer.model.LaemmerSignalsModule;
 
 /**
  * @author dgrether
@@ -70,8 +76,13 @@ public class LaemmerOTFStarter {
 		events.initProcessing();
 		
 		QSim otfVisQSim = (QSim) injector.getInstance(Mobsim.class);
+		Collection<Provider<MobsimListener>> mobsimListeners = (Collection<Provider<MobsimListener>>) injector.getInstance(Key.get(Types.collectionOf(Types.providerOf(MobsimListener.class))));
+		for (Provider<MobsimListener> provider : mobsimListeners) {
+			otfVisQSim.addQueueSimulationListeners(provider.get());
+		}
+		
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);
-		OTFClientLive.run(scenario.getConfig(), server);
+		OTFClientLiveWithSignals.run(scenario.getConfig(), server);
 		
 		otfVisQSim.run();
 
