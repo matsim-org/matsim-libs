@@ -56,13 +56,9 @@ public class AnalyzeAll {
     static void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis) throws Exception {
         Tensor summary = Join.of(1, coreAnalysis.summary, distanceAnalysis.summary);
         saveFile(summary, "summary");
-        AnalyzeAll.plot("summary", "should be time", "time", 0, 1, 10000.0);
-        AnalyzeAll.plot("summary", "number of requests", "amount", 1, 2, 200.0);
-        AnalyzeAll.plot("summary", "unknown", "unknown", 2, 3, 2000.0);
         AnalyzeAll.plot("summary", "binnedWaitingTimes", "waiting times", 3, 6, 1200.0); // maximum waiting time in the plot to have this uniform for all
                                                                                          // simulations
-        AnalyzeAll.plot("summary", "binnedMeanWaitingTime", "mean waiting time", 6, 7, 1200.0); // maximum waiting time in the plot to have this uniform for all
-        AnalyzeAll.plot("summary", "binnedTimeRatios", "occupancy ratio", 10, 11);
+         AnalyzeAll.plot("summary", "binnedTimeRatios", "occupancy ratio", 10, 11);
         AnalyzeAll.plot("summary", "binnedDistanceRatios", "distance ratio", 13, 14);
         getTotals(summary, coreAnalysis);
     }
