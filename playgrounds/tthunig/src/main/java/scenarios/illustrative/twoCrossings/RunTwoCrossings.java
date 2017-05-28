@@ -107,8 +107,8 @@ public class RunTwoCrossings {
 		
 		createTwoCrossingsNetwork(scenario.getNetwork());
 		createSingleStreamPopulation(scenario.getPopulation(), 1, Id.createLinkId("0_1"), Id.createLinkId("4_5"));
-		createSingleStreamPopulation(scenario.getPopulation(), 10, Id.createLinkId("6_2"), Id.createLinkId("2_8"));
-		createSingleStreamPopulation(scenario.getPopulation(), 10, Id.createLinkId("7_3"), Id.createLinkId("3_9"));
+		createSingleStreamPopulation(scenario.getPopulation(), 10, Id.createLinkId("10_6"), Id.createLinkId("8_12"));
+		createSingleStreamPopulation(scenario.getPopulation(), 10, Id.createLinkId("11_7"), Id.createLinkId("9_13"));
 		if (!SIGNALTYPE.equals(SignalType.NONE)){
 			createTwoCrossingSignals(scenario);
 		}
@@ -200,11 +200,15 @@ public class RunTwoCrossings {
 	}
 
 	/**
+	 *             (10)  (11)
+	 *              |     |
 	 *             (6)   (7)
 	 *              |     |
 	 * (0)---(1)---[2]---[3]---(4)---(5)
 	 *      ^       |     |         ^
 	 *             (8)   (9)
+	 *              |     |
+	 *             (12)  (13)
 	 *      
 	 * demand travels from ^ to ^
 	 */
@@ -223,9 +227,13 @@ public class RunTwoCrossings {
 		net.addNode(netFac.createNode(Id.createNodeId(8), new Coord(-linkLength, -linkLength)));
 		net.addNode(netFac.createNode(Id.createNodeId(7), new Coord(0, linkLength)));
 		net.addNode(netFac.createNode(Id.createNodeId(9), new Coord(0, -linkLength)));
+		net.addNode(netFac.createNode(Id.createNodeId(10), new Coord(-linkLength, 2*linkLength)));
+		net.addNode(netFac.createNode(Id.createNodeId(11), new Coord(0, 2*linkLength)));
+		net.addNode(netFac.createNode(Id.createNodeId(12), new Coord(-linkLength, -2*linkLength)));
+		net.addNode(netFac.createNode(Id.createNodeId(13), new Coord(0, -2*linkLength)));
 
 		String[] links = { "0_1", "1_2", "2_3", "3_4", "4_5",
-				"6_2", "7_3", "2_8", "3_9"};
+				"6_2", "7_3", "2_8", "3_9", "10_6", "11_7", "8_12", "9_13"};
 
 		for (String linkId : links) {
 			String fromNodeId = linkId.split("_")[0];
@@ -268,6 +276,14 @@ public class RunTwoCrossings {
 				path.add(Id.createLinkId("1_2"));
 				path.add(Id.createLinkId("2_3"));
 				path.add(Id.createLinkId("3_4"));
+			} else if (fromLinkId.equals(Id.createLinkId("10_6"))){
+				// OD relation equals left NS stream
+				path.add(Id.createLinkId("6_2"));
+				path.add(Id.createLinkId("2_8"));
+			} else if (fromLinkId.equals(Id.createLinkId("11_7"))){
+				// OD relation equals right NS stream
+				path.add(Id.createLinkId("7_3"));
+				path.add(Id.createLinkId("3_9"));
 			}
 			leg.setRoute(new LinkNetworkRouteImpl(fromLinkId, path, toLinkId));
 			plan.addLeg(leg);
