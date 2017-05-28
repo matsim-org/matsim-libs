@@ -60,14 +60,14 @@ public class LaemmerBasicExample {
     public static void main(String[] args) {
         log.info("Running Laemmer main method...");
 
-        for (int i = 0; i <= 1200; i += 60) {
-        run(180, i, LaemmerConfig.Regime.COMBINED, false, false, false, true, true);
-//            run(180, i, LaemmerConfig.Regime.OPTIMIZING, false, false, false, true);
-//            run(180, i, LaemmerConfig.Regime.STABILIZING, false, false, false, true);
-        }
+//        for (int i = 0; i <= 2520; i += 120) {
+        run(360, 480, LaemmerConfig.Regime.COMBINED, false, false, false, true, false, true);
+//            run(360, i, LaemmerConfig.Regime.OPTIMIZING, false, false, false, true, false, true);
+//            run(360, i, LaemmerConfig.Regime.STABILIZING, false, false, false, true, false, true);
+//        }
     }
 
-    private static void run(double flowNS, double flowWE, LaemmerConfig.Regime regime, boolean vis, boolean log, boolean stochastic, boolean lanes, boolean liveArrivalRates) {
+    private static void run(double flowNS, double flowWE, LaemmerConfig.Regime regime, boolean vis, boolean log, boolean stochastic, boolean lanes, boolean liveArrivalRates, boolean grouped) {
 
         String outputPath;
         if (stochastic) {
@@ -104,12 +104,18 @@ public class LaemmerBasicExample {
         CombinedSignalsModule module = new CombinedSignalsModule();
         LaemmerConfig laemmerConfig = new LaemmerConfig();
         laemmerConfig.setDEFAULT_INTERGREEN(5);
-        laemmerConfig.setDESIRED_PERIOD(120);
-        laemmerConfig.setMAX_PERIOD(180);
+
+        if(grouped) {
+            laemmerConfig.setDESIRED_PERIOD(60);
+            laemmerConfig.setMAX_PERIOD(90);
+        } else {
+            laemmerConfig.setDESIRED_PERIOD(120);
+            laemmerConfig.setMAX_PERIOD(180);
+        }
         laemmerConfig.setActiveRegime(regime);
         module.setLaemmerConfig(laemmerConfig);
 
-        final Scenario scenario = defineScenario(config, flowNS, flowWE, laemmerConfig, stochastic, lanes, liveArrivalRates);
+        final Scenario scenario = defineScenario(config, flowNS, flowWE, laemmerConfig, stochastic, lanes, liveArrivalRates, grouped);
         Controler controler = new Controler(scenario);
 
 
@@ -172,7 +178,7 @@ public class LaemmerBasicExample {
         return config;
     }
 
-    private static Scenario defineScenario(Config config, double flowNS, double flowWE, LaemmerConfig laemmerConfig, boolean stochastic, boolean lanes, boolean liveArrivalRates) {
+    private static Scenario defineScenario(Config config, double flowNS, double flowWE, LaemmerConfig laemmerConfig, boolean stochastic, boolean lanes, boolean liveArrivalRates, boolean grouped) {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         // add missing scenario elements
         SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
@@ -182,7 +188,7 @@ public class LaemmerBasicExample {
             createLanes(scenario);
         }
         createPopulation(scenario, flowNS, flowWE, stochastic);
-        createSignals(scenario, laemmerConfig, flowNS, flowWE, lanes, liveArrivalRates);
+        createSignals(scenario, laemmerConfig, flowNS, flowWE, lanes, liveArrivalRates, grouped);
         return scenario;
     }
 
@@ -274,7 +280,7 @@ public class LaemmerBasicExample {
 
         // original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
         LanesUtils.createAndAddLane(lanesForLink2_3, factory,
-                Id.create("2_3.ol", Lane.class), LANE_CAPACITY, 1000, 0, 1,
+                Id.create("2_3.ol", Lane.class), 3600, 1000, 0, 1,
                 null, Arrays.asList(Id.create("2_3.l", Lane.class), Id.create("2_3.r", Lane.class)));
 
 
@@ -296,7 +302,7 @@ public class LaemmerBasicExample {
 
         // original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
         LanesUtils.createAndAddLane(lanesForLink4_3, factory,
-                Id.create("4_3.ol", Lane.class), LANE_CAPACITY, 1000, 0, 1,
+                Id.create("4_3.ol", Lane.class), 3600, 1000, 0, 1,
                 null, Arrays.asList(Id.create("4_3.l", Lane.class), Id.create("4_3.r", Lane.class)));
 
         // straight and left turning lane (alignment 1)
@@ -408,7 +414,7 @@ public class LaemmerBasicExample {
         }
     }
 
-    private static void createSignals(Scenario scenario, LaemmerConfig laemmerConfig, double flowNS, double flowWE, boolean useLanes, boolean liveArrivalRates) {
+    private static void createSignals(Scenario scenario, LaemmerConfig laemmerConfig, double flowNS, double flowWE, boolean useLanes, boolean liveArrivalRates, boolean grouped) {
 
         SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
         SignalSystemsData signalSystems = signalsData.getSignalSystemsData();
@@ -450,28 +456,42 @@ public class LaemmerBasicExample {
         Id<Signal> id2_3 = Id.create("Signal2_3", Signal.class);
         signalGroup1.addSignalId(id2_3);
 
-        signalGroups.addSignalGroupData(signalGroup1);
 
         Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
         SignalGroupData signalGroup2 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId2);
         Id<Signal> id7_3 = Id.create("Signal7_3", Signal.class);
         signalGroup2.addSignalId(id7_3);
-        signalGroups.addSignalGroupData(signalGroup2);
 
         Id<SignalGroup> signalGroupId3 = Id.create("SignalGroup3", SignalGroup.class);
         SignalGroupData signalGroup3 = signalGroups.getFactory()
                 .createSignalGroupData(signalSystemId, signalGroupId3);
-        Id<Signal> id4_3 = Id.create("Signal4_3", Signal.class);
-        signalGroup3.addSignalId(id4_3);
-        signalGroups.addSignalGroupData(signalGroup3);
+        if(grouped) {
+            Id<Signal> id4_3 = Id.create("Signal4_3", Signal.class);
+            signalGroup1.addSignalId(id4_3);
+        } else{
 
+            Id<Signal> id4_3 = Id.create("Signal4_3", Signal.class);
+            signalGroup3.addSignalId(id4_3);
+        }
         Id<SignalGroup> signalGroupId4 = Id.create("SignalGroup4", SignalGroup.class);
-        SignalGroupData signalGroup4 = signalGroups.getFactory()
-                .createSignalGroupData(signalSystemId, signalGroupId4);
-        Id<Signal> id8_3 = Id.create("Signal8_3", Signal.class);
-        signalGroup4.addSignalId(id8_3);
-        signalGroups.addSignalGroupData(signalGroup4);
+        SignalGroupData signalGroup4 = signalGroups.getFactory().createSignalGroupData(signalSystemId, signalGroupId4);
+
+        if(grouped) {
+            Id<Signal> id8_3 = Id.create("Signal8_3", Signal.class);
+            signalGroup2.addSignalId(id8_3);
+        }
+        else {
+            Id<Signal> id8_3 = Id.create("Signal8_3", Signal.class);
+            signalGroup4.addSignalId(id8_3);
+        }
+
+        signalGroups.addSignalGroupData(signalGroup1);
+        signalGroups.addSignalGroupData(signalGroup2);
+        if(!grouped) {
+            signalGroups.addSignalGroupData(signalGroup3);
+            signalGroups.addSignalGroupData(signalGroup4);
+        }
 
         if (!liveArrivalRates) {
             if (useLanes) {

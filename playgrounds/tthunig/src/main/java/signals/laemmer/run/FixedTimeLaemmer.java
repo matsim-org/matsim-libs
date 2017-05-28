@@ -59,8 +59,8 @@ public class FixedTimeLaemmer {
     public static void main(String[] args) {
         log.info("Running Laemmer main method...");
 
-//        for (int i = 0; i <= 1200; i += 60) {
-            run(180, 600, true, false, true, true);
+//        for (int i = 0; i <= 2520; i += 120) {
+            run(360, 2280, true, false, true, true);
 //        }
     }
 
@@ -240,7 +240,7 @@ public class FixedTimeLaemmer {
 
         // original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
         LanesUtils.createAndAddLane(lanesForLink2_3, factory,
-                Id.create("2_3.ol", Lane.class), LANE_CAPACITY, 1000, 0, 1,
+                Id.create("2_3.ol", Lane.class), 3600, 1000, 0, 1,
                 null, Arrays.asList(Id.create("2_3.l", Lane.class), Id.create("2_3.r", Lane.class)));
 
 
@@ -262,7 +262,7 @@ public class FixedTimeLaemmer {
 
         // original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
         LanesUtils.createAndAddLane(lanesForLink4_3, factory,
-                Id.create("4_3.ol", Lane.class), LANE_CAPACITY, 1000, 0, 1,
+                Id.create("4_3.ol", Lane.class), 3600, 1000, 0, 1,
                 null, Arrays.asList(Id.create("4_3.l", Lane.class), Id.create("4_3.r", Lane.class)));
 
         // straight and left turning lane (alignment 1)
