@@ -17,78 +17,78 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.passenger;
+package org.matsim.contrib.drt.passenger.events;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.data.*;
 
 /**
  * @author michalm
  */
-public class DrtRequestSubmittedEvent extends Event {
+public class DrtRequestScheduledEvent extends Event {
 
-	public static final String EVENT_TYPE = "DrtRequest submitted";
+	public static final String EVENT_TYPE = "DrtRequest scheduled";
 
 	public static final String ATTRIBUTE_REQUEST = "request";
-	public static final String ATTRIBUTE_PERSON = "person";
-	public static final String ATTRIBUTE_FROM_LINK = "fromLink";
-	public static final String ATTRIBUTE_TO_LINK = "toLink";
-	public static final String ATTRIBUTE_UNSHARED_RIDE_TIME = "unsharedRideTime";
+	public static final String ATTRIBUTE_VEHICLE = "vehicle";
+	public static final String ATTRIBUTE_PICKUP_TIME = "pickupTime";
+	public static final String ATTRIBUTE_DROPOFF_TIME = "dropoffTime";
 
 	private final Id<Request> requestId;
-	private final Id<Person> personId;
-	private final Id<Link> fromLinkId;
-	private final Id<Link> toLinkId;
-	private final double unsharedRideTime;
+	private final Id<Vehicle> vehicleId;
+	private final double pickupTime;
+	private final double dropoffTime;
 
-	public DrtRequestSubmittedEvent(double time, Id<Request> requestId, Id<Person> personId, Id<Link> fromLinkId,
-			Id<Link> toLinkId, double unsharedRideTime) {
+	public DrtRequestScheduledEvent(double time, Id<Request> requestId, Id<Vehicle> vehicleId, double pickupTime,
+			double dropoffTime) {
 		super(time);
 		this.requestId = requestId;
-		this.personId = personId;
-		this.fromLinkId = fromLinkId;
-		this.toLinkId = toLinkId;
-		this.unsharedRideTime = unsharedRideTime;
+		this.vehicleId = vehicleId;
+		this.pickupTime = pickupTime;
+		this.dropoffTime = dropoffTime;
 	}
 
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-
+	/**
+	 * the ID of the request
+	 */
 	public Id<Request> getRequestId() {
 		return requestId;
 	}
-
-	public Id<Person> getPersonId() {
-		return personId;
+	/**
+	 *  the vehicle scheduled to the request
+	 */
+	public Id<Vehicle> getVehicleId() {
+		return vehicleId;
 	}
 
-	public Id<Link> getFromLinkId() {
-		return fromLinkId;
+	/**
+	 *  the <b>estimated</b> pickup time of the request
+	 */
+	public double getPickupTime() {
+		return pickupTime;
 	}
 
-	public Id<Link> getToLinkId() {
-		return toLinkId;
-	}
-
-	public double getUnsharedRideTime() {
-		return unsharedRideTime;
+	/**
+	 *  the <b>estimated</b> arrival time of the request
+	 */
+	public double getDropoffTime() {
+		return dropoffTime;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_REQUEST, requestId + "");
-		attr.put(ATTRIBUTE_PERSON, personId + "");
-		attr.put(ATTRIBUTE_FROM_LINK, fromLinkId + "");
-		attr.put(ATTRIBUTE_TO_LINK, toLinkId + "");
-		attr.put(ATTRIBUTE_UNSHARED_RIDE_TIME, unsharedRideTime + "");
+		attr.put(ATTRIBUTE_VEHICLE, vehicleId + "");
+		attr.put(ATTRIBUTE_PICKUP_TIME, pickupTime + "");
+		attr.put(ATTRIBUTE_DROPOFF_TIME, dropoffTime + "");
 		return attr;
 	}
 }

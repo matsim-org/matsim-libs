@@ -26,6 +26,8 @@ import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.*;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.passenger.*;
+import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
+import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.locationchoice.router.*;

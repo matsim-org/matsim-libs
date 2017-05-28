@@ -50,6 +50,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	MatsimServices matsimServices;
 	@Inject
 	Network network;
+	@Inject
+	DrtRequestAnalyzer drtRequestAnalyzer;
 	private final DrtConfigGroup drtgroup;
 	private boolean headerWritten = false;
 	private boolean vheaderWritten = false;
@@ -79,6 +81,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 			vehicleOccupancyEvaluator.writeDetailedOccupancyFiles(
 					matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleStats_"));
 		}
+		drtRequestAnalyzer.writeAndPlotWaitTimeEstimateComparison(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitTimeComparison.png"), matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitTimeComparison.csv"));
 		List<DynModeTrip> trips = drtPassengerStats.getDrtTrips();
 
 		writeIterationPassengerStats(DynModeTripsAnalyser.summarizeTrips(trips, ";"), event.getIteration());

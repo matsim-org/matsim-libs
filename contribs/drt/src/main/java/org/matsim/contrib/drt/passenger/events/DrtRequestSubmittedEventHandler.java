@@ -20,27 +20,18 @@
 /**
  * 
  */
-package org.matsim.contrib.drt.analysis;
+package org.matsim.contrib.drt.passenger.events;
 
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
- * @author jbischoff
+ * @author  jbischoff
  *
  */
-public class DrtAnalysisModule extends AbstractModule {
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.matsim.core.controler.AbstractModule#install()
-	 */
-	@Override
-	public void install() {
-		bind(DrtVehicleOccupancyEvaluator.class).asEagerSingleton();
-		bind(DynModePassengerStats.class).asEagerSingleton();
-		bind(DrtRequestAnalyzer.class).asEagerSingleton();
-		addControlerListenerBinding().to(DrtAnalysisControlerListener.class).asEagerSingleton();
-	}
+/**
+ *
+ */
+public interface DrtRequestSubmittedEventHandler extends EventHandler {
+	public void handleEvent(final DrtRequestScheduledEvent event);
 
 }

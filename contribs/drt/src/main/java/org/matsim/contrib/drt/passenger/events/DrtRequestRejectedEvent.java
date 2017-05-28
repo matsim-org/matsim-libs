@@ -17,68 +17,48 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.passenger;
+package org.matsim.contrib.drt.passenger.events;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Request;
 
 /**
  * @author michalm
  */
-public class DrtRequestScheduledEvent extends Event {
 
-	public static final String EVENT_TYPE = "DrtRequest scheduled";
+public class DrtRequestRejectedEvent extends Event {
+
+	public static final String EVENT_TYPE = "DrtRequest rejected";
 
 	public static final String ATTRIBUTE_REQUEST = "request";
-	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String ATTRIBUTE_PICKUP_TIME = "pickupTime";
-	public static final String ATTRIBUTE_DROPOFF_TIME = "dropoffTime";
 
 	private final Id<Request> requestId;
-	private final Id<Vehicle> vehicleId;
-	private final double pickupTime;
-	private final double dropoffTime;
 
-	public DrtRequestScheduledEvent(double time, Id<Request> requestId, Id<Vehicle> vehicleId, double pickupTime,
-			double dropoffTime) {
+	public DrtRequestRejectedEvent(double time, Id<Request> requestId) {
 		super(time);
 		this.requestId = requestId;
-		this.vehicleId = vehicleId;
-		this.pickupTime = pickupTime;
-		this.dropoffTime = dropoffTime;
 	}
 
 	@Override
+	
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
-
+	
+	/**
+	 *  the ID of the initial request submitted
+	 */
 	public Id<Request> getRequestId() {
 		return requestId;
-	}
-
-	public Id<Vehicle> getVehicleId() {
-		return vehicleId;
-	}
-
-	public double getPickupTime() {
-		return pickupTime;
-	}
-
-	public double getDropoffTime() {
-		return dropoffTime;
 	}
 
 	@Override
 	public Map<String, String> getAttributes() {
 		Map<String, String> attr = super.getAttributes();
 		attr.put(ATTRIBUTE_REQUEST, requestId + "");
-		attr.put(ATTRIBUTE_VEHICLE, vehicleId + "");
-		attr.put(ATTRIBUTE_PICKUP_TIME, pickupTime + "");
-		attr.put(ATTRIBUTE_DROPOFF_TIME, dropoffTime + "");
 		return attr;
 	}
 }
