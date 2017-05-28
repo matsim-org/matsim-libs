@@ -540,7 +540,7 @@ public class LaemmerSignalController extends AbstractSignalController implements
             if (n >= nCrit) {
                 regulationQueue.add(this);
 //                signalLog.debug("Regulation time parameters: lambda: " + determiningLoad + " | T: " + desiredPeriod + " | qmax: " + determiningOutflow + " | qsum: " + flowSum + " | T_idle:" + tIdle);
-                this.regulationTime = Math.min(Math.rint(determiningLoad * desiredPeriod + (outflowSum / flowSum) * Math.max(tIdle, 0)), MIN_G);
+                this.regulationTime = Math.max(Math.rint(determiningLoad * desiredPeriod + (outflowSum / flowSum) * Math.max(tIdle, 0)), MIN_G);
                 signalLog.info("Granted time " + regulationTime);
                 this.stabilize = true;
             }
