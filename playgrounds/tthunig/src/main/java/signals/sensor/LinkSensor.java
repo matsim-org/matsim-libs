@@ -143,6 +143,14 @@ public final class LinkSensor {
 	
 	public void handleEvent(VehicleEntersTrafficEvent event) {
 		this.vehiclesOnLink++;
+		/* the sensor so far does not work for doAverageVehiclesPerSecondMonitoring when vehicles enter traffic at this link.
+		 * the following is a quick suggestion how to fix it, but has to be tested. theresa, may'16
+		if(this.doAverageVehiclesPerSecondMonitoring) {
+			totalVehicles ++;
+			if(totalVehicles == 1) {
+				monitoringStartTime = event.getTime();
+			}
+		} */
 		if (this.doDistanceMonitoring){
 			// the vehicle leaves its first act on this link --> add a car locator
 			if (! this.link2WaitEventPerVehicleId.containsKey(event.getVehicleId())){ 
