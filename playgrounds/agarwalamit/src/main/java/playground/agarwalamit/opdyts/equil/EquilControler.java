@@ -148,7 +148,7 @@ public class EquilControler {
         config.plans().setInputFile(file.getAbsoluteFile().getAbsolutePath());
         config.strategy().setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
 
-        for (int asc : ascTrials){
+        for (double asc : ascTrials){
             OUT_DIR = OUT_DIR+"/ascRun"+asc+"/";
             config.planCalcScore().getOrCreateModeParams("bicycle").setConstant(asc);
             config.controler().setOutputDirectory(OUT_DIR);
