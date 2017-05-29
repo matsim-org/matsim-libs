@@ -30,6 +30,10 @@ import org.matsim.vehicles.Vehicle;
  */
 public interface EmissionCostHandler extends EventHandler {
 
+    Map<Double, Map<Id<Vehicle>, Double>> getTimeBin2VehicleId2TotalEmissionCosts();
+
+    Map<Double, Map<Id<Person>, Double>> getTimeBin2PersonId2TotalEmissionCosts();
+
     Map<Id<Vehicle>, Double> getVehicleId2TotalEmissionCosts();
 
     Map<Id<Person>, Double> getPersonId2TotalEmissionCosts();
