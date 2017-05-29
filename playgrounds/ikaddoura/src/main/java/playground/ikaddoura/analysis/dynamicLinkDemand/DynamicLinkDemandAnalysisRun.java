@@ -46,7 +46,7 @@ public class DynamicLinkDemandAnalysisRun {
 			log.info("Output base directory: " + OUTPUT_BASE_DIR);
 			
 		} else {
-			OUTPUT_BASE_DIR = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct/output/r_output_run0_bln_bc/";		
+			OUTPUT_BASE_DIR = "/Users/ihab/Documents/workspace/runs-svn/vickrey-decongestion/output-FINAL/V9/";		
 		}
 
 		DynamicLinkDemandAnalysisRun analysis = new DynamicLinkDemandAnalysisRun(OUTPUT_BASE_DIR);

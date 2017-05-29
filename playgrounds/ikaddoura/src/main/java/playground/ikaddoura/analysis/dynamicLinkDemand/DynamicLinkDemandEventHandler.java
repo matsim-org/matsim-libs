@@ -84,7 +84,7 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler {
 
 	public void printResults(String path) {
 		
-		String fileName = path + "dynamicLinkDemand.csv";
+		String fileName = path + "dynamicLinkDemand_numberOfLinkLeaveEvents.csv";
 		File file1 = new File(fileName);
 		File file2 = new File(fileName + "t");
 		
@@ -96,7 +96,8 @@ public class DynamicLinkDemandEventHandler implements  LinkLeaveEventHandler {
 			bw2.write("\"String\"");
 			
 			for (Double timeBinEndTime : this.timeBinEndTime2linkId2demand.keySet()) {
-				bw1.write(";" + "leavingAgents_" + Time.writeTime(timeBinEndTime, Time.TIMEFORMAT_HHMMSS));
+				bw1.write(";" + Time.writeTime(timeBinEndTime, Time.TIMEFORMAT_HHMMSS));
+//				bw1.write(";" + timeBinEndTime);
 				bw2.write(",\"Real\"");
 			}
 			bw1.newLine();
