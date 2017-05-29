@@ -55,8 +55,7 @@ public class EquilControler {
 
     private static final boolean isPlansRelaxed = false;
 
-    private static final int ascTrials [] = {0,1,2,3,4,5,6,7,8,9,10};
-    private static final int avgItrAfterValueOfObjectiveFn [] = {0, 10, 25, 50, 100};
+    private static final double ascTrials [] = {-2.0, -1.5, -1.0, -0.5, -0.2, 0.0 };
 
     public static void main(String[] args) {
 
