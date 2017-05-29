@@ -136,7 +136,7 @@ public class ExperiencedEMissionCostCalculatorBerlin {
                     emissionsConfigGroup.setEmissionCostMultiplicationFactor(1.);
 
                     EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(emissionsConfigGroup, rgt);
-                    ExperiencedEmissionCostHandler handler = new ExperiencedEmissionCostHandler(emissionCostModule, null, simulationEndtime, 1);
+                    ExperiencedEmissionCostHandler handler = new ExperiencedEmissionCostHandler(emissionCostModule, null, simulationEndtime, noOfTimeBins);
 
                     EventsManager events = EventsUtils.createEventsManager();
                     events.addHandler(handler);
