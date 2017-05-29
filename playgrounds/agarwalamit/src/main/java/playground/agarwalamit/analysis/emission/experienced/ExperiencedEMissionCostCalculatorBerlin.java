@@ -61,8 +61,7 @@ public class ExperiencedEMissionCostCalculatorBerlin {
         final int noOfTimeBins = 30;
 
         // berlin
-		String dir = "/Users/ihab/Desktop/ils4a/kaddoura/cne/berlin-dz-1pct-simpleNetwork/output-with-randomization_noise-averageCostPricing/";
-		String outFile = dir +"airPolluationExposureCosts_cne.txt";
+		String dir = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct-simpleNetwork/output_selectedPlans_flowCapFactor0.015_randomization/";
 
         // berlin
 		String [] cases = {
@@ -92,7 +91,7 @@ public class ExperiencedEMissionCostCalculatorBerlin {
 		};
 		int [] its = {100};
 
-        try(BufferedWriter writer = IOUtils.getBufferedWriter(outFile)) {
+        try(BufferedWriter writer = IOUtils.getBufferedWriter(dir +"airPolluationExposureCosts.txt")) {
             writer.write("case \t itNr \t costsInEur \t tollValuesEUR \n");
 
             for(String str : cases) {
@@ -150,7 +149,7 @@ public class ExperiencedEMissionCostCalculatorBerlin {
                     writer.write(MapUtils.doubleValueSum(person2toll)+"\n");
 
                     // writing time bin 2 costs
-                    BufferedWriter bufferedWriter = IOUtils.getBufferedWriter("/Users/amit/Documents/timeBin2AirPollutionExposureCosts_"+str+".txt");
+                    BufferedWriter bufferedWriter = IOUtils.getBufferedWriter(dir + "timeBin2AirPollutionExposureCosts_"+str+".txt");
 
                     Map<Double, Double> time2costs = handler.getTimeBin2TotalCosts();
                     bufferedWriter.write("timeBin\tairPollutionExposureCostsEUR\n");
