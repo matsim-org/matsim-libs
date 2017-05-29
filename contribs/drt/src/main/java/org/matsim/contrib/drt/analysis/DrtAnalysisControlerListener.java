@@ -112,7 +112,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 			if (!headerWritten) {
 				headerWritten = true;
 				bw.write(
-						"iteration;rides;wait_average;wait_max;wait_p95;wait_p75;wait_median;inVehicleTravelTime_mean;distance_m_mean;totalTravelTime_mean");
+						"iteration;rides;wait_average;wait_max;wait_p95;wait_p75;wait_median;inVehicleTravelTime_mean;distance_m_mean;directDistance_m_mean;totalTravelTime_mean");
 			}
 			bw.newLine();
 			bw.write(it + ";" + summarizeTrips);

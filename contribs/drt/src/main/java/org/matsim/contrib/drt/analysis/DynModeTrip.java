@@ -36,6 +36,7 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 	private final double waitTime;
 	private double travelTime = Double.NaN;
 	private double travelDistance_m = Double.NaN;
+	private double travelDistanceEstimate_m = Double.NaN;
 	private Id<Link> toLink = null;
 	private double arrivalTime = Double.NaN;
 	private final Coord fromCoord;
@@ -45,7 +46,7 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 	public static final String HEADER = "departureTime" + demitter + "personId" + demitter + "vehicleId" + demitter
 			+ "fromLinkId" + demitter + "fromX" + demitter + "fromY" + demitter + "toLinkId" + demitter + "toX"
 			+ demitter + "toY" + demitter + "waitTime" + demitter + "arrivalTime" + demitter + "travelTime" + demitter
-			+ "travelDistance_m";
+			+ "travelDistance_m"+demitter+"direcTravelDistance_m";
 
 	DynModeTrip(double departureTime, Id<Person> person, Id<Vehicle> vehicle, Id<Link> fromLinkId, Coord fromCoord,
 			double waitTime) {
@@ -63,6 +64,11 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 
 	public Id<Person> getPerson() {
 		return person;
+	}
+	
+
+	public void setTravelDistanceEstimate_m(double travelDistanceEstimate_m) {
+		this.travelDistanceEstimate_m = travelDistanceEstimate_m;
 	}
 
 	public Id<Vehicle> getVehicle() {
@@ -87,6 +93,11 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 
 	public double getTravelDistance() {
 		return travelDistance_m;
+	}
+	
+
+	public double getTravelDistanceEstimate_m() {
+		return travelDistanceEstimate_m;
 	}
 
 	public void setTravelDistance(double travelDistance_m) {
@@ -154,7 +165,7 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 		return getDepartureTime() + demitter + getPerson() + demitter + getVehicle() + demitter + getFromLinkId()
 				+ demitter + fromCoordX + demitter + fromCoordY + demitter + getToLinkId() + demitter + toCoordX
 				+ demitter + toCoordY + demitter + getWaitTime() + demitter + getArrivalTime() + demitter
-				+ getInVehicleTravelTime() + demitter + getTravelDistance();
+				+ getInVehicleTravelTime() + demitter + getTravelDistance()+ demitter+ travelDistanceEstimate_m;
 	}
 
 }

@@ -43,6 +43,9 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
+import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -56,7 +59,7 @@ import com.google.inject.Inject;
  *
  */
 public class DynModePassengerStats implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler,
-		PersonArrivalEventHandler, LinkEnterEventHandler, ActivityEndEventHandler {
+		PersonArrivalEventHandler, LinkEnterEventHandler, ActivityEndEventHandler, DrtRequestSubmittedEventHandler {
 
 	final private Map<Id<Person>, Double> departureTimes = new HashMap<>();
 	final private Map<Id<Person>, Id<Link>> departureLinks = new HashMap<>();
@@ -64,6 +67,7 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	final private Map<Id<Vehicle>, Map<Id<Person>, MutableDouble>> inVehicleDistance = new HashMap<>();
 	final private Map<Id<Vehicle>, double[]> vehicleDistances = new HashMap<>();
 	final private Map<Id<Person>, DynModeTrip> currentTrips = new HashMap<>();
+	final private Map<Id<Person>, Double> directDistanceEstimates = new HashMap<>();
 	final String mode;
 
 	final private Network network;
@@ -189,9 +193,11 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 			double departureTime = this.departureTimes.remove(event.getPersonId());
 			double waitTime = event.getTime() - departureTime;
 			Id<Link> departureLink = this.departureLinks.remove(event.getPersonId());
+			double directDistance = this.directDistanceEstimates.remove(event.getPersonId());
 			Coord departureCoord = this.network.getLinks().get(departureLink).getCoord();
 			DynModeTrip trip = new DynModeTrip(departureTime, event.getPersonId(), event.getVehicleId(), departureLink,
 					departureCoord, waitTime);
+			trip.setTravelDistanceEstimate_m(directDistance);
 			this.drtTrips.add(trip);
 			this.currentTrips.put(event.getPersonId(), trip);
 			this.inVehicleDistance.get(event.getVehicleId()).put(event.getPersonId(), new MutableDouble());
@@ -210,5 +216,13 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	 */
 	public Map<Id<Vehicle>, double[]> getVehicleDistances() {
 		return vehicleDistances;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler#handleEvent(org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent)
+	 */
+	@Override
+	public void handleEvent(DrtRequestSubmittedEvent event) {
+		this.directDistanceEstimates.put(event.getPersonId(), event.getUnsharedRideDistance());
 	}
 }

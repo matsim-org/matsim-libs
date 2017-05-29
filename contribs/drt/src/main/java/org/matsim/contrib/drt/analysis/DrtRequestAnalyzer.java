@@ -93,7 +93,7 @@ public class DrtRequestAnalyzer implements DrtRequestRejectedEventHandler, DrtRe
 			DrtRequestScheduledEvent scheduled = scheduledRequests.get(event.getPersonId());
 			DrtRequestSubmittedEvent submission  = this.submittedRequests.get(scheduled.getRequestId());
 			double actualWaitTime = event.getTime() - submission.getTime();
-			double estimatedWaitTime = event.getTime() - scheduled.getPickupTime();
+			double estimatedWaitTime =  scheduled.getPickupTime() - submission.getTime();
 			waitTimeCompare.put(submission.getRequestId(), new Tuple<>(actualWaitTime,estimatedWaitTime));
 			
 		}
@@ -157,6 +157,8 @@ public class DrtRequestAnalyzer implements DrtRequestRejectedEventHandler, DrtRe
 			NumberAxis yAxis = (NumberAxis)((XYPlot)chart2.getPlot()).getRangeAxis();
 			NumberAxis xAxis = (NumberAxis)((XYPlot)chart2.getPlot()).getDomainAxis();
 			yAxis.setUpperBound(xAxis.getUpperBound());
+			xAxis.setLowerBound(0);
+			yAxis.setLowerBound(0);
 			ChartUtilities.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

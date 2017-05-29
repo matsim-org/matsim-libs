@@ -39,21 +39,25 @@ public class DrtRequestSubmittedEvent extends Event {
 	public static final String ATTRIBUTE_FROM_LINK = "fromLink";
 	public static final String ATTRIBUTE_TO_LINK = "toLink";
 	public static final String ATTRIBUTE_UNSHARED_RIDE_TIME = "unsharedRideTime";
+	public static final String ATTRIBUTE_UNSHARED_RIDE_DISTANCE = "unsharedRideDistance";
 
 	private final Id<Request> requestId;
 	private final Id<Person> personId;
 	private final Id<Link> fromLinkId;
 	private final Id<Link> toLinkId;
 	private final double unsharedRideTime;
+	private final double unsharedRideDistance;
 
+	
 	public DrtRequestSubmittedEvent(double time, Id<Request> requestId, Id<Person> personId, Id<Link> fromLinkId,
-			Id<Link> toLinkId, double unsharedRideTime) {
+			Id<Link> toLinkId, double unsharedRideTime, double unsharedRideDistance) {
 		super(time);
 		this.requestId = requestId;
 		this.personId = personId;
 		this.fromLinkId = fromLinkId;
 		this.toLinkId = toLinkId;
 		this.unsharedRideTime = unsharedRideTime;
+		this.unsharedRideDistance = unsharedRideDistance;
 	}
 
 	@Override
@@ -92,6 +96,12 @@ public class DrtRequestSubmittedEvent extends Event {
 	public double getUnsharedRideTime() {
 		return unsharedRideTime;
 	}
+	/**
+	 *  the estimated distance it would take to ride without any detours
+	 */
+	public double getUnsharedRideDistance() {
+		return unsharedRideDistance;
+	}
 
 	@Override
 	public Map<String, String> getAttributes() {
@@ -101,6 +111,7 @@ public class DrtRequestSubmittedEvent extends Event {
 		attr.put(ATTRIBUTE_FROM_LINK, fromLinkId + "");
 		attr.put(ATTRIBUTE_TO_LINK, toLinkId + "");
 		attr.put(ATTRIBUTE_UNSHARED_RIDE_TIME, unsharedRideTime + "");
+		attr.put(ATTRIBUTE_UNSHARED_RIDE_DISTANCE, unsharedRideDistance+"");
 		return attr;
 	}
 }

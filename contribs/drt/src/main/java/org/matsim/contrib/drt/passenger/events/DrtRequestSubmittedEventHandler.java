@@ -32,6 +32,6 @@ import org.matsim.core.events.handler.EventHandler;
  *
  */
 public interface DrtRequestSubmittedEventHandler extends EventHandler {
-	public void handleEvent(final DrtRequestScheduledEvent event);
+	public void handleEvent(final DrtRequestSubmittedEvent event);
 
 }
