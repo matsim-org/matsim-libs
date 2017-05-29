@@ -1,9 +1,12 @@
 package playground.dziemke.analysis.modalShare;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -34,11 +37,22 @@ public class ModalShareDiagramCreator {
     private static final String GNUPLOT_OUTPUT_PATH = OUTPUT_DIR;
     private static final String GNUPLOT_SCRIPT_NAME = "plot-modal-share.gnu";
 
+    private Network network;
+    private ModalShareDistanceBinContainer container;
+    private Map<Mode, String> consideredModes = new HashMap<>();
+
     public static void main(String[] args) {
 
 
         ModalShareDiagramCreator creator = new ModalShareDiagramCreator();
+        creator.addMode(Mode.CAR, TransportMode.car);
+        creator.addMode(Mode.PT, TransportMode.pt);
+        creator.addMode(Mode.SLOW_PT, "slowPt");
         creator.createModalSplitDiagram(EVENTS_FILE, NETWORK_FILE, DISTANCE_BIN_SIZE);
+    }
+
+    private void addMode(Mode mode, String identifier) {
+        consideredModes.put(mode, identifier);
     }
 
     private void createModalSplitDiagram(String eventsFile, String networkFile, int distanceBinSize) {
@@ -52,30 +66,22 @@ public class ModalShareDiagramCreator {
         log.info("Events file read!");
 
         /* Get network, which is needed to calculate distances */
-        Network network = NetworkUtils.createNetwork();
+        network = NetworkUtils.createNetwork();
         MatsimNetworkReader networkReader = new MatsimNetworkReader(network);
         networkReader.readFile(networkFile);
 
         List<Trip> trips = new ArrayList<>(tripHandler.getTrips().values());
 
-        ModalShareDistanceBinContainer container = new ModalShareDistanceBinContainer(distanceBinSize);
+        container = new ModalShareDistanceBinContainer(distanceBinSize);
 
         for (Trip trip : trips) {
 
-            switch (trip.getMode()) {
-                case "car":
-                    container.enterDistance((int)trip.getDistanceRoutedByCalculation_m(network), Mode.CAR);
-                    break;
-                case "pt":
-                    container.enterDistance((int)trip.getDistanceBeelineByCalculation_m(network), Mode.PT);
-                    break;
-                case "slowPt":
-                    container.enterDistance((int)trip.getDistanceBeelineByCalculation_m(network), Mode.SLOW_PT);
-                    break;
-                default:
-                    log.error("Unknown legMode: " + trip.getMode());
-                    break;
-            }
+            boolean distanceEntered = false;
+            for (Map.Entry<Mode, String> entry : consideredModes.entrySet())
+                distanceEntered = checkModeAndEnterDistance(trip, entry) || distanceEntered;
+            if (!distanceEntered)
+                log.error("Unknown legMode: " + trip.getMode());
+
         }
 
         writeModalShare(container, MODALSHARE_PATH, Mode.CAR, Mode.PT, Mode.SLOW_PT);
@@ -86,6 +92,14 @@ public class ModalShareDiagramCreator {
         int factor = 1000 / DISTANCE_BIN_SIZE;
         int xRange = 30; // has to be divisible by 10
         GnuplotUtils.runGnuplotScript(GNUPLOT_OUTPUT_PATH, relativePathToGnuplotScript, String.valueOf(factor), String.valueOf(xRange));
+    }
+
+    private boolean checkModeAndEnterDistance(Trip trip, Map.Entry<Mode, String> entry) {
+        if (trip.getMode().equals(entry.getValue())) {
+            container.enterDistance((int)trip.getDistanceRoutedByCalculation_m(network), entry.getKey());
+            return true;
+        } else
+            return false;
     }
 
     private void writeModalShare(ModalShareDistanceBinContainer container, String path, Mode... modes) {
