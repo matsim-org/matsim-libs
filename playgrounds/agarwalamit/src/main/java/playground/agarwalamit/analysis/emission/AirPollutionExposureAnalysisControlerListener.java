@@ -25,7 +25,6 @@ import java.io.IOException;
 import java.util.Map;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
-import org.matsim.contrib.emissions.events.EmissionEventsReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -37,6 +36,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.emission.experienced.ExperiencedEmissionCostHandler;
 import playground.agarwalamit.utils.MapUtils;
+import playground.kai.usecases.combinedEventsReader.CombinedMatsimEventsReader;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.IntervalHandler;
 import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
@@ -83,7 +83,6 @@ public class AirPollutionExposureAnalysisControlerListener implements  ShutdownL
 
         responsibilityGridTools.resetAndcaluculateRelativeDurationFactors(intervalHandler.getDuration());
 
-//        String emissionEventsFile = controlerIO.getIterationFilename(lastIt, ".events.xml.gz");
         if (! new File(eventsFile).exists()) {
             LOG.error("The emission events file for last iteration does not exists.");
             return;
@@ -94,7 +93,7 @@ public class AirPollutionExposureAnalysisControlerListener implements  ShutdownL
         {
             EventsManager events = EventsUtils.createEventsManager();
             events.addHandler(this.emissionCostHandler);
-            EmissionEventsReader reader = new EmissionEventsReader(events);
+            CombinedMatsimEventsReader reader = new CombinedMatsimEventsReader(events);
             reader.readFile(eventsFile);
         }
 
