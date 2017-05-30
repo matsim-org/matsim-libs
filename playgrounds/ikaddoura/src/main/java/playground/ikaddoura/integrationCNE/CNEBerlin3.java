@@ -181,6 +181,7 @@ public class CNEBerlin3 {
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 			decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(30.);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(controler.getConfig().controler().getLastIteration());
 
 		} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionBangBang.toString())) {
 
@@ -193,6 +194,7 @@ public class CNEBerlin3 {
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 			decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(30.);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(controler.getConfig().controler().getLastIteration());
 			
 		} else {
 			// for V3, V9 and V10: no additional settings
@@ -224,16 +226,44 @@ public class CNEBerlin3 {
 		ProcessNoiseImmissions processNoiseImmissions = new ProcessNoiseImmissions(immissionsDir, receiverPointsFile, noiseParameters.getReceiverPointGap());
 		processNoiseImmissions.run();
 		
-		final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
-		final String[] workingDirectories = { controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/" , controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/consideredAgentUnits/" , controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration()  + "/damages_receiverPoint/" };
-
-		MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
-		merger.setReceiverPointsFile(receiverPointsFile);
-		merger.setOutputDirectory(controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/");
-		merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
-		merger.setWorkingDirectory(workingDirectories);
-		merger.setLabel(labels);
-		merger.run();
+		{
+			final String[] labels = { "immission", "consideredAgentUnits" , "damages_receiverPoint" };
+			final String[] workingDirectories = { controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/immissions/" , controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/consideredAgentUnits/" , controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration()  + "/damages_receiverPoint/" };
+	
+			MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
+			merger.setReceiverPointsFile(receiverPointsFile);
+			merger.setOutputDirectory(controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/");
+			merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
+			merger.setWorkingDirectory(workingDirectories);
+			merger.setLabel(labels);
+			merger.run();
+		}
+		
+		{
+			final String[] labels = { "consideredAgentUnits" };
+			final String[] workingDirectories = { controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/consideredAgentUnits/" };
+	
+			MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
+			merger.setReceiverPointsFile(receiverPointsFile);
+			merger.setOutputDirectory(controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/");
+			merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
+			merger.setWorkingDirectory(workingDirectories);
+			merger.setLabel(labels);
+			merger.run();
+		}
+		
+		{
+			final String[] labels = {"damages_receiverPoint" };
+			final String[] workingDirectories = { controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration()  + "/damages_receiverPoint/" };
+	
+			MergeNoiseCSVFile merger = new MergeNoiseCSVFile() ;
+			merger.setReceiverPointsFile(receiverPointsFile);
+			merger.setOutputDirectory(controler.getConfig().controler().getOutputDirectory() + "/ITERS/it." + controler.getConfig().controler().getLastIteration() + "/");
+			merger.setTimeBinSize(noiseParameters.getTimeBinSizeNoiseComputation());
+			merger.setWorkingDirectory(workingDirectories);
+			merger.setLabel(labels);
+			merger.run();
+		}
 		
 		// delete unnecessary iterations folder here.
 		int firstIt = controler.getConfig().controler().getFirstIteration();
