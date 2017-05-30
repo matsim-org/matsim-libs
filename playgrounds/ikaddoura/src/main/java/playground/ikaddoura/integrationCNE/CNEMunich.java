@@ -285,6 +285,7 @@ public class CNEMunich {
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 			decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(30.);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(controler.getConfig().controler().getLastIteration());
 
 		} else if (congestionTollingApproach.toString().equals(CongestionTollingApproach.DecongestionBangBang.toString())) {
 
@@ -297,6 +298,7 @@ public class CNEMunich {
 			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
 			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
 			decongestionSettings.setTOLERATED_AVERAGE_DELAY_SEC(30.);
+			decongestionSettings.setWRITE_OUTPUT_ITERATION(controler.getConfig().controler().getLastIteration());
 			
 		} else {
 			// for V3, V9 and V10: no additional settings
