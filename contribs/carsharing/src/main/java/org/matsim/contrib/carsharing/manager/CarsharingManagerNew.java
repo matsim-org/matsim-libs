@@ -1,6 +1,8 @@
 package org.matsim.contrib.carsharing.manager;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -14,8 +16,10 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.carsharing.events.NoVehicleCarSharingEvent;
 import org.matsim.contrib.carsharing.events.StartRentalEvent;
 import org.matsim.contrib.carsharing.manager.demand.CurrentTotalDemand;
+import org.matsim.contrib.carsharing.manager.demand.VehicleChoiceAgent;
 import org.matsim.contrib.carsharing.manager.routers.RouterProvider;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
+import org.matsim.contrib.carsharing.manager.supply.CompanyAgent;
 import org.matsim.contrib.carsharing.manager.supply.CompanyContainer;
 import org.matsim.contrib.carsharing.manager.supply.OneWayContainer;
 import org.matsim.contrib.carsharing.manager.supply.TwoWayContainer;
@@ -48,6 +52,8 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 	@Inject private CarsharingSupplyInterface carsharingSupplyContainer;
 	@Inject private EventsManager eventsManager;
 	@Inject private RouterProvider routerProvider;
+	@Inject private VehicleChoiceAgent vehicleChoiceAgent;
+	
 	
 	@Override
 	public List<PlanElement> reserveAndrouteCarsharingTrip(Plan plan, String carsharingType, Leg legToBeRouted, Double time) {
@@ -108,43 +114,50 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			//=== here he chooses the company, type of vehicle and in the end vehicle ===
 			//=== possibly this could be moved to one method which decides based on the supply which vehicle to take
 			String typeOfVehicle = chooseVehicleType.getPreferredVehicleType(plan, legToBeRouted);
-
-			String companyId = chooseCompany.pickACompany(plan, legToBeRouted, time, typeOfVehicle);
-			if (!companyId.equals("")) {
+			
+			Set<CSVehicle> offeredVehicles = new HashSet<>();
+			for (CompanyAgent companyAgent : this.carsharingSupplyContainer.getCompanyAgents().values()) {
 				
-				//in the current state, the company is not remembered in the carsharing route
-				//one might want to add this or not, depending on the behavior one 
-				//wants to observe
-				vehicle = this.carsharingSupplyContainer.findClosestAvailableVehicle(startLink,
-						carsharingType, typeOfVehicle, companyId, searchDistance);
-				if (vehicle == null) {					
-					eventsManager.processEvent(new NoVehicleCarSharingEvent(time, carsharingType, companyId, startLink, destinationLink));
+				CSVehicle offeredVehicle = companyAgent.vehicleRequest(person.getId(), startLink, destinationLink, carsharingType, typeOfVehicle);
+				
+				if (offeredVehicle != null)
+					offeredVehicles.add(offeredVehicle);				
+			}
+			
+			
+			//TODO: offer the possible cars to the agent, from which the agent can choose
+			CSVehicle chosenVehicle = vehicleChoiceAgent.chooseVehicle(offeredVehicles, startLink);
+			
+			if (chosenVehicle == null) {
+				eventsManager.processEvent(new NoVehicleCarSharingEvent(time, carsharingType, "", startLink, destinationLink));
 
-					return null;				
-				}
-
-				CompanyContainer companyContainer = this.carsharingSupplyContainer.getCompany(companyId);
+				return null;
+			}
+			else {
+				
+				CompanyContainer companyContainer = this.carsharingSupplyContainer.getCompany(chosenVehicle.getCompanyId());
 				VehiclesContainer vehiclesContainer = companyContainer.getVehicleContainer(carsharingType);
-				Link stationLink = vehiclesContainer.getVehicleLocation(vehicle);
-
-				if (false == companyContainer.reserveVehicle(vehicle)) {
-					eventsManager.processEvent(new NoVehicleCarSharingEvent(time, carsharingType, companyId, startLink, destinationLink));
+				Link stationLink = vehiclesContainer.getVehicleLocation(chosenVehicle);
+				
+				if (false == companyContainer.reserveVehicle(chosenVehicle)) {
+					eventsManager.processEvent(new NoVehicleCarSharingEvent(time, carsharingType, chosenVehicle.getCompanyId(), startLink, destinationLink));
 
 					return null;
 				}
 			
-				eventsManager.processEvent(new StartRentalEvent(time, carsharingType, companyId, startLink, stationLink, destinationLink, person.getId(), vehicle.getVehicleId()));
+				eventsManager.processEvent(new StartRentalEvent(time, carsharingType, 
+						chosenVehicle.getCompanyId(), startLink, stationLink, destinationLink, person.getId(), chosenVehicle.getVehicleId()));
 			
 				if ((willHaveATripFromLocation && keepTheCar) || (willHaveATripFromLocation && carsharingType.equals("twoway"))) {
 					((CarsharingRoute)legToBeRouted.getRoute()).setKeepthecar(true);
 
-					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
+					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, chosenVehicle,
 							stationLink, destinationLink, true, false);
 				}
 				else {
 					if ((carsharingType.equals("oneway")) || (carsharingType.equals("freefloating"))) {
 						Link parkingStationLink = this.carsharingSupplyContainer.findClosestAvailableParkingSpace(
-								destinationLink, carsharingType, companyId, searchDistance);
+								destinationLink, carsharingType, chosenVehicle.getCompanyId(), searchDistance);
 						if (parkingStationLink == null)
 							return null;
 					
@@ -153,14 +166,12 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 						destinationLink = parkingStationLink;
 					}
 	
-					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, vehicle,
+					return this.routerProvider.routeCarsharingTrip(plan, time, legToBeRouted, carsharingType, chosenVehicle,
 							stationLink, destinationLink, false, false);				
-				}	
-			}
-			else {
-				eventsManager.processEvent(new NoVehicleCarSharingEvent(time, carsharingType, companyId, startLink, destinationLink));
-				return null;
-			}
+				}		
+				
+			}				
+			
 		}					
 	}
 	
