@@ -27,6 +27,7 @@ import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.MultiNodePathCalculator;
 
 /**
@@ -72,6 +73,7 @@ public class SingleVehicleInsertionProblem {
 	private final OneToManyPathSearch forwardPathSearch;
 	private final OneToManyPathSearch backwardPathSearch;
 	private final double stopDuration;
+	private final MobsimTimer timer;
 	private final InsertionCostCalculator costCalculator;
 
 	///
@@ -98,18 +100,19 @@ public class SingleVehicleInsertionProblem {
 	// private boolean[] considerDropoffInsertion;
 
 	public SingleVehicleInsertionProblem(MultiNodePathCalculator router, BackwardMultiNodePathCalculator backwardRouter,
-			double stopDuration, double maxWaitTime) {
+			double stopDuration, double maxWaitTime, MobsimTimer timer) {
 		forwardPathSearch = OneToManyPathSearch.createForwardSearch(router);
 		backwardPathSearch = OneToManyPathSearch.createBackwardSearch(backwardRouter);
 
 		this.stopDuration = stopDuration;
+		this.timer = timer;
 		costCalculator = new InsertionCostCalculator(stopDuration, maxWaitTime);
 	}
 
 	public BestInsertion findBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry) {
 		initPathData(drtRequest, vEntry);
 		findPickupDropoffInsertions(drtRequest, vEntry);
-		return selectBestInsertion(costCalculator, drtRequest, vEntry);
+		return selectBestInsertion(drtRequest, vEntry);
 	}
 
 	private void initPathData(DrtRequest drtRequest, VehicleData.Entry vEntry) {
@@ -217,12 +220,11 @@ public class SingleVehicleInsertionProblem {
 		insertions.add(new Insertion(i, j, toPickup, fromPickup, toDropoff, fromDropoff));
 	}
 
-	private BestInsertion selectBestInsertion(InsertionCostCalculator costCalculator, DrtRequest drtRequest,
-			VehicleData.Entry vEntry) {
+	private BestInsertion selectBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry) {
 		double minCost = Double.MAX_VALUE;
 		Insertion bestInsertion = null;
 		for (Insertion insertion : insertions) {
-			double cost = costCalculator.calculate(drtRequest, vEntry, insertion);
+			double cost = costCalculator.calculate(drtRequest, vEntry, insertion, timer.getTimeOfDay());
 			if (cost < minCost) {
 				bestInsertion = insertion;
 				minCost = cost;

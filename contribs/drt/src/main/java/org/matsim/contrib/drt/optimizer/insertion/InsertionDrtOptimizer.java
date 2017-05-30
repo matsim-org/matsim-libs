@@ -25,9 +25,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.*;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
-import org.matsim.contrib.drt.passenger.*;
-import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
-import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
+import org.matsim.contrib.drt.passenger.events.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.locationchoice.router.*;
@@ -70,7 +68,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 					optimContext.travelDisutility, optimContext.travelTime, preProcessDijkstra, fastRouterFactory,
 					true);
 			singleVehicleInsertionProblems[i] = new SingleVehicleInsertionProblem(router, backwardRouter,
-					optimContext.scheduler.getParams().stopDuration, drtCfg.getMaxWaitTime());
+					optimContext.scheduler.getParams().stopDuration, drtCfg.getMaxWaitTime(), optimContext.timer);
 		}
 
 		insertionProblem = new ParallelMultiVehicleInsertionProblem(singleVehicleInsertionProblems);
