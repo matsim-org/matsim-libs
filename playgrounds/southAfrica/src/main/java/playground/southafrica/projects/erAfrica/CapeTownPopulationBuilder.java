@@ -34,6 +34,9 @@ import playground.southafrica.utilities.Header;
  * entire synthetic population for the City of Cape Town. The idea is that this
  * is a single-run process with no manual intervention.
  * 
+ * FIXME This is (possibly) still called Phase1PopulationBuilder in the R 
+ * documentation.
+ * 
  * @author jwjoubert
  */
 public class CapeTownPopulationBuilder {
