@@ -60,14 +60,14 @@ public class LaemmerBasicExample {
     public static void main(String[] args) {
         log.info("Running Laemmer main method...");
 
-//        for (int i = 0; i <= 2520; i += 120) {
-        run(360, 480, LaemmerConfig.Regime.COMBINED, false, false, false, true, false, true);
-//            run(360, i, LaemmerConfig.Regime.OPTIMIZING, false, false, false, true, false, true);
-//            run(360, i, LaemmerConfig.Regime.STABILIZING, false, false, false, true, false, true);
-//        }
+        for (int i = 0; i <= 2520; i += 120) {
+        run(360, i, LaemmerConfig.Regime.COMBINED, false, false, false, true, true, true, 0);
+            run(360, i, LaemmerConfig.Regime.OPTIMIZING, false, false, false, true, true, true,0);
+            run(360, i, LaemmerConfig.Regime.STABILIZING, false, false, false, true, true, true,0);
+        }
     }
 
-    private static void run(double flowNS, double flowWE, LaemmerConfig.Regime regime, boolean vis, boolean log, boolean stochastic, boolean lanes, boolean liveArrivalRates, boolean grouped) {
+    private static void run(double flowNS, double flowWE, LaemmerConfig.Regime regime, boolean vis, boolean log, boolean stochastic, boolean lanes, boolean liveArrivalRates, boolean grouped, double minG) {
 
         String outputPath;
         if (stochastic) {
@@ -112,6 +112,7 @@ public class LaemmerBasicExample {
             laemmerConfig.setDESIRED_PERIOD(120);
             laemmerConfig.setMAX_PERIOD(180);
         }
+        laemmerConfig.setMinG(minG);
         laemmerConfig.setActiveRegime(regime);
         module.setLaemmerConfig(laemmerConfig);
 
@@ -127,8 +128,8 @@ public class LaemmerBasicExample {
             OTFVisConfigGroup otfvisConfig =
                     ConfigUtils.addOrGetModule(config, OTFVisConfigGroup.GROUP_NAME, OTFVisConfigGroup.class);
             otfvisConfig.setScaleQuadTreeRect(true);
-            otfvisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.byId);
-            otfvisConfig.setAgentSize(240);
+//            otfvisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.byId);
+//            otfvisConfig.setAgentSize(240);
             controler.addOverridingModule(new OTFVisWithSignalsLiveModule());
         }
         if (log) {
@@ -280,7 +281,7 @@ public class LaemmerBasicExample {
 
         // original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
         LanesUtils.createAndAddLane(lanesForLink2_3, factory,
-                Id.create("2_3.ol", Lane.class), 3600, 1000, 0, 1,
+                Id.create("2_3.ol", Lane.class), 3600, 1000, 0, 2,
                 null, Arrays.asList(Id.create("2_3.l", Lane.class), Id.create("2_3.r", Lane.class)));
 
 
@@ -302,7 +303,7 @@ public class LaemmerBasicExample {
 
         // original lane, i.e. lane that starts at the link from node and leads to all other lanes of the link
         LanesUtils.createAndAddLane(lanesForLink4_3, factory,
-                Id.create("4_3.ol", Lane.class), 3600, 1000, 0, 1,
+                Id.create("4_3.ol", Lane.class), 3600, 1000, 0, 2,
                 null, Arrays.asList(Id.create("4_3.l", Lane.class), Id.create("4_3.r", Lane.class)));
 
         // straight and left turning lane (alignment 1)

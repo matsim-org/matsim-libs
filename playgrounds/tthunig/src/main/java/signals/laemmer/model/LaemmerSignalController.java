@@ -136,8 +136,9 @@ public class LaemmerSignalController extends AbstractSignalController implements
         log.debug("Updating signals");
         updateSignals(now);
         if(activeRequest != null && activeRequest.signal.group.getState().equals(SignalGroupState.GREEN)) {
-            double remainingInBetweenTime = Math.max(activeRequest.time - now, 0);
-            double remainingMinG = Math.max(activeRequest.time - now + MIN_G - remainingInBetweenTime, 0);
+            double remainingMinG = activeRequest.time + MIN_G - now;
+//            double remainingInBetweenTime = Math.max(activeRequest.time - now, 0);
+//            double remainingMinG = Math.max(activeRequest.time - now + MIN_G - remainingInBetweenTime, 0);
             if (remainingMinG > 0) {
                 return;
             }
@@ -433,13 +434,13 @@ public class LaemmerSignalController extends AbstractSignalController implements
                 double remainingInBetweenTime = Math.max(activeRequest.time - now, 0);
                 double remainingMinG = Math.max(activeRequest.time - now + MIN_G - remainingInBetweenTime, 0);
                 signalLog.debug("Remaining in between time " + remainingInBetweenTime);
-                for (double i = remainingInBetweenTime + remainingMinG; i <= DEFAULT_INTERGREEN + MIN_G; i++) {
+                for (double i = remainingInBetweenTime; i <= DEFAULT_INTERGREEN; i++) {
                     double nExpected = 0;
                     double reqGreenTime = remainingMinG;
                     for (Signal signal : this.group.getSignals().values()) {
                         if (signal.getLaneIds() != null && !signal.getLaneIds().isEmpty()) {
                             for (Id<Lane> laneId : signal.getLaneIds()) {
-                                double nTemp = getNumberOfExpectedVehiclesOnLane(now + i, signal.getLinkId(), laneId);
+                                double nTemp = getNumberOfExpectedVehiclesOnLane(now + i + remainingMinG, signal.getLinkId(), laneId);
                                 nExpected += nTemp;
                                 double laneFlow = lanes.getLanesToLinkAssignments().get(signal.getLinkId()).getLanes().get(laneId).getCapacityVehiclesPerHour() / 3600;
                                 double tempGreenTime = nTemp / laneFlow;
@@ -448,7 +449,7 @@ public class LaemmerSignalController extends AbstractSignalController implements
                                 }
                             }
                         } else {
-                            double nTemp = getNumberOfExpectedVehiclesOnLink(now + i, signal.getLinkId());
+                            double nTemp = getNumberOfExpectedVehiclesOnLink(now + i + remainingMinG, signal.getLinkId());
                             nExpected += nTemp;
                             double linkFlow = network.getLinks().get(signal.getLinkId()).getCapacity() / 3600;
                             double tempGreenTime = nTemp / linkFlow;
