@@ -36,7 +36,7 @@ import peoplemover.ClosestStopBasedDrtRoutingModule;
  */
 public class RunDrtScenario {
 	public static void run(String configFile, boolean otfvis) {
-		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
+	    final Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		Controler controler = createControler(config, otfvis);
 		controler.addOverridingModule(new AbstractModule() {
