@@ -98,7 +98,7 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay);
 		eventsManager.processEvent(moneyEvent);
 		
-		PersonLinkMoneyEvent moneyLinkEvent = new PersonLinkMoneyEvent(time, personId, event.getLinkId(), amount2Pay, time);
+		PersonLinkMoneyEvent moneyLinkEvent = new PersonLinkMoneyEvent(time, personId, event.getLinkId(), amount2Pay, time, "airPollution");
 		eventsManager.processEvent(moneyLinkEvent);
 	}
 
@@ -111,7 +111,7 @@ public class EmissionInternalizationHandler implements WarmEmissionEventHandler,
 		Event moneyEvent = new PersonMoneyEvent(time, personId, amount2Pay);
 		eventsManager.processEvent(moneyEvent);
 		
-		PersonLinkMoneyEvent moneyLinkEvent = new PersonLinkMoneyEvent(time, personId, event.getLinkId(), amount2Pay, time);
+		PersonLinkMoneyEvent moneyLinkEvent = new PersonLinkMoneyEvent(time, personId, event.getLinkId(), amount2Pay, time, "airPollution");
 		eventsManager.processEvent(moneyLinkEvent);
 	}
 	
