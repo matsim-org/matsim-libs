@@ -20,13 +20,13 @@
 
 package org.matsim.core.trafficmonitoring;
 
-public abstract class AbstractTravelTimeAggregator {
+ abstract class AbstractTravelTimeAggregator {
 
 	private final int travelTimeBinSize;
 	private final int numSlots;
 	private TravelTimeGetter travelTimeGetter;
 
-	public AbstractTravelTimeAggregator(final int numSlots, final int travelTimeBinSize) {
+	 AbstractTravelTimeAggregator(final int numSlots, final int travelTimeBinSize) {
 		this.numSlots = numSlots;
 		this.travelTimeBinSize = travelTimeBinSize;
 
@@ -36,24 +36,24 @@ public abstract class AbstractTravelTimeAggregator {
 	/**
 	 * Naming this "connect" instead of "set" since it is a two-way pointer.  kai, aug'13
 	 */
-	public void connectTravelTimeGetter(final TravelTimeGetter travelTimeGetter) {
+	 void connectTravelTimeGetter(final TravelTimeGetter travelTimeGetter) {
 		this.travelTimeGetter = travelTimeGetter;
 		travelTimeGetter.setTravelTimeAggregator(this);
 	}
 
-	protected int getTimeSlotIndex(final double time) {
+	 int getTimeSlotIndex(final double time) {
 	    return TimeBinUtils.getTimeBinIndex(time, travelTimeBinSize, numSlots);
 	}
 
-	protected abstract void addTravelTime(TravelTimeData travelTimeRole, double enterTime,
+	 abstract void addTravelTime(TravelTimeData travelTimeRole, double enterTime,
 			double leaveTime);
 
-	public void addStuckEventTravelTime(final TravelTimeData travelTimeRole,
+	 void addStuckEventTravelTime(final TravelTimeData travelTimeRole,
 			final double enterTime, final double stuckEventTime) {
 		//here is the right place to handle StuckEvents (just overwrite this method)
 	}
 
-	protected double getTravelTime(final TravelTimeData travelTimeRole, final double time) {
+	 double getTravelTime(final TravelTimeData travelTimeRole, final double time) {
 		return this.travelTimeGetter.getTravelTime(travelTimeRole, time);
 	}
 

@@ -20,11 +20,13 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
 
 /**
@@ -54,6 +56,8 @@ import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
  */
 public class WithinDayAgentUtils {
 //	private WithinDayAgentUtils(){} // do not instantiate: static methods only
+	
+	private static final Logger log = Logger.getLogger( WithinDayAgentUtils.class );
 
 	public static final Integer getCurrentPlanElementIndex(MobsimAgent agent) {
 		if (agent instanceof PersonDriverAgentImpl) {
@@ -128,4 +132,20 @@ public class WithinDayAgentUtils {
 					" which does not support getCurrentPlanElement(...). Aborting!");
 		}
 	}
+
+	public static boolean isReplannableCarLeg(MobsimAgent agent) {
+	//		if (plan == null) {
+	//			log.info( " we don't have a modifiable plan; returning ... ") ;
+	//			return false;
+	//		}
+			if ( !(getCurrentPlanElement(agent) instanceof Leg) ) {
+				log.info( "agent not on leg; returning ... ") ;
+				return false ;
+			}
+			if (!((Leg) getCurrentPlanElement(agent)).getMode().equals(TransportMode.car)) {
+				log.info( "not a car leg; can only replan car legs; returning ... ") ;
+				return false;
+			}
+			return true ;
+		}
 }
