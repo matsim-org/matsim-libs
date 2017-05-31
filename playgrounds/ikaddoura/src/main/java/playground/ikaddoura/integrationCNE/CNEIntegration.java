@@ -216,14 +216,21 @@ public class CNEIntegration {
 		
 		} else {
 			
-			DecongestionConfigGroup decongestionSettings = (DecongestionConfigGroup) controler.getConfig().getModules().get(DecongestionConfigGroup.GROUP_NAME);
-			decongestionSettings.setRUN_FINAL_ANALYSIS(false);
-			decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
-			decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(1.0);
-			decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(0.0);
-			decongestionSettings.setWRITE_OUTPUT_ITERATION(controler.getConfig().controler().getLastIteration());
 			
-			controler.addOverridingModule(new DecongestionAnalysisModule());
+			DecongestionConfigGroup decongestionSettings = (DecongestionConfigGroup) controler.getConfig().getModules().get(DecongestionConfigGroup.GROUP_NAME);
+			
+			if (decongestionSettings != null) {
+				
+				log.info("Analyzing the delay per link and time bin.");
+				
+				decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+				decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+				decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(1.0);
+				decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(0.0);
+				decongestionSettings.setWRITE_OUTPUT_ITERATION(controler.getConfig().controler().getLastIteration());
+				
+				controler.addOverridingModule(new DecongestionAnalysisModule());
+			}
 		}
 
 		// ########################## Air pollution ##########################
