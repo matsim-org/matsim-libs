@@ -60,9 +60,9 @@ import com.google.inject.Inject;
  * @author nagel
  *
  */
-class WithinDayBangBangMobsimListener implements MobsimBeforeSimStepListener {
+public class ManualDetour implements MobsimBeforeSimStepListener {
 
-	private static final Logger log = Logger.getLogger("dummy");
+	public static final Logger log = Logger.getLogger("dummy");
 
 	private final Scenario scenario;
 
@@ -70,10 +70,6 @@ class WithinDayBangBangMobsimListener implements MobsimBeforeSimStepListener {
 
 	private Id<Link> returnId = Id.createLinkId("4706699_26662459_26662476");
 
-	private List<Id<Link>> originalLinks;
-
-	private TravelTime travelTime;
-	
 	private class AvoidAccidentTravelTimeAndDisutility implements TravelTime, TravelDisutility {
 		FreespeedTravelTimeAndDisutility delegate = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
 		@Override public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
@@ -96,23 +92,19 @@ class WithinDayBangBangMobsimListener implements MobsimBeforeSimStepListener {
 	}
 
 	@Inject
-	WithinDayBangBangMobsimListener(Scenario scenario, LeastCostPathCalculatorFactory pathAlgoFactory, TravelTime travelTime ) {
+	ManualDetour(Scenario scenario, LeastCostPathCalculatorFactory pathAlgoFactory ) {
 		this.scenario = scenario ;
-		this.travelTime = travelTime ;
 
 		AvoidAccidentTravelTimeAndDisutility fff = new AvoidAccidentTravelTimeAndDisutility() ;
 		alternativeLinks = computeRouteLinkIds(pathAlgoFactory, fff, fff) ;
-		
-		FreespeedTravelTimeAndDisutility abc = new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0) ;
-		originalLinks = computeRouteLinkIds( pathAlgoFactory, abc, abc ) ;
-				
+
 	}
 
 	private List<Id<Link>> computeRouteLinkIds(LeastCostPathCalculatorFactory pathAlgoFactory, TravelTime tt,
 			TravelDisutility td) {
 		// it feels like one should have the following infrastructure as fields.  However, since it is only called once, at initialization,
 		// can as well leave it local here. kai, apr'16
-		
+
 		LeastCostPathCalculator routeAlgo = pathAlgoFactory.createPathCalculator( scenario.getNetwork(), td, tt);
 		final RoutingModule routingModule = DefaultRoutingModules.createPureNetworkRouter(TransportMode.car, scenario.getPopulation().getFactory(), 
 				scenario.getNetwork(), routeAlgo);
@@ -132,42 +124,27 @@ class WithinDayBangBangMobsimListener implements MobsimBeforeSimStepListener {
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent event) {
 		double now = event.getSimulationTime() ;
+		double duration = 60 ;
+		if (                                                              now < 8.*3600+10*60 ) return ;
+		if ( 8.*3600 + 10*60 + duration < now && now < 8.*3600+20*60 ) return ;
+		if ( 8.*3600 + 20*60 + duration < now && now < 8.*3600+30*60 ) return ;
+		if ( 8.*3600 + 30*60 + duration < now && now < 8.*3600+40*60 ) return ;
+		if ( 8.*3600 + 40*60 + duration < now && now < 8.*3600+50*60 ) return ;
+		if ( 8.*3600 + 50*60 + duration < now  ) return ;
 
 		Collection<MobsimAgent> agentsToReplan = WithinDayBestRouteMobsimListener.getAgentsToReplan( (Netsim) event.getQueueSimulation() ); 
-		
-		double ttimeThroughAccident = calcTtime(now, this.originalLinks) ;
-		double ttimeDetour = calcTtime( now, this.alternativeLinks ) ;
-		Logger.getLogger( this.getClass() ).warn( "ttimeOrig=" + ttimeThroughAccident + "; ttimeDetour=" + ttimeDetour );
 
 		for (MobsimAgent ma : agentsToReplan) {
-			doReplanning(ma, ttimeThroughAccident, ttimeDetour);
+			doReplanning(ma);
 		}
 	}
 
-	private double calcTtime(double now, List<Id<Link>> linkIds) {
-		double sum = 0. ;
-		for ( Id<Link> linkId : linkIds ) {
-			Link link = scenario.getNetwork().getLinks().get( linkId ) ;
-			sum += travelTime.getLinkTravelTime(link, now, null, null ) ;
-		}
-		return sum;
-	}
-
-	private boolean doReplanning(MobsimAgent agent, double ttimeOrig, double ttimeDetour ) {
+	private boolean doReplanning(MobsimAgent agent ) {
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ; 
 
-		if (plan == null) {
-			log.info( " we don't have a modifiable plan; returning ... ") ;
-			return false;
-		}
-		if ( !(WithinDayAgentUtils.getCurrentPlanElement(agent) instanceof Leg) ) {
-			log.info( "agent not on leg; returning ... ") ;
+		if ( !WithinDayAgentUtils.isReplannableCarLeg(agent) ) {
 			return false ;
-		}
-		if (!((Leg) WithinDayAgentUtils.getCurrentPlanElement(agent)).getMode().equals(TransportMode.car)) {
-			log.info( "not a car leg; can only replan car legs; returning ... ") ;
-			return false;
 		}
 
 		final Integer planElementsIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
@@ -179,27 +156,18 @@ class WithinDayBangBangMobsimListener implements MobsimBeforeSimStepListener {
 		List<Id<Link>> oldLinkIds = new ArrayList<>( oldRoute.getLinkIds() ) ;
 		// the above forces a copy, which I need later
 
-		// method 2:
-//		if ( true ) {
-//		if ( MatsimRandom.getRandom().nextDouble() < 0.2 ) {
-		if ( ttimeDetour < ttimeOrig ) {
+		final int idx = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
 
-			final int idx = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
-
-			if ( oldRoute.getLinkIds().contains( this.returnId ) ) {
-				List<Id<Link>> copy = new ArrayList<>( oldRoute.getLinkIds() ) ;
-				while (  !copy.get( idx ).equals( this.returnId )  ) {
-					copy.remove( idx ) ;
-				}
-				copy.addAll( idx, this.alternativeLinks ) ;
-				final RouteFactories modeRouteFactory = this.scenario.getPopulation().getFactory().getRouteFactories();
-				NetworkRoute newRoute = modeRouteFactory.createRoute( NetworkRoute.class, oldRoute.getStartLinkId(), oldRoute.getEndLinkId()) ;
-
-				//			RouteUtils.createNetworkRoute(routeLinkIds, network) ;
-
-				newRoute.setLinkIds( oldRoute.getStartLinkId(), copy, oldRoute.getEndLinkId() );
-				leg.setRoute(newRoute);
+		if ( oldRoute.getLinkIds().contains( this.returnId ) ) {
+			List<Id<Link>> copy = new ArrayList<>( oldRoute.getLinkIds() ) ;
+			while (  !copy.get( idx ).equals( this.returnId )  ) {
+				copy.remove( idx ) ;
 			}
+			copy.addAll( idx, this.alternativeLinks ) ;
+			final RouteFactories modeRouteFactory = this.scenario.getPopulation().getFactory().getRouteFactories();
+			NetworkRoute newRoute = modeRouteFactory.createRoute( NetworkRoute.class, oldRoute.getStartLinkId(), oldRoute.getEndLinkId()) ;
+			newRoute.setLinkIds( oldRoute.getStartLinkId(), copy, oldRoute.getEndLinkId() );
+			leg.setRoute(newRoute);
 		}
 
 		ArrayList<Id<Link>> currentLinkIds = new ArrayList<>( ((NetworkRoute) leg.getRoute()).getLinkIds() ) ;
@@ -212,7 +180,6 @@ class WithinDayBangBangMobsimListener implements MobsimBeforeSimStepListener {
 
 		// finally reset the cached Values of the PersonAgent - they may have changed!
 		WithinDayAgentUtils.resetCaches(agent);
-		//		WithinDayAgentUtils.rescheduleActivityEnd(agent, mobsim);
 
 		return true;
 	}

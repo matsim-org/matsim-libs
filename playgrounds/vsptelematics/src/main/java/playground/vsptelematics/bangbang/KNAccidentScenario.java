@@ -146,21 +146,21 @@ public class KNAccidentScenario {
 		Link link = scenario.getNetwork().getLinks().get( Id.createLinkId( "-418375_-248_247919764" ) ) ;
 		link.setCapacity(2000.); // "repair" a capacity. (This is Koenigin-Elisabeth-Str., parallel to A100 near Funkturm, having visibly less capacity than links upstream and downstream.)
 
-		Link link2 = scenario.getNetwork().getLinks().get( Id.createLinkId("40371262_533639234_487689293-40371262_487689293_487689300-40371262_487689300_487689306-40371262_487689306_487689312-40371262_487689312_487689316-40371262_487689316_487689336-40371262_487689336_487689344-40371262_487689344_487689349-40371262_487689349_487689356-40371262_487689356_533639223-4396104_533639223_487673629-4396104_487673629_487673633-4396104_487673633_487673636-4396104_487673636_487673640-4396104_487673640_26868611-4396104_26868611_484073-4396104_484073_26868612-4396104_26868612_26662459") ) ;
-		link2.setCapacity( 300. ) ; // reduce cap on alt route. (This is the freeway entry link just downstream of the accident; reducing its capacity
+//		Link link2 = scenario.getNetwork().getLinks().get( Id.createLinkId("40371262_533639234_487689293-40371262_487689293_487689300-40371262_487689300_487689306-40371262_487689306_487689312-40371262_487689312_487689316-40371262_487689316_487689336-40371262_487689336_487689344-40371262_487689344_487689349-40371262_487689349_487689356-40371262_487689356_533639223-4396104_533639223_487673629-4396104_487673629_487673633-4396104_487673633_487673636-4396104_487673636_487673640-4396104_487673640_26868611-4396104_26868611_484073-4396104_484073_26868612-4396104_26868612_26662459") ) ;
+//		link2.setCapacity( 300. ) ; // reduce cap on alt route. (This is the freeway entry link just downstream of the accident; reducing its capacity
 		// means that the router finds a wider variety of alternative routes.)
 
 		// ===
 
 		final Controler controler = new Controler( scenario ) ;
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
-		//		controler.setDirtyShutdown(true);
 
-		Set<String> analyzedModes = new HashSet<>() ;
-		analyzedModes.add( TransportMode.car ) ;
-		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
 
-//		controler.addOverridingModule( new OTFVisLiveModule() );
+//		Set<String> analyzedModes = new HashSet<>() ;
+//		analyzedModes.add( TransportMode.car ) ;
+//		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
+
+		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install() {
@@ -174,17 +174,26 @@ public class KNAccidentScenario {
 //				addPlanStrategyBinding(KEEP_LAST_EXECUTED).toProvider(KeepLastExecutedAsPlanStrategy.class) ;
 
 //				this.bind( MyIterationCounter.class ).asEagerSingleton();
+				
+				this.addMobsimListenerBinding().to( ManualDetour.class ) ;
 
+				// ===
+				
+//				this.addEventHandlerBinding().toInstance( travelTime ) ;
+//				this.addMobsimListenerBinding().toInstance( travelTime );
+//				this.bind( TravelTime.class ).toInstance( travelTime );
+				
 				// ---
+				
 				
 //				this.addMobsimListenerBinding().to( WithinDayBangBangMobsimListener.class );
-//				this.addMobsimListenerBinding().to( WithinDayBestRouteMobsimListener.class );
 				
 				// ---
 
-				this.addEventHandlerBinding().toInstance( travelTime ) ;
-				this.addMobsimListenerBinding().toInstance( travelTime );
-				this.bind( TravelTime.class ).toInstance( travelTime );
+//				this.addMobsimListenerBinding().to( WithinDayBestRouteMobsimListener.class );
+
+				// ---
+				
 			}
 		}) ;
 
