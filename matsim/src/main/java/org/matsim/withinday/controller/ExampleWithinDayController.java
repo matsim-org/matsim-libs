@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -42,6 +44,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.OnlyTravelTimeDependentScoringFunctionFactory;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
@@ -122,11 +125,18 @@ public final class ExampleWithinDayController implements StartupListener {
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
-			System.out.println("Usage: Controler config-file [dtd-file]");
+//			System.out.println("Usage: Controler config-file [dtd-file]");
+			// the [dtd-file] argument was not honoured when I found this fca451f279bd4c8e3921846597d657614d5a5832 . kai, may'17
+			System.out.println("Usage: Controler config-file");
 			System.out.println();
 			System.exit(-1);
 		} 
-		final Controler controler = new Controler(args);
+		
+		Config config = ConfigUtils.loadConfig( args[0] , new WithinDayConfigGroup() ) ;
+		
+		Scenario scenario = ScenarioUtils.loadScenario( config) ;
+		
+		final Controler controler = new Controler(scenario);
 		configure(controler);
 		controler.run();
 	}

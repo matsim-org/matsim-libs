@@ -49,19 +49,19 @@ import org.apache.log4j.Logger;
 public class IOUtils {
 
 	private static final String GZ = ".gz";
-	
+
 	public static final Charset CHARSET_UTF8 = Charset.forName("UTF8");
 	public static final Charset CHARSET_WINDOWS_ISO88591 = Charset.forName("ISO-8859-1");
-	
+
 	public static final String NATIVE_NEWLINE = System.getProperty("line.separator");
 
 	private final static Logger log = Logger.getLogger(IOUtils.class);
 
 	public static URL getUrlFromFileOrResource(String filename) {
 		if (filename.startsWith("~" + File.separator)) {
-		    filename = System.getProperty("user.home") + filename.substring(1);
+			filename = System.getProperty("user.home") + filename.substring(1);
 		}
-		
+
 		File file = new File(filename);
 		if (file.exists()) {
 			try {
@@ -294,35 +294,35 @@ public class IOUtils {
 	public static void deleteDirectoryRecursively(Path path) throws UncheckedIOException {
 		try {
 			Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                    Files.delete(file);
-                    return FileVisitResult.CONTINUE;
-                }
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					Files.delete(file);
+					return FileVisitResult.CONTINUE;
+				}
 
-                @Override
-                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    Files.delete(dir);
-                    return FileVisitResult.CONTINUE;
-                }
-            });
+				@Override
+				public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+					Files.delete(dir);
+					return FileVisitResult.CONTINUE;
+				}
+			});
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
 	}
 
 	/**
-   * Tries to open the specified file for reading and returns an InputStream for it.
-   * Supports gzip-compressed files, such files are automatically decompressed.
-   * If the file is not found, a gzip-compressed version of the file with the
-   * added ending ".gz" will be searched for and used if found.
-   *
-   * @param filename The file to read, may contain the ending ".gz" to force reading a compressed file.
-   * @return InputStream for the specified file.
-   * @throws UncheckedIOException
-   *
-   * <br> author dgrether
-   */
+	 * Tries to open the specified file for reading and returns an InputStream for it.
+	 * Supports gzip-compressed files, such files are automatically decompressed.
+	 * If the file is not found, a gzip-compressed version of the file with the
+	 * added ending ".gz" will be searched for and used if found.
+	 *
+	 * @param filename The file to read, may contain the ending ".gz" to force reading a compressed file.
+	 * @return InputStream for the specified file.
+	 * @throws UncheckedIOException
+	 *
+	 * <br> author dgrether
+	 */
 	public static InputStream getInputStream(final String filename) throws UncheckedIOException {
 		InputStream inputStream = null;
 		if (filename == null) {
@@ -402,7 +402,7 @@ public class IOUtils {
 			throw new UncheckedIOException(e);
 		}
 	}
-	
+
 	/**
 	 * Copy of getOutputStream and then changed to correspond to the PrintStream signature.  Device to hopefully reduce FindBugs warnings.  kai, may'17
 	 * 
@@ -428,21 +428,21 @@ public class IOUtils {
 	// Interestingly, StackOverflow claims that this naive way would be slow,
 	// but for me, it is OK and the fast alternative which is proposed there is 
 	// much slower, so I'm just doing it like this for now.
-	
+
 	// http://stackoverflow.com/questions/4245863/fast-way-to-compare-inputstreams
 	public static boolean isEqual(InputStream i1, InputStream i2)
 			throws IOException {
 		try {
 			while (true) {
 				int fr = i1.read();
-	            int tr = i2.read();
+				int tr = i2.read();
 
-	            if (fr != tr) {
-	                return false;
-	            }
-	            if (fr == -1) {
-	                return true; // EOF on both sides
-	            }
+				if (fr != tr) {
+					return false;
+				}
+				if (fr == -1) {
+					return true; // EOF on both sides
+				}
 			}
 		} finally {
 			if (i1 != null) i1.close();

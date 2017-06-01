@@ -19,6 +19,7 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.facilities.ActivityFacilities;
 
 public class ModifyActivityChain extends AbstractMultithreadedModule{
 	
@@ -32,11 +33,14 @@ public class ModifyActivityChain extends AbstractMultithreadedModule{
 	private ScoringFunctionFactory scoringFunctionFactory;
 	private HashMap scoreChange;
 	private ScoringParametersForPerson parametersForPerson;
+	private final TripRouter routingHandler;
+	private final ActivityFacilities facilities;
 	public ModifyActivityChain(final Scenario scenario, Provider<TripRouter> tripRouterProvider,
 			 QuadTree shopFacilityQuadTree, QuadTree leisureFacilityQuadTree,
 			 LeastCostPathCalculatorFactory pathCalculatorFactory, Map<String, TravelTime> travelTimes,
 			 Map<String, TravelDisutilityFactory> travelDisutilityFactories, ScoringFunctionFactory scoringFunctionFactory,
-			 HashMap scoreChange, ScoringParametersForPerson parametersForPerson) {
+			 HashMap scoreChange, ScoringParametersForPerson parametersForPerson,
+			 final TripRouter routingHandler, final ActivityFacilities facilities) {
 		
 		super(scenario.getConfig().global().getNumberOfThreads());
 		this.scenario = scenario;
@@ -49,6 +53,8 @@ public class ModifyActivityChain extends AbstractMultithreadedModule{
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.scoreChange = scoreChange;
 		this.parametersForPerson = parametersForPerson;
+		this.routingHandler = routingHandler;
+		this.facilities = facilities;
 	}
 
 	@Override
@@ -61,7 +67,7 @@ public class ModifyActivityChain extends AbstractMultithreadedModule{
 		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime ) ;
 		ModifyAndChooseChain algo = new ModifyAndChooseChain(MatsimRandom.getLocalInstance(), tripRouter.getStageActivityTypes(),
 				this.scenario, pathCalculator, this.shopFacilityQuadTree, this.leisureFacilityQuadTree, scoringFunctionFactory,
-				this.scoreChange, this.parametersForPerson);
+				this.scoreChange, this.parametersForPerson, this.routingHandler, this.facilities);
 
 		return algo;
 	}

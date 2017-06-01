@@ -86,7 +86,7 @@ public class Example3D_PtaSample {
 		/* Set up SRTM tile. */
 		Coord blc = Utils3D.getBottomLeftCoordinate(sc.getNetwork());
 		LOG.info("Bottom-left corner: " + blc.toString());
-		String tileName = Utils3D.getSrtmTile(blc);
+		String tileName = playground.southafrica.utilities.coord3D.Utils3D.getSrtmTile(blc);
 		File srtmFile = new File(path + "data/tiles/" + tileName + ".hgt");
 		if(!srtmFile.exists() || !srtmFile.canRead()){
 			LOG.error("Cannot read SRTM tile from " + srtmFile.getAbsolutePath());
@@ -213,7 +213,7 @@ public class Example3D_PtaSample {
 		/* Set up SRTM tile. */
 		Coord blc = Utils3D.getBottomLeftCoordinate(network);
 		LOG.info("Bottom-left corner: " + blc.toString());
-		String tileName = Utils3D.getSrtmTile(blc);
+		String tileName = playground.southafrica.utilities.coord3D.Utils3D.getSrtmTile(blc);
 		File srtmFile = new File(path + "data/tiles/" + tileName + ".hgt");
 		if(!srtmFile.exists() || !srtmFile.canRead()){
 			LOG.error("Cannot read SRTM tile from " + srtmFile.getAbsolutePath());

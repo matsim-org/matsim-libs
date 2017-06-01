@@ -14,11 +14,14 @@ import org.matsim.contrib.carsharing.readers.CarsharingXmlReaderNew;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
 import org.matsim.core.config.ConfigGroup;
 
+import com.google.inject.Inject;
+
 /**
  * @author balac
  */
 public class CarsharingSupplyContainer implements CarsharingSupplyInterface {
 	private Map<String, CompanyContainer> companies = new HashMap<String, CompanyContainer>();
+	private Map<String, CompanyAgent> companyAgents = new HashMap<>();
 	private Map<String, CSVehicle> allVehicles = new HashMap<String, CSVehicle>();
 	private Map<CSVehicle, Link> allVehicleLocations = new HashMap<CSVehicle, Link>();
 	private Set<String> companyNames;
@@ -26,27 +29,22 @@ public class CarsharingSupplyContainer implements CarsharingSupplyInterface {
 	
 	public CarsharingSupplyContainer(Scenario scenario) {
 		this.scenario = scenario;
+		//populateSupply();
 	}	
 	
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#getAllVehicleLocations()
-	 */
+	
 	@Override
 	public Map<CSVehicle, Link> getAllVehicleLocations() {
 		return allVehicleLocations;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#getAllVehicles()
-	 */
+	
 	@Override
 	public Map<String, CSVehicle> getAllVehicles() {
 		return allVehicles;
 	}
 	
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#getCompany(java.lang.String)
-	 */
+	
 	@Override
 	public CompanyContainer getCompany(String companyId) {
 		
@@ -54,18 +52,14 @@ public class CarsharingSupplyContainer implements CarsharingSupplyInterface {
 	}
 	
 	
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#getVehicleWithId(java.lang.String)
-	 */
+	
 	@Override
 	public CSVehicle getVehicleWithId (String vehicleId) {
 		
 		return this.allVehicles.get(vehicleId);
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#findClosestAvailableVehicle(org.matsim.api.core.v01.network.Link, java.lang.String, java.lang.String, java.lang.String, double)
-	 */
+	
 	@Override
 	public CSVehicle findClosestAvailableVehicle(Link startLink, String carsharingType, String typeOfVehicle,
 			String companyId, double searchDistance) {
@@ -75,9 +69,7 @@ public class CarsharingSupplyContainer implements CarsharingSupplyInterface {
 		return vehiclesContainer.findClosestAvailableVehicle(startLink, typeOfVehicle, searchDistance);		
 	}		
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#findClosestAvailableParkingSpace(org.matsim.api.core.v01.network.Link, java.lang.String, java.lang.String, double)
-	 */
+	
 	@Override
 	public Link findClosestAvailableParkingSpace(Link destinationLink, String carsharingType,
 			String companyId, double searchDistance) {
@@ -86,9 +78,7 @@ public class CarsharingSupplyContainer implements CarsharingSupplyInterface {
 		return vehiclesContainer.findClosestAvailableParkingLocation(destinationLink, searchDistance);	
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#populateSupply()
-	 */
+	
 	@Override
 	public void populateSupply() {
 		Network network = this.scenario.getNetwork();
@@ -113,13 +103,24 @@ public class CarsharingSupplyContainer implements CarsharingSupplyInterface {
 		this.allVehicleLocations = reader.getAllVehicleLocations();
 		this.allVehicles = reader.getAllVehicles();
 		this.companyNames = reader.getCompanyNames();
+		
+		for (String companyName : this.companyNames) {
+			
+			CompanyAgent companyAGent = new CompanyAgentImpl(this.companies.get(companyName), "");
+			this.companyAgents.put(companyName, companyAGent);
+		}
+		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface#getCompanyNames()
-	 */
+	
 	@Override
 	public Set<String> getCompanyNames() {
 		return companyNames;
+	}
+
+
+	@Override
+	public Map<String, CompanyAgent> getCompanyAgents() {
+		return companyAgents;
 	}	
 }

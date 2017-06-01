@@ -24,6 +24,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 public interface RoutingNetworkLink extends Link {
+	// yy In most of matsim we have the convention that the wrapped object is provided, but the methods are not delegated.  I.e.
+	//    routingNetworkLink.getLink().getFreeSpeed() ;
+	// but NOT
+	//    routingNetworkLink.getFreeSpeed() ;
+	// The current approach seems to be doing both.  Why did it add the second way of doing things?  
+	// (I can imagine that this came from retrofitting, but a design choice explanation would still be helpful.)  kai, may'17
 
 	public Link getLink();
 	

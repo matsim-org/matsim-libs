@@ -270,7 +270,8 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 			data.needsConsolidation = true;
 			this.aggregator.addStuckEventTravelTime(data.ttData, e.getTime(), event.getTime());
 			if (this.calculateLinkToLinkTravelTimes 
-					&& event.getTime() < qsimConfig.getEndTime() // we think that this only makes problems when the abort is not just because of mobsim end time. kai&theresa, jan'17 
+					&& event.getTime() < qsimConfig.getEndTime() 
+					// (we think that this only makes problems when the abort is not just because of mobsim end time. kai & theresa, jan'17) 
 					){
 				log.error(ERROR_STUCK_AND_LINKTOLINK);
 				throw new IllegalStateException(ERROR_STUCK_AND_LINKTOLINK);

@@ -29,7 +29,7 @@ public class TripAnalyzerV2Extended {
 	public static final Logger LOG = Logger.getLogger(TripAnalyzerV2Extended.class);
 	
 	// Parameters
-	private static String runId = "be_121a"; // <----------
+	private static String runId = "be_124"; // <----------
 	private static String iterationForAnalysis = "300";
 	private static final String cemdapPersonsInputFileId = "21"; // Check if this number corresponds correctly to the runId
 

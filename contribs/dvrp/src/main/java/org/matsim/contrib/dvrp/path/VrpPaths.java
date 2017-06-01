@@ -123,4 +123,19 @@ public class VrpPaths {
 
 		return route;
 	}
+	
+	/**
+	 *
+	 * @return The distance of a VRP path
+	 * Includes the to link, but not the from link
+	 */
+	public static double calcPathDistance(VrpPath path){
+		
+		double distance = 0.0;
+		for (int i = 1; i<path.getLinkCount(); i++){
+			distance += path.getLink(i).getLength();
+		}
+		
+		return distance;
+	}
 }

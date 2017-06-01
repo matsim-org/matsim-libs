@@ -23,7 +23,8 @@
       <link id="1" from="1" to="2" length="10000.00" capacity="36000" freespeed="27.78" permlanes="1" modes="car,bicycle" />
       <link id="2" from="2" to="3" length="10000.00" capacity="3600" freespeed="27.78" permlanes="1" modes="car,bicycle" />
       <link id="3" from="2" to="4" length="10000.00" capacity="3600" freespeed="27.78" permlanes="1" modes="car,bicycle" />
-      <link id="4" from="2" to="5" length="10000.00" capacity="3600" freespeed="27.78" permlanes="1" modes="car,bicycle" />
+      <link id="4" from="2" to="5" length="9999.00" capacity="3600" freespeed="27.78" permlanes="1" modes="car" />
+      <!--  (link 4 deliberately 1m shorter so that the router prefers it in initial iteration. kai, may'17) -->
       <link id="5" from="2" to="6" length="10000.00" capacity="3600" freespeed="27.78" permlanes="1" modes="car,bicycle" />
       <link id="6" from="2" to="7" length="10000.00" capacity="3600" freespeed="27.78" permlanes="1" modes="car,bicycle" />
       <link id="7" from="2" to="8" length="10000.00" capacity="3600" freespeed="27.78" permlanes="1" modes="car,bicycle" />
@@ -32,7 +33,7 @@
       <link id="10" from="2" to="11" length="10000.00" capacity="3600" freespeed="27.78" permlanes="1" modes="car,bicycle" />
       <link id="11" from="3" to="12" length="5000.00" capacity="1000" freespeed="27.78" permlanes="1" modes="car,bicycle" />
       <link id="12" from="4" to="12" length="5000.00" capacity="1000" freespeed="27.78" permlanes="1" modes="car,bicycle" />
-      <link id="13" from="5" to="12" length="5000.00" capacity="1000" freespeed="27.78" permlanes="1" modes="car,bicycle" />
+      <link id="13" from="5" to="12" length="5000.00" capacity="1000" freespeed="27.78" permlanes="1" modes="car" />
       <link id="14" from="6" to="12" length="5000.00" capacity="1000" freespeed="27.78" permlanes="1" modes="car,bicycle" />
       <link id="15" from="7" to="12" length="5000.00" capacity="1000" freespeed="27.78" permlanes="1" modes="car,bicycle" />
       <link id="16" from="8" to="12" length="5000.00" capacity="1000" freespeed="27.78" permlanes="1" modes="car,bicycle" />

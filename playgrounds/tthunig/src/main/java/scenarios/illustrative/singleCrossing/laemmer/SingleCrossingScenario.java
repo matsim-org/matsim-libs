@@ -263,6 +263,7 @@ public class SingleCrossingScenario {
 		config.controler().setLastIteration(0);
 		config.network().setInputFile(network);
 		config.qsim().setUseLanes(false);
+		config.qsim().setUsingFastCapacityUpdate(false);
 		ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class).setUseSignalSystems(true);
 		config.qsim().setEndTime(endTimeSeconds + 2 * 3600);
 		config.qsim().setSnapshotStyle(SnapshotStyle.queue);

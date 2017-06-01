@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.pt.Umlauf;
 import org.matsim.pt.UmlaufBuilder;
 import org.matsim.pt.UmlaufImpl;
@@ -29,6 +30,7 @@ public class SingletonUmlaufBuilderImpl implements UmlaufBuilder {
 		ArrayList<Umlauf> umlaeufe = new ArrayList<Umlauf>();
 		for (TransitLine line : transitLines) {
 			for (TransitRoute route : line.getRoutes().values()) {
+				Gbl.assertNotNull(route.getRoute()); // will fail much later if this is null.  kai, may'17
 				for (Departure departure : route.getDepartures().values()) {
 					UmlaufStueck umlaufStueck = new UmlaufStueck(line, route, departure);
 					Umlauf umlauf = new UmlaufImpl(Id.create(id++, Umlauf.class));

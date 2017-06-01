@@ -19,7 +19,9 @@
 package playground.agarwalamit.analysis.emission.experienced;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import com.google.inject.Inject;
 import org.apache.log4j.Logger;
@@ -33,6 +35,7 @@ import org.matsim.contrib.emissions.events.ColdEmissionEvent;
 import org.matsim.contrib.emissions.events.ColdEmissionEventHandler;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
 import org.matsim.contrib.emissions.events.WarmEmissionEventHandler;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.vehicles.Vehicle;
 import playground.agarwalamit.analysis.emission.EmissionCostHandler;
 import playground.agarwalamit.utils.MapUtils;
@@ -49,28 +52,51 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 
 	private static final Logger LOG = Logger.getLogger(ExperiencedEmissionCostHandler.class);
 
-	private final Map<Id<Vehicle>, Double> vehicleId2ColdEmissCosts = new HashMap<>();
-	private final Map<Id<Vehicle>, Double> vehicleId2WarmEmissCosts = new HashMap<>();
+	private final Map<Double, Map<Id<Vehicle>, Double>> vehicleId2ColdEmissCosts = new HashMap<>();
+	private final Map<Double, Map<Id<Vehicle>, Double>> vehicleId2WarmEmissCosts = new HashMap<>();
+
+	private final Map<Double, Map<Id<Person>, Double>> personId2ColdEmissCosts = new HashMap<>();
+	private final Map<Double, Map<Id<Person>, Double>> personId2WarmEmissCosts = new HashMap<>();
 
 	private final Map<Id<Vehicle>,Id<Person>> vehicle2Person = new HashMap<>();
 
 	private boolean catchedAtLeastOneEmissionEvents = false;
 
+	@Inject private QSimConfigGroup qSimConfigGroup;
+
 	@Inject
 	private EmissionResponsibilityCostModule emissionCostModule;
-	@Inject(optional=true) private PersonFilter pf  ;
+	@Inject(optional=true) private PersonFilter pf ;
+	@Inject(optional=true) private double simulationEndTime;
+	@Inject(optional=true) private double noOfTimeBins ;
+
+	private double timeBinSize;
 
 	public ExperiencedEmissionCostHandler(){}
 
 	public ExperiencedEmissionCostHandler(final EmissionResponsibilityCostModule emissionCostModule, final PersonFilter pf) {
+		double simulationEndTime = qSimConfigGroup.getEndTime();
 		this.emissionCostModule = emissionCostModule;
 		this.pf = pf;
+		this.simulationEndTime = simulationEndTime;
+		this.noOfTimeBins = 1;
+		this.timeBinSize = simulationEndTime/ noOfTimeBins;
+	}
+
+	public ExperiencedEmissionCostHandler(final EmissionResponsibilityCostModule emissionCostModule, final PersonFilter pf, final double simulationEndTime, final double noOfTimeBin) {
+		this.emissionCostModule = emissionCostModule;
+		this.pf = pf;
+		this.simulationEndTime = simulationEndTime;
+		this.noOfTimeBins = noOfTimeBin;
+		this.timeBinSize = simulationEndTime/ noOfTimeBins;
 	}
 
 	@Override
 	public void reset(int iteration) {
 		this.vehicleId2ColdEmissCosts.clear();
 		this.vehicleId2WarmEmissCosts.clear();
+		this.personId2ColdEmissCosts.clear();
+		this.personId2WarmEmissCosts.clear();
 		this.vehicle2Person.clear();
 	}
 
@@ -81,12 +107,33 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 		double warmEmissionCosts = this.emissionCostModule.calculateWarmEmissionCosts(event.getWarmEmissions(), event.getLinkId(), event.getTime());
 		double amount2Pay =  warmEmissionCosts;
 
-		if(this.vehicleId2WarmEmissCosts.containsKey(vehicleId)){
-			double nowCost = this.vehicleId2WarmEmissCosts.get(vehicleId);
-			this.vehicleId2WarmEmissCosts.put(vehicleId, nowCost+amount2Pay);
+		Id<Person> personId = this.vehicle2Person.get(vehicleId);
+		if(personId==null) throw new RuntimeException("no person is found for vehicle "+vehicleId+". This occus at "+ event.toString());
+
+		double endOfTimeInterval = Math.max(1, Math.ceil( event.getTime()/this.timeBinSize) ) * this.timeBinSize;
+
+		Map<Id<Vehicle>,Double> vehi2emiss = this.vehicleId2WarmEmissCosts.get(endOfTimeInterval);
+		Map<Id<Person>, Double> person2emiss = this.personId2WarmEmissCosts.get(endOfTimeInterval);
+
+
+		if(vehi2emiss==null) {
+			vehi2emiss = new HashMap<>();
+			vehi2emiss.put(vehicleId,amount2Pay);
+
+			person2emiss = new HashMap<>();
+			person2emiss.put(personId,amount2Pay);
 		} else {
-			this.vehicleId2WarmEmissCosts.put(vehicleId, amount2Pay);
+			if (vehi2emiss.containsKey(vehicleId)) {
+				double nowCost = vehi2emiss.get(vehicleId);
+				vehi2emiss.put(vehicleId,nowCost+amount2Pay);
+				person2emiss.put(personId, nowCost+ amount2Pay);
+			} else {
+				vehi2emiss.put(vehicleId,amount2Pay);
+				person2emiss.put(personId, amount2Pay);
+			}
 		}
+		this.vehicleId2WarmEmissCosts.put(endOfTimeInterval, vehi2emiss);
+		this.personId2WarmEmissCosts.put(endOfTimeInterval, person2emiss);
 	}
 
 	@Override
@@ -96,12 +143,33 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 		double coldEmissionCosts = this.emissionCostModule.calculateColdEmissionCosts(event.getColdEmissions(), event.getLinkId(), event.getTime());
 		double amount2Pay =  coldEmissionCosts;
 
-		if(this.vehicleId2ColdEmissCosts.containsKey(vehicleId)){
-			double nowCost = this.vehicleId2ColdEmissCosts.get(vehicleId);
-			this.vehicleId2ColdEmissCosts.put(vehicleId, nowCost+amount2Pay);
+		Id<Person> personId = this.vehicle2Person.get(vehicleId);
+		if(personId==null) throw new RuntimeException("no person is found for vehicle "+vehicleId+". This occus at "+ event.toString());
+
+		double endOfTimeInterval = Math.max(1, Math.ceil( event.getTime()/this.timeBinSize) ) * this.timeBinSize;
+
+		Map<Id<Vehicle>,Double> vehi2emiss = this.vehicleId2ColdEmissCosts.get(endOfTimeInterval);
+		Map<Id<Person>, Double> person2emiss = this.personId2ColdEmissCosts.get(endOfTimeInterval);
+
+
+		if(vehi2emiss==null) {
+			vehi2emiss = new HashMap<>();
+			vehi2emiss.put(vehicleId,amount2Pay);
+
+			person2emiss = new HashMap<>();
+			person2emiss.put(personId,amount2Pay);
 		} else {
-			this.vehicleId2ColdEmissCosts.put(vehicleId, amount2Pay);
+			if (vehi2emiss.containsKey(vehicleId)) {
+				double nowCost = vehi2emiss.get(vehicleId);
+				vehi2emiss.put(vehicleId,nowCost+amount2Pay);
+				person2emiss.put(personId, nowCost+ amount2Pay);
+			} else {
+				vehi2emiss.put(vehicleId,amount2Pay);
+				person2emiss.put(personId, amount2Pay);
+			}
 		}
+		this.vehicleId2ColdEmissCosts.put(endOfTimeInterval,vehi2emiss);
+		this.personId2ColdEmissCosts.put(endOfTimeInterval,person2emiss);
 	}
 
 	@Override
@@ -111,37 +179,133 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		this.vehicle2Person.remove(event.getVehicleId());
+		// it is possible that an emission event is thrown after "vehicle leaves traffic" event.
+//		this.vehicle2Person.remove(event.getVehicleId());
 	}
 
-	public Map<Id<Person>, Double> getPersonId2ColdEmissionCosts() {
-		if (vehicle2Person.isEmpty()) throw new RuntimeException("Vehicle to person map is empty, dont know how to find person for corresponding vehicle id.");
-		final Map<Id<Person>, Double> personId2ColdEmissCosts =	getVehicleId2ColdEmissionCosts().entrySet().stream().collect(
-				Collectors.toMap(entry -> this.vehicle2Person.get(entry.getKey()), entry -> entry.getValue())
-		);
-		return personId2ColdEmissCosts;
+	@Override
+	public Map<Double, Map<Id<Person>, Double>> getTimeBin2PersonId2TotalEmissionCosts() {
+		Set<Double> timeBins = new HashSet<>(getTimeBin2PersonId2WarmEmissionCosts().keySet());
+		timeBins.addAll(getTimeBin2PersonId2ColdEmissionCosts().keySet());
+
+		Map<Double, Map<Id<Person>, Double>> outMap = new HashMap<>();
+
+		for(Double d : timeBins) {
+			Map<Id<Person>,Double> person2cost = new HashMap<>();
+
+			Set<Id<Person>> personsSet = new HashSet<>();
+			if (getTimeBin2PersonId2WarmEmissionCosts().get(d)!=null) personsSet.addAll(getTimeBin2PersonId2WarmEmissionCosts().get(d).keySet());
+			if (getTimeBin2PersonId2ColdEmissionCosts().get(d)!=null) personsSet.addAll(getTimeBin2PersonId2ColdEmissionCosts().get(d).keySet());
+
+			for(Id<Person> personId : personsSet) {
+				double warmCost = 0.;
+				double coldCost = 0.;
+
+				if (getTimeBin2PersonId2ColdEmissionCosts().get(d)!=null && getTimeBin2PersonId2ColdEmissionCosts().get(d).get(personId)!=null) {
+					warmCost = getTimeBin2PersonId2ColdEmissionCosts().get(d).get(personId);
+				}
+
+				if (getTimeBin2PersonId2WarmEmissionCosts().get(d)!=null && getTimeBin2PersonId2WarmEmissionCosts().get(d).get(personId)!=null) {
+					coldCost = getTimeBin2PersonId2WarmEmissionCosts().get(d).get(personId);
+				}
+
+				person2cost.put(personId, coldCost+warmCost);
+			}
+			outMap.put(d,person2cost);
+		}
+		return outMap;
 	}
 
 	public Map<Id<Person>, Double> getPersonId2WarmEmissionCosts() {
-		if (vehicle2Person.isEmpty()) throw new RuntimeException("Vehicle to person map is empty, dont know how to find person for corresponding vehicle id.");
-		final Map<Id<Person>, Double> personId2WarmEmissCosts =	getVehicleId2WarmEmissionCosts().entrySet().stream().collect(
-				Collectors.toMap(entry -> this.vehicle2Person.get(entry.getKey()), entry -> entry.getValue())
-		);
-		return personId2WarmEmissCosts;
+		Map<Id<Person>, Double> outMap = new HashMap<>(); // TODO : yet to update the following
+		for(Map<Id<Person>, Double> value : getTimeBin2PersonId2WarmEmissionCosts().values()){
+			for(Map.Entry<Id<Person>, Double> e : value.entrySet()) {
+				if (outMap.containsKey( e.getKey() ) ) {
+					outMap.put( e.getKey(), outMap.get(e.getKey()) + e.getValue());
+				} else {
+					outMap.put(e.getKey(), e.getValue());
+				}
+			}
+		}
+		return outMap;
+	}
+
+	public Map<Id<Person>, Double> getPersonId2ColdEmissionCosts() {
+		Map<Id<Person>, Double> outMap = new HashMap<>(); // TODO : yet to update the following
+		for(Map<Id<Person>, Double> value : getTimeBin2PersonId2ColdEmissionCosts().values()){
+			for(Map.Entry<Id<Person>, Double> e : value.entrySet()) {
+				if (outMap.containsKey( e.getKey() ) ) {
+					outMap.put( e.getKey(), outMap.get(e.getKey()) + e.getValue());
+				} else {
+					outMap.put(e.getKey(), e.getValue());
+				}
+			}
+		}
+		return outMap;
 	}
 
 	@Override
 	public Map<Id<Person>, Double> getPersonId2TotalEmissionCosts() {
-		return getPersonId2ColdEmissionCosts().entrySet().stream().collect(
-				Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue() + this.getPersonId2WarmEmissionCosts().get(entry.getKey()))
-		);
+		Map<Id<Person>,Double> outMap = new HashMap<>();
+		for(Id<Person> personId : this.getPersonId2WarmEmissionCosts().keySet()) {
+			double warmCost = 0.;
+			if (this.getPersonId2ColdEmissionCosts().get(personId)!=null) warmCost = this.getPersonId2ColdEmissionCosts().get(personId);
+			outMap.put(personId,warmCost+this.getPersonId2ColdEmissionCosts().get(personId));
+		}
+		return outMap;
+	}
+
+	@Override
+	public Map<Double, Map<Id<Vehicle>, Double>> getTimeBin2VehicleId2TotalEmissionCosts() {
+		Set<Double> timeBins = new HashSet<>(getTimeBin2VehicleId2WarmEmissionCosts().keySet());
+		timeBins.addAll(getTimeBin2VehicleId2ColdEmissionCosts().keySet());
+
+		Map<Double, Map<Id<Vehicle>, Double>> outMap = new HashMap<>();
+
+		for(Double d : timeBins) {
+			Map<Id<Vehicle>,Double> vehicle2cost = new HashMap<>();
+
+			Set<Id<Vehicle>> vehiclesSet = new HashSet<>();
+			if (getTimeBin2VehicleId2WarmEmissionCosts().get(d)!=null) vehiclesSet.addAll(getTimeBin2VehicleId2WarmEmissionCosts().get(d).keySet());
+			if (getTimeBin2VehicleId2ColdEmissionCosts().get(d)!=null) vehiclesSet.addAll(getTimeBin2VehicleId2ColdEmissionCosts().get(d).keySet());
+
+			for(Id<Vehicle> vehicleId : vehiclesSet) {
+				double warmCost = 0.;
+				double coldCost = 0.;
+
+				if (getTimeBin2VehicleId2ColdEmissionCosts().get(d)!=null && getTimeBin2VehicleId2ColdEmissionCosts().get(d).get(vehicleId)!=null) {
+					warmCost = getTimeBin2PersonId2ColdEmissionCosts().get(d).get(vehicleId);
+				}
+
+				if (getTimeBin2VehicleId2WarmEmissionCosts().get(d)!=null && getTimeBin2VehicleId2WarmEmissionCosts().get(d).get(vehicleId)!=null) {
+					coldCost = getTimeBin2VehicleId2WarmEmissionCosts().get(d).get(vehicleId);
+				}
+
+				vehicle2cost.put(vehicleId, coldCost+warmCost);
+			}
+			outMap.put(d,vehicle2cost);
+		}
+		return outMap;
 	}
 
 	@Override
 	public Map<Id<Vehicle>, Double> getVehicleId2TotalEmissionCosts(){
-		return getVehicleId2ColdEmissionCosts().entrySet().stream().collect(
-				Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue() + getVehicleId2WarmEmissionCosts().get(entry.getKey()))
-		);
+		// TODO : yet to update the following
+		Map<Id<Vehicle>,Double> veh2emiss = new HashMap<>();
+		for(Double time : getTimeBin2VehicleId2TotalEmissionCosts().keySet()){
+			for (Id<Vehicle> vehicleId : getTimeBin2VehicleId2TotalEmissionCosts().get(time).keySet()) {
+				if (veh2emiss.containsKey(vehicleId)) {
+					veh2emiss.put(vehicleId,veh2emiss.get(vehicleId) + getTimeBin2VehicleId2TotalEmissionCosts().get(time).get(vehicleId));
+				} else {
+					veh2emiss.put(vehicleId, getTimeBin2VehicleId2TotalEmissionCosts().get(time).get(vehicleId));
+				}
+			}
+		}
+		return veh2emiss;
+	}
+
+	public Map<Double, Double> getTimeBin2TotalCosts() {
+		return getTimeBin2PersonId2TotalEmissionCosts().entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey(), entry -> MapUtils.doubleValueSum(entry.getValue())));
 	}
 
 	public Map<String, Double> getUserGroup2WarmEmissionCosts(){
@@ -153,7 +317,7 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 			}
 		} else {
 			LOG.warn("The person filter is null, still, trying to get emission costs per user group. Returning emission costs for all persons.");
-			usrGrp2Cost.put("AllPersons", MapUtils.doubleValueSum(getVehicleId2WarmEmissionCosts()));
+			usrGrp2Cost.put("AllPersons", MapUtils.doubleValueSum(getPersonId2WarmEmissionCosts()));
 		}
 		return usrGrp2Cost;
 	}
@@ -167,7 +331,7 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 			}
 		} else {
 			LOG.warn("The person filter is null, still, trying to get emission costs per user group. Returning emission costs for all persons.");
-			usrGrp2Cost.put("AllPersons", MapUtils.doubleValueSum(getVehicleId2ColdEmissionCosts()));
+			usrGrp2Cost.put("AllPersons", MapUtils.doubleValueSum(getPersonId2ColdEmissionCosts()));
 		}
 		return usrGrp2Cost;
 	}
@@ -181,12 +345,11 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 	}
 
 	// a check which should go away in future (End of 2017 or so) amit may'17
-	private void checkForEmissionEvents(final boolean catchedAtLeastOneEmissionEvents){
+	private void checkForCatchingEmissionEvents(final boolean catchedAtLeastOneEmissionEvents){
 		if (! catchedAtLeastOneEmissionEvents) {
 			throw new RuntimeException("Read events file does not have any emission events, please check. " +
 					"This may be due to the recent merging of emission events to the normal events channel.");
 		}
-
 	}
 
 	@Override
@@ -194,14 +357,24 @@ public class ExperiencedEmissionCostHandler implements VehicleEntersTrafficEvent
 		return ! (pf==null);
 	}
 
-	public Map<Id<Vehicle>, Double> getVehicleId2ColdEmissionCosts() {
-		checkForEmissionEvents(catchedAtLeastOneEmissionEvents);
+	public Map<Double, Map<Id<Vehicle>, Double>> getTimeBin2VehicleId2ColdEmissionCosts() {
+		checkForCatchingEmissionEvents(catchedAtLeastOneEmissionEvents);
 		return this.vehicleId2ColdEmissCosts;
 	}
 
-	public Map<Id<Vehicle>, Double> getVehicleId2WarmEmissionCosts() {
-		checkForEmissionEvents(catchedAtLeastOneEmissionEvents);
+	public Map<Double, Map<Id<Vehicle>, Double>> getTimeBin2VehicleId2WarmEmissionCosts() {
+		checkForCatchingEmissionEvents(catchedAtLeastOneEmissionEvents);
 		return this.vehicleId2WarmEmissCosts;
+	}
+
+	public Map<Double, Map<Id<Person>, Double>> getTimeBin2PersonId2ColdEmissionCosts() {
+		checkForCatchingEmissionEvents(catchedAtLeastOneEmissionEvents);
+		return this.personId2ColdEmissCosts;
+	}
+
+	public Map<Double, Map<Id<Person>, Double>> getTimeBin2PersonId2WarmEmissionCosts() {
+		checkForCatchingEmissionEvents(catchedAtLeastOneEmissionEvents);
+		return this.personId2WarmEmissCosts;
 	}
 
 }

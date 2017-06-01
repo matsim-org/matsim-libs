@@ -23,14 +23,14 @@ package org.matsim.core.trafficmonitoring;
 /**
  * @author glaemmel
  */
-public class PessimisticTravelTimeAggregator extends AbstractTravelTimeAggregator {
+public final class PessimisticTravelTimeAggregator extends AbstractTravelTimeAggregator {
 
 	public PessimisticTravelTimeAggregator(int numSlots,int travelTimeBinSize) {
 		super(numSlots,travelTimeBinSize);
 	}
 
 	@Override
-	protected void addTravelTime(TravelTimeData travelTimeData,
+	 void addTravelTime(TravelTimeData travelTimeData,
 			double enterTime, double leaveTime) {
 
 		double ttime = leaveTime - enterTime;
@@ -40,7 +40,7 @@ public class PessimisticTravelTimeAggregator extends AbstractTravelTimeAggregato
 	}
 
 	@Override
-	public void addStuckEventTravelTime(TravelTimeData travelTimeData,
+	 void addStuckEventTravelTime(TravelTimeData travelTimeData,
 			double enterTime, double stuckEventTime) {
 		double ttime = Double.POSITIVE_INFINITY;
 		for (int slot = getTimeSlotIndex(enterTime); slot <= getTimeSlotIndex(stuckEventTime); slot++ ){

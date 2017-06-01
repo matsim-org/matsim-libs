@@ -12,7 +12,10 @@ import org.matsim.contrib.carsharing.events.handlers.PersonArrivalDepartureHandl
 import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerNew;
 import org.matsim.contrib.carsharing.manager.demand.CurrentTotalDemand;
+import org.matsim.contrib.carsharing.manager.demand.CurrentTotalDemandImpl;
 import org.matsim.contrib.carsharing.manager.demand.DemandHandler;
+import org.matsim.contrib.carsharing.manager.demand.VehicleChoiceAgent;
+import org.matsim.contrib.carsharing.manager.demand.VehicleChoiceAgentImpl;
 import org.matsim.contrib.carsharing.manager.demand.membership.MembershipContainer;
 import org.matsim.contrib.carsharing.manager.demand.membership.MembershipReader;
 import org.matsim.contrib.carsharing.manager.routers.RouteCarsharingTrip;
@@ -37,7 +40,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+
 
 /** 
  * @author balac
@@ -86,16 +94,16 @@ public class RunCarsharing {
 		final CostsCalculatorContainer costsCalculatorContainer = CarsharingUtils.createCompanyCostsStructure(carsharingCompanies);
 		
 		final CarsharingListener carsharingListener = new CarsharingListener();
-		final CarsharingSupplyInterface carsharingSupplyContainer = new CarsharingSupplyContainer(controler.getScenario());
-		carsharingSupplyContainer.populateSupply();
+		//final CarsharingSupplyInterface carsharingSupplyContainer = new CarsharingSupplyContainer(controler.getScenario());
+		
 		final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
 		final ChooseTheCompany chooseCompany = new ChooseTheCompanyExample();
 		final ChooseVehicleType chooseCehicleType = new ChooseVehicleTypeExample();
 		final RouterProvider routerProvider = new RouterProviderImpl();
-		final CurrentTotalDemand currentTotalDemand = new CurrentTotalDemand(controler.getScenario().getNetwork());
-		final CarsharingManagerInterface carsharingManager = new CarsharingManagerNew();
+		final CurrentTotalDemand currentTotalDemand = new CurrentTotalDemandImpl(controler.getScenario().getNetwork());
+		//final CarsharingManagerInterface carsharingManager = new CarsharingManagerNew();
 		final RouteCarsharingTrip routeCarsharingTrip = new RouteCarsharingTripImpl();
-		
+		final VehicleChoiceAgent vehicleChoiceAgent = new VehicleChoiceAgentImpl();
 		//===adding carsharing objects on supply and demand infrastructure ===
 		
 		controler.addOverridingModule(new AbstractModule() {
@@ -110,10 +118,18 @@ public class RunCarsharing {
 				bind(RouteCarsharingTrip.class).toInstance(routeCarsharingTrip);
 				bind(CostsCalculatorContainer.class).toInstance(costsCalculatorContainer);
 				bind(MembershipContainer.class).toInstance(memberships);
-			    bind(CarsharingSupplyInterface.class).toInstance(carsharingSupplyContainer);
-			    bind(CarsharingManagerInterface.class).toInstance(carsharingManager);
+			    bind(CarsharingSupplyInterface.class).to(CarsharingSupplyContainer.class);
+			    bind(CarsharingManagerInterface.class).to(CarsharingManagerNew.class);
+			    bind(VehicleChoiceAgent.class).toInstance(vehicleChoiceAgent);
 			    bind(DemandHandler.class).asEagerSingleton();
 			}			
+			@Provides @Singleton
+			CarsharingSupplyContainer provideCarsharingSupplyContainer(Scenario scenario) {
+			    return new CarsharingSupplyContainer(scenario);
+			}
+			
+			
+		
 		});		
 		
 		//=== carsharing specific replanning strategies ===
@@ -133,7 +149,7 @@ public class RunCarsharing {
 				bindMobsim().toProvider(CarsharingQsimFactoryNew.class);
 		        addControlerListenerBinding().toInstance(carsharingListener);
 		        addControlerListenerBinding().to(CarsharingManagerNew.class);		        
-				bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);		      
+				//bindScoringFunctionFactory().to(CarsharingScoringFunctionFactory.class);		      
 		        addEventHandlerBinding().to(PersonArrivalDepartureHandler.class);
 		        addEventHandlerBinding().to(DemandHandler.class);
 			}

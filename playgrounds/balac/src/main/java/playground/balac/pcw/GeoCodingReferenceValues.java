@@ -16,9 +16,9 @@ public class GeoCodingReferenceValues {
 
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-		 BufferedReader readLink = IOUtils.getBufferedReader("C:\\LocalDocuments\\Projects\\PCW\\Routing\\clean_weg_correction1.csv");
+		 BufferedReader readLink = IOUtils.getBufferedReader("C:\\LocalDocuments\\Projects\\Geocoding\\Felix\\frequencytableRest.csv");
 		 
-		BufferedWriter outLink = IOUtils.getBufferedWriter("C:\\LocalDocuments\\Projects\\PCW\\Routing\\clean_weg_correction1_geocoded.csv");
+		BufferedWriter outLink = IOUtils.getBufferedWriter("C:\\LocalDocuments\\Projects\\Geocoding\\Felix\\frequencytable_geocoded_rest.csv");
 		outLink.write("tripid;xcoord_start_ch;ycoord_start_ch;xcoord_end_ch;ycoord_end_ch;xcoord_start;ycoord_start;xcoord_end;ycoord_end;dist;sex;age;time");
 		outLink.newLine();
 		WGS84toCH1903LV03 transformation = new WGS84toCH1903LV03();
