@@ -189,7 +189,7 @@
 						<additionalDependency>
 							<groupId>org.matsim</groupId>
 							<artifactId>matsim-tutorial</artifactId>
-							<version>0.9.0-SNAPSHOT</version>
+							<version>0.10.0-SNAPSHOT</version>
 						</additionalDependency>
 					</additionalDependencies>
 					<detectLinks>true</detectLinks>
