@@ -140,7 +140,7 @@ class WithinDayBangBangMobsimListener implements MobsimBeforeSimStepListener {
 		Logger.getLogger( this.getClass() ).warn( "ttimeOrig=" + ttimeThroughAccident + "; ttimeDetour=" + ttimeDetour );
 
 		for (MobsimAgent ma : agentsToReplan) {
-			doReplanning(ma, (Netsim) event.getQueueSimulation(), ttimeThroughAccident, ttimeDetour);
+			doReplanning(ma, ttimeThroughAccident, ttimeDetour);
 		}
 	}
 
@@ -153,7 +153,7 @@ class WithinDayBangBangMobsimListener implements MobsimBeforeSimStepListener {
 		return sum;
 	}
 
-	private boolean doReplanning(MobsimAgent agent, Netsim netsim, double ttimeOrig, double ttimeDetour ) {
+	private boolean doReplanning(MobsimAgent agent, double ttimeOrig, double ttimeDetour ) {
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ; 
 
@@ -192,7 +192,7 @@ class WithinDayBangBangMobsimListener implements MobsimBeforeSimStepListener {
 					copy.remove( idx ) ;
 				}
 				copy.addAll( idx, this.alternativeLinks ) ;
-				final RouteFactories modeRouteFactory = ((PopulationFactory) this.scenario.getPopulation().getFactory()).getRouteFactories();
+				final RouteFactories modeRouteFactory = this.scenario.getPopulation().getFactory().getRouteFactories();
 				NetworkRoute newRoute = modeRouteFactory.createRoute( NetworkRoute.class, oldRoute.getStartLinkId(), oldRoute.getEndLinkId()) ;
 
 				//			RouteUtils.createNetworkRoute(routeLinkIds, network) ;

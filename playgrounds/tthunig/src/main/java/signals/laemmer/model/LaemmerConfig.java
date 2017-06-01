@@ -25,14 +25,23 @@ public class LaemmerConfig {
     private double DEFAULT_INTERGREEN = 5;
 
     private boolean analysisEnabled = true;
+    private double MIN_G = 0;
 
-//    @Nullable
+    //    @Nullable
     public Double getLaneArrivalRate(Id<Link> linkId, Id<Lane> laneId) {
         if(laneArrivalRates.containsKey(linkId)) {
             return this.laneArrivalRates.get(linkId).get(laneId);
         } else {
             return null;
         }
+    }
+
+    public double getMinG() {
+        return MIN_G;
+    }
+
+    public void setMinG(double minG) {
+        MIN_G = minG;
     }
 
     public enum Regime {COMBINED, OPTIMIZING, STABILIZING};

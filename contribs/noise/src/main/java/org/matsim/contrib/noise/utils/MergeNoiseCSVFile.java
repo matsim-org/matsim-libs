@@ -31,10 +31,14 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.noise.data.ReceiverPoint;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-
-import org.matsim.contrib.noise.data.ReceiverPoint;
 
 /**
  * @author ikaddoura
@@ -55,12 +59,15 @@ public final class MergeNoiseCSVFile {
 	private String outputDirectory = null;
 	private String[] workingDirectories = null;
 	private String[] labels = null;
+	
 	private String receiverPointsFile = null;
+	private String networkFile = null;
 
 	public static enum OutputFormat { xyt1t2t3etc, xyt } ;
 
-	private Map<String, Map<Double, Map<Id<ReceiverPoint>, Double>>> label2time2rp2value = new HashMap<>();
+	private Map<String, Map<Double, Map<String, Double>>> label2time2rp2value = new HashMap<>();
 	private Map<Id<ReceiverPoint>, Coord> rp2Coord = new HashMap<Id<ReceiverPoint>, Coord>();
+	private Network network = null;
 
 	public static void main(String[] args) {
 		MergeNoiseCSVFile readNoiseFile = new MergeNoiseCSVFile();
@@ -122,11 +129,121 @@ public final class MergeNoiseCSVFile {
 		// lv final. kai
 
 		readValues();
-		readReceiverPoints();
-		writeFile();
+		
+		if (receiverPointsFile != null) readReceiverPoints();
+		if (networkFile != null) loadNetwork();
+		
+		if (receiverPointsFile != null) {
+			writeFileReceiverPoint();
+		} else if (networkFile != null) {
+			writeFileLink();
+		} else {
+			throw new RuntimeException("Either provide the receiver points file or the network file! Aborting...");
+		}
 	}
 
-	private void writeFile() {
+	private void loadNetwork() {
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(networkFile);
+		this.network = ScenarioUtils.loadScenario(config).getNetwork();
+	}
+
+	private void writeFileLink() {
+		int lineCounter = 0 ;
+
+		String outputFile = this.outputDirectory;
+
+		for (int i = 0; i < this.labels.length; i++) {
+			outputFile = outputFile + this.labels[i] + "_"; 			
+		}
+		outputFile = outputFile + "merged_" + this.outputFormat.toString() + ".csv.gz";
+
+		try ( BufferedWriter bw = IOUtils.getBufferedWriter(outputFile) ) {
+			// so-called "try-with-resources". Kai
+
+			log.info(" Writing merged file to " + outputFile + "...") ;
+
+			// write headers
+			switch( this.outputFormat ) {
+			// yy should probably become different classes. kai
+			case xyt1t2t3etc:
+				bw.write("Id");
+				for (String label : this.label2time2rp2value.keySet()) {
+					for (double time = startTime; time <= endTime; time = time + timeBinSize) {
+						bw.write(";" + label + "_" + Time.writeTime(time, Time.TIMEFORMAT_HHMMSS));
+					}
+				}
+				break;
+			case xyt:
+				bw.write("Id;time");
+				for (String label : this.label2time2rp2value.keySet()) {
+					bw.write(";" + label);
+				}
+				break;
+			default:
+				throw new RuntimeException("not implemented") ;
+			}
+
+			bw.newLine();
+
+			// fill table
+			switch( this.outputFormat ) {
+			case xyt1t2t3etc:	
+
+				for (Id<Link> rp : this.network.getLinks().keySet()) {
+					bw.write(rp.toString());
+
+					for (String label : this.label2time2rp2value.keySet()) {
+						for (double time = startTime; time <= endTime; time = time + timeBinSize) {
+							bw.write(";" + this.label2time2rp2value.get(label).get(time).get(rp.toString()));
+						}
+					}
+					bw.newLine();
+				}				
+				break;
+			case xyt:
+
+				for (Id<Link> rp : this.network.getLinks().keySet()) {
+
+					for (double time = startTime; time <= endTime; time = time + timeBinSize) {
+
+						boolean writeThisLine = false;
+						String lineToWrite = rp.toString();
+
+						for (String label : this.label2time2rp2value.keySet()) {
+							double value = this.label2time2rp2value.get(label).get(time).get(rp.toString());
+							if (value > this.threshold) {
+								writeThisLine = true;
+							}
+							lineToWrite = lineToWrite + ";" + value;
+						}
+
+						// only write the line if at least one value is larger than threshold
+						if (writeThisLine) {
+							bw.write(lineToWrite);
+							bw.newLine();
+							lineCounter ++ ;
+							if (lineCounter % 10000 == 0.) {
+								log.info("# " + lineCounter);
+							}
+						}
+					}
+				}	
+				break ;
+			default:
+				throw new RuntimeException("not implemented") ;
+			}
+
+			bw.close();
+			log.info("Output written to " + outputFile);
+
+
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+	}
+
+	private void writeFileReceiverPoint() {
 		int lineCounter = 0 ;
 
 		String outputFile = this.outputDirectory;
@@ -270,7 +387,7 @@ public final class MergeNoiseCSVFile {
 	private void readValues() {
 		for (int ll = 0; ll < this.labels.length; ll++) {
 
-			Map<Double, Map<Id<ReceiverPoint>, Double>> time2rp2value = new HashMap<Double, Map<Id<ReceiverPoint>, Double>>();
+			Map<Double, Map<String, Double>> time2rp2value = new HashMap<>();
 
 			String workingDirectory = this.workingDirectories[ll];
 			String label = this.labels[ll];
@@ -290,7 +407,7 @@ public final class MergeNoiseCSVFile {
 
 					String line = br.readLine();
 
-					Map<Id<ReceiverPoint>, Double> rp2value = new HashMap<Id<ReceiverPoint>, Double>();
+					Map<String, Double> rp2value = new HashMap<>();
 					int lineCounter = 0;
 
 					log.info("Reading lines ");
@@ -301,11 +418,11 @@ public final class MergeNoiseCSVFile {
 						}
 
 						String[] columns = line.split(separator);
-						Id<ReceiverPoint> rp = null;
+						String rp = null;
 						Double value = null;
 						for (int column = 0; column < columns.length; column++) {
 							if (column == 0) {
-								rp = Id.create(columns[column], ReceiverPoint.class);
+								rp = columns[column];
 							} else if (column == 1) {
 								value = Double.valueOf(columns[column]);
 								valueSumTimeBin+=value;
@@ -329,6 +446,10 @@ public final class MergeNoiseCSVFile {
 
 			this.label2time2rp2value.put(label, time2rp2value);
 		}
+	}
+
+	public void setNetworkFile(String networkfile) {
+		this.networkFile  = networkfile;
 	}
 
 }

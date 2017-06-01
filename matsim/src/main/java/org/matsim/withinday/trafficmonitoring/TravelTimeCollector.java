@@ -128,11 +128,13 @@ public class TravelTimeCollector implements TravelTime,
 		this.travelTimeInfos = new ConcurrentHashMap<>();
 		this.changedLinks = new HashMap<>();
 		this.vehiclesToFilter = new HashSet<>();
-				
+		
+		// one TravelTimeInfo per link:
 		for (Link link : this.network.getLinks().values()) {
 			TravelTimeInfo travelTimeInfo = new TravelTimeInfo();
 			this.travelTimeInfos.put(link.getId(), travelTimeInfo);
 		}
+		
 		/*
 		 * If no RoutingNetwork is used, ArrayBasedTravelTimeInfoProvider uses 
 		 * a MapBasedTravelTimeInfoProvider as fall back solution. This increases 
@@ -174,6 +176,7 @@ public class TravelTimeCollector implements TravelTime,
 		init();
 		int resetCnt = 0;
 		if ( resetCnt >=1 ) {
+			// yyyy this can never be reached, or can it?  kai, may'17
 			if ( problem ) {
 				throw new RuntimeException("using TravelTimeCollector, but mobsim notifications not called between two resets.  "
 						+ "Did you really add this as a mobsim listener?") ;
@@ -463,7 +466,7 @@ public class TravelTimeCollector implements TravelTime,
 		/*
 		 * After initialization the Threads are waiting at the endBarrier. We
 		 * trigger this Barrier once so they wait at the startBarrier what has
-		 * to be their state if the run() method is called.
+		 * to be their state when the run() method is called.
 		 */
 		try {
 			this.endBarrier.await();

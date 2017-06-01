@@ -36,21 +36,15 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+
 import playground.agarwalamit.analysis.emission.AirPollutionExposureAnalysisControlerListener;
 import playground.agarwalamit.analysis.emission.experienced.ExperiencedEmissionCostHandler;
 import playground.agarwalamit.utils.PersonFilter;
 import playground.ikaddoura.analysis.vtts.VTTSHandler;
 import playground.ikaddoura.analysis.vtts.VTTScomputation;
+import playground.ikaddoura.decongestion.DecongestionAnalysisModule;
 import playground.ikaddoura.decongestion.DecongestionConfigGroup;
-import playground.ikaddoura.decongestion.DecongestionControlerListener;
 import playground.ikaddoura.decongestion.DecongestionModule;
-import playground.ikaddoura.decongestion.data.DecongestionInfo;
-import playground.ikaddoura.decongestion.handler.DelayAnalysis;
-import playground.ikaddoura.decongestion.handler.IntervalBasedTolling;
-import playground.ikaddoura.decongestion.handler.IntervalBasedTollingAll;
-import playground.ikaddoura.decongestion.handler.PersonVehicleTracker;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollSetting;
-import playground.ikaddoura.decongestion.tollSetting.DecongestionTollingPID;
 import playground.ikaddoura.moneyTravelDisutility.MoneyEventAnalysis;
 import playground.ikaddoura.moneyTravelDisutility.MoneyTimeDistanceTravelDisutilityFactory;
 import playground.ikaddoura.moneyTravelDisutility.data.AgentFilter;
@@ -220,6 +214,23 @@ public class CNEIntegration {
 				throw new RuntimeException("Unknown congestion pricing approach. Aborting...");
 			}
 		
+		} else {
+			
+			
+			DecongestionConfigGroup decongestionSettings = (DecongestionConfigGroup) controler.getConfig().getModules().get(DecongestionConfigGroup.GROUP_NAME);
+			
+			if (decongestionSettings != null) {
+				
+				log.info("Analyzing the delay per link and time bin.");
+				
+				decongestionSettings.setRUN_FINAL_ANALYSIS(false);
+				decongestionSettings.setWRITE_LINK_INFO_CHARTS(false);
+				decongestionSettings.setFRACTION_OF_ITERATIONS_TO_START_PRICE_ADJUSTMENT(1.0);
+				decongestionSettings.setFRACTION_OF_ITERATIONS_TO_END_PRICE_ADJUSTMENT(0.0);
+				decongestionSettings.setWRITE_OUTPUT_ITERATION(controler.getConfig().controler().getLastIteration());
+				
+				controler.addOverridingModule(new DecongestionAnalysisModule());
+			}
 		}
 
 		// ########################## Air pollution ##########################

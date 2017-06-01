@@ -70,7 +70,12 @@ public class TravelTimeCalculatorModule extends AbstractModule {
 				});
 			}
 		} else {
+			// (all analyzed modes are measured together, and the same result is returned to each mode)
+			
+			// bind the TravelTimeCalculator, which is the observer and aggregator:
 			bind(TravelTimeCalculator.class).in(Singleton.class);
+			
+			// bind the TravelTime objects.  In this case, this just passes on the same information from TravelTimeCalculator to each individual mode:
 			if (getConfig().travelTimeCalculator().isCalculateLinkTravelTimes()) {
 				for (String mode : CollectionUtils.stringToSet(getConfig().travelTimeCalculator().getAnalyzedModes())) {
 					addTravelTimeBinding(mode).toProvider(ObservedLinkTravelTimes.class);

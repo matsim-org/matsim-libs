@@ -46,18 +46,21 @@ public class PersonLinkMoneyEvent extends Event implements HasPersonId{
 	public static final String ATTRIBUTE_PERSON = "person";
 	public static final String ATTRIBUTE_LINK = "link";
 	public static final String ATTRIBUTE_RELEVANT_TIME = "relevantTime";
+	public static final String ATTRIBUTE_DESCRIPTION = "description";
 	
 	private final Id<Person> personId;
 	private final Id<Link> linkId;
 	private final double amount;
 	private final double relevantTime;
+	private final String description;
 	
-	public PersonLinkMoneyEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, final double amount, final double relevantTime) {
+	public PersonLinkMoneyEvent(final double time, final Id<Person> agentId, final Id<Link> linkId, final double amount, final double relevantTime, final String description) {
 		super(time);
 		this.personId = agentId;
 		this.linkId = linkId;
 		this.amount = amount;
 		this.relevantTime = relevantTime;
+		this.description = description;
 	}
 
 	public Id<Person> getPersonId() {
@@ -76,6 +79,10 @@ public class PersonLinkMoneyEvent extends Event implements HasPersonId{
 		return relevantTime;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
 	@Override
 	public String getEventType() {
 		return EVENT_TYPE;
@@ -88,6 +95,7 @@ public class PersonLinkMoneyEvent extends Event implements HasPersonId{
 		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
 		attr.put(ATTRIBUTE_LINK, this.linkId.toString());
 		attr.put(ATTRIBUTE_RELEVANT_TIME, Double.toString(this.relevantTime));
+		attr.put(ATTRIBUTE_DESCRIPTION, this.description);
 		return attr;
 	}
 

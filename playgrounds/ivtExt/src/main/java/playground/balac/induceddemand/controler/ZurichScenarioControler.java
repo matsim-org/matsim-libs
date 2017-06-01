@@ -4,15 +4,28 @@ import com.google.inject.name.Names;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction;
+import org.matsim.contrib.socnetsim.jointtrips.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import org.matsim.contrib.socnetsim.utils.QuadTreeRebuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.SumScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacilities;
@@ -22,10 +35,12 @@ import playground.balac.induceddemand.config.ActivityStrategiesConfigGroup;
 import playground.balac.induceddemand.controler.listener.ActivitiesAnalysisListener;
 import playground.balac.induceddemand.strategies.activitychainmodifier.ActivityChainModifierStrategy;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
-import playground.ivt.matsim2030.scoring.MATSim2010ScoringModule;
+import playground.ivt.scoring.LineChangeScoringFunction;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 
@@ -35,6 +50,7 @@ import java.util.HashMap;
 public class ZurichScenarioControler {
 
 	public static void main(final String[] args) {
+
 		final String configFile = args[ 0 ];
 
 		// This allows to get a log file containing the log messages happening
@@ -46,13 +62,15 @@ public class ZurichScenarioControler {
 		// file with zillions of "not route found" messages.
 		Logger.getLogger( org.matsim.core.router.MultiNodeDijkstra.class ).setLevel( Level.ERROR ); // this is location choice
 		Logger.getLogger( org.matsim.pt.router.MultiNodeDijkstra.class ).setLevel( Level.ERROR );
+		Logger.getLogger( "org.matsim.analysis.ModeStatsControlerListener" ).setLevel(Level.OFF);
+
 
 		final Config config = ConfigUtils.loadConfig(
 				configFile,
 				// this adds a new config group, used by the specific scoring function
 				// we use
 				new KtiLikeScoringConfigGroup(), new DestinationChoiceConfigGroup(),
-				new ActivityStrategiesConfigGroup());
+				new ActivityStrategiesConfigGroup(), 				new BJActivityScoringConfigGroup());
 		
 		// This is currently needed for location choice: initializing
 		// the location choice writes K-values files to the output directory, which:
@@ -70,12 +88,75 @@ public class ZurichScenarioControler {
 
 		//connectFacilitiesWithNetwork( controler );
 
-		initializeLocationChoice( controler );
+		//initializeLocationChoice( controler );
 		initializeActivityStrategies(scenario, controler);
 		// We use a specific scoring function, that uses individual preferences
 		// for activity durations.
-		controler.addOverridingModule( new MATSim2010ScoringModule() );
+		//controler.addOverridingModule( new MATSim2010ScoringModule() );
 
+		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+
+			@Override
+			public ScoringFunction createNewScoringFunction(Person person) {
+				SumScoringFunction sumScoringFunction = new SumScoringFunction();
+
+				
+				double slopeHome1 = ((BJActivityScoringConfigGroup)controler.getConfig().getModule("BJactivityscoring")).getSlopeHome1();
+				double slopeHome2 = ((BJActivityScoringConfigGroup)controler.getConfig().getModule("BJactivityscoring")).getSlopeHome2();
+				
+				Map<String, Double> slopes = new HashMap<>();
+				slopes.put("home_1", slopeHome1);
+				slopes.put("home_2", slopeHome2);
+				slopes.put("work", 0.0);
+				slopes.put("secondary", 0.0);
+				slopes.put("shopping", 0.0);
+				// Score activities, legs, payments and being stuck
+				// with the default MATSim scoring based on utility parameters in the config file.
+				final ScoringParameters params =
+						new ScoringParameters.Builder(controler.getScenario(), person.getId()).build();
+				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
+
+				final Collection<String> travelCards = PersonUtils.getTravelcards(person);
+				
+						sumScoringFunction.addScoringFunction(
+						new ElementalCharyparNagelLegScoringFunction(
+							TransportMode.pt,
+							new LegScoringParameters(
+								params.modeParams.get(TransportMode.pt).constant,
+								params.modeParams.get(TransportMode.pt).marginalUtilityOfTraveling_s,
+								params.modeParams.get(TransportMode.pt).marginalUtilityOfDistance_m),
+							scenario.getNetwork()));
+						sumScoringFunction.addScoringFunction(
+						new ElementalCharyparNagelLegScoringFunction(
+							TransportMode.walk,
+							LegScoringParameters.createForWalk(
+								params ),
+							scenario.getNetwork()));
+						sumScoringFunction.addScoringFunction(
+						new ElementalCharyparNagelLegScoringFunction(
+							TransportMode.bike,
+							LegScoringParameters.createForBike(
+									params),
+							scenario.getNetwork()));
+						sumScoringFunction.addScoringFunction(
+						new ElementalCharyparNagelLegScoringFunction(
+							TransportMode.transit_walk,
+							LegScoringParameters.createForWalk(
+									params),
+							scenario.getNetwork()));
+						sumScoringFunction.addScoringFunction(
+								new LineChangeScoringFunction(
+										params ) );
+				
+				
+				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
+				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+				return sumScoringFunction;
+			}
+
+		});
+		
+		
 		controler.run();
 	}
 	
@@ -83,14 +164,14 @@ public class ZurichScenarioControler {
 		
 		final QuadTreeRebuilder<ActivityFacility> shopFacilitiesQuadTree = new QuadTreeRebuilder<ActivityFacility>();
 		
-		for(ActivityFacility af : sc.getActivityFacilities().getFacilitiesForActivityType("shop").values()) {
+		for(ActivityFacility af : sc.getActivityFacilities().getFacilitiesForActivityType("shopping").values()) {
 			
 			shopFacilitiesQuadTree.put(af.getCoord(), af);
 		}
 		
 		final QuadTreeRebuilder<ActivityFacility> leisureFacilitiesQuadTree = new QuadTreeRebuilder<ActivityFacility>();
 		
-		for(ActivityFacility af : sc.getActivityFacilities().getFacilitiesForActivityType("leisure").values()) {
+		for(ActivityFacility af : sc.getActivityFacilities().getFacilitiesForActivityType("secondary").values()) {
 			
 			leisureFacilitiesQuadTree.put(af.getCoord(), af);
 		}
@@ -99,7 +180,7 @@ public class ZurichScenarioControler {
 		
 		final QuadTree<ActivityFacility> leisure = leisureFacilitiesQuadTree.getQuadTree();		
 		HashMap<String, Double> scoreChange = new HashMap<String, Double>();
-
+		
 		controler.addOverridingModule(new AbstractModule() {
 
 			@Override

@@ -25,15 +25,15 @@ public class CreateAttributesForBarbellScenario {
 			
 			
 				
-				members.putAttribute(p.getId().toString(), "h" , 3600.0);
+				members.putAttribute(p.getId().toString(), "home" , 13*3600.0);
 			
 			
-				members.putAttribute(p.getId().toString(), "w" , 3600.0);
+				members.putAttribute(p.getId().toString(), "work" , 10*3600.0);
+
+				members.putAttribute(p.getId().toString(), "leisure" , 3600.0);
 
 			
-			
 				
-				members.putAttribute(p.getId().toString(), "OW_CARD" , "true");
 			
 
 						

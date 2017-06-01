@@ -263,7 +263,7 @@ public class AdvancedMarginalCongestionPricingHandler implements CongestionEvent
 				PersonMoneyEvent moneyEvent = new PersonMoneyEvent(activityEndTime, congestionEvent.getCausingAgentId(), amount);				
 				this.events.processEvent(moneyEvent);
 				
-				PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(activityEndTime, congestionEvent.getCausingAgentId(), congestionEvent.getLinkId(), amount, congestionEvent.getEmergenceTime());
+				PersonLinkMoneyEvent linkMoneyEvent = new PersonLinkMoneyEvent(activityEndTime, congestionEvent.getCausingAgentId(), congestionEvent.getLinkId(), amount, congestionEvent.getEmergenceTime(), "congestion");
 				this.events.processEvent(linkMoneyEvent);
 			}
 		}

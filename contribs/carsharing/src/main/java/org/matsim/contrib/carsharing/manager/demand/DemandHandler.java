@@ -29,21 +29,25 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 	
 	@Inject Scenario scenario;
 	@Inject CarsharingSupplyInterface carsharingSupplyContainer;
+
 	private Map<Id<Person>, AgentRentals> agentRentalsMap = new HashMap<Id<Person>, AgentRentals>();	
-	
+
+	private Map<Id<Vehicle>, VehicleRentals> vehicleRentalsMap = new HashMap<Id<Vehicle>, VehicleRentals>();
+
 	private Map<Id<Vehicle>, Id<Person>> vehiclePersonMap = new HashMap<Id<Vehicle>, Id<Person>>();
-	
+
 	private Map<Id<Person>, Double> enterVehicleTimes = new HashMap<Id<Person>, Double>();	
-	
-	
+
+
 	@Override
 	public void reset(int iteration) {
 		agentRentalsMap = new HashMap<Id<Person>, AgentRentals>();	
-			
+
+		vehicleRentalsMap = new HashMap<Id<Vehicle>, VehicleRentals>();
+
 		vehiclePersonMap = new HashMap<Id<Vehicle>, Id<Person>>();
-			
+
 		enterVehicleTimes = new HashMap<Id<Person>, Double>();
-		
 	}
 
 	@Override
@@ -55,9 +59,16 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 		agentRentals.getStatsPerVehicle().remove(event.getvehicleId());
 		info.setEndTime(event.getTime());
 		info.setEndLinkId(event.getLinkId());
-		agentRentals.getArr().add(info);	
-		
-	}
+
+		agentRentals.getArr().add(info);
+
+		Id<Vehicle> vehicleId = Id.create(event.getvehicleId(), Vehicle.class);
+		if (!this.vehicleRentalsMap.containsKey(vehicleId)) {
+			this.vehicleRentalsMap.put(vehicleId, new VehicleRentals(vehicleId));
+		}
+
+		this.vehicleRentalsMap.get(vehicleId).getRentals().add(info);
+}
 
 	@Override
 	public void handleEvent(StartRentalEvent event) {
@@ -136,8 +147,12 @@ PersonEntersVehicleEventHandler, LinkLeaveEventHandler, StartRentalEventHandler,
 
 		return this.carsharingSupplyContainer.getAllVehicles().containsKey(vehicleId.toString());		
 	}
-	
+
 	public Map<Id<Person>, AgentRentals> getAgentRentalsMap() {
 		return agentRentalsMap;
+	}
+
+	public Map<Id<Vehicle>, VehicleRentals> getVehicleRentalsMap() {
+		return this.vehicleRentalsMap;
 	}
 }

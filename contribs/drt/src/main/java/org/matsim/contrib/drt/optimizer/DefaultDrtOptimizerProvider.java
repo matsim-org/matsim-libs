@@ -66,8 +66,9 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 
 		TravelDisutility travelDisutility = travelDisutilityFactory == null ? new TimeAsTravelDisutility(travelTime)
 				: travelDisutilityFactory.createTravelDisutility(travelTime);
+
 		DrtOptimizerContext optimContext = new DrtOptimizerContext(fleet, network, qSim.getSimTimer(), travelTime,
-				travelDisutility, scheduler);
+				travelDisutility, scheduler, qSim.getEventsManager());
 
 		return drtCfg.getIdleVehiclesReturnToDepots() ? new InsertionDrtOptimizerWithDepots(optimContext, drtCfg)
 				: new InsertionDrtOptimizer(optimContext, drtCfg);

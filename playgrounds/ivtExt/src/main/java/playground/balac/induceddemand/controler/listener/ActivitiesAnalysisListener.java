@@ -60,10 +60,12 @@ public class ActivitiesAnalysisListener implements IterationEndsListener, Iterat
 						ind = true;
 				}
 				if (!ind) {
-				sizeChain[t.size()]++;
-				size += t.size();
-				count++;
-	
+					if (t.size() <= 29) {
+						sizeChain[t.size()]++;
+				
+					}
+					size += t.size();
+					count++;
 				String chain = "";
 				
 				for(Activity a : t) {

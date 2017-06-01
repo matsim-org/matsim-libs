@@ -34,12 +34,14 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.*;
+import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import playground.ivt.kticompatibility.KtiActivityScoring;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
@@ -57,7 +59,7 @@ import java.util.*;
 public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private final Scenario scenario;
-	private final StageActivityTypes blackList;
+	private final StageActivityTypes blackList = new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE );;
 
 	// very expensive to initialize:only do once!
 	private final Map<Id, ScoringParameters> individualParameters = new HashMap< >();
@@ -69,7 +71,6 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 			final Scenario scenario,
 			final StageActivityTypes typesNotToScore ) {
 		this.scenario = scenario;
-		this.blackList = typesNotToScore;
 	}
 
 
@@ -88,11 +89,21 @@ public class PersonalizedScoringFunctionFactory implements ScoringFunctionFactor
 		final SumScoringFunction scoringFunctionAccumulator = new SumScoringFunction();
 		//final ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		final ScoringParameters params = createParams( person , config , scenario.getConfig().scenario(), personAttributes );
-
+		if (!Boolean.parseBoolean(scenario.getConfig().getModule("ActivityStrategies").getValue("proportionalPerformingScoring"))) {
+			scoringFunctionAccumulator.addScoringFunction(
+					new BlackListedActivityScoringFunction(
+						blackList,
+						new KtiActivityPersonalizedScoring(
+							person.getSelectedPlan(),
+							params,
+							((MutableScenario) scenario).getActivityFacilities() )) );
+			
+		}
+		else
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(
 					blackList,
-					new KtiActivityScoring(
+					new KtiActivityPersonalizedPropScoring(
 						person.getSelectedPlan(),
 						params,
 						((MutableScenario) scenario).getActivityFacilities() )) );

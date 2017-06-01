@@ -44,6 +44,8 @@ import org.matsim.vehicles.Vehicle;
  * Created by amit on 23/12/2016.
  */
 
+// this is not necessary anymore. Test and remove it.
+@Deprecated
 public class EmissionPersonEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
 
     private final Map<Id<Vehicle>, Id<Person>> vehicle2DriverIdCollector = new HashMap<>();
