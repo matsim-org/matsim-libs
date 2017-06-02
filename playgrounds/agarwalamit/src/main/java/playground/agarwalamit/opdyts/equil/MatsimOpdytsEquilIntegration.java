@@ -51,6 +51,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.opdyts.*;
+import playground.agarwalamit.opdyts.analysis.DecisionVariableAndBestSolutionPlotter;
+import playground.agarwalamit.opdyts.analysis.OpdytsConvergencePlotter;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
 
@@ -243,5 +245,13 @@ public class MatsimOpdytsEquilIntegration {
 			String dir2remove = OUT_DIR+"_"+index+"/ITERS/";
 			IOUtils.deleteDirectoryRecursively(new File(dir2remove).toPath());
 		}
+
+		OpdytsConvergencePlotter opdytsConvergencePlotter = new OpdytsConvergencePlotter();
+		opdytsConvergencePlotter.readFile(OUT_DIR+"/opdyts.con");
+		opdytsConvergencePlotter.plotData(OUT_DIR+"/convergence.png");
+
+		DecisionVariableAndBestSolutionPlotter decisionVariableAndBestSolutionPlotter = new DecisionVariableAndBestSolutionPlotter("bicycle");
+		decisionVariableAndBestSolutionPlotter.readFile(OUT_DIR+"/opdyts.log");
+		decisionVariableAndBestSolutionPlotter.plotData(OUT_DIR+"/decisionVariableVsASC.png");
 	}
 }
