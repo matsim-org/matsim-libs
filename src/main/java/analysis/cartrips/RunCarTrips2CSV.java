@@ -27,8 +27,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.analysis.vsp.traveltimes.CarTrip;
-import org.matsim.contrib.analysis.vsp.traveltimes.CarTripsExtractor;
+import org.matsim.contrib.analysis.vsp.traveltimedistance.CarTrip;
+import org.matsim.contrib.analysis.vsp.traveltimedistance.CarTripsExtractor;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
