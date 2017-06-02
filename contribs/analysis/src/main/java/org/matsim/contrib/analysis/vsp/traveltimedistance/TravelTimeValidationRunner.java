@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.analysis.vsp.traveltimes;
+package org.matsim.contrib.analysis.vsp.traveltimedistance;
 
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
@@ -31,7 +31,10 @@ import java.util.List;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.annotations.XYAnnotation;
+import org.jfree.chart.annotations.XYLineAnnotation;
 import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
@@ -41,6 +44,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
 /**
@@ -54,26 +58,29 @@ public class TravelTimeValidationRunner {
 
 	private final Network network;
 	private final String eventsFile;
-	private final TravelTimeValidator travelTimeValidator;
+	private final TravelTimeDistanceValidator travelTimeValidator;
 	private int numberOfTripsToValidate;
 	private final Population population;
+	private final String outputfolder;
 	
 	
-	public TravelTimeValidationRunner(Network network, Population population, String eventsFile, TravelTimeValidator travelTimeValidator,
+	public TravelTimeValidationRunner(Network network, Population population, String eventsFile, String outputFolder ,TravelTimeDistanceValidator travelTimeValidator,
 			int numberOfTripsToValidate) {
 		this.network = network;
 		this.eventsFile = eventsFile;
 		this.travelTimeValidator = travelTimeValidator;
 		this.numberOfTripsToValidate = numberOfTripsToValidate;
 		this.population = population;
+		this.outputfolder = outputFolder;
 	}
 	
-	public TravelTimeValidationRunner(Network network, Population population, String eventsFile, TravelTimeValidator travelTimeValidator) {
+	public TravelTimeValidationRunner(Network network, Population population, String eventsFile, String outputFolder ,TravelTimeDistanceValidator travelTimeValidator) {
 		this.network = network;
 		this.eventsFile = eventsFile;
 		this.travelTimeValidator = travelTimeValidator;
 		this.numberOfTripsToValidate = Integer.MAX_VALUE;
 		this.population = population;
+		this.outputfolder = outputFolder;
 	}
 	
 	public void run(){
@@ -86,32 +93,36 @@ public class TravelTimeValidationRunner {
 		Collections.shuffle(carTrips, MatsimRandom.getRandom());
 		int i = 0;
 		for (CarTrip trip : carTrips){
-			double validatedTravelTime = travelTimeValidator.getTravelTime(trip);
+			Tuple<Double,Double> timeDistance = travelTimeValidator.getTravelTime(trip);
+			double validatedTravelTime = timeDistance.getFirst();
 			trip.setValidatedTravelTime(validatedTravelTime);
-			
+			trip.setValidatedTravelDistance(timeDistance.getSecond());
 			i++;
 			if (i>=numberOfTripsToValidate){
 				break;
 			}
 		}
-		String fileName = eventsFile.replace(".xml.gz", "");
-		writeTravelTimeValidation(fileName, carTrips);
+		writeTravelTimeValidation(outputfolder, carTrips);
 		
 		
 	}
-	private void writeTravelTimeValidation(String filename, List<CarTrip> trips){
-		BufferedWriter bw = IOUtils.getBufferedWriter(filename+"_trips.csv");
+	private void writeTravelTimeValidation(String folder, List<CarTrip> trips){
+		BufferedWriter bw = IOUtils.getBufferedWriter(folder+"/validated_trips.csv");
 		XYSeriesCollection times = new XYSeriesCollection();
+		XYSeriesCollection distances = new XYSeriesCollection();
 
+		XYSeries distancess = new XYSeries("distances", true, true);
 		XYSeries timess = new XYSeries("times", true, true);
 		times.addSeries(timess);
+		distances.addSeries(distancess);
 		try {
-			bw.append("agent;departureTime;fromX;fromY;toX;toY;traveltimeActual;traveltimeValidated");
+			bw.append("agent;departureTime;fromX;fromY;toX;toY;traveltimeActual;traveltimeValidated;traveledDistance;validatedDistance");
 			for (CarTrip trip : trips){
 				if (trip.getValidatedTravelTime() != null){
 					bw.newLine();
 					bw.append(trip.toString());
 					timess.add(trip.getActualTravelTime(), trip.getValidatedTravelTime());
+					distancess.add(trip.getTravelledDistance(),trip.getValidatedTravelDistance());
 				}
 			}	
 		
@@ -119,11 +130,35 @@ public class TravelTimeValidationRunner {
 			bw.flush();
 			bw.close();
 			final JFreeChart chart2 = ChartFactory.createScatterPlot("Travel Times", "Simulated travel time [s]",
-					"validated travel Time [s]", times);
+					"Validated travel time [s]", times);
+			final JFreeChart chart = ChartFactory.createScatterPlot("Travel Distances", "Simulated travel distance [m]",
+					"Validated travel distance [m]", distances);
+			
+			
 			NumberAxis yAxis = (NumberAxis)((XYPlot)chart2.getPlot()).getRangeAxis();
 			NumberAxis xAxis = (NumberAxis)((XYPlot)chart2.getPlot()).getDomainAxis();
+			NumberAxis yAxisd = (NumberAxis)((XYPlot)chart.getPlot()).getRangeAxis();
+			NumberAxis xAxisd = (NumberAxis)((XYPlot)chart.getPlot()).getDomainAxis();
+			yAxisd.setUpperBound(xAxisd.getUpperBound());
 			yAxis.setUpperBound(xAxis.getUpperBound());
-			ChartUtilities.writeChartAsPNG(new FileOutputStream(filename+"_traveltimes" + ".png"), chart2, 1500, 1500);
+			yAxis.setTickUnit(new NumberTickUnit(500));
+			xAxis.setTickUnit(new NumberTickUnit(500));
+			
+			
+			XYAnnotation diagonal = new  
+			XYLineAnnotation(xAxis.getRange().getLowerBound(),   
+			           yAxis.getRange().getLowerBound(),  xAxis.getRange().getUpperBound(), 
+			           yAxis.getRange().getUpperBound());
+			((XYPlot) chart2.getPlot()).addAnnotation(diagonal);
+			
+			XYAnnotation diagonald = new  
+			XYLineAnnotation(xAxisd.getRange().getLowerBound(),   
+			           yAxisd.getRange().getLowerBound(),  xAxisd.getRange().getUpperBound(), 
+			           yAxisd.getRange().getUpperBound());
+			((XYPlot) chart.getPlot()).addAnnotation(diagonald);
+			
+			ChartUtilities.writeChartAsPNG(new FileOutputStream(folder+"/validated_traveltimes" + ".png"), chart2, 1500, 1500);
+			ChartUtilities.writeChartAsPNG(new FileOutputStream(folder+"/validated_traveldistances.png"), chart, 1500, 1500);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

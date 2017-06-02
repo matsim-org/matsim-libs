@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.analysis.vsp.traveltimes;
+package org.matsim.contrib.analysis.vsp.traveltimedistance;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -27,18 +27,23 @@ public class CarTrip {
 	final private Id<Person> personId;
 	final private double departureTime;
 	final private double arrivalTime;
+	final private double travelledDistance;
 	final private Coord departureLocation;
 	final private Coord arrivalLocation;
+	
 	private Double validatedTravelTime = null;
+	private Double validatedTravelDistance = null;
 	private double actualTravelTime;
 
-	CarTrip(Id<Person> personId, double departureTime, double arrivaldTime, Coord departureLocation,
+	CarTrip(Id<Person> personId, double departureTime, double arrivaldTime, double distance, Coord departureLocation,
 			Coord arrivalLocation) {
 		this.personId = personId;
 		this.departureTime = departureTime;
 		this.arrivalTime = arrivaldTime;
 		this.departureLocation = departureLocation;
 		this.arrivalLocation = arrivalLocation;
+		this.travelledDistance = distance;
+		
 	}
 
 	
@@ -85,9 +90,25 @@ public class CarTrip {
 	public Double getValidatedTravelTime() {
 		return validatedTravelTime;
 	}
+	
+	public Double getValidatedTravelDistance() {
+		return validatedTravelDistance;
+	}
+
+
+	public void setValidatedTravelDistance(Double validatedTravelDistance) {
+		this.validatedTravelDistance = validatedTravelDistance;
+	}
+
+
+	public double getTravelledDistance() {
+		return travelledDistance;
+	}
+
+
 	public String toString(){
-//		bw.append("agent;departureTime;fromX;fromY;toX;toY;traveltimeActual;traveltimeValidated");
-		return (this.personId.toString()+";"+departureTime+";"+departureLocation.getX()+";"+departureLocation.getY()+";"+arrivalLocation.getX()+";"+arrivalLocation.getY()+";"+actualTravelTime+";"+validatedTravelTime);
+//		bw.append("agent;departureTime;fromX;fromY;toX;toY;traveltimeActual;traveltimeValidated;traveledDistance;validatedDistance");
+		return (this.personId.toString()+";"+departureTime+";"+departureLocation.getX()+";"+departureLocation.getY()+";"+arrivalLocation.getX()+";"+arrivalLocation.getY()+";"+actualTravelTime+";"+validatedTravelTime+";"+travelledDistance+";"+validatedTravelDistance);
 	}
 
 }

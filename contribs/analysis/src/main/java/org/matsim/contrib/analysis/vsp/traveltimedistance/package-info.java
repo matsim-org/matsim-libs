@@ -5,4 +5,4 @@
 /**
  *
  */
-package org.matsim.contrib.analysis.vsp.traveltimes;
+package org.matsim.contrib.analysis.vsp.traveltimedistance;
