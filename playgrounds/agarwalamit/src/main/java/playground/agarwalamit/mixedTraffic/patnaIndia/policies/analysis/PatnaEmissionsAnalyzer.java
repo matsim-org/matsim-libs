@@ -59,8 +59,7 @@ public class PatnaEmissionsAnalyzer {
 
     private void run(final String emissionEventsFile, final String eventsFile, final String outFile){
 
-        FilteredEmissionPersonEventHandler emissionPersonEventHandler = new FilteredEmissionPersonEventHandler(
-                PatnaPersonFilter.PatnaUserGroup.urban.toString(), new PatnaPersonFilter());
+        FilteredEmissionPersonEventHandler emissionPersonEventHandler = new FilteredEmissionPersonEventHandler();
 ////        FilteredColdEmissionHandler emissionPersonEventHandler = new FilteredColdEmissionHandler(30*3600.0, 1);
 
 //        EmissionsPerPersonColdEventHandler emissionPersonEventHandler = new EmissionsPerPersonColdEventHandler();
@@ -75,8 +74,10 @@ public class PatnaEmissionsAnalyzer {
 //        eventsReader.readFile(eventsFile);
         emissionEventsReader.readFile(emissionEventsFile);
 
-        Map<String, Double> coldEmissions = emissionUtilsExtended.getTotalColdEmissions(emissionPersonEventHandler.getPersonId2ColdEmissions());
-        Map<String, Double> warmEmissions = emissionUtilsExtended.getTotalWarmEmissions(emissionPersonEventHandler.getPersonId2WarmEmissions());
+        // probably just use the total directly from event handler; (need to test first) amit June'17
+        Map<String, Double> coldEmissions = emissionUtilsExtended.getTotalColdEmissions(emissionPersonEventHandler.getPersonId2ColdEmissions(
+                PatnaPersonFilter.PatnaUserGroup.urban.toString(),new PatnaPersonFilter()));
+        Map<String, Double> warmEmissions = emissionUtilsExtended.getTotalWarmEmissions(emissionPersonEventHandler.getPersonId2WarmEmissions(PatnaPersonFilter.PatnaUserGroup.urban.toString(),new PatnaPersonFilter()));
 
         Map<String, Double> totalEmissions = MapUtils.addMaps(coldEmissions, warmEmissions);
 

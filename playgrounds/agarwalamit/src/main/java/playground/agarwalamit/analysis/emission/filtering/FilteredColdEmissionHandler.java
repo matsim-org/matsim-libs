@@ -42,6 +42,7 @@ import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkCold
  * @author amit
  */
 
+// TODO check FilteredEmissionPersonEventHandler and update following based on that.
 public class FilteredColdEmissionHandler implements VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, ColdEmissionEventHandler{
 	private static final Logger LOGGER = Logger.getLogger(FilteredColdEmissionHandler.class.getName());
 
