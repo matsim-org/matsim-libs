@@ -90,8 +90,8 @@ public class DrtRequestAnalyzer implements DrtRequestRejectedEventHandler, DrtRe
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (this.scheduledRequests.containsKey(event.getPersonId())){
-			DrtRequestScheduledEvent scheduled = scheduledRequests.get(event.getPersonId());
-			DrtRequestSubmittedEvent submission  = this.submittedRequests.get(scheduled.getRequestId());
+			DrtRequestScheduledEvent scheduled = scheduledRequests.remove(event.getPersonId());
+			DrtRequestSubmittedEvent submission  = this.submittedRequests.remove(scheduled.getRequestId());
 			double actualWaitTime = event.getTime() - submission.getTime();
 			double estimatedWaitTime =  scheduled.getPickupTime() - submission.getTime();
 			waitTimeCompare.put(submission.getRequestId(), new Tuple<>(actualWaitTime,estimatedWaitTime));
