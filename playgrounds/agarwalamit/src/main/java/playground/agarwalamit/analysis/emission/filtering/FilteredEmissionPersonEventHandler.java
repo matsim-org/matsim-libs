@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.emission.filtering;
 
+import java.util.HashMap;
 import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -46,6 +47,7 @@ import playground.agarwalamit.utils.PersonFilter;
 public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHandler, WarmEmissionEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private static final Logger LOGGER = Logger.getLogger(FilteredEmissionPersonEventHandler.class.getName());
 
+	private final Map<Id<Vehicle>, Id<Person>> vehicleId2PersonId2 = new HashMap<>();
 	private final EmissionPersonEventHandler delegate;
 	private final PersonFilter pf ;
 	private final Network network;
@@ -102,7 +104,7 @@ public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHand
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
- 		Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
+ 		Id<Person> driverId = this.vehicleId2PersonId2.get(event.getVehicleId());
 
 		if (this.af!=null) { // area filtering
 			Link link = network.getLinks().get(event.getLinkId());
@@ -125,7 +127,7 @@ public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHand
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
-		Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
+		Id<Person> driverId = this.vehicleId2PersonId2.get(event.getVehicleId());
 
 		if (this.af!=null) { // area filtering
 			Link link = network.getLinks().get(event.getLinkId());
@@ -148,16 +150,14 @@ public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHand
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		delegate.handleEvent(event);
+		this.vehicleId2PersonId2.put(event.getVehicleId(), event.getPersonId());
 	}
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		delegate.handleEvent(event);
-	}
-
-	public Id<Person> getDriverOfVehicle(Id<Vehicle> vehicleId) {
-		return delegate.getDriverOfVehicle(vehicleId);
+		// Commeting following due to recent problem with berlin_open_scenario in which a few emission events are thrown
+		// after vehicleLeavesTrafficEvent (in the same time step). If this causes some problem, probably use a later event (PersonArrivalEvent). Amit June'17
+//		this.vehicleId2PersonId2.remove(event.getVehicleId(), event.getPersonId());
 	}
 
 	public Map<Id<Person>, Map<ColdPollutant, Double>> getPersonId2ColdEmissions() {
