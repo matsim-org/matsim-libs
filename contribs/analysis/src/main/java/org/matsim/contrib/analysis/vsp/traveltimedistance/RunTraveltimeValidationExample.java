@@ -76,6 +76,7 @@ public class RunTraveltimeValidationExample {
 		new PopulationReader(scenario).readFile(plans);
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(epsg, TransformationFactory.WGS84);
 		HereMapsRouteValidator validator = new HereMapsRouteValidator(outputfolder, appId, appCode, date, transformation);
+		validator.setWriteDetailedFiles(true);
 		TravelTimeValidationRunner runner;
 		if (tripsToValidate != null){
 		runner = new TravelTimeValidationRunner(scenario.getNetwork(), scenario.getPopulation(), events, outputfolder, validator, tripsToValidate);
