@@ -21,15 +21,15 @@ public class CompareUseCase {
     public static final Logger log = Logger.getLogger(CompareUseCase.class);
 
     //FromMatsim Parameters
-        private static final String RUN_ID = "be_118"; // <----------
-        private static final String ITERATION_FOR_ANALYSIS = "";
+        private static final String RUN_ID = "be_115b"; // <----------
+        private static final String ITERATION_FOR_ANALYSIS = "0";
         private static final String CEMDAP_PERSONS_INPUT_FILE_ID = "21"; // Check if this number corresponds correctly to the RUN_ID
 
         // Input and output
 //        private static final String NETWORK_FILE = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/network_counts/network.xml.gz"; // <----------
-        private static final String NETWORK_FILE = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/network_counts/network_shortIds_v1.xml.gz"; // <----------
-        private static final String EVENTS_FILE = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/" + RUN_ID + ".output_events.xml.gz";
-//        private static final String EVENTS_FILE = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/ITERS/it." + ITERATION_FOR_ANALYSIS + "/" + RUN_ID + "." + ITERATION_FOR_ANALYSIS + ".events.xml.gz";
+        private static final String NETWORK_FILE = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/network_counts/network_shortIds.xml.gz"; // <----------
+//        private static final String EVENTS_FILE = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/" + RUN_ID + ".output_events.xml.gz";
+        private static final String EVENTS_FILE = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/ITERS/it." + ITERATION_FOR_ANALYSIS + "/" + RUN_ID + "." + ITERATION_FOR_ANALYSIS + ".events.xml.gz";
         private static final String cemdapPersonsInputFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" + CEMDAP_PERSONS_INPUT_FILE_ID + "/persons1.dat"; // TODO
         private static final String AREA_SHAPE_FILE = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/shapefiles/2013/Berlin_DHDN_GK4.shp";
         //    private static String outputDirectory = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/analysis";
