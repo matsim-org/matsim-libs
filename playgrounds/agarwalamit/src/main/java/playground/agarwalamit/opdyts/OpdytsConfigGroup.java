@@ -37,7 +37,7 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
    private double scalingParameterToRamdomizeDecisionVariable = 0.1;
 
    private static final String RANDOM_SEED_TO_RANDOMIZE_DECISION_VARIABLE = "randomSeedToRandomizeDecisionVariable";
-   private long randomSeedToRandomizeDecisionVariable = 4711;
+   private int randomSeedToRandomizeDecisionVariable = 4711;
 
    private static final String OUTPUT_DIRECTORY = "outputDirectory";
    private String outputDirectory = "./output/";
@@ -85,130 +85,162 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
    private static final String SELF_TUNING_WEIGHT = "selfTuningWeight";
    private double selfTuningWeight = 1.0;
 
-    public double getScalingParameterToRamdomizeDecisionVariable() {
+   @StringGetter(SCALING_PARAMETER_TO_RANDOMIZE_DECISION_VARIABLE)
+   public double getScalingParameterToRamdomizeDecisionVariable() {
         return scalingParameterToRamdomizeDecisionVariable;
     }
 
+    @StringSetter(SCALING_PARAMETER_TO_RANDOMIZE_DECISION_VARIABLE)
     public void setScalingParameterToRamdomizeDecisionVariable(double scalingParameterToRamdomizeDecisionVariable) {
         this.scalingParameterToRamdomizeDecisionVariable = scalingParameterToRamdomizeDecisionVariable;
     }
 
-    public long getRandomSeedToRandomizeDecisionVariable() {
+    @StringGetter(RANDOM_SEED_TO_RANDOMIZE_DECISION_VARIABLE)
+    public int getRandomSeedToRandomizeDecisionVariable() {
         return this.randomSeedToRandomizeDecisionVariable;
     }
 
-    public void setRandomSeedToRandomizeDecisionVariable(long randomSeedToRandomizeDecisionVariable) {
+    @StringSetter(RANDOM_SEED_TO_RANDOMIZE_DECISION_VARIABLE)
+    public void setRandomSeedToRandomizeDecisionVariable(int randomSeedToRandomizeDecisionVariable) {
         this.randomSeedToRandomizeDecisionVariable = randomSeedToRandomizeDecisionVariable;
     }
 
+    @StringGetter(OUTPUT_DIRECTORY)
     public String getOutputDirectory() {
         return this.outputDirectory;
     }
 
+    @StringSetter(OUTPUT_DIRECTORY)
     public void setOutputDirectory(String outputDirectory) {
         this.outputDirectory = outputDirectory;
     }
 
+    @StringGetter(MAX_ITERATION)
     public int getMaxIteration() {
         return this.maxIteration;
     }
 
+    @StringSetter(MAX_ITERATION)
     public void setMaxIteration(int maxIteration) {
         this.maxIteration = maxIteration;
     }
 
+    @StringGetter(MAX_TRANSITION)
     public int getMaxTransition() {
         return this.maxTransition;
     }
 
+    @StringSetter(MAX_TRANSITION)
     public void setMaxTransition(int maxTransition) {
         this.maxTransition = maxTransition;
     }
 
+    @StringGetter(POPULATION_SIZE)
     public int getPopulationSize() {
         return this.populationSize;
     }
 
+    @StringSetter(POPULATION_SIZE)
     public void setPopulationSize(int populationSize) {
         this.populationSize = populationSize;
     }
 
+    @StringGetter(IS_INTERPOLATE)
     public boolean isInterpolate() {
         return interpolate;
     }
 
+    @StringSetter(IS_INTERPOLATE)
     public void setInterpolate(boolean interpolate) {
         this.interpolate = interpolate;
     }
 
+    @StringGetter(INCLUDE_CURRENT_BEST)
     public boolean isIncludeCurrentBest() {
         return includeCurrentBest;
     }
 
+    @StringSetter(INCLUDE_CURRENT_BEST)
     public void setIncludeCurrentBest(boolean includeCurrentBest) {
         this.includeCurrentBest = includeCurrentBest;
     }
 
+    @StringGetter(START_TIME)
     public int getStartTime() {
         return this.startTime;
     }
 
+    @StringSetter(START_TIME)
     public void setStartTime(int startTime) {
         this.startTime = startTime;
     }
 
+    @StringGetter(BIN_SIZE)
     public int getBinSize() {
         return this.binSize;
     }
 
+    @StringSetter(BIN_SIZE)
     public void setBinSize(int binSize) {
         this.binSize = binSize;
     }
 
+    @StringGetter(BIN_COUNT)
     public int getBinCount() {
         return this.binCount;
     }
 
+    @StringSetter(BIN_COUNT)
     public void setBinCount(int binCount) {
         this.binCount = binCount;
     }
 
+    @StringGetter(NUMBER_OF_ITERATION_TO_AVERAGE)
     public int getNumberOfIterationsForAveraging() {
         return numberOfIterationsForAveraging;
     }
 
+    @StringSetter(NUMBER_OF_ITERATION_TO_AVERAGE)
     public void setNumberOfIterationsForAveraging(int numberOfIterationsForAveraging) {
         this.numberOfIterationsForAveraging = numberOfIterationsForAveraging;
     }
 
+    @StringGetter(NUMER_OF_ITERATION_FOR_CONVERGENCE)
     public int getNumberOfIterationsForConvergence() {
         return numberOfIterationsForConvergence;
     }
 
+    @StringSetter(NUMER_OF_ITERATION_FOR_CONVERGENCE)
     public void setNumberOfIterationsForConvergence(int numberOfIterationsForConvergence) {
         this.numberOfIterationsForConvergence = numberOfIterationsForConvergence;
     }
 
+    @StringGetter(INERTIA)
     public double getInertia() {
         return inertia;
     }
 
+    @StringSetter(INERTIA)
     public void setInertia(double inertia) {
         this.inertia = inertia;
     }
 
+    @StringGetter(NOISY_SYSTEM)
     public boolean isNoisySystem() {
         return noisySystem;
     }
 
+    @StringSetter(NOISY_SYSTEM)
     public void setNoisySystem(boolean noisySystem) {
         this.noisySystem = noisySystem;
     }
 
+    @StringGetter(SELF_TUNING_WEIGHT)
     public double getSelfTuningWeight() {
         return this.selfTuningWeight;
     }
 
+    @StringSetter(SELF_TUNING_WEIGHT)
     public void setSelfTuningWeight(double selfTuningWeight) {
         this.selfTuningWeight = selfTuningWeight;
     }

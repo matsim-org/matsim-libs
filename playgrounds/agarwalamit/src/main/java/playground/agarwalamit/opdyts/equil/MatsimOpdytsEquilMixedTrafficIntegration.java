@@ -65,44 +65,41 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class MatsimOpdytsEquilMixedTrafficIntegration {
 
-	private static double scalingParameterForDecisionVariableVariability = 1;
-	private static int iterationsToConvergence = 1;
-	private static int averagingIterations = 10;
-	private static double selfTunerWeight = 0.95;
-
 	private static String EQUIL_DIR = "./examples/scenarios/equil-mixedTraffic/";
-	private static String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+ scalingParameterForDecisionVariableVariability +"_"+iterationsToConvergence+"its/";
 	private static final OpdytsScenario EQUIL_MIXEDTRAFFIC = OpdytsScenario.EQUIL_MIXEDTRAFFIC;
 
 	private static boolean isPlansRelaxed = false;
-
-	private static int randomSeedForDecisionVariableRandomizer;
-
-	private static double startingASCforBicycle = 0.;
-
-	private static int populationSize = 10;
+	private static double startingASCforBicycle = 2.0;
 
 	public static void main(String[] args) {
+		Config config = ConfigUtils.createConfig();
+		OpdytsConfigGroup opdytsConfigGroup = ConfigUtils.addOrGetModule(config, OpdytsConfigGroup.GROUP_NAME,OpdytsConfigGroup.class);
+		String OUT_DIR ;
 
 		if (args.length > 0) {
-			scalingParameterForDecisionVariableVariability = Double.valueOf(args[0]);
-			iterationsToConvergence = Integer.valueOf(args[1]);
+			opdytsConfigGroup.setScalingParameterToRamdomizeDecisionVariable(Double.valueOf(args[0]));
+			opdytsConfigGroup.setNumberOfIterationsForConvergence(Integer.valueOf(args[1]));
+			opdytsConfigGroup.setNumberOfIterationsForAveraging(Integer.valueOf(args[4]));
+			opdytsConfigGroup.setSelfTuningWeight(Double.valueOf(args[5]));
+			opdytsConfigGroup.setRandomSeedToRandomizeDecisionVariable(Integer.valueOf(args[7]));
+			opdytsConfigGroup.setPopulationSize(Integer.valueOf(args[9]));
+
 			EQUIL_DIR = args[2];
-			OUT_DIR = args[3]+"/equil_car,bicycle_holes_variance"+ scalingParameterForDecisionVariableVariability +"_"+iterationsToConvergence+"its/";
-			averagingIterations = Integer.valueOf(args[4]);
-			selfTunerWeight = Double.valueOf(args[5]);
+			OUT_DIR = args[3]+"/equil_car,bicycle_holes_variance"+ opdytsConfigGroup.getScalingParameterToRamdomizeDecisionVariable() +"_"+opdytsConfigGroup.getNumberOfIterationsForConvergence()+"its/";
 			isPlansRelaxed = Boolean.valueOf(args[6]);
-			randomSeedForDecisionVariableRandomizer = Integer.valueOf(args[7]);
 			startingASCforBicycle = Double.valueOf(args[8]);
-			populationSize = Integer.valueOf(args[9]);
+		} else {
+			OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+ opdytsConfigGroup.getScalingParameterToRamdomizeDecisionVariable() +"_"+opdytsConfigGroup.getNumberOfIterationsForConvergence()+"its/";
 		}
 
 		List<String> modes2consider = Arrays.asList("car","bicycle");
 
 		//see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters 
-		Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
-		config.planCalcScore().getOrCreateModeParams("bicycle").setConstant(startingASCforBicycle);
+		String configFile = EQUIL_DIR+"/config.xml";
+		ConfigUtils.loadConfig(config,configFile);
+		config.setContext(IOUtils.getUrlFromFileOrResource(configFile));
 
+		config.planCalcScore().getOrCreateModeParams("bicycle").setConstant(startingASCforBicycle);
 		config.plans().setInputFile("plans2000.xml.gz");
 
 		//== default config has limited inputs
@@ -119,7 +116,6 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		expChangeBeta.setStrategyName(DefaultPlanStrategiesModule.DefaultSelector.ChangeExpBeta);
 		expChangeBeta.setWeight(0.9);
 		config.strategy().addStrategySettings(expChangeBeta);
-
 		//==
 
 		//== planCalcScore params (initialize will all defaults).
@@ -137,7 +133,6 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		PlanCalcScoreConfigGroup.ModeParams mpBike = new PlanCalcScoreConfigGroup.ModeParams("bicycle");
 		mpBike.setMarginalUtilityOfTraveling(0.);
 
-
 		planCalcScoreConfigGroup.addModeParams(mpCar);
 		planCalcScoreConfigGroup.addModeParams(mpBike);
 		//==
@@ -154,7 +149,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		if(! isPlansRelaxed) {
 			config.controler().setLastIteration(50);
-			config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
+			config.strategy().setFractionOfIterationsToDisableInnovation(1.0);
 
 			Scenario scenarioPlansRelaxor = ScenarioUtils.loadScenario(config);
 			// following is taken from KNBerlinControler.prepareScenario(...);
@@ -182,20 +177,17 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		// set back settings for opdyts
 		File file = new File(config.controler().getOutputDirectory()+"/output_plans.xml.gz");
 		config.plans().setInputFile(file.getAbsoluteFile().getAbsolutePath());
-		OUT_DIR = OUT_DIR+"/calibration_"+ averagingIterations +"Its_"+selfTunerWeight+"weight_"+startingASCforBicycle+"asc/";
+		OUT_DIR = OUT_DIR+"/calibration_"+ opdytsConfigGroup.getNumberOfIterationsForAveraging() +"Its_"+opdytsConfigGroup.getSelfTuningWeight()+"weight_"+startingASCforBicycle+"asc/";
 
 		config.controler().setOutputDirectory(OUT_DIR);
+		opdytsConfigGroup.setOutputDirectory(OUT_DIR);
 		config.strategy().setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		//****************************** mainly opdyts settings ******************************
 
-		// this is something like time bin generator
-		int startTime= 0;
-		int binSize = 3600; // can this be scenario simulation end time.
-		int binCount = 24; // to me, binCount and binSize must be related
-		TimeDiscretization timeDiscretization = new TimeDiscretization(startTime, binSize, binCount);
+		TimeDiscretization timeDiscretization = new TimeDiscretization(opdytsConfigGroup.getStartTime(), opdytsConfigGroup.getBinSize(), opdytsConfigGroup.getBinCount());
 
 		DistanceDistribution distanceDistribution = new EquilDistanceDistribution(EQUIL_MIXEDTRAFFIC);
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
@@ -231,46 +223,36 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		// in my case, this will be the distance based modal split
 		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(distanceDistribution); // in this, the method argument (SimulatorStat) is not used.
 
-		//search algorithm
-		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.
-		int maxTransitions = Integer.MAX_VALUE;
-//		int populationSize = 10; // the number of samples for decision variables, one of them will be drawn randomly for the simulation.
-
-		boolean interpolate = true;
-		boolean includeCurrentBest = false;
-
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
 				RandomizedUtilityParametersChoser.ONLY_ASC,
-				scalingParameterForDecisionVariableVariability,  EQUIL_MIXEDTRAFFIC, null, randomSeedForDecisionVariableRandomizer);
+				opdytsConfigGroup.getScalingParameterToRamdomizeDecisionVariable(),  EQUIL_MIXEDTRAFFIC, null, opdytsConfigGroup.getRandomSeedToRandomizeDecisionVariable());
 
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, EQUIL_MIXEDTRAFFIC);
 
 		// what would decide the convergence of the objective function
-//		final int iterationsToConvergence = 600; //
-		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence,
-				averagingIterations);
+		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(opdytsConfigGroup.getNumberOfIterationsForConvergence(), opdytsConfigGroup.getNumberOfIterationsForAveraging());
 
 		RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>(
 				simulator,
 				decisionVariableRandomizer,
 				initialDecisionVariable,
 				convergenceCriterion,
-				maxIterations, // this many times simulator.run(...) and thus controler.run() will be called.
-				maxTransitions,
-				populationSize,
+				opdytsConfigGroup.getMaxIteration(), // this many times simulator.run(...) and thus controler.run() will be called.
+				opdytsConfigGroup.getMaxTransition(),
+				opdytsConfigGroup.getPopulationSize(),
 				MatsimRandom.getRandom(),
-				interpolate,
+				opdytsConfigGroup.isInterpolate(),
 				objectiveFunction,
-				includeCurrentBest
+				opdytsConfigGroup.isIncludeCurrentBest()
 				);
 
 		// probably, an object which decide about the inertia
-		SelfTuner selfTuner = new SelfTuner(0.95);
-		selfTuner.setWeightScale(selfTunerWeight);
+		SelfTuner selfTuner = new SelfTuner(opdytsConfigGroup.getInertia());
+		selfTuner.setWeightScale(opdytsConfigGroup.getSelfTuningWeight());
 
-		randomSearch.setLogPath(OUT_DIR);
+		randomSearch.setLogPath(opdytsConfigGroup.getOutputDirectory());
 
 		// run it, this will eventually call simulator.run() and thus controler.run
 		randomSearch.run(selfTuner );
@@ -278,10 +260,10 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		OpdytsConvergencePlotter opdytsConvergencePlotter = new OpdytsConvergencePlotter();
 		opdytsConvergencePlotter.readFile(OUT_DIR+"/opdyts.con");
-		opdytsConvergencePlotter.plotData(OUT_DIR+"/convergence_"+ averagingIterations +"Its_"+selfTunerWeight+"weight_"+startingASCforBicycle+"asc.png");
+		opdytsConvergencePlotter.plotData(OUT_DIR+"/convergence_"+ opdytsConfigGroup.getNumberOfIterationsForAveraging() +"Its_"+opdytsConfigGroup.getSelfTuningWeight()+"weight_"+startingASCforBicycle+"asc.png");
 
 		DecisionVariableAndBestSolutionPlotter decisionVariableAndBestSolutionPlotter = new DecisionVariableAndBestSolutionPlotter("bicycle");
 		decisionVariableAndBestSolutionPlotter.readFile(OUT_DIR+"/opdyts.log");
-		decisionVariableAndBestSolutionPlotter.plotData(OUT_DIR+"/decisionVariableVsASC_"+ averagingIterations +"Its_"+selfTunerWeight+"weight_"+startingASCforBicycle+"asc.png");
+		decisionVariableAndBestSolutionPlotter.plotData(OUT_DIR+"/decisionVariableVsASC_"+ opdytsConfigGroup.getNumberOfIterationsForAveraging() +"Its_"+opdytsConfigGroup.getSelfTuningWeight()+"weight_"+startingASCforBicycle+"asc.png");
 	}
 }
