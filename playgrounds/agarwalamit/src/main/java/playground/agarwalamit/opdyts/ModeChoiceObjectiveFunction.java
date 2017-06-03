@@ -32,12 +32,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.contrib.analysis.kai.DataMap;
 import org.matsim.contrib.analysis.kai.Databins;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.scoring.ExperiencedPlansService;
 import org.matsim.core.utils.geometry.CoordUtils;
+import playground.agarwalamit.opdyts.equil.EquilMixedTrafficObjectiveFunctionPenalty;
 
 /**
  *
@@ -51,7 +52,7 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
     private final MainModeIdentifier mainModeIdentifier ;
     private final DistanceDistribution distriInfo ;
 
-    @Inject private ExperiencedPlansService service ;
+    @Inject private PlanCalcScoreConfigGroup planCalcScoreConfigGroup;
     @Inject private TripRouter tripRouter ;
     @Inject private Network network ;
     // Documentation: "Guice injects ... fields of all values that are bound using toInstance(). These are injected at injector-creation time."
@@ -143,22 +144,6 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
             }
         }
 
-         /*
-          *  From Gunnar,
-          *  The (..)^2 objective function becomes very steep when one is very far away from its minimum.
-          *  Meaning that once one is far off, it becomes difficult to get back because
-          *  then the effects even of very small decision variable variations get strongly amplified in the objective function.
-          */
-//        switch (this.opdytsScenarios) {
-//            case EQUIL:
-//            case EQUIL_MIXEDTRAFFIC:
-//            case PATNA_1Pct:
-//            case PATNA_10Pct:
-//                return getSumOfSquareObjectiveFunctionValue();
-//            default:
-//                throw new RuntimeException("not implemented yet.");
-//        }
-
         ObjectiveFunctionEvaluator objectiveFunctionEvaluator = new ObjectiveFunctionEvaluator();
         double objectiveFnValue = 0.;
 
@@ -167,7 +152,20 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
             log.warn("statType=" + theStatType);
             objectiveFnValue = objectiveFunctionEvaluator.getObjectiveFunctionValue(this.refStatsContainer.get(theStatType), entry.getValue());
         }
-        return objectiveFnValue;
+
+        double penalty = 0.;
+        switch (this.distriInfo.getOpdytsScenario()) {
+            case EQUIL:
+            case PATNA_1Pct:
+            case PATNA_10Pct:
+                break;
+            case EQUIL_MIXEDTRAFFIC:
+                double ascBicycle = planCalcScoreConfigGroup.getModes().get("bicycle").getConstant();
+                double bicycleShare = objectiveFunctionEvaluator.getModeToShare().get("bicycle");
+                penalty = EquilMixedTrafficObjectiveFunctionPenalty.getPenalty(bicycleShare, ascBicycle);
+        }
+
+        return objectiveFnValue + penalty;
     }
 
     private void resetContainers() {

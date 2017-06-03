@@ -74,11 +74,13 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 	private static String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+ scalingParameterForDecisionVariableVariability +"_"+iterationsToConvergence+"its/";
 	private static final OpdytsScenario EQUIL_MIXEDTRAFFIC = OpdytsScenario.EQUIL_MIXEDTRAFFIC;
 
-	private static boolean isPlansRelaxed = true;
+	private static boolean isPlansRelaxed = false;
 
 	private static int randomSeedForDecisionVariableRandomizer;
 
 	private static double startingASCforBicycle = 0.;
+
+	private static int populationSize = 10;
 
 	public static void main(String[] args) {
 
@@ -92,6 +94,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			isPlansRelaxed = Boolean.valueOf(args[6]);
 			randomSeedForDecisionVariableRandomizer = Integer.valueOf(args[7]);
 			startingASCforBicycle = Double.valueOf(args[8]);
+			populationSize = Integer.valueOf(args[9]);
 		}
 
 		List<String> modes2consider = Arrays.asList("car","bicycle");
@@ -231,7 +234,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		//search algorithm
 		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.
 		int maxTransitions = Integer.MAX_VALUE;
-		int populationSize = 10; // the number of samples for decision variables, one of them will be drawn randomly for the simulation.
+//		int populationSize = 10; // the number of samples for decision variables, one of them will be drawn randomly for the simulation.
 
 		boolean interpolate = true;
 		boolean includeCurrentBest = false;

@@ -40,6 +40,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.modalShare.FilteredModalShareEventHandler;
 import playground.agarwalamit.analysis.tripDistance.LegModeBeelineDistanceDistributionHandler;
+import playground.agarwalamit.opdyts.equil.EquilMixedTrafficObjectiveFunctionPenalty;
 
 /**
  * Created by amit on 20/09/16.
@@ -84,7 +85,9 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
             mode2consider.stream().forEach(mode -> stringBuilder.append("util_trav_"+mode+ "\t"));
             mode2consider.stream().forEach(mode -> stringBuilder.append("util_dist_"+mode+ "\t"));
             mode2consider.stream().forEach(mode -> stringBuilder.append("money_dist_rate_"+mode+ "\t"));
-            stringBuilder.append("valueOfObjectiveFunction");
+            stringBuilder.append("objectiveFunctionValue"+"\t");
+            stringBuilder.append("penaltyForObjectiveFunction"+"\t");
+            stringBuilder.append("totalObjectiveFunctionValue");
             writer.write(stringBuilder.toString());
             writer.newLine();
         } catch (IOException e) {
@@ -138,6 +141,19 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
             simCounts.put(e.getKey(), counts);
         }
 
+        double objectiveFunctionValue = objectiveFunctionEvaluator.getObjectiveFunctionValue(realCounts,simCounts);
+        double penalty = 0.;
+        switch (this.referenceStudyDistri.getOpdytsScenario()) {
+            case EQUIL:
+            case PATNA_1Pct:
+            case PATNA_10Pct:
+                break;
+            case EQUIL_MIXEDTRAFFIC:
+                double ascBicycle = config.planCalcScore().getModes().get("bicycle").getConstant();
+                double bicycleShare = objectiveFunctionEvaluator.getModeToShare().get("bicycle");
+                penalty = EquilMixedTrafficObjectiveFunctionPenalty.getPenalty(bicycleShare, ascBicycle);
+        }
+
         try {
             // write modalParams
             Map<String, PlanCalcScoreConfigGroup.ModeParams> mode2Params = config.planCalcScore().getModes();
@@ -148,7 +164,9 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
             mode2consider.stream().forEach(mode -> stringBuilder.append(mode2Params.get(mode).getMarginalUtilityOfTraveling()+"\t"));
             mode2consider.stream().forEach(mode -> stringBuilder.append(mode2Params.get(mode).getMarginalUtilityOfDistance()+"\t"));
             mode2consider.stream().forEach(mode -> stringBuilder.append(mode2Params.get(mode).getMonetaryDistanceRate()+"\t"));
-            stringBuilder.append(objectiveFunctionEvaluator.getObjectiveFunctionValue(simCounts,realCounts));
+            stringBuilder.append(objectiveFunctionValue+"\t");
+            stringBuilder.append(penalty+"\t");
+            stringBuilder.append(String.valueOf(objectiveFunctionValue+penalty));
 
             writer.write(stringBuilder.toString());
             writer.newLine();
