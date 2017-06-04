@@ -98,8 +98,6 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		String configFile = EQUIL_DIR+"/config.xml";
 		ConfigUtils.loadConfig(config,configFile);
 		config.setContext(IOUtils.getUrlFromFileOrResource(configFile));
-
-		config.planCalcScore().getOrCreateModeParams("bicycle").setConstant(startingASCforBicycle);
 		config.plans().setInputFile("plans2000.xml.gz");
 
 		//== default config has limited inputs
@@ -132,6 +130,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		PlanCalcScoreConfigGroup.ModeParams mpCar = new PlanCalcScoreConfigGroup.ModeParams("car");
 		PlanCalcScoreConfigGroup.ModeParams mpBike = new PlanCalcScoreConfigGroup.ModeParams("bicycle");
 		mpBike.setMarginalUtilityOfTraveling(0.);
+		mpBike.setConstant(startingASCforBicycle);
 
 		planCalcScoreConfigGroup.addModeParams(mpCar);
 		planCalcScoreConfigGroup.addModeParams(mpBike);
