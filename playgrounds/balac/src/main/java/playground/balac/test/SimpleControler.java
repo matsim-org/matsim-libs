@@ -4,9 +4,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -16,6 +18,8 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
+
+import playground.balac.test.zurich.ZurichScoringFunctionFactory;
 
 
 public class SimpleControler {
@@ -27,9 +31,19 @@ public class SimpleControler {
 				configFile,
 				new BJActivityScoringConfigGroup());
 		
-		Controler controler = new Controler(config);		
+		Controler controler = new Controler(config);	
 
-		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+		controler.addOverridingModule(new AbstractModule() {
+			
+			@Override
+			public void install() {
+				        
+				bindScoringFunctionFactory().to(ZurichScoringFunctionFactory.class);	
+			}
+		});
+		
+
+/*		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 
 			@Override
 			public ScoringFunction createNewScoringFunction(Person person) {
@@ -55,7 +69,7 @@ public class SimpleControler {
 				return sumScoringFunction;
 			}
 
-		});
+		});*/
 		
 		
 		controler.run();
