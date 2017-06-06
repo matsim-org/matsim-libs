@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
  * Author: Bostjan Cigan (http://zerocool.is-a-geek.net)
  */
 public class GammaCorrection {
-    private static BufferedImage original, gamma_corrected;
+    // private static BufferedImage original, gamma_corrected;
 
     public static BufferedImage gammaCorrection(BufferedImage original, double gamma) {
         int alpha, red, green, blue;

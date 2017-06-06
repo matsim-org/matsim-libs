@@ -1,8 +1,9 @@
+// code by jph
 package playground.clruch.gheat.graphics;
 
 import java.awt.Color;
 
-public class GheatPalettes {
+/* package */ class GheatPalettes {
 
     public static ColorScheme createClassic() {
         int[][] sum = new int[][] { { 255, 237, 237, 255 }, { 255, 224, 224, 255 }, { 255, 209, 209, 255 }, { 255, 193, 193, 255 }, { 255, 176, 176, 255 }, { 255, 159, 159, 255 },

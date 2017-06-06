@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.net;
 
 import org.matsim.api.core.v01.Coord;
@@ -5,7 +6,7 @@ import org.matsim.api.core.v01.Coord;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
-public class CoordUtil {
+/* package */ class CoordUtil {
     public static Tensor toTensor(Coord coord) {
         return Tensors.vectorDouble(coord.getX(), coord.getY());
     }
