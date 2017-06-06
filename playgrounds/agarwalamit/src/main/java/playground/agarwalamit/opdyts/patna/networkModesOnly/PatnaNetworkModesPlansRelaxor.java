@@ -27,7 +27,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.agarwalamit.analysis.modalShare.ModalShareControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
@@ -43,15 +43,11 @@ import playground.agarwalamit.utils.FileUtils;
 
 class PatnaNetworkModesPlansRelaxor {
 
-	public void run (String[] args) {
-
-		Config config= ConfigUtils.loadConfig(args[0]);
-		config.controler().setOutputDirectory(args[1]);
-
+	public void run (Config config) {
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		scenario.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		List<String> modes2consider = Arrays.asList("car","bike","motorbike");
 
@@ -81,5 +77,11 @@ class PatnaNetworkModesPlansRelaxor {
 		int firstIt = controler.getConfig().controler().getFirstIteration();
 		int lastIt = controler.getConfig().controler().getLastIteration();
 		FileUtils.deleteIntermediateIterations(config.controler().getOutputDirectory(),firstIt,lastIt);
+	}
+
+	public void run (String[] args) {
+		Config config= ConfigUtils.loadConfig(args[0]);
+		config.controler().setOutputDirectory(args[1]);
+		run(config);
 	}
 }
