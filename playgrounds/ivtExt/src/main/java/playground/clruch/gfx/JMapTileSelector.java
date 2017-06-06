@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gfx;
 
 import java.awt.Dimension;

@@ -23,6 +23,7 @@ import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
+@Deprecated // it is not clear what this dispatcher does and why it exists
 public class PulseDispatcher extends UniversalDispatcher {
     private final List<Link> links;
     int index = 0;

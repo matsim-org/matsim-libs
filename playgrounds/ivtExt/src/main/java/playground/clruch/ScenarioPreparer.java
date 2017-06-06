@@ -13,7 +13,7 @@ import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.clruch.gfx.LocationSpec;
+import playground.clruch.data.LocationSpec;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;

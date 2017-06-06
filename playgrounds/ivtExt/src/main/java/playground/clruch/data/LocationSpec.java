@@ -1,6 +1,9 @@
-package playground.clruch.gfx;
+// code by jph
+package playground.clruch.data;
 
 import org.matsim.api.core.v01.Coord;
+
+import playground.clruch.gfx.ReferenceFrame;
 
 public enum LocationSpec {
     SIOUXFALLS_CITY( //

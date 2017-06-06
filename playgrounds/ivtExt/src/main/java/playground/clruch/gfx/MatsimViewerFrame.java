@@ -1,3 +1,4 @@
+// code adapted by jph
 // License: GPL. For details, see Readme.txt file.
 package playground.clruch.gfx;
 

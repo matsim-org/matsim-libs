@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.dispatcher.core;
 
 import java.util.ArrayList;
@@ -44,7 +45,6 @@ abstract class VehicleMaintainer implements AVDispatcher {
     private final List<AVVehicle> vehicles = new ArrayList<>(); // access via function getFunctioningVehicles()
     private Double private_now = null;
     private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
-    private long routingTimeNano = 0; // <- total cpu time required to compute paths and update schedules
     private int infoLinePeriod = 0;
 
     VehicleMaintainer(EventsManager eventsManager) {
@@ -205,11 +205,9 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
         redispatch(now);
         private_now = null; // <- time unavailable
-        long tic = System.nanoTime();
         private_vehicleDirectives.values().stream() //
                 .parallel() //
                 .forEach(AbstractDirective::execute);
-        routingTimeNano += System.nanoTime() - tic;
         private_vehicleDirectives.clear();
     }
 
