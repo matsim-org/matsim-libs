@@ -1,3 +1,4 @@
+// code by clruch
 package playground.clruch.prep;
 
 import java.io.File;
@@ -14,8 +15,9 @@ import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 
+// TODO this class is not used
 @Deprecated // use ScenarioPreparer instead to have consistent preparation of Scenario.
-public class VirtualNetworkCreator {
+class VirtualNetworkCreator {
 
     public static void main(String[] args) throws IOException {
         File configFile = new File(args[0]);
