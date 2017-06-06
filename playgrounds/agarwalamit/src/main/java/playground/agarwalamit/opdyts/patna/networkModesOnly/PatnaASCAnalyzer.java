@@ -45,6 +45,8 @@ public class PatnaASCAnalyzer {
             configFile = FileUtils.RUNS_SVN+"/opdyts/patna/input_networkModes/"+"/config_networkModesOnly.xml";
             outDir = FileUtils.RUNS_SVN+"/opdyts/patna/output_networkModes/ascAnalysis/";
         }
+
+        new PatnaASCAnalyzer().run(configFile, outDir);
     }
 
     public void run (String configFile, String outDir) {
