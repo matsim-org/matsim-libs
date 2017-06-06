@@ -3,9 +3,9 @@ package playground.clruch;
 
 import org.matsim.api.core.v01.network.Network;
 
+import playground.clruch.data.ReferenceFrame;
 import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
-import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.NetworkLoader;

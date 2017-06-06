@@ -1,6 +1,7 @@
+// code by jph
 package playground.clruch.gfx;
 
-public enum VirtualNodeShader {
+/* package */ enum VirtualNodeShader {
     None, //
     VehicleCount, //
     RequestCount, //

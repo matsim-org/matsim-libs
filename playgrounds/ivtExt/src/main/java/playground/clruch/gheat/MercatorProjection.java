@@ -1,6 +1,7 @@
+// code by varunpant
 package playground.clruch.gheat;
 
-public class MercatorProjection implements Projections {
+/* package */ class MercatorProjection implements Projections {
     static final double MinLatitude = -85.05112878;
     static final double MaxLatitude = 85.05112878;
     static final double MinLongitude = -180;

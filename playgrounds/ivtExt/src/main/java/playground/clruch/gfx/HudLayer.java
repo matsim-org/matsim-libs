@@ -15,7 +15,7 @@ import playground.clruch.utils.gui.SpinnerLabel;
 /**
  * Head Up Display
  */
-public class HudLayer extends ViewerLayer {
+/* package */ class HudLayer extends ViewerLayer {
 
     boolean show = true;
 

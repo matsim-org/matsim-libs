@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gfx;
 
 import java.awt.BasicStroke;
@@ -8,7 +9,7 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Line2D;
 
-class SbbClockDisplay {
+/* package */ class SbbClockDisplay {
 
     int wid = 52;
     int hourRad = 32;

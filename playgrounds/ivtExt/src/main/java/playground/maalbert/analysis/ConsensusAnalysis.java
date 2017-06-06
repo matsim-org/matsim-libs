@@ -8,7 +8,8 @@ import ch.ethz.idsc.tensor.red.Quantile;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import playground.clruch.gfx.ReferenceFrame;
+
+import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;

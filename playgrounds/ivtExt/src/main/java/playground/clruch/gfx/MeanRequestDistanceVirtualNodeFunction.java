@@ -18,7 +18,7 @@ import playground.clruch.netdata.VirtualNode;
 /**
  * mean request distance
  */
-class MeanRequestDistanceVirtualNodeFunction extends AbstractVirtualNodeFunction {
+/* package */ class MeanRequestDistanceVirtualNodeFunction extends AbstractVirtualNodeFunction {
 
     public MeanRequestDistanceVirtualNodeFunction(MatsimStaticDatabase db, VirtualNetwork virtualNetwork) {
         super(db, virtualNetwork);

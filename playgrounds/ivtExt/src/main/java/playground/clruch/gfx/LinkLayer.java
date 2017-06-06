@@ -35,7 +35,7 @@ import playground.clruch.utils.gui.GraphicsUtil;
 import playground.clruch.utils.gui.RowPanel;
 import playground.clruch.utils.gui.SpinnerLabel;
 
-public class LinkLayer extends ViewerLayer {
+/* package */ class LinkLayer extends ViewerLayer {
 
     private volatile boolean drawLoad = false;
     private volatile boolean drawLinks = false;

@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gfx;
 
 import java.awt.Color;
@@ -20,7 +21,7 @@ import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.RowPanel;
 
-public class RequestsLayer extends ViewerLayer {
+/* package */ class RequestsLayer extends ViewerLayer {
 
     private static Font requestsFont = new Font(Font.SANS_SERIF, Font.PLAIN, 10);
     // ---

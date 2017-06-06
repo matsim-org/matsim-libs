@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gfx;
 
 import java.awt.Color;
@@ -20,7 +21,7 @@ import playground.clruch.net.VehicleContainer;
 import playground.clruch.utils.gui.RowPanel;
 import playground.clruch.utils.gui.SpinnerLabel;
 
-public class VehiclesLayer extends ViewerLayer {
+/* package */ class VehiclesLayer extends ViewerLayer {
     private static final AVStatus[] aVStatusArray = new AVStatus[] { //
             AVStatus.DRIVETOCUSTMER, AVStatus.DRIVEWITHCUSTOMER, AVStatus.REBALANCEDRIVE };
     private BitSet bits = new BitSet();

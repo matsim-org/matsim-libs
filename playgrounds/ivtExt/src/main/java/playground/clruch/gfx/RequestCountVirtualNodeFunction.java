@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gfx;
 
 import org.matsim.api.core.v01.network.Link;
@@ -14,7 +15,7 @@ import playground.clruch.netdata.VirtualNode;
 /**
  * count requests
  */
-class RequestCountVirtualNodeFunction extends AbstractVirtualNodeFunction {
+/* package */ class RequestCountVirtualNodeFunction extends AbstractVirtualNodeFunction {
     public RequestCountVirtualNodeFunction(MatsimStaticDatabase db, VirtualNetwork virtualNetwork) {
         super(db, virtualNetwork);
     }

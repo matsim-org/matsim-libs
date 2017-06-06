@@ -9,7 +9,7 @@ import playground.clruch.gheat.HeatMapDataSource;
 import playground.clruch.gheat.PointLatLng;
 import playground.clruch.gheat.Projections;
 
-class MatsimDataSource implements HeatMapDataSource {
+/* package */ class MatsimDataSource implements HeatMapDataSource {
     private List<PointLatLng> _pointList = null;
 
     public MatsimDataSource() {
