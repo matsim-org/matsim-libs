@@ -19,13 +19,15 @@
 
 package playground.agarwalamit.opdyts;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Random;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.utils.collections.Tuple;
 
 public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<ModeChoiceDecisionVariable> {
     private static final Logger log = Logger.getLogger(ModeChoiceRandomizer.class);
@@ -57,31 +59,43 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
 
     @Override
     public List<ModeChoiceDecisionVariable> newRandomVariations(ModeChoiceDecisionVariable decisionVariable) {
-        final PlanCalcScoreConfigGroup oldScoringConfig = decisionVariable.getScoreConfig();
         List<ModeChoiceDecisionVariable> result = new ArrayList<>();
+
+        final PlanCalcScoreConfigGroup oldScoringConfig = decisionVariable.getScoreConfig();
         PlanCalcScoreConfigGroup.ScoringParameterSet oldParameterSet = oldScoringConfig.getScoringParametersPerSubpopulation().get(this.subPopName);
-        Map<String, Tuple<PlanCalcScoreConfigGroup.ModeParams, PlanCalcScoreConfigGroup.ModeParams>> mode2modeParamsSet = new HashMap<>();
 
         for(String mode : considerdModes) {
-            if (mode.equals(TransportMode.car)) continue;
-            else {
-                PlanCalcScoreConfigGroup.ModeParams oldModeParams = oldParameterSet.getModes().get(mode);
-                PlanCalcScoreConfigGroup.ModeParams newModeParamsPos = new PlanCalcScoreConfigGroup.ModeParams(mode) ;
-                PlanCalcScoreConfigGroup.ModeParams newModeParamsNeg = new PlanCalcScoreConfigGroup.ModeParams(mode) ;
+            PlanCalcScoreConfigGroup newScoringConfig1 = new PlanCalcScoreConfigGroup();
+            PlanCalcScoreConfigGroup newScoringConfig2 = new PlanCalcScoreConfigGroup();
 
+            if (mode.equals(TransportMode.car)) {
+                newScoringConfig1.getOrCreateScoringParameters(this.subPopName).addModeParams(oldParameterSet.getModes().get(mode));
+                newScoringConfig2.getOrCreateScoringParameters(this.subPopName).addModeParams(oldParameterSet.getModes().get(mode));
+            } else {
                 double rnd1 = opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable() * rnd.nextDouble();
-//                double rnd2 = 1. * rnd.nextDouble();
-//                double rnd3 = 1. * rnd.nextDouble();
-
                 switch (this.randomizedUtilityParametersChoser) {
                     case ONLY_ASC:
-                        newModeParamsPos.setConstant(oldModeParams.getConstant() + rnd1);
-                        newModeParamsNeg.setConstant(oldModeParams.getConstant() - rnd1);
+                        PlanCalcScoreConfigGroup.ModeParams newModeParamsPos = new PlanCalcScoreConfigGroup.ModeParams(mode) ;
+                        newModeParamsPos.setConstant(oldParameterSet.getModes().get(mode).getConstant() + rnd1);
+                        newScoringConfig1.getOrCreateScoringParameters(this.subPopName).addModeParams(newModeParamsPos);
+                        newScoringConfig2.getOrCreateScoringParameters(this.subPopName).addModeParams(newModeParamsPos);
 
-                        Set<PlanCalcScoreConfigGroup.ModeParams> modeParamsSet = new HashSet<>();
-                        modeParamsSet.add(newModeParamsPos);
-                        modeParamsSet.add(newModeParamsNeg);
-                        mode2modeParamsSet.put(mode, new Tuple<>(newModeParamsPos, newModeParamsNeg));
+                        for(String anotherMode : considerdModes) {
+                            if (anotherMode.equals(TransportMode.car) || mode.equals(anotherMode)) continue;
+                            else {
+                                PlanCalcScoreConfigGroup.ModeParams newAnotherModeParamsNeg = new PlanCalcScoreConfigGroup.ModeParams(anotherMode);
+                                PlanCalcScoreConfigGroup.ModeParams newAnotherModeParamsPos = new PlanCalcScoreConfigGroup.ModeParams(anotherMode);
+                                newAnotherModeParamsNeg.setConstant(oldParameterSet.getModes().get(anotherMode).getConstant() - rnd1);
+                                newAnotherModeParamsPos.setConstant(oldParameterSet.getModes().get(anotherMode).getConstant() + rnd1);
+                                newScoringConfig1.getOrCreateScoringParameters(this.subPopName).addModeParams(newAnotherModeParamsNeg);
+                                newScoringConfig2.getOrCreateScoringParameters(this.subPopName).addModeParams(newAnotherModeParamsPos);
+
+                                result.add(new ModeChoiceDecisionVariable(newScoringConfig1, this.scenario, this.opdytsScenario, this.considerdModes, this.subPopName));
+                                result.add(new ModeChoiceDecisionVariable(newScoringConfig2, this.scenario, this.opdytsScenario, this.considerdModes, this.subPopName));
+                            }
+                        }
+
+
                         break;
                     case ALL_EXCEPT_ASC:
                     case ALL:
@@ -90,80 +104,10 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
                 }
             }
         }
-
-        // create new decision variables
-        // number of cases would be = consideredModes-1 * 2
-//        for(int index =0; index < (considerdModes.size()-1) * 2.; index++) {
-//            PlanCalcScoreConfigGroup newScoringConfig = new PlanCalcScoreConfigGroup();
-//            PlanCalcScoreConfigGroup.ModeParams oldModeParams = oldParameterSet.getModes().get(mode);
-//            newScoringConfig.addModeParams(oldModeParams);
-//
-//
-//
-//        }
-
-
-
-
-
-
-        {
-//            PlanCalcScoreConfigGroup.ScoringParameterSet oldParameterSet = oldScoringConfig.getScoringParametersPerSubpopulation().get(this.subPopName);
-            PlanCalcScoreConfigGroup newScoringConfig1 = new PlanCalcScoreConfigGroup();
-            PlanCalcScoreConfigGroup newScoringConfig2 = new PlanCalcScoreConfigGroup();
-            for (String mode : oldParameterSet.getModes().keySet()) {
-                PlanCalcScoreConfigGroup.ModeParams oldModeParams = oldParameterSet.getModes().get(mode);
-
-                if (TransportMode.car.equals(mode)) {// we leave car alone
-                    newScoringConfig1.addModeParams(oldModeParams);
-                    newScoringConfig2.addModeParams(oldModeParams);
-                } else {
-                    PlanCalcScoreConfigGroup.ModeParams newModeParams1 = new PlanCalcScoreConfigGroup.ModeParams(mode) ;
-                    PlanCalcScoreConfigGroup.ModeParams newModeParams2 = new PlanCalcScoreConfigGroup.ModeParams(mode) ;
-
-                    double rnd1 = opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable() * rnd.nextDouble();
-                    double rnd2 = 1. * rnd.nextDouble();
-                    double rnd3 = 1. * rnd.nextDouble();
-
-                    switch (this.randomizedUtilityParametersChoser) {
-
-                        case ONLY_ASC:
-                            rnd2 = 0;
-                            rnd3 = 0;
-                            break;
-                        case ALL_EXCEPT_ASC:
-                            rnd1 = 0;
-                            break;
-                        case ALL:
-                            break;
-                        default:
-                            throw new RuntimeException("not implemented yet.");
-                    }
-
-                    newModeParams1.setConstant(oldModeParams.getConstant() + rnd1);
-                    newModeParams2.setConstant(oldModeParams.getConstant() - rnd1);
-
-                    newModeParams1.setMarginalUtilityOfDistance(oldModeParams.getMarginalUtilityOfDistance() + rnd2);
-                    newModeParams2.setMarginalUtilityOfDistance(oldModeParams.getMarginalUtilityOfDistance() - rnd2);
-
-                    newModeParams1.setMarginalUtilityOfTraveling(oldModeParams.getMarginalUtilityOfTraveling() + rnd3);
-                    newModeParams2.setMarginalUtilityOfTraveling(oldModeParams.getMarginalUtilityOfTraveling() - rnd3);
-
-                    newModeParams1.setMonetaryDistanceRate(oldModeParams.getMonetaryDistanceRate());
-                    newModeParams2.setMonetaryDistanceRate(oldModeParams.getMonetaryDistanceRate());
-
-                    newScoringConfig1.getOrCreateScoringParameters(this.subPopName).addModeParams(newModeParams1);
-                    newScoringConfig2.getOrCreateScoringParameters(this.subPopName).addModeParams(newModeParams2);
-                }
-            }
-            result.add(new ModeChoiceDecisionVariable(newScoringConfig1, this.scenario, this.opdytsScenario, this.considerdModes, this.subPopName));
-            result.add(new ModeChoiceDecisionVariable(newScoringConfig2, this.scenario, this.opdytsScenario, this.considerdModes, this.subPopName));
-        }
         log.warn("giving the following to opdyts:");
         for (ModeChoiceDecisionVariable var : result) {
             log.warn(var.toString());
         }
-//		System.exit(-1);
         return result;
     }
 }
