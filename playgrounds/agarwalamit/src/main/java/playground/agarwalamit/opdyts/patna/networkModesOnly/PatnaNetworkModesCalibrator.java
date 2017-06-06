@@ -81,8 +81,8 @@ public class PatnaNetworkModesCalibrator {
 
 			isPlansRelaxed = Boolean.valueOf(args[7]);;
 		} else {
-			configFile = FileUtils.RUNS_SVN+"/patnaIndia/run111/opdyts/input_networkModes/"+"/config_networkModesOnly.xml";
-			OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run111/opdyts/output_networkModes/";
+			configFile = FileUtils.RUNS_SVN+"/opdyts/patna/input_networkModes/"+"/config_networkModesOnly.xml";
+			OUT_DIR = FileUtils.RUNS_SVN+"/opdyts/patna/output_networkModes/";
 		}
 
 		String relaxedPlansDir = OUT_DIR+"/initialPlans2RelaxedPlans/";
@@ -95,6 +95,7 @@ public class PatnaNetworkModesCalibrator {
 		OUT_DIR = OUT_DIR+"/calibration_variationSize"+opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable()+"_AvgIts"+opdytsConfigGroup.getNumberOfIterationsForAveraging()+"/";
 
 		ConfigUtils.loadConfig(config,configFile);
+		config.setContext(IOUtils.getUrlFromFileOrResource(configFile));
 		config.plans().setInputFile(relaxedPlansDir+"/output_plans.xml.gz");
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn); // must be warn, since opdyts override few things
