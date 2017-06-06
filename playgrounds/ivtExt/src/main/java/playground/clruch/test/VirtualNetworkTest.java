@@ -1,3 +1,4 @@
+// code by clruch
 package playground.clruch.test;
 
 import java.io.File;
@@ -23,7 +24,7 @@ import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
-public class VirtualNetworkTest {
+/* package */ class VirtualNetworkTest {
 
     public static void main(String[] args) {
         File configFile = new File(args[0]);
