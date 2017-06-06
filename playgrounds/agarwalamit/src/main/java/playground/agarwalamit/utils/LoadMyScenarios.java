@@ -150,6 +150,7 @@ public final class LoadMyScenarios {
 		config.plans().setInputFile(plansFile);
 		config.plans().setInputPersonAttributeFile(null);
 		config.network().setInputFile(null);
+		config.vehicles().setVehiclesFile(null);
         return ScenarioUtils.loadScenario(config);
 	}
 	

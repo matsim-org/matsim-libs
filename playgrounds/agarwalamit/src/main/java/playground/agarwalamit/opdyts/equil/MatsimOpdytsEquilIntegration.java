@@ -208,11 +208,10 @@ public class MatsimOpdytsEquilIntegration {
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC, Double.valueOf(
-				scalingParameterForDecisionVariableVariability), EQUIL,null);
+				RandomizedUtilityParametersChoser.ONLY_ASC, EQUIL, null, modes2consider);
 
 		// what would be the decision variables to optimize the objective function.
-		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, EQUIL);
+		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(), scenario,modes2consider, EQUIL);
 
 		// what would decide the convergence of the objective function
 //		final int iterationsToConvergence = 200; //

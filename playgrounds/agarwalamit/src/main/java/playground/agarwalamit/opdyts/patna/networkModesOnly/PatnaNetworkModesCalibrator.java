@@ -149,10 +149,10 @@ public class PatnaNetworkModesCalibrator {
 		//search algorithm
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC, opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable(), PATNA_1_PCT, null, opdytsConfigGroup.getRandomSeedToRandomizeDecisionVariable());
+				RandomizedUtilityParametersChoser.ONLY_ASC, PATNA_1_PCT, null, modes2consider);
 
 		// what would be the decision variables to optimize the objective function.
-		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, PATNA_1_PCT);
+		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, modes2consider, PATNA_1_PCT);
 
 		// what would decide the convergence of the objective function
 		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(opdytsConfigGroup.getNumberOfIterationsForConvergence(),opdytsConfigGroup.getNumberOfIterationsForAveraging());

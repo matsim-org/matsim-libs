@@ -19,6 +19,7 @@
 
 package playground.agarwalamit.opdyts;
 
+import java.util.Collection;
 import java.util.Map;
 import floetteroed.opdyts.DecisionVariable;
 import org.matsim.api.core.v01.Scenario;
@@ -39,18 +40,20 @@ public class ModeChoiceDecisionVariable implements DecisionVariable {
     private final String subPopulation;
     private final PlanCalcScoreConfigGroup newScoreConfig;
 
+    private final Collection<String> considerdModes ;
+
     public ModeChoiceDecisionVariable(final PlanCalcScoreConfigGroup neScoreConfig, final Scenario scenario,
-                                      final OpdytsScenario opdytsScenario, final String subPopulatioun){
+                                      final OpdytsScenario opdytsScenario, final Collection<String> considerdModes, final String subPopulatioun){
         delegate = new playground.kai.usecases.opdytsintegration.modechoice.ModeChoiceDecisionVariable(neScoreConfig,scenario);
         this.newScoreConfig = neScoreConfig;
         this.opdytsScenario = opdytsScenario;
         this.subPopulation = subPopulatioun;
-
+        this.considerdModes = considerdModes;
     }
 
-    public ModeChoiceDecisionVariable(final PlanCalcScoreConfigGroup neScoreConfig, final Scenario scenario,
+    public ModeChoiceDecisionVariable(final PlanCalcScoreConfigGroup newScoreConfig, final Scenario scenario, final Collection<String> considerdModes,
                                final OpdytsScenario opdytsScenario){
-        this (neScoreConfig, scenario, opdytsScenario, null);
+        this (newScoreConfig, scenario, opdytsScenario, considerdModes, null);
     }
 
     @Override
@@ -64,11 +67,11 @@ public class ModeChoiceDecisionVariable implements DecisionVariable {
         switch (this.opdytsScenario){
             case EQUIL:
             case EQUIL_MIXEDTRAFFIC:
-//                return delegate.toString();
             case PATNA_1Pct:
             case PATNA_10Pct:
             StringBuilder str = new StringBuilder();
-                for(PlanCalcScoreConfigGroup.ModeParams mp : allModes.values()) {
+                for(String mode : considerdModes) {
+                    PlanCalcScoreConfigGroup.ModeParams mp = allModes.get(mode);
                     if(mp.getMode().equals(TransportMode.other)) continue;
                     str.append(mp.getMode() + ": "+ mp.getConstant() + " + "+
                             mp.getMarginalUtilityOfTraveling()+ " * ttime " +
