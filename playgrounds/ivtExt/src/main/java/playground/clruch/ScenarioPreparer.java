@@ -26,10 +26,20 @@ import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.utils.GZHandler;
 import playground.clruch.utils.GlobalAssert;
 
-// TODO make this a class, so that people can invoke new ScenPrep(file, LocationSpec) from other packages 
+/**
+ * Class to prepare a given scenario for MATSim, includes preparation of netowrk, population, creation of virtualNetwork
+ * and travelData objects.
+ * 
+ * @author clruch
+ *
+ */
 public class ScenarioPreparer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
+        run(args);
+    }
+
+    public static void run(String[] args) throws MalformedURLException, Exception {
 
         // INPUT ARGUMENT: path to a config.xml file which contains references to the original xml files (population.xml)
         // if the xml file with the converted files is supplied, no changes are implemented by the ScenarioPreparer.
@@ -42,13 +52,15 @@ public class ScenarioPreparer {
         final int dtTravelData = 300;
         final boolean completeGraph = true;
 
+        // LocationSpec object to specify city location and center, radius for cutting
         LocationSpec ls = LocationSpec.SIOUXFALLS_CITY;
 
         final boolean populationeliminateFreight = true;
-        final boolean populationchangeModeToAV = true;
         final boolean populationeliminateWalking = true;
+        final boolean populationchangeModeToAV = true; // TODO check if this is still needed !?
 
         // output file names
+        final String VIRTUALNETWORKFOLDERNAME = "virtualNetwork";
         final String VIRTUALNETWORKFILENAME = "virtualNetwork";
         final String TRAVELDATAFILENAME = "travelData";
         final String NETWORKUPDATEDNAME = "networkConverted";
@@ -65,8 +77,7 @@ public class ScenarioPreparer {
         Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();
 
-        // 1) cut network (and reduce population to new network)
-        {
+        {// 1) cut network (and reduce population to new network)
             NetworkCutClean.elminateOutsideRadius(network, ls.center, ls.radius);
             final File fileExportGz = new File(dir, NETWORKUPDATEDNAME + ".xml.gz");
             final File fileExport = new File(dir, NETWORKUPDATEDNAME + ".xml");
@@ -84,8 +95,7 @@ public class ScenarioPreparer {
             System.out.println("saved converted network to: " + dir + NETWORKUPDATEDNAME + ".xml");
         }
 
-        // 2) adapt the population to new network
-        {
+        {// 2) adapt the population to new network
             System.out.println("Original population size: " + population.getPersons().values().size());
             PopulationTools.elminateOutsideNetwork(population, network);
             System.out.println("Population size after radius cut: " + population.getPersons().values().size());
@@ -95,10 +105,10 @@ public class ScenarioPreparer {
             if (populationeliminateWalking)
                 PopulationTools.eliminateWalking(population);
             System.out.println("Population size after removing walking people: " + population.getPersons().values().size());
-            if (populationchangeModeToAV)
+            if (populationchangeModeToAV) { // FIXME not sure if this is still required, or should always happen !?
+                System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
                 PopulationTools.changeModesOfTransportToAV(population);
-            System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
-            PopulationTools.changeModesOfTransportToAV(population);
+            }
             System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
             TheApocalypse.decimatesThe(population).toNoMoreThan(maxPopulationSize).people();
             System.out.println("Population after decimation:" + population.getPersons().values().size());
@@ -121,11 +131,10 @@ public class ScenarioPreparer {
             }
         }
 
-        {
-            // 3) create virtual Network
+        {// 3) create virtual Network
             KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
             VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
-            final File vnDir = new File(dir, "virtualNetwork"); // <- magic const
+            final File vnDir = new File(dir, VIRTUALNETWORKFOLDERNAME);
             vnDir.mkdir(); // create folder if necessary
             VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
             VirtualNetworkIO.toXML(new File(vnDir, VIRTUALNETWORKFILENAME + ".xml").toString(), virtualNetwork);
@@ -133,7 +142,6 @@ public class ScenarioPreparer {
 
             PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);
             prs.exportCsv();
-
             // 3) generate travelData
             TravelData travelData = new TravelData(virtualNetwork, network, scenario.getPopulation(), dtTravelData);
             TravelDataIO.toByte(new File(vnDir, TRAVELDATAFILENAME), travelData);

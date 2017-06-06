@@ -26,12 +26,11 @@ import com.google.inject.name.Named;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
-import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
-import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.red.Total;
+import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
@@ -106,28 +105,14 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
                 .match(getStayVehicles(), getAVRequestsAtLinks());
         final long round_now = Math.round(now);
 
-
         // permanently rebalance vehicles according to the rates output by the LP
         if (round_now % rebalancingPeriod == 0) {
-            rebalancingRate = travelData.getAlphaijforTime((int)round_now);
-            
+            rebalancingRate = travelData.getAlphaijforTime((int) round_now);
+
             // update rebalance count using current rate
             rebalanceCount = rebalanceCount.add(rebalancingRate.multiply(RealScalar.of(redispatchPeriod)));
-
-            {
-                List<Integer> dims =Dimensions.of(rebalanceCount); 
-            // redispatch values > 0 and remove from rebalanceCount
-            for (int i = 0; i < dims.get(0); ++i) {
-                for (int j = 0; j < dims.get(1); ++j) {
-//                    double toSend = rebalanceCount.Get(i, j).number().doubleValue();
-                    if (Scalars.lessThan(RealScalar.ONE, rebalanceCount.Get(i, j))) {
-//                    if (toSend > 1.0) {
-                        rebalanceCountInteger.set(RealScalar.ONE, i, j);
-                        rebalanceCount.set(s->s.subtract(RealScalar.ONE), i, j);
-                    }
-                }
-            }
-            }
+            rebalanceCountInteger = Floor.of(rebalanceCount);
+            rebalanceCount = rebalanceCount.subtract(rebalanceCountInteger);
 
             // ensure that not more vehicles are sent away than available
             Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
@@ -162,14 +147,12 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
 
             // reset vector
             rebalanceCountInteger = Array.zeros(nVNodes, nVNodes);
-//                    Tensors.matrix((i, j) -> RealScalar.of(0.0), nVNodes, nVNodes);
         }
-        
-        if(round_now % redispatchPeriod == 0){
+
+        if (round_now % redispatchPeriod == 0) {
             // assign destinations to vehicles using bipartite matching
-            printVals = HungarianUtils.globalBipartiteMatching(this,
-                    () -> getVirtualNodeDivertableNotRebalancingVehicles().values() //
-                    .stream().flatMap(v -> v.stream()).collect(Collectors.toList()));            
+            printVals = HungarianUtils.globalBipartiteMatching(this, () -> getVirtualNodeDivertableNotRebalancingVehicles().values() //
+                    .stream().flatMap(v -> v.stream()).collect(Collectors.toList()));
         }
 
     }

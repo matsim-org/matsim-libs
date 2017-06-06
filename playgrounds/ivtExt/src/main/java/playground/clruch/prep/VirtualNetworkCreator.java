@@ -14,6 +14,7 @@ import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 
+@Deprecated // use ScenarioPreparer instead to have consistent preparation of Scenario.
 public class VirtualNetworkCreator {
 
     public static void main(String[] args) throws IOException {
