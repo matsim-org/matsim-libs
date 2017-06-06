@@ -1,12 +1,10 @@
+// code by clruch and jph
 package playground.clruch;
-
-import java.io.File;
 
 import org.matsim.api.core.v01.network.Network;
 
 import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
-import playground.clruch.gfx.PointCloud;
 import playground.clruch.gfx.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.netdata.VirtualNetworkGet;
@@ -27,11 +25,6 @@ public class ScenarioViewer {
 
         ReferenceFrame referenceFrame = ReferenceFrame.SIOUXFALLS;
 
-        // set manually to display virtual network boundary (will be ignored if file doesn't exist)
-        // this is optional and should not cause problems if file does not exist.
-
-        File csvFile = new File("vN_40vS_L1_v2/voronoi_BoundaryPoints.csv");
-
         // END: CUSTOMIZE -------------------------------------------------
 
         Network network = NetworkLoader.loadNetwork(args);
@@ -40,8 +33,6 @@ public class ScenarioViewer {
 
         // this is optional and should not cause problems if file does not exist.
         // temporary solution
-        matsimJMapViewer.virtualNetworkLayer.setPointCloud(PointCloud.fromCsvFile( //
-                csvFile, MatsimStaticDatabase.INSTANCE.referenceFrame.coords_toWGS84));
         matsimJMapViewer.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
         MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer);

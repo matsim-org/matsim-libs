@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gfx;
 
 import java.awt.Color;
@@ -16,7 +17,6 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.red.Max;
-import playground.clruch.export.AVStatus;
 import playground.clruch.gheat.graphics.ColorSchemes;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
@@ -28,7 +28,6 @@ import playground.clruch.utils.gui.SpinnerLabel;
 
 public class VirtualNetworkLayer extends ViewerLayer {
     public static final Color COLOR = new Color(128, 153 / 2, 0, 128);
-    private PointCloud pointCloud = null;
     private VirtualNetwork virtualNetwork = null;
     private boolean drawVNodes = true;
     private boolean drawVLinks = false;
@@ -52,7 +51,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
     @Override
     void hud(Graphics2D graphics, SimulationObject ref) {
     }
-    
+
     private static Color halfAlpha(Color color) {
         int rgb = color.getRGB() & 0xffffff;
         int alpha = color.getAlpha() / 2;
@@ -61,20 +60,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
-        boolean containsRebalance = ref.vehicles.stream() //
-                .filter(vc -> vc.avStatus.equals(AVStatus.REBALANCEDRIVE)) //
-                .findAny().isPresent();
-        if (drawVNodes && pointCloud != null && containsRebalance) {
-            graphics.setColor(COLOR);
-            int zoom = matsimMapComponent.getZoom();
-            int width = zoom <= 12 ? 0 : 1;
-            for (Coord coord : pointCloud) {
-                Point point = matsimMapComponent.getMapPosition(coord);
-                if (point != null)
-                    graphics.drawRect(point.x, point.y, width, width);
 
-            }
-        }
         if (drawVNodes) {
             {
                 if (virtualNodeShader.renderBoundary()) {
@@ -179,10 +165,6 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 graphics.drawLine(p1.x, p1.y, p2.x, p2.y);
             }
         }
-    }
-
-    public void setPointCloud(PointCloud pointCloud) {
-        this.pointCloud = pointCloud;
     }
 
     void setDrawVNodes(boolean selected) {
