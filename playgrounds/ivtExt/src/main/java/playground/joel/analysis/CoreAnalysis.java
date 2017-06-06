@@ -98,10 +98,10 @@ class CoreAnalysis {
             // Distance ratio
             Tensor row = Join.of( //
                     Tensors.of(time, requestsSize), // 0,1
-                    waitTimeQuantile, 				// 2,3,4 (.1, .5, .95)
-                    waitTimeMean, 					// 5
-                    numStatus,						// 6,7,8,9
-                    occupancyRatio);				// 10
+                    waitTimeQuantile, // 2,3,4 (.1, .5, .95)
+                    waitTimeMean, // 5
+                    numStatus, // 6,7,8,9
+                    occupancyRatio); // 10
 
             table.append(row);
 

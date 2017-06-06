@@ -58,7 +58,7 @@ public class AnalyzeAll {
         saveFile(summary, "summary");
         AnalyzeAll.plot("summary", "binnedWaitingTimes", "waiting times", 3, 6, 1200.0); // maximum waiting time in the plot to have this uniform for all
                                                                                          // simulations
-         AnalyzeAll.plot("summary", "binnedTimeRatios", "occupancy ratio", 10, 11);
+        AnalyzeAll.plot("summary", "binnedTimeRatios", "occupancy ratio", 10, 11);
         AnalyzeAll.plot("summary", "binnedDistanceRatios", "distance ratio", 13, 14);
         getTotals(summary, coreAnalysis);
     }
