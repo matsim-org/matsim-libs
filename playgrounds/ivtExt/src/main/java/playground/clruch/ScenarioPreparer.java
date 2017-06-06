@@ -40,7 +40,7 @@ public class ScenarioPreparer {
         final int maxPopulationSize = 80000;
         final int numVirtualNodes = 40;
         final int dtTravelData = 300;
-        final boolean completeGraph = true; // ;
+        final boolean completeGraph = true;
 
         LocationSpec ls = LocationSpec.SIOUXFALLS_CITY;
 
