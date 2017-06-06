@@ -52,6 +52,12 @@ public class VirtualNetworkLayer extends ViewerLayer {
     @Override
     void hud(Graphics2D graphics, SimulationObject ref) {
     }
+    
+    private static Color halfAlpha(Color color) {
+        int rgb = color.getRGB() & 0xffffff;
+        int alpha = color.getAlpha() / 2;
+        return new Color(rgb | (alpha << 24), true);
+    }
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
@@ -87,8 +93,8 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 Tensor count = new VehicleCountVirtualNodeFunction(matsimMapComponent.db, virtualNetwork).evaluate(ref);
                 Tensor prob = normalize1Norm(count);
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
-                    final int i = 255-prob.Get(entry.getKey().index).number().intValue();
-                    graphics.setColor(colorSchemes.colorScheme.get(i));
+                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
                 break;
@@ -98,8 +104,8 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 Tensor prob = normalize1Norm(count);
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255-prob.Get(entry.getKey().index).number().intValue();
-                    graphics.setColor(colorSchemes.colorScheme.get(i));
+                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
                 break;
@@ -109,8 +115,8 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 Tensor prob = normalize1Norm(count);
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255-prob.Get(entry.getKey().index).number().intValue();
-                    graphics.setColor(colorSchemes.colorScheme.get(i));
+                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
                 break;
@@ -122,8 +128,8 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 Tensor prob = normalize1Norm(count);
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255-prob.Get(entry.getKey().index).number().intValue();
-                    graphics.setColor(colorSchemes.colorScheme.get(i));
+                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
                 break;
@@ -135,8 +141,8 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 Tensor prob = normalize1Norm(count);
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255-prob.Get(entry.getKey().index).number().intValue();
-                    graphics.setColor(colorSchemes.colorScheme.get(i));
+                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
                 break;
@@ -149,8 +155,8 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 Tensor prob = normalize1Norm(count);
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255-prob.Get(entry.getKey().index).number().intValue();
-                    graphics.setColor(colorSchemes.colorScheme.get(i));
+                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
                 break;

@@ -26,11 +26,9 @@ import com.google.inject.name.Named;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
-import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
-import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
@@ -59,7 +57,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class LPFeedforwardDispatcher extends PartitionedDispatcher {
     public final int redispatchPeriod;
-    public final int rebalancePeriod;
+    public final int rebalancingPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractRequestSelector requestSelector;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
@@ -91,7 +89,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
-        rebalancePeriod = Integer.parseInt(config.getParams().get("rebalancePeriod"));
+        rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
         travelData = arrivalInformationIn;
         nVNodes = virtualNetwork.getvNodesCount();
         nVLinks = virtualNetwork.getvLinksCount();
@@ -107,8 +105,8 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
                 .match(getStayVehicles(), getAVRequestsAtLinks());
         final long round_now = Math.round(now);
 
-        // permanently rebalance vehicles according to the rates output by the LP //chose a fast
-        if (round_now % rebalancePeriod == 0) {
+        // permanently rebalance vehicles according to the rates output by the LP
+        if (round_now % rebalancingPeriod == 0) {
             rebalancingRate = travelData.getAlphaijforTime((int) round_now);
 
             // update rebalance count using current rate
