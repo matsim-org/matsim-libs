@@ -1,10 +1,11 @@
+// code by jph
 package playground.clruch.gfx;
 
 import java.awt.Color;
 
 import playground.clruch.export.AVStatus;
 
-public enum AvStatusColor {
+/* package */ enum AvStatusColor {
     Standard( //
             new Color(128, 0, 128), // with customer
             new Color(255, 51, 0), // to customer

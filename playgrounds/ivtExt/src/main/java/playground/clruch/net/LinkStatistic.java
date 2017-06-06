@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.net;
 
 import java.util.function.Function;
@@ -8,6 +9,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.red.Max;
 
+// TODO this is only used in CongestionAnalysis
 public class LinkStatistic {
     public final Tensor vehicleCount;
     public final Tensor requestCount;

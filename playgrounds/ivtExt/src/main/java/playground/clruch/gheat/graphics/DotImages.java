@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gheat.graphics;
 
 import java.util.ArrayList;

@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gfx;
 
 import java.awt.Dimension;
@@ -21,7 +22,7 @@ import playground.clruch.jmapviewer.tilesources.WatercolorTileSource;
 import playground.clruch.jmapviewer.tilesources.WikimediaTileSource;
 import playground.clruch.utils.gui.SpinnerLabel;
 
-public class JMapTileSelector {
+/* package */ class JMapTileSelector {
     public static SpinnerLabel<TileSource> create(JMapViewer jMapViewer) {
         TileSource[] tileSource = new TileSource[] { //
                 new MapnikTileSource(), //

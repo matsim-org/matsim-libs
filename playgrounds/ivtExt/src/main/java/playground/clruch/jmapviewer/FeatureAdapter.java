@@ -8,7 +8,7 @@ import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.logging.Logger;
 
-public final class FeatureAdapter {
+/* package */ final class FeatureAdapter {
 
     private static BrowserAdapter browserAdapter = new DefaultBrowserAdapter();
     private static TranslationAdapter translationAdapter = new DefaultTranslationAdapter();

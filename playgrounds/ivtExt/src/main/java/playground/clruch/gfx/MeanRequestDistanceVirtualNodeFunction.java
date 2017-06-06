@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gfx;
 
 import org.matsim.api.core.v01.network.Link;
@@ -17,7 +18,7 @@ import playground.clruch.netdata.VirtualNode;
 /**
  * mean request distance
  */
-class MeanRequestDistanceVirtualNodeFunction extends AbstractVirtualNodeFunction {
+/* package */ class MeanRequestDistanceVirtualNodeFunction extends AbstractVirtualNodeFunction {
 
     public MeanRequestDistanceVirtualNodeFunction(MatsimStaticDatabase db, VirtualNetwork virtualNetwork) {
         super(db, virtualNetwork);

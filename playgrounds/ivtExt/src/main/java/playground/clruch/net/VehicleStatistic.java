@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.net;
 
 import java.util.LinkedList;
@@ -13,6 +14,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
 import playground.clruch.export.AVStatus;
 
+// TODO group files that have "statistics" and "analysis" in the name
 public class VehicleStatistic {
 
     public final Tensor distanceTotal;

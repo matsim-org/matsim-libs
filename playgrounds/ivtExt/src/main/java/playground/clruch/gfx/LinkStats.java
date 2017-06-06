@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gfx;
 
 import java.util.HashMap;
@@ -16,7 +17,7 @@ import playground.clruch.net.VehicleContainer;
 
 // sioux falls has ~3k roads
 // zurich scenario has ~200k roads
-class LinkStats {
+/* package */ class LinkStats {
 
     static AVStatus[] INTERP = new AVStatus[] { //
             AVStatus.DRIVEWITHCUSTOMER, AVStatus.DRIVETOCUSTMER, AVStatus.REBALANCEDRIVE };

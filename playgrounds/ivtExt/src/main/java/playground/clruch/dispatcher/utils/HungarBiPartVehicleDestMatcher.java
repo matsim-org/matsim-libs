@@ -1,3 +1,4 @@
+// code by clruch
 package playground.clruch.dispatcher.utils;
 
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import playground.clruch.utils.HungarianAlgorithm;
 
 /**
  * array matching with Euclidean distance as criteria
- *
  */
 public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
 

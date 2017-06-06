@@ -162,6 +162,7 @@ public class NotAsDumbDispatcher extends UniversalDispatcher {
      * @return reurns random vehicleLinkPair among all vehicleLinkpairs among the numbNeigh closest ones to reqLink
      */
     VehicleLinkPair someCloseVehicleReturner(Collection<VehicleLinkPair> vehicleLinkPairs, Link reqlink, int numbNeigh) {
+        // TODO code is fairly redundant to code in HungarianUtils
         // otherwise create KD tree and return reduced amount of requestlocs
         // create KD tree
         int dimensions = 2;

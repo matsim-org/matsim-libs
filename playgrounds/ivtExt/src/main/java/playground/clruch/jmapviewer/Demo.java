@@ -33,7 +33,7 @@ import playground.clruch.jmapviewer.tilesources.MapnikTileSource;
  * @author Jan Peter Stotz
  *
  */
-public class Demo extends JFrame implements JMapViewerEventListener {
+/* package */ class Demo extends JFrame implements JMapViewerEventListener {
 
     private static final long serialVersionUID = 1L;
 

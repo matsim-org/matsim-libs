@@ -24,9 +24,9 @@ public class AVTravelTimeRecorder implements MobsimBeforeSimStepListener {
 
             double travelTime = travelTimeTracker.getLinkTravelTime(linkToTrackID).travelTime;
             
-            System.out.println("juhui");
-            System.out.println(travelTime);
-            System.out.println("================================================");
+            // System.out.println("juhui");
+            // System.out.println(travelTime);
+            // System.out.println("================================================");
         }
     }
 }

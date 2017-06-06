@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.dispatcher;
 
 import java.util.Collection;
@@ -28,6 +29,10 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
+/**
+ * this dispatcher is a bad example,
+ * it performs poorly in many scenarios
+ */
 public class EdgyDispatcher extends UniversalDispatcher {
     private final int dispatchPeriod;
 
@@ -44,7 +49,6 @@ public class EdgyDispatcher extends UniversalDispatcher {
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         this.network = network;
         linkReferences = new HashSet<>(network.getLinks().values());
-        // vehicleRequestMatcher = ;
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
     }
 
@@ -68,8 +72,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
 
     @Override
     public void redispatch(double now) {
-        // verifyReferences(); // <- debugging only
-
+        
         new InOrderOfArrivalMatcher(this::setAcceptRequest).match(getStayVehicles(), getAVRequestsAtLinks());
 
         final long round_now = Math.round(now);
@@ -86,8 +89,6 @@ public class EdgyDispatcher extends UniversalDispatcher {
                         if (requestIterator.hasNext()) {
                             AVRequest nextRequest = requestIterator.next();
                             Link link = nextRequest.getFromLink();
-                            // if(coordDistance(link.getCoord(),vehicleLinkPair.getDivertableLocation().getCoord())<
-                            // 3000 || nextRequest.getSubmissionTime()-now > 20*60){
                             if (coordDistance(link.getCoord(), vehicleLinkPair.getDivertableLocation().getCoord()) < 3000
                                     || now - nextRequest.getSubmissionTime() > 10 * 60) {
                                 setVehicleDiversion(vehicleLinkPair, link);

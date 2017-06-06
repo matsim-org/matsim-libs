@@ -1,10 +1,10 @@
+// code by jph
 package playground.clruch.traveldata;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.gnu.glpk.GLPKConstants;
@@ -30,7 +30,6 @@ import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Transpose;
-import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.dispatcher.utils.LPVehicleRebalancing;

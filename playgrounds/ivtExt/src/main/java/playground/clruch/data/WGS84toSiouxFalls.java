@@ -1,4 +1,5 @@
-package playground.clruch.gfx.helper;
+// code by jph
+package playground.clruch.data;
 
 import java.awt.geom.AffineTransform;
 
@@ -7,7 +8,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 
 // https://epsg.io/transform#s_srs=4326&t_srs=2056&x=7.6155211&y=47.5555322
 // https://www.geodata4edu.ch/
-public class WGS84toSiouxFalls implements CoordinateTransformation {
+/* package */ class WGS84toSiouxFalls implements CoordinateTransformation {
 
     /**
      * functionality can NOT be reproduced by java's own {@link AffineTransform} !

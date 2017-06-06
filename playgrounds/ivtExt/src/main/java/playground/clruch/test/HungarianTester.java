@@ -1,14 +1,12 @@
+// code by clruch
 package playground.clruch.test;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
-import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.utils.HungarianAlgorithm;
 
 /**
  * Created by Claudio on 2/27/2017.
  */
-public class HungarianTester {
+/* package */ class HungarianTester {
     public static void main(String[] arg){
         System.out.println("Hungarian Bipartite Matching Running now");
 

@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.net;
 
 import org.matsim.api.core.v01.Coord;

@@ -1,6 +1,7 @@
+// code by jph
 package playground.clruch.gfx;
 
-public class SecondsToHMS {
+/* package */ class SecondsToHMS {
 
     public final int h;
     public final int m;

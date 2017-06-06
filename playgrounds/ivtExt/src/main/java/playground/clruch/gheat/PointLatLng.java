@@ -1,3 +1,4 @@
+// code by varunpant
 package playground.clruch.gheat;
 
 public class PointLatLng implements Comparable<PointLatLng> {
@@ -22,7 +23,7 @@ public class PointLatLng implements Comparable<PointLatLng> {
     public PointLatLng(double longitude, double latitude, double weight) {
         this.latitude = latitude;
         this.longitude = longitude;
-         this.weight = weight; // TODO is this being ack'ed
+        this.weight = weight; // TODO is this being ack'ed
     }
 
     public PointLatLng(double longitude, double latitude, Object opt_value) {

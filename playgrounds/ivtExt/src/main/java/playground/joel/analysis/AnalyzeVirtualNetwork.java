@@ -6,7 +6,7 @@ import java.io.File;
 
 import org.matsim.api.core.v01.network.Network;
 
-import playground.clruch.gfx.ReferenceFrame;
+import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.netdata.VirtualNetwork;

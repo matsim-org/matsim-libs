@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gheat.graphics;
 
 import java.awt.Graphics2D;
@@ -8,6 +9,10 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.io.ImageFormat;
 
+/**
+ * in the original gheat library, these images exists as files
+ * however, we can easily procedurally create these "dot" images
+ */
 public class DotImage {
 
     final int size;

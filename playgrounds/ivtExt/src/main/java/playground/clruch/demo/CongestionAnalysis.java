@@ -15,7 +15,7 @@ import ch.ethz.idsc.tensor.io.CsvFormat;
 import ch.ethz.idsc.tensor.io.ObjectFormat;
 import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.red.Max;
-import playground.clruch.gfx.ReferenceFrame;
+import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.LinkStatistic;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.RequestContainer;

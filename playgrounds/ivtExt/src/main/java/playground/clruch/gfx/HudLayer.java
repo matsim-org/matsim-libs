@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gfx;
 
 import java.awt.Dimension;
@@ -14,7 +15,7 @@ import playground.clruch.utils.gui.SpinnerLabel;
 /**
  * Head Up Display
  */
-public class HudLayer extends ViewerLayer {
+/* package */ class HudLayer extends ViewerLayer {
 
     boolean show = true;
 

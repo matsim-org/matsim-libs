@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gfx;
 
 import java.awt.event.ActionEvent;
@@ -9,7 +10,7 @@ import playground.clruch.net.ObjectClient;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationSubscriber;
 
-public class MatsimToggleButton extends JToggleButton {
+/* package */ class MatsimToggleButton extends JToggleButton {
 
     ObjectClient client = null;
 

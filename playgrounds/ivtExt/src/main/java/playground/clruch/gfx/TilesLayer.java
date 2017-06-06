@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gfx;
 
 import java.awt.Dimension;
@@ -11,7 +12,7 @@ import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.RowPanel;
 import playground.clruch.utils.gui.SpinnerLabel;
 
-public class TilesLayer extends ViewerLayer {
+/* package */ class TilesLayer extends ViewerLayer {
 
     static enum Blend {
         Dark(0), Light(255);

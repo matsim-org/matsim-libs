@@ -1,8 +1,9 @@
+// code by jph
 package playground.clruch.gheat.graphics;
 
 import java.awt.Color;
 
-public class InternetPalettes {
+/* package */ class InternetPalettes {
     public static ColorScheme createJet() {
         int[][] sum = new int[][] { { 133, 15, 6, 255 }, { 137, 15, 6, 255 }, { 141, 16, 6, 255 }, { 145, 16, 7, 255 }, { 148, 16, 7, 255 }, { 153, 17, 7, 255 },
                 { 158, 17, 7, 255 }, { 162, 18, 7, 255 }, { 165, 19, 7, 255 }, { 169, 19, 8, 255 }, { 173, 19, 8, 255 }, { 178, 20, 8, 255 }, { 181, 20, 8, 255 },

@@ -1,3 +1,4 @@
+// code by varunpant
 package playground.clruch.gheat;
 
 import java.awt.image.BufferedImage;
@@ -6,7 +7,7 @@ import java.util.Map;
 
 import playground.clruch.gheat.graphics.ColorScheme;
 
-enum Cache {
+/* package */ enum Cache {
     ;
     // ---
     private static Map<ColorScheme, BufferedImage> _emptyTile = new HashMap<>();

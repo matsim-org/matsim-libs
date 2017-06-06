@@ -1,3 +1,4 @@
+// code adapted by jph
 package playground.clruch.utils;
 
 import java.util.LinkedHashMap;

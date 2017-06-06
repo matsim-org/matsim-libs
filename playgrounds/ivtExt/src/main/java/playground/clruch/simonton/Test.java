@@ -1,7 +1,5 @@
 package playground.clruch.simonton;
 
-import de.lmu.ifi.dbs.elki.data.*;
-
 /**
  * Created by Claudio on 3/23/2017.
  */

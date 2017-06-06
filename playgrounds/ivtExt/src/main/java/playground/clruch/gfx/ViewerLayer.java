@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.gfx;
 
 import java.awt.Color;
@@ -15,7 +16,7 @@ import playground.clruch.net.SimulationObject;
 import playground.clruch.utils.gui.RowPanel;
 import playground.clruch.utils.gui.SpinnerLabel;
 
-public abstract class ViewerLayer {
+/* package */ abstract class ViewerLayer {
     
     static final int DEFAULT_HEIGHT = 20; 
 

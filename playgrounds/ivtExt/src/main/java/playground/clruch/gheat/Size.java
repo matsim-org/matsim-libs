@@ -1,6 +1,7 @@
+// code by varunpant
 package playground.clruch.gheat;
 
-public class Size {
+/* package */ class Size {
     private double height;
     private double width;
 
