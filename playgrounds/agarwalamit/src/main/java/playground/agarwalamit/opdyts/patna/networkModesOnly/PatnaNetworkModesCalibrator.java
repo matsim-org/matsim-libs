@@ -38,6 +38,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
@@ -59,56 +61,55 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 public class PatnaNetworkModesCalibrator {
 
 	private static final OpdytsScenario PATNA_1_PCT = OpdytsScenario.PATNA_1Pct;
-	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run111/opdyts/output_networkModes/";
-	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run111/opdyts/input_networkModes/";
+	private static boolean isPlansRelaxed = false;
 
 	public static void main(String[] args) {
-
 		String configFile;
-		int iterationsToConvergence = 10; //
-		int averagingIterations = 10;
-		boolean isRunningOnCluster = false;
-		double scalingParameterForDecisionVariableVariability = 0.1;
+		Config config = ConfigUtils.createConfig();
+		OpdytsConfigGroup opdytsConfigGroup = ConfigUtils.addOrGetModule(config, OpdytsConfigGroup.GROUP_NAME,OpdytsConfigGroup.class);
+		String OUT_DIR = null;
 
-		if (args.length>0) isRunningOnCluster = true;
+		if ( args.length>0 ) {
+			configFile = args[0];
+			OUT_DIR = args[1];
 
-		if ( isRunningOnCluster ) {
+			opdytsConfigGroup.setVariationSizeOfRamdomizeDecisionVariable(Double.valueOf(args[2]));
+			opdytsConfigGroup.setNumberOfIterationsForConvergence(Integer.valueOf(args[3]));
+			opdytsConfigGroup.setNumberOfIterationsForAveraging(Integer.valueOf(args[4]));
+			opdytsConfigGroup.setSelfTuningWeight(Double.valueOf(args[5]));
+			opdytsConfigGroup.setPopulationSize(Integer.valueOf(args[6]));
 
-			configFile = args[1];
-			averagingIterations = Integer.valueOf(args[2]);
-			iterationsToConvergence = Integer.valueOf(args[3]);
-			scalingParameterForDecisionVariableVariability = Double.valueOf(args[4]);
-
-			OUT_DIR = args[0]+"_"+scalingParameterForDecisionVariableVariability+"_"+averagingIterations+"its/";
-
+			isPlansRelaxed = Boolean.valueOf(args[7]);;
 		} else {
-			configFile = configDir+"/config_networkModesOnly.xml";
+			configFile = FileUtils.RUNS_SVN+"/patnaIndia/run111/opdyts/input_networkModes/"+"/config_networkModesOnly.xml";
+			OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run111/opdyts/output_networkModes/";
 		}
 
-		// relax the plans first.
-		PatnaNetworkModesPlansRelaxor relaxor = new PatnaNetworkModesPlansRelaxor();
-		relaxor.run(new String[]{configFile, OUT_DIR+"/initialPlans2RelaxedPlans/"});
+		String relaxedPlansDir = OUT_DIR+"/initialPlans2RelaxedPlans/";
+		if (! isPlansRelaxed ) {
+			// relax the plans first.
+			PatnaNetworkModesPlansRelaxor relaxor = new PatnaNetworkModesPlansRelaxor();
+			relaxor.run(new String[]{configFile, relaxedPlansDir});
+		}
 
-		Config config = ConfigUtils.loadConfig(configFile);
-		config.plans().setInputFile(OUT_DIR+"/initialPlans2RelaxedPlans/output_plans.xml.gz");
-		OUT_DIR += "/calibration/";
+		OUT_DIR = OUT_DIR+"/calibration_variationSize"+opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable()+"_AvgIts"+opdytsConfigGroup.getNumberOfIterationsForAveraging()+"/";
+
+		ConfigUtils.loadConfig(config,configFile);
+		config.plans().setInputFile(relaxedPlansDir+"/output_plans.xml.gz");
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn); // must be warn, since opdyts override few things
 
 		config.controler().setOutputDirectory(OUT_DIR);
+		opdytsConfigGroup.setOutputDirectory(OUT_DIR);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		// == opdyts settings
 		// this is something like time bin generator
-		int startTime= 0;
-		int binSize = 3600; // can this be scenario simulation end time.
-		int binCount = 24; // to me, binCount and binSize must be related
-		TimeDiscretization timeDiscretization = new TimeDiscretization(startTime, binSize, binCount);
+		TimeDiscretization timeDiscretization = new TimeDiscretization(opdytsConfigGroup.getStartTime(), opdytsConfigGroup.getBinSize(), opdytsConfigGroup.getBinCount());
 
 		List<String> modes2consider = Arrays.asList("car","bike","motorbike");
-
 		DistanceDistribution referenceStudyDistri = new PatnaNetworkModesOneBinDistanceDistribution(PATNA_1_PCT);
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,referenceStudyDistri);
 
@@ -118,9 +119,6 @@ public class PatnaNetworkModesCalibrator {
 
 			@Override
 			public void install() {
-				// add here whatever should be attached to matsim controler
-
-				// some stats
 //				addControlerListenerBinding().to(KaiAnalysisListener.class);
 				addControlerListenerBinding().toInstance(stasControlerListner);
 
@@ -131,58 +129,54 @@ public class PatnaNetworkModesCalibrator {
 				this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
 
 				bind(ScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
+
+				addControlerListenerBinding().toInstance(new ShutdownListener() {
+					@Override
+					public void notifyShutdown(ShutdownEvent event) {
+						// remove the unused iterations
+						String dir2remove = event.getServices().getControlerIO().getOutputPath()+"/ITERS/";
+						IOUtils.deleteDirectoryRecursively(new File(dir2remove).toPath());
+					}
+				});
 			}
 		});
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split
-		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(referenceStudyDistri); // in this, the method argument (SimulatorStat) is not used.
+		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(referenceStudyDistri);
 
 		//search algorithm
-		int maxIterations = 10; // this many times simulator.run(...) and thus controler.run() will be called.
-		int maxTransitions = Integer.MAX_VALUE;
-		int populationSize = 10; // the number of samples for decision variables, one of them will be drawn randomly for the simulation.
-
-		boolean interpolate = true;
-		boolean includeCurrentBest = false;
-
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC, scalingParameterForDecisionVariableVariability, PATNA_1_PCT, null);
+				RandomizedUtilityParametersChoser.ONLY_ASC, opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable(), PATNA_1_PCT, null, opdytsConfigGroup.getRandomSeedToRandomizeDecisionVariable());
 
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, PATNA_1_PCT);
 
 		// what would decide the convergence of the objective function
-		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);
+		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(opdytsConfigGroup.getNumberOfIterationsForConvergence(),opdytsConfigGroup.getNumberOfIterationsForAveraging());
 
 		RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>(
 				simulator,
 				decisionVariableRandomizer,
 				initialDecisionVariable,
 				convergenceCriterion,
-				maxIterations, // this many times simulator.run(...) and thus controler.run() will be called.
-				maxTransitions,
-				populationSize,
+				opdytsConfigGroup.getMaxIteration(), // this many times simulator.run(...) and thus controler.run() will be called.
+				opdytsConfigGroup.getMaxTransition(),
+				opdytsConfigGroup.getPopulationSize(),
 				MatsimRandom.getRandom(),
-				interpolate,
+				opdytsConfigGroup.isInterpolate(),
 				objectiveFunction,
-				includeCurrentBest
-				);
+				opdytsConfigGroup.isIncludeCurrentBest()
+		);
 
 		// probably, an object which decide about the inertia
-		SelfTuner selfTuner = new SelfTuner(0.95);
+		SelfTuner selfTuner = new SelfTuner(opdytsConfigGroup.getInertia());
 		selfTuner.setNoisySystem(true);
-		randomSearch.setLogPath(OUT_DIR);
+		randomSearch.setLogPath(opdytsConfigGroup.getOutputDirectory());
 
 		// run it, this will eventually call simulator.run() and thus controler.run
 		randomSearch.run(selfTuner );
-
-		// remove the unused iterations
-		for (int index =0; index < maxIterations; index++) {
-			String dir2remove = OUT_DIR+"_"+index+"/ITERS/";
-			IOUtils.deleteDirectoryRecursively(new File(dir2remove).toPath());
-		}
 
 		OpdytsConvergencePlotter opdytsConvergencePlotter = new OpdytsConvergencePlotter();
 		opdytsConvergencePlotter.readFile(OUT_DIR+"/opdyts.con");

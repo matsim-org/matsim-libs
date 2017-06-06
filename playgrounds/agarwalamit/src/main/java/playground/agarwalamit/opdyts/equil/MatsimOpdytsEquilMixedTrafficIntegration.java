@@ -77,7 +77,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		String OUT_DIR ;
 
 		if (args.length > 0) {
-			opdytsConfigGroup.setScalingParameterToRamdomizeDecisionVariable(Double.valueOf(args[0]));
+			opdytsConfigGroup.setVariationSizeOfRamdomizeDecisionVariable(Double.valueOf(args[0]));
 			opdytsConfigGroup.setNumberOfIterationsForConvergence(Integer.valueOf(args[1]));
 			opdytsConfigGroup.setNumberOfIterationsForAveraging(Integer.valueOf(args[4]));
 			opdytsConfigGroup.setSelfTuningWeight(Double.valueOf(args[5]));
@@ -85,11 +85,11 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			opdytsConfigGroup.setPopulationSize(Integer.valueOf(args[9]));
 
 			EQUIL_DIR = args[2];
-			OUT_DIR = args[3]+"/equil_car,bicycle_holes_variance"+ opdytsConfigGroup.getScalingParameterToRamdomizeDecisionVariable() +"_"+opdytsConfigGroup.getNumberOfIterationsForConvergence()+"its/";
+			OUT_DIR = args[3]+"/equil_car,bicycle_holes_variance"+ opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable() +"_"+opdytsConfigGroup.getNumberOfIterationsForConvergence()+"its/";
 			isPlansRelaxed = Boolean.valueOf(args[6]);
 			startingASCforBicycle = Double.valueOf(args[8]);
 		} else {
-			OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+ opdytsConfigGroup.getScalingParameterToRamdomizeDecisionVariable() +"_"+opdytsConfigGroup.getNumberOfIterationsForConvergence()+"its/";
+			OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+ opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable() +"_"+opdytsConfigGroup.getNumberOfIterationsForConvergence()+"its/";
 		}
 
 		List<String> modes2consider = Arrays.asList("car","bicycle");
@@ -220,12 +220,12 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 
 		// this is the objective Function which returns the value for given SimulatorState
 		// in my case, this will be the distance based modal split
-		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(distanceDistribution); // in this, the method argument (SimulatorStat) is not used.
+		ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(distanceDistribution);
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
 				RandomizedUtilityParametersChoser.ONLY_ASC,
-				opdytsConfigGroup.getScalingParameterToRamdomizeDecisionVariable(),  EQUIL_MIXEDTRAFFIC, null, opdytsConfigGroup.getRandomSeedToRandomizeDecisionVariable());
+				opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable(),  EQUIL_MIXEDTRAFFIC, null, opdytsConfigGroup.getRandomSeedToRandomizeDecisionVariable());
 
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, EQUIL_MIXEDTRAFFIC);

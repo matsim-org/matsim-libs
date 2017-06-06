@@ -33,8 +33,8 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 
    public static final String GROUP_NAME = "opdyts";
 
-   private static final String SCALING_PARAMETER_TO_RANDOMIZE_DECISION_VARIABLE = "scalingParameterToRamdomizeDecisionVariable";
-   private double scalingParameterToRamdomizeDecisionVariable = 0.1;
+   private static final String VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE = "variationSizeOfRamdomizeDecisionVariable";
+   private double variationSizeOfRamdomizeDecisionVariable = 0.1;
 
    private static final String RANDOM_SEED_TO_RANDOMIZE_DECISION_VARIABLE = "randomSeedToRandomizeDecisionVariable";
    private int randomSeedToRandomizeDecisionVariable = 4711;
@@ -85,14 +85,14 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
    private static final String SELF_TUNING_WEIGHT = "selfTuningWeight";
    private double selfTuningWeight = 1.0;
 
-   @StringGetter(SCALING_PARAMETER_TO_RANDOMIZE_DECISION_VARIABLE)
-   public double getScalingParameterToRamdomizeDecisionVariable() {
-        return scalingParameterToRamdomizeDecisionVariable;
+   @StringGetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
+   public double getVariationSizeOfRamdomizeDecisionVariable() {
+        return variationSizeOfRamdomizeDecisionVariable;
     }
 
-    @StringSetter(SCALING_PARAMETER_TO_RANDOMIZE_DECISION_VARIABLE)
-    public void setScalingParameterToRamdomizeDecisionVariable(double scalingParameterToRamdomizeDecisionVariable) {
-        this.scalingParameterToRamdomizeDecisionVariable = scalingParameterToRamdomizeDecisionVariable;
+    @StringSetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
+    public void setVariationSizeOfRamdomizeDecisionVariable(double variationSizeOfRamdomizeDecisionVariable) {
+        this.variationSizeOfRamdomizeDecisionVariable = variationSizeOfRamdomizeDecisionVariable;
     }
 
     @StringGetter(RANDOM_SEED_TO_RANDOMIZE_DECISION_VARIABLE)
