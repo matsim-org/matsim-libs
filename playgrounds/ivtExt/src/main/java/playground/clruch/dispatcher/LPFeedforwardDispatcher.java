@@ -58,6 +58,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class LPFeedforwardDispatcher extends PartitionedDispatcher {
     public final int redispatchPeriod;
+    public final int rebalancingPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractRequestSelector requestSelector;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
@@ -89,6 +90,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
+        rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
         travelData = arrivalInformationIn;
         nVNodes = virtualNetwork.getvNodesCount();
         nVLinks = virtualNetwork.getvLinksCount();
@@ -106,7 +108,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
 
 
         // permanently rebalance vehicles according to the rates output by the LP
-        if (round_now % redispatchPeriod == 0) {
+        if (round_now % rebalancingPeriod == 0) {
             rebalancingRate = travelData.getAlphaijforTime((int)round_now);
             
             // update rebalance count using current rate
@@ -162,11 +164,14 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             rebalanceCountInteger = Array.zeros(nVNodes, nVNodes);
 //                    Tensors.matrix((i, j) -> RealScalar.of(0.0), nVNodes, nVNodes);
         }
+        
+        if(round_now % redispatchPeriod == 0){
+            // assign destinations to vehicles using bipartite matching
+            printVals = HungarianUtils.globalBipartiteMatching(this,
+                    () -> getVirtualNodeDivertableNotRebalancingVehicles().values() //
+                    .stream().flatMap(v -> v.stream()).collect(Collectors.toList()));            
+        }
 
-        // assign destinations to vehicles using bipartite matching
-        printVals = HungarianUtils.globalBipartiteMatching(this,
-                () -> getVirtualNodeDivertableNotRebalancingVehicles().values() //
-                .stream().flatMap(v -> v.stream()).collect(Collectors.toList()));
     }
 
     @Override
