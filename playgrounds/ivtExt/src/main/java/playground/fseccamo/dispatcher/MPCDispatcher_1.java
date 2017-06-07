@@ -410,6 +410,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                             if (availableVehicles.containsKey(vnFrom)) {
                                 final List<VehicleLinkPair> cars = availableVehicles.get(vnFrom); // find cars
                                 final int desiredRebalance = rebalanceVector.Get(vectorIndex).number().intValue();
+                                @SuppressWarnings("unused")
                                 int pickupPerNode = 0;
                                 if (0 < desiredRebalance) {
                                     String infoString = vnFrom.equals(vnTo) ? "DEST==ORIG" : "";

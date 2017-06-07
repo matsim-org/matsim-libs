@@ -97,7 +97,6 @@ public class PopulationTools {
 
     }
 
-    
     @Deprecated // reduce the network to some disk and use the next function supplying the network only
     public static void elminateOutsideRadius(Population population, Coord center, double radius) {
 
@@ -124,10 +123,7 @@ public class PopulationTools {
                 itPerson.remove();
         }
     }
-    
-    
-    
-    
+
     public static void elminateOutsideNetwork(Population population, Network network) {
 
         log.info("All population elements which have activities inside the provided network are removed.");
@@ -141,7 +137,7 @@ public class PopulationTools {
                 for (PlanElement planElement : plan.getPlanElements()) {
                     if (planElement instanceof Activity) {
                         Activity act = (Activity) planElement;
-                        Coord actCoord = act.getCoord();
+                        // Coord actCoord = act.getCoord(); // not used
                         Id<Link> actLink = act.getLinkId();
                         if (!network.getLinks().containsKey(actLink)) {
                             removePerson = true;
@@ -154,12 +150,10 @@ public class PopulationTools {
                 itPerson.remove();
         }
     }
-    
-    
-    
-    
 
-    /** removes all persons with activity Type "freight" from population
+    /**
+     * removes all persons with activity Type "freight" from population
+     * 
      * @param population
      */
     public static void eliminateFreight(Population population) {
@@ -186,9 +180,10 @@ public class PopulationTools {
         }
 
     }
-    
-    
-    /** removes all persons with activity Type "freight" from population
+
+    /**
+     * removes all persons with activity Type "freight" from population
+     * 
      * @param population
      */
     public static void eliminateWalking(Population population) {
@@ -203,7 +198,7 @@ public class PopulationTools {
                 for (PlanElement planElement : plan.getPlanElements()) {
                     if (planElement instanceof Leg) {
                         Leg leg = (Leg) planElement;
-                        if (leg.getMode() == "walk" ) {
+                        if (leg.getMode() == "walk") {
                             removePerson = true;
                             break;
                         }
@@ -215,8 +210,5 @@ public class PopulationTools {
         }
 
     }
-
-    
-
 
 }

@@ -172,7 +172,7 @@ public class NotAsDumbDispatcher extends UniversalDispatcher {
         MyTree<VehicleLinkPair> KDTree = new MyTree<>(dimensions, maxDensity, maxCoordinate, maxDepth);
 
         // add uniquely identifiable requests to KD tree
-        int reqIter = 0;
+        // int reqIter = 0; // <- not used
         for (VehicleLinkPair vehicleLinkPair : vehicleLinkPairs) {
             double d1 = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord().getX();
             double d2 = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord().getY();

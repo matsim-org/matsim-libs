@@ -85,6 +85,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     void updateDatastructures(Collection<AVVehicle> stayVehicles) {
         stayVehicles.forEach(vehiclesWithCustomer::remove);
         // ---
+        @SuppressWarnings("unused")
         int failed = 0;
         Collection<AVVehicle> collection = getFunctioningVehicles();
         if (!collection.isEmpty()) {

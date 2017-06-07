@@ -178,6 +178,7 @@ public class CreateTraffic {
                 Zone zone = new Zone(id, new Coord(x, y), name);
                 this.zones.put(id, zone);
             }
+            bufferedReader.close();
         } // end try
         catch (IOException e) {
             e.printStackTrace();
@@ -239,7 +240,10 @@ public class CreateTraffic {
 //		((PersonImpl)p).setCarAvail("always");
         //((PersonImpl)p).createDesires("freight");
         //((PersonImpl)p).getDesires().putActivityDuration("freight", "12:00:00");
-        if ( true ) throw new RuntimeException( "Desires are gone. This can be done another way" );
+        if ( true ) 
+            throw new RuntimeException( "Desires are gone. This can be done another way" );
+        
+        // TODO the below is "dead" 
         Zone originZone = this.zones.get(this.zoneIds[originIndex]);
         Zone destinationZone = this.zones.get(this.zoneIds[destinationIndex]);
         p.addPlan(this.createSingleFreightPlan(originZone, destinationZone));
@@ -287,6 +291,7 @@ public class CreateTraffic {
                     cnt += od[i][j];
                 }
             }
+            bufferedReader.close();
             log.info("reading " + odFile + "\n" + formatter.format(cnt) + " trips");
         } // end try
         catch (IOException e) {
@@ -378,7 +383,7 @@ public class CreateTraffic {
                         Activity act = (Activity)pe;
                         String v2Type = ActTypeConverter.convert2FullType(act.getType());
 
-                        Id facilityID = act.getFacilityId();
+                        Id<?> facilityID = act.getFacilityId();
                         ActivityFacility af =
                                 this.scenario.getActivityFacilities().getFacilities().get(facilityID);
 

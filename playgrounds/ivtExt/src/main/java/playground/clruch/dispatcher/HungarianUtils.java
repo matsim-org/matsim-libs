@@ -154,14 +154,14 @@ public enum HungarianUtils {
         MyTree<VehicleLinkPair> KDTree = new MyTree<>(dimensions, maxDensity, maxCoordinate, maxDepth);
 
         // add uniquely identifiable requests to KD tree
-        int vehIter = 0;
+        // int vehIter = 0; // not read
         for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
             double d1 = vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getX();
             double d2 = vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getY();
             GlobalAssert.that(Double.isFinite(d1));
             GlobalAssert.that(Double.isFinite(d2));
             KDTree.add(new double[] { d1, d2 }, vehicleLinkPair);
-            vehIter++;
+            // vehIter++;
         }
 
         // for all requests, start nearestNeighborSearch until union is as large as the number of requests

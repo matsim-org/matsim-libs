@@ -14,9 +14,11 @@ final class BlendingContext implements CompositeContext {
         this.blender = Blender.getBlenderFor(composite);
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public void compose(Raster src, Raster dstIn, WritableRaster dstOut) {
         int width = Math.min(src.getWidth(), dstIn.getWidth());
         int height = Math.min(src.getHeight(), dstIn.getHeight());
