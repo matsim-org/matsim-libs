@@ -26,7 +26,12 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,6 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.NoiseAnalysisHandler;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.PersonMoneyLinkHandler;
 
 /**
  * @author ikaddoura
@@ -41,6 +47,32 @@ import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.NoiseAna
  */
 public class PersonTripNoiseAnalysis {
 	private static final Logger log = Logger.getLogger(PersonTripNoiseAnalysis.class);
+	
+	public void printAvgValuePerParameter(String csvFile, SortedMap<Double, List<Double>> parameter2values) {
+		String fileName = csvFile;
+		File file = new File(fileName);			
+
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+
+			for (Double parameter : parameter2values.keySet()) {
+				double sum = 0.;
+				int counter = 0;
+				for (Double value : parameter2values.get(parameter)) {
+					sum = sum + value;
+					counter++;
+				}
+				
+				bw.write(String.valueOf(parameter) + ";" + sum / counter);
+				bw.newLine();
+			}
+			log.info("Output written to " + fileName);
+			bw.close();
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	public void printPersonInformation(String outputPath,
 			String mode,
@@ -165,7 +197,9 @@ public class PersonTripNoiseAnalysis {
 	public void printTripInformation(String outputPath,
 			String mode,
 			BasicPersonTripAnalysisHandler basicHandler,
-			NoiseAnalysisHandler noiseHandler) {
+			NoiseAnalysisHandler noiseHandler,
+			PersonMoneyLinkHandler moneyHandler
+			) {
 		
 		boolean ignoreModes = false;
 		if (mode == null) {
@@ -192,6 +226,9 @@ public class PersonTripNoiseAnalysis {
 					+ "waiting time (for taxi/pt) (trip) [sec];"
 					+ "travel distance (trip) [m];"
 					+ "toll payments (trip) [monetary units];"
+					+ "congestion toll payments (trip) [monetary units];"
+					+ "noise toll payments (trip) [monetary units];"
+					+ "air pollution toll payments (trip) [monetary units];"
 					+ "approximate caused noise cost (trip) [monetary units]"); // TODO make this accurate?!
 			
 			bw.newLine();
@@ -256,6 +293,21 @@ public class PersonTripNoiseAnalysis {
 							tollPayment = String.valueOf(basicHandler.getPersonId2tripNumber2payment().get(id).get(trip));
 						}
 						
+						String congestionTollPayment = "unknown";
+						if (moneyHandler.getPersonId2tripNumber2congestionPayment().containsKey(id) && moneyHandler.getPersonId2tripNumber2congestionPayment().get(id).containsKey(trip)) {
+							congestionTollPayment = String.valueOf(moneyHandler.getPersonId2tripNumber2congestionPayment().get(id).get(trip));
+						}
+						
+						String noiseTollPayment = "unknown";
+						if (moneyHandler.getPersonId2tripNumber2noisePayment().containsKey(id) && moneyHandler.getPersonId2tripNumber2noisePayment().get(id).containsKey(trip)) {
+							noiseTollPayment = String.valueOf(moneyHandler.getPersonId2tripNumber2noisePayment().get(id).get(trip));
+						}
+						
+						String airPollutionTollPayment = "unknown";
+						if (moneyHandler.getPersonId2tripNumber2airPollutionPayment().containsKey(id) && moneyHandler.getPersonId2tripNumber2airPollutionPayment().get(id).containsKey(trip)) {
+							airPollutionTollPayment = String.valueOf(moneyHandler.getPersonId2tripNumber2airPollutionPayment().get(id).get(trip));
+						}
+						
 						String causedNoiseCost = "unknown";
 						if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {
 							causedNoiseCost = String.valueOf(noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).get(trip));
@@ -274,6 +326,9 @@ public class PersonTripNoiseAnalysis {
 						+ waitingTime + ";"
 						+ travelDistance + ";"
 						+ tollPayment + ";"
+						+ congestionTollPayment + ";"
+						+ noiseTollPayment + ";"
+						+ airPollutionTollPayment + ";"
 						+ causedNoiseCost
 						);
 						bw.newLine();						
@@ -293,7 +348,8 @@ public class PersonTripNoiseAnalysis {
 			String mode,
 			Map<Id<Person>, Double> personId2userBenefit,
 			BasicPersonTripAnalysisHandler basicHandler,
-			NoiseAnalysisHandler noiseHandler) {
+			NoiseAnalysisHandler noiseHandler,
+			PersonMoneyLinkHandler moneyHandler) {
 		
 		boolean ignoreModes = false;
 		if (mode == null) {
@@ -308,7 +364,7 @@ public class PersonTripNoiseAnalysis {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
 			
 			double userBenefits = 0.;
-			for (Double userBenefit: personId2userBenefit.values()) {
+			for (Double userBenefit : personId2userBenefit.values()) {
 				userBenefits = userBenefits + userBenefit;
 			}
 			
@@ -323,6 +379,9 @@ public class PersonTripNoiseAnalysis {
 			int allStuckAndAbortTrips = 0;
 			double affectedNoiseCost = 0.;
 			double tollPayments = 0.;
+			double congestionPayments = 0.;
+			double noisePayments = 0.;
+			double airPollutionPayments = 0.;
 			double causedNoiseCost = 0.;
 			
 			for (Id<Person> id : basicHandler.getScenario().getPopulation().getPersons().keySet()) {
@@ -347,6 +406,18 @@ public class PersonTripNoiseAnalysis {
 						
 						if (basicHandler.getPersonId2tripNumber2payment().containsKey(id) && basicHandler.getPersonId2tripNumber2payment().get(id).containsKey(trip)) {
 							tollPayments = tollPayments + basicHandler.getPersonId2tripNumber2payment().get(id).get(trip);
+						}
+						
+						if (moneyHandler.getPersonId2tripNumber2congestionPayment().containsKey(id) && moneyHandler.getPersonId2tripNumber2congestionPayment().get(id).containsKey(trip)) {
+							congestionPayments = congestionPayments + moneyHandler.getPersonId2tripNumber2congestionPayment().get(id).get(trip);
+						}
+						
+						if (moneyHandler.getPersonId2tripNumber2noisePayment().containsKey(id) && moneyHandler.getPersonId2tripNumber2noisePayment().get(id).containsKey(trip)) {
+							noisePayments = noisePayments + moneyHandler.getPersonId2tripNumber2noisePayment().get(id).get(trip);
+						}
+						
+						if (moneyHandler.getPersonId2tripNumber2airPollutionPayment().containsKey(id) && moneyHandler.getPersonId2tripNumber2airPollutionPayment().get(id).containsKey(trip)) {
+							airPollutionPayments = airPollutionPayments + moneyHandler.getPersonId2tripNumber2airPollutionPayment().get(id).get(trip);
 						}
 						
 						if (noiseHandler.getPersonId2tripNumber2causedNoiseCost().containsKey(id) && noiseHandler.getPersonId2tripNumber2causedNoiseCost().get(id).containsKey(trip)) {
@@ -427,6 +498,15 @@ public class PersonTripNoiseAnalysis {
 			bw.write("travel related user benefits (sample size) (including toll payments) [monetary units];" + userBenefits);
 			bw.newLine();
 			
+			bw.write("congestion toll payments (sample size) (payed by private car users) [monetary units];" + congestionPayments);
+			bw.newLine();
+			
+			bw.write("noise toll payments (sample size) (payed by private car users) [monetary units];" + noisePayments);
+			bw.newLine();
+			
+			bw.write("air pollution toll payments (sample size) (payed by private car users) [monetary units];" + airPollutionPayments);
+			bw.newLine();
+			
 			bw.write("revenues (sample size) (tolls/fares payed by private car users or passengers) [monetary units];" + tollPayments);
 			bw.newLine();
 			
@@ -444,5 +524,110 @@ public class PersonTripNoiseAnalysis {
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public SortedMap<Double, List<Double>> getParameter2Values(
+			String mode, String[] excludedIdPrefixes,
+			BasicPersonTripAnalysisHandler basicHandler,
+			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2parameter,
+			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2value,
+			double intervalLength, double finalInterval) {
+		
+		Map<Id<Person>, Map<Integer, String>> personId2tripNumber2legMode = basicHandler.getPersonId2tripNumber2legMode();
+		
+		SortedMap<Double, List<Double>> parameter2values = new TreeMap<>();
+		Map<Integer, List<Double>> nr2values = new HashMap<>();
+		
+		for (Id<Person> id : personId2tripNumber2legMode.keySet()) {
+			
+			if (excludePerson(id, excludedIdPrefixes)) {
+
+			} else {
+				
+				for (Integer trip : personId2tripNumber2legMode.get(id).keySet()) {
+					
+					if (personId2tripNumber2legMode.get(id).get(trip).equals(mode)) {
+						
+						double departureTime = personId2tripNumber2parameter.get(id).get(trip);
+						int nr = (int) (departureTime / intervalLength) + 1;
+						
+						double value = 0.;
+						if (personId2tripNumber2value.containsKey(id) && personId2tripNumber2value.get(id).containsKey(trip)) {
+							value = personId2tripNumber2value.get(id).get(trip);
+						}
+						
+						if (nr2values.containsKey(nr)) {
+							List<Double> values = nr2values.get(nr);
+							values.add(value);
+							nr2values.put(nr, values);
+						} else {
+							List<Double> values = new ArrayList<>();
+							values.add(value);
+							nr2values.put(nr, values);
+						}				
+					}
+				}
+			}
+		}
+		for (Integer nr : nr2values.keySet()) {
+			parameter2values.put(nr * intervalLength, nr2values.get(nr));
+		}
+		return parameter2values;
+	}
+	
+	private boolean excludePerson(Id<Person> id, String[] excludedIdPrefixes) {
+		
+		boolean excludePerson = false;
+		
+		for (String prefix : excludedIdPrefixes) {
+			if (id.toString().startsWith(prefix)) {
+				excludePerson = true;
+			}
+		}
+		return excludePerson;
+	}
+
+	public SortedMap<Double, List<Double>> getParameter2Values(
+			String mode,
+			BasicPersonTripAnalysisHandler basicHandler,
+			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2parameter,
+			Map<Id<Person>, Map<Integer, Double>> personId2tripNumber2value,
+			double intervalLength, double finalInterval) {
+		
+		Map<Id<Person>, Map<Integer, String>> personId2tripNumber2legMode = basicHandler.getPersonId2tripNumber2legMode();
+		
+		SortedMap<Double, List<Double>> parameter2values = new TreeMap<>();
+		Map<Integer, List<Double>> nr2values = new HashMap<>();
+		
+		for (Id<Person> id : personId2tripNumber2legMode.keySet()) {
+			
+			for (Integer trip : personId2tripNumber2legMode.get(id).keySet()) {
+				
+				if (personId2tripNumber2legMode.get(id).get(trip).equals(mode)) {
+					
+					double departureTime = personId2tripNumber2parameter.get(id).get(trip);
+					int nr = (int) (departureTime / intervalLength) + 1;
+					
+					double value = 0.;
+					if (personId2tripNumber2value.containsKey(id) && personId2tripNumber2value.get(id).containsKey(trip)) {
+						value = personId2tripNumber2value.get(id).get(trip);
+					}
+					
+					if (nr2values.containsKey(nr)) {
+						List<Double> values = nr2values.get(nr);
+						values.add(value);
+						nr2values.put(nr, values);
+					} else {
+						List<Double> values = new ArrayList<>();
+						values.add(value);
+						nr2values.put(nr, values);
+					}				
+				}
+			}
+		}
+		for (Integer nr : nr2values.keySet()) {
+			parameter2values.put(nr * intervalLength, nr2values.get(nr));
+		}
+		return parameter2values;
 	}
 }

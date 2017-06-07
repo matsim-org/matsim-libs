@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.analysis.detailedPersonTripAnalysis;
+package playground.ikaddoura.analysis.detailedPersonTripAnalysis.old;
 
 import java.io.File;
 import java.io.IOException;
@@ -77,7 +77,7 @@ public class PersonTripBasicAnalysisRun {
 			
 		} else {
 			
-			String baiscDirectoryPath = "../../../runs-svn/vickrey-decongestion/output-FINAL/V9/";
+			String baiscDirectoryPath = "/Users/ihab/Desktop/ils4a/kaddoura/cne/berlin-dz-1pct-simpleNetwork/output-FINAL/m_r_output_run4_bln_cne_DecongestionPID/";
 						
 			runDirectory = baiscDirectoryPath;
 			log.info("Could not find run-directory in args. Using the directory " + runDirectory);
@@ -104,6 +104,7 @@ public class PersonTripBasicAnalysisRun {
 		config.plans().setInputFile(populationFile);
 		config.network().setInputFile(networkFile);
 		config.network().setChangeEventsInputFile(null);
+		config.vehicles().setVehiclesFile(null);
 		
 		int finalIteration = config.controler().getLastIteration();
 		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
@@ -126,39 +127,39 @@ public class PersonTripBasicAnalysisRun {
 		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler();
 		basicHandler.setScenario(scenario);
 
-//		VTTSHandler vttsHandler = new VTTSHandler(scenario);
+		VTTSHandler vttsHandler = new VTTSHandler(scenario);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(basicHandler);
-//		events.addHandler(vttsHandler);
+		events.addHandler(vttsHandler);
 		
 		log.info("Reading the events file...");
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		log.info("Reading the events file... Done.");
 
-//		vttsHandler.computeFinalVTTS();
+		vttsHandler.computeFinalVTTS();
 				
 		// plans
 		
-//		Map<Id<Person>, Double> personId2userBenefit = new HashMap<>();
-//		for (Person person : scenario.getPopulation().getPersons().values()) {
-//			personId2userBenefit.put(person.getId(), person.getSelectedPlan().getScore() / scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney());
-//		}
+		Map<Id<Person>, Double> personId2userBenefit = new HashMap<>();
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+			personId2userBenefit.put(person.getId(), person.getSelectedPlan().getScore() / scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney());
+		}
 		
 		// print the results
 		
 		PersonTripBasicAnalysis analysis = new PersonTripBasicAnalysis();
 				
-//		log.info("Print trip information...");
-//		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, vttsHandler);
-//		analysis.printTripInformation(outputPath, null, basicHandler, vttsHandler);
-//		log.info("Print trip information... Done.");
-//
-//		log.info("Print person information...");
-//		analysis.printPersonInformation(outputPath, TransportMode.car, personId2userBenefit, basicHandler, vttsHandler);	
-//		analysis.printPersonInformation(outputPath, null, personId2userBenefit, basicHandler, vttsHandler);	
-//		log.info("Print person information... Done.");
+		log.info("Print trip information...");
+		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, vttsHandler);
+		analysis.printTripInformation(outputPath, null, basicHandler, vttsHandler);
+		log.info("Print trip information... Done.");
+
+		log.info("Print person information...");
+		analysis.printPersonInformation(outputPath, TransportMode.car, personId2userBenefit, basicHandler, vttsHandler);	
+		analysis.printPersonInformation(outputPath, null, personId2userBenefit, basicHandler, vttsHandler);	
+		log.info("Print person information... Done.");
 		
 		SortedMap<Double, List<Double>> departureTime2tolls1 = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 3600., 30 * 3600.);
 		analysis.printAvgValuePerParameter(outputPath + "tollsPerDepartureTime_car_3600.csv", departureTime2tolls1);
@@ -172,31 +173,37 @@ public class PersonTripBasicAnalysisRun {
 		SortedMap<Double, List<Double>> departureTime2tolls4 = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 300., 30 * 3600.);
 		analysis.printAvgValuePerParameter(outputPath + "tollsPerDepartureTime_car_300.csv", departureTime2tolls4);
 		
-//		SortedMap<Double, List<Double>> tripDistance2tolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2tripDistance(), basicHandler.getPersonId2tripNumber2payment(), 2000., 40 * 1000.);
-//		analysis.printAvgValuePerParameter(outputPath + "tollsPerTripDistance_car.csv", tripDistance2tolls);
-//		
-//		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler, vttsHandler);
-//		analysis.printAggregatedResults(outputPath, null, personId2userBenefit, basicHandler, vttsHandler);
-//		
-//		String[] excludedIdPrefixes = {"wv", "lkw"};
-//		SortedMap<Double, List<Double>> departureTime2tolls_excluded = analysis.getParameter2Values(TransportMode.car, excludedIdPrefixes, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 3600., 30 * 3600.);
-//		analysis.printAvgValuePerParameter(outputPath + "tollsPerDepartureTime_car_without-wv-lkw_3600.csv", departureTime2tolls_excluded);
-//		
-//		SortedMap<Double, List<Double>> departureTime2vtts_excluded = analysis.getParameter2Values(TransportMode.car, excludedIdPrefixes, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), vttsHandler.getPersonId2TripNr2VTTSh(), 3600., 30 * 3600.);
-//		analysis.printAvgValuePerParameter(outputPath + "VTTSPerDepartureTime_car_without-wv-lkw_3600.csv", departureTime2vtts_excluded);
-//		
-//		SortedMap<Double, List<Double>> departureTime2vtts = analysis.getParameter2Values(TransportMode.car, excludedIdPrefixes, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), vttsHandler.getPersonId2TripNr2VTTSh(), 3600., 30 * 3600.);
-//		analysis.printAvgValuePerParameter(outputPath + "VTTSPerDepartureTime_car_3600.csv", departureTime2vtts);
-//		
-//		SortedMap<Double, List<Double>> departureTime2tollPerDistance_excluded = analysis.getTollPerDistancePerTime(TransportMode.car, excludedIdPrefixes, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), basicHandler.getPersonId2tripNumber2tripDistance(), 3600., 30 * 3600.);
-//		analysis.printAvgValuePerParameter(outputPath + "tollsPerDistancePerDepartureTime_car_without-wv-lkw_3600.csv", departureTime2tollPerDistance_excluded);
-//		
-//		String[] excludedIdPrefixes2 = {"wv", "lkw", "t", "fh"};
-//		SortedMap<Double, List<Double>> departureTime2tolls_excluded2 = analysis.getParameter2Values(TransportMode.car, excludedIdPrefixes2, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 3600., 30 * 3600.);
-//		analysis.printAvgValuePerParameter(outputPath + "tollsPerDepartureTime_car_without-wv-lkw-t-fh_3600.csv", departureTime2tolls_excluded2);
-//		
-//		SortedMap<Double, List<Double>> departureTime2tollPerDistance_excluded2 = analysis.getTollPerDistancePerTime(TransportMode.car, excludedIdPrefixes2, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), basicHandler.getPersonId2tripNumber2tripDistance(), 3600., 30 * 3600.);
-//		analysis.printAvgValuePerParameter(outputPath + "tollsPerDistancePerDepartureTime_car_without-wv-lkw-t-fh_3600.csv", departureTime2tollPerDistance_excluded2);
+		SortedMap<Double, List<Double>> departureTime2traveldistance = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2tripDistance(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "distancePerDepartureTime_car_3600.csv", departureTime2traveldistance);
+		
+		SortedMap<Double, List<Double>> departureTime2travelTime = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2travelTime(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "travelTimePerDepartureTime_car_3600.csv", departureTime2travelTime);
+		
+		SortedMap<Double, List<Double>> tripDistance2tolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2tripDistance(), basicHandler.getPersonId2tripNumber2payment(), 2000., 40 * 1000.);
+		analysis.printAvgValuePerParameter(outputPath + "tollsPerTripDistance_car.csv", tripDistance2tolls);
+		
+		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler, vttsHandler);
+		analysis.printAggregatedResults(outputPath, null, personId2userBenefit, basicHandler, vttsHandler);
+		
+		String[] excludedIdPrefixes = {"wv", "lkw"};
+		SortedMap<Double, List<Double>> departureTime2tolls_excluded = analysis.getParameter2Values(TransportMode.car, excludedIdPrefixes, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "tollsPerDepartureTime_car_without-wv-lkw_3600.csv", departureTime2tolls_excluded);
+		
+		SortedMap<Double, List<Double>> departureTime2vtts_excluded = analysis.getParameter2Values(TransportMode.car, excludedIdPrefixes, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), vttsHandler.getPersonId2TripNr2VTTSh(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "VTTSPerDepartureTime_car_without-wv-lkw_3600.csv", departureTime2vtts_excluded);
+		
+		SortedMap<Double, List<Double>> departureTime2vtts = analysis.getParameter2Values(TransportMode.car, excludedIdPrefixes, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), vttsHandler.getPersonId2TripNr2VTTSh(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "VTTSPerDepartureTime_car_3600.csv", departureTime2vtts);
+		
+		SortedMap<Double, List<Double>> departureTime2tollPerDistance_excluded = analysis.getTollPerDistancePerTime(TransportMode.car, excludedIdPrefixes, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), basicHandler.getPersonId2tripNumber2tripDistance(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "tollsPerDistancePerDepartureTime_car_without-wv-lkw_3600.csv", departureTime2tollPerDistance_excluded);
+		
+		String[] excludedIdPrefixes2 = {"wv", "lkw", "t", "fh"};
+		SortedMap<Double, List<Double>> departureTime2tolls_excluded2 = analysis.getParameter2Values(TransportMode.car, excludedIdPrefixes2, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "tollsPerDepartureTime_car_without-wv-lkw-t-fh_3600.csv", departureTime2tolls_excluded2);
+		
+		SortedMap<Double, List<Double>> departureTime2tollPerDistance_excluded2 = analysis.getTollPerDistancePerTime(TransportMode.car, excludedIdPrefixes2, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), basicHandler.getPersonId2tripNumber2tripDistance(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "tollsPerDistancePerDepartureTime_car_without-wv-lkw-t-fh_3600.csv", departureTime2tollPerDistance_excluded2);
 				
 	}
 }
