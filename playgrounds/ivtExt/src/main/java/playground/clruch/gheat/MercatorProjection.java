@@ -22,15 +22,18 @@ package playground.clruch.gheat;
         return new Size(sMax.getWidth() - sMin.getWidth() + 1, sMax.getHeight() - sMin.getHeight() + 1);
     }
 
+    @Override
     public Size getTileMatrixMaxXY(int zoom) {
         long xy = (1 << zoom);
         return new Size(xy - 1, xy - 1);
     }
 
+    @Override
     public Size getTileMatrixMinXY(int zoom) {
         return new Size(0, 0);
     }
 
+    @Override
     public DataPoint fromLatLngToPixel(PointLatLng center, int zoom) {
         DataPoint ret = new DataPoint(0, 0);
         center.setLatitude(clip(center.getLatitude(), MinLatitude, MaxLatitude));
@@ -46,6 +49,7 @@ package playground.clruch.gheat;
         return ret;
     }
 
+    @Override
     public DataPoint fromLatLngToPixel(double latitude, double longitude, int zoom) {
         DataPoint ret = new DataPoint(0, 0);
         latitude = clip(latitude, MinLatitude, MaxLatitude);
@@ -61,6 +65,7 @@ package playground.clruch.gheat;
         return ret;
     }
 
+    @Override
     public PointLatLng fromPixelToLatLng(DataPoint tlb, int zoom) {
         PointLatLng ret = new PointLatLng(0, 0, 0);
         Size s = getTileMatrixSizePixel(zoom);
@@ -73,10 +78,12 @@ package playground.clruch.gheat;
         return ret;
     }
 
+    @Override
     public DataPoint fromPixelToTileXY(DataPoint pixelCoordinate) {
         return new DataPoint((long) (pixelCoordinate.getX() / HeatMap.SIZE), (long) (pixelCoordinate.getY() / HeatMap.SIZE));
     }
 
+    @Override
     public DataPoint fromTileXYToPixel(DataPoint dataPoint) {
         return new DataPoint((dataPoint.getX() * HeatMap.SIZE), (dataPoint.getY() * HeatMap.SIZE));
     }

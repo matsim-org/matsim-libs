@@ -6,10 +6,10 @@ import java.util.function.Function;
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.tensor.DoubleScalar;
+import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.red.Max;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Median;
@@ -51,19 +51,19 @@ public class RequestWaitingVirtualNodeFunction extends AbstractVirtualNodeFuncti
     // -----------------------------------------------------------------
     public static Scalar meanOrZero(Tensor vector) {
         if (vector.length() == 0)
-            return ZeroScalar.get();
+            return RealScalar.ZERO;
         return Mean.of(vector).Get();
     }
 
     public static Scalar medianOrZero(Tensor vector) {
         if (vector.length() == 0)
-            return ZeroScalar.get();
+            return RealScalar.ZERO;
         return Median.of(vector).Get();
     }
 
     public static Scalar maxOrZero(Tensor vector) {
         return vector.flatten(0) //
                 .map(Scalar.class::cast) //
-                .reduce(Max::of).orElse(ZeroScalar.get());
+                .reduce(Max::of).orElse(RealScalar.ZERO);
     }
 }

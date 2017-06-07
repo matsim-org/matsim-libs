@@ -4,10 +4,10 @@ package playground.clruch.gfx;
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.tensor.DoubleScalar;
+import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.red.Mean;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.RequestContainer;
@@ -41,7 +41,7 @@ import playground.clruch.netdata.VirtualNode;
 
     private static Scalar meanOrZero(Tensor vector) {
         if (vector.length() == 0)
-            return ZeroScalar.get();
+            return RealScalar.ZERO;
         return Mean.of(vector).Get();
     }
 }

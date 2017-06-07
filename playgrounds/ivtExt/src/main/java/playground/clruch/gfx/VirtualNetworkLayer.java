@@ -14,8 +14,8 @@ import org.matsim.api.core.v01.Coord;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.red.Max;
 import playground.clruch.gheat.graphics.ColorSchemes;
 import playground.clruch.net.MatsimStaticDatabase;
@@ -38,8 +38,8 @@ public class VirtualNetworkLayer extends ViewerLayer {
     // TODO make this functionality part of tensor library
     public static Tensor normalize1Norm(Tensor count) {
         Tensor prob = count; // SoftmaxLayer.of(count);
-        Scalar max = prob.flatten(0).reduce(Max::of).get().Get();
-        if (!max.equals(ZeroScalar.get()))
+        Scalar max = prob.flatten(0).reduce(Max::of).get().Get();        
+        if (Scalars.nonZero(max))
             prob = prob.multiply(RealScalar.of(224).divide(max));
         return prob;
     }

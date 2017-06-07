@@ -26,7 +26,6 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Transpose;
@@ -384,7 +383,7 @@ public class TravelData implements Serializable {
             return RealScalar.of(Double.parseDouble(timeatvLink.getAttribute("P_ij").getValue()));
         }
         GlobalAssert.that(false);
-        return ZeroScalar.get();
+        return null; // <- this will never be returned since above GlobalAssert
     }
 
     @Deprecated
@@ -404,7 +403,7 @@ public class TravelData implements Serializable {
             return RealScalar.of(Double.parseDouble(timeatvLink.getAttribute("alpha_ij").getValue()));
         }
         GlobalAssert.that(false);
-        return ZeroScalar.get();
+        return null; // <- this will never be returned since above GlobalAssert
     }
 
 }

@@ -72,7 +72,9 @@ import playground.clruch.utils.GZHandler;
         List<Id<Person>> list = new ArrayList<>(population.getPersons().keySet());
         Id<Person> p1 = list.get(0);
         System.out.println(p1.toString());
-        HashMap<Id<Person>,Person> popmap = (HashMap<Id<Person>, Person>) population.getPersons();
+        
+        // the map is not used:
+        // HashMap<Id<Person>,Person> popmap = (HashMap<Id<Person>, Person>) population.getPersons();
 
 
         /*

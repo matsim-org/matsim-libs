@@ -31,9 +31,9 @@ import ch.ethz.idsc.jmex.matlab.MfileContainerServer;
 import ch.ethz.idsc.tensor.DoubleScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.io.ExtractPrimitives;
 import ch.ethz.idsc.tensor.red.Max;
@@ -177,7 +177,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                     .flatten(0).map(Scalar.class::cast).reduce(Max::of).get());
                         }
                     }
-                    Scalar vehicleTotal = ZeroScalar.get();
+                    Scalar vehicleTotal = RealScalar.ZERO;
                     Set<AVVehicle> accountedVehicles = new HashSet<>();
                     { // done
                         /**
@@ -241,7 +241,8 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                         vehicleTotal = vehicleTotal.add(Total.of(Tensors.vectorDouble(array)));
                         System.out.println("movingVehiclesWithCustomersPerVLink=" + Total.of(Tensors.vectorDouble(array)));
                     }
-                    if (!Chop.of(vehicleTotal.subtract(RealScalar.of(numberOfVehicles))).equals(ZeroScalar.get())) {
+                    
+                    if (Scalars.nonZero(Chop.of(vehicleTotal.subtract(RealScalar.of(numberOfVehicles))))) {
                         new RuntimeException("#vehiclesTotal=" + vehicleTotal).printStackTrace();
                     }
                     if (numberOfVehicles != accountedVehicles.size())
@@ -282,7 +283,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                                 Scalar d1 = rebalanceVector.Get(vl + 0);
                                 Scalar d2 = rebalanceVector.Get(vl + 1);
 
-                                if (!d1.multiply(d2).equals(ZeroScalar.get())) {
+                                if (Scalars.nonZero(d1.multiply(d2))) {
                                     System.out.println("double rebalance");
                                     System.out.print("" + virtualNetwork.getVirtualLink(vl + 0).getFrom().index);
                                     System.out.println(" -> " + virtualNetwork.getVirtualLink(vl + 0).getTo().index);
@@ -409,6 +410,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
                             if (availableVehicles.containsKey(vnFrom)) {
                                 final List<VehicleLinkPair> cars = availableVehicles.get(vnFrom); // find cars
                                 final int desiredRebalance = rebalanceVector.Get(vectorIndex).number().intValue();
+                                @SuppressWarnings("unused")
                                 int pickupPerNode = 0;
                                 if (0 < desiredRebalance) {
                                     String infoString = vnFrom.equals(vnTo) ? "DEST==ORIG" : "";

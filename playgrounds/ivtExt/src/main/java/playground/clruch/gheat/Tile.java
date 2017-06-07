@@ -112,7 +112,8 @@ public class Tile {
     /// <param name="image">Dot image</param>
     /// <param name="weight">Weight to apply</param>
     /// <returns></returns>
-    private static BufferedImage ApplyWeightToImage(BufferedImage image, double weight) {
+    @SuppressWarnings("unused")
+    private static BufferedImage applyWeightToImage(BufferedImage image, double weight) {
         Graphics2D graphic;
         double tempWeight;
         BufferedImage tempImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
