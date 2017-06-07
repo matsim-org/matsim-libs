@@ -20,9 +20,9 @@ import javax.swing.JPanel;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.ZeroScalar;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Subdivide;
 import ch.ethz.idsc.tensor.io.ObjectFormat;
@@ -130,8 +130,8 @@ import playground.clruch.utils.gui.SpinnerLabel;
             for (OsmLink osmLink : matsimMapComponent.db.getOsmLinks()) {
                 Point middle = matsimMapComponent.getMapPosition(osmLink.getAt(.3333));
                 if (middle != null) {
-                    Scalar carC = matrix.Get(index, 1);
-                    if (!carC.equals(ZeroScalar.get()))
+                    Scalar carC = matrix.Get(index, 1);                    
+                    if (Scalars.nonZero(carC))
                         graphics.drawString("" + carC, middle.x, middle.y);
                 }
                 ++index;
