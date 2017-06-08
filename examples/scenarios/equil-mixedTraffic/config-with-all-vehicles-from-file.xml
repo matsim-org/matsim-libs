@@ -25,7 +25,7 @@
 	</module>
 
 	<module name="qsim">	
-		<param name="vehiclesSource" value="modeVehicleTypesFromVehiclesData" />
+		<param name="vehiclesSource" value="fromVehiclesData" />
 		<param name="mainMode" value="car,bicycle" />
 		<param name="linkDynamics" value="PassingQ" />
 		<param name="trafficDynamics" value="kinematicWaves" />
@@ -67,7 +67,7 @@
 	</module>
 	
 	<module name="vehicles" >
-		<param name="vehiclesFile" value="vehicles.xml" /> 
+		<param name="vehiclesFile" value="all-vehicles.xml" /> 
 	</module>
 	
 	<module name="strategy">
