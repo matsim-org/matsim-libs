@@ -53,6 +53,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private static final String PLOT_VEH_STATS = "writeDetailedVehicleStats";
 	private static final String PRINT_WARNINGS = "plotDetailedWarnings";
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
+	private static final String K_NEAREST_VEHICLES = "kNearestVehiclesToFilter";
 
 	private double stopDuration = Double.NaN;// seconds
 	private double maxWaitTime = Double.NaN;// seconds
@@ -81,9 +82,13 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private boolean printDetailedWarnings = false;
 	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
+	private int kNearestVehicles = 0;
+	
 	public enum OperationalScheme {
 		stationbased, door2door
 	}
+	
+	
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
@@ -130,6 +135,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 						+ "If unset, the number of threads is equal to the number of logical cores available to JVM.");
 		map.put(PRINT_WARNINGS,
 				"Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.");
+		map.put(K_NEAREST_VEHICLES, "Filters the k nearest vehicles to the request. Speeds up simulation with big fleets, but could lead to a worse solution. Default: k==0 (no filtering used)");
 		return map;
 	}
 
@@ -188,6 +194,23 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		return changeStartLinkToLastLinkInSchedule;
 	}
 
+	
+	/**
+	 * @return the kNearestVehicles
+	 */
+	@StringGetter(K_NEAREST_VEHICLES)
+	public int getkNearestVehicles() {
+		return kNearestVehicles;
+	}
+	
+	/**
+	 * @param kNearestVehicles the kNearestVehicles to set
+	 */
+	@StringSetter(K_NEAREST_VEHICLES)
+	public void setkNearestVehicles(int kNearestVehicles) {
+		this.kNearestVehicles = kNearestVehicles;
+	}
+	
 	@StringSetter(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE)
 	public void setChangeStartLinkToLastLinkInSchedule(boolean changeStartLinkToLastLinkInSchedule) {
 		this.changeStartLinkToLastLinkInSchedule = changeStartLinkToLastLinkInSchedule;
