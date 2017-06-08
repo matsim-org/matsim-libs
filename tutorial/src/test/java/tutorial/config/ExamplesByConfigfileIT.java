@@ -19,10 +19,8 @@
 package tutorial.config;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -58,6 +56,7 @@ public class ExamplesByConfigfileIT {
 		filesToRun.add(new Object [] {"../examples/scenarios//equil-mixedTraffic/config.xml"});
 		filesToRun.add(new Object [] {"examples/tutorial/config/example2-config.xml"});
 		filesToRun.add(new Object [] {"../examples/scenarios//equil-extended/config-with-network-change-events.xml"});
+		filesToRun.add(new Object [] {"../examples/scenarios/equil-extended/config-with-subpopulation.xml"});
 		
 		return filesToRun;
 		
