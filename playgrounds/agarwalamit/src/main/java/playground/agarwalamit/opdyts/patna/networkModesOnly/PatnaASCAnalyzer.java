@@ -38,27 +38,42 @@ public class PatnaASCAnalyzer {
         String configFile ;
         String outDir ;
 
+        double ascBike = 0.;
+        double ascMotorbike = 0.;
+
         if(args.length>0) {
             configFile = args[0];
             outDir = args[1];
+
+            if (args.length > 2) {
+                ascBike = Double.valueOf(args[2]);
+                ascMotorbike = Double.valueOf(args[3]);
+            }
+
         } else {
             configFile = FileUtils.RUNS_SVN+"/opdyts/patna/input_networkModes/"+"/config_networkModesOnly.xml";
             outDir = FileUtils.RUNS_SVN+"/opdyts/patna/output_networkModes/ascAnalysis/";
         }
 
-        new PatnaASCAnalyzer().run(configFile, outDir);
+        if (args.length==2)       new PatnaASCAnalyzer().run(configFile, outDir);
+        else if (args.length> 2) new PatnaASCAnalyzer().run(configFile,outDir,ascBike,ascMotorbike);
+
     }
 
     public void run (String configFile, String outDir) {
-        Config config = ConfigUtils.loadConfig(configFile);
-        config.controler().setLastIteration(300);
         for (double ascBike : ascTrials) {
             for (double ascMotorbike : ascTrials) {
-                config.controler().setOutputDirectory(outDir+"/bikeASC"+ascBike+"_motorbikeASC"+ascMotorbike+"/");
-                config.planCalcScore().getModes().get("bike").setConstant(ascBike);
-                config.planCalcScore().getModes().get("motorbike").setConstant(ascMotorbike);
-                new PatnaNetworkModesPlansRelaxor().run(config);
+                run(configFile,outDir,ascBike,ascMotorbike);
             }
         }
+    }
+
+    public void run (String configFile, String outDir, double ascBike, double ascMotorbike) { // so that multiple runs are possible on cluster
+        Config config = ConfigUtils.loadConfig(configFile);
+        config.controler().setLastIteration(300);
+        config.controler().setOutputDirectory(outDir+"/bikeASC"+ascBike+"_motorbikeASC"+ascMotorbike+"/");
+        config.planCalcScore().getModes().get("bike").setConstant(ascBike);
+        config.planCalcScore().getModes().get("motorbike").setConstant(ascMotorbike);
+        new PatnaNetworkModesPlansRelaxor().run(config);
     }
 }
