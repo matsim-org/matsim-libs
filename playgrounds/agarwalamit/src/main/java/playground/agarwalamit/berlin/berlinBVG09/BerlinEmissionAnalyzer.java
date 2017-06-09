@@ -33,8 +33,6 @@ import playground.agarwalamit.utils.FileUtils;
 
 /**
  *
- * Input and output files are corresponding to bvg.run189.10pct
- *
  * Created by amit on 09.06.17.
  */
 
@@ -48,7 +46,7 @@ public class BerlinEmissionAnalyzer {
 
     private final String vehiclesFile = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/emissionsRelatedFiles/bvg.run189.10pct.100.emissionVehicle.xml.gz";
     private final String roadTypeMappingFile = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/emissionsRelatedFiles/rev554B-bvg00-0.1sample.roadTypeMapping.txt";
-    private final String eventsFile = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.events.filtered.xml.gz";
+    private final String eventsFile = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/emissionsRelatedFiles/bvg.run189.10pct.100.events.filtered.converted.xml.gz";
 
     private final String averageFleetColdEmissionFactorsFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/hbefa-files/v3.1/EFA_ColdStart_vehcat_2005average.txt";
     private final String averageFleetWarmEmissionFactorsFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/hbefa-files/v3.1/EFA_HOT_vehcat_2005average.txt";
