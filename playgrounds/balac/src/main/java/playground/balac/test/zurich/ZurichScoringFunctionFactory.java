@@ -101,12 +101,12 @@ public class ZurichScoringFunctionFactory implements ScoringFunctionFactory {
 
 		
 		// activities
-		/*scoringFunctionAccumulator.addScoringFunction(
-				new BlackListedActivityScoringFunction(blackList,
-						new CharyparNagelActivityScoring(params, new FacilityOpeningIntervalCalculator(scenario.getActivityFacilities()))));*/
 		scoringFunctionAccumulator.addScoringFunction(
 				new BlackListedActivityScoringFunction(blackList,
-						new BJActivityScoring(params, slopes)));
+						new CharyparNagelActivityScoring(params, new FacilityOpeningIntervalCalculator(scenario.getActivityFacilities()))));
+		/*scoringFunctionAccumulator.addScoringFunction(
+				new BlackListedActivityScoringFunction(blackList,
+						new BJActivityScoring(params, slopes, new FacilityOpeningIntervalCalculator(scenario.getActivityFacilities()))));*/
 		
 		
 		//		CharyparNagelActivityScoring warns if first activity of the day and last activity of the day are not equal.

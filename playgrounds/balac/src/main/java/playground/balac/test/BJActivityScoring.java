@@ -58,8 +58,9 @@ public final class BJActivityScoring implements org.matsim.core.scoring.SumScori
 	
 	private static final Logger log = Logger.getLogger(BJActivityScoring.class);
 
-	public BJActivityScoring(final ScoringParameters params, Map<String, Double> slopesAfterTypical) {
-		this(params, new ActivityTypeOpeningIntervalCalculator(params));
+	public BJActivityScoring(final ScoringParameters params, Map<String, Double> slopesAfterTypical,
+			final OpeningIntervalCalculator openingIntervalCalculator) {
+		this(params, openingIntervalCalculator);
 		this.slopesAfterTypical = slopesAfterTypical;
 	}
 
