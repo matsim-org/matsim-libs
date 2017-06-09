@@ -25,15 +25,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
+import org.matsim.contrib.emissions.utils.EmissionSpecificationMarker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleReaderV1;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-import org.matsim.vehicles.VehicleWriterV1;
-import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.*;
 
 
 /**
@@ -105,7 +101,8 @@ public class EmissionVehicleGenerator {
 			VehicleType vehicleType = VehicleUtils.getFactory().createVehicleType(vehTypeId);
 
 			// either set following or use switch in EmissionConfigGroup to use vehicle id for vehicle description. Amit sep 2016
-			vehicleType.setDescription(vehTypeId.toString());
+//			vehicleType.setDescription(vehTypeId.toString());
+			vehicleType.setDescription(EmissionSpecificationMarker.BEGIN_EMISSIONS+vehTypeId.toString()+EmissionSpecificationMarker.END_EMISSIONS);
 			if(!(outputVehicles.getVehicles().containsKey(vehTypeId))){
 				outputVehicles.addVehicleType(vehicleType);
 			} else {
