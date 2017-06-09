@@ -24,19 +24,34 @@
 package playground.nmviljoen.io.convertOldToNew;
 
 import java.io.BufferedReader;
+<<<<<<< HEAD
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+=======
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+>>>>>>> 905d616477... Interim commit to deal with xml writing
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+<<<<<<< HEAD
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+=======
+import org.jgrapht.alg.DirectedNeighborIndex;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.io.IOUtils;
+>>>>>>> 905d616477... Interim commit to deal with xml writing
 
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseMultigraph;
@@ -46,7 +61,10 @@ import playground.nmviljoen.gridExperiments.GridExperiment.Archetype;
 import playground.nmviljoen.gridExperiments.NmvLink;
 import playground.nmviljoen.gridExperiments.NmvNode;
 import playground.nmviljoen.io.MultilayerInstanceWriter;
+<<<<<<< HEAD
 import playground.southafrica.utilities.FileUtils;
+=======
+>>>>>>> 905d616477... Interim commit to deal with xml writing
 import playground.southafrica.utilities.Header;
 
 /**
@@ -57,6 +75,12 @@ import playground.southafrica.utilities.Header;
 public class ExperimentConverter {
 	final private static Logger LOG = Logger.getLogger(ExperimentConverter.class);
 	private static DirectedGraph<NmvNode, NmvLink> physicalNetwork;
+<<<<<<< HEAD
+=======
+	private static DirectedGraph<NmvNode, NmvLink> shNetwork;
+	private static DirectedGraph<NmvNode, NmvLink> dhNetwork;
+	private static DirectedGraph<NmvNode, NmvLink> fcNetwork;
+>>>>>>> 905d616477... Interim commit to deal with xml writing
 	private static Map<String, Coord> nodeMap;
 
 	/**
@@ -67,6 +91,7 @@ public class ExperimentConverter {
 		
 		String physicalNetworkNodes = args[0];
 		String physicalNetworkLinks = args[1];
+<<<<<<< HEAD
 		String pathToInstances = args[2];
 		pathToInstances += pathToInstances.endsWith("/") ? "" : "/";
 		Archetype archetype = Archetype.valueOf(args[3]);
@@ -118,6 +143,29 @@ public class ExperimentConverter {
 			}
 		}
 		counter.printCounter();
+=======
+		String singleHub = args[2];
+		String doubleHub = args[3];
+		String fullyConnected = args[4];
+		
+		
+		
+		
+		String xmlFile = args[2];
+
+		buildNodeMap(physicalNetworkNodes);
+		addPhysicalEdges(physicalNetworkLinks);
+		
+		GridExperiment experiment = new GridExperiment();
+		experiment.setArchetype(Archetype.MALIK);
+		experiment.setInstanceNumber(123);
+		experiment.setPhysicalNetwork(physicalNetwork);
+		
+		
+		new MultilayerInstanceWriter(experiment).write(xmlFile);
+		
+		
+>>>>>>> 905d616477... Interim commit to deal with xml writing
 		Header.printFooter();
 	}
 	
@@ -169,8 +217,13 @@ public class ExperimentConverter {
 				String toId = sa[1];
 				double weight = Double.parseDouble(sa[2]);
 				
+<<<<<<< HEAD
 				NmvNode fromNode = getNode(fromId, physicalNetwork);
 				NmvNode toNode = getNode(toId, physicalNetwork);
+=======
+				NmvNode fromNode = getNode(fromId);
+				NmvNode toNode = getNode(toId);
+>>>>>>> 905d616477... Interim commit to deal with xml writing
 				NmvLink link = new NmvLink(fromId + "_" + toId, weight);
 				
 				physicalNetwork.addEdge(link, fromNode, toNode, EdgeType.DIRECTED);
@@ -190,9 +243,15 @@ public class ExperimentConverter {
 		
 	}
 	
+<<<<<<< HEAD
 	private static NmvNode getNode(String id, DirectedGraph<NmvNode, NmvLink> network){
 		NmvNode node = null;
 		Iterator<NmvNode> iterator = network.getVertices().iterator();
+=======
+	private static NmvNode getNode(String id){
+		NmvNode node = null;
+		Iterator<NmvNode> iterator = physicalNetwork.getVertices().iterator();
+>>>>>>> 905d616477... Interim commit to deal with xml writing
 		boolean found = false;
 		while(!found && iterator.hasNext()){
 			NmvNode thisNode = iterator.next();
@@ -202,12 +261,17 @@ public class ExperimentConverter {
 			}
 		}
 		if(node == null){
+<<<<<<< HEAD
 			LOG.warn("Cannot find node '" + id + "', returning NULL. Creating and adding it to the network.");
+=======
+			throw new RuntimeException("Cannot find node '" + id + "'");
+>>>>>>> 905d616477... Interim commit to deal with xml writing
 		}
 		
 		return node;
 	}
 	
+<<<<<<< HEAD
 	private static DirectedGraph<NmvNode, NmvLink> parseLogicalNetwork(String filename){
 		LOG.info("Parse logical network from " + filename + "...");
 		DirectedGraph<NmvNode, NmvLink> network = new DirectedSparseMultigraph<>();
@@ -216,11 +280,21 @@ public class ExperimentConverter {
 		try{
 			String line = br.readLine(); /* Header. */
 			while((line = br.readLine()) != null){
+=======
+	private static DirectedGraph<NmvNode, NmvLink> parseLogicalNetwork(String file){
+		DirectedGraph<NmvNode, NmvLink> network = new DirectedSparseMultigraph<>();
+		
+		BufferedReader brEdges = IOUtils.getBufferedReader(file);
+		try{
+			String line = brEdges.readLine(); /* Header. */
+			while((line = brEdges.readLine()) != null){
+>>>>>>> 905d616477... Interim commit to deal with xml writing
 				String[] sa = line.split(",");
 				String fromId = sa[0];
 				String toId = sa[1];
 				double weight = Double.parseDouble(sa[2]);
 				
+<<<<<<< HEAD
 				NmvNode fromNode = getNode(fromId, network);
 				if(fromNode == null){
 					fromNode = new NmvNode(fromId);
@@ -307,6 +381,29 @@ public class ExperimentConverter {
 			}
 		}
 		
+=======
+				NmvNode fromNode = getNode(fromId);
+				NmvNode toNode = getNode(toId);
+				NmvLink link = new NmvLink(fromId + "_" + toId, weight);
+				
+				physicalNetwork.addEdge(link, fromNode, toNode, EdgeType.DIRECTED);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException(file);
+		} finally{
+			try {
+				brEdges.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException(file);
+			}
+		}
+		
+		
+		
+		return network;
+>>>>>>> 905d616477... Interim commit to deal with xml writing
 	}
 	
 
