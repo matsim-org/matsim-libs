@@ -19,6 +19,7 @@
 
 package playground.southafrica.utilities.grid;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -168,7 +169,12 @@ public class GeneralGrid{
 	}
 	
 	public Geometry getCellGeometry(Point p){
-		return this.geometryCache.get(p);
+		Geometry cell = this.geometryCache.get(p);
+		if(cell == null){
+			cell = this.getIndividualGeometry(p);
+			this.geometryCache.put(p, cell);
+		}
+		return cell;
 	}
 	
 	
@@ -220,8 +226,7 @@ public class GeneralGrid{
 	 * 		  provided. If <code>null</code> then no transformation will be done 
 	 * 		  on the coordinate points of the centroids.  
 	 */
-	public void writeGrid(String folder, String originalCRS){
-		String filename = String.format("%s%s%s_%.0f.csv", folder, (folder.endsWith("/") ? "" : "/"), this.type, this.width, ".csv");
+	public void writeGrid(String filename, String originalCRS){
 		LOG.info("Writing grid to file: " + filename);
 
 		CoordinateTransformation ct = null;
@@ -265,6 +270,92 @@ public class GeneralGrid{
 		LOG.info("Done writing file.");
 		LOG.info(String.format("Avg length (in decimal degrees) of 1000m: %.8f (%d observations)", sum / (count), count));
 	}
+	
+	
+	/**
+	 * Reading a file that is assumed to be a GeneralGrid as produced by the
+	 * {@link #writeGrid(String, String)} method. <br><br>
+	 * 
+	 * <b>WARNING!!</b> Since you have to <i>provide</i> the {@link GridType}, 
+	 * and there is no way of checking if it is the correct {@link GridType},
+	 * this method lends itself to abuse. It has value, though, to ease
+	 * computational burden, but the burden of responsibility is on the user to
+	 * ensure proper use.  
+	 * @param filename
+	 * @param type
+	 * @return
+	 */
+	public static GeneralGrid readGrid(String filename, double width, GridType type){
+		LOG.info("Reading a grid file from " + filename);
+		GeneralGrid grid = new GeneralGrid(width, type);
+		GeometryFactory gf = new GeometryFactory();
+		
+		/* Determining the QuadTree extent */
+		LOG.info("Checking the QuadTree extent...");
+		double xMin = Double.POSITIVE_INFINITY;
+		double xMax = Double.NEGATIVE_INFINITY;
+		double yMin = Double.POSITIVE_INFINITY;
+		double yMax = Double.NEGATIVE_INFINITY;
+		BufferedReader br = IOUtils.getBufferedReader(filename);
+		try{
+			String line = br.readLine(); /* Header */
+			while((line = br.readLine()) != null){
+				String[] sa = line.split(",");
+				double lineWidth = Double.parseDouble(sa[4]);
+				if(width != lineWidth){
+					LOG.error("There is a mismatch between the given width (" + 
+							width + ") and the width read from file (" + 
+							lineWidth + ")");
+					throw new RuntimeException("Aborting! No way of ensuring grid integrity.");
+				}
+				double x = Double.parseDouble(sa[2]);
+				xMin = Math.min(xMin, x);
+				xMax = Math.max(xMax, x);
+				
+				double y = Double.parseDouble(sa[3]);
+				yMin = Math.min(yMin, y);
+				yMax = Math.max(yMax, y);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot read from " + filename);
+		} finally{
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + filename);
+			}
+		}
+		grid.qt = new QuadTree<>(xMin-width, yMin-width, xMax+width, yMax+width);
+		
+		/* Populate the QuadTree. */
+		LOG.info("Populating the QuadTree...");
+		br = IOUtils.getBufferedReader(filename);
+		try{
+			String line = br.readLine(); /* Header */
+			while((line = br.readLine()) != null){
+				String[] sa = line.split(",");
+				double x = Double.parseDouble(sa[2]);
+				double y = Double.parseDouble(sa[3]);
+				Point point = gf.createPoint(new Coordinate(x, y));
+				grid.qt.put(x, y, point);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot read from " + filename);
+		} finally{
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + filename);
+			}
+		}
+		LOG.info("Done reading the grid. Total of " + grid.getGrid().size() + " points found.");
+		
+		return grid;
+	}
 
 
 	/**
@@ -302,7 +393,9 @@ public class GeneralGrid{
 		Geometry dummy = grid.buildDummyPolygon();
 
 		grid.generateGrid(zone);
-		grid.writeGrid(outputFolder, "WGS84_SA_Albers");
+		String filename = String.format("%s%s%s_%.0f.csv", outputFolder, 
+				(outputFolder.endsWith("/") ? "" : "/"), GridType.valueOf(type), width, ".csv");
+		grid.writeGrid(filename, "WGS84_SA_Albers");
 
 		Header.printFooter();
 	}

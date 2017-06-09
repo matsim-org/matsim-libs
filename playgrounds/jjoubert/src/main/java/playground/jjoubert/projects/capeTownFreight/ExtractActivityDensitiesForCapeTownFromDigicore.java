@@ -76,7 +76,9 @@ public class ExtractActivityDensitiesForCapeTownFromDigicore {
 		/* Convert shapefile to hexagonal grid shapes. */
 		GeneralGrid gg = new GeneralGrid(zoneWidth, GridType.HEX);
 		gg.generateGrid(area);
-		gg.writeGrid(outputFolder, "WGS84_SA_Albers");
+		String filename = String.format("%s%s%s_%.0f.csv", outputFolder, 
+				(outputFolder.endsWith("/") ? "" : "/"), GridType.HEX, zoneWidth, ".csv");
+		gg.writeGrid(filename, "WGS84_SA_Albers");
 		QuadTree<Point> grid = gg.getGrid();
 		
 		/* Perform the analysis */

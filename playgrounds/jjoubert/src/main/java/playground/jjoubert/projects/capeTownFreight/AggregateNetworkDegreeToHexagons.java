@@ -113,7 +113,9 @@ public class AggregateNetworkDegreeToHexagons {
 		}
 		GeneralGrid gg = new GeneralGrid(zoneWidth, GridType.HEX);
 		gg.generateGrid(ct);
-		gg.writeGrid(outputfolder, "WGS84_SA_Albers");
+		String filename = String.format("%s%s%s_%.0f.csv", outputfolder, 
+				(outputfolder.endsWith("/") ? "" : "/"), GridType.HEX, zoneWidth, ".csv");
+		gg.writeGrid(filename, "WGS84_SA_Albers");
 		QuadTree<Point> grid = gg.getGrid();
 		
 		/* Initialise the grid's map with zero counts, and the actual geomtery. */

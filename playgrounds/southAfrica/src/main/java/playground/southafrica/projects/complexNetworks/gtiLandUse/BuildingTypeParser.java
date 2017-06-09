@@ -86,7 +86,10 @@ public class BuildingTypeParser extends AbstractAnalysis{
 		BuildingTypeParser btp = new BuildingTypeParser(areaShapefile, gridWidth, gridType);
 		btp.parseGtiBuildingShapefile(buildingShapefile);
 		btp.writeActivityMapToFile(String.format("%s%s%s_activityTypes_%.0f.csv", outputFolder, (outputFolder.endsWith("/") ? "" : "/"), btp.grid.getGridType(), gridWidth));
-		btp.grid.writeGrid(outputFolder, "WGS84_SA_Albers");
+		
+		String filename = String.format("%s%s%s_%.0f.csv", outputFolder, 
+				(outputFolder.endsWith("/") ? "" : "/"), gridType, gridWidth, ".csv");
+		btp.grid.writeGrid(filename, "WGS84_SA_Albers");
 		
 		/* Visualise. */
 		try {

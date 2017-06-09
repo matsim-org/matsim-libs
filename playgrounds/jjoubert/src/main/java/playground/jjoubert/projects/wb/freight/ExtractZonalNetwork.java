@@ -24,6 +24,7 @@
 package playground.jjoubert.projects.wb.freight;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -79,7 +80,8 @@ public class ExtractZonalNetwork {
 	/**
 	 * Class to build a complex network of connectivity, not between clustered
 	 * facilities, but rather zones. For this implementation for the World Bank,
-	 * the zones will be a hexagonal grid with width 2km.
+	 * the zones will be a hexagonal grid with variable width (ultimately 2km)
+	 * as given in the arguments.
 	 *  
 	 * @param args
 	 */
@@ -92,24 +94,36 @@ public class ExtractZonalNetwork {
 	public static void run(String[] args){
 		String vehiclesFile = args[0];
 		String shapefile = args[1];
-		String networkFile = args[2];
+		String gridFilename = args[2];
+		double width = Double.parseDouble(args[3]);
+		String networkFile = args[4];
 		
 		GeometryFactory gf = new GeometryFactory();
 		
-		/* Build the grid from the shapefile */
-		LOG.info("Parsing the area shapefile...");
-		ShapeFileReader sfr = new ShapeFileReader();
-		sfr.readFileAndInitialize(shapefile);
-		Collection<SimpleFeature> features = sfr.getFeatureSet();
-		Iterator<SimpleFeature> iterator = features.iterator();
-		Object o = iterator.next().getDefaultGeometry();
-		Geometry sa = null;
-		if(o instanceof MultiPolygon){
-			sa = (Geometry) o;
+		/* Build the grid. */
+		GeneralGrid grid = new GeneralGrid(width, GRID_TYPE);
+		File gridFile = new File(gridFilename);
+		if(gridFile.exists()){
+			/* Read the grid from file. */
+			grid = GeneralGrid.readGrid(gridFilename, width, GRID_TYPE);
+		} else {
+			/* Build the grid from shapefile. */
+			LOG.info("Parsing the area shapefile...");
+			ShapeFileReader sfr = new ShapeFileReader();
+			sfr.readFileAndInitialize(shapefile);
+			Collection<SimpleFeature> features = sfr.getFeatureSet();
+			Iterator<SimpleFeature> iterator = features.iterator();
+			Object o = iterator.next().getDefaultGeometry();
+			Geometry sa = null;
+			if(o instanceof MultiPolygon){
+				sa = (Geometry) o;
+			}
+			LOG.info("Generating the grid...");
+			grid.generateGrid(sa);
+			
+			/* Write the grid to file for future use. */
+			grid.writeGrid(gridFile.getAbsolutePath(), VEHICLES_CRS);
 		}
-		LOG.info("Generating the grid...");
-		GeneralGrid grid = new GeneralGrid(GRID_WIDTH, GRID_TYPE);
-		grid.generateGrid(sa);
 		
 		/* Parse the vehicles file */
 		LOG.info("Parsing the digicore vehicles container...");
@@ -121,6 +135,7 @@ public class ExtractZonalNetwork {
 		LOG.info("Processing the activity chains...");
 		weightMap = new TreeMap<Id<GridZone>, Map<Id<GridZone>, Double>>();
 		zoneMap = new HashMap<>();
+		pointMap = new HashMap<>();
 		Counter vehicleCounter = new Counter("  vehicle # ");
 		for(DigicoreVehicle vehicle : vehicles.getVehicles().values()){
 			for(DigicoreChain chain : vehicle.getChains()){
@@ -200,7 +215,7 @@ public class ExtractZonalNetwork {
 			bw.write("fId,fX,fY,fLon,fLat,tId,tX,tY,tLon,tLat,weight");
 			bw.newLine();
 			for(Id<GridZone> fId : weightMap.keySet()){
-				for(Id<GridZone> tId : weightMap.keySet()){
+				for(Id<GridZone> tId : weightMap.get(fId).keySet()){
 					double weight = weightMap.get(fId).get(tId);
 					
 					Point fPoint = pointMap.get(fId);
@@ -214,9 +229,11 @@ public class ExtractZonalNetwork {
 					String s = String.format("%s,%.0f,%.0f,%.6f,%.6f,%s,%.0f,%.0f,%.6f,%.6f,%f\n", 
 							fId.toString(),
 							fCoord.getX(), fCoord.getY(),
+//							"NA","NA",
 							fCoordWGS.getX(), fCoordWGS.getY(),
 							tId.toString(),
 							tCoord.getX(), tCoord.getY(),
+//							"NA", "NA",
 							tCoordWGS.getX(), tCoordWGS.getY(),
 							weight );
 					bw.write(s);
