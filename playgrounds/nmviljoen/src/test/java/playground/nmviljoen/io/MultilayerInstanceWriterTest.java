@@ -20,7 +20,6 @@
 
 package playground.nmviljoen.io;
 
-<<<<<<< HEAD
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -43,22 +42,11 @@ import playground.nmviljoen.gridExperiments.GridExperiment;
 import playground.nmviljoen.gridExperiments.GridExperiment.Archetype;
 import playground.nmviljoen.gridExperiments.NmvLink;
 import playground.nmviljoen.gridExperiments.NmvNode;
-=======
-import static org.junit.Assert.*;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-
-import playground.nmviljoen.gridExperiments.GridExperiment;
-import playground.nmviljoen.gridExperiments.GridExperiment.Archetype;
->>>>>>> 905d616477... Interim commit to deal with xml writing
 
 public class MultilayerInstanceWriterTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-<<<<<<< HEAD
 	public void testExperiment(){
 		GridExperiment experiment = buildExperiment();
 		
@@ -212,18 +200,6 @@ public class MultilayerInstanceWriterTest {
 		experiment.addShortestPath(l2.getId(), l1.getId(), spba);
 		
 		return experiment;
-=======
-	public void testV1() {
-		GridExperiment experiment = new GridExperiment();
-		experiment.setArchetype(Archetype.MALIK);
-		experiment.setInstanceNumber(1);
-		
-		try{
-			new MultilayerInstanceWriter(experiment).writeV1(utils.getOutputDirectory() + "test.xml.gz");
-		} catch(Exception e){
-			fail("Should write without throwing exception.");
-		}
->>>>>>> 905d616477... Interim commit to deal with xml writing
 	}
 
 }

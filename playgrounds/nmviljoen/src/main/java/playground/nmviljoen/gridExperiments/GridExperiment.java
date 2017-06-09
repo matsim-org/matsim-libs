@@ -23,21 +23,17 @@
  */
 package playground.nmviljoen.gridExperiments;
 
-<<<<<<< HEAD
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-=======
->>>>>>> 905d616477... Interim commit to deal with xml writing
 import org.apache.log4j.Logger;
 
 import edu.uci.ics.jung.graph.DirectedGraph;
 
 /**
-<<<<<<< HEAD
  * A container for the multilayer network experiments. This is mainly for Nadia
  * Viljoen's PhD work, but may be useful elsewhere too. The container represents
  * a specific problem instance, which contains a specific physical network, a 
@@ -46,9 +42,6 @@ import edu.uci.ics.jung.graph.DirectedGraph;
  * physical and logical network, and the shortest path sets between the logical
  * nodes.
  * 
-=======
- *
->>>>>>> 905d616477... Interim commit to deal with xml writing
  * @author jwjoubert
  */
 public class GridExperiment {
@@ -56,13 +49,10 @@ public class GridExperiment {
 	private Archetype archetype = null;
 	private int instanceNumber = 0;
 	private DirectedGraph<NmvNode, NmvLink> physicalNetwork = null;
-<<<<<<< HEAD
 	private DirectedGraph<NmvNode, NmvLink> logicalNetwork = null;
 	Map<String, String> logicalToPhysicalMap = new TreeMap<>();
 	Map<String, String> physicalToLogicalMap = new TreeMap<>();
 	Map<String, Map<String, Set<List<String>>>> shortestPathSets = new TreeMap<>();
-=======
->>>>>>> 905d616477... Interim commit to deal with xml writing
 	
 	public GridExperiment() {
 	}
@@ -97,7 +87,6 @@ public class GridExperiment {
 		return this.physicalNetwork;
 	}
 	
-<<<<<<< HEAD
 	public void setLogicalNetwork(DirectedGraph<NmvNode, NmvLink> network){
 		this.logicalNetwork = network;
 	}
@@ -168,26 +157,11 @@ public class GridExperiment {
 			this.shortName = shortName;
 			this.description = longName;
 			this.acronym = acronym;
-=======
-	
-	public enum Archetype{
-		MALIK("Malik", "Some longer description for Malik network"),
-		NAVABI("Navabi", "Some longer description for Navabi network"),
-		RESSLER("Ressler", "Some longer description for Ressler network");
-		
-		private String shortName;
-		private String longName;
-		
-		private Archetype(String shortName, String longName) {
-			this.shortName = shortName;
-			this.longName = longName;
->>>>>>> 905d616477... Interim commit to deal with xml writing
 		}
 		
 		public String getShortName(){
 			return this.shortName;
 		}
-<<<<<<< HEAD
 		
 		public String getDescription(){
 			return this.description;
@@ -210,8 +184,6 @@ public class GridExperiment {
 		}
 		
 		
-=======
->>>>>>> 905d616477... Interim commit to deal with xml writing
 	}
 	
 }

@@ -162,9 +162,6 @@ public class MultilayerInstanceWriterHandlerImpl_v1 implements
 	}
 
 	
-	
-	
-	
 	@Override
 	public void startAssociations(BufferedWriter out) throws IOException {
 		out.write("\n\t<associations>\n");
