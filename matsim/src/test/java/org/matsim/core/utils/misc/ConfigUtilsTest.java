@@ -21,6 +21,7 @@ package org.matsim.core.utils.misc;
 
 import java.io.IOException;
 
+import org.hamcrest.core.AnyOf;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,6 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
+import static org.hamcrest.CoreMatchers.*;
 
 /**
  * @author mrieser
@@ -69,7 +71,8 @@ public class ConfigUtilsTest {
 		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		Assert.assertEquals("network.xml", config.network().getInputFile());
 		ConfigUtils.modifyFilePaths(config, "/home/username/matsim");
-		Assert.assertEquals("/home/username/matsim/network.xml", config.network().getInputFile());
+		Assert.assertThat(config.network().getInputFile(), anyOf(is("/home/username/matsim/network.xml"),is("/home/username/matsim\\network.xml")));
+
 	}
 
 	@Test
@@ -77,7 +80,7 @@ public class ConfigUtilsTest {
 		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		Assert.assertEquals("network.xml", config.network().getInputFile());
 		ConfigUtils.modifyFilePaths(config, "/home/username/matsim/");
-		Assert.assertEquals("/home/username/matsim/network.xml", config.network().getInputFile());
+		Assert.assertThat(config.network().getInputFile(), anyOf(is("/home/username/matsim/network.xml"),is("/home/username/matsim\\network.xml")));
 	}
 
 }
