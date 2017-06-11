@@ -38,7 +38,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.agarwalamit.opdyts.DistanceDistribution;
-import playground.agarwalamit.opdyts.OpdytsModalStatsControlerListener;
+import playground.agarwalamit.opdyts.analysis.OpdytsModalStatsControlerListener;
 import playground.agarwalamit.opdyts.OpdytsScenario;
 import playground.agarwalamit.utils.FileUtils;
 

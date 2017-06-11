@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.opdyts;
+package playground.agarwalamit.opdyts.analysis;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -40,6 +40,8 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.modalShare.FilteredModalShareEventHandler;
 import playground.agarwalamit.analysis.tripDistance.LegModeBeelineDistanceDistributionHandler;
+import playground.agarwalamit.opdyts.DistanceDistribution;
+import playground.agarwalamit.opdyts.ObjectiveFunctionEvaluator;
 import playground.agarwalamit.opdyts.equil.EquilMixedTrafficObjectiveFunctionPenalty;
 
 /**
@@ -50,6 +52,9 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
 
     @Inject
     private EventsManager events;
+
+    public static final String OPDYTS_STATS_LABEL_STARTER = "iterationNr";
+    public static final String OPDYTS_STATS_FILE_NAME = "opdyts_modalStats";
 
     private final FilteredModalShareEventHandler modalShareEventHandler = new FilteredModalShareEventHandler();
     private final DistanceDistribution referenceStudyDistri ;
@@ -76,10 +81,10 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
 
     @Override
     public void notifyStartup(StartupEvent event) {
-        String outFile = event.getServices().getConfig().controler().getOutputDirectory() + "/opdyts_modalStats.txt";
+        String outFile = event.getServices().getConfig().controler().getOutputDirectory() + "/"+OPDYTS_STATS_FILE_NAME+".txt";
         writer = IOUtils.getBufferedWriter(outFile);
         try {
-            StringBuilder stringBuilder = new StringBuilder("iterationNr" + "\t");
+            StringBuilder stringBuilder = new StringBuilder(OPDYTS_STATS_LABEL_STARTER + "\t");
             mode2consider.stream().forEach(mode -> stringBuilder.append("legs_"+mode+ "\t"));
             mode2consider.stream().forEach(mode -> stringBuilder.append("asc_"+mode+ "\t"));
             mode2consider.stream().forEach(mode -> stringBuilder.append("util_trav_"+mode+ "\t"));
