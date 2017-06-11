@@ -30,7 +30,9 @@ import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
 
 /**
  * Created by amit on 11.06.17.
@@ -38,14 +40,20 @@ import org.matsim.vehicles.VehicleType;
 
 public class BerlinTransitVehicleTypeIdentifier {
 
+    public enum BerlinTransitEmissionVehicleType {
+        BUS_AS_HGV, TRAINS_AS_ZERO_EMISSIONS
+    }
+
     private static final Logger LOGGER = Logger.getLogger(BerlinTransitVehicleTypeIdentifier.class);
     private final Map<HbefaVehicleCategory,List<Id<VehicleType>>> vehicleCategoryToVehicleTypeList = new HashMap<>();
+    private Vehicles transitVehicles;
+    private final Map<Id<Vehicle>, BerlinTransitEmissionVehicleType> transitVehicleType2BerlinVehicleType = new HashMap<>();
 
     public BerlinTransitVehicleTypeIdentifier (final String vehiclesFile) {
         run(vehiclesFile);
     }
 
-    public HbefaVehicleCategory getHBEFAVehicleCategory(final Id<VehicleType> vehicleTypeId) {
+    private HbefaVehicleCategory getHBEFAVehicleCategoryFromVehicleType(final Id<VehicleType> vehicleTypeId) {
         for (Map.Entry<HbefaVehicleCategory,List<Id<VehicleType>>> e : vehicleCategoryToVehicleTypeList.entrySet()) {
             if (e.getValue().contains(vehicleTypeId)) {
                 return e.getKey();
@@ -56,11 +64,22 @@ public class BerlinTransitVehicleTypeIdentifier {
         return HbefaVehicleCategory.PASSENGER_CAR;
     }
 
+    public BerlinTransitEmissionVehicleType getBerlinTransitEmissionVehicleType (final Id<Vehicle> vehicleId) {
+        if ( getHBEFAVehicleCategory(vehicleId).equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE) ) return BerlinTransitEmissionVehicleType.BUS_AS_HGV;
+        else return BerlinTransitEmissionVehicleType.TRAINS_AS_ZERO_EMISSIONS;
+    }
+
+    public HbefaVehicleCategory getHBEFAVehicleCategory(final Id<Vehicle> vehicleId) {
+        Id<VehicleType> vehicleTypeId = transitVehicles.getVehicles().get(vehicleId).getType().getId();
+        return getHBEFAVehicleCategoryFromVehicleType(vehicleTypeId);
+    }
+
     private void run (final String vehiclesFile) {
         Config config = ConfigUtils.createConfig();
         config.transit().setUseTransit(true);
         config.transit().setVehiclesFile(vehiclesFile);
         Scenario scenario = ScenarioUtils.loadScenario(config);
+        this.transitVehicles = scenario.getTransitVehicles();
 
         // get info from transit vehicles
         // trains/trams will be emission free, rest will be HGV
@@ -68,7 +87,7 @@ public class BerlinTransitVehicleTypeIdentifier {
         vehicleCategoryToVehicleTypeList.put(HbefaVehicleCategory.ZERO_EMISSION_VEHICLE, new ArrayList<>());
         vehicleCategoryToVehicleTypeList.put(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE, new ArrayList<>());
 
-        for(VehicleType vehicleType : scenario.getTransitVehicles().getVehicleTypes().values()) {
+        for(VehicleType vehicleType : this.transitVehicles.getVehicleTypes().values()) {
             String description = vehicleType.getDescription();
             if (description.equals("S Default") || description.equals("Regio Default") ||
                     description.equals("Bahn Default") || description.equals("Fern Default") || description.equals("Default Tram") ||

@@ -83,5 +83,10 @@ public class BerlinEmissionAnalyzer {
         emissionEventWriter.closeFile();
 
         emissionModule.writeEmissionInformation();
+
+
+
+        // BerlinTransitEmissionVehicleType --> will help to identify BUS/TRAIN
+
     }
 }
