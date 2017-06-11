@@ -164,7 +164,7 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
             Map<String, PlanCalcScoreConfigGroup.ModeParams> mode2Params = config.planCalcScore().getModes();
 
             StringBuilder stringBuilder = new StringBuilder(iteration + "\t");
-            mode2consider.stream().forEach(mode-> stringBuilder.append( mode2Legs.containsKey(mode) ? mode2Legs.get(mode) : String.valueOf(0) +"\t"));
+            mode2consider.stream().forEach(mode-> stringBuilder.append( mode2Legs.containsKey(mode) ? mode2Legs.get(mode) + "\t" : String.valueOf(0) + "\t"));
             mode2consider.stream().forEach(mode -> stringBuilder.append(mode2Params.get(mode).getConstant()+"\t"));
             mode2consider.stream().forEach(mode -> stringBuilder.append(mode2Params.get(mode).getMarginalUtilityOfTraveling()+"\t"));
             mode2consider.stream().forEach(mode -> stringBuilder.append(mode2Params.get(mode).getMarginalUtilityOfDistance()+"\t"));

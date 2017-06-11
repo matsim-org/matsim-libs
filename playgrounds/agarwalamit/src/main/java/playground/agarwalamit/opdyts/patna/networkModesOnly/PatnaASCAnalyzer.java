@@ -74,6 +74,7 @@ public class PatnaASCAnalyzer {
         config.controler().setOutputDirectory(outDir+"/bikeASC"+ascBike+"_motorbikeASC"+ascMotorbike+"/");
         config.planCalcScore().getModes().get("bike").setConstant(ascBike);
         config.planCalcScore().getModes().get("motorbike").setConstant(ascMotorbike);
+        config.strategy().setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
         new PatnaNetworkModesPlansRelaxor().run(config);
     }
 }
