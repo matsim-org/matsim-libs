@@ -43,7 +43,7 @@ import playground.benjamin.scenarios.manteuffel.ManteuffelEmissionVehicleGenerat
  *
  */
 public class BerlinEmissionVehicleFromEvents {
-	private static final Logger logger = Logger.getLogger(ManteuffelEmissionVehicleGenerator.class);
+	private static final Logger logger = Logger.getLogger(BerlinEmissionVehicleFromEvents.class);
 
 	private final String populationFile = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/ITERS/it.100/bvg.run189.10pct.100.plans.filtered.selected.xml.gz";
 	private final String netFile = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/emissionsRelatedFiles/rev554B-bvg00-0.1sample.network_withRoadTypes.xml";
