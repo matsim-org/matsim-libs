@@ -19,7 +19,15 @@
 
 package playground.agarwalamit.berlin.berlinBVG09;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.EmissionModule;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -29,7 +37,12 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.vehicles.Vehicle;
+import playground.agarwalamit.analysis.emission.filtering.FilteredEmissionPersonEventHandler;
 import playground.agarwalamit.utils.FileUtils;
+import playground.agarwalamit.utils.MapUtils;
+import playground.kai.usecases.combinedEventsReader.CombinedMatsimEventsReader;
 
 /**
  *
@@ -46,18 +59,97 @@ public class BerlinEmissionAnalyzer {
 
     private final String vehiclesFile = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/emissionsRelatedFiles/bvg.run189.10pct.100.emissionVehicle.xml.gz";
     private final String roadTypeMappingFile = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/emissionsRelatedFiles/rev554B-bvg00-0.1sample.roadTypeMapping.txt";
-    private final String eventsFile = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/emissionsRelatedFiles/bvg.run189.10pct.100.events.filtered.converted.xml.gz";
+    private final String eventsFile = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/emissionsRelatedFiles/bvg.run189.10pct.100.eventsWithNetworkModeInEvents.xml.gz";
 
     private final String averageFleetColdEmissionFactorsFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/hbefa-files/v3.1/EFA_ColdStart_vehcat_2005average.txt";
     private final String averageFleetWarmEmissionFactorsFile = FileUtils.SHARED_SVN+"/projects/detailedEval/matsim-input-files/hbefa-files/v3.1/EFA_HOT_vehcat_2005average.txt";
 
     private final String eventsFileWithEmissionEvents = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/emissionsRelatedFiles/bvg.run189.10pct.100.eventsWithEmissionEvents.xml.gz";
 
+    private final String finalEmissionInfo = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/emissionsRelatedFiles/emissionResults.txt";
+
     public static void main(String[] args) {
-        new BerlinEmissionAnalyzer().run();
+        BerlinEmissionAnalyzer berlinEmissionAnalyzer = new BerlinEmissionAnalyzer();
+        berlinEmissionAnalyzer.createEmissionEventsFile();
+        berlinEmissionAnalyzer.analyseEmissionEvents();
     }
 
-    private void run(){
+    private void analyseEmissionEvents(){
+        String transitVehicleFile = FileUtils.SHARED_SVN+"/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/transitVehicles.final.xml.gz";
+        BerlinTransitVehicleTypeIdentifier berlinTransitVehicleTypeIdentifier = new BerlinTransitVehicleTypeIdentifier(transitVehicleFile);
+
+        //read event file and analyze emissions
+        EventsManager eventsManager = EventsUtils.createEventsManager();
+        FilteredEmissionPersonEventHandler emissionPersonEventHandler = new FilteredEmissionPersonEventHandler();
+        eventsManager.addHandler(emissionPersonEventHandler);
+
+        Map<Id<Person>,Id<Vehicle>> transitDriver2TransitVehicle = new HashMap<>();
+        eventsManager.addHandler(new TransitDriverStartsEventHandler() {
+            @Override
+            public void handleEvent(TransitDriverStartsEvent event) {
+                transitDriver2TransitVehicle.put(event.getDriverId(), event.getVehicleId());
+            }
+
+            @Override
+            public void reset(int iteration) {
+                transitDriver2TransitVehicle.clear();
+            }
+        });
+
+        CombinedMatsimEventsReader reader = new CombinedMatsimEventsReader(eventsManager);
+        reader.readFile(eventsFileWithEmissionEvents);
+
+        //
+        Map<String, Map<String, Double>> vehicleType2Emissions = new HashMap<>();
+        vehicleType2Emissions.put(BerlinPersonFilter.BerlinUserGroup.carUsers_berlin.toString(),new HashMap<>());
+        vehicleType2Emissions.put(BerlinPersonFilter.BerlinUserGroup.carUsers_brandenburger.toString(),new HashMap<>());
+        vehicleType2Emissions.put(BerlinPersonFilter.BerlinUserGroup.carUsers_airport.toString(),new HashMap<>());
+        vehicleType2Emissions.put(BerlinPersonFilter.BerlinUserGroup.carUsers_tourists.toString(),new HashMap<>());
+        vehicleType2Emissions.put(BerlinPersonFilter.BerlinUserGroup.commercial.toString(),new HashMap<>());
+        vehicleType2Emissions.put(BerlinPersonFilter.BerlinUserGroup.freight.toString(),new HashMap<>());
+        vehicleType2Emissions.put(BerlinTransitVehicleTypeIdentifier.BerlinTransitEmissionVehicleType.BUS_AS_HGV.toString(),new HashMap<>());
+        vehicleType2Emissions.put(BerlinTransitVehicleTypeIdentifier.BerlinTransitEmissionVehicleType.TRAINS_AS_ZERO_EMISSIONS.toString(),new HashMap<>());
+
+        Map<Id<Vehicle>, Map<String, Double>> vehicleId2TotalEmissions = emissionPersonEventHandler.getVehicleId2TotalEmissions();
+        BerlinPersonFilter berlinPersonFilter = new BerlinPersonFilter();
+        for(Id<Vehicle> vehicleId : vehicleId2TotalEmissions.keySet()) {
+            Id<Person> personId = Id.createPersonId(vehicleId);
+
+            // check if transit driver
+            if (transitDriver2TransitVehicle.containsKey(personId)) {
+                String userGroup = berlinTransitVehicleTypeIdentifier.getBerlinTransitEmissionVehicleType(vehicleId).toString();
+                Map<String, Double> emissionsSoFar =  vehicleType2Emissions.get(userGroup);
+                Map<String, Double> totalEmissions = MapUtils.addMaps(emissionsSoFar, vehicleId2TotalEmissions.get(vehicleId));
+                vehicleType2Emissions.put(userGroup, totalEmissions);
+            } else {
+                String userGroup = berlinPersonFilter.getUserGroupAsStringFromPersonId(personId);
+                if (vehicleType2Emissions.containsKey(userGroup)) {
+                    Map<String, Double> emissionsSoFar =  vehicleType2Emissions.get(userGroup);
+                    Map<String, Double> totalEmissions = MapUtils.addMaps(emissionsSoFar, vehicleId2TotalEmissions.get(vehicleId));
+                    vehicleType2Emissions.put(userGroup, totalEmissions);
+                } else {
+                    //skip other user groups
+                }
+            }
+        }
+
+        BufferedWriter writer = IOUtils.getBufferedWriter(finalEmissionInfo);
+        try {
+            writer.write("userGroup\tpollutant\tamountInGm\n");
+
+            for(String ug : vehicleType2Emissions.keySet()){
+                for(String pollutant : vehicleType2Emissions.get(ug).keySet()) {
+                    writer.write(ug+"\t"+pollutant+"\t"+vehicleType2Emissions.get(ug).get(pollutant));
+                    writer.newLine();
+                }
+            }
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Data is not written/read. Reason : " + e);
+        }
+    }
+
+    private void createEmissionEventsFile(){
         Config config = ConfigUtils.createConfig();
         config.network().setInputFile(networkFile); // need to find network file
         config.vehicles().setVehiclesFile(vehiclesFile); // need to create vehicles file
@@ -83,10 +175,5 @@ public class BerlinEmissionAnalyzer {
         emissionEventWriter.closeFile();
 
         emissionModule.writeEmissionInformation();
-
-
-
-        // BerlinTransitEmissionVehicleType --> will help to identify BUS/TRAIN
-
     }
 }

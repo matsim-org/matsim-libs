@@ -54,7 +54,7 @@ public class BerlinEmissionVehicleFromEvents implements VehicleEntersTrafficEven
 
 	public static void main(String[] args) {
 		String transitVehicleFile = FileUtils.SHARED_SVN+"/projects/bvg_3_bln_inputdata/rev554B-bvg00-0.1sample/network/transitVehicles.final.xml.gz";
-		String convertedEventsFile = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/emissionsRelatedFiles/bvg.run189.10pct.100.events.filtered.converted.xml.gz";
+		String convertedEventsFile = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/emissionsRelatedFiles/bvg.run189.10pct.100.eventsWithNetworkModeInEvents.xml.gz";
 		String outputVehiclesFile = FileUtils.RUNS_SVN+"/berlin-bvg09/bvg.run189.10pct/emissionsRelatedFiles/bvg.run189.10pct.100.emissionVehicle.xml.gz";
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();

@@ -43,6 +43,7 @@ public class BerlinEventsConverter {
 
         EventsConverterXML converter = new EventsConverterXML(em);
         converter.readFile(eventsFile);
+
         eventWriter.closeFile();
     }
 }
