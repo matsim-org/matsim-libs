@@ -10,7 +10,7 @@ public class ModalShareDistanceBinContainer extends DistanceBinContainer {
     public static final Logger log = Logger.getLogger(ModalShareDistanceBinContainer.class);
 
     enum Mode {
-        CAR, PT, SLOW_PT, FAST_PT, WALK, BIKE, OTHER
+        CAR, PT, PT_SLOW, PT_FAST, WALK, BIKE, OTHER
     }
 
     ModalShareDistanceBinContainer(int binSize) {
@@ -33,9 +33,9 @@ public class ModalShareDistanceBinContainer extends DistanceBinContainer {
                 return 0;
             case PT:
                 return 1;
-            case SLOW_PT:
+            case PT_SLOW:
                 return 2;
-            case FAST_PT:
+            case PT_FAST:
                 return 3;
             case WALK:
                 return 4;
