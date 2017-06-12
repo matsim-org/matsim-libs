@@ -36,7 +36,7 @@ public class InducedDemandPersonAttributes {
 		//new ObjectAttributesXmlReader(bla).readFile(args[0]);
 		new ObjectAttributesXmlReader(bla);
 		
-		
+		int c = 0;
 		//create personAttributes, one typical duration per each activity
 		
 		
@@ -80,7 +80,8 @@ public class InducedDemandPersonAttributes {
 							
 							if (((Activity)pe).getType().equals(((Activity)plan.getPlanElements().get(0)).getType())) {
 								duration = firstHomeActivity.getEndTime() + 24 * 3600.0 - ((Activity) pe).getStartTime();
-
+								if (duration < 15 * 60)
+									duration = 900.0;	
 								bla.putAttribute(p.getId().toString(), "typicalDuration_" + type + "_" + 1, duration);
 								bla.putAttribute(p.getId().toString(), "minimalDuration_" + type + "_" + 1, 0.0);
 								bla.putAttribute(p.getId().toString(), "latestStartTime_" + type + "_" + 1, 86400.0);
@@ -133,7 +134,10 @@ public class InducedDemandPersonAttributes {
 				}
 				
 			}
-			scenario2.getPopulation().addPerson(p);
+			if (((Activity)plan.getPlanElements().get(plan.getPlanElements().size() - 1)).getType().equals(((Activity)plan.getPlanElements().get(0)).getType()))
+				scenario2.getPopulation().addPerson(p);
+			else
+				c++;
 			p.getPlans().clear();
 			p.addPlan(plan);
 			p.setSelectedPlan(plan);
@@ -222,11 +226,11 @@ public class InducedDemandPersonAttributes {
 
 			
 		}*/
-		PopulationWriter populationWriter = new PopulationWriter(scenario.getPopulation());
+		PopulationWriter populationWriter = new PopulationWriter(scenario2.getPopulation());
 		populationWriter.writeV5(args[4]);
 		ObjectAttributesXmlWriter betaWriter = new ObjectAttributesXmlWriter(bla);
 		betaWriter.writeFile(args[3]);		
-		
+		System.out.println(c);
 		
 	}
 
