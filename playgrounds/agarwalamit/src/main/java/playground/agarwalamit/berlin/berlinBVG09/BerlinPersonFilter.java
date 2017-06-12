@@ -67,7 +67,7 @@ public class BerlinPersonFilter implements PersonFilter {
 
     @Override
     public String getUserGroupAsStringFromPersonId(Id<Person> personId) {
-        return null;
+        return getUserGroup(personId).toString();
     }
 
     @Override

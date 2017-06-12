@@ -65,11 +65,15 @@ public class BerlinTransitVehicleTypeIdentifier {
     }
 
     public BerlinTransitEmissionVehicleType getBerlinTransitEmissionVehicleType (final Id<Vehicle> vehicleId) {
-        if ( getHBEFAVehicleCategory(vehicleId).equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE) ) return BerlinTransitEmissionVehicleType.BUS_AS_HGV;
+        HbefaVehicleCategory hbefaVehicleCategory = getHBEFAVehicleCategory(vehicleId);
+        if ( hbefaVehicleCategory.equals(HbefaVehicleCategory.HEAVY_GOODS_VEHICLE) ) return BerlinTransitEmissionVehicleType.BUS_AS_HGV;
         else return BerlinTransitEmissionVehicleType.TRAINS_AS_ZERO_EMISSIONS;
     }
 
     public HbefaVehicleCategory getHBEFAVehicleCategory(final Id<Vehicle> vehicleId) {
+        if (! transitVehicles.getVehicles().containsKey(vehicleId)) {
+            throw new RuntimeException("Vehicle id"+ vehicleId+ " is not a transit vehicle id.");
+        }
         Id<VehicleType> vehicleTypeId = transitVehicles.getVehicles().get(vehicleId).getType().getId();
         return getHBEFAVehicleCategoryFromVehicleType(vehicleTypeId);
     }

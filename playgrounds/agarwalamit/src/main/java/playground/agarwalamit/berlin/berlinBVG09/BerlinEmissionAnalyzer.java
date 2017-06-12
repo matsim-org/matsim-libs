@@ -100,7 +100,7 @@ public class BerlinEmissionAnalyzer {
         reader.readFile(eventsFileWithEmissionEvents);
 
         //
-        Map<String, Map<String, Double>> vehicleType2Emissions = new HashMap<>();
+        Map<String, Map<String, Double>> vehicleType2Emissions = new HashMap<>(); // required vehicle types only
         vehicleType2Emissions.put(BerlinPersonFilter.BerlinUserGroup.carUsers_berlin.toString(),new HashMap<>());
         vehicleType2Emissions.put(BerlinPersonFilter.BerlinUserGroup.carUsers_brandenburger.toString(),new HashMap<>());
         vehicleType2Emissions.put(BerlinPersonFilter.BerlinUserGroup.carUsers_airport.toString(),new HashMap<>());
@@ -112,12 +112,14 @@ public class BerlinEmissionAnalyzer {
 
         Map<Id<Vehicle>, Map<String, Double>> vehicleId2TotalEmissions = emissionPersonEventHandler.getVehicleId2TotalEmissions();
         BerlinPersonFilter berlinPersonFilter = new BerlinPersonFilter();
-        for(Id<Vehicle> vehicleId : vehicleId2TotalEmissions.keySet()) {
+
+        for(Id<Vehicle> vehicleId : vehicleId2TotalEmissions.keySet()) { // all vehicles
             Id<Person> personId = Id.createPersonId(vehicleId);
 
             // check if transit driver
             if (transitDriver2TransitVehicle.containsKey(personId)) {
-                String userGroup = berlinTransitVehicleTypeIdentifier.getBerlinTransitEmissionVehicleType(vehicleId).toString();
+                Id<Vehicle> transitVehicle = transitDriver2TransitVehicle.get(personId);
+                String userGroup = berlinTransitVehicleTypeIdentifier.getBerlinTransitEmissionVehicleType(transitVehicle).toString();
                 Map<String, Double> emissionsSoFar =  vehicleType2Emissions.get(userGroup);
                 Map<String, Double> totalEmissions = MapUtils.addMaps(emissionsSoFar, vehicleId2TotalEmissions.get(vehicleId));
                 vehicleType2Emissions.put(userGroup, totalEmissions);
