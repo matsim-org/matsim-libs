@@ -19,6 +19,7 @@
 
 package playground.agarwalamit.opdyts.analysis;
 
+import java.io.File;
 import playground.agarwalamit.analysis.FileMerger;
 import playground.agarwalamit.utils.FileUtils;
 
@@ -29,19 +30,18 @@ import playground.agarwalamit.utils.FileUtils;
 public class OpdytsModalStatsFileMerger {
 
     public static void main(String[] args) {
-
-//        double [] ascTrials = {-3.0, -2.5, -2.0, 1.0, 1.5, 2.0, 2.5, 3.0};
-        double [] ascTrials = {-3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0};
+        double [] ascTrialsMotorbike = {-3.0, -2.5, -2.0, -1.5, -1.0, -0.5, 0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0};
+        double [] ascTrialsBike = { -1.0, -0.5, 0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0};
         String fileDir = FileUtils.RUNS_SVN+"/opdyts/patna/output_networkModes/ascAnalysis/";
         String outFile = fileDir + "/mergedOpdytsStatsFile.txt";
 
         FileMerger opdytsModalStatsFileMerger = new FileMerger(OpdytsModalStatsControlerListener.OPDYTS_STATS_LABEL_STARTER);
         opdytsModalStatsFileMerger.mergeTo(outFile);
 
-        for (double ascBike : ascTrials) {
-            for (double ascMotorbike : ascTrials) {
+        for (double ascBike : ascTrialsBike) {
+            for (double ascMotorbike : ascTrialsMotorbike) {
                 String file = fileDir + "/bikeASC"+ascBike+"_motorbikeASC"+ascMotorbike+"/"+OpdytsModalStatsControlerListener.OPDYTS_STATS_FILE_NAME+".txt";
-                opdytsModalStatsFileMerger.readAndMerge(file);
+                if (new File(file).exists()) opdytsModalStatsFileMerger.readAndMerge(file);
             }
         }
         opdytsModalStatsFileMerger.finish();
