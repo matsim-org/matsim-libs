@@ -36,24 +36,54 @@ import playground.agarwalamit.analysis.modeSwitcherRetainer.ModeSwitchersTripTim
 
 public class ModeSwitcherAnalyser {
 
-
     public static void main(String[] args) {
-        String dir = "/Users/ihab/Documents/workspace/runs-svn/cne/munich/output-final/";
+        ModeSwitcherAnalyser modeSwitcherAnalyser = new ModeSwitcherAnalyser();
+        modeSwitcherAnalyser.analyseForBerlin();
+        modeSwitcherAnalyser.analyseForMunich();
+    }
 
-        // munich
+    public void analyseForMunich() {
+        String dir = "/Users/ihab/Documents/workspace/runs-svn/cne/munich/output-final/";
+//        String dir = FileUtils.RUNS_SVN+"/cne/munich/output-final/";
+
         String [] cases = {
                 "output_run0_muc_bc","output_run0b_muc_bc"
-//                ,"output_run1_muc_c_QBPV3","output_run1b_muc_c_QBPV3"
-//                ,"output_run2_muc_c_QBPV9","output_run2b_muc_c_QBPV9"
-//                ,"output_run3_muc_c_DecongestionPID","output_run3b_muc_c_DecongestionPID"
-//                ,"output_run3_muc_c_DecongestionPID","output_run3b_muc_c_DecongestionPID"
-//                ,"output_run3-BB_muc_c_DecongestionBangBang","output_run3b-BB_muc_c_DecongestionBangBang"
                 ,"output_run4_muc_cne_DecongestionPID","output_run4b_muc_cne_DecongestionPID"
-//                ,"output_run4-BB_muc_cne_DecongestionBangBang","output_run4b-BB_muc_cne_DecongestionBangBang"
-//                ,"output_run5_muc_cne_QBPV3","output_run5b_muc_cne_QBPV3"
-//                ,"output_run6_muc_cne_QBPV9","output_run6b_muc_cne_QBPV9"
-//                ,"output_run7_muc_n","output_run7b_muc_n"
-//                ,"output_run8_muc_e","output_run8b_muc_e"
+        };
+
+        int [] its = {1000, 1500};
+
+        for (String str : cases) {
+
+            String firstIterationFile = dir + "/" + str + "/ITERS/it." + its[0]+"/"+its[0]+".events.xml.gz";
+            String lastIterationFile = dir + "/" + str + "/ITERS/it." + its[1]+"/"+its[1]+".events.xml.gz";
+
+            ModeSwitchersTripTime modeSwitchersTripTime = new ModeSwitchersTripTime();
+            modeSwitchersTripTime.processEventsFile(firstIterationFile, lastIterationFile);
+            Map<Id<Person>, List<Tuple<String, String>>> personId2ModeSwitches =  modeSwitchersTripTime.getPersonId2ModeSwitcherRetainerTripInfo();
+
+            try(BufferedWriter writer = IOUtils.getBufferedWriter( dir + "/" + str + "/modeSwitchesInfo.txt")) {
+                writer.write("personId\tmodeInFirstItr\tmodeInLastIt\ttripNumber\n");
+                for(Id<Person> personId : personId2ModeSwitches.keySet()) {
+                    int tripIndex = 1;
+                    for (Tuple<String, String> modeSwitch : personId2ModeSwitches.get(personId)) {
+                        writer.write(personId+"\t"+modeSwitch.getFirst()+"\t"+modeSwitch.getSecond()+"\t"+tripIndex+"\n");
+                        tripIndex++;
+                    }
+                }
+                writer.close();
+            } catch (IOException e) {
+                throw new RuntimeException("Data is not read/written. Reason " + e);
+            }
+        }
+    }
+
+    public void analyseForBerlin() {
+        String dir = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct-simpleNetwork/output_selectedPlans_flowCapFactor0.015_randomization/";
+
+        String [] cases = {
+                "m_r_output_run0_bln_bc","r_output_run0_bln_bc"
+                ,"m_r_output_run4_bln_cne_DecongestionPID","r_output_run4_bln_cne_DecongestionPID"
         };
 
         int [] its = {0, 100};
@@ -68,10 +98,11 @@ public class ModeSwitcherAnalyser {
             Map<Id<Person>, List<Tuple<String, String>>> personId2ModeSwitches =  modeSwitchersTripTime.getPersonId2ModeSwitcherRetainerTripInfo();
 
             try(BufferedWriter writer = IOUtils.getBufferedWriter( dir + "/" + str + "/modeSwitchesInfo.txt")) {
-                writer.write("personId\tmodeInFirstItr\tmodeInLastIt\n");
+                writer.write("personId\tmodeInFirstItr\tmodeInLastIt\ttripNumber\n");
                 for(Id<Person> personId : personId2ModeSwitches.keySet()) {
-                    for (Tuple<String, String> modeSwitch : personId2ModeSwitches.get(personId)) {
-                        writer.write(personId+"\t"+modeSwitch.getFirst()+"\t"+modeSwitch.getSecond()+"\n");
+                    for (int index = 1; index <= personId2ModeSwitches.get(personId).size() ; index++) {
+                        Tuple<String, String> modeSwitch = personId2ModeSwitches.get(personId).get(index);
+                        writer.write(personId+"\t"+modeSwitch.getFirst()+"\t"+modeSwitch.getSecond()+"\t"+index+"\n");
                     }
                 }
                 writer.close();
