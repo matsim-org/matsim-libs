@@ -12,6 +12,7 @@ import playground.dziemke.analysis.general.TripFilter;
 import playground.dziemke.utils.ShapeReader;
 
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * @author gthunig on 04.04.2017.
@@ -48,7 +49,8 @@ public class FromMatsimTripFilterImpl implements TripFilter {
         this.mode = Arrays.asList(mode);
     }
 
-    public void activateInt(Network network, String areaShapeFile) {
+    public void activateInt(Network network, String areaShapeFile, int areaId) {
+        this.areaId = areaId;
         assignNetwork(network);
         assignAreGeometry(areaShapeFile);
         this.onlyAnalyzeTripInteriorOfArea = true;
@@ -193,4 +195,36 @@ public class FromMatsimTripFilterImpl implements TripFilter {
         return outputDirectory;
     }
 
+    private boolean isOnlyAnalyzeTripsWithModeActivated(String identifier) {
+        return identifier.contains("[") && identifier.contains("]");
+    }
+
+    private String[] getModesFrom(String identifier) {
+        String modeContainingString = identifier.split(Pattern.quote("["))[1].split(Pattern.quote("]"))[0];
+        return modeContainingString.split(", ");
+    }
+
+    private boolean isOnlyAnalyzeTripInteriorOfAreaActivated(String identifier) {
+        return identifier.contains("_inside-");
+    }
+
+    private boolean isOnlyAnalyzeTripsStartingOrEndingInAreaActivated(String identifier) {
+        return identifier.contains("_soe-in-");
+    }
+
+    private boolean isOnlyAnalyzeTripsInDistanceRangeActivated(String identifier) {
+        return identifier.contains("_dist-");
+    }
+
+    private boolean isOnlyAnalyzeTripsWithActivityTypeBeforeTripActivated(String identifier) {
+        return identifier.contains("_act-bef-");
+    }
+
+    private boolean isOnlyAnalyzeTripsWithActivityTypeAfterTripActivated(String identifier) {
+        return identifier.contains("_act-aft-");
+    }
+
+    private boolean isOnlyAnalyzeTripsDoneByPeopleInAgeRangeActivated(String identifier) {
+        return identifier.contains("_age-");
+    }
 }
