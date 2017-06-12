@@ -70,7 +70,7 @@ public class EquilMixedTrafficIT {
 
     @Test
     public void runSameVehiclesTypesInTrips() {
-        Config config = ConfigUtils.loadConfig(EQUIL_DIR + "/config.xml");
+        Config config = ConfigUtils.loadConfig(EQUIL_DIR + "/config-with-mode-vehicles.xml");
         config.controler().setOutputDirectory(helper.getOutputDirectory());
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -127,7 +127,7 @@ public class EquilMixedTrafficIT {
      */
     @Test
     public void runDifferentVehiclesTypesInTrips() {
-        Config config = ConfigUtils.loadConfig(EQUIL_DIR + "/config.xml");
+        Config config = ConfigUtils.loadConfig(EQUIL_DIR + "/config-with-mode-vehicles.xml");
         String outDir = helper.getOutputDirectory();
         config.controler().setOutputDirectory(outDir);
 

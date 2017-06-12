@@ -73,6 +73,7 @@ public class SouthAfricaInflationCorrector {
 		inflationMap.put(2014, 0.061);
 		inflationMap.put(2015, 0.046);
 		inflationMap.put(2016, 0.064);
+		inflationMap.put(2017, 0.061); // up to and including April 2017
 	}
 	
 	/**

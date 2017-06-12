@@ -34,6 +34,10 @@ public class FromSrvTripFilterImpl implements TripFilter {
     private boolean onlyAnalyzeTripsDoneByPeopleInAgeRange; // "age"; this requires setting a CEMDAP file
     private int minAge = -1; // typically "x0"
     private int maxAge = -1; // typically "x9"; highest number usually chosen is 119
+    
+    private boolean onlyAnalyzeTripsInDepartureTimeWindow;
+    private double minDepartureTime_s;
+    private double maxDepartureTime_s;
 
     public void activateModeChoice(String mode) {
         onlyAnalyzeTripsWithMode = true;
@@ -70,6 +74,12 @@ public class FromSrvTripFilterImpl implements TripFilter {
         onlyAnalyzeTripsDoneByPeopleInAgeRange = true;
         this.minAge = minAge;
         this.maxAge = maxAge;
+    }
+    
+    public void activateDepartureTimeRange(double minDepartureTime_s, double maxDepartureTime_s) {
+    	onlyAnalyzeTripsInDepartureTimeWindow = true;
+        this.minDepartureTime_s = minDepartureTime_s;
+        this.maxDepartureTime_s = maxDepartureTime_s;
     }
 
     public List<? extends Trip> filter(List<? extends Trip> inputTrips) {
@@ -128,6 +138,13 @@ public class FromSrvTripFilterImpl implements TripFilter {
                     continue;
                 }
             }
+            
+            if (onlyAnalyzeTripsInDepartureTimeWindow && (trip.getDepartureTime_s()) > maxDepartureTime_s) {
+                continue;
+            }
+            if (onlyAnalyzeTripsInDepartureTimeWindow && (trip.getDepartureTime_s()) < minDepartureTime_s) {
+                continue;
+            }
 
             // activity times and durations
             if ((trip.getArrivalTime_s() < 0) || (trip.getDepartureTime_s() < 0) || (trip.getDuration_s() < 0) ) {
@@ -163,6 +180,9 @@ public class FromSrvTripFilterImpl implements TripFilter {
         }
         if (onlyAnalyzeTripsDoneByPeopleInAgeRange) {
             outputDirectory = outputDirectory + "_age-" + minAge + "-" + maxAge;
+        }
+        if (onlyAnalyzeTripsInDepartureTimeWindow) {
+            outputDirectory = outputDirectory + "_dep-time-" + (minDepartureTime_s / 3600.) + "-" + (maxDepartureTime_s / 3600.);
         }
         return outputDirectory;
     }

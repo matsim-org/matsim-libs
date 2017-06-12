@@ -21,6 +21,10 @@ package org.matsim.contrib.drt.optimizer;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.insertion.*;
+import org.matsim.contrib.drt.optimizer.insertion.filter.DistanceFilter;
+import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
+import org.matsim.contrib.drt.optimizer.insertion.filter.KNearestVehicleFilter;
+import org.matsim.contrib.drt.optimizer.insertion.filter.NoFilter;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.*;
 import org.matsim.contrib.dvrp.data.Fleet;
@@ -64,11 +68,20 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 		DrtSchedulerParams schedulerParams = new DrtSchedulerParams(drtCfg.getStopDuration());
 		DrtScheduler scheduler = new DrtScheduler(drtCfg, fleet, qSim.getSimTimer(), schedulerParams, travelTime);
 
+//		DrtVehicleFilter filter = new DistanceFilter(drtCfg.getEstimatedDrtSpeed()*drtCfg.getMaxWaitTime()*drtCfg.getEstimatedBeelineDistanceFactor());
+//		DrtVehicleFilter filter = new KNearestVehicleFilter(14);
+		DrtVehicleFilter filter = null;
+		if (drtCfg.getkNearestVehicles()>0){
+			filter = new KNearestVehicleFilter(drtCfg.getkNearestVehicles());
+		}
+		else {
+			filter = new NoFilter();
+		}
 		TravelDisutility travelDisutility = travelDisutilityFactory == null ? new TimeAsTravelDisutility(travelTime)
 				: travelDisutilityFactory.createTravelDisutility(travelTime);
 
 		DrtOptimizerContext optimContext = new DrtOptimizerContext(fleet, network, qSim.getSimTimer(), travelTime,
-				travelDisutility, scheduler, qSim.getEventsManager());
+				travelDisutility, scheduler, qSim.getEventsManager(),filter);
 
 		return drtCfg.getIdleVehiclesReturnToDepots() ? new InsertionDrtOptimizerWithDepots(optimContext, drtCfg)
 				: new InsertionDrtOptimizer(optimContext, drtCfg);

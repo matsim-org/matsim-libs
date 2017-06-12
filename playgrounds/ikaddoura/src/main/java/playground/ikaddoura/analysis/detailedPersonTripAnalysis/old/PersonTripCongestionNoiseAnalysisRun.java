@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ikaddoura.analysis.detailedPersonTripAnalysis;
+package playground.ikaddoura.analysis.detailedPersonTripAnalysis.old;
 
 import java.io.File;
 import java.io.IOException;

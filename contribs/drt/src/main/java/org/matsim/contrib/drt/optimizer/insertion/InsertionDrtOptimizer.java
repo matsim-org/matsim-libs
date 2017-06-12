@@ -71,7 +71,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 					optimContext.scheduler.getParams().stopDuration, drtCfg.getMaxWaitTime(), optimContext.timer);
 		}
 
-		insertionProblem = new ParallelMultiVehicleInsertionProblem(singleVehicleInsertionProblems);
+		insertionProblem = new ParallelMultiVehicleInsertionProblem(singleVehicleInsertionProblems,optimContext.filter);
 	}
 
 	@Override
@@ -86,9 +86,10 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 		}
 
 		VehicleData vData = new VehicleData(getOptimContext(), getOptimContext().fleet.getVehicles().values());
-
+		
 		Iterator<DrtRequest> reqIter = getUnplannedRequests().iterator();
 		while (reqIter.hasNext()) {
+			
 			DrtRequest req = reqIter.next();
 			BestInsertion best = insertionProblem.findBestInsertion(req, vData);
 			if (best == null) {

@@ -26,6 +26,7 @@ import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
+import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
 
 /**
  * @author michalm
@@ -49,9 +50,11 @@ public class ParallelMultiVehicleInsertionProblem {
 	private final int threads;
 	private final TaskGroup[] taskGroups;
 	private final ExecutorService executorService;
+	private final DrtVehicleFilter filter;
 
-	public ParallelMultiVehicleInsertionProblem(SingleVehicleInsertionProblem[] singleInsertionProblems) {
+	public ParallelMultiVehicleInsertionProblem(SingleVehicleInsertionProblem[] singleInsertionProblems, DrtVehicleFilter filter) {
 		threads = singleInsertionProblems.length;
+		this.filter = filter;
 		this.taskGroups = new TaskGroup[threads];
 		for (int i = 0; i < threads; i++) {
 			taskGroups[i] = new TaskGroup(singleInsertionProblems[i]);
@@ -60,14 +63,16 @@ public class ParallelMultiVehicleInsertionProblem {
 	}
 
 	public BestInsertion findBestInsertion(DrtRequest drtRequest, VehicleData vData) {
-		divideTasksIntoGroups(vData);
+		List<Entry> filteredVehicles = filter.applyFilter(drtRequest, vData);
+		divideTasksIntoGroups(filteredVehicles);
 		return findBestInsertion(submitTasks(drtRequest));
 	}
 
-	private void divideTasksIntoGroups(VehicleData vData) {
-		Iterator<Entry> vEntryIter = vData.getEntries().iterator();
-		int div = vData.getSize() / threads;
-		int mod = vData.getSize() % threads;
+	
+	private void divideTasksIntoGroups(List<Entry> filteredVehicles) {
+		Iterator<Entry> vEntryIter = filteredVehicles.iterator();
+		int div = filteredVehicles.size() / threads;
+		int mod = filteredVehicles.size() % threads;
 
 		for (int i = 0; i < threads; i++) {
 			int count = div + (i < mod ? 1 : 0);

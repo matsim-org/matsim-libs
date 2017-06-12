@@ -23,6 +23,7 @@ import org.matsim.core.controler.AbstractModule;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.NoiseAnalysisHandler;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.PersonMoneyLinkHandler;
 
 public class PersonTripAnalysisModule extends AbstractModule {
 	
@@ -31,9 +32,11 @@ public class PersonTripAnalysisModule extends AbstractModule {
 		
 		this.bind(BasicPersonTripAnalysisHandler.class).asEagerSingleton();
 		this.bind(NoiseAnalysisHandler.class).asEagerSingleton();
+		this.bind(PersonMoneyLinkHandler.class).asEagerSingleton();
 		
 		this.addEventHandlerBinding().to(BasicPersonTripAnalysisHandler.class);
 		this.addEventHandlerBinding().to(NoiseAnalysisHandler.class);
+		this.addEventHandlerBinding().to(PersonMoneyLinkHandler.class);
 		
 		this.addControlerListenerBinding().to(AnalysisControlerListener.class);
 	}

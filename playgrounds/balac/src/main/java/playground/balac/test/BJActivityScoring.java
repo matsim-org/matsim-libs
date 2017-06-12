@@ -58,8 +58,9 @@ public final class BJActivityScoring implements org.matsim.core.scoring.SumScori
 	
 	private static final Logger log = Logger.getLogger(BJActivityScoring.class);
 
-	public BJActivityScoring(final ScoringParameters params, Map<String, Double> slopesAfterTypical) {
-		this(params, new ActivityTypeOpeningIntervalCalculator(params));
+	public BJActivityScoring(final ScoringParameters params, Map<String, Double> slopesAfterTypical,
+			final OpeningIntervalCalculator openingIntervalCalculator) {
+		this(params, openingIntervalCalculator);
 		this.slopesAfterTypical = slopesAfterTypical;
 	}
 
@@ -172,7 +173,11 @@ public final class BJActivityScoring implements org.matsim.core.scoring.SumScori
 				tmpScore += utilPerf;
 			}
 			else if (duration > typicalDuration) {
-				double utilPerf = this.params.marginalUtilityOfPerforming_s * 3600.0 * 10.0 + this.slopesAfterTypical.get(act.getType()) * (duration - typicalDuration);
+				double utilPerf = 0.0;
+				if (act.getType().equals("home_1"))
+					utilPerf = this.params.marginalUtilityOfPerforming_s * 3600.0 * 10.0 + this.slopesAfterTypical.get(act.getType()) * (duration - typicalDuration);
+				else
+					utilPerf = this.params.marginalUtilityOfPerforming_s * 3600.0 * 10.0;
 				tmpScore += utilPerf;
 
 			}

@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * BuildNationalGrid.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -20,14 +21,32 @@
 /**
  * 
  */
-package org.matsim.contrib.analysis.vsp.traveltimes;
+package playground.jjoubert.projects.wb.freight;
+
+import org.apache.log4j.Logger;
+
+import playground.southafrica.utilities.Header;
+
 /**
- * @author  jbischoff
- * An Interface for Traveltime Validation
+ * Class to read a shapefile, build a grid, and serialise the grid. This is 
+ * because building the grid is computationally very expensive.
+ *  
+ * @author jwjoubert
  */
-/**
- *
- */
-public interface TravelTimeValidator {
-	double getTravelTime(CarTrip trip);
+public class GridBuilder {
+	final private static Logger LOG = Logger.getLogger(GridBuilder.class);
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Header.printHeader(GridBuilder.class.toString(), args);
+		
+		Header.printFooter();
+	}
+	
+	public static void buildGrid(String[] args){
+		
+	}
+
 }

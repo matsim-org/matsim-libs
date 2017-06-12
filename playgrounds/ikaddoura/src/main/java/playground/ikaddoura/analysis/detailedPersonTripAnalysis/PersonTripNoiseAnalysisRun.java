@@ -22,26 +22,26 @@ package playground.ikaddoura.analysis.detailedPersonTripAnalysis;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.events.NoiseEventsReader;
-import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.NoiseAnalysisHandler;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.PersonMoneyLinkHandler;
 
 /**
  * 
@@ -65,7 +65,6 @@ public class PersonTripNoiseAnalysisRun {
 			
 	public static void main(String[] args) {
 			
-		log.info("Searching for run-directory in args at index 0...");
 		String runDirectory;
 		
 		if (args.length > 0) {
@@ -74,15 +73,12 @@ public class PersonTripNoiseAnalysisRun {
 		
 		} else {
 			
-			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/optAV/output/optAV_av-trip-share-0.01_av-20000_kp999999/";
+			runDirectory = "/Users/ihab/Documents/workspace/runs-svn/cne/munich/output-final/output_run4b_muc_cne_DecongestionPID";
 			log.info("Run directory " + runDirectory);
 		}
 		
 		PersonTripNoiseAnalysisRun analysis = new PersonTripNoiseAnalysisRun(runDirectory);
 		analysis.run();
-		
-//		PersonTripNoiseAnalysisRun analysis1 = new PersonTripNoiseAnalysisRun(runDirectory, "/Users/ihab/Documents/workspace/runs-svn/optAV/output_baseCase/analysis_it.10/10.events_NoiseImmission_Offline.xml.gz");
-//		analysis1.run();
 	}
 	
 	public PersonTripNoiseAnalysisRun(String runDirectory) {
@@ -103,24 +99,20 @@ public class PersonTripNoiseAnalysisRun {
 
 	public void run() {
 		
-		String configFile = runDirectory + "output_config.xml.gz";
-		String networkFile = "output_network.xml.gz";
-		String populationFile = "output_plans.xml.gz";
+		String networkFile = runDirectory + "output_network.xml.gz";
+		String populationFile = runDirectory + "output_plans.xml.gz";
+//		String eventsFile = runDirectory + "output_events.xml.gz";
+		String eventsFile = runDirectory + "ITERS/it.1500/1500.events.xml.gz";
 
-		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());	
+		Config config = ConfigUtils.createConfig();	
 		config.plans().setInputFile(populationFile);
-		config.plans().setInputPersonAttributeFile(null);
 		config.network().setInputFile(networkFile);
-		config.network().setChangeEventsInputFile(null);
-		config.vehicles().setVehiclesFile(null);
 
-		int finalIteration = config.controler().getLastIteration();
-		String eventsFile = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
-		String outputPath = runDirectory + "person-trip-noise-analysis_it." + finalIteration + "/";
+		String outputPath = runDirectory + "detailed-person-trip-analysis/";
 				
 		String noiseEventsFileToAnalyze;
 		if (this.noiseEventFile == null || this.noiseEventFile == "") {
-			noiseEventsFileToAnalyze = runDirectory + "ITERS/it." + finalIteration + "/" + finalIteration + ".events.xml.gz";
+			noiseEventsFileToAnalyze = eventsFile;
 		} else {
 			noiseEventsFileToAnalyze = this.noiseEventFile;
 		}
@@ -136,21 +128,23 @@ public class PersonTripNoiseAnalysisRun {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-		
-		// standard events analysis
-		
+	
 		BasicPersonTripAnalysisHandler basicHandler = new BasicPersonTripAnalysisHandler();
 		basicHandler.setScenario(scenario);
 
 		NoiseAnalysisHandler noiseHandler = new NoiseAnalysisHandler();
 		noiseHandler.setBasicHandler(basicHandler);
 		
+		PersonMoneyLinkHandler moneyHandler = new PersonMoneyLinkHandler();
+		moneyHandler.setBasicHandler(basicHandler);
+		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(basicHandler);
 		events.addHandler(noiseHandler);
+		events.addHandler(moneyHandler);
 		
 		log.info("Reading the events file...");
-		MatsimEventsReader reader = new MatsimEventsReader(events);
+		IKEventsReader reader = new IKEventsReader(events);
 		reader.readFile(eventsFile);
 		log.info("Reading the events file... Done.");
 				
@@ -165,6 +159,7 @@ public class PersonTripNoiseAnalysisRun {
 	
 		if (noiseHandler.isCaughtNoiseEvent()) {
 			log.info("Noise events have already been analyzed based on the standard events file.");
+	
 		} else {
 			
 			EventsManager eventsNoise = EventsUtils.createEventsManager();
@@ -181,20 +176,33 @@ public class PersonTripNoiseAnalysisRun {
 		PersonTripNoiseAnalysis analysis = new PersonTripNoiseAnalysis();
 		
 		log.info("Print trip information...");
-		analysis.printTripInformation(outputPath, TaxiModule.TAXI_MODE, basicHandler, noiseHandler);
-		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, noiseHandler);
-		analysis.printTripInformation(outputPath, null, basicHandler, noiseHandler);
+		analysis.printTripInformation(outputPath, TransportMode.car, basicHandler, noiseHandler, moneyHandler);
 		log.info("Print trip information... Done.");
 
 		log.info("Print person information...");
-		analysis.printPersonInformation(outputPath, TaxiModule.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);	
 		analysis.printPersonInformation(outputPath, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);	
-		analysis.printPersonInformation(outputPath, null, personId2userBenefit, basicHandler, noiseHandler);	
 		log.info("Print person information... Done.");
 
-		analysis.printAggregatedResults(outputPath, TaxiModule.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);
-		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);
-		analysis.printAggregatedResults(outputPath, null, personId2userBenefit, basicHandler, noiseHandler);
+		analysis.printAggregatedResults(outputPath, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler, moneyHandler);
+		analysis.printAggregatedResults(outputPath, null, personId2userBenefit, basicHandler, noiseHandler, moneyHandler);
+		
+		SortedMap<Double, List<Double>> departureTime2tolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2payment(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "tollsPerDepartureTime_car_3600.csv", departureTime2tolls);
+		
+		SortedMap<Double, List<Double>> departureTime2traveldistance = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2tripDistance(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "distancePerDepartureTime_car_3600.csv", departureTime2traveldistance);
+		
+		SortedMap<Double, List<Double>> departureTime2travelTime = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), basicHandler.getPersonId2tripNumber2travelTime(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "travelTimePerDepartureTime_car_3600.csv", departureTime2travelTime);
+		
+		SortedMap<Double, List<Double>> departureTime2congestionTolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), moneyHandler.getPersonId2tripNumber2congestionPayment(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "congestionTollsPerDepartureTime_car_3600.csv", departureTime2congestionTolls);
+		
+		SortedMap<Double, List<Double>> departureTime2noiseTolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), moneyHandler.getPersonId2tripNumber2noisePayment(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "noiseTollsPerDepartureTime_car_3600.csv", departureTime2noiseTolls);
+		
+		SortedMap<Double, List<Double>> departureTime2airPollutionTolls = analysis.getParameter2Values(TransportMode.car, basicHandler, basicHandler.getPersonId2tripNumber2departureTime(), moneyHandler.getPersonId2tripNumber2airPollutionPayment(), 3600., 30 * 3600.);
+		analysis.printAvgValuePerParameter(outputPath + "airPollutionTollsPerDepartureTime_car_3600.csv", departureTime2airPollutionTolls);
 	}
 }
 		

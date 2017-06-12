@@ -1,6 +1,6 @@
 package playground.dziemke.cemdapMatsimCadyts;
 
-
+@Deprecated
 public class Zone2Zone {
 
 	private int source;
