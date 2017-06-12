@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -59,9 +60,9 @@ import playground.vsptelematics.bangbang.KNAccidentScenario.MyIterationCounter;
  * @author nagel
  *
  */
-class WithinDayBestRouteMobsimListener implements MobsimBeforeSimStepListener {
+class WithinDayReRouteMobsimListener implements MobsimBeforeSimStepListener {
 
-	private static final Logger log = Logger.getLogger(WithinDayBestRouteMobsimListener.class);
+	private static final Logger log = Logger.getLogger(WithinDayReRouteMobsimListener.class);
 
 	private final Scenario scenario;
 	private EditRoutes editRoutes ;
@@ -69,13 +70,13 @@ class WithinDayBestRouteMobsimListener implements MobsimBeforeSimStepListener {
 	private MyIterationCounter iterationCounter;
 	
 	@Inject
-	WithinDayBestRouteMobsimListener(Scenario scenario, LeastCostPathCalculatorFactory pathAlgoFactory, TravelTime travelTime,
+	WithinDayReRouteMobsimListener(Scenario scenario, LeastCostPathCalculatorFactory pathAlgoFactory, TravelTime travelTime,
 			Map<String, TravelDisutilityFactory> travelDisutilityFactories, MyIterationCounter ic ) {
 		this.scenario = scenario ;
 		{
 			TravelDisutility travelDisutility = travelDisutilityFactories.get(TransportMode.car).createTravelDisutility( travelTime ) ;
 			LeastCostPathCalculator pathAlgo = pathAlgoFactory.createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime) ;
-			RouteFactories routeFactory = ((PopulationFactory) scenario.getPopulation().getFactory()).getRouteFactories() ;
+			RouteFactories routeFactory = scenario.getPopulation().getFactory().getRouteFactories() ;
 			this.editRoutes = new EditRoutes( scenario.getNetwork(), pathAlgo, routeFactory ) ;
 			this.iterationCounter = ic ;
 		}
@@ -95,10 +96,12 @@ class WithinDayBestRouteMobsimListener implements MobsimBeforeSimStepListener {
 			doReplanning(ma, (Netsim) event.getQueueSimulation());
 		}
 	}
+	
+	private static int cnt2 = 0 ;
 
 	static List<MobsimAgent> getAgentsToReplan(Netsim mobsim ) {
 
-		List<MobsimAgent> set = new ArrayList<MobsimAgent>();
+		List<MobsimAgent> set = new ArrayList<>();
 
 		final double now = mobsim.getSimTimer().getTimeOfDay();
 		if ( now < 8.*3600. || Math.floor(now) % 10 != 0 ) {
@@ -112,7 +115,13 @@ class WithinDayBestRouteMobsimListener implements MobsimBeforeSimStepListener {
 				MobsimDriverAgent agent=vehicle.getDriver();
 				if ( KNAccidentScenario.replanningLinkIds.contains( agent.getCurrentLinkId() ) ) {
 //					System.out.println("found agent");
-					set.add(agent);
+					if ( cnt2==0 ) {
+						log.warn("only replanning with proba 0.1!");
+						cnt2++ ;
+					}
+					if ( MatsimRandom.getRandom().nextDouble() < 0.1 ) {
+						set.add(agent);
+					}
 				}
 			}
 		}
@@ -120,23 +129,16 @@ class WithinDayBestRouteMobsimListener implements MobsimBeforeSimStepListener {
 		return set;
 
 	}
+	
+	private static int cnt = 0 ;
 
 	private boolean doReplanning(MobsimAgent agent, Netsim netsim ) {
 		double now = netsim.getSimTimer().getTimeOfDay() ;
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan( agent ) ; 
-
-		if (plan == null) {
-			log.info( " we don't have a modifiable plan; returning ... ") ;
-			return false;
-		}
-		if ( !(WithinDayAgentUtils.getCurrentPlanElement(agent) instanceof Leg) ) {
-			log.info( "agent not on leg; returning ... ") ;
+		
+		if ( !WithinDayAgentUtils.isReplannableCarLeg(agent) ) {
 			return false ;
-		}
-		if (!((Leg) WithinDayAgentUtils.getCurrentPlanElement(agent)).getMode().equals(TransportMode.car)) {
-			log.info( "not a car leg; can only replan car legs; returning ... ") ;
-			return false;
 		}
 
 		final Integer planElementsIndex = WithinDayAgentUtils.getCurrentPlanElementIndex(agent);
@@ -155,7 +157,10 @@ class WithinDayBestRouteMobsimListener implements MobsimBeforeSimStepListener {
 		// for vis:
 		ArrayList<Id<Link>> currentLinkIds = new ArrayList<>( ((NetworkRoute) leg.getRoute()).getLinkIds() ) ;
 		if ( !Arrays.deepEquals(oldLinkIds.toArray(), currentLinkIds.toArray()) ) {
-			log.warn("modified route");
+			if ( cnt < 10 ) {
+				log.warn("modified route");
+				cnt++ ;
+			}
 			this.scenario.getPopulation().getPersonAttributes().putAttribute( agent.getId().toString(), "marker", true ) ;
 		}
 

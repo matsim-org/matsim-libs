@@ -132,7 +132,7 @@ public class ManualDetour implements MobsimBeforeSimStepListener {
 		if ( 8.*3600 + 40*60 + duration < now && now < 8.*3600+50*60 ) return ;
 		if ( 8.*3600 + 50*60 + duration < now  ) return ;
 
-		Collection<MobsimAgent> agentsToReplan = WithinDayBestRouteMobsimListener.getAgentsToReplan( (Netsim) event.getQueueSimulation() ); 
+		Collection<MobsimAgent> agentsToReplan = WithinDayReRouteMobsimListener.getAgentsToReplan( (Netsim) event.getQueueSimulation() ); 
 
 		for (MobsimAgent ma : agentsToReplan) {
 			doReplanning(ma);
