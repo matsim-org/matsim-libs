@@ -37,6 +37,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public static final String MAX_WAIT_TIME = "maxWaitTime";
 	public static final String MAX_TRAVEL_TIME_ALPHA = "maxTravelTimeAlpha";
 	public static final String MAX_TRAVEL_TIME_BETA = "maxTravelTimeBeta";
+	public static final String A_STAR_EUCLIDEAN_OVERDO_FACTOR = "AStarEuclideanOverdoFactor";
 	public static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE = "changeStartLinkToLastLinkInSchedule";
 
 	public static final String IDLE_VEHICLES_RETURN_TO_DEPOTS = "idleVehiclesReturnToDepots";
@@ -52,17 +53,18 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private static final String PLOT_VEH_STATS = "writeDetailedVehicleStats";
 	private static final String PRINT_WARNINGS = "plotDetailedWarnings";
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
+	private static final String K_NEAREST_VEHICLES = "kNearestVehiclesToFilter";
 
 	private double stopDuration = Double.NaN;// seconds
 	private double maxWaitTime = Double.NaN;// seconds
 
 	// max arrival time defined as:
-	// maxTravelTimeAlpha * estimated_drt_travel_time(fromLink, toLink) + maxTravelTimeBeta",
-	// where
-	// estimated_drt_travel_time(fromLink, toLink) is defined as:
-	// euclidean_distance(fromLink.coord, toLink.coord) * estimatedBeelineDistanceFactor / estimatedDrtSpeed
+	// maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta,
+	// where unshared_ride_travel_time(fromLink, toLink) is calculated with FastAStarEuclidean
+	// (hence AStarEuclideanOverdoFactor needs to be specified)
 	private double maxTravelTimeAlpha = Double.NaN;// [-], >= 1.0
 	private double maxTravelTimeBeta = Double.NaN;// [s], >= 0.0
+	private double AStarEuclideanOverdoFactor = 1.;// >= 1.0
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
 	private boolean idleVehiclesReturnToDepots = false;
@@ -80,14 +82,17 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private boolean printDetailedWarnings = false;
 	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
+	private int kNearestVehicles = 0;
+	
 	public enum OperationalScheme {
 		stationbased, door2door
 	}
+	
+	
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
 	}
-
 
 	@Override
 	public Map<String, String> getComments() {
@@ -102,6 +107,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 				"Defines the shift of the maxTravelTime estimation function (optimisation constraint), i.e. "
 						+ "maxTravelTimeAlpha * estimated_drt_travel_time + maxTravelTimeBeta. "
 						+ "Beta should not be smaller than 0.");
+		map.put(A_STAR_EUCLIDEAN_OVERDO_FACTOR,
+				"Used in AStarEuclidean for shortest path search for unshared (== optimistic) rides. "
+						+ "Default value is 1.0. Values above 1.0 (typically, 1.5 to 3.0) speed up search, "
+						+ "but at the cost of obtaining longer paths");
 		map.put(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE,
 				"If true, the startLink is changed to last link in the current schedule, so the taxi starts the next "
 						+ "day at the link where it stopped operating the day before. False by default.");
@@ -124,7 +133,9 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		map.put(NUMBER_OF_THREADS,
 				"Number of threads used for parallel evaluation of request insertion into existing schedules. "
 						+ "If unset, the number of threads is equal to the number of logical cores available to JVM.");
-		map.put(PRINT_WARNINGS, "Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.");
+		map.put(PRINT_WARNINGS,
+				"Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.");
+		map.put(K_NEAREST_VEHICLES, "Filters the k nearest vehicles to the request. Speeds up simulation with big fleets, but could lead to a worse solution. Default: k==0 (no filtering used)");
 		return map;
 	}
 
@@ -168,11 +179,38 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		this.maxTravelTimeBeta = maxTravelTimeBeta;
 	}
 
+	@StringGetter(A_STAR_EUCLIDEAN_OVERDO_FACTOR)
+	public double getAStarEuclideanOverdoFactor() {
+		return AStarEuclideanOverdoFactor;
+	}
+
+	@StringSetter(A_STAR_EUCLIDEAN_OVERDO_FACTOR)
+	public void setAStarEuclideanOverdoFactor(double aStarEuclideanOverdoFactor) {
+		AStarEuclideanOverdoFactor = aStarEuclideanOverdoFactor;
+	}
+
 	@StringGetter(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE)
 	public boolean isChangeStartLinkToLastLinkInSchedule() {
 		return changeStartLinkToLastLinkInSchedule;
 	}
 
+	
+	/**
+	 * @return the kNearestVehicles
+	 */
+	@StringGetter(K_NEAREST_VEHICLES)
+	public int getkNearestVehicles() {
+		return kNearestVehicles;
+	}
+	
+	/**
+	 * @param kNearestVehicles the kNearestVehicles to set
+	 */
+	@StringSetter(K_NEAREST_VEHICLES)
+	public void setkNearestVehicles(int kNearestVehicles) {
+		this.kNearestVehicles = kNearestVehicles;
+	}
+	
 	@StringSetter(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE)
 	public void setChangeStartLinkToLastLinkInSchedule(boolean changeStartLinkToLastLinkInSchedule) {
 		this.changeStartLinkToLastLinkInSchedule = changeStartLinkToLastLinkInSchedule;

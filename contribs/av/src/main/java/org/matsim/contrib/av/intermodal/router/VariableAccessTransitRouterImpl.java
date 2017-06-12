@@ -105,8 +105,8 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 			Coord toCoord = node.stop.getStopFacility().getCoord();
 			Leg initialLeg = getAccessEgressLeg(person, coord, toCoord, departureTime);
 			double initialTime = initialLeg.getTravelTime();
-			double initialCost = getAccessEgressDisutility(person, coord, toCoord);
-			wrappedNearestNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
+			//variable access: only use time as disutility for the time being
+			wrappedNearestNodes.put(node, new InitialNode(initialTime, initialTime + departureTime));
 		}
 		return wrappedNearestNodes;
 	}

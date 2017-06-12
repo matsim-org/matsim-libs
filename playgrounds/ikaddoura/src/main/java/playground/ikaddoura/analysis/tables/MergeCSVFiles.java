@@ -54,7 +54,7 @@ public class MergeCSVFiles {
 	
 	private static final Logger log = Logger.getLogger(MergeCSVFiles.class);
 	
-	private static final String directory = "/Users/ihab/Documents/workspace/runs-svn/cne/munich/output/";
+	private static final String directory = "/Users/ihab/Desktop/ils4a/kaddoura/cne/munich/output-with-randomization/";
 	private static final String fileName = "aggregated_info_car";
 	private static final String separator = ";";
 	private static final int finalIteration = 1500;

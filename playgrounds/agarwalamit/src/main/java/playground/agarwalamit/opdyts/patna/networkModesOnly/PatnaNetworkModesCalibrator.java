@@ -20,8 +20,9 @@
 package playground.agarwalamit.opdyts.patna.networkModesOnly;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
@@ -46,6 +47,8 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.opdyts.*;
+import playground.agarwalamit.opdyts.analysis.DecisionVariableAndBestSolutionPlotter;
+import playground.agarwalamit.opdyts.analysis.OpdytsConvergencePlotter;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
 
@@ -104,16 +107,13 @@ public class PatnaNetworkModesCalibrator {
 		int binCount = 24; // to me, binCount and binSize must be related
 		TimeDiscretization timeDiscretization = new TimeDiscretization(startTime, binSize, binCount);
 
-		Set<String> modes2consider = new HashSet<>();
-		modes2consider.add("car");
-		modes2consider.add("bike");
-		modes2consider.add("motorbike");
+		List<String> modes2consider = Arrays.asList("car","bike","motorbike");
 
 		DistanceDistribution referenceStudyDistri = new PatnaNetworkModesOneBinDistanceDistribution(PATNA_1_PCT);
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,referenceStudyDistri);
 
 		// following is the  entry point to start a matsim controler together with opdyts
-		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization, modes2consider);
+		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization, new HashSet<>(modes2consider));
 		simulator.addOverridingModule(new AbstractModule() {
 
 			@Override
@@ -183,5 +183,13 @@ public class PatnaNetworkModesCalibrator {
 			String dir2remove = OUT_DIR+"_"+index+"/ITERS/";
 			IOUtils.deleteDirectoryRecursively(new File(dir2remove).toPath());
 		}
+
+		OpdytsConvergencePlotter opdytsConvergencePlotter = new OpdytsConvergencePlotter();
+		opdytsConvergencePlotter.readFile(OUT_DIR+"/opdyts.con");
+		opdytsConvergencePlotter.plotData(OUT_DIR+"/convergence.png");
+
+		DecisionVariableAndBestSolutionPlotter decisionVariableAndBestSolutionPlotter = new DecisionVariableAndBestSolutionPlotter("bicycle");
+		decisionVariableAndBestSolutionPlotter.readFile(OUT_DIR+"/opdyts.log");
+		decisionVariableAndBestSolutionPlotter.plotData(OUT_DIR+"/decisionVariableVsASC.png");
 	}
 }

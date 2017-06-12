@@ -71,6 +71,7 @@ public class PersonLinkMoneyEventsReader extends MatsimXmlParser{
 			Id<Link> linkId = null;
 			Double amount = 0.0;
 			Double relevantTime = 0.0;
+			String description = "";
 			
 			for (int i = 0; i < attributes.getLength(); i++){
 				if (attributes.getQName(i).equals("time")){
@@ -85,9 +86,11 @@ public class PersonLinkMoneyEventsReader extends MatsimXmlParser{
 					amount = Double.parseDouble(attributes.getValue(i));
 				} else if(attributes.getQName(i).equals(PersonLinkMoneyEvent.ATTRIBUTE_RELEVANT_TIME)){
 					relevantTime = Double.parseDouble(attributes.getValue(i));
+				} else if(attributes.getQName(i).equals(PersonLinkMoneyEvent.ATTRIBUTE_DESCRIPTION)){
+					description = attributes.getValue(i);
 				}
 			}
-			this.eventsManager.processEvent(new PersonLinkMoneyEvent(time, personId, linkId, amount, relevantTime));
+			this.eventsManager.processEvent(new PersonLinkMoneyEvent(time, personId, linkId, amount, relevantTime, description));
 		}
 	}
 }

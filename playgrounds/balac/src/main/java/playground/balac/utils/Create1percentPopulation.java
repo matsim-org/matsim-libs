@@ -38,7 +38,7 @@ public class Create1percentPopulation {
 		}
 		
 		new PopulationWriter(scenario.getPopulation(), 
-				scenario.getNetwork()).writeV4("C:\\LocalDocuments\\Papers\\CarsharingFramework2016\\Scenario\\population_10perc.xml.gz");		
+				scenario.getNetwork()).writeV4("C:\\Users\\balacm\\Downloads\\zurich\\population_1perc.xml.gz");		
 		
 	}
 	

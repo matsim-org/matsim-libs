@@ -35,12 +35,12 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public static final String GROUPNAME = "travelTimeCalculator";
 
 	public enum TravelTimeCalculatorType {TravelTimeCalculatorArray,TravelTimeCalculatorHashMap}
-	
+
 	private static final String TRAVEL_TIME_CALCULATOR = "travelTimeCalculator";
 	private static final String TRAVEL_TIME_BIN_SIZE = "travelTimeBinSize";
 	private static final String TRAVEL_TIME_AGGREGATOR = "travelTimeAggregator";
 	private static final String TRAVEL_TIME_GETTER = "travelTimeGetter";
-    private static final String MAX_TIME = "maxTime";
+	private static final String MAX_TIME = "maxTime";
 
 	private static final String CALCULATE_LINK_TRAVELTIMES = "calculateLinkTravelTimes";
 	private static final String CALCULATE_LINKTOLINK_TRAVELTIMES = "calculateLinkToLinkTravelTimes";
@@ -71,8 +71,8 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 		Map<String,String> map = super.getComments();
 		map.put(TRAVEL_TIME_BIN_SIZE, "The size of the time bin (in sec) into which the link travel times are aggregated for " +
 				"the router") ;
-        map.put(MAX_TIME, "The lenght (in sec) of the time period that is splited into time bins; an additional time bin is created " +
-                "to aggregate all travel times collected after maxTime") ;
+		map.put(MAX_TIME, "The lenght (in sec) of the time period that is splited into time bins; an additional time bin is created " +
+				"to aggregate all travel times collected after maxTime") ;
 		map.put(TRAVEL_TIME_GETTER, "How to deal with link entry times at different positions during the time bin. Currently " +
 				"supported: average, linearinterpolation");
 		map.put(TRAVEL_TIME_AGGREGATOR, "How to deal with congested time bins that have no link entry events. `optimistic' " +
@@ -109,7 +109,7 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public void setTravelTimeGetterType(final String travelTimeGetter){
 		this.travelTimeGetter = travelTimeGetter;
 	}
-	 
+
 	@StringGetter( TRAVEL_TIME_AGGREGATOR )
 	public String getTravelTimeAggregatorType(){
 		return this.travelTimeAggregator;
@@ -119,7 +119,7 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public String getTravelTimeGetterType(){
 		return this.travelTimeGetter;
 	}
-	
+
 	/**
 	 * Sets the size of the time-window over which the travel times are accumulated and averaged.<br>
 	 * Note that smaller values for the binSize increase memory consumption to store the travel times.
@@ -130,12 +130,12 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public final void setTraveltimeBinSize(final int binSize) {
 		this.traveltimeBinSize = binSize;
 	}
-	
-	
-    @StringSetter( MAX_TIME )
+
+
+	@StringSetter( MAX_TIME )
 	public void setMaxTime(int maxTime) {
-        this.maxTime = maxTime;
-    }
+		this.maxTime = maxTime;
+	}
 
 	/**
 	 * Returns the size of the time-window used to accumulate and average travel times.
@@ -146,11 +146,11 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public final int getTraveltimeBinSize() {
 		return this.traveltimeBinSize;
 	}
-	
-    @StringGetter( MAX_TIME )
+
+	@StringGetter( MAX_TIME )
 	public int getMaxTime() {
-        return maxTime;
-    }
+		return maxTime;
+	}
 
 	@StringGetter( CALCULATE_LINK_TRAVELTIMES )
 	public boolean isCalculateLinkTravelTimes() {
@@ -172,7 +172,7 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 			final boolean calculateLinkToLinkTravelTimes) {
 		this.calculateLinkToLinkTravelTimes = calculateLinkToLinkTravelTimes;
 	}
-	
+
 	@StringGetter( FILTERMODES )
 	public boolean isFilterModes() {
 		return this.filterModes;
@@ -182,12 +182,12 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public void setFilterModes(final boolean filterModes) {
 		this.filterModes = filterModes;
 	}
-	
+
 	@StringGetter( ANALYZEDMODES )
 	public String getAnalyzedModes() {
 		return this.analyzedModes;
 	}
-	
+
 	@StringSetter( ANALYZEDMODES )
 	public void setAnalyzedModes(final String analyzedModes) {
 		this.analyzedModes = analyzedModes.toLowerCase(Locale.ROOT);
@@ -202,5 +202,5 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 	public void setSeparateModes(boolean separateModes) {
 		this.separateModes = separateModes;
 	}
-	
+
 }

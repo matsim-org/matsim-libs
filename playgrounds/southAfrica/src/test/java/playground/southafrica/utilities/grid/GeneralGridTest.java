@@ -88,12 +88,16 @@ public class GeneralGridTest {
 		Polygon p = buildDummyPolygon();
 		GeneralGrid g1 = new GeneralGrid(10.0, GridType.SQUARE);
 		g1.generateGrid(p);
-		g1.writeGrid(utils.getOutputDirectory(), null);
+		String filename = String.format("%s%s%s_%.0f.csv", utils.getOutputDirectory(), 
+				(utils.getOutputDirectory().endsWith("/") ? "" : "/"), GridType.SQUARE, 10.0, ".csv");
+		g1.writeGrid(filename, null);
 		Assert.assertTrue("File does not exist.", new File(utils.getOutputDirectory() + "/SQUARE_10.csv").exists());
 
 		GeneralGrid g2 = new GeneralGrid(10.0, GridType.HEX);
 		g2.generateGrid(p);
-		g2.writeGrid(utils.getOutputDirectory(), null);
+		filename = String.format("%s%s%s_%.0f.csv", utils.getOutputDirectory(), 
+				(utils.getOutputDirectory().endsWith("/") ? "" : "/"), GridType.HEX, 10.0, ".csv");
+		g2.writeGrid(filename, null);
 		Assert.assertTrue("File does not exist.", new File(utils.getOutputDirectory() + "/HEX_10.csv").exists());
 	}
 	

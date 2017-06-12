@@ -26,4 +26,6 @@ public interface CarsharingSupplyInterface {
 
 	Set<String> getCompanyNames();
 
+	Map<String, CompanyAgent> getCompanyAgents();
+
 }

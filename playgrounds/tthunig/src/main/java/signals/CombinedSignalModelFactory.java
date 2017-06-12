@@ -66,10 +66,13 @@ public class CombinedSignalModelFactory implements SignalModelFactory {
 	private SignalModelFactory delegate = new DefaultSignalModelFactory();
 
 	private Map<String, Provider<SignalController>> signalControlProvider = new HashMap<>();
+	
+	private Scenario scenario;
 
 	@Inject
 	public CombinedSignalModelFactory(Scenario scenario, LaemmerConfig laemmerConfig, DgSylviaConfig sylviaConfig, 
 			LinkSensorManager sensorManager, DownstreamSensor downstreamSensor, TtTotalDelay delayCalculator) {
+		this.scenario = scenario;
 //		SignalsData signalsData = (SignalsData) scenario.getScenarioElement(SignalsData.ELEMENT_NAME);
 		Network network = scenario.getNetwork();
 		Lanes lanes = scenario.getLanes();
@@ -89,6 +92,9 @@ public class CombinedSignalModelFactory implements SignalModelFactory {
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier, SignalSystem signalSystem) {
 		if (signalControlProvider.containsKey(controllerIdentifier)) {
+			if (controllerIdentifier.equals(LaemmerSignalController.IDENTIFIER) && scenario.getConfig().qsim().getFlowCapFactor() != 1.0){
+				throw new RuntimeException("Laemmer signal control does not support flow capacity factors different from 1.0");
+			}
 			log.info("Creating " + controllerIdentifier);
 			SignalController signalControl = signalControlProvider.get(controllerIdentifier).get();
 			signalControl.setSignalSystem(signalSystem);

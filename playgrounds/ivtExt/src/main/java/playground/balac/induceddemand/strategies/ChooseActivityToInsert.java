@@ -1,11 +1,14 @@
 package playground.balac.induceddemand.strategies;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.StageActivityTypes;
@@ -13,8 +16,11 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.ActivityFacility;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 public class ChooseActivityToInsert implements PlanAlgorithm {
 
@@ -24,6 +30,8 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 	
 	private QuadTree<ActivityFacility> shopFacilityQuadTree;
 	private QuadTree<ActivityFacility> leisureFacilityQuadTree;
+	
+	private Map<Id<Person>, Set<String>> perPersonAllActivities;
 
 	
 	public ChooseActivityToInsert(Random localInstance,
@@ -37,6 +45,24 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 		this.leisureFacilityQuadTree = leisureFacilityQuadTree;
 
 	}
+	
+	private Set<String> findPossibleInsertActivities(Plan plan) {
+		
+		
+		Person person = plan.getPerson();
+		
+		Set<String> possibleActivities = perPersonAllActivities.get(person.getId());
+		
+		for (PlanElement pe : plan.getPlanElements()) {
+			
+			if (pe instanceof Activity) {
+				possibleActivities.remove(((Activity) pe).getType());
+			}			
+		}
+		
+		return possibleActivities;
+		
+	}
 
 	@Override
 	public void run(Plan plan) {
@@ -44,15 +70,18 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 			return;
 		List<Activity> t = TripStructureUtils.getActivities(plan, this.stageActivityTypes);
 		
+		
 		if (t.size() > 10)
 			return;
 		
 		else {
 			
-			String actTypes = (String) this.scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(),
-					"activities");
+			//String actTypes = (String) this.scenario.getPopulation().getPersonAttributes().getAttribute(plan.getPerson().getId().toString(),
+			//		"activities");
 			
-			String[] allActTypes = actTypes.split(",");
+			//String[] allActTypes = actTypes.split(",");
+			
+			String[] allActTypes = (String[]) findPossibleInsertActivities(plan).toArray();
 			
 			int index = this.rng.nextInt(allActTypes.length);
 
@@ -66,7 +95,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 			
 			Activity newActivity;
 			
-			if (allActTypes[index].equals("home")) {
+			if (allActTypes[index].startsWith("home")) {
 				
 				primaryActivity = getPersonHomeLocation(t);					
 				
@@ -80,7 +109,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				
 			}
 			
-			else if (allActTypes[index].equals("work")) {
+			else if (allActTypes[index].startsWith("work")) {
 				
 				primaryActivity = getPersonWorkLocation(t);
 				
@@ -94,7 +123,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 
 			}
 			
-			else if (allActTypes[index].equals("education")) {
+			else if (allActTypes[index].startsWith("education")) {
 				
 				primaryActivity = getPersonEducationLocation(t);
 				
@@ -116,6 +145,7 @@ public class ChooseActivityToInsert implements PlanAlgorithm {
 				
 				newActivity.setFacilityId(actFacility.getId());
 				newActivity.setCoord(actFacility.getCoord());
+				//TODO: put the end time to the typical duration from this person's desire
 				newActivity.setEndTime(  t.get(randomIndex - 1).getEndTime() + 3600.0);
 
 				//newActivity.setMaximumDuration(3600);

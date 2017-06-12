@@ -5,6 +5,7 @@ package playground.dziemke.cemdapMatsimCadyts;
 
 import org.matsim.api.core.v01.Coord;
 
+@Deprecated
 public class Zone {
 
 	private int id;

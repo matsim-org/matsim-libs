@@ -25,10 +25,25 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.vehicles.*;
 
 import com.google.inject.name.Names;
+/**
+ * 
+ * This module allows to de- or increase the amount of flow capacity used by a DVRP vehicle, 
+ * which may be useful for modelling autonomous vehicles within the Queue model.
+ * 
+ * When using this model in science, please consider citing 
+ * M. Maciejewski, J. Bischoff; Congestion Effects of Autonomous Taxi Fleets; 16-11;
+ * available from <a href="http://www.vsp.tu-berlin.de/publications/vspwp/">http://www.vsp.tu-berlin.de/publications/vspwp/</a>
 
+ * 
+ */
 public class AvIncreasedCapacityModule extends AbstractModule {
 	private final double flowEfficiencyFactor;
 
+	/**
+	 * 
+	 * @param flowEfficiencyFactor: A factor of 1.0 == same flow for dvrp vehicles as for cars (default), a factor of >1: increased efficiency, e.g. a value of 2.0 would mean, that two
+	 *  AVs would need only the flow capacity of 1 ordinary vehicle. A factor below 1 would mean that more capacity is used.
+	 */
 	public AvIncreasedCapacityModule(double flowEfficiencyFactor) {
 		this.flowEfficiencyFactor = flowEfficiencyFactor;
 	}

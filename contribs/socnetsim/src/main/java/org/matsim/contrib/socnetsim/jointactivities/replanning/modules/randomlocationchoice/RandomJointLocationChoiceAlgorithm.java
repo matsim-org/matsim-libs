@@ -31,7 +31,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.StageActivityTypes;
@@ -136,21 +136,21 @@ public class RandomJointLocationChoiceAlgorithm implements GenericPlanAlgorithm<
 	@Override
 	public void run(final GroupPlans plan) {
 		// TODO: do not split joint plans
-		final Map<Id, Plan> planPerAgent = getPlansMap( plan );
+		final Map<Id<Person>, Plan> planPerAgent = getPlansMap( plan );
 
 		while ( !planPerAgent.isEmpty() ) {
 			mutateJointly( removeRandomPlanGroup( planPerAgent ) );
 		}
 	}
 
-	private Collection<Plan> removeRandomPlanGroup(final Map<Id, Plan> planPerAgent) {
+	private Collection<Plan> removeRandomPlanGroup(final Map<Id<Person>, Plan> planPerAgent) {
 		final List<Plan> plans = new ArrayList<Plan>();
 
 		final Plan seed = CollectionUtils.removeRandomElement( random , planPerAgent ).getValue();
 		plans.add( seed );
 
 		// TODO: recurse (requires some care)
-		final Set<Id> availableAlters = CollectionUtils.intersectSorted(
+		final Set<Id<Person>> availableAlters = CollectionUtils.intersectSorted(
 				socialNetwork.getAlters( seed.getPerson().getId() ),
 				planPerAgent.keySet() );
 
@@ -163,8 +163,8 @@ public class RandomJointLocationChoiceAlgorithm implements GenericPlanAlgorithm<
 		return plans;
 	}
 
-	private static Map<Id, Plan> getPlansMap(final GroupPlans plan) {
-		final Map<Id, Plan> planPerAgent = new LinkedHashMap<Id, Plan>();
+	private static Map<Id<Person>, Plan> getPlansMap(final GroupPlans plan) {
+		final Map<Id<Person>, Plan> planPerAgent = new LinkedHashMap<>();
 
 		for ( Plan p : plan.getAllIndividualPlans() ) {
 			planPerAgent.put( p.getPerson().getId() , p );

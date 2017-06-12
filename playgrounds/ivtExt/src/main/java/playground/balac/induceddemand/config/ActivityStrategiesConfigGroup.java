@@ -8,6 +8,8 @@ public class ActivityStrategiesConfigGroup extends ReflectiveConfigGroup {
 	private boolean useInsertActivityStrategy = false;
 	private boolean useRemoveActivityStrategy = false;
 	private boolean useSwapActivitiesStrategy = false;
+	
+	private boolean proportionalPerformingScoring = false;
 
 	public ActivityStrategiesConfigGroup() {
 		super(GROUP_NAME);
@@ -41,6 +43,16 @@ public class ActivityStrategiesConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( "useSwapActivitiesStrategy" )
 	public void setUseSwapActivitiesStrategy(boolean useSwapActivitiesStrategy) {
 		this.useSwapActivitiesStrategy = useSwapActivitiesStrategy;
+	}
+	
+	@StringGetter( "proportionalPerformingScoring" )
+	public boolean getProportionalPerformingScoring() {
+		return proportionalPerformingScoring;
+	}
+	
+	@StringSetter( "proportionalPerformingScoring" )
+	public void setProportionalPerformingScoring(boolean proportionalPerformingScoring) {
+		this.proportionalPerformingScoring = proportionalPerformingScoring;
 	}
 
 }

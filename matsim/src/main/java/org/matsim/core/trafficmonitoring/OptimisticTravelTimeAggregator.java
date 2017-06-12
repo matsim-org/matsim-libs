@@ -20,14 +20,14 @@
 
 package org.matsim.core.trafficmonitoring;
 
-public class OptimisticTravelTimeAggregator extends AbstractTravelTimeAggregator {
+public final class OptimisticTravelTimeAggregator extends AbstractTravelTimeAggregator {
 
 	public OptimisticTravelTimeAggregator(int numSlots, int travelTimeBinSize) {
 		super(numSlots, travelTimeBinSize);
 	}
 
 	@Override
-	protected void addTravelTime(TravelTimeData travelTimeData,
+	 void addTravelTime(TravelTimeData travelTimeData,
 			double enterTime, double leaveTime) {
 
 		final int timeSlot = getTimeSlotIndex(enterTime);

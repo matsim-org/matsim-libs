@@ -42,6 +42,7 @@ import playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarm
  * @author amit
  */
 
+// TODO check FilteredEmissionPersonEventHandler and update following based on that.
 public class FilteredWarmEmissionHandler implements VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, WarmEmissionEventHandler {
 	private static final Logger LOGGER = Logger.getLogger(FilteredWarmEmissionHandler.class.getName());
 
@@ -147,7 +148,9 @@ public class FilteredWarmEmissionHandler implements VehicleEntersTrafficEventHan
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		this.vehicle2Person.remove(event.getVehicleId());
+		// Commeting following due to recent problem with berlin_open_scenario in which a few emission events are thrown
+		// after vehicleLeavesTrafficEvent (in the same time step). If this causes some problem, probably use a later event (PersonArrivalEvent). Amit June'17
+//		this.vehicle2Person.remove(event.getVehicleId());
 	}
 
 }

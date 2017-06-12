@@ -18,14 +18,15 @@
  * *********************************************************************** */
 package playground.agarwalamit.analysis.emission.filtering;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.emissions.events.ColdEmissionEvent;
@@ -46,31 +47,21 @@ import playground.agarwalamit.utils.PersonFilter;
 public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHandler, WarmEmissionEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler {
 	private static final Logger LOGGER = Logger.getLogger(FilteredEmissionPersonEventHandler.class.getName());
 
+	private final Map<Id<Vehicle>, Id<Person>> vehicleId2PersonId2 = new HashMap<>();
 	private final EmissionPersonEventHandler delegate;
-	private final PersonFilter pf ;
 	private final Network network;
-	private final String ug ;
 	private final AreaFilter af;
 
 	/**
-	 * Area and user group filtering will be used, links fall inside the given shape and persons belongs to the given user group will be considered.
+	 * Area filtering will be used, links fall inside the given shape and persons belongs to the given user group will be considered.
 	 */
-	public FilteredEmissionPersonEventHandler(final String userGroup, final PersonFilter personFilter,
-											  final Network network, final AreaFilter areaFilter){
+	public FilteredEmissionPersonEventHandler(final Network network, final AreaFilter areaFilter){
 		this.delegate = new EmissionPersonEventHandler();
 
 		this.af = areaFilter;
 		this.network = network;
-		this.ug=userGroup;
-		this.pf = personFilter;
 
-		if( (this.ug==null && this.pf!=null) || this.ug!=null && this.pf==null ) {
-			throw new RuntimeException("Either of person filter or user group is null.");
-		} else if( this.ug!=null && this.af !=null) {
-			LOGGER.info("Area and user group filtering is used, links fall inside the given shape and belongs to the "+this.ug+" user group will be considered.");
-		} else if(this.ug!=null) {
-			LOGGER.info("User group filtering is used, result will include all links but persons from "+this.ug+" user group only.");
-		} else if (this.af !=null) {
+		if (this.af !=null) {
 			LOGGER.info("Area filtering is used, result will include links falls inside the given shape and persons from all user groups.");
 		} else {
 			LOGGER.info("No filtering is used, result will include all links, persons from all user groups.");
@@ -78,94 +69,77 @@ public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHand
 	}
 
 	/**
-	 * User group filtering will be used, result will include all links but persons from given user group only. Another class
-	 * {@link playground.agarwalamit.munich.analysis.userGroup.EmissionsPerPersonPerUserGroup} could give more detailed results based on person id for all user groups.
-	 */
-	public FilteredEmissionPersonEventHandler( final String userGroup, final PersonFilter personFilter){
-		this(userGroup,personFilter, null, null);
-		LOGGER.warn( "This could be achieved from the other class \"EmissionsPerPersonPerUserGroup\", alternatively verify your results with the other class.");
-	}
-
-	/**
-	 * Area filtering will be used, result will include links falls inside the given shape and persons from all user groups.
-	 */
-	public FilteredEmissionPersonEventHandler( final Network network, final AreaFilter areaFilter){
-		this(null,null,network,areaFilter);
-	}
-
-	/**
 	 * No filtering will be used, result will include all links, persons from all user groups.
 	 */
 	public FilteredEmissionPersonEventHandler(){
-		this(null,null,null,null);
+		this(null,null);
+	}
+
+
+	@Override
+	public void reset(int iteration) {
+		delegate.reset(iteration);
+		this.vehicleId2PersonId2.clear();
 	}
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
- 		Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
+ 		Id<Person> driverId = this.vehicleId2PersonId2.get(event.getVehicleId());
 
-		if (this.af!=null) { // area filtering
-			Link link = network.getLinks().get(event.getLinkId());
-			if(! this.af.isLinkInsideShape(link)) return;
-
-			if(this.ug==null || this.pf==null) {// only area filtering
-				delegate.handleEvent(event); 
-			} else if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.ug)) { // both filtering
+		if (this.af!=null ) { // area filtering
+			if (this.af.isLinkInsideShape(network.getLinks().get(event.getLinkId()))) {
 				delegate.handleEvent(event);
+			} else {
+				//nothing to do
 			}
-
-		} else {
-			if(this.ug==null || this.pf==null) {// no filtering
-				delegate.handleEvent(event); 
-			} else if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.ug)) { // user group filtering
-				delegate.handleEvent(event);
-			}
+		} else { // no filtering
+			delegate.handleEvent(event);
 		}
 	}
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
-		Id<Person> driverId = this.delegate.getDriverOfVehicle(event.getVehicleId());
+		Id<Person> driverId = this.vehicleId2PersonId2.get(event.getVehicleId());
 
-		if (this.af!=null) { // area filtering
-			Link link = network.getLinks().get(event.getLinkId());
-			if(! this.af.isLinkInsideShape(link)) return;
-
-			if(this.ug==null || this.pf==null) {// only area filtering
+		if (this.af!=null ) { // area filtering
+			if (this.af.isLinkInsideShape(network.getLinks().get(event.getLinkId()))) {
 				delegate.handleEvent(event);
-			} else if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.ug)) { // both filtering
-				delegate.handleEvent(event);
+			} else {
+				//nothing to do
 			}
-
-		} else {
-			if(this.ug==null || this.pf==null) {// no filtering
-				delegate.handleEvent(event);
-			} else if (this.pf.getUserGroupAsStringFromPersonId(driverId).equals(this.ug)) { // user group filtering
-				delegate.handleEvent(event);
-			}
+		} else { // no filtering
+			delegate.handleEvent(event);
 		}
 	}
 
 	@Override
 	public void handleEvent(VehicleEntersTrafficEvent event) {
-		delegate.handleEvent(event);
+		this.vehicleId2PersonId2.put(event.getVehicleId(), event.getPersonId());
 	}
 
 	@Override
 	public void handleEvent(VehicleLeavesTrafficEvent event) {
-		delegate.handleEvent(event);
-	}
-
-	public Id<Person> getDriverOfVehicle(Id<Vehicle> vehicleId) {
-		return delegate.getDriverOfVehicle(vehicleId);
+		// Commeting following due to recent problem with berlin_open_scenario in which a few emission events are thrown
+		// after vehicleLeavesTrafficEvent (in the same time step). If this causes some problem, probably use a later event (PersonArrivalEvent). Amit June'17
+//		this.vehicleId2PersonId2.remove(event.getVehicleId(), event.getPersonId());
 	}
 
 	public Map<Id<Person>, Map<ColdPollutant, Double>> getPersonId2ColdEmissions() {
 		return delegate.getPersonId2ColdEmissions();
 	}
 
+	public Map<Id<Person>, Map<ColdPollutant, Double>> getPersonId2ColdEmissions(String userGroup, PersonFilter personFilter) {
+		return delegate.getPersonId2ColdEmissions().entrySet().parallelStream().filter(entry -> personFilter.getUserGroupAsStringFromPersonId(entry.getKey()).equals(userGroup)).collect(
+				Collectors.toMap(e -> e.getKey(),e-> e.getValue()));
+	}
+
 	public Map<Id<Person>, Map<WarmPollutant, Double>> getPersonId2WarmEmissions() {
 		return delegate.getPersonId2WarmEmissions();
+	}
+
+	public Map<Id<Person>, Map<WarmPollutant, Double>> getPersonId2WarmEmissions(String userGroup, PersonFilter personFilter) {
+		return delegate.getPersonId2WarmEmissions().entrySet().parallelStream().filter(entry -> personFilter.getUserGroupAsStringFromPersonId(entry.getKey()).equals(userGroup)).collect(
+				Collectors.toMap(e -> e.getKey(),e-> e.getValue()));
 	}
 
 	public Map<Id<Vehicle>, Map<ColdPollutant, Double>> getVehicleId2ColdEmissions() {
@@ -176,8 +150,17 @@ public class FilteredEmissionPersonEventHandler implements ColdEmissionEventHand
 		return delegate.getVehicleId2WarmEmissions();
 	}
 
-	@Override
-	public void reset(int iteration) {
-		delegate.reset(iteration);
+	public Map<Id<Vehicle>, Map<String, Double>> getVehicleId2TotalEmissions(){
+		return delegate.getVehicleId2TotalEmissions();
 	}
+
+	public Map<Id<Person>, Map<String, Double>> getPersonId2TotalEmissions(){
+		return delegate.getPersonId2TotalEmissions();
+	}
+
+	public Map<Id<Person>, Map<String, Double>> getPersonId2TotalEmissions(String userGroup, PersonFilter personFilter){
+		return delegate.getPersonId2TotalEmissions().entrySet().parallelStream().filter(entry -> personFilter.getUserGroupAsStringFromPersonId(entry.getKey()).equals(userGroup)).collect(
+				Collectors.toMap(e -> e.getKey(),e-> e.getValue()));
+	}
+
 }

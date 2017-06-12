@@ -44,6 +44,8 @@ public class ChooseActivityToRemove implements PlanAlgorithm {
 		
 		int activitiesCount = countActivities(t.get(index).getType(), t);
 		
+		//====== do not allow to remove work and education activities, since they are compulsory  =======//
+		
 		if ((t.get(index).getType().equals("work") || t.get(index).getType().equals("education")) && activitiesCount == 1)
 			return;
 		

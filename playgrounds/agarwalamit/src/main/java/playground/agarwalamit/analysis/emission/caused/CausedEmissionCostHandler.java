@@ -146,6 +146,16 @@ public class CausedEmissionCostHandler implements VehicleEntersTrafficEventHandl
 	}
 
 	@Override
+	public Map<Double, Map<Id<Vehicle>, Double>> getTimeBin2VehicleId2TotalEmissionCosts() {
+		throw new UnsupportedOperationException("This information is not updated yet.");
+	}
+
+	@Override
+	public Map<Double, Map<Id<Person>, Double>> getTimeBin2PersonId2TotalEmissionCosts() {
+		throw new UnsupportedOperationException("This information is not updated yet.");
+	}
+
+	@Override
 	public Map<Id<Vehicle>, Double> getVehicleId2TotalEmissionCosts(){
 		return this.vehicleId2ColdEmissCosts.entrySet().stream().collect(
 				Collectors.toMap(entry -> entry.getKey(), entry -> entry.getValue() + this.vehicleId2WarmEmissCosts.get(entry.getKey()))

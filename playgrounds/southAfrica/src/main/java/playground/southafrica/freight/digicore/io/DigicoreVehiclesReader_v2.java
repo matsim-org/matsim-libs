@@ -25,9 +25,11 @@ import java.util.Locale;
 import java.util.Stack;
 import java.util.TimeZone;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
@@ -40,6 +42,8 @@ import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicles;
 
 public class DigicoreVehiclesReader_v2 extends MatsimXmlParser {
+	final private Logger log = Logger.getLogger(DigicoreVehiclesReader_v2.class);
+	
 	private final static String VEHICLES = "digicoreVehicles";
 	private final static String VEHICLE = "digicoreVehicle";
 	private final static String CHAIN = "chain";
@@ -74,6 +78,8 @@ public class DigicoreVehiclesReader_v2 extends MatsimXmlParser {
 	private TimeZone timeZone;
 	private Locale locale;
 	
+	private Counter counter = new Counter("  vehicles # ");
+	
 	
 	public DigicoreVehiclesReader_v2(DigicoreVehicles vehicles) {
 		this.vehicles = vehicles;
@@ -103,6 +109,7 @@ public class DigicoreVehiclesReader_v2 extends MatsimXmlParser {
 	public void endTag(String name, String content, Stack<String> context) {
 		if(VEHICLE.equals(name)){
 			vehicles.getVehicles().put(currentVehicle.getId(), currentVehicle);
+			counter.incCounter();
 			currentVehicle = null;
 		} else if(CHAIN.equals(name)){
 			currentVehicle.getChains().add(currentChain);
@@ -113,6 +120,9 @@ public class DigicoreVehiclesReader_v2 extends MatsimXmlParser {
 		} else if(TRACE.equals(name)){
 			currentChain.add(currentTrace);
 			currentTrace = null;
+		} else if(VEHICLES.equalsIgnoreCase(name)){
+			counter.printCounter();
+			log.info("Done reading the vehicles file.");
 		}
 	}
 	
@@ -194,8 +204,10 @@ public class DigicoreVehiclesReader_v2 extends MatsimXmlParser {
 	@Override
 	protected void setDoctype(final String doctype) {
 		super.setDoctype(doctype);
-		// Currently the only digicoreVehicle-type is v1
+		// Currently the only digicoreVehicles-type are v1 & v2
 		if ("digicoreVehicles_v1.dtd".equals(doctype)) {
+			log.warn("This is a v2 reader, but it is reading a v1 file!");
+		} else if ("digicoreVehicles_v2.dtd".equals(doctype)) {
 		} else {
 			throw new IllegalArgumentException("Doctype \"" + doctype + "\" not known.");
 		}

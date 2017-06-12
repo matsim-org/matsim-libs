@@ -21,12 +21,12 @@ package tutorial.config;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author nagel
@@ -53,9 +53,11 @@ public class ExamplesByConfigfileIT {
 		filesToRun.add(new Object [] {"examples/tutorial/config/example1-config.xml"});
 		filesToRun.add(new Object [] {"examples/tutorial/config/example5-config.xml"});
 		filesToRun.add(new Object [] {"examples/tutorial/config/example5trips-config.xml"});
-		filesToRun.add(new Object [] {"../examples/scenarios//equil-mixedTraffic/config.xml"});
+		filesToRun.add(new Object [] {"../examples/scenarios//equil-mixedTraffic/config-with-mode-vehicles.xml"});
+		filesToRun.add(new Object [] {"../examples/scenarios//equil-mixedTraffic/config-with-all-vehicles-from-file.xml"});
 		filesToRun.add(new Object [] {"examples/tutorial/config/example2-config.xml"});
 		filesToRun.add(new Object [] {"../examples/scenarios//equil-extended/config-with-network-change-events.xml"});
+		filesToRun.add(new Object [] {"../examples/scenarios/equil-extended/config-with-subpopulation.xml"});
 		
 		return filesToRun;
 		
@@ -72,7 +74,7 @@ public class ExamplesByConfigfileIT {
 	public final void testMain() {
 		try {
 			IOUtils.deleteDirectoryRecursively(new File("./output/example").toPath());
-		} catch ( IllegalArgumentException ee ) {
+		} catch ( UncheckedIOException ee ) {
 			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
 			// and did not remove the directory afterwards.)
 		}

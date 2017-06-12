@@ -52,7 +52,7 @@ import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.taxi.run.*;
+import org.matsim.contrib.taxi.run.TaxiModule;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
@@ -590,6 +590,10 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		return taxiDrivers;
 	}
 
+//	public Set<Id<Vehicle>> getPtVehicles() {
+//		return ptVehicles;
+//	}
+
 	public Scenario getScenario() {
 		return scenario;
 	}
@@ -610,6 +614,10 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		return personId2tripNumber2inVehicleTime;
 	}
 
+	public Set<Id<Person>> getPtDrivers() {
+		return ptDrivers;
+	}
+
 	public Double getTotalTravelTimeByPersons() {
 		double totalTravelTimeByPersons = 0.;
 		for (Id<Person> id : this.personId2tripNumber2travelTime.keySet()) {
@@ -619,5 +627,5 @@ PersonLeavesVehicleEventHandler , PersonStuckEventHandler {
 		}
 		return totalTravelTimeByPersons;
 	}
-	
+
 }

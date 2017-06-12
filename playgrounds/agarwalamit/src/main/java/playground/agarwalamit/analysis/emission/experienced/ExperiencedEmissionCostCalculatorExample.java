@@ -36,6 +36,7 @@ import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.munich.utils.MunichPersonFilter;
 import playground.agarwalamit.utils.LoadMyScenarios;
 import playground.agarwalamit.utils.MapUtils;
+import playground.kai.usecases.combinedEventsReader.CombinedMatsimEventsReader;
 import playground.vsp.airPollution.exposure.EmissionResponsibilityCostModule;
 import playground.vsp.airPollution.exposure.GridTools;
 import playground.vsp.airPollution.exposure.IntervalHandler;
@@ -135,17 +136,27 @@ public class ExperiencedEmissionCostCalculatorExample {
                     emissionsConfigGroup.setEmissionCostMultiplicationFactor(1.);
 
                     EmissionResponsibilityCostModule emissionCostModule = new EmissionResponsibilityCostModule(emissionsConfigGroup, rgt);
-                    ExperiencedEmissionCostHandler handler = new ExperiencedEmissionCostHandler(emissionCostModule, new MunichPersonFilter());
+                    ExperiencedEmissionCostHandler handler = new ExperiencedEmissionCostHandler(emissionCostModule, new MunichPersonFilter(),simulationEndtime, 1);
 
                     EventsManager events = EventsUtils.createEventsManager();
                     events.addHandler(handler);
-                    MatsimEventsReader reader = new MatsimEventsReader(events);
+                    CombinedMatsimEventsReader reader = new CombinedMatsimEventsReader(events);
                     reader.readFile(eventsFile);
 
                     handler.getUserGroup2TotalEmissionCosts().entrySet().forEach(e -> System.out.println(e.getKey()+"\t"+e.getValue()));
                     writer.write(str+"\t"+itr+"\t"+ MapUtils.doubleValueSum(handler.getUserGroup2TotalEmissionCosts())+"\t");
 
                     writer.write(MapUtils.doubleValueSum(person2toll)+"\n");
+
+                    // writing time bin 2 costs
+                    BufferedWriter bufferedWriter = IOUtils.getBufferedWriter(dir+"timeBin2AirPollutionExposureCosts_"+str+".txt");
+
+                    Map<Double, Double> time2costs = handler.getTimeBin2TotalCosts();
+                    bufferedWriter.write("timeBin\tairPollutionExposureCostsEUR\n");
+                    for(Double d : time2costs.keySet()) {
+                        bufferedWriter.write(d+"\t"+time2costs.get(d)+"\n");
+                    }
+                    bufferedWriter.close();
                 }
             }
             writer.close();

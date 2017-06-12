@@ -20,8 +20,9 @@
 package playground.agarwalamit;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
@@ -74,13 +75,11 @@ public class EquilOpdytsTest {
     private static String EQUIL_DIR = "../../examples/scenarios/equil-mixedTraffic/";
     private static final OpdytsScenario EQUIL_MIXEDTRAFFIC = OpdytsScenario.EQUIL_MIXEDTRAFFIC;
 
-    private static final boolean isPlansRelaxed = false;
+    private static final boolean isPlansRelaxed = true;
 
     @Test@Ignore
     public void runTest(){
-        Set<String> modes2consider = new HashSet<>();
-        modes2consider.add("car");
-        modes2consider.add("bicycle");
+        List<String> modes2consider = Arrays.asList("car","bicycle");
 
         String outDir = helper.getOutputDirectory();
         Config config = setUpAndReturnConfig(modes2consider);
@@ -91,11 +90,11 @@ public class EquilOpdytsTest {
         }
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-
+        scenario.getConfig().controler().setOutputDirectory(outDir);
         runOpdyts(modes2consider,scenario,outDir);
     }
 
-    private void runOpdyts(final Set<String> modes2consider, final Scenario scenario, final String outDir){
+    private void runOpdyts(final List<String> modes2consider, final Scenario scenario, final String outDir){
         int startTime= 0;
         int binSize = 3600;
         int binCount = 24;
@@ -104,11 +103,12 @@ public class EquilOpdytsTest {
         DistanceDistribution distanceDistribution = new EquilDistanceDistribution(EQUIL_MIXEDTRAFFIC);
         OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
 
-        MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization, modes2consider);
+        MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization, new HashSet<>(modes2consider));
         simulator.addOverridingModule(new AbstractModule() {
 
             @Override
             public void install() {
+                addControlerListenerBinding().toInstance(stasControlerListner);
                 bind(ScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
             }
         });
@@ -150,7 +150,7 @@ public class EquilOpdytsTest {
         randomSearch.run(selfTuner );
     }
 
-    private void relaxPlansAndUpdateConfig(final Config config, final String outDir, final Set<String> modes2consider){
+    private void relaxPlansAndUpdateConfig(final Config config, final String outDir, final List<String> modes2consider){
 
         config.controler().setOutputDirectory(outDir+"/relaxingPlans/");
         config.controler().setLastIteration(20);
@@ -185,7 +185,7 @@ public class EquilOpdytsTest {
         config.strategy().setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
     }
 
-    private Config setUpAndReturnConfig(final Set<String> modes2consider){
+    private Config setUpAndReturnConfig(final List<String> modes2consider){
 
         Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
         config.plans().setInputFile("plans2000.xml.gz");

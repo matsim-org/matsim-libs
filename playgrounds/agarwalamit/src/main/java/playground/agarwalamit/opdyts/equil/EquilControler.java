@@ -20,8 +20,8 @@
 package playground.agarwalamit.opdyts.equil;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Arrays;
+import java.util.List;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -65,9 +65,7 @@ public class EquilControler {
             OUT_DIR = args[1];
         }
 
-        Set<String> modes2consider = new HashSet<>();
-        modes2consider.add("car");
-        modes2consider.add("bicycle");
+        List<String> modes2consider = Arrays.asList("car","bicycle");
 
         //see an example with detailed explanations -- package opdytsintegration.example.networkparameters.RunNetworkParameters
         Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");

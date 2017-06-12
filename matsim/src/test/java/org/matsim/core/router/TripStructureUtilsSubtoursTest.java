@@ -36,7 +36,6 @@ import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -95,12 +94,25 @@ public class TripStructureUtilsSubtoursTest {
 		((Activity) act).setFacilityId( facLoc );
 		return act;
 	}
+	
+	private static Id<?> createId(long no, boolean anchorAtFacilities){
+		Id<?> id;
+		if (anchorAtFacilities){
+			id = Id.create(no, ActivityFacility.class);
+		}else
+		{
+			id = Id.create(no, Link.class);
+
+		}
+		
+		return id;
+	}
 
 	private static Fixture createMonoSubtourFixture(final boolean anchorAtFacilities) {
 		final PopulationFactory fact = createPopulationFactory();
 
 		final Plan plan = fact.createPlan();
-		final Activity act1 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act1 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(1,anchorAtFacilities));
 		plan.addActivity( act1 );
 
 		final List<PlanElement> trip1 = new ArrayList<PlanElement>();
@@ -108,17 +120,17 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg1 );
 		trip1.add( leg1 );
 
-		final Activity act2 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act2 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , createId(2,anchorAtFacilities) );
 		plan.addActivity( act2 );
 
-		final Activity act2b = createActivityFromLocationId( anchorAtFacilities , fact , "w" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act2b = createActivityFromLocationId( anchorAtFacilities , fact , "w" , createId(2,anchorAtFacilities) );
 		plan.addActivity( act2b );
 
 		final List<PlanElement> trip2 = new ArrayList<PlanElement>();
 		final Leg leg2 = fact.createLeg( "walk" );
 		plan.addLeg( leg2 );
 		trip2.add( leg2 );
-		final Activity stage = createActivityFromLocationId( anchorAtFacilities , fact , STAGE , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity stage = createActivityFromLocationId( anchorAtFacilities , fact , STAGE , createId(2,anchorAtFacilities) );
 		plan.addActivity( stage );
 		trip2.add( stage );
 		final Leg leg3 = fact.createLeg( "swim" );
@@ -128,7 +140,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg4 );
 		trip2.add( leg4 );
 
-		final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(1,anchorAtFacilities) );
 		plan.addActivity( act3 );
 
 		return new Fixture(
@@ -146,7 +158,7 @@ public class TripStructureUtilsSubtoursTest {
 		final PopulationFactory fact = createPopulationFactory();
 
 		final Plan plan = fact.createPlan();
-		final Activity act1 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act1 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(1,anchorAtFacilities) );
 		plan.addActivity( act1 );
 
 		final List<PlanElement> trip1 = new ArrayList<PlanElement>();
@@ -154,14 +166,14 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg1 );
 		trip1.add( leg1 );
 
-		final Activity act2 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act2 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , createId(2,anchorAtFacilities) );
 		plan.addActivity( act2 );
 
 		final List<PlanElement> trip2 = new ArrayList<PlanElement>();
 		final Leg leg2 = fact.createLeg("walk");
 		plan.addLeg( leg2 );
 		trip2.add(leg2);
-		final Activity stage = createActivityFromLocationId(anchorAtFacilities, fact, STAGE, Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		final Activity stage = createActivityFromLocationId(anchorAtFacilities, fact, STAGE, createId(2,anchorAtFacilities));
 		plan.addActivity(stage);
 		trip2.add( stage );
 		final Leg leg3 = fact.createLeg("swim");
@@ -171,7 +183,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg4 );
 		trip2.add(leg4);
 
-		final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(2,anchorAtFacilities) );
 		plan.addActivity(act3);
 
 		final List<PlanElement> trip3 = new ArrayList<PlanElement>();
@@ -179,7 +191,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg5 );
 		trip3.add(leg5);
 
-		final Activity act4 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act4 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(1,anchorAtFacilities) );
 		plan.addActivity(act4);
 
 		final Subtour rootSubtour =
@@ -209,7 +221,7 @@ public class TripStructureUtilsSubtoursTest {
 		final PopulationFactory fact = createPopulationFactory();
 
 		final Plan plan = fact.createPlan();
-		final Activity act1 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act1 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(1,anchorAtFacilities) );
 		plan.addActivity( act1 );
 
 		final List<PlanElement> trip1 = new ArrayList<PlanElement>();
@@ -217,14 +229,14 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg1 );
 		trip1.add( leg1 );
 
-		final Activity act2 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act2 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , createId(2,anchorAtFacilities) );
 		plan.addActivity( act2 );
 
 		final List<PlanElement> trip2 = new ArrayList<PlanElement>();
 		final Leg leg2 = fact.createLeg( "walk" );
 		plan.addLeg( leg2 );
 		trip2.add( leg2 );
-		final Activity stage = createActivityFromLocationId( anchorAtFacilities , fact , STAGE , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity stage = createActivityFromLocationId( anchorAtFacilities , fact , STAGE , createId(2,anchorAtFacilities) );
 		plan.addActivity( stage );
 		trip2.add( stage );
 		final Leg leg3 = fact.createLeg( "swim" );
@@ -234,7 +246,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg4 );
 		trip2.add( leg4 );
 
-		final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "s" , Id.create(3, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "s" , createId(3,anchorAtFacilities) );
 		plan.addActivity( act3 );
 
 		final List<PlanElement> trip3 = new ArrayList<PlanElement>();
@@ -242,7 +254,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg5 );
 		trip3.add( leg5 );
 
-		final Activity act4 = createActivityFromLocationId( anchorAtFacilities , fact , "t" , Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act4 = createActivityFromLocationId( anchorAtFacilities , fact , "t" , createId(1,anchorAtFacilities) );
 		plan.addActivity( act4 );
 
 		final List<PlanElement> trip4 = new ArrayList<PlanElement>();
@@ -250,7 +262,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg6 );
 		trip4.add( leg6 );
 
-		final Activity act5 = createActivityFromLocationId( anchorAtFacilities , fact , "aa" , Id.create(3, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act5 = createActivityFromLocationId( anchorAtFacilities , fact , "aa" , createId(3,anchorAtFacilities) );
 		plan.addActivity( act5 );
 	
 		final List<PlanElement> trip5 = new ArrayList<PlanElement>();
@@ -258,7 +270,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg7 );
 		trip5.add( leg7 );
 
-		final Activity act6 = createActivityFromLocationId( anchorAtFacilities , fact , "l" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act6 = createActivityFromLocationId( anchorAtFacilities , fact , "l" , createId(2,anchorAtFacilities) );
 		plan.addActivity( act6 );
 
 		final List<PlanElement> trip6 = new ArrayList<PlanElement>();
@@ -266,7 +278,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg8 );
 		trip6.add( leg8 );
 
-		final Activity act7 = createActivityFromLocationId( anchorAtFacilities , fact , "s" , Id.create(3, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act7 = createActivityFromLocationId( anchorAtFacilities , fact , "s" , createId(3,anchorAtFacilities) );
 		plan.addActivity( act7 );
 
 		final List<PlanElement> trip7 = new ArrayList<PlanElement>();
@@ -274,7 +286,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg9 );
 		trip7.add( leg9 );
 
-		final Activity act8 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act8 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(1,anchorAtFacilities) );
 		plan.addActivity( act8 );
 
 
@@ -316,7 +328,7 @@ public class TripStructureUtilsSubtoursTest {
 		final PopulationFactory fact = createPopulationFactory();
 
 		final Plan plan = fact.createPlan();
-		final Activity act1 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act1 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(1,anchorAtFacilities) );
 		plan.addActivity( act1 );
 
 		final List<PlanElement> trip1 = new ArrayList<PlanElement>();
@@ -324,14 +336,14 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg1 );
 		trip1.add( leg1 );
 
-		final Activity act2 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act2 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , createId(2,anchorAtFacilities) );
 		plan.addActivity( act2 );
 
 		final List<PlanElement> trip2 = new ArrayList<PlanElement>();
 		final Leg leg2 = fact.createLeg( "walk" );
 		plan.addLeg( leg2 );
 		trip2.add( leg2 );
-		final Activity stage = createActivityFromLocationId( anchorAtFacilities , fact , STAGE , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity stage = createActivityFromLocationId( anchorAtFacilities , fact , STAGE , createId(2,anchorAtFacilities) );
 		plan.addActivity( stage );
 		trip2.add( stage );
 		final Leg leg3 = fact.createLeg( "swim" );
@@ -341,7 +353,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg4 );
 		trip2.add( leg4 );
 
-		final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(2,anchorAtFacilities) );
 		plan.addActivity( act3 );
 
 		final List<PlanElement> trip3 = new ArrayList<PlanElement>();
@@ -349,7 +361,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg5 );
 		trip3.add( leg5 );
 
-		final Activity act4 = createActivityFromLocationId( anchorAtFacilities , fact , "camping" , Id.create(3, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act4 = createActivityFromLocationId( anchorAtFacilities , fact , "camping" , createId(3,anchorAtFacilities) );
 		plan.addActivity( act4 );
 
 		final Subtour rootSubtour =
@@ -379,7 +391,7 @@ public class TripStructureUtilsSubtoursTest {
 		final PopulationFactory fact = createPopulationFactory();
 
 		final Plan plan = fact.createPlan();
-		final Activity act1 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act1 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(1,anchorAtFacilities) );
 		plan.addActivity( act1 );
 
 		final List<PlanElement> trip1 = new ArrayList<PlanElement>();
@@ -387,14 +399,14 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg1 );
 		trip1.add( leg1 );
 
-		final Activity act2 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act2 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , createId(2,anchorAtFacilities) );
 		plan.addActivity( act2 );
 
 		final List<PlanElement> trip2 = new ArrayList<PlanElement>();
 		final Leg leg2 = fact.createLeg( "walk" );
 		plan.addLeg( leg2 );
 		trip2.add( leg2 );
-		final Activity stage = createActivityFromLocationId( anchorAtFacilities , fact , STAGE , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity stage = createActivityFromLocationId( anchorAtFacilities , fact , STAGE , createId(2,anchorAtFacilities) );
 		plan.addActivity( stage );
 		trip2.add( stage );
 		final Leg leg3 = fact.createLeg( "swim" );
@@ -404,7 +416,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg4 );
 		trip2.add( leg4 );
 
-		final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(2,anchorAtFacilities) );
 		plan.addActivity( act3 );
 
 		final List<PlanElement> trip3 = new ArrayList<PlanElement>();
@@ -412,7 +424,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg5 );
 		trip3.add( leg5 );
 
-		final Activity act4 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(3, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act4 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(3,anchorAtFacilities) );
 		plan.addActivity( act4 );
 
 		final List<PlanElement> trip4 = new ArrayList<PlanElement>();
@@ -420,7 +432,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg6 );
 		trip4.add( leg6 );
 
-		final Activity act5 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(3, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act5 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(3,anchorAtFacilities) );
 		plan.addActivity( act5 );
 
 		final List<PlanElement> trip5 = new ArrayList<PlanElement>();
@@ -428,7 +440,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg7 );
 		trip5.add( leg7 );
 
-		final Activity act6 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act6 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(1,anchorAtFacilities) );
 		plan.addActivity( act6 );
 
 		final Subtour rootSubtour =
@@ -467,19 +479,19 @@ public class TripStructureUtilsSubtoursTest {
 	private static Fixture createSingleTourComingFromSomewhereElse(final boolean anchorAtFacilities) {
 		final PopulationFactory fact = createPopulationFactory();
 		final Plan plan = fact.createPlan();
-		Activity somewhereElse = createActivityFromLocationId(anchorAtFacilities, fact, "somewhere else", Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		Activity somewhereElse = createActivityFromLocationId(anchorAtFacilities, fact, "somewhere else", createId(1,anchorAtFacilities));
 		plan.addActivity(somewhereElse);
 		Leg leg1 = fact.createLeg("some mode");
 		plan.addLeg(leg1);
-		Activity home1 = createActivityFromLocationId(anchorAtFacilities, fact, "home", Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		Activity home1 = createActivityFromLocationId(anchorAtFacilities, fact, "home", createId(2,anchorAtFacilities));
 		plan.addActivity(home1);
 		Leg leg2 = fact.createLeg("some mode");
 		plan.addLeg(leg2);
-		Activity work = createActivityFromLocationId(anchorAtFacilities, fact, "work", Id.create(3, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		Activity work = createActivityFromLocationId(anchorAtFacilities, fact, "work", createId(3,anchorAtFacilities));
 		plan.addActivity(work);
 		Leg leg3 = fact.createLeg("some mode");
 		plan.addLeg(leg3);
-		Activity home2 = createActivityFromLocationId(anchorAtFacilities, fact, "home", Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		Activity home2 = createActivityFromLocationId(anchorAtFacilities, fact, "home", createId(2,anchorAtFacilities));
 		plan.addActivity(home2);
 		Subtour subtour1 = new Subtour(
 				Arrays.asList(
@@ -501,22 +513,22 @@ public class TripStructureUtilsSubtoursTest {
 		final PopulationFactory fact = createPopulationFactory();
 		final Plan plan = fact.createPlan();
 
-		Activity home1 = createActivityFromLocationId(anchorAtFacilities, fact, "home", Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		Activity home1 = createActivityFromLocationId(anchorAtFacilities, fact, "home", createId(2,anchorAtFacilities));
 		plan.addActivity(home1);
 		Leg leg2 = fact.createLeg("some mode");
 		plan.addLeg(leg2);
 
-		Activity work = createActivityFromLocationId(anchorAtFacilities, fact, "work", Id.create(3, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		Activity work = createActivityFromLocationId(anchorAtFacilities, fact, "work", createId(3,anchorAtFacilities));
 		plan.addActivity(work);
 		Leg leg3 = fact.createLeg("some mode");
 		plan.addLeg(leg3);
 
-		Activity home2 = createActivityFromLocationId(anchorAtFacilities, fact, "home", Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		Activity home2 = createActivityFromLocationId(anchorAtFacilities, fact, "home", createId(2,anchorAtFacilities));
 		plan.addActivity(home2);
 		Leg leg1 = fact.createLeg("some mode");
 		plan.addLeg(leg1);
 
-		Activity somewhereElse = createActivityFromLocationId(anchorAtFacilities, fact, "somewhere else", Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		Activity somewhereElse = createActivityFromLocationId(anchorAtFacilities, fact, "somewhere else", createId(1,anchorAtFacilities));
 		plan.addActivity(somewhereElse);
 
 		Subtour subtour1 = new Subtour(
@@ -542,13 +554,13 @@ public class TripStructureUtilsSubtoursTest {
 		final List<Subtour> childrenSubtours = new ArrayList<Subtour>();
 
 		final Plan plan = fact.createPlan();
-		final Activity act1 = createActivityFromLocationId(anchorAtFacilities, fact, "h", Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		final Activity act1 = createActivityFromLocationId(anchorAtFacilities, fact, "h", createId(1,anchorAtFacilities));
 		plan.addActivity( act1 );
 
 		final Leg leg1 = fact.createLeg("walk");
 		plan.addLeg(leg1);
 
-		final Activity act2= createActivityFromLocationId(anchorAtFacilities, fact, "w", Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		final Activity act2= createActivityFromLocationId(anchorAtFacilities, fact, "w", createId(2,anchorAtFacilities));
 		plan.addActivity( act2 );
 
 		trips.add(new Trip(act1, Collections.<PlanElement>singletonList(leg1), act2));
@@ -559,7 +571,7 @@ public class TripStructureUtilsSubtoursTest {
 			final Leg leg2 = fact.createLeg( "walk" );
 			plan.addLeg( leg2 );
 			trip.add( leg2 );
-			final Activity stage = createActivityFromLocationId( anchorAtFacilities , fact , STAGE , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+			final Activity stage = createActivityFromLocationId( anchorAtFacilities , fact , STAGE , createId(2,anchorAtFacilities) );
 			plan.addActivity( stage );
 			trip.add( stage );
 			final Leg leg3 = fact.createLeg( "swim" );
@@ -569,7 +581,7 @@ public class TripStructureUtilsSubtoursTest {
 			plan.addLeg( leg4 );
 			trip.add( leg4 );
 
-			final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+			final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , createId(2,anchorAtFacilities) );
 			plan.addActivity( act3 );
 
 			final Trip tripObject = new Trip( lastAct , trip , act3 );
@@ -586,7 +598,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg5 );
 		trip3.add(leg5);
 
-		final Activity act4 = createActivityFromLocationId(anchorAtFacilities, fact, "h", Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		final Activity act4 = createActivityFromLocationId(anchorAtFacilities, fact, "h", createId(1,anchorAtFacilities));
 		plan.addActivity( act4 );
 
 		trips.add(new Trip(lastAct, trip3, act4));
@@ -613,7 +625,7 @@ public class TripStructureUtilsSubtoursTest {
 		final PopulationFactory fact = createPopulationFactory();
 
 		final Plan plan = fact.createPlan();
-		final Activity act1 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act1 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(1,anchorAtFacilities) );
 		plan.addActivity( act1 );
 
 		final List<PlanElement> trip1 = new ArrayList<PlanElement>();
@@ -621,17 +633,17 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg1 );
 		trip1.add( leg1 );
 
-		final Activity act2 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act2 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , createId(2,anchorAtFacilities) );
 		plan.addActivity( act2 );
 
-		final Activity act2b = createActivityFromLocationId(anchorAtFacilities, fact, "w", Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class));
+		final Activity act2b = createActivityFromLocationId(anchorAtFacilities, fact, "w", createId(1,anchorAtFacilities));
 		plan.addActivity(act2b);
 
 		final List<PlanElement> trip2 = new ArrayList<PlanElement>();
 		final Leg leg2 = fact.createLeg("walk");
 		plan.addLeg(leg2);
 		trip2.add( leg2 );
-		final Activity stage = createActivityFromLocationId( anchorAtFacilities , fact , STAGE , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity stage = createActivityFromLocationId( anchorAtFacilities , fact , STAGE , createId(2,anchorAtFacilities) );
 		plan.addActivity( stage );
 		trip2.add( stage );
 		final Leg leg3 = fact.createLeg( "swim" );
@@ -641,7 +653,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg(leg4);
 		trip2.add( leg4 );
 
-		final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(2,anchorAtFacilities) );
 		plan.addActivity(act3);
 
 		return new Fixture(
@@ -654,7 +666,7 @@ public class TripStructureUtilsSubtoursTest {
 		final PopulationFactory fact = createPopulationFactory();
 
 		final Plan plan = fact.createPlan();
-		final Activity act1 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act1 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(1,anchorAtFacilities) );
 		plan.addActivity( act1 );
 
 		final List<PlanElement> trip1 = new ArrayList<PlanElement>();
@@ -662,14 +674,14 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg1 );
 		trip1.add( leg1 );
 
-		final Activity act2 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act2 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , createId(2,anchorAtFacilities) );
 		plan.addActivity( act2 );
 
 		final List<PlanElement> trip2 = new ArrayList<PlanElement>();
 		final Leg leg2 = fact.createLeg( "walk" );
 		plan.addLeg( leg2 );
 		trip2.add( leg2 );
-		final Activity stage = createActivityFromLocationId( anchorAtFacilities , fact , STAGE , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity stage = createActivityFromLocationId( anchorAtFacilities , fact , STAGE , createId(2,anchorAtFacilities) );
 		plan.addActivity( stage );
 		trip2.add( stage );
 		final Leg leg3 = fact.createLeg( "swim" );
@@ -679,7 +691,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg4 );
 		trip2.add( leg4 );
 
-		final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act3 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(1,anchorAtFacilities) );
 		plan.addActivity( act3 );
 
 		final List<PlanElement> trip3 = new ArrayList<PlanElement>();
@@ -687,7 +699,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg5 );
 		trip3.add( leg5 );
 
-		final Activity act4 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , Id.create(2, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act4 = createActivityFromLocationId( anchorAtFacilities , fact , "w" , createId(2,anchorAtFacilities) );
 		plan.addActivity( act4 );
 
 		final List<PlanElement> trip4 = new ArrayList<PlanElement>();
@@ -695,7 +707,7 @@ public class TripStructureUtilsSubtoursTest {
 		plan.addLeg( leg6 );
 		trip4.add( leg6 );
 
-		final Activity act5 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , Id.create(1, anchorAtFacilities ? ActivityFacility.class : Link.class) );
+		final Activity act5 = createActivityFromLocationId( anchorAtFacilities , fact , "h" , createId(1,anchorAtFacilities) );
 		plan.addActivity( act5 );
 
 		final Subtour firstSubtour =
