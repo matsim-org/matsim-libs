@@ -48,6 +48,7 @@ import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener
 import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.utils.PatnaPersonFilter;
 import playground.agarwalamit.opdyts.*;
+import playground.agarwalamit.opdyts.analysis.OpdytsModalStatsControlerListener;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
 
@@ -67,14 +68,14 @@ public class PatnaJointOpdytsCalibrator {
 		String configFile;
 		int iterationsToConvergence = 300; //
 		int averagingIterations = 100;
-		double randomVariance = 0.1;
+		double scalingParameterForDecisionVariableVariability = 0.1;
 
 		if ( args.length>0 ) {
 			OUT_DIR = args[0];
 			configFile = args[1];
 			averagingIterations = Integer.valueOf(args[2]);
 			iterationsToConvergence = Integer.valueOf(args[3]);
-			randomVariance = Double.valueOf(args[4]);
+			scalingParameterForDecisionVariableVariability = Double.valueOf(args[4]);
 		} else {
 			configFile = configDir+"/config_urban_1pct.xml";
 		}
@@ -136,10 +137,10 @@ public class PatnaJointOpdytsCalibrator {
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC, randomVariance, PATNA_10_PCT, SUB_POP_NAME);
+				RandomizedUtilityParametersChoser.ONLY_ASC, PATNA_10_PCT, SUB_POP_NAME, modes2consider);
 
 		// what would be the decision variables to optimize the objective function.
-		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, PATNA_10_PCT, SUB_POP_NAME);
+		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, PATNA_10_PCT, modes2consider, SUB_POP_NAME);
 
 		// what would decide the convergence of the objective function
 		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);

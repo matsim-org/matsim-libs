@@ -8,10 +8,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -34,7 +34,7 @@ import opdytsintegration.utils.TimeDiscretization;
  *
  */
 public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
-		implements StartupListener, IterationEndsListener, ShutdownListener {
+		implements StartupListener, BeforeMobsimListener, ShutdownListener {
 
 	// -------------------- MEMBERS --------------------
 
@@ -72,6 +72,8 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 	private LinkedList<Vector> stateList = null;
 
 	private MATSimState finalState = null;
+
+	private boolean justStarted = true;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -179,73 +181,169 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 		}
 
 		this.trajectorySampler.initialize();
+
+		// TODO NEW
+		this.justStarted = true;
 	}
 
 	@Override
-	public void notifyIterationEnds(final IterationEndsEvent event) {
+	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 
 		/*
-		 * (1) Extract the instantaneous state vector.
+		 * (0) The mobsim must have been run at least once to allow for the
+		 * extraction of a vector-valued system state. The "just started" MATSim
+		 * iteration is hence run through without Opdyts in the loop.
 		 */
+		if (this.justStarted) {
+			this.justStarted = false;
+		} else {
 
-		Vector newInstantaneousStateVector = null;
+			/*
+			 * (1) Extract the instantaneous state vector.
+			 */
 
-		// car
-		if (this.networkOccupancyAnalyzer != null) {
-			final Vector newInstantaneousStateVectorCar = new Vector(this.relevantNetworkModes.size()
-					* this.relevantLinkIds.size() * this.timeDiscretization.getBinCnt());
-			int i = 0;
-			for (String mode : this.relevantNetworkModes) {
-				final MATSimCountingStateAnalyzer<Link> analyzer = this.networkOccupancyAnalyzer
-						.getNetworkModeAnalyzer(mode);
-				for (Id<Link> linkId : this.relevantLinkIds) {
-					for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
-						newInstantaneousStateVectorCar.set(i++, analyzer.getCount(linkId, bin));
+			Vector newInstantaneousStateVector = null;
+
+			// car
+			if (this.networkOccupancyAnalyzer != null) {
+				final Vector newInstantaneousStateVectorCar = new Vector(this.relevantNetworkModes.size()
+						* this.relevantLinkIds.size() * this.timeDiscretization.getBinCnt());
+				int i = 0;
+				for (String mode : this.relevantNetworkModes) {
+					final MATSimCountingStateAnalyzer<Link> analyzer = this.networkOccupancyAnalyzer
+							.getNetworkModeAnalyzer(mode);
+					for (Id<Link> linkId : this.relevantLinkIds) {
+						for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
+							newInstantaneousStateVectorCar.set(i++, analyzer.getCount(linkId, bin));
+						}
 					}
 				}
+				newInstantaneousStateVector = newInstantaneousStateVectorCar;
 			}
-			newInstantaneousStateVector = newInstantaneousStateVectorCar;
-		}
 
-		// pt
-		if (this.ptOccupancyAnalyzer != null) {
-			final Vector newInstantaneousStateVectorPT = new Vector(
-					this.relevantStopIds.size() * this.timeDiscretization.getBinCnt());
-			int i = 0;
-			for (Id<TransitStopFacility> stopId : this.relevantStopIds) {
-				for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
-					newInstantaneousStateVectorPT.set(i++, this.ptOccupancyAnalyzer.getCount(stopId, bin));
+			// pt
+			if (this.ptOccupancyAnalyzer != null) {
+				final Vector newInstantaneousStateVectorPT = new Vector(
+						this.relevantStopIds.size() * this.timeDiscretization.getBinCnt());
+				int i = 0;
+				for (Id<TransitStopFacility> stopId : this.relevantStopIds) {
+					for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
+						newInstantaneousStateVectorPT.set(i++, this.ptOccupancyAnalyzer.getCount(stopId, bin));
+					}
+				}
+				if (newInstantaneousStateVector != null) {
+					newInstantaneousStateVector = Vector.concat(newInstantaneousStateVector,
+							newInstantaneousStateVectorPT);
+				} else {
+					newInstantaneousStateVector = newInstantaneousStateVectorPT;
 				}
 			}
-			if (newInstantaneousStateVector != null) {
-				newInstantaneousStateVector = Vector.concat(newInstantaneousStateVector, newInstantaneousStateVectorPT);
-			} else {
-				newInstantaneousStateVector = newInstantaneousStateVectorPT;
-			}
-		}
 
-		/*
-		 * (2) Add instantaneous state vector to the list of past state vectors
-		 * and ensure that the size of this list is equal to what the memory
-		 * parameter prescribes.
-		 */
-		this.stateList.addFirst(newInstantaneousStateVector);
-		while (this.stateList.size() < this.memory) {
+			/*
+			 * (2) Add instantaneous state vector to the list of past state
+			 * vectors and ensure that the size of this list is equal to what
+			 * the memory parameter prescribes.
+			 */
 			this.stateList.addFirst(newInstantaneousStateVector);
-		}
-		while (this.stateList.size() > this.memory) {
-			this.stateList.removeLast();
-		}
+			while (this.stateList.size() < this.memory) {
+				this.stateList.addFirst(newInstantaneousStateVector);
+			}
+			while (this.stateList.size() > this.memory) {
+				this.stateList.removeLast();
+			}
 
-		/*
-		 * (3) Inform the TrajectorySampler that one iteration has been
-		 * completed and provide the resulting state.
-		 */
-		this.trajectorySampler.afterIteration(this.newState(this.population));
+			/*
+			 * (3) Inform the TrajectorySampler that one iteration has been
+			 * completed and provide the resulting state.
+			 */
+			this.trajectorySampler.afterIteration(this.newState(this.population));
+		}
+		
+		if (this.networkOccupancyAnalyzer != null) {
+			this.networkOccupancyAnalyzer.beforeIteration();
+		}
+		if (this.ptOccupancyAnalyzer != null) {
+			this.ptOccupancyAnalyzer.beforeIteration();
+		}
+		
 	}
 
+	/*
+	 * TODO Given that an iteration is assumed to end before the
+	 * "mobsim execution" step, the final state is only approximately correctly
+	 * computed because it leaves out the last iteration's "replanning" step.
+	 * 
+	 */
 	@Override
 	public void notifyShutdown(final ShutdownEvent event) {
 		this.finalState = this.newState(this.population);
 	}
+
 }
+
+// @Override
+// public void notifyIterationEnds(final IterationEndsEvent event) {
+//
+// /*
+// * (1) Extract the instantaneous state vector.
+// */
+//
+// Vector newInstantaneousStateVector = null;
+//
+// // car
+// if (this.networkOccupancyAnalyzer != null) {
+// final Vector newInstantaneousStateVectorCar = new
+// Vector(this.relevantNetworkModes.size()
+// * this.relevantLinkIds.size() * this.timeDiscretization.getBinCnt());
+// int i = 0;
+// for (String mode : this.relevantNetworkModes) {
+// final MATSimCountingStateAnalyzer<Link> analyzer =
+// this.networkOccupancyAnalyzer
+// .getNetworkModeAnalyzer(mode);
+// for (Id<Link> linkId : this.relevantLinkIds) {
+// for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
+// newInstantaneousStateVectorCar.set(i++, analyzer.getCount(linkId, bin));
+// }
+// }
+// }
+// newInstantaneousStateVector = newInstantaneousStateVectorCar;
+// }
+//
+// // pt
+// if (this.ptOccupancyAnalyzer != null) {
+// final Vector newInstantaneousStateVectorPT = new Vector(
+// this.relevantStopIds.size() * this.timeDiscretization.getBinCnt());
+// int i = 0;
+// for (Id<TransitStopFacility> stopId : this.relevantStopIds) {
+// for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
+// newInstantaneousStateVectorPT.set(i++,
+// this.ptOccupancyAnalyzer.getCount(stopId, bin));
+// }
+// }
+// if (newInstantaneousStateVector != null) {
+// newInstantaneousStateVector = Vector.concat(newInstantaneousStateVector,
+// newInstantaneousStateVectorPT);
+// } else {
+// newInstantaneousStateVector = newInstantaneousStateVectorPT;
+// }
+// }
+//
+// /*
+// * (2) Add instantaneous state vector to the list of past state vectors
+// * and ensure that the size of this list is equal to what the memory
+// * parameter prescribes.
+// */
+// this.stateList.addFirst(newInstantaneousStateVector);
+// while (this.stateList.size() < this.memory) {
+// this.stateList.addFirst(newInstantaneousStateVector);
+// }
+// while (this.stateList.size() > this.memory) {
+// this.stateList.removeLast();
+// }
+//
+// /*
+// * (3) Inform the TrajectorySampler that one iteration has been
+// * completed and provide the resulting state.
+// */
+// this.trajectorySampler.afterIteration(this.newState(this.population));
+// }

@@ -38,7 +38,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.agarwalamit.opdyts.DistanceDistribution;
-import playground.agarwalamit.opdyts.OpdytsModalStatsControlerListener;
+import playground.agarwalamit.opdyts.analysis.OpdytsModalStatsControlerListener;
 import playground.agarwalamit.opdyts.OpdytsScenario;
 import playground.agarwalamit.utils.FileUtils;
 
@@ -55,8 +55,7 @@ public class EquilControler {
 
     private static final boolean isPlansRelaxed = false;
 
-    private static final int ascTrials [] = {0,1,2,3,4,5,6,7,8,9,10};
-    private static final int avgItrAfterValueOfObjectiveFn [] = {0, 10, 25, 50, 100};
+    private static final double ascTrials [] = {-2.0, -1.5, -1.0, -0.5, -0.2, 0.0 };
 
     public static void main(String[] args) {
 
@@ -141,6 +140,7 @@ public class EquilControler {
                 }
             });
             FileUtils.deleteIntermediateIterations(config.controler().getOutputDirectory(),controler.getConfig().controler().getFirstIteration(), controler.getConfig().controler().getLastIteration());
+            controler.run();
         }
 
         // set back settings for opdyts
@@ -148,7 +148,7 @@ public class EquilControler {
         config.plans().setInputFile(file.getAbsoluteFile().getAbsolutePath());
         config.strategy().setFractionOfIterationsToDisableInnovation(Double.POSITIVE_INFINITY);
 
-        for (int asc : ascTrials){
+        for (double asc : ascTrials){
             OUT_DIR = OUT_DIR+"/ascRun"+asc+"/";
             config.planCalcScore().getOrCreateModeParams("bicycle").setConstant(asc);
             config.controler().setOutputDirectory(OUT_DIR);

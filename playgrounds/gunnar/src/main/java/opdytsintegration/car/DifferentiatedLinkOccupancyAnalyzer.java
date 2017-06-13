@@ -60,19 +60,26 @@ public class DifferentiatedLinkOccupancyAnalyzer implements LinkLeaveEventHandle
 		return ((this.relevantLinks == null) || this.relevantLinks.contains(link));
 	}
 
-	// TODO: Encapsulate and provide access to the full real-valued state vector per mode.
+	// TODO: Encapsulate and provide access to the full real-valued state vector
+	// per mode.
 	public MATSimCountingStateAnalyzer<Link> getNetworkModeAnalyzer(final String mode) {
 		return this.mode2stateAnalyzer.get(mode);
 	}
-	
+
 	// ---------- IMPLEMENTATION OF *EventHandler INTERFACES ----------
+
+	// This replaces EventHandler.reset(int), which appears to be called before
+	// the "before mobsim" hook.
+	public void beforeIteration() {
+		for (MATSimCountingStateAnalyzer<?> stateAnalyzer : this.mode2stateAnalyzer.values()) {
+			stateAnalyzer.beforeIteration();
+		}
+		this.vehicleId2stateAnalyzer = new LinkedHashMap<>();
+	}
 
 	@Override
 	public void reset(final int iteration) {
-		for (MATSimCountingStateAnalyzer<?> stateAnalyzer : this.mode2stateAnalyzer.values()) {
-			stateAnalyzer.reset(iteration);
-		}
-		this.vehicleId2stateAnalyzer = new LinkedHashMap<>();
+		// see the explanation of beforeIteration()
 	}
 
 	@Override
