@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dziemke.cemdapMatsimCadyts;
+package playground.vsp.demandde.cemdapMATSimCadyts;
 
 import org.apache.log4j.Logger;
 
