@@ -32,6 +32,7 @@ public class RunDummy {
 		config.plans().setInputFile("C:/Users/Tille/WORK/Cottbus/Cottbus-pt/INPUT_mod/plans_scale0.015.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
+		
 //		LinkModifier mod = new LinkModifier(scenario);
 ////		mod.modifyLinkCapacity(Id.createLinkId("ptl62"), 300);
 ////		mod.modifyLinkCapacity(Id.createLinkId("ptb62"), 300);
