@@ -43,6 +43,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  * This is an example how to set different flow capacity consumptions for different vehicles. 
  * Two groups of agents, one equipped with AVs (having an improved flow of factor 2), the other one using ordinary cars are traveling on two different routes in a grid network
  * , highlighting the difference between vehicles.
+ * Network flow capacities are the same on all links.
  * All agents try to depart at the same time. The queue is emptied twice as fast for the agents using an AV.
  *  
  */
@@ -55,6 +56,7 @@ public class RunAVExample {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		
 		new RunAVExample().run(true);
 		
 	}
