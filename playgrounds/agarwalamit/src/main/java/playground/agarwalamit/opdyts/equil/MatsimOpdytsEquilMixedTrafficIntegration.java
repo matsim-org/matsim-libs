@@ -20,6 +20,7 @@
 package playground.agarwalamit.opdyts.equil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -261,7 +262,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		opdytsConvergencePlotter.readFile(OUT_DIR+"/opdyts.con");
 		opdytsConvergencePlotter.plotData(OUT_DIR+"/convergence_"+ opdytsConfigGroup.getNumberOfIterationsForAveraging() +"Its_"+opdytsConfigGroup.getSelfTuningWeight()+"weight_"+startingASCforBicycle+"asc.png");
 
-		DecisionVariableAndBestSolutionPlotter decisionVariableAndBestSolutionPlotter = new DecisionVariableAndBestSolutionPlotter("bicycle");
+		DecisionVariableAndBestSolutionPlotter decisionVariableAndBestSolutionPlotter = new DecisionVariableAndBestSolutionPlotter(new ArrayList<>(modes2consider));
 		decisionVariableAndBestSolutionPlotter.readFile(OUT_DIR+"/opdyts.log");
 		decisionVariableAndBestSolutionPlotter.plotData(OUT_DIR+"/decisionVariableVsASC_"+ opdytsConfigGroup.getNumberOfIterationsForAveraging() +"Its_"+opdytsConfigGroup.getSelfTuningWeight()+"weight_"+startingASCforBicycle+"asc.png");
 	}

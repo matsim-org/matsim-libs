@@ -20,6 +20,7 @@
 package playground.agarwalamit.opdyts.patna.networkModesOnly;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -184,7 +185,7 @@ public class PatnaNetworkModesCalibrator {
 		opdytsConvergencePlotter.readFile(OUT_DIR+"/opdyts.con");
 		opdytsConvergencePlotter.plotData(OUT_DIR+"/convergence.png");
 
-		DecisionVariableAndBestSolutionPlotter decisionVariableAndBestSolutionPlotter = new DecisionVariableAndBestSolutionPlotter("bicycle");
+		DecisionVariableAndBestSolutionPlotter decisionVariableAndBestSolutionPlotter = new DecisionVariableAndBestSolutionPlotter(new ArrayList<>(modes2consider));
 		decisionVariableAndBestSolutionPlotter.readFile(OUT_DIR+"/opdyts.log");
 		decisionVariableAndBestSolutionPlotter.plotData(OUT_DIR+"/decisionVariableVsASC.png");
 	}
