@@ -39,7 +39,7 @@ public class ModeSwitcherAnalyser {
     public static void main(String[] args) {
         ModeSwitcherAnalyser modeSwitcherAnalyser = new ModeSwitcherAnalyser();
         modeSwitcherAnalyser.analyseForBerlin();
-        modeSwitcherAnalyser.analyseForMunich();
+//        modeSwitcherAnalyser.analyseForMunich();
     }
 
     public void analyseForMunich() {
@@ -79,7 +79,7 @@ public class ModeSwitcherAnalyser {
     }
 
     public void analyseForBerlin() {
-        String dir = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct-simpleNetwork/output_selectedPlans_flowCapFactor0.015_randomization/";
+        String dir = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct-simpleNetwork/output-FINAL/";
 
         String [] cases = {
                 "m_r_output_run0_bln_bc","r_output_run0_bln_bc"
@@ -100,9 +100,10 @@ public class ModeSwitcherAnalyser {
             try(BufferedWriter writer = IOUtils.getBufferedWriter( dir + "/" + str + "/modeSwitchesInfo.txt")) {
                 writer.write("personId\tmodeInFirstItr\tmodeInLastIt\ttripNumber\n");
                 for(Id<Person> personId : personId2ModeSwitches.keySet()) {
-                    for (int index = 1; index <= personId2ModeSwitches.get(personId).size() ; index++) {
-                        Tuple<String, String> modeSwitch = personId2ModeSwitches.get(personId).get(index);
-                        writer.write(personId+"\t"+modeSwitch.getFirst()+"\t"+modeSwitch.getSecond()+"\t"+index+"\n");
+                    int tripIndex = 1;
+                    for (Tuple<String, String> modeSwitch : personId2ModeSwitches.get(personId)) {
+                        writer.write(personId+"\t"+modeSwitch.getFirst()+"\t"+modeSwitch.getSecond()+"\t"+tripIndex+"\n");
+                        tripIndex++;
                     }
                 }
                 writer.close();
