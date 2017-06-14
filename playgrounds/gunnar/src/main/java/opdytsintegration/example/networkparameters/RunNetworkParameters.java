@@ -17,9 +17,8 @@ import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
-import floetteroed.opdyts.searchalgorithms.Simulator;
-import opdytsintegration.MATSimSimulator;
 import opdytsintegration.MATSimSimulator2;
+import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzerFactory;
 import opdytsintegration.utils.TimeDiscretization;
 
 /**
@@ -122,18 +121,20 @@ public class RunNetworkParameters {
 		 * Packages MATSim for use with Opdyts.
 		 */
 
-		final Simulator<NetworkParameters> matsim;
-		final boolean differentiateNetworkModes = true;
-		if (differentiateNetworkModes) {
-			final Set<String> modes = new LinkedHashSet<>();
-			modes.add("car");
-			matsim = new MATSimSimulator2<NetworkParameters>(stateFactory, scenario,
-					timeDiscretization, modes);
-		} else {
-			matsim = new MATSimSimulator<NetworkParameters>(stateFactory, scenario,
-					timeDiscretization);	
-		}
-		
+		// final Simulator<NetworkParameters> matsim;
+		// final boolean differentiateNetworkModes = true;
+		// if (differentiateNetworkModes) {
+		final Set<String> modes = new LinkedHashSet<>();
+		modes.add("car");
+		final MATSimSimulator2<NetworkParameters> matsim = new MATSimSimulator2<NetworkParameters>(stateFactory,
+				scenario, timeDiscretization, modes);
+		matsim.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzerFactory(timeDiscretization, modes,
+				new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet())));
+		// } else {
+		// matsim = new MATSimSimulator<NetworkParameters>(stateFactory,
+		// scenario, timeDiscretization);
+		// }
+
 		/*
 		 * Further parameters needed to run the optimization.
 		 * 

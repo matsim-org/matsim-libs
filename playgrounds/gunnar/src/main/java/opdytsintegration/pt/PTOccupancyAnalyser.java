@@ -18,6 +18,7 @@ import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHan
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
+import floetteroed.utilities.math.Vector;
 import opdytsintegration.MATSimCountingStateAnalyzer;
 import opdytsintegration.utils.TimeDiscretization;
 
@@ -32,6 +33,8 @@ public class PTOccupancyAnalyser extends MATSimCountingStateAnalyzer<TransitStop
 
 	// -------------------- MEMBERS --------------------
 
+	private final TimeDiscretization timeDiscretization;
+	
 	private final Set<Id<TransitStopFacility>> relevantStops;
 
 	private int totalStuck = 0;
@@ -52,6 +55,8 @@ public class PTOccupancyAnalyser extends MATSimCountingStateAnalyzer<TransitStop
 	public PTOccupancyAnalyser(final int startTime_s, final int binSize_s, final int binCnt,
 			final Set<Id<TransitStopFacility>> relevantStops) {
 		super(startTime_s, binSize_s, binCnt);
+		// TODO Just allow for timeDiscretization as an argument.
+		this.timeDiscretization = new TimeDiscretization(startTime_s, binSize_s, binCnt);		
 		this.relevantStops = relevantStops;
 	}
 
@@ -140,5 +145,19 @@ public class PTOccupancyAnalyser extends MATSimCountingStateAnalyzer<TransitStop
 	public void handleEvent(PersonStuckEvent event) {
 		// Just to check stuck people at the end
 		totalStuck++;
+	}
+
+	// TODO NEW
+
+	public Vector newStateVectorRepresentation() {
+			final Vector result = new Vector(
+					this.relevantStops.size() * this.timeDiscretization.getBinCnt());
+			int i = 0;
+			for (Id<TransitStopFacility> stopId : this.relevantStops) {
+				for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
+					result.set(i++, this.getCount(stopId, bin));
+				}
+			}
+			return result;
 	}
 }
