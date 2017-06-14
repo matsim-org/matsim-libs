@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.opdyts.analysis;
+package playground.agarwalamit.opdyts.plots;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,9 +36,9 @@ import playground.agarwalamit.utils.FileUtils;
  * Created by amit on 30.05.17.
  */
 
-public class OpdytsConvergencePlotter {
+public class OpdytsConvergenceChart {
 
-    private static final Logger LOGGER = Logger.getLogger(OpdytsConvergencePlotter.class);
+    private static final Logger LOGGER = Logger.getLogger(OpdytsConvergenceChart.class);
 
     private final String rawVale = "Raw Objective Function Value";
     private final String avgValue = "Averaged Objective Function Value";
@@ -46,6 +46,8 @@ public class OpdytsConvergencePlotter {
     private final List<Tuple<Double, Double>> rawValueList = new ArrayList<>();
     private final List<Tuple<Double, Double>> avgValueList = new ArrayList<>();
 
+
+    //BEGIN_EXAMPLE
     public static void main(String[] args) {
 
         String filesDir = FileUtils.RUNS_SVN+"/opdyts/equil/car,bicycle/parametrizedRuns/avgIts_STwt/";
@@ -56,12 +58,13 @@ public class OpdytsConvergencePlotter {
             for (Double selfTuningWt : selfTuningWeight) {
                 String caseFileDir = filesDir+ "calibration_"+avgItr+"Its_"+selfTuningWt+"weight_0.0asc/";
 
-                OpdytsConvergencePlotter opdytsLogReader = new OpdytsConvergencePlotter();
+                OpdytsConvergenceChart opdytsLogReader = new OpdytsConvergenceChart();
                 opdytsLogReader.readFile(caseFileDir+"/opdyts.con");
                 opdytsLogReader.plotData(caseFileDir+"/convergence_"+avgItr+"Its_"+selfTuningWt+"weight.png");
             }
         }
     }
+    //END_EXAMPLE
 
     public void readFile(final String inputFile){
         LOGGER.info("Reading file ... "+ inputFile);

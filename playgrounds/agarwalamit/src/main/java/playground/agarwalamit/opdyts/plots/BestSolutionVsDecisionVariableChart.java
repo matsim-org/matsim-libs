@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.opdyts.analysis;
+package playground.agarwalamit.opdyts.plots;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,11 +34,11 @@ import playground.agarwalamit.utils.FileUtils;
  * Created by amit on 30.05.17.
  */
 
-public class DecisionVariableAndBestSolutionPlotter {
+public class BestSolutionVsDecisionVariableChart {
 
-    private static final Logger LOGGER = Logger.getLogger(DecisionVariableAndBestSolutionPlotter.class);
+    private static final Logger LOGGER = Logger.getLogger(BestSolutionVsDecisionVariableChart.class);
 
-    public DecisionVariableAndBestSolutionPlotter(final Collection<String> modesToGetASC) {
+    public BestSolutionVsDecisionVariableChart(final Collection<String> modesToGetASC) {
         this.modesToGetASC = modesToGetASC;
 
         for(String mode : this.modesToGetASC){
@@ -53,6 +53,8 @@ public class DecisionVariableAndBestSolutionPlotter {
     private final List<Tuple<Double, Double>> currentBestSolutions = new ArrayList<>();
     private final Map<String, List<Tuple<Double, Double>>> currentBestDecisionVariables = new HashMap<>();
 
+
+    //BEGIN_EXAMPLE
     public static void main(String[] args) {
 
         String filesDir = FileUtils.RUNS_SVN+"/opdyts/equil/car,bicycle/parametrizedRuns/avgIts_STwt/";
@@ -63,12 +65,13 @@ public class DecisionVariableAndBestSolutionPlotter {
             for (Double selfTuningWt : selfTuningWeight) {
                 String caseFileDir = filesDir+ "calibration_"+avgItr+"Its_"+selfTuningWt+"weight_0.0asc/";
 
-                DecisionVariableAndBestSolutionPlotter opdytsLogReader = new DecisionVariableAndBestSolutionPlotter(Arrays.asList("car","bicycle"));
+                BestSolutionVsDecisionVariableChart opdytsLogReader = new BestSolutionVsDecisionVariableChart(Arrays.asList("car","bicycle"));
                 opdytsLogReader.readFile(caseFileDir+"/opdyts.log");
                 opdytsLogReader.plotData(caseFileDir+"/decisionVariableVsASC_"+avgItr+"Its_"+selfTuningWt+"weight.png");
             }
         }
     }
+    //END_EXAMPLE
 
     public void readFile(final String inputFile){
         LOGGER.info("Reading file ... "+ inputFile);

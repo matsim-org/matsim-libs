@@ -52,8 +52,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.opdyts.*;
-import playground.agarwalamit.opdyts.analysis.DecisionVariableAndBestSolutionPlotter;
-import playground.agarwalamit.opdyts.analysis.OpdytsConvergencePlotter;
+import playground.agarwalamit.opdyts.plots.BestSolutionVsDecisionVariableChart;
+import playground.agarwalamit.opdyts.plots.OpdytsConvergenceChart;
 import playground.agarwalamit.opdyts.analysis.OpdytsModalStatsControlerListener;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
@@ -248,12 +248,12 @@ public class MatsimOpdytsEquilIntegration {
 			IOUtils.deleteDirectoryRecursively(new File(dir2remove).toPath());
 		}
 
-		OpdytsConvergencePlotter opdytsConvergencePlotter = new OpdytsConvergencePlotter();
+		OpdytsConvergenceChart opdytsConvergencePlotter = new OpdytsConvergenceChart();
 		opdytsConvergencePlotter.readFile(OUT_DIR+"/opdyts.con");
 		opdytsConvergencePlotter.plotData(OUT_DIR+"/convergence.png");
 
-		DecisionVariableAndBestSolutionPlotter decisionVariableAndBestSolutionPlotter = new DecisionVariableAndBestSolutionPlotter(new ArrayList<>(modes2consider));
-		decisionVariableAndBestSolutionPlotter.readFile(OUT_DIR+"/opdyts.log");
-		decisionVariableAndBestSolutionPlotter.plotData(OUT_DIR+"/decisionVariableVsASC.png");
+		BestSolutionVsDecisionVariableChart bestSolutionVsDecisionVariableChart = new BestSolutionVsDecisionVariableChart(new ArrayList<>(modes2consider));
+		bestSolutionVsDecisionVariableChart.readFile(OUT_DIR+"/opdyts.log");
+		bestSolutionVsDecisionVariableChart.plotData(OUT_DIR+"/decisionVariableVsASC.png");
 	}
 }

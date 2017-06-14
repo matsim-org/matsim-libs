@@ -50,8 +50,8 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.opdyts.*;
-import playground.agarwalamit.opdyts.analysis.DecisionVariableAndBestSolutionPlotter;
-import playground.agarwalamit.opdyts.analysis.OpdytsConvergencePlotter;
+import playground.agarwalamit.opdyts.plots.BestSolutionVsDecisionVariableChart;
+import playground.agarwalamit.opdyts.plots.OpdytsConvergenceChart;
 import playground.agarwalamit.opdyts.analysis.OpdytsModalStatsControlerListener;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
@@ -181,12 +181,12 @@ public class PatnaNetworkModesCalibrator {
 		// run it, this will eventually call simulator.run() and thus controler.run
 		randomSearch.run(selfTuner );
 
-		OpdytsConvergencePlotter opdytsConvergencePlotter = new OpdytsConvergencePlotter();
+		OpdytsConvergenceChart opdytsConvergencePlotter = new OpdytsConvergenceChart();
 		opdytsConvergencePlotter.readFile(OUT_DIR+"/opdyts.con");
 		opdytsConvergencePlotter.plotData(OUT_DIR+"/convergence.png");
 
-		DecisionVariableAndBestSolutionPlotter decisionVariableAndBestSolutionPlotter = new DecisionVariableAndBestSolutionPlotter(new ArrayList<>(modes2consider));
-		decisionVariableAndBestSolutionPlotter.readFile(OUT_DIR+"/opdyts.log");
-		decisionVariableAndBestSolutionPlotter.plotData(OUT_DIR+"/decisionVariableVsASC.png");
+		BestSolutionVsDecisionVariableChart bestSolutionVsDecisionVariableChart = new BestSolutionVsDecisionVariableChart(new ArrayList<>(modes2consider));
+		bestSolutionVsDecisionVariableChart.readFile(OUT_DIR+"/opdyts.log");
+		bestSolutionVsDecisionVariableChart.plotData(OUT_DIR+"/decisionVariableVsASC.png");
 	}
 }
