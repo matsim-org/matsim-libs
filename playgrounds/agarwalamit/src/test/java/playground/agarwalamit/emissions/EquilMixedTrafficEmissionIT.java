@@ -70,13 +70,13 @@ import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerLi
  */
 
 @RunWith(Parameterized.class)
-public class EquilMixedTrafficEmissionTest {
+public class EquilMixedTrafficEmissionIT {
 
 	@Rule
 	public final MatsimTestUtils helper = new MatsimTestUtils();
-	private static final Logger logger = Logger.getLogger(EquilMixedTrafficEmissionTest.class);
+	private static final Logger logger = Logger.getLogger(EquilMixedTrafficEmissionIT.class);
 
-	private final String classOutputDir = "test/output/" + EquilMixedTrafficEmissionTest.class.getCanonicalName().replace('.', '/') + "/";
+	private final String classOutputDir = "test/output/" + EquilMixedTrafficEmissionIT.class.getCanonicalName().replace('.', '/') + "/";
 
 	private final DecimalFormat df = new DecimalFormat("#.###");
 
@@ -84,7 +84,7 @@ public class EquilMixedTrafficEmissionTest {
 
 	private final QSimConfigGroup.VehiclesSource vehiclesSource;
 
-	public EquilMixedTrafficEmissionTest (boolean isConsideringCO2Costs, QSimConfigGroup.VehiclesSource vehiclesSource) {
+	public EquilMixedTrafficEmissionIT(boolean isConsideringCO2Costs, QSimConfigGroup.VehiclesSource vehiclesSource) {
 		this.isConsideringCO2Costs = isConsideringCO2Costs;
 		this.vehiclesSource = vehiclesSource;
 		logger.info("Each parameter will be used in all the tests i.e. all tests will be run while inclusing and excluding CO2 costs.");
