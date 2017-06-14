@@ -39,6 +39,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -306,6 +308,11 @@ public class VTTSspecificRouterTestIT {
 		
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		
+		for (ActivityParams ap : controler.getConfig().planCalcScore().getActivityParams()){
+			ap.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
+		}
+		
 		controler.run();
 		
 		// high VTTS person's VTTS: 17.21 EUR/h (this is a value provided by the VTTSHandler)
@@ -390,6 +397,11 @@ public class VTTSspecificRouterTestIT {
 		
 		controler.addOverridingModule(new OTFVisFileWriterModule());
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+		
+		for (ActivityParams ap : controler.getConfig().planCalcScore().getActivityParams()){
+			ap.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
+		}
+		
 		controler.run();
 		
 		double scoreSum = 0.;
