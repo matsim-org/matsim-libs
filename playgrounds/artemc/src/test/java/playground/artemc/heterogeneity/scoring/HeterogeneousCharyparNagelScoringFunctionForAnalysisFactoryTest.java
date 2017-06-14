@@ -32,6 +32,8 @@ import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
@@ -320,6 +322,11 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		double zeroUtilDurH = getZeroUtilDuration_hrs(15.0, 1.0);
 
 		f.config.planCalcScore().setPerforming_utils_hr(perf);
+		
+		for(ActivityParams ap : f.config.planCalcScore().getActivityParams()){
+			ap.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
+		}
+		
 		double score = perf * 3.0 * Math.log(2.5 / zeroUtilDurW) + perf * 3.0 * Math.log(2.75 / zeroUtilDurW) + perf * 3.0 * Math.log(2.5 / zeroUtilDurW) + perf * 15.0 * Math.log(14.75 / zeroUtilDurH);
 		assertEquals(score, calcScore(f), EPSILON);
 
@@ -381,8 +388,13 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		Fixture f = new Fixture();
 		double perf_hrs = +6.0;
 		f.config.planCalcScore().setPerforming_utils_hr(perf_hrs);
-		double initialScore = calcScore(f);
-
+		
+		for(ActivityParams ap : f.config.planCalcScore().getActivityParams()){
+			ap.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
+		}
+		
+		double initialScore = calcScore(f);		
+		
 		// test1: agents has to wait before and after
 
 		PlanCalcScoreConfigGroup.ActivityParams wParams = f.config.planCalcScore().getActivityParams("w");
@@ -436,6 +448,10 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		double waiting = -10.0;
 		f.config.planCalcScore().setMarginalUtlOfWaiting_utils_hr(waiting);
 
+		for(ActivityParams ap : f.config.planCalcScore().getActivityParams()){
+			ap.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
+		}
+		
 		PlanCalcScoreConfigGroup.ActivityParams wParams = f.config.planCalcScore().getActivityParams("w");
 		wParams.setOpeningTime(8 * 3600.0); // the agent arrives 30min early
 		wParams.setClosingTime(15 * 3600.0); // the agent stays 1h too long
@@ -597,6 +613,8 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		// change the last act to something different than the first act
 		((Activity) f.plan.getPlanElements().get(8)).setType("h2");
 
+	
+		
 		PlanCalcScoreConfigGroup.ActivityParams params = new PlanCalcScoreConfigGroup.ActivityParams("h2");
 		params.setTypicalDuration(8 * 3600);
 		f.config.planCalcScore().addActivityParams(params);
@@ -604,6 +622,11 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 
 		double perf = +6.0;
 		f.config.planCalcScore().setPerforming_utils_hr(perf);
+		
+		for(ActivityParams ap : f.config.planCalcScore().getActivityParams()){
+			ap.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
+		}
+		
 		double zeroUtilDurW = getZeroUtilDuration_hrs(3.0, 1.0);
 		double zeroUtilDurH = getZeroUtilDuration_hrs(6.0, 1.0);
 		double zeroUtilDurH2 = getZeroUtilDuration_hrs(8.0, 1.0);
@@ -632,6 +655,10 @@ public class HeterogeneousCharyparNagelScoringFunctionForAnalysisFactoryTest {
 		f.config.planCalcScore().getActivityParams("h").setTypicalDuration(7.0 * 3600);
 		f.config.planCalcScore().setPerforming_utils_hr(perf);
 
+		for(ActivityParams ap : f.config.planCalcScore().getActivityParams()){
+			ap.setTypicalDurationScoreComputation(TypicalDurationScoreComputation.uniform);
+		}
+		
 		ScoringFunction testee = getScoringFunctionInstance(f, f.person);
 		testee.handleActivity((Activity) f.plan.getPlanElements().get(0));
 		testee.handleLeg((Leg) f.plan.getPlanElements().get(1));
