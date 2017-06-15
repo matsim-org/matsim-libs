@@ -15,26 +15,27 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 import floetteroed.utilities.math.Vector;
 import opdytsintegration.MATSimCountingStateAnalyzer;
+import opdytsintegration.SimulationStateAnalyzerProvider;
 import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * 
  * @author Mohammad Saleem
+ * @author Gunnar Flötteröd
  *
  */
-public class PTOccupancyAnalyser extends MATSimCountingStateAnalyzer<TransitStopFacility>
+public class PTOccupancyAnalyzer extends MATSimCountingStateAnalyzer<TransitStopFacility>
 		implements AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
 		PersonStuckEventHandler {
 
 	// -------------------- MEMBERS --------------------
 
-	private final TimeDiscretization timeDiscretization;
-	
 	private final Set<Id<TransitStopFacility>> relevantStops;
 
 	private int totalStuck = 0;
@@ -46,17 +47,15 @@ public class PTOccupancyAnalyser extends MATSimCountingStateAnalyzer<TransitStop
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public PTOccupancyAnalyser(final TimeDiscretization timeDiscretization,
+	public PTOccupancyAnalyzer(final TimeDiscretization timeDiscretization,
 			final Set<Id<TransitStopFacility>> relevantStops) {
 		this(timeDiscretization.getStartTime_s(), timeDiscretization.getBinSize_s(), timeDiscretization.getBinCnt(),
 				relevantStops);
 	}
 
-	public PTOccupancyAnalyser(final int startTime_s, final int binSize_s, final int binCnt,
+	public PTOccupancyAnalyzer(final int startTime_s, final int binSize_s, final int binCnt,
 			final Set<Id<TransitStopFacility>> relevantStops) {
 		super(startTime_s, binSize_s, binCnt);
-		// TODO Just allow for timeDiscretization as an argument.
-		this.timeDiscretization = new TimeDiscretization(startTime_s, binSize_s, binCnt);		
 		this.relevantStops = relevantStops;
 	}
 
@@ -147,17 +146,54 @@ public class PTOccupancyAnalyser extends MATSimCountingStateAnalyzer<TransitStop
 		totalStuck++;
 	}
 
-	// TODO NEW
+	// ----- IMPLEMENTATION OF SimulationStateAnalyzerProvider -----
 
-	public Vector newStateVectorRepresentation() {
-			final Vector result = new Vector(
-					this.relevantStops.size() * this.timeDiscretization.getBinCnt());
+	public static class Provider implements SimulationStateAnalyzerProvider {
+
+		// -------------------- MEMBERS --------------------
+
+		private final TimeDiscretization timeDiscretization;
+
+		private final Set<Id<TransitStopFacility>> relevantStops;
+
+		private PTOccupancyAnalyzer analyzer = null;
+
+		// -------------------- CONSTRUCTION --------------------
+
+		public Provider(final TimeDiscretization timeDiscretization, final Set<Id<TransitStopFacility>> relevantStops) {
+			this.timeDiscretization = timeDiscretization;
+			this.relevantStops = relevantStops;
+		}
+
+		// -------------------- IMPLEMENTATION --------------------
+
+		@Override
+		public String getStringIdentifier() {
+			return "pt";
+		}
+
+		@Override
+		public EventHandler newEventHandler() {
+			this.analyzer = new PTOccupancyAnalyzer(this.timeDiscretization, this.relevantStops);
+			return this.analyzer;
+		}
+
+		@Override
+		public Vector newStateVectorRepresentation() {
+			final Vector result = new Vector(this.relevantStops.size() * this.timeDiscretization.getBinCnt());
 			int i = 0;
 			for (Id<TransitStopFacility> stopId : this.relevantStops) {
 				for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
-					result.set(i++, this.getCount(stopId, bin));
+					result.set(i++, this.analyzer.getCount(stopId, bin));
 				}
 			}
 			return result;
+		}
+
+		@Override
+		public void beforeIteration() {
+			this.analyzer.beforeIteration();
+		}
+
 	}
 }

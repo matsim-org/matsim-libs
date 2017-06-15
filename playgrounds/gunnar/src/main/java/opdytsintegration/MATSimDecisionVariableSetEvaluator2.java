@@ -66,7 +66,7 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 	// private PTOccupancyAnalyser ptOccupancyAnalyzer = null;
 
 	// a list because the order matters in the state space vector
-	private final List<SimulationStateAnalyzer> simulationStateAnalyzers = new ArrayList<>();
+	private final List<SimulationStateAnalyzerProvider> simulationStateAnalyzers = new ArrayList<>();
 
 	private LinkedList<Vector> stateList = null;
 
@@ -88,7 +88,7 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 		// this.relevantStopIds = null;
 	}
 
-	public void addSimulationStateAnalyzer(final SimulationStateAnalyzer analyzer) {
+	public void addSimulationStateAnalyzer(final SimulationStateAnalyzerProvider analyzer) {
 		if (this.simulationStateAnalyzers.contains(analyzer)) {
 			throw new RuntimeException("Analyzer " + analyzer + " has already been added.");
 		}
@@ -181,7 +181,7 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 			throw new RuntimeException("No simulation state analyzers have been added.");
 		}
 
-		for (SimulationStateAnalyzer analyzer : this.simulationStateAnalyzers) {
+		for (SimulationStateAnalyzerProvider analyzer : this.simulationStateAnalyzers) {
 			this.eventsManager.addHandler(analyzer.newEventHandler());
 		}
 
@@ -223,7 +223,7 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 			 */
 
 			Vector newInstantaneousStateVector = null;
-			for (SimulationStateAnalyzer analyzer : this.simulationStateAnalyzers) {
+			for (SimulationStateAnalyzerProvider analyzer : this.simulationStateAnalyzers) {
 				if (newInstantaneousStateVector == null) {
 					newInstantaneousStateVector = analyzer.newStateVectorRepresentation();
 				} else {
@@ -296,7 +296,7 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 			this.trajectorySampler.afterIteration(this.newState(this.population));
 		}
 
-		for (SimulationStateAnalyzer analyzer : this.simulationStateAnalyzers) {
+		for (SimulationStateAnalyzerProvider analyzer : this.simulationStateAnalyzers) {
 			analyzer.beforeIteration();
 		}
 

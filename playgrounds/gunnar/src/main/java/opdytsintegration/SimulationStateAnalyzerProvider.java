@@ -10,7 +10,7 @@ import floetteroed.utilities.math.Vector;
  * @author Gunnar Flötteröd
  *
  */
-public interface SimulationStateAnalyzer {
+public interface SimulationStateAnalyzerProvider {
 
 	// for plotting etc
 	public String getStringIdentifier();

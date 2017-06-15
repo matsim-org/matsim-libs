@@ -31,7 +31,7 @@ import opdytsintegration.utils.TimeDiscretization;
  * @author Gunnar Flötteröd
  *
  */
-public class LinkOccupancyAnalyzer extends MATSimCountingStateAnalyzer<Link>
+class LinkOccupancyAnalyzer extends MATSimCountingStateAnalyzer<Link>
 		implements LinkLeaveEventHandler, LinkEnterEventHandler, VehicleEntersTrafficEventHandler,
 		VehicleLeavesTrafficEventHandler, VehicleAbortsEventHandler {
 
@@ -41,12 +41,12 @@ public class LinkOccupancyAnalyzer extends MATSimCountingStateAnalyzer<Link>
 
 	// -------------------- CONSTRUCTION --------------------
 
-	public LinkOccupancyAnalyzer(final TimeDiscretization timeDiscretization, final Set<Id<Link>> relevantLinks) {
+	LinkOccupancyAnalyzer(final TimeDiscretization timeDiscretization, final Set<Id<Link>> relevantLinks) {
 		this(timeDiscretization.getStartTime_s(), timeDiscretization.getBinSize_s(), timeDiscretization.getBinCnt(),
 				relevantLinks);
 	}
 
-	public LinkOccupancyAnalyzer(final int startTime_s, final int binSize_s, final int binCnt,
+	LinkOccupancyAnalyzer(final int startTime_s, final int binSize_s, final int binCnt,
 			final Set<Id<Link>> relevantLinks) {
 		super(startTime_s, binSize_s, binCnt);
 		this.relevantLinks = relevantLinks;
