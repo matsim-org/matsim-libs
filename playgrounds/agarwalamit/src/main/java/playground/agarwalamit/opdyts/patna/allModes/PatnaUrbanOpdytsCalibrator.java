@@ -20,7 +20,10 @@
 package playground.agarwalamit.opdyts.patna.allModes;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
@@ -29,7 +32,7 @@ import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import opdytsintegration.MATSimSimulator2;
 import opdytsintegration.MATSimStateFactoryImpl;
-import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzerFactory;
+import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzer;
 import opdytsintegration.utils.TimeDiscretization;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
@@ -51,7 +54,7 @@ import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler
 import playground.agarwalamit.opdyts.*;
 import playground.agarwalamit.opdyts.analysis.OpdytsModalStatsControlerListener;
 import playground.agarwalamit.opdyts.patna.PatnaOneBinDistanceDistribution;
-import playground.agarwalamit.opdyts.teleportationModes.TeleportationModeOccupancyAnalyzerFactory;
+import playground.agarwalamit.opdyts.teleportationModes.TeleportationODAnalyzer;
 import playground.agarwalamit.opdyts.teleportationModes.Zone;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
@@ -128,13 +131,13 @@ public class PatnaUrbanOpdytsCalibrator {
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(allModes,referenceStudyDistri);
 
 		// following is the  entry point to start a matsim controler together with opdyts
-		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization, new HashSet<>(allModes));
+		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
 
 		PatnaZoneToLinkIdentifier patnaZoneToLinkIdentifier = new PatnaZoneToLinkIdentifier();
 		Set<Zone> relevantZones = patnaZoneToLinkIdentifier.getZones();
 		
-		simulator.addSimulationStateAnalyzer(new TeleportationModeOccupancyAnalyzerFactory(timeDiscretization, new LinkedHashSet<>(teleportationModes),relevantZones));
-		simulator.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzerFactory(timeDiscretization, new LinkedHashSet<>(networkModes), new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet()) ));
+		simulator.addSimulationStateAnalyzer(new TeleportationODAnalyzer.Provider(timeDiscretization, new LinkedHashSet<>(teleportationModes),relevantZones));
+		simulator.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzer.Provider(timeDiscretization, new LinkedHashSet<>(networkModes), new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet()) ));
 
 		simulator.addOverridingModule(new AbstractModule() {
 

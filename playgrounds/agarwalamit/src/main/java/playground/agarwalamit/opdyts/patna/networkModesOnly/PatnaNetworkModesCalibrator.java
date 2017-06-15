@@ -29,7 +29,7 @@ import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import opdytsintegration.MATSimSimulator2;
 import opdytsintegration.MATSimStateFactoryImpl;
-import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzerFactory;
+import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzer;
 import opdytsintegration.utils.TimeDiscretization;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -115,8 +115,8 @@ public class PatnaNetworkModesCalibrator {
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,referenceStudyDistri);
 
 		// following is the  entry point to start a matsim controler together with opdyts
-		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization, new HashSet<>(modes2consider));
-		simulator.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzerFactory(timeDiscretization, new HashSet<>(modes2consider),
+		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
+		simulator.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzer.Provider(timeDiscretization, new HashSet<>(modes2consider),
 				new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet())));
 
 		simulator.addOverridingModule(new AbstractModule() {

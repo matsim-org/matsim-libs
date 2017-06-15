@@ -24,16 +24,17 @@ import java.util.Map;
 import java.util.Set;
 import floetteroed.utilities.math.Vector;
 import opdytsintegration.MATSimCountingStateAnalyzer;
+import opdytsintegration.SimulationStateAnalyzerProvider;
 import opdytsintegration.utils.TimeDiscretization;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
  * Created by amit on 15.06.17. Adapted after {@link opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzer}
  */
-
 
 public class TeleportationODAnalyzer implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
@@ -99,18 +100,52 @@ public class TeleportationODAnalyzer implements PersonDepartureEventHandler, Per
         }
     }
 
-    public Vector newStateVectorRepresentation() {
-        final Vector result = new Vector(
-                this.mode2stateAnalyzer.size() * this.relevantZones.size()  * this.timeDiscretization.getBinCnt());
-        int i = 0;
-        for (String mode : this.mode2stateAnalyzer.keySet()) {
-            final MATSimCountingStateAnalyzer<Zone> analyzer = this.mode2stateAnalyzer.get(mode);
-            for (Zone zone : this.relevantZones) {
-                for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
-                    result.set(i++, analyzer.getCount(zone.getZoneId(), bin));
+    public static class Provider implements SimulationStateAnalyzerProvider {
+
+        private final TimeDiscretization timeDiscretization;
+        private final Set<String> relevantTeleportationMdoes;
+        private final Set<Zone> relevantZones;
+        private TeleportationODAnalyzer teleportationODAnalyzer;
+
+        public Provider(final TimeDiscretization timeDiscretization,
+                                                         final Set<String> relevantTeleportationMdoes,
+                                                         final Set<Zone> relevantZones) {
+            this.timeDiscretization = timeDiscretization;
+            this.relevantTeleportationMdoes = relevantTeleportationMdoes;
+
+            this.relevantZones = relevantZones;
+        }
+
+        @Override
+        public String getStringIdentifier() {
+            return "teleportationModes";
+        }
+
+        @Override
+        public EventHandler newEventHandler() {
+            this.teleportationODAnalyzer = new TeleportationODAnalyzer(timeDiscretization, relevantZones, relevantTeleportationMdoes);
+            return this.teleportationODAnalyzer;
+        }
+
+        @Override
+        public Vector newStateVectorRepresentation() {
+            final Vector result = new Vector(
+                    this.teleportationODAnalyzer.mode2stateAnalyzer.size() * this.relevantZones.size()  * this.timeDiscretization.getBinCnt());
+            int i = 0;
+            for (String mode : this.teleportationODAnalyzer.mode2stateAnalyzer.keySet()) {
+                final MATSimCountingStateAnalyzer<Zone> analyzer = this.teleportationODAnalyzer.mode2stateAnalyzer.get(mode);
+                for (Zone zone : this.relevantZones) {
+                    for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
+                        result.set(i++, analyzer.getCount(zone.getZoneId(), bin));
+                    }
                 }
             }
+            return result;
         }
-        return result;
+
+        @Override
+        public void beforeIteration() {
+            this.teleportationODAnalyzer.beforeIteration();
+        }
     }
 }
