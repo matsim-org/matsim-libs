@@ -11,7 +11,6 @@ import playground.dziemke.analysis.general.srv.FromSrvTripFilterImpl;
 import playground.dziemke.analysis.general.srv.Srv2MATSimPopulation;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -21,15 +20,15 @@ public class CompareUseCase {
     public static final Logger log = Logger.getLogger(CompareUseCase.class);
 
     //FromMatsim Parameters
-        private static final String RUN_ID = "be_115b"; // <----------
+        private static final String RUN_ID = "be_117l"; // <----------
         private static final String ITERATION_FOR_ANALYSIS = "0";
         private static final String CEMDAP_PERSONS_INPUT_FILE_ID = "21"; // Check if this number corresponds correctly to the RUN_ID
 
         // Input and output
 //        private static final String NETWORK_FILE = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/network_counts/network.xml.gz"; // <----------
         private static final String NETWORK_FILE = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/network_counts/network_shortIds.xml.gz"; // <----------
-//        private static final String EVENTS_FILE = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/" + RUN_ID + ".output_events.xml.gz";
-        private static final String EVENTS_FILE = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/ITERS/it." + ITERATION_FOR_ANALYSIS + "/" + RUN_ID + "." + ITERATION_FOR_ANALYSIS + ".events.xml.gz";
+        private static final String EVENTS_FILE = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/" + RUN_ID + ".output_events.xml.gz";
+//        private static final String EVENTS_FILE = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/ITERS/it." + ITERATION_FOR_ANALYSIS + "/" + RUN_ID + "." + ITERATION_FOR_ANALYSIS + ".events.xml.gz";
         private static final String cemdapPersonsInputFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" + CEMDAP_PERSONS_INPUT_FILE_ID + "/persons1.dat"; // TODO
         private static final String AREA_SHAPE_FILE = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/shapefiles/2013/Berlin_DHDN_GK4.shp";
         //    private static String outputDirectory = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/analysis";
@@ -43,7 +42,7 @@ public class CompareUseCase {
         private static final String OUTPUT_POPULATION_FILE_PATH = SRV_BASE_DIR + "testOutputPopulation.xml";
 //        private static String fromSrvOutputDirectory = "/Users/dominik/test-analysis";
 //        private static String fromSrvOutputDirectory = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/analysis_srv";
-        private static String fromSrvOutputDirectory = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/analysis/srv/output/";
+        private static String fromSrvOutputDirectory = "";
 
 
     public static void main(String[] args) {
@@ -79,20 +78,39 @@ public class CompareUseCase {
         fromSrvTripFilter.activateModeChoice(TransportMode.car);
         fromSrvTripFilter.activateDist(0, 100);
         fromSrvTripFilter.activateDepartureTimeRange(16. * 3600, 22. * 3600);
-        List<Trip> filteredFromSrvTrips = TripFilter.castTrips(fromSrvTripFilter.filter(fromSrvTrips));
 
         //determine output directory
         String srvOutputDirectory = fromSrvTripFilter.adaptOutputDirectory("analysis_srv");
-        fromSrvOutputDirectory += srvOutputDirectory;
+        fromSrvOutputDirectory = fromMatsimOutputDirectory + "/" + srvOutputDirectory;
         new File(fromSrvOutputDirectory).mkdirs();
 
-        //write output
-        GeneralTripAnalyzer.analyze(filteredFromSrvTrips, fromSrvOutputDirectory);
+        if (!GeneralTripAnalyzer.doesExist(fromSrvOutputDirectory)) {
+            //filter
+            List<Trip> filteredFromSrvTrips = TripFilter.castTrips(fromSrvTripFilter.filter(fromSrvTrips));
+            //write output
+            GeneralTripAnalyzer.analyze(filteredFromSrvTrips, fromSrvOutputDirectory);
+        }
 
         //Gnuplot
-        String gnuplotScriptName = "plot_rel_path_run.gnu";
+        String gnuplotScriptName = "plot_abs_path_run.gnu";
         String relativePathToGnuplotScript = "../../../../shared-svn/studies/countries/de/berlin_scenario_2016/analysis/gnuplot/" + gnuplotScriptName;
-        File file = new File("../../../shared-svn/studies/countries/de/berlin_scenario_2016/analysis/gnuplot/");
-        GnuplotUtils.runGnuplotScript(fromMatsimOutputDirectory, relativePathToGnuplotScript,srvOutputDirectory);
+        GnuplotUtils.runGnuplotScript(fromMatsimOutputDirectory, relativePathToGnuplotScript, srvOutputDirectory);
+
+        deleteFolder(new File(fromSrvOutputDirectory));
     }
+
+    private static void deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+        if(files!=null) {
+            for(File f: files) {
+                if(f.isDirectory()) {
+                    deleteFolder(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        folder.delete();
+    }
+
 }

@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import playground.dziemke.analysis.GnuplotUtils;
 
+import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -121,5 +123,26 @@ public class GeneralTripAnalyzer {
     /* Create gnuplot graphics */
     public static void runGnuplot(String outputDir, String relativePathToGnuplotScript, String ralativePathToCampareFile) {
         GnuplotUtils.runGnuplotScript(outputDir, relativePathToGnuplotScript, ralativePathToCampareFile);
+    }
+
+    public static boolean doesExist(String analyzeDirectory) {
+        File dir = new File(analyzeDirectory);
+        return dir.exists() && dir.isDirectory() && hasAnalyzeContent(dir);
+    }
+
+    private static boolean hasAnalyzeContent(File analyzeDirectory) {
+        List<String> childs = Arrays.asList(analyzeDirectory.list());
+        return childs.contains("activityTypes.txt") &&
+               childs.contains("averageTripSpeedBeeline.txt") &&
+               childs.contains("averageTripSpeedBeelineCumulative.txt") &&
+               childs.contains("averageTripSpeedRouted.txt") &&
+               childs.contains("beeline.txt") &&
+               childs.contains("departureTime.txt") &&
+               childs.contains("otherInformation.txt") &&
+               childs.contains("tripDistanceBeeline.txt") &&
+               childs.contains("tripDistanceBeelineCumulative.txt") &&
+               childs.contains("tripDistanceRouted.txt") &&
+               childs.contains("tripDuration.txt") &&
+               childs.contains("tripDurationCumulative.txt");
     }
 }
