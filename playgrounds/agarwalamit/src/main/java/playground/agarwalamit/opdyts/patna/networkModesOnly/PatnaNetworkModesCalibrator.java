@@ -57,29 +57,24 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 public class PatnaNetworkModesCalibrator {
 
 	private static final OpdytsScenario PATNA_1_PCT = OpdytsScenario.PATNA_1Pct;
-	private static boolean isPlansRelaxed = false;
+	private static boolean isPlansRelaxed = true;
 
 	public static void main(String[] args) {
 		String configFile;
-		Config config = ConfigUtils.createConfig();
-		OpdytsConfigGroup opdytsConfigGroup = ConfigUtils.addOrGetModule(config, OpdytsConfigGroup.GROUP_NAME,OpdytsConfigGroup.class);
 		String OUT_DIR = null;
 
 		if ( args.length>0 ) {
 			configFile = args[0];
 			OUT_DIR = args[1];
 
-			opdytsConfigGroup.setVariationSizeOfRamdomizeDecisionVariable(Double.valueOf(args[2]));
-			opdytsConfigGroup.setNumberOfIterationsForConvergence(Integer.valueOf(args[3]));
-			opdytsConfigGroup.setNumberOfIterationsForAveraging(Integer.valueOf(args[4]));
-			opdytsConfigGroup.setSelfTuningWeight(Double.valueOf(args[5]));
-			opdytsConfigGroup.setPopulationSize(Integer.valueOf(args[6]));
-
-			isPlansRelaxed = Boolean.valueOf(args[7]);;
+			isPlansRelaxed = Boolean.valueOf(args[2]);;
 		} else {
 			configFile = FileUtils.RUNS_SVN+"/opdyts/patna/input_networkModes/"+"/config_networkModesOnly.xml";
 			OUT_DIR = FileUtils.RUNS_SVN+"/opdyts/patna/output_networkModes/";
 		}
+
+		Config config = ConfigUtils.loadConfig(configFile, new OpdytsConfigGroup());
+		OpdytsConfigGroup opdytsConfigGroup = (OpdytsConfigGroup) config.getModules().get(OpdytsConfigGroup.GROUP_NAME);
 
 		String relaxedPlansDir = OUT_DIR+"/initialPlans2RelaxedPlans/";
 		if (! isPlansRelaxed ) {
@@ -89,9 +84,6 @@ public class PatnaNetworkModesCalibrator {
 		}
 
 		OUT_DIR = OUT_DIR+"/calibration_variationSize"+opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable()+"_AvgIts"+opdytsConfigGroup.getNumberOfIterationsForAveraging()+"/";
-
-		ConfigUtils.loadConfig(config,configFile);
-		config.setContext(IOUtils.getUrlFromFileOrResource(configFile));
 		config.plans().setInputFile(relaxedPlansDir+"/output_plans.xml.gz");
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn); // must be warn, since opdyts override few things
@@ -152,7 +144,6 @@ public class PatnaNetworkModesCalibrator {
 		factories.run(decisionVariableRandomizer, initialDecisionVariable, objectiveFunction);
 
 		// post-process
-
 		OpdytsConvergenceChart opdytsConvergencePlotter = new OpdytsConvergenceChart();
 		opdytsConvergencePlotter.readFile(OUT_DIR+"/opdyts.con");
 		opdytsConvergencePlotter.plotData(OUT_DIR+"/convergence.png");

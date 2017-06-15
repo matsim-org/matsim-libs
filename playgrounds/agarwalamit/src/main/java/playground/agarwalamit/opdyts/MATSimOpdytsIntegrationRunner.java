@@ -100,11 +100,11 @@ public class MATSimOpdytsIntegrationRunner<U extends DecisionVariable>  {
         }
 
         // add for non-network modes
-        Set<String> teleportationModes =  new HashSet<>(scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().keySet());
-        if (teleportationModes.size()>0) {
+//        Set<String> teleportationModes =  new HashSet<>(scenario.getConfig().plansCalcRoute().getModeRoutingParams().keySet());
+//        if (teleportationModes.size()>0) {
             //TODO : dont have information about zones here
 //            new TeleportationModeOccupancyAnalyzerFactory(timeDiscretization, teleportationModes, relevantZones);
-        }
+//        }
 
         // add for pt as network modes
         if (scenario.getConfig().transit().isUseTransit()) {
@@ -124,7 +124,14 @@ public class MATSimOpdytsIntegrationRunner<U extends DecisionVariable>  {
                 convergenceCriterion,
                 objectiveFunction);
 
-        randomSearch.run(selfTuner);
+        OpdytsConfigGroup opdytsConfigGroup = (OpdytsConfigGroup) scenario.getConfig().getModules().get(OpdytsConfigGroup.GROUP_NAME);
+
+        if ( Double.isFinite(opdytsConfigGroup.getEquilibriumGapWeight()) && Double.isFinite(opdytsConfigGroup.getEquilibriumGapWeight()) ) {
+            randomSearch.run(opdytsConfigGroup.getUniformityGapWeight(), opdytsConfigGroup.getEquilibriumGapWeight());
+        } else {
+            randomSearch.run(selfTuner);
+        }
+
     }
 
     public TimeDiscretization getTimeDiscretization() {

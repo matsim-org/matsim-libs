@@ -112,7 +112,8 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
                     List<PlanCalcScoreConfigGroup> tempCombinations = new ArrayList<>();
                     allCombinations.parallelStream().forEach(e -> {
                         PlanCalcScoreConfigGroup planCalcScoreConfigGroup = new PlanCalcScoreConfigGroup();
-                        for ( PlanCalcScoreConfigGroup.ModeParams modeParams : e.getScoringParameters(this.subPopName).getModes().values()) {
+                        for ( String newMode : this.considerdModes) {
+                            PlanCalcScoreConfigGroup.ModeParams modeParams = e.getScoringParameters(this.subPopName).getModes().get(newMode);
                             planCalcScoreConfigGroup.getScoringParametersPerSubpopulation().get(this.subPopName).addModeParams(copyOfModeParam(modeParams) );
                         }
                         tempCombinations.add(planCalcScoreConfigGroup);
