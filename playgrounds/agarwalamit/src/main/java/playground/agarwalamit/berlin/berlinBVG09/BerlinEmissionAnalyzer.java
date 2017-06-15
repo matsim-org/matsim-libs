@@ -83,6 +83,9 @@ public class BerlinEmissionAnalyzer {
         FilteredEmissionPersonEventHandler emissionPersonEventHandler = new FilteredEmissionPersonEventHandler();
         eventsManager.addHandler(emissionPersonEventHandler);
 
+        /*
+         * information about transit driver and transit vehicle is required to identify the vehicle type of PT
+         */
         Map<Id<Person>,Id<Vehicle>> transitDriver2TransitVehicle = new HashMap<>();
         eventsManager.addHandler(new TransitDriverStartsEventHandler() {
             @Override
@@ -99,7 +102,6 @@ public class BerlinEmissionAnalyzer {
         CombinedMatsimEventsReader reader = new CombinedMatsimEventsReader(eventsManager);
         reader.readFile(eventsFileWithEmissionEvents);
 
-        //
         Map<String, Map<String, Double>> vehicleType2Emissions = new HashMap<>(); // required vehicle types only
         vehicleType2Emissions.put(BerlinPersonFilter.BerlinUserGroup.carUsers_berlin.toString(),new HashMap<>());
         vehicleType2Emissions.put(BerlinPersonFilter.BerlinUserGroup.carUsers_brandenburger.toString(),new HashMap<>());
@@ -110,10 +112,10 @@ public class BerlinEmissionAnalyzer {
         vehicleType2Emissions.put(BerlinTransitVehicleTypeIdentifier.BerlinTransitEmissionVehicleType.BUS_AS_HGV.toString(),new HashMap<>());
         vehicleType2Emissions.put(BerlinTransitVehicleTypeIdentifier.BerlinTransitEmissionVehicleType.TRAINS_AS_ZERO_EMISSIONS.toString(),new HashMap<>());
 
-        Map<Id<Vehicle>, Map<String, Double>> vehicleId2TotalEmissions = emissionPersonEventHandler.getVehicleId2TotalEmissions();
+        Map<Id<Vehicle>, Map<String, Double>> vehicleId2EmissionsForAllVehicles = emissionPersonEventHandler.getVehicleId2TotalEmissions();
         BerlinPersonFilter berlinPersonFilter = new BerlinPersonFilter();
 
-        for(Id<Vehicle> vehicleId : vehicleId2TotalEmissions.keySet()) { // all vehicles
+        for(Id<Vehicle> vehicleId : vehicleId2EmissionsForAllVehicles.keySet()) { // all vehicles
             Id<Person> personId = Id.createPersonId(vehicleId);
 
             // check if transit driver
@@ -121,13 +123,13 @@ public class BerlinEmissionAnalyzer {
                 Id<Vehicle> transitVehicle = transitDriver2TransitVehicle.get(personId);
                 String userGroup = berlinTransitVehicleTypeIdentifier.getBerlinTransitEmissionVehicleType(transitVehicle).toString();
                 Map<String, Double> emissionsSoFar =  vehicleType2Emissions.get(userGroup);
-                Map<String, Double> totalEmissions = MapUtils.addMaps(emissionsSoFar, vehicleId2TotalEmissions.get(vehicleId));
+                Map<String, Double> totalEmissions = MapUtils.addMaps(emissionsSoFar, vehicleId2EmissionsForAllVehicles.get(vehicleId));
                 vehicleType2Emissions.put(userGroup, totalEmissions);
             } else {
                 String userGroup = berlinPersonFilter.getUserGroupAsStringFromPersonId(personId);
                 if (vehicleType2Emissions.containsKey(userGroup)) {
                     Map<String, Double> emissionsSoFar =  vehicleType2Emissions.get(userGroup);
-                    Map<String, Double> totalEmissions = MapUtils.addMaps(emissionsSoFar, vehicleId2TotalEmissions.get(vehicleId));
+                    Map<String, Double> totalEmissions = MapUtils.addMaps(emissionsSoFar, vehicleId2EmissionsForAllVehicles.get(vehicleId));
                     vehicleType2Emissions.put(userGroup, totalEmissions);
                 } else {
                     //skip other user groups
@@ -135,20 +137,7 @@ public class BerlinEmissionAnalyzer {
             }
         }
 
-        BufferedWriter writer = IOUtils.getBufferedWriter(finalEmissionInfo);
-        try {
-            writer.write("userGroup\tpollutant\tamountInGm\n");
-
-            for(String ug : vehicleType2Emissions.keySet()){
-                for(String pollutant : vehicleType2Emissions.get(ug).keySet()) {
-                    writer.write(ug+"\t"+pollutant+"\t"+vehicleType2Emissions.get(ug).get(pollutant));
-                    writer.newLine();
-                }
-            }
-            writer.close();
-        } catch (IOException e) {
-            throw new RuntimeException("Data is not written/read. Reason : " + e);
-        }
+        writeData(vehicleType2Emissions);
     }
 
     private void createEmissionEventsFile(){
@@ -177,5 +166,22 @@ public class BerlinEmissionAnalyzer {
         emissionEventWriter.closeFile();
 
         emissionModule.writeEmissionInformation();
+    }
+
+    private void writeData(Map<String, Map<String, Double>> vehicleType2Emissions){
+        BufferedWriter writer = IOUtils.getBufferedWriter(finalEmissionInfo);
+        try {
+            writer.write("userGroup\tpollutant\tamountInGm\n");
+
+            for(String ug : vehicleType2Emissions.keySet()){
+                for(String pollutant : vehicleType2Emissions.get(ug).keySet()) {
+                    writer.write(ug+"\t"+pollutant+"\t"+vehicleType2Emissions.get(ug).get(pollutant));
+                    writer.newLine();
+                }
+            }
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Data is not written/read. Reason : " + e);
+        }
     }
 }

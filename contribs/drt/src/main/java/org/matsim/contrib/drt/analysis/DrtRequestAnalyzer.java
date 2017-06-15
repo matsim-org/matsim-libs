@@ -25,7 +25,9 @@ package org.matsim.contrib.drt.analysis;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -38,9 +40,11 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEventHandler;
@@ -67,11 +71,13 @@ public class DrtRequestAnalyzer implements DrtRequestRejectedEventHandler, DrtRe
 	private final Map<Id<Request>,DrtRequestSubmittedEvent> submittedRequests = new HashMap<>();
 	private final Map<Id<Request>,Tuple<Double,Double>> waitTimeCompare = new HashMap<>();
 	private final Map<Id<Person>,DrtRequestScheduledEvent> scheduledRequests = new HashMap<>();
-	
+	private final List<String> rejections = new ArrayList<>();
+	private final Network network;
 	
 	@Inject
-	public DrtRequestAnalyzer(EventsManager events) {
+	public DrtRequestAnalyzer(EventsManager events, Network network) {
 		events.addHandler(this);
+		this.network = network;
 	}
 	
 	
@@ -82,6 +88,8 @@ public class DrtRequestAnalyzer implements DrtRequestRejectedEventHandler, DrtRe
 	public void reset(int iteration) {
 		submittedRequests.clear();
 		scheduledRequests.clear();
+		waitTimeCompare.clear();
+		rejections.clear();
 	}
 
 	/* (non-Javadoc)
@@ -124,7 +132,10 @@ public class DrtRequestAnalyzer implements DrtRequestRejectedEventHandler, DrtRe
 	 */
 	@Override
 	public void handleEvent(DrtRequestRejectedEvent event) {
-		this.submittedRequests.remove(event.getRequestId());
+		DrtRequestSubmittedEvent submission = this.submittedRequests.remove(event.getRequestId());
+		Coord fromCoord = network.getLinks().get(submission.getFromLinkId()).getCoord();
+		Coord toCoord = network.getLinks().get(submission.getToLinkId()).getCoord();
+		this.rejections.add(submission.getTime()+";"+submission.getPersonId()+";"+submission.getFromLinkId()+";"+submission.getToLinkId()+";"+fromCoord.getX()+";"+fromCoord.getY()+";"+toCoord.getX()+";"+toCoord.getY());
 	}
 	
 	/**
@@ -132,6 +143,13 @@ public class DrtRequestAnalyzer implements DrtRequestRejectedEventHandler, DrtRe
 	 */
 	public Map<Id<Request>, Tuple<Double, Double>> getWaitTimeCompare() {
 		return waitTimeCompare;
+	}
+	
+	/**
+	 * @return the rejections
+	 */
+	public List<String> getRejections() {
+		return rejections;
 	}
 	
 	public void writeAndPlotWaitTimeEstimateComparison(String plotFileName, String textFileName) {

@@ -21,7 +21,6 @@ package org.matsim.contrib.drt.optimizer;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.insertion.*;
-import org.matsim.contrib.drt.optimizer.insertion.filter.DistanceFilter;
 import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
 import org.matsim.contrib.drt.optimizer.insertion.filter.KNearestVehicleFilter;
 import org.matsim.contrib.drt.optimizer.insertion.filter.NoFilter;

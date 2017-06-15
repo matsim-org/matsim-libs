@@ -133,7 +133,7 @@ class WithinDayBangBangMobsimListener implements MobsimBeforeSimStepListener {
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent event) {
 		double now = event.getSimulationTime() ;
 
-		Collection<MobsimAgent> agentsToReplan = WithinDayBestRouteMobsimListener.getAgentsToReplan( (Netsim) event.getQueueSimulation() ); 
+		Collection<MobsimAgent> agentsToReplan = WithinDayReRouteMobsimListener.getAgentsToReplan( (Netsim) event.getQueueSimulation() ); 
 		
 		double ttimeThroughAccident = calcTtime(now, this.originalLinks) ;
 		double ttimeDetour = calcTtime( now, this.alternativeLinks ) ;

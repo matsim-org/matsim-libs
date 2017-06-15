@@ -97,7 +97,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 						.processEvent(new DrtRequestRejectedEvent(getOptimContext().timer.getTimeOfDay(), req.getId()));
 				if (printWarnings) {
 					Logger.getLogger(getClass()).warn("No vehicle found for drt request from passenger \t"
-							+ req.getPassenger().getId() + "\tat\t" + Time.writeTime(req.getSubmissionTime()));
+							+ req.getPassenger().getId() + "\tat\t" + Time.writeTime(req.getSubmissionTime())+"\tfrom Link\t"+req.getFromLink().getId());
 				}
 			} else {
 				getOptimContext().scheduler.insertRequest(best.vehicleEntry, req, best.insertion);

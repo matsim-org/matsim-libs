@@ -52,6 +52,7 @@ public class RunSharedBerlinTaxiCase {
 			drt.setNumberOfThreads(7);
 			drt.setMaxTravelTimeAlpha(1.5);
 			drt.setMaxTravelTimeBeta(300);
+			drt.setkNearestVehicles(7);
 			
 			config.controler().setRunId(runId);
 			config.controler().setOutputDirectory("D:/runs-svn/sharedTaxi/originalScenario");

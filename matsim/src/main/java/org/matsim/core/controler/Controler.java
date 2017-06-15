@@ -186,8 +186,7 @@ public final class Controler implements ControlerI, MatsimServices {
 		// - transformed a StartupListener to a Guice module
 		// - that called methods such as setScoringFunctionFactory(), that redirects to addOverridingModule()
 		// And this happens silently, leading to lots of time and hair lost.
-		// td, nov 17
-		// A message from the future, when Thibaut seems to have (some of) his hair lost??? :-)  kai, jan'17
+		// td, nov 16
 		this.injectorCreated = true;
 		this.injector = Injector.createInjector(config, AbstractModule.override(Collections.singleton(new AbstractModule() {
 			@Override

@@ -20,6 +20,7 @@
 package playground.agarwalamit.opdyts.equil;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import floetteroed.opdyts.DecisionVariableRandomizer;
@@ -51,8 +52,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.opdyts.*;
-import playground.agarwalamit.opdyts.analysis.DecisionVariableAndBestSolutionPlotter;
-import playground.agarwalamit.opdyts.analysis.OpdytsConvergencePlotter;
+import playground.agarwalamit.opdyts.plots.BestSolutionVsDecisionVariableChart;
+import playground.agarwalamit.opdyts.plots.OpdytsConvergenceChart;
+import playground.agarwalamit.opdyts.analysis.OpdytsModalStatsControlerListener;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
 
@@ -62,8 +64,8 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 
 public class MatsimOpdytsEquilIntegration {
 
-	private static int randomVariance = 7;
-	private static int iterationsToConvergence = 400;
+	private static double scalingParameterForDecisionVariableVariability = 3;
+	private static int iterationsToConvergence = 600;
 
 	private static String EQUIL_DIR = "./examples/scenarios/equil/";
 	private static String OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,pt_holes_200its/";
@@ -74,10 +76,10 @@ public class MatsimOpdytsEquilIntegration {
 	public static void main(String[] args) {
 
 		if (args.length > 0) {
-			randomVariance = Integer.valueOf(args[0]);
+			scalingParameterForDecisionVariableVariability = Double.valueOf(args[0]);
 			iterationsToConvergence = Integer.valueOf(args[1]);
 			EQUIL_DIR = args[2];
-			OUT_DIR = args[3]+"/equil_car,pt_holes_variance"+randomVariance+"_"+iterationsToConvergence+"its/";
+			OUT_DIR = args[3]+"/equil_car,pt_holes_variance"+ scalingParameterForDecisionVariableVariability +"_"+iterationsToConvergence+"its/";
 		}
 
 		List<String> modes2consider = Arrays.asList("car","pt");
@@ -208,10 +210,10 @@ public class MatsimOpdytsEquilIntegration {
 
 		// randomize the decision variables (for e.g.\ utility parameters for modes)
 		DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-				RandomizedUtilityParametersChoser.ONLY_ASC, Double.valueOf(randomVariance), EQUIL,null);
+				RandomizedUtilityParametersChoser.ONLY_ASC, EQUIL, null, modes2consider);
 
 		// what would be the decision variables to optimize the objective function.
-		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, EQUIL);
+		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(), scenario,modes2consider, EQUIL);
 
 		// what would decide the convergence of the objective function
 //		final int iterationsToConvergence = 200; //
@@ -246,12 +248,12 @@ public class MatsimOpdytsEquilIntegration {
 			IOUtils.deleteDirectoryRecursively(new File(dir2remove).toPath());
 		}
 
-		OpdytsConvergencePlotter opdytsConvergencePlotter = new OpdytsConvergencePlotter();
+		OpdytsConvergenceChart opdytsConvergencePlotter = new OpdytsConvergenceChart();
 		opdytsConvergencePlotter.readFile(OUT_DIR+"/opdyts.con");
 		opdytsConvergencePlotter.plotData(OUT_DIR+"/convergence.png");
 
-		DecisionVariableAndBestSolutionPlotter decisionVariableAndBestSolutionPlotter = new DecisionVariableAndBestSolutionPlotter("bicycle");
-		decisionVariableAndBestSolutionPlotter.readFile(OUT_DIR+"/opdyts.log");
-		decisionVariableAndBestSolutionPlotter.plotData(OUT_DIR+"/decisionVariableVsASC.png");
+		BestSolutionVsDecisionVariableChart bestSolutionVsDecisionVariableChart = new BestSolutionVsDecisionVariableChart(new ArrayList<>(modes2consider));
+		bestSolutionVsDecisionVariableChart.readFile(OUT_DIR+"/opdyts.log");
+		bestSolutionVsDecisionVariableChart.plotData(OUT_DIR+"/decisionVariableVsASC.png");
 	}
 }

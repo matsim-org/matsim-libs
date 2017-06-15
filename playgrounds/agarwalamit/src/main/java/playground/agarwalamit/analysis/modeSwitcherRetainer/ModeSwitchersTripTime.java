@@ -60,6 +60,7 @@ public class ModeSwitchersTripTime {
 	}
 
 	private final SortedMap<Tuple<String, String>, ModeSwitcherInfoCollector> modeSwitchType2InfoCollector = new TreeMap<>((o1, o2) -> o1.toString().compareTo(o2.toString()));
+	private final Map<Id<Person>,List<Tuple<String, String>>> personId2ModeInfos = new HashMap<>();
 
 	public static void main(String[] args) {
 
@@ -75,16 +76,9 @@ public class ModeSwitchersTripTime {
 		}
 	}
 
-	public void processEventsFiles (final Scenario scenario){
-		String eventsDir = scenario.getConfig().controler().getOutputDirectory();
-		int firstIteration = scenario.getConfig().controler().getFirstIteration();
-		int lastIteration = scenario.getConfig().controler().getLastIteration();
-		// data from event files
-		String eventsFileFirstIt = eventsDir+"/ITERS/it."+firstIteration+"/"+firstIteration+".events.xml.gz";
-		String eventsFileLastIt = eventsDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
-
-		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelTimesFirstIt = getPerson2mode2TripTimes(eventsFileFirstIt);
-		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelTimesLastIt = getPerson2mode2TripTimes(eventsFileLastIt);
+	public void processEventsFile (final String firstIterationFile, final String lastIterationFile){
+		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelTimesFirstIt = getPerson2mode2TripTimes(firstIterationFile);
+		Map<Id<Person>, List<Tuple<String, Double>>> person2ModeTravelTimesLastIt = getPerson2mode2TripTimes(lastIterationFile);
 
 		// start processing
 		for(Id<Person> pId : person2ModeTravelTimesFirstIt.keySet()){
@@ -111,14 +105,42 @@ public class ModeSwitchersTripTime {
 					Tuple<String, String> modeSwitchType = new Tuple<>(firstItMode.getFirst(), lastItMode.getFirst());
 					storeTripTimeInfo(pId, modeSwitchType, new Tuple<>(firstItMode.getSecond(), lastItMode.getSecond()));
 
-				} 
+				}
 			} else if(!person2ModeTravelTimesLastIt.containsKey(pId)) {
 				LOG.warn("Person "+pId+ "is not present in the last iteration map. This person is thus not included in the results. Probably due to stuck and abort event.");
-			} 
+			}
 		}
 	}
 
+	public void processEventsFiles (final Scenario scenario){
+		String eventsDir = scenario.getConfig().controler().getOutputDirectory();
+		int firstIteration = scenario.getConfig().controler().getFirstIteration();
+		int lastIteration = scenario.getConfig().controler().getLastIteration();
+		// data from event files
+		String eventsFileFirstIt = eventsDir+"/ITERS/it."+firstIteration+"/"+firstIteration+".events.xml.gz";
+		String eventsFileLastIt = eventsDir+"/ITERS/it."+lastIteration+"/"+lastIteration+".events.xml.gz";
+
+		processEventsFile(eventsFileFirstIt, eventsFileLastIt);
+
+	}
+
+	private void storePerson2ModeSwitchinfo(final Id<Person> personId, final Tuple<String, String> modeSwitchTyp) {
+		List<Tuple<String, String>> modeInfo = this.personId2ModeInfos.get(personId);
+		if (modeInfo == null) {
+			modeInfo = new ArrayList<>();
+			modeInfo.add(modeSwitchTyp);
+		} else {
+			modeInfo.add(modeSwitchTyp);
+		}
+		this.personId2ModeInfos.put(personId, modeInfo);
+	}
+
+	public Map<Id<Person>, List<Tuple<String, String>>> getPersonId2ModeSwitcherRetainerTripInfo(){
+		return this.personId2ModeInfos;
+	}
+
 	private void storeTripTimeInfo(final Id<Person> personId, final Tuple<String, String> modeSwitchTyp, final Tuple<Double, Double> travelTimes){
+		storePerson2ModeSwitchinfo (personId, modeSwitchTyp);
 
 		ModeSwitcherInfoCollector infoCollector = this.modeSwitchType2InfoCollector.get(modeSwitchTyp);
 		if (infoCollector == null ) {
@@ -132,7 +154,7 @@ public class ModeSwitchersTripTime {
 		this.modeSwitchType2InfoCollector.put(modeSwitchTyp, infoCollector);
 	}
 
-	private Map<Id<Person>, List<Tuple<String, Double>>> getPerson2mode2TripTimes(final String eventsFile){
+	private Map<Id<Person>, List<Tuple<String, Double>>> getPerson2mode2TripTimes(final String eventsFile) {
 
 		ModalTravelTimeAnalyzer mtta = new ModalTravelTimeAnalyzer(eventsFile);
 		mtta.run();

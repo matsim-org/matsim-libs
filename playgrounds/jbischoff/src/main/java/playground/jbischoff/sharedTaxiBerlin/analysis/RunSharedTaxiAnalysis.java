@@ -57,7 +57,7 @@ public static void main(String[] args) {
 	events.addHandler(drtStats);
 	new MatsimEventsReader(events).readFile(eventsFile);
 	vehicleOccupancyEvaluator.writeDetailedOccupancyFiles("C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/vehicles/");
-	vehicleOccupancyEvaluator.calcAndWriteFleetStats("C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/vehicleStats.csv");
+	vehicleOccupancyEvaluator.calcAndWriteFleetStats("C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/vehicleStats.csv",false);
 	List<DynModeTrip> trips = drtStats.getDrtTrips();
 	JbUtils.collection2Text(trips, "C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/drtrips.csv", DynModeTrip.HEADER);
 	DynModeTripsAnalyser.analyseWaitTimes("C:/Users/Joschka/Documents/shared-svn/projects/bvg_sharedTaxi/runs/10_pct_prerun_100veh/waitstats", trips, 1800);

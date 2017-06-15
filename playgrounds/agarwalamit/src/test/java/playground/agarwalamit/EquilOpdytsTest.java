@@ -22,6 +22,7 @@ package playground.agarwalamit;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
@@ -31,6 +32,7 @@ import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import opdytsintegration.MATSimSimulator2;
 import opdytsintegration.MATSimStateFactoryImpl;
+import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzerFactory;
 import opdytsintegration.utils.TimeDiscretization;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -53,6 +55,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.testcases.MatsimTestUtils;
 import playground.agarwalamit.opdyts.*;
+import playground.agarwalamit.opdyts.analysis.OpdytsModalStatsControlerListener;
 import playground.agarwalamit.opdyts.equil.EquilDistanceDistribution;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
@@ -112,6 +115,8 @@ public class EquilOpdytsTest {
                 bind(ScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
             }
         });
+        simulator.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzerFactory(timeDiscretization, new HashSet<>(modes2consider),
+                new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet())));
 
         ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(distanceDistribution);
 
@@ -124,9 +129,9 @@ public class EquilOpdytsTest {
         boolean includeCurrentBest = false;
 
         DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-                RandomizedUtilityParametersChoser.ONLY_ASC,  Double.valueOf(randomVariance),  EQUIL_MIXEDTRAFFIC, null);
+                RandomizedUtilityParametersChoser.ONLY_ASC,   EQUIL_MIXEDTRAFFIC, null, modes2consider);
 
-        ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, EQUIL_MIXEDTRAFFIC);
+        ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, modes2consider, EQUIL_MIXEDTRAFFIC);
 
         final int averagingIterations = 5;
         ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);
@@ -187,7 +192,7 @@ public class EquilOpdytsTest {
 
     private Config setUpAndReturnConfig(final List<String> modes2consider){
 
-        Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config.xml");
+        Config config = ConfigUtils.loadConfig(EQUIL_DIR+"/config-with-mode-vehicles.xml", new OpdytsConfigGroup());
         config.plans().setInputFile("plans2000.xml.gz");
 
         //== default config has limited inputs

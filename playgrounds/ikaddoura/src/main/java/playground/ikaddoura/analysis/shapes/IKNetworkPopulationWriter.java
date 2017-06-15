@@ -59,9 +59,14 @@ public class IKNetworkPopulationWriter {
 
 	private Scenario scenario;
 	
-	private final String networkFile = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct/output/r_output_run0_bln_bc/output_network.xml.gz";
-	private final String populationFile = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct/output/r_output_run0_bln_bc/output_plans.xml.gz";
-	private final String outputPath = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct/output/r_output_run0_bln_bc/";
+//	private final String networkFile = "/Users/ihab/Documents/workspace/runs-svn/cne/munich/output-final/output_run0_muc_bc/output_network.xml.gz";
+//	private final String populationFile = "/Users/ihab/Documents/workspace/runs-svn/cne/munich/output-final/output_run0_muc_bc/output_plans.xml.gz";
+//	private final String outputPath = "/Users/ihab/Documents/workspace/runs-svn/cne/munich/";
+	
+	private final String networkFile = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct-simpleNetwork/output-FINAL/r_output_run0_bln_bc/output_network.xml.gz";
+	private final String populationFile = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct-simpleNetwork/output-FINAL/r_output_run0_bln_bc/output_plans.xml.gz";
+	private final String outputPath = "/Users/ihab/Documents/workspace/runs-svn/cne/berlin-dz-1pct-simpleNetwork/";
+
 	
 //	private final String crs = TransformationFactory.WGS84_UTM33N;
 	private final String crs = TransformationFactory.DHDN_GK4;
