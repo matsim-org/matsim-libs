@@ -25,7 +25,6 @@ package playground.jjoubert.projects.wb.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -33,15 +32,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.opengis.feature.simple.SimpleFeature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 
 import playground.jjoubert.projects.wb.tiff.GeoTiffReader;
@@ -53,15 +49,15 @@ import playground.southafrica.utilities.grid.KernelDensityEstimator;
 import playground.southafrica.utilities.grid.KernelDensityEstimator.KdeType;
 
 /**
- * Class to convert a GeoTiff image to a trip density map. This class assumes 
- * that only a shapefile is available. If you want to use a more standard grid
- * that is comparable to other World Bank analyses, consider the class ...
+ * Class to convert a GeoTiff image to a trip density map using an existing
+ * grid that was generated on National level.
  *   
  * @author jwjoubert
  */
-public class TripDensityGenerator {
-	final private static Logger LOG = Logger.getLogger(TripDensityGenerator.class);
+public class TripDensityGeneratorOnStandardGrid {
+	final private static Logger LOG = Logger.getLogger(TripDensityGeneratorOnStandardGrid.class);
 	private GeoTiffReader reader;
+	private final GeneralGrid grid;
 	private KernelDensityEstimator kde_am_in;
 	private KernelDensityEstimator kde_am_out;
 	private KernelDensityEstimator kde_pm_in;
@@ -71,56 +67,44 @@ public class TripDensityGenerator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Header.printHeader(TripDensityGenerator.class.toString(), args);
+		Header.printHeader(TripDensityGeneratorOnStandardGrid.class.toString(), args);
 		
-		String shapefile = args[0];
-		String crs = args[1];
-		String geotiff = args[2];
-		double width = Double.parseDouble(args[3]);
-		GridType gridType = GridType.valueOf(args[4]);
-		String outputFolder = args[5];
+		String gridfile = args[0];
+		/* The national grid file SHOULD be in the Hartebeesthoek Lo29 NE 
+		 * projected coordinate reference system. */
+		String crs = TransformationFactory.HARTEBEESTHOEK94_LO29;
+		String geotiff = args[1];
+		double width = Double.parseDouble(args[2]);
+		GridType gridType = GridType.valueOf(args[3]);
+		String outputFolder = args[4];
 		outputFolder += outputFolder.endsWith("/") ? "" : "/";
-		String area = args[6];
+		String area = args[5];
 		
 		String description = String.format("%s_%s_%04.0f", area, gridType.toString(), width);
 		
-		TripDensityGenerator tdg = new TripDensityGenerator(shapefile, geotiff, width, gridType);
+		TripDensityGeneratorOnStandardGrid tdg = new TripDensityGeneratorOnStandardGrid(gridfile, geotiff, width, gridType);
 		tdg.generateTrips(crs);
 		tdg.writeDensityForR(outputFolder, description, crs);
 		
 		Header.printFooter();
 	}
 	
-	public TripDensityGenerator(String geometry, String geotiff, 
+	public TripDensityGeneratorOnStandardGrid(String geometry, String geotiff, 
 			double width, GridType gridType) {
 		LOG.info("Initialising the class...");
 		
-		LOG.info("Building kernel density grid from shapefile...");
-		/* Parse the area shapefile. */
-		ShapeFileReader sfr = new ShapeFileReader();
-		sfr.readFileAndInitialize(geometry);
-		Collection<SimpleFeature> features = sfr.getFeatureSet();
-		if(features.size() > 1){
-			LOG.warn("Multiple features in shapefile... only the first to be used!");
-		}
-		SimpleFeature firstFeature = features.iterator().next();
-		Geometry area = null;
-		if(firstFeature.getDefaultGeometry() instanceof MultiPolygon){
-			area = (Geometry) firstFeature.getDefaultGeometry();
-		}
-		
-		GeneralGrid grid = new GeneralGrid(width, gridType);
-		grid.generateGrid(area);
+		LOG.info("Building grid from file...");
+		grid = GeneralGrid.readGrid(geometry, width, gridType);
 		
 		LOG.info("Parsing GeoTIFF image...");
 		this.reader = new GeoTiffReader();
 		reader.read(geotiff);
 		reader.getNumberOfPixels();
 
-		this.kde_am_in = new KernelDensityEstimator(grid, KdeType.CELL, 10.0);
-		this.kde_am_out = new KernelDensityEstimator(grid, KdeType.CELL, 10.0);
-		this.kde_pm_in = new KernelDensityEstimator(grid, KdeType.CELL, 10.0);
-		this.kde_pm_out = new KernelDensityEstimator(grid, KdeType.CELL, 10.0);
+		this.kde_am_in = new KernelDensityEstimator(grid, KdeType.CELL, 1.0);
+		this.kde_am_out = new KernelDensityEstimator(grid, KdeType.CELL, 1.0);
+		this.kde_pm_in = new KernelDensityEstimator(grid, KdeType.CELL, 1.0);
+		this.kde_pm_out = new KernelDensityEstimator(grid, KdeType.CELL, 1.0);
 		
 		LOG.info("Done initializing the class.");
 	}
