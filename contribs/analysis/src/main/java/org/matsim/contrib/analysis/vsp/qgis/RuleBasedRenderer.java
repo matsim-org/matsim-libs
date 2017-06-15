@@ -136,7 +136,7 @@ public class RuleBasedRenderer extends QGisRenderer {
 
     private void createFirstRule() {
         rules[0] = AccessibilityRuleWithFilterCreator.createRuleWithoutLowerBound(nameOfAccessibilityLayer,
-                lowerBound, nameOfDensityLayer, minimumDensity, 0, "< " + String.valueOf(lowerBound));
+                lowerBound, nameOfDensityLayer, minimumDensity, 0, String.valueOf(lowerBound));
     }
 
     private void createMidRules() {
