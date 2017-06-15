@@ -88,10 +88,10 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	private double selfTuningWeight = 1.0;
 
 	private static final String EQUILIBRIUM_GAP_WEIGHT = "equilibriumGapWeight";
-	private double equilibriumGapWeight = 0.0;
+	private double equilibriumGapWeight = Double.NEGATIVE_INFINITY;
 
 	private static final String UNIFORMITY_GAP_WEIGHT = "uniformityGapWeight";
-	private double uniformityGapWeight = 0.0;
+	private double uniformityGapWeight = Double.NEGATIVE_INFINITY;
 
 
 	@StringGetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
