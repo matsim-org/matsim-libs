@@ -34,6 +34,7 @@ import opdytsintegration.MATSimSimulator2;
 import opdytsintegration.MATSimStateFactoryImpl;
 import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzerFactory;
 import opdytsintegration.utils.TimeDiscretization;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -79,7 +80,7 @@ public class EquilOpdytsTest {
 
     private static final boolean isPlansRelaxed = true;
 
-    @Test
+    @Test@Ignore
     public void runTest(){
         List<String> modes2consider = Arrays.asList("car","bicycle");
 

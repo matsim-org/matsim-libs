@@ -118,7 +118,7 @@ public class PatnaNetworkModesCalibrator {
 		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization, new HashSet<>(modes2consider));
 		simulator.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzerFactory(timeDiscretization, new HashSet<>(modes2consider),
 				new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet())));
-		
+
 		simulator.addOverridingModule(new AbstractModule() {
 
 			@Override
