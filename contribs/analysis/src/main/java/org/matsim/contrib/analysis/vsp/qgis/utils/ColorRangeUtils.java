@@ -11,12 +11,15 @@ public class ColorRangeUtils {
     public static final Logger log = Logger.getLogger(ColorRangeUtils.class);
 
     public enum ColorRange {
-        RED_TO_GREEN, GREEN_TO_RED, GREEN_TO_BLUE, BLUE_TO_GREEN, BLUE_TO_RED, RED_TO_BLUE,
+        DEFAULT_RED_TO_BLUE, RED_TO_GREEN, GREEN_TO_RED, GREEN_TO_BLUE, BLUE_TO_GREEN, BLUE_TO_RED, RED_TO_BLUE,
         BLACK_TO_WHITE, WHITE_TO_BLACK
     }
 
     public static Color getColor(ColorRange colorRange, double power) {
         switch (colorRange) {
+            case DEFAULT_RED_TO_BLUE:
+                return getDefaultColorFromRedToBlue(power);
+
             case RED_TO_GREEN:
                 return getColorFromRedToGreen(power);
 
@@ -45,6 +48,13 @@ public class ColorRangeUtils {
                 log.error("No such color range");
                 return new Color(0,0,0);
         }
+    }
+
+
+
+    private static Color getDefaultColorFromRedToBlue(double power) {
+        DefaultColorRange colorRange = new DefaultColorRange();
+        return colorRange.getColor(power);
     }
 
     private static Color getColorFromRedToGreen(double power) {

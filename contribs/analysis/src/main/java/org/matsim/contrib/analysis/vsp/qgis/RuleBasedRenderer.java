@@ -136,7 +136,7 @@ public class RuleBasedRenderer extends QGisRenderer {
 
     private void createFirstRule() {
         rules[0] = AccessibilityRuleWithFilterCreator.createRuleWithoutLowerBound(nameOfAccessibilityLayer,
-                lowerBound, nameOfDensityLayer, minimumDensity, 0, String.valueOf(lowerBound));
+                lowerBound, nameOfDensityLayer, minimumDensity, 0, "< " + String.valueOf(lowerBound));
     }
 
     private void createMidRules() {
@@ -161,7 +161,7 @@ public class RuleBasedRenderer extends QGisRenderer {
     }
 
     private double calcLowerBound(int i) {
-        return lowerBound + upperBound * (i - 1);
+        return lowerBound + ((upperBound-lowerBound)/(range-2)) * (i - 1);
     }
 
     private double calcUpperBound(int i) {

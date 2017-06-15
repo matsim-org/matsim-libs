@@ -37,7 +37,7 @@ public class VisualizationUtils {
                                         String workingDirectory, String crs, boolean includeDensityLayer, Double lowerBound,
                                         Double upperBound, Integer range, int symbolSize, int populationThreshold) {
 	    createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer, lowerBound, upperBound,
-                range, ColorRangeUtils.ColorRange.RED_TO_GREEN, symbolSize, populationThreshold);
+                range, ColorRangeUtils.ColorRange.DEFAULT_RED_TO_BLUE, symbolSize, populationThreshold);
     }
 	
 	public static void createQGisOutput(String actType, String mode, Envelope envelope,
