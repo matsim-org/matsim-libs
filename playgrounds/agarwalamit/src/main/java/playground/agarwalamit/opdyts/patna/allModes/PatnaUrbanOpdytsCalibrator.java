@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.opdyts.patna;
+package playground.agarwalamit.opdyts.patna.allModes;
 
 import java.io.File;
 import java.util.Arrays;
@@ -51,6 +51,7 @@ import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
 import playground.agarwalamit.opdyts.*;
 import playground.agarwalamit.opdyts.analysis.OpdytsModalStatsControlerListener;
+import playground.agarwalamit.opdyts.patna.PatnaOneBinDistanceDistribution;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
 

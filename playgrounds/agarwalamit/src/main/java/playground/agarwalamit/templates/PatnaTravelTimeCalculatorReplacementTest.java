@@ -17,9 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.opdyts.patna;
+package playground.agarwalamit.templates;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
@@ -44,8 +47,6 @@ import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
-import playground.agarwalamit.opdyts.analysis.OpdytsModalStatsControlerListener;
-import playground.agarwalamit.opdyts.OpdytsScenario;
 import playground.agarwalamit.utils.FileUtils;
 
 /**
@@ -146,9 +147,6 @@ public class PatnaTravelTimeCalculatorReplacementTest {
 
                 this.bind(ModalTripTravelTimeHandler.class);
                 this.addControlerListenerBinding().to(ModalTravelTimeControlerListener.class);
-
-                this.addControlerListenerBinding().toInstance(new OpdytsModalStatsControlerListener(modes2consider, new PatnaOneBinDistanceDistribution(
-                        OpdytsScenario.PATNA_1Pct)));
             }
         });
 

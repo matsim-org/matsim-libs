@@ -47,7 +47,7 @@ import playground.agarwalamit.utils.FileUtils;
  */
 
 
-public class EquilControler {
+public class EquilASCTrials {
 
     private static String EQUIL_DIR = "./examples/scenarios/equil-mixedTraffic/";
     private static String OUT_DIR = FileUtils.RUNS_SVN+"opdyts/equil/car,bicycle/ascAnalysis/";
