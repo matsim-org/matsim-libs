@@ -63,7 +63,7 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 public class PatnaUrbanOpdytsCalibrator {
 
 	private static final OpdytsScenario PATNA_1_PCT = OpdytsScenario.PATNA_1Pct;
-	private static String OUT_DIR = FileUtils.RUNS_SVN+"/patnaIndia/run111/opdyts/output222/";
+	private static String OUT_DIR = FileUtils.RUNS_SVN+"/opdyts/patna/run111/opdyts/output222/";
 	private static final String configDir = FileUtils.RUNS_SVN+"/patnaIndia/run111/opdyts/input/";
 
 	public static void main(String[] args) {

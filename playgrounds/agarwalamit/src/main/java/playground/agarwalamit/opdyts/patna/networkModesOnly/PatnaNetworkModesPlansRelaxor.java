@@ -43,8 +43,6 @@ import playground.agarwalamit.utils.FileUtils;
 class PatnaNetworkModesPlansRelaxor {
 
 	public void run (Config config) {
-//		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
-
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
