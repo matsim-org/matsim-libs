@@ -87,6 +87,13 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	private static final String SELF_TUNING_WEIGHT = "selfTuningWeight";
 	private double selfTuningWeight = 1.0;
 
+	private static final String EQUILIBRIUM_GAP_WEIGHT = "equilibriumGapWeight";
+	private double equilibriumGapWeight = 0.0;
+
+	private static final String UNIFORMITY_GAP_WEIGHT = "uniformityGapWeight";
+	private double uniformityGapWeight = 0.0;
+
+
 	@StringGetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
 	public double getVariationSizeOfRamdomizeDecisionVariable() {
 		return variationSizeOfRamdomizeDecisionVariable;
@@ -245,6 +252,26 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(SELF_TUNING_WEIGHT)
 	public void setSelfTuningWeight(double selfTuningWeight) {
 		this.selfTuningWeight = selfTuningWeight;
+	}
+
+	@StringGetter(EQUILIBRIUM_GAP_WEIGHT)
+	public double getEquilibriumGapWeight() {
+		return equilibriumGapWeight;
+	}
+
+	@StringSetter(EQUILIBRIUM_GAP_WEIGHT)
+	public void setEquilibriumGapWeight(double equilibriumGapWeight) {
+		this.equilibriumGapWeight = equilibriumGapWeight;
+	}
+
+	@StringGetter(UNIFORMITY_GAP_WEIGHT)
+	public double getUniformityGapWeight() {
+		return uniformityGapWeight;
+	}
+
+	@StringSetter(UNIFORMITY_GAP_WEIGHT)
+	public void setUniformityGapWeight(double uniformityGapWeight) {
+		this.uniformityGapWeight = uniformityGapWeight;
 	}
 
 	// MAIN-FUNCTION, ONLY FOR TESTING
