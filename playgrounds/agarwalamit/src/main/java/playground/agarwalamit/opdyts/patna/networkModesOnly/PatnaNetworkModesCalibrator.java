@@ -20,17 +20,14 @@
 package playground.agarwalamit.opdyts.patna.networkModesOnly;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
-import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
-import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
-import floetteroed.opdyts.searchalgorithms.RandomSearch;
-import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import opdytsintegration.MATSimSimulator2;
 import opdytsintegration.MATSimStateFactoryImpl;
-import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzer;
-import opdytsintegration.utils.TimeDiscretization;
+import opdytsintegration.utils.OpdytsConfigGroup;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -39,7 +36,6 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.io.IOUtils;
@@ -107,17 +103,13 @@ public class PatnaNetworkModesCalibrator {
 		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
 		// == opdyts settings
-		// this is something like time bin generator
-		TimeDiscretization timeDiscretization = new TimeDiscretization(opdytsConfigGroup.getStartTime(), opdytsConfigGroup.getBinSize(), opdytsConfigGroup.getBinCount());
-
+		MATSimOpdytsIntegrationRunner<ModeChoiceDecisionVariable> factories = new MATSimOpdytsIntegrationRunner<ModeChoiceDecisionVariable>(scenario);
 		List<String> modes2consider = Arrays.asList("car","bike","motorbike");
 		DistanceDistribution referenceStudyDistri = new PatnaNetworkModesOneBinDistanceDistribution(PATNA_1_PCT);
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,referenceStudyDistri);
 
 		// following is the  entry point to start a matsim controler together with opdyts
-		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
-		simulator.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzer.Provider(timeDiscretization, new HashSet<>(modes2consider),
-				new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet())));
+		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = factories.newMATSimSimulator( new MATSimStateFactoryImpl<>());
 
 		simulator.addOverridingModule(new AbstractModule() {
 
@@ -157,30 +149,9 @@ public class PatnaNetworkModesCalibrator {
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, modes2consider, PATNA_1_PCT);
 
-		// what would decide the convergence of the objective function
-		ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(opdytsConfigGroup.getNumberOfIterationsForConvergence(),opdytsConfigGroup.getNumberOfIterationsForAveraging());
+		factories.run(decisionVariableRandomizer, initialDecisionVariable, objectiveFunction);
 
-		RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>(
-				simulator,
-				decisionVariableRandomizer,
-				initialDecisionVariable,
-				convergenceCriterion,
-				opdytsConfigGroup.getMaxIteration(), // this many times simulator.run(...) and thus controler.run() will be called.
-				opdytsConfigGroup.getMaxTransition(),
-				opdytsConfigGroup.getPopulationSize(),
-				MatsimRandom.getRandom(),
-				opdytsConfigGroup.isInterpolate(),
-				objectiveFunction,
-				opdytsConfigGroup.isIncludeCurrentBest()
-		);
-
-		// probably, an object which decide about the inertia
-		SelfTuner selfTuner = new SelfTuner(opdytsConfigGroup.getInertia());
-		selfTuner.setNoisySystem(true);
-		randomSearch.setLogPath(opdytsConfigGroup.getOutputDirectory());
-
-		// run it, this will eventually call simulator.run() and thus controler.run
-		randomSearch.run(selfTuner );
+		// post-process
 
 		OpdytsConvergenceChart opdytsConvergencePlotter = new OpdytsConvergenceChart();
 		opdytsConvergencePlotter.readFile(OUT_DIR+"/opdyts.con");

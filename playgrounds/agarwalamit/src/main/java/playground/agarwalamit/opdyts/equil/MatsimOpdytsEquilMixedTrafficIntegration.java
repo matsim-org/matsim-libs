@@ -31,6 +31,7 @@ import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import opdytsintegration.MATSimSimulator2;
 import opdytsintegration.MATSimStateFactoryImpl;
+import opdytsintegration.utils.OpdytsConfigGroup;
 import opdytsintegration.utils.TimeDiscretization;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;

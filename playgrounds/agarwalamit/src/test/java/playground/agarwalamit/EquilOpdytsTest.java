@@ -21,19 +21,10 @@ package playground.agarwalamit;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
-import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.ObjectiveFunction;
-import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
-import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
-import floetteroed.opdyts.searchalgorithms.RandomSearch;
-import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import opdytsintegration.MATSimSimulator2;
 import opdytsintegration.MATSimStateFactoryImpl;
-import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzerFactory;
-import opdytsintegration.utils.TimeDiscretization;
+import opdytsintegration.utils.OpdytsConfigGroup;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,7 +40,6 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
@@ -98,15 +88,13 @@ public class EquilOpdytsTest {
     }
 
     private void runOpdyts(final List<String> modes2consider, final Scenario scenario, final String outDir){
-        int startTime= 0;
-        int binSize = 3600;
-        int binCount = 24;
-        TimeDiscretization timeDiscretization = new TimeDiscretization(startTime, binSize, binCount);
+
+        MATSimOpdytsIntegrationRunner runner = new MATSimOpdytsIntegrationRunner(scenario);
 
         DistanceDistribution distanceDistribution = new EquilDistanceDistribution(EQUIL_MIXEDTRAFFIC);
         OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
 
-        MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization, new HashSet<>(modes2consider));
+        MATSimSimulator2<ModeChoiceDecisionVariable> simulator = runner.newMATSimSimulator(new MATSimStateFactoryImpl<>());
         simulator.addOverridingModule(new AbstractModule() {
 
             @Override
@@ -115,44 +103,13 @@ public class EquilOpdytsTest {
                 bind(ScoringParametersForPerson.class).to(EveryIterationScoringParameters.class);
             }
         });
-        simulator.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzerFactory(timeDiscretization, new HashSet<>(modes2consider),
-                new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet())));
 
-        ObjectiveFunction objectiveFunction = new ModeChoiceObjectiveFunction(distanceDistribution);
-
-        //search algorithm
-        int maxIterations = 5;
-        int maxTransitions = Integer.MAX_VALUE;
-        int populationSize = 10;
-
-        boolean interpolate = true;
-        boolean includeCurrentBest = false;
-
-        DecisionVariableRandomizer<ModeChoiceDecisionVariable> decisionVariableRandomizer = new ModeChoiceRandomizer(scenario,
-                RandomizedUtilityParametersChoser.ONLY_ASC,   EQUIL_MIXEDTRAFFIC, null, modes2consider);
-
-        ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, modes2consider, EQUIL_MIXEDTRAFFIC);
-
-        final int averagingIterations = 5;
-        ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(iterationsToConvergence, averagingIterations);
-
-        RandomSearch<ModeChoiceDecisionVariable> randomSearch = new RandomSearch<>(
-                simulator,
-                decisionVariableRandomizer,
-                initialDecisionVariable,
-                convergenceCriterion,
-                maxIterations,
-                maxTransitions,
-                populationSize,
-                MatsimRandom.getRandom(),
-                interpolate,
-                objectiveFunction,
-                includeCurrentBest
+        runner.run(
+                new ModeChoiceRandomizer(scenario, RandomizedUtilityParametersChoser.ONLY_ASC,   EQUIL_MIXEDTRAFFIC, null, modes2consider),
+                new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, modes2consider, EQUIL_MIXEDTRAFFIC),
+                new ModeChoiceObjectiveFunction(distanceDistribution)
         );
 
-        SelfTuner selfTuner = new SelfTuner(0.95);
-        randomSearch.setLogPath(outDir);
-        randomSearch.run(selfTuner );
     }
 
     private void relaxPlansAndUpdateConfig(final Config config, final String outDir, final List<String> modes2consider){
