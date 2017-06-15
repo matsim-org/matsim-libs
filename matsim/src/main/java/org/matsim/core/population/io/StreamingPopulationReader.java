@@ -21,6 +21,7 @@
 package org.matsim.core.population.io;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -70,6 +71,10 @@ public final class StreamingPopulationReader implements MatsimReader {
 	}
 	public void parse(InputStream is) {
 		reader.parse(is);
+	}
+
+	public void parse(URL url) {
+		reader.parse( url );
 	}
 
 	//////////////////////////////////////////////////////////////////////
