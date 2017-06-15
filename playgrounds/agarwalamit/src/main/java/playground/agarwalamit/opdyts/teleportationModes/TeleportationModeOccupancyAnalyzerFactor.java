@@ -17,17 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.agarwalamit.opdyts;
+package playground.agarwalamit.opdyts.teleportationModes;
 
 import java.util.Map;
 import java.util.Set;
-import javax.inject.Inject;
-import com.vividsolutions.jts.geom.Geometry;
 import floetteroed.utilities.math.Vector;
 import opdytsintegration.SimulationStateAnalyzer;
 import opdytsintegration.utils.TimeDiscretization;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
@@ -38,13 +36,12 @@ public class TeleportationModeOccupancyAnalyzerFactor implements SimulationState
 
     private final TimeDiscretization timeDiscretization;
     private final Set<String> relevantTeleportationMdoes;
-    private final Map<Id<Geometry>,Geometry> relevantZones;
+    private final Map<Id<Link>,Set<Id<Link>>> relevantZones;
     private TeleportationODAnalyzer teleportationODAnalyzer;
-    @Inject private Network network;
 
     public TeleportationModeOccupancyAnalyzerFactor (final TimeDiscretization timeDiscretization,
                                                      final Set<String> relevantTeleportationMdoes,
-                                                     final Map<Id<Geometry>,Geometry> relevantZones) {
+                                                     final Map<Id<Link>, Set<Id<Link>>> relevantZones) {
         this.timeDiscretization = timeDiscretization;
         this.relevantTeleportationMdoes = relevantTeleportationMdoes;
 
@@ -58,7 +55,7 @@ public class TeleportationModeOccupancyAnalyzerFactor implements SimulationState
 
     @Override
     public EventHandler newEventHandler() {
-        this.teleportationODAnalyzer = new TeleportationODAnalyzer(timeDiscretization, relevantZones, relevantTeleportationMdoes, network);
+        this.teleportationODAnalyzer = new TeleportationODAnalyzer(timeDiscretization, relevantZones, relevantTeleportationMdoes);
         return this.teleportationODAnalyzer;
     }
 
