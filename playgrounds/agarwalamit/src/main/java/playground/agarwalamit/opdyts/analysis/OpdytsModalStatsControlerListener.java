@@ -63,14 +63,14 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
     private final SortedMap<String, SortedMap<Double, Integer>> initialMode2DistanceClass2LegCount = new TreeMap<>();
 
     private BufferedWriter writer;
-    private final List<String> mode2consider;
+    private final Collection<String> mode2consider;
 
     /*
      * after every 10/20/50 iterations, distance distribution will be written out.
      */
     private final int distriEveryItr = 50;
 
-    public OpdytsModalStatsControlerListener(final List<String> modes2consider, final DistanceDistribution referenceStudyDistri) {
+    public OpdytsModalStatsControlerListener(final Collection<String> modes2consider, final DistanceDistribution referenceStudyDistri) {
         this.mode2consider = modes2consider;
         this.referenceStudyDistri = referenceStudyDistri;
     }

@@ -19,29 +19,26 @@
 
 package playground.agarwalamit.opdyts.teleportationModes;
 
-import java.util.Map;
 import java.util.Set;
 import floetteroed.utilities.math.Vector;
 import opdytsintegration.SimulationStateAnalyzer;
 import opdytsintegration.utils.TimeDiscretization;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
  * Created by amit on 15.06.17. Adapted after {@link opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzerFactory}
  */
 
-public class TeleportationModeOccupancyAnalyzerFactor implements SimulationStateAnalyzer {
+public class TeleportationModeOccupancyAnalyzerFactory implements SimulationStateAnalyzer {
 
     private final TimeDiscretization timeDiscretization;
     private final Set<String> relevantTeleportationMdoes;
-    private final Map<Id<Link>,Set<Id<Link>>> relevantZones;
+    private final Set<Zone> relevantZones;
     private TeleportationODAnalyzer teleportationODAnalyzer;
 
-    public TeleportationModeOccupancyAnalyzerFactor (final TimeDiscretization timeDiscretization,
+    public TeleportationModeOccupancyAnalyzerFactory(final TimeDiscretization timeDiscretization,
                                                      final Set<String> relevantTeleportationMdoes,
-                                                     final Map<Id<Link>, Set<Id<Link>>> relevantZones) {
+                                                     final Set<Zone> relevantZones) {
         this.timeDiscretization = timeDiscretization;
         this.relevantTeleportationMdoes = relevantTeleportationMdoes;
 

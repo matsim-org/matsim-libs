@@ -39,7 +39,7 @@ public final class PatnaOneBinDistanceDistribution implements DistanceDistributi
     private double legsSumAllModes = 0;
     private final OpdytsScenario opdytsScenario;
 
-    PatnaOneBinDistanceDistribution(final OpdytsScenario opdytsScenario){
+    public PatnaOneBinDistanceDistribution(final OpdytsScenario opdytsScenario){
         this.opdytsScenario = opdytsScenario;
         double totalLegs ;
         switch (opdytsScenario) {

@@ -25,12 +25,10 @@ import java.util.Set;
 import floetteroed.utilities.math.Vector;
 import opdytsintegration.MATSimCountingStateAnalyzer;
 import opdytsintegration.utils.TimeDiscretization;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.network.Link;
 
 /**
  * Created by amit on 15.06.17. Adapted after {@link opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzer}
@@ -39,27 +37,27 @@ import org.matsim.api.core.v01.network.Link;
 
 public class TeleportationODAnalyzer implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
-    private final Map<String, MATSimCountingStateAnalyzer<Link>> mode2stateAnalyzer;
-    private final Map<Id<Link>,Set<Id<Link>>> relevantZones;
+    private final Map<String, MATSimCountingStateAnalyzer<Zone>> mode2stateAnalyzer;
+    private final Set<Zone> relevantZones;
     private final TimeDiscretization timeDiscretization;
 
     public TeleportationODAnalyzer(final TimeDiscretization timeDiscretization,
-                                   final Map<Id<Link>,Set<Id<Link>>> relevantZones,
+                                   final Set<Zone> relevantZones,
                                    final Set<String> relevantModes) {
         this.relevantZones = relevantZones;
         this.mode2stateAnalyzer = new LinkedHashMap<>();
         this.timeDiscretization = timeDiscretization;
         for (String mode : relevantModes) {
-            this.mode2stateAnalyzer.put(mode, new MATSimCountingStateAnalyzer<Link>(timeDiscretization));
+            this.mode2stateAnalyzer.put(mode, new MATSimCountingStateAnalyzer<Zone>(timeDiscretization));
         }
     }
 
-    public MATSimCountingStateAnalyzer<Link> getNetworkModeAnalyzer(final String mode) {
+    public MATSimCountingStateAnalyzer<Zone> getNetworkModeAnalyzer(final String mode) {
         return this.mode2stateAnalyzer.get(mode);
     }
 
     public void beforeIteration() {
-        for (MATSimCountingStateAnalyzer<Link> stateAnalyzer : this.mode2stateAnalyzer.values()) {
+        for (MATSimCountingStateAnalyzer<Zone> stateAnalyzer : this.mode2stateAnalyzer.values()) {
             stateAnalyzer.beforeIteration();
         }
     }
@@ -71,11 +69,11 @@ public class TeleportationODAnalyzer implements PersonDepartureEventHandler, Per
 
     @Override
     public void handleEvent(PersonArrivalEvent event) {
-        final MATSimCountingStateAnalyzer<Link> stateAnalyzer = this.mode2stateAnalyzer.get(event.getLegMode());
+        final MATSimCountingStateAnalyzer<Zone> stateAnalyzer = this.mode2stateAnalyzer.get(event.getLegMode());
         if (this.mode2stateAnalyzer.containsKey(event.getLegMode())) {
-            for (Id<Link> id : this.relevantZones.keySet()) {
-                if ( this.relevantZones.get(id).contains(event.getLinkId())) {
-                    stateAnalyzer.registerDecrease(id, (int)event.getTime());
+            for (Zone zone : this.relevantZones ) {
+                if ( zone.getLinksInsideZone().contains(event.getLinkId())) {
+                    stateAnalyzer.registerDecrease(zone.getZoneId(), (int)event.getTime());
                 } else {
                     //dont do anything.
                 }
@@ -87,11 +85,11 @@ public class TeleportationODAnalyzer implements PersonDepartureEventHandler, Per
 
     @Override
     public void handleEvent(PersonDepartureEvent event) {
-        final MATSimCountingStateAnalyzer<Link> stateAnalyzer = this.mode2stateAnalyzer.get(event.getLegMode());
+        final MATSimCountingStateAnalyzer<Zone> stateAnalyzer = this.mode2stateAnalyzer.get(event.getLegMode());
         if (this.mode2stateAnalyzer.containsKey(event.getLegMode())) {
-            for (Id<Link> id : this.relevantZones.keySet()) {
-                if ( this.relevantZones.get(id).contains(event.getLinkId())) {
-                    stateAnalyzer.registerIncrease(id, (int)event.getTime());
+            for (Zone zone : this.relevantZones ) {
+                if ( zone.getLinksInsideZone().contains(event.getLinkId())) {
+                    stateAnalyzer.registerIncrease(zone.getZoneId(), (int)event.getTime());
                 } else {
                     //dont do anything.
                 }
@@ -106,10 +104,10 @@ public class TeleportationODAnalyzer implements PersonDepartureEventHandler, Per
                 this.mode2stateAnalyzer.size() * this.relevantZones.size()  * this.timeDiscretization.getBinCnt());
         int i = 0;
         for (String mode : this.mode2stateAnalyzer.keySet()) {
-            final MATSimCountingStateAnalyzer<Link> analyzer = this.mode2stateAnalyzer.get(mode);
-            for (Id<Link> zoneId : this.relevantZones.keySet()) {
+            final MATSimCountingStateAnalyzer<Zone> analyzer = this.mode2stateAnalyzer.get(mode);
+            for (Zone zone : this.relevantZones) {
                 for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
-                    result.set(i++, analyzer.getCount(zoneId, bin));
+                    result.set(i++, analyzer.getCount(zone.getZoneId(), bin));
                 }
             }
         }
