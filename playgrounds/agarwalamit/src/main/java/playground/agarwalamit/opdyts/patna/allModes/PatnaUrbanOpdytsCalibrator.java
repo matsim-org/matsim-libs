@@ -135,6 +135,7 @@ public class PatnaUrbanOpdytsCalibrator {
 		
 		simulator.addSimulationStateAnalyzer(new TeleportationODAnalyzer.Provider(factories.getTimeDiscretization(), teleportationModes, relevantZones));
 
+		String finalOUT_DIR = OUT_DIR;
 		simulator.addOverridingModule(new AbstractModule() {
 
 			@Override
@@ -160,6 +161,15 @@ public class PatnaUrbanOpdytsCalibrator {
 						// remove the unused iterations
 						String dir2remove = event.getServices().getControlerIO().getOutputPath()+"/ITERS/";
 						IOUtils.deleteDirectoryRecursively(new File(dir2remove).toPath());
+
+						// post-process
+						OpdytsConvergenceChart opdytsConvergencePlotter = new OpdytsConvergenceChart();
+						opdytsConvergencePlotter.readFile(finalOUT_DIR +"/opdyts.con");
+						opdytsConvergencePlotter.plotData(finalOUT_DIR +"/convergence.png");
+
+						BestSolutionVsDecisionVariableChart bestSolutionVsDecisionVariableChart = new BestSolutionVsDecisionVariableChart(new ArrayList<>(allModes));
+						bestSolutionVsDecisionVariableChart.readFile(finalOUT_DIR +"/opdyts.log");
+						bestSolutionVsDecisionVariableChart.plotData(finalOUT_DIR +"/decisionVariableVsASC.png");
 					}
 				});
 			}
@@ -176,14 +186,5 @@ public class PatnaUrbanOpdytsCalibrator {
 		// what would be the decision variables to optimize the objective function.
 		ModeChoiceDecisionVariable initialDecisionVariable = new ModeChoiceDecisionVariable(scenario.getConfig().planCalcScore(),scenario, allModes, PATNA_1_PCT);
 		factories.run(decisionVariableRandomizer, initialDecisionVariable, objectiveFunction);
-
-		// post-process
-		OpdytsConvergenceChart opdytsConvergencePlotter = new OpdytsConvergenceChart();
-		opdytsConvergencePlotter.readFile(OUT_DIR+"/opdyts.con");
-		opdytsConvergencePlotter.plotData(OUT_DIR+"/convergence.png");
-
-		BestSolutionVsDecisionVariableChart bestSolutionVsDecisionVariableChart = new BestSolutionVsDecisionVariableChart(new ArrayList<>(allModes));
-		bestSolutionVsDecisionVariableChart.readFile(OUT_DIR+"/opdyts.log");
-		bestSolutionVsDecisionVariableChart.plotData(OUT_DIR+"/decisionVariableVsASC.png");
 	}
 }
