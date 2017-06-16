@@ -59,12 +59,18 @@ import java.util.stream.Stream;
  */
 public class SummarizePlans {
 	private static final Logger log = Logger.getLogger( SummarizePlans.class );
+
 	public static void main( final String... args ) {
 		// should be the experienced plans
 		final String inConfig = args[ 0 ];
 		final String outDat = args[ 1 ];
 
 		final Config config = ConfigUtils.loadConfig( inConfig );
+		run( config , outDat );
+	}
+
+	public static void run( final Config config , final String outDat ) {
+
 		config.global().setNumberOfThreads( 2 );
 
 		// we want to use the streaming reader instead.
@@ -91,9 +97,10 @@ public class SummarizePlans {
 			writer.write( "distance_m\tstop_s" );
 
 			final StreamingPopulationReader reader = new StreamingPopulationReader( scenario );
+			// for debugging of streaming
 			final LambdaCounter counter = new LambdaCounter( c -> log.info( "process person # "+ c +" from population of size "+scenario.getPopulation().getPersons().size() ) );
 			reader.addAlgorithm( person -> {
-				counter.incCounter();
+				//counter.incCounter();
 				prepare.run( person );
 				final Plan plan = person.getSelectedPlan();
 				final double traveledDistance = getCarTraveledDistance( plan );
@@ -109,7 +116,7 @@ public class SummarizePlans {
 			} );
 
 			reader.parse( populationFile );
-			counter.printCounter();
+			//counter.printCounter();
 		}
 		catch ( IOException e ) {
 			throw new UncheckedIOException( e );
