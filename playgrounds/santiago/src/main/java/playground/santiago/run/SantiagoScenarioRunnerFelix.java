@@ -54,7 +54,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.ControlerDefaultsWithRoadPricingModule;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 
+import playground.agarwalamit.analysis.modalShare.ModalShareExample;
+import playground.agarwalamit.analysis.modalShare.ModalShareFromEvents;
 import playground.santiago.SantiagoScenarioConstants;
+import playground.santiago.colectivos.PostProcessModalShare;
 import playground.santiago.colectivos.router.ColectivoModule;
 import playground.vsp.congestion.controler.MarginalCongestionPricingContolerListener;
 import playground.vsp.congestion.handlers.CongestionHandlerImplV3;
@@ -83,7 +86,7 @@ public class SantiagoScenarioRunnerFelix {
 	
 	public static void main(String args[]){		
 
-		if (args.length==6){ //ONLY FOR CMD CASES
+		if (args.length > 0){ //ONLY FOR CMD CASES
 			
 			configFile = args[0]; //COMPLETE PATH TO CONFIG.
 			gantriesFile = args[1]; //COMPLETE PATH TO TOLL LINKS FILE
@@ -95,13 +98,13 @@ public class SantiagoScenarioRunnerFelix {
 			
 		} else {
 		
-			configFile=inputPath + "randomized_sampled_config_fares_eingebunden.xml" ; 
+			configFile=inputPath + "config_test.xml" ; 
 			gantriesFile = inputPath + "gantries.xml";
 			policy=0;    
 			sigma=3 ;    
 			doModeChoice=true ; 
 			mapActs2Links=false;
-			colectivoASC = -0.3781;
+			colectivoASC = -10.0;
 		}	
 			
 			if(policy == 1){
@@ -140,9 +143,14 @@ public class SantiagoScenarioRunnerFelix {
 			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 	
 			//Run!
-			controler.run();		
+			controler.run();
 			
+			String[] outputFolder = {controler.getControlerIO().getOutputPath()+"/"};
+			PostProcessModalShare.main(outputFolder);
 			
+			ModalShareFromEvents msg = new ModalShareFromEvents(outputFolder[0]+"output_events.xml.gz");
+			msg.run();
+			msg.writeResults(outputFolder[0]+"output_modeShare.txt");
 	}
 	
 	

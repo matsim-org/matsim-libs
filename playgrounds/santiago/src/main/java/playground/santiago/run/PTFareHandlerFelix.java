@@ -146,11 +146,19 @@ public class PTFareHandlerFelix implements ActivityStartEventHandler, PersonDepa
 						Double fare = (Double) this.transitSchedule.getTransitLinesAttributes().getAttribute(line, "fare");
 						if (fare!=null){
 							
-						
+							if(personsOnPtTrip.contains(pid)){
+								// person already received ASC for colectivo trip
+							} 
+							else {	
+							//ASC of the pt is compensated by colectivo ASC converted to money.
+							this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, -ptConstantMonetaryUnits));
+							this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, colectivoConstantUtils/controler.getConfig().planCalcScore().getMarginalUtilityOfMoney()));
+							personsOnPtTrip.add(pid);
+							}
+							
 						this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, -fare));
-						//ASC of the pt is replaced by colectivo ASC converted to money.
-						this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, -ptConstantMonetaryUnits));
-						this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, colectivoConstantUtils/controler.getConfig().planCalcScore().getMarginalUtilityOfMoney()));
+						
+						
 						}
 						else{
 							this.controler.getEvents().processEvent(new PersonMoneyEvent(time, pid, -800));
