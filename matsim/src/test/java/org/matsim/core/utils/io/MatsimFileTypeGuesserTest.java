@@ -48,11 +48,11 @@ public class MatsimFileTypeGuesserTest {
 	}
 
 	@Test
-	public void testConfigV1Dtd() throws IOException {
+	public void testConfigV2Dtd() throws IOException {
 		MatsimFileTypeGuesser g = new MatsimFileTypeGuesser("test/scenarios/equil/config.xml");
 		assertEquals(MatsimFileTypeGuesser.FileType.Config, g.getGuessedFileType());
 		assertNull(g.getPublicId());
-		assertEquals("http://www.matsim.org/files/dtd/config_v1.dtd", g.getSystemId());
+		assertEquals("http://www.matsim.org/files/dtd/config_v2.dtd", g.getSystemId());
 	}
 
 	@Test
