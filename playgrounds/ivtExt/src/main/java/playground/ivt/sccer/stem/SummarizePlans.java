@@ -46,6 +46,7 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
+import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.LambdaCounter;
 
 import java.io.BufferedWriter;
@@ -62,10 +63,20 @@ public class SummarizePlans {
 
 	public static void main( final String... args ) {
 		// should be the experienced plans
-		final String inConfig = args[ 0 ];
-		final String outDat = args[ 1 ];
+		final ArgParser parser = new ArgParser();
+		parser.setDefaultValue( "--config" , "-c" , null );
+		parser.setDefaultValue( "--plans" , "-p" , null );
+		parser.setDefaultValue( "--output" , "-o" , "plans_summary.dat" );
+		final ArgParser.Args parsed = parser.parseArgs( args );
 
-		final Config config = ConfigUtils.loadConfig( inConfig );
+		final String inConfig = parsed.getValue( "--config" );
+		final String inPlans = parsed.getValue( "--plans" );
+		final String outDat = parsed.getValue( "--output" );
+
+		final Config config = ConfigUtils.createConfig();
+		if ( inConfig != null ) ConfigUtils.loadConfig( config , inConfig );
+		if ( inPlans != null ) config.plans().setInputFile( inPlans );
+
 		run( config , outDat );
 	}
 
