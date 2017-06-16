@@ -126,12 +126,13 @@ public class MATSimOpdytsIntegrationRunner<U extends DecisionVariable>  {
 
         OpdytsConfigGroup opdytsConfigGroup = (OpdytsConfigGroup) scenario.getConfig().getModules().get(OpdytsConfigGroup.GROUP_NAME);
 
-        if ( Double.isFinite(opdytsConfigGroup.getEquilibriumGapWeight()) && Double.isFinite(opdytsConfigGroup.getEquilibriumGapWeight()) ) {
+        if ( opdytsConfigGroup.getUniformityGapWeight()!= 0. ||  opdytsConfigGroup.getEquilibriumGapWeight() != 0. ) {
+            // by default they are zero.; Also, as discussed with GF, probably, one can set the weights and self tuner together
+            // to do that, make run() call in RandomSearch public. Amit June'17
             randomSearch.run(opdytsConfigGroup.getUniformityGapWeight(), opdytsConfigGroup.getEquilibriumGapWeight());
         } else {
             randomSearch.run(selfTuner);
         }
-
     }
 
     public TimeDiscretization getTimeDiscretization() {
