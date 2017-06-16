@@ -142,31 +142,6 @@ public class SylviaTest {
 		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), MatsimTestUtils.EPSILON);
 	}
 
-	/**
-	 * test sylvia with demand crossing only in south-north direction
-	 */
-	@Test
-	public void testDemandB() {
-		double[] noPersons = { 0, 3600 };
-		TtSignalAnalysisTool signalAnalyzer = runScenario(noPersons);
-
-		// check signal results
-		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // group 1 should have less total green time than group 2
-		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerFlexibleCycle(); // should be 5 vs 45 (excluding initial phase)
-		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = signalAnalyzer.calculateAvgFlexibleCycleTimePerSignalSystem(); // should be 60
-		Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
-		Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
-		Id<SignalSystem> signalSystemId = Id.create("SignalSystem1", SignalSystem.class);
-
-		log.info("total signal green times: " + totalSignalGreenTimes.get(signalGroupId1) + ", " + totalSignalGreenTimes.get(signalGroupId2));
-		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle.get(signalGroupId2));
-		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
-		Assert.assertTrue("total signal green time of group 1 is not less than of group 2", totalSignalGreenTimes.get(signalGroupId1) < totalSignalGreenTimes.get(signalGroupId2));
-		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 5, avgSignalGreenTimePerCycle.get(signalGroupId1), 5);
-		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 45, avgSignalGreenTimePerCycle.get(signalGroupId2), 5);
-		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), MatsimTestUtils.EPSILON);
-	}
-
 	private TtSignalAnalysisTool runScenario(double[] noPersons) {
 		Config config = defineConfig();
 

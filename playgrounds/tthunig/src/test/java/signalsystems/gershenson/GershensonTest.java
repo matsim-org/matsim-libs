@@ -135,33 +135,6 @@ public class GershensonTest {
 //		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), MatsimTestUtils.EPSILON);
 	}
 
-	/**
-	 * demand crossing only in south-north direction
-	 */
-	@Test
-	public void testDemandB() {
-		double[] noPersons = { 0, 3600 };
-		TtSignalAnalysisTool signalAnalyzer = runScenario(noPersons);
-
-		// check signal results
-		Map<Id<SignalGroup>, Double> totalSignalGreenTimes = signalAnalyzer.getTotalSignalGreenTime(); // group 1 should have less total green time than group 2
-		Map<Id<SignalGroup>, Double> avgSignalGreenTimePerCycle = signalAnalyzer.calculateAvgSignalGreenTimePerFlexibleCycle();
-		Map<Id<SignalSystem>, Double> avgCycleTimePerSystem = signalAnalyzer.calculateAvgFlexibleCycleTimePerSignalSystem();
-		Id<SignalGroup> signalGroupId1 = Id.create("SignalGroup1", SignalGroup.class);
-		Id<SignalGroup> signalGroupId2 = Id.create("SignalGroup2", SignalGroup.class);
-		Id<SignalSystem> signalSystemId = Id.create("SignalSystem1", SignalSystem.class);
-
-		log.info("total signal green times: " + totalSignalGreenTimes.get(signalGroupId1) + ", " + totalSignalGreenTimes.get(signalGroupId2));
-		log.info("avg signal green times per cycle: " + avgSignalGreenTimePerCycle.get(signalGroupId1) + ", " + avgSignalGreenTimePerCycle.get(signalGroupId2));
-		log.info("avg cycle time per system: " + avgCycleTimePerSystem.get(signalSystemId));
-		
-		// TODO does not seem to be plausible. but what is plausible for gershenson?
-//		Assert.assertTrue("total signal green time of group 1 is not less than of group 2", totalSignalGreenTimes.get(signalGroupId1) < totalSignalGreenTimes.get(signalGroupId2));
-//		Assert.assertEquals("avg green time per cycle of signal group 1 is wrong", 5, avgSignalGreenTimePerCycle.get(signalGroupId1), 5);
-//		Assert.assertEquals("avg green time per cycle of signal group 2 is wrong", 45, avgSignalGreenTimePerCycle.get(signalGroupId2), 5);
-//		Assert.assertEquals("avg cycle time of the system is wrong", 60, avgCycleTimePerSystem.get(signalSystemId), MatsimTestUtils.EPSILON);
-	}
-
 	private TtSignalAnalysisTool runScenario(double[] noPersons) {
 		Config config = defineConfig();
 
@@ -341,16 +314,6 @@ public class GershensonTest {
 		
 		config.qsim().setUsingFastCapacityUpdate(false);
 
-		// set brain exp beta
-//		config.planCalcScore().setBrainExpBeta(2);
-
-		// set travelTimeBinSize (only has effect if reRoute is used)
-//		config.travelTimeCalculator().setTraveltimeBinSize(10);
-
-//		config.travelTimeCalculator().setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
-		// hash map and array produce same results. only difference: memory and time.
-		// for small time bins and sparse values hash map is better. theresa, may'15
-
 		// define strategies:
 		{
 			StrategySettings strat = new StrategySettings();
@@ -359,9 +322,6 @@ public class GershensonTest {
 			strat.setDisableAfter(config.controler().getLastIteration());
 			config.strategy().addStrategySettings(strat);
 		}
-
-		// choose maximal number of plans per agent. 0 means unlimited
-//		config.strategy().setMaxAgentPlanMemorySize(5);
 
 		config.qsim().setStuckTime(3600);
 		config.qsim().setRemoveStuckVehicles(false);
@@ -374,9 +334,6 @@ public class GershensonTest {
 		config.vspExperimental().setWritingOutputEvents(false);
 		config.planCalcScore().setWriteExperiencedPlans(false);
 		config.controler().setCreateGraphs(false);
-
-		config.controler().setWriteEventsInterval(config.controler().getLastIteration());
-		config.controler().setWritePlansInterval(config.controler().getLastIteration());
 
 		// define activity types
 		{
