@@ -5,10 +5,18 @@ addons:
     packages:
       - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
 script:
-  - mvn test -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
+ # - mvn test -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
+ 
+   - cd ${TRAVIS_BUILD_DIR}/matsim && mvn install -DskipTests # the hybridsim needs this.  or something else
+   - cd ${TRAVIS_BUILD_DIR}/contribs && mvn install -DskipTests # Many of the playgrounds need some of the contribs
+   
+   - cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn test -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true
 env:
   global:
     - MAVEN_OPTS="-Xmx2g"
+  matrix:
+    - MODULE=contribs
+    - MODULE=playgrounds
 cache:
   directories:
   - $HOME/.m2
