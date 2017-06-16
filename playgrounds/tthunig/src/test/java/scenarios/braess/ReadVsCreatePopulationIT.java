@@ -69,10 +69,10 @@ import scenarios.illustrative.braess.createInput.TtCreateBraessPopulation.InitRo
  * @author tthunig
  *
  */
-public class ReadVsCreatePopulationTest {
+public class ReadVsCreatePopulationIT {
 
 	private static final Logger log = Logger
-			.getLogger(ReadVsCreatePopulationTest.class);
+			.getLogger(ReadVsCreatePopulationIT.class);
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
