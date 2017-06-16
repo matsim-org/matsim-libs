@@ -57,7 +57,7 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 public class PatnaNetworkModesCalibrator {
 
 	private static final OpdytsScenario PATNA_1_PCT = OpdytsScenario.PATNA_1Pct;
-	private static boolean isPlansRelaxed = true;
+	private static boolean isPlansRelaxed = false;
 
 	public static void main(String[] args) {
 		String configFile;
@@ -79,8 +79,9 @@ public class PatnaNetworkModesCalibrator {
 		String relaxedPlansDir = OUT_DIR+"/initialPlans2RelaxedPlans/";
 		if (! isPlansRelaxed ) {
 			// relax the plans first.
+			config.controler().setOutputDirectory(relaxedPlansDir);
 			PatnaNetworkModesPlansRelaxor relaxor = new PatnaNetworkModesPlansRelaxor();
-			relaxor.run(new String[]{configFile, relaxedPlansDir});
+			relaxor.run(config);
 		}
 
 		OUT_DIR = OUT_DIR+"/calibration_variationSize"+opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable()+"_AvgIts"+opdytsConfigGroup.getNumberOfIterationsForAveraging()+"/";

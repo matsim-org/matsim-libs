@@ -26,9 +26,7 @@ import floetteroed.utilities.math.Vector;
 import opdytsintegration.MATSimCountingStateAnalyzer;
 import opdytsintegration.SimulationStateAnalyzerProvider;
 import opdytsintegration.utils.TimeDiscretization;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 
@@ -36,7 +34,7 @@ import org.matsim.core.events.handler.EventHandler;
  * Created by amit on 15.06.17. Adapted after {@link opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzer}
  */
 
-public class TeleportationODAnalyzer implements PersonDepartureEventHandler, PersonArrivalEventHandler {
+public class TeleportationODAnalyzer implements PersonDepartureEventHandler {
 
     private final Map<String, MATSimCountingStateAnalyzer<Zone>> mode2stateAnalyzer;
     private final Set<Zone> relevantZones;
@@ -66,22 +64,6 @@ public class TeleportationODAnalyzer implements PersonDepartureEventHandler, Per
     @Override
     public void reset(int iteration) {
 
-    }
-
-    @Override
-    public void handleEvent(PersonArrivalEvent event) {
-        final MATSimCountingStateAnalyzer<Zone> stateAnalyzer = this.mode2stateAnalyzer.get(event.getLegMode());
-        if (this.mode2stateAnalyzer.containsKey(event.getLegMode())) {
-            for (Zone zone : this.relevantZones ) {
-                if ( zone.getLinksInsideZone().contains(event.getLinkId())) {
-                    stateAnalyzer.registerDecrease(zone.getZoneId(), (int)event.getTime());
-                } else {
-                    //dont do anything.
-                }
-            }
-        } else {
-            // network modes thus irrelevant here
-        }
     }
 
     @Override
