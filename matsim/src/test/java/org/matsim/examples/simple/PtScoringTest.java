@@ -28,9 +28,6 @@ import junit.framework.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.Event;
@@ -38,8 +35,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
@@ -52,32 +47,15 @@ import org.matsim.testcases.utils.EventsCollector;
  * @author nagel
  *
  */
-
-@RunWith(Parameterized.class)
 public class PtScoringTest {
 
-	@Parameter
-	public TypicalDurationScoreComputation typicalDurationScoreComputation;
-	
-	 @Parameterized.Parameters
-	 public static Object[] testParameters() {
-	      return new Object[] {TypicalDurationScoreComputation.relative,TypicalDurationScoreComputation.uniform};
-	  }
-	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
 	public void test_PtScoringLineswitch() {
 		Config config = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
-		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 
-		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
-			for(ActivityParams params : pcs.getActivityParams()){
-				params.setTypicalDurationScoreComputation(typicalDurationScoreComputation);
-			}
-		}
-		
-		pcs.setWriteExperiencedPlans(true);
+		config.planCalcScore().setWriteExperiencedPlans(true);
 
 		Controler controler = new Controler(config);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -94,6 +72,7 @@ public class PtScoringTest {
 			System.out.println(event.toString());
 		}
 
+		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 
 
 		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
@@ -207,29 +186,16 @@ public class PtScoringTest {
 			// (there is only one person, but we need to get it)
 
 			System.out.println(" score: " + pp.getSelectedPlan().getScore() ) ;
-			
-			if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
-				Assert.assertEquals(-21.28929580072052, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
-			}
-			else{
-				Assert.assertEquals(27.46011565686209, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
-			}
-			
+			Assert.assertEquals(-21.28929580072052, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
 		}
 
 	}
 	@Test
 	public void test_PtScoringLineswitchAndPtConstant() {
 		Config config = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-simple-lineswitch"), "config.xml"));
-		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 
-		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))
-			for(ActivityParams params : pcs.getActivityParams()){
-				params.setTypicalDurationScoreComputation(typicalDurationScoreComputation);
-		}
-		
-		pcs.setWriteExperiencedPlans(true);
-		pcs.getModes().get(TransportMode.pt).setConstant(1.);
+		config.planCalcScore().setWriteExperiencedPlans(true);
+		config.planCalcScore().getModes().get(TransportMode.pt).setConstant(1.);
 
 		Controler controler = new Controler(config);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -246,6 +212,7 @@ public class PtScoringTest {
 			System.out.println(event.toString());
 		}
 		
+		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
 		double priority = 1. ;
 
@@ -361,32 +328,17 @@ public class PtScoringTest {
 			// (there is only one person, but we need to get it)
 
 			System.out.println(" score: " + pp.getSelectedPlan().getScore() ) ;
-			
-			if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
-//				Assert.assertEquals(89.14608279715044, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
-				Assert.assertEquals(-19.28929580072052, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
-			}
-			else{
-				Assert.assertEquals(29.46011565686209, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
-			}
-			
+			Assert.assertEquals(-19.28929580072052, pp.getSelectedPlan().getScore(), MatsimTestUtils.EPSILON ) ;
 		}
 
 	}
 	@Test
 	public void test_PtScoring_Wait() {
 		Config config = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
-		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
-		
-		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
-			for(ActivityParams params : pcs.getActivityParams()){
-				params.setTypicalDurationScoreComputation(typicalDurationScoreComputation);
-			}
-		}
-		
-		pcs.setWriteExperiencedPlans(true);
-		pcs.setMarginalUtlOfWaitingPt_utils_hr(-18.0) ;
-		
+
+		config.planCalcScore().setWriteExperiencedPlans(true);
+		config.planCalcScore().setMarginalUtlOfWaitingPt_utils_hr(-18.0) ;
+
 		Controler controler = new Controler(config);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
@@ -401,7 +353,8 @@ public class PtScoringTest {
 		for (Event event : allEvents) {
 			System.out.println(event.toString());
 		}
-		
+
+		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
 		double priority = 1. ;
 
@@ -448,13 +401,7 @@ public class PtScoringTest {
 			// (there is only one person, but we need to get it)
 
 			System.out.println("agent score: " + pp.getSelectedPlan().getScore() ) ;
-			
-			if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
-				Assert.assertEquals(89.14608279715044, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
-			}
-			else{
-				Assert.assertEquals(137.14608279715043, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
-			}
+			Assert.assertEquals(89.14608279715044, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 		}
 
 	}
@@ -462,14 +409,8 @@ public class PtScoringTest {
 	@Test
 	public void test_PtScoring() {
 		Config config = this.utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-simple"), "config.xml"));
-		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 
-		if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform))
-		for(ActivityParams params : pcs.getActivityParams()){
-			params.setTypicalDurationScoreComputation(typicalDurationScoreComputation);
-		}
-		
-		pcs.setWriteExperiencedPlans(true);
+		config.planCalcScore().setWriteExperiencedPlans(true);
 
 		Controler controler = new Controler(config);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
@@ -486,6 +427,7 @@ public class PtScoringTest {
 			System.out.println(event.toString());
 		}
 
+		PlanCalcScoreConfigGroup pcs = config.planCalcScore() ;
 		double typicalDuration_s = pcs.getActivityParams("home").getTypicalDuration() ;
 		double priority = 1. ;
 
@@ -530,15 +472,7 @@ public class PtScoringTest {
 			// (there is only one person, but we need to get it)
 
 			System.out.println(" score: " + pp.getSelectedPlan().getScore() ) ;
-			
-			if(this.typicalDurationScoreComputation.equals(TypicalDurationScoreComputation.uniform)){
-				Assert.assertEquals(89.85608279715044, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
-			}
-			else{
-				Assert.assertEquals(137.85608279715044, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
-			}
-			
-			
+			Assert.assertEquals(89.85608279715044, pp.getSelectedPlan().getScore(),MatsimTestUtils.EPSILON ) ;
 		}
 
 	}

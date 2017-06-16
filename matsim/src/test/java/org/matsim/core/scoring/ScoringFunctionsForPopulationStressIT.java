@@ -11,7 +11,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.controler.ControlerListenerManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
@@ -165,12 +164,7 @@ public class ScoringFunctionsForPopulationStressIT {
 		}
 		events.finishProcessing();
 		scoringFunctionsForPopulation.finishScoringFunctions();
-		
-		//assert when TypicalDurationScoreComputation.uniform
-//		assertEquals(60.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
-		
-		//assert when TypicalDurationScoreComputation.relative
-		assertEquals(1.0/6.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
+		assertEquals(60.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
 	}
 
 	@Test
@@ -279,12 +273,7 @@ public class ScoringFunctionsForPopulationStressIT {
 		}
 		events.finishProcessing();
 		scoringFunctionsForPopulation.finishScoringFunctions();
-		
-		//assert when TypicalDurationScoreComputation.uniform
-//		assertEquals(60.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
-		
-		//assert when TypicalDurationScoreComputation.relative
-		assertEquals(1.0/6.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
+		assertEquals(60.0 * MAX, scoringFunctionsForPopulation.getScoringFunctionForAgent(personId).getScore(), 1.0);
 	}
 
 }
