@@ -132,7 +132,7 @@ public class ActivityDensityGeneratorOnStandardGrid {
 		BufferedWriter bw = IOUtils.getBufferedWriter(outputFile);
 		int index = 1;
 		try{
-			bw.write("id,point,centroidLon,centroidLat,lon,lat,trips");
+			bw.write("id,point,centroidLon,centroidLat,lon,lat,weight");
 			bw.newLine();
 			
 			Iterator<Point> iterator = kde.getGrid().getGrid().values().iterator();
