@@ -290,7 +290,10 @@ public final class MergeNoiseCSVFile {
 
 					for (String label : this.label2time2rp2value.keySet()) {
 						for (double time = startTime; time <= endTime; time = time + timeBinSize) {
-							bw.write(";" + this.label2time2rp2value.get(label).get(time).get(rp));
+							if (this.label2time2rp2value.get(label).get(time).get(rp.toString()) == null) {
+								throw new RuntimeException("null!");
+							}
+							bw.write(";" + this.label2time2rp2value.get(label).get(time).get(rp.toString()));
 						}
 					}
 					bw.newLine();
