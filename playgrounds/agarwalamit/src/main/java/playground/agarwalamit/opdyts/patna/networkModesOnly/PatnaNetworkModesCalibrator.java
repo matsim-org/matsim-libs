@@ -128,10 +128,12 @@ public class PatnaNetworkModesCalibrator {
 						IOUtils.deleteDirectoryRecursively(new File(dir2remove).toPath());
 
 						// post-process
-						OpdytsConvergenceChart opdytsConvergencePlotter = new OpdytsConvergenceChart();
-						opdytsConvergencePlotter.readFile(finalOUT_DIR +"/opdyts.con");
-						opdytsConvergencePlotter.plotData(finalOUT_DIR +"/convergence.png");
-
+						String opdytsConvergencefile = finalOUT_DIR +"/opdyts.con";
+						if (new File(opdytsConvergencefile).exists()) {
+							OpdytsConvergenceChart opdytsConvergencePlotter = new OpdytsConvergenceChart();
+							opdytsConvergencePlotter.readFile(finalOUT_DIR +"/opdyts.con");
+							opdytsConvergencePlotter.plotData(finalOUT_DIR +"/convergence.png");
+						}
 						BestSolutionVsDecisionVariableChart bestSolutionVsDecisionVariableChart = new BestSolutionVsDecisionVariableChart(new ArrayList<>(modes2consider));
 						bestSolutionVsDecisionVariableChart.readFile(finalOUT_DIR +"/opdyts.log");
 						bestSolutionVsDecisionVariableChart.plotData(finalOUT_DIR +"/decisionVariableVsASC.png");
