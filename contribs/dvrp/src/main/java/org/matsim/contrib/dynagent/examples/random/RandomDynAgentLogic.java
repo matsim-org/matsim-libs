@@ -49,8 +49,8 @@ public class RandomDynAgentLogic implements DynAgentLogic {
 
 	@Override
 	public DynAction computeNextAction(DynAction oldAction, double now) {
-		// I am tired, I want to stop being simulated (1% chance)
-		if (MatsimRandom.getRandom().nextInt(100) == 0) {
+		// I am tired, I want to stop being simulated (2% chance)
+		if (MatsimRandom.getRandom().nextInt(50) == 0) {
 			return new StaticDynActivity("Infinite laziness :-)", Double.POSITIVE_INFINITY);
 		}
 
