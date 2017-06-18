@@ -27,7 +27,7 @@ import org.matsim.core.config.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class RunTaxibusScenarioTest {
+public class RunTaxibusScenarioIT {
 	@Rule
 	public MatsimTestUtils utils = new MatsimTestUtils();
 

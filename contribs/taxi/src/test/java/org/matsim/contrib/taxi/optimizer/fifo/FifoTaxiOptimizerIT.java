@@ -26,7 +26,7 @@ import java.util.*;
 import org.junit.Test;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider.OptimizerType;
 
-public class FifoTaxiOptimizerTest {
+public class FifoTaxiOptimizerIT {
 	@Test
 	public void testFifo() {
 		PreloadedBenchmark benchmark = new PreloadedBenchmark("3.0", "25");
