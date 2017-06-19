@@ -46,10 +46,8 @@ import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.VehicleType;
 
 /**
- *
  * See a simple example {@link tutorial.programming.example18MultipleSubpopulations.RunSubpopulationsExample} without mode choice
  * Created by amit on 18.06.17.
- *
  */
 
 public class ModeChoiceWithMultipleSubpopulationIT {
@@ -58,7 +56,7 @@ public class ModeChoiceWithMultipleSubpopulationIT {
 	private static final String PLANS_FILE = "../../examples/scenarios/equil-mixedTraffic/plans2000.xml.gz";
 
 	private static final String SUBPOP_ATTRIB_NAME = "subpopulation";
-	private static final String SUBPOP1_NAME = "lower"; // half of persons will come in this group
+	private static final String SUBPOP1_NAME = "lower"; // half of the persons will fall under this group
 	private static final String SUBPOP2_NAME = "upper"; // rest half here.
 
 	@Rule
@@ -72,11 +70,13 @@ public class ModeChoiceWithMultipleSubpopulationIT {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		updateScenarioForMotorbikeAsMainMode(scenario); // these are things which are required to add another mode as main/network mode
+		// these are things which are required to add another mode as main/network mode
+		updateScenarioForMotorbikeAsMainMode(scenario);
 
+		// one can create them seperately and provide person_attribute file to plansConfigGroup
 		createSubPopulationAttributes(scenario);
 
-		//  following is required to differentiate the agents
+		//  following is required to differentiate the agents based on provide subpopulation attribute name
 		scenario.getConfig().plans().setSubpopulationAttributeName(SUBPOP_ATTRIB_NAME); /* This is the default anyway. */
 
 		// clear previous strategies
@@ -126,7 +126,6 @@ public class ModeChoiceWithMultipleSubpopulationIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-//				final Provider<TripRouter> tripRouterProvider = binder().getProvider(TripRouter.class);
 				addPlanStrategyBinding(CHANGE_TRIP_MODE_FOR_SUBPOP_2).toProvider(new javax.inject.Provider<PlanStrategy>() {
 					final String[] availableModes = {"car", "motorbike"};
 					@Inject Scenario sc;
