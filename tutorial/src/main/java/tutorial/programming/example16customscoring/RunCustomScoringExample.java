@@ -5,16 +5,13 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -33,44 +30,48 @@ import org.matsim.vehicles.Vehicle;
 import javax.inject.Inject;
 
 public class RunCustomScoringExample {
+	static final String DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE = "DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE";
 
-	static class RainOnPersonEvent extends Event implements HasPersonId {
 
-		private Id<Person> personId;
+	private static final class RainScoringFunctionFactory implements ScoringFunctionFactory {
+		private final  Scenario scenario;
+		private final ObjectAttributes personAttributes;
 
-		public RainOnPersonEvent(double time, Id<Person> personId) {
-			super(time);
-			this.personId = personId;
+		private RainScoringFunctionFactory(Scenario scenario, ObjectAttributes personAttributes) {
+			this.scenario = scenario;
+			this.personAttributes = personAttributes;
 		}
 
 		@Override
-		public Id<Person> getPersonId() {
-			return personId;
-		}
+		public ScoringFunction createNewScoringFunction(Person person) {
+			SumScoringFunction sumScoringFunction = new SumScoringFunction();
 
-		@Override
-		public String getEventType() {
-			return "rain";
-		}
+			// Score activities, legs, payments and being stuck
+			// with the default MATSim scoring based on utility parameters in the config file.
+			final ScoringParameters params = new ScoringParameters.Builder(scenario, person.getId()).build();
+			sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
+			sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
+			sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
+			sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-		@Override
-		public Map<String, String> getAttributes() {
-			final Map<String, String> attributes = super.getAttributes();
-			attributes.put("person", getPersonId().toString());
-			return attributes;
-		}
+			if ((Boolean) personAttributes.getAttribute(person.getId().toString(), DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE)) {
+				sumScoringFunction.addScoringFunction(new ExtremeTimePenaltyScoring());
+			}
 
+			sumScoringFunction.addScoringFunction(new RainScoring()); 
+
+			return sumScoringFunction;
+		}
 	}
 
 	public static void main(String[] args) {
 		String configFile = "examples/tutorial/config/example5-config.xml" ;
 		final Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
-		
+
 		// Every second person gets a special property which influences their score.
 		// ObjectAttributes can be written to and read from files, so in reality,
 		// this would come from a census, a pre-processing step, or from anywhere else, 
 		// but for this example I just make it up.
-		final String DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE = "DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE";
 		final ObjectAttributes personAttributes = scenario.getPopulation().getPersonAttributes();
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			if (Integer.parseInt(person.getId().toString()) % 2 == 0) {
@@ -79,7 +80,7 @@ public class RunCustomScoringExample {
 				personAttributes.putAttribute(person.getId().toString(), DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE, false);
 			}
 		}
-		
+
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -90,84 +91,32 @@ public class RunCustomScoringExample {
 				bind(RainEngine.class).asEagerSingleton();
 			}
 		});
-		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 
-			@Override
-			public ScoringFunction createNewScoringFunction(Person person) {
-				SumScoringFunction sumScoringFunction = new SumScoringFunction();
-
-				// Score activities, legs, payments and being stuck
-				// with the default MATSim scoring based on utility parameters in the config file.
-				final ScoringParameters params =
-						new ScoringParameters.Builder(scenario, person.getId()).build();
-				sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params));
-				sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
-				sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring(params));
-				sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-
-				// Some people (not all) really do not like leaving home early or coming home late. These people
-				// get extra penalties if that should happen.
-				// This property is not directly attached to the Person object. I have to look it up through my 
-				// custom attribute table which I defined above.
-				if ((Boolean) personAttributes.getAttribute(person.getId().toString(), DISLIKES_LEAVING_EARLY_AND_COMING_HOME_LATE)) {
-					sumScoringFunction.addScoringFunction(new SumScoringFunction.ActivityScoring() {
-						private double score;
-						@Override public void handleFirstActivity(Activity act) {
-							if (act.getEndTime() < (6 * 60 * 60)) {
-								score -= 300.0;
-							} 
-						}
-						@Override public void handleActivity(Activity act) {} // Not doing anything on mid-day activities.
-						@Override public void handleLastActivity(Activity act) {	
-							if (act.getStartTime() > (20.0 * 60 * 60)) {
-								score -= 100.0;
-							}
-						}
-						@Override public void finish() {}
-						@Override
-						public double getScore() {
-							return score;
-						}
-					});
-				}
-
-				sumScoringFunction.addScoringFunction(new SumScoringFunction.ArbitraryEventScoring() {
-					private double score;
-					@Override
-					public void handleEvent(Event event) {
-						if (event instanceof RainOnPersonEvent) {
-							score -= 1000.0;
-						}
-					}
-					@Override public void finish() {}
-					@Override
-					public double getScore() {
-						return score;
-					}
-				});
-
-				return sumScoringFunction;
+		controler.addOverridingModule( new AbstractModule(){
+			@Override public void install() {
+				this.bindScoringFunctionFactory().toInstance(new RainScoringFunctionFactory(scenario, personAttributes) ) ;
+				
 			}
 
 		});
 		controler.run();
 	}
-	
+
 	static class RainEngine implements PersonEntersVehicleEventHandler, LinkEnterEventHandler {
-		
+
 		private EventsManager eventsManager;
-		
+
 		private Map<Id<Vehicle>, Id<Person>> vehicle2driver = new HashMap<>();
-		 
+
 		@Inject
 		RainEngine(EventsManager eventsManager) {
 			this.eventsManager = eventsManager;
 			this.eventsManager.addHandler(this);
 		}
-		
+
 		@Override 
 		public void reset(int iteration) {}
-		
+
 		@Override
 		public void handleEvent(PersonEntersVehicleEvent event) {
 			vehicle2driver.put(event.getVehicleId(), event.getPersonId());
@@ -188,7 +137,7 @@ public class RunCustomScoringExample {
 				return false;
 			}
 		}
-		
+
 	}
 
 }

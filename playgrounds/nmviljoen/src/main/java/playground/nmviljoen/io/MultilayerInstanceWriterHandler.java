@@ -74,6 +74,7 @@ public interface MultilayerInstanceWriterHandler {
 	/* <logicalEdge ... /> */
 	public void startLogicalEdge(final BufferedWriter out, NmvLink link) throws IOException;
 	public void endLogicalEdge(final BufferedWriter out) throws IOException;
+	
 
 	
 	/* <associations> ... </associations> */
@@ -83,6 +84,7 @@ public interface MultilayerInstanceWriterHandler {
 	/* <association ... /> */
 	public void startAssociation(final BufferedWriter out, String logicalId, String physicalId) throws IOException;
 	public void endAssociation(final BufferedWriter out) throws IOException;
+	
 	
 	
 	/* <shortestPathSets> ... </shortestPathSets> */

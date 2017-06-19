@@ -128,8 +128,8 @@ public class RunTwoCrossings {
 	        laemmerConfig.setDESIRED_PERIOD(60);
 	        laemmerConfig.setMAX_PERIOD(90);
 	        signalsModule.setLaemmerConfig(laemmerConfig);
-	        LaemmerSignalController.log.setLevel(Level.OFF);
-	        LaemmerSignalController.signalLog.setLevel(Level.OFF);
+//	        LaemmerSignalController.log.setLevel(Level.OFF);
+//	        LaemmerSignalController.signalLog.setLevel(Level.OFF);
 			
 			controler.addOverridingModule(signalsModule);
 

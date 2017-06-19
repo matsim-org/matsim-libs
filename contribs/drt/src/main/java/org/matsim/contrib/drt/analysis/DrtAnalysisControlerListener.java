@@ -76,13 +76,15 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	public void notifyIterationEnds(IterationEndsEvent event) {
 
 		vehicleOccupancyEvaluator.calcAndWriteFleetStats(
-				matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleOccupancy"));
+				matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleOccupancy"),drtgroup.isPlotDetailedVehicleStats());
 		if (drtgroup.isPlotDetailedVehicleStats()) {
 			vehicleOccupancyEvaluator.writeDetailedOccupancyFiles(
 					matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleStats_"));
 		}
 		drtRequestAnalyzer.writeAndPlotWaitTimeEstimateComparison(matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitTimeComparison.png"), matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitTimeComparison.csv"));
 		List<DynModeTrip> trips = drtPassengerStats.getDrtTrips();
+
+		DynModeTripsAnalyser.collection2Text(drtRequestAnalyzer.getRejections(), matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "drt_rejections.csv"),"time;personId;fromLinkId;toLinkId;fromX;fromY;toX;toY" ); 
 
 		writeIterationPassengerStats(DynModeTripsAnalyser.summarizeTrips(trips, ";"), event.getIteration());
 		writeIterationVehicleStats(DynModeTripsAnalyser.summarizeVehicles(drtPassengerStats.getVehicleDistances(), ";"),

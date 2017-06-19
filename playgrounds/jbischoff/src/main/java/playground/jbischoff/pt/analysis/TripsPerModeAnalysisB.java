@@ -44,7 +44,7 @@ import playground.jbischoff.analysis.modalsplit.ModalSplitAnalyser;
  */
 public class TripsPerModeAnalysisB {
 public static void main(String[] args) {
-	String runId = "25pct.r05";
+	String runId = "25pct.r06";
 	String plansFile = "D:/runs-svn/bvg_intermodal/software-lieferung/bvg.run191.25pct.100.plans.filtered.selected.noRoutes.xml.gz";
 	String eventsF = "D:/runs-svn/bvg_intermodal/"+runId+"/"+runId+".output_events.xml.gz";
 	

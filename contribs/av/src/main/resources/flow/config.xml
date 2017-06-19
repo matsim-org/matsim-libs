@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	
+
+	<module name="network">
+		<param name="inputNetworkFile" value="grid_network.xml" />
+		
+	</module>
+
+
+
+	<module name="qsim">
+		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
+		<param name="snapshotStyle" value="queue" />
+		<!-- Options: maxOfStarttimeAndEarliestActivityEnd onlyUseStarttime  -->
+		<param name="simStarttimeInterpretation" value="maxOfStarttimeAndEarliestActivityEnd" />
+	</module>
+	
+	<module name="otfvis">
+		<param name="drawNonMovingItems" value="true" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="test/output/av_flow" />
+		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="0" />
+	</module>
+
+	<module name="planCalcScore">
+		<param name="activityType_0" value="dummy" />
+		<param name="activityTypicalDuration_0" value="24:00:00" />
+			<parameterset type="modeParams" >
+				<param name="constant" value="-3.0" />
+				<param name="mode" value="car" />
+			</parameterset>
+
+		</module>
+
+	<module name="strategy">
+		<!-- We focus only on DynAgents. "Standard" agents do not change their behaviour -->
+		<param name="maxAgentPlanMemorySize" value="1" />
+		<param name="ModuleProbability_1" value="1.0" />
+		<param name="Module_1" value="KeepLastSelected" />
+	</module>
+</config>

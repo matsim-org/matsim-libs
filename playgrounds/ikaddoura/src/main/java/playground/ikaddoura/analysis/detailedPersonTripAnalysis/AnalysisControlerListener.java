@@ -47,6 +47,7 @@ import com.google.inject.Inject;
 
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.BasicPersonTripAnalysisHandler;
 import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.NoiseAnalysisHandler;
+import playground.ikaddoura.analysis.detailedPersonTripAnalysis.handler.PersonMoneyLinkHandler;
 
 
 /**
@@ -74,6 +75,9 @@ public class AnalysisControlerListener implements IterationEndsListener {
 	@Inject
 	private NoiseAnalysisHandler noiseHandler;
 	
+	@Inject
+	private PersonMoneyLinkHandler moneyHandler;
+	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		
@@ -94,9 +98,9 @@ public class AnalysisControlerListener implements IterationEndsListener {
 		
 		if (event.getIteration() == this.scenario.getConfig().controler().getLastIteration()) {
 			log.info("Print trip information...");
-			analysis.printTripInformation(outputPathAnalysisIteration, TaxiModule.TAXI_MODE, basicHandler, noiseHandler);
-			analysis.printTripInformation(outputPathAnalysisIteration, TransportMode.car, basicHandler, noiseHandler);
-			analysis.printTripInformation(outputPathAnalysisIteration, null, basicHandler, noiseHandler);
+			analysis.printTripInformation(outputPathAnalysisIteration, TaxiModule.TAXI_MODE, basicHandler, noiseHandler, moneyHandler);
+			analysis.printTripInformation(outputPathAnalysisIteration, TransportMode.car, basicHandler, noiseHandler, moneyHandler);
+			analysis.printTripInformation(outputPathAnalysisIteration, null, basicHandler, noiseHandler, moneyHandler);
 			log.info("Print trip information... Done.");
 
 			log.info("Print person information...");
@@ -106,9 +110,9 @@ public class AnalysisControlerListener implements IterationEndsListener {
 			log.info("Print person information... Done.");
 		}
 
-		analysis.printAggregatedResults(outputPathAnalysisIteration, TaxiModule.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler);
-		analysis.printAggregatedResults(outputPathAnalysisIteration, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler);
-		analysis.printAggregatedResults(outputPathAnalysisIteration, null, personId2userBenefit, basicHandler, noiseHandler);
+		analysis.printAggregatedResults(outputPathAnalysisIteration, TaxiModule.TAXI_MODE, personId2userBenefit, basicHandler, noiseHandler, moneyHandler);
+		analysis.printAggregatedResults(outputPathAnalysisIteration, TransportMode.car, personId2userBenefit, basicHandler, noiseHandler, moneyHandler);
+		analysis.printAggregatedResults(outputPathAnalysisIteration, null, personId2userBenefit, basicHandler, noiseHandler, moneyHandler);
 		
 		// all iterations
 				

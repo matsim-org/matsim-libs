@@ -110,11 +110,6 @@ class PlanForResampling implements Alternative {
 		this.epsilonRealization = eps;
 	}
 
-//	@Override
-	public void setMATSimTimeScore(double score) {
-		this.congestedTravelTimeUtility = score;
-	}
-
 	// TODO NEW
 	public double getFrozenEpsilon() {
 		return this.frozenEpsilon;

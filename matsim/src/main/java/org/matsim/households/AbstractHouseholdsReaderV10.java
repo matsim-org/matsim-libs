@@ -26,6 +26,7 @@ import java.util.Stack;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Income.IncomePeriod;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
@@ -51,6 +52,8 @@ abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 	private String currentincomeCurrency;
 
 	private final Households households;
+	
+	private Counter counter = new Counter("  households # ");
 
 	public AbstractHouseholdsReaderV10(Households households) {
 		if (households == null) {
@@ -65,10 +68,14 @@ abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 		if (HouseholdsSchemaV10Names.HOUSEHOLD.equalsIgnoreCase(name)) {
 			Household currentHousehold = createHousehold();
 			((HouseholdsImpl)this.households).addHousehold(currentHousehold);
+			counter.incCounter();
 		}
 		else if (HouseholdsSchemaV10Names.INCOME.equalsIgnoreCase(name)) {
 			this.currentincome = this.builder.createIncome(Double.parseDouble(content.trim()), this.currentIncomePeriod);
 			this.currentincome.setCurrency(this.currentincomeCurrency);
+		}
+		else if (HouseholdsSchemaV10Names.HOUSEHOLDS.equalsIgnoreCase(name)) {
+			counter.printCounter();
 		}
 	}
 

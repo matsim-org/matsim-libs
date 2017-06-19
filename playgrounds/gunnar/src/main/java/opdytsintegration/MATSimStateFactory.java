@@ -18,6 +18,8 @@ public interface MATSimStateFactory<U extends DecisionVariable> {
 
 	/**
 	 * Because the controler is created after this factory.
+	 * 
+	 * TODO What could this be good for? Is it used at all?
 	 */
 	public void registerControler(final Controler controler);
 

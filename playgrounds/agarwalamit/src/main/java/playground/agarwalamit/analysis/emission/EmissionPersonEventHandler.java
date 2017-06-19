@@ -40,19 +40,18 @@ import org.matsim.vehicles.Vehicle;
 /**
  * EmissionEvents only have vehicle id, which looks fine, however, to collect emissions for every person, one need
  * a connector, which is only available via normal events file. Thus, both emission and normal event files are required.
+ * For this, use CombinedMatsimEventsReader.
  *
  * Created by amit on 23/12/2016.
  */
 
-// this is not necessary anymore. Test and remove it.
-@Deprecated
-public class EmissionPersonEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler, VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler {
+public class EmissionPersonEventHandler implements WarmEmissionEventHandler, ColdEmissionEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler{
 
     private final Map<Id<Vehicle>, Id<Person>> vehicle2DriverIdCollector = new HashMap<>();
 
     private final Map<Id<Person>, Map<ColdPollutant, Double>> personId2ColdEmissions = new HashMap<>();
-    private final Map<Id<Vehicle>, Map<ColdPollutant, Double>> vehicleId2ColdEmissions = new HashMap<>();
     private final Map<Id<Person>, Map<WarmPollutant, Double>> personId2WarmEmissions = new HashMap<>();
+    private final Map<Id<Vehicle>, Map<ColdPollutant, Double>> vehicleId2ColdEmissions = new HashMap<>();
     private final Map<Id<Vehicle>, Map<WarmPollutant, Double>> vehicleId2WarmEmissions = new HashMap<>();
 
     @Override
@@ -90,7 +89,6 @@ public class EmissionPersonEventHandler implements WarmEmissionEventHandler, Col
     @Override
     public void handleEvent(ColdEmissionEvent event) {
         Id<Person> driverId = getDriverOfVehicle(event.getVehicleId());
-
         {
             Map<ColdPollutant, Double> coldEmissions = this.personId2ColdEmissions.get(driverId);
 
@@ -140,7 +138,7 @@ public class EmissionPersonEventHandler implements WarmEmissionEventHandler, Col
         this.vehicle2DriverIdCollector.remove(event.getVehicleId());
     }
 
-    public Id<Person> getDriverOfVehicle(Id<Vehicle> vehicleId) {
+    private Id<Person> getDriverOfVehicle(Id<Vehicle> vehicleId) {
         return this.vehicle2DriverIdCollector.get(vehicleId);
     }
 
@@ -158,5 +156,17 @@ public class EmissionPersonEventHandler implements WarmEmissionEventHandler, Col
 
     public Map<Id<Vehicle>, Map<WarmPollutant, Double>> getVehicleId2WarmEmissions() {
         return vehicleId2WarmEmissions;
+    }
+
+    public Map<Id<Vehicle>, Map<String, Double>> getVehicleId2TotalEmissions(){
+        EmissionUtilsExtended emissionUtilsExtended = new EmissionUtilsExtended();
+        return this.vehicleId2WarmEmissions.entrySet().stream().collect(Collectors.toMap(entry-> entry.getKey(), entry ->
+                emissionUtilsExtended.sumUpEmissions(entry.getValue(), this.vehicleId2ColdEmissions.get(entry.getKey()))));
+    }
+
+    public Map<Id<Person>, Map<String, Double>> getPersonId2TotalEmissions(){
+        EmissionUtilsExtended emissionUtilsExtended = new EmissionUtilsExtended();
+        return this.personId2WarmEmissions.entrySet().stream().collect(Collectors.toMap(entry-> entry.getKey(), entry ->
+                emissionUtilsExtended.sumUpEmissions(entry.getValue(), this.personId2ColdEmissions.get(entry.getKey()))));
     }
 }

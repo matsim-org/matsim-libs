@@ -42,6 +42,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -54,12 +55,13 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.replanning.modules.KeepLastExecuted;
 import org.matsim.core.replanning.strategies.KeepLastExecutedAsPlanStrategy;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.withinday.controller.ExecutedPlansServiceImpl;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 /**
@@ -106,7 +108,7 @@ public class KNAccidentScenario {
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 
 		config.controler().setFirstIteration(9);
-		config.controler().setLastIteration(9);
+		config.controler().setLastIteration(19);
 		config.controler().setOutputDirectory("./output/telematics/funkturm-example");
 		config.controler().setWriteEventsInterval(100);
 		config.controler().setWritePlansInterval(100);
@@ -125,11 +127,11 @@ public class KNAccidentScenario {
 			config.planCalcScore().addModeParams(params);
 		}
 
-//		StrategySettings stratSets = new StrategySettings() ;
-//		//		stratSets.setStrategyName(DefaultSelector.KeepLastSelected.name());
-//		stratSets.setStrategyName(KEEP_LAST_EXECUTED);
-//		stratSets.setWeight(1.);
-//		config.strategy().addStrategySettings(stratSets);
+		StrategySettings stratSets = new StrategySettings() ;
+		//		stratSets.setStrategyName(DefaultSelector.KeepLastSelected.name());
+		stratSets.setStrategyName(KEEP_LAST_EXECUTED);
+		stratSets.setWeight(1.);
+		config.strategy().addStrategySettings(stratSets);
 
 		config.vspExperimental().setVspDefaultsCheckingLevel( VspDefaultsCheckingLevel.warn );
 		config.vspExperimental().setWritingOutputEvents(true);
@@ -146,8 +148,8 @@ public class KNAccidentScenario {
 		Link link = scenario.getNetwork().getLinks().get( Id.createLinkId( "-418375_-248_247919764" ) ) ;
 		link.setCapacity(2000.); // "repair" a capacity. (This is Koenigin-Elisabeth-Str., parallel to A100 near Funkturm, having visibly less capacity than links upstream and downstream.)
 
-//		Link link2 = scenario.getNetwork().getLinks().get( Id.createLinkId("40371262_533639234_487689293-40371262_487689293_487689300-40371262_487689300_487689306-40371262_487689306_487689312-40371262_487689312_487689316-40371262_487689316_487689336-40371262_487689336_487689344-40371262_487689344_487689349-40371262_487689349_487689356-40371262_487689356_533639223-4396104_533639223_487673629-4396104_487673629_487673633-4396104_487673633_487673636-4396104_487673636_487673640-4396104_487673640_26868611-4396104_26868611_484073-4396104_484073_26868612-4396104_26868612_26662459") ) ;
-//		link2.setCapacity( 300. ) ; // reduce cap on alt route. (This is the freeway entry link just downstream of the accident; reducing its capacity
+		Link link2 = scenario.getNetwork().getLinks().get( Id.createLinkId("40371262_533639234_487689293-40371262_487689293_487689300-40371262_487689300_487689306-40371262_487689306_487689312-40371262_487689312_487689316-40371262_487689316_487689336-40371262_487689336_487689344-40371262_487689344_487689349-40371262_487689349_487689356-40371262_487689356_533639223-4396104_533639223_487673629-4396104_487673629_487673633-4396104_487673633_487673636-4396104_487673636_487673640-4396104_487673640_26868611-4396104_26868611_484073-4396104_484073_26868612-4396104_26868612_26662459") ) ;
+		link2.setCapacity( 300. ) ; // reduce cap on alt route. (This is the freeway entry link just downstream of the accident; reducing its capacity
 		// means that the router finds a wider variety of alternative routes.)
 
 		// ===
@@ -156,44 +158,40 @@ public class KNAccidentScenario {
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
 
 
-//		Set<String> analyzedModes = new HashSet<>() ;
-//		analyzedModes.add( TransportMode.car ) ;
-//		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
+		Set<String> analyzedModes = new HashSet<>() ;
+		analyzedModes.add( TransportMode.car ) ;
+		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
+		
+//		final MyTravelTime travelTime = new MyTravelTime(scenario) ;
 
 		controler.addOverridingModule( new OTFVisLiveModule() );
 
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install() {
-//				MobsimDataProvider mdp = new MobsimDataProvider() ;
-//				bind( MobsimDataProvider.class ).toInstance( mdp ) ;
-//				addMobsimListenerBinding().toInstance( mdp ) ;	
-//
-//				bind( ExecutedPlansServiceImpl.class ).asEagerSingleton(); 
-//				addControlerListenerBinding().to( ExecutedPlansServiceImpl.class ) ;
-//				
-//				addPlanStrategyBinding(KEEP_LAST_EXECUTED).toProvider(KeepLastExecutedAsPlanStrategy.class) ;
+				MobsimDataProvider mdp = new MobsimDataProvider() ;
+				bind( MobsimDataProvider.class ).toInstance( mdp ) ;
+				addMobsimListenerBinding().toInstance( mdp ) ;	
 
-//				this.bind( MyIterationCounter.class ).asEagerSingleton();
+				bind( ExecutedPlansServiceImpl.class ).asEagerSingleton(); 
+				addControlerListenerBinding().to( ExecutedPlansServiceImpl.class ) ;
+//				
+				addPlanStrategyBinding(KEEP_LAST_EXECUTED).toProvider(KeepLastExecutedAsPlanStrategy.class) ;
+
+				this.bind( MyIterationCounter.class ).asEagerSingleton();
 				
-				this.addMobsimListenerBinding().to( ManualDetour.class ) ;
 
 				// ===
 				
-//				this.addEventHandlerBinding().toInstance( travelTime ) ;
-//				this.addMobsimListenerBinding().toInstance( travelTime );
-//				this.bind( TravelTime.class ).toInstance( travelTime );
+				this.addEventHandlerBinding().toInstance( travelTime ) ;
+				this.addMobsimListenerBinding().toInstance( travelTime );
+				this.bind( TravelTime.class ).toInstance( travelTime );
 				
 				// ---
-				
-				
+				// These are the possible strategies.  They have various pre-requisites.
+				this.addMobsimListenerBinding().to( ManualDetour.class ) ;
 //				this.addMobsimListenerBinding().to( WithinDayBangBangMobsimListener.class );
-				
-				// ---
+//				this.addMobsimListenerBinding().to( WithinDayReRouteMobsimListener.class );
 
-//				this.addMobsimListenerBinding().to( WithinDayBestRouteMobsimListener.class );
-
-				// ---
-				
 			}
 		}) ;
 

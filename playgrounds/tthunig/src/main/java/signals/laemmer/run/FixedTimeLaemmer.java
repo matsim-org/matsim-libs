@@ -60,11 +60,11 @@ public class FixedTimeLaemmer {
         log.info("Running Laemmer main method...");
 
 //        for (int i = 0; i <= 2520; i += 120) {
-            run(360, 2280, true, false, true, true);
+            run(360, 1800, true, false, true, true, true);
 //        }
     }
 
-    private static void run(double flowNS, double flowWE, boolean vis, boolean stochastic, boolean lanes, boolean grouped) {
+    private static void run(double flowNS, double flowWE, boolean vis, boolean stochastic, boolean lanes, boolean grouped, boolean temporalCrowd) {
 
         String outputPath;
         if (stochastic) {
@@ -84,7 +84,7 @@ public class FixedTimeLaemmer {
 
         CombinedSignalsModule module = new CombinedSignalsModule();
 
-        final Scenario scenario = defineScenario(config, flowNS, flowWE, stochastic, lanes, grouped);
+        final Scenario scenario = defineScenario(config, flowNS, flowWE, stochastic, lanes, grouped, temporalCrowd);
         Controler controler = new Controler(scenario);
 
 
@@ -138,7 +138,7 @@ public class FixedTimeLaemmer {
 
 
 
-    private static Scenario defineScenario(Config config, double flowNS, double flowWE, boolean stochastic, boolean lanes, boolean grouped) {
+    private static Scenario defineScenario(Config config, double flowNS, double flowWE, boolean stochastic, boolean lanes, boolean grouped, boolean temporalCrowd) {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         // add missing scenario elements
         SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
@@ -147,7 +147,7 @@ public class FixedTimeLaemmer {
         if(lanes) {
             createLanes(scenario);
         }
-        createPopulation(scenario, flowNS, flowWE, stochastic);
+        createPopulation(scenario, flowNS, flowWE, stochastic, temporalCrowd);
         createSignals(scenario, flowNS, flowWE, lanes, grouped);
         return scenario;
     }
@@ -298,18 +298,18 @@ public class FixedTimeLaemmer {
 
     }
 
-    private static void createPopulation(Scenario scenario, double flowNS, double flowWE, boolean stochastic) {
+    private static void createPopulation(Scenario scenario, double flowNS, double flowWE, boolean stochastic, boolean temporalCrowd) {
         Population population = scenario.getPopulation();
 
         String[] linksNS = {"6_7-8_9", "9_8-7_6"};
         String[] linksWE = {"5_4-2_1", "1_2-4_5"};
 
         Random rnd = new Random(14);
-        createPopulationForRelation(flowNS, population, linksNS, stochastic, rnd);
-        createPopulationForRelation(flowWE, population, linksWE, stochastic, rnd);
+        createPopulationForRelation(flowNS, population, linksNS, stochastic, rnd, temporalCrowd);
+        createPopulationForRelation(flowWE, population, linksWE, stochastic, rnd, temporalCrowd);
     }
 
-    private static void createPopulationForRelation(double flow, Population population, String[] links, boolean stochastic, Random rnd) {
+    private static void createPopulationForRelation(double flow, Population population, String[] links, boolean stochastic, Random rnd, boolean temporalCrowd) {
 
         double lambdaT = (flow / 3600 ) / 5;
         double lambdaN = 1./5.;
@@ -342,7 +342,11 @@ public class FixedTimeLaemmer {
             } else {
                 double nthSecond = (3600 / flow);
                 for (double i = 0; i < 5400; i += nthSecond) {
-                    insertNAtSecond.put(i, 1);
+                    if(temporalCrowd && i>1800 && i<2400) {
+                        insertNAtSecond.put(i, 2);
+                    } else {
+                        insertNAtSecond.put(i, 1);
+                    }
                 }
             }
 

@@ -106,6 +106,9 @@ public class VehicleData {
 	private Entry createVehicleData(Vehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
 		ScheduleStatus status = schedule.getStatus();
+		if (currTime <= vehicle.getServiceBeginTime()) {
+			return null;
+		}
 		if (currTime >= vehicle.getServiceEndTime() || status == ScheduleStatus.COMPLETED) {
 			return null;
 		}

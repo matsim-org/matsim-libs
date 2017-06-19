@@ -39,6 +39,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 
+@Deprecated
 public class ZoneAndLOSGenerator {
 
 	private Map <Integer, Zone> zonesMap = new HashMap <Integer, Zone>();

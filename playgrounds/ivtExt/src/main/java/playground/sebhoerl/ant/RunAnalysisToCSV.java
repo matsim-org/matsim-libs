@@ -1,6 +1,5 @@
 package playground.sebhoerl.ant;
 
-import com.sun.javafx.binding.StringFormatter;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;

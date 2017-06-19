@@ -60,14 +60,14 @@ public class LaemmerBasicExample {
     public static void main(String[] args) {
         log.info("Running Laemmer main method...");
 
-        for (int i = 0; i <= 2520; i += 120) {
-        run(360, i, LaemmerConfig.Regime.COMBINED, false, false, false, true, true, true, 0);
-            run(360, i, LaemmerConfig.Regime.OPTIMIZING, false, false, false, true, true, true,0);
-            run(360, i, LaemmerConfig.Regime.STABILIZING, false, false, false, true, true, true,0);
-        }
+//        for (int i = 0; i <= 2520; i += 120) {
+        run(360, 1800, LaemmerConfig.Regime.COMBINED, true, false, false, true, true, true, 0, true);
+//            run(360, i, LaemmerConfig.Regime.OPTIMIZING, false, false, false, true, true, true,0, false);
+//            run(360, i, LaemmerConfig.Regime.STABILIZING, false, false, false, true, true, true,0,false);
+//        }
     }
 
-    private static void run(double flowNS, double flowWE, LaemmerConfig.Regime regime, boolean vis, boolean log, boolean stochastic, boolean lanes, boolean liveArrivalRates, boolean grouped, double minG) {
+    private static void run(double flowNS, double flowWE, LaemmerConfig.Regime regime, boolean vis, boolean log, boolean stochastic, boolean lanes, boolean liveArrivalRates, boolean grouped, double minG, boolean temporalCrowd) {
 
         String outputPath;
         if (stochastic) {
@@ -116,7 +116,7 @@ public class LaemmerBasicExample {
         laemmerConfig.setActiveRegime(regime);
         module.setLaemmerConfig(laemmerConfig);
 
-        final Scenario scenario = defineScenario(config, flowNS, flowWE, laemmerConfig, stochastic, lanes, liveArrivalRates, grouped);
+        final Scenario scenario = defineScenario(config, flowNS, flowWE, laemmerConfig, stochastic, lanes, liveArrivalRates, grouped, temporalCrowd);
         Controler controler = new Controler(scenario);
 
 
@@ -132,17 +132,6 @@ public class LaemmerBasicExample {
 //            otfvisConfig.setAgentSize(240);
             controler.addOverridingModule(new OTFVisWithSignalsLiveModule());
         }
-        if (log) {
-            try {
-                LaemmerSignalController.log.addAppender(new FileAppender(new SimpleLayout(), "logs/main.txt"));
-//                LaemmerSignalController.signalLog.addAppender(new FileAppender(new SimpleLayout(), "logs/driveways.txt"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            LaemmerSignalController.log.setLevel(Level.OFF);
-        }
-        LaemmerSignalController.signalLog.setLevel(Level.OFF);
         controler.run();
     }
 
@@ -179,7 +168,7 @@ public class LaemmerBasicExample {
         return config;
     }
 
-    private static Scenario defineScenario(Config config, double flowNS, double flowWE, LaemmerConfig laemmerConfig, boolean stochastic, boolean lanes, boolean liveArrivalRates, boolean grouped) {
+    private static Scenario defineScenario(Config config, double flowNS, double flowWE, LaemmerConfig laemmerConfig, boolean stochastic, boolean lanes, boolean liveArrivalRates, boolean grouped, boolean temporalCrowd) {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         // add missing scenario elements
         SignalSystemsConfigGroup signalsConfigGroup = ConfigUtils.addOrGetModule(config, SignalSystemsConfigGroup.GROUPNAME, SignalSystemsConfigGroup.class);
@@ -188,7 +177,7 @@ public class LaemmerBasicExample {
         if (lanes) {
             createLanes(scenario);
         }
-        createPopulation(scenario, flowNS, flowWE, stochastic);
+        createPopulation(scenario, flowNS, flowWE, stochastic, temporalCrowd);
         createSignals(scenario, laemmerConfig, flowNS, flowWE, lanes, liveArrivalRates, grouped);
         return scenario;
     }
@@ -339,18 +328,18 @@ public class LaemmerBasicExample {
 
     }
 
-    private static void createPopulation(Scenario scenario, double flowNS, double flowWE, boolean stochastic) {
+    private static void createPopulation(Scenario scenario, double flowNS, double flowWE, boolean stochastic, boolean temporalCrowd) {
         Population population = scenario.getPopulation();
 
         String[] linksNS = {"6_7-8_9", "9_8-7_6"};
         String[] linksWE = {"5_4-2_1", "1_2-4_5"};
 
         Random rnd = new Random(14);
-        createPopulationForRelation(flowNS, population, linksNS, stochastic, rnd);
-        createPopulationForRelation(flowWE, population, linksWE, stochastic, rnd);
+        createPopulationForRelation(flowNS, population, linksNS, stochastic, rnd, temporalCrowd);
+        createPopulationForRelation(flowWE, population, linksWE, stochastic, rnd, temporalCrowd);
     }
 
-    private static void createPopulationForRelation(double flow, Population population, String[] links, boolean stochastic, Random rnd) {
+    private static void createPopulationForRelation(double flow, Population population, String[] links, boolean stochastic, Random rnd, boolean temporalCrowd) {
 
         double lambdaT = (flow / 3600) / 5;
         double lambdaN = 1. / 5.;
@@ -383,7 +372,11 @@ public class LaemmerBasicExample {
             } else {
                 double nthSecond = (3600 / flow);
                 for (double i = 0; i < 5400; i += nthSecond) {
-                    insertNAtSecond.put(i, 1);
+                    if(temporalCrowd && i>1800 && i<2400) {
+                        insertNAtSecond.put(i, 2);
+                    } else {
+                        insertNAtSecond.put(i, 1);
+                    }
                 }
             }
 

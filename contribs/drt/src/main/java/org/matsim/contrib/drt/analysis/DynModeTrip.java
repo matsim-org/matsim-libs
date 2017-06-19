@@ -22,6 +22,10 @@
  */
 package org.matsim.contrib.drt.analysis;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -41,6 +45,8 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 	private double arrivalTime = Double.NaN;
 	private final Coord fromCoord;
 	private Coord toCoord = null;
+	private final	DecimalFormat format;
+
 
 	static final String demitter = ";";
 	public static final String HEADER = "departureTime" + demitter + "personId" + demitter + "vehicleId" + demitter
@@ -56,6 +62,12 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 		this.fromLinkId = fromLinkId;
 		this.fromCoord = fromCoord;
 		this.waitTime = waitTime;
+		
+		this.format = new DecimalFormat();
+		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+		format.setMinimumIntegerDigits(1);
+		format.setMaximumFractionDigits(2);
+		format.setGroupingUsed(false);
 	}
 
 	public Double getDepartureTime() {
@@ -163,9 +175,9 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 			fromCoordY = fromCoord.getY();
 		}
 		return getDepartureTime() + demitter + getPerson() + demitter + getVehicle() + demitter + getFromLinkId()
-				+ demitter + fromCoordX + demitter + fromCoordY + demitter + getToLinkId() + demitter + toCoordX
-				+ demitter + toCoordY + demitter + getWaitTime() + demitter + getArrivalTime() + demitter
-				+ getInVehicleTravelTime() + demitter + getTravelDistance()+ demitter+ travelDistanceEstimate_m;
+				+ demitter + format.format(fromCoordX) + demitter + format.format(fromCoordY) + demitter + getToLinkId() + demitter + format.format(toCoordX)
+				+ demitter + format.format(toCoordY) + demitter + getWaitTime() + demitter + getArrivalTime() + demitter
+				+ getInVehicleTravelTime() + demitter + format.format(getTravelDistance())+ demitter+ format.format(travelDistanceEstimate_m);
 	}
 
 }

@@ -101,7 +101,7 @@ public class TtRunCottbusSimulation {
 
 	private static final Logger LOG = Logger.getLogger(TtRunCottbusSimulation.class);
 	
-	private final static String RUN_ID = "3103c";
+	private final static String RUN_ID = "1111";
 	
 	private final static NetworkType NETWORK_TYPE = NetworkType.V1;
 	public enum NetworkType {
@@ -120,7 +120,7 @@ public class TtRunCottbusSimulation {
 		WoMines // without mines as working places
 	}
 	
-	private final static SignalType SIGNAL_TYPE = SignalType.ALL_MS_AS_SYLVIA_INSIDE_ENVELOPE_REST_GREEN;
+	private final static SignalType SIGNAL_TYPE = SignalType.MS;
 	public enum SignalType {
 		NONE, MS, MS_RANDOM_OFFSETS, MS_SYLVIA, BTU_OPT, DOWNSTREAM_MS, DOWNSTREAM_BTUOPT, DOWNSTREAM_ALLGREEN, 
 		ALL_NODES_ALL_GREEN, ALL_NODES_DOWNSTREAM, ALL_GREEN_INSIDE_ENVELOPE, 
@@ -142,7 +142,7 @@ public class TtRunCottbusSimulation {
 	// (higher sigma cause more randomness. use 0.0 for no randomness.)
 	private static final double SIGMA = 0.0;
 	
-	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/cottbus/createGridLock/";
+	private static final String OUTPUT_BASE_DIR = "../../../runs-svn/cottbus/baseCase/";
 	private static final String INPUT_BASE_DIR = "../../../shared-svn/projects/cottbus/data/scenarios/cottbus_scenario/";
 	private static final String BTU_BASE_DIR = "../../../shared-svn/projects/cottbus/data/optimization/cb2ks2010/2015-02-25_minflow_50.0_morning_peak_speedFilter15.0_SP_tt_cBB50.0_sBB500.0/";
 	
@@ -208,9 +208,9 @@ public class TtRunCottbusSimulation {
 		case WoMines:
 			// TODO choose one
 			// BaseCase output plans. the number specifies the flow and storage capacity that was used	
-			config.plans().setInputFile(OUTPUT_BASE_DIR + "run3100/3100.output_plans.xml.gz");
+//			config.plans().setInputFile(OUTPUT_BASE_DIR + "run3100/3100.output_plans.xml.gz");
 			// BaseCase plans, no routes
-//			config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only.xml.gz");
+			config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only.xml.gz");
 			// BaseCase plans, no links for acitivties, no routes
 //			config.plans().setInputFile(INPUT_BASE_DIR + "cb_spn_gemeinde_nachfrage_landuse_woMines/commuter_population_wgs84_utm33n_car_only_woLinks.xml.gz");
 			break;
@@ -232,8 +232,10 @@ public class TtRunCottbusSimulation {
 
 		// set number of iterations
 		// TODO
-		config.controler().setFirstIteration(100);
-		config.controler().setLastIteration(200);
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(100);
+		
+		config.qsim().setUsingFastCapacityUpdate(false);
 
 		// able or enable signals and lanes
 		// if signal type 'All...' is used without 'MS', lanes and signals are defined later in 'prepareScenario'

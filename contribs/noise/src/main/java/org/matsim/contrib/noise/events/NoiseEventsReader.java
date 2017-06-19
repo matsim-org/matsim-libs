@@ -60,19 +60,13 @@ public class NoiseEventsReader extends MatsimXmlParser{
 
 	@Override
 	public void characters(char[] ch, int start, int length) throws SAXException {
-		// ignore characters to prevent OutOfMemoryExceptions
-		/* the events-file only contains empty tags with attributes,
-		 * but without the dtd or schema, all whitespace between tags is handled
-		 * by characters and added up by super.characters, consuming huge
-		 * amount of memory when large events-files are read in.
-		 */
 	}
 
 	private void startEvent(final Attributes attributes){
 
 		String eventType = attributes.getValue("type");
 
-		if (NoiseEventCaused.EVENT_TYPE.equals(eventType)){
+		if (NoiseEventCaused.EVENT_TYPE.equals(eventType)) {
 			Double time = 0.0;
 			Double timeBinEndTime = 0.0;
 			Double linkEnteringTime = 0.0;
@@ -106,15 +100,10 @@ public class NoiseEventsReader extends MatsimXmlParser{
 				else if(attributes.getQName(i).equals(NoiseEventCaused.ATTRIBUTE_LINK_ID)){
 					linkId = Id.create((attributes.getValue(i)), Link.class);
 				}
-				
-//				else {
-//					throw new RuntimeException("Unknown event attribute. Aborting... " + attributes.getQName(i));
-//				}
 			}
 			this.eventsManager.processEvent(new NoiseEventCaused(time, timeBinEndTime, linkEnteringTime, causingAgentId, causingVehicleId, amount, linkId));
-		}
 		
-		else if (NoiseEventAffected.EVENT_TYPE.equals(eventType)){
+		} else if (NoiseEventAffected.EVENT_TYPE.equals(eventType)){
 			Double time = 0.0;
 			Double timeBinEndTime = 0.0;
 			Id<Person> affectedAgentId = null;
