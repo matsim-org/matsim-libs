@@ -1,11 +1,15 @@
 package playground.kai.usecases.opdytsintegration.modechoice;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import opdytsintegration.MATSimSimulator2;
 import opdytsintegration.MATSimStateFactoryImpl;
+import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzer;
 import opdytsintegration.utils.TimeDiscretization;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -114,6 +118,12 @@ class KNModeChoiceCalibMain {
 			final MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>( new MATSimStateFactoryImpl<>(),
 					scenario, timeDiscretization); 
 			simulator.addOverridingModule( overrides ) ;
+
+			//
+			Set<String> relevantNetworkModes = new HashSet<>();
+			relevantNetworkModes.add("car");
+			simulator.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzer.Provider(timeDiscretization, relevantNetworkModes,
+					new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet())));
 
 			int maxIterations = 10 ;
 			int maxTransitions = Integer.MAX_VALUE ;
