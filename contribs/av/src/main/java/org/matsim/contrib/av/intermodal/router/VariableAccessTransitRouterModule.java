@@ -35,6 +35,8 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import com.google.inject.name.Names;
 
+import java.net.URL;
+
 
 public class VariableAccessTransitRouterModule extends AbstractModule {
 
@@ -44,12 +46,12 @@ public class VariableAccessTransitRouterModule extends AbstractModule {
         	VariableAccessConfigGroup vaconfig = (VariableAccessConfigGroup) getConfig().getModules().get(VariableAccessConfigGroup.GROUPNAME);
         	addRoutingModuleBinding(vaconfig.getMode()).toProvider(VariableAccessTransit.class);
         	Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-        	String scheduleFile = getConfig().transit().getTransitScheduleFileURL(getConfig().getContext()).getFile();
+        	URL scheduleFile = getConfig().transit().getTransitScheduleFileURL(getConfig().getContext());
         	if (vaconfig.getTransitScheduleFile()!=null){
-        		scheduleFile = vaconfig.getTransitScheduleFileURL(getConfig().getContext()).getFile();
+        		scheduleFile = vaconfig.getTransitScheduleFileURL(getConfig().getContext());
         	}
         	
-        	new TransitScheduleReader(scenario2).readFile(scheduleFile);
+        	new TransitScheduleReader(scenario2).readURL(scheduleFile);
         	bind(MainModeIdentifier.class).to(VariableAccessMainModeIdentifier.class);
 			bind(TransitSchedule.class).annotatedWith(Names.named("variableAccess")).toInstance(scenario2.getTransitSchedule());
             bind(TransitRouter.class).annotatedWith(Names.named("variableAccess")).toProvider(VariableAccessTransitRouterImplFactory.class);
