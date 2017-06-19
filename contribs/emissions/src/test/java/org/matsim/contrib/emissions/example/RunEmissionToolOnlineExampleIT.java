@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,32 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.contrib.emissions.example;
 
-/**
- * 
- */
-package org.matsim.contrib.av.intermodal;
+import static org.junit.Assert.*;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.contrib.emissions.example.archive.RunEmissionToolOnlineExample;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 /**
- * @author  jbischoff
+ * @author nagel
  *
  */
-/**
- *
- */
-public class RunIntermodalExampleTest {
-	
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+public class RunEmissionToolOnlineExampleIT {
 
+	/**
+	 * Test method for {@link RunEmissionToolOnlineExample#main(java.lang.String[])}.
+	 */
+	@SuppressWarnings("static-method")
 	@Test
-	public void testIntermodalExample() {
+	public final void testMain() {
+		try {
+			RunEmissionToolOnlineExampleV2 tool = new RunEmissionToolOnlineExampleV2(null) ;
 
-		new RunTaxiPTIntermodalExample().run(false);
+			tool.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			// otherwise the test fails on jenkins
+
+			tool.run();
+		} catch ( Exception ee ) {
+			ee.printStackTrace();
+			fail("something did not work" ) ;
+		}
 	}
-	
+
 }

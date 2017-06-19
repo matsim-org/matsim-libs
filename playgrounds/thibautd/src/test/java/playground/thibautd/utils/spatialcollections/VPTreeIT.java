@@ -32,7 +32,7 @@ import java.util.stream.IntStream;
 /**
  * @author thibautd
  */
-public class VPTreeTest {
+public class VPTreeIT {
 	private static final int GRID_SIZE = 50;
 
 	@Test

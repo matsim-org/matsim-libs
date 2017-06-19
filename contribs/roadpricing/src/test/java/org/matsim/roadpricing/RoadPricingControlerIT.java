@@ -37,7 +37,7 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  * @author mrieser
  */
-public class RoadPricingControlerTest {
+public class RoadPricingControlerIT {
 
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils();

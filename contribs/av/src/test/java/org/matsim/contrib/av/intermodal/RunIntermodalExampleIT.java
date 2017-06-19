@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,36 +16,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.replanning;
+
+/**
+ * 
+ */
+package org.matsim.contrib.av.intermodal;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * @author thibautd
+ * @author  jbischoff
+ *
  */
-public class BlackListedTAMTest {
+/**
+ *
+ */
+public class RunIntermodalExampleIT {
+	
 	@Rule
-	public final MatsimTestUtils utils = new MatsimTestUtils();
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	public void testDoesNotCrash() {
-		final Config config = utils.loadConfig( "test/scenarios/siouxfalls-2014-reduced/config_default.xml" );
-		config.controler().setLastIteration( 1 );
-		config.plans().setActivityDurationInterpretation(
-				PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration );
-		final StrategyConfigGroup.StrategySettings settings = new StrategyConfigGroup.StrategySettings();
-		settings.setStrategyName( "BlackListedTimeAllocationMutator" );
-		settings.setWeight( 100 );
-		config.strategy().addStrategySettings( settings );
+	public void testIntermodalExample() {
 
-		final Controler controler = new Controler( config );
-		controler.addOverridingModule( new BlackListedTimeAllocationMutatorStrategyModule() );
-		controler.run();
+		new RunTaxiPTIntermodalExample().run(false);
 	}
+	
 }

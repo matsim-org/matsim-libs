@@ -39,7 +39,7 @@ import playground.boescpa.analysis.spatialCutters.NoCutter;
 /**
  * @author boescpa
  */
-public class TestScenarioAnalyzer {
+public class ScenarioAnalyzerIT {
 
 	private ScenarioAnalyzer scenarioAnalyzer;
 

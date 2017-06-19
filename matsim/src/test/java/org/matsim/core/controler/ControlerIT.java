@@ -33,7 +33,6 @@ import java.util.EnumSet;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,10 +51,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
@@ -74,14 +71,14 @@ import org.matsim.testcases.MatsimTestUtils;
 import com.google.inject.Provider;
 
 @RunWith(Parameterized.class)
-public class ControlerTest {
+public class ControlerIT {
 
-	private final static Logger log = Logger.getLogger(ControlerTest.class);
+	private final static Logger log = Logger.getLogger(ControlerIT.class);
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private final boolean isUsingFastCapacityUpdate;
 	
-	public ControlerTest(boolean isUsingFastCapacityUpdate) {
+	public ControlerIT(boolean isUsingFastCapacityUpdate) {
 		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
 	}
 	

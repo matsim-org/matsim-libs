@@ -31,7 +31,7 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  * @author thibautd
  */
-public class PopulationReprojectionIOTest {
+public class PopulationReprojectionIOIT {
 
 	private static final String NET_FILE = "network.xml.gz";
 	private static final String BASE_FILE = "plans_hwh_1pct.xml.gz";

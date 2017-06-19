@@ -54,8 +54,8 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class RoutingTest  {
-	/*package*/ static final Logger log = Logger.getLogger(RoutingTest.class);
+public class RoutingIT {
+	/*package*/ static final Logger log = Logger.getLogger(RoutingIT.class);
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 

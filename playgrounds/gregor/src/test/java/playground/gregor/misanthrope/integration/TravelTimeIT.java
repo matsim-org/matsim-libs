@@ -66,8 +66,8 @@ import java.util.Set;
 /**
  * Created by laemmel on 15/10/15.
  */
-public class TravelTimeIntegrationTest extends MatsimTestCase {
-	private static final Logger log = Logger.getLogger(TravelTimeIntegrationTest.class);
+public class TravelTimeIT extends MatsimTestCase {
+	private static final Logger log = Logger.getLogger(TravelTimeIT.class);
 
 	private static LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(
 			Scenario scenario) {

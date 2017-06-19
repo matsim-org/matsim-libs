@@ -37,7 +37,7 @@ import org.matsim.vehicles.VehicleType;
 
 import playground.kturner.freightKt.CarrierScoringFunctionFactoryImpl_KT;
 
-public class CarrierScoringFunctionFactoryImpl_KTTest {
+public class CarrierScoringFunctionFactoryImpl_KTIT {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 

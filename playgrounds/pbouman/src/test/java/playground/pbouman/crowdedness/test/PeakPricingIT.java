@@ -19,7 +19,7 @@ import playground.pbouman.transitfares.TransitFares;
  * @author nagel
  *
  */
-public class PeakPricingTest {
+public class PeakPricingIT {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**

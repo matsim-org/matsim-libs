@@ -32,8 +32,8 @@ import java.util.Random;
 /**
  * @author thibautd
  */
-public class KDTreeTest {
-	private static final Logger log = Logger.getLogger( KDTreeTest.class );
+public class KDTreeIT {
+	private static final Logger log = Logger.getLogger( KDTreeIT.class );
 
 	@Test
 	public void testClosestEuclidean() {

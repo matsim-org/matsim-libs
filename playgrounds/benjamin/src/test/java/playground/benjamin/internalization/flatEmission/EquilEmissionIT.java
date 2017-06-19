@@ -60,12 +60,12 @@ import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerLi
  */
 
 @RunWith(Parameterized.class)
-public class EquilEmissionTest {
+public class EquilEmissionIT {
 	
 	@Rule
 	public MatsimTestUtils helper = new MatsimTestUtils();
 
-	private static final Logger logger = Logger.getLogger(EquilEmissionTest.class);
+	private static final Logger logger = Logger.getLogger(EquilEmissionIT.class);
 
 	private DecimalFormat df = new DecimalFormat("#.###");
 
@@ -73,7 +73,7 @@ public class EquilEmissionTest {
 	private final double emissionCostMultiplicationFactor;
 	private final double emissionEfficiencyFactor;
 
-	public EquilEmissionTest (final boolean isConsideringCO2Costs, final double emissionCostMultiplicationFactor, final double emissionEfficiencyFactor) {
+	public EquilEmissionIT(final boolean isConsideringCO2Costs, final double emissionCostMultiplicationFactor, final double emissionEfficiencyFactor) {
 		this.isConsideringCO2Costs = isConsideringCO2Costs;
 		this.emissionCostMultiplicationFactor = emissionCostMultiplicationFactor;
 		this.emissionEfficiencyFactor = emissionEfficiencyFactor;

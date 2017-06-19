@@ -44,7 +44,7 @@ import java.util.Arrays;
  * @author yu
  * 
  */
-public class OTFVisTest {
+public class OTFVisIT {
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();

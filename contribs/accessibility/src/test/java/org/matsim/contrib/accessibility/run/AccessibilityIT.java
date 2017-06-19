@@ -59,8 +59,8 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  * @author nagel
  */
-public class AccessibilityTest implements SpatialGridDataExchangeInterface, FacilityDataExchangeInterface {
-	private static Logger log = Logger.getLogger( AccessibilityTest.class ) ;
+public class AccessibilityIT implements SpatialGridDataExchangeInterface, FacilityDataExchangeInterface {
+	private static Logger log = Logger.getLogger( AccessibilityIT.class ) ;
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -99,7 +99,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 		
 		// ---
 
-		Config config = AccessibilityTest.generateConfigV3() ;
+		Config config = AccessibilityIT.generateConfigV3() ;
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists) ;
 		
@@ -157,7 +157,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 
 		// ---
 		
-		final Config config = AccessibilityTest.generateConfigV3() ;
+		final Config config = AccessibilityIT.generateConfigV3() ;
 		
 		// ---
 
@@ -227,7 +227,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Faci
 						ZoneBasedAccessibilityControlerListenerV3 listener = new ZoneBasedAccessibilityControlerListenerV3(
 								accessibilityCalculator, opportunities, path, scenario);
 
-						listener.addFacilityDataExchangeListener(AccessibilityTest.this);
+						listener.addFacilityDataExchangeListener(AccessibilityIT.this);
 
 						return listener ;
 					}

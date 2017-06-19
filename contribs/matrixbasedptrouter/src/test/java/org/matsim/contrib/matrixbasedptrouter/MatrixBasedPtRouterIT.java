@@ -50,7 +50,7 @@ import java.io.IOException;
  * @author nagel
  *
  */
-public class MatrixBasedPtRouterIntegrationTest {
+public class MatrixBasedPtRouterIT {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Rule
