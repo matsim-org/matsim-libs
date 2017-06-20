@@ -16,8 +16,8 @@ import java.util.List;
 /**
  * @author gthunig on 24.04.2017.
  */
-public class CompareUseCase {
-    public static final Logger log = Logger.getLogger(CompareUseCase.class);
+public class AnalyzeAndCompareTrips {
+    public static final Logger log = Logger.getLogger(AnalyzeAndCompareTrips.class);
 
     //FromMatsim Parameters
         private static final String RUN_ID = "be_210"; // <----------
