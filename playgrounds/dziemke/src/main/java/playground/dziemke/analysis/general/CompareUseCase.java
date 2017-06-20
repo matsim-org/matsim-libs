@@ -20,7 +20,7 @@ public class CompareUseCase {
     public static final Logger log = Logger.getLogger(CompareUseCase.class);
 
     //FromMatsim Parameters
-        private static final String RUN_ID = "be_117l"; // <----------
+        private static final String RUN_ID = "be_210"; // <----------
         private static final String ITERATION_FOR_ANALYSIS = "0";
         private static final String CEMDAP_PERSONS_INPUT_FILE_ID = "21"; // Check if this number corresponds correctly to the RUN_ID
 
@@ -55,7 +55,8 @@ public class CompareUseCase {
         fromMatsimTripFilter.activateModeChoice(TransportMode.car);
         fromMatsimTripFilter.activateStartsOrEndsIn(events2TripsParser.getNetwork(), AREA_SHAPE_FILE, 11000000);
         fromMatsimTripFilter.activateDist(0, 100);
-        fromMatsimTripFilter.activateDepartureTimeRange(16. * 3600, 22. * 3600);
+        fromMatsimTripFilter.activateDepartureTimeRange(7. * 3600, 9. * 3600);
+//        fromMatsimTripFilter.activateDepartureTimeRange(16. * 3600, 22. * 3600);
         List<Trip> filteredFromMatsimTrips = TripFilter.castTrips(fromMatsimTripFilter.filter(fromMatsimTrips));
 
         //determine output directory
@@ -77,7 +78,8 @@ public class CompareUseCase {
         FromSrvTripFilterImpl fromSrvTripFilter = new FromSrvTripFilterImpl();
         fromSrvTripFilter.activateModeChoice(TransportMode.car);
         fromSrvTripFilter.activateDist(0, 100);
-        fromSrvTripFilter.activateDepartureTimeRange(16. * 3600, 22. * 3600);
+        fromSrvTripFilter.activateDepartureTimeRange(7. * 3600, 9. * 3600);
+//        fromSrvTripFilter.activateDepartureTimeRange(16. * 3600, 22. * 3600);
 
         //determine output directory
         String srvOutputDirectory = fromSrvTripFilter.adaptOutputDirectory("analysis_srv");
@@ -112,5 +114,4 @@ public class CompareUseCase {
         }
         folder.delete();
     }
-
 }
