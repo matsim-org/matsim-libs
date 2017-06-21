@@ -34,7 +34,7 @@ import com.google.inject.Inject;
  * @author michalm
  *
  */
-public class TaxiBenchmarkModule extends TaxiModule {
+final class TaxiBenchmarkModule extends TaxiModule {
 	@Inject
 	private DvrpConfigGroup dvrpCfg;
 
@@ -44,13 +44,17 @@ public class TaxiBenchmarkModule extends TaxiModule {
 	 */
 	@Override
 	public void install() {
-		String mode = dvrpCfg.getMode();
-		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
-
-		// Visualisation of schedules for DVRP DynAgents
-		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
+		throw new RuntimeException("class should be deleted") ;
+		
+//		String mode = dvrpCfg.getMode();
+//		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
+//
+//		// Visualisation of schedules for DVRP DynAgents
+//		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
+		
+//		super.install();
 
 		// Fixed free-speed TT
-		install(VrpTravelTimeModules.createFreeSpeedTravelTimeForBenchmarkingModule());
+//		install(VrpTravelTimeModules.createFreeSpeedTravelTimeForBenchmarkingModule());
 	}
 }

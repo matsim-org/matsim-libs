@@ -30,24 +30,31 @@ import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 
-import com.google.inject.*;
+import com.google.inject.Provider;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 /**
  * @author michalm
  */
-public class TaxiModule extends DvrpModule {
+public class TaxiModule extends AbstractModule {
 	public static final String TAXI_MODE = "taxi";
+	
+	private DvrpModule dvrpModule ;
 
 	public TaxiModule() {
 		this(DefaultTaxiOptimizerProvider.class);
 	}
 
 	public TaxiModule(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		super(createModuleForQSimPlugin(providerClass), TaxiOptimizer.class);
+//		super(createModuleForQSimPlugin(providerClass), TaxiOptimizer.class);
+		dvrpModule = new DvrpModule(createModuleForQSimPlugin(providerClass), TaxiOptimizer.class);
 	}
 
+	@SuppressWarnings("static-method")
 	@Provides
 	@Singleton
 	private Fleet provideVehicles(@Named(DvrpModule.DVRP_ROUTING) Network network, Config config,
@@ -68,5 +75,10 @@ public class TaxiModule extends DvrpModule {
 				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
 			}
 		};
+	}
+
+	@Override
+	public void install() {
+		install( dvrpModule ) ;
 	}
 }
