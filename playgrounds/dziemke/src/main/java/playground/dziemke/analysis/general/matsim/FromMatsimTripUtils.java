@@ -38,7 +38,8 @@ public class FromMatsimTripUtils {
 
     static double getDistanceRoutedByCalculation_m(FromMatsimTrip trip, Network network, Collection<String> networkModes) {
         double tripDistance_m = 0.;
-        if (trip.getLinks().isEmpty() && networkModes.contains(trip.getLegMode())) {
+        if (trip.getLinks().isEmpty() && networkModes.contains(trip.getLegMode())
+                && !trip.getDepartureLinkId().equals(trip.getArrivalLinkId())) {
             log.warn("List of links is empty. LegMode " + trip.getLegMode() + " is listed as NetworkMode.");
         }
         for (int i = 0; i < trip.getLinks().size(); i++) {
