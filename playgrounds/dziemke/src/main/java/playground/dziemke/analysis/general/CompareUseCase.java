@@ -20,34 +20,35 @@ public class CompareUseCase {
     public static final Logger log = Logger.getLogger(CompareUseCase.class);
 
     //FromMatsim Parameters
-        private static final String RUN_ID = "be_117l"; // <----------
-        private static final String ITERATION_FOR_ANALYSIS = "0";
-        private static final String CEMDAP_PERSONS_INPUT_FILE_ID = "21"; // Check if this number corresponds correctly to the RUN_ID
+    private static final String RUN_ID = "be_117l"; // <----------
+    private static final String ITERATION_FOR_ANALYSIS = "0";
+    private static final String CEMDAP_PERSONS_INPUT_FILE_ID = "21"; // Check if this number corresponds correctly to the RUN_ID
 
-        // Input and output
+    // Input and output
 //        private static final String NETWORK_FILE = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/network_counts/network.xml.gz"; // <----------
-        private static final String NETWORK_FILE = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/network_counts/network_shortIds.xml.gz"; // <----------
-        private static final String EVENTS_FILE = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/" + RUN_ID + ".output_events.xml.gz";
+    private static final String NETWORK_FILE = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/network_counts/network_shortIds.xml.gz"; // <----------
+    private static final String CONFIG_FILE = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/" + RUN_ID + ".output_config.xml.gz";
+    private static final String EVENTS_FILE = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/" + RUN_ID + ".output_events.xml.gz";
 //        private static final String EVENTS_FILE = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/ITERS/it." + ITERATION_FOR_ANALYSIS + "/" + RUN_ID + "." + ITERATION_FOR_ANALYSIS + ".events.xml.gz";
-        private static final String cemdapPersonsInputFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" + CEMDAP_PERSONS_INPUT_FILE_ID + "/persons1.dat"; // TODO
-        private static final String AREA_SHAPE_FILE = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/shapefiles/2013/Berlin_DHDN_GK4.shp";
-        //    private static String outputDirectory = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/analysis";
-        // private static String fromMatsimOutputDirectory = "/Users/dominik/test-analysis";
-        private static String fromMatsimOutputDirectory = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/analysis_run";
+    private static final String cemdapPersonsInputFile = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_berlin/" + CEMDAP_PERSONS_INPUT_FILE_ID + "/persons1.dat"; // TODO
+    private static final String AREA_SHAPE_FILE = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/shapefiles/2013/Berlin_DHDN_GK4.shp";
+    //    private static String outputDirectory = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/analysis";
+    // private static String fromMatsimOutputDirectory = "/Users/dominik/test-analysis";
+    private static String fromMatsimOutputDirectory = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/analysis_run";
 
-    //FromSrv Parameters
-        private static final String SRV_BASE_DIR = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/analysis/srv/input/";
-        private static final String SRV_PERSON_FILE_PATH = SRV_BASE_DIR + "P2008_Berlin2.dat";
-        private static final String SRV_TRIP_FILE_PATH = SRV_BASE_DIR + "W2008_Berlin_Weekday.dat";
-        private static final String OUTPUT_POPULATION_FILE_PATH = SRV_BASE_DIR + "testOutputPopulation.xml";
+//FromSrv Parameters
+    private static final String SRV_BASE_DIR = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/analysis/srv/input/";
+    private static final String SRV_PERSON_FILE_PATH = SRV_BASE_DIR + "P2008_Berlin2.dat";
+    private static final String SRV_TRIP_FILE_PATH = SRV_BASE_DIR + "W2008_Berlin_Weekday.dat";
+    private static final String OUTPUT_POPULATION_FILE_PATH = SRV_BASE_DIR + "testOutputPopulation.xml";
 //        private static String fromSrvOutputDirectory = "/Users/dominik/test-analysis";
 //        private static String fromSrvOutputDirectory = "../../../runs-svn/berlin_scenario_2016/" + RUN_ID + "/analysis_srv";
-        private static String fromSrvOutputDirectory = "";
+    private static String fromSrvOutputDirectory = "";
 
 
     public static void main(String[] args) {
 
-        Events2TripsParser events2TripsParser = new Events2TripsParser(EVENTS_FILE, NETWORK_FILE);
+        Events2TripsParser events2TripsParser = new Events2TripsParser(CONFIG_FILE, EVENTS_FILE, NETWORK_FILE);
         List<FromMatsimTrip> fromMatsimTrips = events2TripsParser.getTrips();
 
         //TODO highlight tripfilter?
