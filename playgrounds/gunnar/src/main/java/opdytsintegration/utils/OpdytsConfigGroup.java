@@ -35,8 +35,8 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "opdyts";
 
-	private static final String VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE = "variationSizeOfRamdomizeDecisionVariable";
-	private double variationSizeOfRamdomizeDecisionVariable = 0.1;
+	private static final String VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE = "variationSizeOfRandomizeDecisionVariable";
+	private double variationSizeOfRandomizeDecisionVariable = 0.1;
 
 	private static final String RANDOM_SEED_TO_RANDOMIZE_DECISION_VARIABLE = "randomSeedToRandomizeDecisionVariable";
 	private int randomSeedToRandomizeDecisionVariable = 4711;
@@ -95,13 +95,13 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 
 
 	@StringGetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
-	public double getVariationSizeOfRamdomizeDecisionVariable() {
-		return variationSizeOfRamdomizeDecisionVariable;
+	public double getVariationSizeOfRandomizeDecisionVariable() {
+		return variationSizeOfRandomizeDecisionVariable;
 	}
 
 	@StringSetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
-	public void setVariationSizeOfRamdomizeDecisionVariable(double variationSizeOfRamdomizeDecisionVariable) {
-		this.variationSizeOfRamdomizeDecisionVariable = variationSizeOfRamdomizeDecisionVariable;
+	public void setVariationSizeOfRandomizeDecisionVariable(double variationSizeOfRandomizeDecisionVariable) {
+		this.variationSizeOfRandomizeDecisionVariable = variationSizeOfRandomizeDecisionVariable;
 	}
 
 	@StringGetter(RANDOM_SEED_TO_RANDOMIZE_DECISION_VARIABLE)

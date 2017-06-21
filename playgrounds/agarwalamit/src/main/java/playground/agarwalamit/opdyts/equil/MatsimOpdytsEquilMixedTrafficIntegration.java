@@ -79,7 +79,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		String OUT_DIR ;
 
 		if (args.length > 0) {
-			opdytsConfigGroup.setVariationSizeOfRamdomizeDecisionVariable(Double.valueOf(args[0]));
+			opdytsConfigGroup.setVariationSizeOfRandomizeDecisionVariable(Double.valueOf(args[0]));
 			opdytsConfigGroup.setNumberOfIterationsForConvergence(Integer.valueOf(args[1]));
 			opdytsConfigGroup.setNumberOfIterationsForAveraging(Integer.valueOf(args[4]));
 			opdytsConfigGroup.setSelfTuningWeight(Double.valueOf(args[5]));
@@ -87,11 +87,11 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			opdytsConfigGroup.setPopulationSize(Integer.valueOf(args[9]));
 
 			EQUIL_DIR = args[2];
-			OUT_DIR = args[3]+"/equil_car,bicycle_holes_variance"+ opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable() +"_"+opdytsConfigGroup.getNumberOfIterationsForConvergence()+"its/";
+			OUT_DIR = args[3]+"/equil_car,bicycle_holes_variance"+ opdytsConfigGroup.getVariationSizeOfRandomizeDecisionVariable() +"_"+opdytsConfigGroup.getNumberOfIterationsForConvergence()+"its/";
 			isPlansRelaxed = Boolean.valueOf(args[6]);
 			startingASCforBicycle = Double.valueOf(args[8]);
 		} else {
-			OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+ opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable() +"_"+opdytsConfigGroup.getNumberOfIterationsForConvergence()+"its/";
+			OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+ opdytsConfigGroup.getVariationSizeOfRandomizeDecisionVariable() +"_"+opdytsConfigGroup.getNumberOfIterationsForConvergence()+"its/";
 		}
 
 		List<String> modes2consider = Arrays.asList("car","bicycle");
