@@ -34,7 +34,7 @@ import org.matsim.testcases.MatsimTestCase;
 /**
  * @author dgrether
  */
-public class LinkSensorManagerTest extends MatsimTestCase implements IterationStartsListener, IterationEndsListener {
+public class LinkSensorManagerIT extends MatsimTestCase implements IterationStartsListener, IterationEndsListener {
 
 	private LinkSensorManager manager = null;
 	private Config config = null;

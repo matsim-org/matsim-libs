@@ -38,7 +38,7 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  */
 
-public class NoiseConfigGroupTest {
+public class NoiseConfigGroupIT {
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();

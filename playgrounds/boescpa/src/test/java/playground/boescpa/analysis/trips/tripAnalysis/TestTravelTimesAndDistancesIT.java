@@ -42,7 +42,7 @@ import java.util.List;
  * @author pboesch
  *
  */
-public class TestTravelTimesAndDistances {
+public class TestTravelTimesAndDistancesIT {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	

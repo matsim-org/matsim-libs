@@ -44,7 +44,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author thibautd
  */
-public class FixedGroupsTest {
+public class FixedGroupsIT {
 	@Rule
 	public final MatsimTestUtils utils = new MatsimTestUtils();
 

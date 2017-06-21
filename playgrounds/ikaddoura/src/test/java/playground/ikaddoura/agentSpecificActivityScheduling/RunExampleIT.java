@@ -34,7 +34,7 @@ import org.matsim.testcases.MatsimTestUtils;
 * @author ikaddoura
 */
 
-public class RunExampleTest {
+public class RunExampleIT {
 
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();

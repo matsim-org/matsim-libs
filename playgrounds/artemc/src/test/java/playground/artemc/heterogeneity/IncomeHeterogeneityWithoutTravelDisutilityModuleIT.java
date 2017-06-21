@@ -17,7 +17,7 @@ import java.net.URL;
 /**
  * Created by artemc on 25/4/15.
  */
-public class IncomeHeterogeneityWithoutTravelDisutilityModuleTest {
+public class IncomeHeterogeneityWithoutTravelDisutilityModuleIT {
 
 	final int nIterations = 1;
 
