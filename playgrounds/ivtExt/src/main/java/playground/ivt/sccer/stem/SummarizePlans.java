@@ -27,10 +27,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.controler.NewControlerModule;
-import org.matsim.core.controler.PrepareForSim;
-import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.io.StreamingPopulationReader;
@@ -38,14 +34,12 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.core.utils.misc.Counter;
-import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
+import org.matsim.core.utils.misc.Time;
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.LambdaCounter;
 
@@ -66,16 +60,21 @@ public class SummarizePlans {
 		final ArgParser parser = new ArgParser();
 		parser.setDefaultValue( "--config" , "-c" , null );
 		parser.setDefaultValue( "--plans" , "-p" , null );
+		parser.setDefaultValue( "--network" , "-n" , null );
 		parser.setDefaultValue( "--output" , "-o" , "plans_summary.dat" );
 		final ArgParser.Args parsed = parser.parseArgs( args );
 
 		final String inConfig = parsed.getValue( "--config" );
 		final String inPlans = parsed.getValue( "--plans" );
+		final String inNetwork = parsed.getValue( "--network" );
 		final String outDat = parsed.getValue( "--output" );
 
-		final Config config = ConfigUtils.createConfig();
-		if ( inConfig != null ) ConfigUtils.loadConfig( config , inConfig );
+		final Config config =
+				inConfig == null ?
+						ConfigUtils.createConfig() :
+						ConfigUtils.loadConfig( inConfig );
 		if ( inPlans != null ) config.plans().setInputFile( inPlans );
+		if ( inNetwork != null ) config.network().setInputFile( inNetwork );
 
 		run( config , outDat );
 	}
@@ -114,6 +113,7 @@ public class SummarizePlans {
 				//counter.incCounter();
 				prepare.run( person );
 				final Plan plan = person.getSelectedPlan();
+				setStartTimes( plan );
 				final double traveledDistance = getCarTraveledDistance( plan );
 				final double longestCarStop = getLongestCarStop( plan );
 
@@ -134,13 +134,31 @@ public class SummarizePlans {
 		}
 	}
 
+	private static void setStartTimes( final Plan plan ) {
+		double now = 0;
+
+		for ( PlanElement pe : plan.getPlanElements() ) {
+			if ( pe instanceof Activity ) {
+				final Activity act = (Activity) pe;
+				act.setStartTime( now );
+				if ( act.getEndTime() != Time.UNDEFINED_TIME ) now = act.getEndTime();
+				else now += act.getMaximumDuration();
+			}
+			else {
+				final Leg leg = (Leg) pe;
+				now += leg.getTravelTime();
+			}
+		}
+	}
+
 	private static double getLongestCarStop( final Plan plan ) {
 		boolean wasCar = false;
 		double maxStop = 0;
 
 		for ( PlanElement pe : plan.getPlanElements() ) {
-			if ( wasCar && ((Activity) pe).getType().equals( "work" ) ) {
-				maxStop = Math.max( maxStop , ((Activity) pe).getEndTime() - ((Activity) pe).getStartTime() );
+			if ( wasCar && ((Activity) pe).getType().startsWith( "work" ) ) {
+				final double duration = ((Activity) pe).getEndTime() - ((Activity) pe).getStartTime();
+				maxStop = Math.max( maxStop , duration );
 			}
 			wasCar = pe instanceof Leg && ((Leg) pe).getMode().equals( "car" );
 		}
