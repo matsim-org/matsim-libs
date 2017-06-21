@@ -29,7 +29,7 @@ import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 /**
  * @author michalm
  */
-public class TaxiRequest extends RequestImpl implements PassengerRequest {
+public class TaxiRequest /*extends RequestImpl*/ implements PassengerRequest {
 	public enum TaxiRequestStatus {
 		// INACTIVE, // invisible to the dispatcher (ARTIFICIAL STATE!)
 		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
@@ -50,6 +50,8 @@ public class TaxiRequest extends RequestImpl implements PassengerRequest {
 
 	private TaxiPickupTask pickupTask;
 	private TaxiDropoffTask dropoffTask;
+	
+	private RequestImpl delegate ;
 
 	public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, double startTime,
 			double submissionTime) {
@@ -58,7 +60,8 @@ public class TaxiRequest extends RequestImpl implements PassengerRequest {
 
 	public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink, double startTime,
 			double submissionTime) {
-		super(id, 1, startTime, startTime, submissionTime);
+//		super(id, 1, startTime, startTime, submissionTime);
+		delegate = new RequestImpl( id, 1, startTime, startTime, submissionTime ) ;
 		this.passenger = passenger;
 		this.fromLink = fromLink;
 		this.toLink = toLink;
@@ -126,5 +129,86 @@ public class TaxiRequest extends RequestImpl implements PassengerRequest {
 		}
 
 		throw new IllegalStateException("Unreachable code");
+	}
+
+	/**
+	 * @return
+	 * @see java.lang.Object#hashCode()
+	 */
+	public int hashCode() {
+		return delegate.hashCode();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getId()
+	 */
+	public Id<Request> getId() {
+		return delegate.getId();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getQuantity()
+	 */
+	public double getQuantity() {
+		return delegate.getQuantity();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getEarliestStartTime()
+	 */
+	public double getEarliestStartTime() {
+		return delegate.getEarliestStartTime();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getLatestStartTime()
+	 */
+	public double getLatestStartTime() {
+		return delegate.getLatestStartTime();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getSubmissionTime()
+	 */
+	public double getSubmissionTime() {
+		return delegate.getSubmissionTime();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#isRejected()
+	 */
+	public boolean isRejected() {
+		return delegate.isRejected();
+	}
+
+	/**
+	 * @param rejected
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#setRejected(boolean)
+	 */
+	public void setRejected(boolean rejected) {
+		delegate.setRejected(rejected);
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#toString()
+	 */
+	public String toString() {
+		return delegate.toString();
+	}
+
+	/**
+	 * @param obj
+	 * @return
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object obj) {
+		return delegate.equals(obj);
 	}
 }

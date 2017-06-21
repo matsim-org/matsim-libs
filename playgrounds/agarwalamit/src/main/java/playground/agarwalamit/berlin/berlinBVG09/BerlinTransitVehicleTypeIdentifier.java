@@ -60,7 +60,7 @@ public class BerlinTransitVehicleTypeIdentifier {
             }
         }
 
-        LOGGER.warn("noHBEFA vehicle category is identified, using "+ HbefaVehicleCategory.PASSENGER_CAR);
+        LOGGER.warn("no HBEFA vehicle category is identified, using "+ HbefaVehicleCategory.PASSENGER_CAR);
         return HbefaVehicleCategory.PASSENGER_CAR;
     }
 

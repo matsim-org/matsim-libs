@@ -16,9 +16,12 @@ import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
 import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.vehicles.Vehicle;
 
+import floetteroed.utilities.math.Vector;
 import opdytsintegration.MATSimCountingStateAnalyzer;
+import opdytsintegration.SimulationStateAnalyzerProvider;
 import opdytsintegration.utils.TimeDiscretization;
 
 /**
@@ -60,19 +63,26 @@ public class DifferentiatedLinkOccupancyAnalyzer implements LinkLeaveEventHandle
 		return ((this.relevantLinks == null) || this.relevantLinks.contains(link));
 	}
 
-	// TODO: Encapsulate and provide access to the full real-valued state vector per mode.
+	// TODO: Encapsulate and provide access to the full real-valued state vector
+	// per mode.
 	public MATSimCountingStateAnalyzer<Link> getNetworkModeAnalyzer(final String mode) {
 		return this.mode2stateAnalyzer.get(mode);
 	}
-	
+
 	// ---------- IMPLEMENTATION OF *EventHandler INTERFACES ----------
+
+	// This replaces EventHandler.reset(int), which appears to be called before
+	// the "before mobsim" hook.
+	public void beforeIteration() {
+		for (MATSimCountingStateAnalyzer<?> stateAnalyzer : this.mode2stateAnalyzer.values()) {
+			stateAnalyzer.beforeIteration();
+		}
+		this.vehicleId2stateAnalyzer = new LinkedHashMap<>();
+	}
 
 	@Override
 	public void reset(final int iteration) {
-		for (MATSimCountingStateAnalyzer<?> stateAnalyzer : this.mode2stateAnalyzer.values()) {
-			stateAnalyzer.reset(iteration);
-		}
-		this.vehicleId2stateAnalyzer = new LinkedHashMap<>();
+		// see the explanation of beforeIteration()
 	}
 
 	@Override
@@ -128,4 +138,65 @@ public class DifferentiatedLinkOccupancyAnalyzer implements LinkLeaveEventHandle
 			this.vehicleId2stateAnalyzer.remove(event.getVehicleId());
 		}
 	}
+
+	// -------------------- INNER PROVIDER CLASS --------------------
+
+	public static class Provider implements SimulationStateAnalyzerProvider {
+
+		// -------------------- MEMBERS --------------------
+
+		private final TimeDiscretization timeDiscretization;
+
+		private final Set<String> relevantModes;
+
+		private final Set<Id<Link>> relevantLinks;
+
+		private DifferentiatedLinkOccupancyAnalyzer linkOccupancyAnalyzer = null;
+
+		// -------------------- CONSTRUCTION --------------------
+
+		public Provider(final TimeDiscretization timeDiscretization, final Set<String> relevantModes,
+				final Set<Id<Link>> relevantLinks) {
+			this.timeDiscretization = timeDiscretization;
+			this.relevantModes = relevantModes;
+			this.relevantLinks = relevantLinks;
+		}
+
+		// ----- IMPLEMENTATION OF SimulationStateAnalyzerProvider -----
+
+		@Override
+		public String getStringIdentifier() {
+			return "network modes";
+		}
+
+		@Override
+		public EventHandler newEventHandler() {
+			this.linkOccupancyAnalyzer = new DifferentiatedLinkOccupancyAnalyzer(this.timeDiscretization,
+					this.relevantModes, this.relevantLinks);
+			return this.linkOccupancyAnalyzer;
+		}
+
+		@Override
+		public Vector newStateVectorRepresentation() {
+			final Vector result = new Vector(this.linkOccupancyAnalyzer.mode2stateAnalyzer.size()
+					* this.relevantLinks.size() * this.timeDiscretization.getBinCnt());
+			int i = 0;
+			for (String mode : this.linkOccupancyAnalyzer.mode2stateAnalyzer.keySet()) {
+				final MATSimCountingStateAnalyzer<Link> analyzer = this.linkOccupancyAnalyzer.mode2stateAnalyzer
+						.get(mode);
+				for (Id<Link> linkId : this.relevantLinks) {
+					for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
+						result.set(i++, analyzer.getCount(linkId, bin));
+					}
+				}
+			}
+			return result;
+		}
+
+		@Override
+		public void beforeIteration() {
+			this.linkOccupancyAnalyzer.beforeIteration();
+		}
+	}
+
 }

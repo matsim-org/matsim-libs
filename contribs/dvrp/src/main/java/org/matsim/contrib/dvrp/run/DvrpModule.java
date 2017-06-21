@@ -39,7 +39,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 
-public class DvrpModule extends AbstractModule {
+public final class DvrpModule extends AbstractModule {
 	public static final String DVRP_ROUTING = "dvrp_routing";// TODO ==> dvrp_optimizer???
 
 	@Inject

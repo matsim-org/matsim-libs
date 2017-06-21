@@ -8,18 +8,17 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
-import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
-import floetteroed.opdyts.searchalgorithms.Simulator;
-import opdytsintegration.MATSimSimulator;
 import opdytsintegration.MATSimSimulator2;
+import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzer;
+import opdytsintegration.utils.MATSimConfiguredFactories;
+import opdytsintegration.utils.OpdytsConfigGroup;
 import opdytsintegration.utils.TimeDiscretization;
 
 /**
@@ -48,7 +47,24 @@ public class RunNetworkParameters {
 		config.controler()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		final String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
+		// final String outputDirectory =
+		// scenario.getConfig().controler().getOutputDirectory();
+
+		// >>>>>>>>>> SHOULD COME FROM FILE >>>>>>>>>>
+
+		final OpdytsConfigGroup opdytsConfig = new OpdytsConfigGroup();
+		opdytsConfig.setNumberOfIterationsForConvergence(10);
+		opdytsConfig.setNumberOfIterationsForAveraging(5);
+		opdytsConfig.setPopulationSize(4);
+		opdytsConfig.setBinCount(24);
+		opdytsConfig.setBinSize(3600);
+		opdytsConfig.setStartTime(0);
+		opdytsConfig.setMaxIteration(3);
+		config.addModule(opdytsConfig);
+
+		// <<<<<<<<<< SHOULD COME FROM FILE <<<<<<<<<<
+
+		MATSimConfiguredFactories<NetworkParameters> factories = new MATSimConfiguredFactories<>(config);
 
 		/*
 		 * Define convergence criterion.
@@ -71,10 +87,12 @@ public class RunNetworkParameters {
 		 * decision variable and its random variation.
 		 */
 
-		int maxIterations = 10;
-		int averageIterations = maxIterations / 2;
-		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(maxIterations,
-				averageIterations);
+		// int maxIterations = 10;
+		// int averageIterations = maxIterations / 2;
+		// final ConvergenceCriterion convergenceCriterion = new
+		// FixedIterationNumberConvergenceCriterion(maxIterations,
+		// averageIterations);
+		final ConvergenceCriterion convergenceCriterion = factories.newFixedIterationNumberConvergenceCriterion();
 
 		/*
 		 * Creation of MATSim state objects. A basic MATSim state class
@@ -102,9 +120,12 @@ public class RunNetworkParameters {
 		 * trial decision variables should be as large as memory allows.
 		 */
 
-		int numberOfTrialDecisionVariables = 4;
+		// int numberOfTrialDecisionVariables = 4;
+		// final DecisionVariableRandomizer<NetworkParameters> randomizer = new
+		// NetworkParametersRandomizer(
+		// numberOfTrialDecisionVariables);
 		final DecisionVariableRandomizer<NetworkParameters> randomizer = new NetworkParametersRandomizer(
-				numberOfTrialDecisionVariables);
+				opdytsConfig.getPopulationSize());
 
 		/*
 		 * The optimization extracts simulation information on a fixed time
@@ -114,26 +135,30 @@ public class RunNetworkParameters {
 		 * resources.
 		 */
 
-		final int timeBinSize_s = 3600;
-		final int timeBinCnt = 24;
-		final TimeDiscretization timeDiscretization = new TimeDiscretization(0, timeBinSize_s, timeBinCnt);
+		// final int timeBinSize_s = 3600;
+		// final int timeBinCnt = 24;
+		// final TimeDiscretization timeDiscretization = new
+		// TimeDiscretization(0, timeBinSize_s, timeBinCnt);
+		final TimeDiscretization timeDiscretization = factories.newTimeDiscretization();
 
 		/*
 		 * Packages MATSim for use with Opdyts.
 		 */
 
-		final Simulator<NetworkParameters> matsim;
-		final boolean differentiateNetworkModes = true;
-		if (differentiateNetworkModes) {
-			final Set<String> modes = new LinkedHashSet<>();
-			modes.add("car");
-			matsim = new MATSimSimulator2<NetworkParameters>(stateFactory, scenario,
-					timeDiscretization, modes);
-		} else {
-			matsim = new MATSimSimulator<NetworkParameters>(stateFactory, scenario,
-					timeDiscretization);	
-		}
-		
+		// final Simulator<NetworkParameters> matsim;
+		// final boolean differentiateNetworkModes = true;
+		// if (differentiateNetworkModes) {
+		final MATSimSimulator2<NetworkParameters> matsim = new MATSimSimulator2<NetworkParameters>(stateFactory,
+				scenario, timeDiscretization);
+		final Set<String> modes = new LinkedHashSet<>();
+		modes.add("car");
+		matsim.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzer.Provider(timeDiscretization, modes,
+				new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet())));
+		// } else {
+		// matsim = new MATSimSimulator<NetworkParameters>(stateFactory,
+		// scenario, timeDiscretization);
+		// }
+
 		/*
 		 * Further parameters needed to run the optimization.
 		 * 
@@ -143,7 +168,7 @@ public class RunNetworkParameters {
 		 */
 
 		final NetworkParameters initialDecisionVariable = new NetworkParameters(scenario.getNetwork());
-		int maxSearchIterations = 3;
+		// int maxSearchIterations = 3;
 
 		/*
 		 * Create the search algorithm.
@@ -151,13 +176,20 @@ public class RunNetworkParameters {
 		 * The max. total memory should be reduced only if memory issues arise.
 		 */
 
-		final RandomSearch<NetworkParameters> randomSearch = new RandomSearch<>(matsim, randomizer,
-				initialDecisionVariable, convergenceCriterion, maxSearchIterations, Integer.MAX_VALUE,
-				numberOfTrialDecisionVariables, MatsimRandom.getRandom(), true, objectiveFunction, false);
-		randomSearch.setLogPath(outputDirectory);
-		randomSearch.setMaxTotalMemory(Integer.MAX_VALUE);
-		final SelfTuner selfTuner = new SelfTuner(0.95);
-		selfTuner.setNoisySystem(true);
+		// final RandomSearch<NetworkParameters> randomSearch = new
+		// RandomSearch<>(matsim, randomizer,
+		// initialDecisionVariable, convergenceCriterion, maxSearchIterations,
+		// Integer.MAX_VALUE,
+		// numberOfTrialDecisionVariables, MatsimRandom.getRandom(), true,
+		// objectiveFunction, false);
+		// randomSearch.setLogPath(outputDirectory);
+		// randomSearch.setMaxTotalMemory(Integer.MAX_VALUE);
+		final RandomSearch<NetworkParameters> randomSearch = factories.newRandomSearch(matsim, randomizer,
+				initialDecisionVariable, convergenceCriterion, objectiveFunction);
+
+		// final SelfTuner selfTuner = new SelfTuner(0.95);
+		// selfTuner.setNoisySystem(true);
+		final SelfTuner selfTuner = factories.newSelfTuner();
 
 		/*
 		 * Finally, run it.

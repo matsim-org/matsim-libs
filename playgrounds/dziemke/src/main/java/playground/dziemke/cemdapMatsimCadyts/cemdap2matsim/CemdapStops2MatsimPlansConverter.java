@@ -59,20 +59,16 @@ public class CemdapStops2MatsimPlansConverter {
 	private String cemdapActivityFilename = "Activity.out";
 	
 	public static void main(String[] args) {
-		int numberOfFirstCemdapOutputFile = 100;
-//		int numberOfFirstCemdapOutputFile = 90;
+		int numberOfFirstCemdapOutputFile = 200;
 
-		int numberOfPlans = 5;
+		int numberOfPlans = 1;
 		boolean allowVariousWorkAndEducationLocations = true;
 		boolean addStayHomePlan = true;
 
-		int numberOfPlansFile = 100;
-//		int numberOfPlansFile = 35;
-
-//		String outputDirectory = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap2matsim/" + numberOfPlansFile + "/";
+		int numberOfPlansFile = 200;
+		
 		String outputDirectory = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/matsim_initial/" + numberOfPlansFile + "/";
 		String zonalShapeFile = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/shapefiles/2013/gemeindenLOR_DHDN_GK4.shp";
-//		String cemdapDataRoot = "../../../shared-svn/projects/cemdapMatsimCadyts/scenario/cemdap_output/";
 		String cemdapDataRoot = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/cemdap_output/";
 
 		if (args.length != 0) {

@@ -19,7 +19,10 @@
 
 package playground.agarwalamit.opdyts;
 
+import java.util.Arrays;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.analysis.kai.Databins;
@@ -33,6 +36,7 @@ import org.matsim.contrib.analysis.kai.Databins;
 public class ObjectiveFunctionEvaluator {
 
     private static final Logger LOG = Logger.getLogger(ObjectiveFunctionEvaluator.class);
+    private final SortedMap<String, Double> mode2share = new TreeMap<>();
 
     public enum ObjectiveFunctionType {
         SUM_ABS_DIFF, SUM_SQR_DIFF_NORMALIZED
@@ -67,10 +71,10 @@ public class ObjectiveFunctionEvaluator {
         double realValueSum = 0;
         for ( Map.Entry<String, double[]> theEntry : realCounts.entrySet() ) {
             String mode = theEntry.getKey() ;
-//            LOG.warn("mode=" + mode);
-
             double[] realValue = theEntry.getValue() ;
             double[] simValue = simCounts.get(mode);
+
+            mode2share.put(mode, Arrays.stream(simValue).sum());
 
             for ( int ii=0 ; ii < realValue.length ; ii++ ) {
                 double diff ;
@@ -96,7 +100,6 @@ public class ObjectiveFunctionEvaluator {
                 }
             }
         }
-
         switch (this.objectiveFunctionType) {
             case SUM_ABS_DIFF:
                 LOG.error("This should be used with great caution, with Patna, it was not a good experience. See email from GF on 24.11.2016");
@@ -110,5 +113,10 @@ public class ObjectiveFunctionEvaluator {
 
         LOG.warn( "objective=" + objective );
         return objective;
+    }
+
+    public Map<String,Double> getModeToShare(){
+        double sumShare = mode2share.values().stream().mapToDouble(Number::doubleValue).sum();
+        return mode2share.entrySet().stream().collect(Collectors.toMap(entry-> entry.getKey(), entry -> entry.getValue() / sumShare ));
     }
 }

@@ -11,7 +11,7 @@
 	</module>
 	
 	<module name="roadpricing">
-   		<param name="tollLinksFile" value="test/input/org/matsim/roadpricing/AvoidTolledRouteTest/tollLinksFile_0.xml" />
+   		<param name="tollLinksFile" value="tollLinksFile_0.xml" />
 	</module>
 
 	<module name="controler">

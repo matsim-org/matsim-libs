@@ -212,32 +212,7 @@ public class DownstreamSignalTest {
 		signalConfigGroup.setUseSignalSystems(true);
 		
 		config.qsim().setUsingFastCapacityUpdate(false);
-
-		// // set brain exp beta
-		// config.planCalcScore().setBrainExpBeta( 2 );
-
-		// // set travelTimeBinSize (only has effect if reRoute is used)
-		// config.travelTimeCalculator().setTraveltimeBinSize( 10 );
-
-		// config.travelTimeCalculator().setTravelTimeCalculatorType(TravelTimeCalculatorType.TravelTimeCalculatorHashMap.toString());
-		// // hash map and array produce same results. only difference: memory and time.
-		// // for small time bins and sparse values hash map is better. theresa, may'15
-
-		// define strategies:
-		// {
-		// StrategySettings strat = new StrategySettings();
-		// strat.setStrategyName(DefaultStrategy.ReRoute.toString());
-		// strat.setWeight(0.1);
-		// strat.setDisableAfter(config.controler().getLastIteration() - 50);
-		// config.strategy().addStrategySettings(strat);
-		// }
-		// {
-		// StrategySettings strat = new StrategySettings();
-		// strat.setStrategyName(DefaultSelector.ChangeExpBeta.toString());
-		// strat.setWeight(0.9);
-		// strat.setDisableAfter(config.controler().getLastIteration());
-		// config.strategy().addStrategySettings(strat);
-		// }
+		
 		{
 			StrategySettings strat = new StrategySettings();
 			strat.setStrategyName(DefaultSelector.KeepLastSelected.toString());
@@ -253,16 +228,13 @@ public class DownstreamSignalTest {
 		config.qsim().setRemoveStuckVehicles(false);
 
 		config.qsim().setStartTime(0);
-		config.qsim().setEndTime(6 * 3600);
+		config.qsim().setEndTime(3 * 3600);
 
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 
-		config.vspExperimental().setWritingOutputEvents(true);
+		config.vspExperimental().setWritingOutputEvents(false);
 		config.planCalcScore().setWriteExperiencedPlans(false);
 		config.controler().setCreateGraphs(false);
-
-		config.controler().setWriteEventsInterval(1);
-		config.controler().setWritePlansInterval(config.controler().getLastIteration());
 
 		// define activity types
 		{
@@ -355,7 +327,7 @@ public class DownstreamSignalTest {
 	private void createSingleStreamPopulation(Population pop, Id<Link> fromLinkId, Id<Link> toLinkId) {
 		PopulationFactory fac = pop.getFactory();
 
-		for (int i = 0; i < 3600; i++) {
+		for (int i = 0; i < 1800; i++) {
 			// create a person
 			Person person = fac.createPerson(Id.createPersonId(fromLinkId + "-" + toLinkId + "-" + i));
 			pop.addPerson(person);

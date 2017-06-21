@@ -53,7 +53,9 @@ import playground.southafrica.utilities.grid.KernelDensityEstimator;
 import playground.southafrica.utilities.grid.KernelDensityEstimator.KdeType;
 
 /**
- * Class to convert a GeoTiff image to a trip density map.
+ * Class to convert a GeoTiff image to a trip density map. This class assumes 
+ * that only a shapefile is available. If you want to use a more standard grid
+ * that is comparable to other World Bank analyses, consider the class ...
  *   
  * @author jwjoubert
  */

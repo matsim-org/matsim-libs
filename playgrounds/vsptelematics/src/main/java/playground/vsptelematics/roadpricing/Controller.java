@@ -48,31 +48,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
 /**
  * @author dgrether
  *
  */
 public class Controller {
-
-	
 	private static final Logger log = Logger.getLogger(Controller.class);
 	
-
 	public Controller(String[] args){
 		Config config = ConfigUtils.loadConfig( args[0]) ;
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		Controler c = new Controler(scenario);
-		TelematicsConfigGroup telematicsConfigGroup = ConfigUtils.addOrGetModule(config,
-				TelematicsConfigGroup.GROUPNAME, TelematicsConfigGroup.class);
-		c.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+		TelematicsConfigGroup telematicsConfigGroup = ConfigUtils.addOrGetModule(config, TelematicsConfigGroup.GROUPNAME, TelematicsConfigGroup.class);
+		c.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		c.getConfig().controler().setCreateGraphs(false);
         addListener(c);
 		c.run();
 	}
+	
 	
 	private void addListener(Controler c) {
         c.setModules(new ControlerDefaultsWithRoadPricingModule());
@@ -87,7 +80,7 @@ public class Controller {
 			  }
 		});
 	}
-
+	
 	
 	private static class TollBehaviour implements BeforeMobsimListener {
 		private double prediction1;
@@ -131,7 +124,7 @@ public class Controller {
 			Population pop = con.getScenario().getPopulation();
 			for (Person person : pop.getPersons().values()){
 				double vot = this.getVoT(person);
-				double score1 = (- vot * prediction1/3600.0) - tollRoute1;
+				double score1 = (-vot * prediction1/3600.0) - tollRoute1;
 				double score2 = (-vot * prediction2/3600.0) - tollRoute2;
 //				log.error("score 1: " + score1 + " score2: " + score2);
 				double exp1 = Math.exp(2.0*score1);
@@ -159,9 +152,8 @@ public class Controller {
 		}
 	};
 	
+	
 	public static void main(String[] args) {
 		new Controller(args);
 	}
-
-	
 }

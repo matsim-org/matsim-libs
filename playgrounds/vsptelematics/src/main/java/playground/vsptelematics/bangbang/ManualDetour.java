@@ -123,14 +123,14 @@ public class ManualDetour implements MobsimBeforeSimStepListener {
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent event) {
-		double now = event.getSimulationTime() ;
-		double duration = 60 ;
-		if (                                                              now < 8.*3600+10*60 ) return ;
-		if ( 8.*3600 + 10*60 + duration < now && now < 8.*3600+20*60 ) return ;
-		if ( 8.*3600 + 20*60 + duration < now && now < 8.*3600+30*60 ) return ;
-		if ( 8.*3600 + 30*60 + duration < now && now < 8.*3600+40*60 ) return ;
-		if ( 8.*3600 + 40*60 + duration < now && now < 8.*3600+50*60 ) return ;
-		if ( 8.*3600 + 50*60 + duration < now  ) return ;
+//		double now = event.getSimulationTime() ;
+//		double duration = 60 ;
+//		if (                                                              now < 8.*3600+10*60 ) return ;
+//		if ( 8.*3600 + 10*60 + duration < now && now < 8.*3600+20*60 ) return ;
+//		if ( 8.*3600 + 20*60 + duration < now && now < 8.*3600+30*60 ) return ;
+//		if ( 8.*3600 + 30*60 + duration < now && now < 8.*3600+40*60 ) return ;
+//		if ( 8.*3600 + 40*60 + duration < now && now < 8.*3600+50*60 ) return ;
+//		if ( 8.*3600 + 50*60 + duration < now  ) return ;
 
 		Collection<MobsimAgent> agentsToReplan = WithinDayReRouteMobsimListener.getAgentsToReplan( (Netsim) event.getQueueSimulation() ); 
 

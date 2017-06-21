@@ -27,6 +27,6 @@
         <param name="lastIteration" value="0" />
     </module>
     <module name="roadpricing">
-        <param name="tollLinksFile" value="test/input/org/matsim/roadpricing/ModuleTest/roadpricing.xml" />
+        <param name="tollLinksFile" value="roadpricing.xml" />
     </module>
 </config>

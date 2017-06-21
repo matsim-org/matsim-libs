@@ -46,7 +46,7 @@ public class DynamicLinkDemandAnalysisRun {
 			log.info("Output base directory: " + OUTPUT_BASE_DIR);
 			
 		} else {
-			OUTPUT_BASE_DIR = "/Users/ihab/Documents/workspace/runs-svn/vickrey-decongestion/output-FINAL/V9/";		
+			OUTPUT_BASE_DIR = "/Users/ihab/Documents/workspace/runs-svn/cne/munich/output-final/output_run4_muc_cne_DecongestionPID/";		
 		}
 
 		DynamicLinkDemandAnalysisRun analysis = new DynamicLinkDemandAnalysisRun(OUTPUT_BASE_DIR);
@@ -64,6 +64,7 @@ public class DynamicLinkDemandAnalysisRun {
 		config.transit().setTransitScheduleFile(null);
 		config.transit().setVehiclesFile(null);
 		config.plans().setInputFile(null);
+		config.plans().setInputPersonAttributeFile(null);
 		config.network().setChangeEventsInputFile(null);
 		config.vehicles().setVehiclesFile(null);
 		config.network().setInputFile(outputDirectory + "output_network.xml.gz");

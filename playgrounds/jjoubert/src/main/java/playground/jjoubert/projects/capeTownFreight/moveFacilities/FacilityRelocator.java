@@ -247,8 +247,10 @@ public class FacilityRelocator {
 	
 	/**
 	 * Returns the relocation activity. The coordinate is transformed into the
-	 * <code>WGS_SA_Albers</code> coordinate reference system, which is 
-	 * typically what we use in MATSim models in South Africa.
+	 * <code>Hartebeesthoek Lo19</code> coordinate reference system, which is 
+	 * typically what we use in MATSim models in South Africa. 
+	 * 
+	 * Updated (2017/6): changed to Hartebeesthoek_
 	 * 
 	 * @return
 	 */
@@ -269,8 +271,10 @@ public class FacilityRelocator {
 		public Coord getCoord(){
 			switch (this) {
 			case BELCON:
+//				return CoordUtils.createCoord(2073560.0, -4016772.0);
 				return CoordUtils.createCoord(2073560.0, -4016772.0);
 			case KRAAICON:
+//				return CoordUtils.createCoord(2085660.0, -4007210.0);
 				return CoordUtils.createCoord(2085660.0, -4007210.0);
 			default:
 				throw new RuntimeException("Dont know what to do with " + this.toString());

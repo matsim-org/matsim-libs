@@ -1,7 +1,6 @@
 package saleem.ptoptimisation;
 
-import opdytsintegration.MATSimSimulator;
-import opdytsintegration.utils.TimeDiscretization;
+import java.util.LinkedHashSet;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -16,17 +15,20 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 
-import saleem.ptoptimisation.optimisationintegration.PTMatsimStateFactoryImpl;
-import saleem.ptoptimisation.optimisationintegration.PTObjectiveFunction;
-import saleem.ptoptimisation.optimisationintegration.PTSchedule;
-import saleem.ptoptimisation.optimisationintegration.PTScheduleRandomiser;
-import saleem.stockholmmodel.modelbuilding.PTCapacityAdjusmentPerSample;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
+import opdytsintegration.MATSimSimulator2;
+import opdytsintegration.pt.PTOccupancyAnalyzer;
+import opdytsintegration.utils.TimeDiscretization;
+import saleem.ptoptimisation.optimisationintegration.PTMatsimStateFactoryImpl;
+import saleem.ptoptimisation.optimisationintegration.PTObjectiveFunction;
+import saleem.ptoptimisation.optimisationintegration.PTSchedule;
+import saleem.ptoptimisation.optimisationintegration.PTScheduleRandomiser;
+import saleem.stockholmmodel.modelbuilding.PTCapacityAdjusmentPerSample;
 
 /**
  * An execution class for PT Optimisation.
@@ -76,11 +78,20 @@ public class OptimisePT {
 		
 		final double occupancyScale = 1.0;
 		
-
+		// >>>>> ORIGINAL >>>>>
+//		@SuppressWarnings("unchecked")		
+//		final MATSimSimulator<PTSchedule> matsimSimulator = new MATSimSimulator(
+//				new PTMatsimStateFactoryImpl<>(scenario, occupancyScale),
+//				scenario, timeDiscretization);
+		// >>>>> NEW, UNTESTED >>>>>
 		@SuppressWarnings("unchecked")		
-		final MATSimSimulator<PTSchedule> matsimSimulator = new MATSimSimulator(
+		final MATSimSimulator2<PTSchedule> matsimSimulator = new MATSimSimulator2(
 				new PTMatsimStateFactoryImpl<>(scenario, occupancyScale),
 				scenario, timeDiscretization);
+		matsimSimulator.addSimulationStateAnalyzer(new PTOccupancyAnalyzer.Provider(timeDiscretization, 
+				new LinkedHashSet<>(scenario.getTransitSchedule().getFacilities().keySet())));
+		// <<<<< NEW, UNTESTED <<<<<
+		
 		matsimSimulator.setReplacingModules(module);
 		final RandomSearch<PTSchedule> randomSearch = new RandomSearch<>(
 				matsimSimulator, decisionVariableRandomizer, ptschedule,

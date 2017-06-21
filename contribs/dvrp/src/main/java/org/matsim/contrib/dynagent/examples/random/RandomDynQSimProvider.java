@@ -43,7 +43,7 @@ public class RandomDynQSimProvider implements Provider<Mobsim> {
 	@Override
 	public Mobsim get() {
 		QSim qSim = QSimUtils.createQSim(scenario, events, plugins);
-		qSim.addAgentSource(new RandomDynAgentSource(qSim, 100));
+		qSim.addAgentSource(new RandomDynAgentSource(qSim, 50));
 		return qSim;
 	}
 }
