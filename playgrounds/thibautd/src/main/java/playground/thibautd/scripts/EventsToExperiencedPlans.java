@@ -67,12 +67,7 @@ public class EventsToExperiencedPlans {
 
 		final EventsToPlans eventsToPlans =
 			new EventsToPlans(
-					new EventsToPlans.IdFilter() {
-						@Override
-						public boolean accept(final Id id) {
-							return inputSc.getPopulation().getPersons().containsKey( id );
-						}
-					});
+					id -> inputSc.getPopulation().getPersons().containsKey( id ) );
 
 		EventsToActivities eventsToActivities = injector.getInstance(EventsToActivities.class);
 		eventsToActivities.addActivityHandler(eventsToPlans);
@@ -107,7 +102,7 @@ public class EventsToExperiencedPlans {
 			final Activity origAct = origIterator.next();
 			final Activity newAct = newIterator.next();
 
-			((Activity) newAct).setCoord( origAct.getCoord() );
+			newAct.setCoord( origAct.getCoord() );
 		}
 	}
 }
