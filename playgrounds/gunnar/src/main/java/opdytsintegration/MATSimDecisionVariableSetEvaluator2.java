@@ -1,24 +1,22 @@
 package opdytsintegration;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
-import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
-
+import java.util.*;
 import com.google.inject.Inject;
-
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
 import opdytsintegration.utils.TimeDiscretization;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.utils.charts.StackedBarChart;
 
 /**
  * Identifies the approximately best out of a set of decision variables.
@@ -29,7 +27,7 @@ import opdytsintegration.utils.TimeDiscretization;
  *
  */
 public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
-		implements StartupListener, BeforeMobsimListener, ShutdownListener {
+		implements StartupListener, BeforeMobsimListener, ShutdownListener, IterationEndsListener {
 
 	// -------------------- MEMBERS --------------------
 
@@ -66,7 +64,7 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 	// private PTOccupancyAnalyser ptOccupancyAnalyzer = null;
 
 	// a list because the order matters in the state space vector
-	private final List<SimulationStateAnalyzer> simulationStateAnalyzers = new ArrayList<>();
+	private final List<SimulationStateAnalyzerProvider> simulationStateAnalyzers = new ArrayList<>();
 
 	private LinkedList<Vector> stateList = null;
 
@@ -88,7 +86,7 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 		// this.relevantStopIds = null;
 	}
 
-	public void addSimulationStateAnalyzer(final SimulationStateAnalyzer analyzer) {
+	public void addSimulationStateAnalyzer(final SimulationStateAnalyzerProvider analyzer) {
 		if (this.simulationStateAnalyzers.contains(analyzer)) {
 			throw new RuntimeException("Analyzer " + analyzer + " has already been added.");
 		}
@@ -181,7 +179,7 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 			throw new RuntimeException("No simulation state analyzers have been added.");
 		}
 
-		for (SimulationStateAnalyzer analyzer : this.simulationStateAnalyzers) {
+		for (SimulationStateAnalyzerProvider analyzer : this.simulationStateAnalyzers) {
 			this.eventsManager.addHandler(analyzer.newEventHandler());
 		}
 
@@ -204,6 +202,9 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 
 		// TODO NEW
 		this.justStarted = true;
+
+		//NEW: amit
+		this.stateVectorSizePlotter = new StateVectorSizePlotter();
 	}
 
 	@Override
@@ -223,12 +224,15 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 			 */
 
 			Vector newInstantaneousStateVector = null;
-			for (SimulationStateAnalyzer analyzer : this.simulationStateAnalyzers) {
+			for (SimulationStateAnalyzerProvider analyzer : this.simulationStateAnalyzers) {
 				if (newInstantaneousStateVector == null) {
 					newInstantaneousStateVector = analyzer.newStateVectorRepresentation();
+
+					stateVectorSizePlotter.addStateSize(newInstantaneousStateVector.size(),analyzer.getStringIdentifier()); // amit
 				} else {
 					newInstantaneousStateVector = Vector.concat(newInstantaneousStateVector,
 							analyzer.newStateVectorRepresentation());
+					stateVectorSizePlotter.addStateSize(newInstantaneousStateVector.size(),analyzer.getStringIdentifier()); // amit
 				}
 			}
 
@@ -296,7 +300,7 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 			this.trajectorySampler.afterIteration(this.newState(this.population));
 		}
 
-		for (SimulationStateAnalyzer analyzer : this.simulationStateAnalyzers) {
+		for (SimulationStateAnalyzerProvider analyzer : this.simulationStateAnalyzers) {
 			analyzer.beforeIteration();
 		}
 
@@ -318,6 +322,51 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 	@Override
 	public void notifyShutdown(final ShutdownEvent event) {
 		this.finalState = this.newState(this.population);
+	}
+
+	//NEW: Amit
+	private StateVectorSizePlotter stateVectorSizePlotter ;
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		this.stateVectorSizePlotter.plotData(event.getServices().getControlerIO().getOutputFilename("stateVectorSize.png"));
+	}
+
+	class StateVectorSizePlotter {
+
+		StateVectorSizePlotter () {
+			identifierToVectorSizes = new HashMap<>();
+		}
+
+		private final Map<String, List<Integer>> identifierToVectorSizes ;
+
+		public void addStateSize(final int vectorSize, final String identifier) {
+			List<Integer> sizes = this.identifierToVectorSizes.get(identifier);
+			if (sizes == null) {
+				sizes = new ArrayList<>();
+				sizes.add(vectorSize);
+			} else {
+				sizes.add(vectorSize);
+			}
+			this.identifierToVectorSizes.put(identifier, sizes);
+		}
+
+		public void plotData(final String outFile){
+			StackedBarChart chart = new StackedBarChart("Size of the state vector element","iteration", "size");
+			for (String mode : this.identifierToVectorSizes.keySet()) {
+				double[] ys = new double[ identifierToVectorSizes.get(mode).size()];
+
+				List<Integer> sizes = this.identifierToVectorSizes.get(mode);
+				Collections.sort(sizes, Collections.reverseOrder());
+
+				for (int index = 0; index < ys.length ; index++) {
+					ys[index] = sizes.get(index);
+				}
+
+				chart.addSeries(mode, ys);
+			}
+			chart.saveAsPng(outFile,1200,800);
+		}
 	}
 
 }

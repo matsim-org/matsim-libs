@@ -16,7 +16,7 @@ import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import opdytsintegration.MATSimSimulator2;
-import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzerFactory;
+import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzer;
 import opdytsintegration.utils.MATSimConfiguredFactories;
 import opdytsintegration.utils.OpdytsConfigGroup;
 import opdytsintegration.utils.TimeDiscretization;
@@ -47,7 +47,8 @@ public class RunNetworkParameters {
 		config.controler()
 				.setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		// final String outputDirectory = scenario.getConfig().controler().getOutputDirectory();
+		// final String outputDirectory =
+		// scenario.getConfig().controler().getOutputDirectory();
 
 		// >>>>>>>>>> SHOULD COME FROM FILE >>>>>>>>>>
 
@@ -147,11 +148,11 @@ public class RunNetworkParameters {
 		// final Simulator<NetworkParameters> matsim;
 		// final boolean differentiateNetworkModes = true;
 		// if (differentiateNetworkModes) {
+		final MATSimSimulator2<NetworkParameters> matsim = new MATSimSimulator2<NetworkParameters>(stateFactory,
+				scenario, timeDiscretization);
 		final Set<String> modes = new LinkedHashSet<>();
 		modes.add("car");
-		final MATSimSimulator2<NetworkParameters> matsim = new MATSimSimulator2<NetworkParameters>(stateFactory,
-				scenario, timeDiscretization, modes);
-		matsim.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzerFactory(timeDiscretization, modes,
+		matsim.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzer.Provider(timeDiscretization, modes,
 				new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet())));
 		// } else {
 		// matsim = new MATSimSimulator<NetworkParameters>(stateFactory,

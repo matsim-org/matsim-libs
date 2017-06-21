@@ -31,8 +31,9 @@ import org.matsim.vehicles.Vehicle;
 	public class PostProcessModalShare {
 		
 		public static void main(String[] args) {
-			String outputFolder =  "C:/Users/Felix/Documents/Bachelor/Santiago de Chile/v3/output_final_newConstants2/";
-			String eventsFile = outputFolder + "50.events.xml.gz";
+//			String outputFolder =  "C:/Users/Felix/Documents/Bachelor/Santiago de Chile/v3/output0/";
+			String outputFolder = args[0];
+			String eventsFile = outputFolder + "output_events.xml.gz";
 //			String eventsFile = outputFolder + "output_events_test.xml";
 			String networkFile = outputFolder + "output_network.xml.gz";
 //			String plansFile = outputFolder + "output_plans.xml.gz";

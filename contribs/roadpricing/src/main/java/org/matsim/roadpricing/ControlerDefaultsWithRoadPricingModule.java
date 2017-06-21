@@ -22,6 +22,7 @@
 
 package org.matsim.roadpricing;
 
+import java.net.URL;
 import java.util.Arrays;
 
 import javax.inject.Inject;
@@ -29,6 +30,7 @@ import javax.inject.Provider;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaults;
@@ -89,15 +91,15 @@ public final class ControlerDefaultsWithRoadPricingModule extends AbstractModule
 				return scenarioRoadPricingScheme;
 			} else {
 				RoadPricingConfigGroup rpConfig = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-				
-				String tollLinksFile = rpConfig.getTollLinksFile();
-				if ( tollLinksFile == null ) {
+
+				if ( rpConfig.getTollLinksFile() == null ) {
 					throw new RuntimeException("Road pricing inserted but neither toll links file nor RoadPricingScheme given.  "
 							+ "Such an execution path is not allowed.  If you want a base case without toll, "
 							+ "construct a zero toll file and insert that. ") ;
 				}
+				URL tollLinksFile = ConfigGroup.getInputFileURL(this.config.getContext(), rpConfig.getTollLinksFile());
 				RoadPricingSchemeImpl rpsImpl = new RoadPricingSchemeImpl() ;
-				new RoadPricingReaderXMLv1(rpsImpl).readFile(tollLinksFile);
+				new RoadPricingReaderXMLv1(rpsImpl).parse(tollLinksFile);
 				return rpsImpl;
 			}
 		}

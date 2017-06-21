@@ -114,12 +114,13 @@ class WithinDayReRouteMobsimListener implements MobsimBeforeSimStepListener {
 			for (MobsimVehicle vehicle : link.getAllNonParkedVehicles()) {
 				MobsimDriverAgent agent=vehicle.getDriver();
 				if ( KNAccidentScenario.replanningLinkIds.contains( agent.getCurrentLinkId() ) ) {
+					double proba = 1. ;
 //					System.out.println("found agent");
 					if ( cnt2==0 ) {
-						log.warn("only replanning with proba 0.1!");
+						log.warn("only replanning with proba=" + proba + "!" );
 						cnt2++ ;
 					}
-					if ( MatsimRandom.getRandom().nextDouble() < 0.1 ) {
+					if ( MatsimRandom.getRandom().nextDouble() < proba ) {
 						set.add(agent);
 					}
 				}

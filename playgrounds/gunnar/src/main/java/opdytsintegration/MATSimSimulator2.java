@@ -53,10 +53,10 @@ public class MATSimSimulator2<U extends DecisionVariable> implements Simulator<U
 
 	// TODO not elegant
 	// a list because the order matters in the state space vector
-	private final List<SimulationStateAnalyzer> simulationStateAnalyzers = new ArrayList<>();
+	private final List<SimulationStateAnalyzerProvider> simulationStateAnalyzers = new ArrayList<>();
 
 	// TODO exists also in MATSimDecisionVariableSetEvaluator2
-	public void addSimulationStateAnalyzer(final SimulationStateAnalyzer analyzer) {
+	public void addSimulationStateAnalyzer(final SimulationStateAnalyzerProvider analyzer) {
 		if (this.simulationStateAnalyzers.contains(analyzer)) {
 			throw new RuntimeException("Analyzer " + analyzer + " has already been added.");
 		}
@@ -66,7 +66,7 @@ public class MATSimSimulator2<U extends DecisionVariable> implements Simulator<U
 	// -------------------- CONSTRUCTOR --------------------
 
 	public MATSimSimulator2(final MATSimStateFactory<U> stateFactory, final Scenario scenario,
-			final TimeDiscretization timeDiscretization, final Set<String> relevantNetworkModes) {
+			final TimeDiscretization timeDiscretization) {
 		this.stateFactory = stateFactory;
 		this.scenario = scenario;
 		this.timeDiscretization = timeDiscretization;
@@ -136,7 +136,7 @@ public class MATSimSimulator2<U extends DecisionVariable> implements Simulator<U
 		final MATSimDecisionVariableSetEvaluator2<U> matsimDecisionVariableEvaluator = new MATSimDecisionVariableSetEvaluator2<>(
 				trajectorySampler, this.stateFactory, this.timeDiscretization);
 		
-		for (SimulationStateAnalyzer analyzer : this.simulationStateAnalyzers) {
+		for (SimulationStateAnalyzerProvider analyzer : this.simulationStateAnalyzers) {
 			matsimDecisionVariableEvaluator.addSimulationStateAnalyzer(analyzer);
 		}
 		

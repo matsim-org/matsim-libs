@@ -22,7 +22,7 @@ public class OSM2MATSimNetwork {
 		/*
 		 * The input file name.
 		 */
-		String osm = "C:/Users/Felix/Documents/VSP/Berlin-Netz/merged-filtered.osm";
+		String osm = "C:/Users/Felix/Documents/VSP/Berlin-Netz/berlin.osm";
 		
 		
 		/*
@@ -60,7 +60,7 @@ public class OSM2MATSimNetwork {
 		/*
 		 * Write the Network to a MATSim network file.
 		 */
-		new NetworkWriter(network).write("C:/Users/Felix/Documents/VSP/Berlin-Netz/mergedFilteredReducedSpeedSantiago.xml");
+		new NetworkWriter(network).write("C:/Users/Felix/Documents/VSP/Berlin-Netz/berlin_fein.xml");
 		
 	}
 	

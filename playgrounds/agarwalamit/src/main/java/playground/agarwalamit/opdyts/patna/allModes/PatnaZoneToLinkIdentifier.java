@@ -25,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -44,15 +45,20 @@ import playground.agarwalamit.utils.LoadMyScenarios;
 
 public final class PatnaZoneToLinkIdentifier {
 
-    private static final String zoneFile = FileUtils.SHARED_SVN+"/simulationInputs/urban/"+ PatnaUtils.PATNA_NETWORK_TYPE.toString()+"/raw/others/wardFile/Wards.shp";
+    private static final Logger LOGGER = Logger.getLogger(PatnaZoneToLinkIdentifier.class);
 
-    private static final String networkFile = FileUtils.RUNS_SVN+"/opdyts/patna/input_networkModes/network.xml.gz";
+    //BEGIN_EXAMPLE
+    public static void main(String[] args) {
+        String zoneFile = FileUtils.RUNS_SVN+"/opdyts/patna/input_allModes/Wards.shp";
+        String networkFile = FileUtils.RUNS_SVN+"/opdyts/patna/input_allModes/network.xml.gz";
+        new PatnaZoneToLinkIdentifier(networkFile, zoneFile);
+    }
+    //END_EXAMPLE
 
     private static final Set<Zone> zones = new LinkedHashSet<>();
-
     private final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(PatnaUtils.EPSG, TransformationFactory.WGS84);
 
-    public PatnaZoneToLinkIdentifier () {
+    PatnaZoneToLinkIdentifier (final String networkFile, final String zoneFile) {
 
         Network network = LoadMyScenarios.loadScenarioFromNetwork(networkFile).getNetwork();
 
@@ -74,8 +80,9 @@ public final class PatnaZoneToLinkIdentifier {
             }
 
             if (zone.getLinksInsideZone().isEmpty()) {
-                throw new RuntimeException("No link found in the ");
+                LOGGER.warn("No link found in the zone "+ zone.getZoneId());
             } else {
+                LOGGER.info(zone.getLinksInsideZone().size() + " links are inside the zone "+ zone.getZoneId());
                 zones.add(zone);
             }
         }

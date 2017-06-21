@@ -25,7 +25,6 @@ import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityModule;
@@ -35,7 +34,6 @@ import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -150,8 +148,8 @@ public class AccessibilityComputationNMBTest {
 		// ----------
 		
 		// Activity types
-		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING, FacilityTypes.LEISURE, FacilityTypes.OTHER, FacilityTypes.EDUCATION});
-//		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.EDUCATION});
+//		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING, FacilityTypes.LEISURE, FacilityTypes.OTHER, FacilityTypes.EDUCATION});
+		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.EDUCATION});
 		log.info("Using activity types: " + activityTypes);
 		
 		// Combine certain activity options into one combined computation
@@ -180,10 +178,10 @@ public class AccessibilityComputationNMBTest {
 		
 		// QGis
 		if (createQGisOutput) {
-			final boolean includeDensityLayer = true;
+			final boolean includeDensityLayer = false;
 			final Integer range = 9; // In the current implementation, this must always be 9
-			final Double lowerBound = 0.5; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
-			final Double upperBound = 4.0;
+			final Double lowerBound = -3.5; // (upperBound - lowerBound) ideally nicely divisible by (range - 2)
+			final Double upperBound = 3.5;
 			final int populationThreshold = (int) (50 / (1000/cellSize * 1000/cellSize));
 			
 			String osName = System.getProperty("os.name");

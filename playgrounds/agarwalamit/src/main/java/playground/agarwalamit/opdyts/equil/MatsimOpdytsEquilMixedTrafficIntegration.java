@@ -22,7 +22,6 @@ package playground.agarwalamit.opdyts.equil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
@@ -32,6 +31,7 @@ import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import opdytsintegration.MATSimSimulator2;
 import opdytsintegration.MATSimStateFactoryImpl;
+import opdytsintegration.utils.OpdytsConfigGroup;
 import opdytsintegration.utils.TimeDiscretization;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -55,9 +55,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.opdyts.*;
+import playground.agarwalamit.opdyts.analysis.OpdytsModalStatsControlerListener;
 import playground.agarwalamit.opdyts.plots.BestSolutionVsDecisionVariableChart;
 import playground.agarwalamit.opdyts.plots.OpdytsConvergenceChart;
-import playground.agarwalamit.opdyts.analysis.OpdytsModalStatsControlerListener;
 import playground.agarwalamit.utils.FileUtils;
 import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScoringParameters;
 
@@ -79,7 +79,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		String OUT_DIR ;
 
 		if (args.length > 0) {
-			opdytsConfigGroup.setVariationSizeOfRamdomizeDecisionVariable(Double.valueOf(args[0]));
+			opdytsConfigGroup.setVariationSizeOfRandomizeDecisionVariable(Double.valueOf(args[0]));
 			opdytsConfigGroup.setNumberOfIterationsForConvergence(Integer.valueOf(args[1]));
 			opdytsConfigGroup.setNumberOfIterationsForAveraging(Integer.valueOf(args[4]));
 			opdytsConfigGroup.setSelfTuningWeight(Double.valueOf(args[5]));
@@ -87,11 +87,11 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 			opdytsConfigGroup.setPopulationSize(Integer.valueOf(args[9]));
 
 			EQUIL_DIR = args[2];
-			OUT_DIR = args[3]+"/equil_car,bicycle_holes_variance"+ opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable() +"_"+opdytsConfigGroup.getNumberOfIterationsForConvergence()+"its/";
+			OUT_DIR = args[3]+"/equil_car,bicycle_holes_variance"+ opdytsConfigGroup.getVariationSizeOfRandomizeDecisionVariable() +"_"+opdytsConfigGroup.getNumberOfIterationsForConvergence()+"its/";
 			isPlansRelaxed = Boolean.valueOf(args[6]);
 			startingASCforBicycle = Double.valueOf(args[8]);
 		} else {
-			OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+ opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable() +"_"+opdytsConfigGroup.getNumberOfIterationsForConvergence()+"its/";
+			OUT_DIR = "./playgrounds/agarwalamit/output/equil_car,bicycle_holes_KWM_variance"+ opdytsConfigGroup.getVariationSizeOfRandomizeDecisionVariable() +"_"+opdytsConfigGroup.getNumberOfIterationsForConvergence()+"its/";
 		}
 
 		List<String> modes2consider = Arrays.asList("car","bicycle");
@@ -194,7 +194,7 @@ public class MatsimOpdytsEquilMixedTrafficIntegration {
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(modes2consider,distanceDistribution);
 
 		// following is the  entry point to start a matsim controler together with opdyts
-		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization, new HashSet<>(modes2consider));
+		MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>(new MATSimStateFactoryImpl<>(), scenario, timeDiscretization);
 		simulator.addOverridingModule(new AbstractModule() {
 
 			@Override

@@ -48,6 +48,7 @@ public class MATSimConfiguredFactories<U extends DecisionVariable> {
 	public SelfTuner newSelfTuner() {
 		final SelfTuner result = new SelfTuner(this.opdytsConfig.getInertia());
 		result.setNoisySystem(this.opdytsConfig.isNoisySystem());
+		result.setWeightScale(this.opdytsConfig.getSelfTuningWeight());
 		return result;
 	}
 

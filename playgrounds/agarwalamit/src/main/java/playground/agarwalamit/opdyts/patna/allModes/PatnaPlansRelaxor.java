@@ -26,18 +26,17 @@ import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.agarwalamit.analysis.modalShare.ModalShareControlerListener;
 import playground.agarwalamit.analysis.modalShare.ModalShareEventHandler;
 import playground.agarwalamit.analysis.tripTime.ModalTravelTimeControlerListener;
 import playground.agarwalamit.analysis.tripTime.ModalTripTravelTimeHandler;
 import playground.agarwalamit.mixedTraffic.patnaIndia.scoring.PtFareEventHandler;
-import playground.agarwalamit.opdyts.analysis.OpdytsModalStatsControlerListener;
 import playground.agarwalamit.opdyts.OpdytsScenario;
+import playground.agarwalamit.opdyts.analysis.OpdytsModalStatsControlerListener;
 import playground.agarwalamit.opdyts.patna.PatnaOneBinDistanceDistribution;
 import playground.agarwalamit.utils.FileUtils;
 
@@ -47,15 +46,10 @@ import playground.agarwalamit.utils.FileUtils;
 
 class PatnaPlansRelaxor {
 
-	public void run (String[] args) {
-
-		Config config= ConfigUtils.loadConfig(args[0]);
-		config.controler().setOutputDirectory(args[1]);
-
-		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.abort);
+	public void run (Config config) {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		scenario.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		scenario.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 
 		List<String> modes2consider = Arrays.asList("car","bike","motorbike","pt","walk");
 
@@ -97,5 +91,11 @@ class PatnaPlansRelaxor {
 		int firstIt = controler.getConfig().controler().getFirstIteration();
 		int lastIt = controler.getConfig().controler().getLastIteration();
 		FileUtils.deleteIntermediateIterations(config.controler().getOutputDirectory(),firstIt,lastIt);
+	}
+
+	public void run (String[] args) {
+		Config config= ConfigUtils.loadConfig(args[0]);
+		config.controler().setOutputDirectory(args[1]);
+		run(config);
 	}
 }

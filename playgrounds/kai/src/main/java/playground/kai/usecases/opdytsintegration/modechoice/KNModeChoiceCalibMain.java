@@ -1,7 +1,16 @@
 package playground.kai.usecases.opdytsintegration.modechoice;
 
 import java.util.Arrays;
-
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
+import floetteroed.opdyts.searchalgorithms.RandomSearch;
+import floetteroed.opdyts.searchalgorithms.SelfTuner;
+import opdytsintegration.MATSimSimulator2;
+import opdytsintegration.MATSimStateFactoryImpl;
+import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzer;
+import opdytsintegration.utils.TimeDiscretization;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -12,13 +21,6 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
-
-import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
-import floetteroed.opdyts.searchalgorithms.RandomSearch;
-import floetteroed.opdyts.searchalgorithms.SelfTuner;
-import opdytsintegration.MATSimSimulator;
-import opdytsintegration.MATSimStateFactoryImpl;
-import opdytsintegration.utils.TimeDiscretization;
 import playground.kairuns.run.KNBerlinControler;
 import playground.kairuns.run.KNBerlinControler.A100;
 
@@ -113,9 +115,15 @@ class KNModeChoiceCalibMain {
 		if ( calib ) {
 
 			final TimeDiscretization timeDiscretization = new TimeDiscretization(0, 3600, 24);
-			final MATSimSimulator<ModeChoiceDecisionVariable> simulator = new MATSimSimulator<>( new MATSimStateFactoryImpl<>(), 
+			final MATSimSimulator2<ModeChoiceDecisionVariable> simulator = new MATSimSimulator2<>( new MATSimStateFactoryImpl<>(),
 					scenario, timeDiscretization); 
 			simulator.addOverridingModule( overrides ) ;
+
+			//
+			Set<String> relevantNetworkModes = new HashSet<>();
+			relevantNetworkModes.add("car");
+			simulator.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzer.Provider(timeDiscretization, relevantNetworkModes,
+					new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet())));
 
 			int maxIterations = 10 ;
 			int maxTransitions = Integer.MAX_VALUE ;

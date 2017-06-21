@@ -107,8 +107,8 @@ public class ZoneParkingManager extends FacilityBasedParkingManager {
 					double newOcc = this.occupationOfZone.get(zone) + 1;
 					if(this.totalCapOfZone.get(zone)<newOcc){
 						String s = "FacilityID: " + this.parkingLocations.get(vehicleId);
-						String t = "Belegt: " + this.occupation.get(this.parkingLocations.get(vehicleId));
-						String u = "Kapazität: " + this.parkingFacilities.get(this.parkingLocations.get(vehicleId)).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
+						String t = "Occupied: " + this.occupation.get(this.parkingLocations.get(vehicleId));
+						String u = "Capacity: " + this.parkingFacilities.get(this.parkingLocations.get(vehicleId)).getActivityOptions().get(ParkingUtils.PARKACTIVITYTYPE).getCapacity();
 						String v = "TotalCapacityOnLink: " + getNrOfAllParkingSpacesOnLink(linkId);
 						throw new RuntimeException("occupancy of zone " + zone + " is higher than 100%. Capacity= " + this.totalCapOfZone.get(zone) + "  occupancy=" + newOcc + "time = " + time
 								+ "\n" + s + "\n" + t + "\n" + u + "\n" + v);

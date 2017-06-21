@@ -20,14 +20,17 @@ package playground.vsptelematics.bangbang;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
@@ -59,6 +62,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import org.matsim.withinday.controller.ExecutedPlansServiceImpl;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
+import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 /**
  * @author nagel
@@ -144,8 +148,8 @@ public class KNAccidentScenario {
 		Link link = scenario.getNetwork().getLinks().get( Id.createLinkId( "-418375_-248_247919764" ) ) ;
 		link.setCapacity(2000.); // "repair" a capacity. (This is Koenigin-Elisabeth-Str., parallel to A100 near Funkturm, having visibly less capacity than links upstream and downstream.)
 
-//		Link link2 = scenario.getNetwork().getLinks().get( Id.createLinkId("40371262_533639234_487689293-40371262_487689293_487689300-40371262_487689300_487689306-40371262_487689306_487689312-40371262_487689312_487689316-40371262_487689316_487689336-40371262_487689336_487689344-40371262_487689344_487689349-40371262_487689349_487689356-40371262_487689356_533639223-4396104_533639223_487673629-4396104_487673629_487673633-4396104_487673633_487673636-4396104_487673636_487673640-4396104_487673640_26868611-4396104_26868611_484073-4396104_484073_26868612-4396104_26868612_26662459") ) ;
-//		link2.setCapacity( 300. ) ; // reduce cap on alt route. (This is the freeway entry link just downstream of the accident; reducing its capacity
+		Link link2 = scenario.getNetwork().getLinks().get( Id.createLinkId("40371262_533639234_487689293-40371262_487689293_487689300-40371262_487689300_487689306-40371262_487689306_487689312-40371262_487689312_487689316-40371262_487689316_487689336-40371262_487689336_487689344-40371262_487689344_487689349-40371262_487689349_487689356-40371262_487689356_533639223-4396104_533639223_487673629-4396104_487673629_487673633-4396104_487673633_487673636-4396104_487673636_487673640-4396104_487673640_26868611-4396104_26868611_484073-4396104_484073_26868612-4396104_26868612_26662459") ) ;
+		link2.setCapacity( 300. ) ; // reduce cap on alt route. (This is the freeway entry link just downstream of the accident; reducing its capacity
 		// means that the router finds a wider variety of alternative routes.)
 
 		// ===
@@ -154,11 +158,11 @@ public class KNAccidentScenario {
 		controler.getConfig().controler().setOverwriteFileSetting( OverwriteFileSetting.overwriteExistingFiles ) ;
 
 
-//		Set<String> analyzedModes = new HashSet<>() ;
-//		analyzedModes.add( TransportMode.car ) ;
-//		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
+		Set<String> analyzedModes = new HashSet<>() ;
+		analyzedModes.add( TransportMode.car ) ;
+		final TravelTimeCollector travelTime = new TravelTimeCollector(controler.getScenario(), analyzedModes);
 		
-		final MyTravelTime travelTime = new MyTravelTime(scenario) ;
+//		final MyTravelTime travelTime = new MyTravelTime(scenario) ;
 
 		controler.addOverridingModule( new OTFVisLiveModule() );
 
@@ -179,14 +183,14 @@ public class KNAccidentScenario {
 				// ===
 				
 				this.addEventHandlerBinding().toInstance( travelTime ) ;
-//				this.addMobsimListenerBinding().toInstance( travelTime );
+				this.addMobsimListenerBinding().toInstance( travelTime );
 				this.bind( TravelTime.class ).toInstance( travelTime );
 				
 				// ---
 				// These are the possible strategies.  They have various pre-requisites.
-//				this.addMobsimListenerBinding().to( ManualDetour.class ) ;
+				this.addMobsimListenerBinding().to( ManualDetour.class ) ;
 //				this.addMobsimListenerBinding().to( WithinDayBangBangMobsimListener.class );
-				this.addMobsimListenerBinding().to( WithinDayReRouteMobsimListener.class );
+//				this.addMobsimListenerBinding().to( WithinDayReRouteMobsimListener.class );
 
 			}
 		}) ;

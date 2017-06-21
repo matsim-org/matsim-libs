@@ -57,9 +57,10 @@ public class LinkSensorManagerTest extends MatsimTestCase implements IterationSt
 	}
 
 	public void testSensorManagement() {
+		config.controler().setCreateGraphs(false);
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setLastIteration(0);
 		Controler controler = new Controler(this.config);
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.addControlerListener(this);
 		this.manager = new LinkSensorManager();
 		this.manager.addLinkSensor(Id.create("1", Link.class));

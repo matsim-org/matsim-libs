@@ -23,16 +23,19 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
 
-public class PickupDeliveryRequestImpl extends RequestImpl implements PickupDeliveryRequest {
+public class PickupDeliveryRequestImpl /*extends RequestImpl*/ implements PickupDeliveryRequest {
 	private final Link fromLink;
 	private final Link toLink;
 
 	private PickupDeliveryTask pickupTask;
 	private PickupDeliveryTask deliveryTask;
+	
+	private RequestImpl delegate ;
 
 	public PickupDeliveryRequestImpl(Id<Request> id, double quantity, double earliestStartTime, double latestStartTime,
 			double submissionTime, Link fromLink, Link toLink) {
-		super(id, quantity, earliestStartTime, latestStartTime, submissionTime);
+//		super(id, quantity, earliestStartTime, latestStartTime, submissionTime);
+		delegate = new RequestImpl( id, quantity, earliestStartTime, latestStartTime, submissionTime ) ;
 		this.fromLink = fromLink;
 		this.toLink = toLink;
 	}
@@ -63,5 +66,86 @@ public class PickupDeliveryRequestImpl extends RequestImpl implements PickupDeli
 
 	public void setDeliveryTask(PickupDeliveryTask deliveryTask) {
 		this.deliveryTask = deliveryTask;
+	}
+
+	/**
+	 * @return
+	 * @see java.lang.Object#hashCode()
+	 */
+	public int hashCode() {
+		return delegate.hashCode();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getId()
+	 */
+	public Id<Request> getId() {
+		return delegate.getId();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getQuantity()
+	 */
+	public double getQuantity() {
+		return delegate.getQuantity();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getEarliestStartTime()
+	 */
+	public double getEarliestStartTime() {
+		return delegate.getEarliestStartTime();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getLatestStartTime()
+	 */
+	public double getLatestStartTime() {
+		return delegate.getLatestStartTime();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getSubmissionTime()
+	 */
+	public double getSubmissionTime() {
+		return delegate.getSubmissionTime();
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#isRejected()
+	 */
+	public boolean isRejected() {
+		return delegate.isRejected();
+	}
+
+	/**
+	 * @param rejected
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#setRejected(boolean)
+	 */
+	public void setRejected(boolean rejected) {
+		delegate.setRejected(rejected);
+	}
+
+	/**
+	 * @return
+	 * @see org.matsim.contrib.dvrp.data.RequestImpl#toString()
+	 */
+	public String toString() {
+		return delegate.toString();
+	}
+
+	/**
+	 * @param obj
+	 * @return
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	public boolean equals(Object obj) {
+		return delegate.equals(obj);
 	}
 }
