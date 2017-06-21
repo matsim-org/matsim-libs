@@ -59,6 +59,7 @@ public class RunTaxiBenchmark {
 
 //		controler.addOverridingModule(new TaxiBenchmarkModule());
 		controler.addOverridingModule(new TaxiModule());
+		// (rather use the standard module, and modify as needed. kai, jun'17)
 
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

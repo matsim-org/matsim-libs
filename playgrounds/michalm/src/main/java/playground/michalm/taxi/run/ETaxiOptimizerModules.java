@@ -42,26 +42,36 @@ public class ETaxiOptimizerModules {
 	}
 
 	public static AbstractModule createBenchmarkModule() {
-		return new DvrpModule(createModuleForQSimPlugin(), TaxiOptimizer.class) {
-			@Inject
-			private DvrpConfigGroup dvrpCfg;
-
-			/**
-			 * Overrides the {@link org.matsim.contrib.dvrp.run.DvrpModule#install() in order to install
-			 * freeSpeedTravelTimeForBenchmarkingModule instead of travelTimeEstimatorModule}
-			 */
-			@Override
-			public void install() {
-				String mode = dvrpCfg.getMode();
-				addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
-
-				// Visualisation of schedules for DVRP DynAgents
-				bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
-
-				// Fixed free-speed TT
+//		return new DvrpModule(createModuleForQSimPlugin(), TaxiOptimizer.class) {
+//			@Inject
+//			private DvrpConfigGroup dvrpCfg;
+//
+//			/**
+//			 * Overrides the {@link org.matsim.contrib.dvrp.run.DvrpModule#install() in order to install
+//			 * freeSpeedTravelTimeForBenchmarkingModule instead of travelTimeEstimatorModule}
+//			 */
+//			@Override
+//			public void install() {
+//				String mode = dvrpCfg.getMode();
+//				addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
+//
+//				// Visualisation of schedules for DVRP DynAgents
+//				bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
+//
+//				// Fixed free-speed TT
+//		install(VrpTravelTimeModules.createFreeSpeedTravelTimeForBenchmarkingModule());
+//			}
+//		};
+		
+		// I think that what follows now replaces what was above (and what does not work any more because of making DvrpModule
+		// final), but I do not know if it is covered by a test.  kai, jun'17
+		
+		return new AbstractModule(){
+			@Override public void install() {
+				install( new DvrpModule(createModuleForQSimPlugin(), TaxiOptimizer.class) ) ;
 				install(VrpTravelTimeModules.createFreeSpeedTravelTimeForBenchmarkingModule());
 			}
-		};
+		} ;
 	}
 
 	private static com.google.inject.AbstractModule createModuleForQSimPlugin() {
