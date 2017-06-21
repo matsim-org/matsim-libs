@@ -37,7 +37,7 @@ import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-public class ScheduleReconstructionTest {
+public class ScheduleReconstructionIT {
 	@Test
 	public void testOneTaxiReconstruction() {
 		runReconstruction("one_taxi/one_taxi_config.xml");

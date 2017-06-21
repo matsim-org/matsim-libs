@@ -60,8 +60,8 @@ import playground.vsp.airPollution.flatEmissions.InternalizeEmissionsControlerLi
  * @author benjamin
  *
  */
-public class InternalizationRoutingTest extends MatsimTestCase{
-	private static final Logger logger = Logger.getLogger(InternalizationRoutingTest.class);
+public class InternalizationRoutingIT extends MatsimTestCase{
+	private static final Logger logger = Logger.getLogger(InternalizationRoutingIT.class);
 
 	static boolean isUsingDetailedEmissionCalculation = false;
 

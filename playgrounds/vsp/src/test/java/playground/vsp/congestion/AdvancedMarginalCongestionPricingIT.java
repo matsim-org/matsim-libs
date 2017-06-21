@@ -68,7 +68,7 @@ import javax.inject.Provider;
  * @author ikaddoura
  *
  */
-public class AdvancedMarginalCongestionPricingTest {
+public class AdvancedMarginalCongestionPricingIT {
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();

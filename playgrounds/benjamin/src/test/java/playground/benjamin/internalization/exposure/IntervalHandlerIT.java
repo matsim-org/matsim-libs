@@ -35,7 +35,7 @@ import playground.vsp.airPollution.exposure.IntervalHandler;
  * @author amit
  */
 
-public class IntervalHandlerTest {
+public class IntervalHandlerIT {
 
 	@Test
 	public void activityDurationForActiveAgentTest ( ) {

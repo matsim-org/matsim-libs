@@ -46,7 +46,7 @@ import java.util.Map;
  *
  * @author boescpa
  */
-public class TestNetworkSpiderCreator {
+public class TestNetworkSpiderCreatorIT {
 
 	private List<String> links = new ArrayList<>(2);
 	private NetworkSpiderCreator spiderCreator;
