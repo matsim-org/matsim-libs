@@ -65,7 +65,7 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
 
         final PlanCalcScoreConfigGroup oldScoringConfig = decisionVariable.getScoreConfig();
         PlanCalcScoreConfigGroup.ScoringParameterSet oldParameterSet = oldScoringConfig.getScoringParametersPerSubpopulation().get(this.subPopName);
-        double ascChangeAmount = opdytsConfigGroup.getVariationSizeOfRamdomizeDecisionVariable() * rnd.nextDouble();
+        double ascChangeAmount = opdytsConfigGroup.getVariationSizeOfRandomizeDecisionVariable() * rnd.nextDouble();
 
         int totalNumberOfCombination = (int) Math.pow(2, this.considerdModes.size()-1); // exclude car
         List<PlanCalcScoreConfigGroup> allCombinations = new ArrayList<>(totalNumberOfCombination);
