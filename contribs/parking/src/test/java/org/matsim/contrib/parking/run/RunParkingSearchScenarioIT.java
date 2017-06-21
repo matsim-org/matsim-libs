@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,13 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.examples.onetaxi;
+/**
+ * 
+ */
+package org.matsim.contrib.parking.run;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.parking.parkingsearch.RunParkingSearchExample;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class RunOneTaxiExampleTest {
+/**
+ * @author  jbischoff
+ *
+ */
+/**
+ *
+ */
+public class RunParkingSearchScenarioIT {
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+
 	@Test
-	public void testRun() {
-		RunOneTaxiExample.run(false, 2);
+	public void testRunOneTaxi() {
+		String configFile = "./src/main/resources/parkingsearch/config.xml";
+		Config config = ConfigUtils.loadConfig(configFile);
+		config.controler().setLastIteration(0);
+		config.controler().setOutputDirectory( utils.getOutputDirectory() );
+
+		new RunParkingSearchExample().run(config,false);
+		
 	}
 }

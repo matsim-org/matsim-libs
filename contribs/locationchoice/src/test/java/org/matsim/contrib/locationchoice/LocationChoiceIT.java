@@ -78,7 +78,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 import javax.inject.Provider;
 import java.util.Random;
 
-public class LocationChoiceIntegrationTest extends MatsimTestCase {
+public class LocationChoiceIT extends MatsimTestCase {
 
 	public void testLocationChoiceJan2013() {
 		//	CONFIG:

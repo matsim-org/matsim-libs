@@ -40,7 +40,7 @@ import org.matsim.testcases.MatsimTestUtils;
 /**
  * @author mrieser / Senozon AG
  */
-public class PtTutorialTest {
+public class PtTutorialIT {
 
 	private static final class EnterVehicleEventCounter implements BasicEventHandler {
 		private long cnt = 0 ;
@@ -58,7 +58,7 @@ public class PtTutorialTest {
 		}
 	}
 
-	private final static Logger log = Logger.getLogger(PtTutorialTest.class);
+	private final static Logger log = Logger.getLogger(PtTutorialIT.class);
 	
 	public @Rule MatsimTestUtils utils = new MatsimTestUtils();
 	

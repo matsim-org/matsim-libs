@@ -40,9 +40,9 @@ import java.util.List;
  * @author nagel
  *
  */
-public class MATSim4UrbanSimParcelIntegrationTest {
+public class MATSim4UrbanSimParcelIT {
 	
-	private static final Logger log = Logger.getLogger(MATSim4UrbanSimParcelIntegrationTest.class);
+	private static final Logger log = Logger.getLogger(MATSim4UrbanSimParcelIT.class);
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	

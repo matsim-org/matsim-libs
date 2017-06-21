@@ -40,7 +40,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class EquilWithCarrierWithoutPassTest {
+public class EquilWithCarrierWithoutPassIT {
 	
 	Controler controler;
 	
