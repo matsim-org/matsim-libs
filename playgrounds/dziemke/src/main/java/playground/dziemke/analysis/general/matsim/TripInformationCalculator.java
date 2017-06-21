@@ -2,6 +2,7 @@ package playground.dziemke.analysis.general.matsim;
 
 import org.matsim.api.core.v01.network.Network;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -9,14 +10,14 @@ import java.util.List;
  */
 class TripInformationCalculator {
 
-    static void calculateInformation(List<FromMatsimTrip> trips, Network network) {
+    static void calculateInformation(List<FromMatsimTrip> trips, Network network, Collection<String> networkModes) {
         for (FromMatsimTrip trip : trips)
-            calculateInformation(trip, network);
+            calculateInformation(trip, network, networkModes);
     }
 
-    private static void calculateInformation(FromMatsimTrip trip, Network network) {
+    private static void calculateInformation(FromMatsimTrip trip, Network network, Collection<String> networkModes) {
         trip.setDuration_s(FromMatsimTripUtils.getDurationByCalculation_s(trip));
         trip.setDistanceBeeline_m(FromMatsimTripUtils.calculateBeelineDistance_m(trip, network));
-        trip.setDistanceRouted_m(FromMatsimTripUtils.getDistanceRoutedByCalculation_m(trip, network));
+        trip.setDistanceRouted_m(FromMatsimTripUtils.getDistanceRoutedByCalculation_m(trip, network, networkModes));
     }
 }

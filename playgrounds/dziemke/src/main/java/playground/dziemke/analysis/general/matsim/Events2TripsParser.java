@@ -3,6 +3,9 @@ package playground.dziemke.analysis.general.matsim;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigReader;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkUtils;
@@ -22,11 +25,11 @@ public class Events2TripsParser {
 
     private int noPreviousEndOfActivityCounter;
 
-    public Events2TripsParser(String eventsFile, String networkFile) {
-        parse(eventsFile, networkFile);
+    public Events2TripsParser(String configFile, String eventsFile, String networkFile) {
+        parse(configFile, eventsFile, networkFile);
     }
 
-    private void parse(String eventsFile, String networkFile) {
+    private void parse(String configFile, String eventsFile, String networkFile) {
         /* Events infrastructure and reading the events file */
         EventsManager eventsManager = EventsUtils.createEventsManager();
         TripHandler tripHandler = new TripHandler();
@@ -43,7 +46,11 @@ public class Events2TripsParser {
 
         List<FromMatsimTrip> trips = new ArrayList<>(tripHandler.getTrips().values());
 
-        TripInformationCalculator.calculateInformation(trips, network);
+        Config config = ConfigUtils.createConfig();
+        ConfigReader configReader = new ConfigReader(config);
+        configReader.readFile(configFile);
+
+        TripInformationCalculator.calculateInformation(trips, network, config.plansCalcRoute().getNetworkModes());
 
         this.trips = trips;
     }

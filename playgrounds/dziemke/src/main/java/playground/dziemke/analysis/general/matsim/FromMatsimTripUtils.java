@@ -5,6 +5,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * @author gthunig on 04.04.2017.
  */
@@ -33,10 +36,10 @@ public class FromMatsimTripUtils {
                 + verticalDistance_m * verticalDistance_m);
     }
 
-    static double getDistanceRoutedByCalculation_m(FromMatsimTrip trip, Network network) {
+    static double getDistanceRoutedByCalculation_m(FromMatsimTrip trip, Network network, Collection<String> networkModes) {
         double tripDistance_m = 0.;
-        if (trip.getLinks().isEmpty()) {
-            log.warn("List of links is empty.");
+        if (trip.getLinks().isEmpty() && networkModes.contains(trip.getLegMode())) {
+            log.warn("List of links is empty. LegMode " + trip.getLegMode() + " is listed as NetworkMode.");
         }
         for (int i = 0; i < trip.getLinks().size(); i++) {
             Id<Link> linkId = trip.getLinks().get(i);
