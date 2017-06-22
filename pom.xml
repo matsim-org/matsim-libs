@@ -12,7 +12,7 @@
 		<module>tutorial</module>
 		<module>benchmark</module>
 		<module>contribs</module>
-		<module>playgrounds</module>
+		<!-- <module>playgrounds</module> -->
 		<module>distribution</module>
 	</modules>
 </project>
