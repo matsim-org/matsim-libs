@@ -105,6 +105,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	
 	/*package*/ final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();
 
+	// nodes that are definitely to be kept (e.g. for counts later)
+	private Set<Long> nodeIDsToKeep = null;
+	
+	
 	/**
 	 * Creates a new Reader to convert OSM data into a MATSim network.
 	 *
@@ -321,6 +325,12 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		this.slowButLowMemory = memoryEnabled;
 	}
 	
+	public void setNodeIDsToKeep(Set<Long> nodeIDsToKeep){
+		if(nodeIDsToKeep != null && !nodeIDsToKeep.isEmpty()){
+			this.nodeIDsToKeep = nodeIDsToKeep;
+		}
+	}
+	
 	private void convert() {
 		if (this.network instanceof Network) {
 			((Network) this.network).setCapacityPeriod(3600);
@@ -329,6 +339,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		log.info("Remove ways that have at least one node that was not read previously ...");
 		// yy I _think_ this is what it does.  kai, may'16
 		Iterator<Entry<Long, OsmWay>> it = this.ways.entrySet().iterator();
+		int counter = 0;
 		while (it.hasNext()) {
 			Entry<Long, OsmWay> entry = it.next();
 			for (Long nodeId : entry.getValue().nodes) {
@@ -338,7 +349,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				}
 			}
 		}
-		log.info("... done removing ways that have at least one node that was not read previously.");
+		log.info("... done removing " + counter + "ways that have at least one node that was not read previously.");
 
 		log.info("Mark OSM nodes that shoud be kept ...");
 		for (OsmWay way : this.ways.values()) {
@@ -414,6 +425,21 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 		}
 
+		//check here whether node is needed for counts
+		//tschlenther jun'17
+		if(nodeIDsToKeep != null){
+			log.info("...assure that all nodes that are definitely to be kept are marked as used");
+			for(Long nodeToBeKept : this.nodeIDsToKeep){
+				OsmNode node = this.nodes.get(nodeToBeKept);
+				if(node==null){
+					log.error("cannot find node " + nodeToBeKept + ". maybe it was not read in or got deleted..");
+				}
+				else{
+					node.used = true;
+				}
+			}
+		}
+		
 		log.info("Create the required nodes ...") ;
 		for (OsmNode node : this.nodes.values()) {
 			if (node.used) {
