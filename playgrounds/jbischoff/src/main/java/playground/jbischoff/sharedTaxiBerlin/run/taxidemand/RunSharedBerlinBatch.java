@@ -22,6 +22,10 @@
  */
 package playground.jbischoff.sharedTaxiBerlin.run.taxidemand;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
 import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
 import org.matsim.contrib.drt.run.*;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -37,30 +41,45 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 /**
  *
  */
-public class RunSharedBerlinTaxiCase {
+public class RunSharedBerlinBatch {
 
 	public static void main(String[] args) {
-
 		
-			String runId = "c1_reference";
-			String configFile = "../../../shared-svn/projects/sustainability-w-michal-and-dlr/data/scenarios/drt/config0.1.xml";
+		int capacity = Integer.parseInt(args[1]);
+		DecimalFormat format = new DecimalFormat();
+		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+		format.setMinimumIntegerDigits(1);
+		format.setMaximumFractionDigits(2);
+		format.setGroupingUsed(false);
+			for (double a = 1.1; a<=2.3; a = a+0.2){
+				for (int b = 0; b<1200; b=b+120){
+					String runId = "c_"+capacity+"_a_"+format.format(a)+"_b_"+b;
+					try{
+					
+			String configFile = args[0];
 			Config config = ConfigUtils.loadConfig(configFile, new DvrpConfigGroup(), new DrtConfigGroup(),
 					new OTFVisConfigGroup(), new TaxiFareConfigGroup());
 			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 		
 			drt.setEstimatedBeelineDistanceFactor(1.5);
-			drt.setVehiclesFile("new_net.taxis4to4_cap1.xml");
-			drt.setNumberOfThreads(7);
-			drt.setMaxTravelTimeAlpha(1.5);
-			drt.setMaxTravelTimeBeta(300);
-			drt.setkNearestVehicles(105);
+			drt.setVehiclesFile("new_net.taxis4to4_cap"+capacity+".xml");
+//			drt.setNumberOfThreads(8);
+			drt.setMaxTravelTimeAlpha(a);
+			drt.setMaxTravelTimeBeta(b);
+			drt.setkNearestVehicles(56);
 			
 			config.controler().setRunId(runId);
-			config.controler().setOutputDirectory("D:/runs-svn/sharedTaxi/c1_reference");
+			config.controler().setOutputDirectory("/net/ils4/jbischoff/sharedTaxi/parameterizedRuns/"+runId+"/");
 			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 			DrtControlerCreator.createControler(config, false).run();
-		
-	}
+					}
+					catch (Exception e){
+						System.err.println("Run "+runId+ " failed." );
+						e.printStackTrace();
+					}
+					}
+				}
+		}
 		
 		
 	
