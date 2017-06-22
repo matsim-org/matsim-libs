@@ -35,7 +35,7 @@ import org.matsim.vehicles.VehicleType;
 
 
 
-public class TestIntegrationIT {
+public class IntegrationIT {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 

@@ -69,8 +69,8 @@ import playground.vsp.airPollution.exposure.ResponsibilityGridTools;
  *
  */
 @RunWith(Parameterized.class)
-public class TestExposurePricingIT {
-	private Logger logger = Logger.getLogger(TestExposurePricingIT.class);
+public class ExposurePricingIT {
+	private Logger logger = Logger.getLogger(ExposurePricingIT.class);
 
 	private Double xMin = 0.0;
 
@@ -93,7 +93,7 @@ public class TestExposurePricingIT {
 
 	private int noOfTimeBins;
 
-	public TestExposurePricingIT(boolean isConsideringCO2Costs, int noOfTimeBins) {
+	public ExposurePricingIT(boolean isConsideringCO2Costs, int noOfTimeBins) {
 		this.isConsideringCO2Costs = isConsideringCO2Costs;
 		this.noOfTimeBins = noOfTimeBins;
 	}

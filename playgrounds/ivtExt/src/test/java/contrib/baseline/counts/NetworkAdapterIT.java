@@ -50,7 +50,7 @@ import java.util.Map;
  *
  * @author boescpa
  */
-public class TestNetworkAdapterIT {
+public class NetworkAdapterIT {
 
 	private static boolean setUpIsDone = false;
 	private static NetworkSpiderCreator spiderCreator;

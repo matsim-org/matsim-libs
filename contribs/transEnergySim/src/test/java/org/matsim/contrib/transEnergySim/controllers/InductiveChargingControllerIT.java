@@ -38,7 +38,7 @@ import org.matsim.testcases.MatsimTestCase;
  * @author wrashid
  *
  */
-public class TestInductiveChargingControllerIT extends MatsimTestCase {
+public class InductiveChargingControllerIT extends MatsimTestCase {
 
 	public void testBasic(){
 		Config config= loadConfig(getClassInputDirectory()+"config.xml");
