@@ -8,19 +8,21 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class PreparePopulationForTRB {
     static public void main(String[] args) {
         double avShare = Double.parseDouble(args[0]);
         String populationInputPath = args[1];
-        String populationOutputPath = args[2];
+        String populationAttributesInputPath = args[2];
+        String populationOutputPath = args[3];
 
         Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
         new PopulationReader(scenario).readFile(populationInputPath);
+        new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).readFile(populationAttributesInputPath);
         new PreparePopulationForTRB().run(scenario, avShare);
         new PopulationWriter(scenario.getPopulation()).write(populationOutputPath);
     }
@@ -48,6 +50,7 @@ public class PreparePopulationForTRB {
 
     /**
      * - Removes all agents that do not have car or pt as a main mode
+     * - Removes all cross-border, freight and commuting agents
      * - Set all car or pt legs of avShare % of remaining agents to AV
      *
      * @param scenario
@@ -68,10 +71,9 @@ public class PreparePopulationForTRB {
 
         while (personIterator.hasNext()) {
             Person person = personIterator.next();
-
             String mainMode = findMainMode(person.getSelectedPlan());
 
-            if (allowedMainModes.contains(mainMode)) {
+            if (allowedMainModes.contains(mainMode) && scenario.getPopulation().getPersonAttributes().getAttribute(person.getId().toString(), "subpopulation") == null) {
                 if (random.nextDouble() <= avShare) {
                     for (PlanElement element : person.getSelectedPlan().getPlanElements()) {
                         if (element instanceof Leg) {
