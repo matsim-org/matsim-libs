@@ -20,7 +20,6 @@
 
 package org.matsim.core.network;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -37,7 +36,9 @@ import org.matsim.testcases.MatsimTestUtils;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 public class NetworkChangeEventsParserWriterTest {
 
@@ -68,8 +69,8 @@ public class NetworkChangeEventsParserWriterTest {
 		assertEquals(checksum_ref, checksum_run);
 	}
 
-	@Test @Ignore
-	public void testWriteChangeEventWithoutLinkAndReadBack() {
+	@Test(expected = Exception.class)
+	public void testWriteChangeEventWithoutLinkDoesntWork() {
 		final String fileName = utils.getOutputDirectory() + "wurst.xml";
 
 		List<NetworkChangeEvent> events = new ArrayList<>();
@@ -77,15 +78,9 @@ public class NetworkChangeEventsParserWriterTest {
 		e.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 10));
 		events.add(e);
 		new NetworkChangeEventsWriter().write(fileName, events);
-
-		final Network network = NetworkUtils.createNetwork();
-
-		List<NetworkChangeEvent> readEvents = new ArrayList<>();
-		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network, readEvents);
-		parser.readFile(fileName);
 	}
 
-	@Test @Ignore
+	@Test
 	public void testWriteChangeEventWithSmallValueAndReadBack() {
 		final String fileName = utils.getOutputDirectory() + "wurst.xml";
 
@@ -94,16 +89,18 @@ public class NetworkChangeEventsParserWriterTest {
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		final Link link = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), node1, node2, (double) 1500, 1.667, (double) 3600, (double) 1);
 
-		List<NetworkChangeEvent> events = new ArrayList<>();
-		final NetworkChangeEvent e = new NetworkChangeEvent(0.0);
-		e.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0.000000000004));
-		e.addLink(link);
-		events.add(e);
-		new NetworkChangeEventsWriter().write(fileName, events);
+		List<NetworkChangeEvent> outputEvents = new ArrayList<>();
+		final NetworkChangeEvent event = new NetworkChangeEvent(0.0);
+		event.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0.000000000004));
+		event.addLink(link);
+		outputEvents.add(event);
+		new NetworkChangeEventsWriter().write(fileName, outputEvents);
 
-		List<NetworkChangeEvent> readEvents = new ArrayList<>();
-		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network, readEvents);
+		List<NetworkChangeEvent> inputEvents = new ArrayList<>();
+		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network, inputEvents);
 		parser.readFile(fileName);
+
+		assertThat(inputEvents, hasItem(event));
 	}
 
 }
