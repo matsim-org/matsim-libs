@@ -54,12 +54,13 @@ import java.util.Random;
  */
 public class Controller {
 	private static final Logger log = Logger.getLogger(Controller.class);
+	TelematicsConfigGroup telematicsConfigGroup;
 	
 	public Controller(String[] args){
 		Config config = ConfigUtils.loadConfig( args[0]) ;
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
 		Controler c = new Controler(scenario);
-		TelematicsConfigGroup telematicsConfigGroup = ConfigUtils.addOrGetModule(config, TelematicsConfigGroup.GROUPNAME, TelematicsConfigGroup.class);
+		telematicsConfigGroup = ConfigUtils.addOrGetModule(config, TelematicsConfigGroup.GROUPNAME, TelematicsConfigGroup.class);
 		c.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		c.getConfig().controler().setCreateGraphs(false);
         addListener(c);
@@ -73,7 +74,9 @@ public class Controller {
 			  @Override
 			  public void install() {
 				  addControlerListenerBinding().to(RouteTTObserver.class);
-				  addControlerListenerBinding().toInstance(new TollBehaviour());
+				  if (telematicsConfigGroup.getUsePredictedTravelTimes()) {					  
+					  addControlerListenerBinding().toInstance(new TollBehaviour());
+				  }
 				  if (getConfig().network().isTimeVariantNetwork()) {
 					  addControlerListenerBinding().to(IncidentGenerator.class);
 				  }
