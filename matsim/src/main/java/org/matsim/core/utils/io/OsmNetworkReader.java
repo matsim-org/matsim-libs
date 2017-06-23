@@ -428,17 +428,21 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		//check here whether node is needed for counts
 		//tschlenther jun'17
 		if(nodeIDsToKeep != null){
+			int cnt = 0;
 			log.info("...assure that all nodes that are definitely to be kept are marked as used");
 			for(Long nodeToBeKept : this.nodeIDsToKeep){
 				OsmNode node = this.nodes.get(nodeToBeKept);
 				if(node==null){
-					log.error("cannot find node " + nodeToBeKept + ". maybe it was not read in or got deleted..");
+					log.warn("cannot find node " + nodeToBeKept + ". maybe it was not read in or got deleted..");
 				}
 				else{
 					node.used = true;
+					cnt ++;
 				}
 			}
+			log.info("..found " + cnt + " out of " + nodeIDsToKeep.size() + " nodes to keep and marked them as used..");
 		}
+		
 		
 		log.info("Create the required nodes ...") ;
 		for (OsmNode node : this.nodes.values()) {
