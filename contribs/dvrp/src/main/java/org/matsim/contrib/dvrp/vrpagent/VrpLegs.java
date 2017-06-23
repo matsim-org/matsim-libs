@@ -51,21 +51,11 @@ public class VrpLegs {
 	}
 
 	public static LegCreator createLegWithOfflineTrackerCreator(final MobsimTimer timer) {
-		return new LegCreator() {
-			@Override
-			public VrpLeg createLeg(Vehicle vehicle) {
-				return createLegWithOfflineTracker(vehicle, timer);
-			}
-		};
+		return vehicle -> createLegWithOfflineTracker(vehicle, timer);
 	}
 
 	public static LegCreator createLegWithOnlineTrackerCreator(final VrpOptimizerWithOnlineTracking optimizer,
 			final MobsimTimer timer) {
-		return new LegCreator() {
-			@Override
-			public VrpLeg createLeg(Vehicle vehicle) {
-				return createLegWithOnlineTracker(vehicle, optimizer, timer);
-			}
-		};
+		return vehicle -> createLegWithOnlineTracker(vehicle, optimizer, timer);
 	}
 }

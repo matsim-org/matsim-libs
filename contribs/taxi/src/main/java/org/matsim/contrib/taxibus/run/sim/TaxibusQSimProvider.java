@@ -88,7 +88,7 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 			qSim.addQueueSimulationListeners((MobsimListener) orderManager);
 		}
 
-		LegCreator legCreator = VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer());
+		LegCreator legCreator = vehicle -> VrpLegs.createLegWithOfflineTracker(vehicle, qSim.getSimTimer());
 		TaxibusActionCreator actionCreator = new TaxibusActionCreator(passengerEngine, legCreator,
 				tbcg.getPickupDuration());
 		qSim.addAgentSource(new VrpAgentSource(actionCreator, fleetData, optimizer, qSim));

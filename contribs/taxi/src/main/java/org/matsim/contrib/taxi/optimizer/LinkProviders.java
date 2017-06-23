@@ -30,11 +30,7 @@ import org.matsim.contrib.util.LinkProvider;
  * @author michalm
  */
 public class LinkProviders {
-	public static final LinkProvider<TaxiRequest> REQUEST_TO_FROM_LINK = new LinkProvider<TaxiRequest>() {
-		public Link apply(TaxiRequest req) {
-			return req.getFromLink();
-		}
-	};
+	public static final LinkProvider<TaxiRequest> REQUEST_TO_FROM_LINK = req -> req.getFromLink();
 
 	public static <D> LinkProvider<DestEntry<D>> createDestEntryToLink() {
 		return new LinkProvider<DestEntry<D>>() {
@@ -45,11 +41,7 @@ public class LinkProviders {
 		};
 	}
 
-	public static final LinkProvider<VehicleData.Entry> VEHICLE_ENTRY_TO_LINK = new LinkProvider<VehicleData.Entry>() {
-		public Link apply(VehicleData.Entry veh) {
-			return veh.link;
-		}
-	};
+	public static final LinkProvider<VehicleData.Entry> VEHICLE_ENTRY_TO_LINK = veh -> veh.link;
 
 	public static LinkProvider<Vehicle> createImmediateDiversionOrEarliestIdlenessLinkProvider(
 			final TaxiScheduleInquiry scheduleInquiry) {
