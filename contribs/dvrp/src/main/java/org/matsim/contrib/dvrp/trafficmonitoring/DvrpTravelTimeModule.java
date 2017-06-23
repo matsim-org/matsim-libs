@@ -36,19 +36,9 @@ public class DvrpTravelTimeModule extends AbstractModule {
 	public static final String DVRP_OBSERVED = "dvrp_observed";
 	public static final String DVRP_ESTIMATED = "dvrp_estimated";
 
-	private final TravelTime initialTravelTime;
-
-	public DvrpTravelTimeModule() {
-		this(new FreeSpeedTravelTime());
-	}
-
-	public DvrpTravelTimeModule(final TravelTime initialTravelTime) {
-		this.initialTravelTime = initialTravelTime;
-	}
-
 	public void install() {
 		bind(TravelTime.class).annotatedWith(Names.named(DvrpTravelTimeModule.DVRP_INITIAL))
-				.toInstance(initialTravelTime);
+				.toInstance(new FreeSpeedTravelTime());
 		bind(DvrpTravelTimeEstimator.class).to(DvrpTravelTimeEstimatorImpl.class).asEagerSingleton();
 		addTravelTimeBinding(DVRP_ESTIMATED).to(DvrpTravelTimeEstimator.class);
 		addMobsimListenerBinding().to(DvrpTravelTimeEstimator.class);

@@ -30,6 +30,8 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.vehicles.Vehicle;
 
 /**
+ * This module overrides the bindings set up by DvrpTravelTimeModule
+ * 
  * @author michalm
  */
 public class DvrpBenchmarkTravelTimeModule extends AbstractModule {
@@ -47,6 +49,7 @@ public class DvrpBenchmarkTravelTimeModule extends AbstractModule {
 		// Because TravelTimeCalculatorModule is not installed for benchmarking, we need to add a binding
 		// for the car mode
 		addTravelTimeBinding(TransportMode.car).toInstance(travelTime);
+		
 		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).toInstance(travelTime);
 
 		// since we cannot undo: addMobsimListenerBinding().to(VrpTravelTimeEstimator.class)
