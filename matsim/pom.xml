@@ -187,6 +187,7 @@
 					</groups>
 					<detectLinks>true</detectLinks>
 					<additionalparam>-Xdoclint:none</additionalparam>
+					<linksource>true</linksource>
 				</configuration>
 			</plugin>
 			<plugin>
