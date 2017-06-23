@@ -22,7 +22,6 @@ package org.matsim.contrib.taxi.benchmark;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
@@ -57,15 +56,12 @@ public class RunTaxiBenchmark {
 		controler.setModules(new DvrpBenchmarkControlerModule());
 		controler.addOverridingModule(new TaxiOutputModule());
 
-//		controler.addOverridingModule(new TaxiBenchmarkModule());
 		controler.addOverridingModule(new TaxiModule());
-		// (rather use the standard module, and modify as needed. kai, jun'17)
-
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addControlerListenerBinding().to(TaxiBenchmarkStats.class).asEagerSingleton();
-				install(VrpTravelTimeModules.createFreeSpeedTravelTimeForBenchmarkingModule());
+				install(new DvrpBenchmarkTravelTimeModule());
 			};
 		});
 

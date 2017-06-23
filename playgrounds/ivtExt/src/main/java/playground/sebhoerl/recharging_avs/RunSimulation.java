@@ -2,7 +2,7 @@ package playground.sebhoerl.recharging_avs;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -34,7 +34,7 @@ public class RunSimulation {
         ScenarioUtils.loadScenario(scenario);
 
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
+        controler.addOverridingModule(new DvrpTravelTimeModule());
         controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new RechargingModule());

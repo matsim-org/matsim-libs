@@ -39,7 +39,7 @@ public class RunAudiAVFlowPaper {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(TravelTime.class).annotatedWith(Names.named(VrpTravelTimeModules.DVRP_INITIAL))
+				bind(TravelTime.class).annotatedWith(Names.named(DvrpTravelTimeModule.DVRP_INITIAL))
 						.toInstance(initialTT);
 			}
 		});

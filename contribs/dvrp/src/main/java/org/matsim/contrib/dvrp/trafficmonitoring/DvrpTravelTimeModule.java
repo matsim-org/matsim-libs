@@ -27,53 +27,37 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import com.google.inject.*;
 import com.google.inject.name.*;
 
-public class VrpTravelTimeModules {
+/**
+ * Travel times recorded during the previous iteration. They are always updated after the mobsim ends. This is the
+ * standard approach for running DVRP
+ */
+public class DvrpTravelTimeModule extends AbstractModule {
 	public static final String DVRP_INITIAL = "dvrp_initial";
 	public static final String DVRP_OBSERVED = "dvrp_observed";
 	public static final String DVRP_ESTIMATED = "dvrp_estimated";
 
-	public static AbstractModule createTravelTimeEstimatorModule() {
-		return createTravelTimeEstimatorModule(new FreeSpeedTravelTime());
+	private final TravelTime initialTravelTime;
+
+	public DvrpTravelTimeModule() {
+		this(new FreeSpeedTravelTime());
 	}
 
-	/**
-	 * Travel times recorded during the previous iteration. They are always updated after the mobsim ends. This is the
-	 * standard approach for running DVRP
-	 */
-	public static AbstractModule createTravelTimeEstimatorModule(final TravelTime initialTravelTime) {
-		return new AbstractModule() {
-			public void install() {
-				bind(TravelTime.class).annotatedWith(Names.named(VrpTravelTimeModules.DVRP_INITIAL))
-						.toInstance(initialTravelTime);
-				bind(VrpTravelTimeEstimator.class).asEagerSingleton();
-				addTravelTimeBinding(DVRP_ESTIMATED).to(VrpTravelTimeEstimator.class);
-				addMobsimListenerBinding().to(VrpTravelTimeEstimator.class);
-			}
-
-			@Provides
-			@Named(VrpTravelTimeModules.DVRP_OBSERVED)
-			@Singleton
-			TravelTime provideTravelTime(@Named(TransportMode.car) TravelTime observedTT) {
-				return observedTT;
-			}
-		};
+	public DvrpTravelTimeModule(final TravelTime initialTravelTime) {
+		this.initialTravelTime = initialTravelTime;
 	}
 
-	public static AbstractModule createFreeSpeedTravelTimeForBenchmarkingModule() {
-		return createTravelTimeForBenchmarkingModule(new FreeSpeedTravelTime());
+	public void install() {
+		bind(TravelTime.class).annotatedWith(Names.named(DvrpTravelTimeModule.DVRP_INITIAL))
+				.toInstance(initialTravelTime);
+		bind(DvrpTravelTimeEstimator.class).to(DvrpTravelTimeEstimatorImpl.class).asEagerSingleton();
+		addTravelTimeBinding(DVRP_ESTIMATED).to(DvrpTravelTimeEstimator.class);
+		addMobsimListenerBinding().to(DvrpTravelTimeEstimator.class);
 	}
 
-	/**
-	 * Instead of TravelTimeCalculatorModule
-	 */
-	public static AbstractModule createTravelTimeForBenchmarkingModule(final TravelTime travelTime) {
-		return new AbstractModule() {
-			public void install() {
-				// Because TravelTimeCalculatorModule is not installed for benchmarking, we need to add a binding
-				// for the car mode
-				addTravelTimeBinding(TransportMode.car).toInstance(travelTime);
-				addTravelTimeBinding(DVRP_ESTIMATED).toInstance(travelTime);
-			}
-		};
+	@Provides
+	@Named(DvrpTravelTimeModule.DVRP_OBSERVED)
+	@Singleton
+	TravelTime provideTravelTime(@Named(TransportMode.car) TravelTime observedTT) {
+		return observedTT;
 	}
 }

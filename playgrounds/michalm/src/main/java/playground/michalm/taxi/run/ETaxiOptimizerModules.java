@@ -21,17 +21,12 @@ package playground.michalm.taxi.run;
 
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.*;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
-import org.matsim.contrib.dynagent.run.DynRoutingModule;
+import org.matsim.contrib.taxi.benchmark.DvrpBenchmarkTravelTimeModule;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
-
-import com.google.inject.Inject;
 
 import playground.michalm.taxi.optimizer.ETaxiOptimizerProvider;
 import playground.michalm.taxi.vrpagent.ETaxiActionCreator;
@@ -42,36 +37,13 @@ public class ETaxiOptimizerModules {
 	}
 
 	public static AbstractModule createBenchmarkModule() {
-//		return new DvrpModule(createModuleForQSimPlugin(), TaxiOptimizer.class) {
-//			@Inject
-//			private DvrpConfigGroup dvrpCfg;
-//
-//			/**
-//			 * Overrides the {@link org.matsim.contrib.dvrp.run.DvrpModule#install() in order to install
-//			 * freeSpeedTravelTimeForBenchmarkingModule instead of travelTimeEstimatorModule}
-//			 */
-//			@Override
-//			public void install() {
-//				String mode = dvrpCfg.getMode();
-//				addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
-//
-//				// Visualisation of schedules for DVRP DynAgents
-//				bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
-//
-//				// Fixed free-speed TT
-//		install(VrpTravelTimeModules.createFreeSpeedTravelTimeForBenchmarkingModule());
-//			}
-//		};
-		
-		// I think that what follows now replaces what was above (and what does not work any more because of making DvrpModule
-		// final), but I do not know if it is covered by a test.  kai, jun'17
-		
-		return new AbstractModule(){
-			@Override public void install() {
-				install( new DvrpModule(createModuleForQSimPlugin(), TaxiOptimizer.class) ) ;
-				install(VrpTravelTimeModules.createFreeSpeedTravelTimeForBenchmarkingModule());
+		return new AbstractModule() {
+			@Override
+			public void install() {
+				install(new DvrpModule(createModuleForQSimPlugin(), TaxiOptimizer.class));
+				install(new DvrpBenchmarkTravelTimeModule());
 			}
-		} ;
+		};
 	}
 
 	private static com.google.inject.AbstractModule createModuleForQSimPlugin() {

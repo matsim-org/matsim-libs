@@ -111,9 +111,13 @@ public class TaxiOptimizerTests {
 			optimizerCfg.addParam(e.getKey(), e.getValue());
 		}
 		taxiCfg.setOptimizerConfigGroup(optimizerCfg);
-
+		
+		String outputDir = benchmark.config.controler().getOutputDirectory();
+		int i = 0;
+		
 		for (TaxiConfigVariant v : variants) {
 			v.updateTaxiConfig(taxiCfg);
+			benchmark.config.controler().setOutputDirectory(outputDir + "/" + i++);
 			benchmark.controler.run();
 		}
 	}

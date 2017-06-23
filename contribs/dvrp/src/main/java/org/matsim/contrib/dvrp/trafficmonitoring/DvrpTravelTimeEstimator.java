@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.util.sim;
+package org.matsim.contrib.dvrp.trafficmonitoring;
 
-import java.util.Arrays;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
+import org.matsim.core.router.util.TravelTime;
 
-import org.matsim.core.controler.*;
-
-public class SimLauncher {
-	public static void main(String[] args) {
-		String dir;
-		String cfgFile;
-
-//		if (args.length == 1 && args[0].equals("test")) {// for testing
-//			dir = "d:/PP-rad/taxi/mielec-2-peaks/2013_02/input/";
-//			cfgFile = "siec-config.xml";
-//			// dir = "d:\\PP-rad\\taxi\\poznan\\";
-//			// cfgFile = "poznan-config.xml";
-//		} else if (args.length == 2) {
-			dir = "d:\\temp\\NY Bus\\";
-			cfgFile = "config.xml";
-//		} else {
-//			throw new IllegalArgumentException("Incorrect program arguments: " + Arrays.toString(args));
-//		}
-
-		Controler controler = new Controler(new String[] { dir + cfgFile });
-		controler.getConfig().controler().setOverwriteFileSetting(// OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles
-				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.run();
-	}
+/**
+ * @author michalm
+ */
+public interface DvrpTravelTimeEstimator extends TravelTime, MobsimBeforeCleanupListener {
 }

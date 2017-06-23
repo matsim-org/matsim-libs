@@ -29,7 +29,7 @@ import org.matsim.contrib.drt.scheduler.*;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.*;
@@ -54,7 +54,7 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 
 	@Inject
 	public DefaultDrtOptimizerProvider(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
-			Fleet fleet, @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim) {
+			Fleet fleet, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim) {
 		this.drtCfg = drtCfg;
 		this.network = network;
 		this.fleet = fleet;

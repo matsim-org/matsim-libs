@@ -30,7 +30,7 @@ import org.matsim.contrib.taxibus.run.sim.TaxibusQSimProvider;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dynagent.run.*;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.*;
@@ -63,7 +63,7 @@ public class TaxibusControlerCreator {
 				.parse(tbcg.getVehiclesFileUrl(scenario.getConfig().getContext()));
 		
 
-		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
+		controler.addOverridingModule(new DvrpTravelTimeModule());
 		controler.addOverridingModule(new DynQSimModule<>(TaxibusQSimProvider.class));
 		controler.addOverridingModule(new AbstractModule() {
 

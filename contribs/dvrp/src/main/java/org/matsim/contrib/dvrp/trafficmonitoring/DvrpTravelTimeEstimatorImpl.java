@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TimeBinUtils;
 import org.matsim.vehicles.Vehicle;
@@ -36,7 +35,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-public class VrpTravelTimeEstimator implements TravelTime, MobsimBeforeCleanupListener {
+public class DvrpTravelTimeEstimatorImpl implements DvrpTravelTimeEstimator {
 	private final TravelTime observedTT;
 	private final Network network;
 
@@ -46,14 +45,14 @@ public class VrpTravelTimeEstimator implements TravelTime, MobsimBeforeCleanupLi
 	private final double alpha;
 
 	@Inject
-	public VrpTravelTimeEstimator(@Named(VrpTravelTimeModules.DVRP_INITIAL) TravelTime initialTT,
-			@Named(VrpTravelTimeModules.DVRP_OBSERVED) TravelTime observedTT,
+	public DvrpTravelTimeEstimatorImpl(@Named(DvrpTravelTimeModule.DVRP_INITIAL) TravelTime initialTT,
+			@Named(DvrpTravelTimeModule.DVRP_OBSERVED) TravelTime observedTT,
 			@Named(DvrpModule.DVRP_ROUTING) Network network, TravelTimeCalculatorConfigGroup ttCalcConfig,
 			DvrpConfigGroup dvrpConfig) {
 		this(initialTT, observedTT, network, ttCalcConfig, dvrpConfig.getTravelTimeEstimationAlpha());
 	}
 
-	public VrpTravelTimeEstimator(TravelTime initialTT, TravelTime observedTT, Network network,
+	public DvrpTravelTimeEstimatorImpl(TravelTime initialTT, TravelTime observedTT, Network network,
 			TravelTimeCalculatorConfigGroup ttCalcConfig, double travelTimeEstimationAlpha) {
 		this.observedTT = observedTT;
 		this.network = network;

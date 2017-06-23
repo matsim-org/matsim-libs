@@ -24,7 +24,7 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.contrib.taxibus.TaxibusActionCreator;
@@ -60,7 +60,7 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 
 	@Inject
 	TaxibusQSimProvider(Scenario scenario, EventsManager events, Collection<AbstractQSimPlugin> plugins, Fleet vrpData,
-			@Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, TaxibusConfigGroup tbcg,
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, TaxibusConfigGroup tbcg,
 			OrderManager orderManager) {
 		this.scenario = scenario;
 		this.events = events;
