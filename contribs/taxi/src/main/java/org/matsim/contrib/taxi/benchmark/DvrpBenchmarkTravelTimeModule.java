@@ -20,14 +20,10 @@
 package org.matsim.contrib.taxi.benchmark;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dvrp.trafficmonitoring.*;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.vehicles.Vehicle;
 
 /**
  * This module overrides the bindings set up by DvrpTravelTimeModule
@@ -49,21 +45,13 @@ public class DvrpBenchmarkTravelTimeModule extends AbstractModule {
 		// Because TravelTimeCalculatorModule is not installed for benchmarking, we need to add a binding
 		// for the car mode
 		addTravelTimeBinding(TransportMode.car).toInstance(travelTime);
-		
+
 		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).toInstance(travelTime);
 
 		// since we cannot undo: addMobsimListenerBinding().to(VrpTravelTimeEstimator.class)
-		// that is bound in DvrpModule, we need to bind VrpTravelTimeEstimator.class to this NOP instance
-		bind(DvrpTravelTimeEstimator.class).toInstance(new DvrpTravelTimeEstimator() {
-			@SuppressWarnings("rawtypes")
-			@Override
-			public void notifyMobsimBeforeCleanup(MobsimBeforeCleanupEvent e) {
-			}
-
-			@Override
-			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-				throw new UnsupportedOperationException();// or travelTime.getLinkTravelTime(....)
-			}
+		// that is bound in DvrpModule, we need to bind VrpTravelTimeEstimator.class to this mock instance
+		bind(DvrpTravelTimeEstimator.class).toInstance((link, time, person, vehicle) -> {
+			throw new UnsupportedOperationException();
 		});
 	}
 }
