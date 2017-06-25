@@ -47,7 +47,7 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
              final OpdytsScenario opdytsScenario, final String subPopName, final Collection<String> considerdModes) {
         this.scenario = scenario;
         opdytsConfigGroup = (OpdytsConfigGroup) scenario.getConfig().getModules().get(OpdytsConfigGroup.GROUP_NAME);
-        this.rnd = new Random();
+        this.rnd = new Random(opdytsConfigGroup.getRandomSeedToRandomizeDecisionVariable());
         log.warn("The random seed to randomizing decision variable is :"+ opdytsConfigGroup.getRandomSeedToRandomizeDecisionVariable());
         //        this.rnd = new Random(4711);
         // this will create an identical sequence of candidate decision variables for each experiment where a new ModeChoiceRandomizer instance is created.
