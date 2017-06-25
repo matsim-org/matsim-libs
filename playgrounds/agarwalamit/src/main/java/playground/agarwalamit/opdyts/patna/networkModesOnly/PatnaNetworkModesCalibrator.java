@@ -84,7 +84,7 @@ public class PatnaNetworkModesCalibrator {
 			relaxor.run(config);
 		}
 
-		OUT_DIR = OUT_DIR+"/calibration_variationSize"+opdytsConfigGroup.getVariationSizeOfRandomizeDecisionVariable()+"_AvgIts"+opdytsConfigGroup.getNumberOfIterationsForAveraging()+"/";
+		OUT_DIR = OUT_DIR+"/calibration_variationSize_"+opdytsConfigGroup.getVariationSizeOfRandomizeDecisionVariable()+"_AvgIts"+opdytsConfigGroup.getNumberOfIterationsForAveraging()+"/";
 		config.plans().setInputFile(relaxedPlansDir+"/output_plans.xml.gz");
 
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn); // must be warn, since opdyts override few things

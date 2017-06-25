@@ -57,19 +57,11 @@ public class BestSolutionVsDecisionVariableChart {
     //BEGIN_EXAMPLE
     public static void main(String[] args) {
 
-        String filesDir = FileUtils.RUNS_SVN+"/opdyts/equil/car,bicycle/parametrizedRuns/avgIts_STwt/";
-        Integer avgItrsCases [] = {20,40,80,100,150,200};
-        Double selfTuningWeight [] = {1.,2.,4.,6.,8.};
+        String filesDir = FileUtils.RUNS_SVN+"/opdyts/patna/output_allModes/calibration_variationSize0.1_AvgIts20/";
 
-        for(Integer avgItr : avgItrsCases) {
-            for (Double selfTuningWt : selfTuningWeight) {
-                String caseFileDir = filesDir+ "calibration_"+avgItr+"Its_"+selfTuningWt+"weight_0.0asc/";
-
-                BestSolutionVsDecisionVariableChart opdytsLogReader = new BestSolutionVsDecisionVariableChart(Arrays.asList("car","bicycle"));
-                opdytsLogReader.readFile(caseFileDir+"/opdyts.log");
-                opdytsLogReader.plotData(caseFileDir+"/decisionVariableVsASC_"+avgItr+"Its_"+selfTuningWt+"weight.png");
-            }
-        }
+        BestSolutionVsDecisionVariableChart opdytsLogReader = new BestSolutionVsDecisionVariableChart(Arrays.asList("car","bike","motorbike","pt","walk"));
+        opdytsLogReader.readFile(filesDir+"/opdyts.log");
+        opdytsLogReader.plotData(filesDir+"/decisionVariableVsASC.png");
     }
     //END_EXAMPLE
 
