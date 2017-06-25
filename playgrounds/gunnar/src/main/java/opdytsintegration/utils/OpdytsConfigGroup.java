@@ -287,7 +287,8 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 
 		OpdytsConfigGroup optConf = (OpdytsConfigGroup) config.getModules().get(OpdytsConfigGroup.GROUP_NAME);
 
-		
+		// alternative to get configGroup from configUtils, amit June'17
+//		OpdytsConfigGroup optConf = ConfigUtils.addOrGetModule(config, OpdytsConfigGroup.GROUP_NAME,OpdytsConfigGroup.class);
 		
 	}
 }
