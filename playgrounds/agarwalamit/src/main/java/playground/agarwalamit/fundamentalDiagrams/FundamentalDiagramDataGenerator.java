@@ -217,6 +217,8 @@ public class FundamentalDiagramDataGenerator {
 		scenario.getConfig().controler().setCreateGraphs(false);
 		scenario.getConfig().controler().setDumpDataAtEnd(false);
 
+		scenario.getConfig().qsim().setEndTime(100.0*3600.); // qsim should not go beyond 100 hrs it stability is not achieved.
+
 		// following is necessary, in order to achieve the data points at high density
 		if(this.travelModes.length==1 && this.travelModes[0].equals("car")) scenario.getConfig().qsim().setStuckTime(60.);
 		else  if (this.travelModes.length==1 && this.travelModes[0].equals("truck")) scenario.getConfig().qsim().setStuckTime(180.);
