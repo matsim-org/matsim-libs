@@ -44,6 +44,9 @@ public class TRBGenerator implements AVGenerator {
         int index = MatsimRandom.getRandom().nextInt(availableLinks.size());
 
         Id<Vehicle> id = Id.create("av_" + prefix + String.valueOf(generatedNumberOfVehicles), Vehicle.class);
+
+        System.out.println("Vehicle @ " + availableLinks.get(index));
+
         return new AVVehicle(id, availableLinks.get(index), 4.0, 0.0, 108000.0);
     }
 

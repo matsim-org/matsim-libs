@@ -82,6 +82,10 @@ public class VirtualNetwork implements Serializable {
         return linkVNodeMap.get(link);
     }
 
+    public boolean hasVirtualNode(Link link) {
+        return linkVNodeMap.containsKey(link);
+    }
+
     /**
      * @param index
      * @return the virtualLink belonging to a certain index.
