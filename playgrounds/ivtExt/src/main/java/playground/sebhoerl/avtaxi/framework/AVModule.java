@@ -54,6 +54,7 @@ import playground.sebhoerl.avtaxi.dispatcher.single_fifo.SingleFIFODispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SingleHeuristicDispatcher;
 import playground.sebhoerl.avtaxi.generator.AVGenerator;
 import playground.sebhoerl.avtaxi.generator.PopulationDensityGenerator;
+import playground.sebhoerl.avtaxi.generator.RandomDensityGenerator;
 import playground.sebhoerl.avtaxi.replanning.AVOperatorChoiceStrategy;
 import playground.sebhoerl.avtaxi.routing.AVParallelRouterFactory;
 import playground.sebhoerl.avtaxi.routing.AVRoute;
@@ -153,6 +154,9 @@ public class AVModule extends AbstractModule {
     private void configureGeneratorStrategies() {
         bind(PopulationDensityGenerator.Factory.class);
         AVUtils.bindGeneratorFactory(binder(), "PopulationDensity").to(PopulationDensityGenerator.Factory.class);
+
+        bind(RandomDensityGenerator.Factory.class);
+        AVUtils.bindGeneratorFactory(binder(), "RandomDensity").to(RandomDensityGenerator.Factory.class);
     }
 
     @Provides
