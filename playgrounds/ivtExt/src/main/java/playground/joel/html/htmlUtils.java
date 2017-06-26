@@ -49,21 +49,31 @@ public abstract class htmlUtils {
         }
     }
 
+    /**
+     * tab title
+     *
+     * @param title
+     */
     public static void setTitle(String title) {
         head();
         stringBuilder.append("<title>" + title + "</title>");
         head();
     }
 
+    /**
+     * page title
+     *
+     * @param title
+     */
     public static void insertTitle(String title) {
-        body();
+        head();
         stringBuilder.append("<h1>" + title + "</h1>");
-        body();
+        head();
     }
 
     public static void title(String title) {
-        insertTitle("HTML Demo");
-        setTitle("HTML Demo");
+        insertTitle(title);
+        setTitle(title);
     }
 
     public static void insertText(String... line) {
@@ -71,6 +81,7 @@ public abstract class htmlUtils {
             stringBuilder.append("<p>" + line[i] + "</p>");
         }
     }
+
 
 
 
