@@ -28,7 +28,7 @@ public class AVConfigGroup extends ReflectiveConfigGroup {
 	}
 
 	@StringGetter(PARALLEL_ROUTERS)
-	public double getParallelRouters() {
+	public long getParallelRouters() {
 		return parallelRouters;
 	}
 

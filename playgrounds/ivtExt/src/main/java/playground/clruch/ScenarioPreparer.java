@@ -53,7 +53,7 @@ public class ScenarioPreparer {
         final boolean completeGraph = true;
 
         // LocationSpec object to specify city location and center, radius for cutting
-        LocationSpec ls = LocationSpec.SIOUXFALLS_CITY;
+        LocationSpec ls = LocationSpec.ZURICH_CITY;
 
         final boolean populationeliminateFreight = true;
         final boolean populationeliminateWalking = true;

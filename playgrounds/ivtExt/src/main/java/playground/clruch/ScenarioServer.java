@@ -19,6 +19,7 @@ import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
+import playground.clruch.trb18.TRBModule;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.joel.analysis.AnalyzeAll;
@@ -80,7 +81,7 @@ public class ScenarioServer {
 //        final Set<Link> filteredPermissibleLinks = permissibleLinks.stream().filter((l) -> l.getAllowedModes().contains("car")).collect(Collectors.toSet());
         
         
-        TheApocalypse.decimatesThe(population).toNoMoreThan(maxPopulationSize).people();
+        //TheApocalypse.decimatesThe(population).toNoMoreThan(maxPopulationSize).people();
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
         controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
@@ -88,7 +89,7 @@ public class ScenarioServer {
         controler.addOverridingModule(new DatabaseModule()); // added only to listen to iteration counter
         controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
         controler.addOverridingModule(new AVTravelTimeModule());
-        
+        controler.addOverridingModule(new TRBModule());
         
 //        controler.addOverridingModule(new AbstractModule() {
 //            @Override
