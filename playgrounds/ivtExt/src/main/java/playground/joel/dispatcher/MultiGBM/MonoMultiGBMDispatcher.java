@@ -13,6 +13,7 @@ import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
+import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -21,6 +22,8 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,16 +46,21 @@ public class MonoMultiGBMDispatcher extends UniversalDispatcher {
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
         maxMatchNumber = safeConfig.getInteger("maxMatchNumber", Integer.MAX_VALUE);
         vehiclesPerRequest = safeConfig.getInteger("vehiclesPerRequest", 1);
+        GlobalAssert.that(vehiclesPerRequest > 0);
+        if (vehiclesPerRequest == 1)
+            System.out.println("ATTENTION: only one vehicle is sent to each request, standard HungarianDispatcher");
     }
 
     public final Map<Link, List<AVRequest>> getMultiAVRequestsAtLinks() {
-        Map<Link, List<AVRequest>> multiAVRequestsAtLinks = this.getAVRequestsAtLinks();
-        multiAVRequestsAtLinks.forEach((link, list) -> {
+        Map<Link, List<AVRequest>> multiAVRequestsAtLinks = new HashMap<>();
+        this.getAVRequestsAtLinks().forEach((link, list) -> {
+            List<AVRequest> tempList = new ArrayList<>();
             list.forEach(avRequest -> {
-                for (int i = 1; i < vehiclesPerRequest; i++) {
-                    list.add(avRequest);
+                for (int i = 0; i < vehiclesPerRequest; i++) {
+                    tempList.add(avRequest);
                 }
             });
+            multiAVRequestsAtLinks.put(link, tempList);
         });
         return multiAVRequestsAtLinks;
     }
