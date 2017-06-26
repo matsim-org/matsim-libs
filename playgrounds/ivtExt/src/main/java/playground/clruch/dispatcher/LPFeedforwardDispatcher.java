@@ -178,7 +178,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
         @Inject
         private EventsManager eventsManager;
 
-        @Inject
+        @Inject @Named("trb_reduced")
         private Network network;
 
         public static VirtualNetwork virtualNetwork;
