@@ -357,7 +357,7 @@ public class PrepareScenarioForTRB {
         Leg previousLeg = null;
 
         for (PlanElement element : plan.getPlanElements()) {
-            if (element instanceof Leg) {
+            if (element instanceof Leg && ((Leg) element).getMode().equals(TransportMode.pt)) {
                 previousLeg = (Leg) element;
             }
 
@@ -430,7 +430,11 @@ public class PrepareScenarioForTRB {
                     if (isCarUser) {
                         for (PlanElement element : duplicate.getPlanElements()) {
                             if (element instanceof  Leg) {
-                                ((Leg) element).setMode(AVModule.AV_MODE);
+                                Leg leg = (Leg) element;
+
+                                if (allowedMainModes.contains(leg.getMode())) {
+                                    leg.setMode(AVModule.AV_MODE);
+                                }
                             }
                         }
                     } else {
