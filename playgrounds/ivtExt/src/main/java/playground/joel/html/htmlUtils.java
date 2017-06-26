@@ -17,8 +17,10 @@ public abstract class htmlUtils {
      * called at the begin and end of document
      */
     public static void html() {
-        if (html)
+        if (html) {
             stringBuilder.append("</html>");
+            html = false;
+        }
         else {
             stringBuilder.append("<html>");
             html = true;
@@ -29,8 +31,10 @@ public abstract class htmlUtils {
      * called at the begin and end of head
      */
     public static void head() {
-        if (head)
+        if (head) {
             stringBuilder.append("</head>");
+            head = false;
+        }
         else {
             stringBuilder.append("<head>");
             head = true;
@@ -41,8 +45,10 @@ public abstract class htmlUtils {
      * called at the begin and end of document
      */
     public static void body() {
-        if (body)
+        if (body) {
             stringBuilder.append("</body>");
+            body = false;
+        }
         else {
             stringBuilder.append("<body>");
             body = true;
