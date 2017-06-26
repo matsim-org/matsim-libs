@@ -172,7 +172,8 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         if (round_now % redispatchPeriod == 0) {
             printVals = HungarianUtils.globalBipartiteMatching(this, //
                     () -> getVirtualNodeDivertableNotRebalancingVehicles().values() //
-                            .stream().flatMap(v -> v.stream()).collect(Collectors.toList()));
+                            .stream().flatMap(v -> v.stream()).collect(Collectors.toList()), //
+                    this.getAVRequestsAtLinks());
         }
     }
 

@@ -36,6 +36,8 @@ import playground.clruch.dispatcher.NotAsDumbDispatcher;
 import playground.clruch.dispatcher.PulseDispatcher;
 import playground.clruch.dispatcher.SelfishDispatcher;
 import playground.fseccamo.dispatcher.MPCDispatcher_1;
+import playground.joel.dispatcher.MultiGBM.MonoMultiGBMDispatcher;
+import playground.joel.dispatcher.MultiGBM.PolyMultiGBMDispatcher;
 import playground.joel.dispatcher.single_heuristic.NewSingleHeuristicDispatcher; // TODO: delete this or the other
 import playground.maalbert.dispatcher.DFRDispatcher;
 import playground.sebhoerl.avtaxi.config.AVConfig;
@@ -125,6 +127,12 @@ public class AVModule extends AbstractModule {
 
         bind(NewSingleHeuristicDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), NewSingleHeuristicDispatcher.class.getSimpleName()).to(NewSingleHeuristicDispatcher.Factory.class);
+
+        bind(MonoMultiGBMDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), MonoMultiGBMDispatcher.class.getSimpleName()).to(MonoMultiGBMDispatcher.Factory.class);
+
+        bind(PolyMultiGBMDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), PolyMultiGBMDispatcher.class.getSimpleName()).to(PolyMultiGBMDispatcher.Factory.class);
 
         /** dispatchers for PartitionedDispatcher */
         //bind(ConsensusDispatcherDFR.Factory.class);
