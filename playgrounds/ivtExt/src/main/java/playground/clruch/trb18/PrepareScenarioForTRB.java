@@ -302,11 +302,11 @@ public class PrepareScenarioForTRB {
         VirtualNetworkIO.toByte(new File(virtualNetworkOutputDirectory, VIRTUALNETWORKFILENAME), virtualNetwork);
         VirtualNetworkIO.toXML(new File(virtualNetworkOutputDirectory, VIRTUALNETWORKFILENAME + ".xml").toString(), virtualNetwork);
 
-        //PopulationRequestSchedule prs = new PopulationRequestSchedule(reducedNetwork, reducedPopulation, virtualNetwork);
-        //prs.exportCsv();
+        PopulationRequestSchedule prs = new PopulationRequestSchedule(reducedNetwork, reducedPopulation, virtualNetwork);
+        prs.exportCsv();
 
-        //TravelData travelData = new TravelData(virtualNetwork, reducedNetwork, reducedPopulation, dtTravelData);
-        //TravelDataIO.toByte(new File(virtualNetworkOutputDirectory, TRAVELDATAFILENAME), travelData);
+        TravelData travelData = new TravelData(virtualNetwork, reducedNetwork, reducedPopulation, dtTravelData);
+        TravelDataIO.toByte(new File(virtualNetworkOutputDirectory, TRAVELDATAFILENAME), travelData);
 
         return reducedNetwork;
     }
