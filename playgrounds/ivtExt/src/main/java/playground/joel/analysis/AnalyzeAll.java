@@ -25,6 +25,8 @@ import playground.joel.data.TotalData;
  */
 public class AnalyzeAll {
     public static final File RELATIVE_DIRECTORY = new File("output", "data");
+    public static final boolean filter = true;  // filter size can be adapted in the diagram creator
+    public static final double maxWaitingTime = 20.0; // maximally displayed waiting time in minutes
 
     public static void main(String[] args) throws Exception {
         analyze(args);
@@ -43,7 +45,8 @@ public class AnalyzeAll {
         table = Transpose.of(table);
 
         try {
-            DiagramCreator.createDiagram(RELATIVE_DIRECTORY, name, title, table.get(0), table.extract(from, to), maxRange);
+            DiagramCreator.createDiagram(RELATIVE_DIRECTORY, name, title, table.get(0), table.extract(from, to), //
+                    maxRange, filter);
         } catch (Exception e) {
             System.out.println("Error creating the diagrams");
         }
@@ -56,14 +59,13 @@ public class AnalyzeAll {
     static void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis) throws Exception {
         Tensor summary = Join.of(1, coreAnalysis.summary, distanceAnalysis.summary);
         saveFile(summary, "summary");
-        AnalyzeAll.plot("summary", "binnedWaitingTimes", "waiting times", 3, 6, 1200.0); // maximum waiting time in the plot to have this uniform for all
-                                                                                         // simulations
-        AnalyzeAll.plot("summary", "binnedTimeRatios", "occupancy ratio", 10, 11);
-        AnalyzeAll.plot("summary", "binnedDistanceRatios", "distance ratio", 13, 14);
+        AnalyzeAll.plot("summary", "binnedWaitingTimes", "Waiting Times", 3, 6, maxWaitingTime);
+            // maximum waiting time in the plot to have this uniform for all simulations
+        AnalyzeAll.plot("summary", "binnedTimeRatios", "Occupancy Ratio", 10, 11);
+        AnalyzeAll.plot("summary", "binnedDistanceRatios", "Distance Ratio", 13, 14);
         getTotals(summary, coreAnalysis);
     }
 
-    // TODO: get mean and quantiles over entire day, placeholders
     static void getTotals(Tensor table, CoreAnalysis coreAnalysis) {
         int size = table.length();
         double timeRatio = 0;
@@ -81,7 +83,8 @@ public class AnalyzeAll {
         double distanceRatio = distanceWithCust / distance;
 
         TotalData totalData = new TotalData();
-        totalData.generate(String.valueOf(timeRatio), String.valueOf(distanceRatio), String.valueOf(mean), String.valueOf(quantile50), String.valueOf(quantile95),
+        totalData.generate(String.valueOf(timeRatio), String.valueOf(distanceRatio), //
+                String.valueOf(mean), String.valueOf(quantile50), String.valueOf(quantile95),
                 new File(RELATIVE_DIRECTORY, "totalData.xml"));
     }
 
