@@ -92,6 +92,8 @@ public class PrepareScenarioForTRB {
 
         prepare.applyAVToNetwork(scenario.getNetwork(), reducedNetwork);
         new NetworkWriter(scenario.getNetwork()).write(new File(new File(outputPath), "trb_network.xml.gz").getAbsolutePath());
+
+        new NetworkWriter(reducedNetwork).write(new File(new File(outputPath), "reduced_network.xml.gz").getAbsolutePath());
     }
 
     public PrepareScenarioForTRB(File outputDirectory, double avRadius) {

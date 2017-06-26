@@ -53,7 +53,7 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
     }
 
     @Provides @Singleton
-    public PassengerEngine providePassengerEngine(EventsManager events, AVRequestCreator requestCreator, AVOptimizer optimizer, Network network) {
+    public PassengerEngine providePassengerEngine(EventsManager events, AVRequestCreator requestCreator, AVOptimizer optimizer, @Named("trb_reduced") Network network) {
         return new PassengerEngine(
                 AVModule.AV_MODE,
                 events,

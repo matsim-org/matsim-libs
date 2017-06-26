@@ -155,7 +155,7 @@ public class AVModule extends AbstractModule {
     }
 
 	@Provides @Named(AVModule.AV_MODE)
-    LeastCostPathCalculator provideLeastCostPathCalculator(Network network, @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime) {
+    LeastCostPathCalculator provideLeastCostPathCalculator(@Named("trb_reduced") Network network, @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime) {
         return new Dijkstra(network, new OnlyTimeDependentTravelDisutility(travelTime), travelTime);
     }
 

@@ -14,7 +14,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculatorFactory;
 @Singleton
 public class AVParallelRouterFactory implements ParallelLeastCostPathCalculatorFactory {
     @Inject @Named(AVModule.AV_MODE) TravelTime travelTime;
-    @Inject Network network;
+    @Inject @Named("trb_reduced") Network network;
 
     @Override
     public LeastCostPathCalculator createRouter() {

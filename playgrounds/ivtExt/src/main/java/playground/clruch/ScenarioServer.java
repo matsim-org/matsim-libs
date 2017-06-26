@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
@@ -11,6 +12,8 @@ import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.clruch.data.ReferenceFrame;
@@ -62,8 +65,17 @@ public class ScenarioServer {
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
+
+
+
+        Network reducedNetwork = NetworkUtils.createNetwork();
+        new MatsimNetworkReader(reducedNetwork).readFile("reduced_network.xml.gz");
+
+
+
+
         MatsimStaticDatabase.initializeSingletonInstance( //
-                scenario.getNetwork(), ReferenceFrame.IDENTITY);
+                reducedNetwork, ReferenceFrame.IDENTITY);
         
         
 //        // admissible Nodes sebhoerl
@@ -89,7 +101,7 @@ public class ScenarioServer {
         controler.addOverridingModule(new DatabaseModule()); // added only to listen to iteration counter
         controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
         controler.addOverridingModule(new AVTravelTimeModule());
-        controler.addOverridingModule(new TRBModule());
+        controler.addOverridingModule(new TRBModule(reducedNetwork));
         
 //        controler.addOverridingModule(new AbstractModule() {
 //            @Override

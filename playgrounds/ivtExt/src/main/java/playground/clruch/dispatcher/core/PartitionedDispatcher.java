@@ -49,7 +49,7 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
     protected Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeAvailableVehicles() {
         Map<VirtualNode, List<VehicleLinkPair>> returnMap = getDivertableVehicles().stream() //
                 .parallel() //
-                .filter(vlp -> virtualNetwork.hasVirtualNode(vlp.getDivertableLocation())) // TODO: IS THIS OKAY???
+                //.filter(vlp -> virtualNetwork.hasVirtualNode(vlp.getDivertableLocation())) // TODO: IS THIS OKAY???
                 .collect(Collectors.groupingBy(vlp -> virtualNetwork.getVirtualNode(vlp.getDivertableLocation())));
 
         for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())

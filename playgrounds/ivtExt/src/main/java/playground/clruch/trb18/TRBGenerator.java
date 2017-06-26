@@ -1,6 +1,7 @@
 package playground.clruch.trb18;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -11,6 +12,8 @@ import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.generator.AVGenerator;
 
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +32,7 @@ public class TRBGenerator implements AVGenerator {
         String prefix = config.getPrefix();
         this.prefix = prefix == null ? "av_" + config.getParent().getId().toString() + "_" : prefix + "_";
 
-        availableLinks = network.getLinks().values().stream().filter(l -> l.getAllowedModes().contains(AVModule.AV_MODE)).collect(Collectors.toList());
+        availableLinks = new LinkedList<Link>(network.getLinks().values()); //.stream().filter(l -> l.getAllowedModes().contains(AVModule.AV_MODE)).collect(Collectors.toList());
     }
 
     @Override
@@ -51,7 +54,7 @@ public class TRBGenerator implements AVGenerator {
     }
 
     static public class Factory implements AVGenerator.AVGeneratorFactory {
-        @Inject
+        @Inject @Named("trb_reduced")
         private Network network;
 
         @Override
