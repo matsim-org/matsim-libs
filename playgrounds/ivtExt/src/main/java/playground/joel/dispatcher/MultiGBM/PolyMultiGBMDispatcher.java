@@ -9,15 +9,24 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 import playground.clruch.dispatcher.HungarianUtils;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
+import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
+import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
+import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class PolyMultiGBMDispatcher extends UniversalDispatcher {
 
@@ -25,6 +34,7 @@ public class PolyMultiGBMDispatcher extends UniversalDispatcher {
     private final int maxMatchNumber; // implementation may not use this
     private final int vehiclesPerRequest;
     private Tensor printVals = Tensors.empty();
+    private final Map<String, Integer> vehicleIDs = new HashMap<>(); // for faster ID search
 
     private PolyMultiGBMDispatcher( //
                                     AVDispatcherConfig avDispatcherConfig, //
@@ -37,6 +47,26 @@ public class PolyMultiGBMDispatcher extends UniversalDispatcher {
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
         maxMatchNumber = safeConfig.getInteger("maxMatchNumber", Integer.MAX_VALUE);
         vehiclesPerRequest = safeConfig.getInteger("vehiclesPerRequest", 1);
+        GlobalAssert.that(vehiclesPerRequest > 0);
+        if (vehiclesPerRequest == 1)
+            System.out.println("ATTENTION: only one vehicle is sent to each request, standard HungarianDispatcher");
+    }
+
+    public int getId(AVVehicle avVehicle) {
+        String string = avVehicle.getId().toString();
+        GlobalAssert.that(string.startsWith("av_av_op1_"));
+        if (!vehicleIDs.containsKey(string)) {
+            int value = Integer.parseInt(string.substring(10)) - 1;
+            // System.out.println("ID=[" + string + "] -> " + value);
+            vehicleIDs.put(string, value);
+        }
+        return vehicleIDs.get(string);
+    }
+
+    public Supplier<Collection<VehicleLinkPair>> supplier(int fleetSection) {
+        Supplier<Collection<VehicleLinkPair>> supplier = () -> getDivertableVehicles().stream() //
+                .filter(vlp -> getId(vlp.avVehicle) % vehiclesPerRequest == fleetSection).collect(Collectors.toList());
+        return supplier;
     }
 
     @Override
@@ -47,7 +77,9 @@ public class PolyMultiGBMDispatcher extends UniversalDispatcher {
                 .match(getStayVehicles(), getAVRequestsAtLinks());
 
         if (round_now % dispatchPeriod == 0) {
-            printVals = HungarianUtils.globalBipartiteMatching(this, () -> getDivertableVehicles(), this.getAVRequestsAtLinks());
+            for (int fleetSection = 0; fleetSection < vehiclesPerRequest; fleetSection++) {
+                printVals = HungarianUtils.globalBipartiteMatching(this, supplier(fleetSection), this.getAVRequestsAtLinks());
+            }
         }
     }
 
