@@ -123,10 +123,11 @@ public class CharyparNagelScoringFunctionTest {
 	private double getZeroUtilDuration_hrs(final double typicalDuration_hrs, final double priority) {
 		// yy could/should use static function from CharyparNagelScoringUtils. kai, nov'13
 		
-		if(typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform))
+		if(typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)){
 			return typicalDuration_hrs * Math.exp(-10.0 / typicalDuration_hrs / priority);
-		else
+		} else {
 			return typicalDuration_hrs * Math.exp( -1.0 / priority );
+		}
 	}
 
 	/**
@@ -141,8 +142,7 @@ public class CharyparNagelScoringFunctionTest {
 		ZeroUtilityComputation computation;
 		if(this.typicalDurationComputation.equals(TypicalDurationScoreComputation.uniform)){
 			computation = new ActivityUtilityParameters.SameAbsoluteScore();	
-		}
-		else{
+		} else {
 			computation = new ActivityUtilityParameters.SameRelativeScore();
 		}
 		
