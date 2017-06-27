@@ -20,36 +20,22 @@
 package playground.agarwalamit.analysis.tripDistance;
 
 import java.io.BufferedWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
+import java.util.*;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
-
 import playground.vsp.analysis.modules.AbstractAnalysisModule;
 
 /**
- * Provides leg mode distance distribution, distances are calculated from routes of selected plans 
+ * Provides leg mode distance distribution, distances are calculated from routes of selected plans
  * unlike playground.vsp.analysis.modules.legModeDistanceDistribution where beeline distance is calculated
  *
  * Also returns mode2PersonId2RouteDistances.
@@ -154,12 +140,13 @@ public class LegModeBeelineDistanceDistributionFromPlansAnalyzer extends Abstrac
 			}
 			writer1.write("\t" + "sum");
 			writer1.write("\n");
-			for(int i = 0; i < this.distanceClasses.size() - 1 ; i++){
-				writer1.write(this.distanceClasses.get(i+1) + "\t");
+			// making it 0+, 2km+, 10km+ etc. Amit June'17
+			for(int i = 0; i < this.distanceClasses.size() ; i++){
+				writer1.write(this.distanceClasses.get(i) + "\t");
 				Integer totalLegsInDistanceClass = 0;
 				for(String mode : this.usedModes){
 					Integer modeLegs = null;
-					modeLegs = this.mode2DistanceClass2LegCount.get(mode).get(this.distanceClasses.get(i + 1));
+					modeLegs = this.mode2DistanceClass2LegCount.get(mode).get(this.distanceClasses.get(i ));
 					totalLegsInDistanceClass = totalLegsInDistanceClass + modeLegs;
 					writer1.write(modeLegs.toString() + "\t");
 				}
@@ -181,15 +168,25 @@ public class LegModeBeelineDistanceDistributionFromPlansAnalyzer extends Abstrac
 			for(PlanElement pe : planElements){
 				if(pe instanceof Leg){
 					Leg leg = (Leg)pe;
-					Route route = ((Route)((Leg)pe).getRoute());
-					double distance = route != null ? route.getDistance() : 0.;
-					for(int i=0;i<this.distanceClasses.size()-1;i++){
-						if(distance > this.distanceClasses.get(i) && distance <= this.distanceClasses.get(i + 1)){
-							SortedMap<Double, Integer> distanceClass2NoOfLegs = this.mode2DistanceClass2LegCount.get(leg.getMode());
-							int oldLeg = distanceClass2NoOfLegs.get(this.distanceClasses.get(i+1));
-							int newLeg = oldLeg+1;
-							distanceClass2NoOfLegs.put(this.distanceClasses.get(i+1), newLeg);
-						} 
+
+					String legMode = leg.getMode();
+					final Leg leg2 = leg;
+					Coord from = PopulationUtils.getPreviousActivity(plan, leg2).getCoord();
+					final Leg leg1 = leg;
+					Coord to = PopulationUtils.getNextActivity(plan, leg1).getCoord();
+					Double legBeelineDist = CoordUtils.calcEuclideanDistance(from, to);
+
+					// making it 0+, 2km+, 10km+ etc. Amit June'17
+					for(int i=0;i<this.distanceClasses.size();i++){
+						SortedMap<Double, Integer> distanceClass2NoOfLegs = this.mode2DistanceClass2LegCount.get(leg.getMode());
+						if ( (i== this.distanceClasses.size()-1) ||
+								( legBeelineDist >= this.distanceClasses.get(i) && legBeelineDist < this.distanceClasses.get(i + 1)) ){
+
+							int oldLeg = distanceClass2NoOfLegs.get(this.distanceClasses.get(i));
+							distanceClass2NoOfLegs.put(this.distanceClasses.get(i), oldLeg+1);
+							this.mode2DistanceClass2LegCount.put(leg.getMode(), distanceClass2NoOfLegs);
+						}
+
 					}
 				}
 			}
