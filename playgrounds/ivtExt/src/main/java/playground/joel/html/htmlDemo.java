@@ -38,7 +38,7 @@ public class htmlDemo {
         htmlUtils.insertText("1st line", "2nd line", "3rd line", "and so forth");
         htmlUtils.insertImg("data/binnedWaitingTimes.png", 400, 300);
         htmlUtils.newLine();
-        // text writen in this exact manner
+        // text written in this exact manner
         htmlUtils.insertText("1st line of preformatted text\n" + //
                 "2nd line of preformatted text\n" + //
                 "3rd line and \t so \t forth");

@@ -19,6 +19,7 @@ import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
 import playground.joel.data.TotalData;
+import playground.joel.html.DataCollector;
 
 /**
  * Created by Joel on 05.04.2017.
@@ -117,6 +118,8 @@ public class AnalyzeAll {
         }
 
         collectAndPlot(coreAnalysis, distanceAnalysis);
+
+        DataCollector dataCollector = new DataCollector(args);
 
     }
 }

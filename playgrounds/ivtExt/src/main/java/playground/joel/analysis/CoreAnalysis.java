@@ -22,12 +22,12 @@ import playground.clruch.net.VehicleContainer;
 /**
  * Created by Joel on 05.04.2017.
  */
-class CoreAnalysis {
+public class CoreAnalysis {
     StorageSupplier storageSupplier;
     int size;
-    Tensor summary = Tensors.empty();
-    Tensor totalWaitTimeQuantile = Tensors.empty();
-    Tensor totalWaitTimeMean = Tensors.empty();
+    public Tensor summary = Tensors.empty();
+    public Tensor totalWaitTimeQuantile = Tensors.empty();
+    public Tensor totalWaitTimeMean = Tensors.empty();
 
     CoreAnalysis(StorageSupplier storageSupplierIn) {
         storageSupplier = storageSupplierIn;
@@ -110,7 +110,7 @@ class CoreAnalysis {
 
         }
 
-        AnalyzeAll.saveFile(table, "basicDemo");
+        // AnalyzeAll.saveFile(table, "basicDemo");
 
         Tensor uniqueSubmissions = Tensor.of(requestWaitTimes.values().stream().map(RealScalar::of));
 
