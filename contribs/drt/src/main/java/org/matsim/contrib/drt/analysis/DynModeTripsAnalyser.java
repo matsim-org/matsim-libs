@@ -211,7 +211,7 @@ public class DynModeTripsAnalyser {
 		format.setMaximumFractionDigits(2);
 		format.setGroupingUsed(false);
 
-		SimpleDateFormat sdf2 = new SimpleDateFormat("hh:mm:ss");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss");
 
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileName + ".csv");
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
