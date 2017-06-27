@@ -30,11 +30,15 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.events.*;
-import org.matsim.core.controler.listener.*;
+import org.matsim.core.controler.events.ReplanningEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.ReplanningListener;
+import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.io.IOUtils;
 import playground.agarwalamit.analysis.modalShare.ModalShareFromPlans;
-import playground.agarwalamit.analysis.tripDistance.LegModeBeelineDistanceDistributionHandler;
+import playground.agarwalamit.analysis.tripDistance.LegModeBeelineDistanceDistributionFromPlansAnalyzer;
 import playground.agarwalamit.opdyts.DistanceDistribution;
 import playground.agarwalamit.opdyts.ObjectiveFunctionEvaluator;
 import playground.agarwalamit.opdyts.equil.EquilMixedTrafficObjectiveFunctionPenalty;
@@ -43,7 +47,7 @@ import playground.agarwalamit.opdyts.equil.EquilMixedTrafficObjectiveFunctionPen
  * Created by amit on 20/09/16.
  */
 
-public class OpdytsModalStatsControlerListener implements StartupListener, IterationStartsListener, ShutdownListener, ReplanningListener {
+public class OpdytsModalStatsControlerListener implements StartupListener, ShutdownListener, ReplanningListener {
 
     @Inject
     private EventsManager events;
@@ -54,7 +58,6 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
     public static final String OPDYTS_STATS_FILE_NAME = "opdyts_modalStats";
 
     private final DistanceDistribution referenceStudyDistri ;
-    private LegModeBeelineDistanceDistributionHandler beelineDistanceDistributionHandler;
 
     private final SortedMap<String, SortedMap<Double, Integer>> initialMode2DistanceClass2LegCount = new TreeMap<>();
 
@@ -96,16 +99,6 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
         } catch (IOException e) {
             throw new RuntimeException("File not found.");
         }
-
-        // initializing it here so that scenario can be accessed.
-        List<Double> dists = Arrays.stream(this.referenceStudyDistri.getDistClasses()).boxed().collect(Collectors.toList());
-        this.beelineDistanceDistributionHandler = new LegModeBeelineDistanceDistributionHandler(dists, event.getServices().getScenario().getNetwork());
-        this.events.addHandler(this.beelineDistanceDistributionHandler);
-    }
-
-    @Override
-    public void notifyIterationStarts(final IterationStartsEvent event) {
-        this.beelineDistanceDistributionHandler.reset(event.getIteration());
     }
 
     @Override
@@ -114,8 +107,15 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
        final int iteration = event.getIteration();
        final Config config = event.getServices().getConfig();
 
+        // initializing it here so that scenario can be accessed.
+        List<Double> dists = Arrays.stream(this.referenceStudyDistri.getDistClasses()).boxed().collect(Collectors.toList());
+        LegModeBeelineDistanceDistributionFromPlansAnalyzer beelineDistanceDistributionHandler = new LegModeBeelineDistanceDistributionFromPlansAnalyzer(dists);
+        beelineDistanceDistributionHandler.init(scenario);
+        beelineDistanceDistributionHandler.preProcessData();
+        beelineDistanceDistributionHandler.postProcessData();
+
         if (iteration == config.controler().getFirstIteration()) {
-            this.initialMode2DistanceClass2LegCount.putAll(this.beelineDistanceDistributionHandler.getMode2DistanceClass2LegCounts());
+            this.initialMode2DistanceClass2LegCount.putAll(beelineDistanceDistributionHandler.getMode2DistanceClass2LegCount());
         } else {
             // nothing to do
         }
@@ -132,7 +132,7 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
         // initialize simcounts array for each mode
         realCounts.entrySet().forEach(entry -> simCounts.put(entry.getKey(), new double[entry.getValue().length]));
 
-        SortedMap<String, SortedMap<Double, Integer>> simCountsHandler = this.beelineDistanceDistributionHandler.getMode2DistanceClass2LegCounts();
+        SortedMap<String, SortedMap<Double, Integer>> simCountsHandler = beelineDistanceDistributionHandler.getMode2DistanceClass2LegCount();
         for (Map.Entry<String, SortedMap<Double, Integer>> e : simCountsHandler.entrySet()) {
             if (!realCounts.containsKey(e.getKey())) continue;
             double[] counts = new double[realCounts.get(e.getKey()).length];
@@ -182,7 +182,7 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
             String distriDir = config.controler().getOutputDirectory() + "/distanceDistri/";
             new File(distriDir).mkdir();
             String outFile = distriDir + "/" + iteration + ".distanceDistri.txt";
-            writeDistanceDistribution(outFile);
+            writeDistanceDistribution(outFile, beelineDistanceDistributionHandler.getMode2DistanceClass2LegCount());
         }
     }
 
@@ -195,7 +195,7 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
         }
     }
 
-    private void writeDistanceDistribution(String outputFile) {
+    private void writeDistanceDistribution(String outputFile, final SortedMap<String, SortedMap<Double, Integer>> mode2dist2counts) {
         final BufferedWriter writer2 = IOUtils.getBufferedWriter(outputFile);
         try {
             writer2.write( "distBins" + "\t" );
@@ -244,7 +244,6 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
                 writer2.write("===== begin writing distribution from simulation ===== ");
                 writer2.newLine();
 
-                SortedMap<String, SortedMap<Double, Integer>> mode2dist2counts = this.beelineDistanceDistributionHandler.getMode2DistanceClass2LegCounts();
                 for (String mode : mode2dist2counts.keySet()) {
                     writer2.write(mode + "\t");
                     for (Double d : mode2dist2counts.get(mode).keySet()) {
