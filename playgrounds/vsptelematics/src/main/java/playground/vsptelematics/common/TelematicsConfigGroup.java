@@ -9,6 +9,7 @@ public class TelematicsConfigGroup extends ReflectiveConfigGroup {
 	public static final String USE_HOMOGENEOUS_TRAVEL_TIMES = "useHomogeneousTravelTimes";
 	public static final String INFOTYPE = "infotype";
 	public static final String EQUIPMENT_RATE = "equipmentRate";
+	public static final String USE_PREDICTED_TRAVEL_TIMES = "usePredictedTravelTimes";
 	public static final String PREDICTED_TRAVEL_TIME_ROUTE1 = "predictedTravelTimeRoute1";
 	public static final String PREDICTED_TRAVEL_TIME_ROUTE2 = "predictedTravelTimeRoute2";
 	
@@ -19,6 +20,7 @@ public class TelematicsConfigGroup extends ReflectiveConfigGroup {
 	private String incidentsFile;
 	private Infotype infotype;
 	private double equipmentRate;
+	private boolean usePredictedTravelTimes = false;
 	private double predictedTravelTimeRoute1;
 	private double predictedTravelTimeRoute2;
 	private boolean useHomogeneousTravelTimes = false;
@@ -83,6 +85,16 @@ public class TelematicsConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( EQUIPMENT_RATE )
 	public void setEquipmentRate(final double equipmentRate) {
 		this.equipmentRate = equipmentRate;
+	}
+	
+	@StringGetter( USE_PREDICTED_TRAVEL_TIMES )
+	public boolean getUsePredictedTravelTimes() {
+		return this.usePredictedTravelTimes;
+	}
+
+	@StringSetter( USE_PREDICTED_TRAVEL_TIMES )
+	public void setUsePredictedTravelTimes(final boolean usePredictedTravelTimes) {
+		this.usePredictedTravelTimes = usePredictedTravelTimes;
 	}
 	
 	@StringGetter( PREDICTED_TRAVEL_TIME_ROUTE1 )

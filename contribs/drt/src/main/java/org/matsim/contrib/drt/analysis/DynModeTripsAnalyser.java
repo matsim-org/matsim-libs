@@ -127,6 +127,22 @@ public class DynModeTripsAnalyser {
 				+ delimiter + format.format(traveltimes.getMean());
 		return value;
 	}
+	
+	public static double getDirectDistanceMean(List<DynModeTrip> trips) {
+
+		DescriptiveStatistics directDistanceStats = new DescriptiveStatistics();
+
+		for (DynModeTrip trip : trips) {
+			if (trip.getToLinkId() == null) {
+				continue;
+			}
+			
+			directDistanceStats.addValue(trip.getTravelDistanceEstimate_m());
+		}
+		return directDistanceStats.getMean();
+	}
+	
+	
 
 	public static void analyseDetours(Network network, List<DynModeTrip> trips, double beelineDistanceFactor,
 			double freeSpeedModeFactor, String fileName) {
@@ -366,11 +382,20 @@ public class DynModeTripsAnalyser {
 			double emptyD = dist[0] - dist[2];
 			empty.addValue(emptyD);
 		}
+		double d_r_d_t = revenue.getSum()/driven.getSum();
 		// bw.write("iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
 		String result = vehicleDistances.size() + del + format.format(driven.getSum()) + del
 				+ format.format(empty.getSum()) + del + format.format(empty.getSum() / driven.getSum()) + del
 				+ format.format(revenue.getSum()) + del + format.format(driven.getMean()) + del
-				+ format.format(empty.getMean()) + del + format.format(revenue.getMean());
+				+ format.format(empty.getMean()) + del + format.format(revenue.getMean()) + del + format.format(d_r_d_t);
 		return result;
+	}
+	
+	public static double getTotalDistance(Map<Id<Vehicle>, double[]> vehicleDistances) {
+		DescriptiveStatistics driven = new DescriptiveStatistics();
+		for (double[] dist : vehicleDistances.values()) {
+			driven.addValue(dist[0]);
+		}
+		return driven.getSum();
 	}
 }

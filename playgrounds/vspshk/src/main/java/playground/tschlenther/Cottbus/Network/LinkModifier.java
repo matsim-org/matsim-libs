@@ -71,13 +71,13 @@ public class LinkModifier {
 	public void modifyFromNode(Id<Link> linkId, Id<Node> newFromNode){
 		Link link = net.getLinks().get(linkId);
 		if (link == null){
-			logger.error("coulndt find link " + linkId + " in the network");
+			logger.error("couldnt find link " + linkId + " in the network");
 			return;
 		}
 		logger.info("set fromNode of link " + linkId + " to " + newFromNode);
 		Node fromNode = net.getNodes().get(newFromNode);
 		if (fromNode == null){
-			logger.error("coulndt find node " + fromNode + " in the network");
+			logger.error("couldnt find node " + fromNode + " in the network");
 			return;
 		}
 		link.setFromNode(fromNode);

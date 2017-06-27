@@ -68,17 +68,14 @@ public class ModuleTest {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
         config.controler().setOutputDirectory(utils.getOutputDirectory()+"/1");
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        RoadPricingConfigGroup roadPricingConfigGroup = ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class);
-        RoadPricingSchemeImpl roadPricingScheme = new RoadPricingSchemeImpl() ;
-        new RoadPricingReaderXMLv1(roadPricingScheme).readFile(roadPricingConfigGroup.getTollLinksFile());
 
 
         Controler controler1 = new Controler(scenario);
-        controler1.setModules(new ControlerDefaultsWithRoadPricingModule(roadPricingScheme));
+        controler1.setModules(new ControlerDefaultsWithRoadPricingModule());
         controler1.run();
         config.controler().setOutputDirectory(utils.getOutputDirectory()+"/2");
         Controler controler2 = new Controler(scenario);
-        controler2.setModules(new ControlerDefaultsWithRoadPricingModule(roadPricingScheme));
+        controler2.setModules(new ControlerDefaultsWithRoadPricingModule());
         controler2.run();
     }
 

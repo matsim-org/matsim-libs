@@ -21,11 +21,12 @@ package org.matsim.contrib.taxi.run;
 
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
-public class TaxiConfigConsistencyChecker extends DvrpConfigConsistencyChecker {
+public class TaxiConfigConsistencyChecker implements ConfigConsistencyChecker {
 	@Override
 	public void checkConsistency(Config config) {
-		super.checkConsistency(config);
+		new DvrpConfigConsistencyChecker().checkConsistency(config);
 
 		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(config);
 		if (taxiCfg.isVehicleDiversion() && !taxiCfg.isOnlineVehicleTracker()) {

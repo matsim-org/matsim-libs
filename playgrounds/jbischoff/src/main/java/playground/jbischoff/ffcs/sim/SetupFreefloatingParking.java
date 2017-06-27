@@ -23,7 +23,7 @@
 package playground.jbischoff.ffcs.sim;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.contrib.parking.parkingsearch.ParkingUtils;
 import org.matsim.contrib.parking.parkingsearch.evaluation.ParkingListener;
@@ -87,7 +87,7 @@ public class SetupFreefloatingParking {
 		};
 		routingModuleCar.setStageActivityTypes(stageActivityTypesCar);
 		new CarsharingVehiclesReader(data).parse(ffcsconfig.getVehiclesFileUrl(controler.getConfig().getContext()));
-		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule());
+		controler.addOverridingModule(new DvrpTravelTimeModule());
 		controler.addOverridingModule(new AbstractModule() {
 
 			@Override

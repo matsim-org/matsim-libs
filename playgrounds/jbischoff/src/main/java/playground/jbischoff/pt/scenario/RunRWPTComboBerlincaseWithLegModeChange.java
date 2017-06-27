@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.*;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;

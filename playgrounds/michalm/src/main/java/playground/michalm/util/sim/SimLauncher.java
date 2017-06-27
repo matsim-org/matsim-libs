@@ -28,21 +28,21 @@ public class SimLauncher {
 		String dir;
 		String cfgFile;
 
-		if (args.length == 1 && args[0].equals("test")) {// for testing
-			dir = "d:/PP-rad/taxi/mielec-2-peaks/2013_02/input/";
-			cfgFile = "siec-config.xml";
-			// dir = "d:\\PP-rad\\taxi\\poznan\\";
-			// cfgFile = "poznan-config.xml";
-		} else if (args.length == 2) {
-			dir = args[0];
-			cfgFile = args[1];
-		} else {
-			throw new IllegalArgumentException("Incorrect program arguments: " + Arrays.toString(args));
-		}
+//		if (args.length == 1 && args[0].equals("test")) {// for testing
+//			dir = "d:/PP-rad/taxi/mielec-2-peaks/2013_02/input/";
+//			cfgFile = "siec-config.xml";
+//			// dir = "d:\\PP-rad\\taxi\\poznan\\";
+//			// cfgFile = "poznan-config.xml";
+//		} else if (args.length == 2) {
+			dir = "d:\\temp\\NY Bus\\";
+			cfgFile = "config.xml";
+//		} else {
+//			throw new IllegalArgumentException("Incorrect program arguments: " + Arrays.toString(args));
+//		}
 
 		Controler controler = new Controler(new String[] { dir + cfgFile });
 		controler.getConfig().controler().setOverwriteFileSetting(// OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles
-				OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
+				OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.run();
 	}
 }

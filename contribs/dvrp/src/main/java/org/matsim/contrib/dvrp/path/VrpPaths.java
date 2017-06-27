@@ -55,14 +55,15 @@ public class VrpPaths {
 		int count = path.links.size();
 		if (count > 0) {
 			if (fromLink.getToNode() != path.links.get(0).getFromNode()) {
-				throw new IllegalArgumentException("fromLink and path are not connected; fromLink: "+fromLink +"\n path beg"+path.links.get(0));
+				throw new IllegalArgumentException("fromLink and path are not connected; fromLink: " + fromLink
+						+ "\n path beg" + path.links.get(0));
 			}
 			if (path.links.get(count - 1).getToNode() != toLink.getFromNode()) {
-				throw new IllegalArgumentException("path and toLink are not connected; path end:"+path.links.get(count - 1).toString()+ "\n toLink: "+toLink.toString());
+				throw new IllegalArgumentException("path and toLink are not connected; path end:"
+						+ path.links.get(count - 1).toString() + "\n toLink: " + toLink.toString());
 			}
 		}
-		
-		
+
 		Link[] links = new Link[count + 2];
 		double[] linkTTs = new double[count + 2];
 
@@ -123,19 +124,16 @@ public class VrpPaths {
 
 		return route;
 	}
-	
+
 	/**
-	 *
-	 * @return The distance of a VRP path
-	 * Includes the to link, but not the from link
+	 * @return The distance of a VRP path Includes the to link, but not the from link
 	 */
-	public static double calcPathDistance(VrpPath path){
-		
+	public static double calcPathDistance(VrpPath path) {
 		double distance = 0.0;
-		for (int i = 1; i<path.getLinkCount(); i++){
+		for (int i = 1; i < path.getLinkCount(); i++) {
 			distance += path.getLink(i).getLength();
 		}
-		
+
 		return distance;
 	}
 }

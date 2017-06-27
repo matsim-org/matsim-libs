@@ -51,8 +51,8 @@ import com.google.inject.name.*;
  * @author jbischoff
  *
  */
-public class DrtControlerCreator {
-
+public final class DrtControlerCreator {
+	
 	public static Controler createControler(Config config, boolean otfvis) {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
@@ -71,18 +71,9 @@ public class DrtControlerCreator {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(
-				new DvrpModule(createModuleForQSimPlugin(DefaultDrtOptimizerProvider.class), DrtOptimizer.class) {
-					@Provides
-					@Singleton
-					private Fleet provideVehicles(@Named(DvrpModule.DVRP_ROUTING) Network network, Config config,
-							DrtConfigGroup drtCfg) {
-						FleetImpl fleet = new FleetImpl();
-						new VehicleReader(network, fleet).parse(drtCfg.getVehiclesFileUrl(config.getContext()));
-						return fleet;
-					}
-
-				});
+		
+		controler.addOverridingModule( new DrtModule() ) ;
+		
 		controler.addOverridingModule(new DrtAnalysisModule());
 
 		switch (drtCfg.getOperationalScheme()) {
@@ -122,7 +113,7 @@ public class DrtControlerCreator {
 		return controler;
 	}
 
-	private static com.google.inject.AbstractModule createModuleForQSimPlugin(
+	static com.google.inject.AbstractModule createModuleForQSimPlugin(
 			final Class<? extends Provider<? extends DrtOptimizer>> providerClass) {
 		return new com.google.inject.AbstractModule() {
 			@Override

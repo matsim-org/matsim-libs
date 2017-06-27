@@ -50,19 +50,11 @@ public class OpdytsConvergenceChart {
     //BEGIN_EXAMPLE
     public static void main(String[] args) {
 
-        String filesDir = FileUtils.RUNS_SVN+"/opdyts/equil/car,bicycle/parametrizedRuns/avgIts_STwt/";
-        Integer avgItrsCases [] = {20,40,80,100,150,200};
-        Double selfTuningWeight [] = {1.,2.,4.,6.,8.};
+        String filesDir = FileUtils.RUNS_SVN+"/opdyts/patna/output_allModes/calibration_variationSize0.1_AvgIts20/";
 
-        for(Integer avgItr : avgItrsCases) {
-            for (Double selfTuningWt : selfTuningWeight) {
-                String caseFileDir = filesDir+ "calibration_"+avgItr+"Its_"+selfTuningWt+"weight_0.0asc/";
-
-                OpdytsConvergenceChart opdytsLogReader = new OpdytsConvergenceChart();
-                opdytsLogReader.readFile(caseFileDir+"/opdyts.con");
-                opdytsLogReader.plotData(caseFileDir+"/convergence_"+avgItr+"Its_"+selfTuningWt+"weight.png");
-            }
-        }
+        OpdytsConvergenceChart opdytsLogReader = new OpdytsConvergenceChart();
+        opdytsLogReader.readFile(filesDir+"/opdyts.con");
+        opdytsLogReader.plotData(filesDir+"/convergence.png");
     }
     //END_EXAMPLE
 

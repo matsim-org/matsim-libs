@@ -30,6 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
+import org.matsim.population.algorithms.TestsUtil;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -59,7 +60,7 @@ public class RoadPricingControlerIT {
 
 		// now run toll case
 //        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
-        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(utils.getInputDirectory() + "distanceToll.xml");
+        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(IOUtils.newUrl(utils.inputResourcePath(), "distanceToll.xml").toString());
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/tollcase/");
 		Controler controler2 = new Controler(config);
         controler2.setModules(new ControlerDefaultsWithRoadPricingModule());

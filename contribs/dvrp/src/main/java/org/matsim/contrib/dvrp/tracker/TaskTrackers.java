@@ -46,21 +46,11 @@ public class TaskTrackers {
 	}
 
 	public static void initOnlineStayTaskTracking(StayTask stayTask, final DynActivity dynActivity) {
-		stayTask.initTaskTracker(new TaskTracker() {
-			@Override
-			public double predictEndTime() {
-				return dynActivity.getEndTime();
-			}
-		});
+		stayTask.initTaskTracker(() -> dynActivity.getEndTime());
 	}
 
 	public static void initOfflineTaskTracking(final Task task, final MobsimTimer timer) {
-		task.initTaskTracker(new TaskTracker() {
-			@Override
-			public double predictEndTime() {
-				return TaskTrackers.predictEndTimeOffline(task, timer.getTimeOfDay());
-			}
-		});
+		task.initTaskTracker(() -> TaskTrackers.predictEndTimeOffline(task, timer.getTimeOfDay()));
 	}
 
 	public static double predictEndTime(Task task, double currentTime) {

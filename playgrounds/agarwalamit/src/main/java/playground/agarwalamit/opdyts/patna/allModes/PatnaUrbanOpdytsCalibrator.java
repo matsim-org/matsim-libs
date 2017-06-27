@@ -115,7 +115,7 @@ public class PatnaUrbanOpdytsCalibrator {
 		Set<String> teleportationModes = new HashSet<>(scenario.getConfig().plansCalcRoute().getModeRoutingParams().keySet());
 
 		Set<String> allModes = new LinkedHashSet<>(networkModes);
-		networkModes.addAll(teleportationModes);
+		allModes.addAll(teleportationModes);
 
 		DistanceDistribution referenceStudyDistri = new PatnaOneBinDistanceDistribution(PATNA_1_PCT);
 		OpdytsModalStatsControlerListener stasControlerListner = new OpdytsModalStatsControlerListener(allModes, referenceStudyDistri);

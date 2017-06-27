@@ -68,7 +68,7 @@ public class RunRobotaxiExample {
 			}
 		});
 		controler.addOverridingModule(new TaxiOutputModule());
-        controler.addOverridingModule(new TaxiModule());
+		controler.addOverridingModule(new TaxiModule());
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());

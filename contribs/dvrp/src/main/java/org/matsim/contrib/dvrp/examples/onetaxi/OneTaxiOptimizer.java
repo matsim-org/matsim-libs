@@ -41,7 +41,7 @@ import com.google.inject.name.Named;
 /**
  * @author michalm
  */
-public class OneTaxiOptimizer implements VrpOptimizer {
+final class OneTaxiOptimizer implements VrpOptimizer {
 	private final MobsimTimer timer;
 
 	private final TravelTime travelTime;

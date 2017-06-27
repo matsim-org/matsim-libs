@@ -22,13 +22,14 @@ package org.matsim.contrib.drt.run;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
-public class DrtConfigConsistencyChecker extends DvrpConfigConsistencyChecker {
+public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
 	private static final Logger log = Logger.getLogger(DrtConfigConsistencyChecker.class);
 
 	@Override
 	public void checkConsistency(Config config) {
-		super.checkConsistency(config);
+		new DvrpConfigConsistencyChecker().checkConsistency(config);
 
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		if (drtCfg.getMaxTravelTimeAlpha() < 1) {

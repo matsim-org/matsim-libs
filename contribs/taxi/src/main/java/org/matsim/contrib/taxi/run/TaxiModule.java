@@ -30,6 +30,7 @@ import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.*;
 import com.google.inject.name.Named;
@@ -37,24 +38,17 @@ import com.google.inject.name.Named;
 /**
  * @author michalm
  */
-public class TaxiModule extends DvrpModule {
+public final class TaxiModule extends AbstractModule {
 	public static final String TAXI_MODE = "taxi";
+
+	private final DvrpModule dvrpModule;
 
 	public TaxiModule() {
 		this(DefaultTaxiOptimizerProvider.class);
 	}
 
 	public TaxiModule(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		super(createModuleForQSimPlugin(providerClass), TaxiOptimizer.class);
-	}
-
-	@Provides
-	@Singleton
-	private Fleet provideVehicles(@Named(DvrpModule.DVRP_ROUTING) Network network, Config config,
-			TaxiConfigGroup taxiCfg) {
-		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(network, fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
-		return fleet;
+		dvrpModule = new DvrpModule(createModuleForQSimPlugin(providerClass), TaxiOptimizer.class);
 	}
 
 	private static com.google.inject.AbstractModule createModuleForQSimPlugin(
@@ -68,5 +62,29 @@ public class TaxiModule extends DvrpModule {
 				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
 			}
 		};
+	}
+
+	@Override
+	public void install() {
+		bind(Fleet.class).toProvider(DefaultTaxiFleetProvider.class).asEagerSingleton();
+		install(dvrpModule);
+	}
+
+	@Singleton
+	public static final class DefaultTaxiFleetProvider implements Provider<Fleet> {
+		@Inject
+		@Named(DvrpModule.DVRP_ROUTING)
+		Network network;
+		@Inject
+		Config config;
+		@Inject
+		TaxiConfigGroup taxiCfg;
+
+		@Override
+		public Fleet get() {
+			FleetImpl fleet = new FleetImpl();
+			new VehicleReader(network, fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
+			return fleet;
+		}
 	}
 }

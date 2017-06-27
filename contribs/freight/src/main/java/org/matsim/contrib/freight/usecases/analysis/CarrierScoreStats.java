@@ -20,15 +20,10 @@
 
 package org.matsim.contrib.freight.usecases.analysis;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Locale;
-
 import org.apache.log4j.Logger;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierPlan;
 import org.matsim.contrib.freight.carrier.Carriers;
-import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -38,6 +33,10 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Locale;
 
 /**
  * As you can see, it is basically a copy of {@link org.matsim.analysis.ScoreStatsControlerListener}. However, it is modified to score {@link Carrier}s
@@ -64,7 +63,7 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 	final private static int INDEX_AVERAGE = 2;
 	final private static int INDEX_EXECUTED = 3;
 
-	final private BufferedWriter out;
+	private BufferedWriter out;
 	final private String fileName;
 	
 	private final boolean createPNG;
@@ -86,23 +85,22 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 		this.carriers = carriers;
 		this.fileName = filename;
 		this.createPNG = createPNG;
-		if (filename.toLowerCase(Locale.ROOT).endsWith(".txt")) {
-			this.out = IOUtils.getBufferedWriter(filename);
+	}
+
+	@Override
+	public void notifyStartup(final StartupEvent event) {
+		if (fileName.toLowerCase(Locale.ROOT).endsWith(".txt")) {
+			this.out = IOUtils.getBufferedWriter(fileName);
 		} else {
-			this.out = IOUtils.getBufferedWriter(filename + ".txt");
+			this.out = IOUtils.getBufferedWriter(fileName + ".txt");
 		}
 		try {
 			this.out.write("ITERATION\tavg. EXECUTED\tavg. WORST\tavg. AVG\tavg. BEST\n");
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
-	}
-
-	@Override
-	public void notifyStartup(final StartupEvent event) {
-		MatsimServices controler = event.getServices();
-		this.minIteration = controler.getConfig().controler().getFirstIteration();
-		int maxIter = controler.getConfig().controler().getLastIteration();
+		this.minIteration = event.getServices().getConfig().controler().getFirstIteration();
+		int maxIter = event.getServices().getConfig().controler().getLastIteration();
 		int iterations = maxIter - this.minIteration;
 		if (iterations > 5000) iterations = 5000; // limit the history size
 		this.history = new double[4][iterations+1];
@@ -134,7 +132,7 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 				if (plan.getScore() == null) {
 					continue;
 				}
-				double score = plan.getScore().doubleValue();
+				double score = plan.getScore();
 
 				// worst plan
 				if (worstPlan == null) {
@@ -245,13 +243,4 @@ public class CarrierScoreStats implements StartupListener, IterationEndsListener
 
 	}
 
-	/**
-	 * @return the history of scores in last iterations
-	 */
-	public double[][] getHistory() {
-		if (this.history == null) {
-			return null;
-		}
-		return this.history.clone();
-	}
 }

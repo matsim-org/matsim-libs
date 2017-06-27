@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 /**
  * @author michalm
  */
-public class RequestImpl implements Request {
+public final class RequestImpl implements Request {
 	private final Id<Request> id;
 	private final double quantity;
 	private final double earliestStartTime;

@@ -6,7 +6,7 @@ import com.google.inject.name.Names;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.population.routes.RouteFactories;
@@ -58,7 +58,7 @@ public class AVModule extends AbstractModule {
 
         // Bind the AV travel time to the DVRP estimated travel time
         bind(TravelTime.class).annotatedWith(Names.named(AVModule.AV_MODE))
-                .to(Key.get(TravelTime.class, Names.named(VrpTravelTimeModules.DVRP_ESTIMATED)));
+                .to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 
         bind(VehicleType.class).annotatedWith(Names.named(AVModule.AV_MODE)).toInstance(VehicleUtils.getDefaultVehicleType());
 
@@ -101,7 +101,7 @@ public class AVModule extends AbstractModule {
     }
 
 	@Provides @Named(AVModule.AV_MODE)
-    LeastCostPathCalculator provideLeastCostPathCalculator(Network network, @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime) {
+    LeastCostPathCalculator provideLeastCostPathCalculator(Network network, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime) {
         return new Dijkstra(network, new OnlyTimeDependentTravelDisutility(travelTime), travelTime);
     }
 

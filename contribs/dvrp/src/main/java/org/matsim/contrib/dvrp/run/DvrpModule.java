@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.run.*;
@@ -39,7 +39,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 
-public class DvrpModule extends AbstractModule {
+public final class DvrpModule extends AbstractModule {
 	public static final String DVRP_ROUTING = "dvrp_routing";// TODO ==> dvrp_optimizer???
 
 	@Inject
@@ -83,7 +83,7 @@ public class DvrpModule extends AbstractModule {
 		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
 
 		// VrpTravelTimeEstimator
-		install(VrpTravelTimeModules.createTravelTimeEstimatorModule());
+		install(new DvrpTravelTimeModule());
 	}
 
 	@Provides

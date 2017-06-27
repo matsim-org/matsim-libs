@@ -20,6 +20,7 @@
 
 package org.matsim.core.events.handler;
 
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 
 /**
@@ -42,6 +43,6 @@ public interface EventHandler extends MatsimExtensionPoint {
 	 *  
 	 * @param iteration the up-coming iteration from which up-coming events will be from.
 	 */
-	public void reset(int iteration);
+	default void reset(int iteration) {}
 
 }

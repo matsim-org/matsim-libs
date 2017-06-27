@@ -55,12 +55,13 @@ public class RunTaxiBenchmark {
 		Controler controler = new Controler(scenario);
 		controler.setModules(new DvrpBenchmarkControlerModule());
 		controler.addOverridingModule(new TaxiOutputModule());
-		controler.addOverridingModule(new TaxiBenchmarkModule());
 
+		controler.addOverridingModule(new TaxiModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addControlerListenerBinding().to(TaxiBenchmarkStats.class).asEagerSingleton();
+				install(new DvrpBenchmarkTravelTimeModule());
 			};
 		});
 
