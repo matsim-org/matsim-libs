@@ -57,7 +57,7 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 public class PatnaNetworkModesCalibrator {
 
 	private static final OpdytsScenario PATNA_1_PCT = OpdytsScenario.PATNA_1Pct;
-	private static boolean isPlansRelaxed = false;
+	private static boolean isPlansRelaxed = true;
 
 	public static void main(String[] args) {
 		String configFile;

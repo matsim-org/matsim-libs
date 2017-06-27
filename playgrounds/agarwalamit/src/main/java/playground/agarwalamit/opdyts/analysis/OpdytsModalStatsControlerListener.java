@@ -25,20 +25,15 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.controler.events.*;
+import org.matsim.core.controler.listener.*;
 import org.matsim.core.utils.io.IOUtils;
-import playground.agarwalamit.analysis.modalShare.FilteredModalShareEventHandler;
+import playground.agarwalamit.analysis.modalShare.ModalShareFromPlans;
 import playground.agarwalamit.analysis.tripDistance.LegModeBeelineDistanceDistributionHandler;
 import playground.agarwalamit.opdyts.DistanceDistribution;
 import playground.agarwalamit.opdyts.ObjectiveFunctionEvaluator;
@@ -48,15 +43,16 @@ import playground.agarwalamit.opdyts.equil.EquilMixedTrafficObjectiveFunctionPen
  * Created by amit on 20/09/16.
  */
 
-public class OpdytsModalStatsControlerListener implements StartupListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
+public class OpdytsModalStatsControlerListener implements StartupListener, IterationStartsListener, ShutdownListener, ReplanningListener {
 
     @Inject
     private EventsManager events;
+    @Inject
+    private Scenario scenario;
 
     public static final String OPDYTS_STATS_LABEL_STARTER = "iterationNr";
     public static final String OPDYTS_STATS_FILE_NAME = "opdyts_modalStats";
 
-    private final FilteredModalShareEventHandler modalShareEventHandler = new FilteredModalShareEventHandler();
     private final DistanceDistribution referenceStudyDistri ;
     private LegModeBeelineDistanceDistributionHandler beelineDistanceDistributionHandler;
 
@@ -95,11 +91,11 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
             stringBuilder.append("totalObjectiveFunctionValue");
             writer.write(stringBuilder.toString());
             writer.newLine();
+            writer.flush();
+
         } catch (IOException e) {
             throw new RuntimeException("File not found.");
         }
-
-        this.events.addHandler(modalShareEventHandler);
 
         // initializing it here so that scenario can be accessed.
         List<Double> dists = Arrays.stream(this.referenceStudyDistri.getDistClasses()).boxed().collect(Collectors.toList());
@@ -110,11 +106,10 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
     @Override
     public void notifyIterationStarts(final IterationStartsEvent event) {
         this.beelineDistanceDistributionHandler.reset(event.getIteration());
-        this.modalShareEventHandler.reset(event.getIteration());
     }
 
     @Override
-    public void notifyIterationEnds(IterationEndsEvent event) {
+    public void notifyReplanning(ReplanningEvent event) {
 
        final int iteration = event.getIteration();
        final Config config = event.getServices().getConfig();
@@ -125,7 +120,9 @@ public class OpdytsModalStatsControlerListener implements StartupListener, Itera
             // nothing to do
         }
 
-        SortedMap<String, Integer> mode2Legs = modalShareEventHandler.getMode2numberOflegs();
+        ModalShareFromPlans modalShareFromPlans = new ModalShareFromPlans(scenario.getPopulation());
+        modalShareFromPlans.run();
+        SortedMap<String, Integer> mode2Legs = modalShareFromPlans.getModeToNumberOfLegs();
 
         // evaluate objective function value
         ObjectiveFunctionEvaluator objectiveFunctionEvaluator = new ObjectiveFunctionEvaluator();
