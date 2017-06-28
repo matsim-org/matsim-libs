@@ -5,9 +5,13 @@ import com.google.inject.Inject;
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
+import opdytsintegration.utils.OpdytsConfigGroup;
 import opdytsintegration.utils.TimeDiscretization;
-import org.matsim.api.core.v01.population.Population;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -30,6 +34,8 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 		implements StartupListener, BeforeMobsimListener, ShutdownListener, IterationEndsListener {
 
 	// -------------------- MEMBERS --------------------
+
+	private static final Logger LOGGER = Logger.getLogger(MATSimDecisionVariableSetEvaluator2.class);
 
 	private final TrajectorySampler<U> trajectorySampler;
 
@@ -293,11 +299,34 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 				this.stateList.removeLast();
 			}
 
+			// BEGIN_NEW: amit June'17
+			Config config = event.getServices().getConfig();
+			OpdytsConfigGroup opdytsConfigGroup = ConfigUtils.addOrGetModule(config,OpdytsConfigGroup.GROUP_NAME, OpdytsConfigGroup.class);
+			int numberOfDecisionVariableTrials = opdytsConfigGroup.getNumberOfDecisionVariableTrials();
+			int decisionVariableUpdateIteration = opdytsConfigGroup.getDecisionVariableTrialUpdateIteration();
+			int totalIterationForUpdation = numberOfDecisionVariableTrials * decisionVariableUpdateIteration;
+
 			/*
 			 * (3) Inform the TrajectorySampler that one iteration has been
 			 * completed and provide the resulting state.
 			 */
-			this.trajectorySampler.afterIteration(this.newState(this.population));
+			if (event.getIteration() == config.controler().getFirstIteration() ||
+					event.getIteration() > totalIterationForUpdation
+					) { //i.e., for first iteration and after all decision variables are tried out.
+
+				LOGGER.info("Informing trajectory sampler at iteration Nr "+ event.getIteration() + "; this will provide the resulting state.");
+				this.trajectorySampler.afterIteration(this.newState(this.population));
+
+			} else if( event.getIteration() % decisionVariableUpdateIteration == 1
+					) { // i.e., update after every decisionVariableUpdateIteration
+
+				LOGGER.info("Informing trajectory sampler at iteration Nr "+ event.getIteration() + "; this will provide the resulting state.");
+				this.trajectorySampler.afterIteration(this.newState(this.population));
+
+			} else {
+				// nothing to do for intermediate iterations.
+			}
+			// END_NEW: amit June'17
 		}
 
 		for (SimulationStateAnalyzerProvider analyzer : this.simulationStateAnalyzers) {

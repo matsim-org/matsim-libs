@@ -93,6 +93,33 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	private static final String UNIFORMITY_GAP_WEIGHT = "uniformityGapWeight";
 	private double uniformityGapWeight = 0.;
 
+	// BEGIN_NEW : amit June'17
+	private static final String NUMBER_OF_DECISION_VARIABLE_TRIALS = "numberOfDecisionVariableTrials";
+	private int numberOfDecisionVariableTrials = this.populationSize;
+
+	private static final String DECISION_VARIABLE_TRIAL_UPDATE_ITERATION = "decisionVariableTrialUpdateIteration";
+	private int decisionVariableTrialUpdateIteration = 1;
+
+	@StringGetter(NUMBER_OF_DECISION_VARIABLE_TRIALS)
+	public int getNumberOfDecisionVariableTrials() {
+		return numberOfDecisionVariableTrials;
+	}
+
+	@StringSetter(NUMBER_OF_DECISION_VARIABLE_TRIALS)
+	public void setNumberOfDecisionVariableTrials(int numberOfDecisionVariableTrials) {
+		this.numberOfDecisionVariableTrials = numberOfDecisionVariableTrials;
+	}
+
+	@StringGetter(DECISION_VARIABLE_TRIAL_UPDATE_ITERATION)
+	public int getDecisionVariableTrialUpdateIteration() {
+		return decisionVariableTrialUpdateIteration;
+	}
+
+	@StringSetter(DECISION_VARIABLE_TRIAL_UPDATE_ITERATION)
+	public void setDecisionVariableTrialUpdateIteration(int decisionVariableTrialUpdateIteration) {
+		this.decisionVariableTrialUpdateIteration = decisionVariableTrialUpdateIteration;
+	}
+	// END_NEW : amit June'17
 
 	@StringGetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
 	public double getVariationSizeOfRandomizeDecisionVariable() {

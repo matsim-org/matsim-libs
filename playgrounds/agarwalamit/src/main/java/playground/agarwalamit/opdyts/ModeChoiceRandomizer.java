@@ -57,6 +57,8 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
         this.subPopName = subPopName;
         this.opdytsScenario = opdytsScenario;
         this.considerdModes = considerdModes;
+
+        opdytsConfigGroup.setNumberOfDecisionVariableTrials(0); // will update once decision variables are created
     }
 
     @Override
@@ -92,6 +94,9 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
         for (ModeChoiceDecisionVariable var : result) {
             log.warn(var.toString());
         }
+
+        log.warn("updating the numer of decision variables trials");
+        opdytsConfigGroup.setNumberOfDecisionVariableTrials(opdytsConfigGroup.getNumberOfDecisionVariableTrials()+result.size());
         return result;
     }
 

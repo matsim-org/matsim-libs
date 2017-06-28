@@ -76,6 +76,11 @@ public class PatnaNetworkModesCalibrator {
 		Config config = ConfigUtils.loadConfig(configFile, new OpdytsConfigGroup());
 		OpdytsConfigGroup opdytsConfigGroup = (OpdytsConfigGroup) config.getModules().get(OpdytsConfigGroup.GROUP_NAME);
 
+		if(args.length==0) {
+			opdytsConfigGroup.setDecisionVariableTrialUpdateIteration(5);
+			opdytsConfigGroup.setPopulationSize(4);
+		}
+
 		String relaxedPlansDir = OUT_DIR+"/initialPlans2RelaxedPlans/";
 		if (! isPlansRelaxed ) {
 			// relax the plans first.
