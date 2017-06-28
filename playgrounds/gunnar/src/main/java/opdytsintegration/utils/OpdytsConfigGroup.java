@@ -97,8 +97,8 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	private static final String NUMBER_OF_DECISION_VARIABLE_TRIALS = "numberOfDecisionVariableTrials";
 	private int numberOfDecisionVariableTrials = this.populationSize;
 
-	private static final String DECISION_VARIABLE_TRIAL_UPDATE_ITERATION = "decisionVariableTrialUpdateIteration";
-	private int decisionVariableTrialUpdateIteration = 1;
+	private static final String ITERATION_TO_UPDATE_DECISION_VARIABLE_TRIAL = "iterationsToUpdateDecisionVariableTrial";
+	private int iterationsToUpdateDecisionVariableTrial = 1;
 
 	@StringGetter(NUMBER_OF_DECISION_VARIABLE_TRIALS)
 	public int getNumberOfDecisionVariableTrials() {
@@ -110,14 +110,14 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 		this.numberOfDecisionVariableTrials = numberOfDecisionVariableTrials;
 	}
 
-	@StringGetter(DECISION_VARIABLE_TRIAL_UPDATE_ITERATION)
-	public int getDecisionVariableTrialUpdateIteration() {
-		return decisionVariableTrialUpdateIteration;
+	@StringGetter(ITERATION_TO_UPDATE_DECISION_VARIABLE_TRIAL)
+	public int getIterationsToUpdateDecisionVariableTrial() {
+		return iterationsToUpdateDecisionVariableTrial;
 	}
 
-	@StringSetter(DECISION_VARIABLE_TRIAL_UPDATE_ITERATION)
-	public void setDecisionVariableTrialUpdateIteration(int decisionVariableTrialUpdateIteration) {
-		this.decisionVariableTrialUpdateIteration = decisionVariableTrialUpdateIteration;
+	@StringSetter(ITERATION_TO_UPDATE_DECISION_VARIABLE_TRIAL)
+	public void setIterationsToUpdateDecisionVariableTrial(int iterationsToUpdateDecisionVariableTrial) {
+		this.iterationsToUpdateDecisionVariableTrial = iterationsToUpdateDecisionVariableTrial;
 	}
 	// END_NEW : amit June'17
 

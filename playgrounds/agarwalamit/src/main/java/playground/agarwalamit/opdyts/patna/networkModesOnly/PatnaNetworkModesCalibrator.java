@@ -77,7 +77,7 @@ public class PatnaNetworkModesCalibrator {
 		OpdytsConfigGroup opdytsConfigGroup = (OpdytsConfigGroup) config.getModules().get(OpdytsConfigGroup.GROUP_NAME);
 
 		if(args.length==0) {
-			opdytsConfigGroup.setDecisionVariableTrialUpdateIteration(5);
+			opdytsConfigGroup.setIterationsToUpdateDecisionVariableTrial(5);
 			opdytsConfigGroup.setPopulationSize(4);
 		}
 

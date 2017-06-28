@@ -303,8 +303,8 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 			Config config = event.getServices().getConfig();
 			OpdytsConfigGroup opdytsConfigGroup = ConfigUtils.addOrGetModule(config,OpdytsConfigGroup.GROUP_NAME, OpdytsConfigGroup.class);
 			int numberOfDecisionVariableTrials = opdytsConfigGroup.getNumberOfDecisionVariableTrials();
-			int decisionVariableUpdateIteration = opdytsConfigGroup.getDecisionVariableTrialUpdateIteration();
-			int totalIterationForUpdation = numberOfDecisionVariableTrials * decisionVariableUpdateIteration;
+			int iterationsToUpdateDecisionVariableTrial = opdytsConfigGroup.getIterationsToUpdateDecisionVariableTrial();
+			int totalIterationForUpdation = numberOfDecisionVariableTrials * iterationsToUpdateDecisionVariableTrial;
 
 			/*
 			 * (3) Inform the TrajectorySampler that one iteration has been
@@ -317,8 +317,8 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 				LOGGER.info("Informing trajectory sampler at iteration Nr "+ event.getIteration() + "; this will provide the resulting state.");
 				this.trajectorySampler.afterIteration(this.newState(this.population));
 
-			} else if( event.getIteration() % decisionVariableUpdateIteration == 1
-					) { // i.e., update after every decisionVariableUpdateIteration
+			} else if( event.getIteration() % iterationsToUpdateDecisionVariableTrial == 1
+					) { // i.e., update after every iterationsToUpdateDecisionVariableTrial
 
 				LOGGER.info("Informing trajectory sampler at iteration Nr "+ event.getIteration() + "; this will provide the resulting state.");
 				this.trajectorySampler.afterIteration(this.newState(this.population));
