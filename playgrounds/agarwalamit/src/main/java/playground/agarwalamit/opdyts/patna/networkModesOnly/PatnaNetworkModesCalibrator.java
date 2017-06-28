@@ -57,44 +57,28 @@ import playground.kai.usecases.opdytsintegration.modechoice.EveryIterationScorin
 public class PatnaNetworkModesCalibrator {
 
 	private static final OpdytsScenario PATNA_1_PCT = OpdytsScenario.PATNA_1Pct;
-	private static boolean isPlansRelaxed = true;
 
 	public static void main(String[] args) {
 		String configFile;
 		String OUT_DIR = null;
+		String relaxedPlans ;
 
 		if ( args.length>0 ) {
 			configFile = args[0];
 			OUT_DIR = args[1];
-
-			isPlansRelaxed = Boolean.valueOf(args[2]);;
+			relaxedPlans = args[2];
 		} else {
 			configFile = FileUtils.RUNS_SVN+"/opdyts/patna/input_networkModes/"+"/config_networkModesOnly.xml";
-			OUT_DIR = FileUtils.RUNS_SVN+"/opdyts/patna/output_networkModes/";
+			OUT_DIR = FileUtils.RUNS_SVN+"/opdyts/patna/output_networkModes/calib_trial/";
+			relaxedPlans = FileUtils.RUNS_SVN+"/opdyts/patna/output_networkModes/initialPlans2RelaxedPlans/output_plans.xml.gz";
 		}
 
 		Config config = ConfigUtils.loadConfig(configFile, new OpdytsConfigGroup());
-		OpdytsConfigGroup opdytsConfigGroup = (OpdytsConfigGroup) config.getModules().get(OpdytsConfigGroup.GROUP_NAME);
-
-		if(args.length==0) {
-			opdytsConfigGroup.setIterationsToUpdateDecisionVariableTrial(5);
-			opdytsConfigGroup.setPopulationSize(4);
-		}
-
-		String relaxedPlansDir = OUT_DIR+"/initialPlans2RelaxedPlans/";
-		if (! isPlansRelaxed ) {
-			// relax the plans first.
-			config.controler().setOutputDirectory(relaxedPlansDir);
-			PatnaNetworkModesPlansRelaxor relaxor = new PatnaNetworkModesPlansRelaxor();
-			relaxor.run(config);
-		}
-
-		OUT_DIR = OUT_DIR+"/calibration_variationSize_"+opdytsConfigGroup.getVariationSizeOfRandomizeDecisionVariable()+"_AvgIts"+opdytsConfigGroup.getNumberOfIterationsForAveraging()+"/";
-		config.plans().setInputFile(relaxedPlansDir+"/output_plans.xml.gz");
-
+		config.plans().setInputFile(relaxedPlans);
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspExperimentalConfigGroup.VspDefaultsCheckingLevel.warn); // must be warn, since opdyts override few things
-
 		config.controler().setOutputDirectory(OUT_DIR);
+
+		OpdytsConfigGroup opdytsConfigGroup = (OpdytsConfigGroup) config.getModules().get(OpdytsConfigGroup.GROUP_NAME);
 		opdytsConfigGroup.setOutputDirectory(OUT_DIR);
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
