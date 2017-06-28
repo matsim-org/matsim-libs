@@ -3,6 +3,7 @@ package playground.joel.html;
 import playground.clruch.utils.GlobalAssert;
 
 import java.io.*;
+import java.nio.file.Files;
 
 /**
  * Created by Joel on 26.06.2017.
@@ -27,9 +28,12 @@ public abstract class htmlUtils {
             htmlUtils.insertCSS("header, footer {font-family: arial;", //
                     "background-color: #000099;", //
                     "color: white;", //
-                    "padding: 20px;}", //
-                    "body {font-family: times;", //
-                    "line-height: 1.5}");
+                    "padding: 20px;", //
+                    "float: left;", //
+                    "width: 100%}", //
+                    "body {font-family: verdana;", //
+                    "font-size: 16px;", //
+                    "line-height: 1.75;}");
         }
     }
 
@@ -107,6 +111,10 @@ public abstract class htmlUtils {
         header();
     }
 
+    public static void insertSubTitle(String title) {
+        stringBuilder.append("<h2>" + title + "</h2>");
+    }
+
     public static void title(String title) {
         insertTitle(title);
         setTitle(title);
@@ -121,6 +129,14 @@ public abstract class htmlUtils {
 
     public static void insertText(String text) {
         stringBuilder.append("<pre>" + text + "</pre>");
+    }
+
+    public static void insertTextLeft(String text) {
+        stringBuilder.append("<pre id=\"pre_left\">" + text + "</pre>");
+    }
+
+    public static void insertTextRight(String text) {
+        stringBuilder.append("<pre id=\"pre_right\">" + text + "</pre>");
     }
 
     public static void insertLink(String url, String link) {
@@ -180,11 +196,14 @@ public abstract class htmlUtils {
         stringBuilder.append("</ul>");
     }
 
+    public static String bold(String text) {
+        return "<b>" + text + "</b>";
+    }
+
     public static void saveFile(String fileName) throws IOException {
-        File file = new File("output", fileName);
+        File file = new File("output/report", fileName);
         // if file does exists, then delete and create a new file
-        if (file.exists())
-            GlobalAssert.that(file.delete());
+        Files.deleteIfExists(file.toPath());
 
         //write to file with OutputStreamWriter
         OutputStream outputStream = new FileOutputStream(file.getAbsoluteFile());

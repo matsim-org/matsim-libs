@@ -12,6 +12,8 @@ import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
 import playground.clruch.net.VehicleStatistic;
+import playground.clruch.utils.GlobalAssert;
+import playground.joel.html.DataCollector;
 
 /**
  * Created by Joel on 05.04.2017.
@@ -20,7 +22,6 @@ public class DistanceAnalysis {
     StorageSupplier storageSupplier;
     int size;
     public Tensor summary = Tensors.empty();
-    public Tensor others = Tensors.empty();
     public int numVehicles;
 
     DistanceAnalysis(StorageSupplier storageSupplierIn) {
@@ -32,7 +33,8 @@ public class DistanceAnalysis {
 
         SimulationObject init = storageSupplier.getSimulationObject(1);
         numVehicles = init.vehicles.size();
-        System.out.println("found vehicles: " + numVehicles);
+
+        System.out.println("Found vehicles: " + numVehicles);
 
         List<VehicleStatistic> list = new ArrayList<>();
         IntStream.range(0, numVehicles).forEach(i -> list.add(new VehicleStatistic(size)));
@@ -51,11 +53,10 @@ public class DistanceAnalysis {
 
         Tensor table1 = list.stream().map(vs -> vs.distanceTotal).reduce(Tensor::add).get(); // summary 0 (11)
         Tensor table2 = list.stream().map(vs -> vs.distanceWithCustomer).reduce(Tensor::add).get(); // summary 1 (12)
-        Tensor table3 = list.stream().map(vs -> vs.distancePickup).reduce(Tensor::add).get(); // others 0
-        Tensor table4 = list.stream().map(vs -> vs.distanceRebalance).reduce(Tensor::add).get(); // others 1
-        Tensor table5 = table1.map(InvertUnlessZero.function).pmul(table2); // summary 2 (13)
-        summary = Join.of(1, table1, table2, table5);
-        others = Join.of(1, table3, table4);
+        Tensor table3 = list.stream().map(vs -> vs.distancePickup).reduce(Tensor::add).get(); // summary 2 (13)
+        Tensor table4 = list.stream().map(vs -> vs.distanceRebalance).reduce(Tensor::add).get(); // summary 3 (14)
+        Tensor table5 = table1.map(InvertUnlessZero.function).pmul(table2); // summary 4 (15)
+        summary = Join.of(1, table1, table2, table3, table4, table5);
         /*
         {
             AnalyzeAll.saveFile(table1, "distanceTotal");

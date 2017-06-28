@@ -22,6 +22,9 @@ import playground.clruch.traveltimetracker.AVTravelTimeModule;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.joel.analysis.AnalyzeAll;
+import playground.joel.analysis.AnalyzeSummary;
+import playground.joel.html.DataCollector;
+import playground.joel.html.ReportGenerator;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -41,7 +44,7 @@ public class ScenarioServer {
 
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
-        int maxPopulationSize = 15000;
+        int maxPopulationSize = 1000;
 
 
         // set to true in order to make server wait for at least 1 client, for instance viewer client
@@ -100,13 +103,17 @@ public class ScenarioServer {
 //                addPlanStrategyBinding("ZurichModeChoice").toProvider(ZurichPlanStrategyProvider.class);
 //            }
 //        });
-        
-        
+
         controler.run();
-        
+
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
-        AnalyzeAll.analyze(args);
+        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
         //AnalyzeMarc.analyze(args);
+
+        DataCollector.store(args, controler, analyzeSummary);
+
+        ReportGenerator.from(args);
+
     }
 }

@@ -18,16 +18,19 @@ import playground.clruch.export.AVStatus;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
+import playground.joel.html.DataCollector;
 
 /**
  * Created by Joel on 05.04.2017.
  */
 public class CoreAnalysis {
-    StorageSupplier storageSupplier;
-    int size;
+    final StorageSupplier storageSupplier;
+    final int size;
     public Tensor summary = Tensors.empty();
     public Tensor totalWaitTimeQuantile = Tensors.empty();
     public Tensor totalWaitTimeMean = Tensors.empty();
+    public double maximumWaitTime;
+    public int numRequests;
 
     CoreAnalysis(StorageSupplier storageSupplierIn) {
         storageSupplier = storageSupplierIn;
@@ -48,6 +51,16 @@ public class CoreAnalysis {
         } else {
             return Mean.of(Array.zeros(1));
         }
+    }
+
+    static double maximum(Tensor submissions){
+        double max = submissions.Get(0).number().doubleValue();
+        for (int i = 1; i < submissions.length(); i++) {
+            double current = submissions.Get(i).number().doubleValue();
+            if (max < current)
+                max = current;
+        }
+        return max;
     }
 
     public void analyze() throws Exception {
@@ -113,6 +126,10 @@ public class CoreAnalysis {
         // AnalyzeAll.saveFile(table, "basicDemo");
 
         Tensor uniqueSubmissions = Tensor.of(requestWaitTimes.values().stream().map(RealScalar::of));
+        numRequests = uniqueSubmissions.length();
+        maximumWaitTime = maximum(uniqueSubmissions);
+
+        System.out.println("Found requests: " + numRequests);
 
         totalWaitTimeQuantile = quantiles(uniqueSubmissions);
         System.out.println("Q = " + totalWaitTimeQuantile);
