@@ -99,8 +99,8 @@ public class DiagramCreator {
         }
 
         // save plot as png
-        int width = 1200; /* Width of the image */
-        int height = 900; /* Height of the image */
+        int width = 1000; /* Width of the image */
+        int height = 750; /* Height of the image */
         File timeChart = new File(directory, fileTitle + ".png");
         ChartUtilities.saveChartAsPNG(timeChart, timechart, width, height);
         GlobalAssert.that(timeChart.exists() && !timeChart.isDirectory());

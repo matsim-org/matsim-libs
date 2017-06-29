@@ -17,6 +17,9 @@ public class ReportGenerator {
 
     final static DecimalFormat d = new DecimalFormat("#0.00");
 
+    // TODO: insert correct distance transformation
+    final static double link2km = 0.001;
+
     public static void main(String[] args) throws Exception {
         from(args);
     }
@@ -76,31 +79,39 @@ public class ReportGenerator {
                 "\n" + scenarioParameters.redispatchPeriod);
 
         htmlUtils.insertSubTitle("Aggregate Results");
+        htmlUtils.insertTextLeft("Computation Time:");
+        htmlUtils.insertTextLeft("SOON");
+        htmlUtils.newLine();
         htmlUtils.insertTextLeft(htmlUtils.bold("Waiting Times") + //
                 "\n\tMean:" + //
                 "\n\t50% quantile:" + //
                 "\n\t95% quantile:" + //
-                "\n\tMaximum:");
+                "\n\tMaximum:" + //
+                "\n" + //
+                "\nOccupancy Ratio:" + //
+                "\nDistance Ratio:" + //
+                "\n" + //
+                "\n" + htmlUtils.bold("Distances") + //
+                "\n\tTotal:" + //
+                "\n\tRebalancing:" + //
+                "\n\tPickup:" + //
+                "\n\tWith Customer:" //
+        );
         htmlUtils.insertTextLeft(" " + //
                 "\n" + d.format(analyzeSummary.totalWaitTimeMean.Get().number().doubleValue()/60) + " min" + //
                 "\n" + d.format(analyzeSummary.totalWaitTimeQuantile.Get(1).number().doubleValue()/60) + " min" + //
                 "\n" + d.format(analyzeSummary.totalWaitTimeQuantile.Get(2).number().doubleValue()/60)+ " min" + //
-                "\n" + d.format(analyzeSummary.maximumWaitTime/60) + " min");
-        htmlUtils.newLine();
-        htmlUtils.insertTextLeft("Occupancy Ratio:" + //
-                "\nDistance Ratio:");
-        htmlUtils.insertTextLeft(d.format(analyzeSummary.occupancyRatio*100) + "%" + //
-                "\n" + d.format(analyzeSummary.distanceRatio*100)+ "%");
-        htmlUtils.newLine();
-        htmlUtils.insertTextLeft(htmlUtils.bold("Distances") + //
-                "\n\tRebalancing:" + //
-                "\n\tPickup:" + //
-                "\n\tWith Customer:");
-        // TODO: insert correct distance transformation
-        htmlUtils.insertTextLeft(" " + //
-                "\n" + d.format(analyzeSummary.distanceRebalance/1000) + " km" + //
-                "\n" + d.format(analyzeSummary.distancePickup/1000) + " km" + //
-                "\n" + d.format(analyzeSummary.distanceWithCust/1000) + " km");
+                "\n" + d.format(analyzeSummary.maximumWaitTime/60) + " min" + //
+                "\n" + //
+                "\n" + d.format(analyzeSummary.occupancyRatio*100) + "%" + //
+                "\n" + d.format(analyzeSummary.distanceRatio*100)+ "%" + //
+                "\n\n" + //
+                "\n" + d.format(analyzeSummary.distance*link2km) + " km" + //
+                "\n" + d.format(analyzeSummary.distanceRebalance*link2km) + " km" + //
+                "\n" + d.format(analyzeSummary.distancePickup*link2km) + " km" + //
+                "\n" + d.format(analyzeSummary.distanceWithCust*link2km) + " km" //
+        );
+        htmlUtils.insertImgRight(IMAGE_FOLDER + "/stackedDistance.png", 250, 400);
 
         htmlUtils.insertSubTitle("Wait Times");
         htmlUtils.insertTextLeft("Requests:");
@@ -120,6 +131,15 @@ public class ReportGenerator {
         htmlUtils.insertImg(IMAGE_FOLDER + "/binnedWaitingTimes.png", 800, 600);
 
         htmlUtils.insertSubTitle("Fleet Performance");
+        htmlUtils.insertTextLeft( //
+                "Occupancy Ratio:" + //
+                "\nDistance Ratio:" //
+        );
+        htmlUtils.insertTextLeft( //
+                d.format(analyzeSummary.occupancyRatio*100) + "%" + //
+                "\n" + d.format(analyzeSummary.distanceRatio*100)+ "%" //
+        );
+        htmlUtils.newLine();
         htmlUtils.insertImg(IMAGE_FOLDER + "/binnedTimeRatios.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/binnedDistanceRatios.png", 800, 600);
 

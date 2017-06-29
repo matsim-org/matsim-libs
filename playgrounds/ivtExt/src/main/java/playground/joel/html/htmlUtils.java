@@ -166,6 +166,11 @@ public abstract class htmlUtils {
                 width + "px;height:" + heigth + "px;\">");
     }
 
+    public static void insertImgRight(String relPath, int width, int heigth) {
+        stringBuilder.append("<img id=\"img_right\" float=\"right\" src=" + relPath + " " + //
+                "alt=\"Image not found\" style=\"width:" + width + "px;height:" + heigth + "px;\">");
+    }
+
     /**
      * first elements are automatically set as headings
      *

@@ -1,7 +1,5 @@
 package playground.joel.html;
 
-import playground.joel.analysis.AnalyzeSummary;
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;

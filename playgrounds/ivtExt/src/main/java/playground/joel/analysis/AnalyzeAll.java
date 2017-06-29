@@ -72,12 +72,15 @@ public class AnalyzeAll {
     static void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis) throws Exception {
         Tensor summary = Join.of(1, coreAnalysis.summary, distanceAnalysis.summary);
         saveFile(summary, "summary");
-        AnalyzeAll.plot("summary", "binnedWaitingTimes", "Waiting Times", 3, 6, maxWaitingTime);
-            // maximum waiting time in the plot to have this uniform for all simulations
-        AnalyzeAll.plot("summary", "binnedTimeRatios", "Occupancy Ratio", 10, 11);
-        AnalyzeAll.plot("summary", "binnedDistanceRatios", "Distance Ratio", 15, 16);
 
         getTotals(summary, coreAnalysis);
+
+        AnalyzeAll.plot("summary", "binnedWaitingTimes", "Waiting Times", 3, 6, maxWaitingTime);
+        // maximum waiting time in the plot to have this uniform for all simulations
+        AnalyzeAll.plot("summary", "binnedTimeRatios", "Occupancy Ratio", 10, 11);
+        AnalyzeAll.plot("summary", "binnedDistanceRatios", "Distance Ratio", 15, 16);
+        UniqueDiagrams.distanceStack(RELATIVE_DIRECTORY, "stackedDistance", "Distance Partition", //
+                distanceRebalance/distance, distancePickup/distance, distanceWithCust/distance);
     }
 
     static void getTotals(Tensor summary, CoreAnalysis coreAnalysis) {

@@ -14,8 +14,8 @@ public class AnalyzeSummary implements Serializable {
     public int numRequests;
     public int numVehicles;
 
-    public double occupancyRatio ;
-    public double distance ;
+    public double occupancyRatio;
+    public double distance;
     public double distanceWithCust;
     public double distancePickup;
     public double distanceRebalance;
