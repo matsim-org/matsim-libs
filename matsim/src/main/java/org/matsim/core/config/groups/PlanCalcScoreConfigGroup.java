@@ -586,7 +586,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private double closingTime = Time.UNDEFINED_TIME;
 		private boolean scoringThisActivityAtAll = true ;
 
-		private TypicalDurationScoreComputation typicalDurationScoreComputation = TypicalDurationScoreComputation.uniform ;
+		private TypicalDurationScoreComputation typicalDurationScoreComputation = TypicalDurationScoreComputation.relative ;
 
 
 		public ActivityParams() {
