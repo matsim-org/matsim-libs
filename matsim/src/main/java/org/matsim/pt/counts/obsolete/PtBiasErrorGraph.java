@@ -73,14 +73,14 @@ public final class PtBiasErrorGraph extends CountsGraph {
 
 		double[] meanRelError = errorStats.getMeanRelError();
 		// double[] meanAbsError = errorStats.getMeanAbsError();
-		double[] meanAbsBias = errorStats.getMeanAbsBias();
+		double[] meanAbsBias = errorStats.getMeanBias();
 
 		for (int h = 0; h < 24; h++) {
 			dataset0.addValue(meanRelError[h], "Mean rel error", Integer
 					.toString(h + 1));
 			// dataset1.addValue(meanAbsError[h], "Mean abs error",
 			// Integer.toString(h + 1));
-			dataset1.addValue(meanAbsBias[h], "Mean abs bias", Integer
+			dataset1.addValue(meanAbsBias[h], "Mean bias", Integer
 					.toString(h + 1));
 		}
 
@@ -138,6 +138,6 @@ public final class PtBiasErrorGraph extends CountsGraph {
 			throw new RuntimeException(
 					"Object not initialized correctly. Call createChart(..) first!");
 		}
-		return this.errorStats.getMeanAbsBias();
+		return this.errorStats.getMeanBias();
 	}
 }
