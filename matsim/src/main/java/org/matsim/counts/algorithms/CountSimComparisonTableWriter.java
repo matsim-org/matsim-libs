@@ -41,36 +41,39 @@ import org.matsim.counts.CountSimComparison;
  * anhorni 31.03.2008: Writing the 'average weekday traffic volume' (german: DWV) per link
  * to another table.
  * Future work: Use parameter in the config file to choose which table to be printed.
+ * 
+ * Added normalized relative errors and geh values to output file. cdobler jun'17
  */
 public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
+	
 	/**
-   * the separator used
-   */
+	 * the separator used
+	 */
 	private static final String SEPARATOR = "\t";
 
 	/**
-   * newline
-   */
+	 * newline
+	 */
 	private static final String NEWLINE = "\n";
 
 	/**
-   * the column headers of the table
-   */
+	 * the column headers of the table
+	 */
 	private static final String[] COLUMNHEADERS = { "Link Id", "Hour",
-			"MATSIM volumes", "Count volumes", "Relative Error"};
+			"MATSIM volumes", "Count volumes", "Relative Error [%]", "Normalized Relative Error [%]", "GEH"};
 
 	/**
-   * the formatter for numbers
-   */
+	 * the formatter for numbers
+	 */
 	private final NumberFormat numberFormat;
 
 	private static final Logger log = Logger.getLogger(CountSimComparisonTableWriter.class);
 
 	/**
-   *
-   * @param countSimComparisons
+	 *
+	 * @param countSimComparisons
 	 * @param l the Locale used, if null then DecimalFormat("#.############") is used
-   */
+	 */
 	public CountSimComparisonTableWriter(
 			final List<CountSimComparison> countSimComparisons, final Locale l) {
 		super(countSimComparisons);
@@ -92,14 +95,16 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 	public void writeFile(final String filename) {
 		log.info("Writing CountsSimComparison to " + filename);
 		try (BufferedWriter out = new BufferedWriter(new FileWriter(filename))) {
-			for (int i = 0; i < COLUMNHEADERS.length; i++) {
-				out.write(COLUMNHEADERS[i]);
+			
+			out.write(COLUMNHEADERS[0]);
+			for (int i = 1; i < COLUMNHEADERS.length; i++) {
 				out.write(SEPARATOR);
+				out.write(COLUMNHEADERS[i]);
 			}
 			out.write(NEWLINE);
 
 			for (CountSimComparison csc : this.countComparisonFilter.getCountsForHour(null)) {
-
+				
 				out.write(csc.getId().toString());
 				out.write(SEPARATOR);
 				out.write(Integer.toString(csc.getHour()));
@@ -109,6 +114,10 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 				out.write(this.numberFormat.format(csc.getCountValue()));
 				out.write(SEPARATOR);
 				out.write(this.numberFormat.format(csc.calculateRelativeError()));
+				out.write(SEPARATOR);
+				out.write(this.numberFormat.format(csc.calculateNormalizedRelativeError()));
+				out.write(SEPARATOR);
+				out.write(this.numberFormat.format(csc.calculateGEHValue()));
 				out.write(NEWLINE);
 			}
 		} catch (IOException e) {
@@ -117,16 +126,15 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 
 		// writing the 'average weekday traffic volume' table:
 		this.writeAWTVTable(filename);
-
 	}
 
 	private void writeAWTVTable(final String file) {
 		// output file always ends with ".txt"
-		String filename=file.substring(0,file.length()-4)+"AWTV.txt";
+		String filename = file.substring(0, file.length() - 4) + "AWTV.txt";
 
 		log.info("Writing 'average weekday traffic volume' to " + filename);
 
-		CountSimComparisonLinkFilter linkFilter=new CountSimComparisonLinkFilter(
+		CountSimComparisonLinkFilter linkFilter = new CountSimComparisonLinkFilter(
 				this.countComparisonFilter.getCountsForHour(null));
 
 		try (BufferedWriter out = new BufferedWriter(new FileWriter(filename))) {

@@ -56,8 +56,10 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	}
 
 	/**
-	 * @see org.matsim.counts.CountSimComparison#calculateRelativeError() return
-	 *      signed rel error
+	 * Note that this return the value in percent!
+	 * 
+	 * @see org.matsim.counts.CountSimComparison#calculateRelativeError() 
+	 * @return signed relative error [%]
 	 */
 	@Override
 	public double calculateRelativeError() {
@@ -104,4 +106,25 @@ public class CountSimComparisonImpl implements CountSimComparison {
 		return this.simulationValue;
 	}
 
+	/**
+	 * Note that this return the value in percent!
+	 *  
+	 * @see org.matsim.counts.CountSimComparison#calculateNormalizedRelativeError()
+	 * @return normalized relative error [%]
+	 */
+	@Override
+	public double calculateNormalizedRelativeError() {		
+		return Math.abs(this.simulationValue - this.countValue) / Math.max(this.simulationValue, this.countValue);
+	}
+
+	/**
+	 * @see org.matsim.counts.CountSimComparison#calculateGEHValue()
+	 */
+	@Override
+	public double calculateGEHValue() {
+		final double diff = this.simulationValue - this.countValue;
+		final double sum = this.simulationValue + this.countValue;
+		final double gehV = Math.sqrt(2 * diff * diff / sum);
+		return gehV;
+	}
 }
