@@ -10,7 +10,7 @@ public class htmlDemo {
         String fileName = "htmlDemo";
 
         File config = new File(args[0]);
-        File file= new File(config.getParent());
+        File file = new File(config.getParent());
         file.mkdir();
 
         // write document

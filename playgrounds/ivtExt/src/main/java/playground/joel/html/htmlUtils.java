@@ -33,7 +33,9 @@ public abstract class htmlUtils {
                     "width: 100%}", //
                     "body {font-family: verdana;", //
                     "font-size: 16px;", //
-                    "line-height: 1.75;}");
+                    "line-height: 1.75;}", //
+                    "img {padding: 5px;}" //
+            );
         }
     }
 
@@ -141,8 +143,9 @@ public abstract class htmlUtils {
 
     public static void insertLink(String url, String link) {
         htmlUtils.insertCSS("a {font-family: arial;}");
-        if (footer || header) htmlUtils.insertCSS("a {color: white;}");
-        stringBuilder.append("<a href=\"" + url + "\"> <b>" + link + "</b></a>");
+        if (footer || header) stringBuilder.append("<a id=\"footer_link\" target=\"_blank\" href=\" color=\"white\"" + //
+                url + "\"> <b>" + link + "</b></a>");
+        else stringBuilder.append("<a target=\"_blank\" href=\"" + url + "\"> <b>" + link + "</b></a>");
     }
 
     public static void insertCSS(String... line) {
@@ -159,7 +162,7 @@ public abstract class htmlUtils {
     }
 
     public static void insertImg(String relPath, int width, int heigth) {
-        stringBuilder.append("<img src=" + relPath + " alt=\"image not found\" style=\"width:" + //
+        stringBuilder.append("<img src=" + relPath + " alt=\"Image not found\" style=\"width:" + //
                 width + "px;height:" + heigth + "px;\">");
     }
 

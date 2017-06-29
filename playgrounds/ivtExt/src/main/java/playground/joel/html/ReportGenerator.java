@@ -11,8 +11,9 @@ import java.text.DecimalFormat;
 public class ReportGenerator {
 
     final static String REPORT_NAME = "report";
-
     final static String TITLE = "AV Simulation Report";
+
+    final static String IMAGE_FOLDER = "../data"; // relative to report folder
 
     final static DecimalFormat d = new DecimalFormat("#0.00");
 
@@ -35,8 +36,9 @@ public class ReportGenerator {
                 "h2 {float: left; width: 100%; padding: 10px}", //
                 "pre {font-family: verdana; float: left; width: 100%; padding-left: 20px;}", //
                 "p {float: left; width: 80%; padding-left: 20px;}", //
-                "#pre_left {float: left; width: 40%;}", "#pre_right {float: right; width: 40%;}", //
-                "img {float: right;}"
+                "a {padding-left: 20px;}", //
+                "#pre_left {float: left; width: 300px;}", "#pre_right {float: right; width: 300px;}", //
+                "img {display: block; margin-left: auto; margin-right: auto;}" //
 
         );
         htmlUtils.body();
@@ -48,8 +50,13 @@ public class ReportGenerator {
                 "\nTimestamp:");
         htmlUtils.insertTextLeft(scenarioParameters.user + //
                 "\n" + scenarioParameters.date);
+        htmlUtils.newLine();
         htmlUtils.insertTextLeft("Iterations:");
         htmlUtils.insertTextLeft(String.valueOf(scenarioParameters.iterations));
+        htmlUtils.newLine();
+        htmlUtils.insertLink("av.xml", "AV File");
+        htmlUtils.insertLink("av_config.xml", "AV_Config File");
+        htmlUtils.newLine();
         htmlUtils.insertTextLeft("Network:" + //
                 "\nVirtual Nodes:" + //
                 "\nPopulation:" + //
@@ -58,6 +65,7 @@ public class ReportGenerator {
                 "\n" + scenarioParameters.virtualNodes + //
                 "\n" + scenarioParameters.populationSize + //
                 "\n" + analyzeSummary.numRequests);
+        htmlUtils.newLine();
         htmlUtils.insertTextLeft("Dispatcher:" + //
                 "\nVehicles:" + //
                 "\nRebalancing Period:" + //
@@ -78,10 +86,12 @@ public class ReportGenerator {
                 "\n" + d.format(analyzeSummary.totalWaitTimeQuantile.Get(1).number().doubleValue()/60) + " min" + //
                 "\n" + d.format(analyzeSummary.totalWaitTimeQuantile.Get(2).number().doubleValue()/60)+ " min" + //
                 "\n" + d.format(analyzeSummary.maximumWaitTime/60) + " min");
+        htmlUtils.newLine();
         htmlUtils.insertTextLeft("Occupancy Ratio:" + //
                 "\nDistance Ratio:");
         htmlUtils.insertTextLeft(d.format(analyzeSummary.occupancyRatio*100) + "%" + //
                 "\n" + d.format(analyzeSummary.distanceRatio*100)+ "%");
+        htmlUtils.newLine();
         htmlUtils.insertTextLeft(htmlUtils.bold("Distances") + //
                 "\n\tRebalancing:" + //
                 "\n\tPickup:" + //
@@ -93,8 +103,25 @@ public class ReportGenerator {
                 "\n" + d.format(analyzeSummary.distanceWithCust/1000) + " km");
 
         htmlUtils.insertSubTitle("Wait Times");
+        htmlUtils.insertTextLeft("Requests:");
+        htmlUtils.insertTextLeft(String.valueOf(analyzeSummary.numRequests));
+        htmlUtils.newLine();
+        htmlUtils.insertTextLeft(htmlUtils.bold("Waiting Times") + //
+                "\n\tMean:" + //
+                "\n\t50% quantile:" + //
+                "\n\t95% quantile:" + //
+                "\n\tMaximum:");
+        htmlUtils.insertTextLeft(" " + //
+                "\n" + d.format(analyzeSummary.totalWaitTimeMean.Get().number().doubleValue()/60) + " min" + //
+                "\n" + d.format(analyzeSummary.totalWaitTimeQuantile.Get(1).number().doubleValue()/60) + " min" + //
+                "\n" + d.format(analyzeSummary.totalWaitTimeQuantile.Get(2).number().doubleValue()/60)+ " min" + //
+                "\n" + d.format(analyzeSummary.maximumWaitTime/60) + " min");
+        htmlUtils.newLine();
+        htmlUtils.insertImg(IMAGE_FOLDER + "/binnedWaitingTimes.png", 800, 600);
 
         htmlUtils.insertSubTitle("Fleet Performance");
+        htmlUtils.insertImg(IMAGE_FOLDER + "/binnedTimeRatios.png", 800, 600);
+        htmlUtils.insertImg(IMAGE_FOLDER + "/binnedDistanceRatios.png", 800, 600);
 
         // ----------------------------------------------
         htmlUtils.footer();
