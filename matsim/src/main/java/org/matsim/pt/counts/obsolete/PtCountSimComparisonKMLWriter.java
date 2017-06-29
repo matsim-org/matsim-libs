@@ -460,7 +460,7 @@ public final class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWri
 			// (Actually, it seems to be locId = location id in the original design, so it might be a mis-documentation in the javadoc.???)
 
 			coord = this.coordTransform.transform(count.getCoord());
-			relativeError = csc.calculateRelativeError();
+			relativeError = csc.calculateRelativeError() * 100;
 			// build placemark
 			placemark = createPlacemark(stopid.toString(), csc, relativeError,
 					csc.getHour(), type);

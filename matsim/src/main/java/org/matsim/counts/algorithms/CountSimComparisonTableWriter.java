@@ -60,7 +60,7 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 	 * the column headers of the table
 	 */
 	private static final String[] COLUMNHEADERS = { "Link Id", "Hour",
-			"MATSIM volumes", "Count volumes", "Relative Error [%]", "Normalized Relative Error [%]", "GEH"};
+			"MATSIM volumes", "Count volumes", "Relative Error", "Normalized Relative Error", "GEH"};
 
 	/**
 	 * the formatter for numbers

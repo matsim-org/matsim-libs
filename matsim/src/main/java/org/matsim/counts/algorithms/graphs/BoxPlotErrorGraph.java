@@ -62,7 +62,7 @@ public final class BoxPlotErrorGraph extends CountsGraph {
 		// add the values of all counting stations to each hour
 		for (CountSimComparison cc : this.ccl_) {
 			int hour = cc.getHour() - 1;
-			listRel[hour].add(cc.calculateRelativeError());
+			listRel[hour].add(cc.calculateRelativeError() * 100);
 			listAbs[hour].add(cc.getSimulationValue() - cc.getCountValue());
 		}
 
