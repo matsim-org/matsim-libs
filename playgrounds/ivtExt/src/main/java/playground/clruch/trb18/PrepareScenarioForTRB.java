@@ -70,6 +70,7 @@ public class PrepareScenarioForTRB {
         int numberOfVirtualNodes = Integer.parseInt(args[2]);
         int dtTravelData = Integer.parseInt(args[3]);
         double avRadius = Double.parseDouble(args[4]);
+        String stage = args[5];
         String outputPath = ".";
 
         PrepareScenarioForTRB prepare = new PrepareScenarioForTRB(new File(outputPath), avRadius);
@@ -81,12 +82,16 @@ public class PrepareScenarioForTRB {
         prepare.applyAVPlans(scenario.getPopulation(), reducedNetwork);
         prepare.adjustInitialAVShare(scenario.getPopulation(), avShare);
 
+        if (stage.equals("baseline")) {
+            prepare.removeAVPlans(scenario.getPopulation());
+        }
+
         new PopulationWriter(scenario.getPopulation()).write(new File(new File(outputPath), "trb_population.xml.gz").getAbsolutePath());
 
         config.transit().setTransitScheduleFile(transitScheduleFile);
         config.transit().setVehiclesFile(transitVehiclesFile);
 
-        prepare.prepareConfig(config, scenario.getPopulation());
+        prepare.prepareConfig(config, scenario.getPopulation(), stage);
 
         new ConfigWriter(config).write(new File(new File(outputPath), "trb_config.xml").getAbsolutePath());
 
@@ -139,6 +144,13 @@ public class PrepareScenarioForTRB {
         return false;
     }
 
+    public void removeAVPlans(Population population) {
+        for (Person person : population.getPersons().values()) {
+            person.getPlans().removeIf(p -> isAVPlan(p));
+            GlobalAssert.that(person.getPlans().size() > 0);
+        }
+    }
+
     public void applyAVToNetwork(Network network, Network reducedNetwork) {
         for (Id<Link> linkId : reducedNetwork.getLinks().keySet()) {
             Link link = network.getLinks().get(linkId);
@@ -150,17 +162,9 @@ public class PrepareScenarioForTRB {
         }
     }
 
-    public void prepareConfig(Config config, Population population) {
+    public void prepareConfig(Config config, Population population, String stage) {
         List<StrategyConfigGroup.StrategySettings> mainStrategies = config.strategy().getStrategySettings().stream().filter(s -> s.getSubpopulation() == null).collect(Collectors.toList());
         config.strategy().clearStrategySettings();
-
-        for (StrategyConfigGroup.StrategySettings strategy : mainStrategies) {
-            String name = strategy.getStrategyName();
-
-            if (name.equals("ChangeExpBeta") || name.equals("ReRoute")) {
-                config.strategy().addStrategySettings(strategy);
-            }
-        }
 
         config.plans().setInputFile("trb_population.xml.gz");
         config.network().setInputFile("trb_network.xml.gz");
@@ -181,10 +185,28 @@ public class PrepareScenarioForTRB {
                 for (PlanElement element : plan.getPlanElements()) {
                     if (element instanceof Activity) {
                         Activity activity = (Activity) element;
-                        config.planCalcScore().getOrCreateScoringParameters(null).getOrCreateActivityParams(activity.getType());
+                        PlanCalcScoreConfigGroup.ActivityParams params = config.planCalcScore().getOrCreateScoringParameters(null).getOrCreateActivityParams(activity.getType());
+                        params.setScoringThisActivityAtAll(false);
                     }
                 }
             }
+        }
+
+        if (stage.equals("baseline")) {
+            for (StrategyConfigGroup.StrategySettings strategy : mainStrategies) {
+                String name = strategy.getStrategyName();
+
+                if (name.equals("ChangeExpBeta") || name.equals("ReRoute")) {
+                    config.strategy().addStrategySettings(strategy);
+                    strategy.setDisableAfter(400);
+                }
+            }
+
+            config.controler().setLastIteration(500);
+        }
+
+        if (stage.equals("stage1")) {
+            config.controler().setLastIteration(0);
         }
     }
 
@@ -434,12 +456,14 @@ public class PrepareScenarioForTRB {
 
                                 if (allowedMainModes.contains(leg.getMode())) {
                                     leg.setMode(AVModule.AV_MODE);
+                                    leg.setRoute(null);
                                 }
                             }
                         }
                     } else {
                         for (Leg leg : changeablePTLegs) {
                             leg.setMode(AVModule.AV_MODE);
+                            leg.setRoute(null);
                         }
                     }
 
@@ -459,8 +483,7 @@ public class PrepareScenarioForTRB {
         logger.info(String.format("Number of agents: %d", numberOfAgents));
         logger.info(String.format("Number of changed car agents: %d (%.2f%%)", numberOfChangedCarAgents, 100.0 * numberOfChangedCarAgents / numberOfAgents));
         logger.info(String.format("Number of changed pt agents: %d (%.2f%%)", numberOfChangedPTAgents, 100.0 * numberOfChangedPTAgents / numberOfAgents));
-        logger.info(String.format("Number of PT legs: %d", numberOfPTLegs));
-        logger.info(String.format("Number of changed PT legs: %d (%.2f%%)", numberOfChangedPTLegs, 100.0 * numberOfChangedPTLegs / numberOfPTLegs));
+        logger.info(String.format("Number of changed PT legs: %d", numberOfChangedPTLegs));
         logger.info(String.format("Number of removed car agents: %d (%.2f%%)", numberOfRemovedCarAgents, 100.0 * numberOfRemovedCarAgents / numberOfAgents));
         logger.info(String.format("Number of removed PT agents: %d (%.2f%%)", numberOfRemovedPTAgents, 100.0 * numberOfRemovedPTAgents / numberOfAgents));
     }
@@ -469,6 +492,25 @@ public class PrepareScenarioForTRB {
         logger.info("Removing special agents ...");
         // 0. In case it is a pre-routed population, remove all non-selected plans
         population.getPersons().values().stream().forEach(p -> PersonUtils.removeUnselectedPlans(p));
+        population.getPersons().values().removeIf(p -> p.getPlans().get(0).getPlanElements().size() < 2);
+
+        for (Person person : population.getPersons().values()) {
+            person.setSelectedPlan(person.getPlans().get(0));
+
+            Iterator<PlanElement> iterator = person.getSelectedPlan().getPlanElements().iterator();
+
+            while (iterator.hasNext()) {
+                PlanElement element = iterator.next();
+
+                if (element instanceof Leg && ((Leg) element).getMode().equals(TransportMode.transit_walk)) {
+                    iterator.remove();
+                }
+
+                if (element instanceof Activity && ((Activity) element).getType().equals("pt interaction")) {
+                    iterator.remove();
+                }
+            }
+        }
 
         // 1. Remove all agents which have walk or bike as the main mode
         // TODO: Remove also crossborder, freight and commuters???
@@ -477,6 +519,8 @@ public class PrepareScenarioForTRB {
 
         long numberOfRemovedAgents = 0;
         long numberOfAgents = 0;
+        long numberOfPtAgents = 0;
+        long numberOfCarAgents = 0;
 
         while (personIterator.hasNext()) {
             Person person = personIterator.next();
@@ -485,6 +529,9 @@ public class PrepareScenarioForTRB {
             if (!allowedMainModes.contains(mainMode) || population.getPersonAttributes().getAttribute(person.getId().toString(), "subpopulation") != null) {
                 personIterator.remove();
                 numberOfRemovedAgents++;
+            } else {
+                if (mainMode.equals(TransportMode.car)) numberOfCarAgents++;
+                if (mainMode.equals(TransportMode.pt)) numberOfPtAgents++;
             }
 
             numberOfAgents++;
@@ -492,5 +539,7 @@ public class PrepareScenarioForTRB {
 
         logger.info(String.format("Number of agents: %d", numberOfAgents));
         logger.info(String.format("Number of removed agents: %d (%.2f%%)", numberOfRemovedAgents, 100.0 * numberOfRemovedAgents / numberOfAgents));
+        logger.info(String.format("Number of car agents: %d", numberOfCarAgents));
+        logger.info(String.format("Number of pt agents: %d", numberOfPtAgents));
     }
 }

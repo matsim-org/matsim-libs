@@ -99,7 +99,7 @@ public class ScenarioServer {
         controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule()); // added only to listen to iteration counter
-        controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
+        //controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
         controler.addOverridingModule(new AVTravelTimeModule());
         controler.addOverridingModule(new TRBModule(reducedNetwork));
         
@@ -119,7 +119,7 @@ public class ScenarioServer {
         
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
-        AnalyzeAll.analyze(args);
+        //AnalyzeAll.analyze(args);
         //AnalyzeMarc.analyze(args);
     }
 }
