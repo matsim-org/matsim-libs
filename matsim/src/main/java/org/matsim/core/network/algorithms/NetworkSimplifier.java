@@ -35,6 +35,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -59,6 +60,8 @@ public final class NetworkSimplifier {
 	private boolean mergeLinkStats = false;
 	private Collection<Integer> nodeTopoToMerge = Arrays.asList( NetworkCalcTopoType.PASS1WAY , NetworkCalcTopoType.PASS2WAY );
 
+	private Set<Id<Node>> nodesNotToMerge = new HashSet<Id<Node>>();
+	
 	
 	/**
 	 * Merges all qualifying links, ignoring length threshold.
@@ -80,6 +83,19 @@ public final class NetworkSimplifier {
 		run(network, thresholdLength, thresholdExceeded.EITHER);
 	}
 	
+	
+	/**
+	 * Specifies a set of nodes of which all outgoing and ingoing links should not be merged.
+	 * Should probably not be used if nodes of type {@link NetworkCalcTopoType.INTERSECTION} are to be merged.
+	 * tschlenther jun'17
+	 * @param nodeIDs
+	 */
+	public void setNodesNotToMerge(Set<Long> nodeIDs){
+		for(Long l : nodeIDs){
+			this.nodesNotToMerge.add(Id.createNodeId(l));
+		}
+	}
+	
 	private void run(final Network network, double thresholdLength, thresholdExceeded type) {
 
 		if(this.nodeTopoToMerge.size() == 0){
@@ -92,8 +108,8 @@ public final class NetworkSimplifier {
 		nodeTopo.run(network);
 
 		for (Node node : network.getNodes().values()) {
-
-			if(this.nodeTopoToMerge.contains(Integer.valueOf(nodeTopo.getTopoType(node)))){
+			
+			if(this.nodeTopoToMerge.contains(Integer.valueOf(nodeTopo.getTopoType(node))) && (!this.nodesNotToMerge.contains(node.getId())) ){
 
 				List<Link> iLinks = new ArrayList<Link> (node.getInLinks().values());
 

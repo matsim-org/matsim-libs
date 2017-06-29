@@ -23,13 +23,14 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
-public class TaxiBenchmarkConfigConsistencyChecker extends TaxiConfigConsistencyChecker {
+public class TaxiBenchmarkConfigConsistencyChecker implements ConfigConsistencyChecker {
 	private static final Logger log = Logger.getLogger(TaxiBenchmarkConfigConsistencyChecker.class);
 
 	@Override
 	public void checkConsistency(Config config) {
-		super.checkConsistency(config);
+		new TaxiConfigConsistencyChecker().checkConsistency(config);
 
 		if (config.network().isTimeVariantNetwork() && config.network().getChangeEventsInputFile() == null) {
 			log.warn("No change events provided for the time variant network");

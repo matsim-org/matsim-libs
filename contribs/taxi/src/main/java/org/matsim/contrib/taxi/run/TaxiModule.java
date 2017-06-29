@@ -32,10 +32,7 @@ import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
+import com.google.inject.*;
 import com.google.inject.name.Named;
 
 /**
@@ -43,8 +40,8 @@ import com.google.inject.name.Named;
  */
 public final class TaxiModule extends AbstractModule {
 	public static final String TAXI_MODE = "taxi";
-	
-	private DvrpModule dvrpModule ;
+
+	private final DvrpModule dvrpModule;
 
 	public TaxiModule() {
 		this(DefaultTaxiOptimizerProvider.class);
@@ -69,16 +66,22 @@ public final class TaxiModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind( Fleet.class ).toProvider( DefaultTaxiFleetProvider.class ).asEagerSingleton() ;
-		install( dvrpModule ) ;
+		bind(Fleet.class).toProvider(DefaultTaxiFleetProvider.class).asEagerSingleton();
+		install(dvrpModule);
 	}
-	
+
 	@Singleton
 	public static final class DefaultTaxiFleetProvider implements Provider<Fleet> {
-		@Inject @Named(DvrpModule.DVRP_ROUTING) Network network ;
-		@Inject Config config ;
-		@Inject TaxiConfigGroup taxiCfg ;
-		@Override public Fleet get() {
+		@Inject
+		@Named(DvrpModule.DVRP_ROUTING)
+		Network network;
+		@Inject
+		Config config;
+		@Inject
+		TaxiConfigGroup taxiCfg;
+
+		@Override
+		public Fleet get() {
 			FleetImpl fleet = new FleetImpl();
 			new VehicleReader(network, fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
 			return fleet;

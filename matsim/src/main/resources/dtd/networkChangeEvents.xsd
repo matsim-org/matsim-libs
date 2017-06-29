@@ -42,7 +42,7 @@
 	</xs:attribute>
 	<xs:attribute name="value">
 		<xs:simpleType>
-		  <xs:restriction base="xs:decimal">
+		  <xs:restriction base="xs:double">
 			  <xs:minInclusive value="0.0"/>
 	    </xs:restriction>
 		</xs:simpleType>

@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.*;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.run.*;
@@ -83,7 +83,7 @@ public final class DvrpModule extends AbstractModule {
 		bind(NonPlanAgentQueryHelper.class).to(VrpAgentQueryHelper.class);
 
 		// VrpTravelTimeEstimator
-		install(VrpTravelTimeModules.createTravelTimeEstimatorModule());
+		install(new DvrpTravelTimeModule());
 	}
 
 	@Provides

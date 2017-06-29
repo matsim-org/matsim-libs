@@ -22,13 +22,14 @@ package org.matsim.contrib.dvrp.run;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.dynagent.run.DynQSimConfigConsistencyChecker;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
-public class DvrpConfigConsistencyChecker extends DynQSimConfigConsistencyChecker {
+public class DvrpConfigConsistencyChecker implements ConfigConsistencyChecker {
 	private static final Logger log = Logger.getLogger(DvrpConfigConsistencyChecker.class);
 
 	@Override
 	public void checkConsistency(Config config) {
-		super.checkConsistency(config);
+		new DynQSimConfigConsistencyChecker().checkConsistency(config);
 
 		if (!config.qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles()) {
 			log.warn("Typically, vrp paths are calculated from startLink to endLink"

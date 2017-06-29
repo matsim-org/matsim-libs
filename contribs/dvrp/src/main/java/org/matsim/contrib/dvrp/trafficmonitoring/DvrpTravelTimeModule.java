@@ -17,38 +17,37 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.optimizer;
+package org.matsim.contrib.dvrp.trafficmonitoring;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
-import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
-import org.matsim.contrib.util.LinkProvider;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+
+import com.google.inject.*;
+import com.google.inject.name.*;
 
 /**
- * @author michalm
+ * Travel times recorded during the previous iteration. They are always updated after the mobsim ends. This is the
+ * standard approach for running DVRP
  */
-public class LinkProviders {
-	public static final LinkProvider<TaxiRequest> REQUEST_TO_FROM_LINK = req -> req.getFromLink();
+public class DvrpTravelTimeModule extends AbstractModule {
+	public static final String DVRP_INITIAL = "dvrp_initial";
+	public static final String DVRP_OBSERVED = "dvrp_observed";
+	public static final String DVRP_ESTIMATED = "dvrp_estimated";
 
-	public static <D> LinkProvider<DestEntry<D>> createDestEntryToLink() {
-		return new LinkProvider<DestEntry<D>>() {
-			@Override
-			public Link apply(DestEntry<D> dest) {
-				return dest.link;
-			}
-		};
+	public void install() {
+		bind(TravelTime.class).annotatedWith(Names.named(DvrpTravelTimeModule.DVRP_INITIAL))
+				.toInstance(new FreeSpeedTravelTime());
+		bind(DvrpTravelTimeEstimator.class).to(DvrpTravelTimeEstimatorImpl.class).asEagerSingleton();
+		addTravelTimeBinding(DVRP_ESTIMATED).to(DvrpTravelTimeEstimator.class);
+		addMobsimListenerBinding().to(DvrpTravelTimeEstimator.class);
 	}
 
-	public static final LinkProvider<VehicleData.Entry> VEHICLE_ENTRY_TO_LINK = veh -> veh.link;
-
-	public static LinkProvider<Vehicle> createImmediateDiversionOrEarliestIdlenessLinkProvider(
-			final TaxiScheduleInquiry scheduleInquiry) {
-		return new LinkProvider<Vehicle>() {
-			public Link apply(Vehicle veh) {
-				return scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh).link;
-			}
-		};
+	@Provides
+	@Named(DvrpTravelTimeModule.DVRP_OBSERVED)
+	@Singleton
+	TravelTime provideTravelTime(@Named(TransportMode.car) TravelTime observedTT) {
+		return observedTT;
 	}
 }

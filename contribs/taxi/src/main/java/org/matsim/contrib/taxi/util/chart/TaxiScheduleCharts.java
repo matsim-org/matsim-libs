@@ -15,23 +15,15 @@ public class TaxiScheduleCharts {
 		return ScheduleCharts.chartSchedule(vehicles, TAXI_DESCRIPTION_CREATOR, TAXI_PAINT_SELECTOR);
 	}
 
-	public static final DescriptionCreator TAXI_DESCRIPTION_CREATOR = new DescriptionCreator() {
-		@Override
-		public String create(Task task) {
-			return ((TaxiTask)task).getTaxiTaskType().name();
-		}
-	};
+	public static final DescriptionCreator TAXI_DESCRIPTION_CREATOR = task -> ((TaxiTask)task).getTaxiTaskType().name();
 
-	public static final DescriptionCreator TAXI_DESCRIPTION_WITH_PASSENGER_ID_CREATOR = new DescriptionCreator() {
-		@Override
-		public String create(Task task) {
-			if (task instanceof TaxiTaskWithRequest) {
-				TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
-				return taskWithReq.getTaxiTaskType().name() + "_" + taskWithReq.getRequest().getPassenger().getId();
-			}
-
-			return ((TaxiTask)task).getTaxiTaskType().name();
+	public static final DescriptionCreator TAXI_DESCRIPTION_WITH_PASSENGER_ID_CREATOR = task -> {
+		if (task instanceof TaxiTaskWithRequest) {
+			TaxiTaskWithRequest taskWithReq = (TaxiTaskWithRequest)task;
+			return taskWithReq.getTaxiTaskType().name() + "_" + taskWithReq.getRequest().getPassenger().getId();
 		}
+
+		return ((TaxiTask)task).getTaxiTaskType().name();
 	};
 
 	private static final Color OCCUPIED_DRIVE_COLOR = new Color(200, 0, 0);

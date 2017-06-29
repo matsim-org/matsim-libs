@@ -20,9 +20,8 @@
 
 package org.matsim.core.network;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -32,13 +31,24 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.io.NetworkChangeEventsParser;
 import org.matsim.core.network.io.NetworkChangeEventsWriter;
 import org.matsim.core.utils.misc.CRCChecksum;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{
+import java.util.ArrayList;
+import java.util.List;
 
-	public void testChangeEventsParserWriter(){
-		String input = getInputDirectory() + "testNetworkChangeEvents.xml";
-		String output  = getOutputDirectory() + "outputTestNetworkChangeEvents.xml";
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
+public class NetworkChangeEventsParserWriterTest {
+
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils() ;
+
+	@Test
+	public void testChangeEventsParserWriter() {
+		String input = utils.getInputDirectory() + "testNetworkChangeEvents.xml";
+		String output  = utils.getOutputDirectory() + "outputTestNetworkChangeEvents.xml";
 		final Network network = NetworkUtils.createNetwork();
 		NetworkFactory nf = network.getFactory();
 		nf.setLinkFactory(new VariableIntervalTimeVariantLinkFactory());
@@ -46,14 +56,10 @@ public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
 		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
 		Node node3 = NetworkUtils.createAndAddNode(network, Id.create("3", Node.class), new Coord((double) 1000, (double) 2000));
-		final Node fromNode = node1;
-		final Node toNode = node2;
-		NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, (double) 1000, 1.667, (double) 3600, (double) 1 );
-		final Node fromNode1 = node2;
-		final Node toNode1 = node3;
-		NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, (double) 1500, 1.667, (double) 3600, (double) 1 );
+        NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), node1, node2, (double) 1000, 1.667, (double) 3600, (double) 1 );
+        NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), node2, node3, (double) 1500, 1.667, (double) 3600, (double) 1 );
 
-		List<NetworkChangeEvent> events = new ArrayList<>() ;
+		List<NetworkChangeEvent> events = new ArrayList<>();
 		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network, events );
 		parser.readFile(input);
 		new NetworkChangeEventsWriter().write(output, events);
@@ -61,6 +67,40 @@ public class NetworkChangeEventsParserWriterTest  extends MatsimTestCase{
 		long checksum_ref = CRCChecksum.getCRCFromFile(input);
 		long checksum_run = CRCChecksum.getCRCFromFile(output);
 		assertEquals(checksum_ref, checksum_run);
-
 	}
+
+	@Test(expected = Exception.class)
+	public void testWriteChangeEventWithoutLinkDoesntWork() {
+		final String fileName = utils.getOutputDirectory() + "wurst.xml";
+
+		List<NetworkChangeEvent> events = new ArrayList<>();
+		final NetworkChangeEvent e = new NetworkChangeEvent(0.0);
+		e.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 10));
+		events.add(e);
+		new NetworkChangeEventsWriter().write(fileName, events);
+	}
+
+	@Test
+	public void testWriteChangeEventWithSmallValueAndReadBack() {
+		final String fileName = utils.getOutputDirectory() + "wurst.xml";
+
+		final Network network = NetworkUtils.createNetwork();
+		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
+		Node node2 = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord((double) 0, (double) 1000));
+		final Link link = NetworkUtils.createAndAddLink(network, Id.create("2", Link.class), node1, node2, (double) 1500, 1.667, (double) 3600, (double) 1);
+
+		List<NetworkChangeEvent> outputEvents = new ArrayList<>();
+		final NetworkChangeEvent event = new NetworkChangeEvent(0.0);
+		event.setFlowCapacityChange(new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE_IN_SI_UNITS, 0.000000000004));
+		event.addLink(link);
+		outputEvents.add(event);
+		new NetworkChangeEventsWriter().write(fileName, outputEvents);
+
+		List<NetworkChangeEvent> inputEvents = new ArrayList<>();
+		NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network, inputEvents);
+		parser.readFile(fileName);
+
+		assertThat(inputEvents, hasItem(event));
+	}
+
 }

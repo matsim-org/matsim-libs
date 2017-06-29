@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.taxi.optimizer.assignment.*;
 import org.matsim.contrib.taxi.optimizer.fifo.*;
 import org.matsim.contrib.taxi.optimizer.rules.*;
@@ -56,7 +56,7 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 	@Inject
 	public DefaultTaxiOptimizerProvider(TaxiConfigGroup taxiCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
-			Fleet fleet, @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim) {
+			Fleet fleet, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim) {
 		this.taxiCfg = taxiCfg;
 		this.network = network;
 		this.fleet = fleet;

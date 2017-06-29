@@ -41,7 +41,7 @@ public class Counts<T> {
 	public final Count<T> createAndAddCount(final Id<T> linkId, final String stationName) {
 		// check id string for uniqueness
 		if (this.counts.containsKey(linkId)) {
-			return null;
+			throw new RuntimeException();
 		}
 		Count<T> c = new Count<>(linkId, stationName);
 		this.counts.put(linkId, c);

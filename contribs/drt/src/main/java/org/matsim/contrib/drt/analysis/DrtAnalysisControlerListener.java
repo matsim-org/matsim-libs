@@ -24,7 +24,10 @@ package org.matsim.contrib.drt.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Locale;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -55,6 +58,8 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	private final DrtConfigGroup drtgroup;
 	private boolean headerWritten = false;
 	private boolean vheaderWritten = false;
+	private final String runId;
+	private final DecimalFormat format = new DecimalFormat();
 
 	/**
 	 * 
@@ -62,7 +67,12 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 	@Inject
 	public DrtAnalysisControlerListener(Config config) {
 		drtgroup = (DrtConfigGroup)config.getModules().get(DrtConfigGroup.GROUP_NAME);
-
+		runId = config.controler().getRunId();
+		
+		format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+		format.setMinimumIntegerDigits(1);
+		format.setMaximumFractionDigits(2);
+		format.setGroupingUsed(false);
 	}
 
 	/*
@@ -86,8 +96,13 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 
 		DynModeTripsAnalyser.collection2Text(drtRequestAnalyzer.getRejections(), matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "drt_rejections.csv"),"time;personId;fromLinkId;toLinkId;fromX;fromY;toX;toY" ); 
 
-		writeIterationPassengerStats(DynModeTripsAnalyser.summarizeTrips(trips, ";"), event.getIteration());
-		writeIterationVehicleStats(DynModeTripsAnalyser.summarizeVehicles(drtPassengerStats.getVehicleDistances(), ";"),
+		double rejectionRate = (double)drtRequestAnalyzer.getRejections().size()/(double)(drtRequestAnalyzer.getRejections().size()+trips.size());
+		String tripsSummarize =DynModeTripsAnalyser.summarizeTrips(trips, ";");
+		double directDistanceMean = DynModeTripsAnalyser.getDirectDistanceMean(trips);
+		writeIterationPassengerStats(tripsSummarize+";"+drtRequestAnalyzer.getRejections().size()+";"+format.format(rejectionRate), event.getIteration());
+		double l_d= DynModeTripsAnalyser.getTotalDistance(drtPassengerStats.getVehicleDistances()) / (trips.size()*directDistanceMean);
+		String vehStats = DynModeTripsAnalyser.summarizeVehicles(drtPassengerStats.getVehicleDistances(), ";")+";"+format.format(l_d);
+		writeIterationVehicleStats(vehStats,
 				event.getIteration());
 		if (drtgroup.isPlotDetailedCustomerStats()) {
 			DynModeTripsAnalyser.collection2Text(trips,
@@ -114,10 +129,10 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 			if (!headerWritten) {
 				headerWritten = true;
 				bw.write(
-						"iteration;rides;wait_average;wait_max;wait_p95;wait_p75;wait_median;inVehicleTravelTime_mean;distance_m_mean;directDistance_m_mean;totalTravelTime_mean");
+						"runId;iteration;rides;wait_average;wait_max;wait_p95;wait_p75;wait_median;inVehicleTravelTime_mean;distance_m_mean;directDistance_m_mean;totalTravelTime_mean;rejections;rejectionRate");
 			}
 			bw.newLine();
-			bw.write(it + ";" + summarizeTrips);
+			bw.write(runId+";"+ it + ";" + summarizeTrips);
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {
@@ -137,11 +152,11 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 			if (!vheaderWritten) {
 				vheaderWritten = true;
 				bw.write(
-						"iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
+						"runId;iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance;d_r/d_t;l_det");
 
 			}
 			bw.newLine();
-			bw.write(it + ";" + summarizeVehicles);
+			bw.write(runId+";"+ it + ";" + summarizeVehicles);
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {

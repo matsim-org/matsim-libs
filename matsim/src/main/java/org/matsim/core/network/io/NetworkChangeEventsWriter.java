@@ -136,7 +136,10 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 		this.writer.write(QUOTE);
 		this.writer.write(CLOSE_TAG_1);
 		this.writer.write(NL);
-		
+
+		if (event.getLinks().isEmpty()) {
+			throw new IllegalArgumentException("NetworkChangeEvent must contain at least one link.");
+		}
 		for(Link link : event.getLinks()) {
 			this.writer.write(TAB);
 			this.writer.write(TAB);
