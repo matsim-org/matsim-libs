@@ -54,15 +54,14 @@ public final class BiasErrorGraph extends CountsGraph {
 
 		this.errorStats = new ComparisonErrorStatsCalculator(this.ccl_);
 
-		double[] meanRelError = errorStats.getMeanRelError();
-//		double[] meanAbsError = errorStats.getMeanAbsError();
-		double[] meanAbsBias = errorStats.getMeanAbsBias();
-
+		double[] meanRelError = this.errorStats.getMeanRelError();
+//		double[] meanAbsError = this.errorStats.getMeanAbsError();
+		double[] meanBias = this.errorStats.getMeanBias();
 
 		for (int h = 0; h < 24; h++) {
 			dataset0.addValue(meanRelError[h], "Mean rel error", Integer.toString(h + 1));
 //			dataset1.addValue(meanAbsError[h], "Mean abs error", Integer.toString(h + 1));
-			dataset1.addValue(meanAbsBias[h], "Mean abs bias", Integer.toString(h + 1));
+			dataset1.addValue(meanBias[h], "Mean bias", Integer.toString(h + 1));
 		}
 
 		this.chart_ = ChartFactory.createLineChart("", "Hour", "Mean rel error [%]", dataset0, PlotOrientation.VERTICAL,
@@ -107,14 +106,10 @@ public final class BiasErrorGraph extends CountsGraph {
 		return this.errorStats.getMeanRelError();
 	}
 
-
-
 	public double[] getMeanAbsBias() {
 		if (this.errorStats == null) {
 			throw new RuntimeException("Object not initialized correctly. Call createChart(..) first!");
 		}
-		return this.errorStats.getMeanAbsBias();
+		return this.errorStats.getMeanBias();
 	}
-	
-	
 }

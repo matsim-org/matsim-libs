@@ -35,9 +35,9 @@ public class ComparisonErrorStatsCalculator {
 
 	private double[] meanAbsError = null;
 
-	private double[] meanAbsBias = null;
+	private double[] meanBias = null;
 
-	private int[] nbrAbsBias = null;
+	private int[] nbrBias = null;
 
 	private int[] nbrRelErr = null;
 
@@ -50,68 +50,63 @@ public class ComparisonErrorStatsCalculator {
 	private void calculateErrorStats(final List<CountSimComparison> ccl) {
 		// init with same value. Shorter stat.?
 		// Possibly not all links have values for all hours.
-		meanRelError = new double[24];
-		nbrRelErr = new int[24];
-		meanAbsError = new double[24];
-		nbrAbsErr = new int[24];
-		meanAbsBias = new double[24];
-		nbrAbsBias = new int[24];
+		this.meanRelError = new double[24];
+		this.nbrRelErr = new int[24];
+		this.meanAbsError = new double[24];
+		this.nbrAbsErr = new int[24];
+		this.meanBias = new double[24];
+		this.nbrBias = new int[24];
 		Iterator<CountSimComparison> l_it = ccl.iterator();
 		while (l_it.hasNext()) {
 			CountSimComparison cc = l_it.next();
 			int hour = cc.getHour() - 1;
-			meanRelError[hour] += Math.abs(cc.calculateRelativeError());
-			nbrRelErr[hour]++;
+			this.meanRelError[hour] += Math.abs(cc.calculateRelativeError());
+			this.nbrRelErr[hour]++;
 
-			meanAbsError[hour] += Math.abs(cc.getSimulationValue() - cc.getCountValue());
-			nbrAbsErr[hour]++;
+			this.meanAbsError[hour] += Math.abs(cc.getSimulationValue() - cc.getCountValue());
+			this.nbrAbsErr[hour]++;
 
-			meanAbsBias[hour] += cc.getSimulationValue() - cc.getCountValue();
-			nbrAbsBias[hour]++;
+			this.meanBias[hour] += cc.getSimulationValue() - cc.getCountValue();
+			this.nbrBias[hour]++;
 		}// while
 
 		for (int h = 0; h < 24; h++) {
-			if (nbrRelErr[h] > 0) {
-				meanRelError[h] /= nbrRelErr[h];
+			if (this.nbrRelErr[h] > 0) {
+				this.meanRelError[h] /= this.nbrRelErr[h];
 			} else {
-				meanRelError[h] = 1000.0;
+				this.meanRelError[h] = 1000.0;
 			}
-			if (nbrAbsErr[h] > 0) {
-				meanAbsError[h] /= nbrAbsErr[h];
+			if (this.nbrAbsErr[h] > 0) {
+				this.meanAbsError[h] /= this.nbrAbsErr[h];
 			} else {
-				meanAbsError[h] = 1.0;
+				this.meanAbsError[h] = 1.0;
 			}
-			if (nbrAbsBias[h] > 0) {
-				meanAbsBias[h] /= nbrAbsBias[h];
+			if (this.nbrBias[h] > 0) {
+				this.meanBias[h] /= this.nbrBias[h];
 			} else {
-				meanAbsBias[h] = 1.0;
+				this.meanBias[h] = 1.0;
 			}
 		}
 	}
-
 
 	public double[] getMeanRelError() {
-		if (meanRelError == null) {
+		if (this.meanRelError == null) {
 			throw new RuntimeException("Object not initialized correctly. Call calculateErrorStats(..) first!");
 		}
-		return meanRelError.clone();
+		return this.meanRelError.clone();
 	}
-
 
 	public double[] getMeanAbsError() {
-		if (meanAbsError == null) {
+		if (this.meanAbsError == null) {
 			throw new RuntimeException("Object not initialized correctly. Call calculateErrorStats(..) first!");
 		}
-		return meanAbsError.clone();
+		return this.meanAbsError.clone();
 	}
 
-
-	public double[] getMeanAbsBias() {
-		if (meanAbsBias == null) {
+	public double[] getMeanBias() {
+		if (this.meanBias == null) {
 			throw new RuntimeException("Object not initialized correctly. Call calculateErrorStats(..) first!");
 		}
-		return meanAbsBias.clone();
+		return this.meanBias.clone();
 	}
-
-
 }
