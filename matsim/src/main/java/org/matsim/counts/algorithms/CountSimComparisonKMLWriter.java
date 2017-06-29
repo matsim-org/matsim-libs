@@ -408,7 +408,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 			} else {
 				coord = this.coordTransform.transform(counts.getCount( itemId ).getCoord()) ;
 			}
-			relativeError = csc.calculateRelativeError();
+			relativeError = csc.calculateRelativeError() * 100;
 			// build placemark
 			placemark = createPlacemark(itemId.toString(), csc, relativeError, csc.getHour());
 			point = kmlObjectFactory.createPointType();
