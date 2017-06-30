@@ -41,20 +41,46 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	 * the Id of the link
 	 */
 	private final Id<Link> id;
-
+	/**
+	 * the Id of the count station
+	 */
+	private final String csId;
+	
 	/**
 	 * @param id
 	 * @param hour
-	 * @param countValue2
+	 * @param countValue
 	 * @param simValue
 	 */
-	public CountSimComparisonImpl(final Id<Link> id, final int hour, final double countValue2, final double simValue) {
+	@Deprecated
+	public CountSimComparisonImpl(final Id<Link> id, final int hour, final double countValue, final double simValue) {
 		this.id = id;
+		this.csId = null;
 		this.hour = hour;
-		this.countValue = countValue2;
+		this.countValue = countValue;
 		this.simulationValue = simValue;
 	}
 
+	/**
+	 * @param id
+	 * @param csId
+	 * @param hour
+	 * @param countValue
+	 * @param simValue
+	 */
+	public CountSimComparisonImpl(final Id<Link> id, final String csId, final int hour, final double countValue, final double simValue) {
+		this.id = id;
+		this.csId = csId;
+		this.hour = hour;
+		this.countValue = countValue;
+		this.simulationValue = simValue;
+	}
+	
+	@Override
+	public String getCsId() {
+		return this.csId;
+	}
+	
 	/**
 	 * Note that this return the value in percent!
 	 * 
@@ -113,8 +139,10 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	 * @return normalized relative error
 	 */
 	@Override
-	public double calculateNormalizedRelativeError() {		
-		return Math.abs(this.simulationValue - this.countValue) / Math.max(this.simulationValue, this.countValue);
+	public double calculateNormalizedRelativeError() {
+		final double max = Math.max(this.simulationValue, this.countValue);
+		if (max == 0.0) return 0;
+		return Math.abs(this.simulationValue - this.countValue) / max;
 	}
 
 	/**

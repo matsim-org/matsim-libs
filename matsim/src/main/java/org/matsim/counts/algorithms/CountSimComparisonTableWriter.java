@@ -25,13 +25,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.counts.CountSimComparison;
 
 /**
@@ -59,7 +56,7 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 	/**
 	 * the column headers of the table
 	 */
-	private static final String[] COLUMNHEADERS = { "Link Id", "Hour",
+	private static final String[] COLUMNHEADERS = { "Link Id", "Count Station Id", "Hour",
 			"MATSIM volumes", "Count volumes", "Relative Error", "Normalized Relative Error", "GEH"};
 
 	/**
@@ -107,6 +104,8 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 				
 				out.write(csc.getId().toString());
 				out.write(SEPARATOR);
+				out.write(csc.getCsId());
+				out.write(SEPARATOR);
 				out.write(Integer.toString(csc.getHour()));
 				out.write(SEPARATOR);
 				out.write(this.numberFormat.format(csc.getSimulationValue()));
@@ -138,19 +137,36 @@ public class CountSimComparisonTableWriter extends CountSimComparisonWriter {
 				this.countComparisonFilter.getCountsForHour(null));
 
 		try (BufferedWriter out = new BufferedWriter(new FileWriter(filename))) {
-			out.write("Link Id\tMATSIM volumes\tCount volumes");
+			out.write("Link Id");
+			out.write(SEPARATOR);
+			out.write("Count Station Id");
+			out.write(SEPARATOR);
+			out.write("MATSIM volumes");
+			out.write(SEPARATOR);
+			out.write("Count volumes");
+			out.write(SEPARATOR);
+			out.write("Normalized Relative Error");
 			out.write(NEWLINE);
 
-			Iterator<Id<Link>> id_it = new CountSimComparisonLinkFilter(
-					this.countComparisonFilter.getCountsForHour(null)).getLinkIds().iterator();
+			for (CountSimComparison csc : this.countComparisonFilter.getCountsForHour(null)) {
 
-			while (id_it.hasNext()) {
-				Id<Link> id= id_it.next();
-				out.write(id.toString());
+				final double simValue = linkFilter.getAggregatedSimValue(csc.getId());
+				final double countValue = linkFilter.getAggregatedCountValue(csc.getId());
+				final double nomRelError;
+				
+				final double max = Math.max(simValue, countValue);
+				if (max == 0.0) nomRelError = 0;
+				else nomRelError = Math.abs(simValue - countValue) / max;
+				
+				out.write(csc.getId().toString());
 				out.write(SEPARATOR);
-				out.write(this.numberFormat.format(linkFilter.getAggregatedSimValue(id)));
+				out.write(csc.getCsId());
 				out.write(SEPARATOR);
-				out.write(this.numberFormat.format(linkFilter.getAggregatedCountValue(id)));
+				out.write(this.numberFormat.format(simValue));
+				out.write(SEPARATOR);
+				out.write(this.numberFormat.format(countValue));
+				out.write(SEPARATOR);
+				out.write(this.numberFormat.format(nomRelError));
 				out.write(NEWLINE);
 			}
 		} catch (IOException e) {

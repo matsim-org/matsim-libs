@@ -59,6 +59,7 @@ public final class BiasErrorGraph extends CountsGraph {
 		double[] meanBias = this.errorStats.getMeanBias();
 
 		for (int h = 0; h < 24; h++) {
+			meanRelError[h] *= 100;
 			dataset0.addValue(meanRelError[h], "Mean rel error", Integer.toString(h + 1));
 //			dataset1.addValue(meanAbsError[h], "Mean abs error", Integer.toString(h + 1));
 			dataset1.addValue(meanBias[h], "Mean bias", Integer.toString(h + 1));
@@ -83,7 +84,7 @@ public final class BiasErrorGraph extends CountsGraph {
 		plot.setDomainAxis(axis1);
 
 //		final ValueAxis axis2 = new NumberAxis("Mean abs {bias, error} [veh/h]");
-		final ValueAxis axis2 = new NumberAxis("Mean abs bias [veh/h]");
+		final ValueAxis axis2 = new NumberAxis("Mean bias [veh/h]");
 		plot.setRangeAxis(1, axis2);
 
 		final ValueAxis axis3 = plot.getRangeAxis(0);
@@ -106,7 +107,7 @@ public final class BiasErrorGraph extends CountsGraph {
 		return this.errorStats.getMeanRelError();
 	}
 
-	public double[] getMeanAbsBias() {
+	public double[] getMeanBias() {
 		if (this.errorStats == null) {
 			throw new RuntimeException("Object not initialized correctly. Call createChart(..) first!");
 		}

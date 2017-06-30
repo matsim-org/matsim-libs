@@ -53,7 +53,7 @@ public class CountsComparisonAlgorithm {
 	}
 	
 	public static interface DistanceFilter {
-		boolean isInRange(Count count);
+		boolean isInRange(Count<Link> count);
 	}
 
 	private final VolumesForId volumesPerLinkPerHour;
@@ -65,7 +65,7 @@ public class CountsComparisonAlgorithm {
 	private DistanceFilter distanceFilter = new DistanceFilter() {
 
 		@Override
-		public boolean isInRange(Count count) {
+		public boolean isInRange(Count<Link> count) {
 			return true;
 		}
 		
@@ -77,7 +77,7 @@ public class CountsComparisonAlgorithm {
 
 	private final static Logger log = Logger.getLogger(CountsComparisonAlgorithm.class);
 
-	public CountsComparisonAlgorithm(final VolumesAnalyzer volumes, final Counts counts, final Network network, final double countsScaleFactor) {
+	public CountsComparisonAlgorithm(final VolumesAnalyzer volumes, final Counts<Link> counts, final Network network, final double countsScaleFactor) {
 		this.counts = counts;
 		this.result = new ArrayList<CountSimComparison>();
 		this.network = network;
@@ -92,7 +92,7 @@ public class CountsComparisonAlgorithm {
 		};
 	}
 
-	public CountsComparisonAlgorithm(final Map<Id<Link>, double[]> volumesPerLinkPerHour, final Counts counts, final Network network, final double countsScaleFactor) {
+	public CountsComparisonAlgorithm(final Map<Id<Link>, double[]> volumesPerLinkPerHour, final Counts<Link> counts, final Network network, final double countsScaleFactor) {
 		this.volumesPerLinkPerHour = new VolumesForId() {
 
 			@Override
@@ -107,7 +107,7 @@ public class CountsComparisonAlgorithm {
 		this.countsScaleFactor = countsScaleFactor;
 	}
 
-	public CountsComparisonAlgorithm(VolumesForId volumesPerLinkPerHour, final Counts counts, final Network network, final double countsScaleFactor) {
+	public CountsComparisonAlgorithm(VolumesForId volumesPerLinkPerHour, final Counts<Link> counts, final Network network, final double countsScaleFactor) {
 		this.volumesPerLinkPerHour = volumesPerLinkPerHour;
 		this.counts = counts;
 		this.result = new ArrayList<CountSimComparison>();
@@ -120,7 +120,7 @@ public class CountsComparisonAlgorithm {
 	 * countAttribute Attribute of this class.
 	 */
 	private void compare() {
-		for (Count count : this.counts.getCounts().values()) {
+		for (Count<Link> count : this.counts.getCounts().values()) {
 			if (!distanceFilter.isInRange(count)) {
 				continue;
 			}
@@ -135,7 +135,7 @@ public class CountsComparisonAlgorithm {
 					double countValue = volume.getValue();
 					double simValue=volumes[hour-1];
 					simValue *= this.countsScaleFactor;
-					this.result.add(new CountSimComparisonImpl(count.getId(), hour, countValue, simValue));
+					this.result.add(new CountSimComparisonImpl(count.getId(), count.getCsLabel(), hour, countValue, simValue));
 				}
 			}
 		}
@@ -164,7 +164,7 @@ public class CountsComparisonAlgorithm {
 		this.distanceFilter = new DistanceFilter() {
 
 			@Override
-			public boolean isInRange(Count count) {
+			public boolean isInRange(Count<Link> count) {
 				Link l = network.getLinks().get(count.getId());
 				if (l == null) {
 					log.warn("Cannot find requested link: " + count.getId().toString());
@@ -182,7 +182,7 @@ public class CountsComparisonAlgorithm {
 		this.distanceFilter = new CountsComparisonAlgorithm.DistanceFilter() {
 			
 			@Override
-			public boolean isInRange(Count count) {
+			public boolean isInRange(Count<Link> count) {
 				double dist = CoordUtils.calcEuclideanDistance(count.getCoord(), centerCoord);
 				return dist < distance;
 			}

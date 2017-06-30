@@ -23,6 +23,8 @@ package org.matsim.counts.algorithms;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +57,9 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.algorithms.graphs.BiasErrorGraph;
+import org.matsim.counts.algorithms.graphs.BiasNormalizedErrorGraph;
 import org.matsim.counts.algorithms.graphs.BoxPlotErrorGraph;
+import org.matsim.counts.algorithms.graphs.BoxPlotNormalizedErrorGraph;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
@@ -73,10 +77,13 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * constant for the name of the links
 	 */
 	private static final String LINK = "Link: ";
+	private static final String CSID = "Count Station: ";
 
 	private static final String COUNTVALUE = "Count Value: ";
 	private static final String MATSIMVALUE = "MATSim Value: ";
 	private static final String RELERROR = "Relative Error: ";
+	private static final String NORMRELERROR = "Normalized Relative Error: ";
+	private static final String GEH = "GEH: ";
 	private static final String IMG = "<img src=\"../";
 	private static final String IMGEND = "\">";
 	private static final String H24OVERVIEW = "24 h overview";
@@ -85,9 +92,12 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	private static final String OCLOCK = " o'clock";
 	private static final String ZERO = "0";
 
-	/*
+	private static final NumberFormat nf = new DecimalFormat("#.#");
+	
+	/**
 	 * the icons
 	 */
+	private static final String CIRCLEICON = "icons/circle.png";
 	private static final String CROSSICON = "icons/plus.png";
 	private static final String MINUSICON = "icons/minus.png";
 
@@ -107,10 +117,10 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * constant for the file suffix of graphs
 	 */
 	private static final String PNG = ".png";
-	private final String graphname ;
+	private final String graphname;
 
 	private final Network network;
-	private final Counts counts ;
+	private final Counts<Link> counts;
 	
 	private CoordinateTransformation coordTransform = null;
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
@@ -123,16 +133,21 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	private FolderType mainFolder = null;
 	private KMZWriter writer = null;
 
+	private StyleType redCircleStyle;
 	private StyleType redCrossStyle;
 	private StyleType redMinusStyle;
+	private StyleType yellowCircleStyle;
 	private StyleType yellowCrossStyle;
 	private StyleType yellowMinusStyle;
 	private StyleType greenMinusStyle;
+	private StyleType greenCircleStyle;
 	private StyleType greenCrossStyle;
+	private StyleType greyCircleStyle;
 	private StyleType greyCrossStyle;
 	private StyleType greyMinusStyle;
+	
 	/**
-	 * maps linkids to filenames in the kmz
+	 * maps linkIds to filenames in the kmz
 	 */
 	private Map<String, String> countsLoadCurveGraphMap;
 
@@ -145,7 +160,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final Network network, final CoordinateTransformation coordTransform) {
 		super(countSimCompList);
 		this.network = network;
-		this.counts = null ;
+		this.counts = null;
 		this.coordTransform = coordTransform;
 		this.graphname = "countsSimRealPerHour_";
 	}
@@ -153,12 +168,12 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * Sets the data to the fields of this class.  We either accept "network" or "counts" to localize the counting stations.
 	 * @param graphname TODO
 	 */
-	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final Counts counts, final CoordinateTransformation coordTransform, String graphname) {
+	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final Counts<Link> counts, final CoordinateTransformation coordTransform, String graphname) {
 		super(countSimCompList);
-		this.network = null ;
-		this.counts = counts ;
+		this.network = null;
+		this.counts = counts;
 		this.coordTransform = coordTransform;
-		this.graphname = graphname ;
+		this.graphname = graphname;
 	}
 
 	/**
@@ -166,14 +181,18 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 */
 	private void createStyles() {
 
-		this.redCrossStyle = kmlObjectFactory.createStyleType(); this.redCrossStyle.setId("redCrossStyle");
-		this.redMinusStyle = kmlObjectFactory.createStyleType(); this.redMinusStyle.setId("redMinusStyle");
-		this.yellowCrossStyle = kmlObjectFactory.createStyleType(); this.yellowCrossStyle.setId("yellowCrossStyle");
-		this.yellowMinusStyle = kmlObjectFactory.createStyleType(); this.yellowMinusStyle.setId("yellowMinusStyle");
-		this.greenCrossStyle = kmlObjectFactory.createStyleType(); this.greenCrossStyle.setId("greenCrossStyle");
-		this.greenMinusStyle = kmlObjectFactory.createStyleType(); this.greenMinusStyle.setId("greenMinusStyle");
-		this.greyCrossStyle = kmlObjectFactory.createStyleType(); this.greyCrossStyle.setId("greyCrossStyle");
-		this.greyMinusStyle = kmlObjectFactory.createStyleType(); this.greyMinusStyle.setId("greyMinusStyle");
+		this.redCircleStyle = this.kmlObjectFactory.createStyleType(); this.redCircleStyle.setId("redCircleStyle");
+		this.redCrossStyle = this.kmlObjectFactory.createStyleType(); this.redCrossStyle.setId("redCrossStyle");
+		this.redMinusStyle = this.kmlObjectFactory.createStyleType(); this.redMinusStyle.setId("redMinusStyle");
+		this.yellowCircleStyle = this.kmlObjectFactory.createStyleType(); this.yellowCircleStyle.setId("yellowCircleStyle");
+		this.yellowCrossStyle = this.kmlObjectFactory.createStyleType(); this.yellowCrossStyle.setId("yellowCrossStyle");
+		this.yellowMinusStyle = this.kmlObjectFactory.createStyleType(); this.yellowMinusStyle.setId("yellowMinusStyle");
+		this.greenCircleStyle = this.kmlObjectFactory.createStyleType(); this.greenCircleStyle.setId("greenCircleStyle");
+		this.greenCrossStyle = this.kmlObjectFactory.createStyleType(); this.greenCrossStyle.setId("greenCrossStyle");
+		this.greenMinusStyle = this.kmlObjectFactory.createStyleType(); this.greenMinusStyle.setId("greenMinusStyle");
+		this.greyCircleStyle = this.kmlObjectFactory.createStyleType(); this.greyCircleStyle.setId("greyCircleStyle");
+		this.greyCrossStyle = this.kmlObjectFactory.createStyleType(); this.greyCrossStyle.setId("greyCrossStyle");
+		this.greyMinusStyle = this.kmlObjectFactory.createStyleType(); this.greyMinusStyle.setId("greyMinusStyle");
 
 		byte[] red = new byte[]{(byte) 0xFF, (byte) 0x0F, (byte) 0x0F, (byte) 0xBE};
 		byte[] green = new byte[]{(byte) 0xFF, (byte) 0x14, (byte) 0xDC, (byte) 0x0A};
@@ -181,30 +200,38 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		byte[] grey = new byte[]{(byte) 0xFF, (byte) 0x42, (byte) 0x42, (byte) 0x42};
 
 		HashMap<StyleType, byte[]> colors = new HashMap<StyleType, byte[]>();
+		colors.put(this.redCircleStyle, red);
 		colors.put(this.redCrossStyle, red);
 		colors.put(this.redMinusStyle, red);
+		colors.put(this.yellowCircleStyle, yellow);
 		colors.put(this.yellowCrossStyle, yellow);
 		colors.put(this.yellowMinusStyle, yellow);
+		colors.put(this.greenCircleStyle, green);
 		colors.put(this.greenCrossStyle, green);
 		colors.put(this.greenMinusStyle, green);
+		colors.put(this.greyCircleStyle, grey);
 		colors.put(this.greyCrossStyle, grey);
 		colors.put(this.greyMinusStyle, grey);
 
 		HashMap<StyleType, String> hrefs = new HashMap<StyleType, String>();
+		hrefs.put(this.redCircleStyle, CIRCLEICON);
 		hrefs.put(this.redCrossStyle, CROSSICON);
 		hrefs.put(this.redMinusStyle, MINUSICON);
+		hrefs.put(this.yellowCircleStyle, CIRCLEICON);
 		hrefs.put(this.yellowCrossStyle, CROSSICON);
 		hrefs.put(this.yellowMinusStyle, MINUSICON);
+		hrefs.put(this.greenCircleStyle, CIRCLEICON);
 		hrefs.put(this.greenCrossStyle, CROSSICON);
 		hrefs.put(this.greenMinusStyle, MINUSICON);
+		hrefs.put(this.greyCircleStyle, CIRCLEICON);
 		hrefs.put(this.greyCrossStyle, CROSSICON);
 		hrefs.put(this.greyMinusStyle, MINUSICON);
 
 		for (StyleType styleType : new StyleType[]{
-				this.redCrossStyle, this.redMinusStyle, this.yellowCrossStyle, this.yellowMinusStyle,
-				this.greenCrossStyle, this.greenMinusStyle, this.greyCrossStyle, this.greyMinusStyle}) {
+				this.redCircleStyle, this.redCrossStyle, this.redMinusStyle, this.yellowCircleStyle, this.yellowCrossStyle, this.yellowMinusStyle,
+				this.greenCircleStyle, this.greenCrossStyle, this.greenMinusStyle, this.greyCrossStyle, this.greyCrossStyle, this.greyMinusStyle}) {
 
-			IconStyleType icon = kmlObjectFactory.createIconStyleType();
+			IconStyleType icon = this.kmlObjectFactory.createIconStyleType();
 			icon.setColor(
 					new byte[]{
 							colors.get(styleType)[0],
@@ -213,13 +240,13 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 							colors.get(styleType)[3]});
 			icon.setScale(ICONSCALE);
 
-			LinkType link = kmlObjectFactory.createLinkType();
+			LinkType link = this.kmlObjectFactory.createLinkType();
 			link.setHref(hrefs.get(styleType));
 			icon.setIcon(link);
 
 			styleType.setIconStyle(icon);
 
-			this.mainDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(styleType));
+			this.mainDoc.getAbstractStyleSelectorGroup().add(this.kmlObjectFactory.createStyle(styleType));
 		}
 	}
 
@@ -232,34 +259,36 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	public void writeFile(final String filename) {
 		log.info("Writing google earth file to " + filename);
 		// init kml
-		this.mainKml = kmlObjectFactory.createKmlType();
-		this.mainDoc = kmlObjectFactory.createDocumentType();
-		this.mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));
+		this.mainKml = this.kmlObjectFactory.createKmlType();
+		this.mainDoc = this.kmlObjectFactory.createDocumentType();
+		this.mainKml.setAbstractFeatureGroup(this.kmlObjectFactory.createDocument(mainDoc));
 
 		// create the styles and the folders
 		createStyles();
 		// create a folder
-		this.mainFolder = kmlObjectFactory.createFolderType();
+		this.mainFolder = this.kmlObjectFactory.createFolderType();
 		this.mainFolder.setName("Comparison, Iteration " + this.iterationNumber);
-		this.mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(this.mainFolder));
+		this.mainDoc.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(this.mainFolder));
 		// the writer
 		this.writer = new KMZWriter(filename);
 
 		try {
 			//try to create the legend
-			this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(createLegend()));
+			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(createLegend()));
+			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(createLegendGEH()));
 		} catch (IOException e) {
 			log.error("Cannot add legend to the KMZ file.", e);
 		}
 		try {
 			//add the matsim logo to the kml
-			this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(MatsimKMLLogo.writeMatsimKMLLogo(writer)));
+			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(MatsimKMLLogo.writeMatsimKMLLogo(writer)));
 		} catch (IOException e) {
 			log.error("Cannot add logo to the KMZ file.", e);
 		}
 
 		try {
 			// copy required icons to the kmz
+			this.writer.addNonKMLFile(MatsimResource.getAsInputStream("icons/circle.png"), CIRCLEICON);
 			this.writer.addNonKMLFile(MatsimResource.getAsInputStream("icons/plus.png"), CROSSICON);
 			this.writer.addNonKMLFile(MatsimResource.getAsInputStream("icons/minus.png"), MINUSICON);
 		} catch (IOException e) {
@@ -267,36 +296,48 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		}
 
 		// prepare folders for simRealPerHour-Graphs (top-left, xy-plots)
-		FolderType simRealFolder = kmlObjectFactory.createFolderType();
+		FolderType simRealFolder = this.kmlObjectFactory.createFolderType();
 		simRealFolder.setName("XY Comparison Plots");
-		this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(simRealFolder));
+		this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(simRealFolder));
 
 		// error graphs and awtv graph
 		{
 			ScreenOverlayType errorGraph = createBiasErrorGraph(filename);
 			errorGraph.setVisibility(Boolean.TRUE);
-			this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(errorGraph));
+			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(errorGraph));
+		}
+		{
+			ScreenOverlayType errorGraph = createBiasNormalizedErrorGraph(filename);
+			errorGraph.setVisibility(Boolean.FALSE);
+			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(errorGraph));
 		}
 		{
 			ScreenOverlayType errorGraph = createBoxPlotErrorGraph();
 			if (errorGraph != null) {
 				errorGraph.setVisibility(Boolean.FALSE);
-				this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(errorGraph));
+				this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(errorGraph));
 			}
 		}
 		{
-			ScreenOverlayType awtv = null ;
+			ScreenOverlayType errorGraph = createBoxPlotNormalizedErrorGraph();
+			if (errorGraph != null) {
+				errorGraph.setVisibility(Boolean.FALSE);
+				this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(errorGraph));
+			}
+		}
+		{
+			ScreenOverlayType awtv = null;
 			try {
 				awtv=this.createAWTVGraph();
-			} catch ( Exception ee ) {
-				log.warn("generating awtv (average weekday traffic volumes) graph failed; printing stacktrace but continuing anyways ...") ;
-				for ( int ii=0 ; ii<ee.getStackTrace().length ; ii++ ) {
-					log.info( ee.getStackTrace()[ii].toString() );
+			} catch (Exception ee) {
+				log.warn("generating awtv (average weekday traffic volumes) graph failed; printing stacktrace but continuing anyways ...");
+				for (int ii = 0; ii < ee.getStackTrace().length; ii++) {
+					log.info(ee.getStackTrace()[ii].toString());
 				}
 			}
 			if (awtv != null) {
 				awtv.setVisibility(Boolean.FALSE);
-				this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(awtv));
+				this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(awtv));
 			}
 		}
 
@@ -304,9 +345,18 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		this.createCountsLoadCurveGraphs();
 
 		// hourly data...
+		FolderType folderRelative = this.kmlObjectFactory.createFolderType();
+		folderRelative.setName("Relative Values");
+		this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(folderRelative));
+		
+		FolderType folderGEH = kmlObjectFactory.createFolderType();
+		folderGEH.setName("GEH Values");
+		folderGEH.setVisibility(Boolean.FALSE);
+		this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(folderGEH));
+		
 		for (int h = 1; h < 25; h++) {
 			// the timespan for this hour
-			TimeSpanType timespan = kmlObjectFactory.createTimeSpanType();
+			TimeSpanType timespan = this.kmlObjectFactory.createTimeSpanType();
 			timespan.setBegin("1999-01-01T" + Time.writeTime(((h - 1) * 3600)));
 			timespan.setEnd("1999-01-01T" + Time.writeTime((h * 3600)));
 
@@ -314,13 +364,20 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 			this.addCountsSimRealPerHourGraphs(simRealFolder, h, timespan);
 
 			// add the placemarks for the links in this hour
-			FolderType subfolder = kmlObjectFactory.createFolderType();
-			subfolder.setName(createFolderName(h));
-			subfolder.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timespan));
-			this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(subfolder));
+			FolderType subfolderRelative = this.kmlObjectFactory.createFolderType();
+			subfolderRelative.setName(createFolderName(h));
+			subfolderRelative.setAbstractTimePrimitiveGroup(this.kmlObjectFactory.createTimeSpan(timespan));
+			folderRelative.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(subfolderRelative));
 
-			writeLinkData(this.countComparisonFilter.getCountsForHour(Integer.valueOf(h)), subfolder);
+			FolderType subfolderGEH = this.kmlObjectFactory.createFolderType();
+			subfolderGEH.setName(createFolderName(h));
+			subfolderGEH.setAbstractTimePrimitiveGroup(this.kmlObjectFactory.createTimeSpan(timespan));
+			subfolderGEH.setVisibility(Boolean.FALSE);
+			folderGEH.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(subfolderGEH));
+			
+			writeLinkData(this.countComparisonFilter.getCountsForHour(Integer.valueOf(h)), subfolderRelative, subfolderGEH);
 		}
+		
 		finish();
 	}
 
@@ -347,27 +404,57 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	private ScreenOverlayType createLegend() throws IOException {
 
 		this.writer.addNonKMLFile(MatsimResource.getAsInputStream("countsKml/countsLegend240x300.png"), "countsLegend.png");
-		ScreenOverlayType overlay = kmlObjectFactory.createScreenOverlayType();
-		LinkType icon = kmlObjectFactory.createLinkType();
+		ScreenOverlayType overlay = this.kmlObjectFactory.createScreenOverlayType();
+		LinkType icon = this.kmlObjectFactory.createLinkType();
 		icon.setHref("./countsLegend.png");
 		overlay.setIcon(icon);
 		overlay.setName("Legend");
 		// place the image bottom left
-		Vec2Type overlayXY = kmlObjectFactory.createVec2Type();
+		Vec2Type overlayXY = this.kmlObjectFactory.createVec2Type();
 		overlayXY.setX(0.0);
 		overlayXY.setY(0.0);
 		overlayXY.setXunits(UnitsEnumType.FRACTION);
 		overlayXY.setYunits(UnitsEnumType.FRACTION);
 		overlay.setOverlayXY(overlayXY);
-		Vec2Type screenXY = kmlObjectFactory.createVec2Type();
+		Vec2Type screenXY = this.kmlObjectFactory.createVec2Type();
 		screenXY.setX(0.02);
 		screenXY.setY(0.07);
 		screenXY.setXunits(UnitsEnumType.FRACTION);
 		screenXY.setYunits(UnitsEnumType.FRACTION);
 		overlay.setScreenXY(screenXY);
 		return overlay;
-
 	}
+	
+	/**
+	 * Creates a legend
+	 * @return a ScreenOverlay read from a file
+	 * @throws IOException
+	 */
+	private ScreenOverlayType createLegendGEH() throws IOException {
+
+		this.writer.addNonKMLFile(MatsimResource.getAsInputStream("countsKml/countsLegendGEH.png"), "countsLegendGEH.png");
+		ScreenOverlayType overlay = this.kmlObjectFactory.createScreenOverlayType();
+		LinkType icon = this.kmlObjectFactory.createLinkType();
+		icon.setHref("./countsLegendGEH.png");
+		overlay.setIcon(icon);
+		overlay.setName("Legend GEH");
+		// place the image bottom left
+		Vec2Type overlayXY = this.kmlObjectFactory.createVec2Type();
+		overlayXY.setX(0.0);
+		overlayXY.setY(0.0);
+		overlayXY.setXunits(UnitsEnumType.FRACTION);
+		overlayXY.setYunits(UnitsEnumType.FRACTION);
+		overlay.setOverlayXY(overlayXY);
+		Vec2Type screenXY = this.kmlObjectFactory.createVec2Type();
+		screenXY.setX(0.02);
+		screenXY.setY(0.07);
+		screenXY.setXunits(UnitsEnumType.FRACTION);
+		screenXY.setYunits(UnitsEnumType.FRACTION);
+		overlay.setScreenXY(screenXY);
+		overlay.setVisibility(Boolean.FALSE);
+		return overlay;
+	}
+	
 	/**
 	 * Creates a placemark
 	 *
@@ -377,13 +464,10 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param timestep
 	 * @return the Placemark instance with description and name set
 	 */
-	private PlacemarkType createPlacemark(final String linkid, final CountSimComparison csc, final double relativeError, final int timestep) {
-		StringBuilder stringBuffer = new StringBuilder();
-		PlacemarkType placemark = kmlObjectFactory.createPlacemarkType();
-		stringBuffer.delete(0, stringBuffer.length());
-		stringBuffer.append(LINK);
-		stringBuffer.append(linkid);
-		placemark.setDescription(createPlacemarkDescription(linkid, csc, relativeError, timestep));
+	private PlacemarkType createPlacemark(final String linkid, final CountSimComparison csc, final double relativeError, final double normalizedRelativeError, 
+			final double gehValue, final int timestep) {
+		PlacemarkType placemark = this.kmlObjectFactory.createPlacemarkType();
+		placemark.setDescription(createPlacemarkDescription(linkid, csc, relativeError, normalizedRelativeError, gehValue, timestep));
 		return placemark;
 	}
 
@@ -394,49 +478,77 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param countSimComparisonList provides "the data"
 	 * @param folder The folder to which to add the data in the kml-file.
 	 */
-	private void writeLinkData(final List<CountSimComparison> countSimComparisonList, final FolderType folder) {
+	private void writeLinkData(final List<CountSimComparison> countSimComparisonList, final FolderType folder, final FolderType folderGEH) {
 		PlacemarkType placemark;
 		double relativeError;
+		double normalizedRelativeError;
+		double gehValue;
 		PointType point;
 		for (CountSimComparison csc : countSimComparisonList) {
-			Id itemId = csc.getId() ;
+			Id<Link> itemId = csc.getId();
 			Coord coord = null;
+//			String description = csc.getCsId();
 			
-			if ( counts==null ) {			
+			if (this.counts == null) {			
 				Link link = this.network.getLinks().get(itemId);
 				coord = this.coordTransform.transform(calculatePlacemarkPosition(link));
 			} else {
-				coord = this.coordTransform.transform(counts.getCount( itemId ).getCoord()) ;
+				coord = this.coordTransform.transform(this.counts.getCount(itemId).getCoord());
 			}
-			relativeError = csc.calculateRelativeError() * 100;
-			// build placemark
-			placemark = createPlacemark(itemId.toString(), csc, relativeError, csc.getHour());
-			point = kmlObjectFactory.createPointType();
-			point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
-			placemark.setAbstractGeometryGroup(kmlObjectFactory.createPoint(point));
-			// cross
-			if (csc.getSimulationValue() > csc.getCountValue()) {
-				if (csc.getSimulationValue() < csc.getCountValue() * 1.5) {
-					placemark.setStyleUrl(this.greenCrossStyle.getId());
+			relativeError = csc.calculateRelativeError();
+			normalizedRelativeError = csc.calculateNormalizedRelativeError();
+			gehValue = csc.calculateGEHValue();
+			
+			// +/- placemark
+			{
+				// build placemark
+				placemark = createPlacemark(itemId.toString(), csc, relativeError, normalizedRelativeError, gehValue, csc.getHour());
+//				if (description != null) placemark.setName(description);
+				point = this.kmlObjectFactory.createPointType();
+				point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
+				placemark.setAbstractGeometryGroup(this.kmlObjectFactory.createPoint(point));
+				// cross
+				if (csc.getSimulationValue() > csc.getCountValue()) {
+					if (csc.getSimulationValue() < csc.getCountValue() * 1.5) {
+						placemark.setStyleUrl(this.greenCrossStyle.getId());
+					}
+					else if (csc.getSimulationValue() < csc.getCountValue() * 2) {
+						placemark.setStyleUrl(this.yellowCrossStyle.getId());
+					}
+					else {
+						placemark.setStyleUrl(this.redCrossStyle.getId());
+					}
 				}
-				else if (csc.getSimulationValue() < csc.getCountValue() * 2) {
-					placemark.setStyleUrl(this.yellowCrossStyle.getId());
-				}
+				// minus
 				else {
-					placemark.setStyleUrl(this.redCrossStyle.getId());
+					if (csc.getSimulationValue() > csc.getCountValue() * 0.75) {
+						placemark.setStyleUrl("#greenMinusStyle");
+					} else if (csc.getSimulationValue() > csc.getCountValue() * 0.5) {
+						placemark.setStyleUrl("#yellowMinusStyle");
+					} else {
+						placemark.setStyleUrl("#redMinusStyle");
+					}
 				}
+				folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(placemark));
 			}
-			// minus
-			else {
-				if (csc.getSimulationValue() > csc.getCountValue() * 0.75) {
-					placemark.setStyleUrl("#greenMinusStyle");
-				} else if (csc.getSimulationValue() > csc.getCountValue() * 0.5) {
-					placemark.setStyleUrl("#yellowMinusStyle");
-				} else {
-					placemark.setStyleUrl("#redMinusStyle");
-				}
+			
+			// circle placemark
+			{
+				// build placemark
+				placemark = createPlacemark(itemId.toString(), csc, relativeError, normalizedRelativeError, gehValue, csc.getHour());
+//				if (description != null) placemark.setName(description);
+				placemark.setVisibility(Boolean.FALSE);
+				point = this.kmlObjectFactory.createPointType();
+				point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
+				placemark.setAbstractGeometryGroup(this.kmlObjectFactory.createPoint(point));
+				
+				if (gehValue < 5) placemark.setStyleUrl(this.greenCircleStyle.getId());
+				else if (gehValue < 10) placemark.setStyleUrl(this.yellowCircleStyle.getId());
+				else if (gehValue > 10) placemark.setStyleUrl(this.redCircleStyle.getId());
+				else placemark.setStyleUrl(this.greyCircleStyle.getId());
+				
+				folderGEH.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(placemark));				
 			}
-			folder.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(placemark));
 		}
 	}
 	/**
@@ -465,13 +577,20 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param timestep
 	 * @return A String containing the description for each placemark
 	 */
-	private String createPlacemarkDescription(final String linkid, final CountSimComparison csc, final double relativeError, final int timestep) {
+	private String createPlacemarkDescription(final String linkid, final CountSimComparison csc, final double relativeError, final double normalizedRelativeError, 
+			final double gehValue, final int timestep) {
 		StringBuilder buffer = new StringBuilder(100);
 //		buffer.append(NetworkFeatureFactory.STARTCDATA);
 //		buffer.append(STARTH1);
 //		buffer.append(LINK);
 //		buffer.append(linkid);
 //		buffer.append(ENDH1);
+		if (csc.getCsId() != null) {
+			buffer.append(NetworkFeatureFactory.STARTH2);
+			buffer.append(CSID);
+			buffer.append(csc.getCsId());
+			buffer.append(NetworkFeatureFactory.ENDH2);			
+		}
 		buffer.append(NetworkFeatureFactory.STARTH2);
 		buffer.append(LINK);
 		buffer.append(linkid);
@@ -501,7 +620,15 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		buffer.append(NetworkFeatureFactory.ENDP);
 		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append(RELERROR);
-		buffer.append(relativeError);
+		buffer.append(nf.format(relativeError * 100) +  "%");
+		buffer.append(NetworkFeatureFactory.ENDP);
+		buffer.append(NetworkFeatureFactory.STARTP);
+		buffer.append(NORMRELERROR);
+		buffer.append(nf.format(normalizedRelativeError * 100) +  "%");
+		buffer.append(NetworkFeatureFactory.ENDP);
+		buffer.append(NetworkFeatureFactory.STARTP);
+		buffer.append(GEH);
+		buffer.append(gehValue);
 		buffer.append(NetworkFeatureFactory.ENDP);
 //		buffer.append(NetworkFeatureFactory.ENDCDATA);
 		return buffer.toString();
@@ -544,27 +671,27 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 
 			this.writeChartToKmz(filename.toString(), graph.getChart());
 			//and link with the overlay
-			overlay = kmlObjectFactory.createScreenOverlayType();
-			LinkType icon = kmlObjectFactory.createLinkType();
+			overlay = this.kmlObjectFactory.createScreenOverlayType();
+			LinkType icon = this.kmlObjectFactory.createLinkType();
 			icon.setHref("./" + filename.toString());
 			overlay.setIcon(icon);
 			overlay.setName(graph.getChartTitle());
 			// place the image top left
-			Vec2Type overlayXY = kmlObjectFactory.createVec2Type();
+			Vec2Type overlayXY = this.kmlObjectFactory.createVec2Type();
 			overlayXY.setX(1.0);
 			overlayXY.setY(1.0);
 			overlayXY.setXunits(UnitsEnumType.FRACTION);
 			overlayXY.setYunits(UnitsEnumType.FRACTION);
 			overlay.setOverlayXY(overlayXY);
-			Vec2Type screenXY = kmlObjectFactory.createVec2Type();
+			Vec2Type screenXY = this.kmlObjectFactory.createVec2Type();
 			screenXY.setX(0.98);
 			screenXY.setY(0.98);
 			screenXY.setXunits(UnitsEnumType.FRACTION);
 			screenXY.setYunits(UnitsEnumType.FRACTION);
 			overlay.setScreenXY(screenXY);
-			overlay.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeSpan(timespan));
+			overlay.setAbstractTimePrimitiveGroup(this.kmlObjectFactory.createTimeSpan(timespan));
 			//add the overlay to the folder
-			folder.getAbstractFeatureGroup().add(kmlObjectFactory.createScreenOverlay(overlay));
+			folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(overlay));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -634,6 +761,32 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 
 	/**
 	 * Creates the CountsErrorGraph for all the data
+	 * @param visible true if initially visible
+	 * @return the ScreenOverlay Feature
+	 */
+	private ScreenOverlayType createBoxPlotNormalizedErrorGraph() {
+
+		CountsGraph ep;
+		try {
+			ep = new BoxPlotNormalizedErrorGraph(this.countComparisonFilter.getCountsForHour(null), this.iterationNumber, null, "error graph");
+			ep.createChart(0);
+		} catch (IllegalArgumentException e) {
+			log.error("Could not create BoxPlot-NormalizedErrorGraph.", e);
+			return null;
+		}
+
+		String filename = "errorGraphNormalizedBoxPlot.png";
+		try {
+			writeChartToKmz(filename, ep.getChart());
+			return createOverlayBottomRight(filename, "Normalized Error Graph [Box-Plot]");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Creates the CountsErrorGraph for all the data
 	 * @param kmlFilename the filename of the kml file
 	 * @param visible true if initially visible
 	 * @return the ScreenOverlay Feature
@@ -643,9 +796,9 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		ep.createChart(0);
 
 		double[] meanError = ep.getMeanRelError();
-		double[] meanBias = ep.getMeanAbsBias();
+		double[] meanBias = ep.getMeanBias();
 		int index = kmlFilename.lastIndexOf(System.getProperty("file.separator"));
-		if (index == -1){
+		if (index == -1) {
 			index = kmlFilename.lastIndexOf('/');
 		}
 		String outdir;
@@ -660,7 +813,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		try {
 			BufferedWriter bwriter = IOUtils.getBufferedWriter(file);
 			StringBuilder buffer = new StringBuilder(200);
-			buffer.append("hour \t mean relative error \t mean absolute bias");
+			buffer.append("hour \t mean relative error \t mean bias");
 			bwriter.write(buffer.toString());
 			bwriter.newLine();
 			for (int i = 0; i < meanError.length; i++) {
@@ -678,11 +831,66 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 			e.printStackTrace();
 		}
 
-
 		String filename = "errorGraphErrorBias.png";
 		try {
 			writeChartToKmz(filename, ep.getChart());
 			return createOverlayBottomRight(filename, "Error Graph [Error/Bias]");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Creates the CountsErrorGraph for all the data
+	 * @param kmlFilename the filename of the kml file
+	 * @param visible true if initially visible
+	 * @return the ScreenOverlay Feature
+	 */
+	private ScreenOverlayType createBiasNormalizedErrorGraph(String kmlFilename) {
+		BiasNormalizedErrorGraph ep = new BiasNormalizedErrorGraph(this.countComparisonFilter.getCountsForHour(null), this.iterationNumber, null, "error graph");
+		ep.createChart(0);
+
+		double[] meanError = ep.getMeanNormRelError();
+		double[] meanBias = ep.getMeanBias();
+		int index = kmlFilename.lastIndexOf(System.getProperty("file.separator"));
+		if (index == -1) {
+			index = kmlFilename.lastIndexOf('/');
+		}
+		String outdir;
+		if (index == -1) {
+			outdir = "";
+		}
+		else {
+			outdir = kmlFilename.substring(0, index) + System.getProperty("file.separator");
+		}
+		String file = outdir + "biasNormalizedErrorGraphData.txt";
+		log.info("writing chart data to " + new File(file).getAbsolutePath());
+		try {
+			BufferedWriter bwriter = IOUtils.getBufferedWriter(file);
+			StringBuilder buffer = new StringBuilder(200);
+			buffer.append("hour \t mean normalized relative error \t mean bias");
+			bwriter.write(buffer.toString());
+			bwriter.newLine();
+			for (int i = 0; i < meanError.length; i++) {
+				buffer.delete(0, buffer.length());
+				buffer.append(i + 1);
+				buffer.append('\t');
+				buffer.append(meanError[i]);
+				buffer.append('\t');
+				buffer.append(meanBias[i]);
+				bwriter.write(buffer.toString());
+				bwriter.newLine();
+			}
+			bwriter.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		String filename = "errorGraphNormalizedErrorBias.png";
+		try {
+			writeChartToKmz(filename, ep.getChart());
+			return createOverlayBottomRight(filename, "Normalized Error Graph [Error/Bias]");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -713,19 +921,19 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	}
 
 	private ScreenOverlayType createOverlayBottomRight(final String fileName, final String overlayName) {
-		ScreenOverlayType overlay = kmlObjectFactory.createScreenOverlayType();
-		LinkType icon1 = kmlObjectFactory.createLinkType();
+		ScreenOverlayType overlay = this.kmlObjectFactory.createScreenOverlayType();
+		LinkType icon1 = this.kmlObjectFactory.createLinkType();
 		icon1.setHref("./" + fileName);
 		overlay.setIcon(icon1);
 		overlay.setName(overlayName);
 		// place the image bottom right
-		Vec2Type overlayXY = kmlObjectFactory.createVec2Type();
+		Vec2Type overlayXY = this.kmlObjectFactory.createVec2Type();
 		overlayXY.setX(1.0);
 		overlayXY.setY(0.0);
 		overlayXY.setXunits(UnitsEnumType.FRACTION);
 		overlayXY.setYunits(UnitsEnumType.FRACTION);
 		overlay.setOverlayXY(overlayXY);
-		Vec2Type screenXY = kmlObjectFactory.createVec2Type();
+		Vec2Type screenXY = this.kmlObjectFactory.createVec2Type();
 		screenXY.setX(0.98);
 		screenXY.setY(0.1);
 		screenXY.setXunits(UnitsEnumType.FRACTION);

@@ -38,6 +38,12 @@ public interface CountSimComparison {
 	public Id<Link> getId();
 
 	/**
+	 * 
+	 * @return The Id of the count station
+	 */
+	public String getCsId();
+	
+	/**
 	 * The time at which the data was measured.
 	 * @return A value in 1..24, 1 means 0 - 1 am, 2 means 1 - 2 am and so on
 	 */
