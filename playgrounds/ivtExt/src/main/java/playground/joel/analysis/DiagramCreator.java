@@ -101,10 +101,7 @@ public class DiagramCreator {
         // save plot as png
         int width = 1000; /* Width of the image */
         int height = 750; /* Height of the image */
-        File timeChart = new File(directory, fileTitle + ".png");
-        ChartUtilities.saveChartAsPNG(timeChart, timechart, width, height);
-        GlobalAssert.that(timeChart.exists() && !timeChart.isDirectory());
-        System.out.println("exported " + fileTitle + ".png");
+        savePlot(directory, fileTitle, timechart, width, height);
     }
 
     /**
@@ -133,5 +130,13 @@ public class DiagramCreator {
             }
             return temp;
         } else return values;
+    }
+
+    public static void savePlot(File directory, String fileTitle, JFreeChart chart, int width, int height)
+            throws Exception {
+        File fileChart = new File(directory, fileTitle + ".png");
+        ChartUtilities.saveChartAsPNG(fileChart, chart, width, height);
+        GlobalAssert.that(fileChart.exists() && !fileChart.isDirectory());
+        System.out.println("Exported " + fileTitle + ".png");
     }
 }

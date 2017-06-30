@@ -2,13 +2,11 @@ package playground.joel.analysis;
 
 import ch.ethz.idsc.tensor.Tensor;
 import org.jfree.chart.*;
+import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.plot.*;
-import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DatasetUtilities;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.util.SortOrder;
-import playground.clruch.utils.GlobalAssert;
 
 import java.awt.*;
 import java.io.File;
@@ -40,6 +38,8 @@ public class UniqueDiagrams {
         chart.getCategoryPlot().getRangeAxis().setRange(0, 1.0);
         chart.getCategoryPlot().setRangeGridlinePaint(Color.lightGray);
         chart.getCategoryPlot().getDomainAxis().setTickLabelsVisible(false);
+        chart.getCategoryPlot().getDomainAxis().setLowerMargin(0.0);
+        chart.getCategoryPlot().getDomainAxis().setUpperMargin(0.0);
         chart.getCategoryPlot().getRangeAxis().setTickLabelFont(tickFont);
         chart.getTitle().setFont(titleFont);
         LegendItemCollection legend = new LegendItemCollection();
@@ -51,9 +51,42 @@ public class UniqueDiagrams {
         chart.getLegend().setItemFont(tickFont);
         chart.getLegend().setSortOrder(SortOrder.DESCENDING);
 
-        File stackedChart = new File(directory, fileTitle + ".png");
-        ChartUtilities.saveChartAsPNG(stackedChart, chart, width, height);
-        GlobalAssert.that(stackedChart.exists() && !stackedChart.isDirectory());
-        System.out.println("exported " + fileTitle + ".png");
+        DiagramCreator.savePlot(directory, fileTitle, chart, width, height);
+    }
+
+    public static void binCountGraph(File directory, String fileTitle, String diagramTitle, //
+                                     Tensor binCounter, double binSize, double scaling, //
+                                     String valueAxisLabel, String rangeAxisLabel, String rangeAxisAppendix) throws Exception {
+        int width = 1600; /* Width of the image */
+        int height = 800; /* Height of the image */
+
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        for (int i = 0; i < binCounter.length(); i++) {
+            dataset.addValue(binCounter.Get(i).number().doubleValue()*scaling, "", //
+                    binName(binSize, i, rangeAxisAppendix));
+        }
+        JFreeChart chart = ChartFactory.createBarChart(
+                diagramTitle,
+                rangeAxisLabel, valueAxisLabel,
+                dataset,PlotOrientation.VERTICAL,
+                false, false, false);
+
+        chart.setBackgroundPaint(Color.white);
+        chart.getCategoryPlot().setRangeGridlinePaint(Color.lightGray);
+        chart.getCategoryPlot().getDomainAxis().setTickLabelFont(tickFont);
+        chart.getCategoryPlot().getDomainAxis().setLowerMargin(0.0);
+        chart.getCategoryPlot().getDomainAxis().setUpperMargin(0.0);
+        chart.getCategoryPlot().getDomainAxis().setCategoryMargin(0.0);
+        chart.getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
+        chart.getCategoryPlot().getDomainAxis().setLabelFont(axisFont);
+        chart.getCategoryPlot().getRangeAxis().setTickLabelFont(tickFont);
+        chart.getCategoryPlot().getRangeAxis().setLabelFont(axisFont);
+        chart.getTitle().setFont(titleFont);
+
+        DiagramCreator.savePlot(directory, fileTitle, chart, width, height);
+    }
+
+    public static String binName(double binSize, int i, String appedix) {
+        return i*binSize + " - " + (i+1)*binSize + appedix;
     }
 }

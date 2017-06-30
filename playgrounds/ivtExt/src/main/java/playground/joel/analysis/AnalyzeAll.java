@@ -20,9 +20,7 @@ import ch.ethz.idsc.tensor.io.MatlabExport;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
-import playground.clruch.utils.GlobalAssert;
 import playground.joel.data.TotalData;
-import playground.joel.html.DataCollector;
 
 /**
  * Created by Joel on 05.04.2017.
@@ -31,6 +29,8 @@ public class AnalyzeAll {
     public static final File RELATIVE_DIRECTORY = new File("output", "data");
     public static final boolean filter = true;  // filter size can be adapted in the diagram creator
     public static final double maxWaitingTime = 20.0; // maximally displayed waiting time in minutes
+
+    public static double waitBinSize = 10.0;
 
     public static double timeRatio ;
     public static double distance ;
@@ -53,10 +53,7 @@ public class AnalyzeAll {
 
     static void plot(String csv, String name, String title, int from, int to, Double maxRange) throws Exception {
         Tensor table = CsvFormat.parse(Files.lines(Paths.get("output/data/" + csv + ".csv")));
-        System.out.println(Dimensions.of(table));
-
         table = Transpose.of(table);
-
         try {
             DiagramCreator.createDiagram(RELATIVE_DIRECTORY, name, title, table.get(0), table.extract(from, to), //
                     maxRange, filter);
@@ -72,6 +69,7 @@ public class AnalyzeAll {
     static void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis) throws Exception {
         Tensor summary = Join.of(1, coreAnalysis.summary, distanceAnalysis.summary);
         saveFile(summary, "summary");
+        System.out.println("Size of data summary: " + Dimensions.of(summary));
 
         getTotals(summary, coreAnalysis);
 
@@ -81,6 +79,10 @@ public class AnalyzeAll {
         AnalyzeAll.plot("summary", "binnedDistanceRatios", "Distance Ratio", 15, 16);
         UniqueDiagrams.distanceStack(RELATIVE_DIRECTORY, "stackedDistance", "Distance Partition", //
                 distanceRebalance/distance, distancePickup/distance, distanceWithCust/distance);
+        UniqueDiagrams.binCountGraph(RELATIVE_DIRECTORY, "waitBinCounter", //
+                "Requests per Waiting Time", coreAnalysis.waitBinCounter, waitBinSize, //
+                100.0/coreAnalysis.numRequests, "% of requests", //
+                "Waiting Times", " sec");
     }
 
     static void getTotals(Tensor summary, CoreAnalysis coreAnalysis) {

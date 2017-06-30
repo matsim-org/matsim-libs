@@ -129,6 +129,7 @@ public class ReportGenerator {
                 "\n" + d.format(analyzeSummary.maximumWaitTime/60) + " min");
         htmlUtils.newLine();
         htmlUtils.insertImg(IMAGE_FOLDER + "/binnedWaitingTimes.png", 800, 600);
+        htmlUtils.insertImg(IMAGE_FOLDER + "/waitBinCounter.png", 1200, 600);
 
         htmlUtils.insertSubTitle("Fleet Performance");
         htmlUtils.insertTextLeft( //
