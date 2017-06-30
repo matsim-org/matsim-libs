@@ -90,7 +90,7 @@ public abstract class PtCountsFixture {
 	public List<CountSimComparison> ceateCountSimCompList() {
 		List<CountSimComparison> csc_l = new Vector<CountSimComparison>(24);
 		for (int i = 0; i < 24; i++) {
-			csc_l.add(new CountSimComparisonImpl(Id.create(100, Link.class), i + 1, 1.0,1.0));
+			csc_l.add(new CountSimComparisonImpl(Id.create(100, Link.class), "", i + 1, 1.0,1.0));
 		}
 		return csc_l;
 	}
