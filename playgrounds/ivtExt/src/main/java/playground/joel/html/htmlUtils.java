@@ -34,7 +34,8 @@ public abstract class htmlUtils {
                     "body {font-family: verdana;", //
                     "font-size: 16px;", //
                     "line-height: 1.75;}", //
-                    "img {padding: 5px;}" //
+                    "img {padding: 5px;}", //
+                    "#footer_link {color: white;}"
             );
         }
     }
@@ -143,8 +144,8 @@ public abstract class htmlUtils {
 
     public static void insertLink(String url, String link) {
         htmlUtils.insertCSS("a {font-family: arial;}");
-        if (footer || header) stringBuilder.append("<a id=\"footer_link\" target=\"_blank\" href=\" color=\"white\"" + //
-                url + "\"> <b>" + link + "</b></a>");
+        if (footer || header) stringBuilder.append("<a id=\"footer_link\" target=\"_blank\"" +
+                " href=\"" + url + "\"> <b>" + link + "</b></a>");
         else stringBuilder.append("<a target=\"_blank\" href=\"" + url + "\"> <b>" + link + "</b></a>");
     }
 

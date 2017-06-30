@@ -83,6 +83,8 @@ public class AnalyzeAll {
                 "Requests per Waiting Time", coreAnalysis.waitBinCounter, waitBinSize, //
                 100.0/coreAnalysis.numRequests, "% of requests", //
                 "Waiting Times", " sec");
+        UniqueDiagrams.distanceDistribution(RELATIVE_DIRECTORY, "distanceDistribution", //
+                "Distance Distribution", true);
     }
 
     static void getTotals(Tensor summary, CoreAnalysis coreAnalysis) {

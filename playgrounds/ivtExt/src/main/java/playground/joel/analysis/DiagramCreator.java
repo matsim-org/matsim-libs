@@ -23,6 +23,10 @@ import playground.clruch.utils.GlobalAssert;
 public class DiagramCreator {
     public static final int filterSize = 120;
 
+    public static Font titleFont = new Font("Dialog", Font.BOLD, 24);
+    public static Font axisFont = new Font("Dialog", Font.BOLD, 18);
+    public static Font tickFont = new Font("Dialog", Font.PLAIN, 14);
+
     static Second toTime(double time) {
         int days = (int) (time / 86400) + 1;
         int hours = (int) (time / 3600) - (days - 1) * 24;
@@ -81,9 +85,6 @@ public class DiagramCreator {
         }
 
         // set text fonts
-        Font titleFont = new Font("Dialog", Font.BOLD, 24);
-        Font axisFont = new Font("Dialog", Font.BOLD, 18);
-        Font tickFont = new Font("Dialog", Font.PLAIN, 14);
         timechart.getTitle().setFont(titleFont);
         timechart.getXYPlot().getDomainAxis().setLabelFont(axisFont);
         timechart.getXYPlot().getRangeAxis().setLabelFont(axisFont);

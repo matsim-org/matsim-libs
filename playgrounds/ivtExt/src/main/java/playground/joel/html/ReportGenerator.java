@@ -143,6 +143,7 @@ public class ReportGenerator {
         htmlUtils.newLine();
         htmlUtils.insertImg(IMAGE_FOLDER + "/binnedTimeRatios.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/binnedDistanceRatios.png", 800, 600);
+        htmlUtils.insertImg(IMAGE_FOLDER + "/distanceDistribution.png", 800, 600);
 
         // ----------------------------------------------
         htmlUtils.footer();
