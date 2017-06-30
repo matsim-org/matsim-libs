@@ -8,9 +8,6 @@ import org.jfree.chart.axis.*;
 import org.jfree.chart.plot.*;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.time.Second;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.time.TimeTableXYDataset;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.util.SortOrder;
@@ -19,7 +16,6 @@ import java.awt.*;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
 
 /**
  * Created by Joel on 29.06.2017.
@@ -73,9 +69,10 @@ public class UniqueDiagrams {
         String[] labels = {"With Customer", "Pickup", "Rebalancing"};
 
         final TimeTableXYDataset dataset = new TimeTableXYDataset();
+        Tensor time = table.get(0);
         for (int i = 0; i < values.length(); i++)
-            for (int j = 0; j < table.get(0).length(); j++)
-                dataset.add(DiagramCreator.toTime(table.get(0).Get(j).number().doubleValue()), //
+            for (int j = 0; j < time.length(); j++)
+                dataset.add(DiagramCreator.toTime(time.Get(j).number().doubleValue()), //
                         values.Get(i, j).number().doubleValue()*(i == 0 ? -1.0 : 1.0)/1000, labels[i]);
 
         JFreeChart timechart = ChartFactory.createStackedXYAreaChart(diagramTitle, "Time", //

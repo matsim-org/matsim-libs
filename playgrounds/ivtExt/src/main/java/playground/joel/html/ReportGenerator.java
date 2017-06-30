@@ -60,6 +60,15 @@ public class ReportGenerator {
         htmlUtils.insertLink("av.xml", "AV File");
         htmlUtils.insertLink("av_config.xml", "AV_Config File");
         htmlUtils.newLine();
+        htmlUtils.insertTextLeft("Dispatcher:" + //
+                "\nVehicles:" + //
+                "\nRebalancing Period:" + //
+                "\nRedispatching Period:");
+        htmlUtils.insertTextLeft(scenarioParameters.dispatcher + //
+                "\n" + analyzeSummary.numVehicles + //
+                "\n" + scenarioParameters.rebalancingPeriod + //
+                "\n" + scenarioParameters.redispatchPeriod);
+        htmlUtils.newLine();
         htmlUtils.insertTextLeft("Network:" + //
                 "\nVirtual Nodes:" + //
                 "\nPopulation:" + //
@@ -69,14 +78,9 @@ public class ReportGenerator {
                 "\n" + scenarioParameters.populationSize + //
                 "\n" + analyzeSummary.numRequests);
         htmlUtils.newLine();
-        htmlUtils.insertTextLeft("Dispatcher:" + //
-                "\nVehicles:" + //
-                "\nRebalancing Period:" + //
-                "\nRedispatching Period:");
-        htmlUtils.insertTextLeft(scenarioParameters.dispatcher + //
-                "\n" + analyzeSummary.numVehicles + //
-                "\n" + scenarioParameters.rebalancingPeriod + //
-                "\n" + scenarioParameters.redispatchPeriod);
+        htmlUtils.insertTextLeft("Average Trip Distance:");
+        htmlUtils.insertTextLeft(d.format( //
+                analyzeSummary.distanceWithCust*link2km/analyzeSummary.numRequests) + " km");
 
         htmlUtils.insertSubTitle("Aggregate Results");
         htmlUtils.insertTextLeft("Computation Time:");
@@ -129,7 +133,7 @@ public class ReportGenerator {
                 "\n" + d.format(analyzeSummary.maximumWaitTime/60) + " min");
         htmlUtils.newLine();
         htmlUtils.insertImg(IMAGE_FOLDER + "/binnedWaitingTimes.png", 800, 600);
-        htmlUtils.insertImg(IMAGE_FOLDER + "/waitBinCounter.png", 1200, 600);
+        htmlUtils.insertImg(IMAGE_FOLDER + "/waitBinCounter.png", 800, 600);
 
         htmlUtils.insertSubTitle("Fleet Performance");
         htmlUtils.insertTextLeft( //

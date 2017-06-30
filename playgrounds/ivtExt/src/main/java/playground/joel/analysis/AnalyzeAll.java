@@ -30,7 +30,7 @@ public class AnalyzeAll {
     public static final boolean filter = true;  // filter size can be adapted in the diagram creator
     public static final double maxWaitingTime = 20.0; // maximally displayed waiting time in minutes
 
-    public static final Scalar waitBinSize = RealScalar.of(10.0); // in minutes
+    public static final Scalar waitBinSize = RealScalar.of(20.0); // in minutes
     public static final Scalar distanceBinSize = RealScalar.of(10.0); // in km
 
     public static double timeRatio ;
@@ -81,7 +81,7 @@ public class AnalyzeAll {
         DiagramCreator.binCountGraph(RELATIVE_DIRECTORY, "waitBinCounter", //
                 "Requests per Waiting Time", coreAnalysis.waitBinCounter, waitBinSize.number().doubleValue(), //
                 100.0/coreAnalysis.numRequests, "% of requests", //
-                "Waiting Times", " sec", 1500, 750);
+                "Waiting Times", " sec", 1000, 750);
         DiagramCreator.binCountGraph(RELATIVE_DIRECTORY, "totalDistanceVehicle", //
                 "Vehicle per Total Distance", distanceAnalysis.tdBinCounter, //
                 distanceBinSize.number().doubleValue(), 100.0/distanceAnalysis.numVehicles, //
