@@ -5,7 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
+import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.red.Total;
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.tensor.RealScalar;
@@ -84,6 +87,15 @@ public class VehicleStatistic {
                 ++count;
             }
         }
+    }
+
+    public Tensor totalDistances() {
+        Tensor distances = Tensors.empty();
+        distances.append(Total.of(distanceTotal));
+        distances.append(Total.of(distanceWithCustomer));
+        distances.append(Total.of(distancePickup));
+        distances.append(Total.of(distanceRebalance));
+        return distances;
     }
 
 }

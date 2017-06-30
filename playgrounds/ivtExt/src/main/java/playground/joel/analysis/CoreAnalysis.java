@@ -118,8 +118,8 @@ public class CoreAnalysis {
 
         Tensor uniqueSubmissions = Tensor.of(requestWaitTimes.values().stream().map(RealScalar::of));
         numRequests = uniqueSubmissions.length();
-        maximumWaitTime = AnalysisUtils.maximum(uniqueSubmissions);
-        waitBinCounter = AnalysisUtils.binCounter(uniqueSubmissions, AnalyzeAll.waitBinSize);
+        maximumWaitTime = AnalysisUtils.maximum(uniqueSubmissions).number().doubleValue();
+        waitBinCounter = AnalysisUtils.binCount(uniqueSubmissions, AnalyzeAll.waitBinSize);
 
         System.out.println("Found requests: " + numRequests);
 

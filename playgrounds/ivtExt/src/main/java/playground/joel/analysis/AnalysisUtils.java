@@ -1,10 +1,12 @@
 package playground.joel.analysis;
 
-import ch.ethz.idsc.tensor.DoubleScalar;
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.*;
+import ch.ethz.idsc.tensor.red.Max;
+import ch.ethz.idsc.tensor.red.Tally;
+import ch.ethz.idsc.tensor.sca.Floor;
 
 
+import java.util.Map;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
@@ -13,26 +15,18 @@ import java.util.TreeMap;
  */
 public class AnalysisUtils {
 
-    static double maximum(Tensor submissions){
-        double max = submissions.Get(0).number().doubleValue();
-        for (int i = 1; i < submissions.length(); i++) {
-            double current = submissions.Get(i).number().doubleValue();
-            if (max < current)
-                max = current;
-        }
-        return max;
+    static Scalar maximum(Tensor submissions){
+        return submissions.flatten(0).reduce(Max::of).get().Get();
     }
 
-    static Tensor binCounter(Tensor tensor, double binSize) {
-        Tensor binCounter = Tensors.empty();
-        NavigableMap<Double, Integer> counter = new TreeMap<>();
-        for (int i = 0; i*binSize < maximum(tensor); i++) counter.put(i*binSize, 0);
-        for (int j = 0; j < tensor.length(); j++) {
-            int current = counter.floorEntry(tensor.Get(j).number().doubleValue()).getValue();
-            counter.put(counter.floorKey(tensor.Get(j).number().doubleValue()), current + 1);
-        }
-        counter.values().forEach(k -> binCounter.append(DoubleScalar.of(k)));
-        return binCounter;
+
+    static Tensor binCount(Tensor tensor, Scalar binSize) {
+        Tensor floor = Floor.of(tensor.multiply(binSize.invert()));
+        Map<Tensor, Long> map = Tally.of(floor);
+        Scalar max = maximum(floor);
+        return Tensors.vector(i->map.containsKey(RealScalar.of(i)) ? //
+                RealScalar.of(map.get(RealScalar.of(i))) : RealScalar.ZERO, max.number().intValue()+1);
+
     }
 
 }

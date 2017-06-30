@@ -61,42 +61,6 @@ public class UniqueDiagrams {
         DiagramCreator.savePlot(directory, fileTitle, chart, width, height);
     }
 
-    public static void binCountGraph(File directory, String fileTitle, String diagramTitle, //
-                                     Tensor binCounter, double binSize, double scaling, //
-                                     String valueAxisLabel, String rangeAxisLabel, String rangeAxisAppendix) throws Exception {
-        int width = 1600; /* Width of the image */
-        int height = 800; /* Height of the image */
-
-        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        for (int i = 0; i < binCounter.length(); i++) {
-            dataset.addValue(binCounter.Get(i).number().doubleValue()*scaling, "", //
-                    binName(binSize, i, rangeAxisAppendix));
-        }
-        JFreeChart chart = ChartFactory.createBarChart(
-                diagramTitle,
-                rangeAxisLabel, valueAxisLabel,
-                dataset,PlotOrientation.VERTICAL,
-                false, false, false);
-
-        chart.setBackgroundPaint(Color.white);
-        chart.getCategoryPlot().setRangeGridlinePaint(Color.lightGray);
-        chart.getCategoryPlot().getDomainAxis().setTickLabelFont(DiagramCreator.tickFont);
-        chart.getCategoryPlot().getDomainAxis().setLowerMargin(0.0);
-        chart.getCategoryPlot().getDomainAxis().setUpperMargin(0.0);
-        chart.getCategoryPlot().getDomainAxis().setCategoryMargin(0.0);
-        chart.getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
-        chart.getCategoryPlot().getDomainAxis().setLabelFont(DiagramCreator.axisFont);
-        chart.getCategoryPlot().getRangeAxis().setTickLabelFont(DiagramCreator.tickFont);
-        chart.getCategoryPlot().getRangeAxis().setLabelFont(DiagramCreator.axisFont);
-        chart.getTitle().setFont(DiagramCreator.titleFont);
-
-        DiagramCreator.savePlot(directory, fileTitle, chart, width, height);
-    }
-
-    public static String binName(double binSize, int i, String appedix) {
-        return i*binSize + " - " + (i+1)*binSize + appedix;
-    }
-
     public static void distanceDistribution(File directory, String fileTitle, String diagramTitle, //
                                             boolean filter) throws Exception {
         int width = 1000; /* Width of the image */
@@ -109,12 +73,10 @@ public class UniqueDiagrams {
         String[] labels = {"With Customer", "Pickup", "Rebalancing"};
 
         final TimeTableXYDataset dataset = new TimeTableXYDataset();
-        for (int i = 0; i < values.length(); i++) {
-            for (int j = 0; j < table.get(0).length(); j++) {
+        for (int i = 0; i < values.length(); i++)
+            for (int j = 0; j < table.get(0).length(); j++)
                 dataset.add(DiagramCreator.toTime(table.get(0).Get(j).number().doubleValue()), //
                         values.Get(i, j).number().doubleValue()*(i == 0 ? -1.0 : 1.0)/1000, labels[i]);
-            }
-        }
 
         JFreeChart timechart = ChartFactory.createStackedXYAreaChart(diagramTitle, "Time", //
                 "Distance [km]", dataset, PlotOrientation.VERTICAL, false, false, false);

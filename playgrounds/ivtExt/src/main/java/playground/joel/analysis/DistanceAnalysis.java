@@ -4,16 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.*;
 import ch.ethz.idsc.tensor.alg.Join;
+import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
 import playground.clruch.net.VehicleStatistic;
-import playground.clruch.utils.GlobalAssert;
-import playground.joel.html.DataCollector;
 
 /**
  * Created by Joel on 05.04.2017.
@@ -21,6 +19,10 @@ import playground.joel.html.DataCollector;
 public class DistanceAnalysis {
     StorageSupplier storageSupplier;
     int size;
+    public Tensor totalDistancesPerVehicle = Tensors.empty();
+    public Tensor distancesWCPerVehicle = Tensors.empty();
+    public Tensor tdBinCounter = Tensors.empty();
+    public Tensor dwcBinCounter = Tensors.empty();
     public Tensor summary = Tensors.empty();
     public int numVehicles;
 
@@ -48,6 +50,15 @@ public class DistanceAnalysis {
                 System.out.println(s.now);
 
         }
+
+
+        totalDistancesPerVehicle = Tensor.of(list.stream().map(vs ->
+                        Total.of(vs.distanceTotal))).multiply(RealScalar.of(0.001));
+        distancesWCPerVehicle = Tensor.of(list.stream().map(vs ->
+                Total.of(vs.distanceWithCustomer))).multiply(RealScalar.of(0.001));
+
+        tdBinCounter = AnalysisUtils.binCount(totalDistancesPerVehicle, AnalyzeAll.distanceBinSize);
+        dwcBinCounter = AnalysisUtils.binCount(distancesWCPerVehicle, AnalyzeAll.distanceBinSize);
 
         list.forEach(VehicleStatistic::consolidate);
 

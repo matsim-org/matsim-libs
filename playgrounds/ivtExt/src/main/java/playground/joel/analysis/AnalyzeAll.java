@@ -5,9 +5,9 @@ import static playground.clruch.utils.NetworkLoader.loadNetwork;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DecimalFormat;
 
-import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalar;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.tensor.Tensor;
@@ -30,7 +30,8 @@ public class AnalyzeAll {
     public static final boolean filter = true;  // filter size can be adapted in the diagram creator
     public static final double maxWaitingTime = 20.0; // maximally displayed waiting time in minutes
 
-    public static double waitBinSize = 10.0;
+    public static final Scalar waitBinSize = RealScalar.of(10.0); // in minutes
+    public static final Scalar distanceBinSize = RealScalar.of(10.0); // in km
 
     public static double timeRatio ;
     public static double distance ;
@@ -45,7 +46,7 @@ public class AnalyzeAll {
         analyze(args);
     }
 
-    static void saveFile(Tensor table, String name) throws Exception {
+    public static void saveFile(Tensor table, String name) throws Exception {
         Files.write(Paths.get("output/data/" + name + ".csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
         Files.write(Paths.get("output/data/" + name + ".mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
         Files.write(Paths.get("output/data/" + name + ".m"), (Iterable<String>) MatlabExport.of(table)::iterator);
@@ -77,12 +78,22 @@ public class AnalyzeAll {
         // maximum waiting time in the plot to have this uniform for all simulations
         AnalyzeAll.plot("summary", "binnedTimeRatios", "Occupancy Ratio", 10, 11);
         AnalyzeAll.plot("summary", "binnedDistanceRatios", "Distance Ratio", 15, 16);
+        DiagramCreator.binCountGraph(RELATIVE_DIRECTORY, "waitBinCounter", //
+                "Requests per Waiting Time", coreAnalysis.waitBinCounter, waitBinSize.number().doubleValue(), //
+                100.0/coreAnalysis.numRequests, "% of requests", //
+                "Waiting Times", " sec", 1500, 750);
+        DiagramCreator.binCountGraph(RELATIVE_DIRECTORY, "totalDistanceVehicle", //
+                "Vehicle per Total Distance", distanceAnalysis.tdBinCounter, //
+                distanceBinSize.number().doubleValue(), 100.0/distanceAnalysis.numVehicles, //
+                "% of fleet", "Total Distances", " km", //
+                1000, 750);
+        DiagramCreator.binCountGraph(RELATIVE_DIRECTORY, "dwcVehicle", //
+                "Vehicles per Distance with Customer", distanceAnalysis.dwcBinCounter, //
+                distanceBinSize.number().doubleValue(), 100.0/distanceAnalysis.numVehicles, //
+                "% of fleet", "Distances with Customer", " km", //
+                1000, 750);
         UniqueDiagrams.distanceStack(RELATIVE_DIRECTORY, "stackedDistance", "Distance Partition", //
                 distanceRebalance/distance, distancePickup/distance, distanceWithCust/distance);
-        UniqueDiagrams.binCountGraph(RELATIVE_DIRECTORY, "waitBinCounter", //
-                "Requests per Waiting Time", coreAnalysis.waitBinCounter, waitBinSize, //
-                100.0/coreAnalysis.numRequests, "% of requests", //
-                "Waiting Times", " sec");
         UniqueDiagrams.distanceDistribution(RELATIVE_DIRECTORY, "distanceDistribution", //
                 "Distance Distribution", true);
     }
@@ -126,6 +137,8 @@ public class AnalyzeAll {
         analyzeSummary.distancePickup = distancePickup;
         analyzeSummary.distanceRebalance = distanceRebalance;
         analyzeSummary.distanceRatio = distanceRatio;
+        analyzeSummary.totalDistancesPerVehicle = distanceAnalysis.totalDistancesPerVehicle;
+        analyzeSummary.distancesWCPerVehicle = distanceAnalysis.distancesWCPerVehicle;
         analyzeSummary.totalWaitTimeMean = coreAnalysis.totalWaitTimeMean;
         analyzeSummary.totalWaitTimeQuantile = coreAnalysis.totalWaitTimeQuantile;
         analyzeSummary.maximumWaitTime = coreAnalysis.maximumWaitTime;
