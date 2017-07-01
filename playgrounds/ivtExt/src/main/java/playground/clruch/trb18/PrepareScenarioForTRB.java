@@ -22,6 +22,7 @@ import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
@@ -113,7 +114,7 @@ public class PrepareScenarioForTRB {
 
     final private static Logger logger = Logger.getLogger(PrepareScenarioForTRB.class);
 
-    final private List<String> modePrecedence = Arrays.asList(TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk);
+    final private List<String> modePrecedence = new LinkedList<>(Arrays.asList(TransportMode.car, TransportMode.pt, TransportMode.bike, TransportMode.walk));
     final private Set<String> allowedMainModes = new HashSet<>(Arrays.asList(TransportMode.car, TransportMode.pt));
 
     private String findMainMode(Plan plan) {
@@ -123,8 +124,10 @@ public class PrepareScenarioForTRB {
             if (element instanceof Leg) {
                 Leg leg = (Leg) element;
 
-                if (mainMode == null || (modePrecedence.indexOf(leg.getMode()) < modePrecedence.indexOf(mainMode))) {
-                    mainMode = leg.getMode();
+                if (modePrecedence.contains(leg.getMode())) {
+                    if (mainMode == null || (modePrecedence.indexOf(leg.getMode()) < modePrecedence.indexOf(mainMode))) {
+                        mainMode = leg.getMode();
+                    }
                 }
             }
         }
@@ -221,21 +224,24 @@ public class PrepareScenarioForTRB {
                 for (PlanElement element : plan.getPlanElements()) {
                     if (element instanceof Activity) {
                         Activity activity = (Activity) element;
-                        numberOfActivities++;
 
-                        if (activity.getFacilityId() != null && facilities.getFacilities().containsKey(activity.getFacilityId())) {
-                            Id<Link> linkId = facilities.getFacilities().get(activity.getFacilityId()).getLinkId();
-                            activity.setLinkId(linkId);
-                            numberOfFoundLinkIds++;
+                        if (!activity.getType().equals("pt interaction")) {
+                            numberOfActivities++;
+
+                            if (activity.getFacilityId() != null && facilities.getFacilities().containsKey(activity.getFacilityId())) {
+                                Id<Link> linkId = facilities.getFacilities().get(activity.getFacilityId()).getLinkId();
+                                activity.setLinkId(linkId);
+                                numberOfFoundLinkIds++;
+                            }
+
+                            String activityType = activity.getType();
+
+                            for (int i = 0; i < 20; i++) {
+                                activityType = activityType.replace("_" + i, "");
+                            }
+
+                            activity.setType(activityType);
                         }
-
-                        String activityType = activity.getType();
-
-                        for (int i = 0; i < 20; i++) {
-                            activityType = activityType.replace("_" + i, "");
-                        }
-
-                        activity.setType(activityType);
                     }
                 }
             }
@@ -401,6 +407,37 @@ public class PrepareScenarioForTRB {
         return returnLegs;
     }
 
+    private void removeAuxiliaryPtFromPlan(Plan plan) {
+        Iterator<PlanElement> iterator = plan.getPlanElements().iterator();
+        boolean isOnPtLeg = false;
+
+        while (iterator.hasNext()) {
+            PlanElement element = iterator.next();
+
+            if (element instanceof Leg) {
+                Leg leg = (Leg) element;
+
+                if (leg.getMode().equals(TransportMode.pt) || leg.getMode().equals(TransportMode.transit_walk)) {
+                    if (isOnPtLeg) {
+                        iterator.remove();
+                    } else {
+                        isOnPtLeg = true;
+                        leg.setMode(TransportMode.pt);
+                        leg.setRoute(null);
+                    }
+                }
+            }
+
+            if (element instanceof Activity) {
+                if (((Activity) element).getType().equals("pt interaction")) {
+                    iterator.remove();
+                } else {
+                    isOnPtLeg = false;
+                }
+            }
+        }
+    }
+
     public void applyAVPlans(Population population, Network reducedNetwork) {
         logger.info("Applying AV plans to agents ...");
 
@@ -426,6 +463,8 @@ public class PrepareScenarioForTRB {
 
                 Plan duplicate = PlanUtils.createCopy(plan);
                 List<Leg> changeablePTLegs = null;
+
+                removeAuxiliaryPtFromPlan(duplicate);
 
                 if (isCarUser) {
                     for (PlanElement element : duplicate.getPlanElements()) {
@@ -464,6 +503,7 @@ public class PrepareScenarioForTRB {
                         for (Leg leg : changeablePTLegs) {
                             leg.setMode(AVModule.AV_MODE);
                             leg.setRoute(null);
+                            numberOfChangedPTLegs++;
                         }
                     }
 
@@ -496,7 +536,8 @@ public class PrepareScenarioForTRB {
 
         for (Person person : population.getPersons().values()) {
             person.setSelectedPlan(person.getPlans().get(0));
-
+        }
+        /*
             Iterator<PlanElement> iterator = person.getSelectedPlan().getPlanElements().iterator();
 
             while (iterator.hasNext()) {
@@ -510,7 +551,7 @@ public class PrepareScenarioForTRB {
                     iterator.remove();
                 }
             }
-        }
+        }*/
 
         // 1. Remove all agents which have walk or bike as the main mode
         // TODO: Remove also crossborder, freight and commuters???
