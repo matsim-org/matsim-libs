@@ -17,6 +17,9 @@ public class DataFrame {
 
     public long numberOfUnservedRequests = 0;
 
+    public List<List<Double>> travelTimeDelays = new LinkedList<>();
+    public long numberOfUnmeasurableDelays = 0;
+
     public DataFrame(BinCalculator binCalculator) {
         vehicleDistance.addAll(Collections.nCopies(binCalculator.getBins(), 0.0d));
         passengerDistance.addAll(Collections.nCopies(binCalculator.getBins(), 0.0d));
@@ -25,5 +28,6 @@ public class DataFrame {
 
         for (int i = 0; i < binCalculator.getBins(); i++) waitingTimes.add(new LinkedList<>());
         for (int i = 0; i < binCalculator.getBins(); i++) travelTimes.add(new LinkedList<>());
+        for (int i = 0; i < binCalculator.getBins(); i++) travelTimeDelays.add(new LinkedList<>());
     }
 }
