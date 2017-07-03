@@ -62,7 +62,7 @@ public class DataCollector {
 
         scenarioParameters = new ScenarioParameters();
         analyzeSummary = analyzeSummaryIn;
-        collectData(controler, analyzeSummary);
+        collectData(controler);
 
         saveConfigs(args);
 
@@ -103,20 +103,15 @@ public class DataCollector {
         return Import.object(new File(report(args), "analyzeSummary.obj"));
     }
 
-    public static void collectData(Controler controler, AnalyzeSummary analyzeSummary) {
-        /*
-        CoreAnalysis coreAnalysis = analyzeSummary.coreAnalysis;
-        scenarioParameters.numRequests = coreAnalysis.numRequests;
-
-        DistanceAnalysis distanceAnalysis = analyzeSummary.distanceAnalysis;
-        scenarioParameters.numVehicles = distanceAnalysis.numVehicles;
-        */
+    public static void collectData(Controler controler) {
 
         Scenario scenario = controler.getScenario();
         Network network = scenario.getNetwork();
         scenarioParameters.networkName = network.getName();
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(network);
-        scenarioParameters.virtualNodes = virtualNetwork.getvNodesCount();
+        if (virtualNetwork != null) {
+            scenarioParameters.virtualNodes = virtualNetwork.getvNodesCount();
+        }
 
         Config config = controler.getConfig();
         /*
@@ -137,22 +132,5 @@ public class DataCollector {
 
 
     }
-
-
-
-    public void summarize(String[] args) throws Exception {
-        ScenarioParameters scenarioParameters = loadScenarioData(args);
-        AnalyzeSummary analyzeSummary = loadAnalysisData(args);
-        System.out.println("----------------------------------------------------------------------------" +
-                "\nDispatcher: " + scenarioParameters.dispatcher + //
-                "\nVehicles: " + analyzeSummary.numVehicles +
-                "\nRebalancing Period: " + scenarioParameters.rebalancingPeriod + //
-                "\nRedispatching Period: " + scenarioParameters.redispatchPeriod + //
-                "\nIterations: " + scenarioParameters.iterations + //
-                "\nUser: " + scenarioParameters.user + //
-                "\nTimestamp: " + scenarioParameters.date + //
-                "----------------------------------------------------------------------------");
-    }
-
 
 }

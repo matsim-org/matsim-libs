@@ -17,7 +17,6 @@ public class ReportGenerator {
 
     final static DecimalFormat d = new DecimalFormat("#0.00");
 
-    // TODO: insert correct distance transformation
     final static double link2km = 0.001;
 
     public static void main(String[] args) throws Exception {

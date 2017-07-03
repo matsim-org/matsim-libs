@@ -210,7 +210,7 @@ public abstract class htmlUtils {
     }
 
     public static void saveFile(String fileName) throws IOException {
-        File file = new File("output/report", fileName);
+        File file = new File("output/report", fileName + ".html");
         // if file does exists, then delete and create a new file
         Files.deleteIfExists(file.toPath());
 
