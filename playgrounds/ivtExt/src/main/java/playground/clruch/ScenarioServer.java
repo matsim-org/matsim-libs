@@ -117,7 +117,8 @@ public class ScenarioServer {
 
 
         StorageUtils.OUTPUT = new File(config.controler().getOutputDirectory());
-        
+        StorageUtils.DIRECTORY = new File(StorageUtils.OUTPUT, "simobj");
+
         controler.run();
         
         SimulationServer.INSTANCE.stopAccepting(); // close port
