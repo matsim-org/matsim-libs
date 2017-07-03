@@ -17,7 +17,8 @@ public class DataFrame {
 
     public long numberOfUnservedRequests = 0;
 
-    public List<List<Double>> travelTimeDelays = new LinkedList<>();
+    public List<List<Double>> travelTimeDelaysCar = new LinkedList<>();
+    public List<List<Double>> travelTimeDelaysPt = new LinkedList<>();
     public long numberOfUnmeasurableDelays = 0;
 
     public Map<Id<Person>, Queue<Double>> referenceTravelTimes;
@@ -30,6 +31,7 @@ public class DataFrame {
 
         for (int i = 0; i < binCalculator.getBins(); i++) waitingTimes.add(new LinkedList<>());
         for (int i = 0; i < binCalculator.getBins(); i++) travelTimes.add(new LinkedList<>());
-        for (int i = 0; i < binCalculator.getBins(); i++) travelTimeDelays.add(new LinkedList<>());
+        for (int i = 0; i < binCalculator.getBins(); i++) travelTimeDelaysCar.add(new LinkedList<>());
+        for (int i = 0; i < binCalculator.getBins(); i++) travelTimeDelaysPt.add(new LinkedList<>());
     }
 }

@@ -18,10 +18,10 @@ public class DelayHandler implements PersonDepartureEventHandler, PersonArrivalE
     final private BinCalculator binCalculator;
     final private DataFrame dataFrame;
 
-    private final Map<Id<Person>, Queue<Double>> referenceTravelTimes;
+    private final Map<Id<Person>, Queue<ReferenceReader.ReferenceTrip>> referenceTravelTimes;
     private final Map<Id<Person>, Double> departureTimes = new HashMap<>();
 
-    public DelayHandler(DataFrame dataFrame, BinCalculator binCalculator, Map<Id<Person>, Queue<Double>> referenceTravelTimes) {
+    public DelayHandler(DataFrame dataFrame, BinCalculator binCalculator, Map<Id<Person>, Queue<ReferenceReader.ReferenceTrip>> referenceTravelTimes) {
         this.referenceTravelTimes = referenceTravelTimes;
         this.binCalculator = binCalculator;
         this.dataFrame = dataFrame;
@@ -37,16 +37,23 @@ public class DelayHandler implements PersonDepartureEventHandler, PersonArrivalE
     @Override
     public void handleEvent(PersonArrivalEvent event) {
         Double departureTime = departureTimes.remove(event.getPersonId());
-        Queue<Double> queue = referenceTravelTimes.get(event.getPersonId());
+        Queue<ReferenceReader.ReferenceTrip> queue = referenceTravelTimes.get(event.getPersonId());
 
         if (departureTime != null && queue != null) {
             double travelTime = event.getTime() - departureTime;
-            Double referenceTravelTime = queue.poll();
+            ReferenceReader.ReferenceTrip referenceTrip = queue.poll();
 
-            if (referenceTravelTime != null) {
+            if (referenceTrip != null) {
                 if (binCalculator.isCoveredValue(departureTime)) {
                     int index = binCalculator.getIndex(departureTime);
-                    dataFrame.travelTimeDelays.get(index).add(travelTime - referenceTravelTime);
+
+                    if (referenceTrip.mode.equals("car")) {
+                        dataFrame.travelTimeDelaysCar.get(index).add(travelTime - referenceTrip.travelTime);
+                    } else if (referenceTrip.mode.equals("pt")) {
+                        dataFrame.travelTimeDelaysPt.get(index).add(travelTime - referenceTrip.travelTime);
+                    } else {
+                        System.err.println("something is wrong 2..." + event.getPersonId());
+                    }
                 }
             } else {
                 System.err.println("something is wrong..." + event.getPersonId());
