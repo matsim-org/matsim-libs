@@ -14,7 +14,7 @@ import playground.clruch.utils.GlobalAssert;
 public enum StorageUtils {
     ;
     // ---
-    public static final File OUTPUT = new File("output"); // folder created by MATSim
+    public static File OUTPUT = new File("output"); // folder created by MATSim
     public static final File DIRECTORY = new File(OUTPUT, "simobj");
 
     /**

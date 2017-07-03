@@ -20,6 +20,7 @@ import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
+import playground.clruch.net.StorageUtils;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
 import playground.clruch.trb18.TRBModule;
@@ -113,7 +114,9 @@ public class ScenarioServer {
 //                addPlanStrategyBinding("ZurichModeChoice").toProvider(ZurichPlanStrategyProvider.class);
 //            }
 //        });
-        
+
+
+        StorageUtils.OUTPUT = new File(config.controler().getOutputDirectory());
         
         controler.run();
         
