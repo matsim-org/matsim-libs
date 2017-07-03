@@ -21,8 +21,6 @@ public class DataFrame {
     public List<List<Double>> travelTimeDelaysPt = new LinkedList<>();
     public long numberOfUnmeasurableDelays = 0;
 
-    public Map<Id<Person>, Queue<Double>> referenceTravelTimes;
-
     public DataFrame(BinCalculator binCalculator) {
         vehicleDistance.addAll(Collections.nCopies(binCalculator.getBins(), 0.0d));
         passengerDistance.addAll(Collections.nCopies(binCalculator.getBins(), 0.0d));

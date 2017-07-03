@@ -3,6 +3,8 @@ package playground.clruch;
 
 import org.matsim.api.core.v01.network.Network;
 
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
@@ -27,7 +29,10 @@ public class ScenarioViewer {
 
         // END: CUSTOMIZE -------------------------------------------------
 
-        Network network = NetworkLoader.loadNetwork(args);
+        //Network network = NetworkLoader.loadNetwork(args);
+        Network network = NetworkUtils.createNetwork();
+        new MatsimNetworkReader(network).readFile("reduced_network.xml.gz");
+
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         MatsimMapComponent matsimJMapViewer = new MatsimMapComponent(MatsimStaticDatabase.INSTANCE);
 

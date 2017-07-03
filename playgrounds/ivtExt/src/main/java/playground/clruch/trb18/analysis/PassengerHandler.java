@@ -22,6 +22,7 @@ public class PassengerHandler implements PersonEntersVehicleEventHandler, Person
     final private BinCalculator binCalculator;
 
     final private Map<Id<Person>, PersonDepartureEvent> departureEvents = new HashMap<>();
+    final private Map<Id<Person>, PersonEntersVehicleEvent> enterEvents = new HashMap<>();
 
     public PassengerHandler(DataFrame dataFrame, BinCalculator binCalculator) {
         this.dataFrame = dataFrame;
@@ -45,14 +46,17 @@ public class PassengerHandler implements PersonEntersVehicleEventHandler, Person
 
                 dataFrame.waitingTimes.get(index).add(event.getTime() - departureEvent.getTime());
             }
+
+            enterEvents.put(event.getPersonId(), event);
         }
     }
 
     @Override
     public void handleEvent(PersonArrivalEvent event) {
         PersonDepartureEvent departureEvent = departureEvents.remove(event.getPersonId());
+        PersonEntersVehicleEvent enterEvent = enterEvents.remove(event.getPersonId());
 
-        if (departureEvent != null) {
+        if (departureEvent != null && enterEvent != null) {
             if (binCalculator.isCoveredValue(departureEvent.getTime())) {
                 int index = binCalculator.getIndex(departureEvent.getTime());
 
@@ -60,7 +64,7 @@ public class PassengerHandler implements PersonEntersVehicleEventHandler, Person
                 dataFrame.numberOfServedRequests.set(index, dataFrame.numberOfServedRequests.get(index) + 1);
             }
 
-            for (BinCalculator.BinEntry entry : binCalculator.getBinEntriesNormalized(departureEvent.getTime(), event.getTime())) {
+            for (BinCalculator.BinEntry entry : binCalculator.getBinEntriesNormalized(enterEvent.getTime(), event.getTime())) {
                 dataFrame.withPassengerTime.set(entry.getIndex(), dataFrame.withPassengerTime.get(entry.getIndex()) + entry.getWeight() * binCalculator.getInterval());
             }
         }

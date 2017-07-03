@@ -27,7 +27,7 @@ public class RunAnalysis {
         String eventsInputPath = args[2];
         String outputPath = args[3];
 
-        Map<Id<Person>, Queue<Double>> referenceTravelTimes = ReferenceReader.getReferenceTravelTimes(baselineEventsInputPath);
+        Map<Id<Person>, Queue<ReferenceReader.ReferenceTrip>> referenceTrips = ReferenceReader.getReferenceTravelTimes(baselineEventsInputPath);
 
         Network network = NetworkUtils.createNetwork();
         new MatsimNetworkReader(network).readFile(networkInputPath);
@@ -35,13 +35,12 @@ public class RunAnalysis {
         BinCalculator binCalculator = BinCalculator.createByInterval(0.0, 30.0 * 3600.0, 300.0);
 
         DataFrame dataFrame = new DataFrame(binCalculator);
-        dataFrame.referenceTravelTimes = referenceTravelTimes;
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
 
         DistanceHandler distanceHandler = new DistanceHandler(dataFrame, binCalculator, network);
         PassengerHandler passengerHandler = new PassengerHandler(dataFrame, binCalculator);
-        DelayHandler delayHandler = new DelayHandler(dataFrame, binCalculator, referenceTravelTimes);
+        DelayHandler delayHandler = new DelayHandler(dataFrame, binCalculator, referenceTrips);
 
         eventsManager.addHandler(distanceHandler);
         eventsManager.addHandler(passengerHandler);
