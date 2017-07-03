@@ -41,11 +41,15 @@ public class DelayHandler implements PersonDepartureEventHandler, PersonArrivalE
 
         if (departureTime != null && queue != null) {
             double travelTime = event.getTime() - departureTime;
-            double referenceTravelTime = queue.poll();
+            Double referenceTravelTime = queue.poll();
 
-            if (binCalculator.isCoveredValue(departureTime)) {
-                int index = binCalculator.getIndex(departureTime);
-                dataFrame.travelTimeDelays.get(index).add(travelTime - referenceTravelTime);
+            if (referenceTravelTime != null) {
+                if (binCalculator.isCoveredValue(departureTime)) {
+                    int index = binCalculator.getIndex(departureTime);
+                    dataFrame.travelTimeDelays.get(index).add(travelTime - referenceTravelTime);
+                }
+            } else {
+                System.err.println("something is wrong..." + event.getPersonId());
             }
         }
     }
@@ -53,5 +57,9 @@ public class DelayHandler implements PersonDepartureEventHandler, PersonArrivalE
     @Override
     public void reset(int iteration) {
 
+    }
+
+    public void finish() {
+        dataFrame.numberOfUnmeasurableDelays += departureTimes.size();
     }
 }

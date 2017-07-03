@@ -51,10 +51,11 @@ public class PrepareScenarioForTRB {
     final String TRAVELDATAFILENAME = "travelData";
 
     final private Coord scenarioCenterCoord;
-    final private double scenarioRadius;
     final private double avRadius;
 
     final private File outputDirectory;
+
+    final static private boolean enableBackgroundTraffic = false;
 
     static public void main(String[] args) throws Exception {
         Config config = ConfigUtils.loadConfig(args[0]);
@@ -76,12 +77,18 @@ public class PrepareScenarioForTRB {
 
         PrepareScenarioForTRB prepare = new PrepareScenarioForTRB(new File(outputPath), avRadius);
 
-        prepare.preparePopulation(scenario.getPopulation());
+        List<Person> backgroundTraffic = new LinkedList<>();
+
+        prepare.preparePopulation(scenario.getPopulation(), backgroundTraffic);
         prepare.prepareActivities(scenario.getPopulation(), scenario.getActivityFacilities());
         Network reducedNetwork = prepare.createAndWriteVirtualNetwork(config, scenario.getPopulation(), numberOfVirtualNodes, dtTravelData);
 
         prepare.applyAVPlans(scenario.getPopulation(), reducedNetwork);
         prepare.adjustInitialAVShare(scenario.getPopulation(), avShare);
+
+        if (enableBackgroundTraffic) {
+            prepare.addBackgroundTraffic(scenario.getPopulation(), backgroundTraffic);
+        }
 
         if (stage.equals("baseline")) {
             prepare.removeAVPlans(scenario.getPopulation());
@@ -108,7 +115,6 @@ public class PrepareScenarioForTRB {
 
         ZHCutter.ZHCutterConfigGroup zhConfig = new ZHCutter.ZHCutterConfigGroup("");
         this.scenarioCenterCoord = new Coord(zhConfig.getxCoordCenter(), zhConfig.getyCoordCenter());
-        this.scenarioRadius = zhConfig.getRadius();
         this.avRadius = avRadius;
     }
 
@@ -151,6 +157,13 @@ public class PrepareScenarioForTRB {
         for (Person person : population.getPersons().values()) {
             person.getPlans().removeIf(p -> isAVPlan(p));
             GlobalAssert.that(person.getPlans().size() > 0);
+        }
+    }
+
+    public void addBackgroundTraffic(Population population, List<Person> backgroundTraffic) {
+        for (Person person : backgroundTraffic) {
+            population.addPerson(person);
+            population.getPersonAttributes().putAttribute(person.getId().toString(), "subpopulation", "background");
         }
     }
 
@@ -528,7 +541,7 @@ public class PrepareScenarioForTRB {
         logger.info(String.format("Number of removed PT agents: %d (%.2f%%)", numberOfRemovedPTAgents, 100.0 * numberOfRemovedPTAgents / numberOfAgents));
     }
 
-    public void preparePopulation(Population population) {
+    public void preparePopulation(Population population, List<Person> backgroundTraffic) {
         logger.info("Removing special agents ...");
         // 0. In case it is a pre-routed population, remove all non-selected plans
         population.getPersons().values().stream().forEach(p -> PersonUtils.removeUnselectedPlans(p));
@@ -568,6 +581,7 @@ public class PrepareScenarioForTRB {
             String mainMode = findMainMode(person.getSelectedPlan());
 
             if (!allowedMainModes.contains(mainMode) || population.getPersonAttributes().getAttribute(person.getId().toString(), "subpopulation") != null) {
+                backgroundTraffic.add(person);
                 personIterator.remove();
                 numberOfRemovedAgents++;
             } else {

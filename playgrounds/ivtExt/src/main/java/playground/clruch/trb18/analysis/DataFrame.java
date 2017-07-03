@@ -1,10 +1,10 @@
 package playground.clruch.trb18.analysis;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import playground.sebhoerl.av_paper.BinCalculator;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class DataFrame {
     public List<Double> vehicleDistance = new LinkedList<>();
@@ -19,6 +19,8 @@ public class DataFrame {
 
     public List<List<Double>> travelTimeDelays = new LinkedList<>();
     public long numberOfUnmeasurableDelays = 0;
+
+    public Map<Id<Person>, Queue<Double>> referenceTravelTimes;
 
     public DataFrame(BinCalculator binCalculator) {
         vehicleDistance.addAll(Collections.nCopies(binCalculator.getBins(), 0.0d));

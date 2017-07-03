@@ -30,7 +30,7 @@ public class ReferenceReader {
         return data;
     }
 
-    static class TravelTimeHandler implements PersonDepartureEventHandler, ActivityStartEventHandler {
+    static class TravelTimeHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityStartEventHandler {
         final private Map<Id<Person>, Queue<Double>> data;
 
         final private Map<Id<Person>, Double> departureTimes = new HashMap<>();
@@ -63,6 +63,11 @@ public class ReferenceReader {
         @Override
         public void reset(int iteration) {
 
+        }
+
+        @Override
+        public void handleEvent(PersonArrivalEvent event) {
+            arrivalTimes.put(event.getPersonId(), event.getTime());
         }
     }
 }
