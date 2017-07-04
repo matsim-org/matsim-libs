@@ -44,7 +44,8 @@ public class DataCollector {
     public static ScenarioParameters scenarioParameters;
     public static AnalyzeSummary analyzeSummary;
 
-    public static void store(String[] args, Controler controler, AnalyzeSummary analyzeSummaryIn, ScenarioParameters scenarioParametersIn) throws Exception {
+    public static void store(String[] args, Controler controler, AnalyzeSummary analyzeSummaryIn, //
+                             ScenarioParameters scenarioParametersIn) throws Exception {
 
         scenarioParameters = scenarioParametersIn; // new ScenarioParameters();
         analyzeSummary = analyzeSummaryIn;
@@ -105,7 +106,6 @@ public class DataCollector {
 
     public static void readStopwatch(String[] args) {
         File stopwatch = new File((new File(args[0])).getParent(), "output/stopwatch.txt");
-
         try {
             BufferedReader reader = new BufferedReader(new FileReader(stopwatch));
             String startTime = "00:00:00";
@@ -128,17 +128,10 @@ public class DataCollector {
                 lineInt++;
             }
             scenarioParameters.iterations = lineInt - 1;
-            analyzeSummary.computationTime = Time.writeTime(toSeconds(endTime) - toSeconds(startTime));
-
+            analyzeSummary.computationTime = Time.writeTime(Time.parseTime(endTime) - Time.parseTime(startTime));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-    }
-
-    public static long toSeconds(String hhmmss) {
-        String[] time = hhmmss.split(":");
-        return 3600*Long.parseLong(time[0]) + 60*Long.parseLong(time[1]) + Long.parseLong(time[2]);
     }
 
 }
