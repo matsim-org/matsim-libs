@@ -76,7 +76,7 @@ public class TravelData implements Serializable {
         System.out.println("the ID of the virtualNetwork used for travel data construction is: " + virtualNetworkID);
 
         // ensure that dayduration / timeInterval is integer value
-        dt = greatestNonRestDt(dtIn, dayduration);
+        dt = TravelDataUtils.greatestNonRestDt(dtIn, dayduration);
         numberTimeSteps = dayduration / dt;
         System.out.println("Number of time steps = " + numberTimeSteps);
         System.out.println("dt = " + dt);
@@ -248,16 +248,6 @@ public class TravelData implements Serializable {
         return alphaijPSF.get(timestep).copy();
     }
 
-    /**
-     * @param a
-     * @param b
-     * @return greatest common divisor for integers a and b
-     */
-    public int greatestNonRestDt(int dt, int length) {
-        if (length % dt == 0)
-            return dt;
-        return greatestNonRestDt(dt - 1, length);
-    }
 
     protected void fillSerializationInfo(VirtualNetwork virtalNetworkIn) {
         // check if TravelData object was created with the supplied virtualNetwork
