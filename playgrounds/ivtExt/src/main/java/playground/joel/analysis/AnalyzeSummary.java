@@ -9,11 +9,11 @@ import java.util.List;
  * Created by Joel on 28.06.2017.
  */
 public class AnalyzeSummary implements Serializable {
-    // public CoreAnalysis coreAnalysis;
-    // public DistanceAnalysis distanceAnalysis;
 
     public int numRequests;
     public int numVehicles;
+
+    public String computationTime; // from begin of first iteration till end of the last
 
     public double occupancyRatio;
     public double distance;

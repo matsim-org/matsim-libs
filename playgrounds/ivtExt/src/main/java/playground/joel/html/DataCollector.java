@@ -10,6 +10,8 @@ import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.utils.misc.Time;
+import playground.clruch.ScenarioServer;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.GlobalAssert;
@@ -21,11 +23,10 @@ import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.zip.DataFormatException;
 
@@ -48,6 +49,7 @@ public class DataCollector {
         scenarioParameters = scenarioParametersIn; // new ScenarioParameters();
         analyzeSummary = analyzeSummaryIn;
         collectData(controler);
+        readStopwatch(args);
 
         saveConfigs(args);
 
@@ -99,24 +101,44 @@ public class DataCollector {
             scenarioParameters.virtualNodes = virtualNetwork.getvNodesCount();
         }
 
-        Config config = controler.getConfig();
-        /*
-        AVConfigGroup avConfigGroup = (AVConfigGroup) config.getModules().get("av");
-        AVOperatorConfig operatorConfig = ;
-        GlobalAssert.that(operatorConfig != null);
-        AVDispatcherConfig dispatcherConfig = operatorConfig.getDispatcherConfig();
-        AVGeneratorConfig generatorConfig = operatorConfig.getGeneratorConfig();
+    }
 
-        scenarioParameters.numVehicles = (int) generatorConfig.getNumberOfVehicles();
-        scenarioParameters.populationSize = scenario.getPopulation().getPersons().keySet().size();
-        scenarioParameters.iterations = controler.getIterationNumber();
-        scenarioParameters.redispatchPeriod = Integer.parseInt(dispatcherConfig.getParams().get("redispatchPeriod"));
-        scenarioParameters.rebalancingPeriod = Integer.parseInt(dispatcherConfig.getParams().get("rebalancingPeriod"));
+    public static void readStopwatch(String[] args) {
+        File stopwatch = new File((new File(args[0])).getParent(), "output/stopwatch.txt");
 
-        scenarioParameters.dispatcher = generatorConfig.getStrategyName();
-        */
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(stopwatch));
+            String startTime = "00:00:00";
+            int startTimePos = 0;
+            String endTime = "00:00:00";
+            int endTimePos = 0;
+            String lineString = reader.readLine();
+            int lineInt = 0;
+            while (lineString != null) {
+                String[] sections = lineString.split("\t");
+                if (lineInt == 0) {
+                    startTimePos = Arrays.asList(sections).indexOf("BEGIN iteration");
+                    endTimePos = Arrays.asList(sections).indexOf("END iteration");
+                    GlobalAssert.that(startTimePos != endTimePos);
+                } else {
+                    if (lineInt == 1) startTime = sections[startTimePos];
+                    endTime = sections[endTimePos];
+                }
+                lineString = reader.readLine();
+                lineInt++;
+            }
+            scenarioParameters.iterations = lineInt - 1;
+            analyzeSummary.computationTime = Time.writeTime(toSeconds(endTime) - toSeconds(startTime));
 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+    }
+
+    public static long toSeconds(String hhmmss) {
+        String[] time = hhmmss.split(":");
+        return 3600*Long.parseLong(time[0]) + 60*Long.parseLong(time[1]) + Long.parseLong(time[2]);
     }
 
 }

@@ -83,7 +83,7 @@ public class ReportGenerator {
 
         htmlUtils.insertSubTitle("Aggregate Results");
         htmlUtils.insertTextLeft("Computation Time:");
-        htmlUtils.insertTextLeft("SOON");
+        htmlUtils.insertTextLeft(analyzeSummary.computationTime);
         htmlUtils.newLine();
         htmlUtils.insertTextLeft(htmlUtils.bold("Waiting Times") + //
                 "\n\tMean:" + //
