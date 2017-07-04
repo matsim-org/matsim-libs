@@ -44,7 +44,7 @@ public class PolyMultiGBMDispatcher extends UniversalDispatcher {
                                     Network network, AbstractRequestSelector abstractRequestSelector) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
-        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
+        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
         maxMatchNumber = safeConfig.getInteger("maxMatchNumber", Integer.MAX_VALUE);
         vehiclesPerRequest = safeConfig.getInteger("vehiclesPerRequest", 1);
         GlobalAssert.that(vehiclesPerRequest > 0);

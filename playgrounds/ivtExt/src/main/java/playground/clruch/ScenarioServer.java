@@ -25,6 +25,7 @@ import playground.joel.analysis.AnalyzeAll;
 import playground.joel.analysis.AnalyzeSummary;
 import playground.joel.html.DataCollector;
 import playground.joel.html.ReportGenerator;
+import playground.joel.html.ScenarioParameters;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -40,6 +41,8 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
  */
 public class ScenarioServer {
 
+    public static ScenarioParameters scenarioParameters;
+
     public static void main(String[] args) throws MalformedURLException, Exception {
 
         // BEGIN: CUSTOMIZE -----------------------------------------------
@@ -51,6 +54,8 @@ public class ScenarioServer {
         boolean waitForClients = false;
 
         // END: CUSTOMIZE -------------------------------------------------
+
+        scenarioParameters = new ScenarioParameters();
 
         // open server port for clients to connect to
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
@@ -111,7 +116,7 @@ public class ScenarioServer {
         AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
         //AnalyzeMarc.analyze(args);
 
-        DataCollector.store(args, controler, analyzeSummary);
+        DataCollector.store(args, controler, analyzeSummary, scenarioParameters);
 
         ReportGenerator.from(args);
 

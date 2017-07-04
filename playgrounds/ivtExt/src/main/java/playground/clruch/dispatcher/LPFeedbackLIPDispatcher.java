@@ -77,8 +77,8 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
 
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
-        rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
-        redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));        
+        rebalancingPeriod = getRebalancingPeriod(config); // Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+        redispatchPeriod = getDispatchPeriod(config); // Integer.parseInt(config.getParams().get("redispatchPeriod"));
         // setup linear program
         lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
     }

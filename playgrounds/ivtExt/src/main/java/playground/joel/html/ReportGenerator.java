@@ -65,8 +65,8 @@ public class ReportGenerator {
                 "\nRedispatching Period:");
         htmlUtils.insertTextLeft(scenarioParameters.dispatcher + //
                 "\n" + analyzeSummary.numVehicles + //
-                "\n" + scenarioParameters.rebalancingPeriod + //
-                "\n" + scenarioParameters.redispatchPeriod);
+                "\n" + scenarioParameters.rebalancingPeriod + " sec" + //
+                "\n" + scenarioParameters.redispatchPeriod + " sec");
         htmlUtils.newLine();
         htmlUtils.insertTextLeft("Network:" + //
                 "\nVirtual Nodes:" + //

@@ -23,4 +23,5 @@ public class ScenarioParameters implements Serializable {
         user = System.getProperty("user.name");
         date = new SimpleDateFormat("yyyy/MM/dd - HH:mm:ss").format(new Date());
     }
+
 }

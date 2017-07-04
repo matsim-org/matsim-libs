@@ -83,7 +83,7 @@ public class AnalyzeAll {
                 100.0/coreAnalysis.numRequests, "% of requests", //
                 "Waiting Times", " sec", 1000, 750);
         DiagramCreator.binCountGraph(RELATIVE_DIRECTORY, "totalDistanceVehicle", //
-                "Vehicle per Total Distance", distanceAnalysis.tdBinCounter, //
+                "Vehicles per Total Distance", distanceAnalysis.tdBinCounter, //
                 distanceBinSize.number().doubleValue(), 100.0/distanceAnalysis.numVehicles, //
                 "% of fleet", "Total Distances", " km", //
                 1000, 750);

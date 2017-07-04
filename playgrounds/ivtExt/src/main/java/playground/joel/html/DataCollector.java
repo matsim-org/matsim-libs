@@ -33,21 +33,6 @@ import java.util.zip.DataFormatException;
  * Created by Joel on 27.06.2017.
  */
 public class DataCollector {
-    /*
-    public static int numRequests;
-    public static int numVehicles;
-    public static int populationSize;
-    public static int iterations;
-    public static int redispatchPeriod;
-    public static int rebalancingPeriod;
-    public static int virtualNodes;
-
-    public static String dispatcher;
-    public static String networkName;
-    public static String user;
-    public static String date;
-    */
-
 
     static File avConfigOld;
     static File folder;
@@ -58,9 +43,9 @@ public class DataCollector {
     public static ScenarioParameters scenarioParameters;
     public static AnalyzeSummary analyzeSummary;
 
-    public static void store(String[] args, Controler controler, AnalyzeSummary analyzeSummaryIn) throws Exception {
+    public static void store(String[] args, Controler controler, AnalyzeSummary analyzeSummaryIn, ScenarioParameters scenarioParametersIn) throws Exception {
 
-        scenarioParameters = new ScenarioParameters();
+        scenarioParameters = scenarioParametersIn; // new ScenarioParameters();
         analyzeSummary = analyzeSummaryIn;
         collectData(controler);
 
@@ -106,6 +91,7 @@ public class DataCollector {
     public static void collectData(Controler controler) {
 
         Scenario scenario = controler.getScenario();
+        scenarioParameters.populationSize = scenario.getPopulation().getPersons().values().size();
         Network network = scenario.getNetwork();
         scenarioParameters.networkName = network.getName();
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(network);
