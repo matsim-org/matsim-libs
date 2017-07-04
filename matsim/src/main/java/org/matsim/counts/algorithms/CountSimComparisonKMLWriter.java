@@ -275,6 +275,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		try {
 			//try to create the legend
 			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(createLegend()));
+			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(createLegendNormalized()));
 			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createScreenOverlay(createLegendGEH()));
 		} catch (IOException e) {
 			log.error("Cannot add legend to the KMZ file.", e);
@@ -349,6 +350,11 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		folderRelative.setName("Relative Values");
 		this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(folderRelative));
 		
+		FolderType folderNormalizedRelative = this.kmlObjectFactory.createFolderType();
+		folderNormalizedRelative.setName("Normalized Relative Values");
+		folderNormalizedRelative.setVisibility(Boolean.FALSE);
+		this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(folderNormalizedRelative));
+		
 		FolderType folderGEH = kmlObjectFactory.createFolderType();
 		folderGEH.setName("GEH Values");
 		folderGEH.setVisibility(Boolean.FALSE);
@@ -369,13 +375,18 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 			subfolderRelative.setAbstractTimePrimitiveGroup(this.kmlObjectFactory.createTimeSpan(timespan));
 			folderRelative.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(subfolderRelative));
 
+			FolderType subfolderNormalizedRelative = this.kmlObjectFactory.createFolderType();
+			subfolderNormalizedRelative.setName(createFolderName(h));
+			subfolderNormalizedRelative.setAbstractTimePrimitiveGroup(this.kmlObjectFactory.createTimeSpan(timespan));
+			folderNormalizedRelative.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(subfolderNormalizedRelative));
+			
 			FolderType subfolderGEH = this.kmlObjectFactory.createFolderType();
 			subfolderGEH.setName(createFolderName(h));
 			subfolderGEH.setAbstractTimePrimitiveGroup(this.kmlObjectFactory.createTimeSpan(timespan));
 			subfolderGEH.setVisibility(Boolean.FALSE);
 			folderGEH.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(subfolderGEH));
 			
-			writeLinkData(this.countComparisonFilter.getCountsForHour(Integer.valueOf(h)), subfolderRelative, subfolderGEH);
+			writeLinkData(this.countComparisonFilter.getCountsForHour(Integer.valueOf(h)), subfolderRelative, subfolderNormalizedRelative, subfolderGEH);
 		}
 		
 		finish();
@@ -422,6 +433,36 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		screenXY.setXunits(UnitsEnumType.FRACTION);
 		screenXY.setYunits(UnitsEnumType.FRACTION);
 		overlay.setScreenXY(screenXY);
+		return overlay;
+	}
+	
+	/**
+	 * Creates a legend
+	 * @return a ScreenOverlay read from a file
+	 * @throws IOException
+	 */
+	private ScreenOverlayType createLegendNormalized() throws IOException {
+
+		this.writer.addNonKMLFile(MatsimResource.getAsInputStream("countsKml/countsLegendNormalized.png"), "countsLegendNormalized.png");
+		ScreenOverlayType overlay = this.kmlObjectFactory.createScreenOverlayType();
+		LinkType icon = this.kmlObjectFactory.createLinkType();
+		icon.setHref("./countsLegendNormalized.png");
+		overlay.setIcon(icon);
+		overlay.setName("Legend Normalized");
+		// place the image bottom left
+		Vec2Type overlayXY = this.kmlObjectFactory.createVec2Type();
+		overlayXY.setX(0.0);
+		overlayXY.setY(0.0);
+		overlayXY.setXunits(UnitsEnumType.FRACTION);
+		overlayXY.setYunits(UnitsEnumType.FRACTION);
+		overlay.setOverlayXY(overlayXY);
+		Vec2Type screenXY = this.kmlObjectFactory.createVec2Type();
+		screenXY.setX(0.02);
+		screenXY.setY(0.07);
+		screenXY.setXunits(UnitsEnumType.FRACTION);
+		screenXY.setYunits(UnitsEnumType.FRACTION);
+		overlay.setScreenXY(screenXY);
+		overlay.setVisibility(Boolean.FALSE);
 		return overlay;
 	}
 	
@@ -478,7 +519,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @param countSimComparisonList provides "the data"
 	 * @param folder The folder to which to add the data in the kml-file.
 	 */
-	private void writeLinkData(final List<CountSimComparison> countSimComparisonList, final FolderType folder, final FolderType folderGEH) {
+	private void writeLinkData(final List<CountSimComparison> countSimComparisonList, final FolderType folder, final FolderType folderNormalized, final FolderType folderGEH) {
 		PlacemarkType placemark;
 		double relativeError;
 		double normalizedRelativeError;
@@ -499,7 +540,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 			normalizedRelativeError = csc.calculateNormalizedRelativeError();
 			gehValue = csc.calculateGEHValue();
 			
-			// +/- placemark
+			// +/- placemark for relative values
 			{
 				// build placemark
 				placemark = createPlacemark(itemId.toString(), csc, relativeError, normalizedRelativeError, gehValue, csc.getHour());
@@ -532,7 +573,36 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 				folder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(placemark));
 			}
 			
-			// circle placemark
+			// +/- placemark for normalized relative values
+			{
+				// build placemark
+				placemark = createPlacemark(itemId.toString(), csc, relativeError, normalizedRelativeError, gehValue, csc.getHour());
+//				if (description != null) placemark.setName(description);
+				placemark.setVisibility(Boolean.FALSE);
+				point = this.kmlObjectFactory.createPointType();
+				point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
+				placemark.setAbstractGeometryGroup(this.kmlObjectFactory.createPoint(point));
+				
+				// circle
+				if (normalizedRelativeError <= 0.10) {
+					placemark.setStyleUrl(this.greenCircleStyle.getId());
+				} else if (normalizedRelativeError <= 0.25) {
+					if (csc.getSimulationValue() > csc.getCountValue()) placemark.setStyleUrl(this.greenCrossStyle.getId());
+					else placemark.setStyleUrl(this.greenMinusStyle.getId());
+				} else if (normalizedRelativeError <= 0.50) {
+					if (csc.getSimulationValue() > csc.getCountValue()) placemark.setStyleUrl(this.yellowCrossStyle.getId());
+					else placemark.setStyleUrl(this.yellowMinusStyle.getId());
+				} else if (normalizedRelativeError <= 1.00) {
+					if (csc.getSimulationValue() > csc.getCountValue()) placemark.setStyleUrl(this.redCrossStyle.getId());
+					else placemark.setStyleUrl(this.redMinusStyle.getId());
+				} else {
+					placemark.setStyleUrl(this.greyCircleStyle.getId());
+				}
+
+				folderNormalized.getAbstractFeatureGroup().add(this.kmlObjectFactory.createPlacemark(placemark));
+			}
+			
+			// circle placemark for geh
 			{
 				// build placemark
 				placemark = createPlacemark(itemId.toString(), csc, relativeError, normalizedRelativeError, gehValue, csc.getHour());
