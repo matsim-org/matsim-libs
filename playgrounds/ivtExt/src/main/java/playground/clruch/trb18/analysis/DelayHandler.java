@@ -49,14 +49,16 @@ public class DelayHandler implements PersonDepartureEventHandler, PersonArrivalE
 
                     if (referenceTrip.mode.equals("car")) {
                         dataFrame.travelTimeDelaysCar.get(index).add(travelTime - referenceTrip.travelTime);
+                        dataFrame.relativeTravelTimeDelaysCar.get(index).add((travelTime - referenceTrip.travelTime) / referenceTrip.travelTime);
                     } else if (referenceTrip.mode.equals("pt")) {
                         dataFrame.travelTimeDelaysPt.get(index).add(travelTime - referenceTrip.travelTime);
+                        dataFrame.relativeTravelTimeDelaysPt.get(index).add((travelTime - referenceTrip.travelTime) / referenceTrip.travelTime);
                     } else {
                         System.err.println("something is wrong 2..." + event.getPersonId());
                     }
                 }
             } else {
-                System.err.println("something is wrong..." + event.getPersonId());
+                System.err.println("something is wrong... " + event.getLegMode() + " " + event.getPersonId());
             }
         }
     }

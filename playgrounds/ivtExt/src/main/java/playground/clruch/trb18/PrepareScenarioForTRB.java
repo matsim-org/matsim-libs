@@ -28,6 +28,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
@@ -55,8 +56,6 @@ public class PrepareScenarioForTRB {
 
     final private File outputDirectory;
 
-    final static private boolean enableBackgroundTraffic = false;
-
     static public void main(String[] args) throws Exception {
         Config config = ConfigUtils.loadConfig(args[0]);
 
@@ -77,24 +76,19 @@ public class PrepareScenarioForTRB {
 
         PrepareScenarioForTRB prepare = new PrepareScenarioForTRB(new File(outputPath), avRadius);
 
-        List<Person> backgroundTraffic = new LinkedList<>();
-
-        prepare.preparePopulation(scenario.getPopulation(), backgroundTraffic);
+        prepare.preparePopulation(scenario.getPopulation());
         prepare.prepareActivities(scenario.getPopulation(), scenario.getActivityFacilities());
         Network reducedNetwork = prepare.createAndWriteVirtualNetwork(config, scenario.getPopulation(), numberOfVirtualNodes, dtTravelData);
 
         prepare.applyAVPlans(scenario.getPopulation(), reducedNetwork);
         prepare.adjustInitialAVShare(scenario.getPopulation(), avShare);
 
-        if (enableBackgroundTraffic) {
-            prepare.addBackgroundTraffic(scenario.getPopulation(), backgroundTraffic);
-        }
-
         if (stage.equals("baseline")) {
             prepare.removeAVPlans(scenario.getPopulation());
         }
 
         new PopulationWriter(scenario.getPopulation()).write(new File(new File(outputPath), "trb_population.xml.gz").getAbsolutePath());
+        new ObjectAttributesXmlWriter(scenario.getPopulation().getPersonAttributes()).writeFile(new File(new File(outputPath), "trb_population_attributes.xml.gz").getAbsolutePath());
 
         config.transit().setTransitScheduleFile(transitScheduleFile);
         config.transit().setVehiclesFile(transitVehiclesFile);
@@ -183,6 +177,7 @@ public class PrepareScenarioForTRB {
         config.strategy().clearStrategySettings();
 
         config.plans().setInputFile("trb_population.xml.gz");
+        config.plans().setInputPersonAttributeFile("trb_population_attributes.xml.gz");
         config.network().setInputFile("trb_network.xml.gz");
 
         PlanCalcScoreConfigGroup.ModeParams avParams = config.planCalcScore().getOrCreateModeParams(AVModule.AV_MODE);
@@ -222,7 +217,9 @@ public class PrepareScenarioForTRB {
         }
 
         if (stage.equals("stage1")) {
-            config.controler().setLastIteration(0);
+            config.controler().setLastIteration(20);
+            StrategyConfigGroup.StrategySettings settings = new StrategyConfigGroup.StrategySettings();
+            settings.setStrategyName("KeepLastSelected");
         }
     }
 
@@ -279,6 +276,7 @@ public class PrepareScenarioForTRB {
 
         for (Person originalPerson : original.getPersons().values()) {
             numberOfPersons++;
+            boolean crossesBorder = false;
 
             if (original.getPersonAttributes().getAttribute(originalPerson.getId().toString(), "subpopulation") != null) {
                 continue;
@@ -296,9 +294,9 @@ public class PrepareScenarioForTRB {
                 if (element instanceof Activity) {
                     Activity activity = (Activity) element;
 
-                    //if (CoordUtils.calcEuclideanDistance(activityCoord, scenarioCenterCoord) >= avRadius) {
+                    //if (CoordUtils.calcEuclideanDistance(activity.getCoord(), scenarioCenterCoord) >= avRadius) {
                     if (!reducedNetwork.getLinks().containsKey(activity.getLinkId())) {
-                        elementIterator.remove();
+                        crossesBorder = true;
                     } else {
                         currentActivityEndTime = activity.getEndTime();
                     }
@@ -320,8 +318,10 @@ public class PrepareScenarioForTRB {
                 plan.getPlanElements().remove(plan.getPlanElements().size() - 1);
             }
 
-            reduced.addPerson(reducedPerson);
-            numberOfReducedPersons++;
+            if (!crossesBorder) {
+                reduced.addPerson(reducedPerson);
+                numberOfReducedPersons++;
+            }
         }
 
         logger.info(String.format("Number of persons: %d", numberOfPersons));
@@ -360,7 +360,7 @@ public class PrepareScenarioForTRB {
         long numberOfChangedAgents = 0;
 
         for (Person person : population.getPersons().values()) {
-            if (population.getPersonAttributes().getAttribute(person.toString(), "subpopulation") == null) {
+            if (population.getPersonAttributes().getAttribute(person.getId().toString(), "subpopulation") == null) {
                 Plan avPlan = null;
                 Plan standardPlan = null;
 
@@ -387,8 +387,8 @@ public class PrepareScenarioForTRB {
             }
         }
 
-        logger.info(String.format("Number of agents: %d", numberOfAgents));
-        logger.info(String.format("Number of agents with default AV plan: %d (%.2f%%)", numberOfChangedAgents, 100.0 * numberOfChangedAgents / numberOfAgents));
+        logger.info(String.format("Number of AV agents: %d", numberOfAgents));
+        logger.info(String.format("Number of AV agents with default AV plan: %d (%.2f%%)", numberOfChangedAgents, 100.0 * numberOfChangedAgents / numberOfAgents));
     }
 
     private List<Leg> getChangeablePTLegs(Plan plan, Network reducedNetwork) {
@@ -468,7 +468,7 @@ public class PrepareScenarioForTRB {
             numberOfAgents++;
             Person person = personIterator.next();
 
-            if (population.getPersonAttributes().getAttribute(person.toString(), "subpopulation") == null) {
+            if (population.getPersonAttributes().getAttribute(person.getId().toString(), "subpopulation") == null) {
                 Plan plan = person.getSelectedPlan();
                 boolean isCarUser = findMainMode(plan).equals(TransportMode.car);
 
@@ -528,8 +528,11 @@ public class PrepareScenarioForTRB {
                         numberOfChangedPTAgents++;
                     }
                 } else {
-                    personIterator.remove();
+                    population.getPersonAttributes().putAttribute(person.getId().toString(), "subpopulation", "noav");
+                    //personIterator.remove();
                 }
+            } else {
+                population.getPersonAttributes().putAttribute(person.getId().toString(), "subpopulation", "noav");
             }
         }
 
@@ -537,15 +540,16 @@ public class PrepareScenarioForTRB {
         logger.info(String.format("Number of changed car agents: %d (%.2f%%)", numberOfChangedCarAgents, 100.0 * numberOfChangedCarAgents / numberOfAgents));
         logger.info(String.format("Number of changed pt agents: %d (%.2f%%)", numberOfChangedPTAgents, 100.0 * numberOfChangedPTAgents / numberOfAgents));
         logger.info(String.format("Number of changed PT legs: %d", numberOfChangedPTLegs));
-        logger.info(String.format("Number of removed car agents: %d (%.2f%%)", numberOfRemovedCarAgents, 100.0 * numberOfRemovedCarAgents / numberOfAgents));
-        logger.info(String.format("Number of removed PT agents: %d (%.2f%%)", numberOfRemovedPTAgents, 100.0 * numberOfRemovedPTAgents / numberOfAgents));
+        logger.info(String.format("Number of non-av car agents: %d (%.2f%%)", numberOfRemovedCarAgents, 100.0 * numberOfRemovedCarAgents / numberOfAgents));
+        logger.info(String.format("Number of non-av PT agents: %d (%.2f%%)", numberOfRemovedPTAgents, 100.0 * numberOfRemovedPTAgents / numberOfAgents));
     }
 
-    public void preparePopulation(Population population, List<Person> backgroundTraffic) {
+    public void preparePopulation(Population population) {
         logger.info("Removing special agents ...");
         // 0. In case it is a pre-routed population, remove all non-selected plans
         population.getPersons().values().stream().forEach(p -> PersonUtils.removeUnselectedPlans(p));
         population.getPersons().values().removeIf(p -> p.getPlans().get(0).getPlanElements().size() < 2);
+
 
         for (Person person : population.getPersons().values()) {
             person.setSelectedPlan(person.getPlans().get(0));
@@ -565,8 +569,6 @@ public class PrepareScenarioForTRB {
                 }
             }
         }*/
-
-        // 1. Remove all agents which have walk or bike as the main mode
         // TODO: Remove also crossborder, freight and commuters???
 
         Iterator<? extends Person> personIterator = population.getPersons().values().iterator();
@@ -580,8 +582,7 @@ public class PrepareScenarioForTRB {
             Person person = personIterator.next();
             String mainMode = findMainMode(person.getSelectedPlan());
 
-            if (!allowedMainModes.contains(mainMode) || population.getPersonAttributes().getAttribute(person.getId().toString(), "subpopulation") != null) {
-                backgroundTraffic.add(person);
+            if (!allowedMainModes.contains(mainMode)) { // || population.getPersonAttributes().getAttribute(person.getId().toString(), "subpopulation") != null) {
                 personIterator.remove();
                 numberOfRemovedAgents++;
             } else {

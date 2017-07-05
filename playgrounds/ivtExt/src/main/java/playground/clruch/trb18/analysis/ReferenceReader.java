@@ -59,7 +59,7 @@ public class ReferenceReader {
                 Double arrivalTime = arrivalTimes.remove(event.getPersonId());
                 String legMode = legModes.remove(event.getPersonId());
 
-                if (departureTime != null && arrivalTime != null && legMode != null) {
+                if (departureTime != null && arrivalTime != null && legMode != null && (legMode.equals("car") || legMode.equals("pt") || legMode.equals("transit_walk"))) {
                     if (!referenceTrips.containsKey(event.getPersonId())) {
                         referenceTrips.put(event.getPersonId(), new LinkedList<>());
                     }

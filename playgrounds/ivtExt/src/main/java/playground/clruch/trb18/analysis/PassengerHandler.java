@@ -45,6 +45,11 @@ public class PassengerHandler implements PersonEntersVehicleEventHandler, Person
                 int index = binCalculator.getIndex(departureEvent.getTime());
 
                 dataFrame.waitingTimes.get(index).add(event.getTime() - departureEvent.getTime());
+
+                for (BinCalculator.BinEntry entry : binCalculator.getBinEntriesNormalized(departureEvent.getTime(), event.getTime())) {
+                    int binIndex = entry.getIndex();
+                    dataFrame.numberOfWaitingRequests.set(binIndex, dataFrame.numberOfWaitingRequests.get(binIndex) + entry.getWeight());
+                }
             }
 
             enterEvents.put(event.getPersonId(), event);
