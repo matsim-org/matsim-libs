@@ -60,6 +60,8 @@ import org.matsim.counts.algorithms.graphs.BiasErrorGraph;
 import org.matsim.counts.algorithms.graphs.BiasNormalizedErrorGraph;
 import org.matsim.counts.algorithms.graphs.BoxPlotErrorGraph;
 import org.matsim.counts.algorithms.graphs.BoxPlotNormalizedErrorGraph;
+import org.matsim.counts.algorithms.graphs.CountsGEHCurveGraph;
+import org.matsim.counts.algorithms.graphs.CountsGEHCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsGraph;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraph;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
@@ -150,6 +152,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * maps linkIds to filenames in the kmz
 	 */
 	private Map<String, String> countsLoadCurveGraphMap;
+	private Map<String, String> countsGEHCurveGraphMap;
 
 	/** The logging object for this class. */
 	private static final Logger log = Logger.getLogger(CountSimComparisonKMLWriter.class);
@@ -229,7 +232,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 
 		for (StyleType styleType : new StyleType[]{
 				this.redCircleStyle, this.redCrossStyle, this.redMinusStyle, this.yellowCircleStyle, this.yellowCrossStyle, this.yellowMinusStyle,
-				this.greenCircleStyle, this.greenCrossStyle, this.greenMinusStyle, this.greyCrossStyle, this.greyCrossStyle, this.greyMinusStyle}) {
+				this.greenCircleStyle, this.greenCrossStyle, this.greenMinusStyle, this.greyCircleStyle, this.greyCrossStyle, this.greyMinusStyle}) {
 
 			IconStyleType icon = this.kmlObjectFactory.createIconStyleType();
 			icon.setColor(
@@ -344,6 +347,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 
 		// link graphs
 		this.createCountsLoadCurveGraphs();
+		this.createCountsGEHCurveGraphs();
 
 		// hourly data...
 		FolderType folderRelative = this.kmlObjectFactory.createFolderType();
@@ -506,9 +510,9 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @return the Placemark instance with description and name set
 	 */
 	private PlacemarkType createPlacemark(final String linkid, final CountSimComparison csc, final double relativeError, final double normalizedRelativeError, 
-			final double gehValue, final int timestep) {
+			final double gehValue, final int timestep, final String imagePath) {
 		PlacemarkType placemark = this.kmlObjectFactory.createPlacemarkType();
-		placemark.setDescription(createPlacemarkDescription(linkid, csc, relativeError, normalizedRelativeError, gehValue, timestep));
+		placemark.setDescription(createPlacemarkDescription(linkid, csc, relativeError, normalizedRelativeError, gehValue, timestep, imagePath));
 		return placemark;
 	}
 
@@ -543,7 +547,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 			// +/- placemark for relative values
 			{
 				// build placemark
-				placemark = createPlacemark(itemId.toString(), csc, relativeError, normalizedRelativeError, gehValue, csc.getHour());
+				placemark = createPlacemark(itemId.toString(), csc, relativeError, normalizedRelativeError, gehValue, csc.getHour(), this.countsLoadCurveGraphMap.get(itemId.toString()));
 //				if (description != null) placemark.setName(description);
 				point = this.kmlObjectFactory.createPointType();
 				point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
@@ -576,7 +580,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 			// +/- placemark for normalized relative values
 			{
 				// build placemark
-				placemark = createPlacemark(itemId.toString(), csc, relativeError, normalizedRelativeError, gehValue, csc.getHour());
+				placemark = createPlacemark(itemId.toString(), csc, relativeError, normalizedRelativeError, gehValue, csc.getHour(), this.countsLoadCurveGraphMap.get(itemId.toString()));
 //				if (description != null) placemark.setName(description);
 				placemark.setVisibility(Boolean.FALSE);
 				point = this.kmlObjectFactory.createPointType();
@@ -605,7 +609,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 			// circle placemark for geh
 			{
 				// build placemark
-				placemark = createPlacemark(itemId.toString(), csc, relativeError, normalizedRelativeError, gehValue, csc.getHour());
+				placemark = createPlacemark(itemId.toString(), csc, relativeError, normalizedRelativeError, gehValue, csc.getHour(), this.countsGEHCurveGraphMap.get(itemId.toString()));
 //				if (description != null) placemark.setName(description);
 				placemark.setVisibility(Boolean.FALSE);
 				point = this.kmlObjectFactory.createPointType();
@@ -648,7 +652,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * @return A String containing the description for each placemark
 	 */
 	private String createPlacemarkDescription(final String linkid, final CountSimComparison csc, final double relativeError, final double normalizedRelativeError, 
-			final double gehValue, final int timestep) {
+			final double gehValue, final int timestep, final String imagePath) {
 		StringBuilder buffer = new StringBuilder(100);
 //		buffer.append(NetworkFeatureFactory.STARTCDATA);
 //		buffer.append(STARTH1);
@@ -670,7 +674,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		buffer.append(NetworkFeatureFactory.ENDH3);
 		buffer.append(NetworkFeatureFactory.STARTP);
 		buffer.append(IMG);
-		buffer.append(this.countsLoadCurveGraphMap.get(linkid));
+		buffer.append(imagePath);
 		buffer.append(IMGEND);
 		buffer.append(NetworkFeatureFactory.ENDP);
 		buffer.append(NetworkFeatureFactory.STARTH3);
@@ -772,9 +776,9 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 */
 	private void createCountsLoadCurveGraphs() {
 		CountsLoadCurveGraphCreator cgc = new CountsLoadCurveGraphCreator("");
-		List<CountsGraph> graphs= cgc.createGraphs(this.countComparisonFilter.getCountsForHour(null), this.iterationNumber);
+		List<CountsGraph> graphs = cgc.createGraphs(this.countComparisonFilter.getCountsForHour(null), this.iterationNumber);
 
-		this.countsLoadCurveGraphMap = new HashMap<String, String>(graphs.size());
+		this.countsLoadCurveGraphMap = new HashMap<>(graphs.size());
 		String linkid;
 		StringBuffer filename;
 		for (CountsGraph cg : graphs) {
@@ -791,6 +795,31 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		}
 	}
 
+	/**
+	 * Creates CountsGEHCurveGraphs for each link and puts them in the kmz as pngs
+	 */
+	private void createCountsGEHCurveGraphs() {
+		CountsGEHCurveGraphCreator cgc = new CountsGEHCurveGraphCreator("");
+		List<CountsGraph> graphs = cgc.createGraphs(this.countComparisonFilter.getCountsForHour(null), this.iterationNumber);
+
+		this.countsGEHCurveGraphMap = new HashMap<>(graphs.size());
+		String linkId;
+		StringBuffer filename;
+		for (CountsGraph cg : graphs) {
+			try {
+				filename = new StringBuffer();
+				linkId = ((CountsGEHCurveGraph) cg).getLinkId();
+				filename.append(linkId);
+				filename.append("_GEH");
+				filename.append(PNG);
+				writeChartToKmz(filename.toString(), cg.getChart());
+				this.countsGEHCurveGraphMap.put(linkId, filename.toString());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	/**
 	 * Writes the given JFreeChart to the kmz file specified for the kmz writer attribute of this class.
 	 * @param filename the filename to use in the kmz
