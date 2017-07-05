@@ -108,23 +108,23 @@ public class ScoreStatsModuleTest {
 
 			// yy the following is retrofitted from an older double[][] data structure and thus messy.  Please improve it.  kai, nov'16
 			if ( ! config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
-					{
-						Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
-						Assert.assertEquals(53.191443246069156, array[0], DELTA);
-						Assert.assertEquals(53.21824061550687, array[1], DELTA);
-					} {
-						Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
-						Assert.assertEquals(new double[]{53.191443246069156, 53.27637814856666}[0], array[0], DELTA);
-						Assert.assertEquals(new double[]{53.191443246069156, 53.27637814856666}[1], array[1], DELTA);
-					}{
-						Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
-						Assert.assertEquals(new double[]{53.191443246069156, 53.24730938203677}[0], array[0], DELTA);
-						Assert.assertEquals(new double[]{53.191443246069156, 53.24730938203677}[1], array[1], DELTA);
-					}{
-						Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
-						Assert.assertEquals(new double[]{53.191443246069156, 53.27637814856666}[0],array[0], DELTA);
-						Assert.assertEquals(new double[]{53.191443246069156, 53.27637814856666}[1], array[1], DELTA);
-					}
+				{
+					Double[] array = result.get(ScoreItem.worst).values().toArray(new Double[0]) ;
+					Assert.assertEquals(64.75688384156044, array[0], DELTA);
+					Assert.assertEquals(64.78368121099818, array[1], DELTA);
+				} {
+					Double[] array = result.get(ScoreItem.best).values().toArray(new Double[0]) ;
+					Assert.assertEquals(64.75688384156044, array[0], DELTA);
+					Assert.assertEquals(64.84181874405796, array[1], DELTA);
+				}{
+					Double[] array = result.get(ScoreItem.average).values().toArray(new Double[0]) ;
+					Assert.assertEquals(64.75688384156044, array[0], DELTA);
+					Assert.assertEquals(64.81274997752806, array[1], DELTA);
+				}{
+					Double[] array = result.get(ScoreItem.executed).values().toArray(new Double[0]) ;
+					Assert.assertEquals(64.75688384156044, array[0], DELTA);
+					Assert.assertEquals(64.84181874405796, array[1], DELTA);
+				}
 				} else {
 					// yyyy these change with the access/egress car router, but I cannot say if the magnitude of change is plausible. kai, feb'16
 //					if(config.qsim().isUsingFastCapacityUpdate()) {

@@ -1,3 +1,0 @@
-linkId;	countStationDescr; countVolume
-1112;	linkFrom11To12; 10
-1211;	linkFrom12To11; 20

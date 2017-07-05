@@ -192,6 +192,8 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2.1</version>
+				<!-- Setting this to 2.2.1 because I want to be able to skip assembly from the command line.  kai, jun'17  -->
 				<configuration>
 					<descriptors>
 						<descriptor>src/main/assembly/assembly-release.xml</descriptor>

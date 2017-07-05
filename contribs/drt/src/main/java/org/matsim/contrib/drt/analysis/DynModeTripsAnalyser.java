@@ -211,7 +211,7 @@ public class DynModeTripsAnalyser {
 		format.setMaximumFractionDigits(2);
 		format.setGroupingUsed(false);
 
-		SimpleDateFormat sdf2 = new SimpleDateFormat("hh:mm:ss");
+		SimpleDateFormat sdf2 = new SimpleDateFormat("HH:mm:ss");
 
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileName + ".csv");
 		TimeSeriesCollection dataset = new TimeSeriesCollection();
@@ -256,7 +256,7 @@ public class DynModeTripsAnalyser {
 				averageWaitC.addOrUpdate(h, Double.valueOf(averageWait));
 				p_5Wait.addOrUpdate(h, Double.valueOf(p_5));
 				p_95Wait.addOrUpdate(h, Double.valueOf(p_95));
-				requests.addOrUpdate(h, rides);
+				requests.addOrUpdate(h, rides * 3600. / binsize_s);//normalised [req/h]
 				bw.newLine();
 				bw.write(Time.writeTime(e.getKey()) + ";" + rides + ";" + format.format(averageWait) + ";"
 						+ format.format(min) + ";" + format.format(p_5) + ";" + format.format(p_25) + ";"
@@ -272,7 +272,7 @@ public class DynModeTripsAnalyser {
 			dataset.addSeries(p_95Wait);
 			datasetrequ.addSeries(requests);
 			JFreeChart chart = chartProfile(splitTrips.size(), dataset, "Waiting times", "Wait time (s)");
-			JFreeChart chart2 = chartProfile(splitTrips.size(), datasetrequ, "Ride requests", "Requests");
+			JFreeChart chart2 = chartProfile(splitTrips.size(), datasetrequ, "Ride requests per hour", "Requests per hour (req/h)");
 			ChartSaveUtils.saveAsPNG(chart, fileName, 1500, 1000);
 			ChartSaveUtils.saveAsPNG(chart2, fileName + "_requests", 1500, 1000);
 

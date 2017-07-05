@@ -1,6 +1,0 @@
-<?xml version="1.0" ?>
-<!DOCTYPE vehicles SYSTEM "http://matsim.org/files/dtd/dvrp_vehicles_v1.dtd">
-
-<vehicles>
-	<vehicle id="Taxi1" start_link="BC" t_0="0" t_1="108000" capacity="4" />
-</vehicles>
