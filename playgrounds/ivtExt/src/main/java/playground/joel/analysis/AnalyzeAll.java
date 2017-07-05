@@ -28,7 +28,8 @@ import playground.joel.data.TotalData;
 public class AnalyzeAll {
     public static final File RELATIVE_DIRECTORY = new File("output", "data");
     public static final boolean filter = true;  // filter size can be adapted in the diagram creator
-    public static final double maxWaitingTime = 20.0; // maximally displayed waiting time in minutes
+    public static final double maxWaitingTime = -1.0; // maximally displayed waiting time in minutes,
+                                                        // -1.0 sets it automatically
 
     public static final Scalar waitBinSize = RealScalar.of(20.0); // in minutes
     public static final Scalar distanceBinSize = RealScalar.of(10.0); // in km
@@ -127,8 +128,6 @@ public class AnalyzeAll {
 
     public static AnalyzeSummary summarize(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis) {
         AnalyzeSummary analyzeSummary = new AnalyzeSummary();
-        // analyzeSummary.coreAnalysis = coreAnalysis;
-        // analyzeSummary.distanceAnalysis = distanceAnalysis;
         analyzeSummary.numVehicles = distanceAnalysis.numVehicles;
         analyzeSummary.numRequests = coreAnalysis.numRequests;
         analyzeSummary.occupancyRatio = timeRatio;

@@ -76,10 +76,6 @@ public class ReportGenerator {
                 "\n" + scenarioParameters.virtualNodes + //
                 "\n" + scenarioParameters.populationSize + //
                 "\n" + analyzeSummary.numRequests);
-        htmlUtils.newLine();
-        htmlUtils.insertTextLeft("Average Trip Distance:");
-        htmlUtils.insertTextLeft(d.format( //
-                analyzeSummary.distanceWithCust*link2km/analyzeSummary.numRequests) + " km");
 
         htmlUtils.insertSubTitle("Aggregate Results");
         htmlUtils.insertTextLeft("Computation Time:");
@@ -98,7 +94,9 @@ public class ReportGenerator {
                 "\n\tTotal:" + //
                 "\n\tRebalancing:" + //
                 "\n\tPickup:" + //
-                "\n\tWith Customer:" //
+                "\n\tWith Customer:" + //
+                "\n" + //
+                "\nAverage Trip Distance:" //
         );
         htmlUtils.insertTextLeft(" " + //
                 "\n" + d.format(analyzeSummary.totalWaitTimeMean.Get().number().doubleValue()/60) + " min" + //
@@ -112,7 +110,9 @@ public class ReportGenerator {
                 "\n" + d.format(analyzeSummary.distance*link2km) + " km" + //
                 "\n" + d.format(analyzeSummary.distanceRebalance*link2km) + " km" + //
                 "\n" + d.format(analyzeSummary.distancePickup*link2km) + " km" + //
-                "\n" + d.format(analyzeSummary.distanceWithCust*link2km) + " km" //
+                "\n" + d.format(analyzeSummary.distanceWithCust*link2km) + " km" + //
+                "\n" + //
+                "\n" + d.format(link2km*analyzeSummary.distanceWithCust/analyzeSummary.numRequests) + " km"
         );
         htmlUtils.insertImgRight(IMAGE_FOLDER + "/stackedDistance.png", 250, 400);
 

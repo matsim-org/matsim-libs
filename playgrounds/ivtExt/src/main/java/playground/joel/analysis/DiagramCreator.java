@@ -77,7 +77,7 @@ public class DiagramCreator {
                 dataset, false, false, false);
 
         // range and colors of the background/grid
-        timechart.getXYPlot().getRangeAxis().setRange(0, maxRange);
+        if (maxRange != -1.0) timechart.getXYPlot().getRangeAxis().setRange(0, maxRange);
         timechart.getPlot().setBackgroundPaint(Color.white);
         timechart.getXYPlot().setRangeGridlinePaint(Color.lightGray);
         timechart.getXYPlot().setDomainGridlinePaint(Color.lightGray);
