@@ -3,9 +3,11 @@
  */
 package playground.joel.analysis;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -18,9 +20,15 @@ import org.matsim.api.core.v01.population.Population;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataUtils;
+import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 
 /**
  * @author Claudio Ruch
@@ -34,7 +42,23 @@ public class MinimumFleetSizeCalculator {
     final int numberTimeSteps;
     final int dt;
 
-    public MinimumFleetSizeCalculator(Network networkIn, Population populationIn, VirtualNetwork virtualNetworkIn,int dtIn) {
+    public static void main(String[] args) throws  Exception {
+        // for test purpose only
+        DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+        dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
+
+        File configFile = new File(args[0]);
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+        Network network = scenario.getNetwork();
+        MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, //
+                scenario.getPopulation(), VirtualNetworkIO.fromByte(network, //
+                new File(configFile.getParentFile(), "virtualNetwork/virtualNetwork")), 60*60*5);
+
+        System.out.println(minimumFleetSizeCalculator.calculateMinFleet());
+    }
+
+    public MinimumFleetSizeCalculator(Network networkIn, Population populationIn, VirtualNetwork virtualNetworkIn, int dtIn) {
         int dayduration = 30 * 60 * 60;
         dt = TravelDataUtils.greatestNonRestDt(dtIn, 30 * 60 * 60);
         numberTimeSteps = dayduration / dt;
@@ -58,14 +82,14 @@ public class MinimumFleetSizeCalculator {
             double lambdak = RequestAnalysis.calcArrivalRate(relevantRequests, dt);
 
             // calculate average trip distance
-            double dODk = RequestAnalysis.calcavDistance(relevantRequests);
+            double dODk = RequestAnalysis.calcavDistance(network, relevantRequests);
 
             // calculate earth movers distance
             //FIXME time and timesteps wrong
             double EMDk = RequestAnalysis.calcEMD(tData,virtualNetwork, dt, dt+1);
 
             // calculate average speed
-            double vk = RequestAnalysis.calcAVSpeed(relevantRequests);
+            double vk = RequestAnalysis.calcAVSpeed(network, relevantRequests);
 
             // compute minimal fleet size
             double minFleetSizek = (lambdak * (dODk + EMDk)) / vk;
