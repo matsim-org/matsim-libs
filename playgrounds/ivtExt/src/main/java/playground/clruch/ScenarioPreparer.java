@@ -47,16 +47,16 @@ public class ScenarioPreparer {
 
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
-        final int maxPopulationSize = 1000;
+        final int maxPopulationSize = 80000;
         final int numVirtualNodes = 40;
-        final int dtTravelData = 300;
+        final int dtTravelData = 600;
         final boolean completeGraph = true;
 
         // LocationSpec object to specify city location and center, radius for cutting
         LocationSpec ls = LocationSpec.ZURICH_CITY;
 
         final boolean populationeliminateFreight = true;
-        final boolean populationeliminateWalking = true;
+        final boolean populationeliminateWalking = false;
         final boolean populationchangeModeToAV = true; // TODO check if this is still needed !?
 
         // output file names
