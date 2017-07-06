@@ -11,8 +11,8 @@ public enum TravelDataUtils {
     ;
     
     /**
-     * @param a
-     * @param b
+     * @param dt
+     * @param length
      * @return greatest common divisor for integers a and b
      */
     public static int greatestNonRestDt(int dt, int length) {

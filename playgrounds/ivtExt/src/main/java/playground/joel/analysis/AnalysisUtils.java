@@ -16,7 +16,7 @@ import java.util.TreeMap;
 public class AnalysisUtils {
 
     static Scalar maximum(Tensor submissions){
-        return submissions.flatten(0).reduce(Max::of).get().Get();
+        return submissions.flatten(-1).reduce(Max::of).get().Get();
     }
 
 

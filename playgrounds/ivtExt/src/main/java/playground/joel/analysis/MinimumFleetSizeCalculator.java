@@ -47,9 +47,12 @@ public class MinimumFleetSizeCalculator {
     final TravelData tData;
     final int numberTimeSteps;
     final int dt;
+    public static Tensor EMDks = Tensors.empty();
 
     public static void main(String[] args) throws  Exception {
         // for test purpose only
+        int samples = 6;
+
         /*
         PrintStream originalStream = System.out;
         System.setOut(new PrintStream(new OutputStream(){
@@ -70,19 +73,21 @@ public class MinimumFleetSizeCalculator {
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, //
                 population, VirtualNetworkIO.fromByte(network, //
-                new File(configFile.getParentFile(), "virtualNetwork/virtualNetwork")), 60*60*5);
+                new File(configFile.getParentFile(), "virtualNetwork/virtualNetwork")), 108000/samples);
 
         // System.setOut(originalStream);
         Tensor minFleet = minimumFleetSizeCalculator.calculateMinFleet();
-        System.out.println(minFleet);
-        double minVeh = minFleet.flatten(0).reduce(Max::of).get().Get().number().doubleValue();
+
+        System.out.println("Earth movers distances: " + EMDks);
+        System.out.println("Minimallly required fleet sizes " + minFleet);
+        double minVeh = AnalysisUtils.maximum(minFleet).number().doubleValue();
         System.out.println(minVeh + " -> " + Math.ceil(minVeh));
     }
 
     public MinimumFleetSizeCalculator(Network networkIn, Population populationIn, VirtualNetwork virtualNetworkIn, int dtIn) {
-        int dayduration = 30 * 60 * 60;
+        int dayduration = 108000;
         // ensure that dayduration / timeInterval is integer value
-        dt = TravelDataUtils.greatestNonRestDt(dtIn, 30 * 60 * 60);
+        dt = TravelDataUtils.greatestNonRestDt(dtIn, dayduration);
         numberTimeSteps = dayduration / dt;
         
         network = networkIn;
@@ -109,6 +114,7 @@ public class MinimumFleetSizeCalculator {
             // calculate earth movers distance
             //FIXME time and timesteps wrong, was: (..., dt, dt + 1)
             double EMDk = RequestAnalysis.calcEMD(tData, virtualNetwork, dijkstra, dt, k * dt);
+            EMDks.append(RealScalar.of(EMDk));
 
             // calculate average speed
             double vk = RequestAnalysis.calcAVSpeed(dijkstra, relevantRequests);

@@ -112,8 +112,8 @@ public enum RequestAnalysis {
 
         // return RealScalar.of(actualDistance(vi.getCoord(), vj.getCoord())); // euclidean approach
 
-        Node ni = virtualToReal(abstractVirtualNodeDest, vi, false);
-        Node nj = virtualToReal(abstractVirtualNodeDest, vj, true);
+        Node ni = abstractVirtualNodeDest.virtualToReal(vi, false);
+        Node nj = abstractVirtualNodeDest.virtualToReal(vj, true);
         return RealScalar.of(actualDistance(dijkstra, ni, nj)); // dijkstra approach
         
     }
@@ -135,10 +135,12 @@ public enum RequestAnalysis {
         return dist;
     }
 
+    /*
     public static Node virtualToReal(AbstractVirtualNodeDest abstractVirtualNodeDest, VirtualNode vNode, boolean endNode) {
         // TODO: maybe better randomized choice over all links in vi/vj instead of just center
         if (endNode) return abstractVirtualNodeDest.selectLinkSet(vNode, 1).get(0).getToNode();
         return abstractVirtualNodeDest.selectLinkSet(vNode, 1).get(0).getFromNode();
     }
+    */
 
 }
