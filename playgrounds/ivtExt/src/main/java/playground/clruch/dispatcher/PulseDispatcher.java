@@ -40,7 +40,7 @@ public class PulseDispatcher extends UniversalDispatcher {
         links = new ArrayList<>(network.getLinks().values());
         Collections.shuffle(links);
         SafeConfig safeConfig = SafeConfig.wrap(config);
-        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 120);
+        dispatchPeriod = getDispatchPeriod(safeConfig, 120); // safeConfig.getInteger("dispatchPeriod", 120);
     }
 
     @Override

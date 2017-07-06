@@ -21,6 +21,7 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.clruch.ScenarioServer;
 import playground.clruch.net.SimulationDistribution;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationObjectCompiler;
@@ -302,6 +303,24 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 super.getInfoLine(), //
                 getAVRequests().size(), //
                 total_matchedRequests);
+    }
+
+    public int getDispatchPeriod(SafeConfig safeConfig, int alt) {
+        int redispatchPeriod = safeConfig.getInteger("dispatchPeriod", alt);
+        ScenarioServer.scenarioParameters.redispatchPeriod = redispatchPeriod;
+        return  redispatchPeriod;
+    }
+
+    public int getDispatchPeriod(AVDispatcherConfig config) {
+        int redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
+        ScenarioServer.scenarioParameters.redispatchPeriod = redispatchPeriod;
+        return redispatchPeriod;
+    }
+
+    public int getRebalancingPeriod(AVDispatcherConfig config) {
+        int rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+        ScenarioServer.scenarioParameters.rebalancingPeriod = rebalancingPeriod;
+        return rebalancingPeriod;
     }
 
 }

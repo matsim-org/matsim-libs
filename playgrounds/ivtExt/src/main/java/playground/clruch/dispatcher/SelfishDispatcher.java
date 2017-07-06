@@ -70,7 +70,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
 
         // Load parameters from av.xml
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
-        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
+        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
 
         updateRefPeriod = safeConfig.getInteger("updateRefPeriod", 3600);
         weiszfeldMaxIter = safeConfig.getIntegerStrict("weiszfeldMaxIter");

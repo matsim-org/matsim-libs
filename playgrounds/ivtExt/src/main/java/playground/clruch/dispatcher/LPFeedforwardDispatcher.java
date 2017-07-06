@@ -88,8 +88,8 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
         this.requestSelector = abstractRequestSelector;
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
-        redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
-        rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+        redispatchPeriod = getDispatchPeriod(config); // Integer.parseInt(config.getParams().get("redispatchPeriod"));
+        rebalancingPeriod = getRebalancingPeriod(config); // Integer.parseInt(config.getParams().get("rebalancingPeriod"));
         travelData = arrivalInformationIn;
         nVNodes = virtualNetwork.getvNodesCount();
         nVLinks = virtualNetwork.getvLinksCount();
