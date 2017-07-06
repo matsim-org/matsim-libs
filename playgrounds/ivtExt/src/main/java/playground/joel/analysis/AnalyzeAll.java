@@ -21,6 +21,7 @@ import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
 import playground.joel.data.TotalData;
+import playground.joel.html.DataCollector;
 
 /**
  * Created by Joel on 05.04.2017.
@@ -31,8 +32,10 @@ public class AnalyzeAll {
     public static final double maxWaitingTime = -1.0; // maximally displayed waiting time in minutes,
                                                         // -1.0 sets it automatically
 
-    public static final Scalar waitBinSize = RealScalar.of(20.0); // in minutes
-    public static final Scalar distanceBinSize = RealScalar.of(10.0); // in km
+    public static Scalar waitBinSize = RealScalar.of(5.0); // minimally, in minutes
+    public static Scalar totalDistanceBinSize = RealScalar.of(10.0); // minimally, in km
+    public static Scalar distanceWCBinSize = RealScalar.of(10.0); // minimally, in km
+    // will be stepwise increased if too small
 
     public static double timeRatio ;
     public static double distance ;
@@ -68,7 +71,7 @@ public class AnalyzeAll {
         plot(csv, name, title, from, to, 1.05);
     }
 
-    static void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis) throws Exception {
+    static void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis, String[] args) throws Exception {
         Tensor summary = Join.of(1, coreAnalysis.summary, distanceAnalysis.summary);
         saveFile(summary, "summary");
         System.out.println("Size of data summary: " + Dimensions.of(summary));
@@ -85,14 +88,18 @@ public class AnalyzeAll {
                 "Waiting Times", " sec", 1000, 750);
         DiagramCreator.binCountGraph(RELATIVE_DIRECTORY, "totalDistanceVehicle", //
                 "Vehicles per Total Distance", distanceAnalysis.tdBinCounter, //
-                distanceBinSize.number().doubleValue(), 100.0/distanceAnalysis.numVehicles, //
+                totalDistanceBinSize.number().doubleValue(), 100.0/distanceAnalysis.numVehicles, //
                 "% of fleet", "Total Distances", " km", //
                 1000, 750);
         DiagramCreator.binCountGraph(RELATIVE_DIRECTORY, "dwcVehicle", //
                 "Vehicles per Distance with Customer", distanceAnalysis.dwcBinCounter, //
-                distanceBinSize.number().doubleValue(), 100.0/distanceAnalysis.numVehicles, //
+                distanceWCBinSize.number().doubleValue(), 100.0/distanceAnalysis.numVehicles, //
                 "% of fleet", "Distances with Customer", " km", //
                 1000, 750);
+        DiagramCreator.createDiagram(RELATIVE_DIRECTORY, "EMD", "Earth Movers Distance", //
+                DataCollector.loadScenarioData(args).EMDks.multiply(RealScalar.of(0.001)), "km");
+        DiagramCreator.createDiagram(RELATIVE_DIRECTORY, "minFleet", "Minimum Fleet Size", //
+                DataCollector.loadScenarioData(args).minFleet, "vehicles");
         UniqueDiagrams.distanceStack(RELATIVE_DIRECTORY, "stackedDistance", "Distance Partition", //
                 distanceRebalance/distance, distancePickup/distance, distanceWithCust/distance);
         UniqueDiagrams.distanceDistribution(RELATIVE_DIRECTORY, "distanceDistribution", //
@@ -172,7 +179,7 @@ public class AnalyzeAll {
             e.printStackTrace();
         }
 
-        collectAndPlot(coreAnalysis, distanceAnalysis);
+        collectAndPlot(coreAnalysis, distanceAnalysis, args);
 
         return summarize(coreAnalysis, distanceAnalysis);
 

@@ -1,5 +1,7 @@
 package playground.joel.html;
 
+import ch.ethz.idsc.tensor.sca.Ceiling;
+import playground.joel.analysis.AnalysisUtils;
 import playground.joel.analysis.AnalyzeSummary;
 
 import java.io.File;
@@ -76,6 +78,14 @@ public class ReportGenerator {
                 "\n" + scenarioParameters.virtualNodes + //
                 "\n" + scenarioParameters.populationSize + //
                 "\n" + analyzeSummary.numRequests);
+        if (scenarioParameters.EMDks != null) {
+            htmlUtils.newLine();
+            htmlUtils.insertTextLeft("Minimum Fleet Size: ");
+            htmlUtils.insertTextLeft(d.format(Ceiling.of(AnalysisUtils.maximum(scenarioParameters.minFleet)).number()));
+            htmlUtils.newLine();
+            htmlUtils.insertImg(IMAGE_FOLDER + "/EMD.png", 800, 600);
+            htmlUtils.insertImg(IMAGE_FOLDER + "/minFleet.png", 800, 600);
+        }
 
         htmlUtils.insertSubTitle("Aggregate Results");
         htmlUtils.insertTextLeft("Computation Time:");
