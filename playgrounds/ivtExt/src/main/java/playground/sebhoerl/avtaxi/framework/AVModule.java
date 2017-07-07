@@ -35,6 +35,7 @@ import playground.clruch.dispatcher.LPFeedforwardDispatcher;
 import playground.clruch.dispatcher.NotAsDumbDispatcher;
 import playground.clruch.dispatcher.PulseDispatcher;
 import playground.clruch.dispatcher.SelfishDispatcher;
+import playground.fseccamo.dispatcher.MPCDispatcher1;
 import playground.fseccamo.dispatcher.MPCDispatcher2;
 import playground.joel.dispatcher.MultiGBM.MonoMultiGBMDispatcher;
 import playground.joel.dispatcher.MultiGBM.PolyMultiGBMDispatcher;
@@ -146,6 +147,8 @@ public class AVModule extends AbstractModule {
         AVUtils.bindDispatcherFactory(binder(), DFRDispatcher.class.getSimpleName()).to(DFRDispatcher.Factory.class);
         
         // MPC dispatcher
+        bind(MPCDispatcher1.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher1.class.getSimpleName()).to(MPCDispatcher1.Factory.class);
         bind(MPCDispatcher2.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), MPCDispatcher2.class.getSimpleName()).to(MPCDispatcher2.Factory.class);
         
