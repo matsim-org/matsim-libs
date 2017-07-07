@@ -387,8 +387,8 @@ public class CountsControlerListenerTest {
 		if (line == null) {
 			return Double.NaN; // should never happen...
 		}
-		String[] parts = line.split("\t");// [0] = linkId, [1] = matsim volume, [2] = real volume
-		return Double.parseDouble(parts[1]);
+		String[] parts = line.split("\t");// [0] = linkId, [1] = Count Station Id, [2] = matsim volume, [3] = real volume, [4] = normalized relative error
+		return Double.parseDouble(parts[2]);
 	}
 	
 	private static class DummyMobsim implements Mobsim {
