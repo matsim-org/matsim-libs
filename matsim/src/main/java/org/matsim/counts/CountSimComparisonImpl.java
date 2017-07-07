@@ -82,8 +82,6 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	}
 	
 	/**
-	 * Note that this return the value in percent!
-	 * 
 	 * @see org.matsim.counts.CountSimComparison#calculateRelativeError() 
 	 * @return signed relative error
 	 */
@@ -133,8 +131,6 @@ public class CountSimComparisonImpl implements CountSimComparison {
 	}
 
 	/**
-	 * Note that this return the value in percent!
-	 *  
 	 * @see org.matsim.counts.CountSimComparison#calculateNormalizedRelativeError()
 	 * @return normalized relative error
 	 */
