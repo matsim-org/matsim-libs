@@ -202,8 +202,8 @@ public class DiagramCreator {
         timechart.getXYPlot().getRangeAxis().setTickLabelFont(tickFont);
 
         // save plot as png
-        int width = 1000; /* Width of the image */
-        int height = 750; /* Height of the image */
+        int width = 1000; // Width of the image
+        int height = 750; // Height of the image
         savePlot(directory, fileTitle, timechart, width, height);
     }
 

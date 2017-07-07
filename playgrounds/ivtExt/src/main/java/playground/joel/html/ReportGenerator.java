@@ -1,5 +1,6 @@
 package playground.joel.html;
 
+import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.sca.Ceiling;
 import playground.joel.analysis.AnalysisUtils;
 import playground.joel.analysis.AnalyzeSummary;
@@ -20,6 +21,14 @@ public class ReportGenerator {
     final static DecimalFormat d = new DecimalFormat("#0.00");
 
     final static double link2km = 0.001;
+
+    public static String minSec(double secs) {
+        int min = (int) Math.floor(secs/60);
+        int sec = (int) Math.round(secs % 60);
+        if (min > 0)
+            return min + " min " + sec + " sec";
+        return sec + " sec";
+    }
 
     public static void main(String[] args) throws Exception {
         from(args);
@@ -67,8 +76,8 @@ public class ReportGenerator {
                 "\nRedispatching Period:");
         htmlUtils.insertTextLeft(scenarioParameters.dispatcher + //
                 "\n" + analyzeSummary.numVehicles + //
-                "\n" + scenarioParameters.rebalancingPeriod + " sec" + //
-                "\n" + scenarioParameters.redispatchPeriod + " sec");
+                "\n" + minSec(scenarioParameters.rebalancingPeriod) + //
+                "\n" + minSec(scenarioParameters.redispatchPeriod));
         htmlUtils.newLine();
         htmlUtils.insertTextLeft("Network:" + //
                 "\nVirtual Nodes:" + //
@@ -78,14 +87,6 @@ public class ReportGenerator {
                 "\n" + scenarioParameters.virtualNodes + //
                 "\n" + scenarioParameters.populationSize + //
                 "\n" + analyzeSummary.numRequests);
-        if (scenarioParameters.EMDks != null) {
-            htmlUtils.newLine();
-            htmlUtils.insertTextLeft("Minimum Fleet Size: ");
-            htmlUtils.insertTextLeft(d.format(Ceiling.of(AnalysisUtils.maximum(scenarioParameters.minFleet)).number()));
-            htmlUtils.newLine();
-            htmlUtils.insertImg(IMAGE_FOLDER + "/EMD.png", 800, 600);
-            htmlUtils.insertImg(IMAGE_FOLDER + "/minFleet.png", 800, 600);
-        }
 
         htmlUtils.insertSubTitle("Aggregate Results");
         htmlUtils.insertTextLeft("Computation Time:");
@@ -109,22 +110,34 @@ public class ReportGenerator {
                 "\nAverage Trip Distance:" //
         );
         htmlUtils.insertTextLeft(" " + //
-                "\n" + d.format(analyzeSummary.totalWaitTimeMean.Get().number().doubleValue()/60) + " min" + //
-                "\n" + d.format(analyzeSummary.totalWaitTimeQuantile.Get(1).number().doubleValue()/60) + " min" + //
-                "\n" + d.format(analyzeSummary.totalWaitTimeQuantile.Get(2).number().doubleValue()/60)+ " min" + //
-                "\n" + d.format(analyzeSummary.maximumWaitTime/60) + " min" + //
+                "\n" + minSec(analyzeSummary.totalWaitTimeMean.Get().number().doubleValue()) + //
+                "\n" + minSec(analyzeSummary.totalWaitTimeQuantile.Get(1).number().doubleValue()) + //
+                "\n" + minSec(analyzeSummary.totalWaitTimeQuantile.Get(2).number().doubleValue()) + //
+                "\n" + minSec(analyzeSummary.maximumWaitTime) + //
                 "\n" + //
                 "\n" + d.format(analyzeSummary.occupancyRatio*100) + "%" + //
                 "\n" + d.format(analyzeSummary.distanceRatio*100)+ "%" + //
                 "\n\n" + //
                 "\n" + d.format(analyzeSummary.distance*link2km) + " km" + //
-                "\n" + d.format(analyzeSummary.distanceRebalance*link2km) + " km" + //
-                "\n" + d.format(analyzeSummary.distancePickup*link2km) + " km" + //
-                "\n" + d.format(analyzeSummary.distanceWithCust*link2km) + " km" + //
+                "\n" + d.format(analyzeSummary.distanceRebalance*link2km) + " km (" + //
+                d.format(100*analyzeSummary.distanceRebalance/analyzeSummary.distance) + "%)" + //
+                "\n" + d.format(analyzeSummary.distancePickup*link2km) + " km (" + //
+                d.format(100*analyzeSummary.distancePickup/analyzeSummary.distance) + "%)" + //
+                "\n" + d.format(analyzeSummary.distanceWithCust*link2km) + " km (" + //
+                d.format(100*analyzeSummary.distanceWithCust/analyzeSummary.distance) + "%)" + //
                 "\n" + //
                 "\n" + d.format(link2km*analyzeSummary.distanceWithCust/analyzeSummary.numRequests) + " km"
         );
         htmlUtils.insertImgRight(IMAGE_FOLDER + "/stackedDistance.png", 250, 400);
+        if (scenarioParameters.EMDks != null) {
+            htmlUtils.newLine();
+            htmlUtils.insertTextLeft("Minimum Fleet Size:" + //
+                    "\nAverage Earth Movers Distance:" //
+            );
+            htmlUtils.insertTextLeft(Ceiling.of(AnalysisUtils.maximum(scenarioParameters.minFleet)).number().intValue() + //
+                    "\n" + d.format(Mean.of(scenarioParameters.EMDks).Get().number().doubleValue()*link2km) + " km"
+            );
+        }
 
         htmlUtils.insertSubTitle("Wait Times");
         htmlUtils.insertTextLeft("Requests:");
@@ -136,10 +149,10 @@ public class ReportGenerator {
                 "\n\t95% quantile:" + //
                 "\n\tMaximum:");
         htmlUtils.insertTextLeft(" " + //
-                "\n" + d.format(analyzeSummary.totalWaitTimeMean.Get().number().doubleValue()/60) + " min" + //
-                "\n" + d.format(analyzeSummary.totalWaitTimeQuantile.Get(1).number().doubleValue()/60) + " min" + //
-                "\n" + d.format(analyzeSummary.totalWaitTimeQuantile.Get(2).number().doubleValue()/60)+ " min" + //
-                "\n" + d.format(analyzeSummary.maximumWaitTime/60) + " min");
+                "\n" + minSec(analyzeSummary.totalWaitTimeMean.Get().number().doubleValue()) + //
+                "\n" + minSec(analyzeSummary.totalWaitTimeQuantile.Get(1).number().doubleValue()) + //
+                "\n" + minSec(analyzeSummary.totalWaitTimeQuantile.Get(2).number().doubleValue()) + //
+                "\n" + minSec(analyzeSummary.maximumWaitTime));
         htmlUtils.newLine();
         htmlUtils.insertImg(IMAGE_FOLDER + "/binnedWaitingTimes.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/waitBinCounter.png", 800, 600);
@@ -159,6 +172,11 @@ public class ReportGenerator {
         htmlUtils.insertImg(IMAGE_FOLDER + "/distanceDistribution.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/totalDistanceVehicle.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/dwcVehicle.png", 800, 600);
+        htmlUtils.insertImg(IMAGE_FOLDER + "/statusDistribution.png", 800, 600);
+        if (scenarioParameters.EMDks != null) {
+            htmlUtils.insertImg(IMAGE_FOLDER + "/EMD.png", 800, 600);
+            htmlUtils.insertImg(IMAGE_FOLDER + "/minFleet.png", 800, 600);
+        }
 
         // ----------------------------------------------
         htmlUtils.footer();
@@ -176,4 +194,5 @@ public class ReportGenerator {
             e.printStackTrace();
         }
     }
+
 }

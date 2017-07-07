@@ -104,6 +104,8 @@ public class AnalyzeAll {
                 distanceRebalance/distance, distancePickup/distance, distanceWithCust/distance);
         UniqueDiagrams.distanceDistribution(RELATIVE_DIRECTORY, "distanceDistribution", //
                 "Distance Distribution", true);
+        UniqueDiagrams.statusDistribution(RELATIVE_DIRECTORY, "statusDistribution", //
+                "Status Distribution", true);
     }
 
     static void getTotals(Tensor summary, CoreAnalysis coreAnalysis) {
