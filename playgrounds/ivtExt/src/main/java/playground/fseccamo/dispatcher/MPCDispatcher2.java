@@ -68,7 +68,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 /**
  * MPC dispatcher requires yalmip running in matlab
  */
-public class MPCDispatcher_1 extends BaseMpcDispatcher {
+public class MPCDispatcher2 extends BaseMpcDispatcher {
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
     final Map<VirtualLink, Double> travelTimes;
@@ -79,7 +79,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
 
     final JavaContainerSocket javaContainerSocket;
 
-    public MPCDispatcher_1( //
+    public MPCDispatcher2( //
             AVDispatcherConfig config, //
             AVGeneratorConfig generatorConfig, //
             TravelTime travelTime, //
@@ -531,7 +531,7 @@ public class MPCDispatcher_1 extends BaseMpcDispatcher {
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
             virtualNetwork = VirtualNetworkGet.readDefault(network);
 
-            return new MPCDispatcher_1(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, network, abstractVirtualNodeDest,
+            return new MPCDispatcher2(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, network, abstractVirtualNodeDest,
                     abstractVehicleDestMatcher, travelTimes);
         }
     }

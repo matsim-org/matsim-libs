@@ -35,7 +35,7 @@ import playground.clruch.dispatcher.LPFeedforwardDispatcher;
 import playground.clruch.dispatcher.NotAsDumbDispatcher;
 import playground.clruch.dispatcher.PulseDispatcher;
 import playground.clruch.dispatcher.SelfishDispatcher;
-import playground.fseccamo.dispatcher.MPCDispatcher_1;
+import playground.fseccamo.dispatcher.MPCDispatcher2;
 import playground.joel.dispatcher.MultiGBM.MonoMultiGBMDispatcher;
 import playground.joel.dispatcher.MultiGBM.PolyMultiGBMDispatcher;
 import playground.joel.dispatcher.single_heuristic.NewSingleHeuristicDispatcher; // TODO: delete this or the other
@@ -146,8 +146,8 @@ public class AVModule extends AbstractModule {
         AVUtils.bindDispatcherFactory(binder(), DFRDispatcher.class.getSimpleName()).to(DFRDispatcher.Factory.class);
         
         // MPC dispatcher
-        bind(MPCDispatcher_1.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher_1.class.getSimpleName()).to(MPCDispatcher_1.Factory.class);
+        bind(MPCDispatcher2.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher2.class.getSimpleName()).to(MPCDispatcher2.Factory.class);
         
     }
 
