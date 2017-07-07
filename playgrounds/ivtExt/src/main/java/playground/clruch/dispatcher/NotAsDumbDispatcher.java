@@ -52,7 +52,7 @@ public class NotAsDumbDispatcher extends UniversalDispatcher {
         this.network = network;
         linkReferences = new HashSet<>(network.getLinks().values());
         // vehicleRequestMatcher = ;
-        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
+        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
     }
 
     /**

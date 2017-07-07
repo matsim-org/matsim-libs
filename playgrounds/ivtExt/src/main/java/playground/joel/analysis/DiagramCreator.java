@@ -6,7 +6,10 @@ import java.io.File;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.CategoryLabelPositions;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.title.LegendTitle;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
@@ -22,6 +25,10 @@ import playground.clruch.utils.GlobalAssert;
  */
 public class DiagramCreator {
     public static final int filterSize = 120;
+
+    public static Font titleFont = new Font("Dialog", Font.BOLD, 24);
+    public static Font axisFont = new Font("Dialog", Font.BOLD, 18);
+    public static Font tickFont = new Font("Dialog", Font.PLAIN, 14);
 
     static Second toTime(double time) {
         int days = (int) (time / 86400) + 1;
@@ -81,9 +88,6 @@ public class DiagramCreator {
         }
 
         // set text fonts
-        Font titleFont = new Font("Dialog", Font.BOLD, 24);
-        Font axisFont = new Font("Dialog", Font.BOLD, 18);
-        Font tickFont = new Font("Dialog", Font.PLAIN, 14);
         timechart.getTitle().setFont(titleFont);
         timechart.getXYPlot().getDomainAxis().setLabelFont(axisFont);
         timechart.getXYPlot().getRangeAxis().setLabelFont(axisFont);
@@ -99,12 +103,9 @@ public class DiagramCreator {
         }
 
         // save plot as png
-        int width = 1200; /* Width of the image */
-        int height = 900; /* Height of the image */
-        File timeChart = new File(directory, fileTitle + ".png");
-        ChartUtilities.saveChartAsPNG(timeChart, timechart, width, height);
-        GlobalAssert.that(timeChart.exists() && !timeChart.isDirectory());
-        System.out.println("exported " + fileTitle + ".png");
+        int width = 1000; /* Width of the image */
+        int height = 750; /* Height of the image */
+        savePlot(directory, fileTitle, timechart, width, height);
     }
 
     /**
@@ -133,5 +134,48 @@ public class DiagramCreator {
             }
             return temp;
         } else return values;
+    }
+
+    public static void binCountGraph(File directory, String fileTitle, String diagramTitle, //
+                                     Tensor binCounter, double binSize, double scaling, //
+                                     String valueAxisLabel, String rangeAxisLabel, String rangeAxisAppendix, //
+                                     int width, int height) throws Exception {
+
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+        for (int i = 0; i < binCounter.length(); i++) {
+            dataset.addValue(binCounter.Get(i).number().doubleValue()*scaling, "", //
+                    binName(binSize, i, rangeAxisAppendix));
+        }
+        JFreeChart chart = ChartFactory.createBarChart(
+                diagramTitle,
+                rangeAxisLabel, valueAxisLabel,
+                dataset, PlotOrientation.VERTICAL,
+                false, false, false);
+
+        chart.getPlot().setBackgroundPaint(Color.white);
+        chart.getCategoryPlot().setRangeGridlinePaint(Color.lightGray);
+        chart.getCategoryPlot().getDomainAxis().setTickLabelFont(tickFont);
+        chart.getCategoryPlot().getDomainAxis().setLowerMargin(0.0);
+        chart.getCategoryPlot().getDomainAxis().setUpperMargin(0.0);
+        chart.getCategoryPlot().getDomainAxis().setCategoryMargin(0.0);
+        chart.getCategoryPlot().getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_90);
+        chart.getCategoryPlot().getDomainAxis().setLabelFont(axisFont);
+        chart.getCategoryPlot().getRangeAxis().setTickLabelFont(tickFont);
+        chart.getCategoryPlot().getRangeAxis().setLabelFont(axisFont);
+        chart.getTitle().setFont(titleFont);
+
+        DiagramCreator.savePlot(directory, fileTitle, chart, width, height);
+    }
+
+    public static String binName(double binSize, int i, String appedix) {
+        return i*binSize + " - " + (i+1)*binSize + appedix;
+    }
+
+    public static void savePlot(File directory, String fileTitle, JFreeChart chart, int width, int height)
+            throws Exception {
+        File fileChart = new File(directory, fileTitle + ".png");
+        ChartUtilities.saveChartAsPNG(fileChart, chart, width, height);
+        GlobalAssert.that(fileChart.exists() && !fileChart.isDirectory());
+        System.out.println("Exported " + fileTitle + ".png");
     }
 }
