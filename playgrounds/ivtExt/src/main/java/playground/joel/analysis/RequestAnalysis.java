@@ -31,6 +31,8 @@ import playground.joel.helpers.EasyDijkstra;
 public enum RequestAnalysis {
     ;
 
+    static Tensor dist = Tensors.empty();
+
     /**
      * 
      * @param requests
@@ -71,10 +73,14 @@ public enum RequestAnalysis {
      */
     public static double calcEMD(TravelData tData, VirtualNetwork virtualNetwork, LeastCostPathCalculator dijkstra, //
                                  int dt, int time) {
+        // TODO: scaling of alphaij? see: DFRDispatcher (poulation size) or LPFeedForwardDispatcher (redispatchPeriod)
+        // TODO: check correct travelData, maybe read from file
         Tensor alphaij = tData.getAlphaijforTime(time);
         AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
-        Tensor dist = Tensors.matrix((i, j) -> vLinkDistance(i,j, virtualNetwork, dijkstra, abstractVirtualNodeDest), //
-                virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
+        if (dist.length() == 0) {
+            dist = Tensors.matrix((i, j) -> vLinkDistance(i, j, virtualNetwork, dijkstra, abstractVirtualNodeDest), //
+                    virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
+        }
         RealScalar total = (RealScalar) Total.of(Total.of(alphaij.pmul(dist)));
         return total.number().doubleValue();
     }
@@ -115,7 +121,7 @@ public enum RequestAnalysis {
         Node ni = abstractVirtualNodeDest.virtualToReal(vi, false);
         Node nj = abstractVirtualNodeDest.virtualToReal(vj, true);
         return RealScalar.of(actualDistance(dijkstra, ni, nj)); // dijkstra approach
-        
+
     }
 
     // TODO make more realistic, step 1: include factor from Euclidean to Network distance, step 2: full shortest path distance (then also add for LP)
