@@ -96,10 +96,6 @@ public class AnalyzeAll {
                 distanceWCBinSize.number().doubleValue(), 100.0/distanceAnalysis.numVehicles, //
                 "% of fleet", "Distances with Customer", " km", //
                 1000, 750);
-        DiagramCreator.createDiagram(RELATIVE_DIRECTORY, "EMD", "Earth Movers Distance", //
-                DataCollector.loadScenarioData(args).EMDks.multiply(RealScalar.of(0.001)), "km");
-        DiagramCreator.createDiagram(RELATIVE_DIRECTORY, "minFleet", "Minimum Fleet Size", //
-                DataCollector.loadScenarioData(args).minFleet, "vehicles");
         UniqueDiagrams.distanceStack(RELATIVE_DIRECTORY, "stackedDistance", "Distance Partition", //
                 distanceRebalance/distance, distancePickup/distance, distanceWithCust/distance);
         UniqueDiagrams.distanceDistribution(RELATIVE_DIRECTORY, "distanceDistribution", //

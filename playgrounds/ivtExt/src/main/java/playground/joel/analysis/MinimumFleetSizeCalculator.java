@@ -35,6 +35,7 @@ import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataUtils;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.joel.helpers.EasyDijkstra;
+import playground.joel.html.DataCollector;
 
 /**
  * @author Claudio Ruch
@@ -47,7 +48,7 @@ public class MinimumFleetSizeCalculator {
     final TravelData tData;
     final int numberTimeSteps;
     final int dt;
-    public static Tensor EMDks = Tensors.empty();
+    final public static Tensor EMDks = Tensors.empty();
 
     public static void main(String[] args) throws  Exception {
         // for test purpose only
@@ -168,6 +169,13 @@ public class MinimumFleetSizeCalculator {
             }
         }
         return returnRequests;
+    }
+
+    public void plot(String[] args) throws Exception {
+        DiagramCreator.createDiagram(AnalyzeAll.RELATIVE_DIRECTORY, "EMD", "Earth Movers Distance", //
+                DataCollector.loadScenarioData(args).EMDks.multiply(RealScalar.of(0.001)), "km");
+        DiagramCreator.createDiagram(AnalyzeAll.RELATIVE_DIRECTORY, "minFleet", "Minimum Fleet Size", //
+                DataCollector.loadScenarioData(args).minFleet, "vehicles");
     }
 
 }

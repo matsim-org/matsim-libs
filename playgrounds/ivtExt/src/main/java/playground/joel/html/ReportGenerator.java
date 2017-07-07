@@ -2,6 +2,7 @@ package playground.joel.html;
 
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.sca.Ceiling;
+import org.matsim.core.utils.misc.Time;
 import playground.joel.analysis.AnalysisUtils;
 import playground.joel.analysis.AnalyzeSummary;
 
@@ -21,14 +22,6 @@ public class ReportGenerator {
     final static DecimalFormat d = new DecimalFormat("#0.00");
 
     final static double link2km = 0.001;
-
-    public static String minSec(double secs) {
-        int min = (int) Math.floor(secs/60);
-        int sec = (int) Math.round(secs % 60);
-        if (min > 0)
-            return min + " min " + sec + " sec";
-        return sec + " sec";
-    }
 
     public static void main(String[] args) throws Exception {
         from(args);
@@ -76,8 +69,8 @@ public class ReportGenerator {
                 "\nRedispatching Period:");
         htmlUtils.insertTextLeft(scenarioParameters.dispatcher + //
                 "\n" + analyzeSummary.numVehicles + //
-                "\n" + minSec(scenarioParameters.rebalancingPeriod) + //
-                "\n" + minSec(scenarioParameters.redispatchPeriod));
+                "\n" + Time.writeTime(scenarioParameters.rebalancingPeriod) + //
+                "\n" + Time.writeTime(scenarioParameters.redispatchPeriod));
         htmlUtils.newLine();
         htmlUtils.insertTextLeft("Network:" + //
                 "\nVirtual Nodes:" + //
@@ -110,10 +103,10 @@ public class ReportGenerator {
                 "\nAverage Trip Distance:" //
         );
         htmlUtils.insertTextLeft(" " + //
-                "\n" + minSec(analyzeSummary.totalWaitTimeMean.Get().number().doubleValue()) + //
-                "\n" + minSec(analyzeSummary.totalWaitTimeQuantile.Get(1).number().doubleValue()) + //
-                "\n" + minSec(analyzeSummary.totalWaitTimeQuantile.Get(2).number().doubleValue()) + //
-                "\n" + minSec(analyzeSummary.maximumWaitTime) + //
+                "\n" + Time.writeTime(analyzeSummary.totalWaitTimeMean.Get().number().doubleValue()) + //
+                "\n" + Time.writeTime(analyzeSummary.totalWaitTimeQuantile.Get(1).number().doubleValue()) + //
+                "\n" + Time.writeTime(analyzeSummary.totalWaitTimeQuantile.Get(2).number().doubleValue()) + //
+                "\n" + Time.writeTime(analyzeSummary.maximumWaitTime) + //
                 "\n" + //
                 "\n" + d.format(analyzeSummary.occupancyRatio*100) + "%" + //
                 "\n" + d.format(analyzeSummary.distanceRatio*100)+ "%" + //
@@ -132,11 +125,9 @@ public class ReportGenerator {
         if (scenarioParameters.EMDks != null) {
             htmlUtils.newLine();
             htmlUtils.insertTextLeft("Minimum Fleet Size:" + //
-                    "\nAverage Earth Movers Distance:" //
-            );
+                    "\nAverage Earth Movers Distance:");
             htmlUtils.insertTextLeft(Ceiling.of(AnalysisUtils.maximum(scenarioParameters.minFleet)).number().intValue() + //
-                    "\n" + d.format(Mean.of(scenarioParameters.EMDks).Get().number().doubleValue()*link2km) + " km"
-            );
+                    "\n" + d.format(Mean.of(scenarioParameters.EMDks).Get().number().doubleValue()*link2km) + " km");
         }
 
         htmlUtils.insertSubTitle("Wait Times");
@@ -149,10 +140,10 @@ public class ReportGenerator {
                 "\n\t95% quantile:" + //
                 "\n\tMaximum:");
         htmlUtils.insertTextLeft(" " + //
-                "\n" + minSec(analyzeSummary.totalWaitTimeMean.Get().number().doubleValue()) + //
-                "\n" + minSec(analyzeSummary.totalWaitTimeQuantile.Get(1).number().doubleValue()) + //
-                "\n" + minSec(analyzeSummary.totalWaitTimeQuantile.Get(2).number().doubleValue()) + //
-                "\n" + minSec(analyzeSummary.maximumWaitTime));
+                "\n" + Time.writeTime(analyzeSummary.totalWaitTimeMean.Get().number().doubleValue()) + //
+                "\n" + Time.writeTime(analyzeSummary.totalWaitTimeQuantile.Get(1).number().doubleValue()) + //
+                "\n" + Time.writeTime(analyzeSummary.totalWaitTimeQuantile.Get(2).number().doubleValue()) + //
+                "\n" + Time.writeTime(analyzeSummary.maximumWaitTime));
         htmlUtils.newLine();
         htmlUtils.insertImg(IMAGE_FOLDER + "/binnedWaitingTimes.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/waitBinCounter.png", 800, 600);

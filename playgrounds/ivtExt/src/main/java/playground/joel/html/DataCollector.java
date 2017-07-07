@@ -56,6 +56,7 @@ public class DataCollector {
 
         saveConfigs(args);
 
+        minimumFleetSizeCalculator.plot(args);
     }
 
     public static File report(String[] args) {

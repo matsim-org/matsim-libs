@@ -135,12 +135,4 @@ public enum RequestAnalysis {
         return dist;
     }
 
-    /*
-    public static Node virtualToReal(AbstractVirtualNodeDest abstractVirtualNodeDest, VirtualNode vNode, boolean endNode) {
-        // TODO: maybe better randomized choice over all links in vi/vj instead of just center
-        if (endNode) return abstractVirtualNodeDest.selectLinkSet(vNode, 1).get(0).getToNode();
-        return abstractVirtualNodeDest.selectLinkSet(vNode, 1).get(0).getFromNode();
-    }
-    */
-
 }
