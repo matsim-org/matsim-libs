@@ -10,6 +10,7 @@ import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -47,7 +48,7 @@ public class ScenarioServer {
 
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
-        int maxPopulationSize = 1000;
+        int maxPopulationSize = 100000;
 
 
         // set to true in order to make server wait for at least 1 client, for instance viewer client
@@ -71,6 +72,16 @@ public class ScenarioServer {
         final Population population = scenario.getPopulation();
         MatsimStaticDatabase.initializeSingletonInstance( //
                 scenario.getNetwork(), ReferenceFrame.IDENTITY);
+        
+        
+        for (String type : new String[] {"home", "shop", "leisure", "escort_kids", "escort_other", "work", "education","remote_work","remote_home"}) {
+            for (int i = 0; i <= 20; i++) {
+                ActivityParams params = new ActivityParams();
+                params.setActivityType(type + "_" + i);
+                params.setScoringThisActivityAtAll(false);
+                config.planCalcScore().addActivityParams(params);
+            }
+        }
         
         
 //        // admissible Nodes sebhoerl

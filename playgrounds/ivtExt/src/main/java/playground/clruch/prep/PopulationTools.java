@@ -4,6 +4,8 @@ package playground.clruch.prep;
 import static org.matsim.pt.PtConstants.TRANSIT_ACTIVITY_TYPE;
 
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -23,10 +25,9 @@ import org.matsim.core.utils.geometry.CoordUtils;
  */
 
 /**
- * Class iterates through plans in population file and replaces all trips by mode "av". First
- * pt_interaction activities are searched and following legs are deleted, then all remaining legs
- * are replace by <leg mode="av" dep_time="prevActivityEndTime" trav_time=
- * "NextActivityStartTime-PrevActivityEndTime"> </leg>
+ * Class iterates through plans in population file and replaces all trips by mode "av". First pt_interaction activities are searched and following
+ * legs are deleted, then all remaining legs are replace by
+ * <leg mode="av" dep_time="prevActivityEndTime" trav_time= "NextActivityStartTime-PrevActivityEndTime"> </leg>
  */
 
 public class PopulationTools {
@@ -42,37 +43,85 @@ public class PopulationTools {
 
             for (Plan plan : person.getPlans()) {
                 {
-                    // step 1: remove all mode ="pt_interaction" activities, and one subsequent leg
+                    // step 0: replace pt chains by single pt leg
                     Iterator<PlanElement> it = plan.getPlanElements().iterator();
+
+                    boolean isOnPtTrip = false;
+                    long numberOfPtTripElements = 0;
+                    Leg ptTripChainStart = null;
+
                     while (it.hasNext()) {
                         PlanElement pE = it.next();
-                        if (pE instanceof Activity) {
+
+                        if (pE instanceof Leg) {
+                            Leg leg = (Leg) pE;
+
+                            if (!isOnPtTrip) {
+                                if (leg.getMode().equals("pt") || leg.getMode().equals("transit_walk")) {
+                                    isOnPtTrip = true;
+                                    leg.setRoute(null);
+                                    numberOfPtTripElements = 1;
+                                    ptTripChainStart = leg;
+                                }
+                            } else {
+                                it.remove();
+                                numberOfPtTripElements++;
+                            }
+                        }
+
+                        if (pE instanceof Activity && isOnPtTrip) {
                             Activity act = (Activity) pE;
-                            // if act type = "pt_interaction" is deteceted, remove it and the next
-                            // element which is a pt leg.
-                            // this ensures that public transport legs are removed and the sequence
-                            // act - leg - act - leg - act - leg is preserved.
-                            if (act.getType().equals(TRANSIT_ACTIVITY_TYPE)) {
-                                it.remove(); // remove action pt interaction
-                                it.next(); // go to next leg
-                                it.remove(); // remove also this leg
+
+                            if (!act.getType().equals(TRANSIT_ACTIVITY_TYPE)) {
+                                isOnPtTrip = false;
+
+                                if (numberOfPtTripElements == 1 && ptTripChainStart.getMode().equals("transit_walk")) {
+                                    ptTripChainStart.setMode("walk");
+                                } else {
+                                    ptTripChainStart.setMode("pt");
+                                }
+                            } else {
+                                it.remove();
                             }
                         }
                     }
                 }
+
+                // {
+                // // step 1: remove all mode ="pt_interaction" activities, and one subsequent leg
+                // Iterator<PlanElement> it = plan.getPlanElements().iterator();
+                // while (it.hasNext()) {
+                // PlanElement pE = it.next();
+                // if (pE instanceof Activity) {
+                // Activity act = (Activity) pE;
+                // // if act type = "pt_interaction" is deteceted, remove it and the next
+                // // element which is a pt leg.
+                // // this ensures that public transport legs are removed and the sequence
+                // // act - leg - act - leg - act - leg is preserved.
+                // if (act.getType().equals(TRANSIT_ACTIVITY_TYPE)) {
+                // it.remove(); // remove action pt interaction
+                // it.next(); // go to next leg
+                // it.remove(); // remove also this leg
+                // }
+                // }
+                // }
+                // }
                 {
-                    // step 2: for all remaining legs set mode="av" and remove the routing
+                    // step 1: for all remaining legs set mode="av" and remove the routing
                     // information
                     for (PlanElement pE1 : plan.getPlanElements()) {
                         if (pE1 instanceof Leg) {
                             Leg leg = (Leg) pE1;
-                            leg.setMode("av"); // TODO magic const
-                            leg.setRoute(null);
+                            if (leg.getMode().equals("car") || leg.getMode().equals("pt")) {
+                                leg.setMode("av"); // TODO magic const
+                                leg.setRoute(null);
+                            }
+
                         }
                     }
                 }
                 {
-                    // step 3: consistency of departure and travel times between the av legs and the
+                    // step 2: consistency of departure and travel times between the av legs and the
                     // activities
                     double endTimeActivity = 0;
                     Leg prevLeg = null;
@@ -187,7 +236,7 @@ public class PopulationTools {
      * @param population
      */
     public static void eliminateWalking(Population population) {
-        log.info("All population elements with activity freight are removed.");
+        log.info("All population elements with walking segments removed.");
 
         Iterator<? extends Person> itPerson = population.getPersons().values().iterator();
 

@@ -54,31 +54,32 @@ public class PopulationRequestSchedule {
         for (Person person : population.getPersons().values()) {
             // System.out.println(person);
             int planCount = 0;
-            for (Plan plan : person.getPlans()) {
-                // System.out.println(" " + plan);
-                StdRequest std = null;
-                for (PlanElement pE1 : plan.getPlanElements()) {
-                    // System.out.println(" " + pE1);
-                    if (pE1 instanceof Activity) {
-                        Activity activity = (Activity) pE1;
-                        Link link = linkMap.get(activity.getLinkId());
-                        if (std != null) {
-                            std.post = link;
-                            requestScheduleUnsorted.append(requestRow(std));
-                        }
-                        std = new StdRequest(link);
+            // for (Plan plan : person.getPlans()) {
+            // System.out.println(" " + plan);
+            Plan plan = person.getSelectedPlan();
+            StdRequest std = null;
+            for (PlanElement pE1 : plan.getPlanElements()) {
+                // System.out.println(" " + pE1);
+                if (pE1 instanceof Activity) {
+                    Activity activity = (Activity) pE1;
+                    Link link = linkMap.get(activity.getLinkId());
+                    if (std != null) {
+                        std.post = link;
+                        requestScheduleUnsorted.append(requestRow(std));
                     }
-                    if (pE1 instanceof Leg) {
-                        Leg leg = (Leg) pE1;
-                        leg.getMode().equals("av");
-                        std.departureTime = leg.getDepartureTime();
-                        // System.out.println(" " + pE1);
-                    }
+                    std = new StdRequest(link);
                 }
-                ++planCount;
+                if (pE1 instanceof Leg) {
+                    Leg leg = (Leg) pE1;
+                    leg.getMode().equals("av");
+                    std.departureTime = leg.getDepartureTime();
+                    // System.out.println(" " + pE1);
+                }
             }
+            ++planCount;
+            // }
             if (planCount != 1) {
-                System.out.println("person with plans: " + planCount);
+                // System.out.println("person with plans: " + planCount);
             }
             ++personCount;
         }
