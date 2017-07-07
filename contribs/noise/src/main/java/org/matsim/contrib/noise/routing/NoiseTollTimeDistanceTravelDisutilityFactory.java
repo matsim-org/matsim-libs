@@ -26,6 +26,8 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.inject.Inject;
+
 
 /**
  * @author ikaddoura
@@ -35,14 +37,12 @@ public final class NoiseTollTimeDistanceTravelDisutilityFactory implements Trave
 
 	private double sigma = 0. ;
 	private RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory;
-	private final NoiseContext noiseContext;
-	private final PlanCalcScoreConfigGroup cnScoringGroup;
-
-	public NoiseTollTimeDistanceTravelDisutilityFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory,
-			NoiseContext noiseContext, PlanCalcScoreConfigGroup cnScoringGroup) {
-		this.noiseContext = noiseContext;
+	
+	@Inject
+	private NoiseContext noiseContext;
+	
+	public NoiseTollTimeDistanceTravelDisutilityFactory(RandomizingTimeDistanceTravelDisutilityFactory randomizedTimeDistanceTravelDisutilityFactory, PlanCalcScoreConfigGroup cnScoringGroup) {
 		this.randomizedTimeDistanceTravelDisutilityFactory = randomizedTimeDistanceTravelDisutilityFactory;
-		this.cnScoringGroup = cnScoringGroup;
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public final class NoiseTollTimeDistanceTravelDisutilityFactory implements Trave
 		return new NoiseTollTimeDistanceTravelDisutility(
 				randomizedTimeDistanceTravelDisutilityFactory.createTravelDisutility(timeCalculator),
 				this.noiseContext,
-				cnScoringGroup.getMarginalUtilityOfMoney(),
+				this.noiseContext.getScenario().getConfig().planCalcScore().getMarginalUtilityOfMoney(),
 				this.sigma
 			);
 	}

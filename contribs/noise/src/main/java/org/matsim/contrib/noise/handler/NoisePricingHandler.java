@@ -28,6 +28,8 @@ import org.matsim.contrib.noise.events.NoiseEventCaused;
 import org.matsim.contrib.noise.personLinkMoneyEvents.PersonLinkMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import com.google.inject.Inject;
+
 
 /**
  * This handler calculates agent money events based on the noise damages an agent may cause (NoiseEventCaused).
@@ -37,15 +39,13 @@ import org.matsim.core.api.experimental.events.EventsManager;
  */
 public class NoisePricingHandler implements NoiseEventCausedHandler {
 
+	@Inject
+	private EventsManager events;
+	
+	@Inject
+	private NoiseContext noiseContext;
 
-	private final EventsManager events;
 	private double amountSum = 0.;
-	private final NoiseContext noiseContext;
-
-	public NoisePricingHandler(EventsManager eventsManager, NoiseContext noiseContext) {
-		this.events = eventsManager;
-		this.noiseContext = noiseContext;
-	}
 
 	@Override
 	public void reset(int iteration) {

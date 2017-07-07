@@ -84,11 +84,16 @@ public class NoiseOfflineCalculation {
 				
 		EventsManager events = EventsUtils.createEventsManager();
 
-		timeTracker = new NoiseTimeTracker(noiseContext, events, outputFilePath);
+		timeTracker = new NoiseTimeTracker();
+		timeTracker.setNoiseContext(noiseContext);
+		timeTracker.setEvents(events);
+		timeTracker.setOutputFilePath(outputFilePath);
+		
 		events.addHandler(timeTracker);
 		
 		if (noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
-			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation(noiseContext);
+			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation();
+			linkSpeedCalculator.setNoiseContext(noiseContext);
 			events.addHandler(linkSpeedCalculator);	
 		}
 		

@@ -25,8 +25,8 @@ package org.matsim.contrib.noise.examples;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.noise.NoiseCalculationOnline;
 import org.matsim.contrib.noise.NoiseConfigGroup;
+import org.matsim.contrib.noise.NoiseModule;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.core.config.Config;
@@ -56,7 +56,8 @@ public class NoiseOnlineControlerExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
 		Controler controler = new Controler(scenario);
-		controler.addControlerListener(new NoiseCalculationOnline(controler));
+		controler.addOverridingModule(new NoiseModule(scenario));
+		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 				
