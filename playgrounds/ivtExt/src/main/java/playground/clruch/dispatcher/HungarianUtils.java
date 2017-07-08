@@ -24,59 +24,44 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public enum HungarianUtils {
     ;
-    // ---
-    public static Tensor globalBipartiteMatching(UniversalDispatcher dispatcher, Supplier<Collection<VehicleLinkPair>> supplier, Map<Link, List<AVRequest>> requestsIn) {
-        // assign new destination to vehicles with bipartite matching
 
-        Tensor returnTensor = Tensors.empty();
+    /**
+     * @param dispatcher
+     *            univeralDispatcher from where call takes place
+     * @param supplier
+     *            supplier for VehicleLinkPairs (divertble Vehicles)
+     * @param requests
+     *            open requests
+     * @return does assignment according to globalBipartiteMatching and returns a tensor with infoline Information
+     */
+    public static Tensor globalBipartiteMatching(UniversalDispatcher dispatcher, Supplier<Collection<VehicleLinkPair>> supplier,
+            Map<Link, List<AVRequest>> requests) {
 
-        Map<Link, List<AVRequest>> requests = requestsIn;
+        Tensor returnTensor = Tensors.empty(); // contains information for InfoLine
 
-        // reduce the number of requests for a smaller running time
-        // take out and match request-vehicle pairs with distance zero
-        List<Link> requestlocs = requests.values().stream() //
-                .flatMap(List::stream) // all from links of all requests with
-                .map(AVRequest::getFromLink) // multiplicity
-                .collect(Collectors.toList());
+        // generate a list of request links (there can be multiple entries)
+        List<Link> requestLinks = requests.values().stream() //
+                .flatMap(List::stream).map(AVRequest::getFromLink).collect(Collectors.toList());
 
-        {
-            // call getDivertableVehicles again to get remaining vehicles
-            Collection<VehicleLinkPair> divertableVehicles = supplier.get();
-
-            returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requestlocs.size()));
-
-            // this call removes the matched links from requestlocs
-            new ImmobilizeVehicleDestMatcher().match(divertableVehicles, requestlocs) //
-                    .entrySet().forEach(dispatcher::setVehicleDiversion);
-        }
-
-        /*
-         * // only select MAXMATCHNUMBER of oldest requests
-         * Collection<AVRequest> avRequests = requests.values().stream().flatMap(v -> v.stream()).collect(Collectors.toList());
-         * Collection<AVRequest> avRequestsReduced = requestSelector.selectRequests(divertableVehicles, avRequests, MAXMATCHNUMBER);
-         */
-
-        // call getDivertableVehicles again to get remaining vehicles
+        // 1) immobilize all vehicles which are on the same location as a request
         Collection<VehicleLinkPair> divertableVehicles = supplier.get();
+        returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requestLinks.size())); // initial problem size
+        new ImmobilizeVehicleDestMatcher().match(divertableVehicles, requestLinks) //
+                .entrySet().forEach(dispatcher::setVehicleDiversion);
 
-        // in case requests >> divertablevehicles or divertablevehicles >> requests reduce the search space using kd-trees
-        returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requestlocs.size()));
-        List<Link> requestlocsCut = reduceRequestsKDTree(requestlocs, divertableVehicles);
-        Collection<VehicleLinkPair> divertableVehiclesCut = reduceVehiclesKDTree(requestlocs, divertableVehicles);
+        // 2) in case requests >> divertablevehicles or divertablevehicles >> requests reduce the search space using kd-trees
+        divertableVehicles.clear();
+        divertableVehicles = supplier.get();
+        returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requestLinks.size())); // problem size after immobilizing
+        List<Link> requestlocsCut = reduceRequestsKDTree(requestLinks, divertableVehicles);
+        Collection<VehicleLinkPair> divertableVehiclesCut = reduceVehiclesKDTree(requestLinks, divertableVehicles);
         returnTensor.append(Tensors.vectorInt(divertableVehiclesCut.size(), requestlocsCut.size()));
 
-        // System.out.println("number of available vehicles before cutting: " + divertableVehicles.size());
-        // System.out.println("number of available vehicles after cutting: " + divertableVehiclesCut.size());
-        // System.out.println("number of requests before cutting: " + requestlocs.size());
-        // System.out.println("number of requetss after cutting:" + requestlocsCut.size());
+        // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method
+        new HungarBiPartVehicleDestMatcher().match(divertableVehicles, requestlocsCut) //
+                .entrySet().forEach(dispatcher::setVehicleDiversion);
 
-        {
-
-            // find the Euclidean bipartite matching for all vehicles using the Hungarian method
-            new HungarBiPartVehicleDestMatcher().match(divertableVehicles, requestlocsCut) //
-                    .entrySet().forEach(dispatcher::setVehicleDiversion);
-        }
-
+        // return infoLine
         return returnTensor;
     }
 
