@@ -12,6 +12,7 @@ import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.Time;
 import playground.clruch.ScenarioServer;
+import playground.clruch.net.StorageUtils;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.GlobalAssert;
@@ -35,9 +36,9 @@ import java.util.zip.DataFormatException;
  */
 public class DataCollector {
 
-    static File avConfigOld;
+    public static File avConfigOld;
     static File folder;
-    static File avOld;
+    public static File avOld;
     static File avConfig;
     static File av;
 
@@ -57,11 +58,7 @@ public class DataCollector {
     }
 
     public static File report(String[] args) {
-        avConfigOld = new File(args[0]);
-        folder = avConfigOld.getParentFile();
-        avOld = new File(folder, "av.xml");
-
-        return new File(folder, "output/report");
+        return new File(StorageUtils.OUTPUT, "report");
     }
 
     public static void saveConfigs(String[] args) throws Exception {
@@ -105,7 +102,7 @@ public class DataCollector {
     }
 
     public static void readStopwatch(String[] args) {
-        File stopwatch = new File((new File(args[0])).getParent(), "output/stopwatch.txt");
+        File stopwatch = new File(StorageUtils.OUTPUT, "stopwatch.txt");
         try {
             BufferedReader reader = new BufferedReader(new FileReader(stopwatch));
             String startTime = "00:00:00";

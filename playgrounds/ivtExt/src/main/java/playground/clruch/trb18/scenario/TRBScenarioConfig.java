@@ -30,5 +30,5 @@ public class TRBScenarioConfig {
     public int dtTravelData = 300;
     public String travelDataFileName = "travelData";
 
-    public long maximumNumberOfAgents = 1000;
+    public long maximumNumberOfAgents = Long.MAX_VALUE;
 }

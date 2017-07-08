@@ -1,5 +1,6 @@
 package playground.joel.html;
 
+import playground.clruch.net.StorageUtils;
 import playground.joel.analysis.AnalyzeSummary;
 
 import java.io.File;
@@ -25,7 +26,7 @@ public class ReportGenerator {
 
     public static void from(String[] args) throws Exception {
         File config = new File(args[0]);
-        File file = new File(config.getParent(), "output/report");
+        File file = new File(StorageUtils.OUTPUT, "report");
         file.mkdir();
 
         ScenarioParameters scenarioParameters = DataCollector.loadScenarioData(args);

@@ -73,7 +73,8 @@ public class ScenarioServer {
 
         File configFile = new File(args[0]);
         //Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
+        AVConfigGroup avConfigGroup = new AVConfigGroup();
+        Config config = ConfigUtils.loadConfig(configFile.toString(), avConfigGroup, dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
 
@@ -144,6 +145,9 @@ public class ScenarioServer {
 
         AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
         //AnalyzeMarc.analyze(args);
+
+        DataCollector.avConfigOld = configFile;
+        DataCollector.avOld = new File(avConfigGroup.getConfigPath());
 
         DataCollector.store(args, controler, analyzeSummary, scenarioParameters);
 
