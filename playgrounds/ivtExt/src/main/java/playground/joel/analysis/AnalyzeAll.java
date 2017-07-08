@@ -20,13 +20,14 @@ import ch.ethz.idsc.tensor.io.MatlabExport;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
+import playground.clruch.net.StorageUtils;
 import playground.joel.data.TotalData;
 
 /**
  * Created by Joel on 05.04.2017.
  */
 public class AnalyzeAll {
-    public static final File RELATIVE_DIRECTORY = new File("output", "data");
+    public static final File RELATIVE_DIRECTORY = new File(StorageUtils.OUTPUT, "data");
     public static final boolean filter = true;  // filter size can be adapted in the diagram creator
     public static final double maxWaitingTime = 20.0; // maximally displayed waiting time in minutes
 
@@ -47,13 +48,13 @@ public class AnalyzeAll {
     }
 
     public static void saveFile(Tensor table, String name) throws Exception {
-        Files.write(Paths.get("output/data/" + name + ".csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
-        Files.write(Paths.get("output/data/" + name + ".mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
-        Files.write(Paths.get("output/data/" + name + ".m"), (Iterable<String>) MatlabExport.of(table)::iterator);
+        Files.write(Paths.get(StorageUtils.OUTPUT.getAbsolutePath() + "/data/" + name + ".csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
+        Files.write(Paths.get(StorageUtils.OUTPUT.getAbsolutePath() + "/data/" + name + ".mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
+        Files.write(Paths.get(StorageUtils.OUTPUT.getAbsolutePath() + "/data/" + name + ".m"), (Iterable<String>) MatlabExport.of(table)::iterator);
     }
 
     static void plot(String csv, String name, String title, int from, int to, Double maxRange) throws Exception {
-        Tensor table = CsvFormat.parse(Files.lines(Paths.get("output/data/" + csv + ".csv")));
+        Tensor table = CsvFormat.parse(Files.lines(Paths.get(StorageUtils.OUTPUT.getAbsolutePath() + "/data/" + csv + ".csv")));
         table = Transpose.of(table);
         try {
             DiagramCreator.createDiagram(RELATIVE_DIRECTORY, name, title, table.get(0), table.extract(from, to), //
@@ -148,7 +149,7 @@ public class AnalyzeAll {
     public static AnalyzeSummary analyze(String[] args) throws Exception {
 
         File config = new File(args[0]);
-        File data = new File(config.getParent(), "output/data");
+        File data = new File(StorageUtils.OUTPUT, "data");
         data.mkdir();
 
         // load system network
@@ -156,7 +157,7 @@ public class AnalyzeAll {
 
         // load coordinate system
         // TODO later remove hard-coded
-        MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SIOUXFALLS);
+        MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SWITZERLAND);
 
         // load simulation data
         StorageSupplier storageSupplier = StorageSupplier.getDefault();
