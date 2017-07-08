@@ -11,6 +11,7 @@ package playground.clruch.dispatcher;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -122,6 +123,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             // generate routing instructions for rebalancing vehicles
             Map<VirtualNode, List<Link>> destinationLinks = createvNodeLinksMap();
 
+
             // fill rebalancing destinations
             for (int i = 0; i < nVLinks; ++i) {
                 VirtualLink virtualLink = this.virtualNetwork.getVirtualLink(i);
@@ -135,6 +137,16 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             // consistency check: rebalancing destination links must not exceed
             // available vehicles in virtual node
             Map<VirtualNode, List<VehicleLinkPair>> finalAvailableVehicles = availableVehicles;
+
+            // Fix (???): randomly remove links so there are not too many
+            for (Map.Entry<VirtualNode, List<Link>> entry : destinationLinks.entrySet()) {
+                Collections.shuffle(entry.getValue());
+
+                while (finalAvailableVehicles.get(entry.getKey()).size() < entry.getValue().size()) {
+                    entry.getValue().remove(0);
+                }
+            }
+
             GlobalAssert.that(!virtualNetwork.getVirtualNodes().stream()
                     .filter(v -> finalAvailableVehicles.get(v).size() < destinationLinks.get(v).size()).findAny().isPresent());
 
