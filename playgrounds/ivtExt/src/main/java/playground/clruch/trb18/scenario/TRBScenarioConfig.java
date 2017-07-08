@@ -29,4 +29,6 @@ public class TRBScenarioConfig {
     public String virtualNetworkFileName = "virtualNetwork";
     public int dtTravelData = 300;
     public String travelDataFileName = "travelData";
+
+    public long maximumNumberOfAgents = 1000;
 }

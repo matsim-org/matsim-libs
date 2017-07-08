@@ -67,17 +67,19 @@ public class RunTRBScenarioBuilder {
         // --> Now all agents that MAY use AVs in the specified area have an (unselected) plan with AV trip within the area
         //     See TRBPlanModifier for how a plan and/or a trip is eligible to be converted to AV
 
-        // Extract reduced population (only the AV agents) for further processing with VirtualNetwork etc.
-        Population reducedPopulation = new TRBReducedPopulationExtractor().run(population);
-
-        // --> This can be used to generate the virtual network and to find the requests for the LP Feedfoward Dispatcher
-
         // Clean up useless (or unwanted) stuff
         new TRBSlowModeCleaner().clean(population);
 
         if (scenarioConfig.removeBackgroundTraffic) {
             new TRBBackgroundTrafficCleaner().clean(population);
         }
+
+        // Optionally, remove agents until a maximum number of agents is reached
+        new TRBPopulationDecimiser(new Random(0L)).decimise(population, scenarioConfig.maximumNumberOfAgents);
+
+        // Extract reduced population (only the AV agents) for further processing with VirtualNetwork etc.
+        Population reducedPopulation = new TRBReducedPopulationExtractor().run(population);
+        // --> This can be used to generate the virtual network and to find the requests for the LP Feedfoward Dispatcher
 
         // --> Now population does not contain slow-mode agents and maybe also no background traffic!
 
@@ -126,7 +128,7 @@ public class RunTRBScenarioBuilder {
         prs.exportCsv();
 
         Population travelDataPopulation = createTravelDataPopulation(reducedPopulation);
-        TravelData travelData = new TravelData(virtualNetwork, filteredNetwork, reducedPopulation, scenarioConfig.dtTravelData);
+        TravelData travelData = new TravelData(virtualNetwork, filteredNetwork, travelDataPopulation, scenarioConfig.dtTravelData);
         TravelDataIO.toByte(new File(virtualNetworkOutputDirectory, scenarioConfig.travelDataFileName), travelData);
     }
 

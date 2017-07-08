@@ -70,7 +70,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
         @Inject
         private EventsManager eventsManager;
 
-        @Inject
+        @Inject @Named("trb_reduced")
         private Network network;
 
         @Override

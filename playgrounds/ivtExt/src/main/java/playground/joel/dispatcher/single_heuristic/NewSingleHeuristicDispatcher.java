@@ -185,7 +185,7 @@ public class NewSingleHeuristicDispatcher extends BindingUniversalDispatcher {
         @Inject
         private EventsManager eventsManager;
 
-        @Inject
+        @Inject @Named("trb_reduced")
         private Network network;
 
         @Override
