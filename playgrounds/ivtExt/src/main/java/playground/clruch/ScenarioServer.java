@@ -24,6 +24,7 @@ import playground.clruch.net.StorageUtils;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
 import playground.clruch.trb18.TRBModule;
+import playground.clruch.trb18.scenario.TRBScenarioConfig;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.joel.analysis.AnalyzeAll;
@@ -70,13 +71,13 @@ public class ScenarioServer {
 
 
         Network reducedNetwork = NetworkUtils.createNetwork();
-        new MatsimNetworkReader(reducedNetwork).readFile("reduced_network.xml.gz");
+        new MatsimNetworkReader(reducedNetwork).readFile(new TRBScenarioConfig().filteredNetworkOutputPath);
 
 
 
 
         MatsimStaticDatabase.initializeSingletonInstance( //
-                reducedNetwork, ReferenceFrame.IDENTITY);
+                reducedNetwork, ReferenceFrame.SWITZERLAND);
         
         
 //        // admissible Nodes sebhoerl

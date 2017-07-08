@@ -9,8 +9,12 @@ import playground.clruch.data.ReferenceFrame;
 import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.net.MatsimStaticDatabase;
+import playground.clruch.net.StorageUtils;
 import playground.clruch.netdata.VirtualNetworkGet;
+import playground.clruch.trb18.scenario.TRBScenarioConfig;
 import playground.clruch.utils.NetworkLoader;
+
+import java.io.File;
 
 /**
  * the viewer allows to connect to the scenario server
@@ -27,11 +31,14 @@ public class ScenarioViewer {
 
         ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
 
+        StorageUtils.OUTPUT = new File(args[0]);
+        StorageUtils.DIRECTORY = new File(StorageUtils.OUTPUT, "simobj");
+
         // END: CUSTOMIZE -------------------------------------------------
 
         //Network network = NetworkLoader.loadNetwork(args);
         Network network = NetworkUtils.createNetwork();
-        new MatsimNetworkReader(network).readFile("reduced_network.xml.gz");
+        new MatsimNetworkReader(network).readFile(new TRBScenarioConfig().filteredNetworkOutputPath);
 
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         MatsimMapComponent matsimJMapViewer = new MatsimMapComponent(MatsimStaticDatabase.INSTANCE);

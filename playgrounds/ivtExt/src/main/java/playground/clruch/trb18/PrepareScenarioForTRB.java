@@ -154,13 +154,6 @@ public class PrepareScenarioForTRB {
         }
     }
 
-    public void addBackgroundTraffic(Population population, List<Person> backgroundTraffic) {
-        for (Person person : backgroundTraffic) {
-            population.addPerson(person);
-            population.getPersonAttributes().putAttribute(person.getId().toString(), "subpopulation", "background");
-        }
-    }
-
     public void applyAVToNetwork(Network network, Network reducedNetwork) {
         for (Id<Link> linkId : reducedNetwork.getLinks().keySet()) {
             Link link = network.getLinks().get(linkId);
@@ -424,6 +417,9 @@ public class PrepareScenarioForTRB {
         Iterator<PlanElement> iterator = plan.getPlanElements().iterator();
         boolean isOnPtLeg = false;
 
+        Leg initialPtLeg = null;
+        long numberOfLegs = 0;
+
         while (iterator.hasNext()) {
             PlanElement element = iterator.next();
 
@@ -433,10 +429,13 @@ public class PrepareScenarioForTRB {
                 if (leg.getMode().equals(TransportMode.pt) || leg.getMode().equals(TransportMode.transit_walk)) {
                     if (isOnPtLeg) {
                         iterator.remove();
+                        numberOfLegs++;
                     } else {
                         isOnPtLeg = true;
-                        leg.setMode(TransportMode.pt);
+                        initialPtLeg = leg;
+                        //leg.setMode(TransportMode.pt);
                         leg.setRoute(null);
+                        numberOfLegs = 1;
                     }
                 }
             }
@@ -446,6 +445,12 @@ public class PrepareScenarioForTRB {
                     iterator.remove();
                 } else {
                     isOnPtLeg = false;
+
+                    if (initialPtLeg.getMode().equals("transit_walk") && numberOfLegs == 1) {
+                        initialPtLeg.setMode("walk");
+                    } else {
+                        initialPtLeg.setMode("pt");
+                    }
                 }
             }
         }
