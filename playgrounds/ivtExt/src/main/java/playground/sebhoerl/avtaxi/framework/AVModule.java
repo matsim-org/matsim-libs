@@ -35,7 +35,10 @@ import playground.clruch.dispatcher.LPFeedforwardDispatcher;
 import playground.clruch.dispatcher.NotAsDumbDispatcher;
 import playground.clruch.dispatcher.PulseDispatcher;
 import playground.clruch.dispatcher.SelfishDispatcher;
-import playground.fseccamo.dispatcher.MPCDispatcher_1;
+import playground.fseccamo.dispatcher.MPCDispatcher1;
+import playground.fseccamo.dispatcher.MPCDispatcher2;
+import playground.joel.dispatcher.MultiGBM.MonoMultiGBMDispatcher;
+import playground.joel.dispatcher.MultiGBM.PolyMultiGBMDispatcher;
 import playground.joel.dispatcher.single_heuristic.NewSingleHeuristicDispatcher; // TODO: delete this or the other
 import playground.maalbert.dispatcher.DFRDispatcher;
 import playground.sebhoerl.avtaxi.config.AVConfig;
@@ -52,6 +55,7 @@ import playground.sebhoerl.avtaxi.dispatcher.single_fifo.SingleFIFODispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SingleHeuristicDispatcher;
 import playground.sebhoerl.avtaxi.generator.AVGenerator;
 import playground.sebhoerl.avtaxi.generator.PopulationDensityGenerator;
+import playground.sebhoerl.avtaxi.generator.RandomDensityGenerator;
 import playground.sebhoerl.avtaxi.replanning.AVOperatorChoiceStrategy;
 import playground.sebhoerl.avtaxi.routing.AVParallelRouterFactory;
 import playground.sebhoerl.avtaxi.routing.AVRoute;
@@ -126,6 +130,12 @@ public class AVModule extends AbstractModule {
         bind(NewSingleHeuristicDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), NewSingleHeuristicDispatcher.class.getSimpleName()).to(NewSingleHeuristicDispatcher.Factory.class);
 
+        bind(MonoMultiGBMDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), MonoMultiGBMDispatcher.class.getSimpleName()).to(MonoMultiGBMDispatcher.Factory.class);
+
+        bind(PolyMultiGBMDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), PolyMultiGBMDispatcher.class.getSimpleName()).to(PolyMultiGBMDispatcher.Factory.class);
+
         /** dispatchers for PartitionedDispatcher */
         //bind(ConsensusDispatcherDFR.Factory.class);
         bind(LPFeedbackLIPDispatcher.Factory.class);
@@ -137,14 +147,19 @@ public class AVModule extends AbstractModule {
         AVUtils.bindDispatcherFactory(binder(), DFRDispatcher.class.getSimpleName()).to(DFRDispatcher.Factory.class);
         
         // MPC dispatcher
-        bind(MPCDispatcher_1.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher_1.class.getSimpleName()).to(MPCDispatcher_1.Factory.class);
+        bind(MPCDispatcher1.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher1.class.getSimpleName()).to(MPCDispatcher1.Factory.class);
+        bind(MPCDispatcher2.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher2.class.getSimpleName()).to(MPCDispatcher2.Factory.class);
         
     }
 
     private void configureGeneratorStrategies() {
         bind(PopulationDensityGenerator.Factory.class);
         AVUtils.bindGeneratorFactory(binder(), "PopulationDensity").to(PopulationDensityGenerator.Factory.class);
+
+        bind(RandomDensityGenerator.Factory.class);
+        AVUtils.bindGeneratorFactory(binder(), "RandomDensity").to(RandomDensityGenerator.Factory.class);
     }
 
     @Provides

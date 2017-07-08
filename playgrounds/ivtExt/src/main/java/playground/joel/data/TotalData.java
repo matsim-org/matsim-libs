@@ -68,7 +68,7 @@ public class TotalData <Type> {
             xmlOutput.setFormat(Format.getPrettyFormat());
             xmlOutput.output(doc, new FileWriter(file));
 
-            System.out.println("exported " + file.getName());
+            System.out.println("Exported " + file.getName());
         } catch (IOException io) {
             System.out.println(io.getMessage());
         }

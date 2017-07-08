@@ -25,12 +25,12 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 public enum HungarianUtils {
     ;
     // ---
-    public static Tensor globalBipartiteMatching(UniversalDispatcher dispatcher, Supplier<Collection<VehicleLinkPair>> supplier) {
+    public static Tensor globalBipartiteMatching(UniversalDispatcher dispatcher, Supplier<Collection<VehicleLinkPair>> supplier, Map<Link, List<AVRequest>> requestsIn) {
         // assign new destination to vehicles with bipartite matching
 
         Tensor returnTensor = Tensors.empty();
 
-        Map<Link, List<AVRequest>> requests = dispatcher.getAVRequestsAtLinks();
+        Map<Link, List<AVRequest>> requests = requestsIn;
 
         // reduce the number of requests for a smaller running time
         // take out and match request-vehicle pairs with distance zero

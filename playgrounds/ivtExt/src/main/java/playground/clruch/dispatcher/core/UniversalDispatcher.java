@@ -21,6 +21,7 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.clruch.ScenarioServer;
 import playground.clruch.net.SimulationDistribution;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationObjectCompiler;
@@ -41,19 +42,19 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
- * purpose of {@link UniversalDispatcher} is to collect and manage {@link AVRequest}s
- * alternative implementation of {@link AVDispatcher}; supersedes {@link AbstractDispatcher}.
+ * purpose of {@link UniversalDispatcher} is to collect and manage {@link AVRequest}s alternative implementation of {@link AVDispatcher}; supersedes
+ * {@link AbstractDispatcher}.
  */
 public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final FuturePathFactory futurePathFactory;
 
     protected final Set<AVRequest> pendingRequests = new LinkedHashSet<>(); // access via getAVRequests()
     private final Set<AVRequest> matchedRequests = new HashSet<>(); // for data integrity, private!
+    private final Set<AVRequest> publishPeriodMatchedRequests = new HashSet<>(); // requests which are matched within a publish period.
     private final Map<AVVehicle, Link> vehiclesWithCustomer = new HashMap<>();
 
     /**
-     * map stores most recently known location of vehicles.
-     * map is used in case obtaining the vehicle location fails
+     * map stores most recently known location of vehicles. map is used in case obtaining the vehicle location fails
      */
     private final Map<AVVehicle, Link> vehicleLocations = new HashMap<>();
 
@@ -107,8 +108,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     }
 
     /**
-     * function call leaves the state of the {@link UniversalDispatcher} unchanged.
-     * successive calls to the function return the identical collection.
+     * function call leaves the state of the {@link UniversalDispatcher} unchanged. successive calls to the function return the identical collection.
      * 
      * @return collection of all requests that have not been matched
      */
@@ -119,8 +119,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     }
 
     /**
-     * function call leaves the state of the {@link UniversalDispatcher} unchanged.
-     * successive calls to the function return the identical collection.
+     * function call leaves the state of the {@link UniversalDispatcher} unchanged. successive calls to the function return the identical collection.
      * 
      * @return list of {@link AVRequest}s grouped by link
      */
@@ -130,11 +129,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     }
 
     /**
-     * assigns new destination to vehicle.
-     * if vehicle is already located at destination, nothing happens.
+     * assigns new destination to vehicle. if vehicle is already located at destination, nothing happens.
      * 
-     * in one pass of redispatch(...), the function setVehicleDiversion(...)
-     * may only be invoked once for a single vehicle (specified in vehicleLinkPair).
+     * in one pass of redispatch(...), the function setVehicleDiversion(...) may only be invoked once for a single vehicle (specified in
+     * vehicleLinkPair).
      *
      * @param vehicleLinkPair
      *            is provided from super.getDivertableVehicles()
@@ -194,8 +192,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     }
 
     /**
-     * Function called from derived class to match a vehicle with a request. The function appends
-     * the pick-up, drive, and drop-off tasks for the car.
+     * Function called from derived class to match a vehicle with a request. The function appends the pick-up, drive, and drop-off tasks for the car.
      * 
      * @param avVehicle
      *            vehicle in {@link AVStayTask} in order to match the request
@@ -207,6 +204,11 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
         boolean status = matchedRequests.add(avRequest);
         GlobalAssert.that(status); // matchedRequests did not already contain avRequest
+
+        // save avRequests which are matched for one publishPeriod to ensure
+        // no requests are lost in the recording.
+
+        publishPeriodMatchedRequests.add(avRequest);
 
         final Schedule schedule = avVehicle.getSchedule();
         // check that current task is last task in schedule
@@ -275,7 +277,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         if (publishPeriod > 0 && round_now % publishPeriod == 0) {
             SimulationObjectCompiler simulationObjectCompiler = SimulationObjectCompiler.create( //
                     round_now, getInfoLine(), total_matchedRequests);
-            simulationObjectCompiler.addRequests(getAVRequests());
+
+            simulationObjectCompiler.addRequests(publishPeriodMatchedRequests); // adding requests submittend and matched within current publish period
+            simulationObjectCompiler.addRequests(getAVRequests()); // adding requests open in >=1 publish periods
             simulationObjectCompiler.addVehiclesWithCustomer(getVehiclesWithCustomer(), vehicleLocations);
             simulationObjectCompiler.addRebalancingVehicles(getRebalancingVehicles(), vehicleLocations);
             SimulationObject simulationObject = simulationObjectCompiler.compile( //
@@ -287,6 +291,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 // GlobalAssert.that(AVVEHILCECOUNT == simulationObject.vehicles.size());
                 SimulationDistribution.of(simulationObject); // store simObj and distribute to clients
             }
+            publishPeriodMatchedRequests.clear();
         }
     }
 
@@ -303,6 +308,24 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 super.getInfoLine(), //
                 getAVRequests().size(), //
                 total_matchedRequests);
+    }
+
+    public int getDispatchPeriod(SafeConfig safeConfig, int alt) {
+        int redispatchPeriod = safeConfig.getInteger("dispatchPeriod", alt);
+        ScenarioServer.scenarioParameters.redispatchPeriod = redispatchPeriod;
+        return redispatchPeriod;
+    }
+
+    public int getDispatchPeriod(AVDispatcherConfig config) {
+        int redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
+        ScenarioServer.scenarioParameters.redispatchPeriod = redispatchPeriod;
+        return redispatchPeriod;
+    }
+
+    public int getRebalancingPeriod(AVDispatcherConfig config) {
+        int rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+        ScenarioServer.scenarioParameters.rebalancingPeriod = rebalancingPeriod;
+        return rebalancingPeriod;
     }
 
 }

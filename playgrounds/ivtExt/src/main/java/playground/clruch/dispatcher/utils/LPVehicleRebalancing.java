@@ -102,7 +102,6 @@ public class LPVehicleRebalancing {
                 GLPK.glp_set_row_name(lp, eq, constr_name);
                 GLPK.glp_set_row_bnds(lp, eq, GLPKConstants.GLP_LO, -1.0, 0.0);
 
-                System.out.println("n= " + n);
 
                 // set the entries of the coefficient matrix A
                 {

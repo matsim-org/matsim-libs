@@ -11,6 +11,7 @@ import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -28,6 +29,10 @@ import playground.clruch.trb18.scenario.TRBScenarioConfig;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.joel.analysis.AnalyzeAll;
+import playground.joel.analysis.AnalyzeSummary;
+import playground.joel.html.DataCollector;
+import playground.joel.html.ReportGenerator;
+import playground.joel.html.ScenarioParameters;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -43,17 +48,21 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
  */
 public class ScenarioServer {
 
+    public static ScenarioParameters scenarioParameters;
+
     public static void main(String[] args) throws MalformedURLException, Exception {
 
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
-        int maxPopulationSize = 80000;
+        int maxPopulationSize = 100000;
 
 
         // set to true in order to make server wait for at least 1 client, for instance viewer client
         boolean waitForClients = false;
 
         // END: CUSTOMIZE -------------------------------------------------
+
+        scenarioParameters = new ScenarioParameters();
 
         // open server port for clients to connect to
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
@@ -78,6 +87,16 @@ public class ScenarioServer {
 
         MatsimStaticDatabase.initializeSingletonInstance( //
                 reducedNetwork, ReferenceFrame.SWITZERLAND);
+        
+        
+        for (String type : new String[] {"home", "shop", "leisure", "escort_kids", "escort_other", "work", "education","remote_work","remote_home"}) {
+            for (int i = 0; i <= 20; i++) {
+                ActivityParams params = new ActivityParams();
+                params.setActivityType(type + "_" + i);
+                params.setScoringThisActivityAtAll(false);
+                config.planCalcScore().addActivityParams(params);
+            }
+        }
         
         
 //        // admissible Nodes sebhoerl
@@ -116,15 +135,19 @@ public class ScenarioServer {
 //            }
 //        });
 
-
         StorageUtils.OUTPUT = new File(config.controler().getOutputDirectory());
         StorageUtils.DIRECTORY = new File(StorageUtils.OUTPUT, "simobj");
 
         controler.run();
-        
+
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
-        //AnalyzeAll.analyze(args);
+        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
         //AnalyzeMarc.analyze(args);
+
+        DataCollector.store(args, controler, analyzeSummary, scenarioParameters);
+
+        ReportGenerator.from(args);
+
     }
 }

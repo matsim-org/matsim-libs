@@ -5,7 +5,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
+import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.red.Total;
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.tensor.RealScalar;
@@ -19,6 +22,8 @@ public class VehicleStatistic {
 
     public final Tensor distanceTotal;
     public final Tensor distanceWithCustomer;
+    public final Tensor distancePickup;
+    public final Tensor distanceRebalance;
 
     private int lastIndex = -1;
     private int offset = -1;
@@ -28,6 +33,8 @@ public class VehicleStatistic {
     public VehicleStatistic(int tics_max) {
         distanceTotal = Array.zeros(tics_max);
         distanceWithCustomer = Array.zeros(tics_max);
+        distancePickup = Array.zeros(tics_max);
+        distanceRebalance = Array.zeros(tics_max);
     }
 
     public void register(int tics, VehicleContainer vehicleContainer) {
@@ -64,8 +71,14 @@ public class VehicleStatistic {
                 switch (vehicleContainer.avStatus) {
                 case DRIVEWITHCUSTOMER:
                     distanceWithCustomer.set(contrib, index);
+                    distanceTotal.set(contrib, index); // applies to all three
+                    break;
                 case DRIVETOCUSTMER:
+                    distancePickup.set(contrib, index);
+                    distanceTotal.set(contrib, index); // applies to all three
+                    break;
                 case REBALANCEDRIVE:
+                    distanceRebalance.set(contrib, index);
                     distanceTotal.set(contrib, index); // applies to all three
                     break;
                 default:
@@ -74,6 +87,15 @@ public class VehicleStatistic {
                 ++count;
             }
         }
+    }
+
+    public Tensor totalDistances() {
+        Tensor distances = Tensors.empty();
+        distances.append(Total.of(distanceTotal));
+        distances.append(Total.of(distanceWithCustomer));
+        distances.append(Total.of(distancePickup));
+        distances.append(Total.of(distanceRebalance));
+        return distances;
     }
 
 }

@@ -61,8 +61,6 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
             for (Plan plan : person.getPlans()) {
                 for (PlanElement planElem : plan.getPlanElements()) {
                     if (planElem instanceof Activity) {
-                        //double x = ((Activity) planElem).getCoord().getX();
-                        //double y = ((Activity) planElem).getCoord().getY();
                         double x = network.getLinks().get(((Activity) planElem).getLinkId()).getCoord().getX();
                         double y = network.getLinks().get(((Activity) planElem).getLinkId()).getCoord().getY();
                         dataList.add(new double[] { x, y });
