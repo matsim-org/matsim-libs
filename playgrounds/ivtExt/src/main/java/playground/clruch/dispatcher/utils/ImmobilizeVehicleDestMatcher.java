@@ -16,24 +16,30 @@ import java.util.*;
  * Created by Claudio on 3/10/2017.
  */
 public class ImmobilizeVehicleDestMatcher extends AbstractVehicleDestMatcher {
- 
+
     // TODO the current implementation is O(n*m), this could be improved
+    /**
+     * for every request, it immobilizes one vehicle which is on the same link as the request
+     */
     @Override
     protected Map<VehicleLinkPair, Link> protected_match(Collection<VehicleLinkPair> vehicleLinkPairs, List<Link> links) {
+        // create map with the pairs
         Map<VehicleLinkPair, Link> returnmap = new HashMap<>();
-        for (VehicleLinkPair vehicleLinkPair : vehicleLinkPairs) {
-            int i = 0;
-            while (i < links.size()) {
-                Link link = links.get(i);
-                if (link.equals(vehicleLinkPair.getCurrentDriveDestination())) {
-                    returnmap.put(vehicleLinkPair, link);
+        int i = 0;
+        while(i<links.size()){
+            Link link = links.get(i);
+            for (VehicleLinkPair vehicleLinkpair : vehicleLinkPairs) {
+                if (link.equals(vehicleLinkpair.getDivertableLocation())) {
+                    returnmap.put(vehicleLinkpair, link);
                     links.remove(i);
                     break;
-                } else {
-                    ++i;
                 }
             }
+            ++i;
         }
+            
+
+
         return returnmap;
     }
 }

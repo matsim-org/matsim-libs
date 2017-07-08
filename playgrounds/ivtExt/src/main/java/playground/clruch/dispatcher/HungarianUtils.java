@@ -43,11 +43,12 @@ public enum HungarianUtils {
         List<Link> requestLinks = requests.values().stream() //
                 .flatMap(List::stream).map(AVRequest::getFromLink).collect(Collectors.toList());
 
-        // 1) immobilize all vehicles which are on the same location as a request
+        // 1) for every request, immobilize a stay vehicle on the same link if existing
         Collection<VehicleLinkPair> divertableVehicles = supplier.get();
         returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requestLinks.size())); // initial problem size
         new ImmobilizeVehicleDestMatcher().match(divertableVehicles, requestLinks) //
                 .entrySet().forEach(dispatcher::setVehicleDiversion);
+        
 
         // 2) in case requests >> divertablevehicles or divertablevehicles >> requests reduce the search space using kd-trees
         divertableVehicles.clear();
@@ -56,9 +57,10 @@ public enum HungarianUtils {
         List<Link> requestlocsCut = reduceRequestsKDTree(requestLinks, divertableVehicles);
         Collection<VehicleLinkPair> divertableVehiclesCut = reduceVehiclesKDTree(requestLinks, divertableVehicles);
         returnTensor.append(Tensors.vectorInt(divertableVehiclesCut.size(), requestlocsCut.size()));
+        
 
         // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method
-        new HungarBiPartVehicleDestMatcher().match(divertableVehicles, requestlocsCut) //
+        new HungarBiPartVehicleDestMatcher().match(divertableVehiclesCut, requestlocsCut) //
                 .entrySet().forEach(dispatcher::setVehicleDiversion);
 
         // return infoLine
