@@ -1,5 +1,8 @@
 package playground.clruch.trb18.scenario;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
@@ -34,7 +37,17 @@ import java.util.Set;
 
 public class RunTRBScenarioBuilder {
     public static void main(String args[]) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
         TRBScenarioConfig scenarioConfig = new TRBScenarioConfig();
+
+        if (args.length > 0 && new File(args[0]).exists()) {
+            mapper.readValue(new File(args[0]), TRBScenarioConfig.class);
+        } else {
+            mapper.writeValue(new File("builder.json"), scenarioConfig);
+        }
+
         //ConfigUtils.loadConfig(args[0], config);
 
         // Read all the necessary data
@@ -50,7 +63,7 @@ public class RunTRBScenarioBuilder {
 
         // Clean up input scenario & filter network
         Population population = new TRBPopulationCleaner().clean(originalPopulation);
-        Network filteredNetwork = new TRBNetworkFilter().filter(originalNetwork, scenarioConfig.centerCoord, scenarioConfig.radius);
+        Network filteredNetwork = new TRBNetworkFilter().filter(originalNetwork, new Coord(scenarioConfig.centerX, scenarioConfig.centerY), scenarioConfig.radius);
 
         // --> Now the population looks like an "initial" population without routes and collapsed PT trips
         // --> The filtered network only contains links that are usable by AVs within the specified area

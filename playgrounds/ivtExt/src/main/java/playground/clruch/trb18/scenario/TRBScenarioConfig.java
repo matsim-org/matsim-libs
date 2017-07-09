@@ -5,7 +5,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class TRBScenarioConfig {
-    public Coord centerCoord = new Coord(2683518.0, 1246836.0);
+    public double centerX = 2683518.0;
+    public double centerY = 1246836.0;
     public double radius = 15000.0;
     public boolean removeBackgroundTraffic = true;
     public double avShare = 1.0;
