@@ -2,6 +2,7 @@ package playground.clruch.dispatcher;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,7 @@ public enum HungarianUtils {
      * @param dispatcher
      *            univeralDispatcher from where call takes place
      * @param supplier
-     *            supplier for VehicleLinkPairs (divertble Vehicles)
+     *            supplier for VehicleLinkPairs (divertable Vehicles)
      * @param requests
      *            open requests
      * @return does assignment according to globalBipartiteMatching and returns a tensor with infoline Information
@@ -43,24 +44,28 @@ public enum HungarianUtils {
         List<Link> requestLinks = requests.values().stream() //
                 .flatMap(List::stream).map(AVRequest::getFromLink).collect(Collectors.toList());
 
-        // 1) for every request, immobilize a stay vehicle on the same link if existing
+        // 1) for every request, immobilize a stay vehicle on the same link if existing and take request out of set
         Collection<VehicleLinkPair> divertableVehicles = supplier.get();
         returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requestLinks.size())); // initial problem size
         new ImmobilizeVehicleDestMatcher().match(divertableVehicles, requestLinks) //
                 .entrySet().forEach(dispatcher::setVehicleDiversion);
-        
 
-        // 2) in case requests >> divertablevehicles or divertablevehicles >> requests reduce the search space using kd-trees
-        divertableVehicles.clear();
         divertableVehicles = supplier.get();
-        returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requestLinks.size())); // problem size after immobilizing
-        List<Link> requestlocsCut = reduceRequestsKDTree(requestLinks, divertableVehicles);
-        Collection<VehicleLinkPair> divertableVehiclesCut = reduceVehiclesKDTree(requestLinks, divertableVehicles);
-        returnTensor.append(Tensors.vectorInt(divertableVehiclesCut.size(), requestlocsCut.size()));
-        
+        returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requestLinks.size())); // initial problem size
 
-        // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method
-        new HungarBiPartVehicleDestMatcher().match(divertableVehiclesCut, requestlocsCut) //
+        // TODO: this global assert does not work. Check if it is because some vehicles are not available all the time
+        // and thus do not appear in getDivertableVehicles();
+        // GlobalAssert.that(returnTensor.get(0,0).subtract(returnTensor.get(1,0)).equals(returnTensor.get(0,1).subtract(returnTensor.get(1,1))));
+
+        // 2) In case divertableVehicles >> requests reduce search space using kd-trees
+        Collection<VehicleLinkPair> divertableVehiclesReduced = reduceVehiclesKDTree(requestLinks, divertableVehicles);
+
+        // 3) In case requests >> divertablevehicles reduce the search space using kd-trees
+        List<Link> requestLinksReduced = reduceRequestsKDTree(requestLinks, divertableVehicles);
+
+        // 4) compute Euclidean bipartite matching for all vehicles using the Hungarian method
+        returnTensor.append(Tensors.vectorInt(divertableVehiclesReduced.size(), requestLinks.size())); // initial problem size
+        new HungarBiPartVehicleDestMatcher().match(divertableVehiclesReduced, requestLinksReduced) //
                 .entrySet().forEach(dispatcher::setVehicleDiversion);
 
         // return infoLine
@@ -153,7 +158,7 @@ public enum HungarianUtils {
 
         // for all requests, start nearestNeighborSearch until union is as large as the number of requests
         // start with only one vehicle per request
-        Collection<VehicleLinkPair> vehiclesChosen = new LinkedList<>();
+        HashSet<VehicleLinkPair> vehiclesChosen = new HashSet(); // note: must be HashSet to avoid duplicate elements.
         int iter = 1;
         do {
             vehiclesChosen.clear();
