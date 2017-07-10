@@ -1,13 +1,10 @@
 package playground.joel.html;
 
-<<<<<<< HEAD
 import playground.clruch.net.StorageUtils;
-=======
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.sca.Ceiling;
 import org.matsim.core.utils.misc.Time;
 import playground.joel.analysis.AnalysisUtils;
->>>>>>> origin/master
 import playground.joel.analysis.AnalyzeSummary;
 
 import java.io.File;
