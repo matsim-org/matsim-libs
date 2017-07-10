@@ -52,7 +52,7 @@ public class ScenarioServer {
 
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
-        int maxPopulationSize = 100000;
+        int maxPopulationSize = 1000;
 
         int minFleetSizeBinSize = 3600;
 
@@ -132,14 +132,12 @@ public class ScenarioServer {
         AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
         //AnalyzeMarc.analyze(args);
 
-        
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
         if (virtualNetwork != null) {
             minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(scenario.getNetwork(), //
                     population, virtualNetwork.getvNodesCount(), minFleetSizeBinSize);
         }
-
 
         DataCollector.store(args, controler, minimumFleetSizeCalculator, analyzeSummary, scenarioParameters);
 

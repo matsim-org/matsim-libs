@@ -31,6 +31,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.red.Mean;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataUtils;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
@@ -49,10 +50,11 @@ public class MinimumFleetSizeCalculator {
     final int numberTimeSteps;
     final int dt;
     final public static Tensor EMDks = Tensors.empty();
+    public static double minimumFleet;
 
     public static void main(String[] args) throws Exception {
         // for test purpose only
-        int samples = 15;
+        int samples = 30;
 
         /*
          * PrintStream originalStream = System.out; System.setOut(new PrintStream(new OutputStream(){
@@ -69,10 +71,10 @@ public class MinimumFleetSizeCalculator {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();
-        // TheApocalypse.decimatesThe(population).toNoMoreThan(1000).people();
+        TheApocalypse.decimatesThe(population).toNoMoreThan(1000).people();
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, //
-                population, 60, 108000 / samples);
+                population, 40, 108000 / samples);
 
         // System.setOut(originalStream);
         Tensor minFleet = minimumFleetSizeCalculator.calculateMinFleet();
@@ -82,7 +84,7 @@ public class MinimumFleetSizeCalculator {
         System.out.println("Minimallly required fleet sizes " + minFleet);
         double minVeh = AnalysisUtils.maximum(minFleet).number().doubleValue();
         System.out.println(minVeh + " -> " + Math.ceil(minVeh));
-        System.out.println("min Fleet size: " + Mean.of(minFleet));
+        System.out.println("min Fleet size: " + minimumFleet);
     }
 
     public MinimumFleetSizeCalculator(Network networkIn, Population populationIn, int numVirtualNodes, int dtIn) {
@@ -112,6 +114,8 @@ public class MinimumFleetSizeCalculator {
         LeastCostPathCalculator dijkstra = EasyDijkstra.prepDijkstra(network);
 
         Tensor minFleet = Tensors.empty();
+        double num = 0.0;
+        double den = 0.0;
         for (int k = 0; k < numberTimeSteps; ++k) {
             // extract all relevant requests
             ArrayList<RequestObj> relevantRequests = getRelevantRequests(population, k * dt, (k + 1) * dt);
@@ -134,8 +138,11 @@ public class MinimumFleetSizeCalculator {
             // compute minimal fleet size
             double minFleetSizek = vk == 0.0 ? 0.0 : (lambdak * (dODk + EMDkav)) / vk;
             minFleet.append(RealScalar.of(minFleetSizek));
+            num += (minFleetSizek * vk);
+            den += vk;
 
         }
+        minimumFleet = num/den;
         return minFleet;
     }
 

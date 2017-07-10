@@ -62,7 +62,7 @@ public class UniqueDiagrams {
                                             boolean filter) throws Exception {
         String[] labels = {"With Customer", "Pickup", "Rebalancing"};
         Double[] scale = {-0.001, 0.001, 0.001};
-        stackedTimeChart(directory, fileTitle, diagramTitle, filter, 12 ,15, scale, //
+        stackedTimeChart(directory, fileTitle, diagramTitle, filter, DiagramCreator.filterSize, 12,15, scale, //
                 labels, "Distance [km]");
     }
 
@@ -70,12 +70,12 @@ public class UniqueDiagrams {
                                             boolean filter) throws Exception {
         String[] labels = {"With Customer", "Pickup", "Rebalancing", "Stay"};
         Double[] scale = {1.0, 1.0, 1.0, 1.0};
-        stackedTimeChart(directory, fileTitle, diagramTitle, filter, 6 ,10, scale, //
+        stackedTimeChart(directory, fileTitle, diagramTitle, filter, 60,6 ,10, scale, //
                 labels, "Vehicles");
     }
 
     public static void stackedTimeChart(File directory, String fileTitle, String diagramTitle, //
-                                            boolean filter, int from, int to, Double[] scale, //
+                                            boolean filter, int filterSize, int from, int to, Double[] scale, //
                                         String[] labels, String yAxisLabel) throws Exception {
         int width = 1000; /* Width of the image */
         int height = 750; /* Height of the image */
@@ -85,7 +85,7 @@ public class UniqueDiagrams {
         Tensor table = CsvFormat.parse(Files.lines(Paths.get("output/data/summary.csv")));
         table = Transpose.of(table);
 
-        Tensor values = DiagramCreator.filter(table.extract(from, to), table.get(0), DiagramCreator.filterSize, filter);
+        Tensor values = DiagramCreator.filter(table.extract(from, to), table.get(0), filterSize, filter);
 
         final TimeTableXYDataset dataset = new TimeTableXYDataset();
         Tensor time = table.get(0);
