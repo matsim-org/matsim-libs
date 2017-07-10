@@ -23,9 +23,12 @@ import org.matsim.api.core.v01.population.Population;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.clruch.netdata.VirtualNetwork;
@@ -33,6 +36,7 @@ import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataUtils;
+import playground.clruch.trb18.scenario.TRBScenarioConfig;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.joel.helpers.EasyDijkstra;
 import playground.joel.html.DataCollector;
@@ -66,8 +70,13 @@ public class MinimumFleetSizeCalculator {
 
         File configFile = new File(args[0]);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
+        config.facilities().setInputFile(null);
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        Network network = scenario.getNetwork();
+        //Network network = scenario.getNetwork();
+
+        Network network = NetworkUtils.createNetwork();
+        new MatsimNetworkReader(network).readFile(new TRBScenarioConfig().filteredNetworkOutputPath);
+
         Population population = scenario.getPopulation();
         TheApocalypse.decimatesThe(population).toNoMoreThan(1000).people();
 
@@ -151,18 +160,21 @@ public class MinimumFleetSizeCalculator {
 
                     if (pE2 instanceof Leg) {
                         Leg leg = (Leg) pE2;
-                        double submissionTime = leg.getDepartureTime();
-                        if (timeStart <= submissionTime && submissionTime < timeEnd) {
-                            Activity a1 = (Activity) pE1;
-                            Activity a3 = (Activity) pE3;
 
-                            Id<Link> startLinkID = a1.getLinkId();
-                            Id<Link> endLinkID = a3.getLinkId();
+                        if (leg.getMode().equals("av")) { // FIX: Only AV legs!!!
+                            double submissionTime = leg.getDepartureTime();
+                            if (timeStart <= submissionTime && submissionTime < timeEnd) {
+                                Activity a1 = (Activity) pE1;
+                                Activity a3 = (Activity) pE3;
 
-                            Link startLink = network.getLinks().get(startLinkID);
-                            Link endLink = network.getLinks().get(endLinkID);
+                                Id<Link> startLinkID = a1.getLinkId();
+                                Id<Link> endLinkID = a3.getLinkId();
 
-                            returnRequests.add(new RequestObj(submissionTime, startLink, endLink));
+                                Link startLink = network.getLinks().get(startLinkID);
+                                Link endLink = network.getLinks().get(endLinkID);
+
+                                returnRequests.add(new RequestObj(submissionTime, startLink, endLink));
+                            }
                         }
                     }
                 }
