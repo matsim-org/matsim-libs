@@ -77,7 +77,7 @@ public class DiagramCreator {
                 dataset, false, false, false);
 
         // range and colors of the background/grid
-        timechart.getXYPlot().getRangeAxis().setRange(0, maxRange);
+        if (maxRange != -1.0) timechart.getXYPlot().getRangeAxis().setRange(0, maxRange);
         timechart.getPlot().setBackgroundPaint(Color.white);
         timechart.getXYPlot().setRangeGridlinePaint(Color.lightGray);
         timechart.getXYPlot().setDomainGridlinePaint(Color.lightGray);
@@ -169,6 +169,42 @@ public class DiagramCreator {
 
     public static String binName(double binSize, int i, String appedix) {
         return i*binSize + " - " + (i+1)*binSize + appedix;
+    }
+
+    public static void createDiagram(File directory, String fileTitle, String diagramTitle, Tensor values, String valueAxisLabel) //
+            throws Exception {
+        final TimeSeriesCollection dataset = new TimeSeriesCollection();
+        final TimeSeries series = new TimeSeries("");
+        for (int i = 0; i < values.length(); i++) {
+            Second daytime = toTime(i*108000/values.length());
+            series.add(daytime, values.Get(i).number().doubleValue());
+        }
+        dataset.addSeries(series);
+
+        JFreeChart timechart = ChartFactory.createTimeSeriesChart(diagramTitle, "Time", valueAxisLabel, //
+                dataset, false, false, false);
+
+        // range and colors of the background/grid
+        timechart.getPlot().setBackgroundPaint(Color.white);
+        timechart.getXYPlot().setRangeGridlinePaint(Color.lightGray);
+        timechart.getXYPlot().setDomainGridlinePaint(Color.lightGray);
+
+        // line thickness
+        for (int k = 0; k < values.length(); k++) {
+            timechart.getXYPlot().getRenderer().setSeriesStroke(k, new BasicStroke(2.0f));
+        }
+
+        // set text fonts
+        timechart.getTitle().setFont(titleFont);
+        timechart.getXYPlot().getDomainAxis().setLabelFont(axisFont);
+        timechart.getXYPlot().getRangeAxis().setLabelFont(axisFont);
+        timechart.getXYPlot().getDomainAxis().setTickLabelFont(tickFont);
+        timechart.getXYPlot().getRangeAxis().setTickLabelFont(tickFont);
+
+        // save plot as png
+        int width = 1000; // Width of the image
+        int height = 750; // Height of the image
+        savePlot(directory, fileTitle, timechart, width, height);
     }
 
     public static void savePlot(File directory, String fileTitle, JFreeChart chart, int width, int height)

@@ -1,5 +1,7 @@
 package playground.joel.html;
 
+import ch.ethz.idsc.tensor.Tensor;
+
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -18,6 +20,9 @@ public class ScenarioParameters implements Serializable {
     public String networkName;
     public String user;
     public String date;
+
+    public Tensor EMDks;
+    public Tensor minFleet;
 
     public ScenarioParameters() {
         user = System.getProperty("user.name");

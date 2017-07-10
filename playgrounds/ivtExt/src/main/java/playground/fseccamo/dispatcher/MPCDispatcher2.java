@@ -359,15 +359,15 @@ public class MPCDispatcher2 extends BaseMpcDispatcher {
                                 // ==================================
                                 // Inserting new code here
 
-                                // 1) build Collection<VehicleLinkPair> with stay vehicles and links
-                                List<VehicleLinkPair> unassignedVehiclesNode = Collections.emptyList();
+                                // 1) build List<VehicleLinkPair> with stay vehicles and links
+                                List<VehicleLinkPair> unassignedVehiclesNode = new ArrayList<>();
                                 for (AVVehicle avVehicle : cars) {
                                     LinkTimePair ltp = new LinkTimePair(getVehicleLocation(avVehicle), now);
                                     unassignedVehiclesNode.add(new VehicleLinkPair(avVehicle, ltp, getVehicleLocation(avVehicle)));
                                 }
 
                                 // 2) build List<link> with requests locations
-                                List<Link> requestLinksNode = Collections.emptyList();
+                                List<Link> requestLinksNode = new  ArrayList<>();
                                 for (int count = 0; count < min; ++count) {
                                     MpcRequest mpcRequest = requests.get(count);
                                     requestLinksNode.add(mpcRequest.avRequest.getFromLink());

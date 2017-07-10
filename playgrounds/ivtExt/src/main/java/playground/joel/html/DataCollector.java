@@ -1,5 +1,6 @@
 package playground.joel.html;
 
+import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.io.Export;
 import ch.ethz.idsc.tensor.io.Import;
 import ch.ethz.idsc.tensor.io.Serialization;
@@ -19,6 +20,7 @@ import playground.clruch.utils.GlobalAssert;
 import playground.joel.analysis.AnalyzeSummary;
 import playground.joel.analysis.CoreAnalysis;
 import playground.joel.analysis.DistanceAnalysis;
+import playground.joel.analysis.MinimumFleetSizeCalculator;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
@@ -45,16 +47,17 @@ public class DataCollector {
     public static ScenarioParameters scenarioParameters;
     public static AnalyzeSummary analyzeSummary;
 
-    public static void store(String[] args, Controler controler, AnalyzeSummary analyzeSummaryIn, //
-                             ScenarioParameters scenarioParametersIn) throws Exception {
+    public static void store(String[] args, Controler controler, MinimumFleetSizeCalculator minimumFleetSizeCalculator, //
+                             AnalyzeSummary analyzeSummaryIn, ScenarioParameters scenarioParametersIn) throws Exception {
 
         scenarioParameters = scenarioParametersIn; // new ScenarioParameters();
         analyzeSummary = analyzeSummaryIn;
-        collectData(controler);
+        collectData(controler, minimumFleetSizeCalculator);
         readStopwatch(args);
 
         saveConfigs(args);
 
+        minimumFleetSizeCalculator.plot(args);
     }
 
     public static File report(String[] args) {
@@ -88,7 +91,7 @@ public class DataCollector {
         return Import.object(new File(report(args), "analyzeSummary.obj"));
     }
 
-    public static void collectData(Controler controler) {
+    public static void collectData(Controler controler, MinimumFleetSizeCalculator minimumFleetSizeCalculator) {
 
         Scenario scenario = controler.getScenario();
         scenarioParameters.populationSize = scenario.getPopulation().getPersons().values().size();
@@ -97,6 +100,8 @@ public class DataCollector {
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(network);
         if (virtualNetwork != null) {
             scenarioParameters.virtualNodes = virtualNetwork.getvNodesCount();
+            scenarioParameters.minFleet = minimumFleetSizeCalculator.calculateMinFleet();
+            scenarioParameters.EMDks = minimumFleetSizeCalculator.EMDks;
         }
 
     }

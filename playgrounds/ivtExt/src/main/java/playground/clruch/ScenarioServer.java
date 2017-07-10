@@ -22,6 +22,9 @@ import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.net.StorageUtils;
+import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.netdata.VirtualNetworkGet;
+import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
 import playground.clruch.trb18.TRBModule;
@@ -30,6 +33,7 @@ import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.joel.analysis.AnalyzeAll;
 import playground.joel.analysis.AnalyzeSummary;
+import playground.joel.analysis.MinimumFleetSizeCalculator;
 import playground.joel.html.DataCollector;
 import playground.joel.html.ReportGenerator;
 import playground.joel.html.ScenarioParameters;
@@ -56,6 +60,7 @@ public class ScenarioServer {
         // set manually depending on the scenario:
         int maxPopulationSize = 100000;
 
+        int minFleetSizeBinSize = 3600;
 
         // set to true in order to make server wait for at least 1 client, for instance viewer client
         boolean waitForClients = false;
@@ -143,13 +148,20 @@ public class ScenarioServer {
 
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
+        VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(reducedNetwork);
+        MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
+        if (virtualNetwork != null) {
+            minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(reducedNetwork, //
+                    population, virtualNetwork, minFleetSizeBinSize);
+        }
+
         AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
         //AnalyzeMarc.analyze(args);
 
         DataCollector.avConfigOld = configFile;
         DataCollector.avOld = new File(avConfigGroup.getConfigPath());
 
-        DataCollector.store(args, controler, analyzeSummary, scenarioParameters);
+        DataCollector.store(args, controler, minimumFleetSizeCalculator, analyzeSummary, scenarioParameters);
 
         ReportGenerator.from(args);
 

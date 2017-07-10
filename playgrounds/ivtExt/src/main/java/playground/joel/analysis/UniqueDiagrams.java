@@ -11,6 +11,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.TimeTableXYDataset;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.util.SortOrder;
+import playground.clruch.utils.GlobalAssert;
 
 import java.awt.*;
 import java.io.File;
@@ -25,8 +26,8 @@ public class UniqueDiagrams {
     public static void distanceStack(File directory, String fileTitle, String diagramTitle, //
                                      Double rebalance, Double pickup, Double customer) throws Exception {
         String[] labels = {"With Customer", "Pickup", "Rebalancing"};
-        int width = 250; /* Width of the image */
-        int height = 400; /* Height of the image */
+        int width = 250; // Width of the image
+        int height = 400; // Height of the image
 
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
         dataset.addValue(customer, labels[0], "s1");
@@ -59,24 +60,42 @@ public class UniqueDiagrams {
 
     public static void distanceDistribution(File directory, String fileTitle, String diagramTitle, //
                                             boolean filter) throws Exception {
+        String[] labels = {"With Customer", "Pickup", "Rebalancing"};
+        Double[] scale = {-0.001, 0.001, 0.001};
+        stackedTimeChart(directory, fileTitle, diagramTitle, filter, 12 ,15, scale, //
+                labels, "Distance [km]");
+    }
+
+    public static void statusDistribution(File directory, String fileTitle, String diagramTitle, //
+                                            boolean filter) throws Exception {
+        String[] labels = {"With Customer", "Pickup", "Rebalancing", "Stay"};
+        Double[] scale = {1.0, 1.0, 1.0, 1.0};
+        stackedTimeChart(directory, fileTitle, diagramTitle, filter, 6 ,10, scale, //
+                labels, "Vehicles");
+    }
+
+    public static void stackedTimeChart(File directory, String fileTitle, String diagramTitle, //
+                                            boolean filter, int from, int to, Double[] scale, //
+                                        String[] labels, String yAxisLabel) throws Exception {
         int width = 1000; /* Width of the image */
         int height = 750; /* Height of the image */
+
+        GlobalAssert.that(labels.length >= from - to && scale.length >= from - to);
 
         Tensor table = CsvFormat.parse(Files.lines(Paths.get("output/data/summary.csv")));
         table = Transpose.of(table);
 
-        Tensor values = DiagramCreator.filter(table.extract(12, 15), table.get(0), DiagramCreator.filterSize, filter);
-        String[] labels = {"With Customer", "Pickup", "Rebalancing"};
+        Tensor values = DiagramCreator.filter(table.extract(from, to), table.get(0), DiagramCreator.filterSize, filter);
 
         final TimeTableXYDataset dataset = new TimeTableXYDataset();
         Tensor time = table.get(0);
         for (int i = 0; i < values.length(); i++)
             for (int j = 0; j < time.length(); j++)
                 dataset.add(DiagramCreator.toTime(time.Get(j).number().doubleValue()), //
-                        values.Get(i, j).number().doubleValue()*(i == 0 ? -1.0 : 1.0)/1000, labels[i]);
+                        values.Get(i, j).number().doubleValue()*scale[i], labels[i]);
 
         JFreeChart timechart = ChartFactory.createStackedXYAreaChart(diagramTitle, "Time", //
-                "Distance [km]", dataset, PlotOrientation.VERTICAL, false, false, false);
+                yAxisLabel, dataset, PlotOrientation.VERTICAL, false, false, false);
 
         timechart.getPlot().setBackgroundPaint(Color.white);
         timechart.getXYPlot().setRangeGridlinePaint(Color.lightGray);

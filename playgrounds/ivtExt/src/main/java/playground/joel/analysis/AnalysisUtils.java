@@ -15,8 +15,8 @@ import java.util.TreeMap;
  */
 public class AnalysisUtils {
 
-    static Scalar maximum(Tensor submissions){
-        return submissions.flatten(0).reduce(Max::of).get().Get();
+    public static Scalar maximum(Tensor submissions){
+        return submissions.flatten(-1).reduce(Max::of).get().Get();
     }
 
 
@@ -27,6 +27,14 @@ public class AnalysisUtils {
         return Tensors.vector(i->map.containsKey(RealScalar.of(i)) ? //
                 RealScalar.of(map.get(RealScalar.of(i))) : RealScalar.ZERO, max.number().intValue()+1);
 
+    }
+
+    static Scalar adaptBinSize(Tensor tensor, Scalar binSize, Scalar step) {
+        if(AnalysisUtils.maximum(tensor).multiply(binSize.invert()).number().doubleValue() > 40.0) {
+            binSize = binSize.add(step);
+            binSize = adaptBinSize(tensor, binSize, step);
+        }
+        return binSize;
     }
 
 }
