@@ -31,7 +31,7 @@ import playground.joel.helpers.EasyDijkstra;
 public enum RequestAnalysis {
     ;
 
-    static Tensor dist = Tensors.empty();
+    static Tensor vlDist = Tensors.empty();
 
     /**
      * 
@@ -54,7 +54,7 @@ public enum RequestAnalysis {
         Tensor distances = Tensors.empty();
 
         for (RequestObj rObj : requests) {
-            // double dist = actualDistance(rObj.fromLink.getCoord(), rObj.toLink.getCoord()); // euclidean approach
+            // double vlDist = actualDistance(rObj.fromLink.getCoord(), rObj.toLink.getCoord()); // euclidean approach
             double dist = actualDistance(dijkstra, rObj.fromLink.getFromNode(), rObj.toLink.getToNode()); // dijkstra approach
             distances.append(RealScalar.of(dist));
         }
@@ -77,11 +77,12 @@ public enum RequestAnalysis {
         // TODO: check correct travelData, maybe read from file
         Tensor alphaij = tData.getAlphaijforTime(time);
         AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
-        if (dist.length() == 0) {
-            dist = Tensors.matrix((i, j) -> vLinkDistance(i, j, virtualNetwork, dijkstra, abstractVirtualNodeDest), //
+        if (vlDist.length() == 0) {
+            vlDist = Tensors.matrix((i, j) -> vLinkDistance(i, j, virtualNetwork, dijkstra, abstractVirtualNodeDest), //
                     virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
+            System.out.println(vlDist);
         }
-        RealScalar total = (RealScalar) Total.of(Total.of(alphaij.pmul(dist)));
+        RealScalar total = (RealScalar) Total.of(Total.of(alphaij.pmul(vlDist)));
         return total.number().doubleValue();
     }
 
@@ -133,7 +134,7 @@ public enum RequestAnalysis {
 
     // dijkstra approach
     public static double actualDistance(LeastCostPathCalculator dijkstra, Node from, Node to) {
-        double dist = 0;
+        double dist = 0.0;
         LeastCostPathCalculator.Path path = EasyDijkstra.executeDijkstra(dijkstra, from, to);
         for (Link link : path.links) {
             dist += link.getLength();

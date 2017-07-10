@@ -52,7 +52,7 @@ public class MinimumFleetSizeCalculator {
 
     public static void main(String[] args) throws  Exception {
         // for test purpose only
-        int samples = 6;
+        int samples = 30;
 
         /*
         PrintStream originalStream = System.out;
@@ -69,8 +69,7 @@ public class MinimumFleetSizeCalculator {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();
-        // TODO: apocalypse makes a difference
-        TheApocalypse.decimatesThe(population).toNoMoreThan(Integer.MAX_VALUE).people();
+        TheApocalypse.decimatesThe(population).toNoMoreThan(1000).people();
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, //
                 population, VirtualNetworkIO.fromByte(network, //
@@ -79,6 +78,7 @@ public class MinimumFleetSizeCalculator {
         // System.setOut(originalStream);
         Tensor minFleet = minimumFleetSizeCalculator.calculateMinFleet();
 
+        System.out.println("Population size: " + population.getPersons().size());
         System.out.println("Earth movers distances: " + EMDks);
         System.out.println("Minimallly required fleet sizes " + minFleet);
         double minVeh = AnalysisUtils.maximum(minFleet).number().doubleValue();
