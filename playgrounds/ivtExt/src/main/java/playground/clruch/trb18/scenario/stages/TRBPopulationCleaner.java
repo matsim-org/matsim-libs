@@ -20,6 +20,7 @@ public class TRBPopulationCleaner {
     /**
      * Prepares a scenario for further processing for the AV framework
      *
+     * - Removes all agents that just have one activity
      * - Removes all non-selected plans
      * - Merges all PT trips (with multiple stages) into one unrouted PT leg
      * - Removes all routes
@@ -33,25 +34,27 @@ public class TRBPopulationCleaner {
         logger.info("Cloning population and removing unselected plans and all routes ...");
 
         for (Person originalPerson : originalPopulation.getPersons().values()) {
-            Person duplicatePerson = cleanedPopulation.getFactory().createPerson(originalPerson.getId());
-            cleanedPopulation.addPerson(duplicatePerson);
+            if (originalPerson.getSelectedPlan().getPlanElements().size() > 1) {
+                Person duplicatePerson = cleanedPopulation.getFactory().createPerson(originalPerson.getId());
+                cleanedPopulation.addPerson(duplicatePerson);
 
-            Plan selectedPlan = originalPerson.getSelectedPlan();
+                Plan selectedPlan = originalPerson.getSelectedPlan();
 
-            Plan duplicatedPlan = PlanUtils.createCopy(selectedPlan);
-            duplicatedPlan.setPerson(duplicatePerson);
-            duplicatePerson.addPlan(duplicatedPlan);
+                Plan duplicatedPlan = PlanUtils.createCopy(selectedPlan);
+                duplicatedPlan.setPerson(duplicatePerson);
+                duplicatePerson.addPlan(duplicatedPlan);
 
-            for (PlanElement element : duplicatedPlan.getPlanElements()) {
-                if (element instanceof Leg) {
-                    Leg leg = (Leg) element;
-                    leg.setRoute(null);
+                for (PlanElement element : duplicatedPlan.getPlanElements()) {
+                    if (element instanceof Leg) {
+                        Leg leg = (Leg) element;
+                        leg.setRoute(null);
+                    }
                 }
             }
         }
 
         logger.info("  Number of agents in original population: " + originalPopulation.getPersons().size());
-        logger.info("  Number of agents in cleaned population: " + cleanedPopulation.getPersons().size());
+        logger.info("  Number of agents in cleaned population (stay-home-agents removed): " + cleanedPopulation.getPersons().size());
 
         logger.info("Merging PT trips into single PT legs ...");
 

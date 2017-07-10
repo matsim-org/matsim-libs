@@ -12,9 +12,11 @@ import java.util.List;
 
 public class TRBPlanModifier {
     final private Network filteredNetwork;
+    final private boolean allowMultimodalPlans;
 
-    public TRBPlanModifier(Network filteredNetwork) {
+    public TRBPlanModifier(Network filteredNetwork, boolean allowMultimodalPlans) {
         this.filteredNetwork = filteredNetwork;
+        this.allowMultimodalPlans = allowMultimodalPlans;
     }
 
     /**
@@ -50,10 +52,13 @@ public class TRBPlanModifier {
      * - If the agent uses car: All car legs must be within operating area, otherwise no conversion!
      * - If the agent does not use car: There must be at least one PT leg within the operating area, otherwise no conversion!
      * - Otherwise no conversion!
+     *
+     * - If allowMultimodalPlans == false: Only allow plans where ALL trips can be converted to AV
      */
     public boolean canUseAVs(Plan plan) {
         List<TripStructureUtils.Trip> trips = TripStructureUtils.getTrips(plan, new StageActivityTypesImpl(PtConstants.TRANSIT_ACTIVITY_TYPE));
 
+        long numberOfTrips = 0;
         long numberOfCarTrips = 0;
         long numberOfConvertableCarTrips = 0;
         long numberOfConvertablePtTrips = 0;
@@ -72,13 +77,19 @@ public class TRBPlanModifier {
             if (isPtTrip(trip) && canBeConvertedToAV(trip)) {
                 numberOfConvertablePtTrips++;
             }
+
+            numberOfTrips++;
         }
 
-        if (numberOfCarTrips > 0) {
-            return numberOfCarTrips == numberOfConvertableCarTrips;
-        }
+        if (!allowMultimodalPlans) {
+            return numberOfTrips == numberOfConvertableCarTrips + numberOfConvertablePtTrips;
+        } else {
+            if (numberOfCarTrips > 0) {
+                return numberOfCarTrips == numberOfConvertableCarTrips;
+            }
 
-        return numberOfConvertablePtTrips > 0;
+            return numberOfConvertablePtTrips > 0;
+        }
     }
 
     /**

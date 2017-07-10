@@ -43,7 +43,7 @@ public class RunTRBScenarioBuilder {
         TRBScenarioConfig scenarioConfig = new TRBScenarioConfig();
 
         if (args.length > 0 && new File(args[0]).exists()) {
-            mapper.readValue(new File(args[0]), TRBScenarioConfig.class);
+            scenarioConfig = mapper.readValue(new File(args[0]), TRBScenarioConfig.class);
         } else {
             mapper.writeValue(new File("builder.json"), scenarioConfig);
         }
@@ -74,7 +74,7 @@ public class RunTRBScenarioBuilder {
         // --> All links where AVs can drive are now annotated with "av" mode in the network!
 
         // Add AV plans
-        TRBPlanModifier planModifier = new TRBPlanModifier(filteredNetwork);
+        TRBPlanModifier planModifier = new TRBPlanModifier(filteredNetwork, scenarioConfig.allowMultimodalPlans);
         new TRBPopulationPreparer(planModifier).filter(population, originalPopulation.getPersonAttributes());
 
         // --> Now all agents that MAY use AVs in the specified area have an (unselected) plan with AV trip within the area

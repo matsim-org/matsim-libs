@@ -62,7 +62,7 @@ public class TRBPopulationPreparer {
         new ObjectAttributesXmlReader(scenario.getPopulation().getPersonAttributes()).readFile(args[1]);
         new MatsimNetworkReader(scenario.getNetwork()).readFile(args[2]);
 
-        TRBPlanModifier planModifier = new TRBPlanModifier(scenario.getNetwork());
+        TRBPlanModifier planModifier = new TRBPlanModifier(scenario.getNetwork(), true);
         new TRBPopulationPreparer(planModifier).filter(scenario.getPopulation(), scenario.getPopulation().getPersonAttributes());
 
         new PopulationWriter(scenario.getPopulation()).write(args[3]);

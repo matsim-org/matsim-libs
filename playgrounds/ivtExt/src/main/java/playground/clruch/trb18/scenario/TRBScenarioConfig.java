@@ -9,6 +9,7 @@ public class TRBScenarioConfig {
     public double centerY = 1246836.0;
     public double radius = 15000.0;
     public boolean removeBackgroundTraffic = true;
+    public boolean allowMultimodalPlans = true;
     public double avShare = 1.0;
     public boolean allowModeChoice = false;
 
