@@ -104,7 +104,7 @@ class PrepareForSimImpl implements PrepareForSim {
 										  .contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
 
 								if (vehicleId == null) {
-									vehicleId = createAutomaticVehicleId(person, leg, route);
+									vehicleId = createAutomaticVehicleId(person.getId(), leg, route);
 								}
 
 								// so here we have a vehicle id, now try to find or create a physical vehicle:
@@ -177,13 +177,10 @@ class PrepareForSimImpl implements PrepareForSim {
 			// if it was not found, next step depends on config:
 			switch ( qSimConfigGroup.getVehiclesSource() ) {
 				case defaultVehicle:
-					// create vehicle but don't add it to the container. Amit Apr'17
-					// I think, we should add vehicle to vehicles container. Amit May'17
 					vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, vehicleType);
 					scenario.getVehicles().addVehicle(vehicle);
 					break;
 				case modeVehicleTypesFromVehiclesData:
-					// if config says mode vehicles, then create and add it:
 					vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, vehicleType);
 					scenario.getVehicles().addVehicle(vehicle);
 					break;
@@ -198,21 +195,21 @@ class PrepareForSimImpl implements PrepareForSim {
 		return vehicle;
 	}
 
-	private Id<Vehicle> createAutomaticVehicleId(Person p, Leg leg, NetworkRoute route) {
+	private Id<Vehicle> createAutomaticVehicleId(Id<Person> personId, Leg leg, NetworkRoute route) {
 		Id<Vehicle> vehicleId ;
 		if (qSimConfigGroup.getUsePersonIdForMissingVehicleId()) {
 
 			switch (qSimConfigGroup.getVehiclesSource()) {
 				case defaultVehicle:
 				case fromVehiclesData:
-					vehicleId = Id.createVehicleId(p.getId());
+					vehicleId = Id.createVehicleId(personId);
 					break;
 				case modeVehicleTypesFromVehiclesData:
 					if(!leg.getMode().equals(TransportMode.car)) {
-						String vehIdString = p.getId().toString() + "_" + leg.getMode() ;
+						String vehIdString = personId.toString() + "_" + leg.getMode() ;
 						vehicleId = Id.create(vehIdString, Vehicle.class);
 					} else {
-						vehicleId = Id.createVehicleId(p.getId());
+						vehicleId = Id.createVehicleId(personId);
 					}
 					break;
 				default:
