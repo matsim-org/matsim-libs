@@ -23,7 +23,6 @@ import java.util.*;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -94,7 +93,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 	}
 	
 	@SuppressWarnings("static-method")
-	@Test@Ignore
+	@Test
 	public void testIntegration_Slow() {
 		Fixture f = new Fixture();
 
@@ -128,6 +127,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		eventsManager.addHandler(collector);
 		eventsManager.addHandler(new EventsLogger());
 
+		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario,f.events).run();
 		injector.getInstance( Mobsim.class ).run();
 		
 		List<Event> events = collector.getEvents();
@@ -146,7 +146,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 	}
 	
 	@SuppressWarnings("static-method")
-	@Test@Ignore
+	@Test
 	public void testIntegration_Fast() {
 		Fixture f = new Fixture();
 
@@ -182,6 +182,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		eventsManager.addHandler(collector);
 		eventsManager.addHandler(new EventsLogger());
 
+		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario,f.events).run();
 		injector.getInstance( Mobsim.class ).run();
 		
 		List<Event> events = collector.getEvents();

@@ -19,35 +19,14 @@
 
 package org.matsim.core.controler;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.router.TripRouterModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityModule;
-import org.matsim.core.scenario.ScenarioByInstanceModule;
-import org.matsim.core.trafficmonitoring.TravelTimeCalculatorModule;
-
 /**
- * Created by amit on 16.05.17.
+ * Created by amit on 10.07.17.
  */
 
-
-public class PrepareForSimUtils {
-
-    public static PrepareForSim createDefaultPrepareForSim(final Scenario scenario, final EventsManager eventsManager){
-        com.google.inject.Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(),
-                new AbstractModule() {
-                    @Override
-                    public void install() {
-                        install(new ScenarioByInstanceModule(scenario));
-                        bind(EventsManager.class).toInstance(eventsManager);
-
-                        install(new TripRouterModule());
-                        install(new TravelDisutilityModule());
-                        install(new TravelTimeCalculatorModule());
-
-                        install(new DefaultPrepareForSimModule());
-                    }
-                });
-        return (PrepareForSim) injector.getInstance(PrepareForSim.class);
+public class DefaultPrepareForSimModule extends AbstractModule {
+    // probably, rename it.
+    @Override
+    public void install() {
+        bind(PrepareForSim.class).to(PrepareForSimImpl.class);
     }
 }
