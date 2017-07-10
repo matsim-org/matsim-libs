@@ -47,21 +47,24 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
         for (VehicleLinkPair vehicleLinkPair : ordered_vehicleLinkPairs) {
             ++i;
             int j = -1;
-            for (Link dest : links)                 
-                distancematrix[i][++j] = getDistance(vehicleLinkPair.linkTimePair.link, dest);            
+            for (Link dest : links)
+                distancematrix[i][++j] = getDistance(vehicleLinkPair.linkTimePair.link, dest);
         }
 
         // vehicle at position i is assigned to destination matchinghungarianAlgorithm[j]
         int[] matchinghungarianAlgorithm = new HungarianAlgorithm(distancematrix).execute(); // O(n^3)
+
 
         // do the assignment according to the Hungarian algorithm (only for the matched elements, otherwise keep current drive destination)
         final Map<VehicleLinkPair, Link> map = new HashMap<>();
         i = -1;
         for (VehicleLinkPair vehicleLinkPair : ordered_vehicleLinkPairs) {
             ++i;
-            if (0 <= matchinghungarianAlgorithm[i])
+            if (0 <= matchinghungarianAlgorithm[i]) {
                 map.put(vehicleLinkPair, links.get(matchinghungarianAlgorithm[i]));
+            }
         }
+
         GlobalAssert.that(map.size() == Math.min(n, m));
         return map;
     }
