@@ -57,8 +57,10 @@ public class DistanceAnalysis {
         distancesWCPerVehicle = Tensor.of(list.stream().map(vs ->
                 Total.of(vs.distanceWithCustomer))).multiply(RealScalar.of(0.001));
 
-        tdBinCounter = AnalysisUtils.binCount(totalDistancesPerVehicle, AnalyzeAll.distanceBinSize);
-        dwcBinCounter = AnalysisUtils.binCount(distancesWCPerVehicle, AnalyzeAll.distanceBinSize);
+        AnalyzeAll.totalDistanceBinSize = AnalysisUtils.adaptBinSize(totalDistancesPerVehicle, AnalyzeAll.totalDistanceBinSize, RealScalar.of(5.0));
+        tdBinCounter = AnalysisUtils.binCount(totalDistancesPerVehicle, AnalyzeAll.totalDistanceBinSize);
+        AnalyzeAll.distanceWCBinSize = AnalysisUtils.adaptBinSize(distancesWCPerVehicle, AnalyzeAll.distanceWCBinSize, RealScalar.of(5.0));
+        dwcBinCounter = AnalysisUtils.binCount(distancesWCPerVehicle, AnalyzeAll.distanceWCBinSize);
 
         list.forEach(VehicleStatistic::consolidate);
 
