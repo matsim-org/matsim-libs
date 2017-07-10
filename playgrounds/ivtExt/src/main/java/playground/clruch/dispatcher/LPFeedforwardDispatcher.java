@@ -139,13 +139,13 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             Map<VirtualNode, List<VehicleLinkPair>> finalAvailableVehicles = availableVehicles;
 
             // Fix (???): randomly remove links so there are not too many
-            for (Map.Entry<VirtualNode, List<Link>> entry : destinationLinks.entrySet()) {
+            /*for (Map.Entry<VirtualNode, List<Link>> entry : destinationLinks.entrySet()) {
                 Collections.shuffle(entry.getValue());
 
                 while (finalAvailableVehicles.get(entry.getKey()).size() < entry.getValue().size()) {
                     entry.getValue().remove(0);
                 }
-            }
+            }*/
 
             GlobalAssert.that(!virtualNetwork.getVirtualNodes().stream()
                     .filter(v -> finalAvailableVehicles.get(v).size() < destinationLinks.get(v).size()).findAny().isPresent());
