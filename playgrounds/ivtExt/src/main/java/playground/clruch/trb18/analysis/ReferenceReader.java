@@ -20,8 +20,8 @@ import java.util.Queue;
 
 public class ReferenceReader {
     static public class ReferenceTrip {
-        double travelTime;
-        String mode;
+        public double travelTime;
+        public String mode;
 
         public ReferenceTrip(double travelTime, String mode) {
             this.travelTime = travelTime;
