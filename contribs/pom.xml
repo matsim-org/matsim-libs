@@ -185,6 +185,7 @@
 		<module>hybridsim</module>
 		<module>noise</module>
 		<module>bicycle</module>
+		<module>opdytsIntegration</module>
 	</modules>
 	<repositories>
 		<repository>
