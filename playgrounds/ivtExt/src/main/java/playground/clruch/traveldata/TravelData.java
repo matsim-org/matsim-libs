@@ -262,7 +262,7 @@ public class TravelData implements Serializable {
     /**
      * @param T tensor which will be normed for row-stochasticity
      */
-    private Tensor normToRowStochastic(Tensor Tin) {
+    public Tensor normToRowStochastic(Tensor Tin) {
         List<Integer> dims = Dimensions.of(Tin);
         int rows = dims.get(0);
         Tensor T = Tin.copy();

@@ -26,6 +26,8 @@ public class ScenarioParameters implements Serializable {
     public Tensor minFleet;
     public double minimumFleet;
 
+    public Tensor Availabilities;
+
     public ScenarioParameters() {
         user = System.getProperty("user.name");
         date = new SimpleDateFormat("yyyy/MM/dd - HH:mm:ss").format(new Date());

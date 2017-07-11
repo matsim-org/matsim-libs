@@ -28,6 +28,7 @@ import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.joel.analysis.AnalyzeAll;
 import playground.joel.analysis.AnalyzeSummary;
 import playground.joel.analysis.MinimumFleetSizeCalculator;
+import playground.joel.analysis.PerformanceFleetSizeCalculator;
 import playground.joel.html.DataCollector;
 import playground.joel.html.ReportGenerator;
 import playground.joel.html.ScenarioParameters;
@@ -134,12 +135,16 @@ public class ScenarioServer {
 
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
+        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
         if (virtualNetwork != null) {
             minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(scenario.getNetwork(), //
                     population, virtualNetwork.getvNodesCount(), minFleetSizeBinSize);
+            performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(scenario.getNetwork(), //
+                    population, virtualNetwork.getvNodesCount(), minFleetSizeBinSize);
         }
 
-        DataCollector.store(args, controler, minimumFleetSizeCalculator, analyzeSummary, scenarioParameters);
+        DataCollector.store(args, controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
+                analyzeSummary, scenarioParameters);
 
         ReportGenerator.from(args);
 
