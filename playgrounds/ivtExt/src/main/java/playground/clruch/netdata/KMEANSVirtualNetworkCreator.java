@@ -46,7 +46,7 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
     DatabaseConnection dbc;
     Database db;
     //SquaredEuclideanDistanceFunction dist = SquaredEuclideanDistanceFunction.STATIC;
-    LPNormDistanceFunction dist = new LPNormDistanceFunction(0.01);
+    LPNormDistanceFunction dist = new LPNormDistanceFunction(0.1);
     RandomlyGeneratedInitialMeans init = new RandomlyGeneratedInitialMeans(RandomFactory.DEFAULT);
     KMeansLloyd<NumberVector> km;
     Clustering<KMeansModel> c;
