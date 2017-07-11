@@ -1,10 +1,9 @@
-package opdytsintegration;
-
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+package org.matsim.contrib.opdyts;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Vector;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.controler.Controler;
 
 /**
  * A factory for MATSim simulation states.

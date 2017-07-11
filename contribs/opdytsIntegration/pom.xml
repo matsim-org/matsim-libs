@@ -28,14 +28,19 @@
           <version>0.10.0-SNAPSHOT</version>
       </dependency>
       <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-math3</artifactId>
+          <version>3.6.1</version>
+      </dependency>
+      <dependency>
            	<groupId>floetteroed.utilities</groupId>
            	<artifactId>floetteroed-utilities</artifactId>
            	<version>1.0.0</version>
       </dependency>
       <dependency>
-           	<groupId>floetteroed.opdyts</groupId>
-           	<artifactId>opdyts</artifactId>
-           	<version>1.0.0</version>
+           	<groupId>com.github.gunnarfloetteroed</groupId>
+           	<artifactId>java</artifactId>
+           	<version>master-SNAPSHOT</version>
       </dependency>
 
   </dependencies>

@@ -1,4 +1,4 @@
-package opdytsintegration.example.networkparameters;
+package org.matsim.contrib.opdyts.example.networkparameters;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

@@ -1,28 +1,18 @@
-package opdytsintegration.car;
+package org.matsim.contrib.opdyts.car;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-
+import floetteroed.utilities.math.Vector;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.VehicleAbortsEvent;
-import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
-import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
-import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.opdyts.MATSimCountingStateAnalyzer;
+import org.matsim.contrib.opdyts.SimulationStateAnalyzerProvider;
+import org.matsim.contrib.opdyts.utils.TimeDiscretization;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.vehicles.Vehicle;
-
-import floetteroed.utilities.math.Vector;
-import opdytsintegration.MATSimCountingStateAnalyzer;
-import opdytsintegration.SimulationStateAnalyzerProvider;
-import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * Keeps track of link occupancies per time bin and network mode.

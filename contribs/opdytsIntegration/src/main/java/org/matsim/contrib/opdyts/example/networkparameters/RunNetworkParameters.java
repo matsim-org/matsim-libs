@@ -1,25 +1,23 @@
-package opdytsintegration.example.networkparameters;
+package org.matsim.contrib.opdyts.example.networkparameters;
 
 import java.io.FileNotFoundException;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.scenario.ScenarioUtils;
-
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
-import opdytsintegration.MATSimSimulator2;
-import opdytsintegration.car.DifferentiatedLinkOccupancyAnalyzer;
-import opdytsintegration.utils.MATSimConfiguredFactories;
-import opdytsintegration.utils.OpdytsConfigGroup;
-import opdytsintegration.utils.TimeDiscretization;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.opdyts.MATSimSimulator2;
+import org.matsim.contrib.opdyts.car.DifferentiatedLinkOccupancyAnalyzer;
+import org.matsim.contrib.opdyts.utils.MATSimConfiguredFactories;
+import org.matsim.contrib.opdyts.utils.OpdytsConfigGroup;
+import org.matsim.contrib.opdyts.utils.TimeDiscretization;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * Simple optimization example. Selects flow capacity, number of lanes and max.

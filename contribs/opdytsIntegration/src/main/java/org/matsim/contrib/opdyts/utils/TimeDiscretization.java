@@ -1,4 +1,4 @@
-package opdytsintegration.utils;
+package org.matsim.contrib.opdyts.utils;
 
 import floetteroed.utilities.Time;
 

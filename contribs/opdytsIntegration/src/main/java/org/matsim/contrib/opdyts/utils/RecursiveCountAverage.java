@@ -1,4 +1,4 @@
-package opdytsintegration.utils;
+package org.matsim.contrib.opdyts.utils;
 
 /**
  * Computes recursively the average value of an integer counting process over a

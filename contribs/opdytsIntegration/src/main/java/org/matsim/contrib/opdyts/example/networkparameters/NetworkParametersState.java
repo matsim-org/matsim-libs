@@ -1,9 +1,8 @@
-package opdytsintegration.example.networkparameters;
-
-import org.matsim.api.core.v01.population.Population;
+package org.matsim.contrib.opdyts.example.networkparameters;
 
 import floetteroed.utilities.math.Vector;
-import opdytsintegration.MATSimState;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.opdyts.MATSimState;
 
 /**
  * This is only to show that one can create own states that carry more

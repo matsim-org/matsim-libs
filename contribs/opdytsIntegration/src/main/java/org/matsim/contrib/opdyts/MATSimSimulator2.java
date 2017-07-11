@@ -1,25 +1,18 @@
-package opdytsintegration;
+package org.matsim.contrib.opdyts;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.TerminationCriterion;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
-import opdytsintegration.utils.TimeDiscretization;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.opdyts.utils.TimeDiscretization;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.TerminationCriterion;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 /**
  * Created by michaelzilske on 08/10/15.

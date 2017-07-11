@@ -1,4 +1,4 @@
-package opdytsintegration.example.networkparameters;
+package org.matsim.contrib.opdyts.example.networkparameters;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;

@@ -1,11 +1,10 @@
-package opdytsintegration.example.networkparameters;
-
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+package org.matsim.contrib.opdyts.example.networkparameters;
 
 import floetteroed.utilities.math.Vector;
-import opdytsintegration.MATSimState;
-import opdytsintegration.MATSimStateFactory;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.opdyts.MATSimState;
+import org.matsim.contrib.opdyts.MATSimStateFactory;
+import org.matsim.core.controler.Controler;
 
 /**
  * 

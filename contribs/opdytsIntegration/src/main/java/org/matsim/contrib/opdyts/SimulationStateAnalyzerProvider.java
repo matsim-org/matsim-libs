@@ -1,4 +1,4 @@
-package opdytsintegration;
+package org.matsim.contrib.opdyts;
 
 import org.matsim.core.events.handler.EventHandler;
 

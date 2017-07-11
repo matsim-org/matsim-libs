@@ -1,21 +1,13 @@
-package opdytsintegration;
+package org.matsim.contrib.opdyts;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
+import floetteroed.opdyts.SimulatorState;
+import floetteroed.utilities.math.Vector;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.population.PopulationUtils;
-
-import floetteroed.opdyts.SimulatorState;
-import floetteroed.utilities.math.Vector;
 
 /**
  * Considering the "day-to-day" iterations of MATSim as the stages of a

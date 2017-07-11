@@ -1,7 +1,4 @@
-package opdytsintegration.utils;
-
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.MatsimRandom;
+package org.matsim.contrib.opdyts.utils;
 
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
@@ -10,7 +7,9 @@ import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
-import opdytsintegration.MATSimSimulator2;
+import org.matsim.contrib.opdyts.MATSimSimulator2;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * 

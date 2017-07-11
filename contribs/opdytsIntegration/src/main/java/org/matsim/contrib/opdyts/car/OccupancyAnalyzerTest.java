@@ -1,4 +1,4 @@
-package opdytsintegration.car;
+package org.matsim.contrib.opdyts.car;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;

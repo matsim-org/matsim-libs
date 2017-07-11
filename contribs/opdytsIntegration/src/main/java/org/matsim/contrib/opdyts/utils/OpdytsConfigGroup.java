@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package opdytsintegration.utils;
+package org.matsim.contrib.opdyts.utils;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;

@@ -1,14 +1,13 @@
-package opdytsintegration.car;
+package org.matsim.contrib.opdyts.car;
 
+import floetteroed.utilities.Time;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.opdyts.utils.TimeDiscretization;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-
-import floetteroed.utilities.Time;
-import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * 

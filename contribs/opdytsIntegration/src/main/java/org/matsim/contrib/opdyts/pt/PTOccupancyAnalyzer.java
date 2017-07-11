@@ -1,10 +1,10 @@
-package opdytsintegration.pt;
+package org.matsim.contrib.opdyts.pt;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
+import floetteroed.utilities.math.Vector;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
@@ -13,16 +13,14 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.opdyts.MATSimCountingStateAnalyzer;
+import org.matsim.contrib.opdyts.SimulationStateAnalyzerProvider;
+import org.matsim.contrib.opdyts.utils.TimeDiscretization;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-
-import floetteroed.utilities.math.Vector;
-import opdytsintegration.MATSimCountingStateAnalyzer;
-import opdytsintegration.SimulationStateAnalyzerProvider;
-import opdytsintegration.utils.TimeDiscretization;
 
 /**
  * 
