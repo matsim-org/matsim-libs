@@ -61,9 +61,12 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
             for (Plan plan : person.getPlans()) {
                 for (PlanElement planElem : plan.getPlanElements()) {
                     if (planElem instanceof Activity) {
-                        double x = network.getLinks().get(((Activity) planElem).getLinkId()).getCoord().getX();
-                        double y = network.getLinks().get(((Activity) planElem).getLinkId()).getCoord().getY();
-                        dataList.add(new double[] { x, y });
+                        Activity activity = (Activity) planElem;
+                        if (network.getLinks().containsKey(activity.getLinkId())) {
+                            double x = network.getLinks().get(((Activity) planElem).getLinkId()).getCoord().getX();
+                            double y = network.getLinks().get(((Activity) planElem).getLinkId()).getCoord().getY();
+                            dataList.add(new double[] { x, y });
+                        }
                     }
                 }
             }
@@ -168,8 +171,8 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
 
         // FILL information for serialization
         virtualNetwork.fillVNodeMapRAWVERYPRIVATE();
-        
-        System.out.println("VNODES="+virtualNetwork.getvNodesCount());
+
+        System.out.println("VNODES=" + virtualNetwork.getvNodesCount());
 
         return virtualNetwork;
 

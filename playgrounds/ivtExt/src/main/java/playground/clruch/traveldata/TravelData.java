@@ -186,7 +186,6 @@ public class TravelData implements Serializable {
             }
 
             // rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-7));
-
             alphaijPSF.set(rebalancingRate, t);
 
         }

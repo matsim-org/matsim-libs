@@ -45,7 +45,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
-
+@Deprecated
 public class PrepareScenarioForTRB {
     final String VIRTUALNETWORKFOLDERNAME = "virtualNetwork";
     final String VIRTUALNETWORKFILENAME = "virtualNetwork";

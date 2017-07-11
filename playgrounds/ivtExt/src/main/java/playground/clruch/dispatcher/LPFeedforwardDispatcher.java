@@ -136,7 +136,6 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
 
             // consistency check: rebalancing destination links must not exceed
             // available vehicles in virtual node
-
             GlobalAssert.that(!virtualNetwork.getVirtualNodes().stream()
                     .filter(v -> availableVehicles.get(v).size() < destinationLinks.get(v).size()).findAny().isPresent());
 
