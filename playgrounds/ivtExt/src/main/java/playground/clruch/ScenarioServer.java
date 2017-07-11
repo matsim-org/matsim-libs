@@ -58,7 +58,7 @@ public class ScenarioServer {
 
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
-        int maxPopulationSize = 100000;
+        int maxPopulationSize = 1000;
 
         int minFleetSizeBinSize = 3600;
 
@@ -148,11 +148,12 @@ public class ScenarioServer {
 
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
+        
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(reducedNetwork);
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
         if (virtualNetwork != null) {
             minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(reducedNetwork, //
-                    population, virtualNetwork, minFleetSizeBinSize);
+                    population, virtualNetwork.getvNodesCount(), minFleetSizeBinSize);
         }
 
         AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
@@ -160,6 +161,7 @@ public class ScenarioServer {
 
         DataCollector.avConfigOld = configFile;
         DataCollector.avOld = new File(avConfigGroup.getConfigPath());
+
 
         DataCollector.store(args, controler, minimumFleetSizeCalculator, analyzeSummary, scenarioParameters);
 

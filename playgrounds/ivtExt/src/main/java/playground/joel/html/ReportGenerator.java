@@ -127,7 +127,7 @@ public class ReportGenerator {
             htmlUtils.newLine();
             htmlUtils.insertTextLeft("Minimum Fleet Size:" + //
                     "\nAverage Earth Movers Distance:");
-            htmlUtils.insertTextLeft(Ceiling.of(AnalysisUtils.maximum(scenarioParameters.minFleet)).number().intValue() + //
+            htmlUtils.insertTextLeft((int) Math.ceil(scenarioParameters.minimumFleet) + //
                     "\n" + d.format(Mean.of(scenarioParameters.EMDks).Get().number().doubleValue()*link2km) + " km");
         }
 
@@ -161,13 +161,26 @@ public class ReportGenerator {
         htmlUtils.newLine();
         htmlUtils.insertImg(IMAGE_FOLDER + "/binnedTimeRatios.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/binnedDistanceRatios.png", 800, 600);
+        if (scenarioParameters.EMDks != null) {
+            htmlUtils.insertTextLeft("Average Trip Distance:");
+            htmlUtils.insertTextLeft(d.format( //
+                    link2km * analyzeSummary.distanceWithCust / analyzeSummary.numRequests) + " km");
+            htmlUtils.newLine();
+        }
+        htmlUtils.insertImg(IMAGE_FOLDER + "/tripDistances.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/distanceDistribution.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/totalDistanceVehicle.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/dwcVehicle.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/statusDistribution.png", 800, 600);
         if (scenarioParameters.EMDks != null) {
-            htmlUtils.insertImg(IMAGE_FOLDER + "/EMD.png", 800, 600);
+            htmlUtils.newLine();
+            htmlUtils.insertTextLeft("Minimum Fleet Size:" + //
+                    "\nAverage Earth Movers Distance:");
+            htmlUtils.insertTextLeft((int) Math.ceil(scenarioParameters.minimumFleet) + //
+                    "\n" + d.format(Mean.of(scenarioParameters.EMDks).Get().number().doubleValue()*link2km) + " km");
+            htmlUtils.newLine();
             htmlUtils.insertImg(IMAGE_FOLDER + "/minFleet.png", 800, 600);
+            htmlUtils.insertImg(IMAGE_FOLDER + "/EMD.png", 800, 600);
         }
 
         // ----------------------------------------------
