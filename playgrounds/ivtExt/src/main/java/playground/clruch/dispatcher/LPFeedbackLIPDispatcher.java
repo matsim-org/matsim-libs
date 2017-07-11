@@ -98,9 +98,10 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             // II.i compute rebalancing vehicles and send to virtualNodes
             {
                 Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+                // Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableVehicles();
                 int totalAvailable = 0;
-                for(List<VehicleLinkPair> vlpl : availableVehicles.values()){
-                    totalAvailable += vlpl.size();                    
+                for (List<VehicleLinkPair> vlpl : availableVehicles.values()) {
+                    totalAvailable += vlpl.size();
                 }
 
                 // calculate desired vehicles per vNode
@@ -121,7 +122,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 }
 
                 // solve the linear program with updated right-hand side
-                // fill right-hand-side    // TODO if MATSim would never produce zero available vehicles, we could save these lines
+                // fill right-hand-side // TODO if MATSim would never produce zero available vehicles, we could save these lines
                 Tensor rhs = vi_desiredT.subtract(vi_excessT);
                 Tensor rebalanceCount2 = Tensors.empty();
                 if (totalAvailable > 0) {
@@ -198,7 +199,8 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         @Inject
         private EventsManager eventsManager;
 
-        @Inject @Named("trb_reduced")
+        @Inject
+        @Named("trb_reduced")
         private Network network;
 
         public static VirtualNetwork virtualNetwork;
