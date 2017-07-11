@@ -17,30 +17,18 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-<<<<<<< HEAD
-
-import ch.ethz.idsc.tensor.RealScalar;
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
-import org.matsim.contrib.accessibility.utils.NetworkUtil;
-=======
->>>>>>> master
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
-<<<<<<< HEAD
-import org.matsim.core.network.io.MatsimNetworkReader;
-=======
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
->>>>>>> master
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.red.Mean;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.prep.TheApocalypse;
@@ -79,15 +67,12 @@ public class MinimumFleetSizeCalculator {
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 
         File configFile = new File(args[0]);
-<<<<<<< HEAD
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
-        config.facilities().setInputFile(null);
-=======
         Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup,
                 new BlackListedTimeAllocationMutatorConfigGroup());
->>>>>>> master
+        config.facilities().setInputFile(null);
+
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        //Network network = scenario.getNetwork();
+        // Network network = scenario.getNetwork();
 
         Network network = NetworkUtils.createNetwork();
         new MatsimNetworkReader(network).readFile(new TRBScenarioConfig().filteredNetworkOutputPath);
@@ -164,7 +149,7 @@ public class MinimumFleetSizeCalculator {
             den += vk;
 
         }
-        minimumFleet = num/den;
+        minimumFleet = num / den;
         return minFleet;
     }
 
