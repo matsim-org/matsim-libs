@@ -82,7 +82,7 @@ public enum RequestAnalysis {
                     virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
             System.out.println(vlDist);
         }
-        RealScalar total = (RealScalar) Total.of(Total.of(alphaij.pmul(vlDist)));
+        RealScalar total = (RealScalar) Total.of(Total.of(alphaij.pmul(vlDist))).multiply(RealScalar.of(dt));
         return total.number().doubleValue();
     }
 

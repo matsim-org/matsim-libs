@@ -129,15 +129,17 @@ public class ScenarioServer {
 
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
+        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
+        //AnalyzeMarc.analyze(args);
+
+        
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
         if (virtualNetwork != null) {
             minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(scenario.getNetwork(), //
-                    population, virtualNetwork, minFleetSizeBinSize);
+                    population, virtualNetwork.getvNodesCount(), minFleetSizeBinSize);
         }
 
-        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
-        //AnalyzeMarc.analyze(args);
 
         DataCollector.store(args, controler, minimumFleetSizeCalculator, analyzeSummary, scenarioParameters);
 
