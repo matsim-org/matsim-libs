@@ -16,10 +16,7 @@ import playground.clruch.ScenarioServer;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.GlobalAssert;
-import playground.joel.analysis.AnalyzeSummary;
-import playground.joel.analysis.CoreAnalysis;
-import playground.joel.analysis.DistanceAnalysis;
-import playground.joel.analysis.MinimumFleetSizeCalculator;
+import playground.joel.analysis.*;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
@@ -57,6 +54,7 @@ public class DataCollector {
         saveConfigs(args);
 
         minimumFleetSizeCalculator.plot(args);
+        TripDistances.analyze();
     }
 
     public static File report(String[] args) {
@@ -105,6 +103,7 @@ public class DataCollector {
             scenarioParameters.virtualNodes = virtualNetwork.getvNodesCount();
             scenarioParameters.minFleet = minimumFleetSizeCalculator.calculateMinFleet();
             scenarioParameters.EMDks = minimumFleetSizeCalculator.EMDks;
+            scenarioParameters.minimumFleet = minimumFleetSizeCalculator.minimumFleet;
         }
 
     }

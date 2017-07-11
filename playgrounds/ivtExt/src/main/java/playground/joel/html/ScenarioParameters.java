@@ -1,5 +1,6 @@
 package playground.joel.html;
 
+import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 
 import java.io.Serializable;
@@ -23,6 +24,7 @@ public class ScenarioParameters implements Serializable {
 
     public Tensor EMDks;
     public Tensor minFleet;
+    public double minimumFleet;
 
     public ScenarioParameters() {
         user = System.getProperty("user.name");

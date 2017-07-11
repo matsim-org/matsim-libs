@@ -57,6 +57,7 @@ public enum RequestAnalysis {
             // double vlDist = actualDistance(rObj.fromLink.getCoord(), rObj.toLink.getCoord()); // euclidean approach
             double dist = actualDistance(dijkstra, rObj.fromLink.getFromNode(), rObj.toLink.getToNode()); // dijkstra approach
             distances.append(RealScalar.of(dist));
+            TripDistances.tripDistances.append(RealScalar.of(dist));
         }
 
         RealScalar mean = (RealScalar) Mean.of(distances);
@@ -73,14 +74,12 @@ public enum RequestAnalysis {
      */
     public static double calcEMD(TravelData tData, VirtualNetwork virtualNetwork, LeastCostPathCalculator dijkstra, //
                                  int dt, int time) {
-        // TODO: scaling of alphaij? see: DFRDispatcher (poulation size) or LPFeedForwardDispatcher (redispatchPeriod)
-        // TODO: check correct travelData, maybe read from file
         Tensor alphaij = tData.getAlphaijforTime(time);
         AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
         if (vlDist.length() == 0) {
             vlDist = Tensors.matrix((i, j) -> vLinkDistance(i, j, virtualNetwork, dijkstra, abstractVirtualNodeDest), //
                     virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
-            System.out.println(vlDist);
+            // System.out.println(vlDist);
         }
         RealScalar total = (RealScalar) Total.of(Total.of(alphaij.pmul(vlDist))).multiply(RealScalar.of(dt));
         return total.number().doubleValue();
