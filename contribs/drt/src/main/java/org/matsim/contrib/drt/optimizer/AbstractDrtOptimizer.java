@@ -60,9 +60,7 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 	@Override
 	public void requestSubmitted(Request request) {
 		DrtRequest drtRequest = (DrtRequest)request;
-		
 		if (!optimContext.validator.validateDrtRequest(drtRequest)) {
-			
 			return;
 		}	
 		unplannedRequests.add(drtRequest);
