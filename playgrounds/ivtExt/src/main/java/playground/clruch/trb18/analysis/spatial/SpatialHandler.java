@@ -2,14 +2,8 @@ package playground.clruch.trb18.analysis.spatial;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.handler.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -20,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
 
-public class SpatialHandler implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler, ActivityStartEventHandler {
+public class SpatialHandler implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler, ActivityEndEventHandler {
     final private Map<Id<Person>, Queue<ReferenceReader.ReferenceTrip>> referenceTravelTimes;
     final private Map<Id<Person>, Sample> samples = new HashMap<>();
     final private Map<Id<Person>, Double> departures = new HashMap<>();
@@ -83,7 +77,7 @@ public class SpatialHandler implements PersonDepartureEventHandler, PersonEnters
     }
 
     @Override
-    public void handleEvent(ActivityStartEvent event) {
+    public void handleEvent(ActivityEndEvent event) {
         if (event.getActType().startsWith("home")) {
             Sample sample = getSample(event.getPersonId());
             sample.homeCoord = network.getLinks().get(event.getLinkId()).getCoord();
@@ -92,8 +86,6 @@ public class SpatialHandler implements PersonDepartureEventHandler, PersonEnters
 
     public void write(File outputPath) throws IOException {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputPath)));
-
-        System.err.println("SIZE " + samples.size());
 
         String[] columns = {
                 "person_id",
@@ -108,7 +100,7 @@ public class SpatialHandler implements PersonDepartureEventHandler, PersonEnters
         writer.flush();
 
         for (Map.Entry<Id<Person>, Sample> entry : samples.entrySet()) {
-            if (entry.getValue().homeCoord == null) return;
+            if (entry.getValue().homeCoord == null) continue;
 
             String[] row = {
                     entry.getKey().toString(),
