@@ -60,12 +60,9 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 	@Override
 	public void requestSubmitted(Request request) {
 		DrtRequest drtRequest = (DrtRequest)request;
-		if (drtRequest.getFromLink() == drtRequest.getToLink()) {
-			// throw new IllegalArgumentException("fromLink and toLink must be different");
-			Logger.getLogger(getClass()).error("fromLink and toLink must be different. Request " + request.getId()
-					+ " will not be served. The agent will stay in limbo.");
+		if (!optimContext.validator.validateDrtRequest(drtRequest)) {
 			return;
-		}
+		}	
 		unplannedRequests.add(drtRequest);
 		requiresReoptimization = true;
 	}

@@ -36,18 +36,18 @@ import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.data.NoiseLink;
 import org.matsim.vehicles.Vehicle;
 
+import com.google.inject.Inject;
+
 /**
  * @author ikaddoura
  *
  */
 public class LinkSpeedCalculation implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler{
 
-	private final NoiseContext noiseContext;
+	@Inject
+	private NoiseContext noiseContext;
+	
 	private Map<Id<Vehicle>, Double> vehicleId2enterTime = new HashMap<>();
-
-	public LinkSpeedCalculation(NoiseContext noiseContext) {
-		this.noiseContext = noiseContext;
-	}
 
 	@Override
 	public void reset(int iteration) {
@@ -115,6 +115,10 @@ public class LinkSpeedCalculation implements LinkEnterEventHandler, LinkLeaveEve
 	public void handleEvent(LinkEnterEvent event) {
 		// the person has entered the link, store the time
 		this.vehicleId2enterTime.put(event.getVehicleId(), event.getTime());
+	}
+
+	public void setNoiseContext(NoiseContext noiseContext) {
+		this.noiseContext = noiseContext;
 	}
 
 }

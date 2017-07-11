@@ -23,27 +23,20 @@
 package org.matsim.contrib.noise;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.noise.data.NoiseContext;
 import org.matsim.contrib.noise.data.NoiseReceiverPoint;
-import org.matsim.contrib.noise.handler.LinkSpeedCalculation;
-import org.matsim.contrib.noise.handler.NoisePricingHandler;
 import org.matsim.contrib.noise.handler.NoiseTimeTracker;
-import org.matsim.contrib.noise.handler.PersonActivityTracker;
-import org.matsim.contrib.noise.routing.NoiseTollTimeDistanceTravelDisutilityFactory;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
+
+import com.google.inject.Inject;
 
 
 /**
- * Starts the noise computation as specified in the {@link NoiseConfigGroup}.
  * 
  * @author ikaddoura
  *
@@ -51,79 +44,15 @@ import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisut
 public class NoiseCalculationOnline implements BeforeMobsimListener, AfterMobsimListener, StartupListener {
 	private static final Logger log = Logger.getLogger(NoiseCalculationOnline.class);
 	
+	@Inject
 	private NoiseContext noiseContext;
+	
+	@Inject
 	private NoiseTimeTracker timeTracker;
-	private PersonActivityTracker actTracker;
-	private NoisePricingHandler pricing;
-		
-	/**
-	 * Use this constructor if the default travel disutility is replaced in your own controler. 
-	 *
-	 */
-	public NoiseCalculationOnline(NoiseContext noiseContext) {
-		this.noiseContext = noiseContext;
-		
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) noiseContext.getScenario().getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
-		
-		if (noiseParameters.isInternalizeNoiseDamages()) {
-			log.warn("Internalizing noise damages. This requires that the default travel disutility is replaced by a travel distuility which accounts for noise tolls.");
-		}
-	}
-
-	/**
-	 * In case noise damages are internalized, this constructor replaces the default travel disutility by a travel disutility which accounts for the noise tolls. 
-	 *
-	 */
-	public NoiseCalculationOnline(Controler controler) {
-		
-		NoiseContext noiseContext = new NoiseContext(controler.getScenario());
-		this.noiseContext = noiseContext;
-		
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) controler.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
-		
-		if (noiseParameters.isInternalizeNoiseDamages()) {
 			
-			log.info("Internalizing noise damages. The default travel disutility will be replaced by a travel distuility which accounts for noise tolls...");
-			
-			if (noiseParameters.isComputeAvgNoiseCostPerLinkAndTime() == false) {
-				log.warn("The travel disutility which accounts for noise tolls requires the computation of average noise cost per link and time bin. Setting the value 'computeAvgNoiseCostPerLinkAndTime' to 'true'...");
-				noiseParameters.setComputeAvgNoiseCostPerLinkAndTime(true);
-			}
-			
-			final NoiseTollTimeDistanceTravelDisutilityFactory tollDisutilityCalculatorFactory = new NoiseTollTimeDistanceTravelDisutilityFactory(
-					new RandomizingTimeDistanceTravelDisutilityFactory(TransportMode.car, controler.getConfig().planCalcScore()),
-					this.noiseContext, controler.getConfig().planCalcScore());
-			controler.addOverridingModule(new AbstractModule() {
-				@Override
-				public void install() {
-					bindCarTravelDisutilityFactory().toInstance(tollDisutilityCalculatorFactory);
-				}
-			});
-		}
-	}
-
 	@Override
 	public void notifyStartup(StartupEvent event) {
-				
-		NoiseWriter.writeReceiverPoints(noiseContext, event.getServices().getConfig().controler().getOutputDirectory() + "/receiverPoints/", false);
-			
-		this.timeTracker = new NoiseTimeTracker(noiseContext, event.getServices().getEvents(), event.getServices().getConfig().controler().getOutputDirectory() + "/ITERS/");
-		event.getServices().getEvents().addHandler(this.timeTracker);
-	
-		if (this.noiseContext.getNoiseParams().isUseActualSpeedLevel()) {
-			LinkSpeedCalculation linkSpeedCalculator = new LinkSpeedCalculation(noiseContext);
-			event.getServices().getEvents().addHandler(linkSpeedCalculator);
-		}
-		
-		if (this.noiseContext.getNoiseParams().isComputePopulationUnits()) {
-			this.actTracker = new PersonActivityTracker(noiseContext);
-			event.getServices().getEvents().addHandler(this.actTracker);
-		}
-			
-		if (this.noiseContext.getNoiseParams().isInternalizeNoiseDamages()) {
-			this.pricing = new NoisePricingHandler(event.getServices().getEvents(), noiseContext);
-			event.getServices().getEvents().addHandler(this.pricing);
-		}		
+		NoiseWriter.writeReceiverPoints(noiseContext, event.getServices().getConfig().controler().getOutputDirectory() + "/receiverPoints/", false);	
 	}
 	
 	@Override

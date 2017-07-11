@@ -57,8 +57,8 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 	private static final Logger log = Logger.getLogger(PersonActivityTracker.class);
 	
 	private final NoiseContext noiseContext;
-	private final Set<String> consideredActivityTypes = new HashSet<String>();
 	
+	private final Set<String> consideredActivityTypes = new HashSet<String>();
 	private Map<Id<Person>, Integer> personId2currentActNr = new HashMap<Id<Person>, Integer>();
 		
 	public PersonActivityTracker(NoiseContext noiseContext) {

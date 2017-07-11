@@ -20,7 +20,6 @@
 
 package org.matsim.core.network;
 
-import javafx.scene.control.TextFormatter;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimComparator;
 
