@@ -11,6 +11,8 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.TimeTableXYDataset;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.util.SortOrder;
+
+import playground.clruch.net.StorageUtils;
 import playground.clruch.utils.GlobalAssert;
 
 import java.awt.*;
@@ -82,7 +84,7 @@ public class UniqueDiagrams {
 
         GlobalAssert.that(labels.length >= from - to && scale.length >= from - to);
 
-        Tensor table = CsvFormat.parse(Files.lines(Paths.get("output/data/summary.csv")));
+        Tensor table = CsvFormat.parse(Files.lines(Paths.get(StorageUtils.OUTPUT.getAbsolutePath()+ "/data/summary.csv")));
         table = Transpose.of(table);
 
         Tensor values = DiagramCreator.filter(table.extract(from, to), table.get(0), filterSize, filter);
