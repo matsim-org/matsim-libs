@@ -176,7 +176,16 @@ public class TravelData implements Serializable {
 
             // ensure positivity of solution (small negative values possible due to solver
             // accuracy)
-            rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-7));
+            for (int i = 0; i < Dimensions.of(rebalancingRate).get(0); ++i) {
+                for (int j = 0; j < Dimensions.of(rebalancingRate).get(1); ++j) {
+                    if (rebalancingRate.Get(i, j).number().doubleValue() < 0.0) {
+                        GlobalAssert.that(rebalancingRate.Get(i, j).number().doubleValue() > -10E-7);
+                        rebalancingRate.set(RealScalar.of(0.0), i, j);
+                    }
+                }
+            }
+
+            // rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-7));
 
             alphaijPSF.set(rebalancingRate, t);
 
@@ -260,7 +269,8 @@ public class TravelData implements Serializable {
     }
 
     /**
-     * @param T tensor which will be normed for row-stochasticity
+     * @param T
+     *            tensor which will be normed for row-stochasticity
      */
     private Tensor normToRowStochastic(Tensor Tin) {
         List<Integer> dims = Dimensions.of(Tin);
