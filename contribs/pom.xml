@@ -173,6 +173,7 @@
 		<module>socnetgen</module>
 		<module>transEnergySim</module>
 		<module>roadpricing</module>
+		<module>opdytsIntegration</module>
 		<module>multimodal</module>
 		<module>integration</module>
 		<module>wagonSim</module>
@@ -185,7 +186,6 @@
 		<module>hybridsim</module>
 		<module>noise</module>
 		<module>bicycle</module>
-		<module>opdytsIntegration</module>
 	</modules>
 	<repositories>
 		<repository>
