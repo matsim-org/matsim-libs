@@ -1,18 +1,20 @@
 package playground.joel.analysis;
 
-import ch.ethz.idsc.tensor.RealScalar;
-import ch.ethz.idsc.tensor.Scalars;
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.*;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.TensorMap;
-import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.mat.IdentityMatrix;
 import ch.ethz.idsc.tensor.mat.LinearSolve;
 import ch.ethz.idsc.tensor.mat.NullSpace;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Total;
+import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.time.Second;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -30,6 +32,7 @@ import playground.clruch.traveldata.TravelDataUtils;
 import playground.clruch.utils.GlobalAssert;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 
+import java.awt.*;
 import java.io.File;
 import java.util.Collections;
 
@@ -59,12 +62,12 @@ public class PerformanceFleetSizeCalculator {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();
-        TheApocalypse.decimatesThe(population).toNoMoreThan(100).people();
+        TheApocalypse.decimatesThe(population).toNoMoreThan(1000).people();
 
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, //
                 population, 40, 108000 / samples);
 
-        Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities(10);
+        Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
         System.out.println("A " + Dimensions.of(Availabilities) + " = " + Availabilities);
 
     }
@@ -92,7 +95,8 @@ public class PerformanceFleetSizeCalculator {
 
     }
 
-    public Tensor calculateAvailabilities(int numVehicles) {
+    public Tensor calculateAvailabilities() {
+        int numVehicles = 100;
         int vehicleSteps = 10;
         Tensor A = Tensors.empty(); // Tensor of all availabilities(timestep, vehiclestep)
         for (int k = 0; k < numberTimeSteps; ++k) {
@@ -110,13 +114,21 @@ public class PerformanceFleetSizeCalculator {
             Tensor mi = lambdai.add(getPsii(alphaij));
             MeanValueAnalysis MVA = new MeanValueAnalysis(numVehicles, mi, pii);
             MVA.perform();
+            // TODO: replace loop with vector operations
             for (int vehicleStep = 0; vehicleStep < vehicleSteps; vehicleStep++) {
                 // availabilities at all nodes at a certain level of vehicles
-                Tensor Ami = (MVA.getL(numVehicles*vehicleStep/vehicleSteps). //
-                        pmul(MVA.getW(numVehicles*vehicleStep/vehicleSteps))).pmul(lambdai);
+                Tensor Ami = ((MVA.getW(numVehicles*vehicleStep/vehicleSteps).pmul(lambdai)) //
+                        .map(InvertUnlessZero.function)) //
+                        .pmul(MVA.getL(numVehicles*vehicleStep/vehicleSteps));
                 Ak.append(Mean.of(Ami));
             }
             A.append(Ak);
+        }
+        try {
+            AnalyzeAll.saveFile(A, "availabilities");
+            plot(A, numVehicles, vehicleSteps);
+        } catch (Exception e) {
+            System.out.println("Error saving the availabilities");
         }
         return A;
     }
@@ -150,11 +162,49 @@ public class PerformanceFleetSizeCalculator {
 
     private Tensor getPii(Tensor lambdai, Tensor alphaij, int time) {
         Tensor Ptilde = getPtilde(lambdai, alphaij, time);
+        // TODO: find actual null space
         // a * x = x ---> (a - 1) * x = 0 ---> m * x = b
         return LinearSolve.any(Ptilde.subtract(IdentityMatrix.of(size)), Array.zeros(size));
         // return LinearSolve.of(Ptilde.subtract(IdentityMatrix.of(size)), Array.zeros(size)); // Tensor Runtime Exception
         // return NullSpace.usingSvd(Ptilde.subtract(IdentityMatrix.of(size))); // -> cast exception
         // return NullSpace.of(Ptilde.subtract(IdentityMatrix.of(size))); // -> {}, empty
+    }
+
+    private void plot(Tensor values, int numVehicles, int vehicleSteps) throws Exception {
+        final TimeSeriesCollection dataset = new TimeSeriesCollection();
+        for (int v = 0; v < values.get(0).length(); v++) {
+            final TimeSeries series = new TimeSeries(numVehicles*v/vehicleSteps + " vehicles");
+            for (int t = 0; t < values.length(); t++) {
+                Second daytime = DiagramCreator.toTime(t * 108000 / values.length());
+                series.add(daytime, values.get(t).Get(v).number().doubleValue());
+            }
+            dataset.addSeries(series);
+        }
+
+        JFreeChart timechart = ChartFactory.createTimeSeriesChart("Vehicle Availability", "Time", //
+                "Availability", dataset, true, false, false);
+
+        // range and colors of the background/grid
+        timechart.getPlot().setBackgroundPaint(Color.white);
+        timechart.getXYPlot().setRangeGridlinePaint(Color.lightGray);
+        timechart.getXYPlot().setDomainGridlinePaint(Color.lightGray);
+
+        // line thickness
+        for (int k = 0; k < values.length(); k++) {
+            timechart.getXYPlot().getRenderer().setSeriesStroke(k, new BasicStroke(2.0f));
+        }
+
+        // set text fonts
+        timechart.getTitle().setFont(DiagramCreator.titleFont);
+        timechart.getXYPlot().getDomainAxis().setLabelFont(DiagramCreator.axisFont);
+        timechart.getXYPlot().getRangeAxis().setLabelFont(DiagramCreator.axisFont);
+        timechart.getXYPlot().getDomainAxis().setTickLabelFont(DiagramCreator.tickFont);
+        timechart.getXYPlot().getRangeAxis().setTickLabelFont(DiagramCreator.tickFont);
+
+        // save plot as png
+        int width = 1000; // Width of the image
+        int height = 750; // Height of the image
+        DiagramCreator.savePlot(AnalyzeAll.RELATIVE_DIRECTORY, "availabilitiesByTime", timechart, width, height);
     }
 
 }
