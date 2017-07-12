@@ -81,7 +81,7 @@ public final class PopulationAgentSource implements AgentSource {
 					NetworkRoute route = (NetworkRoute) leg.getRoute();
 					Id<Vehicle> vehicleId = null ;
 					if (route != null) {
-						vehicleId = route.getVehicleId(); // should not be null! Amit, May'17
+						vehicleId = route.getVehicleId();
 					}
 					if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
 						// yyyy this is already getting rather messy; need to consider simplifications ...  kai/amit, sep'16
@@ -92,7 +92,6 @@ public final class PopulationAgentSource implements AgentSource {
 
 						// so here we have a vehicle id, now try to find or create a physical vehicle:
 
-						// vehicle should not be null except in case of defaultVehicle vehicleSource.
 						Vehicle vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
 						
 						// place the vehicle:
