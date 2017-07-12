@@ -22,6 +22,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.em.EM;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyGeneratedInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -34,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.ArrayAdapterDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import playground.clruch.utils.GlobalAssert;
@@ -43,7 +45,8 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
     Random random = new Random();
     DatabaseConnection dbc;
     Database db;
-    SquaredEuclideanDistanceFunction dist = SquaredEuclideanDistanceFunction.STATIC;
+    //SquaredEuclideanDistanceFunction dist = SquaredEuclideanDistanceFunction.STATIC;
+    LPNormDistanceFunction dist = new LPNormDistanceFunction(0.1);
     RandomlyGeneratedInitialMeans init = new RandomlyGeneratedInitialMeans(RandomFactory.DEFAULT);
     KMeansLloyd<NumberVector> km;
     Clustering<KMeansModel> c;
