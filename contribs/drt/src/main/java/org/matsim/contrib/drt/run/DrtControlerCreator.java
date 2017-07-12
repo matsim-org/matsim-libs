@@ -69,43 +69,9 @@ public final class DrtControlerCreator {
 			}
 		}
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-
 		Controler controler = new Controler(scenario);
-		
-		controler.addOverridingModule( new DrtModule() ) ;
-		
+		controler.addOverridingModule(new DrtModule() ) ;
 		controler.addOverridingModule(new DrtAnalysisModule());
-
-		switch (drtCfg.getOperationalScheme()) {
-			case door2door: {
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						addRoutingModuleBinding(DrtConfigGroup.DRT_MODE).to(DrtRoutingModule.class).asEagerSingleton();
-					}
-				});
-				break;
-			}
-			case stationbased: {
-				final Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-				new TransitScheduleReader(scenario2)
-						.readFile(drtCfg.getTransitStopsFileUrl(config.getContext()).getFile());
-				controler.addOverridingModule(new AbstractModule() {
-					@Override
-					public void install() {
-						bind(TransitSchedule.class).annotatedWith(Names.named(DrtConfigGroup.DRT_MODE))
-								.toInstance(scenario2.getTransitSchedule());;
-						addRoutingModuleBinding(DrtConfigGroup.DRT_MODE).to(StopBasedDrtRoutingModule.class)
-								.asEagerSingleton();
-
-					}
-				});
-				break;
-
-			}
-			default:
-				throw new IllegalStateException();
-		}
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}
@@ -113,7 +79,7 @@ public final class DrtControlerCreator {
 		return controler;
 	}
 
-	static com.google.inject.AbstractModule createModuleForQSimPlugin(
+	public static com.google.inject.AbstractModule createModuleForQSimPlugin(
 			final Class<? extends Provider<? extends DrtOptimizer>> providerClass) {
 		return new com.google.inject.AbstractModule() {
 			@Override
