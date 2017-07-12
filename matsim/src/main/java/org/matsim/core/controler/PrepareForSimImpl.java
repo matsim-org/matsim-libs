@@ -1,6 +1,7 @@
 package org.matsim.core.controler;
 
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,6 +15,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -21,6 +23,7 @@ import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.Lockable;
@@ -50,6 +53,8 @@ class PrepareForSimImpl implements PrepareForSim {
 		this.activityFacilities = activityFacilities;
 		this.tripRouterProvider = tripRouterProvider;
 		this.qSimConfigGroup = qSimConfigGroup;
+
+
 	}
 
 
@@ -100,15 +105,14 @@ class PrepareForSimImpl implements PrepareForSim {
 								throw new RuntimeException("Route not found.");
 							}
 
-							if (!seenModes.keySet()
-										  .contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
+							if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
 
 								if (vehicleId == null) {
-									vehicleId = createAutomaticVehicleId(person.getId(), leg, route);
+									vehicleId = createAutomaticVehicleId(person.getId(), leg.getMode(), route);
 								}
 
 								// so here we have a vehicle id, now try to find or create a physical vehicle:
-								Vehicle vehicle = createVehicle(leg, vehicleId, modeVehicleTypes.get(leg.getMode()));
+								Vehicle vehicle = createAndAddVehicleIfNotPresent( vehicleId, modeVehicleTypes.get(leg.getMode()));
 								seenModes.put(leg.getMode(), vehicleId);
 							} else {
 								if (vehicleId == null && route != null) {
@@ -122,6 +126,9 @@ class PrepareForSimImpl implements PrepareForSim {
 				}
 			}
 		}
+
+		// create vehicles and add to scenario if using mode choice. Amit July'17
+		createVehiclesInAdvance(modeVehicleTypes);
 
 		if (scenario instanceof Lockable) {
 			((Lockable)scenario).setLocked();
@@ -138,6 +145,33 @@ class PrepareForSimImpl implements PrepareForSim {
 		
 		// (yyyy means that if someone replaces prepareForSim and does not add the above lines, the containers are not locked.  kai, nov'16)
 
+	}
+
+	private void createVehiclesInAdvance(final Map<String, VehicleType> modeVehicleTypes) {
+		boolean isModeChoicePresent = false;
+		Collection<StrategyConfigGroup.StrategySettings> strategySettings = scenario.getConfig().strategy().getStrategySettings();
+		for (StrategyConfigGroup.StrategySettings strategySetting : strategySettings) {
+			String name = strategySetting.getStrategyName();
+			if ( name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name())
+					|| name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeTripMode.name())
+					) {
+				isModeChoicePresent = true;
+			} else if (name.equals(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name())) {
+				isModeChoicePresent = true;
+				log.warn("Creating one vehicle corresponding to each network mode for every agent and parking it to the departure link. \n" +
+						"If this is undesirable, then write a new PrepareForSim.");
+			}
+		}
+
+		if (isModeChoicePresent) {
+			Collection<String> networkModes = scenario.getConfig().plansCalcRoute().getNetworkModes();
+			for (Id<Person> personId : scenario.getPopulation().getPersons().keySet()) {
+				for (String mode : networkModes) {
+					Id<Vehicle> vehicleId = createAutomaticVehicleId(personId, mode, null);
+					createAndAddVehicleIfNotPresent(vehicleId, modeVehicleTypes.get(mode));
+				}
+			}
+		}
 	}
 
 	private  Map<String, VehicleType> getMode2VehicleType(){
@@ -169,7 +203,7 @@ class PrepareForSimImpl implements PrepareForSim {
 		return modeVehicleTypes;
 	}
 
-	private Vehicle createVehicle(Leg leg, Id<Vehicle> vehicleId, VehicleType vehicleType) {
+	private Vehicle createAndAddVehicleIfNotPresent(Id<Vehicle> vehicleId, VehicleType vehicleType) {
 		// try to get vehicle from the vehicles container:
 		Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
 
@@ -195,7 +229,7 @@ class PrepareForSimImpl implements PrepareForSim {
 		return vehicle;
 	}
 
-	private Id<Vehicle> createAutomaticVehicleId(Id<Person> personId, Leg leg, NetworkRoute route) {
+	private Id<Vehicle> createAutomaticVehicleId(Id<Person> personId, String mode, NetworkRoute route) {
 		Id<Vehicle> vehicleId ;
 		if (qSimConfigGroup.getUsePersonIdForMissingVehicleId()) {
 
@@ -205,8 +239,8 @@ class PrepareForSimImpl implements PrepareForSim {
 					vehicleId = Id.createVehicleId(personId);
 					break;
 				case modeVehicleTypesFromVehiclesData:
-					if(!leg.getMode().equals(TransportMode.car)) {
-						String vehIdString = personId.toString() + "_" + leg.getMode() ;
+					if(! mode.equals(TransportMode.car)) {
+						String vehIdString = personId.toString() + "_" + mode ;
 						vehicleId = Id.create(vehIdString, Vehicle.class);
 					} else {
 						vehicleId = Id.createVehicleId(personId);

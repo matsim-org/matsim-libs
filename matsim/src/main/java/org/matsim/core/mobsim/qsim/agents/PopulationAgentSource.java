@@ -86,12 +86,14 @@ public final class PopulationAgentSource implements AgentSource {
 					if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
 						// yyyy this is already getting rather messy; need to consider simplifications ...  kai/amit, sep'16
 						
-						if (vehicleId == null) { // not sure, but probably if a person uses more than one vehicle, problem may arise: see putVehicleFromOldTripIntoNewTripIfMeaningful in org.matsim.core.router.PlanRouter
-							throw new RuntimeException("Vehicle id should not be null since they are already created in prepareForSim if was not available on the first place.");
+						if (vehicleId == null) {
+							// if mode choice is allowed, it is possible that a new mode is assigned to an agent and then the route does not have the vehicle
+							// but scenario must have that vehicle; however, in order to find the vehicle, we need to identify the vehicle id. Amit July'17
+							vehicleId = createAutomaticVehicleId (p.getId(), leg.getMode());
+							route.setVehicleId(vehicleId);
 						}
 
 						// so here we have a vehicle id, now try to find or create a physical vehicle:
-
 						Vehicle vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
 						
 						// place the vehicle:
@@ -152,5 +154,30 @@ public final class PopulationAgentSource implements AgentSource {
 			}
 		}
 		throw new RuntimeException("Don't know where to put a vehicle for this agent.");
+	}
+
+	private Id<Vehicle> createAutomaticVehicleId(Id<Person> personId, String mode) {
+		Id<Vehicle> vehicleId ;
+		if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
+			switch (qsim.getScenario().getConfig().qsim().getVehiclesSource()) {
+				case defaultVehicle:
+				case fromVehiclesData:
+					vehicleId = Id.createVehicleId(personId);
+					break;
+				case modeVehicleTypesFromVehiclesData:
+					if(! mode.equals(TransportMode.car)) {
+						String vehIdString = personId.toString() + "_" + mode ;
+						vehicleId = Id.create(vehIdString, Vehicle.class);
+					} else {
+						vehicleId = Id.createVehicleId(personId);
+					}
+					break;
+				default:
+					throw new RuntimeException("not implemented") ;
+			}
+		} else {
+			throw new IllegalStateException("Found a network route without a vehicle id.");
+		}
+		return vehicleId;
 	}
 }
