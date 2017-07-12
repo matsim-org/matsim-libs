@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -256,6 +257,8 @@ import junit.framework.TestCase;
 		Population referencePopulation = scenario.getPopulation();
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsToScore scoring = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), events);
+
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario, events).run();
 		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		scoring.beginIteration(0);
 		sim.run();
