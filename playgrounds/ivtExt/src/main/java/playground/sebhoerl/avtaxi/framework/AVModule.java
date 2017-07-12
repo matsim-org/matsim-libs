@@ -29,7 +29,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
 import playground.clruch.dispatcher.EdgyDispatcher;
-import playground.clruch.dispatcher.HungarianDispatcher;
+import playground.clruch.dispatcher.GlobalBipartiteMatchingDispatcher;
 import playground.clruch.dispatcher.LPFeedbackLIPDispatcher;
 import playground.clruch.dispatcher.LPFeedforwardDispatcher;
 import playground.clruch.dispatcher.NotAsDumbDispatcher;
@@ -121,8 +121,8 @@ public class AVModule extends AbstractModule {
         bind(NotAsDumbDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(),NotAsDumbDispatcher.class.getSimpleName()).to(NotAsDumbDispatcher.Factory.class);
 
-        bind(HungarianDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), HungarianDispatcher.class.getSimpleName()).to(HungarianDispatcher.Factory.class);
+        bind(GlobalBipartiteMatchingDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), GlobalBipartiteMatchingDispatcher.class.getSimpleName()).to(GlobalBipartiteMatchingDispatcher.Factory.class);
         
         bind(SelfishDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);

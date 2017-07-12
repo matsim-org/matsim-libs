@@ -3,7 +3,7 @@ package playground.clruch.dispatcher.utils;
 
 import org.matsim.api.core.v01.network.Link;
 
-import playground.clruch.dispatcher.HungarianDispatcher;
+import playground.clruch.dispatcher.GlobalBipartiteMatchingDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 
 import java.util.*;
@@ -11,7 +11,7 @@ import java.util.*;
 /**
  * this call removes the matched links from links
  * 
- * matcher is used in {@link HungarianDispatcher}
+ * matcher is used in {@link GlobalBipartiteMatchingDispatcher}
  * 
  * Created by Claudio on 3/10/2017.
  */
