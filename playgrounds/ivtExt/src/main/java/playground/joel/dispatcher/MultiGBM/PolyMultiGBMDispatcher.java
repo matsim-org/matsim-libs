@@ -7,7 +7,7 @@ import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
-import playground.clruch.dispatcher.HungarianUtils;
+import playground.clruch.dispatcher.BipartiteMatchingUtils;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
@@ -78,7 +78,7 @@ public class PolyMultiGBMDispatcher extends UniversalDispatcher {
 
         if (round_now % dispatchPeriod == 0) {
             for (int fleetSection = 0; fleetSection < vehiclesPerRequest; fleetSection++) {
-                printVals = HungarianUtils.globalBipartiteMatching(this, supplier(fleetSection), this.getAVRequestsAtLinks());
+                printVals = BipartiteMatchingUtils.globalBipartiteMatching(this, supplier(fleetSection), this.getAVRequestsAtLinks());
             }
         }
     }

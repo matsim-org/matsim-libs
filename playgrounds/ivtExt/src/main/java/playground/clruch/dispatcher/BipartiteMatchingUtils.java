@@ -23,7 +23,7 @@ import playground.clruch.simonton.MyTree;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
-public enum HungarianUtils {
+public enum BipartiteMatchingUtils {
     ;
 
     /**

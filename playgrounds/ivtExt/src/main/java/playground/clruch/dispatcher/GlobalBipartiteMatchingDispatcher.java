@@ -44,7 +44,7 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
                 .match(getStayVehicles(), getAVRequestsAtLinks());
 
         if (round_now % dispatchPeriod == 0) {
-            printVals = HungarianUtils.globalBipartiteMatching(this, () -> getDivertableVehicles(), this.getAVRequestsAtLinks());
+            printVals = BipartiteMatchingUtils.globalBipartiteMatching(this, () -> getDivertableVehicles(), this.getAVRequestsAtLinks());
         }
     }
 

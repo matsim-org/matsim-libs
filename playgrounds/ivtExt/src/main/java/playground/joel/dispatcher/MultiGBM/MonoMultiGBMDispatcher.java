@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
-import playground.clruch.dispatcher.HungarianUtils;
+import playground.clruch.dispatcher.BipartiteMatchingUtils;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
@@ -73,7 +73,7 @@ public class MonoMultiGBMDispatcher extends UniversalDispatcher {
                 .match(getStayVehicles(), getAVRequestsAtLinks());
 
         if (round_now % dispatchPeriod == 0) {
-            printVals = HungarianUtils.globalBipartiteMatching(this, () -> getDivertableVehicles(), getMultiAVRequestsAtLinks());
+            printVals = BipartiteMatchingUtils.globalBipartiteMatching(this, () -> getDivertableVehicles(), getMultiAVRequestsAtLinks());
         }
     }
 
