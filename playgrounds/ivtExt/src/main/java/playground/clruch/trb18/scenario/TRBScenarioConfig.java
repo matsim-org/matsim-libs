@@ -34,5 +34,6 @@ public class TRBScenarioConfig {
 
     public long maximumNumberOfAgents = Long.MAX_VALUE;
 
-    public String shapefileInputPath = "stadtkreis/Stadtkreis.shp";
+//    public String shapefileInputPath = "stadtkreis/Stadtkreis.shp";
+    public String shapefileInputPath = null;
 }
