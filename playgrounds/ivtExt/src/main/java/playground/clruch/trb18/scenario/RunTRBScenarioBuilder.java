@@ -63,7 +63,13 @@ public class RunTRBScenarioBuilder {
 
         // Clean up input scenario & filter network
         Population population = new TRBPopulationCleaner().clean(originalPopulation);
-        Network filteredNetwork = new TRBNetworkFilter().filter(originalNetwork, new Coord(scenarioConfig.centerX, scenarioConfig.centerY), scenarioConfig.radius);
+        Network filteredNetwork;
+
+        if (scenarioConfig.shapefileInputPath != null) {
+            filteredNetwork = new TRBNetworkShapeFilter().filter(originalNetwork, scenarioConfig.shapefileInputPath);
+        } else {
+            filteredNetwork = new TRBNetworkRadiusFilter().filter(originalNetwork, new Coord(scenarioConfig.centerX, scenarioConfig.centerY), scenarioConfig.radius);
+        }
 
         // --> Now the population looks like an "initial" population without routes and collapsed PT trips
         // --> The filtered network only contains links that are usable by AVs within the specified area

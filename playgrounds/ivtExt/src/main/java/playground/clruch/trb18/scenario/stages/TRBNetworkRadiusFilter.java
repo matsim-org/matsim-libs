@@ -14,8 +14,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 import java.util.Collections;
 
-public class TRBNetworkFilter {
-    final private Logger logger = Logger.getLogger(TRBNetworkFilter.class);
+public class TRBNetworkRadiusFilter {
+    final private Logger logger = Logger.getLogger(TRBNetworkRadiusFilter.class);
 
     /**
      * Filters the network for TRB:
@@ -81,7 +81,7 @@ public class TRBNetworkFilter {
         Network network = NetworkUtils.createNetwork();
         new MatsimNetworkReader(network).readFile(args[0]);
         ZHCutter.ZHCutterConfigGroup zhCutterConfigGroup = new ZHCutter.ZHCutterConfigGroup("");
-        new TRBNetworkFilter().filter(network, new Coord(zhCutterConfigGroup.getxCoordCenter(), zhCutterConfigGroup.getyCoordCenter()), 15000.0);
+        new TRBNetworkRadiusFilter().filter(network, new Coord(zhCutterConfigGroup.getxCoordCenter(), zhCutterConfigGroup.getyCoordCenter()), 15000.0);
         new NetworkWriter(network).write(args[1]);
     }
 }

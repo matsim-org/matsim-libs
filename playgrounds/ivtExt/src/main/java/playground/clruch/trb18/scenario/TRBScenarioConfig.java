@@ -33,4 +33,6 @@ public class TRBScenarioConfig {
     public String travelDataFileName = "travelData";
 
     public long maximumNumberOfAgents = Long.MAX_VALUE;
+
+    public String shapefileInputPath = "stadtkreis/Stadtkreis.shp";
 }
