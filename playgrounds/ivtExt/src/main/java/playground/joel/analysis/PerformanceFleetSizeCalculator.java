@@ -1,24 +1,36 @@
 package playground.joel.analysis;
 
 import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
+import ch.ethz.idsc.tensor.alg.TensorMap;
+import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.mat.IdentityMatrix;
 import ch.ethz.idsc.tensor.mat.LinearSolve;
+import ch.ethz.idsc.tensor.mat.NullSpace;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Total;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.scenario.ScenarioUtils;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataUtils;
 import playground.clruch.utils.GlobalAssert;
+import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 
+import java.io.File;
 import java.util.Collections;
 
 
@@ -34,6 +46,29 @@ public class PerformanceFleetSizeCalculator {
     final int numberTimeSteps;
     final int dt;
 
+    public static void main(String[] args) throws Exception {
+        // for test purpose only
+        int samples = 30;
+
+        DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+        dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
+
+        File configFile = new File(args[0]);
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup,
+                new BlackListedTimeAllocationMutatorConfigGroup());
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+        Network network = scenario.getNetwork();
+        Population population = scenario.getPopulation();
+        TheApocalypse.decimatesThe(population).toNoMoreThan(100).people();
+
+        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, //
+                population, 40, 108000 / samples);
+
+        Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities(10);
+        System.out.println("A " + Dimensions.of(Availabilities) + " = " + Availabilities);
+
+    }
+
     public PerformanceFleetSizeCalculator(Network networkIn, Population populationIn, int numVirtualNodes, int dtIn) {
         population = populationIn;
 
@@ -47,7 +82,6 @@ public class PerformanceFleetSizeCalculator {
         // create virtualNetwork based on input network
         KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
         virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, true);
-        // size = numVirtualNodes; for some reason not equal to the length of alphaij etc.
 
         int dayduration = 108000;
         // ensure that dayduration / timeInterval is integer value
@@ -63,6 +97,7 @@ public class PerformanceFleetSizeCalculator {
         Tensor A = Tensors.empty(); // Tensor of all availabilities(timestep, vehiclestep)
         for (int k = 0; k < numberTimeSteps; ++k) {
 
+            // TODO: need scaling with dt?
             Tensor alphaij = tData.normToRowStochastic(tData.getAlphaijforTime(k * dt)).multiply(RealScalar.of(dt));
             Tensor lambdai = tData.getLambdaforTime(k * dt).multiply(RealScalar.of(dt));
             size = alphaij.length();
@@ -77,21 +112,17 @@ public class PerformanceFleetSizeCalculator {
             MVA.perform();
             for (int vehicleStep = 0; vehicleStep < vehicleSteps; vehicleStep++) {
                 // availabilities at all nodes at a certain level of vehicles
-                Tensor Ami = (MVA.getL(vehicleStep).pmul(MVA.getW(vehicleStep))).pmul(lambdai);
+                Tensor Ami = (MVA.getL(numVehicles*vehicleStep/vehicleSteps). //
+                        pmul(MVA.getW(numVehicles*vehicleStep/vehicleSteps))).pmul(lambdai);
                 Ak.append(Mean.of(Ami));
             }
             A.append(Ak);
-            System.out.println("Availability at time: " + k*dt + " = " + Ak);
         }
         return A;
     }
 
     private Tensor getPsii(Tensor alphaij) {
-        Tensor Psii = Tensors.empty();
-        // GlobalAssert.that(alphaij.length() == size); for some reason not true
-        for (int j = 0; j < size; j++) {
-            Psii.append(Total.of(alphaij.get(j)));
-        }
+        Tensor Psii = TensorMap.of(Total::of, alphaij, 1);
         return Psii;
     }
 
@@ -101,9 +132,10 @@ public class PerformanceFleetSizeCalculator {
         // calculate pi
         Tensor Pi = Tensors.empty();
         for (int i = 0; i < lambdai.length(); i++)
-            Pi.append(Psii.Get(i).divide(Psii.Get(i).add(lambdai.Get(i))));
+            if (Scalars.isZero(Psii.Get(i).add(lambdai.Get(i)))) Pi.append(RealScalar.ZERO);
+            else Pi.append(Psii.Get(i).divide(Psii.Get(i).add(lambdai.Get(i))));
 
-        // calculate pij
+        // calculate pijtilde
         Tensor pTilde = Tensors.empty();
         for (int i = 0; i < size; i++) {
             Tensor pisub = Tensors.empty();
@@ -120,6 +152,9 @@ public class PerformanceFleetSizeCalculator {
         Tensor Ptilde = getPtilde(lambdai, alphaij, time);
         // a * x = x ---> (a - 1) * x = 0 ---> m * x = b
         return LinearSolve.any(Ptilde.subtract(IdentityMatrix.of(size)), Array.zeros(size));
+        // return LinearSolve.of(Ptilde.subtract(IdentityMatrix.of(size)), Array.zeros(size)); // Tensor Runtime Exception
+        // return NullSpace.usingSvd(Ptilde.subtract(IdentityMatrix.of(size))); // -> cast exception
+        // return NullSpace.of(Ptilde.subtract(IdentityMatrix.of(size))); // -> {}, empty
     }
 
 }

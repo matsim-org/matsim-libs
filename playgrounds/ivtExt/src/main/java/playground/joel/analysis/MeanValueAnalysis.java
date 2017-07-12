@@ -2,6 +2,7 @@ package playground.joel.analysis;
 
 import ch.ethz.idsc.tensor.*;
 import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.red.Total;
 import playground.clruch.utils.GlobalAssert;
 
@@ -34,25 +35,26 @@ public class MeanValueAnalysis {
             updateW(step);
             updateL(step);
         }
-        System.out.println("W = " + W);
-        System.out.println("L = " + L);
     }
 
     private void updateW(int step) {
         Tensor Wt = Tensors.empty();
         for (int i = 0; i < size; i++) {
             // TODO possible to replace x?x:x with InvertUnlessZero.apply if it was static
-            Wt.append((RealScalar.of(1).add(L.get(step - 1, i))).multiply( //
+            Wt.append((L.get(step - 1, i).add(RealScalar.of(1))).multiply( //
                     Scalars.isZero(mi.Get(i)) ? mi.Get(i) : mi.Get(i).invert()));
         }
-        System.out.println("Wt = " + Wt);
         W.set(Wt, step);
     }
 
     private void updateL(int step) {
         Tensor Lt = Tensors.empty();
-        Tensor piMulW = W.get(step).pmul(pi);
-        System.out.println("piMulW = " + piMulW);
+        // TODO: use Tensor operations instead of for loop
+        // Tensor piMulW = W.get(step).pmul(pi);
+        Tensor piMulW = Tensors.empty();
+        for (int i = 0; i < size; i++) {
+            piMulW.append(W.Get(step, i)).multiply(pi.Get(i));
+        }
         Scalar norm = Scalars.isZero(Total.of(piMulW).Get()) ? Total.of(piMulW).Get() : Total.of(piMulW).Get().invert();
         for (int i = 0; i < size; i++) {
             Lt.append((RealScalar.of(step).multiply(piMulW.Get(i))).multiply(norm));
