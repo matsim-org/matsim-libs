@@ -44,9 +44,12 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
         // .match(getStayVehicles(), getAVRequestsAtLinks());
 
         if (round_now % dispatchPeriod == 0) {
-            printVals = BipartiteMatchingUtils.globalBipartiteMatching(this, () -> getDivertableVehicleLinkPairs(), this.getAVRequests());
+            BipartiteMatchingUtils bpmu = new BipartiteMatchingUtils();
+            // dispatch vehicles to pickup locations
+            printVals = bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), this.getAVRequests());
+            bpmu.executePickup(this);
         }
-        
+
         super.endofStepTasks();
     }
 

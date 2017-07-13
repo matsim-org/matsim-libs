@@ -19,15 +19,15 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * rebalancing capability (without virtual network)
  */
 public abstract class RebalancingDispatcher extends UniversalDispatcher {
-    
+
     private final Map<AVVehicle, Link> rebalancingVehicles = new HashMap<>();
     protected boolean nonStrict = false;
-    
+
     protected RebalancingDispatcher(AVDispatcherConfig avDispatcherConfig, TravelTime travelTime,
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, EventsManager eventsManager) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
     }
-    
+
     @Override
     final void updateDatastructures(Collection<AVVehicle> stayVehicles) {
         super.updateDatastructures(stayVehicles); // mandatory call
@@ -40,13 +40,16 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
     protected Map<AVVehicle, Link> getRebalancingVehicles() {
         return Collections.unmodifiableMap(rebalancingVehicles);
     }
+    
+    
 
     // This function has to be called only after getVirtualNodeRebalancingVehicles
-    protected synchronized final void setVehicleRebalance(final VehicleLinkPair vehicleLinkPair, final Link destination) {
+    public synchronized final void setVehicleRebalance(final AVVehicle avVehicle, final Link destination) {
         // redivert the vehicle, then generate a rebalancing event and add to list of currently rebalancing vehicles
-        setVehicleDiversion(vehicleLinkPair, destination);
-        eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), vehicleLinkPair.avVehicle, destination));
-        Link returnVal = rebalancingVehicles.put(vehicleLinkPair.avVehicle, destination);
+        setVehicleDiversion(avVehicle, destination);
+        eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), avVehicle, destination));
+        Link returnVal = rebalancingVehicles.put(avVehicle, destination);
         GlobalAssert.that(nonStrict || returnVal == null);
     }
+
 }

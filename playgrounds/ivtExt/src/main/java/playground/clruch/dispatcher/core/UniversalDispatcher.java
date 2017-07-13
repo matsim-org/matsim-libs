@@ -252,18 +252,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     // TODO find a way to make this protected again.
     public final void setVehiclePickup(AVVehicle avVehicle, AVRequest avRequest) {
         // 1) enter information into pickup table
-        AVVehicle previousPickup = pickupRegister.put(avRequest, avVehicle);
-
-        // // 2) if other pickup scheduld to pickup request, ensure it stays where it is.
-        // if (previousPickup != null) {
-        //
-        // System.out.println(avVehicle);
-        // System.out.println(avVehicleVehicleLinkPairMap.get(avVehicle).getDivertableLocation());
-        // setVehicleDiversion(avVehicle, avVehicleVehicleLinkPairMap.get(avVehicle).getDivertableLocation());
-        //
-        // }
-
-        // 3) set vehicle diversion of AVVehicle
+        pickupRegister.put(avRequest, avVehicle);
+        
+        // 2) set vehicle diversion of AVVehicle
         setVehicleDiversion(avVehicle, avRequest.getFromLink());
 
     }

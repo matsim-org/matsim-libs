@@ -1,17 +1,25 @@
 package playground.joel.dispatcher.MultiGBM;
 
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.dispatcher.BipartiteMatchingUtils;
-import playground.clruch.dispatcher.core.UniversalDispatcher;
+import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
-import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
@@ -22,60 +30,71 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-public class MonoMultiGBMDispatcher extends UniversalDispatcher {
+public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
 
     private final int dispatchPeriod;
-    private final int maxMatchNumber; // implementation may not use this
     private final int vehiclesPerRequest;
     private Tensor printVals = Tensors.empty();
 
     private MonoMultiGBMDispatcher( //
-                                    AVDispatcherConfig avDispatcherConfig, //
-                                    TravelTime travelTime, //
-                                    ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
-                                    EventsManager eventsManager, //
-                                    Network network, AbstractRequestSelector abstractRequestSelector) {
+            AVDispatcherConfig avDispatcherConfig, //
+            TravelTime travelTime, //
+            ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
+            EventsManager eventsManager, //
+            Network network, AbstractRequestSelector abstractRequestSelector) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
-        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
-        maxMatchNumber = safeConfig.getInteger("maxMatchNumber", Integer.MAX_VALUE);
+        dispatchPeriod = getDispatchPeriod(safeConfig, 20);
         vehiclesPerRequest = safeConfig.getInteger("vehiclesPerRequest", 1);
         GlobalAssert.that(vehiclesPerRequest > 0);
         if (vehiclesPerRequest == 1)
             System.out.println("ATTENTION: only one vehicle is sent to each request, standard HungarianDispatcher");
     }
 
-    public final Map<Link, List<AVRequest>> getMultiAVRequestsAtLinks() {
-        Map<Link, List<AVRequest>> multiAVRequestsAtLinks = new HashMap<>();
-        this.getAVRequestsAtLinks().forEach((link, list) -> {
-            List<AVRequest> tempList = new ArrayList<>();
-            list.forEach(avRequest -> {
-                for (int i = 0; i < vehiclesPerRequest; i++) {
-                    tempList.add(avRequest);
-                }
-            });
-            multiAVRequestsAtLinks.put(link, tempList);
-        });
-        return multiAVRequestsAtLinks;
-    }
-
     @Override
     public void redispatch(double now) {
         final long round_now = Math.round(now);
 
-        new InOrderOfArrivalMatcher(this::setAcceptRequest) //
-                .match(getStayVehicles(), getAVRequestsAtLinks());
 
         if (round_now % dispatchPeriod == 0) {
-            printVals = BipartiteMatchingUtils.globalBipartiteMatching(this, () -> getDivertableVehicles(), getMultiAVRequestsAtLinks());
+            BipartiteMatchingUtils bpmu = new BipartiteMatchingUtils();
+            // dispatch vehicles to pickup locations
+            printVals = bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), this.getAVRequests());
+            bpmu.executePickup(this);
+            
+            // perform rebalancing with remaining vehicles
+            Collection<AVRequest> rebalanceRequests = getMultipleRebalanceRequests(this.getAVRequests(), vehiclesPerRequest);
+            bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), rebalanceRequests);
+            bpmu.executeRebalance(this);
         }
+
+        super.endofStepTasks();
+
     }
+
+    private final Collection<AVRequest> getMultipleRebalanceRequests(Collection<AVRequest> avRequests, int multipl) {
+        Collection<AVRequest> rebalanceRequests = Collections.emptyList();
+        for (AVRequest avRequest : avRequests) {
+            for (int i = 0; i < multipl; ++i) {
+                rebalanceRequests.add(avRequest);
+            }
+        }
+        return rebalanceRequests;
+    }
+
+//    public final Map<Link, List<AVRequest>> getMultiAVRequestsAtLinks() {
+//        Map<Link, List<AVRequest>> multiAVRequestsAtLinks = new HashMap<>();
+//        this.getAVRequestsAtLinks().forEach((link, list) -> {
+//            List<AVRequest> tempList = new ArrayList<>();
+//            list.forEach(avRequest -> {
+//                for (int i = 0; i < vehiclesPerRequest; i++) {
+//                    tempList.add(avRequest);
+//                }
+//            });
+//            multiAVRequestsAtLinks.put(link, tempList);
+//        });
+//        return multiAVRequestsAtLinks;
+//    }
 
     @Override
     public String getInfoLine() {

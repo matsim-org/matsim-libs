@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
@@ -20,8 +21,9 @@ import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
-public enum BipartiteMatchingUtils {
-    ;
+public class BipartiteMatchingUtils {
+
+    Map<VehicleLinkPair, AVRequest> gbpMatch = null;
 
     /**
      * @param dispatcher
@@ -32,8 +34,7 @@ public enum BipartiteMatchingUtils {
      *            open requests
      * @return does assignment according to globalBipartiteMatching and returns a tensor with infoline Information
      */
-    public static Tensor globalBipartiteMatching(UniversalDispatcher dispatcher, Supplier<Collection<VehicleLinkPair>> supplier,
-            Collection<AVRequest> requests) {
+    public Tensor globalBipartiteMatching(Supplier<Collection<VehicleLinkPair>> supplier, Collection<AVRequest> requests) {
 
         Tensor returnTensor = Tensors.empty(); // contains information for InfoLine
         Collection<VehicleLinkPair> divertableVehicles = supplier.get(); // save initial problem size
@@ -48,20 +49,29 @@ public enum BipartiteMatchingUtils {
         // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method and set new pickup commands
         returnTensor.append(Tensors.vectorInt(divertableVehiclesReduced.size(), requestsReduced.size())); // initial problem size
 
-        Map<VehicleLinkPair, AVRequest> hungarianMatch = (new HungarBiPartVehicleDestMatcher()).match(divertableVehiclesReduced, requestsReduced); //
-        
-        
-        for (Entry<VehicleLinkPair, AVRequest> entry : hungarianMatch.entrySet()) {
-            AVVehicle av = entry.getKey().avVehicle;
-            AVRequest avRequest = entry.getValue();
-            dispatcher.setVehiclePickup(av, avRequest);
-        }
+        gbpMatch = (new HungarBiPartVehicleDestMatcher()).match(divertableVehiclesReduced, requestsReduced); //
 
         // return infoLine
         return returnTensor;
     }
 
-    private static Collection<AVRequest> reduceRequestsKDTree(Collection<AVRequest> requests, Collection<VehicleLinkPair> divertableVehicles) {
+    public void executePickup(UniversalDispatcher dispatcher) {
+        for (Entry<VehicleLinkPair, AVRequest> entry : gbpMatch.entrySet()) {
+            AVVehicle av = entry.getKey().avVehicle;
+            AVRequest avRequest = entry.getValue();
+            dispatcher.setVehiclePickup(av, avRequest);
+        }
+    }
+
+    public void executeRebalance(RebalancingDispatcher dispatcher) {
+        for (Entry<VehicleLinkPair, AVRequest> entry : gbpMatch.entrySet()) {
+            AVVehicle av = entry.getKey().avVehicle;
+            AVRequest avRequest = entry.getValue();
+            dispatcher.setVehicleRebalance(av, avRequest.getFromLink());
+        }
+    }
+
+    private Collection<AVRequest> reduceRequestsKDTree(Collection<AVRequest> requests, Collection<VehicleLinkPair> divertableVehicles) {
         // for less requests than cars, don't do anything
         if (requests.size() < divertableVehicles.size())
             return requests;
@@ -105,7 +115,7 @@ public enum BipartiteMatchingUtils {
 
     }
 
-    private static Collection<VehicleLinkPair> reduceVehiclesKDTree(Collection<AVRequest> requests, Collection<VehicleLinkPair> divertableVehicles) {
+    private Collection<VehicleLinkPair> reduceVehiclesKDTree(Collection<AVRequest> requests, Collection<VehicleLinkPair> divertableVehicles) {
         // for less requests than cars, don't do anything
         if (divertableVehicles.size() < requests.size())
             return divertableVehicles;
@@ -147,32 +157,3 @@ public enum BipartiteMatchingUtils {
         return vehiclesChosen;
     }
 }
-
-//// generate list of all open requests
-// List<AVRequest> =
-//
-//
-//// generate a list of request links (there can be multiple entries)
-// List<Link> requestLinks = requests.values().stream() //
-// .flatMap(List::stream).map(AVRequest::getFromLink).collect(Collectors.toList());
-
-//// 1) for every request, immobilize a stay vehicle on the same link if existing and take request out of set
-// Collection<VehicleLinkPair> divertableVehicles = supplier.get();
-// returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requestLinks.size())); // initial problem size
-// new ImmobilizeVehicleDestMatcher().match(divertableVehicles, requestLinks) //
-// .entrySet().forEach(dispatcher::setVehicleDiversion);
-
-// TODO: this global assert does not work. Check if it is because some vehicles are not available all the time
-// and thus do not appear in getDivertableVehicles();
-// GlobalAssert.that(returnTensor.get(0,0).subtract(returnTensor.get(1,0)).equals(returnTensor.get(0,1).subtract(returnTensor.get(1,1))));
-
-//// class to uniquely distinguish requests
-// static class RequestWithID {
-// public Link link;
-// public int id;
-//
-// RequestWithID(Link linkIn, int idIn) {
-// link = linkIn;
-// id = idIn;
-// }
-// }
