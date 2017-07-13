@@ -33,7 +33,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
 
     private final int dispatchPeriod;
-    private final int vehiclesPerRequest;
+    private final int rebVehperRequest;
     private Tensor printVals = Tensors.empty();
 
     private MonoMultiGBMDispatcher( //
@@ -45,9 +45,9 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         dispatchPeriod = getDispatchPeriod(safeConfig, 20);
-        vehiclesPerRequest = safeConfig.getInteger("vehiclesPerRequest", 1);
-        GlobalAssert.that(vehiclesPerRequest > 0);
-        if (vehiclesPerRequest == 1)
+        rebVehperRequest = safeConfig.getInteger("vehiclesPerRequest", 1);
+        GlobalAssert.that(rebVehperRequest > 0);
+        if (rebVehperRequest == 1)
             System.out.println("ATTENTION: only one vehicle is sent to each request, standard HungarianDispatcher");
     }
 
@@ -63,7 +63,7 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
             bpmu.executePickup(this);
             
             // perform rebalancing with remaining vehicles
-            Collection<AVRequest> rebalanceRequests = getMultipleRebalanceRequests(this.getAVRequests(), vehiclesPerRequest);
+            Collection<AVRequest> rebalanceRequests = getMultipleRebalanceRequests(this.getAVRequests(), rebVehperRequest);
             bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), rebalanceRequests);
             bpmu.executeRebalance(this);
         }
@@ -73,7 +73,7 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
     }
 
     private final Collection<AVRequest> getMultipleRebalanceRequests(Collection<AVRequest> avRequests, int multipl) {
-        Collection<AVRequest> rebalanceRequests = Collections.emptyList();
+        Collection<AVRequest> rebalanceRequests = new ArrayList<>();
         for (AVRequest avRequest : avRequests) {
             for (int i = 0; i < multipl; ++i) {
                 rebalanceRequests.add(avRequest);

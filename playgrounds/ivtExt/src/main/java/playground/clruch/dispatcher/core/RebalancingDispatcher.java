@@ -49,7 +49,24 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
         setVehicleDiversion(avVehicle, destination);
         eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), avVehicle, destination));
         Link returnVal = rebalancingVehicles.put(avVehicle, destination);
-        GlobalAssert.that(nonStrict || returnVal == null);
+//        GlobalAssert.that(nonStrict || returnVal == null);
     }
+    
+    
+    @Override
+    protected void endofStepTasks() {
+        // stop all vehicles which are not on a pickup or rebalancing mission.
+        Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicleLinkPairs();
+        for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
+            boolean isOnPickup = super.pickupRegister.values().contains(vehicleLinkPair.avVehicle);
+            boolean isOnRebalance = rebalancingVehicles.containsKey(vehicleLinkPair.avVehicle);
+
+            if (!isOnPickup && !isOnRebalance) {
+                setVehicleDiversion(vehicleLinkPair.avVehicle, vehicleLinkPair.getDivertableLocation());
+            }
+        }
+
+    }
+
 
 }

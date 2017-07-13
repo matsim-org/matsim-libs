@@ -52,7 +52,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final Set<AVRequest> matchedRequests = new HashSet<>(); // for data integrity, private!
     private final Set<AVRequest> publishPeriodMatchedRequests = new HashSet<>(); // requests which are matched within a publish period.
     private final Map<AVVehicle, Link> vehiclesWithCustomer = new HashMap<>();
-    private final Map<AVRequest, AVVehicle> pickupRegister = new HashMap<>();
+    protected final Map<AVRequest, AVVehicle> pickupRegister = new HashMap<>();
 
     /**
      * map stores most recently known location of vehicles. map is used in case obtaining the vehicle location fails
@@ -86,8 +86,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     @Override
     void updateDatastructures(Collection<AVVehicle> stayVehicles) {
         stayVehicles.forEach(vehiclesWithCustomer::remove);
-        
-        
+
         // complete all matchings if vehicle has arrived on link
         for (AVRequest avRequest : pickupRegister.keySet()) {
             AVVehicle pickupVehicle = pickupRegister.get(avRequest);
@@ -97,9 +96,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             }
         }
 
-        
-        
-        
         // ---
         @SuppressWarnings("unused")
         int failed = 0;
@@ -253,7 +249,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     public final void setVehiclePickup(AVVehicle avVehicle, AVRequest avRequest) {
         // 1) enter information into pickup table
         pickupRegister.put(avRequest, avVehicle);
-        
+
         // 2) set vehicle diversion of AVVehicle
         setVehicleDiversion(avVehicle, avRequest.getFromLink());
 
@@ -300,19 +296,18 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(link != null);
         return link;
     }
-    
-    protected void endofStepTasks(){
-        // stop all vehicles which are not on a pickup mission. 
+
+    protected void endofStepTasks() {
+        // stop all vehicles which are not on a pickup or rebalancing mission.
         Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicleLinkPairs();
-        for(VehicleLinkPair vehicleLinkPair : divertableVehicles){
-            if(!pickupRegister.values().contains(vehicleLinkPair.avVehicle)){
-                setVehicleDiversion(vehicleLinkPair.avVehicle,vehicleLinkPair.getDivertableLocation());
+        for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
+            boolean isOnPickup = pickupRegister.values().contains(vehicleLinkPair.avVehicle);
+            if (!isOnPickup) {
+                setVehicleDiversion(vehicleLinkPair.avVehicle, vehicleLinkPair.getDivertableLocation());
             }
         }
-        
+
     }
-    
-    
 
     @Override
     final void notifySimulationSubscribers(long round_now) {
