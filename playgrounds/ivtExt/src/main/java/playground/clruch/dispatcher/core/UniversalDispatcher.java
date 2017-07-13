@@ -85,6 +85,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     @Override
     void updateDatastructures(Collection<AVVehicle> stayVehicles) {
+        stayVehicles.forEach(vehiclesWithCustomer::remove);
+        
+        
         // complete all matchings if vehicle has arrived on link
         for (AVRequest avRequest : pickupRegister.keySet()) {
             AVVehicle pickupVehicle = pickupRegister.get(avRequest);
@@ -94,7 +97,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             }
         }
 
-        stayVehicles.forEach(vehiclesWithCustomer::remove);
+        
+        
+        
         // ---
         @SuppressWarnings("unused")
         int failed = 0;
