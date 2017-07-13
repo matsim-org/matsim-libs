@@ -23,6 +23,7 @@ import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
+import playground.clruch.trb18.TRBModule;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.joel.analysis.AnalyzeAll;
@@ -112,6 +113,7 @@ public class ScenarioServer {
         controler.addOverridingModule(new DatabaseModule()); // added only to listen to iteration counter
         controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
         controler.addOverridingModule(new AVTravelTimeModule());
+        controler.addOverridingModule(new TRBModule(reducedNetwork));
         
         
 //        controler.addOverridingModule(new AbstractModule() {
