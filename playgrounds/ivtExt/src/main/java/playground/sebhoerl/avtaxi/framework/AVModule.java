@@ -102,55 +102,55 @@ public class AVModule extends AbstractModule {
 
 	private void configureDispatchmentStrategies() {
         /** dispatchers by sebhoerl */
-        bind(SingleFIFODispatcher.Factory.class);
-        bind(SingleHeuristicDispatcher.Factory.class);
-        bind(MultiODHeuristic.Factory.class);
-        
-        AVUtils.bindDispatcherFactory(binder(), "SingleFIFO").to(SingleFIFODispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), "SingleHeuristic").to(SingleHeuristicDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), "MultiOD").to(MultiODHeuristic.Factory.class);
+//        bind(SingleFIFODispatcher.Factory.class);
+//        bind(SingleHeuristicDispatcher.Factory.class);
+//        bind(MultiODHeuristic.Factory.class);
+//        
+//        AVUtils.bindDispatcherFactory(binder(), "SingleFIFO").to(SingleFIFODispatcher.Factory.class);
+//        AVUtils.bindDispatcherFactory(binder(), "SingleHeuristic").to(SingleHeuristicDispatcher.Factory.class);
+//        AVUtils.bindDispatcherFactory(binder(), "MultiOD").to(MultiODHeuristic.Factory.class);
         
         // ---BIND
         /** dispatchers for UniversalDispatcher */
-        bind(PulseDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), PulseDispatcher.class.getSimpleName()).to(PulseDispatcher.Factory.class);
-        
-        bind(EdgyDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), EdgyDispatcher.class.getSimpleName()).to(EdgyDispatcher.Factory.class);
-
-        bind(NotAsDumbDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(),NotAsDumbDispatcher.class.getSimpleName()).to(NotAsDumbDispatcher.Factory.class);
+//        bind(PulseDispatcher.Factory.class);
+//        AVUtils.bindDispatcherFactory(binder(), PulseDispatcher.class.getSimpleName()).to(PulseDispatcher.Factory.class);
+//        
+//        bind(EdgyDispatcher.Factory.class);
+//        AVUtils.bindDispatcherFactory(binder(), EdgyDispatcher.class.getSimpleName()).to(EdgyDispatcher.Factory.class);
+//
+//        bind(NotAsDumbDispatcher.Factory.class);
+//        AVUtils.bindDispatcherFactory(binder(),NotAsDumbDispatcher.class.getSimpleName()).to(NotAsDumbDispatcher.Factory.class);
 
         bind(GlobalBipartiteMatchingDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), GlobalBipartiteMatchingDispatcher.class.getSimpleName()).to(GlobalBipartiteMatchingDispatcher.Factory.class);
         
-        bind(SelfishDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);
-
-        bind(NewSingleHeuristicDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), NewSingleHeuristicDispatcher.class.getSimpleName()).to(NewSingleHeuristicDispatcher.Factory.class);
-
-        bind(MonoMultiGBMDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), MonoMultiGBMDispatcher.class.getSimpleName()).to(MonoMultiGBMDispatcher.Factory.class);
-
-        bind(PolyMultiGBMDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), PolyMultiGBMDispatcher.class.getSimpleName()).to(PolyMultiGBMDispatcher.Factory.class);
+//        bind(SelfishDispatcher.Factory.class);
+//        AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);
+//
+//        bind(NewSingleHeuristicDispatcher.Factory.class);
+//        AVUtils.bindDispatcherFactory(binder(), NewSingleHeuristicDispatcher.class.getSimpleName()).to(NewSingleHeuristicDispatcher.Factory.class);
+//
+//        bind(MonoMultiGBMDispatcher.Factory.class);
+//        AVUtils.bindDispatcherFactory(binder(), MonoMultiGBMDispatcher.class.getSimpleName()).to(MonoMultiGBMDispatcher.Factory.class);
+//
+//        bind(PolyMultiGBMDispatcher.Factory.class);
+//        AVUtils.bindDispatcherFactory(binder(), PolyMultiGBMDispatcher.class.getSimpleName()).to(PolyMultiGBMDispatcher.Factory.class);
 
         /** dispatchers for PartitionedDispatcher */
-        //bind(ConsensusDispatcherDFR.Factory.class);
-        bind(LPFeedbackLIPDispatcher.Factory.class);
-        bind(LPFeedforwardDispatcher.Factory.class);
-        bind(DFRDispatcher.Factory.class);
-        //AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcherDFR.class.getSimpleName()).to(ConsensusDispatcherDFR.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), LPFeedbackLIPDispatcher.class.getSimpleName()).to(LPFeedbackLIPDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), LPFeedforwardDispatcher.class.getSimpleName()).to(LPFeedforwardDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), DFRDispatcher.class.getSimpleName()).to(DFRDispatcher.Factory.class);
-        
-        // MPC dispatcher
-        bind(MPCDispatcher1.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher1.class.getSimpleName()).to(MPCDispatcher1.Factory.class);
-        bind(MPCDispatcher2.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher2.class.getSimpleName()).to(MPCDispatcher2.Factory.class);
+//        //bind(ConsensusDispatcherDFR.Factory.class);
+//        bind(LPFeedbackLIPDispatcher.Factory.class);
+//        bind(LPFeedforwardDispatcher.Factory.class);
+//        bind(DFRDispatcher.Factory.class);
+//        //AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcherDFR.class.getSimpleName()).to(ConsensusDispatcherDFR.Factory.class);
+//        AVUtils.bindDispatcherFactory(binder(), LPFeedbackLIPDispatcher.class.getSimpleName()).to(LPFeedbackLIPDispatcher.Factory.class);
+//        AVUtils.bindDispatcherFactory(binder(), LPFeedforwardDispatcher.class.getSimpleName()).to(LPFeedforwardDispatcher.Factory.class);
+//        AVUtils.bindDispatcherFactory(binder(), DFRDispatcher.class.getSimpleName()).to(DFRDispatcher.Factory.class);
+//        
+//        // MPC dispatcher
+//        bind(MPCDispatcher1.Factory.class);
+//        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher1.class.getSimpleName()).to(MPCDispatcher1.Factory.class);
+//        bind(MPCDispatcher2.Factory.class);
+//        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher2.class.getSimpleName()).to(MPCDispatcher2.Factory.class);
         
     }
 

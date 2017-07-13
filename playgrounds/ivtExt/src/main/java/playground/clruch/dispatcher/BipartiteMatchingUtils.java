@@ -48,8 +48,9 @@ public enum BipartiteMatchingUtils {
         // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method and set new pickup commands
         returnTensor.append(Tensors.vectorInt(divertableVehiclesReduced.size(), requestsReduced.size())); // initial problem size
 
-        Map<VehicleLinkPair, AVRequest> hungarianMatch = new HungarBiPartVehicleDestMatcher().match(divertableVehiclesReduced, requestsReduced); //
-
+        Map<VehicleLinkPair, AVRequest> hungarianMatch = (new HungarBiPartVehicleDestMatcher()).match(divertableVehiclesReduced, requestsReduced); //
+        
+        
         for (Entry<VehicleLinkPair, AVRequest> entry : hungarianMatch.entrySet()) {
             AVVehicle av = entry.getKey().avVehicle;
             AVRequest avRequest = entry.getValue();

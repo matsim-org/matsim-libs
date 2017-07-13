@@ -46,6 +46,8 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
         if (round_now % dispatchPeriod == 0) {
             printVals = BipartiteMatchingUtils.globalBipartiteMatching(this, () -> getDivertableVehicleLinkPairs(), this.getAVRequests());
         }
+        
+        super.endofStepTasks();
     }
 
     @Override

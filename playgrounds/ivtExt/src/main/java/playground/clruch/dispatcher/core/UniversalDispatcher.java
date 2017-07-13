@@ -53,7 +53,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final Set<AVRequest> publishPeriodMatchedRequests = new HashSet<>(); // requests which are matched within a publish period.
     private final Map<AVVehicle, Link> vehiclesWithCustomer = new HashMap<>();
     private final Map<AVRequest, AVVehicle> pickupRegister = new HashMap<>();
-    private final Map<AVVehicle, VehicleLinkPair> avVehicleVehicleLinkPairMap = new HashMap<>();
 
     /**
      * map stores most recently known location of vehicles. map is used in case obtaining the vehicle location fails
@@ -90,7 +89,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         for (AVRequest avRequest : pickupRegister.keySet()) {
             AVVehicle pickupVehicle = pickupRegister.get(avRequest);
             Link pickupVehicleLink = getStayVehiclesUnique().get(pickupVehicle);
-            if (avRequest.getFromLink().equals(pickupVehicleLink)) {
+            if (avRequest.getFromLink().equals(pickupVehicleLink) && pendingRequests.contains(avRequest)) {
                 setAcceptRequest(pickupVehicle, avRequest);
             }
         }
@@ -245,16 +244,19 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @param entry
      *            <VehicleLinkPair,AVRequest> sets AVVehicle to pickup AVRequest
      */
-    // TODO find a way to make this protected again. 
+    // TODO find a way to make this protected again.
     public final void setVehiclePickup(AVVehicle avVehicle, AVRequest avRequest) {
         // 1) enter information into pickup table
         AVVehicle previousPickup = pickupRegister.put(avRequest, avVehicle);
 
-        // 2) if other pickup scheduld to pickup request, ensure it stays where it is.
-        if (previousPickup != null) {
-            setVehicleDiversion(avVehicle, avVehicleVehicleLinkPairMap.get(avVehicle).getDivertableLocation());
-
-        }
+        // // 2) if other pickup scheduld to pickup request, ensure it stays where it is.
+        // if (previousPickup != null) {
+        //
+        // System.out.println(avVehicle);
+        // System.out.println(avVehicleVehicleLinkPairMap.get(avVehicle).getDivertableLocation());
+        // setVehicleDiversion(avVehicle, avVehicleVehicleLinkPairMap.get(avVehicle).getDivertableLocation());
+        //
+        // }
 
         // 3) set vehicle diversion of AVVehicle
         setVehicleDiversion(avVehicle, avRequest.getFromLink());
@@ -302,6 +304,19 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(link != null);
         return link;
     }
+    
+    protected void endofStepTasks(){
+        // stop all vehicles which are not on a pickup mission. 
+        Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicleLinkPairs();
+        for(VehicleLinkPair vehicleLinkPair : divertableVehicles){
+            if(!pickupRegister.values().contains(vehicleLinkPair.avVehicle)){
+                setVehicleDiversion(vehicleLinkPair.avVehicle,vehicleLinkPair.getDivertableLocation());
+            }
+        }
+        
+    }
+    
+    
 
     @Override
     final void notifySimulationSubscribers(long round_now) {

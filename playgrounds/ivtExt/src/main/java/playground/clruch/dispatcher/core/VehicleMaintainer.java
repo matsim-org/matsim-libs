@@ -44,7 +44,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
     private Double private_now = null;
     private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
     private int infoLinePeriod = 0;
-    private Map<AVVehicle, VehicleLinkPair> avVehicleVehicleLinkPairMap = new HashMap<>();
+    protected Map<AVVehicle, VehicleLinkPair> avVehicleVehicleLinkPairMap = new HashMap<>();
 
     VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
@@ -194,6 +194,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     protected final Collection<VehicleLinkPair> getDivertableVehicleLinkPairs() {
+        getDivertableVehicles();
         return avVehicleVehicleLinkPairMap.values();
     }
 
