@@ -1,13 +1,10 @@
 package playground.clruch.dispatcher;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 
@@ -16,11 +13,11 @@ import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
-import playground.clruch.dispatcher.utils.ImmobilizeVehicleDestMatcher;
 import playground.clruch.simonton.Cluster;
 import playground.clruch.simonton.EuclideanDistancer;
 import playground.clruch.simonton.MyTree;
 import playground.clruch.utils.GlobalAssert;
+import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public enum BipartiteMatchingUtils {
@@ -36,105 +33,80 @@ public enum BipartiteMatchingUtils {
      * @return does assignment according to globalBipartiteMatching and returns a tensor with infoline Information
      */
     public static Tensor globalBipartiteMatching(UniversalDispatcher dispatcher, Supplier<Collection<VehicleLinkPair>> supplier,
-            Map<Link, List<AVRequest>> requests) {
+            Collection<AVRequest> requests) {
 
         Tensor returnTensor = Tensors.empty(); // contains information for InfoLine
+        Collection<VehicleLinkPair> divertableVehicles = supplier.get(); // save initial problem size
+        returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requests.size()));
 
-        // generate a list of request links (there can be multiple entries)
-        List<Link> requestLinks = requests.values().stream() //
-                .flatMap(List::stream).map(AVRequest::getFromLink).collect(Collectors.toList());
+        // 1) In case divertableVehicles >> requests reduce search space using kd-trees
+        Collection<VehicleLinkPair> divertableVehiclesReduced = reduceVehiclesKDTree(requests, divertableVehicles);
 
-        // 1) for every request, immobilize a stay vehicle on the same link if existing and take request out of set
-        Collection<VehicleLinkPair> divertableVehicles = supplier.get();
-        returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requestLinks.size())); // initial problem size
-        new ImmobilizeVehicleDestMatcher().match(divertableVehicles, requestLinks) //
-                .entrySet().forEach(dispatcher::setVehicleDiversion);
+        // 2) In case requests >> divertablevehicles reduce the search space using kd-trees
+        Collection<AVRequest> requestsReduced = reduceRequestsKDTree(requests, divertableVehicles);
 
-        divertableVehicles = supplier.get();
-        returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requestLinks.size())); // initial problem size
+        // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method and set new pickup commands
+        returnTensor.append(Tensors.vectorInt(divertableVehiclesReduced.size(), requestsReduced.size())); // initial problem size
 
-        // TODO: this global assert does not work. Check if it is because some vehicles are not available all the time
-        // and thus do not appear in getDivertableVehicles();
-        // GlobalAssert.that(returnTensor.get(0,0).subtract(returnTensor.get(1,0)).equals(returnTensor.get(0,1).subtract(returnTensor.get(1,1))));
+        Map<VehicleLinkPair, AVRequest> hungarianMatch = new HungarBiPartVehicleDestMatcher().match(divertableVehiclesReduced, requestsReduced); //
 
-        // 2) In case divertableVehicles >> requests reduce search space using kd-trees
-        Collection<VehicleLinkPair> divertableVehiclesReduced = reduceVehiclesKDTree(requestLinks, divertableVehicles);
-
-        // 3) In case requests >> divertablevehicles reduce the search space using kd-trees
-        List<Link> requestLinksReduced = reduceRequestsKDTree(requestLinks, divertableVehicles);
-
-        // 4) compute Euclidean bipartite matching for all vehicles using the Hungarian method
-        returnTensor.append(Tensors.vectorInt(divertableVehiclesReduced.size(), requestLinks.size())); // initial problem size
-        new HungarBiPartVehicleDestMatcher().match(divertableVehiclesReduced, requestLinksReduced) //
-                .entrySet().forEach(dispatcher::setVehicleDiversion);
+        for (Entry<VehicleLinkPair, AVRequest> entry : hungarianMatch.entrySet()) {
+            AVVehicle av = entry.getKey().avVehicle;
+            AVRequest avRequest = entry.getValue();
+            dispatcher.setVehiclePickup(av, avRequest);
+        }
 
         // return infoLine
         return returnTensor;
     }
 
-    // class to uniquely distinguish requests
-    static class RequestWithID {
-        public Link link;
-        public int id;
-
-        RequestWithID(Link linkIn, int idIn) {
-            link = linkIn;
-            id = idIn;
-        }
-    }
-
-    private static List<Link> reduceRequestsKDTree(List<Link> requestlocs, Collection<VehicleLinkPair> divertableVehicles) {
+    private static Collection<AVRequest> reduceRequestsKDTree(Collection<AVRequest> requests, Collection<VehicleLinkPair> divertableVehicles) {
         // for less requests than cars, don't do anything
-        if (requestlocs.size() < divertableVehicles.size())
-            return requestlocs;
+        if (requests.size() < divertableVehicles.size())
+            return requests;
 
         // otherwise create KD tree and return reduced amount of requestlocs
         // create KD tree
         int dimensions = 2;
-        int maxDensity = requestlocs.size();
+        int maxDensity = requests.size();
         double maxCoordinate = 1000000000000.0;
-        int maxDepth = requestlocs.size();
-        MyTree<RequestWithID> KDTree = new MyTree<>(dimensions, maxDensity, maxCoordinate, maxDepth);
+        int maxDepth = requests.size();
+        MyTree<AVRequest> KDTree = new MyTree<>(dimensions, maxDensity, maxCoordinate, maxDepth);
 
         // add uniquely identifiable requests to KD tree
         int reqIter = 0;
-        for (Link link : requestlocs) {
+        for (AVRequest avRequest : requests) {
+            Link link = avRequest.getFromLink();
             double d1 = link.getFromNode().getCoord().getX();
             double d2 = link.getFromNode().getCoord().getY();
             GlobalAssert.that(Double.isFinite(d1));
             GlobalAssert.that(Double.isFinite(d2));
-            KDTree.add(new double[] { d1, d2 }, new RequestWithID(link, reqIter));
+            KDTree.add(new double[] { d1, d2 }, avRequest);
             reqIter++;
         }
 
         // for all divertable vehicles, start nearestNeighborSearch until union is as large as the number of vehicles
         // start with only one request per vehicle
-        HashMap<RequestWithID, Link> requestsChosen = new HashMap<>();
+        Collection<AVRequest> requestsChosen = new HashSet<>();
         int iter = 1;
         do {
             requestsChosen.clear();
             for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
                 double[] vehLoc = new double[] { vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getX(),
                         vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getY() };
-                Cluster<RequestWithID> nearestCluster = KDTree.buildCluster(vehLoc, iter, new EuclideanDistancer());
-                nearestCluster.getValues().stream().forEach(v -> requestsChosen.put(v, v.link));
+                Cluster<AVRequest> nearestCluster = KDTree.buildCluster(vehLoc, iter, new EuclideanDistancer());
+                nearestCluster.getValues().stream().forEach(v -> requestsChosen.add(v));
             }
             ++iter;
         } while (requestsChosen.size() < divertableVehicles.size() && iter <= divertableVehicles.size());
 
-        List<Link> toSearchrequestlocs = new LinkedList<>();
-        requestsChosen.values().stream().forEach(v -> toSearchrequestlocs.add(v));
+        return requestsChosen;
 
-        if (toSearchrequestlocs.size() < divertableVehicles.size()) {
-            System.out.println("Hoppla");
-        }
-
-        return toSearchrequestlocs;
     }
 
-    private static Collection<VehicleLinkPair> reduceVehiclesKDTree(List<Link> requestlocs, Collection<VehicleLinkPair> divertableVehicles) {
+    private static Collection<VehicleLinkPair> reduceVehiclesKDTree(Collection<AVRequest> requests, Collection<VehicleLinkPair> divertableVehicles) {
         // for less requests than cars, don't do anything
-        if (divertableVehicles.size() < requestlocs.size())
+        if (divertableVehicles.size() < requests.size())
             return divertableVehicles;
 
         // otherwise create KD tree and return reduced amount of requestlocs
@@ -162,14 +134,44 @@ public enum BipartiteMatchingUtils {
         int iter = 1;
         do {
             vehiclesChosen.clear();
-            for (Link link : requestlocs) {
+            for (AVRequest avRequest : requests) {
+                Link link = avRequest.getFromLink();
                 double[] reqloc = new double[] { link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY() };
                 Cluster<VehicleLinkPair> nearestCluster = KDTree.buildCluster(reqloc, iter, new EuclideanDistancer());
                 nearestCluster.getValues().stream().forEach(v -> vehiclesChosen.add(v));
             }
             ++iter;
-        } while (vehiclesChosen.size() < requestlocs.size() && iter <= requestlocs.size());
+        } while (vehiclesChosen.size() < requests.size() && iter <= requests.size());
 
         return vehiclesChosen;
     }
 }
+
+//// generate list of all open requests
+// List<AVRequest> =
+//
+//
+//// generate a list of request links (there can be multiple entries)
+// List<Link> requestLinks = requests.values().stream() //
+// .flatMap(List::stream).map(AVRequest::getFromLink).collect(Collectors.toList());
+
+//// 1) for every request, immobilize a stay vehicle on the same link if existing and take request out of set
+// Collection<VehicleLinkPair> divertableVehicles = supplier.get();
+// returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requestLinks.size())); // initial problem size
+// new ImmobilizeVehicleDestMatcher().match(divertableVehicles, requestLinks) //
+// .entrySet().forEach(dispatcher::setVehicleDiversion);
+
+// TODO: this global assert does not work. Check if it is because some vehicles are not available all the time
+// and thus do not appear in getDivertableVehicles();
+// GlobalAssert.that(returnTensor.get(0,0).subtract(returnTensor.get(1,0)).equals(returnTensor.get(0,1).subtract(returnTensor.get(1,1))));
+
+//// class to uniquely distinguish requests
+// static class RequestWithID {
+// public Link link;
+// public int id;
+//
+// RequestWithID(Link linkIn, int idIn) {
+// link = linkIn;
+// id = idIn;
+// }
+// }

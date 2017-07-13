@@ -40,11 +40,11 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
     public void redispatch(double now) {
         final long round_now = Math.round(now);
 
-        new InOrderOfArrivalMatcher(this::setAcceptRequest) //
-                .match(getStayVehicles(), getAVRequestsAtLinks());
+        // new InOrderOfArrivalMatcher(this::setAcceptRequest) //
+        // .match(getStayVehicles(), getAVRequestsAtLinks());
 
         if (round_now % dispatchPeriod == 0) {
-            printVals = BipartiteMatchingUtils.globalBipartiteMatching(this, () -> getDivertableVehicles(), this.getAVRequestsAtLinks());
+            printVals = BipartiteMatchingUtils.globalBipartiteMatching(this, () -> getDivertableVehicleLinkPairs(), this.getAVRequests());
         }
     }
 
