@@ -105,7 +105,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		legList.addAll(walkRouter.calcRoute(fromFacility, accessFacility, departureTime, person));
 		Leg walkLeg = (Leg)legList.get(0);
 		Activity drtInt1 = scenario.getPopulation().getFactory()
-				.createActivityFromCoord(DrtStageActivityType.DRTSTAGEACTIVITY, accessFacility.getCoord());
+				.createActivityFromCoord(DrtStageActivityType.DRT_STAGE_ACTIVITY, accessFacility.getCoord());
 		drtInt1.setMaximumDuration(1);
 		drtInt1.setLinkId(accessFacility.getLinkId());
 		legList.add(drtInt1);
@@ -131,7 +131,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		legList.add(drtLeg);
 
 		Activity drtInt2 = scenario.getPopulation().getFactory()
-				.createActivityFromCoord(DrtStageActivityType.DRTSTAGEACTIVITY, egressFacility.getCoord());
+				.createActivityFromCoord(DrtStageActivityType.DRT_STAGE_ACTIVITY, egressFacility.getCoord());
 		drtInt2.setMaximumDuration(1);
 		drtInt2.setLinkId(egressFacility.getLinkId());
 		legList.add(drtInt2);

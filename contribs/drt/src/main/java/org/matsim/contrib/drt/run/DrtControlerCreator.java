@@ -24,53 +24,49 @@ package org.matsim.contrib.drt.run;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
 import org.matsim.contrib.drt.optimizer.*;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
-import org.matsim.contrib.drt.routing.*;
+import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.core.config.*;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.*;
 
-import com.google.inject.*;
-import com.google.inject.name.*;
+import com.google.inject.Provider;
 
 /**
  * @author jbischoff
  *
  */
 public final class DrtControlerCreator {
-	
+
 	public static Controler createControler(Config config, boolean otfvis) {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
 		config.checkConsistency();
-		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stationbased)){
-			ActivityParams params = config.planCalcScore().getActivityParams(DrtStageActivityType.DRTSTAGEACTIVITY);
-			if (params == null)
-			{
-				params = new ActivityParams(DrtStageActivityType.DRTSTAGEACTIVITY);
+		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stationbased)) {
+			ActivityParams params = config.planCalcScore().getActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY);
+			if (params == null) {
+				params = new ActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY);
 				params.setTypicalDuration(1);
 				params.setScoringThisActivityAtAll(false);
 				config.planCalcScore().addActivityParams(params);
-				Logger.getLogger(DrtControlerCreator.class).info("drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
+				Logger.getLogger(DrtControlerCreator.class).info(
+						"drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 			}
 		}
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DrtModule() ) ;
+		controler.addOverridingModule(new DvrpModule(
+				DrtControlerCreator.createModuleForQSimPlugin(DefaultDrtOptimizerProvider.class), DrtOptimizer.class));
+		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
