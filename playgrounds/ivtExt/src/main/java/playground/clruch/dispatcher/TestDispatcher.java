@@ -1,5 +1,7 @@
 package playground.clruch.dispatcher;
 
+import java.util.ArrayList;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -19,6 +21,7 @@ import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
+import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class TestDispatcher extends RebalancingDispatcher {
@@ -27,8 +30,8 @@ public class TestDispatcher extends RebalancingDispatcher {
     private Tensor printVals = Tensors.empty();
     private final Network network;
     AVVehicle avVehicle;
-    Link link1;
-    Link link2;
+    ArrayList<Link> links = new ArrayList<>();
+    ArrayList<AVRequest> requests = new ArrayList<>();
 
     private TestDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -48,28 +51,56 @@ public class TestDispatcher extends RebalancingDispatcher {
 
         if (round_now == 290) {
             // chose two links
-            link1 = network.getLinks().entrySet().stream().filter(v->v.getKey().toString().equals("238283219_1")).findAny().get().getValue();
-            System.out.println("link chosen = " + link1.getId().toString());
-
-            link2 = network.getLinks().entrySet().stream().filter(v->v.getKey().toString().equals("42145650_0")).findAny().get().getValue();
-            System.out.println("link chosen = " + link2.getId().toString());
+            links.add(network.getLinks().entrySet().stream().filter(v -> v.getKey().toString().equals("238283219_1")).findAny().get().getValue());
+            links.add(network.getLinks().entrySet().stream().filter(v -> v.getKey().toString().equals("42145650_0")).findAny().get().getValue());
+            links.add(network.getLinks().entrySet().stream().filter(v -> v.getKey().toString().equals("9904192_0")).findAny().get().getValue());
+            
 
             // chose avehicle
             avVehicle = getMaintainedVehicles().stream().findAny().get();
             System.out.println("vehicle chosen = " + avVehicle.getId().toString());
         }
 
-        if (round_now == 300) {
+        if (round_now == 300 ) {
             // rebalance the vehicle to link1
-            setVehicleRebalance(avVehicle, link1);
+            setVehicleRebalance(avVehicle, links.get(0));
 
         }
-
-        if (round_now == 900) {
+        
+        if (round_now == 310 ) {
             // rebalance the vehicle to link1
-            setVehicleRebalance(avVehicle, link2);
+            setVehicleRebalance(avVehicle, links.get(1));
 
         }
+        
+        if (round_now == 320 ) {
+            // rebalance the vehicle to link1
+            setVehicleRebalance(avVehicle, links.get(0));
+
+        }
+        
+        if (round_now == 330 ) {
+            // rebalance the vehicle to link1
+            setVehicleRebalance(avVehicle, links.get(1));
+
+        }
+        
+        if (round_now == 22100 ) {
+            // rebalance the vehicle to link1
+            setVehicleRebalance(avVehicle, links.get(2));
+        }
+        
+        
+        if(round_now == 24210){
+            for(AVRequest avRequest : getAVRequests()){
+                requests.add(avRequest);
+            }
+            AVRequest theRequest = requests.get(0);
+            
+            setVehiclePickup(avVehicle, theRequest);
+        }
+
+
 
         super.endofStepTasks();
     }
