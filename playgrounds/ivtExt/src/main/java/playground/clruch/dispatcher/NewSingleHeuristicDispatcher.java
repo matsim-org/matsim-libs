@@ -1,4 +1,4 @@
-package playground.joel.dispatcher.single_heuristic;
+package playground.clruch.dispatcher;
 
 import java.util.*;
 
