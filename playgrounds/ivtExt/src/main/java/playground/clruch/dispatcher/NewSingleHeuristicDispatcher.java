@@ -14,7 +14,7 @@ import org.matsim.core.utils.collections.QuadTree;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import playground.clruch.dispatcher.core.BindingUniversalDispatcher;
+import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
@@ -28,7 +28,7 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-public class NewSingleHeuristicDispatcher extends BindingUniversalDispatcher {
+public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
 
     private final int dispatchPeriod;
     private final double[] networkBounds;
@@ -58,6 +58,7 @@ public class NewSingleHeuristicDispatcher extends BindingUniversalDispatcher {
         if (round_now % dispatchPeriod == 0) {
 
             // get open requests and available vehicles
+            // TODO use the normal call functions and implement in UniveralDispatcher a setVehiclePickupBinding function instead
             List<VehicleLinkPair> vehicles = getDivertableUnassignedVehicleLinkPairs();
             addUnassignedVehicles(getDivertableUnassignedVehicleLinkPairs());
 
@@ -73,10 +74,8 @@ public class NewSingleHeuristicDispatcher extends BindingUniversalDispatcher {
             if (oversupply && canMatch) { // OVERSUPPLY CASE
                 for (AVRequest avr : requests) {
                     AVVehicle cloestVeh = findClosestVehicle(avr);
-                    // VehicleLinkPair closestVeh = getClosestVehicle(vehicles, avr);
                     if (cloestVeh != null) {
                         setVehiclePickup(cloestVeh, avr);
-                        // vehicles.remove(cloestVeh);
                         removeFromTrees(cloestVeh, avr);
                     }
                 }
@@ -87,7 +86,6 @@ public class NewSingleHeuristicDispatcher extends BindingUniversalDispatcher {
                     AVRequest closestReq = findClosestRequest(vlp);
                     if (closestReq != null) {
                         setVehiclePickup(vlp.avVehicle, closestReq);
-                        // requests.remove(closestReq);
                         removeFromTrees(vlp.avVehicle, closestReq);
                     }
                 }

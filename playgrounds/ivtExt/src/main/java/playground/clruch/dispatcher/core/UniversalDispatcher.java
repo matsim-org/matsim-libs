@@ -1,6 +1,7 @@
 // code by jph
 package playground.clruch.dispatcher.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -144,6 +145,41 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 .collect(Collectors.groupingBy(AVRequest::getFromLink));
     }
 
+    
+    
+
+    /**
+     * @return AVRequests which are currently not assigned to a vehicle
+     */
+    protected synchronized final List<AVRequest> getUnassignedAVRequests() {
+        List<AVRequest> unassignedRequests = new ArrayList<>();
+        for (AVRequest avRequest : pendingRequests) {
+            if (pickupRegister.get(avRequest) == null) {
+                unassignedRequests.add(avRequest);
+            }
+        }
+        return unassignedRequests;
+    }
+
+
+    /**
+     * 
+     * @return available vehicles which are yet unassigned to a request as vehicle Link pairs
+     */
+    protected List<VehicleLinkPair> getDivertableUnassignedVehicleLinkPairs() {
+        // get the staying vehicles and requests
+        List<VehicleLinkPair> divertableUnassignedVehiclesLinkPairs = new ArrayList<>();
+        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicleLinkPairs()) {
+            if (!pickupRegister.inverse().containsKey(vehicleLinkPair.avVehicle)) {
+                divertableUnassignedVehiclesLinkPairs.add(vehicleLinkPair);
+            }
+        }
+        return divertableUnassignedVehiclesLinkPairs;
+    }
+    
+    
+    
+    
     /**
      * assigns new destination to vehicle. if vehicle is already located at destination, nothing happens.
      * 
