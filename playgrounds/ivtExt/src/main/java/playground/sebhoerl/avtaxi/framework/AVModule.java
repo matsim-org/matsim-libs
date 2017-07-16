@@ -117,10 +117,10 @@ public class AVModule extends AbstractModule {
         /** dispatchers for UniversalDispatcher */
         // bind(PulseDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), PulseDispatcher.class.getSimpleName()).to(PulseDispatcher.Factory.class);
-        //
-        // bind(EdgyDispatcher.Factory.class);
-        // AVUtils.bindDispatcherFactory(binder(), EdgyDispatcher.class.getSimpleName()).to(EdgyDispatcher.Factory.class);
-        //
+
+        bind(EdgyDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), EdgyDispatcher.class.getSimpleName()).to(EdgyDispatcher.Factory.class);
+
         // bind(NotAsDumbDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(),NotAsDumbDispatcher.class.getSimpleName()).to(NotAsDumbDispatcher.Factory.class);
 
@@ -129,10 +129,8 @@ public class AVModule extends AbstractModule {
                 .to(GlobalBipartiteMatchingDispatcher.Factory.class);
 
         bind(TestDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), TestDispatcher.class.getSimpleName())
-                .to(TestDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), TestDispatcher.class.getSimpleName()).to(TestDispatcher.Factory.class);
 
-        
         // bind(SelfishDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);
         //
