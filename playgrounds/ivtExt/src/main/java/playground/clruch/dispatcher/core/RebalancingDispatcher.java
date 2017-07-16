@@ -59,6 +59,14 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
 
     // This function has to be called only after getVirtualNodeRebalancingVehicles
     public synchronized final void setVehicleRebalance(final AVVehicle avVehicle, final Link destination) {
+        // in case vehicle is picking up, remove from pickup register
+        if (pickupRegister.containsValue(avVehicle)){
+            AVRequest avRequest = pickupRegister.inverse().get(avVehicle);
+            pickupRegister.forcePut(avRequest, null);
+        }
+        
+        //pickupRegister.inverse().forcePut(avVehicle, null);
+        
         // redivert the vehicle, then generate a rebalancing event and add to list of currently rebalancing vehicles
         setVehicleDiversion(avVehicle, destination);
         eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), avVehicle, destination));

@@ -100,7 +100,7 @@ public class TestDispatcher extends RebalancingDispatcher {
             setVehiclePickup(avVehicle, theRequest);
         }
         
-        if(round_now == 26440){
+        if(round_now == 24440){
             setVehicleRebalance(avVehicle, links.get(0));
         }
 
