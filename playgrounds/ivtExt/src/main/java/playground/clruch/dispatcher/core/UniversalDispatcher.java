@@ -219,13 +219,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
 
         boolean status = matchedRequests.add(avRequest);
-        if (status == false) {
-            System.out.println(avVehicle.getId());
-            System.out.println(avRequest.getId());
-            System.out.println(pickupRegister.inverse().get(avRequest));
-            System.out.println(pickupRegister.get(avVehicle));
-            GlobalAssert.that(status); // matchedRequests did not already contain avRequest
-        }
         // TODO this causes an error if there are open requests at the end of the simulation
 
         // save avRequests which are matched for one publishPeriod to ensure
