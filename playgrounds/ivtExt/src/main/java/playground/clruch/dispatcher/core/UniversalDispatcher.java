@@ -55,8 +55,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final Set<AVRequest> matchedRequests = new HashSet<>(); // for data integrity, private!
     private final Set<AVRequest> publishPeriodMatchedRequests = new HashSet<>(); // requests which are matched within a publish period.
     private final Map<AVVehicle, Link> vehiclesWithCustomer = new HashMap<>();
-    protected final BiMap<AVRequest,AVVehicle> pickupRegister = HashBiMap.create();
-    //protected final Map<AVRequest, AVVehicle> pickupRegister = new HashMap<>();
+    protected final BiMap<AVRequest, AVVehicle> pickupRegister = HashBiMap.create();
+    // protected final Map<AVRequest, AVVehicle> pickupRegister = new HashMap<>();
 
     /**
      * map stores most recently known location of vehicles. map is used in case obtaining the vehicle location fails
@@ -129,7 +129,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      */
     protected synchronized final Collection<AVRequest> getAVRequests() {
         pendingRequests.removeAll(matchedRequests);
-        matchedRequests.stream().forEach(v->pickupRegister.remove(v));
+        matchedRequests.stream().forEach(v -> pickupRegister.remove(v));
         matchedRequests.clear();
         return Collections.unmodifiableCollection(pendingRequests);
     }
@@ -215,11 +215,17 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @param avRequest
      *            provided by getAVRequests()
      */
-    protected synchronized final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
+    private synchronized final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
         GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
 
         boolean status = matchedRequests.add(avRequest);
-        GlobalAssert.that(status); // matchedRequests did not already contain avRequest
+        if (status == false) {
+            System.out.println(avVehicle.getId());
+            System.out.println(avRequest.getId());
+            System.out.println(pickupRegister.inverse().get(avRequest));
+            System.out.println(pickupRegister.get(avVehicle));
+            GlobalAssert.that(status); // matchedRequests did not already contain avRequest
+        }
         // TODO this causes an error if there are open requests at the end of the simulation
 
         // save avRequests which are matched for one publishPeriod to ensure
