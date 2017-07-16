@@ -85,7 +85,7 @@ public class TestDispatcher extends RebalancingDispatcher {
 
         }
         
-        if (round_now == 22100 ) {
+        if (round_now == 24100 ) {
             // rebalance the vehicle to link1
             setVehicleRebalance(avVehicle, links.get(2));
         }
@@ -98,6 +98,10 @@ public class TestDispatcher extends RebalancingDispatcher {
             AVRequest theRequest = requests.get(0);
             
             setVehiclePickup(avVehicle, theRequest);
+        }
+        
+        if(round_now == 24440){
+            setVehicleRebalance(avVehicle, links.get(0));
         }
 
 
