@@ -22,7 +22,6 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 public abstract class RebalancingDispatcher extends UniversalDispatcher {
 
     private final Map<AVVehicle, Link> rebalancingVehicles = new HashMap<>();
-    protected boolean nonStrict = false;
 
     protected RebalancingDispatcher(AVDispatcherConfig avDispatcherConfig, TravelTime travelTime,
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, EventsManager eventsManager) {
@@ -65,13 +64,10 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
             pickupRegister.forcePut(avRequest, null);
         }
         
-        //pickupRegister.inverse().forcePut(avVehicle, null);
-        
         // redivert the vehicle, then generate a rebalancing event and add to list of currently rebalancing vehicles
         setVehicleDiversion(avVehicle, destination);
         eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), avVehicle, destination));
         Link returnVal = rebalancingVehicles.put(avVehicle, destination);
-//        GlobalAssert.that(nonStrict || returnVal == null);
     }
     
     

@@ -2,12 +2,7 @@ package playground.clruch.dispatcher;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
@@ -54,13 +49,12 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
     public void redispatch(double now) {
         final long round_now = Math.round(now);
 
-
         if (round_now % dispatchPeriod == 0) {
             BipartiteMatchingUtils bpmu = new BipartiteMatchingUtils();
             // dispatch vehicles to pickup locations
             printVals = bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), this.getAVRequests());
             bpmu.executePickup(this);
-            
+
             // perform rebalancing with remaining vehicles
             Collection<AVRequest> rebalanceRequests = getMultipleRebalanceRequests(this.getAVRequests(), rebVehperRequest);
             bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), rebalanceRequests);
@@ -71,6 +65,12 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
 
     }
 
+    /**
+     * 
+     * @param avRequests all open avRequests
+     * @param multipl number of rebalancingVehicles to send of every request
+     * @return artificial set of Requests to feed to GBPMatcher
+     */
     private final Collection<AVRequest> getMultipleRebalanceRequests(Collection<AVRequest> avRequests, int multipl) {
         Collection<AVRequest> rebalanceRequests = new ArrayList<>();
         for (AVRequest avRequest : avRequests) {
@@ -80,7 +80,6 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
         }
         return rebalanceRequests;
     }
-
 
     @Override
     public String getInfoLine() {
