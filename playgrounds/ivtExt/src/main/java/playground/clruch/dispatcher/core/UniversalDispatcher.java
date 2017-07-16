@@ -21,6 +21,9 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import playground.clruch.ScenarioServer;
 import playground.clruch.net.SimulationDistribution;
 import playground.clruch.net.SimulationObject;
@@ -52,7 +55,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final Set<AVRequest> matchedRequests = new HashSet<>(); // for data integrity, private!
     private final Set<AVRequest> publishPeriodMatchedRequests = new HashSet<>(); // requests which are matched within a publish period.
     private final Map<AVVehicle, Link> vehiclesWithCustomer = new HashMap<>();
-    protected final Map<AVRequest, AVVehicle> pickupRegister = new HashMap<>();
+    protected final BiMap<AVRequest,AVVehicle> pickupRegister = HashBiMap.create();
+    //protected final Map<AVRequest, AVVehicle> pickupRegister = new HashMap<>();
 
     /**
      * map stores most recently known location of vehicles. map is used in case obtaining the vehicle location fails
@@ -125,6 +129,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      */
     protected synchronized final Collection<AVRequest> getAVRequests() {
         pendingRequests.removeAll(matchedRequests);
+        matchedRequests.stream().forEach(v->pickupRegister.remove(v));
         matchedRequests.clear();
         return Collections.unmodifiableCollection(pendingRequests);
     }
@@ -215,6 +220,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
         boolean status = matchedRequests.add(avRequest);
         GlobalAssert.that(status); // matchedRequests did not already contain avRequest
+        
 
         // save avRequests which are matched for one publishPeriod to ensure
         // no requests are lost in the recording.
@@ -248,7 +254,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     // TODO find a way to make this protected again.
     public void setVehiclePickup(AVVehicle avVehicle, AVRequest avRequest) {
         // 1) enter information into pickup table
-        pickupRegister.put(avRequest, avVehicle);
+        pickupRegister.forcePut(avRequest, avVehicle);
 
         // 2) set vehicle diversion of AVVehicle
         setVehicleDiversion(avVehicle, avRequest.getFromLink());
