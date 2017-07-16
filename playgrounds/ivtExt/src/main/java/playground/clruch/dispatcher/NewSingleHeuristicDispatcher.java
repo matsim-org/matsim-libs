@@ -1,26 +1,23 @@
 package playground.clruch.dispatcher;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordUtils;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import playground.clruch.dispatcher.core.DispatcherUtils;
-import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.BindingUniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
-import playground.clruch.dispatcher.utils.PredefinedMatchingMatcher;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
@@ -62,90 +59,90 @@ public class NewSingleHeuristicDispatcher extends BindingUniversalDispatcher {
 
             // get open requests and available vehicles
             List<VehicleLinkPair> vehicles = getDivertableUnassignedVehicleLinkPairs();
+            addUnassignedVehicles(getDivertableUnassignedVehicleLinkPairs());
+
             List<AVRequest> requests = getUnassignedAVRequests();
             addOpenRequests(requests);
-            System.out.println("requests.size : " + requests.size());
-            System.out.println("pendingRequestsTree.size : " + pendingRequestsTree.size());
 
             boolean oversupply = false;
-            if (vehicles.size() >= requests.size())
+            if (unassignedVehicles.size() >= requests.size())
                 oversupply = true;
 
-            boolean canMatch = (vehicles.size() > 0 && requests.size() > 0);
+            boolean canMatch = (unassignedVehicles.size() > 0 && requests.size() > 0);
 
             if (oversupply && canMatch) { // OVERSUPPLY CASE
                 for (AVRequest avr : requests) {
-                    VehicleLinkPair closestVeh = getClosestVehicle(vehicles, avr);
-                    if (closestVeh != null) {
-                        setVehiclePickup(closestVeh.avVehicle, avr);
-                        vehicles.remove(closestVeh);
-                        removeFromTrees(closestVeh.avVehicle, avr);
+                    AVVehicle cloestVeh = findClosestVehicle(avr);
+                    // VehicleLinkPair closestVeh = getClosestVehicle(vehicles, avr);
+                    if (cloestVeh != null) {
+                        setVehiclePickup(cloestVeh, avr);
+                        // vehicles.remove(cloestVeh);
+                        removeFromTrees(cloestVeh, avr);
                     }
                 }
             }
             if (!oversupply && canMatch) { // UNDERSUPPLY CASE
                 for (VehicleLinkPair vlp : vehicles) {
 
-//                    AVRequest closestReq = getClosestRequest(requests, vlp);
                     AVRequest closestReq = findClosestRequest(vlp);
                     if (closestReq != null) {
                         setVehiclePickup(vlp.avVehicle, closestReq);
-                        requests.remove(closestReq);
+                        // requests.remove(closestReq);
                         removeFromTrees(vlp.avVehicle, closestReq);
                     }
                 }
             }
-
-            System.out.println("requests.size : " + requests.size());
-            System.out.println("pendingRequestsTree.size : " + pendingRequestsTree.size());
-            System.out.println("==========================");
-
         }
-
     }
 
-    private VehicleLinkPair getClosestVehicle(List<VehicleLinkPair> vehicles, AVRequest avRequest) {
-        VehicleLinkPair closestVehicle = null;
-        double closestDistance = Double.MAX_VALUE;
-        for (VehicleLinkPair vehicleLinkPair : vehicles) {
-            double dist = CoordUtils.calcEuclideanDistance(avRequest.getFromLink().getCoord(), vehicleLinkPair.getDivertableLocation().getCoord());
-            if (dist < closestDistance) {
-                closestVehicle = vehicleLinkPair;
-                closestDistance = dist;
+    private boolean removeFromTrees(AVVehicle avVehicle, AVRequest avRequest) {
+        // remove avRequest
+        boolean succRM = openRequests.remove(avRequest);
+        boolean succRT = pendingRequestsTree.remove(avRequest.getFromLink().getFromNode().getCoord().getX(),
+                avRequest.getFromLink().getFromNode().getCoord().getY(), avRequest);
+        boolean removeSuccessR = succRT && succRM;
+        GlobalAssert.that(removeSuccessR);
+
+        // remove avVehicle
+        boolean succVM = unassignedVehicles.remove(avVehicle);
+        boolean succVT = unassignedVehiclesTree.remove(getVehicleLocation(avVehicle).getCoord().getX(),
+                getVehicleLocation(avVehicle).getCoord().getY(), avVehicle);
+        boolean removeSuccessV = succVT && succVM;
+        GlobalAssert.that(removeSuccessV);
+
+        return removeSuccessR && removeSuccessV;
+    }
+
+    /**
+     * @param avRequest
+     *            some request
+     * @param avVehicles
+     *            list of currently unassigned VehicleLinkPairs
+     * @return the AVVehicle closest to the given request
+     */
+    private AVVehicle findClosestVehicle(AVRequest avRequest) {
+        Coord requestCoord = avRequest.getFromLink().getCoord();
+        // System.out.println("treesize " + unassignedVehiclesTree.size());
+        return unassignedVehiclesTree.getClosest(requestCoord.getX(), requestCoord.getY());
+    }
+
+    /**
+     * @param vehicleLinkPair
+     *            ensures that new unassignedVehicles are added to a list with all unassigned vehicles
+     */
+    private void addUnassignedVehicles(List<VehicleLinkPair> vehicleLinkPair) {
+        for (VehicleLinkPair avLinkPair : vehicleLinkPair) {
+            if (!unassignedVehicles.contains(avLinkPair.avVehicle)) {
+                Coord toMatchVehicleCoord = getVehicleLocation(avLinkPair.avVehicle).getCoord();
+                boolean uaSucc = unassignedVehicles.add(avLinkPair.avVehicle);
+                boolean qtSucc = unassignedVehiclesTree.put( //
+                        toMatchVehicleCoord.getX(), //
+                        toMatchVehicleCoord.getY(), //
+                        avLinkPair.avVehicle);
+                GlobalAssert.that(uaSucc && qtSucc);
             }
         }
-        return closestVehicle;
     }
-
-    private AVRequest getClosestRequest(List<AVRequest> requests, VehicleLinkPair vehicleLinkPair) {
-        AVRequest closestRequest = null;
-        double closestDistance = Double.MAX_VALUE;
-        for (AVRequest avRequest : requests) {
-            double dist = CoordUtils.calcEuclideanDistance(avRequest.getFromLink().getCoord(), vehicleLinkPair.getDivertableLocation().getCoord());
-            if (dist < closestDistance) {
-                closestRequest = avRequest;
-                closestDistance = dist;
-            }
-        }
-        return closestRequest;
-    }
-    
-    
-    
-    private boolean removeFromTrees(AVVehicle avVehicle, AVRequest avRequest){
-        //TODO remove also vehicle
-        System.out.println("open Request contains?");
-        System.out.println(openRequests.contains(avRequest));
-        boolean succM = openRequests.remove(avRequest);
-        GlobalAssert.that(succM);
-        boolean succT = pendingRequestsTree.remove(avRequest.getFromLink().getFromNode().getCoord().getX(), avRequest.getFromLink().getFromNode().getCoord().getY(), avRequest);
-        GlobalAssert.that(succT);
-        boolean removeSuccess = succT && succM;
-        GlobalAssert.that(removeSuccess);
-        return removeSuccess;
-    }
-
-    // // ========================== OLD FCTNS. =========================================
 
     /**
      * 
@@ -200,84 +197,3 @@ public class NewSingleHeuristicDispatcher extends BindingUniversalDispatcher {
         }
     }
 }
-
-// // add open requests to search tree
-// addOpenRequests(getUnassignedAVRequests());
-// // add unassigned vehicles to search tree
-// addUnassignedVehicles(getDivertableUnassignedVehicleLinkPairs());
-//
-// if (getDivertableUnassignedVehicleLinkPairs().size() > 0 && getUnassignedAVRequests().size() > 0){
-//
-// }
-//
-// while (!(getDivertableUnassignedVehicleLinkPairs().size() == 0 || getUnassignedAVRequests().size() == 0)) {
-//
-// // oversupply case
-// if (getDivertableUnassignedVehicleLinkPairs().size() >= getUnassignedAVRequests().size()) {
-// // System.out.println("oversupply: more unassigned vehicles than unassigned requests; " +
-// // "(" + getavailableUnassignedVehicleLinkPairs().size() + ":" + getUnassignedAVRequests().size() + ")");
-// AVRequest request = getUnassignedAVRequests().iterator().next();
-// AVVehicle closestVehicle = findClosestVehicle(request, getDivertableUnassignedVehicleLinkPairs());
-// if (closestVehicle != null)
-// sendAndRemove(request, closestVehicle);
-// }
-//
-// // undersupply case
-// else {
-// // System.out.println("undersupply: more unassigned requests than unassigned vehicles; " +
-// // "(" + getavailableUnassignedVehicleLinkPairs().size() + ":" + getUnassignedAVRequests().size() + ")");
-// VehicleLinkPair vehicleLinkPair = getDivertableUnassignedVehicleLinkPairs().get(0);
-// AVRequest closestRequest = findClosestRequest(vehicleLinkPair, getUnassignedAVRequests());
-// if (closestRequest != null)
-// sendAndRemove(closestRequest, vehicleLinkPair.avVehicle);
-// }
-// }
-
-//
-// /**
-// * @param vehicleLinkPair
-// * ensures that new unassignedVehicles are added to a list with all unassigned vehicles
-// */
-// private void addUnassignedVehicles(List<VehicleLinkPair> vehicleLinkPair) {
-// for (VehicleLinkPair avLinkPair : vehicleLinkPair) {
-// if (!unassignedVehicles.contains(avLinkPair.avVehicle)) {
-// Coord toMatchVehicleCoord = getVehicleLocation(avLinkPair.avVehicle).getCoord();
-// boolean uaSucc = unassignedVehicles.add(avLinkPair.avVehicle);
-// boolean qtSucc = unassignedVehiclesTree.put( //
-// toMatchVehicleCoord.getX(), //
-// toMatchVehicleCoord.getY(), //
-// avLinkPair.avVehicle);
-// GlobalAssert.that(uaSucc && qtSucc);
-// }
-// }
-// }
-
-// /**
-// * @param request
-// * vehicle shoul be sent here
-// * @param vehicle
-// * assigned to the request
-// */
-// private void sendAndRemove(AVRequest request, AVVehicle vehicle) {
-// sendStayVehicleCustomer(vehicle, request);
-// Coord toMatchRequestCoord = request.getFromLink().getFromNode().getCoord();
-// pendingRequestsTree.remove(toMatchRequestCoord.getX(), toMatchRequestCoord.getY(), request);
-// Coord toMatchVehicleCoord = getVehicleLocation(vehicle).getCoord();
-// unassignedVehicles.remove(vehicle);
-// unassignedVehiclesTree.remove(toMatchVehicleCoord.getX(), toMatchVehicleCoord.getY(), vehicle);
-// }
-
-//
-// /**
-// * @param avRequest
-// * some request
-// * @param avVehicles
-// * list of currently unassigned VehicleLinkPairs
-// * @return the AVVehicle closest to the given request
-// */
-// private AVVehicle findClosestVehicle(AVRequest avRequest, List<VehicleLinkPair> avVehicles) {
-// Coord requestCoord = avRequest.getFromLink().getCoord();
-// // System.out.println("treesize " + unassignedVehiclesTree.size());
-// return unassignedVehiclesTree.getClosest(requestCoord.getX(), requestCoord.getY());
-// }
-//

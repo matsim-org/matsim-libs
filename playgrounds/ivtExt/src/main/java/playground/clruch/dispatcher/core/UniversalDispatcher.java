@@ -1,7 +1,6 @@
 // code by jph
 package playground.clruch.dispatcher.core;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -243,8 +242,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(returnVal == null);
 
         ++total_matchedRequests;
-
-        protected_setAcceptRequest_postProcessing(avVehicle, avRequest);
     }
 
     /**
@@ -260,13 +257,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         // 2) set vehicle diversion of AVVehicle
         setVehicleDiversion(avVehicle, avRequest.getFromLink());
 
-    }
-    
-    
-    
-    
-
-    protected void protected_setAcceptRequest_postProcessing(AVVehicle avVehicle, AVRequest avRequest) {
     }
 
     /**
@@ -297,8 +287,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     protected Map<AVVehicle, Link> getRebalancingVehicles() {
         return Collections.emptyMap();
     }
-
-    
 
     /**
      * @param avVehicle
