@@ -220,7 +220,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
         boolean status = matchedRequests.add(avRequest);
         GlobalAssert.that(status); // matchedRequests did not already contain avRequest
-        
+        // TODO this causes an error if there are open requests at the end of the simulation
 
         // save avRequests which are matched for one publishPeriod to ensure
         // no requests are lost in the recording.
