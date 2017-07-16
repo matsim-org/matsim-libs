@@ -13,6 +13,7 @@ import org.matsim.core.router.util.TravelTime;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
+import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
@@ -30,15 +31,28 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
 
     @Override
     final void updateDatastructures(Collection<AVVehicle> stayVehicles) {
-        super.updateDatastructures(stayVehicles); // mandatory call
+        // mandatory call
+        super.updateDatastructures(stayVehicles);
+        
+        
+        // 1) remove rebalancing vehicles that have reached their destination
         // TODO currently the vehicles are removed when arriving at final link,
         // ... could be removed as soon as they reach rebalancing destination virtualNode instead
         stayVehicles.forEach(rebalancingVehicles::remove);
+        
     }
 
     @Override
     protected Map<AVVehicle, Link> getRebalancingVehicles() {
         return Collections.unmodifiableMap(rebalancingVehicles);
+    }
+    
+    
+    
+    @Override
+    public final void setVehiclePickup(AVVehicle avVehicle, AVRequest avRequest) {
+        super.setVehiclePickup(avVehicle, avRequest);
+        if(rebalancingVehicles.containsKey(avVehicle))rebalancingVehicles.remove(avVehicle);
     }
     
     

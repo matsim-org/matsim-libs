@@ -246,7 +246,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      *            <VehicleLinkPair,AVRequest> sets AVVehicle to pickup AVRequest
      */
     // TODO find a way to make this protected again.
-    public final void setVehiclePickup(AVVehicle avVehicle, AVRequest avRequest) {
+    public void setVehiclePickup(AVVehicle avVehicle, AVRequest avRequest) {
         // 1) enter information into pickup table
         pickupRegister.put(avRequest, avVehicle);
 
