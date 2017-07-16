@@ -32,13 +32,13 @@ import playground.clruch.dispatcher.EdgyDispatcher;
 import playground.clruch.dispatcher.GlobalBipartiteMatchingDispatcher;
 import playground.clruch.dispatcher.LPFeedbackLIPDispatcher;
 import playground.clruch.dispatcher.LPFeedforwardDispatcher;
+import playground.clruch.dispatcher.MonoMultiGBMDispatcher;
 import playground.clruch.dispatcher.NotAsDumbDispatcher;
 import playground.clruch.dispatcher.PulseDispatcher;
 import playground.clruch.dispatcher.SelfishDispatcher;
 import playground.clruch.dispatcher.TestDispatcher;
 import playground.fseccamo.dispatcher.MPCDispatcher1;
 import playground.fseccamo.dispatcher.MPCDispatcher2;
-import playground.joel.dispatcher.MultiGBM.MonoMultiGBMDispatcher;
 import playground.joel.dispatcher.MultiGBM.PolyMultiGBMDispatcher;
 import playground.joel.dispatcher.single_heuristic.NewSingleHeuristicDispatcher; // TODO: delete this or the other
 import playground.maalbert.dispatcher.DFRDispatcher;
