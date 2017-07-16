@@ -81,19 +81,6 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
         return rebalanceRequests;
     }
 
-//    public final Map<Link, List<AVRequest>> getMultiAVRequestsAtLinks() {
-//        Map<Link, List<AVRequest>> multiAVRequestsAtLinks = new HashMap<>();
-//        this.getAVRequestsAtLinks().forEach((link, list) -> {
-//            List<AVRequest> tempList = new ArrayList<>();
-//            list.forEach(avRequest -> {
-//                for (int i = 0; i < vehiclesPerRequest; i++) {
-//                    tempList.add(avRequest);
-//                }
-//            });
-//            multiAVRequestsAtLinks.put(link, tempList);
-//        });
-//        return multiAVRequestsAtLinks;
-//    }
 
     @Override
     public String getInfoLine() {
