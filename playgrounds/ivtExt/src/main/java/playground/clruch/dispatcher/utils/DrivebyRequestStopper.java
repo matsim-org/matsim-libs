@@ -12,8 +12,12 @@ import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
+
 /**
- * this class is used for testing old functionality the class is superseded by DivertIfCurrentDestinationEmpty etc.
+ * 
+ * @author Claudio Ruch
+ *
+ * call with setVehiclePickup as biConsumer, this class stops vehicles which are diving by an open request. 
  */
 public enum DrivebyRequestStopper {
     ;
