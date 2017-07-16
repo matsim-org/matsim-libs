@@ -133,10 +133,10 @@ public class AVModule extends AbstractModule {
 
         // bind(SelfishDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);
-        //
-        // bind(NewSingleHeuristicDispatcher.Factory.class);
-        // AVUtils.bindDispatcherFactory(binder(), NewSingleHeuristicDispatcher.class.getSimpleName()).to(NewSingleHeuristicDispatcher.Factory.class);
-        //
+
+        bind(NewSingleHeuristicDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), NewSingleHeuristicDispatcher.class.getSimpleName()).to(NewSingleHeuristicDispatcher.Factory.class);
+
         bind(MonoMultiGBMDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), MonoMultiGBMDispatcher.class.getSimpleName()).to(MonoMultiGBMDispatcher.Factory.class);
         //

@@ -1,6 +1,7 @@
 // code by jph
 package playground.clruch.dispatcher.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -219,6 +220,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
 
         boolean status = matchedRequests.add(avRequest);
+        GlobalAssert.that(status);
         // TODO this causes an error if there are open requests at the end of the simulation
 
         // save avRequests which are matched for one publishPeriod to ensure
@@ -259,6 +261,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         setVehicleDiversion(avVehicle, avRequest.getFromLink());
 
     }
+    
+    
+    
+    
 
     protected void protected_setAcceptRequest_postProcessing(AVVehicle avVehicle, AVRequest avRequest) {
     }
@@ -291,6 +297,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     protected Map<AVVehicle, Link> getRebalancingVehicles() {
         return Collections.emptyMap();
     }
+
+    
 
     /**
      * @param avVehicle
