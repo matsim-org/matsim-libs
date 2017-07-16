@@ -32,6 +32,7 @@ public class TestDispatcher extends RebalancingDispatcher {
     AVVehicle avVehicle;
     ArrayList<Link> links = new ArrayList<>();
     ArrayList<AVRequest> requests = new ArrayList<>();
+    ArrayList<AVVehicle> vehicles = new ArrayList<>();
 
     private TestDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -54,58 +55,54 @@ public class TestDispatcher extends RebalancingDispatcher {
             links.add(network.getLinks().entrySet().stream().filter(v -> v.getKey().toString().equals("238283219_1")).findAny().get().getValue());
             links.add(network.getLinks().entrySet().stream().filter(v -> v.getKey().toString().equals("42145650_0")).findAny().get().getValue());
             links.add(network.getLinks().entrySet().stream().filter(v -> v.getKey().toString().equals("9904192_0")).findAny().get().getValue());
-            
+            links.add(network.getLinks().entrySet().stream().filter(v -> v.getKey().toString().equals("9904301_1")).findAny().get().getValue());
+            links.add(network.getLinks().entrySet().stream().filter(v -> v.getKey().toString().equals("57932785_0")).findAny().get().getValue());
 
             // chose avehicle
-            avVehicle = getMaintainedVehicles().stream().findAny().get();
-            System.out.println("vehicle chosen = " + avVehicle.getId().toString());
+            for (AVVehicle avVehicle : getMaintainedVehicles()) {
+                vehicles.add(avVehicle);
+            }
         }
 
-        if (round_now == 300 ) {
-            // rebalance the vehicle to link1
-            setVehicleRebalance(avVehicle, links.get(0));
+        if (round_now == 300) {
+            System.out.println(" there are " + getDivertableVehicles().size() + " divertable vehicles");
+        }
 
-        }
-        
-        if (round_now == 310 ) {
-            // rebalance the vehicle to link1
-            setVehicleRebalance(avVehicle, links.get(1));
+        if (round_now == 24180) {
+            setVehicleRebalance(vehicles.get(0), links.get(0));
+            setVehicleRebalance(vehicles.get(1), links.get(1));
+            setVehicleRebalance(vehicles.get(2), links.get(2));
+            setVehicleRebalance(vehicles.get(3), links.get(3));
+            setVehicleRebalance(vehicles.get(4), links.get(4));
 
+            System.out.println(" there are " + getDivertableVehicles().size() + " divertable vehicles");
         }
         
-        if (round_now == 320 ) {
-            // rebalance the vehicle to link1
-            setVehicleRebalance(avVehicle, links.get(0));
 
-        }
-        
-        if (round_now == 330 ) {
-            // rebalance the vehicle to link1
-            setVehicleRebalance(avVehicle, links.get(1));
-
-        }
-        
-        if (round_now == 24100 ) {
-            // rebalance the vehicle to link1
-            setVehicleRebalance(avVehicle, links.get(2));
-        }
-        
-        
-        if(round_now == 24210){
-            for(AVRequest avRequest : getAVRequests()){
+        if (round_now == 24210) {
+            for (AVRequest avRequest : getAVRequests()) {
                 requests.add(avRequest);
             }
             AVRequest theRequest = requests.get(0);
+
+            setVehiclePickup(vehicles.get(0), theRequest);
+        }        
+
+        
+        if (round_now == 24220) {
+            System.out.println(" there are " + getDivertableVehicles().size() + " divertable vehicles");
             
-            setVehiclePickup(avVehicle, theRequest);
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
         
-        if(round_now == 24440){
-            setVehicleRebalance(avVehicle, links.get(0));
-        }
-
-
-
+        
+        
+        // mandatory call
         super.endofStepTasks();
     }
 
@@ -140,3 +137,46 @@ public class TestDispatcher extends RebalancingDispatcher {
         }
     }
 }
+
+// if (round_now == 300 ) {
+// // rebalance the vehicle to link1
+// setVehicleRebalance(avVehicle, links.get(0));
+//
+// }
+//
+// if (round_now == 310 ) {
+// // rebalance the vehicle to link1
+// setVehicleRebalance(avVehicle, links.get(1));
+//
+// }
+//
+// if (round_now == 320 ) {
+// // rebalance the vehicle to link1
+// setVehicleRebalance(avVehicle, links.get(0));
+//
+// }
+//
+// if (round_now == 330 ) {
+// // rebalance the vehicle to link1
+// setVehicleRebalance(avVehicle, links.get(1));
+//
+// }
+//
+// if (round_now == 24100 ) {
+// // rebalance the vehicle to link1
+// setVehicleRebalance(avVehicle, links.get(2));
+// }
+//
+//
+// if(round_now == 24210){
+// for(AVRequest avRequest : getAVRequests()){
+// requests.add(avRequest);
+// }
+// AVRequest theRequest = requests.get(0);
+//
+// setVehiclePickup(avVehicle, theRequest);
+// }
+//
+// if(round_now == 24440){
+// setVehicleRebalance(avVehicle, links.get(0));
+// }
