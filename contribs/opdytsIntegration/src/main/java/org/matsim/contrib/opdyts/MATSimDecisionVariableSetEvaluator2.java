@@ -244,7 +244,7 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 							tempVector);
 					//NEW: amit
 					String outFile = event.getServices().getControlerIO().getIterationFilename(event.getIteration(),"stateVector_"+analyzer.getStringIdentifier()+".txt");
-					StateVectorSizeWriter.writeData(newInstantaneousStateVector, outFile);
+					StateVectorSizeWriter.writeData(tempVector, outFile);
 				}
 			}
 
