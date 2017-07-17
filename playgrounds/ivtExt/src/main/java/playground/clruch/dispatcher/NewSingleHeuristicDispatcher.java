@@ -91,6 +91,7 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
                 }
             }
         }
+        super.endofStepTasks();
     }
 
     private boolean removeFromTrees(AVVehicle avVehicle, AVRequest avRequest) {

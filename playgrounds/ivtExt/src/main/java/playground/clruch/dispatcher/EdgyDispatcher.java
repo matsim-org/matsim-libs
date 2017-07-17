@@ -20,6 +20,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
@@ -36,10 +37,10 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 /**
  * this dispatcher is a bad example, it performs poorly in many scenarios
  * 
- * The dispatcher setsVehiclePickup if a vehicle is driving by a requests, furthermore it diverts vehicles 
- * to requests within the distance DISTCLOSE or requests which are waiting for more then MAXWAIT
+ * The dispatcher setsVehiclePickup if a vehicle is driving by a requests, furthermore it diverts vehicles to requests within the distance DISTCLOSE
+ * or requests which are waiting for more then MAXWAIT
  */
-public class EdgyDispatcher extends UniversalDispatcher {
+public class EdgyDispatcher extends RebalancingDispatcher {
     private final int dispatchPeriod;
 
     final Network network; // <- for verifying link references
@@ -60,7 +61,6 @@ public class EdgyDispatcher extends UniversalDispatcher {
         dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
     }
 
-
     int total_abortTrip = 0;
     int total_driveOrder = 0;
 
@@ -74,7 +74,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
         if (round_now % dispatchPeriod == 0) {
 
             // iterate over all requests and send vehicles to some arbitrary request closer than distClose m
-            // or to q request waiting for more than double waitMax
+            // or to a request waiting for more than double waitMax
             Iterator<AVRequest> requestIterator = getAVRequests().iterator();
             for (VehicleLinkPair vehicleLinkPair : getDivertableVehicleLinkPairs()) {
                 Link dest = vehicleLinkPair.getCurrentDriveDestination();
@@ -84,7 +84,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
                         Link link = nextRequest.getFromLink();
                         if (CoordUtils.calcEuclideanDistance(link.getCoord(), vehicleLinkPair.getDivertableLocation().getCoord()) < DISTCLOSE
                                 || now - nextRequest.getSubmissionTime() > MAXWAIT) {
-                            setVehicleDiversion(vehicleLinkPair.avVehicle, link);
+                            setVehicleRebalance(vehicleLinkPair.avVehicle, link);
                             ++total_driveOrder;
                         }
                     } else
@@ -92,6 +92,7 @@ public class EdgyDispatcher extends UniversalDispatcher {
                 }
             }
         }
+        super.endofStepTasks();
     }
 
     @Override

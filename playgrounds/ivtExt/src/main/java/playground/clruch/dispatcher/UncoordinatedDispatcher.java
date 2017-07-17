@@ -37,7 +37,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * @author Claudio Ruch
  *
  */
-public class UncoodrinatedDispatcher extends PartitionedDispatcher {
+public class UncoordinatedDispatcher extends PartitionedDispatcher {
     private final int dispatchPeriod;
 
     final int numberOfAVs;
@@ -45,7 +45,7 @@ public class UncoodrinatedDispatcher extends PartitionedDispatcher {
     final Network network; // <- for verifying link references
     final Map<VirtualNode, Link> waitLocations;
 
-    private UncoodrinatedDispatcher( //
+    private UncoordinatedDispatcher( //
             AVDispatcherConfig config, //
             AVGeneratorConfig generatorConfig, //
             TravelTime travelTime, //
@@ -177,7 +177,7 @@ public class UncoodrinatedDispatcher extends PartitionedDispatcher {
                 }
             }
 
-            return new UncoodrinatedDispatcher( //
+            return new UncoordinatedDispatcher( //
                     config, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork);
         }
     }
