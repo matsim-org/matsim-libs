@@ -4,6 +4,7 @@ import ch.ethz.idsc.tensor.*;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.TensorMap;
+import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.mat.IdentityMatrix;
 import ch.ethz.idsc.tensor.mat.LinearSolve;
 import ch.ethz.idsc.tensor.mat.NullSpace;
@@ -26,8 +27,10 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveldata.TravelData;
+import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.traveldata.TravelDataUtils;
 import playground.clruch.utils.GlobalAssert;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
@@ -36,63 +39,76 @@ import java.awt.*;
 import java.io.File;
 import java.util.Collections;
 
-
 /**
- * Created by Joel on 11.07.2017.
+ * Created by Joel on 11.07.2017. Debugged, finished and overall reworked by Claudio on July 17, 2017
+ * 
+ * Procedure is according to publication "Control of Robotic Mobility-On-Demand Systems: a Queueing-Theoretical Perspective" by Rick Zhang and Marco
+ * Pavone, page 5 B. Computation of performance metrics
  */
 public class PerformanceFleetSizeCalculator {
     final Network network;
-    final Population population;
     final VirtualNetwork virtualNetwork;
     final TravelData tData;
-    int size;
     final int numberTimeSteps;
     final int dt;
+    final int dayduration = 108000;
+    int size;
 
     public static void main(String[] args) throws Exception {
-        // for test purpose only
-        int samples = 30;
-
+        // number of timesteps in day
+        int samples = 10;
+        
+        
+        // load needed information
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
-
         File configFile = new File(args[0]);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup,
                 new BlackListedTimeAllocationMutatorConfigGroup());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
-        Population population = scenario.getPopulation();
-        TheApocalypse.decimatesThe(population).toNoMoreThan(1000).people();
+        VirtualNetwork virtualNetworkLoad  = VirtualNetworkGet.readDefault(scenario.getNetwork());
+        final File virtualnetworkDir = new File("virtualNetwork");
+        TravelData travelDataLoad = TravelDataIO.fromByte(network, virtualNetworkLoad, new File(virtualnetworkDir, "travelData"));
 
-        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, //
-                population, 40, 108000 / samples);
+        
+        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetworkLoad, travelDataLoad, 108000/samples);
 
         Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
-        System.out.println("A " + Dimensions.of(Availabilities) + " = " + Availabilities);
+        System.out.println("A " + Dimensions.of(Availabilities) + " = ");
+        System.out.println(Pretty.of(Availabilities));
 
+        // OLD MAIN:
+        // int samples = 10;
+        //
+        // DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+        // dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
+        //
+        // File configFile = new File(args[0]);
+        // Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup,
+        // new BlackListedTimeAllocationMutatorConfigGroup());
+        // Scenario scenario = ScenarioUtils.loadScenario(config);
+        // Network network = scenario.getNetwork();
+        // Population population = scenario.getPopulation();
+        // TheApocalypse.decimatesThe(population).toNoMoreThan(1000).people();
+        //
+        // PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, //
+        // population, 10, 108000 / samples);
+        //
+        // Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
+        // System.out.println("A " + Dimensions.of(Availabilities) + " = ");
+        // System.out.println(Pretty.of(Availabilities));
     }
 
-    public PerformanceFleetSizeCalculator(Network networkIn, Population populationIn, int numVirtualNodes, int dtIn) {
-        population = populationIn;
 
-        // create a network containing only car nodes
-        System.out.println("number of links in original network: " + networkIn.getLinks().size());
-        final TransportModeNetworkFilter filter = new TransportModeNetworkFilter(networkIn);
-        network = NetworkUtils.createNetwork();
-        filter.filter(network, Collections.singleton("car"));
-        System.out.println("number of links in car network: " + network.getLinks().size());
 
-        // create virtualNetwork based on input network
-        KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
-        virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, true);
-
-        int dayduration = 108000;
+    public PerformanceFleetSizeCalculator(Network networkIn, VirtualNetwork virtualNetworkIn, TravelData travelDataIn, int dtIn) {
+        network = networkIn;
+        virtualNetwork = virtualNetworkIn;
+        tData = travelDataIn;
         // ensure that dayduration / timeInterval is integer value
         dt = TravelDataUtils.greatestNonRestDt(dtIn, dayduration);
         numberTimeSteps = dayduration / dt;
-
-        tData = new TravelData(virtualNetwork, network, population, dt);
-
     }
 
     public Tensor calculateAvailabilities() {
@@ -102,24 +118,28 @@ public class PerformanceFleetSizeCalculator {
         for (int k = 0; k < numberTimeSteps; ++k) {
 
             // TODO: need scaling with dt?
-            Tensor alphaij = tData.normToRowStochastic(tData.getAlphaijforTime(k * dt)).multiply(RealScalar.of(dt));
+            Tensor betaij = tData.normToRowStochastic(tData.getAlphaijforTime(k * dt)).multiply(RealScalar.of(dt));
+            System.out.println("betaij " + Dimensions.of(betaij) + " = ");
+            System.out.println(Pretty.of(betaij));
             Tensor lambdai = tData.getLambdaforTime(k * dt).multiply(RealScalar.of(dt));
-            size = alphaij.length();
+            System.out.println("lambdai " + Dimensions.of(lambdai) + " = ");
+            System.out.println(Pretty.of(lambdai));
+            size = betaij.length();
 
             // calculate pii, relative throuputs
-            Tensor pii = getPii(lambdai, alphaij, k * dt);
+            Tensor pii = getPii(lambdai, betaij, k * dt);
 
             // calculate availabilities
             Tensor Ak = Tensors.empty();
-            Tensor mi = lambdai.add(getPsii(alphaij));
+            Tensor mi = lambdai.add(getPsii(betaij));
             MeanValueAnalysis MVA = new MeanValueAnalysis(numVehicles, mi, pii);
             MVA.perform();
             // TODO: replace loop with vector operations
             for (int vehicleStep = 0; vehicleStep < vehicleSteps; vehicleStep++) {
                 // availabilities at all nodes at a certain level of vehicles
-                Tensor Ami = ((MVA.getW(numVehicles*vehicleStep/vehicleSteps).pmul(lambdai)) //
+                Tensor Ami = ((MVA.getW(numVehicles * vehicleStep / vehicleSteps).pmul(lambdai)) //
                         .map(InvertUnlessZero.function)) //
-                        .pmul(MVA.getL(numVehicles*vehicleStep/vehicleSteps));
+                                .pmul(MVA.getL(numVehicles * vehicleStep / vehicleSteps));
                 Ak.append(Mean.of(Ami));
             }
             A.append(Ak);
@@ -144,16 +164,18 @@ public class PerformanceFleetSizeCalculator {
         // calculate pi
         Tensor Pi = Tensors.empty();
         for (int i = 0; i < lambdai.length(); i++)
-            if (Scalars.isZero(Psii.Get(i).add(lambdai.Get(i)))) Pi.append(RealScalar.ZERO);
-            else Pi.append(Psii.Get(i).divide(Psii.Get(i).add(lambdai.Get(i))));
+            if (Scalars.isZero(Psii.Get(i).add(lambdai.Get(i))))
+                Pi.append(RealScalar.ZERO);
+            else
+                Pi.append(Psii.Get(i).divide(Psii.Get(i).add(lambdai.Get(i))));
 
         // calculate pijtilde
         Tensor pTilde = Tensors.empty();
         for (int i = 0; i < size; i++) {
             Tensor pisub = Tensors.empty();
             for (int j = 0; j < size; j++) {
-                pisub.append( (alphaij.Get(i,j).multiply(Pi.Get(i))).add( //
-                        tData.getpijforTime(time, i, j).multiply(RealScalar.of(1).subtract(Pi.Get(i)))) );
+                pisub.append((alphaij.Get(i, j).multiply(Pi.Get(i))).add( //
+                        tData.getpijforTime(time, i, j).multiply(RealScalar.of(1).subtract(Pi.Get(i)))));
             }
             pTilde.append(pisub);
         }
@@ -173,7 +195,7 @@ public class PerformanceFleetSizeCalculator {
     private void plot(Tensor values, int numVehicles, int vehicleSteps) throws Exception {
         final TimeSeriesCollection dataset = new TimeSeriesCollection();
         for (int v = 0; v < values.get(0).length(); v++) {
-            final TimeSeries series = new TimeSeries(numVehicles*v/vehicleSteps + " vehicles");
+            final TimeSeries series = new TimeSeries(numVehicles * v / vehicleSteps + " vehicles");
             for (int t = 0; t < values.length(); t++) {
                 Second daytime = DiagramCreator.toTime(t * 108000 / values.length());
                 series.add(daytime, values.get(t).Get(v).number().doubleValue());
@@ -207,4 +229,31 @@ public class PerformanceFleetSizeCalculator {
         DiagramCreator.savePlot(AnalyzeAll.RELATIVE_DIRECTORY, "availabilitiesByTime", timechart, width, height);
     }
 
+    
+    
+    
+    @Deprecated   // use other constructor that loads directly from file 
+    public PerformanceFleetSizeCalculator(Network networkIn, Population populationIn, int numVirtualNodes, int dtIn) {
+        Population population = populationIn;
+
+        // create a network containing only car nodes
+        System.out.println("number of links in original network: " + networkIn.getLinks().size());
+        final TransportModeNetworkFilter filter = new TransportModeNetworkFilter(networkIn);
+        network = NetworkUtils.createNetwork();
+        filter.filter(network, Collections.singleton("car"));
+        System.out.println("number of links in car network: " + network.getLinks().size());
+
+        // create virtualNetwork based on input network
+        KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
+        virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, true);
+
+        // ensure that dayduration / timeInterval is integer value
+        dt = TravelDataUtils.greatestNonRestDt(dtIn, dayduration);
+        numberTimeSteps = dayduration / dt;
+
+        tData = new TravelData(virtualNetwork, network, population, dt);
+
+    }
+    
+    
 }
