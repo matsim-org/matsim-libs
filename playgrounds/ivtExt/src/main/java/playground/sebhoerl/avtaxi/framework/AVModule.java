@@ -121,8 +121,8 @@ public class AVModule extends AbstractModule {
         bind(EdgyDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), EdgyDispatcher.class.getSimpleName()).to(EdgyDispatcher.Factory.class);
 
-        // bind(NotAsDumbDispatcher.Factory.class);
-        // AVUtils.bindDispatcherFactory(binder(),NotAsDumbDispatcher.class.getSimpleName()).to(NotAsDumbDispatcher.Factory.class);
+        bind(UncoodrinatedDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), UncoodrinatedDispatcher.class.getSimpleName()).to(UncoodrinatedDispatcher.Factory.class);
 
         bind(GlobalBipartiteMatchingDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), GlobalBipartiteMatchingDispatcher.class.getSimpleName())
