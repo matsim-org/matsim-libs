@@ -34,7 +34,7 @@ import playground.clruch.dispatcher.LPFBDispatcher;
 import playground.clruch.dispatcher.LPFFDispatcher;
 import playground.clruch.dispatcher.MonoMultiGBMDispatcher;
 import playground.clruch.dispatcher.NewSingleHeuristicDispatcher;
-import playground.clruch.dispatcher.NotAsDumbDispatcher;
+import playground.clruch.dispatcher.UncoodrinatedDispatcher;
 import playground.clruch.dispatcher.DriveByDispatcher;
 import playground.clruch.dispatcher.SelfishDispatcher;
 import playground.clruch.dispatcher.TestDispatcher;
