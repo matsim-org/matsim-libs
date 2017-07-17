@@ -172,6 +172,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
             bpmu.executePickup(this);
         }
 
+        super.endofStepTasks();
     }
 
     @Override

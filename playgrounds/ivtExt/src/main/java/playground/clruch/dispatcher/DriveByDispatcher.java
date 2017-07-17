@@ -3,6 +3,7 @@ package playground.clruch.dispatcher;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -12,6 +13,7 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
 import playground.clruch.utils.SafeConfig;
@@ -22,17 +24,17 @@ import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-
-
 /**
- * Dispatcher sends vehicles to all links in the network and lets them pickup any
- * customers which are waiting along the road. 
+ * Dispatcher sends vehicles to all links in the network and lets them pickup any customers which are waiting along the road.
+ * 
  * @author Claudio Ruch
  *
  */
-public class DriveByDispatcher extends UniversalDispatcher {
+public class DriveByDispatcher extends RebalancingDispatcher {
     private final List<Link> links;
     int index = 0;
+    double rebPos = 0.1;
+    Random randGen = new Random(1234);
     private final int dispatchPeriod;
     private int total_abortTrip = 0;
 
@@ -52,8 +54,6 @@ public class DriveByDispatcher extends UniversalDispatcher {
     @Override
     public void redispatch(double now) {
 
-
-
         // stop all vehicles which are driving by an open request
         total_abortTrip += DrivebyRequestStopper.stopDrivingBy(getAVRequestsAtLinks(), getDivertableVehicleLinkPairs(), this::setVehiclePickup);
 
@@ -61,8 +61,11 @@ public class DriveByDispatcher extends UniversalDispatcher {
         if (round_now % dispatchPeriod == 0 && 0 < getAVRequests().size()) {
             // send vehicles to travel around the city
             for (AVVehicle avVehicle : getDivertableVehicles())
-                setVehicleDiversion(avVehicle, pollNextDestination());
+                if (rebPos > randGen.nextDouble()) {
+                    setVehicleRebalance(avVehicle, pollNextDestination());
+                }
         }
+        super.endofStepTasks();
     }
 
     private Link pollNextDestination() {
