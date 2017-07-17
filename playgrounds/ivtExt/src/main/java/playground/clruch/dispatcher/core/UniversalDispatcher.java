@@ -145,9 +145,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 .collect(Collectors.groupingBy(AVRequest::getFromLink));
     }
 
-    
-    
-
     /**
      * @return AVRequests which are currently not assigned to a vehicle
      */
@@ -161,7 +158,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         return unassignedRequests;
     }
 
-
     /**
      * 
      * @return available vehicles which are yet unassigned to a request as vehicle Link pairs
@@ -170,16 +166,14 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         // get the staying vehicles and requests
         List<VehicleLinkPair> divertableUnassignedVehiclesLinkPairs = new ArrayList<>();
         for (VehicleLinkPair vehicleLinkPair : getDivertableVehicleLinkPairs()) {
-            if (!pickupRegister.inverse().containsKey(vehicleLinkPair.avVehicle)) {
+            if (!pickupRegister.containsValue(vehicleLinkPair.avVehicle)) {
+                // if (!pickupRegister.inverse().containsKey(vehicleLinkPair.avVehicle)) {
                 divertableUnassignedVehiclesLinkPairs.add(vehicleLinkPair);
             }
         }
         return divertableUnassignedVehiclesLinkPairs;
     }
-    
-    
-    
-    
+
     /**
      * assigns new destination to vehicle. if vehicle is already located at destination, nothing happens.
      * 
@@ -387,12 +381,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     public int getDispatchPeriod(SafeConfig safeConfig, int alt) {
         int redispatchPeriod = safeConfig.getInteger("dispatchPeriod", alt);
-        ScenarioServer.scenarioParameters.redispatchPeriod = redispatchPeriod;
-        return redispatchPeriod;
-    }
-
-    public int getDispatchPeriod(AVDispatcherConfig config) {
-        int redispatchPeriod = Integer.parseInt(config.getParams().get("redispatchPeriod"));
         ScenarioServer.scenarioParameters.redispatchPeriod = redispatchPeriod;
         return redispatchPeriod;
     }

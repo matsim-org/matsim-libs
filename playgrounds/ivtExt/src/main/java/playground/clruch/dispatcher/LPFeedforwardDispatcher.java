@@ -49,6 +49,7 @@ import playground.clruch.netdata.VirtualNode;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.utils.GlobalAssert;
+import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -56,7 +57,7 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class LPFeedforwardDispatcher extends PartitionedDispatcher {
-    public final int redispatchPeriod;
+    public final int dispatchPeriod;
     public final int rebalancingPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractRequestSelector requestSelector;
@@ -88,7 +89,6 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
         this.requestSelector = abstractRequestSelector;
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
-        redispatchPeriod = getDispatchPeriod(config); // Integer.parseInt(config.getParams().get("redispatchPeriod"));
         rebalancingPeriod = getRebalancingPeriod(config); // Integer.parseInt(config.getParams().get("rebalancingPeriod"));
         travelData = arrivalInformationIn;
         nVNodes = virtualNetwork.getvNodesCount();
@@ -96,6 +96,8 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
         rebalanceCount = Array.zeros(nVNodes, nVNodes);
         rebalanceCountInteger = Array.zeros(nVNodes, nVNodes);
         lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
+        SafeConfig safeConfig = SafeConfig.wrap(config);
+        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
     }
 
     @Override
@@ -110,7 +112,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             rebalancingRate = travelData.getAlphaijforTime((int) round_now);
 
             // update rebalance count using current rate
-            rebalanceCount = rebalanceCount.add(rebalancingRate.multiply(RealScalar.of(redispatchPeriod)));
+            rebalanceCount = rebalanceCount.add(rebalancingRate.multiply(RealScalar.of(rebalancingPeriod)));
             rebalanceCountInteger = Floor.of(rebalanceCount);
             rebalanceCount = rebalanceCount.subtract(rebalanceCountInteger);
 
@@ -148,7 +150,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
             rebalanceCountInteger = Array.zeros(nVNodes, nVNodes);
         }
 
-        if (round_now % redispatchPeriod == 0) {
+        if (round_now % dispatchPeriod == 0) {
             // assign destinations to vehicles using bipartite matching
             printVals = BipartiteMatchingUtils.globalBipartiteMatching(this, () -> getVirtualNodeDivertableNotRebalancingVehicles().values() //
                     .stream().flatMap(v -> v.stream()).collect(Collectors.toList()), this.getAVRequestsAtLinks());

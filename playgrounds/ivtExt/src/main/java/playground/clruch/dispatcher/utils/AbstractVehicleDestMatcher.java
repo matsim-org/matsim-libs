@@ -18,17 +18,33 @@ public abstract class AbstractVehicleDestMatcher {
      * @param links collection may be modified inside the matcher
      * @return
      */
-    public final Map<VehicleLinkPair, AVRequest> match( //
+    public final Map<VehicleLinkPair, AVRequest> matchAVRequest( //
             Collection<VehicleLinkPair> vehicleLinkPairs, //
             Collection<AVRequest> avRequests) {
         if (vehicleLinkPairs.isEmpty() || avRequests.isEmpty())
             return Collections.emptyMap();
-        return protected_match(vehicleLinkPairs, avRequests);
+        return protected_matchAVRequest(vehicleLinkPairs, avRequests);
     }
 
-    protected abstract Map<VehicleLinkPair, AVRequest> protected_match( //
+    protected abstract Map<VehicleLinkPair, AVRequest> protected_matchAVRequest( //
             Collection<VehicleLinkPair> vehicleLinkPairs, //
             Collection<AVRequest> links //
     );
+    
+    
+    public final Map<VehicleLinkPair, Link> matchLink( //
+            Collection<VehicleLinkPair> vehicleLinkPairs, //
+            Collection<Link> destinations) {
+        if (vehicleLinkPairs.isEmpty() || destinations.isEmpty())
+            return Collections.emptyMap();
+        return protected_matchLink(vehicleLinkPairs, destinations);
+    }
+
+    protected abstract Map<VehicleLinkPair, Link> protected_matchLink( //
+            Collection<VehicleLinkPair> vehicleLinkPairs, //
+            Collection<Link> links //
+    );    
+    
+    
 
 }

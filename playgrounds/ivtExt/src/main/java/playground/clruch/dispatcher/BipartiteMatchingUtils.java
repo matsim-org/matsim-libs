@@ -49,7 +49,7 @@ public class BipartiteMatchingUtils {
         // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method and set new pickup commands
         returnTensor.append(Tensors.vectorInt(divertableVehiclesReduced.size(), requestsReduced.size())); // initial problem size
 
-        gbpMatch = (new HungarBiPartVehicleDestMatcher()).match(divertableVehiclesReduced, requestsReduced); //
+        gbpMatch = (new HungarBiPartVehicleDestMatcher()).matchAVRequest(divertableVehiclesReduced, requestsReduced); //
 
         // return infoLine
         return returnTensor;

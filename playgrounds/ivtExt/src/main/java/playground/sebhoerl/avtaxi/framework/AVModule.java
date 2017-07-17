@@ -30,7 +30,7 @@ import com.google.inject.name.Names;
 
 import playground.clruch.dispatcher.EdgyDispatcher;
 import playground.clruch.dispatcher.GlobalBipartiteMatchingDispatcher;
-import playground.clruch.dispatcher.LPFeedbackLIPDispatcher;
+import playground.clruch.dispatcher.LPFBDispatcher;
 import playground.clruch.dispatcher.LPFeedforwardDispatcher;
 import playground.clruch.dispatcher.MonoMultiGBMDispatcher;
 import playground.clruch.dispatcher.NewSingleHeuristicDispatcher;
@@ -147,8 +147,8 @@ public class AVModule extends AbstractModule {
         // //bind(ConsensusDispatcherDFR.Factory.class);
         // //AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcherDFR.class.getSimpleName()).to(ConsensusDispatcherDFR.Factory.class);
 
-        // bind(LPFeedbackLIPDispatcher.Factory.class);
-        // AVUtils.bindDispatcherFactory(binder(), LPFeedbackLIPDispatcher.class.getSimpleName()).to(LPFeedbackLIPDispatcher.Factory.class);
+        bind(LPFBDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), LPFBDispatcher.class.getSimpleName()).to(LPFBDispatcher.Factory.class);
 
         // bind(LPFeedforwardDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), LPFeedforwardDispatcher.class.getSimpleName()).to(LPFeedforwardDispatcher.Factory.class);
