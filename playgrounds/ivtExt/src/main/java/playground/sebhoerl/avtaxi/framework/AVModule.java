@@ -35,7 +35,7 @@ import playground.clruch.dispatcher.LPFeedforwardDispatcher;
 import playground.clruch.dispatcher.MonoMultiGBMDispatcher;
 import playground.clruch.dispatcher.NewSingleHeuristicDispatcher;
 import playground.clruch.dispatcher.NotAsDumbDispatcher;
-import playground.clruch.dispatcher.PulseDispatcher;
+import playground.clruch.dispatcher.DriveByDispatcher;
 import playground.clruch.dispatcher.SelfishDispatcher;
 import playground.clruch.dispatcher.TestDispatcher;
 import playground.fseccamo.dispatcher.MPCDispatcher1;
@@ -106,17 +106,17 @@ public class AVModule extends AbstractModule {
     private void configureDispatchmentStrategies() {
         /** dispatchers by sebhoerl */
         // bind(SingleFIFODispatcher.Factory.class);
-        // bind(SingleHeuristicDispatcher.Factory.class);
-        // bind(MultiODHeuristic.Factory.class);
-        //
         // AVUtils.bindDispatcherFactory(binder(), "SingleFIFO").to(SingleFIFODispatcher.Factory.class);
+
+        // bind(SingleHeuristicDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), "SingleHeuristic").to(SingleHeuristicDispatcher.Factory.class);
+
+        // bind(MultiODHeuristic.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), "MultiOD").to(MultiODHeuristic.Factory.class);
 
-        // ---BIND
         /** dispatchers for UniversalDispatcher */
-        // bind(PulseDispatcher.Factory.class);
-        // AVUtils.bindDispatcherFactory(binder(), PulseDispatcher.class.getSimpleName()).to(PulseDispatcher.Factory.class);
+        bind(DriveByDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), DriveByDispatcher.class.getSimpleName()).to(DriveByDispatcher.Factory.class);
 
         bind(EdgyDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), EdgyDispatcher.class.getSimpleName()).to(EdgyDispatcher.Factory.class);
@@ -145,17 +145,20 @@ public class AVModule extends AbstractModule {
 
         /** dispatchers for PartitionedDispatcher */
         // //bind(ConsensusDispatcherDFR.Factory.class);
-        // bind(LPFeedbackLIPDispatcher.Factory.class);
-        // bind(LPFeedforwardDispatcher.Factory.class);
-        // bind(DFRDispatcher.Factory.class);
         // //AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcherDFR.class.getSimpleName()).to(ConsensusDispatcherDFR.Factory.class);
+
+        // bind(LPFeedbackLIPDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), LPFeedbackLIPDispatcher.class.getSimpleName()).to(LPFeedbackLIPDispatcher.Factory.class);
+
+        // bind(LPFeedforwardDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), LPFeedforwardDispatcher.class.getSimpleName()).to(LPFeedforwardDispatcher.Factory.class);
+
+        // bind(DFRDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), DFRDispatcher.class.getSimpleName()).to(DFRDispatcher.Factory.class);
-        //
-        // // MPC dispatcher
+
         // bind(MPCDispatcher1.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), MPCDispatcher1.class.getSimpleName()).to(MPCDispatcher1.Factory.class);
+
         // bind(MPCDispatcher2.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), MPCDispatcher2.class.getSimpleName()).to(MPCDispatcher2.Factory.class);
 
