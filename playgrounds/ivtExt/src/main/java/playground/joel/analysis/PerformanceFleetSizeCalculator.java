@@ -1,16 +1,10 @@
 package playground.joel.analysis;
 
-import ch.ethz.idsc.tensor.*;
-import ch.ethz.idsc.tensor.alg.Array;
-import ch.ethz.idsc.tensor.alg.Dimensions;
-import ch.ethz.idsc.tensor.alg.TensorMap;
-import ch.ethz.idsc.tensor.io.Pretty;
-import ch.ethz.idsc.tensor.mat.IdentityMatrix;
-import ch.ethz.idsc.tensor.mat.LinearSolve;
-import ch.ethz.idsc.tensor.mat.NullSpace;
-import ch.ethz.idsc.tensor.red.Mean;
-import ch.ethz.idsc.tensor.red.Total;
-import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.io.File;
+import java.util.Collections;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.time.Second;
@@ -25,19 +19,29 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalars;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.alg.Dimensions;
+import ch.ethz.idsc.tensor.alg.TensorMap;
+import ch.ethz.idsc.tensor.io.Pretty;
+import ch.ethz.idsc.tensor.mat.IdentityMatrix;
+import ch.ethz.idsc.tensor.mat.LinearSolve;
+import ch.ethz.idsc.tensor.red.Mean;
+import ch.ethz.idsc.tensor.red.Norm;
+import ch.ethz.idsc.tensor.red.Total;
+import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.traveldata.TravelDataUtils;
 import playground.clruch.utils.GlobalAssert;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
-
-import java.awt.*;
-import java.io.File;
-import java.util.Collections;
 
 /**
  * Created by Joel on 11.07.2017. Debugged, finished and overall reworked by Claudio on July 17, 2017
@@ -71,10 +75,11 @@ public class PerformanceFleetSizeCalculator {
         final File virtualnetworkDir = new File("virtualNetwork");
         TravelData travelDataLoad = TravelDataIO.fromByte(network, virtualNetworkLoad, new File(virtualnetworkDir, "travelData"));
 
-        
+        // call the performancefleetsizecalculator and calculate the availabilities
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetworkLoad, travelDataLoad, 108000/samples);
-
         Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
+        
+        // show the availabilities
         System.out.println("A " + Dimensions.of(Availabilities) + " = ");
         System.out.println(Pretty.of(Availabilities));
 
@@ -111,12 +116,13 @@ public class PerformanceFleetSizeCalculator {
         numberTimeSteps = dayduration / dt;
     }
 
-    public Tensor calculateAvailabilities() {
+    public Tensor calculateAvailabilities() throws InterruptedException {
         int numVehicles = 100;
         int vehicleSteps = 10;
         Tensor A = Tensors.empty(); // Tensor of all availabilities(timestep, vehiclestep)
         for (int k = 0; k < numberTimeSteps; ++k) {
 
+            // extract the betaij and lambdai from the travel information
             // TODO: need scaling with dt?
             Tensor betaij = tData.normToRowStochastic(tData.getAlphaijforTime(k * dt)).multiply(RealScalar.of(dt));
             System.out.println("betaij " + Dimensions.of(betaij) + " = ");
@@ -126,13 +132,21 @@ public class PerformanceFleetSizeCalculator {
             System.out.println(Pretty.of(lambdai));
             size = betaij.length();
 
+
+            
             // calculate pii, relative throuputs
-            Tensor pii = getPii(lambdai, betaij, k * dt);
+            Tensor relativeThroughputOfi = getRelativeThroughputOfi(lambdai, betaij, k * dt);
+            System.out.println("relativeThroughputOfi " + Dimensions.of(relativeThroughputOfi) + " = ");
+            System.out.println(Pretty.of(relativeThroughputOfi));
+            System.out.println("norm of relativeThroughputOfi : " + Norm.ofVector(relativeThroughputOfi, 2));
+            if(Norm.ofVector(relativeThroughputOfi, 2).number().doubleValue() > 0.00001) GlobalAssert.that(false);
+            Thread.sleep(1000);            
+            
 
             // calculate availabilities
             Tensor Ak = Tensors.empty();
             Tensor mi = lambdai.add(getPsii(betaij));
-            MeanValueAnalysis MVA = new MeanValueAnalysis(numVehicles, mi, pii);
+            MeanValueAnalysis MVA = new MeanValueAnalysis(numVehicles, mi, relativeThroughputOfi);
             MVA.perform();
             // TODO: replace loop with vector operations
             for (int vehicleStep = 0; vehicleStep < vehicleSteps; vehicleStep++) {
@@ -153,6 +167,9 @@ public class PerformanceFleetSizeCalculator {
         return A;
     }
 
+    
+    
+    
     private Tensor getPsii(Tensor alphaij) {
         Tensor Psii = TensorMap.of(Total::of, alphaij, 1);
         return Psii;
@@ -182,15 +199,25 @@ public class PerformanceFleetSizeCalculator {
         return pTilde;
     }
 
-    private Tensor getPii(Tensor lambdai, Tensor alphaij, int time) {
-        Tensor Ptilde = getPtilde(lambdai, alphaij, time);
+    private Tensor getRelativeThroughputOfi(Tensor lambdai, Tensor alphaij, int time) throws InterruptedException {
+        Tensor pkiTilde = getPtilde(lambdai, alphaij, time);
+        System.out.println("pkiTilde " + Dimensions.of(pkiTilde) + " = ");
+        System.out.println(Pretty.of(pkiTilde));
+        Thread.sleep(5000);            
+
+        
+        
         // TODO: find actual null space
         // a * x = x ---> (a - 1) * x = 0 ---> m * x = b
-        return LinearSolve.any(Ptilde.subtract(IdentityMatrix.of(size)), Array.zeros(size));
+        return LinearSolve.any(pkiTilde.subtract(IdentityMatrix.of(size)), Array.zeros(size));
         // return LinearSolve.of(Ptilde.subtract(IdentityMatrix.of(size)), Array.zeros(size)); // Tensor Runtime Exception
         // return NullSpace.usingSvd(Ptilde.subtract(IdentityMatrix.of(size))); // -> cast exception
         // return NullSpace.of(Ptilde.subtract(IdentityMatrix.of(size))); // -> {}, empty
     }
+    
+    
+    
+    
 
     private void plot(Tensor values, int numVehicles, int vehicleSteps) throws Exception {
         final TimeSeriesCollection dataset = new TimeSeriesCollection();
