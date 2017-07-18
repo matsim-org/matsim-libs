@@ -58,23 +58,24 @@ public class MeanValueAnalysis {
         return W.copy();
     }
 
-    public Tensor getW(int tokens) {
-        return W.get(tokens).copy();
-    }
-
-    public Scalar getW(int tokens, int node) {
-        return W.Get(tokens, node);
+    public Tensor getW(int agents) {
+        return W.get(agents).copy();
     }
 
     public Tensor getL() {
         return L.copy();
     }
 
-    public Tensor getL(int tokens) {
-        return L.get(tokens).copy();
+    public Tensor getL(int agents) {
+        return L.get(agents).copy();
     }
 
-    public Scalar getL(int tokens, int node) {
-        return L.Get(tokens, node);
-    }
+    // public Scalar getL(int agents, int node) {
+    // return L.Get(agents, node);
+    // }
+
+    // public Scalar getW(int agents, int node) {
+    // return W.Get(agents, node);
+    // }
+
 }

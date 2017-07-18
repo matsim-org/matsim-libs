@@ -7,9 +7,8 @@ import java.util.Collections;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
-import org.jfree.data.time.Second;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -24,12 +23,14 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.TensorMap;
 import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.mat.IdentityMatrix;
 import ch.ethz.idsc.tensor.mat.NullSpace;
 import ch.ethz.idsc.tensor.red.Mean;
+import ch.ethz.idsc.tensor.red.Norm;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
@@ -38,7 +39,6 @@ import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.traveldata.TravelDataUtils;
-import playground.clruch.utils.GlobalAssert;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 
 /**
@@ -72,7 +72,6 @@ public class PerformanceFleetSizeCalculator {
         VirtualNetwork virtualNetworkLoad = VirtualNetworkGet.readDefault(scenario.getNetwork());
         TravelData travelDataLoad = TravelDataIO.fromByte(network, virtualNetworkLoad, new File(virtualnetworkDir, "travelData"));
 
-
         // call the performancefleetsizecalculator and calculate the availabilities
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetworkLoad,
                 travelDataLoad, 108000 / samples);
@@ -95,49 +94,78 @@ public class PerformanceFleetSizeCalculator {
     }
 
     public Tensor calculateAvailabilities() throws InterruptedException {
-        int numVehicles = 100;
-        int vehicleSteps = 10;
-        Tensor A = Tensors.empty(); // Tensor of all availabilities(timestep, vehiclestep)
-        
-        
+        int numVehicles = 50;
+        // Tensor A = Tensors.empty(); // Tensor of all availabilities(timestep, vehiclestep)
+        Tensor A = Array.zeros(virtualNetwork.getvNodesCount(), numberTimeSteps, numVehicles + 1);
+        Tensor Aold = Tensors.empty();
+
         for (int k = 0; k < numberTimeSteps; ++k) {
             // extract the betaij and lambdai from the travel information
-            Tensor betaij = tData.normToRowStochastic(tData.getAlphaijPSFforTime(k*dt));
+            Tensor betaij = tData.normToRowStochastic(tData.getAlphaijPSFforTime(k * dt));
             Tensor lambdai = tData.getLambdaPSFforTime(k * dt);
-            Tensor pij = tData.getpijPSFforTime(k*dt);
+            Tensor pij = tData.getpijPSFforTime(k * dt);
             Tensor psii = getPsii(betaij);
-                             
+
+            // only calculate if there are customers in the timestep, otherwise will result in zero
 
             // calculate pii, relative throughputs
             Tensor relativeThroughputOfi = getRelativeThroughputOfi(tData, k * dt);
             System.out.println("relativeThroughputOfi = " + relativeThroughputOfi);
-            
-                        
+
             // compute lambdaTilde
             Tensor lambdaTilde = lambdai.add(psii);
-            
 
             // calculate availabilities
-            MeanValueAnalysis MVA = new MeanValueAnalysis(numVehicles, lambdaTilde, relativeThroughputOfi);
+            System.out.println("lambdaTilde = " + lambdaTilde);
+            System.out.println("relativeThroughputOfi = " + relativeThroughputOfi);
+            MeanValueAnalysis mva = new MeanValueAnalysis(numVehicles, lambdaTilde, relativeThroughputOfi);
 
             Tensor Ak = Tensors.empty();
-            // TODO: replace loop with vector operations
-            for (int vehicleStep = 0; vehicleStep < vehicleSteps; vehicleStep++) {
-                // availabilities at all nodes at a certain level of vehicles
-                Tensor Ami = ((MVA.getW(numVehicles * vehicleStep / vehicleSteps).pmul(lambdai)) //
-                        .map(InvertUnlessZero.function)) //
-                                .pmul(MVA.getL(numVehicles * vehicleStep / vehicleSteps));
-                Ak.append(Mean.of(Ami));
+            for (int veh = 0; veh <= numVehicles; ++veh) {
+                Tensor Lveh = mva.getL(veh);
+                Tensor Wveh = mva.getW(veh);
+
+                // availabilities at timestep k with v vehicles for every virtualNode
+                Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(lambdaTilde));
+                System.out.println("Aveh = " + Aveh);
+                for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
+                    A.set(Aveh.Get(i), i, k, veh);
+                }
+
+                Aold.append(Mean.of(Aveh));
             }
-            A.append(Ak);
         }
+
+        // based on A calculate overall availbilities as a function of the number of vehicles
+        System.out.println(Dimensions.of(A));
+        Tensor ATimeVehMean = Mean.of(A);
+
+        System.out.println("ATimeVehMean = " + Pretty.of(ATimeVehMean));
+        System.out.println(Dimensions.of(ATimeVehMean));
+
+        Tensor ATimeVehMeanOnlyWithCustomer = Tensors.empty();
+
+        for (int i = 0; i < numberTimeSteps; ++i) {
+            Tensor row = ATimeVehMean.get(i);
+            if (!(Norm.ofVector(row, 2).number().doubleValue() == 0.0)) {
+                ATimeVehMeanOnlyWithCustomer.append(row);
+            }
+        }
+
+        System.out.println("ATimeVehMeanOnlyWithCustomer = " + Pretty.of(ATimeVehMeanOnlyWithCustomer));
+
+        System.out.println("vehicle Mean = " + Mean.of(Mean.of(A)));
+        System.out.println("vehicle Mean timefilter = " + Mean.of(ATimeVehMeanOnlyWithCustomer));
+
+        Tensor meanAvailabilityVehicle = Mean.of(ATimeVehMeanOnlyWithCustomer);
+
         try {
-            AnalyzeAll.saveFile(A, "availabilities");
-            plot(A, numVehicles, vehicleSteps);
+            AnalyzeAll.saveFile(meanAvailabilityVehicle, "availabilities");
+            plot(meanAvailabilityVehicle, numVehicles + 1, 1);
         } catch (Exception e) {
             System.out.println("Error saving the availabilities");
         }
-        return A;
+        return Aold;
     }
 
     private Tensor getPsii(Tensor alphaij) {
@@ -146,23 +174,22 @@ public class PerformanceFleetSizeCalculator {
     }
 
     private Tensor getpijTilde(TravelData tData, int time) {
-        
+
         Tensor betaij = tData.normToRowStochastic(tData.getAlphaijPSFforTime(time));
         Tensor lambdai = tData.getLambdaPSFforTime(time);
         Tensor pij = tData.getpijPSFforTime(time);
         Tensor psii = getPsii(betaij);
-        
-        
+
         // compute lambdaTilde
         Tensor lambdaTilde = lambdai.add(psii);
 
         // compute ratio (pi in paper)
         Tensor ratioi = Tensors.empty();
-        for(int i = 0; i<Dimensions.of(betaij).get(0); ++i){
-            if(lambdaTilde.Get(i).number().doubleValue() == 0.0){
-                ratioi.append(RealScalar.ZERO);                
-            }else{
-                ratioi.append(psii.Get(i).divide(lambdaTilde.Get(i)));                
+        for (int i = 0; i < Dimensions.of(betaij).get(0); ++i) {
+            if (lambdaTilde.Get(i).number().doubleValue() == 0.0) {
+                ratioi.append(RealScalar.ZERO);
+            } else {
+                ratioi.append(psii.Get(i).divide(lambdaTilde.Get(i)));
             }
         }
 
@@ -175,37 +202,40 @@ public class PerformanceFleetSizeCalculator {
             pijTilde.append((row1.multiply(pi)).add(row2.multiply(RealScalar.ONE.subtract(pi))));
         }
 
-     return pijTilde;   
+        return pijTilde;
     }
-        
-
 
     private Tensor getRelativeThroughputOfi(TravelData tData, int time) throws InterruptedException {
         Tensor pkiTilde = getpijTilde(tData, time);
         Tensor IminusPki = IdentityMatrix.of(size).subtract(pkiTilde);
         Tensor relativeThroughput = NullSpace.usingSvd(IminusPki);
 
-        if(Dimensions.of(relativeThroughput).get(0) == 0){
-            return Tensors.vector(i->RealScalar.ZERO, virtualNetwork.getvNodesCount());
-        }else{
-            return relativeThroughput;            
+        if (Dimensions.of(relativeThroughput).get(0) == 0) {
+            return Tensors.vector(i -> RealScalar.ZERO, virtualNetwork.getvNodesCount());
+        } else {
+            return relativeThroughput.get(0);
         }
     }
 
     private void plot(Tensor values, int numVehicles, int vehicleSteps) throws Exception {
-        final TimeSeriesCollection dataset = new TimeSeriesCollection();
-        for (int v = 0; v < values.get(0).length(); v++) {
-            final TimeSeries series = new TimeSeries(numVehicles * v / vehicleSteps + " vehicles");
-            for (int t = 0; t < values.length(); t++) {
-                Second daytime = DiagramCreator.toTime(t * 108000 / values.length());
-                series.add(daytime, values.get(t).Get(v).number().doubleValue());
-            }
-            dataset.addSeries(series);
+        System.out.println("now in the plotting part");
+        System.out.println(Dimensions.of(values));
+        System.out.println("values = " + values);
+
+        XYSeries series = new XYSeries("Availability");
+        for(int i = 0 ; i<Dimensions.of(values).get(0);++i){
+            series.add(i, values.Get(i).number().doubleValue());
         }
+        
 
-        JFreeChart timechart = ChartFactory.createTimeSeriesChart("Vehicle Availability", "Time", //
-                "Availability", dataset, true, false, false);
+        XYSeriesCollection dataset = new XYSeriesCollection();
+        dataset.addSeries(series);
 
+
+        JFreeChart timechart = ChartFactory.createXYLineChart("Vehicle Availability", "Number of Vehicles", //
+                "Availability", dataset);
+
+        
         // range and colors of the background/grid
         timechart.getPlot().setBackgroundPaint(Color.white);
         timechart.getXYPlot().setRangeGridlinePaint(Color.lightGray);
