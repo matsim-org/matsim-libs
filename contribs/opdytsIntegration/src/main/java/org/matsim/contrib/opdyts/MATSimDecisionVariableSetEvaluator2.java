@@ -12,7 +12,6 @@ import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.opdyts.utils.TimeDiscretization;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -41,8 +40,6 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 
 	private final MATSimStateFactory<U> stateFactory;
 
-	// private final TimeDiscretization timeDiscretization;
-
 	private int memory = 1;
 
 	private boolean averageMemory = false;
@@ -52,22 +49,6 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 
 	@Inject
 	private Population population;
-
-	// created during runtime:
-
-	// // must be linked to ensure a unique iteration ordering
-	// private LinkedHashSet<String> relevantNetworkModes;
-	//
-	// // must be linked to ensure a unique iteration ordering
-	// private LinkedHashSet<Id<Link>> relevantLinkIds;
-	//
-	// // must be linked to ensure a unique iteration ordering
-	// private LinkedHashSet<Id<TransitStopFacility>> relevantStopIds;
-	//
-	// private DifferentiatedLinkOccupancyAnalyzer networkOccupancyAnalyzer =
-	// null;
-	//
-	// private PTOccupancyAnalyser ptOccupancyAnalyzer = null;
 
 	// a list because the order matters in the state space vector
 	private final List<SimulationStateAnalyzerProvider> simulationStateAnalyzers = new ArrayList<>();
@@ -81,15 +62,9 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 	// -------------------- CONSTRUCTION --------------------
 
 	public MATSimDecisionVariableSetEvaluator2(final TrajectorySampler<U> trajectorySampler,
-			final MATSimStateFactory<U> stateFactory, final TimeDiscretization timeDiscretization) {
-		// TODO timeDiscretization argument is no longer needed
+											   final MATSimStateFactory<U> stateFactory) {
 		this.trajectorySampler = trajectorySampler;
 		this.stateFactory = stateFactory;
-		// this.timeDiscretization = timeDiscretization;
-		// the following need to be explicitly set
-		// this.relevantNetworkModes = null;
-		// this.relevantLinkIds = null;
-		// this.relevantStopIds = null;
 	}
 
 	public void addSimulationStateAnalyzer(final SimulationStateAnalyzerProvider analyzer) {
@@ -98,18 +73,6 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 		}
 		this.simulationStateAnalyzers.add(analyzer);
 	}
-
-	// public void enableNetworkTraffic(final Collection<String>
-	// relevantNetworkModes,
-	// final Collection<Id<Link>> relevantLinkIds) {
-	// this.relevantNetworkModes = new LinkedHashSet<>(relevantNetworkModes);
-	// this.relevantLinkIds = new LinkedHashSet<>(relevantLinkIds);
-	// }
-
-	// public void enablePT(final Collection<Id<TransitStopFacility>>
-	// relevantStopIds) {
-	// this.relevantStopIds = new LinkedHashSet<>(relevantStopIds);
-	// }
 
 	// -------------------- SETTERS AND GETTERS --------------------
 
@@ -189,21 +152,6 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 			this.eventsManager.addHandler(analyzer.newEventHandler());
 		}
 
-		// if ((this.relevantLinkIds != null) && (this.relevantLinkIds.size() >
-		// 0) && (this.relevantNetworkModes != null)
-		// && (this.relevantNetworkModes.size() > 0)) {
-		// this.networkOccupancyAnalyzer = new
-		// DifferentiatedLinkOccupancyAnalyzer(this.timeDiscretization,
-		// this.relevantNetworkModes, this.relevantLinkIds);
-		// this.eventsManager.addHandler(this.networkOccupancyAnalyzer);
-		// }
-
-		// if (this.relevantStopIds != null && (relevantStopIds.size() > 0)) {
-		// this.ptOccupancyAnalyzer = new
-		// PTOccupancyAnalyser(this.timeDiscretization, this.relevantStopIds);
-		// this.eventsManager.addHandler(this.ptOccupancyAnalyzer);
-		// }
-
 		this.trajectorySampler.initialize();
 
 		// TODO NEW
@@ -233,8 +181,6 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 					String outFile = event.getServices().getControlerIO().getIterationFilename(event.getIteration(),"stateVector_"+analyzer.getStringIdentifier()+".txt");
 					StateVectorSizeWriter.writeData(newInstantaneousStateVector, outFile);
 				} else {
-//					newInstantaneousStateVector = Vector.concat(newInstantaneousStateVector,
-//							analyzer.newStateVectorRepresentation());
 					// NEW: amit
 					Vector tempVector = analyzer.newStateVectorRepresentation();
 					newInstantaneousStateVector = Vector.concat(newInstantaneousStateVector,
@@ -244,50 +190,6 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 					StateVectorSizeWriter.writeData(tempVector, outFile);
 				}
 			}
-
-			// car
-			// if (this.networkOccupancyAnalyzer != null) {
-			// final Vector newInstantaneousStateVectorCar = new
-			// Vector(this.relevantNetworkModes.size()
-			// * this.relevantLinkIds.size() *
-			// this.timeDiscretization.getBinCnt());
-			// int i = 0;
-			// for (String mode : this.relevantNetworkModes) {
-			// final MATSimCountingStateAnalyzer<Link> analyzer =
-			// this.networkOccupancyAnalyzer
-			// .getNetworkModeAnalyzer(mode);
-			// for (Id<Link> linkId : this.relevantLinkIds) {
-			// for (int bin = 0; bin < this.timeDiscretization.getBinCnt();
-			// bin++) {
-			// newInstantaneousStateVectorCar.set(i++, analyzer.getCount(linkId,
-			// bin));
-			// }
-			// }
-			// }
-			// newInstantaneousStateVector = newInstantaneousStateVectorCar;
-			// }
-
-			// pt
-			// if (this.ptOccupancyAnalyzer != null) {
-			// final Vector newInstantaneousStateVectorPT = new Vector(
-			// this.relevantStopIds.size() *
-			// this.timeDiscretization.getBinCnt());
-			// int i = 0;
-			// for (Id<TransitStopFacility> stopId : this.relevantStopIds) {
-			// for (int bin = 0; bin < this.timeDiscretization.getBinCnt();
-			// bin++) {
-			// newInstantaneousStateVectorPT.set(i++,
-			// this.ptOccupancyAnalyzer.getCount(stopId, bin));
-			// }
-			// }
-			// if (newInstantaneousStateVector != null) {
-			// newInstantaneousStateVector =
-			// Vector.concat(newInstantaneousStateVector,
-			// newInstantaneousStateVectorPT);
-			// } else {
-			// newInstantaneousStateVector = newInstantaneousStateVectorPT;
-			// }
-			// }
 
 			/*
 			 * (2) Add instantaneous state vector to the list of past state
@@ -302,7 +204,6 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 				this.stateList.removeLast();
 			}
 
-			// BEGIN_NEW: amit June'17
 			/*
 			 * (3) Inform the TrajectorySampler that one iteration has been
 			 * completed and provide the resulting state.
@@ -314,13 +215,6 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 		for (SimulationStateAnalyzerProvider analyzer : this.simulationStateAnalyzers) {
 			analyzer.beforeIteration();
 		}
-
-		// if (this.networkOccupancyAnalyzer != null) {
-		// this.networkOccupancyAnalyzer.beforeIteration();
-		// }
-		// if (this.ptOccupancyAnalyzer != null) {
-		// this.ptOccupancyAnalyzer.beforeIteration();
-		// }
 
 	}
 
@@ -352,70 +246,3 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 		}
 	}
 }
-
-// @Override
-// public void notifyIterationEnds(final IterationEndsEvent event) {
-//
-// /*
-// * (1) Extract the instantaneous state vector.
-// */
-//
-// Vector newInstantaneousStateVector = null;
-//
-// // car
-// if (this.networkOccupancyAnalyzer != null) {
-// final Vector newInstantaneousStateVectorCar = new
-// Vector(this.relevantNetworkModes.size()
-// * this.relevantLinkIds.size() * this.timeDiscretization.getBinCnt());
-// int i = 0;
-// for (String mode : this.relevantNetworkModes) {
-// final MATSimCountingStateAnalyzer<Link> analyzer =
-// this.networkOccupancyAnalyzer
-// .getNetworkModeAnalyzer(mode);
-// for (Id<Link> linkId : this.relevantLinkIds) {
-// for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
-// newInstantaneousStateVectorCar.set(i++, analyzer.getCount(linkId, bin));
-// }
-// }
-// }
-// newInstantaneousStateVector = newInstantaneousStateVectorCar;
-// }
-//
-// // pt
-// if (this.ptOccupancyAnalyzer != null) {
-// final Vector newInstantaneousStateVectorPT = new Vector(
-// this.relevantStopIds.size() * this.timeDiscretization.getBinCnt());
-// int i = 0;
-// for (Id<TransitStopFacility> stopId : this.relevantStopIds) {
-// for (int bin = 0; bin < this.timeDiscretization.getBinCnt(); bin++) {
-// newInstantaneousStateVectorPT.set(i++,
-// this.ptOccupancyAnalyzer.getCount(stopId, bin));
-// }
-// }
-// if (newInstantaneousStateVector != null) {
-// newInstantaneousStateVector = Vector.concat(newInstantaneousStateVector,
-// newInstantaneousStateVectorPT);
-// } else {
-// newInstantaneousStateVector = newInstantaneousStateVectorPT;
-// }
-// }
-//
-// /*
-// * (2) Add instantaneous state vector to the list of past state vectors
-// * and ensure that the size of this list is equal to what the memory
-// * parameter prescribes.
-// */
-// this.stateList.addFirst(newInstantaneousStateVector);
-// while (this.stateList.size() < this.memory) {
-// this.stateList.addFirst(newInstantaneousStateVector);
-// }
-// while (this.stateList.size() > this.memory) {
-// this.stateList.removeLast();
-// }
-//
-// /*
-// * (3) Inform the TrajectorySampler that one iteration has been
-// * completed and provide the resulting state.
-// */
-// this.trajectorySampler.afterIteration(this.newState(this.population));
-// }

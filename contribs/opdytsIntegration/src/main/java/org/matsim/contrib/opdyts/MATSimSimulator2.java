@@ -8,7 +8,6 @@ import floetteroed.opdyts.SimulatorState;
 import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.opdyts.utils.TimeDiscretization;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.TerminationCriterion;
@@ -26,14 +25,6 @@ public class MATSimSimulator2<U extends DecisionVariable> implements Simulator<U
 	private final MATSimStateFactory<U> stateFactory;
 
 	private final Scenario scenario;
-
-	private final TimeDiscretization timeDiscretization;
-
-//	private final Set<String> relevantNetworkModes;
-
-//	private final Set<Id<Link>> relevantLinkIds;
-
-//	private final Set<Id<TransitStopFacility>> relevantStopIds;
 
 	private AbstractModule[] replacingModules = null;
 	private AbstractModule overrides = AbstractModule.emptyModule();
@@ -58,26 +49,9 @@ public class MATSimSimulator2<U extends DecisionVariable> implements Simulator<U
 
 	// -------------------- CONSTRUCTOR --------------------
 
-	public MATSimSimulator2(final MATSimStateFactory<U> stateFactory, final Scenario scenario,
-			final TimeDiscretization timeDiscretization) {
+	public MATSimSimulator2(final MATSimStateFactory<U> stateFactory, final Scenario scenario) {
 		this.stateFactory = stateFactory;
 		this.scenario = scenario;
-		this.timeDiscretization = timeDiscretization;
-//		if ((scenario.getNetwork() != null) && (scenario.getNetwork().getLinks() != null)
-//				&& (scenario.getNetwork().getLinks().size() > 0) && (relevantNetworkModes != null)
-//				&& (relevantNetworkModes.size() > 0)) {
-//			this.relevantNetworkModes = relevantNetworkModes;
-//			this.relevantLinkIds = new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet());
-//		} else {
-//			this.relevantNetworkModes = null;
-//			this.relevantLinkIds = null;
-//		}
-//		if ((scenario.getTransitSchedule() != null) && (scenario.getTransitSchedule().getFacilities() != null)
-//				&& (scenario.getTransitSchedule().getFacilities().size() > 0)) {
-//			this.relevantStopIds = new LinkedHashSet<>(scenario.getTransitSchedule().getFacilities().keySet());
-//		} else {
-//			this.relevantStopIds = null;
-//		}
 
 		final String outputDirectory = this.scenario.getConfig().controler().getOutputDirectory();
 		this.scenario.getConfig().controler().setOutputDirectory(outputDirectory + "_0");
@@ -127,21 +101,12 @@ public class MATSimSimulator2<U extends DecisionVariable> implements Simulator<U
 		 * "optimize along" the MATSim run of this iteration.
 		 */
 		final MATSimDecisionVariableSetEvaluator2<U> matsimDecisionVariableEvaluator = new MATSimDecisionVariableSetEvaluator2<>(
-				trajectorySampler, this.stateFactory, this.timeDiscretization);
+				trajectorySampler, this.stateFactory);
 		
 		for (SimulationStateAnalyzerProvider analyzer : this.simulationStateAnalyzers) {
 			matsimDecisionVariableEvaluator.addSimulationStateAnalyzer(analyzer);
 		}
 		
-//		// car
-//		if ((this.relevantLinkIds != null) && (this.relevantNetworkModes != null)) {
-//			matsimDecisionVariableEvaluator.enableNetworkTraffic(this.relevantNetworkModes, this.relevantLinkIds);
-//		}
-//		// pt
-//		if (this.relevantStopIds != null) {
-//			matsimDecisionVariableEvaluator.enablePT(this.relevantStopIds);
-//		}
-
 		matsimDecisionVariableEvaluator.setMemory(this.stateMemory);
 
 		/*

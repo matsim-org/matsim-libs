@@ -147,7 +147,7 @@ public class RunNetworkParameters {
 		// final boolean differentiateNetworkModes = true;
 		// if (differentiateNetworkModes) {
 		final MATSimSimulator2<NetworkParameters> matsim = new MATSimSimulator2<NetworkParameters>(stateFactory,
-				scenario, timeDiscretization);
+				scenario);
 		final Set<String> modes = new LinkedHashSet<>();
 		modes.add("car");
 		matsim.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzer.Provider(timeDiscretization, modes,
