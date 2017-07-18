@@ -12,11 +12,8 @@ import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import floetteroed.utilities.math.Vector;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.opdyts.utils.OpdytsConfigGroup;
 import org.matsim.contrib.opdyts.utils.TimeDiscretization;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -306,34 +303,12 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 			}
 
 			// BEGIN_NEW: amit June'17
-			Config config = event.getServices().getConfig();
-			OpdytsConfigGroup opdytsConfigGroup = ConfigUtils.addOrGetModule(config,OpdytsConfigGroup.GROUP_NAME, OpdytsConfigGroup.class);
-			int numberOfDecisionVariableTrials = opdytsConfigGroup.getNumberOfDecisionVariableTrials();
-			int iterationsToUpdateDecisionVariableTrial = opdytsConfigGroup.getWarmUpIterations();
-			int totalIterationForUpdation = numberOfDecisionVariableTrials * iterationsToUpdateDecisionVariableTrial + 1;
-			int iteration = event.getIteration() - 1;
-
 			/*
 			 * (3) Inform the TrajectorySampler that one iteration has been
 			 * completed and provide the resulting state.
 			 */
-			if (iteration == config.controler().getFirstIteration() ||
-					iteration > totalIterationForUpdation
-					) { //i.e., for first time and after all decision variables are tried out.
 
-				LOGGER.info("Informing trajectory sampler at iteration Nr "+ event.getIteration() + "; this will provide the resulting state.");
-				this.trajectorySampler.afterIteration(this.newState(this.population));
-
-			} else if( iteration % iterationsToUpdateDecisionVariableTrial == 0
-					) { // i.e., update after every iterationsToUpdateDecisionVariableTrial
-
-				LOGGER.info("Informing trajectory sampler at iteration Nr "+ event.getIteration() + "; this will provide the resulting state.");
-				this.trajectorySampler.afterIteration(this.newState(this.population));
-
-			} else {
-				// nothing to do for intermediate iterations.
-			}
-			// END_NEW: amit June'17
+			this.trajectorySampler.afterIteration(this.newState(this.population));
 		}
 
 		for (SimulationStateAnalyzerProvider analyzer : this.simulationStateAnalyzers) {
