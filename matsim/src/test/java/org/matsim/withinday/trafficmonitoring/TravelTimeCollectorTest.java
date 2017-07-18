@@ -22,7 +22,7 @@ package org.matsim.withinday.trafficmonitoring;
 
 import java.util.Arrays;
 import java.util.Collection;
-
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -47,6 +47,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * @author cdobler
@@ -55,6 +56,8 @@ import org.matsim.testcases.MatsimTestCase;
 public class TravelTimeCollectorTest extends MatsimTestCase {
 
 	private final boolean isUsingFastCapacityUpdate ;
+	@Rule
+	public MatsimTestUtils helper = new MatsimTestUtils();
 	
 	public TravelTimeCollectorTest(boolean isUsingFastCapacityUpdate) {
 		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
@@ -69,6 +72,8 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 	@Test
 	public void testGetLinkTravelTime() {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
+		config.controler().setOutputDirectory(helper.getOutputDirectory()+"/fastCapacityUpdate_"+this.isUsingFastCapacityUpdate);
+
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
 		qSimConfig.setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
@@ -111,8 +116,6 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.getConfig().controler().setWritePlansInterval(0);
 		
-		// I do not know why but after injecting junit parameters, following is required else injector is not created and NPE is thrwon. amit Feb'16
-		controler.getConfig().controler().setOutputDirectory("./output_fastCapacityUpdate_"+ this.isUsingFastCapacityUpdate+ "/");
 		controler.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		
 		controler.run();
