@@ -21,17 +21,15 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.tensor.RealScalar;
-import ch.ethz.idsc.tensor.Scalars;
+import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.TensorMap;
 import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.mat.IdentityMatrix;
-import ch.ethz.idsc.tensor.mat.LinearSolve;
+import ch.ethz.idsc.tensor.mat.NullSpace;
 import ch.ethz.idsc.tensor.red.Mean;
-import ch.ethz.idsc.tensor.red.Norm;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
@@ -61,8 +59,7 @@ public class PerformanceFleetSizeCalculator {
     public static void main(String[] args) throws Exception {
         // number of timesteps in day
         int samples = 10;
-        
-        
+
         // load needed information
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
@@ -71,41 +68,21 @@ public class PerformanceFleetSizeCalculator {
                 new BlackListedTimeAllocationMutatorConfigGroup());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
-        VirtualNetwork virtualNetworkLoad  = VirtualNetworkGet.readDefault(scenario.getNetwork());
         final File virtualnetworkDir = new File("virtualNetwork");
+        VirtualNetwork virtualNetworkLoad = VirtualNetworkGet.readDefault(scenario.getNetwork());
         TravelData travelDataLoad = TravelDataIO.fromByte(network, virtualNetworkLoad, new File(virtualnetworkDir, "travelData"));
 
+
         // call the performancefleetsizecalculator and calculate the availabilities
-        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetworkLoad, travelDataLoad, 108000/samples);
+        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetworkLoad,
+                travelDataLoad, 108000 / samples);
         Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
-        
+
         // show the availabilities
         System.out.println("A " + Dimensions.of(Availabilities) + " = ");
         System.out.println(Pretty.of(Availabilities));
 
-        // OLD MAIN:
-        // int samples = 10;
-        //
-        // DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
-        // dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
-        //
-        // File configFile = new File(args[0]);
-        // Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup,
-        // new BlackListedTimeAllocationMutatorConfigGroup());
-        // Scenario scenario = ScenarioUtils.loadScenario(config);
-        // Network network = scenario.getNetwork();
-        // Population population = scenario.getPopulation();
-        // TheApocalypse.decimatesThe(population).toNoMoreThan(1000).people();
-        //
-        // PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, //
-        // population, 10, 108000 / samples);
-        //
-        // Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
-        // System.out.println("A " + Dimensions.of(Availabilities) + " = ");
-        // System.out.println(Pretty.of(Availabilities));
     }
-
-
 
     public PerformanceFleetSizeCalculator(Network networkIn, VirtualNetwork virtualNetworkIn, TravelData travelDataIn, int dtIn) {
         network = networkIn;
@@ -114,40 +91,36 @@ public class PerformanceFleetSizeCalculator {
         // ensure that dayduration / timeInterval is integer value
         dt = TravelDataUtils.greatestNonRestDt(dtIn, dayduration);
         numberTimeSteps = dayduration / dt;
+        size = virtualNetwork.getvNodesCount();
     }
 
     public Tensor calculateAvailabilities() throws InterruptedException {
         int numVehicles = 100;
         int vehicleSteps = 10;
         Tensor A = Tensors.empty(); // Tensor of all availabilities(timestep, vehiclestep)
+        
+        
         for (int k = 0; k < numberTimeSteps; ++k) {
-
             // extract the betaij and lambdai from the travel information
-            // TODO: need scaling with dt?
-            Tensor betaij = tData.normToRowStochastic(tData.getAlphaijforTime(k * dt)).multiply(RealScalar.of(dt));
-            System.out.println("betaij " + Dimensions.of(betaij) + " = ");
-            System.out.println(Pretty.of(betaij));
-            Tensor lambdai = tData.getLambdaforTime(k * dt).multiply(RealScalar.of(dt));
-            System.out.println("lambdai " + Dimensions.of(lambdai) + " = ");
-            System.out.println(Pretty.of(lambdai));
-            size = betaij.length();
+            Tensor betaij = tData.normToRowStochastic(tData.getAlphaijPSFforTime(k*dt));
+            Tensor lambdai = tData.getLambdaPSFforTime(k * dt);
+            Tensor pij = tData.getpijPSFforTime(k*dt);
+            Tensor psii = getPsii(betaij);
+                             
 
-
+            // calculate pii, relative throughputs
+            Tensor relativeThroughputOfi = getRelativeThroughputOfi(tData, k * dt);
+            System.out.println("relativeThroughputOfi = " + relativeThroughputOfi);
             
-            // calculate pii, relative throuputs
-            Tensor relativeThroughputOfi = getRelativeThroughputOfi(lambdai, betaij, k * dt);
-            System.out.println("relativeThroughputOfi " + Dimensions.of(relativeThroughputOfi) + " = ");
-            System.out.println(Pretty.of(relativeThroughputOfi));
-            System.out.println("norm of relativeThroughputOfi : " + Norm.ofVector(relativeThroughputOfi, 2));
-            if(Norm.ofVector(relativeThroughputOfi, 2).number().doubleValue() > 0.00001) GlobalAssert.that(false);
-            Thread.sleep(1000);            
+                        
+            // compute lambdaTilde
+            Tensor lambdaTilde = lambdai.add(psii);
             
 
             // calculate availabilities
+            MeanValueAnalysis MVA = new MeanValueAnalysis(numVehicles, lambdaTilde, relativeThroughputOfi);
+
             Tensor Ak = Tensors.empty();
-            Tensor mi = lambdai.add(getPsii(betaij));
-            MeanValueAnalysis MVA = new MeanValueAnalysis(numVehicles, mi, relativeThroughputOfi);
-            MVA.perform();
             // TODO: replace loop with vector operations
             for (int vehicleStep = 0; vehicleStep < vehicleSteps; vehicleStep++) {
                 // availabilities at all nodes at a certain level of vehicles
@@ -167,57 +140,57 @@ public class PerformanceFleetSizeCalculator {
         return A;
     }
 
-    
-    
-    
     private Tensor getPsii(Tensor alphaij) {
         Tensor Psii = TensorMap.of(Total::of, alphaij, 1);
         return Psii;
     }
 
-    private Tensor getPtilde(Tensor lambdai, Tensor alphaij, int time) {
-        Tensor Psii = getPsii(alphaij);
-        GlobalAssert.that(lambdai.length() == Psii.length());
-        // calculate pi
-        Tensor Pi = Tensors.empty();
-        for (int i = 0; i < lambdai.length(); i++)
-            if (Scalars.isZero(Psii.Get(i).add(lambdai.Get(i))))
-                Pi.append(RealScalar.ZERO);
-            else
-                Pi.append(Psii.Get(i).divide(Psii.Get(i).add(lambdai.Get(i))));
+    private Tensor getpijTilde(TravelData tData, int time) {
+        
+        Tensor betaij = tData.normToRowStochastic(tData.getAlphaijPSFforTime(time));
+        Tensor lambdai = tData.getLambdaPSFforTime(time);
+        Tensor pij = tData.getpijPSFforTime(time);
+        Tensor psii = getPsii(betaij);
+        
+        
+        // compute lambdaTilde
+        Tensor lambdaTilde = lambdai.add(psii);
 
-        // calculate pijtilde
-        Tensor pTilde = Tensors.empty();
-        for (int i = 0; i < size; i++) {
-            Tensor pisub = Tensors.empty();
-            for (int j = 0; j < size; j++) {
-                pisub.append((alphaij.Get(i, j).multiply(Pi.Get(i))).add( //
-                        tData.getpijforTime(time, i, j).multiply(RealScalar.of(1).subtract(Pi.Get(i)))));
+        // compute ratio (pi in paper)
+        Tensor ratioi = Tensors.empty();
+        for(int i = 0; i<Dimensions.of(betaij).get(0); ++i){
+            if(lambdaTilde.Get(i).number().doubleValue() == 0.0){
+                ratioi.append(RealScalar.ZERO);                
+            }else{
+                ratioi.append(psii.Get(i).divide(lambdaTilde.Get(i)));                
             }
-            pTilde.append(pisub);
         }
-        return pTilde;
-    }
 
-    private Tensor getRelativeThroughputOfi(Tensor lambdai, Tensor alphaij, int time) throws InterruptedException {
-        Tensor pkiTilde = getPtilde(lambdai, alphaij, time);
-        System.out.println("pkiTilde " + Dimensions.of(pkiTilde) + " = ");
-        System.out.println(Pretty.of(pkiTilde));
-        Thread.sleep(5000);            
+        // compute pijTilde
+        Tensor pijTilde = Tensors.empty();
+        for (int i = 0; i < Dimensions.of(betaij).get(0); ++i) {
+            Tensor row1 = betaij.get(i);
+            Tensor row2 = pij.get(i);
+            Scalar pi = ratioi.Get(i);
+            pijTilde.append((row1.multiply(pi)).add(row2.multiply(RealScalar.ONE.subtract(pi))));
+        }
 
-        
-        
-        // TODO: find actual null space
-        // a * x = x ---> (a - 1) * x = 0 ---> m * x = b
-        return LinearSolve.any(pkiTilde.subtract(IdentityMatrix.of(size)), Array.zeros(size));
-        // return LinearSolve.of(Ptilde.subtract(IdentityMatrix.of(size)), Array.zeros(size)); // Tensor Runtime Exception
-        // return NullSpace.usingSvd(Ptilde.subtract(IdentityMatrix.of(size))); // -> cast exception
-        // return NullSpace.of(Ptilde.subtract(IdentityMatrix.of(size))); // -> {}, empty
+     return pijTilde;   
     }
-    
-    
-    
-    
+        
+
+
+    private Tensor getRelativeThroughputOfi(TravelData tData, int time) throws InterruptedException {
+        Tensor pkiTilde = getpijTilde(tData, time);
+        Tensor IminusPki = IdentityMatrix.of(size).subtract(pkiTilde);
+        Tensor relativeThroughput = NullSpace.usingSvd(IminusPki);
+
+        if(Dimensions.of(relativeThroughput).get(0) == 0){
+            return Tensors.vector(i->RealScalar.ZERO, virtualNetwork.getvNodesCount());
+        }else{
+            return relativeThroughput;            
+        }
+    }
 
     private void plot(Tensor values, int numVehicles, int vehicleSteps) throws Exception {
         final TimeSeriesCollection dataset = new TimeSeriesCollection();
@@ -256,10 +229,7 @@ public class PerformanceFleetSizeCalculator {
         DiagramCreator.savePlot(AnalyzeAll.RELATIVE_DIRECTORY, "availabilitiesByTime", timechart, width, height);
     }
 
-    
-    
-    
-    @Deprecated   // use other constructor that loads directly from file 
+    @Deprecated // use other constructor that loads directly from file
     public PerformanceFleetSizeCalculator(Network networkIn, Population populationIn, int numVirtualNodes, int dtIn) {
         Population population = populationIn;
 
@@ -281,6 +251,5 @@ public class PerformanceFleetSizeCalculator {
         tData = new TravelData(virtualNetwork, network, population, dt);
 
     }
-    
-    
+
 }
