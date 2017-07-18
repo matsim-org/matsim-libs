@@ -94,14 +94,15 @@ public class PerformanceFleetSizeCalculator {
     }
 
     public Tensor calculateAvailabilities() throws InterruptedException {
-        int numVehicles = 50;
+        int numVehicles = 10;
         // Tensor A = Tensors.empty(); // Tensor of all availabilities(timestep, vehiclestep)
         Tensor A = Array.zeros(virtualNetwork.getvNodesCount(), numberTimeSteps, numVehicles + 1);
         Tensor Aold = Tensors.empty();
 
         for (int k = 0; k < numberTimeSteps; ++k) {
             // extract the betaij and lambdai from the travel information
-            Tensor betaij = tData.normToRowStochastic(tData.getAlphaijPSFforTime(k * dt));
+            // Tensor betaij = tData.normToRowStochastic(tData.getAlphaijPSFforTime(k * dt));
+            Tensor betaij = tData.getAlphaijPSFforTime(k * dt);
             Tensor lambdai = tData.getLambdaPSFforTime(k * dt);
             Tensor pij = tData.getpijPSFforTime(k * dt);
             Tensor psii = getPsii(betaij);
@@ -124,6 +125,8 @@ public class PerformanceFleetSizeCalculator {
             for (int veh = 0; veh <= numVehicles; ++veh) {
                 Tensor Lveh = mva.getL(veh);
                 Tensor Wveh = mva.getW(veh);
+                // System.out.println("Lveh = " + Lveh);
+                // System.out.println("Wveh = " + Wveh);
 
                 // availabilities at timestep k with v vehicles for every virtualNode
                 Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(lambdaTilde));
@@ -175,7 +178,8 @@ public class PerformanceFleetSizeCalculator {
 
     private Tensor getpijTilde(TravelData tData, int time) {
 
-        Tensor betaij = tData.normToRowStochastic(tData.getAlphaijPSFforTime(time));
+        // Tensor betaij = tData.normToRowStochastic(tData.getAlphaijPSFforTime(time));
+        Tensor betaij = tData.getAlphaijPSFforTime(time);
         Tensor lambdai = tData.getLambdaPSFforTime(time);
         Tensor pij = tData.getpijPSFforTime(time);
         Tensor psii = getPsii(betaij);
@@ -206,7 +210,8 @@ public class PerformanceFleetSizeCalculator {
     }
 
     private Tensor getRelativeThroughputOfi(TravelData tData, int time) throws InterruptedException {
-        Tensor pkiTilde = getpijTilde(tData, time);
+ //       Tensor pkiTilde = getpijTilde(tData, time);
+        Tensor pkiTilde = tData.getpijPSFforTime(time);
         Tensor IminusPki = IdentityMatrix.of(size).subtract(pkiTilde);
         Tensor relativeThroughput = NullSpace.usingSvd(IminusPki);
 
@@ -223,19 +228,16 @@ public class PerformanceFleetSizeCalculator {
         System.out.println("values = " + values);
 
         XYSeries series = new XYSeries("Availability");
-        for(int i = 0 ; i<Dimensions.of(values).get(0);++i){
+        for (int i = 0; i < Dimensions.of(values).get(0); ++i) {
             series.add(i, values.Get(i).number().doubleValue());
         }
-        
 
         XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(series);
 
-
         JFreeChart timechart = ChartFactory.createXYLineChart("Vehicle Availability", "Number of Vehicles", //
                 "Availability", dataset);
 
-        
         // range and colors of the background/grid
         timechart.getPlot().setBackgroundPaint(Color.white);
         timechart.getXYPlot().setRangeGridlinePaint(Color.lightGray);
