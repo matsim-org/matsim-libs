@@ -208,6 +208,11 @@ public class TravelData implements Serializable {
         return lambda.get(row).copy();
     }
 
+    public Tensor getLambdaPSFforTime(int time) {
+        int row = (int) Math.min(time / dt, numberTimeSteps - 1);
+        return lambdaPSF.get(row).copy();
+    }
+
     public Scalar getLambdaforTime(int time, int vNodeindex) {
         return getLambdaforTime(time).Get(vNodeindex);
     }
@@ -243,11 +248,21 @@ public class TravelData implements Serializable {
         return pij.Get(timestep, from, to);
     }
 
-    public Tensor getAlphaijforTime(int time) {
+    public Tensor getpijPSFforTime(int time) {
+        int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
+        return pijPSF.get(timestep).copy();
+    }
+    
+    public Scalar getpijPSFforTime(int time, int from, int to) {
+        int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
+        return pijPSF.Get(timestep, from, to);
+    }
+    
+
+    public Tensor getAlphaijPSFforTime(int time) {
         int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
         return alphaijPSF.get(timestep).copy();
     }
-
 
     protected void fillSerializationInfo(VirtualNetwork virtalNetworkIn) {
         // check if TravelData object was created with the supplied virtualNetwork
@@ -260,7 +275,8 @@ public class TravelData implements Serializable {
     }
 
     /**
-     * @param T tensor which will be normed for row-stochasticity
+     * @param T
+     *            tensor which will be normed for row-stochasticity
      */
     public Tensor normToRowStochastic(Tensor Tin) {
         List<Integer> dims = Dimensions.of(Tin);
