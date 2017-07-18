@@ -93,6 +93,7 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	private static final String UNIFORMITY_GAP_WEIGHT = "uniformityGapWeight";
 	private double uniformityGapWeight = 0.;
 
+	//following two should go away because warm up iterations are implemeted within opdyts
 	// BEGIN_NEW : amit June'17
 	private static final String NUMBER_OF_DECISION_VARIABLE_TRIALS = "numberOfDecisionVariableTrials";
 	private int numberOfDecisionVariableTrials = this.populationSize;
