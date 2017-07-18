@@ -93,32 +93,18 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	private static final String UNIFORMITY_GAP_WEIGHT = "uniformityGapWeight";
 	private double uniformityGapWeight = 0.;
 
-	//following two should go away because warm up iterations are implemeted within opdyts
 	// BEGIN_NEW : amit June'17
-	private static final String NUMBER_OF_DECISION_VARIABLE_TRIALS = "numberOfDecisionVariableTrials";
-	private int numberOfDecisionVariableTrials = this.populationSize;
+	private static final String WARM_UP_ITERATIONS = "warmUpIterations";
+	private int warmUpIterations = 1;
 
-	private static final String ITERATION_TO_UPDATE_DECISION_VARIABLE_TRIAL = "iterationsToUpdateDecisionVariableTrial";
-	private int iterationsToUpdateDecisionVariableTrial = 1;
-
-	@StringGetter(NUMBER_OF_DECISION_VARIABLE_TRIALS)
-	public int getNumberOfDecisionVariableTrials() {
-		return numberOfDecisionVariableTrials;
+	@StringGetter(WARM_UP_ITERATIONS)
+	public int getWarmUpIterations() {
+		return warmUpIterations;
 	}
 
-	@StringSetter(NUMBER_OF_DECISION_VARIABLE_TRIALS)
-	public void setNumberOfDecisionVariableTrials(int numberOfDecisionVariableTrials) {
-		this.numberOfDecisionVariableTrials = numberOfDecisionVariableTrials;
-	}
-
-	@StringGetter(ITERATION_TO_UPDATE_DECISION_VARIABLE_TRIAL)
-	public int getIterationsToUpdateDecisionVariableTrial() {
-		return iterationsToUpdateDecisionVariableTrial;
-	}
-
-	@StringSetter(ITERATION_TO_UPDATE_DECISION_VARIABLE_TRIAL)
-	public void setIterationsToUpdateDecisionVariableTrial(int iterationsToUpdateDecisionVariableTrial) {
-		this.iterationsToUpdateDecisionVariableTrial = iterationsToUpdateDecisionVariableTrial;
+	@StringSetter(WARM_UP_ITERATIONS)
+	public void setWarmUpIterations(int warmUpIterations) {
+		this.warmUpIterations = warmUpIterations;
 	}
 	// END_NEW : amit June'17
 

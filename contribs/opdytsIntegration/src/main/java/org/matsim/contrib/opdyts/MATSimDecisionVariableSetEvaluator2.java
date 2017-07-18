@@ -309,7 +309,7 @@ public class MATSimDecisionVariableSetEvaluator2<U extends DecisionVariable>
 			Config config = event.getServices().getConfig();
 			OpdytsConfigGroup opdytsConfigGroup = ConfigUtils.addOrGetModule(config,OpdytsConfigGroup.GROUP_NAME, OpdytsConfigGroup.class);
 			int numberOfDecisionVariableTrials = opdytsConfigGroup.getNumberOfDecisionVariableTrials();
-			int iterationsToUpdateDecisionVariableTrial = opdytsConfigGroup.getIterationsToUpdateDecisionVariableTrial();
+			int iterationsToUpdateDecisionVariableTrial = opdytsConfigGroup.getWarmUpIterations();
 			int totalIterationForUpdation = numberOfDecisionVariableTrials * iterationsToUpdateDecisionVariableTrial + 1;
 			int iteration = event.getIteration() - 1;
 

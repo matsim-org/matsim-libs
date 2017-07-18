@@ -59,7 +59,7 @@ public class MATSimConfiguredFactories<U extends DecisionVariable> {
 				this.opdytsConfig.getMaxTransition(), // Integer.MAX_VALUE,
 				this.opdytsConfig.getPopulationSize(), // numberOfTrialDecisionVariables,
 				MatsimRandom.getRandom(), this.opdytsConfig.isInterpolate(), objectiveFunction,
-				this.opdytsConfig.isIncludeCurrentBest());
+				this.opdytsConfig.isIncludeCurrentBest(), this.opdytsConfig.getWarmUpIterations());
 		result.setLogPath(this.opdytsConfig.getOutputDirectory());
 		result.setMaxTotalMemory(Integer.MAX_VALUE);
 		return result;
