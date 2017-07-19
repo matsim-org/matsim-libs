@@ -141,7 +141,8 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 		this.noiseContext.getTimeInterval2linkId2noiseLinks().clear();
 		this.noiseContext.getLinkId2vehicleId2lastEnterTime().clear();
 		this.noiseContext.setCurrentTimeBinEndTime(this.noiseContext.getNoiseParams().getTimeBinSizeNoiseComputation());
-		
+		this.noiseContext.getVehicleId2PersonId().clear();
+
 		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 			rp.getLinkId2IsolatedImmission().clear();
 			rp.setFinalImmission(0.);

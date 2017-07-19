@@ -51,7 +51,7 @@ public class NoiseComputationModule extends AbstractModule {
 		
 		this.bind(NoiseContext.class).toInstance(noiseContext);
 		
-		this.bind(NoiseTimeTracker.class).asEagerSingleton();;
+		this.bind(NoiseTimeTracker.class).asEagerSingleton();
 		this.addEventHandlerBinding().to(NoiseTimeTracker.class);
 		
 		if (noiseParameters.isUseActualSpeedLevel()) {
