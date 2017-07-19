@@ -58,6 +58,8 @@ public class RunNetworkParameters {
 		opdytsConfig.setBinSize(3600);
 		opdytsConfig.setStartTime(0);
 		opdytsConfig.setMaxIteration(3);
+		opdytsConfig.setWarmUpIterations(3);
+		opdytsConfig.setUseAllWarmUpIterations(false);
 		config.addModule(opdytsConfig);
 
 		// <<<<<<<<<< SHOULD COME FROM FILE <<<<<<<<<<

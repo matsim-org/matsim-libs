@@ -97,6 +97,9 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	private static final String WARM_UP_ITERATIONS = "warmUpIterations";
 	private int warmUpIterations = 1;
 
+	private static final String USE_ALL_WARM_UP_ITERATIONS = "useAllWarmUpIterations";
+	private boolean useAllWarmUpIterations = false;
+
 	@StringGetter(WARM_UP_ITERATIONS)
 	public int getWarmUpIterations() {
 		return warmUpIterations;
@@ -106,6 +109,17 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	public void setWarmUpIterations(int warmUpIterations) {
 		this.warmUpIterations = warmUpIterations;
 	}
+
+	@StringGetter(USE_ALL_WARM_UP_ITERATIONS)
+	public boolean getUseAllWarmUpIterations() {
+		return useAllWarmUpIterations;
+	}
+
+	@StringSetter(USE_ALL_WARM_UP_ITERATIONS)
+	public void setUseAllWarmUpIterations(boolean useAllWarmUpIterations) {
+		this.useAllWarmUpIterations = useAllWarmUpIterations;
+	}
+
 	// END_NEW : amit June'17
 
 	@StringGetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
@@ -302,7 +316,8 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 		OpdytsConfigGroup optConf = (OpdytsConfigGroup) config.getModules().get(OpdytsConfigGroup.GROUP_NAME);
 
 		// alternative to get configGroup from configUtils, amit June'17
-//		OpdytsConfigGroup optConf = ConfigUtils.addOrGetModule(config, OpdytsConfigGroup.GROUP_NAME,OpdytsConfigGroup.class);
-		
+		// OpdytsConfigGroup optConf = ConfigUtils.addOrGetModule(config,
+		// OpdytsConfigGroup.GROUP_NAME,OpdytsConfigGroup.class);
+
 	}
 }
