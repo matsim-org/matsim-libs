@@ -26,6 +26,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.TensorMap;
+import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.mat.IdentityMatrix;
 import ch.ethz.idsc.tensor.mat.NullSpace;
@@ -94,33 +95,48 @@ public class PerformanceFleetSizeCalculator {
     }
 
     public Tensor calculateAvailabilities() throws InterruptedException {
-        int numVehicles = 10;
+        int numVehicles = 100;
         // Tensor A = Tensors.empty(); // Tensor of all availabilities(timestep, vehiclestep)
         Tensor A = Array.zeros(virtualNetwork.getvNodesCount(), numberTimeSteps, numVehicles + 1);
         Tensor Aold = Tensors.empty();
 
         for (int k = 0; k < numberTimeSteps; ++k) {
-            // extract the betaij and lambdai from the travel information
-            // Tensor betaij = tData.normToRowStochastic(tData.getAlphaijPSFforTime(k * dt));
-            Tensor betaij = tData.getAlphaijPSFforTime(k * dt);
-            Tensor lambdai = tData.getLambdaPSFforTime(k * dt);
+            // Step 1: Calculate the customer flows cf (i->j)
+            Tensor lambdaii = tData.getLambdaPSFforTime(k * dt);
             Tensor pij = tData.getpijPSFforTime(k * dt);
-            Tensor psii = getPsii(betaij);
 
-            // only calculate if there are customers in the timestep, otherwise will result in zero
+            Tensor flowCust = Tensors.empty();
+            for (int i = 0; i < Dimensions.of(lambdaii).get(0); ++i) {
+                Tensor row = pij.get(i);
+                Tensor rowUpdated = row.multiply(lambdaii.Get(i));
+                flowCust.append(rowUpdated);
+//                flowCust.set(rowUpdated, i);
+            }
 
-            // calculate pii, relative throughputs
-            Tensor relativeThroughputOfi = getRelativeThroughputOfi(tData, k * dt);
-            System.out.println("relativeThroughputOfi = " + relativeThroughputOfi);
+            
+            // Step 2: calculate the total flow and transition probabilities
+            // for customer and rebalancing flows, calculate the overall arrival rates
+            Tensor flowReb = tData.getAlphaijPSFforTime(k * dt);
+            Tensor flowTot = flowCust.add(flowReb);
+            Tensor pijTot = tData.normToRowStochastic(flowTot);
+            
+            
+            Tensor arrivalTot = Tensors.empty();
+            for(int i = 0; i<Dimensions.of(lambdaii).get(0);++i){
+                Tensor rebarrivali = Total.of(flowReb.get(i));
+                arrivalTot.append(rebarrivali.add(lambdaii.Get(i)));
+            }
+            
+            // Step 3: calculate the throughput
+            Tensor throughput = PerformanceFleetSizeCalculator.getRelativeThroughputOfi(pijTot);
+            
 
-            // compute lambdaTilde
-            Tensor lambdaTilde = lambdai.add(psii);
-
-            // calculate availabilities
-            System.out.println("lambdaTilde = " + lambdaTilde);
-            System.out.println("relativeThroughputOfi = " + relativeThroughputOfi);
-            MeanValueAnalysis mva = new MeanValueAnalysis(numVehicles, lambdaTilde, relativeThroughputOfi);
-
+            
+            // Step 4: conduct mean value analysis
+            MeanValueAnalysis mva = new MeanValueAnalysis(numVehicles, arrivalTot, throughput);
+            
+            
+            // Step 5: compute availabilities
             Tensor Ak = Tensors.empty();
             for (int veh = 0; veh <= numVehicles; ++veh) {
                 Tensor Lveh = mva.getL(veh);
@@ -129,7 +145,7 @@ public class PerformanceFleetSizeCalculator {
                 // System.out.println("Wveh = " + Wveh);
 
                 // availabilities at timestep k with v vehicles for every virtualNode
-                Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(lambdaTilde));
+                Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(arrivalTot));
                 System.out.println("Aveh = " + Aveh);
                 for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
                     A.set(Aveh.Get(i), i, k, veh);
@@ -137,6 +153,47 @@ public class PerformanceFleetSizeCalculator {
 
                 Aold.append(Mean.of(Aveh));
             }
+            
+            
+            
+
+            // // extract the betaij and lambdai from the travel information
+            // // Tensor betaij = tData.normToRowStochastic(tData.getAlphaijPSFforTime(k * dt));
+            // Tensor betaij = tData.getAlphaijPSFforTime(k * dt);
+            // Tensor lambdai = tData.getLambdaPSFforTime(k * dt);
+            // Tensor pij = tData.getpijPSFforTime(k * dt);
+            // Tensor psii = getPsii(betaij);
+            //
+            // // only calculate if there are customers in the timestep, otherwise will result in zero
+            //
+            // // calculate pii, relative throughputs
+            // Tensor relativeThroughputOfi = getRelativeThroughputOfi(tData, k * dt);
+            // System.out.println("relativeThroughputOfi = " + relativeThroughputOfi);
+            //
+            // // compute lambdaTilde
+            // Tensor lambdaTilde = lambdai.add(psii);
+            //
+            // // calculate availabilities
+            // System.out.println("lambdaTilde = " + lambdaTilde);
+            // System.out.println("relativeThroughputOfi = " + relativeThroughputOfi);
+            // MeanValueAnalysis mva = new MeanValueAnalysis(numVehicles, lambdaTilde, relativeThroughputOfi);
+            //
+            // Tensor Ak = Tensors.empty();
+            // for (int veh = 0; veh <= numVehicles; ++veh) {
+            // Tensor Lveh = mva.getL(veh);
+            // Tensor Wveh = mva.getW(veh);
+            // // System.out.println("Lveh = " + Lveh);
+            // // System.out.println("Wveh = " + Wveh);
+            //
+            // // availabilities at timestep k with v vehicles for every virtualNode
+            // Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(lambdaTilde));
+            // System.out.println("Aveh = " + Aveh);
+            // for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
+            // A.set(Aveh.Get(i), i, k, veh);
+            // }
+            //
+            // Aold.append(Mean.of(Aveh));
+            // }
         }
 
         // based on A calculate overall availbilities as a function of the number of vehicles
@@ -209,16 +266,29 @@ public class PerformanceFleetSizeCalculator {
         return pijTilde;
     }
 
-    private Tensor getRelativeThroughputOfi(TravelData tData, int time) throws InterruptedException {
- //       Tensor pkiTilde = getpijTilde(tData, time);
-        Tensor pkiTilde = tData.getpijPSFforTime(time);
-        Tensor IminusPki = IdentityMatrix.of(size).subtract(pkiTilde);
+    /**
+     * 
+     * @param transitionProb
+     *            row-stochastic matrix where M(i,j) is transition probability from i to j
+     * @return relative throughputs normed and positive
+     * @throws InterruptedException
+     */
+    public static Tensor getRelativeThroughputOfi(Tensor transitionProb) throws InterruptedException {
+        int size = Dimensions.of(transitionProb).get(0);
+        Tensor IminusPki = IdentityMatrix.of(size).subtract(Transpose.of(transitionProb));
         Tensor relativeThroughput = NullSpace.usingSvd(IminusPki);
 
+        // if no solution found, return empty Tensor.
         if (Dimensions.of(relativeThroughput).get(0) == 0) {
-            return Tensors.vector(i -> RealScalar.ZERO, virtualNetwork.getvNodesCount());
+            return  Array.zeros(size);
         } else {
+            // make sure relative throughput positive in case solver returns negative throughput
+            if (((RealScalar) relativeThroughput.get(0, 0)).number().doubleValue() < 0.0) {
+                relativeThroughput = relativeThroughput.multiply(RealScalar.of(-1));
+            }
+
             return relativeThroughput.get(0);
+
         }
     }
 
