@@ -48,7 +48,8 @@ public class MeanValueAnalysis {
 
     private void updateL(int agents) {
         Tensor numerator = (W.get(agents).pmul(pii)).multiply(RealScalar.of(agents));
-        Tensor denominator = mui.dot(W.get(agents));
+        // Tensor denominator = mui.dot(W.get(agents));
+        Tensor denominator = pii.dot(W.get(agents));
         L.set(numerator.multiply((Scalar) InvertUnlessZero.of(denominator)), agents);
 
     }

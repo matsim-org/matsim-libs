@@ -123,6 +123,23 @@ public class PerformanceFleetSizeCalculator {
 
             // Step 3: calculate the throughput
             Tensor throughput = PerformanceFleetSizeCalculator.getRelativeThroughputOfi(pijTot);
+            if(k==6){
+                System.out.println("throughput = " + throughput); 
+                System.out.println("arrivalTot = " + arrivalTot);
+            }
+            
+            if(k==7){
+                System.out.println("throughput = " + throughput); 
+                System.out.println("arrivalTot = " + arrivalTot);
+
+            }
+            
+            if(k==8){
+                System.out.println("throughput = " + throughput); 
+                System.out.println("arrivalTot = " + arrivalTot);
+
+            }
+            
 
             // Step 4: conduct mean value analysis
             MeanValueAnalysis mva = new MeanValueAnalysis(numVehicles, arrivalTot, throughput);
@@ -131,7 +148,7 @@ public class PerformanceFleetSizeCalculator {
             Tensor Ak = Tensors.empty();
             for (int vehBin = 0; vehBin <= vehicleBins; ++vehBin) {
                 Tensor Lveh = mva.getL(vehBin * vehicleSteps);
-                Tensor Wveh = mva.getW(vehBin * vehicleSteps);                
+                Tensor Wveh = mva.getW(vehBin * vehicleSteps); 
 
                 // availabilities at timestep k with v vehicles for every virtualNode
                 Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(arrivalTot));
