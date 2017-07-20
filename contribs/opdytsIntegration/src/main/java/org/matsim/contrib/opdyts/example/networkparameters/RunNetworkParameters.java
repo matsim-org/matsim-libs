@@ -59,7 +59,7 @@ public class RunNetworkParameters {
 		opdytsConfig.setStartTime(0);
 		opdytsConfig.setMaxIteration(3);
 		opdytsConfig.setWarmUpIterations(3);
-		opdytsConfig.setUseAllWarmUpIterations(false);
+		opdytsConfig.setUseAllWarmUpIterations(true);
 		config.addModule(opdytsConfig);
 
 		// <<<<<<<<<< SHOULD COME FROM FILE <<<<<<<<<<
