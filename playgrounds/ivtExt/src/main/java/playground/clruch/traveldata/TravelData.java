@@ -273,6 +273,11 @@ public class TravelData implements Serializable {
     public long getVirtualNetworkID() {
         return virtualNetworkID;
     }
+    
+    
+    public int getNumbertimeSteps(){
+        return numberTimeSteps;
+    }
 
     /**
      * @param T

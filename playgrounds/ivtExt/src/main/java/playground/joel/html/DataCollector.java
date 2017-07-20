@@ -94,7 +94,7 @@ public class DataCollector {
     }
 
     public static void collectData(Controler controler, MinimumFleetSizeCalculator minimumFleetSizeCalculator, //
-                                   PerformanceFleetSizeCalculator performanceFleetSizeCalculator) {
+                                   PerformanceFleetSizeCalculator performanceFleetSizeCalculator) throws InterruptedException {
 
         Scenario scenario = controler.getScenario();
         scenarioParameters.populationSize = scenario.getPopulation().getPersons().values().size();

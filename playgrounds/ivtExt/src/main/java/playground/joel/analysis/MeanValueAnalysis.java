@@ -36,7 +36,7 @@ public class MeanValueAnalysis {
         // L_i(0) = 0 was initialized in the constructor
         // W_i(0) = 0 was initialized in the constructor
         for (int agents = 1; agents <= maxAgents; ++agents) {
-            if(agents%100 ==0)System.out.println("mva at agents = " + agents);
+            if(agents%1000 ==0)System.out.println("mva at agents = " + agents);
             updateW(agents);
             updateL(agents);
         }
@@ -70,13 +70,4 @@ public class MeanValueAnalysis {
     public Tensor getL(int agents) {
         return L.get(agents).copy();
     }
-
-    // public Scalar getL(int agents, int node) {
-    // return L.Get(agents, node);
-    // }
-
-    // public Scalar getW(int agents, int node) {
-    // return W.Get(agents, node);
-    // }
-
 }

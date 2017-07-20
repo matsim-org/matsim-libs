@@ -20,7 +20,6 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
-import ch.ethz.idsc.tensor.alg.TensorMap;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.mat.IdentityMatrix;
@@ -34,6 +33,7 @@ import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.traveldata.TravelDataUtils;
+import playground.clruch.utils.GlobalAssert;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 
 /**
@@ -50,10 +50,12 @@ public class PerformanceFleetSizeCalculator {
     final int dt;
     final int dayduration = 108000;
     int size;
+    final int numVehicles;
+    final int vehicleSteps;
+
 
     public static void main(String[] args) throws Exception {
-        // number of timesteps in day
-        int dtDay = 1800;
+
 
         // load needed information
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
@@ -69,24 +71,23 @@ public class PerformanceFleetSizeCalculator {
 
         // call the performancefleetsizecalculator and calculate the availabilities
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetworkLoad,
-                travelDataLoad, dtDay);
+                travelDataLoad, travelDataLoad.getNumbertimeSteps(), 5000,50);
         Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
-
     }
 
-    public PerformanceFleetSizeCalculator(Network networkIn, VirtualNetwork virtualNetworkIn, TravelData travelDataIn, int dtIn) {
+    public PerformanceFleetSizeCalculator(Network networkIn, VirtualNetwork virtualNetworkIn, TravelData travelDataIn, int numberTimeStepsIn, int numVehiclesMaxIn, int vehicleStepsIn) {
         network = networkIn;
         virtualNetwork = virtualNetworkIn;
         tData = travelDataIn;
-        // ensure that dayduration / timeInterval is integer value
-        dt = TravelDataUtils.greatestNonRestDt(dtIn, dayduration);
-        numberTimeSteps = dayduration / dt;
+        numberTimeSteps = numberTimeStepsIn;
+        GlobalAssert.that(dayduration%numberTimeStepsIn ==0);
+        dt = dayduration/numberTimeStepsIn;
         size = virtualNetwork.getvNodesCount();
+        numVehicles = numVehiclesMaxIn;
+        vehicleSteps = vehicleStepsIn;
     }
 
     public Tensor calculateAvailabilities() throws InterruptedException {
-        int numVehicles = 10000;
-        int vehicleSteps = 200;
         int vehicleBins = numVehicles/TravelDataUtils.greatestNonRestDt(vehicleSteps, numVehicles);
         System.out.println("number of vehicle  bins = " + vehicleBins);
         
@@ -144,6 +145,7 @@ public class PerformanceFleetSizeCalculator {
         }
 
         // based on A calculate overall availabilities as a function of the number of vehicles
+        System.out.println(Pretty.of(A));
         Tensor ATimeVehMean = Mean.of(A);
         Tensor ATimeVehMeanOnlyWithCustomer = Tensors.empty();
 
@@ -195,10 +197,6 @@ public class PerformanceFleetSizeCalculator {
     }
 
     private void plot(Tensor values, int vehicleSteps) throws Exception {
-        System.out.println("now in the plotting part");
-        System.out.println(Dimensions.of(values));
-        // System.out.println("values = " + values);
-
         XYSeries series = new XYSeries("Availability");
         for (int i = 0; i < Dimensions.of(values).get(0); ++i) {
             series.add(i * vehicleSteps, values.Get(i).number().doubleValue());
@@ -235,110 +233,3 @@ public class PerformanceFleetSizeCalculator {
 
 }
 
-// private Tensor getpijTilde(TravelData tData, int time) {
-//
-// // Tensor betaij = tData.normToRowStochastic(tData.getAlphaijPSFforTime(time));
-// Tensor betaij = tData.getAlphaijPSFforTime(time);
-// Tensor lambdai = tData.getLambdaPSFforTime(time);
-// Tensor pij = tData.getpijPSFforTime(time);
-// Tensor psii = getPsii(betaij);
-//
-// // compute lambdaTilde
-// Tensor lambdaTilde = lambdai.add(psii);
-//
-// // compute ratio (pi in paper)
-// Tensor ratioi = Tensors.empty();
-// for (int i = 0; i < Dimensions.of(betaij).get(0); ++i) {
-// if (lambdaTilde.Get(i).number().doubleValue() == 0.0) {
-// ratioi.append(RealScalar.ZERO);
-// } else {
-// ratioi.append(psii.Get(i).divide(lambdaTilde.Get(i)));
-// }
-// }
-//
-// // compute pijTilde
-// Tensor pijTilde = Tensors.empty();
-// for (int i = 0; i < Dimensions.of(betaij).get(0); ++i) {
-// Tensor row1 = betaij.get(i);
-// Tensor row2 = pij.get(i);
-// Scalar pi = ratioi.Get(i);
-// pijTilde.append((row1.multiply(pi)).add(row2.multiply(RealScalar.ONE.subtract(pi))));
-// }
-//
-// return pijTilde;
-// }
-
-// @Deprecated // use other constructor that loads directly from file
-// public PerformanceFleetSizeCalculator(Network networkIn, Population populationIn, int numVirtualNodes, int dtIn) {
-// Population population = populationIn;
-//
-// // create a network containing only car nodes
-// System.out.println("number of links in original network: " + networkIn.getLinks().size());
-// final TransportModeNetworkFilter filter = new TransportModeNetworkFilter(networkIn);
-// network = NetworkUtils.createNetwork();
-// filter.filter(network, Collections.singleton("car"));
-// System.out.println("number of links in car network: " + network.getLinks().size());
-//
-// // create virtualNetwork based on input network
-// KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
-// virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, true);
-//
-// // ensure that dayduration / timeInterval is integer value
-// dt = TravelDataUtils.greatestNonRestDt(dtIn, dayduration);
-// numberTimeSteps = dayduration / dt;
-//
-// tData = new TravelData(virtualNetwork, network, population, dt);
-//
-// }
-
-
-// System.out.println("ATimeVehMeanOnlyWithCustomer = " + Pretty.of(ATimeVehMeanOnlyWithCustomer));
-
-// System.out.println("vehicle Mean = " + Mean.of(Mean.of(A)));
-// System.out.println("vehicle Mean timefilter = " + Mean.of(ATimeVehMeanOnlyWithCustomer));
-
-
-
-// // extract the betaij and lambdai from the travel information
-// // Tensor betaij = tData.normToRowStochastic(tData.getAlphaijPSFforTime(k * dt));
-// Tensor betaij = tData.getAlphaijPSFforTime(k * dt);
-// Tensor lambdai = tData.getLambdaPSFforTime(k * dt);
-// Tensor pij = tData.getpijPSFforTime(k * dt);
-// Tensor psii = getPsii(betaij);
-//
-// // only calculate if there are customers in the timestep, otherwise will result in zero
-//
-// // calculate pii, relative throughputs
-// Tensor relativeThroughputOfi = getRelativeThroughputOfi(tData, k * dt);
-// System.out.println("relativeThroughputOfi = " + relativeThroughputOfi);
-//
-// // compute lambdaTilde
-// Tensor lambdaTilde = lambdai.add(psii);
-//
-// // calculate availabilities
-// System.out.println("lambdaTilde = " + lambdaTilde);
-// System.out.println("relativeThroughputOfi = " + relativeThroughputOfi);
-// MeanValueAnalysis mva = new MeanValueAnalysis(numVehicles, lambdaTilde, relativeThroughputOfi);
-//
-// Tensor Ak = Tensors.empty();
-// for (int veh = 0; veh <= numVehicles; ++veh) {
-// Tensor Lveh = mva.getL(veh);
-// Tensor Wveh = mva.getW(veh);
-// // System.out.println("Lveh = " + Lveh);
-// // System.out.println("Wveh = " + Wveh);
-//
-// // availabilities at timestep k with v vehicles for every virtualNode
-// Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(lambdaTilde));
-// System.out.println("Aveh = " + Aveh);
-// for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
-// A.set(Aveh.Get(i), i, k, veh);
-// }
-//
-// Aold.append(Mean.of(Aveh));
-// }
-
-
-//private Tensor getPsii(Tensor alphaij) {
-//    Tensor Psii = TensorMap.of(Total::of, alphaij, 1);
-//    return Psii;
-//}
