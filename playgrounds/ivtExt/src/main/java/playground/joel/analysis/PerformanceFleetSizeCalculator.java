@@ -70,7 +70,7 @@ public class PerformanceFleetSizeCalculator {
 
         // call the performancefleetsizecalculator and calculate the availabilities
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetworkLoad,
-                travelDataLoad, travelDataLoad.getNumbertimeSteps(), 800, 4);
+                travelDataLoad, travelDataLoad.getNumbertimeSteps(), 8000, 100);
         Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
     }
 
@@ -100,6 +100,8 @@ public class PerformanceFleetSizeCalculator {
             // Step 1: Calculate the customer flows cf (i->j)
             Tensor lambdaii = tData.getLambdaPSFforTime(k * dt);
             Tensor pij = tData.getpijPSFforTime(k * dt);
+            
+            
 
             Tensor flowCust = Tensors.empty();
             for (int i = 0; i < Dimensions.of(lambdaii).get(0); ++i) {
@@ -107,12 +109,31 @@ public class PerformanceFleetSizeCalculator {
                 Tensor rowUpdated = row.multiply(lambdaii.Get(i));
                 flowCust.append(rowUpdated);
             }
+            
+            if(k==8){
+                System.out.println("flowCust = " + Pretty.of(flowCust));
+            }
+
+            
 
             // Step 2: calculate the total flow and transition probabilities
             // for customer and rebalancing flows, calculate the overall arrival rates
             Tensor flowReb = tData.getAlphaijPSFforTime(k * dt);
+            if(k==8){
+                System.out.println("flowReb = " + Pretty.of(flowReb));
+            }
+
+            
+            
+            
             Tensor flowTot = flowCust.add(flowReb);
             Tensor pijTot = tData.normToRowStochastic(flowTot);
+            
+            if(k==8){
+                System.out.println("flowTot = " + Pretty.of(flowTot));
+            }
+            
+            
 
             Tensor arrivalTot = Tensors.empty();
             for (int i = 0; i < Dimensions.of(lambdaii).get(0); ++i) {
@@ -122,22 +143,16 @@ public class PerformanceFleetSizeCalculator {
 
 
             // Step 3: calculate the throughput
-            Tensor throughput = PerformanceFleetSizeCalculator.getRelativeThroughputOfi(pijTot);
-            if(k==6){
-                System.out.println("throughput = " + throughput); 
-                System.out.println("arrivalTot = " + arrivalTot);
+            if(k==8){
+                System.out.println("pijTot = " + pijTot);
+                System.out.println("pijTot = " + Pretty.of(pijTot));
             }
             
-            if(k==7){
-                System.out.println("throughput = " + throughput); 
-                System.out.println("arrivalTot = " + arrivalTot);
-
-            }
+            Tensor throughput = PerformanceFleetSizeCalculator.getRelativeThroughputOfi(pijTot);
             
             if(k==8){
-                System.out.println("throughput = " + throughput); 
+                System.out.println("throughput = " + throughput);
                 System.out.println("arrivalTot = " + arrivalTot);
-
             }
             
 
@@ -201,6 +216,7 @@ public class PerformanceFleetSizeCalculator {
         int size = Dimensions.of(transitionProb).get(0);
         Tensor IminusPki = IdentityMatrix.of(size).subtract(Transpose.of(transitionProb));
         Tensor relativeThroughput = NullSpace.usingSvd(IminusPki);
+        
 
         // if no solution found, return empty Tensor.
         if (Dimensions.of(relativeThroughput).get(0) == 0) {
