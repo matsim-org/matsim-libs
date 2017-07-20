@@ -176,7 +176,10 @@ public class TravelData implements Serializable {
 
             // ensure positivity of solution (small negative values possible due to solver
             // accuracy)
-            rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-7));
+            rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-12));
+            // make negative values positive to ensure no problems in subsequent steps
+            // rebalancingRate.flatten(-1).filter(v->v.Get().number().doubleValue()<0.0).forEach(v->v=v.multiply(RealScalar.of(-1.0)));
+            rebalancingRate.flatten(-1).filter(v -> v.Get().number().doubleValue() < 0.0).forEach(v -> v = RealScalar.ZERO);
 
             alphaijPSF.set(rebalancingRate, t);
 
@@ -252,12 +255,11 @@ public class TravelData implements Serializable {
         int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
         return pijPSF.get(timestep).copy();
     }
-    
+
     public Scalar getpijPSFforTime(int time, int from, int to) {
         int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
         return pijPSF.Get(timestep, from, to);
     }
-    
 
     public Tensor getAlphaijPSFforTime(int time) {
         int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
@@ -273,9 +275,8 @@ public class TravelData implements Serializable {
     public long getVirtualNetworkID() {
         return virtualNetworkID;
     }
-    
-    
-    public int getNumbertimeSteps(){
+
+    public int getNumbertimeSteps() {
         return numberTimeSteps;
     }
 
