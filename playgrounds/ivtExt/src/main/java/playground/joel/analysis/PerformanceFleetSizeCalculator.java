@@ -53,7 +53,7 @@ public class PerformanceFleetSizeCalculator {
 
     public static void main(String[] args) throws Exception {
         // number of timesteps in day
-        int samples = 10;
+        int dtDay = 1800;
 
         // load needed information
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
@@ -69,12 +69,8 @@ public class PerformanceFleetSizeCalculator {
 
         // call the performancefleetsizecalculator and calculate the availabilities
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetworkLoad,
-                travelDataLoad, 1800);
+                travelDataLoad, dtDay);
         Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
-
-        // show the availabilities
-        System.out.println("A " + Dimensions.of(Availabilities) + " = ");
-        System.out.println(Pretty.of(Availabilities));
 
     }
 
@@ -96,10 +92,10 @@ public class PerformanceFleetSizeCalculator {
         
         
 
-        // Tensor A = Tensors.empty(); // Tensor of all availabilities(timestep, vehiclestep)
+        // Tensor of all availabilities(virtualnode, timestep, vehiclestep)
         Tensor A = Array.zeros(virtualNetwork.getvNodesCount(), numberTimeSteps, vehicleBins+1);
-        // Tensor Aold = Tensors.empty();
 
+        // iterate through timesteps to compute availabilities
         for (int k = 0; k < numberTimeSteps; ++k) {
             // Step 1: Calculate the customer flows cf (i->j)
             Tensor lambdaii = tData.getLambdaPSFforTime(k * dt);
@@ -110,7 +106,6 @@ public class PerformanceFleetSizeCalculator {
                 Tensor row = pij.get(i);
                 Tensor rowUpdated = row.multiply(lambdaii.Get(i));
                 flowCust.append(rowUpdated);
-                // flowCust.set(rowUpdated, i);
             }
 
             // Step 2: calculate the total flow and transition probabilities
@@ -138,28 +133,18 @@ public class PerformanceFleetSizeCalculator {
             for (int vehBin = 0; vehBin <= vehicleBins; ++vehBin) {
                 Tensor Lveh = mva.getL(vehBin*vehicleSteps);
                 Tensor Wveh = mva.getW(vehBin*vehicleSteps);
-                // System.out.println("Lveh = " + Lveh);
-                // System.out.println("Wveh = " + Wveh);
 
                 // availabilities at timestep k with v vehicles for every virtualNode
                 Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(arrivalTot));
-                // System.out.println("Aveh = " + Aveh);
+
                 for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
                     A.set(Aveh.Get(i), i, k, vehBin);
                 }
-
-                // Aold.append(Mean.of(Aveh));
             }
-
         }
 
-        // based on A calculate overall availbilities as a function of the number of vehicles
-        // System.out.println(Dimensions.of(A));
+        // based on A calculate overall availabilities as a function of the number of vehicles
         Tensor ATimeVehMean = Mean.of(A);
-
-        // System.out.println("ATimeVehMean = " + Pretty.of(ATimeVehMean));
-        // System.out.println(Dimensions.of(ATimeVehMean));
-
         Tensor ATimeVehMeanOnlyWithCustomer = Tensors.empty();
 
         for (int i = 0; i < numberTimeSteps; ++i) {
@@ -178,14 +163,10 @@ public class PerformanceFleetSizeCalculator {
         } catch (Exception e) {
             System.out.println("Error saving the availabilities");
         }
-        // return Aold;
+
         return meanAvailabilityVehicle;
     }
 
-    private Tensor getPsii(Tensor alphaij) {
-        Tensor Psii = TensorMap.of(Total::of, alphaij, 1);
-        return Psii;
-    }
 
     /**
      * 
@@ -357,3 +338,7 @@ public class PerformanceFleetSizeCalculator {
 // }
 
 
+//private Tensor getPsii(Tensor alphaij) {
+//    Tensor Psii = TensorMap.of(Total::of, alphaij, 1);
+//    return Psii;
+//}
