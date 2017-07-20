@@ -48,8 +48,8 @@ public class ScenarioPreparer {
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
         final int maxPopulationSize = 80000;
-        final int numVirtualNodes = 40;
-        final int dtTravelData = 21600;
+        final int numVirtualNodes = 5;
+        final int dtTravelData = 10800;
         final boolean completeGraph = true;
 
         // LocationSpec object to specify city location and center, radius for cutting

@@ -36,7 +36,6 @@ public class MeanValueAnalysis {
         // L_i(0) = 0 was initialized in the constructor
         // W_i(0) = 0 was initialized in the constructor
         for (int agents = 1; agents <= maxAgents; ++agents) {
-            if(agents%1000 ==0)System.out.println("mva at agents = " + agents);
             updateW(agents);
             updateL(agents);
         }

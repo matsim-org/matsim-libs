@@ -52,10 +52,9 @@ public class PerformanceFleetSizeCalculator {
     int size;
     final int numVehicles;
     final int vehicleSteps;
-
+    final int vehicleBins;
 
     public static void main(String[] args) throws Exception {
-
 
         // load needed information
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
@@ -71,30 +70,30 @@ public class PerformanceFleetSizeCalculator {
 
         // call the performancefleetsizecalculator and calculate the availabilities
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetworkLoad,
-                travelDataLoad, travelDataLoad.getNumbertimeSteps(), 5000,50);
+                travelDataLoad, travelDataLoad.getNumbertimeSteps(), 800, 4);
         Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
     }
 
-    public PerformanceFleetSizeCalculator(Network networkIn, VirtualNetwork virtualNetworkIn, TravelData travelDataIn, int numberTimeStepsIn, int numVehiclesMaxIn, int vehicleStepsIn) {
+    public PerformanceFleetSizeCalculator(Network networkIn, VirtualNetwork virtualNetworkIn, TravelData travelDataIn, int numberTimeStepsIn,
+            int numVehiclesMaxIn, int vehicleStepsIn) {
         network = networkIn;
         virtualNetwork = virtualNetworkIn;
         tData = travelDataIn;
         numberTimeSteps = numberTimeStepsIn;
-        GlobalAssert.that(dayduration%numberTimeStepsIn ==0);
-        dt = dayduration/numberTimeStepsIn;
+        GlobalAssert.that(dayduration % numberTimeStepsIn == 0);
+        dt = dayduration / numberTimeStepsIn;
         size = virtualNetwork.getvNodesCount();
         numVehicles = numVehiclesMaxIn;
         vehicleSteps = vehicleStepsIn;
+        vehicleBins = numVehicles / TravelDataUtils.greatestNonRestDt(vehicleSteps, numVehicles);
     }
 
     public Tensor calculateAvailabilities() throws InterruptedException {
-        int vehicleBins = numVehicles/TravelDataUtils.greatestNonRestDt(vehicleSteps, numVehicles);
+
         System.out.println("number of vehicle  bins = " + vehicleBins);
-        
-        
 
         // Tensor of all availabilities(virtualnode, timestep, vehiclestep)
-        Tensor A = Array.zeros(virtualNetwork.getvNodesCount(), numberTimeSteps, vehicleBins+1);
+        Tensor a = Array.zeros(virtualNetwork.getvNodesCount(), numberTimeSteps, vehicleBins + 1);
 
         // iterate through timesteps to compute availabilities
         for (int k = 0; k < numberTimeSteps; ++k) {
@@ -121,54 +120,58 @@ public class PerformanceFleetSizeCalculator {
                 arrivalTot.append(rebarrivali.add(lambdaii.Get(i)));
             }
 
+
             // Step 3: calculate the throughput
             Tensor throughput = PerformanceFleetSizeCalculator.getRelativeThroughputOfi(pijTot);
 
             // Step 4: conduct mean value analysis
-            System.out.println("starting mean value analysis");
             MeanValueAnalysis mva = new MeanValueAnalysis(numVehicles, arrivalTot, throughput);
-            System.out.println("ended mean value analysis");
 
             // Step 5: compute availabilities
             Tensor Ak = Tensors.empty();
             for (int vehBin = 0; vehBin <= vehicleBins; ++vehBin) {
-                Tensor Lveh = mva.getL(vehBin*vehicleSteps);
-                Tensor Wveh = mva.getW(vehBin*vehicleSteps);
+                Tensor Lveh = mva.getL(vehBin * vehicleSteps);
+                Tensor Wveh = mva.getW(vehBin * vehicleSteps);                
 
                 // availabilities at timestep k with v vehicles for every virtualNode
                 Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(arrivalTot));
 
                 for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
-                    A.set(Aveh.Get(i), i, k, vehBin);
+                    a.set(Aveh.Get(i), i, k, vehBin);
                 }
             }
         }
 
-        // based on A calculate overall availabilities as a function of the number of vehicles
-        System.out.println(Pretty.of(A));
-        Tensor ATimeVehMean = Mean.of(A);
-        Tensor ATimeVehMeanOnlyWithCustomer = Tensors.empty();
+        // based on the a matrix calculate overall availabilities as a function of the number of vehicles
+        Tensor aTimeVehiclesMean = Mean.of(a);
 
-        for (int i = 0; i < numberTimeSteps; ++i) {
-            Tensor row = ATimeVehMean.get(i);
-            if (!(Norm.ofVector(row, 2).number().doubleValue() == 0.0)) {
-                ATimeVehMeanOnlyWithCustomer.append(row);
+        // filter all time/station pairs where availability is zero independent ofthe nubmer of
+        // vehicles (i.e. no customer arrivals in respective bin)
+        Tensor meanByVehicles = Array.zeros(vehicleBins + 1);
+        int numElem = 0;
+        for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
+            for (int j = 0; j < numberTimeSteps; ++j) {
+                Tensor aByVehicle = a.get(i, j, Tensor.ALL);
+                if (!(Norm.ofVector(aByVehicle, 2).number().doubleValue() == 0.0)) {
+                    meanByVehicles = meanByVehicles.add(aByVehicle);
+                    ++numElem;
+                }
             }
         }
 
-
-        Tensor meanAvailabilityVehicle = Mean.of(ATimeVehMeanOnlyWithCustomer);
+        meanByVehicles = meanByVehicles.multiply(RealScalar.of(1.0 / numElem));
 
         try {
-            AnalyzeAll.saveFile(meanAvailabilityVehicle, "availabilities");
-            plot(meanAvailabilityVehicle, vehicleSteps);
+            AnalyzeAll.saveFile(a, "availabilitiesFull");
+            // AnalyzeAll.saveFile(aTimeVehiclesMeanBusyTime, "aTimeVehiclesMeanBusyTime");
+            AnalyzeAll.saveFile(meanByVehicles, "availabilities");
+            plot(meanByVehicles, vehicleSteps);
         } catch (Exception e) {
             System.out.println("Error saving the availabilities");
         }
 
-        return meanAvailabilityVehicle;
+        return meanByVehicles;
     }
-
 
     /**
      * 
@@ -232,4 +235,3 @@ public class PerformanceFleetSizeCalculator {
     }
 
 }
-
