@@ -16,12 +16,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.emissions.example;
+package org.matsim.contrib.emissions.example.archive;
 
-import static org.junit.Assert.*;
-
+import static org.junit.Assert.fail;
 import org.junit.Test;
-import org.matsim.contrib.emissions.example.archive.RunEmissionToolOnlineExample;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 /**
@@ -31,13 +29,13 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 public class RunEmissionToolOnlineExampleIT {
 
 	/**
-	 * Test method for {@link RunEmissionToolOnlineExampleV2#main(java.lang.String[])}.
+	 * Test method for {@link RunEmissionToolOnlineExample#main(String[])}.
 	 */
 	@SuppressWarnings("static-method")
 	@Test
 	public final void testMain() {
 		try {
-			RunEmissionToolOnlineExampleV2 tool = new RunEmissionToolOnlineExampleV2(null) ;
+			RunEmissionToolOnlineExample tool = new RunEmissionToolOnlineExample(null) ;
 
 			tool.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 			// otherwise the test fails on jenkins
