@@ -172,7 +172,13 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( RUNID )
 	public void setRunId(final String runid) {
-		this.runId = runid;
+		
+		if (runid.equals("")) {
+			log.info("No run Id provided. Setting run Id to null.");
+			this.runId = null;
+		} else {
+			this.runId = runid;
+		}
 	}
 
 	@StringGetter( LINKTOLINK_ROUTING_ENABLED )
