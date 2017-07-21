@@ -127,7 +127,10 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 	@Override
 	public void reset(int iteration) {
 		
-		this.outputDirectory = noiseContext.getScenario().getConfig().controler().getOutputDirectory() + "/ITERS/" + "it." + iteration + "/";
+		String outputDir = noiseContext.getScenario().getConfig().controler().getOutputDirectory();
+		if (!outputDir.endsWith("/")) outputDir = outputDir + "/";
+		
+		this.outputDirectory = outputDir + "ITERS/" + "it." + iteration + "/";
 		log.info("Setting the output directory to " + outputDirectory);
 		
 		this.iteration = iteration;
