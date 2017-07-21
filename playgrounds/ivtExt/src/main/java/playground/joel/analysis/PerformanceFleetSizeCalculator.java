@@ -27,6 +27,7 @@ import ch.ethz.idsc.tensor.mat.NullSpace;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Norm;
 import ch.ethz.idsc.tensor.red.Total;
+import ch.ethz.idsc.tensor.sca.Chop;
 import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
@@ -70,7 +71,7 @@ public class PerformanceFleetSizeCalculator {
 
         // call the performancefleetsizecalculator and calculate the availabilities
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetworkLoad,
-                travelDataLoad, travelDataLoad.getNumbertimeSteps(), 8000, 100);
+                travelDataLoad, travelDataLoad.getNumbertimeSteps(), 12000, 100);
         Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
     }
 
@@ -164,9 +165,20 @@ public class PerformanceFleetSizeCalculator {
             for (int vehBin = 0; vehBin <= vehicleBins; ++vehBin) {
                 Tensor Lveh = mva.getL(vehBin * vehicleSteps);
                 Tensor Wveh = mva.getW(vehBin * vehicleSteps); 
+                
+                if(k==8 && vehBin == 100){
+                    System.out.println("Lveh = " + Lveh);
+                    System.out.println("Lveh = " + Wveh);
+                }
+                
 
                 // availabilities at timestep k with v vehicles for every virtualNode
                 Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(arrivalTot));
+                
+                if(k==8 && vehBin == 100){
+                    System.out.println("Aveh = " + Aveh);
+                }
+                
 
                 for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
                     a.set(Aveh.Get(i), i, k, vehBin);
@@ -215,19 +227,49 @@ public class PerformanceFleetSizeCalculator {
     public static Tensor getRelativeThroughputOfi(Tensor transitionProb) throws InterruptedException {
         int size = Dimensions.of(transitionProb).get(0);
         Tensor IminusPki = IdentityMatrix.of(size).subtract(Transpose.of(transitionProb));
-        Tensor relativeThroughput = NullSpace.usingSvd(IminusPki);
-        
+        Tensor relativeThroughput = Chop.of(NullSpace.usingSvd(IminusPki)); // chopped to avoid numerical errors
 
         // if no solution found, return empty Tensor.
         if (Dimensions.of(relativeThroughput).get(0) == 0) {
             return Array.zeros(size);
         } else {
+            // if there are multiple solutions, take the feasible one, i.e. all entries same sign
+            int selectedSolution = -1;
+            boolean isNegativeScaled = false;
+
+            System.out.println("multiple throughput solutions found, selecting first solution with all entries same sign");
+
+            for (int i = 0; i < Dimensions.of(relativeThroughput).get(0); ++i) {
+                int positiveSigns = 0;
+                int negativeSigns = 0;
+                int zeroSigns = 0;
+                for (int j = 0; j < Dimensions.of(relativeThroughput).get(1); ++j) {
+                    if (relativeThroughput.Get(i, j).number().doubleValue() > 0.0)
+                        ++positiveSigns;
+                    if (relativeThroughput.Get(i, j).number().doubleValue() < 0.0)
+                        ++negativeSigns;
+                    if (relativeThroughput.Get(i, j).number().doubleValue() == 0.0)
+                        ++zeroSigns;
+                  }
+                GlobalAssert.that(positiveSigns + negativeSigns + zeroSigns == size);
+                if (positiveSigns + zeroSigns == size || negativeSigns + zeroSigns == size) {
+                    selectedSolution = i;
+                    if (negativeSigns > 0) {
+                        isNegativeScaled = true;
+                    }
+                    break;
+                }
+            }
+            GlobalAssert.that(selectedSolution != -1); // ensure solution found
+            
+            Tensor selectedRelativeThroughput = relativeThroughput.get(selectedSolution);
+
             // make sure relative throughput positive in case solver returns negative throughput
-            if (((RealScalar) relativeThroughput.get(0, 0)).number().doubleValue() < 0.0) {
-                relativeThroughput = relativeThroughput.multiply(RealScalar.of(-1));
+            if (isNegativeScaled) {
+                selectedRelativeThroughput = selectedRelativeThroughput.multiply(RealScalar.of(-1));
             }
 
-            return relativeThroughput.get(0);
+            return selectedRelativeThroughput;
 
         }
     }
