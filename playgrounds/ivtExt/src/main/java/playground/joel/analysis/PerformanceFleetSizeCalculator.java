@@ -9,9 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.print.attribute.HashAttributeSet;
-
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
@@ -29,10 +26,8 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Transpose;
-import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.mat.IdentityMatrix;
 import ch.ethz.idsc.tensor.mat.NullSpace;
-import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Norm;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Chop;
@@ -51,11 +46,10 @@ import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
  * Procedure is according to publication "Control of Robotic Mobility-On-Demand Systems: a Queueing-Theoretical Perspective" by Rick Zhang and Marco
  * Pavone, page 5 B. Computation of performance metrics
  * 
- * TODO:
- * Note: numerical instabilities for very low arrival rates observed, where availabilities do not approach 1 indepenntly of the number of cars
- * added to the system. Therfore only timesteps are considered when more than 0.5 % of the peak arrivals happen. This is reasonable because e.g. 
- * in Sioux falls with 45 min timestep the maximum number of arrivals is ~ 21,654, if only 0.5%of this, i.e. 100 arrive in 45 mins any reasonable
- * fleet for peak times will be able to serve with availability 1. 
+ * TODO: Note: numerical instabilities for very low arrival rates observed, where availabilities do not approach 1 indepenntly of the number of cars
+ * added to the system. Therfore only timesteps are considered when more than 0.5 % of the peak arrivals happen. This is reasonable because e.g. in
+ * Sioux falls with 45 min timestep the maximum number of arrivals is ~ 21,654, if only 0.5%of this, i.e. 100 arrive in 45 mins any reasonable fleet
+ * for peak times will be able to serve with availability 1.
  * 
  */
 public class PerformanceFleetSizeCalculator {
@@ -69,7 +63,9 @@ public class PerformanceFleetSizeCalculator {
     final int numVehicles;
     final int vehicleSteps;
     final int vehicleBins;
-    final double MINPERCENTAGEARRIVAL = 0.005;
+    final double MINPERCENTAGE = 0.005;
+    final double PEAKPERCENTAGE = 0.75;
+    final double PEAKSTATIONPERCENTAGE = 0.7;
 
     public static void main(String[] args) throws Exception {
 
@@ -87,7 +83,7 @@ public class PerformanceFleetSizeCalculator {
 
         // call the performancefleetsizecalculator and calculate the availabilities
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetworkLoad,
-                travelDataLoad, travelDataLoad.getNumbertimeSteps(), 12000, 100);
+                travelDataLoad, travelDataLoad.getNumbertimeSteps(), 8000, 20);
         Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
     }
 
@@ -108,7 +104,7 @@ public class PerformanceFleetSizeCalculator {
     public Tensor calculateAvailabilities() throws InterruptedException {
 
         System.out.println("number of vehicle  bins = " + vehicleBins);
-        
+
         // find relevant timesteps when more than MINPERCENTAGEARRIVAL of maximum arrivals happen
         List<Double> arrivalNumbers = new ArrayList<>();
         for (int k = 0; k < numberTimeSteps; ++k) {
@@ -117,28 +113,33 @@ public class PerformanceFleetSizeCalculator {
             RealScalar arrivals = (RealScalar) totalArrivalRate.multiply(RealScalar.of(dt));
             arrivalNumbers.add(arrivals.number().doubleValue());
         }
-        
-        System.out.println(arrivalNumbers);
+
+
         double maxArrival = Collections.max(arrivalNumbers);
-        System.out.println(maxArrival);
-        Set<Integer> relevantTimeSteps = new HashSet();
-        
-        for(int k = 0; k<numberTimeSteps;++k){
-            if(arrivalNumbers.get(k)>MINPERCENTAGEARRIVAL*maxArrival){
+        Set<Integer> relevantTimeSteps = new HashSet<Integer>();
+        Set<Integer> offpeakSteps = new HashSet<Integer>();
+        Set<Integer> peakSteps = new HashSet<Integer>();
+     
+        for (int k = 0; k < numberTimeSteps; ++k) {
+
+            if (arrivalNumbers.get(k) > MINPERCENTAGE * maxArrival) {
                 relevantTimeSteps.add(k);
             }
+            if (arrivalNumbers.get(k) > PEAKPERCENTAGE * maxArrival) {
+                peakSteps.add(k);
+
+            } else {
+                offpeakSteps.add(k);
+            }
+
         }
         
-        System.out.println(relevantTimeSteps);
         
-        
-
         // Tensor of all availabilities(virtualnode, timestep, vehiclestep)
         Tensor a = Array.zeros(virtualNetwork.getvNodesCount(), numberTimeSteps, vehicleBins + 1);
 
         // iterate through timesteps to compute availabilities
-        for (int k : relevantTimeSteps){
-        //        for (int k = 0; k < numberTimeSteps; ++k) {
+        for (int k : relevantTimeSteps) {
             // Step 1: Calculate the customer flows cf (i->j)
             Tensor lambdaii = tData.getLambdaPSFforTime(k * dt);
             Tensor pij = tData.getpijPSFforTime(k * dt);
@@ -150,25 +151,13 @@ public class PerformanceFleetSizeCalculator {
                 flowCust.append(rowUpdated);
             }
 
-//            if (k == 28) {
-//                System.out.println("flowCust = " + Pretty.of(flowCust));
-//            }
-
             // Step 2: calculate the total flow and transition probabilities
             // for customer and rebalancing flows, calculate the overall arrival rates
             Tensor flowReb = tData.getAlphaijPSFforTime(k * dt);
-            
-            
-//            if (k == 28) {
-//                System.out.println("flowReb = " + Pretty.of(flowReb));
-//            }
+
 
             Tensor flowTot = flowCust.add(flowReb);
             Tensor pijTot = tData.normToRowStochastic(flowTot);
-
-//            if (k == 28) {
-//                System.out.println("flowTot = " + Pretty.of(flowTot));
-//            }
 
             Tensor arrivalTot = Tensors.empty();
             for (int i = 0; i < Dimensions.of(lambdaii).get(0); ++i) {
@@ -177,22 +166,8 @@ public class PerformanceFleetSizeCalculator {
             }
 
             // Step 3: calculate the throughput
-//            if (k == 28) {
-//                System.out.println("pijTot = " + pijTot);
-//                System.out.println("pijTot = " + Pretty.of(pijTot));
-//                System.out.println("lambdaii = " + lambdaii);
-//            }
-            
-//            System.out.println("total arrivals at : " + k + "  ==  " + Total.of(lambdaii));
-
             Tensor throughput = PerformanceFleetSizeCalculator.getRelativeThroughputOfi(pijTot);
-//            System.out.println("total of throughput: " + Total.of(throughput));
 
-//            if (k == 28) {
-//
-//                System.out.println("arrivalTot = " + arrivalTot);
-//                System.out.println("throughput = " + throughput);
-//            }
 
             // Step 4: conduct mean value analysis
             MeanValueAnalysis mva = new MeanValueAnalysis(numVehicles, arrivalTot, throughput);
@@ -203,17 +178,10 @@ public class PerformanceFleetSizeCalculator {
                 Tensor Lveh = mva.getL(vehBin * vehicleSteps);
                 Tensor Wveh = mva.getW(vehBin * vehicleSteps);
 
-//                if (k == 28 && vehBin == 10) {
-//                    System.out.println("Lveh = " + Lveh);
-//                    System.out.println("Wveh = " + Wveh);
-//                }
 
                 // availabilities at timestep k with v vehicles for every virtualNode
                 Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(arrivalTot));
 
-//                if (k == 28 && vehBin == 10) {
-//                    System.out.println("Aveh = " + Aveh);
-//                }
 
                 for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
                     a.set(Aveh.Get(i), i, k, vehBin);
@@ -222,14 +190,29 @@ public class PerformanceFleetSizeCalculator {
         }
 
         // based on the a matrix calculate overall availabilities as a function of the number of vehicles
-        Tensor aTimeVehiclesMean = Mean.of(a);
+        Tensor meanByVehicles = calcMeanByVehicles(a, relevantTimeSteps);
+        Tensor meanByVehiclesPeak = calcMeanByVehicles(a, peakSteps);
 
-        // filter all time/station pairs where availability is zero independent ofthe nubmer of
-        // vehicles (i.e. no customer arrivals in respective bin)
+
+        try {
+            AnalyzeAll.saveFile(a, "availabilitiesFull");
+            AnalyzeAll.saveFile(meanByVehicles, "availabilities");
+            AnalyzeAll.saveFile(meanByVehiclesPeak, "availabilitiesPeak");
+            plot(meanByVehicles, meanByVehiclesPeak, vehicleSteps);
+        } catch (Exception e) {
+            System.out.println("Error saving the availabilities");
+        }
+
+        return meanByVehicles;
+    }
+    
+   
+
+    Tensor calcMeanByVehicles(Tensor a, Set<Integer> steps) {
         Tensor meanByVehicles = Array.zeros(vehicleBins + 1);
         int numElem = 0;
         for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
-            for (int j = 0; j < numberTimeSteps; ++j) {
+            for (int j : steps) {
                 Tensor aByVehicle = a.get(i, j, Tensor.ALL);
                 if (!(Norm.ofVector(aByVehicle, 2).number().doubleValue() == 0.0)) {
                     meanByVehicles = meanByVehicles.add(aByVehicle);
@@ -239,17 +222,8 @@ public class PerformanceFleetSizeCalculator {
         }
 
         meanByVehicles = meanByVehicles.multiply(RealScalar.of(1.0 / numElem));
-
-        try {
-            AnalyzeAll.saveFile(a, "availabilitiesFull");
-            // AnalyzeAll.saveFile(aTimeVehiclesMeanBusyTime, "aTimeVehiclesMeanBusyTime");
-            AnalyzeAll.saveFile(meanByVehicles, "availabilities");
-            plot(meanByVehicles, vehicleSteps);
-        } catch (Exception e) {
-            System.out.println("Error saving the availabilities");
-        }
-
         return meanByVehicles;
+
     }
 
     /**
@@ -272,7 +246,7 @@ public class PerformanceFleetSizeCalculator {
             int selectedSolution = -1;
             boolean isNegativeScaled = false;
 
-            System.out.println("multiple throughput solutions found, selecting first solution with all entries same sign");
+            System.out.println("multiple throughput solutions: selecting first with equal sign");
 
             for (int i = 0; i < Dimensions.of(relativeThroughput).get(0); ++i) {
                 int positiveSigns = 0;
@@ -309,14 +283,19 @@ public class PerformanceFleetSizeCalculator {
         }
     }
 
-    private void plot(Tensor values, int vehicleSteps) throws Exception {
+    private void plot(Tensor values, Tensor valuesPeak, int vehicleSteps) throws Exception {
         XYSeries series = new XYSeries("Availability");
         for (int i = 0; i < Dimensions.of(values).get(0); ++i) {
             series.add(i * vehicleSteps, values.Get(i).number().doubleValue());
         }
+        XYSeries seriesPeak = new XYSeries("Availability Peak");
+        for (int i = 0; i < Dimensions.of(values).get(0); ++i) {
+            seriesPeak.add(i * vehicleSteps, valuesPeak.Get(i).number().doubleValue());
+        }
 
         XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(series);
+        dataset.addSeries(seriesPeak);
 
         JFreeChart timechart = ChartFactory.createXYLineChart("Vehicle Availability", "Number of Vehicles", //
                 "Availability", dataset);
