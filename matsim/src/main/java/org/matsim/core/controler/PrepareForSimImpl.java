@@ -159,7 +159,8 @@ class PrepareForSimImpl implements PrepareForSim {
 			} else if (name.equals(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name())) {
 				isModeChoicePresent = true;
 				log.warn("Creating one vehicle corresponding to each network mode for every agent and parking it to the departure link. \n" +
-						"If this is undesirable, then write a new PrepareForSim.");
+						"If this is undesirable, then write a new PrepareForSim +" +
+						"or, somehow get vehicles generation in your plan strategy.");
 			}
 		}
 
