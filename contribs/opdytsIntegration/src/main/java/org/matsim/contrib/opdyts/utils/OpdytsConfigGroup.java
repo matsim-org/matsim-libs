@@ -94,31 +94,32 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	private double uniformityGapWeight = 0.;
 
 	// BEGIN_NEW : amit June'17
-	private static final String NUMBER_OF_DECISION_VARIABLE_TRIALS = "numberOfDecisionVariableTrials";
-	private int numberOfDecisionVariableTrials = this.populationSize;
+	private static final String WARM_UP_ITERATIONS = "warmUpIterations";
+	private int warmUpIterations = 1;
 
-	private static final String ITERATION_TO_UPDATE_DECISION_VARIABLE_TRIAL = "iterationsToUpdateDecisionVariableTrial";
-	private int iterationsToUpdateDecisionVariableTrial = 1;
+	private static final String USE_ALL_WARM_UP_ITERATIONS = "useAllWarmUpIterations";
+	private boolean useAllWarmUpIterations = false;
 
-	@StringGetter(NUMBER_OF_DECISION_VARIABLE_TRIALS)
-	public int getNumberOfDecisionVariableTrials() {
-		return numberOfDecisionVariableTrials;
+	@StringGetter(WARM_UP_ITERATIONS)
+	public int getWarmUpIterations() {
+		return warmUpIterations;
 	}
 
-	@StringSetter(NUMBER_OF_DECISION_VARIABLE_TRIALS)
-	public void setNumberOfDecisionVariableTrials(int numberOfDecisionVariableTrials) {
-		this.numberOfDecisionVariableTrials = numberOfDecisionVariableTrials;
+	@StringSetter(WARM_UP_ITERATIONS)
+	public void setWarmUpIterations(int warmUpIterations) {
+		this.warmUpIterations = warmUpIterations;
 	}
 
-	@StringGetter(ITERATION_TO_UPDATE_DECISION_VARIABLE_TRIAL)
-	public int getIterationsToUpdateDecisionVariableTrial() {
-		return iterationsToUpdateDecisionVariableTrial;
+	@StringGetter(USE_ALL_WARM_UP_ITERATIONS)
+	public boolean getUseAllWarmUpIterations() {
+		return useAllWarmUpIterations;
 	}
 
-	@StringSetter(ITERATION_TO_UPDATE_DECISION_VARIABLE_TRIAL)
-	public void setIterationsToUpdateDecisionVariableTrial(int iterationsToUpdateDecisionVariableTrial) {
-		this.iterationsToUpdateDecisionVariableTrial = iterationsToUpdateDecisionVariableTrial;
+	@StringSetter(USE_ALL_WARM_UP_ITERATIONS)
+	public void setUseAllWarmUpIterations(boolean useAllWarmUpIterations) {
+		this.useAllWarmUpIterations = useAllWarmUpIterations;
 	}
+
 	// END_NEW : amit June'17
 
 	@StringGetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
@@ -315,7 +316,8 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 		OpdytsConfigGroup optConf = (OpdytsConfigGroup) config.getModules().get(OpdytsConfigGroup.GROUP_NAME);
 
 		// alternative to get configGroup from configUtils, amit June'17
-//		OpdytsConfigGroup optConf = ConfigUtils.addOrGetModule(config, OpdytsConfigGroup.GROUP_NAME,OpdytsConfigGroup.class);
-		
+		// OpdytsConfigGroup optConf = ConfigUtils.addOrGetModule(config,
+		// OpdytsConfigGroup.GROUP_NAME,OpdytsConfigGroup.class);
+
 	}
 }

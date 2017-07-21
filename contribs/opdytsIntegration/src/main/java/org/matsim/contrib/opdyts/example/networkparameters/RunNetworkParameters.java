@@ -58,6 +58,8 @@ public class RunNetworkParameters {
 		opdytsConfig.setBinSize(3600);
 		opdytsConfig.setStartTime(0);
 		opdytsConfig.setMaxIteration(3);
+		opdytsConfig.setWarmUpIterations(3);
+		opdytsConfig.setUseAllWarmUpIterations(true);
 		config.addModule(opdytsConfig);
 
 		// <<<<<<<<<< SHOULD COME FROM FILE <<<<<<<<<<
@@ -147,7 +149,7 @@ public class RunNetworkParameters {
 		// final boolean differentiateNetworkModes = true;
 		// if (differentiateNetworkModes) {
 		final MATSimSimulator2<NetworkParameters> matsim = new MATSimSimulator2<NetworkParameters>(stateFactory,
-				scenario, timeDiscretization);
+				scenario);
 		final Set<String> modes = new LinkedHashSet<>();
 		modes.add("car");
 		matsim.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzer.Provider(timeDiscretization, modes,

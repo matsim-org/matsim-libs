@@ -20,11 +20,12 @@ public class DrtOptimizerContext {
 	public final TravelDisutility travelDisutility;
 	public final DrtScheduler scheduler;
 	public final EventsManager eventsManager;
-	public final DrtVehicleFilter filter;
-	public final DrtRequestValidator validator;
+	public final DrtVehicleFilter vehicleFilter;
+	public final DrtRequestValidator requestValidator;
 
 	public DrtOptimizerContext(Fleet fleet, Network network, MobsimTimer timer, TravelTime travelTime,
-			TravelDisutility travelDisutility, DrtScheduler scheduler, EventsManager eventsManager,DrtVehicleFilter filter, DrtRequestValidator validator) {
+			TravelDisutility travelDisutility, DrtScheduler scheduler, EventsManager eventsManager,
+			DrtVehicleFilter filter, DrtRequestValidator validator) {
 		this.fleet = fleet;
 		this.network = network;
 		this.timer = timer;
@@ -32,7 +33,7 @@ public class DrtOptimizerContext {
 		this.travelDisutility = travelDisutility;
 		this.scheduler = scheduler;
 		this.eventsManager = eventsManager;
-		this.filter = filter;
-		this.validator = validator;
+		this.vehicleFilter = filter;
+		this.requestValidator = validator;
 	}
 }

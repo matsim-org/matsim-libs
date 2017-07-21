@@ -17,26 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.contrib.drt.data.validator;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.data.DrtRequest;
 
 /**
- * @author  jbischoff
- *	accepts all DRT requests, as long as start and end link are different.
+ * Accepts all DRT requests as long as start and end link are different.
+ * 
+ * @author jbischoff
  */
-
 public class DefaultDrtRequestValidator implements DrtRequestValidator {
-
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.drt.data.validator.DrtRequestValidator#validateDrtRequest(org.matsim.contrib.drt.data.DrtRequest)
-	 */
-	
-	
 	@Override
 	public boolean validateDrtRequest(DrtRequest request) {
 		if (request.getFromLink() == request.getToLink()) {
@@ -44,8 +35,8 @@ public class DefaultDrtRequestValidator implements DrtRequestValidator {
 			Logger.getLogger(getClass()).error("fromLink and toLink must be different. Request " + request.getId()
 					+ " will not be served. The agent will stay in limbo.");
 			return false;
-		} else 
+		}
+
 		return true;
 	}
-
 }

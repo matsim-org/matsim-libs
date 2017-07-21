@@ -20,12 +20,9 @@
 package org.matsim.contrib.drt.optimizer;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.data.validator.DefaultDrtRequestValidator;
 import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
 import org.matsim.contrib.drt.optimizer.insertion.*;
-import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
-import org.matsim.contrib.drt.optimizer.insertion.filter.KNearestVehicleFilter;
-import org.matsim.contrib.drt.optimizer.insertion.filter.NoFilter;
+import org.matsim.contrib.drt.optimizer.insertion.filter.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.*;
 import org.matsim.contrib.dvrp.data.Fleet;
@@ -50,37 +47,36 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 	private final Fleet fleet;
 	private final TravelTime travelTime;
 	private final QSim qSim;
+	private final DrtRequestValidator requestValidator;
 
 	@Inject(optional = true)
 	private @Named(DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory;
 
 	@Inject
 	public DefaultDrtOptimizerProvider(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
-			Fleet fleet, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim) {
+			Fleet fleet, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim,
+			DrtRequestValidator requestValidator) {
 		this.drtCfg = drtCfg;
 		this.network = network;
 		this.fleet = fleet;
 		this.travelTime = travelTime;
 		this.qSim = qSim;
+		this.requestValidator = requestValidator;
 	}
 
 	@Override
 	public DrtOptimizer get() {
 		DrtSchedulerParams schedulerParams = new DrtSchedulerParams(drtCfg.getStopDuration());
 		DrtScheduler scheduler = new DrtScheduler(drtCfg, fleet, qSim.getSimTimer(), schedulerParams, travelTime);
-		DrtRequestValidator validator = new DefaultDrtRequestValidator();
-		DrtVehicleFilter filter = null;
-		if (drtCfg.getkNearestVehicles()>0){
-			filter = new KNearestVehicleFilter(drtCfg.getkNearestVehicles());
-		}
-		else {
-			filter = new NoFilter();
-		}
+
+		DrtVehicleFilter filter = drtCfg.getkNearestVehicles() > 0
+				? new KNearestVehicleFilter(drtCfg.getkNearestVehicles()) : new NoFilter();
+
 		TravelDisutility travelDisutility = travelDisutilityFactory == null ? new TimeAsTravelDisutility(travelTime)
 				: travelDisutilityFactory.createTravelDisutility(travelTime);
 
 		DrtOptimizerContext optimContext = new DrtOptimizerContext(fleet, network, qSim.getSimTimer(), travelTime,
-				travelDisutility, scheduler, qSim.getEventsManager(),filter,validator);
+				travelDisutility, scheduler, qSim.getEventsManager(), filter, requestValidator);
 
 		return drtCfg.getIdleVehiclesReturnToDepots() ? new InsertionDrtOptimizerWithDepots(optimContext, drtCfg)
 				: new InsertionDrtOptimizer(optimContext, drtCfg);

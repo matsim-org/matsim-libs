@@ -17,20 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
 package org.matsim.contrib.drt.data.validator;
 
 import org.matsim.contrib.drt.data.DrtRequest;
 
 /**
- * @author  jbischoff
- *	Validates (for the optimizer), whether a DRTRequest should be served or not (e.g. for limitations in business area or distance or time)
- *
+ * Validates (for the optimizer), whether a DRTRequest should be served or not (e.g. for limitations in business area or
+ * distance or time)
+ * 
+ * @author jbischoff
  */
-
 public interface DrtRequestValidator {
-
 	boolean validateDrtRequest(DrtRequest request);
 }

@@ -21,9 +21,9 @@ package org.matsim.contrib.drt.optimizer;
 
 import java.util.Collection;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.data.DrtRequest;
+import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.Task;
@@ -60,9 +60,12 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 	@Override
 	public void requestSubmitted(Request request) {
 		DrtRequest drtRequest = (DrtRequest)request;
-		if (!optimContext.validator.validateDrtRequest(drtRequest)) {
+		if (!optimContext.requestValidator.validateDrtRequest(drtRequest)) {
+			optimContext.eventsManager.processEvent(
+					new DrtRequestRejectedEvent(getOptimContext().timer.getTimeOfDay(), drtRequest.getId()));
 			return;
-		}	
+		}
+
 		unplannedRequests.add(drtRequest);
 		requiresReoptimization = true;
 	}
@@ -70,9 +73,8 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 	@Override
 	public void nextTask(Vehicle vehicle) {
 		optimContext.scheduler.updateBeforeNextTask(vehicle);
-
+		
 		Task newCurrentTask = vehicle.getSchedule().nextTask();
-
 		if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
 			requiresReoptimization = doReoptimizeAfterNextTask((DrtTask)newCurrentTask);
 		}
