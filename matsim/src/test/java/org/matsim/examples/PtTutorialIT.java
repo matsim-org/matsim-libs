@@ -21,7 +21,6 @@ package org.matsim.examples;
 
 import java.io.File;
 import java.net.MalformedURLException;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;

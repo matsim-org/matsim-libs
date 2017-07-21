@@ -18,13 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,22 +35,15 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -118,7 +105,13 @@ public class VehVsLinkSpeedTest {
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(new VehicleLinkTravelTimeHandler(vehicleLinkTravelTime));
 
-		QSim qSim = createQSim(net, manager, this.vehSpeed);
+		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
+		car.setMaximumVelocity(this.vehSpeed);
+		car.setPcuEquivalents(1.0);
+		net.scenario.getVehicles().addVehicleType(car);
+
+		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario,manager).run();
+		QSim qSim = QSimUtils.createDefaultQSim(net.scenario, manager);
 		qSim.run();
 
 		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTime.get(Id.create("0", Vehicle.class));
@@ -131,34 +124,6 @@ public class VehVsLinkSpeedTest {
 		Assert.assertEquals("In the simulation minimum of vehicle speed and link speed should be used.", 
 				Math.min(vehSpeed, MAX_SPEED_ON_LINK), speedUsedInSimulation, MatsimTestUtils.EPSILON);
 	}
-
-	private QSim createQSim (SimpleNetwork net, EventsManager manager, double maxVelocity){
-		Scenario sc = net.scenario;
-		QSim qSim1 = new QSim(sc, manager);
-		ActivityEngine activityEngine = new ActivityEngine(manager, qSim1.getAgentCounter());
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
-		qSim1.addMobsimEngine(netsimEngine);
-		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, manager);
-		qSim1.addMobsimEngine(teleportationEngine);
-		QSim qSim = qSim1;
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-
-		Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
-
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
-		car.setMaximumVelocity(maxVelocity);
-		car.setPcuEquivalents(1.0);
-		modeVehicleTypes.put("car", car);
-		agentSource.setModeVehicleTypes(modeVehicleTypes);
-		qSim.addAgentSource(agentSource);
-		return qSim;
-	}
-
 
 	private static final class SimpleNetwork{
 		final Config config;
@@ -175,8 +140,9 @@ public class VehVsLinkSpeedTest {
 			config = scenario.getConfig();
 			config.qsim().setFlowCapFactor(1.0);
 			config.qsim().setStorageCapFactor(1.0);
-			config.qsim().setMainModes(Arrays.asList("car","bike"));
+			config.qsim().setMainModes(Arrays.asList("car"));
 			config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
+			config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 			network = (Network) scenario.getNetwork();
 			this.network.setCapacityPeriod(Time.parseTime("1:00:00"));

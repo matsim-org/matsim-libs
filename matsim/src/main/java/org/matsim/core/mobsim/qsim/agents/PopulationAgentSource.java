@@ -46,7 +46,6 @@ public final class PopulationAgentSource implements AgentSource {
 	private final Population population;
 	private final AgentFactory agentFactory;
 	private final QSim qsim;
-	private Map<String, VehicleType> modeVehicleTypes;
 	private final Collection<String> mainModes;
 	private Map<Id<Vehicle>,Id<Link>> seenVehicleIds = new HashMap<>() ;
 
@@ -58,32 +57,7 @@ public final class PopulationAgentSource implements AgentSource {
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
-		this.modeVehicleTypes = new HashMap<>();
 		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
-		switch ( qsimConfig.getVehiclesSource() ) {
-		case defaultVehicle:
-			for (String mode : mainModes) {
-				// initialize each mode with default vehicle type:
-				modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
-			}
-			break;
-		case fromVehiclesData:
-			// don't do anything
-			break;
-		case modeVehicleTypesFromVehiclesData:
-			for (String mode : mainModes) {
-				VehicleType vehicleType = vehicles.getVehicleTypes().get( Id.create(mode, VehicleType.class) ) ;
-				Gbl.assertNotNull(vehicleType);
-				modeVehicleTypes.put(mode, vehicleType );
-			}
-			break;
-		default:
-			break;
-		
-		}
-		
-		
-		
 	}
 
 	@Override
@@ -107,18 +81,20 @@ public final class PopulationAgentSource implements AgentSource {
 					NetworkRoute route = (NetworkRoute) leg.getRoute();
 					Id<Vehicle> vehicleId = null ;
 					if (route != null) {
-						vehicleId = route.getVehicleId(); // may be null!
+						vehicleId = route.getVehicleId();
 					}
 					if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
 						// yyyy this is already getting rather messy; need to consider simplifications ...  kai/amit, sep'16
 						
-						if (vehicleId == null) {							
-							vehicleId = createAutomaticVehicleId(p, leg, route);
+						if (vehicleId == null) {
+							// if mode choice is allowed, it is possible that a new mode is assigned to an agent and then the route does not have the vehicle
+							// but scenario must have that vehicle; however, in order to find the vehicle, we need to identify the vehicle id. Amit July'17
+							vehicleId = createAutomaticVehicleId (p.getId(), leg.getMode());
+							route.setVehicleId(vehicleId);
 						}
 
 						// so here we have a vehicle id, now try to find or create a physical vehicle:
-						
-						Vehicle vehicle = createVehicle(leg, vehicleId);
+						Vehicle vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
 						
 						// place the vehicle:
 						Id<Link> vehicleLinkId = findVehicleLink(p);
@@ -146,63 +122,6 @@ public final class PopulationAgentSource implements AgentSource {
 				}
 			}
 		}
-	}
-
-	private Vehicle createVehicle(Leg leg, Id<Vehicle> vehicleId) {
-		// yyyy this creates vehicles "on the fly", but then leaves them for good in the vehicles container.  We should consider
-		// to move this into prepareForSim.  kai/amit, apr'17
-		
-		// try to get vehicle from the vehicles container:
-		Vehicle vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
-
-		if ( vehicle==null ) {
-			// if it was not found, next step depends on config:
-			switch ( qsim.getScenario().getConfig().qsim().getVehiclesSource() ) {
-			case defaultVehicle:
-				// create vehicle but don't add it to the container. Amit Apr'17
-				vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
-				break;
-			case modeVehicleTypesFromVehiclesData:
-				// if config says mode vehicles, then create and add it:
-				vehicle = VehicleUtils.getFactory().createVehicle(vehicleId, modeVehicleTypes.get(leg.getMode()));
-				qsim.getScenario().getVehicles().addVehicle(vehicle);
-				break;
-			case fromVehiclesData:
-				// otherwise complain:
-				throw new IllegalStateException("Expecting a vehicle id which is missing in the vehicles database: " + vehicleId);
-			default:
-				// also complain when someone added another config option here:
-				throw new RuntimeException("not implemented") ;
-			}
-		}
-		return vehicle;
-	}
-
-	private Id<Vehicle> createAutomaticVehicleId(Person p, Leg leg, NetworkRoute route) {
-		Id<Vehicle> vehicleId ;
-		if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
-
-			switch (qsim.getScenario().getConfig().qsim().getVehiclesSource()) {
-				case defaultVehicle:
-				case fromVehiclesData:
-					vehicleId = Id.createVehicleId(p.getId());
-					break;
-				case modeVehicleTypesFromVehiclesData:
-					if(!leg.getMode().equals(TransportMode.car)) {
-						String vehIdString = p.getId().toString() + "_" + leg.getMode() ;
-						vehicleId = Id.create(vehIdString, Vehicle.class);
-					} else {
-						vehicleId = Id.createVehicleId(p.getId());
-					}
-					break;
-				default:
-					throw new RuntimeException("not implemented") ;
-			}
-			if(route!=null) route.setVehicleId(vehicleId);
-		} else {
-			throw new IllegalStateException("Found a network route without a vehicle id.");
-		}
-		return vehicleId;
 	}
 
 	/**
@@ -237,8 +156,28 @@ public final class PopulationAgentSource implements AgentSource {
 		throw new RuntimeException("Don't know where to put a vehicle for this agent.");
 	}
 
-	public void setModeVehicleTypes(Map<String, VehicleType> modeVehicleTypes) {
-		this.modeVehicleTypes = modeVehicleTypes;
+	private Id<Vehicle> createAutomaticVehicleId(Id<Person> personId, String mode) {
+		Id<Vehicle> vehicleId ;
+		if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
+			switch (qsim.getScenario().getConfig().qsim().getVehiclesSource()) {
+				case defaultVehicle:
+				case fromVehiclesData:
+					vehicleId = Id.createVehicleId(personId);
+					break;
+				case modeVehicleTypesFromVehiclesData:
+					if(! mode.equals(TransportMode.car)) {
+						String vehIdString = personId.toString() + "_" + mode ;
+						vehicleId = Id.create(vehIdString, Vehicle.class);
+					} else {
+						vehicleId = Id.createVehicleId(personId);
+					}
+					break;
+				default:
+					throw new RuntimeException("not implemented") ;
+			}
+		} else {
+			throw new IllegalStateException("Found a network route without a vehicle id.");
+		}
+		return vehicleId;
 	}
-
 }

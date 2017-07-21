@@ -20,6 +20,7 @@
 
 package org.matsim.integration;
 
+import java.util.Arrays;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,6 +36,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -59,8 +61,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
-
-import java.util.Arrays;
 
 public class SimulateAndScoreTest extends MatsimTestCase {
 
@@ -191,6 +191,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		// ---
 		
 		EventsManager events = EventsUtils.createEventsManager();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
 		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		EventsToScore scorer =
 				EventsToScore.createWithScoreUpdating(
@@ -248,6 +249,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		scenario.getPopulation().addPerson(person);
 
 		EventsManager events = EventsUtils.createEventsManager();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
 		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
 		h.setTypicalDuration(16 * 3600);

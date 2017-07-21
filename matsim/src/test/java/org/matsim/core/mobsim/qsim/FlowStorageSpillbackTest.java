@@ -22,15 +22,7 @@
  */
 package org.matsim.core.mobsim.qsim;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import java.util.*;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,19 +39,11 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -141,9 +125,9 @@ public class FlowStorageSpillbackTest {
 				vehicleOfPerson.put(event.getPersonId(), event.getVehicleId());
 			}
 		});
-		
-		
-		QSim sim = createQSim(sc, events);
+
+		PrepareForSimUtils.createDefaultPrepareForSim(sc,events).run();
+		QSim sim = QSimUtils.createDefaultQSim(sc, events);
 		sim.run();
 
 		for (LinkLeaveEvent event : linkLeaveEvents) {
@@ -159,24 +143,6 @@ public class FlowStorageSpillbackTest {
 		}
 		
 	}
-	
-	private QSim createQSim(Scenario scenario, EventsManager events) {
-		QSim qSim = new QSim(scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
-		qSim.addMobsimEngine(activityEngine);
-		qSim.addActivityHandler(activityEngine);
-        QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
-		qSim.addMobsimEngine(teleportationEngine);
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-		qSim.addAgentSource(agentSource);
-		return qSim;
-	}
-		
-
 	private void setPopulation(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();

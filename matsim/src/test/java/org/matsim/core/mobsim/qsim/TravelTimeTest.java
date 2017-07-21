@@ -21,7 +21,6 @@ package org.matsim.core.mobsim.qsim;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -34,6 +33,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -61,6 +61,7 @@ public class TravelTimeTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
 		QSimUtils.createDefaultQSim(scenario, events).run();
 
 		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
@@ -89,6 +90,7 @@ public class TravelTimeTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
 		QSimUtils.createDefaultQSim(scenario, events).run();
 
 		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));

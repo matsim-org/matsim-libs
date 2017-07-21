@@ -22,15 +22,14 @@
  */
 package org.matsim.core.mobsim.qsim;
 
-import com.google.inject.*;
+import java.util.Collection;
+import java.util.Collections;
 import com.google.inject.Injector;
+import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
-
-import java.util.Collection;
-import java.util.Collections;
 
 /**
  * @author nagel

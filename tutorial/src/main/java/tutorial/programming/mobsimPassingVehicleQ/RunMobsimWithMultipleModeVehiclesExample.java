@@ -1,5 +1,6 @@
 package tutorial.programming.mobsimPassingVehicleQ;
 
+import javax.inject.Inject;
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -21,10 +22,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Example to show how the standard queue can be replaced by something else.  Search for PassingVehicleQ in the code below.
  * <p></p>
@@ -41,10 +38,31 @@ class RunMobsimWithMultipleModeVehiclesExample {
 		// prepare the config:
 		Config config = ConfigUtils.loadConfig( args[0] ) ;
 		config.qsim().setLinkDynamics(QSimConfigGroup.LinkDynamics.PassingQ);
+		config.qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 		config.plans().setRemovingUnneccessaryPlanAttributes(true) ;
 
 		// prepare the scenario
 		Scenario scenario = ScenarioUtils.loadScenario( config ) ;
+
+		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
+		car.setMaximumVelocity(60.0/3.6);
+		car.setPcuEquivalents(1.0);
+		scenario.getVehicles().addVehicleType(car);
+
+		VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
+		bike.setMaximumVelocity(60.0/3.6);
+		bike.setPcuEquivalents(0.25);
+		scenario.getVehicles().addVehicleType(bike);
+
+		VehicleType bicycles = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
+		bicycles.setMaximumVelocity(15.0/3.6);
+		bicycles.setPcuEquivalents(0.05);
+		scenario.getVehicles().addVehicleType(bicycles);
+
+		VehicleType walks = VehicleUtils.getFactory().createVehicleType(Id.create("walk", VehicleType.class));
+		walks.setMaximumVelocity(1.5);
+		walks.setPcuEquivalents(0.10);  			// assumed pcu for walks is 0.1
+		scenario.getVehicles().addVehicleType(walks);
 
 		// prepare the control(l)er:
 		Controler controler = new Controler( scenario ) ;
@@ -98,30 +116,6 @@ class RunMobsimWithMultipleModeVehiclesExample {
 			AgentFactory agentFactory = new DefaultAgentFactory(qSim);
 
 			PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-			Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
-
-			VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create("car", VehicleType.class));
-			car.setMaximumVelocity(60.0/3.6);
-			car.setPcuEquivalents(1.0);
-			modeVehicleTypes.put("car", car);
-
-			VehicleType bike = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
-			bike.setMaximumVelocity(60.0/3.6);
-			bike.setPcuEquivalents(0.25);
-			modeVehicleTypes.put("bike", bike);
-
-			VehicleType bicycles = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
-			bicycles.setMaximumVelocity(15.0/3.6);
-			bicycles.setPcuEquivalents(0.05);
-			modeVehicleTypes.put("bicycle", bicycles);
-
-			VehicleType walks = VehicleUtils.getFactory().createVehicleType(Id.create("walk", VehicleType.class));
-			walks.setMaximumVelocity(1.5);
-			walks.setPcuEquivalents(0.10);  			// assumed pcu for walks is 0.1
-			modeVehicleTypes.put("walk", walks);
-
-			agentSource.setModeVehicleTypes(modeVehicleTypes);
-
 			qSim.addAgentSource(agentSource);
 
 			return qSim ;

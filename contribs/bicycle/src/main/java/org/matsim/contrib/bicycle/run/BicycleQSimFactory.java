@@ -18,14 +18,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.run;
 
-import java.util.HashMap;
 import java.util.Map;
-
 import javax.inject.Inject;
-
-import org.matsim.api.core.v01.Id;
+import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -37,10 +33,6 @@ import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehicleUtils;
-
-import com.google.inject.Provider;
 
 public class BicycleQSimFactory implements Provider<Mobsim> {
 	
@@ -89,20 +81,6 @@ public class BicycleQSimFactory implements Provider<Mobsim> {
 		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
 
 		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-		Map<String, VehicleType> modeVehicleTypes = new HashMap<>();
-
-		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
-		car.setMaximumVelocity(60.0/3.6);
-		car.setPcuEquivalents(1.0);
-		modeVehicleTypes.put("car", car);
-
-		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
-		bicycle.setMaximumVelocity(30.0/3.6);
-		bicycle.setPcuEquivalents(0.0);
-		modeVehicleTypes.put("bike", bicycle);
-		
-		agentSource.setModeVehicleTypes(modeVehicleTypes);
-
 		qSim.addAgentSource(agentSource);
 
 		return qSim ;

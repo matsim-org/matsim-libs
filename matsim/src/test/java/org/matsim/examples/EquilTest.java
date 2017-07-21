@@ -22,7 +22,6 @@ package org.matsim.examples;
 
 import java.util.Arrays;
 import java.util.Collection;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,6 +30,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -88,6 +88,7 @@ public class EquilTest extends MatsimTestCase {
 		events.addHandler(writer);
 
 		//		SimulationTimer.setTime(0); // I don't think this is needed. kai, may'10
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
 		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		sim.run();
 

@@ -21,7 +21,6 @@ package org.matsim.integration.lanes11;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,6 +39,7 @@ import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -142,6 +142,8 @@ public class MixedLaneTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(this.fixture);
 		events.addHandler(handler);
+
+		PrepareForSimUtils.createDefaultPrepareForSim(this.fixture.sc, events).run();
 		QSim qsim = QSimUtils.createDefaultQSim(this.fixture.sc, events);
 		qsim.run();
 		Assert.assertNotNull(handler.lastAgentDepartureEvent);
@@ -211,7 +213,8 @@ public class MixedLaneTest {
 	
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(this.fixture);
 		events.addHandler(handler);
-	
+
+		PrepareForSimUtils.createDefaultPrepareForSim(this.fixture.sc, events).run();
 		QSim qsim = (QSim) QSimUtils.createDefaultQSim(this.fixture.sc, events);
 		qsim.run();
 		
@@ -260,7 +263,8 @@ public class MixedLaneTest {
 	
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(fixture);
 		events.addHandler(handler);
-	
+
+		PrepareForSimUtils.createDefaultPrepareForSim(this.fixture.sc, events).run();
 		QSim qsim = (QSim) QSimUtils.createDefaultQSim(fixture.sc, events);
 		qsim.run();
 		

@@ -21,7 +21,9 @@
 package org.matsim.contrib.signals;
 
 import java.util.Collection;
-
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.util.Types;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,10 +34,7 @@ import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.controler.Injector;
-import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.*;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -46,10 +45,6 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
-
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.util.Types;
 
 /**
  * @author aneumann
@@ -121,7 +116,8 @@ public class TravelTimeFourWaysTest {
 		String eventsOut = this.testUtils.getOutputDirectory() + EVENTSFILE;
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
-		
+
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario, events).run();
 		Mobsim mobsim = injector.getInstance(Mobsim.class);
 		Collection<Provider<MobsimListener>> mobsimListeners = (Collection<Provider<MobsimListener>>) 
 				injector.getInstance(Key.get(Types.collectionOf(Types.providerOf(MobsimListener.class))));

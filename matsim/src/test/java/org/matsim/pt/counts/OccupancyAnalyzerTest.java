@@ -22,9 +22,7 @@ package org.matsim.pt.counts;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Set;
-
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -35,6 +33,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -112,6 +111,7 @@ public class OccupancyAnalyzerTest {
 		OccupancyAnalyzer oa = new OccupancyAnalyzer(3600, 12*3600);
 		eventsManager.addHandler(oa);
 
+		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario,eventsManager).run();
 		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 

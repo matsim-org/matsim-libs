@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -35,6 +36,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -42,8 +44,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.*;
 
 /**
  * Tests the behavior of the qsim with agents waiting for vehicles.
@@ -175,6 +175,7 @@ public class VehicleWaitingTest {
 			}
 		});
 
+		PrepareForSimUtils.createDefaultPrepareForSim(sc,events).run();
 		final Netsim qsim = QSimUtils.createDefaultQSim(sc, events);
 
 //		try {

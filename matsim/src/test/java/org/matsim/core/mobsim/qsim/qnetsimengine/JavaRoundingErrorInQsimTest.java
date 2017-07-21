@@ -39,13 +39,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -92,7 +89,8 @@ public class JavaRoundingErrorInQsimTest {
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTime));
 
-		QSim qSim = createQSim(net,manager);
+		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario,manager).run();
+		QSim qSim = QSimUtils.createDefaultQSim(net.scenario, manager);
 		qSim.run();
 
 		//agent 2 is departed first so will have free speed time = 1000/25 +1 = 41 sec
@@ -101,24 +99,6 @@ public class JavaRoundingErrorInQsimTest {
 		// agent 1 should have 1000/25 +1 + 10 = 51 but, it may be 52 sec sometimes due to rounding errors in java. Rounding errors is eliminated at the moment if accumulating flow to zero instead of one. 
 		Assert.assertEquals( "Wrong travel time for on link 2 for vehicle 1" , 51.0 , vehicleLinkTravelTime.get(Id.createVehicleId(1))  , MatsimTestUtils.EPSILON);
 		Logger.getLogger(JavaRoundingErrorInQsimTest.class).warn("Although the test is passing instead of failing for vehicle 1. This is done intentionally in order to keep this in mind for future.");
-	}
-
-	private QSim createQSim (PseudoInputs net, EventsManager manager){
-		Scenario sc = net.scenario;
-		QSim qSim1 = new QSim(sc, manager);
-		ActivityEngine activityEngine = new ActivityEngine(manager, qSim1.getAgentCounter());
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim1);
-		qSim1.addMobsimEngine(netsimEngine);
-		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine(sc, manager);
-		qSim1.addMobsimEngine(teleportationEngine);
-		QSim qSim = qSim1;
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
-		qSim.addAgentSource(agentSource);
-		return qSim;
 	}
 
 	private static class VehicleLinkTravelTimeEventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
