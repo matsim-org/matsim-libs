@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author dgrether
@@ -40,12 +41,14 @@ class LaneImpl implements Lane {
 	 */
 	private double startsAtMeterFromLinkEnd = 45.0;
 	private List<Id<Link>> toLinkIds;
-  private List<Id<Lane>> toLaneIds;
-  private int alignment = 0;
+	private List<Id<Lane>> toLaneIds;
+	private int alignment = 0;
 	/**
 	 * the default according to the xml schema, never change the value if schema is not changed
 	 */
 	private double capacity = 3600.0;
+
+	private final Attributes attributes = new Attributes();
 
 	public LaneImpl(Id<Lane> id) {
 		this.id = id;
@@ -66,13 +69,11 @@ class LaneImpl implements Lane {
 		return id;
 	}
 
-	
 	@Override
 	public double getNumberOfRepresentedLanes() {
 		return numberOfRepresentedLanes;
 	}
 
-	
 	@Override
 	public double getStartsAtMeterFromLinkEnd() {
 		return startsAtMeterFromLinkEnd;
@@ -85,12 +86,12 @@ class LaneImpl implements Lane {
 		}
 		this.toLinkIds.add(id);
 	}
-	
+
 	@Override
 	public List<Id<Link>> getToLinkIds() {
 		return this.toLinkIds;
 	}
-	
+
 	@Override
 	public void addToLaneId(Id<Lane> id) {
 		if (this.toLaneIds == null) {
@@ -98,17 +99,17 @@ class LaneImpl implements Lane {
 		}
 		this.toLaneIds.add(id);
 	}
-	
+
 	@Override
 	public List<Id<Lane>> getToLaneIds() {
 		return this.toLaneIds;
 	}
-	
+
 	@Override
 	public int getAlignment() {
 		return alignment;
 	}
-	
+
 	@Override
 	public void setAlignment(int alignment) {
 		this.alignment = alignment;
@@ -116,12 +117,17 @@ class LaneImpl implements Lane {
 
 	@Override
 	public double getCapacityVehiclesPerHour() {
-		return this.capacity ;
+		return this.capacity;
 	}
 
 	@Override
 	public void setCapacityVehiclesPerHour(double capacity) {
 		this.capacity = capacity;
 	}
-	
+
+	@Override
+	public Attributes getAttributes() {
+		return attributes;
+	}
+
 }

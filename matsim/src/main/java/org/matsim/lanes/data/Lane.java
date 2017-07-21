@@ -2,6 +2,7 @@ package org.matsim.lanes.data;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ import java.util.List;
  * @author dgrether
  * 
  */
-public interface Lane {
+public interface Lane extends Attributable {
 
 	public Id<Lane> getId();
 
