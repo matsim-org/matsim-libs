@@ -1,5 +1,9 @@
 package org.matsim.contrib.opdyts.utils;
 
+import org.matsim.contrib.opdyts.MATSimSimulator2;
+import org.matsim.core.config.Config;
+import org.matsim.core.gbl.MatsimRandom;
+
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
@@ -7,9 +11,6 @@ import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
-import org.matsim.contrib.opdyts.MATSimSimulator2;
-import org.matsim.core.config.Config;
-import org.matsim.core.gbl.MatsimRandom;
 
 /**
  * 
@@ -44,26 +45,34 @@ public class MATSimConfiguredFactories<U extends DecisionVariable> {
 				this.opdytsConfig.getBinCount());
 	}
 
-	public SelfTuner newSelfTuner() {
-		final SelfTuner result = new SelfTuner(this.opdytsConfig.getInertia());
-		result.setNoisySystem(this.opdytsConfig.isNoisySystem());
-		result.setWeightScale(this.opdytsConfig.getSelfTuningWeight());
-		return result;
-	}
+	// public SelfTuner newSelfTuner() {
+	// final SelfTuner result = new SelfTuner(this.opdytsConfig.getInertia());
+	// result.setNoisySystem(this.opdytsConfig.isNoisySystem());
+	// result.setWeightScale(this.opdytsConfig.getSelfTuningWeight());
+	// return result;
+	// }
 
 	public RandomSearch<U> newRandomSearch(final MATSimSimulator2<U> matsim,
 			final DecisionVariableRandomizer<U> randomizer, final U initialDecisionVariable,
 			final ConvergenceCriterion convergenceCriterion, final ObjectiveFunction objectiveFunction) {
+
 		final RandomSearch<U> result = new RandomSearch<U>(matsim, randomizer, initialDecisionVariable,
-				convergenceCriterion, this.opdytsConfig.getMaxIteration(), // maxSearchIterations,
-				this.opdytsConfig.getMaxTransition(), // Integer.MAX_VALUE,
-				this.opdytsConfig.getPopulationSize(), // numberOfTrialDecisionVariables,
-				MatsimRandom.getRandom(), this.opdytsConfig.isInterpolate(), objectiveFunction,
-				this.opdytsConfig.isIncludeCurrentBest(), this.opdytsConfig.getWarmUpIterations(),
-				this.opdytsConfig.getUseAllWarmUpIterations());
+				convergenceCriterion, this.opdytsConfig.getMaxIteration(), this.opdytsConfig.getMaxTransition(),
+				this.opdytsConfig.getPopulationSize(), objectiveFunction);
+
 		result.setLogPath(this.opdytsConfig.getOutputDirectory());
 		result.setMaxTotalMemory(Integer.MAX_VALUE);
+		result.setIncludeCurrentBest(this.opdytsConfig.isIncludeCurrentBest());
+		result.setRandom(MatsimRandom.getRandom());
+		result.setInterpolate(this.opdytsConfig.isInterpolate());
+		result.setWarmupIterations(this.opdytsConfig.getWarmUpIterations());
+		result.setUseAllWarmupIterations(this.opdytsConfig.getUseAllWarmUpIterations());
+
+		final SelfTuner selfTuner = new SelfTuner(this.opdytsConfig.getInertia());
+		selfTuner.setNoisySystem(this.opdytsConfig.isNoisySystem());
+		selfTuner.setWeightScale(this.opdytsConfig.getSelfTuningWeight());
+		result.setSelfTuner(selfTuner);
+
 		return result;
 	}
-
 }
