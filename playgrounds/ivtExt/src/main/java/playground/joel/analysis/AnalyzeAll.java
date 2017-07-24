@@ -123,6 +123,9 @@ public class AnalyzeAll {
         timeRatio = timeRatio / size;
         distanceRatio = distanceWithCust / distance;
 
+
+        System.out.println("===================================");
+        System.out.println("totalWaitTimeMean: " + totalWaitTimeMean);
         TotalData totalData = new TotalData();
         totalData.generate(String.valueOf(timeRatio), String.valueOf(distanceRatio), //
                 String.valueOf(totalWaitTimeMean.Get().number().doubleValue()), //
