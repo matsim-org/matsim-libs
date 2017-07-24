@@ -293,7 +293,7 @@ public class TravelData implements Serializable {
         // for every row
         for (int i = 0; i < rows; ++i) {
             Scalar sum = Total.of(T.get(i)).Get();
-            T.set(v -> v.multiply(InvertUnlessZero.function.apply(sum)), i);
+            T.set(v -> v.multiply(InvertUnlessZero.of(sum)), i);
         }
         return T;
     }

@@ -5,7 +5,7 @@ import ch.ethz.idsc.jmex.DoubleArray;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Transpose;
-import ch.ethz.idsc.tensor.io.ExtractPrimitives;
+import ch.ethz.idsc.tensor.io.Primitives;
 import ch.ethz.idsc.tensor.red.KroneckerDelta;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.prep.PopulationRequestSchedule;
@@ -21,13 +21,13 @@ enum MpcUtils {
         Container container = new Container("init");
         { // directed graph incidence matrix
             Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getTo().index, i), n, m);
-            double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
+            double[] array = Primitives.toArrayDouble(Transpose.of(matrix));
             DoubleArray doubleArray = new DoubleArray("E_in", new int[] { n, m }, array);
             container.add(doubleArray);
         }
         {
             Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getFrom().index, i), n, m);
-            double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
+            double[] array = Primitives.toArrayDouble(Transpose.of(matrix));
             DoubleArray doubleArray = new DoubleArray("E_out", new int[] { n, m }, array);
             container.add(doubleArray);
         }
@@ -42,7 +42,7 @@ enum MpcUtils {
                     virtualNetwork.getVirtualNode(i).getCoord().getY() //
             ), n);
             // System.out.println(Pretty.of(matrix));
-            double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(matrix));
+            double[] array = Primitives.toArrayDouble(Transpose.of(matrix));
             DoubleArray doubleArray = new DoubleArray("voronoiCenter", new int[] { n, 2 }, array);
             container.add(doubleArray);
         }
@@ -56,7 +56,7 @@ enum MpcUtils {
         // TODO in the future use to tune:
         final int expectedRequestCount = populationRequestSchedule.length();
         {
-            double[] array = ExtractPrimitives.toArrayDouble(Transpose.of(populationRequestSchedule));
+            double[] array = Primitives.toArrayDouble(Transpose.of(populationRequestSchedule));
             DoubleArray doubleArray = new DoubleArray("requestSchedule", new int[] { populationRequestSchedule.length(), 3 }, array);
             container.add(doubleArray);
         }
