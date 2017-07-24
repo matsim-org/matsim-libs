@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.stream.IntStream;
 
 import ch.ethz.idsc.tensor.*;
+import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Join;
+import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.net.SimulationObject;
@@ -69,7 +71,15 @@ public class DistanceAnalysis {
         Tensor table3 = list.stream().map(vs -> vs.distancePickup).reduce(Tensor::add).get(); // summary 2 (13)
         Tensor table4 = list.stream().map(vs -> vs.distanceRebalance).reduce(Tensor::add).get(); // summary 3 (14)
         Tensor table5 = table1.map(InvertUnlessZero.FUNCTION).pmul(table2); // summary 4 (15)
-        summary = Join.of(1, table1, table2, table3, table4, table5);
+        System.out.println("1:"+Dimensions.of(table1));
+        System.out.println("2:"+Dimensions.of(table2));
+        System.out.println("3:"+Dimensions.of(table3));
+        System.out.println("4:"+Dimensions.of(table4));
+        System.out.println("5:"+Dimensions.of(table5));
+        
+        summary = Transpose.of(Tensors.of(table1, table2, table3, table4, table5)); 
+//                Join.of(1, table1, table2, table3, table4, table5);
+        System.out.println(Dimensions.of(summary));
         /*
         {
             AnalyzeAll.saveFile(table1, "distanceTotal");

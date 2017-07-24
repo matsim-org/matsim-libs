@@ -14,8 +14,8 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 
 import java.util.*;
 
-public class DelayHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler {
-    final private BinCalculator binCalculator;
+public class DelayHandler { //} implements PersonDepartureEventHandler, PersonArrivalEventHandler {
+    /*final private BinCalculator binCalculator;
     final private DataFrame dataFrame;
 
     private final Map<Id<Person>, Queue<ReferenceReader.ReferenceTrip>> referenceTravelTimes;
@@ -80,5 +80,5 @@ public class DelayHandler implements PersonDepartureEventHandler, PersonArrivalE
 
     public void finish() {
         dataFrame.numberOfUnmeasurableDelays += departureTimes.size();
-    }
+    }*/
 }

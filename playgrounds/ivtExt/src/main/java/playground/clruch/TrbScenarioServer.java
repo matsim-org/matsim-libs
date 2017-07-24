@@ -51,7 +51,7 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
  * 
  * if you wish to run multiple simulations at the same time use for instance {@link RunAVScenario}
  */
-public class ScenarioServer {
+public class TrbScenarioServer {
 
     public static ScenarioParameters scenarioParameters;
 

@@ -18,6 +18,7 @@ import playground.clruch.export.AVStatus;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
+import playground.clruch.utils.GlobalAssert;
 import playground.joel.html.DataCollector;
 
 /**
@@ -100,12 +101,14 @@ public class CoreAnalysis {
             }
 
             // Distance ratio
+            GlobalAssert.that(!waitTimeQuantile.isScalar());
+            GlobalAssert.that(!numStatus.isScalar());
             Tensor row = Join.of( //
                     Tensors.of(time, requestsSize), // 0,1
                     waitTimeQuantile, // 2,3,4 (.1, .5, .95)
-                    waitTimeMean, // 5
+                    Tensors.of(waitTimeMean), // 5
                     numStatus, // 6,7,8,9
-                    occupancyRatio); // 10
+                    Tensors.of(occupancyRatio)); // 10
 
             table.append(row);
 
