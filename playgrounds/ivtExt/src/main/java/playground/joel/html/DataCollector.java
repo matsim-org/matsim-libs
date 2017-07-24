@@ -106,8 +106,7 @@ public class DataCollector {
             scenarioParameters.minFleet = minimumFleetSizeCalculator.calculateMinFleet();
             scenarioParameters.EMDks = minimumFleetSizeCalculator.EMDks;
             scenarioParameters.minimumFleet = minimumFleetSizeCalculator.minimumFleet;
-            scenarioParameters.Availabilities = //
-                    performanceFleetSizeCalculator.calculateAvailabilities();
+            scenarioParameters.availabilities =  performanceFleetSizeCalculator.calculateAvailabilities();
         }
 
     }

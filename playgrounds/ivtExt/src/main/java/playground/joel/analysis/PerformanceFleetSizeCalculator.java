@@ -90,18 +90,18 @@ public class PerformanceFleetSizeCalculator {
 
         // call the performancefleetsizecalculator and calculate the availabilities
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetworkLoad,
-                travelDataLoad, travelDataLoad.getNumbertimeSteps(), 5000, 10);
+                travelDataLoad, 5000, 10);
         Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
     }
 
-    public PerformanceFleetSizeCalculator(Network networkIn, VirtualNetwork virtualNetworkIn, TravelData travelDataIn, int numberTimeStepsIn,
-            int numVehiclesMaxIn, int vehicleStepsIn) {
+    public PerformanceFleetSizeCalculator(Network networkIn, VirtualNetwork virtualNetworkIn, TravelData travelDataIn, int numVehiclesMaxIn,
+            int vehicleStepsIn) {
         network = networkIn;
         virtualNetwork = virtualNetworkIn;
         tData = travelDataIn;
-        numberTimeSteps = numberTimeStepsIn;
-        GlobalAssert.that(dayduration % numberTimeStepsIn == 0);
-        dt = dayduration / numberTimeStepsIn;
+        numberTimeSteps = tData.getNumbertimeSteps();
+        GlobalAssert.that(dayduration % numberTimeSteps == 0);
+        dt = dayduration / numberTimeSteps;
         numVehicles = numVehiclesMaxIn;
         vehicleSteps = vehicleStepsIn;
         vehicleBins = numVehicles / TravelDataUtils.greatestNonRestDt(vehicleSteps, numVehicles);

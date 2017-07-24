@@ -26,7 +26,7 @@ public class ScenarioParameters implements Serializable {
     public Tensor minFleet;
     public double minimumFleet;
 
-    public Tensor Availabilities;
+    public Tensor availabilities;
 
     public ScenarioParameters() {
         user = System.getProperty("user.name");
