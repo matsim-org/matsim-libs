@@ -156,11 +156,11 @@ public class AVModule extends AbstractModule {
         // bind(DFRDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), DFRDispatcher.class.getSimpleName()).to(DFRDispatcher.Factory.class);
 
-        // bind(MPCDispatcher1.Factory.class);
-        // AVUtils.bindDispatcherFactory(binder(), MPCDispatcher1.class.getSimpleName()).to(MPCDispatcher1.Factory.class);
+        bind(MPCDispatcher1.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher1.class.getSimpleName()).to(MPCDispatcher1.Factory.class);
 
-        // bind(MPCDispatcher2.Factory.class);
-        // AVUtils.bindDispatcherFactory(binder(), MPCDispatcher2.class.getSimpleName()).to(MPCDispatcher2.Factory.class);
+        bind(MPCDispatcher2.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher2.class.getSimpleName()).to(MPCDispatcher2.Factory.class);
 
     }
 

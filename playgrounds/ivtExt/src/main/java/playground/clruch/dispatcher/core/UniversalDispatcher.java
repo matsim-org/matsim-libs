@@ -56,8 +56,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final Set<AVRequest> matchedRequests = new HashSet<>(); // for data integrity, private!
     private final Set<AVRequest> publishPeriodMatchedRequests = new HashSet<>(); // requests which are matched within a publish period.
     private final Map<AVVehicle, Link> vehiclesWithCustomer = new HashMap<>();
+    // TODO visibility of map to private
     protected final BiMap<AVRequest, AVVehicle> pickupRegister = HashBiMap.create();
-    // protected final Map<AVRequest, AVVehicle> pickupRegister = new HashMap<>();
 
     /**
      * map stores most recently known location of vehicles. map is used in case obtaining the vehicle location fails
@@ -328,16 +328,20 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         return link;
     }
 
-    protected void endofStepTasks() {
+    final void endofStepTasks() {
         // stop all vehicles which are not on a pickup or rebalancing mission.
         Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicleLinkPairs();
         for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
             boolean isOnPickup = pickupRegister.values().contains(vehicleLinkPair.avVehicle);
-            if (!isOnPickup) {
+            boolean isOnExtra = extraCheck(vehicleLinkPair);
+            if (!isOnPickup && !isOnExtra) {
                 setVehicleDiversion(vehicleLinkPair.avVehicle, vehicleLinkPair.getDivertableLocation());
             }
         }
-
+    }
+    
+    boolean extraCheck(VehicleLinkPair vehicleLinkPair) {
+    	return true;
     }
 
     @Override

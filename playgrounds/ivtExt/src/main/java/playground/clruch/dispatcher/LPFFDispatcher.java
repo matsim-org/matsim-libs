@@ -151,9 +151,6 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             printVals = bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), this.getAVRequests());
             bpmu.executePickup(this);
         }
-        
-        super.endofStepTasks();
-
     }
 
     @Override

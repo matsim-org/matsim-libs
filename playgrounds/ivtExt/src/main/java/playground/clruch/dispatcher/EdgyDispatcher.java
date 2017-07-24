@@ -92,7 +92,6 @@ public class EdgyDispatcher extends RebalancingDispatcher {
                 }
             }
         }
-        super.endofStepTasks();
     }
 
     @Override

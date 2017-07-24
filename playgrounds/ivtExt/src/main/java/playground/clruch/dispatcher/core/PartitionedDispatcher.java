@@ -60,6 +60,23 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
     }
 
     /**
+     * @return returns the divertable vehicles per virtualNode
+     */
+    protected Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeDivertableUnassignedNotRebalancingVehicleLinkPairs() {
+        Map<VirtualNode, List<VehicleLinkPair>> returnMap = getDivertableUnassignedNotRebalancingVehicleLinkPairs().stream() //
+                .parallel() //
+                .collect(Collectors.groupingBy(vlp -> virtualNetwork.getVirtualNode(vlp.getDivertableLocation())));
+
+        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
+            if (!returnMap.containsKey(virtualNode))
+                returnMap.put(virtualNode, Collections.emptyList());
+
+        GlobalAssert.that(returnMap.size() == virtualNetwork.getvNodesCount());
+        return returnMap;
+    }
+
+
+    /**
      * @return returns the stay vehicles per virtualNode
      */
     protected Map<VirtualNode, List<AVVehicle>> getVirtualNodeStayVehicles() {

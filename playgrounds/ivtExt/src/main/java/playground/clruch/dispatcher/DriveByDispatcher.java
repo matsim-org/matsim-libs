@@ -65,7 +65,6 @@ public class DriveByDispatcher extends RebalancingDispatcher {
                     setVehicleRebalance(avVehicle, pollNextDestination());
                 }
         }
-        super.endofStepTasks();
     }
 
     private Link pollNextDestination() {
