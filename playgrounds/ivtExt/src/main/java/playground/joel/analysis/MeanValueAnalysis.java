@@ -42,12 +42,12 @@ public class MeanValueAnalysis {
     }
 
     private void updateW(int agents) {
-        Tensor OnePlusLi = (L.get(agents - 1)).add(Tensors.vector(i_ -> RealScalar.ONE, numNodes));
+        Tensor OnePlusLi = L.get(agents - 1).add(Tensors.vector(i_ -> RealScalar.ONE, numNodes));
         W.set(muiInv.pmul(OnePlusLi), agents);
     }
 
     private void updateL(int agents) {
-        Tensor numerator = (W.get(agents).pmul(pii)).multiply(RealScalar.of(agents));
+        Tensor numerator = W.get(agents).pmul(pii).multiply(RealScalar.of(agents));
         // Tensor denominator = mui.dot(W.get(agents));
         Tensor denominator = pii.dot(W.get(agents));
         L.set(numerator.multiply((Scalar) InvertUnlessZero.of(denominator)), agents);
@@ -60,7 +60,7 @@ public class MeanValueAnalysis {
     }
 
     public Tensor getW(int agents) {
-        return W.get(agents).copy();
+        return W.get(agents);
     }
 
     public Tensor getL() {
@@ -68,6 +68,6 @@ public class MeanValueAnalysis {
     }
 
     public Tensor getL(int agents) {
-        return L.get(agents).copy();
+        return L.get(agents);
     }
 }
