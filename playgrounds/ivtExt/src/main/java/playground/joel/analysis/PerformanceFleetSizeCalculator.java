@@ -30,7 +30,6 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Transpose;
-import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.mat.IdentityMatrix;
 import ch.ethz.idsc.tensor.mat.NullSpace;
 import ch.ethz.idsc.tensor.red.Norm;
@@ -38,8 +37,10 @@ import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Chop;
 import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import ch.ethz.idsc.tensor.sca.Round;
+import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
+import playground.clruch.netdata.VirtualNode;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.traveldata.TravelDataUtils;
@@ -47,7 +48,7 @@ import playground.clruch.utils.GlobalAssert;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 
 /**
- * Created by Joel on 11.07.2017. Debugged, finished and overall reworked by Claudio on July 17, 2017
+ * Claudio on July 17, 2017
  * 
  * Procedure is according to publication "Control of Robotic Mobility-On-Demand Systems: a Queueing-Theoretical Perspective" by Rick Zhang and Marco
  * Pavone, page 5 B. Computation of performance metrics
@@ -65,13 +66,13 @@ public class PerformanceFleetSizeCalculator {
     final int numberTimeSteps;
     final int dt;
     final int dayduration = 108000;
-    int size;
     final int numVehicles;
     final int vehicleSteps;
     final int vehicleBins;
+    final int numberRoads;
+    final int numberStations;
     final double MINPERCENTAGE = 0.005;
-    final double PEAKPERCENTAGE = 0.3;
-    final double PEAKSTATIONPERCENTAGE = 0.7;
+    final double PEAKPERCENTAGE = 0.5;
 
     public static void main(String[] args) throws Exception {
 
@@ -89,7 +90,7 @@ public class PerformanceFleetSizeCalculator {
 
         // call the performancefleetsizecalculator and calculate the availabilities
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetworkLoad,
-                travelDataLoad, travelDataLoad.getNumbertimeSteps(), 20, 20);
+                travelDataLoad, travelDataLoad.getNumbertimeSteps(), 5000, 10);
         Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
     }
 
@@ -101,19 +102,19 @@ public class PerformanceFleetSizeCalculator {
         numberTimeSteps = numberTimeStepsIn;
         GlobalAssert.that(dayduration % numberTimeStepsIn == 0);
         dt = dayduration / numberTimeStepsIn;
-        size = virtualNetwork.getvNodesCount();
         numVehicles = numVehiclesMaxIn;
         vehicleSteps = vehicleStepsIn;
         vehicleBins = numVehicles / TravelDataUtils.greatestNonRestDt(vehicleSteps, numVehicles);
+        numberStations = virtualNetwork.getvNodesCount();
+        numberRoads = numberStations * numberStations - numberStations;
+        GlobalAssert.that(numberRoads == virtualNetwork.getvLinksCount());
     }
-    
-    public static Function<Scalar, Scalar> NICE = s->Round.toMultipleOf(DecimalScalar.of(new BigDecimal("0.0001"))).apply(s);
+
+    public static Function<Scalar, Scalar> NICE = s -> Round.toMultipleOf(DecimalScalar.of(new BigDecimal("0.0001"))).apply(s);
 
     public Tensor calculateAvailabilities() throws InterruptedException {
 
-        System.out.println("number of vehicle  bins = " + vehicleBins);
-
-        // find relevant timesteps when more than MINPERCENTAGEARRIVAL of maximum arrivals happen
+        // find relevant time steps when more than MINPERCENTAGEARRIVAL of maximum arrivals happen
         List<Double> arrivalNumbers = new ArrayList<>();
         for (int k = 0; k < numberTimeSteps; ++k) {
             Tensor lambdaii = tData.getLambdaPSFforTime(k * dt);
@@ -124,33 +125,37 @@ public class PerformanceFleetSizeCalculator {
 
         double maxArrival = Collections.max(arrivalNumbers);
         Set<Integer> relevantTimeSteps = new HashSet<Integer>();
+        Set<Integer> irrelevantSteps = new HashSet<Integer>();
         Set<Integer> offpeakSteps = new HashSet<Integer>();
         Set<Integer> peakSteps = new HashSet<Integer>();
 
         for (int k = 0; k < numberTimeSteps; ++k) {
-
             if (arrivalNumbers.get(k) > MINPERCENTAGE * maxArrival) {
                 relevantTimeSteps.add(k);
-            }
-            if (arrivalNumbers.get(k) > PEAKPERCENTAGE * maxArrival) {
-                peakSteps.add(k);
+                if (arrivalNumbers.get(k) > PEAKPERCENTAGE * maxArrival) {
+                    peakSteps.add(k);
 
+                } else {
+                    offpeakSteps.add(k);
+                }
             } else {
-                offpeakSteps.add(k);
+                irrelevantSteps.add(k);
             }
-
         }
 
         System.out.println("peak steps : " + peakSteps);
-        System.out.println("peak steps : " + offpeakSteps);
+        System.out.println("offpeak steps : " + offpeakSteps);
+        System.out.println("not considered steps: " + irrelevantSteps);
 
         // Tensor of all availabilities(virtualnode, timestep, vehiclestep)
-        Tensor a = Array.zeros(virtualNetwork.getvNodesCount(), numberTimeSteps, vehicleBins + 1);
+        // only the results for station virtual nodes are saved, not for road nodes
+        Tensor a = Array.zeros(numberRoads, numberTimeSteps, vehicleBins + 1);
 
         // iterate through timesteps to compute availabilities
         for (int k : relevantTimeSteps) {
+
             // Step 1: Calculate the customer flows cf (i->j)
-            Tensor lambdaii = tData.getLambdaPSFforTime(k * dt);            
+            Tensor lambdaii = tData.getLambdaPSFforTime(k * dt);
             Tensor pij = tData.getpijPSFforTime(k * dt);
 
             Tensor flowCust = Tensors.empty();
@@ -160,55 +165,86 @@ public class PerformanceFleetSizeCalculator {
                 flowCust.append(rowUpdated);
             }
 
-            // Step 2: calculate the total flow and transition probabilities
-            // for customer and rebalancing flows, calculate the overall arrival rates
+            // Step 2: calculate the serviceRates as a function of the number of vehicles, first
+            // service rates for stations, then for roads
             Tensor flowReb = tData.getAlphaijPSFforTime(k * dt);
 
             Tensor flowTot = flowCust.add(flowReb);
             Tensor pijTot = tData.normToRowStochastic(flowTot);
 
-            Tensor arrivalTot = Tensors.empty();
+            Tensor serviceRateStations = Tensors.empty();
             for (int i = 0; i < Dimensions.of(lambdaii).get(0); ++i) {
                 Tensor rebarrivali = Total.of(flowReb.get(i));
-                arrivalTot.append(rebarrivali.add(lambdaii.Get(i)));
+                serviceRateStations.append(rebarrivali.add(lambdaii.Get(i)));
+            }
+
+            Tensor serviceRateRoads = Array.zeros(numberStations, numberStations);
+            for (int i = 0; i < numberStations; ++i) {
+                for (int j = 0; j < numberStations; ++j) {
+                    VirtualNode from = virtualNetwork.getVirtualNode(i);
+                    VirtualNode to = virtualNetwork.getVirtualNode(j);
+                    RealScalar serviceRate = RealScalar.ZERO;
+                    if (i != j) {
+                        VirtualLink vLink = virtualNetwork.getVirtualLink(from, to);
+                        serviceRate = RealScalar.of(1.0 / vLink.getTtime());
+                    }
+                    serviceRateRoads.set(serviceRate, i, j);
+                }
+            }
+
+            Tensor serviceRateRoadsVector = Tensors.empty();
+
+            for (int i = 0; i < Dimensions.of(serviceRateRoads).get(0); ++i) {
+                for (int j = 0; j < Dimensions.of(serviceRateRoads).get(1); ++j) {
+                    if (i != j) {
+                        serviceRateRoadsVector.append(serviceRateRoads.Get(i, j));
+                    }
+                }
+            }
+
+            Tensor serviceRatesPerVehicles = Tensors.empty();
+
+            for (int i = 0; i <= numVehicles; ++i) {
+                Tensor lineupd = serviceRateStations.copy();
+                Tensor roadServ = serviceRateRoadsVector.multiply(RealScalar.of(i));
+                roadServ.flatten(-1).forEach(v -> lineupd.append(v));
+                serviceRatesPerVehicles.append(lineupd);
             }
 
             // Step 3: calculate the throughput
-            Tensor throughput = PerformanceFleetSizeCalculator.getRelativeThroughputOfi(pijTot);
-            
+            Tensor throughputStations = PerformanceFleetSizeCalculator.getRelativeThroughputOfi(pijTot);
+            Tensor throughputRoads = Array.zeros(numberStations, numberStations);
+            for (int i = 0; i < numberStations; ++i) {
+                for (int j = 0; j < numberStations; ++j) {
+                    Tensor tpij = (RealScalar) pijTot.Get(i, j).multiply(throughputStations.Get(i));
+                    throughputRoads.set(tpij, i, j);
+                }
+            }
 
-            
-            
+            Tensor throughPut = throughputStations.copy();
+
+            for (int i = 0; i < Dimensions.of(throughputRoads).get(0); ++i) {
+                for (int j = 0; j < Dimensions.of(throughputRoads).get(1); ++j) {
+                    if (i != j) {
+                        throughPut.append(throughputRoads.Get(i, j));
+                    }
+                }
+            }
 
             // Step 4: conduct mean value analysis
-            MeanValueAnalysis mva = new MeanValueAnalysis(numVehicles, arrivalTot, throughput);
+            MeanValueAnalysis mva = new MeanValueAnalysis(numVehicles, serviceRatesPerVehicles, throughPut);
 
             // Step 5: compute availabilities
             Tensor Ak = Tensors.empty();
-            
-            if(((k==5)||(k==6))){
-                System.out.println(Pretty.of(mva.getW().map(NICE)));
-                System.out.println(Pretty.of(mva.getL().map(NICE)));
-                System.out.println(Pretty.of(throughput.map(NICE)));
-            }
-            
-            
+
             for (int vehBin = 0; vehBin <= vehicleBins; ++vehBin) {
                 Tensor Lveh = mva.getL(vehBin * vehicleSteps);
                 Tensor Wveh = mva.getW(vehBin * vehicleSteps);
-                
+
                 // availabilities at timestep k with v vehicles for every virtualNode
-                Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(arrivalTot));
+                Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(serviceRatesPerVehicles.get(vehBin)));
 
-                if(((k==5)||(k==6)) && vehBin == 1){
-                    System.out.println("aveh =" + Aveh);
-                    System.out.println("Lveh =" + Lveh);
-                    System.out.println("Wveh =" + Wveh.map(NICE));
-                    System.out.println("arrivalTot =" + arrivalTot.map(NICE));
-                    System.out.println("throughput = " +  throughput.map(NICE));
-                }
-
-                for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
+                for (int i = 0; i < numberStations; ++i) {
                     a.set(Aveh.Get(i), i, k, vehBin);
                 }
             }
@@ -233,7 +269,7 @@ public class PerformanceFleetSizeCalculator {
     Tensor calcMeanByVehicles(Tensor a, Set<Integer> steps) {
         Tensor meanByVehicles = Array.zeros(vehicleBins + 1);
         int numElem = 0;
-        for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
+        for (int i = 0; i < numberStations; ++i) {
             for (int j : steps) {
                 Tensor aByVehicle = a.get(i, j, Tensor.ALL);
                 if (!(Norm.ofVector(aByVehicle, 2).number().doubleValue() == 0.0)) {
@@ -342,7 +378,7 @@ public class PerformanceFleetSizeCalculator {
         // save plot as png
         int width = 1000; // Width of the image
         int height = 750; // Height of the image
-        DiagramCreator.savePlot(AnalyzeAll.RELATIVE_DIRECTORY, "availabilitiesByTime", timechart, width, height);
+        DiagramCreator.savePlot(AnalyzeAll.RELATIVE_DIRECTORY, "availbilitiesByNumberVehicles", timechart, width, height);
     }
 
 }
