@@ -13,7 +13,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 
 import org.matsim.api.core.v01.network.Link;
@@ -38,7 +37,6 @@ import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
 import playground.clruch.dispatcher.utils.FeasibleRebalanceCreator;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
-import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
 import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
@@ -49,14 +47,15 @@ import playground.clruch.netdata.VirtualNode;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.utils.GlobalAssert;
+import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-public class LPFeedforwardDispatcher extends PartitionedDispatcher {
-    public final int redispatchPeriod;
+public class LPFFDispatcher extends PartitionedDispatcher {
+    public final int dispatchPeriod;
     public final int rebalancingPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractRequestSelector requestSelector;
@@ -72,7 +71,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
     Tensor rebalanceCountInteger;
     LPVehicleRebalancing lpVehicleRebalancing;
 
-    public LPFeedforwardDispatcher( //
+    public LPFFDispatcher( //
             AVDispatcherConfig config, //
             AVGeneratorConfig generatorConfig, //
             TravelTime travelTime, //
@@ -88,7 +87,6 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
         this.requestSelector = abstractRequestSelector;
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
-        redispatchPeriod = getDispatchPeriod(config); // Integer.parseInt(config.getParams().get("redispatchPeriod"));
         rebalancingPeriod = getRebalancingPeriod(config); // Integer.parseInt(config.getParams().get("rebalancingPeriod"));
         travelData = arrivalInformationIn;
         nVNodes = virtualNetwork.getvNodesCount();
@@ -96,21 +94,20 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
         rebalanceCount = Array.zeros(nVNodes, nVNodes);
         rebalanceCountInteger = Array.zeros(nVNodes, nVNodes);
         lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
+        SafeConfig safeConfig = SafeConfig.wrap(config);
+        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
     }
 
     @Override
     public void redispatch(double now) {
-        // PART 0: match vehicles at a customer link
-        new InOrderOfArrivalMatcher(this::setAcceptRequest) //
-                .match(getStayVehicles(), getAVRequestsAtLinks());
         final long round_now = Math.round(now);
 
-        // permanently rebalance vehicles according to the rates output by the LP
+        // Part I: permanently rebalance vehicles according to the rates output by the LP
         if (round_now % rebalancingPeriod == 0) {
             rebalancingRate = travelData.getAlphaijPSFforTime((int) round_now);
 
             // update rebalance count using current rate
-            rebalanceCount = rebalanceCount.add(rebalancingRate.multiply(RealScalar.of(redispatchPeriod)));
+            rebalanceCount = rebalanceCount.add(rebalancingRate.multiply(RealScalar.of(rebalancingPeriod)));
             rebalanceCountInteger = Floor.of(rebalanceCount);
             rebalanceCount = rebalanceCount.subtract(rebalanceCountInteger);
 
@@ -134,26 +131,26 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
 
             // consistency check: rebalancing destination links must not exceed
             // available vehicles in virtual node
-            GlobalAssert.that(!virtualNetwork.getVirtualNodes().stream()
-                    .filter(v -> availableVehicles.get(v).size() < destinationLinks.get(v).size()).findAny().isPresent());
+            GlobalAssert.that(!virtualNetwork.getVirtualNodes().stream().filter(v -> availableVehicles.get(v).size() < destinationLinks.get(v).size())
+                    .findAny().isPresent());
 
             // send rebalancing vehicles using the setVehicleRebalance command
             for (VirtualNode virtualNode : destinationLinks.keySet()) {
-                Map<VehicleLinkPair, Link> rebalanceMatching = vehicleDestMatcher.match(availableVehicles.get(virtualNode),
+                Map<VehicleLinkPair, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode),
                         destinationLinks.get(virtualNode));
-                rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v, rebalanceMatching.get(v)));
+                rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v.avVehicle, rebalanceMatching.get(v)));
             }
 
             // reset vector
             rebalanceCountInteger = Array.zeros(nVNodes, nVNodes);
         }
 
-        if (round_now % redispatchPeriod == 0) {
-            // assign destinations to vehicles using bipartite matching
-            printVals = HungarianUtils.globalBipartiteMatching(this, () -> getVirtualNodeDivertableNotRebalancingVehicles().values() //
-                    .stream().flatMap(v -> v.stream()).collect(Collectors.toList()), this.getAVRequestsAtLinks());
+        // Part II: outside rebalancing periods, permanently assign destinations to vehicles using bipartite matching
+        if (round_now % dispatchPeriod == 0) {
+            BipartiteMatchingUtils bpmu = new BipartiteMatchingUtils();
+            printVals = bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), this.getAVRequests());
+            bpmu.executePickup(this);
         }
-
     }
 
     @Override
@@ -209,7 +206,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
                 e.printStackTrace();
             }
 
-            return new LPFeedforwardDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, abstractVirtualNodeDest,
+            return new LPFFDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, abstractVirtualNodeDest,
                     abstractRequestSelector, abstractVehicleDestMatcher, travelData);
         }
     }

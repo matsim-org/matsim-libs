@@ -130,7 +130,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
             final int pendingSize = getAVRequests().size();
             final int matchingSize = getMatchings().size();
 
-            new PredefinedMatchingMatcher(this::setAcceptRequest).matchPredefined(getMatchings(), stayVehiclesAtLinks);
+			// new PredefinedMatchingMatcher(this::setAcceptRequest).matchPredefined(getMatchings(), stayVehiclesAtLinks);
 
             final int delta = pendingSize - getAVRequests().size();
 
@@ -373,7 +373,8 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                         GlobalAssert.that(removed);
                                     }
                                     Link pickupLocation = mpcRequest.avRequest.getFromLink(); // where the customer is waiting right now
-                                    setStayVehicleDiversion(avVehicle, pickupLocation); // send car to customer
+                                    setVehiclePickup(avVehicle, mpcRequest.avRequest);
+                                    //setStayVehicleDiversion(avVehicle, pickupLocation); // send car to customer
                                     ++totalPickupEffective;
                                     // ++pickupPerNode;
                                     getMatchings().put(mpcRequest.avRequest, avVehicle);
@@ -430,7 +431,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                                         // vnTo.getLinks() //
                                                         candidateLinks //
                                                 ).get(random.nextInt(candidateLinks.size()));
-                                        setVehicleRebalance(vehicleLinkPair, rebalanceDest); // send car to adjacent virtual node
+                                        setVehicleRebalance(vehicleLinkPair.avVehicle, rebalanceDest); // send car to adjacent virtual node
                                         ++totalRebalanceEffective;
                                         if (vnFrom.equals(vnTo))
                                             ++selfRebalanceEffective;

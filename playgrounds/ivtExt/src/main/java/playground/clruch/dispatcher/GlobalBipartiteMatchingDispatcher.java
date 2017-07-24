@@ -20,13 +20,12 @@ import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-public class HungarianDispatcher extends UniversalDispatcher {
+public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
 
     private final int dispatchPeriod;
-    private final int maxMatchNumber; // implementation may not use this
     private Tensor printVals = Tensors.empty();
 
-    private HungarianDispatcher( //
+    private GlobalBipartiteMatchingDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
@@ -35,18 +34,20 @@ public class HungarianDispatcher extends UniversalDispatcher {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
-        maxMatchNumber = safeConfig.getInteger("maxMatchNumber", Integer.MAX_VALUE);
     }
 
     @Override
     public void redispatch(double now) {
         final long round_now = Math.round(now);
 
-        new InOrderOfArrivalMatcher(this::setAcceptRequest) //
-                .match(getStayVehicles(), getAVRequestsAtLinks());
+        // new InOrderOfArrivalMatcher(this::setAcceptRequest) //
+        // .match(getStayVehicles(), getAVRequestsAtLinks());
 
         if (round_now % dispatchPeriod == 0) {
-            printVals = HungarianUtils.globalBipartiteMatching(this, () -> getDivertableVehicles(), this.getAVRequestsAtLinks());
+            BipartiteMatchingUtils bpmu = new BipartiteMatchingUtils();
+            // dispatch vehicles to pickup locations
+            printVals = bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), this.getAVRequests());
+            bpmu.executePickup(this);
         }
     }
 
@@ -76,7 +77,7 @@ public class HungarianDispatcher extends UniversalDispatcher {
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
-            return new HungarianDispatcher( //
+            return new GlobalBipartiteMatchingDispatcher( //
                     config, travelTime, router, eventsManager, network, abstractRequestSelector);
         }
     }

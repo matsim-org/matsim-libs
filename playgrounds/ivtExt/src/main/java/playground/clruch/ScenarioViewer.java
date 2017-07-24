@@ -23,7 +23,7 @@ public class ScenarioViewer {
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
 
-        ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
+        ReferenceFrame referenceFrame = ReferenceFrame.SIOUXFALLS;
 
         // END: CUSTOMIZE -------------------------------------------------
 

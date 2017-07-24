@@ -13,6 +13,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.clruch.data.ReferenceFrame;
@@ -25,6 +27,8 @@ import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
+import playground.clruch.trb18.TRBModule;
+import playground.clruch.trb18.scenario.TRBScenarioConfig;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.joel.analysis.AnalyzeAll;
@@ -69,11 +73,25 @@ public class ScenarioServer {
         File configFile = new File(args[0]);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup,
                 new BlackListedTimeAllocationMutatorConfigGroup());
+
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
-        MatsimStaticDatabase.initializeSingletonInstance( //
-                scenario.getNetwork(), ReferenceFrame.IDENTITY);
+        
+        Network network = scenario.getNetwork();
 
+//        Network reducedNetwork = NetworkUtils.createNetwork();
+//        new MatsimNetworkReader(reducedNetwork).readFile(new TRBScenarioConfig().filteredNetworkOutputPath);
+        
+        
+
+        
+        
+        MatsimStaticDatabase.initializeSingletonInstance( //
+
+                network, ReferenceFrame.SIOUXFALLS);
+        
+        
+        
         for (String type : new String[] { "home", "shop", "leisure", "escort_kids", "escort_other", "work", "education", "remote_work",
                 "remote_home" }) {
             for (int i = 0; i <= 20; i++) {
@@ -97,7 +115,6 @@ public class ScenarioServer {
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
         AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
-        Network network = scenario.getNetwork();
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         TravelData travelData = TravelDataGet.readDefault(network, virtualNetwork);
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;

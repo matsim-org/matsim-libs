@@ -20,6 +20,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
  * more available cars at a link, or no more requests. customers who have waited longer are picked
  * up first.
  */
+@Deprecated // setAcceptRequest which was passed as a biConsumer to this function can noly be called inside UniversalDispatcher.
 public class PredefinedMatchingMatcher extends AbstractVehicleRequestMatcher {
     final BiConsumer<AVVehicle, AVRequest> biConsumer;
 

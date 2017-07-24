@@ -29,17 +29,18 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
 import playground.clruch.dispatcher.EdgyDispatcher;
-import playground.clruch.dispatcher.HungarianDispatcher;
-import playground.clruch.dispatcher.LPFeedbackLIPDispatcher;
-import playground.clruch.dispatcher.LPFeedforwardDispatcher;
-import playground.clruch.dispatcher.NotAsDumbDispatcher;
-import playground.clruch.dispatcher.PulseDispatcher;
+import playground.clruch.dispatcher.GlobalBipartiteMatchingDispatcher;
+import playground.clruch.dispatcher.LPFBDispatcher;
+import playground.clruch.dispatcher.LPFFDispatcher;
+import playground.clruch.dispatcher.MonoMultiGBMDispatcher;
+import playground.clruch.dispatcher.NewSingleHeuristicDispatcher;
+import playground.clruch.dispatcher.UncoordinatedDispatcher;
+import playground.clruch.dispatcher.DriveByDispatcher;
 import playground.clruch.dispatcher.SelfishDispatcher;
+import playground.clruch.dispatcher.TestDispatcher;
 import playground.fseccamo.dispatcher.MPCDispatcher1;
 import playground.fseccamo.dispatcher.MPCDispatcher2;
-import playground.joel.dispatcher.MultiGBM.MonoMultiGBMDispatcher;
 import playground.joel.dispatcher.MultiGBM.PolyMultiGBMDispatcher;
-import playground.joel.dispatcher.single_heuristic.NewSingleHeuristicDispatcher; // TODO: delete this or the other
 import playground.maalbert.dispatcher.DFRDispatcher;
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVConfigReader;
@@ -68,8 +69,8 @@ public class AVModule extends AbstractModule {
     final static public String AV_MODE = "av";
     final static Logger log = Logger.getLogger(AVModule.class);
 
-	@Override
-	public void install() {
+    @Override
+    public void install() {
         addRoutingModuleBinding(AV_MODE).to(AVRoutingModule.class);
         bind(ScoringFunctionFactory.class).to(AVScoringFunctionFactory.class).asEagerSingleton();
         addControlerListenerBinding().to(AVLoader.class);
@@ -93,65 +94,74 @@ public class AVModule extends AbstractModule {
         bind(AVParallelRouterFactory.class);
         addControlerListenerBinding().to(Key.get(ParallelLeastCostPathCalculator.class, Names.named(AVModule.AV_MODE)));
         addMobsimListenerBinding().to(Key.get(ParallelLeastCostPathCalculator.class, Names.named(AVModule.AV_MODE)));
-	}
+    }
 
-	@Provides @Singleton @Named(AVModule.AV_MODE)
-	private ParallelLeastCostPathCalculator provideParallelLeastCostPathCalculator(AVConfigGroup config, AVParallelRouterFactory factory) {
+    @Provides
+    @Singleton
+    @Named(AVModule.AV_MODE)
+    private ParallelLeastCostPathCalculator provideParallelLeastCostPathCalculator(AVConfigGroup config, AVParallelRouterFactory factory) {
         return new ParallelLeastCostPathCalculator((int) config.getParallelRouters(), factory);
     }
 
-	private void configureDispatchmentStrategies() {
+    private void configureDispatchmentStrategies() {
         /** dispatchers by sebhoerl */
-        bind(SingleFIFODispatcher.Factory.class);
-        bind(SingleHeuristicDispatcher.Factory.class);
-        bind(MultiODHeuristic.Factory.class);
-        
-        AVUtils.bindDispatcherFactory(binder(), "SingleFIFO").to(SingleFIFODispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), "SingleHeuristic").to(SingleHeuristicDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), "MultiOD").to(MultiODHeuristic.Factory.class);
-        
-        // ---BIND
+        // bind(SingleFIFODispatcher.Factory.class);
+        // AVUtils.bindDispatcherFactory(binder(), "SingleFIFO").to(SingleFIFODispatcher.Factory.class);
+
+        // bind(SingleHeuristicDispatcher.Factory.class);
+        // AVUtils.bindDispatcherFactory(binder(), "SingleHeuristic").to(SingleHeuristicDispatcher.Factory.class);
+
+        // bind(MultiODHeuristic.Factory.class);
+        // AVUtils.bindDispatcherFactory(binder(), "MultiOD").to(MultiODHeuristic.Factory.class);
+
         /** dispatchers for UniversalDispatcher */
-        bind(PulseDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), PulseDispatcher.class.getSimpleName()).to(PulseDispatcher.Factory.class);
-        
+        bind(DriveByDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), DriveByDispatcher.class.getSimpleName()).to(DriveByDispatcher.Factory.class);
+
         bind(EdgyDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), EdgyDispatcher.class.getSimpleName()).to(EdgyDispatcher.Factory.class);
 
-        bind(NotAsDumbDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(),NotAsDumbDispatcher.class.getSimpleName()).to(NotAsDumbDispatcher.Factory.class);
+        bind(UncoordinatedDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), UncoordinatedDispatcher.class.getSimpleName()).to(UncoordinatedDispatcher.Factory.class);
 
-        bind(HungarianDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), HungarianDispatcher.class.getSimpleName()).to(HungarianDispatcher.Factory.class);
-        
-        bind(SelfishDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);
+        bind(GlobalBipartiteMatchingDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), GlobalBipartiteMatchingDispatcher.class.getSimpleName())
+                .to(GlobalBipartiteMatchingDispatcher.Factory.class);
+
+        bind(TestDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), TestDispatcher.class.getSimpleName()).to(TestDispatcher.Factory.class);
+
+        // bind(SelfishDispatcher.Factory.class);
+        // AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);
 
         bind(NewSingleHeuristicDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), NewSingleHeuristicDispatcher.class.getSimpleName()).to(NewSingleHeuristicDispatcher.Factory.class);
 
         bind(MonoMultiGBMDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), MonoMultiGBMDispatcher.class.getSimpleName()).to(MonoMultiGBMDispatcher.Factory.class);
-
-        bind(PolyMultiGBMDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), PolyMultiGBMDispatcher.class.getSimpleName()).to(PolyMultiGBMDispatcher.Factory.class);
+        //
+        // bind(PolyMultiGBMDispatcher.Factory.class);
+        // AVUtils.bindDispatcherFactory(binder(), PolyMultiGBMDispatcher.class.getSimpleName()).to(PolyMultiGBMDispatcher.Factory.class);
 
         /** dispatchers for PartitionedDispatcher */
-        //bind(ConsensusDispatcherDFR.Factory.class);
-        bind(LPFeedbackLIPDispatcher.Factory.class);
-        bind(LPFeedforwardDispatcher.Factory.class);
-        bind(DFRDispatcher.Factory.class);
-        //AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcherDFR.class.getSimpleName()).to(ConsensusDispatcherDFR.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), LPFeedbackLIPDispatcher.class.getSimpleName()).to(LPFeedbackLIPDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), LPFeedforwardDispatcher.class.getSimpleName()).to(LPFeedforwardDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), DFRDispatcher.class.getSimpleName()).to(DFRDispatcher.Factory.class);
-        
-        // MPC dispatcher
+        // //bind(ConsensusDispatcherDFR.Factory.class);
+        // //AVUtils.bindDispatcherFactory(binder(), ConsensusDispatcherDFR.class.getSimpleName()).to(ConsensusDispatcherDFR.Factory.class);
+
+        bind(LPFBDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), LPFBDispatcher.class.getSimpleName()).to(LPFBDispatcher.Factory.class);
+
+        bind(LPFFDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), LPFFDispatcher.class.getSimpleName()).to(LPFFDispatcher.Factory.class);
+
+        // bind(DFRDispatcher.Factory.class);
+        // AVUtils.bindDispatcherFactory(binder(), DFRDispatcher.class.getSimpleName()).to(DFRDispatcher.Factory.class);
+
         bind(MPCDispatcher1.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), MPCDispatcher1.class.getSimpleName()).to(MPCDispatcher1.Factory.class);
+
         bind(MPCDispatcher2.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), MPCDispatcher2.class.getSimpleName()).to(MPCDispatcher2.Factory.class);
-        
+
     }
 
     private void configureGeneratorStrategies() {
@@ -169,12 +179,14 @@ public class AVModule extends AbstractModule {
         return factories;
     }
 
-	@Provides @Named(AVModule.AV_MODE)
+    @Provides
+    @Named(AVModule.AV_MODE)
     LeastCostPathCalculator provideLeastCostPathCalculator(Network network, @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime) {
         return new Dijkstra(network, new OnlyTimeDependentTravelDisutility(travelTime), travelTime);
     }
 
-	@Provides @Singleton
+    @Provides
+    @Singleton
     Map<Id<AVOperator>, AVOperator> provideOperators(AVConfig config, AVOperatorFactory factory) {
         Map<Id<AVOperator>, AVOperator> operators = new HashMap<>();
 
@@ -185,7 +197,8 @@ public class AVModule extends AbstractModule {
         return operators;
     }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     AVConfig provideAVConfig(Config config, AVConfigGroup configGroup) {
         File basePath = new File(config.getContext().getPath()).getParentFile();
         File configPath = new File(basePath, configGroup.getConfigPath());
@@ -197,7 +210,8 @@ public class AVModule extends AbstractModule {
         return avConfig;
     }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     public AVData provideData(Map<Id<AVOperator>, AVOperator> operators, Map<Id<AVOperator>, List<AVVehicle>> vehicles) {
         AVData data = new AVData();
 
@@ -210,7 +224,8 @@ public class AVModule extends AbstractModule {
         return data;
     }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     Map<Id<AVOperator>, AVGenerator> provideGenerators(Map<String, AVGenerator.AVGeneratorFactory> factories, AVConfig config) {
         Map<Id<AVOperator>, AVGenerator> generators = new HashMap<>();
 
@@ -231,8 +246,10 @@ public class AVModule extends AbstractModule {
         return generators;
     }
 
-    @Provides @Singleton
-    public Map<Id<AVOperator>, List<AVVehicle>> provideVehicles(Map<Id<AVOperator>, AVOperator> operators, Map<Id<AVOperator>, AVGenerator> generators) {
+    @Provides
+    @Singleton
+    public Map<Id<AVOperator>, List<AVVehicle>> provideVehicles(Map<Id<AVOperator>, AVOperator> operators,
+            Map<Id<AVOperator>, AVGenerator> generators) {
         Map<Id<AVOperator>, List<AVVehicle>> vehicles = new HashMap<>();
 
         for (AVOperator operator : operators.values()) {

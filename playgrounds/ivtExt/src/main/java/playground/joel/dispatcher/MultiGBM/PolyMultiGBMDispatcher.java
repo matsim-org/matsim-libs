@@ -7,7 +7,7 @@ import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
-import playground.clruch.dispatcher.HungarianUtils;
+import playground.clruch.dispatcher.BipartiteMatchingUtils;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.VehicleLinkPair;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+@Deprecated // this version is not used anymore, delete eventually. Look at playground.clruch.dispatcher. MonomultiGBMDispatcher
+// version is compiliing but not working.
 public class PolyMultiGBMDispatcher extends UniversalDispatcher {
 
     private final int dispatchPeriod;
@@ -37,11 +39,11 @@ public class PolyMultiGBMDispatcher extends UniversalDispatcher {
     private final Map<String, Integer> vehicleIDs = new HashMap<>(); // for faster ID search
 
     private PolyMultiGBMDispatcher( //
-                                    AVDispatcherConfig avDispatcherConfig, //
-                                    TravelTime travelTime, //
-                                    ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
-                                    EventsManager eventsManager, //
-                                    Network network, AbstractRequestSelector abstractRequestSelector) {
+            AVDispatcherConfig avDispatcherConfig, //
+            TravelTime travelTime, //
+            ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
+            EventsManager eventsManager, //
+            Network network, AbstractRequestSelector abstractRequestSelector) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
@@ -63,24 +65,24 @@ public class PolyMultiGBMDispatcher extends UniversalDispatcher {
         return vehicleIDs.get(string);
     }
 
-    public Supplier<Collection<VehicleLinkPair>> supplier(int fleetSection) {
-        Supplier<Collection<VehicleLinkPair>> supplier = () -> getDivertableVehicles().stream() //
-                .filter(vlp -> getId(vlp.avVehicle) % vehiclesPerRequest == fleetSection).collect(Collectors.toList());
-        return supplier;
-    }
+    // public Supplier<Collection<VehicleLinkPair>> supplier(int fleetSection) {
+    // Supplier<Collection<VehicleLinkPair>> supplier = () -> getDivertableVehicles().stream() //
+    // .filter(vlp -> getId(vlp.avVehicle) % vehiclesPerRequest == fleetSection).collect(Collectors.toList());
+    // return supplier;
+    // }
 
     @Override
     public void redispatch(double now) {
         final long round_now = Math.round(now);
 
-        new InOrderOfArrivalMatcher(this::setAcceptRequest) //
-                .match(getStayVehicles(), getAVRequestsAtLinks());
+        // new InOrderOfArrivalMatcher(this::setAcceptRequest) //
+        // .match(getStayVehicles(), getAVRequestsAtLinks());
 
-        if (round_now % dispatchPeriod == 0) {
-            for (int fleetSection = 0; fleetSection < vehiclesPerRequest; fleetSection++) {
-                printVals = HungarianUtils.globalBipartiteMatching(this, supplier(fleetSection), this.getAVRequestsAtLinks());
-            }
-        }
+        // if (round_now % dispatchPeriod == 0) {
+        // for (int fleetSection = 0; fleetSection < vehiclesPerRequest; fleetSection++) {
+        // printVals = BipartiteMatchingUtils.globalBipartiteMatching(this, supplier(fleetSection), this.getAVRequestsAtLinks());
+        // }
+        // }
     }
 
     @Override

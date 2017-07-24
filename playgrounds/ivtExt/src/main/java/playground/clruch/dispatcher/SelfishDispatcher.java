@@ -41,6 +41,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
     private final int updateRefPeriod; // implementation may not use this
     private final int weiszfeldMaxIter; // Weiszfeld max iterations
     private final double weiszfeldTol; // Weiszfeld convergence tolerance
+    private final boolean nonStrict;
     
     private final String subStrategy;
     private final double primaryWeight;
@@ -102,10 +103,6 @@ public class SelfishDispatcher extends RebalancingDispatcher {
                 addOpenRequests(getAVRequests());
                 GlobalAssert.that(openRequests.size() == pendingRequestsTree.size());
                 
-                // match vehicles on same link as request
-                new InOrderOfArrivalMatcher(this::setAcceptRequest)
-                    .matchRecord(getStayVehicles(), getAVRequestsAtLinks(), requestsServed, openRequests, pendingRequestsTree);
-
                 // ensure all requests recorded properly
                 GlobalAssert.that(requestsServed.values().stream().mapToInt(List::size).sum() == getTotalMatchedRequests());
 
@@ -117,20 +114,20 @@ public class SelfishDispatcher extends RebalancingDispatcher {
                 // if requests present ...
                 if (!getAVRequests().isEmpty()) { 
                     if (subStrategy.equals("noComm")) { // send every vehicle to closest customer
-                        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+                        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicleLinkPairs()) {
                             Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
                             AVRequest closestRequest = pendingRequestsTree.getClosest(vehicleCoord.getX(), vehicleCoord.getY());  
-                            setVehicleDiversion(vehicleLinkPair, closestRequest.getFromLink());
+                            setVehiclePickup(vehicleLinkPair.avVehicle, closestRequest);
                         }
                     } else if (subStrategy.equals("voronoi")) { // use the Voronoi sets in the selfish strategy
                         HashMap<AVVehicle, QuadTree<AVRequest>> voronoiSets = computeVoronoiSets();
-                        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+                        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicleLinkPairs()) {
                             Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
                             QuadTree<AVRequest> voronoiSet = voronoiSets.get(vehicleLinkPair.avVehicle);
                             if (voronoiSet.size() > 0) {
                                 AVRequest closestRequest = voronoiSet.getClosest(vehicleCoord.getX(), vehicleCoord.getY());
                                 // AVRequest closestRequest = findClosestRequest(vehicleLinkPair, voronoiSet.values());
-                                setVehicleDiversion(vehicleLinkPair, closestRequest.getFromLink());
+                                setVehiclePickup(vehicleLinkPair.avVehicle, closestRequest);
                             }
                         }   
                     } else if (subStrategy.equals("selfishLoiter")) { //
@@ -140,7 +137,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
                             } else {
                             VehicleLinkPair closestDivertableVehicle = findClosestDivertableVehicle(pendingRequest);
                             // TODO instead of just diverting, MATCH the closest vehicle with the pending request
-                            setVehicleDiversion(closestDivertableVehicle, pendingRequest.getFromLink());
+                            setVehiclePickup(closestDivertableVehicle.avVehicle, pendingRequest);
                             // setAcceptRequest(closestDivertableVehicle.avVehicle, pendingRequest); // TODO throws error 
                             }
                         }
@@ -148,12 +145,12 @@ public class SelfishDispatcher extends RebalancingDispatcher {
                 }
                 
                 // send remaining vehicles to their reference position
-                for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+                for (VehicleLinkPair vehicleLinkPair : getDivertableVehicleLinkPairs()) {
                     GlobalAssert.that(refPositions.containsKey(vehicleLinkPair.avVehicle));
                     Link link = refPositions.get(vehicleLinkPair.avVehicle);
                     GlobalAssert.that(link != null);
                     // setVehicleDiversion(vehicleLinkPair, link);
-                    setVehicleRebalance(vehicleLinkPair, link);
+                    setVehicleRebalance(vehicleLinkPair.avVehicle, link);
                 }
             }
         }
@@ -206,7 +203,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
         Coord requestCoord = avRequest.getFromLink().getCoord();
         VehicleLinkPair closestVehicle = null;
         double closestDistance = Double.POSITIVE_INFINITY;
-        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicleLinkPairs()) {
             Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
             double distance = Math.hypot(requestCoord.getX() - vehicleCoord.getX(), requestCoord.getY() - vehicleCoord.getY());
             if (distance < closestDistance) {
@@ -267,7 +264,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
             Coord requestCoord = avRequest.getFromLink().getFromNode().getCoord();
             AVVehicle closestVehicle = null;
             double closestDistance = Double.POSITIVE_INFINITY;
-            for (VehicleLinkPair vehicleLinkPair : getDivertableVehicles()) {
+            for (VehicleLinkPair vehicleLinkPair : getDivertableVehicleLinkPairs()) {
                 
                 // Coord avCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
                 Coord avCoord = refPositions.get(vehicleLinkPair.avVehicle).getCoord();
