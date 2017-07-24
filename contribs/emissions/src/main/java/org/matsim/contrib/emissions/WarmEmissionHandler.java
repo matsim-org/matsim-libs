@@ -60,6 +60,8 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 	private int linkLeaveFirstActWarnCnt = 0;
 	private int linkLeaveSomeActWarnCnt = 0;
 
+	private int zeroLinkLengthWarnCnt = 0;
+
 	private int nonCarWarn = 0;
 
 	private final Map<Id<Vehicle>, Tuple<Id<Link>, Double>> linkenter = new HashMap<>();
@@ -128,12 +130,24 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		linkLeaveCnt++;
 		Id<Vehicle> vehicleId = event.getVehicleId();
 		Id<Link> linkId = event.getLinkId();
 		Double leaveTime = event.getTime();
 		Link link = (Link) this.network.getLinks().get(linkId);
 		Double linkLength = link.getLength();
+
+		if (linkLength == 0.) {
+			if (zeroLinkLengthWarnCnt == 0 ){
+				logger.warn("Length of the link "+ linkId + " is zero. No emissions will be estimated for this link. Make sure, this is intentional.");
+				logger.warn(Gbl.ONLYONCE);
+				zeroLinkLengthWarnCnt++;
+			}
+			return;
+		}
+
+		// excluding links with zero lengths from leaveCnt. Amit July'17
+		linkLeaveCnt++;
+
 		Double freeVelocity = link.getFreespeed();
 		String roadTypeString = NetworkUtils.getType(link);
 		Integer roadType;

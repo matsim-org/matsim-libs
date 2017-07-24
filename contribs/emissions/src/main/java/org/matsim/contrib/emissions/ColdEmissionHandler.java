@@ -52,6 +52,7 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
     private final Network network;
     private final ColdEmissionAnalysisModule coldEmissionAnalysisModule;
 
+    private int zeroLinkLengthWarnCnt = 0;
     private int nonCarWarn = 0;
 
     private final Map<Id<Vehicle>, Double> vehicleId2stopEngineTime = new HashMap<>();
@@ -85,6 +86,16 @@ public class ColdEmissionHandler implements LinkLeaveEventHandler, VehicleLeaves
         Id<Link> linkId = event.getLinkId();
         Link link = this.network.getLinks().get(linkId);
         double linkLength = link.getLength();
+
+        if (linkLength == 0.) {
+            if (zeroLinkLengthWarnCnt == 0 ){
+                logger.warn("Length of the link "+ linkId + " is zero. No emissions will be estimated for this link. Make sure, this is intentional.");
+                logger.warn(Gbl.ONLYONCE);
+                zeroLinkLengthWarnCnt++;
+            }
+            return;
+        }
+
         Double previousDistance = this.vehicleId2accumulatedDistance.get(vehicleId);
         if (previousDistance != null) {
             double distance = previousDistance + linkLength;
