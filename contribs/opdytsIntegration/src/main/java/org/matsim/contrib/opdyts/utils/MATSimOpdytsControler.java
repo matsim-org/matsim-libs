@@ -1,5 +1,8 @@
 package org.matsim.contrib.opdyts.utils;
 
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
@@ -9,6 +12,8 @@ import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.opdyts.MATSimSimulator2;
+import org.matsim.contrib.opdyts.car.DifferentiatedLinkOccupancyAnalyzer;
+import org.matsim.contrib.opdyts.pt.PTOccupancyAnalyzer;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -25,6 +30,7 @@ public class MATSimOpdytsControler<U extends DecisionVariable> {
 	private TimeDiscretization timeDiscretization;
 	private ConvergenceCriterion convergenceCriterion;
 	private RandomSearch<U> randomSearch;
+	private Scenario scenario;
 
 	// -------------------- CONSTRUCTION --------------------
 
@@ -32,6 +38,7 @@ public class MATSimOpdytsControler<U extends DecisionVariable> {
 		this.opdytsConfig = ConfigUtils.addOrGetModule(scenario.getConfig(), OpdytsConfigGroup.class);
 		this.timeDiscretization = newTimeDiscretization();
 		this.convergenceCriterion = newFixedIterationNumberConvergenceCriterion();
+		this.scenario = scenario;
 	}
 
 	// -------------------- IMPLEMENTATION --------------------
@@ -96,5 +103,31 @@ public class MATSimOpdytsControler<U extends DecisionVariable> {
 
 	public ConvergenceCriterion getFixedIterationNumberConvergenceCriterion (){
 		return this.convergenceCriterion;
+	}
+
+
+	//utils
+	public void addPublicTransportOccupancyAnalyzr(final MATSimSimulator2<U> matSimSimulator ){
+		if (scenario.getConfig().transit().isUseTransit()) {
+			matSimSimulator.addSimulationStateAnalyzer(new PTOccupancyAnalyzer.Provider(this.timeDiscretization,
+					new HashSet<>(scenario.getTransitSchedule().getFacilities().keySet())) );
+		} else {
+			throw new RuntimeException("Switch to use transit is off.");
+		}
+	}
+
+	public void addNetworkModeOccupancyAnalyzr(final MATSimSimulator2<U> matSimSimulator ){
+		// the name is not necessarily exactly same as network modes in MATSim PlansCalcRouteConfigGroup.
+		// Here, this means, which needs to be counted on the links.
+		// cant take network modes from PlansCalcRouteConfigGroup because this may have additional modes in there
+		// however, this must be same as analyzeModes in TravelTimeCalculatorConfigGroup
+		Set<String> networkModes = new HashSet<>(scenario.getConfig().qsim().getMainModes());
+
+		// add for network modes
+		if (networkModes.size() > 0.) {
+			matSimSimulator.addSimulationStateAnalyzer(new DifferentiatedLinkOccupancyAnalyzer.Provider(this.timeDiscretization,
+					networkModes,
+					new LinkedHashSet<>(scenario.getNetwork().getLinks().keySet())));
+		}
 	}
 }
