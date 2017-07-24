@@ -74,7 +74,7 @@ public enum RequestAnalysis {
      */
     public static double calcEMD(TravelData tData, VirtualNetwork virtualNetwork, LeastCostPathCalculator dijkstra, //
                                  int dt, int time) {
-        Tensor alphaij = tData.getAlphaijforTime(time);
+        Tensor alphaij = tData.getAlphaijPSFforTime(time);
         AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
         if (vlDist.length() == 0) {
             vlDist = Tensors.matrix((i, j) -> vLinkDistance(i, j, virtualNetwork, dijkstra, abstractVirtualNodeDest), //

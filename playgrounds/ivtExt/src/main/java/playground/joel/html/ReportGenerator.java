@@ -181,6 +181,10 @@ public class ReportGenerator {
             htmlUtils.insertImg(IMAGE_FOLDER + "/minFleet.png", 800, 600);
             htmlUtils.insertImg(IMAGE_FOLDER + "/EMD.png", 800, 600);
         }
+        
+        
+        htmlUtils.insertImg(IMAGE_FOLDER + "/availbilitiesByNumberVehicles.png",800,600);
+        
 
         // ----------------------------------------------
         htmlUtils.footer();

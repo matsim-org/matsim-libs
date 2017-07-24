@@ -107,7 +107,7 @@ public class LPFeedforwardDispatcher extends PartitionedDispatcher {
 
         // permanently rebalance vehicles according to the rates output by the LP
         if (round_now % rebalancingPeriod == 0) {
-            rebalancingRate = travelData.getAlphaijforTime((int) round_now);
+            rebalancingRate = travelData.getAlphaijPSFforTime((int) round_now);
 
             // update rebalance count using current rate
             rebalanceCount = rebalanceCount.add(rebalancingRate.multiply(RealScalar.of(redispatchPeriod)));
