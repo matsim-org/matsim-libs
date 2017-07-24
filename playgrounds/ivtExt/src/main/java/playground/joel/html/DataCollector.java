@@ -44,11 +44,12 @@ public class DataCollector {
     public static AnalyzeSummary analyzeSummary;
 
     public static void store(String[] args, Controler controler, MinimumFleetSizeCalculator minimumFleetSizeCalculator, //
+                             PerformanceFleetSizeCalculator performanceFleetSizeCalculator, //
                              AnalyzeSummary analyzeSummaryIn, ScenarioParameters scenarioParametersIn) throws Exception {
 
         scenarioParameters = scenarioParametersIn; // new ScenarioParameters();
         analyzeSummary = analyzeSummaryIn;
-        collectData(controler, minimumFleetSizeCalculator);
+        collectData(controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator);
         readStopwatch(args);
 
         saveConfigs(args);
@@ -92,7 +93,8 @@ public class DataCollector {
         return Import.object(new File(report(args), "analyzeSummary.obj"));
     }
 
-    public static void collectData(Controler controler, MinimumFleetSizeCalculator minimumFleetSizeCalculator) {
+    public static void collectData(Controler controler, MinimumFleetSizeCalculator minimumFleetSizeCalculator, //
+                                   PerformanceFleetSizeCalculator performanceFleetSizeCalculator) throws InterruptedException {
 
         Scenario scenario = controler.getScenario();
         scenarioParameters.populationSize = scenario.getPopulation().getPersons().values().size();
@@ -104,6 +106,7 @@ public class DataCollector {
             scenarioParameters.minFleet = minimumFleetSizeCalculator.calculateMinFleet();
             scenarioParameters.EMDks = minimumFleetSizeCalculator.EMDks;
             scenarioParameters.minimumFleet = minimumFleetSizeCalculator.minimumFleet;
+            scenarioParameters.availabilities =  performanceFleetSizeCalculator.calculateAvailabilities();
         }
 
     }

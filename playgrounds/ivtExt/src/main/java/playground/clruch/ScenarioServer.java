@@ -23,8 +23,9 @@ import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.prep.TheApocalypse;
+import playground.clruch.traveldata.TravelData;
+import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
 import playground.clruch.trb18.TRBModule;
 import playground.clruch.trb18.scenario.TRBScenarioConfig;
@@ -33,6 +34,7 @@ import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.joel.analysis.AnalyzeAll;
 import playground.joel.analysis.AnalyzeSummary;
 import playground.joel.analysis.MinimumFleetSizeCalculator;
+import playground.joel.analysis.PerformanceFleetSizeCalculator;
 import playground.joel.html.DataCollector;
 import playground.joel.html.ReportGenerator;
 import playground.joel.html.ScenarioParameters;
@@ -43,11 +45,9 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 /**
  * main entry point
  * 
- * only one ScenarioServer can run at one time, since a fixed network port is reserved
- * to serve the simulation status
+ * only one ScenarioServer can run at one time, since a fixed network port is reserved to serve the simulation status
  * 
- * if you wish to run multiple simulations at the same time use for instance
- * {@link RunAVScenario}
+ * if you wish to run multiple simulations at the same time use for instance {@link RunAVScenario}
  */
 public class ScenarioServer {
 
@@ -56,11 +56,6 @@ public class ScenarioServer {
     public static void main(String[] args) throws MalformedURLException, Exception {
 
         // BEGIN: CUSTOMIZE -----------------------------------------------
-        // set manually depending on the scenario:
-        int maxPopulationSize = 1000;
-
-        int minFleetSizeBinSize = 3600;
-
         // set to true in order to make server wait for at least 1 client, for instance viewer client
         boolean waitForClients = false;
 
@@ -76,9 +71,9 @@ public class ScenarioServer {
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 
         File configFile = new File(args[0]);
-        //Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
-        AVConfigGroup avConfigGroup = new AVConfigGroup();
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup,
+                new BlackListedTimeAllocationMutatorConfigGroup());
+
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
         
@@ -92,6 +87,7 @@ public class ScenarioServer {
         
         
         MatsimStaticDatabase.initializeSingletonInstance( //
+
                 network, ReferenceFrame.SIOUXFALLS);
         
         
@@ -105,24 +101,7 @@ public class ScenarioServer {
                 config.planCalcScore().addActivityParams(params);
             }
         }
-        
-        
-//        // admissible Nodes sebhoerl
-//        final Network network = scenario.getNetwork();
-//        
-//        FileInputStream stream = new FileInputStream(ConfigGroup.getInputFileURL(config.getContext(), "nodes.list").getPath());
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
-//
-//        final Set<Node> permissibleNodes = new HashSet<>();
-//        final Set<Link> permissibleLinks = new HashSet<>();
-//
-//        reader.lines().forEach((String nodeId) -> permissibleNodes.add(network.getNodes().get(Id.createNodeId(nodeId))) );
-//        permissibleNodes.forEach((Node node) -> permissibleLinks.addAll(node.getOutLinks().values()));
-//        permissibleNodes.forEach((Node node) -> permissibleLinks.addAll(node.getInLinks().values()));
-//        final Set<Link> filteredPermissibleLinks = permissibleLinks.stream().filter((l) -> l.getAllowedModes().contains("car")).collect(Collectors.toSet());
-        
-        
-        TheApocalypse.decimatesThe(population).toNoMoreThan(maxPopulationSize).people();
+
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
         controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
@@ -130,35 +109,27 @@ public class ScenarioServer {
         controler.addOverridingModule(new DatabaseModule()); // added only to listen to iteration counter
         controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
         controler.addOverridingModule(new AVTravelTimeModule());
-//        controler.addOverridingModule(new TRBModule(reducedNetwork));
-        
-        
-//        controler.addOverridingModule(new AbstractModule() {
-//            @Override
-//            public void install() {
-//                bind(new TypeLiteral<Collection<Link>>() {}).annotatedWith(Names.named("zurich")).toInstance(filteredPermissibleLinks);
-//                //AVUtils.registerDispatcherFactory(binder(), "ZurichDispatcher", ZurichDispatcher.ZurichDispatcherFactory.class);
-//                AVUtils.registerGeneratorFactory(binder(), "ZurichGenerator", ZurichGenerator.ZurichGeneratorFactory.class);
-//
-//                addPlanStrategyBinding("ZurichModeChoice").toProvider(ZurichPlanStrategyProvider.class);
-//            }
-//        });
 
         controler.run();
 
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
         AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
-        //AnalyzeMarc.analyze(args);
-
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
+        TravelData travelData = TravelDataGet.readDefault(network, virtualNetwork);
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
+        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
+        int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
+        int vehicleSteps = Math.max(10, maxNumberVehiclesPerformanceCalculator / 400);
+
         if (virtualNetwork != null) {
-            minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(scenario.getNetwork(), //
-                    population, virtualNetwork.getvNodesCount(), minFleetSizeBinSize);
+            minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network,population,virtualNetwork,travelData);
+            performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetwork, travelData,
+                    maxNumberVehiclesPerformanceCalculator, vehicleSteps);
         }
 
-        DataCollector.store(args, controler, minimumFleetSizeCalculator, analyzeSummary, scenarioParameters);
+        DataCollector.store(args, controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
+                analyzeSummary, scenarioParameters);
 
         ReportGenerator.from(args);
 

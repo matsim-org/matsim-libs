@@ -185,9 +185,9 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 {
                     // --------------------------------------------------------------------------------------------------
                     // Get Feedforward rebalancing Rates
-                    // --------------------------------------------------------------------------------------------------
-                    Tensor alphaij = arrivalInformation.getAlphaijforTime((int) now).multiply(RealScalar.of(popSize));
-                    // FeedForward Rebalancing
+                    //--------------------------------------------------------------------------------------------------
+                    Tensor alphaij = arrivalInformation.getAlphaijPSFforTime((int) now).multiply(RealScalar.of(popSize));
+                    //FeedForward Rebalancing
                     for (int i = 0; i < N_vStations; i++) {
                         for (int j = 0; j < N_vStations; j++) {
                             feedfwrd_Rebalancing_LPR.set(alphaij.Get(i, j), i, j);
