@@ -35,7 +35,7 @@ import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
-import ch.ethz.idsc.tensor.io.ExtractPrimitives;
+import ch.ethz.idsc.tensor.io.Primitives;
 import ch.ethz.idsc.tensor.red.Max;
 import ch.ethz.idsc.tensor.red.Min;
 import ch.ethz.idsc.tensor.red.Total;
@@ -48,7 +48,6 @@ import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
-import playground.clruch.dispatcher.utils.PredefinedMatchingMatcher;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
@@ -167,13 +166,13 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                             maxWaitingTimePerVLink.set(Max.function(DoubleScalar.of(waitTime)), mpcRequest.vectorIndex);
                         }
                         {
-                            double[] array = ExtractPrimitives.toArrayDouble(waitCustomersPerVLink);
+                            double[] array = Primitives.toArrayDouble(waitCustomersPerVLink);
                             DoubleArray doubleArray = new DoubleArray("waitCustomersPerVLink", new int[] { array.length }, array);
                             container.add(doubleArray);
                             System.out.println("waitCustomersPerVLink=" + Total.of(Tensors.vectorDouble(array)));
                         }
                         {
-                            double[] array = ExtractPrimitives.toArrayDouble(maxWaitingTimePerVLink);
+                            double[] array = Primitives.toArrayDouble(maxWaitingTimePerVLink);
                             DoubleArray doubleArray = new DoubleArray("maxWaitingTimePerVLink", new int[] { array.length }, array);
                             container.add(doubleArray);
                             System.out.println("maxWaitingTimePerVLink=" + Tensors.vectorDouble(array) //
@@ -206,7 +205,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                         Map<AVVehicle, Link> map = getRebalancingVehicles();
                         accountedVehicles.addAll(map.keySet());
                         final Tensor vector = countVehiclesPerVLink(map);
-                        double[] array = ExtractPrimitives.toArrayDouble(vector);
+                        double[] array = Primitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("movingRebalancingVehiclesPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
                         vehicleTotal = vehicleTotal.add(Total.of(Tensors.vectorDouble(array)));
@@ -238,14 +237,14 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                 }
                             }
                         }
-                        double[] array = ExtractPrimitives.toArrayDouble(vector);
+                        double[] array = Primitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("movingVehiclesWithCustomersPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
                         vehicleTotal = vehicleTotal.add(Total.of(Tensors.vectorDouble(array)));
                         System.out.println("movingVehiclesWithCustomersPerVLink=" + Total.of(Tensors.vectorDouble(array)));
                     }
                     
-                    if (Scalars.nonZero(Chop.of(vehicleTotal.subtract(RealScalar.of(numberOfVehicles))))) {
+                    if (!Chop._10.close(vehicleTotal,RealScalar.of(numberOfVehicles))) {
                         new RuntimeException("#vehiclesTotal=" + vehicleTotal).printStackTrace();
                     }
                     if (numberOfVehicles != accountedVehicles.size())

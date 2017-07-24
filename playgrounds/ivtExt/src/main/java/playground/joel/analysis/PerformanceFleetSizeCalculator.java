@@ -183,7 +183,7 @@ public class PerformanceFleetSizeCalculator {
                 for (int j = 0; j < numberStations; ++j) {
                     VirtualNode from = virtualNetwork.getVirtualNode(i);
                     VirtualNode to = virtualNetwork.getVirtualNode(j);
-                    RealScalar serviceRate = RealScalar.ZERO;
+                    Scalar serviceRate = RealScalar.ZERO;
                     if (i != j) {
                         VirtualLink vLink = virtualNetwork.getVirtualLink(from, to);
                         serviceRate = RealScalar.of(1.0 / vLink.getTtime());
@@ -297,7 +297,7 @@ public class PerformanceFleetSizeCalculator {
         
         
         Tensor IminusPki = IdentityMatrix.of(size).subtract(Transpose.of(transitionProb));
-        Tensor relativeThroughput = Chop.of(NullSpace.usingSvd(IminusPki)); // chopped to avoid numerical errors
+        Tensor relativeThroughput = Chop._10.of(NullSpace.usingSvd(IminusPki)); // chopped to avoid numerical errors
 
         // if no solution found, return empty Tensor.
         if (Dimensions.of(relativeThroughput).get(0) == 0) {
