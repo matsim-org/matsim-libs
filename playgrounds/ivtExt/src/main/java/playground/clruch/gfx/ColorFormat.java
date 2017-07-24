@@ -6,7 +6,7 @@ import java.awt.Color;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.io.ExtractPrimitives;
+import ch.ethz.idsc.tensor.io.Primitives;
 
 // EXPERIMENTAL
 /* package */ enum ColorFormat {
@@ -32,7 +32,7 @@ import ch.ethz.idsc.tensor.io.ExtractPrimitives;
   /** @param vector with length() == 4
    * @return int in hex 0xAA:RR:GG:BB */
   static Color toColor(Tensor vector) {
-    int[] rgba = ExtractPrimitives.toArrayInt(vector);
+    int[] rgba = Primitives.toArrayInt(vector);
     return new Color(rgba[0], rgba[1], rgba[2], rgba[3]);
   }
 }

@@ -77,13 +77,8 @@ public class VirtualNetwork implements Serializable {
         if (!linkVNodeMap.containsKey(link)) {
             System.out.println("link: " + link.getId().toString());
             System.out.println("virtualNode not found ");
-            throw new RuntimeException();
         }
         return linkVNodeMap.get(link);
-    }
-
-    public boolean hasVirtualNode(Link link) {
-        return linkVNodeMap.containsKey(link);
     }
 
     /**

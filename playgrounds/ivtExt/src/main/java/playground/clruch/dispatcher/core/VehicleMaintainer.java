@@ -32,11 +32,9 @@ import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
- * The purpose of VehicleMaintainer is to register {@link AVVehicle}
- * and provide the collection of available vehicles to derived class.
+ * The purpose of VehicleMaintainer is to register {@link AVVehicle} and provide the collection of available vehicles to derived class.
  * <p>
- * manages assignments of {@link AbstractDirective} to {@link AVVehicle}s.
- * path computations attached to assignments are computed in parallel
+ * manages assignments of {@link AbstractDirective} to {@link AVVehicle}s. path computations attached to assignments are computed in parallel
  * {@link ParallelLeastCostPathCalculator}.
  */
 abstract class VehicleMaintainer implements AVDispatcher {
@@ -46,6 +44,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
     private Double private_now = null;
     private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
     private int infoLinePeriod = 0;
+    protected Map<AVVehicle, VehicleLinkPair> avVehicleVehicleLinkPairMap = new HashMap<>();
 
     VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
@@ -53,8 +52,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
     /**
      * @param infoLinePeriod
-     *            positive values determine the period,
-     *            negative values or 0 will disable the printout
+     *            positive values determine the period, negative values or 0 will disable the printout
      */
     public final void setInfoLinePeriod(int infoLinePeriod) {
         this.infoLinePeriod = infoLinePeriod;
@@ -97,8 +95,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     /**
-     * function call leaves the state of the {@link UniversalDispatcher} unchanged.
-     * successive calls to the function return the identical collection.
+     * function call leaves the state of the {@link UniversalDispatcher} unchanged. successive calls to the function return the identical collection.
      *
      * @return collection of all vehicles that currently are in the last task, which is of type STAY
      */
@@ -121,6 +118,26 @@ abstract class VehicleMaintainer implements AVDispatcher {
         return Collections.unmodifiableMap(map);
     }
 
+    public final Map<AVVehicle, Link> getStayVehiclesUnique() {
+        Map<AVVehicle, Link> map = new HashMap<>();
+        for (AVVehicle avVehicle : getFunctioningVehicles())
+            if (isWithoutDirective(avVehicle)) {
+                Task task = Schedules.getLastTask(avVehicle.getSchedule()); // <- last task
+                if (task.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
+                    new AVTaskAdapter(task) {
+                        @Override
+                        public void handle(AVStayTask avStayTask) { // <- type of task is STAY
+                            final Link link = avStayTask.getLink();
+
+                            map.put(avVehicle, link);
+
+                        }
+                    };
+            }
+        return Collections.unmodifiableMap(map);
+
+    }
+
     /**
      * @return collection of AVVehicles that are in stay mode
      */
@@ -132,13 +149,13 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     /**
-     * @return collection of cars that are in the driving state without customer, or stay task.
-     *         if a vehicle is given a directive for instance by setVehicleDiversion(...) or setAcceptRequest(...)
-     *         that invoke assignDirective(...), the vehicle is not included in the successive call to
-     *         getDivertableVehicles() until it becomes <i>divertable</i> again.
+     * @return collection of cars that are in the driving state without customer, or stay task. if a vehicle is given a directive for instance by
+     *         setVehicleDiversion(...) or setAcceptRequest(...) that invoke assignDirective(...), the vehicle is not included in the successive call
+     *         to getDivertableVehicles() until it becomes <i>divertable</i> again.
      */
-    protected final Collection<VehicleLinkPair> getDivertableVehicles() {
-        Collection<VehicleLinkPair> collection = new LinkedList<>();
+    protected final Collection<AVVehicle> getDivertableVehicles() {
+        avVehicleVehicleLinkPairMap.clear();
+        // Collection<VehicleLinkPair> collection = new LinkedList<>();
         for (AVVehicle avVehicle : getFunctioningVehicles())
             if (isWithoutDirective(avVehicle)) {
                 Schedule schedule = avVehicle.getSchedule();
@@ -149,9 +166,12 @@ abstract class VehicleMaintainer implements AVDispatcher {
                         if (Schedules.isNextToLastTask(avDriveTask)) {
                             TaskTracker taskTracker = avDriveTask.getTaskTracker();
                             OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
-                            LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns null
+                            LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint(); // there is a slim chance that function returns
+                                                                                                    // null
                             if (linkTimePair != null)
-                                collection.add(new VehicleLinkPair(avVehicle, linkTimePair, avDriveTask.getPath().getToLink()));
+                                // collection.add(new VehicleLinkPair(avVehicle, linkTimePair, avDriveTask.getPath().getToLink()));
+                                avVehicleVehicleLinkPairMap.put(avVehicle,
+                                        new VehicleLinkPair(avVehicle, linkTimePair, avDriveTask.getPath().getToLink()));
                         }
                     }
 
@@ -161,12 +181,29 @@ abstract class VehicleMaintainer implements AVDispatcher {
                         if (Schedules.isLastTask(avStayTask)) {
                             GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow()); // <- self evident?
                             LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
-                            collection.add(new VehicleLinkPair(avVehicle, linkTimePair, null));
+                            // collection.add(new VehicleLinkPair(avVehicle, linkTimePair, null));
+                            avVehicleVehicleLinkPairMap.put(avVehicle, new VehicleLinkPair(avVehicle, linkTimePair, null));
                         }
                     }
                 };
             }
-        return collection;
+
+        return avVehicleVehicleLinkPairMap.keySet();
+        // return collection;
+
+    }
+
+    protected final Collection<VehicleLinkPair> getDivertableVehicleLinkPairs() {
+        getDivertableVehicles();
+        return avVehicleVehicleLinkPairMap.values();
+    }
+
+    protected final LinkTimePair getLinkTimePair(AVVehicle avVehicle) {
+        return avVehicleVehicleLinkPairMap.get(avVehicle).linkTimePair;
+    }
+
+    protected final VehicleLinkPair getVehicleLinkPair(AVVehicle avVehicle) {
+        return avVehicleVehicleLinkPairMap.get(avVehicle);
     }
 
     @Override
@@ -180,9 +217,8 @@ abstract class VehicleMaintainer implements AVDispatcher {
     abstract void notifySimulationSubscribers(long round_now);
 
     /**
-     * invoked at the beginning of every iteration
-     * dispatchers can update their data structures based on the stay vehicle set
-     * function is not meant for issuing directives
+     * invoked at the beginning of every iteration dispatchers can update their data structures based on the stay vehicle set function is not meant
+     * for issuing directives
      */
     abstract void updateDatastructures(Collection<AVVehicle> stayVehicles);
 
@@ -204,12 +240,16 @@ abstract class VehicleMaintainer implements AVDispatcher {
         notifySimulationSubscribers(Math.round(now));
 
         redispatch(now);
+        endofStepTasks();
+        
         private_now = null; // <- time unavailable
         private_vehicleDirectives.values().stream() //
                 .parallel() //
                 .forEach(AbstractDirective::execute);
         private_vehicleDirectives.clear();
     }
+    
+    /* package */ abstract void endofStepTasks();
 
     /**
      * derived classes should override this function to add details

@@ -16,7 +16,6 @@ import org.gnu.glpk.glp_smcp;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import playground.clruch.net.StorageUtils;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
@@ -148,7 +147,7 @@ public class LPVehicleRebalancing {
             }
 
             // Write model to file
-            GLPK.glp_write_lp(lp, null, StorageUtils.OUTPUT + "/rebalancing_linearprogram_initial.lp");
+            GLPK.glp_write_lp(lp, null, "rebalancing_linearprogram_initial.lp");
         } catch (GlpkException ex){
             ex.printStackTrace();
         }
@@ -179,7 +178,7 @@ public class LPVehicleRebalancing {
         }
 
         // Solve model
-        GLPK.glp_write_lp(lp, null, StorageUtils.OUTPUT + "/rebalancing_linearprogram_updated.lp");
+        GLPK.glp_write_lp(lp, null, "rebalancing_linearprogram_updated.lp");
         GLPK.glp_init_smcp(parm);
         int ret = GLPK.glp_simplex(lp, parm); // ret==0 indicates of the algorithm ran correctly
         GlobalAssert.that(ret==0);

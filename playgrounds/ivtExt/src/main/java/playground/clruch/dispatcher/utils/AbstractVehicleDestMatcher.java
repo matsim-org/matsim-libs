@@ -9,6 +9,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public abstract class AbstractVehicleDestMatcher {
 
@@ -17,17 +18,33 @@ public abstract class AbstractVehicleDestMatcher {
      * @param links collection may be modified inside the matcher
      * @return
      */
-    public final Map<VehicleLinkPair, Link> match( //
+    public final Map<VehicleLinkPair, AVRequest> matchAVRequest( //
             Collection<VehicleLinkPair> vehicleLinkPairs, //
-            List<Link> links) {
-        if (vehicleLinkPairs.isEmpty() || links.isEmpty())
+            Collection<AVRequest> avRequests) {
+        if (vehicleLinkPairs.isEmpty() || avRequests.isEmpty())
             return Collections.emptyMap();
-        return protected_match(vehicleLinkPairs, links);
+        return protected_matchAVRequest(vehicleLinkPairs, avRequests);
     }
 
-    protected abstract Map<VehicleLinkPair, Link> protected_match( //
+    protected abstract Map<VehicleLinkPair, AVRequest> protected_matchAVRequest( //
             Collection<VehicleLinkPair> vehicleLinkPairs, //
-            List<Link> links //
+            Collection<AVRequest> links //
     );
+    
+    
+    public final Map<VehicleLinkPair, Link> matchLink( //
+            Collection<VehicleLinkPair> vehicleLinkPairs, //
+            Collection<Link> destinations) {
+        if (vehicleLinkPairs.isEmpty() || destinations.isEmpty())
+            return Collections.emptyMap();
+        return protected_matchLink(vehicleLinkPairs, destinations);
+    }
+
+    protected abstract Map<VehicleLinkPair, Link> protected_matchLink( //
+            Collection<VehicleLinkPair> vehicleLinkPairs, //
+            Collection<Link> links //
+    );    
+    
+    
 
 }

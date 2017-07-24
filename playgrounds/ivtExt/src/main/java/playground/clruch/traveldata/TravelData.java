@@ -176,16 +176,12 @@ public class TravelData implements Serializable {
 
             // ensure positivity of solution (small negative values possible due to solver
             // accuracy)
-            for (int i = 0; i < Dimensions.of(rebalancingRate).get(0); ++i) {
-                for (int j = 0; j < Dimensions.of(rebalancingRate).get(1); ++j) {
-                    if (rebalancingRate.Get(i, j).number().doubleValue() < 0.0) {
-                        GlobalAssert.that(rebalancingRate.Get(i, j).number().doubleValue() > -10E-7);
-                        rebalancingRate.set(RealScalar.of(0.0), i, j);
-                    }
-                }
-            }
 
-            // rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-7));
+            rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-12));
+            // make negative values positive to ensure no problems in subsequent steps
+            rebalancingRate.flatten(-1).filter(v -> v.Get().number().doubleValue() < 0.0).forEach(v -> v = RealScalar.ZERO);
+
+            
             alphaijPSF.set(rebalancingRate, t);
 
         }
@@ -214,6 +210,11 @@ public class TravelData implements Serializable {
     public Tensor getLambdaforTime(int time) {
         int row = (int) Math.min(time / dt, numberTimeSteps - 1);
         return lambda.get(row).copy();
+    }
+
+    public Tensor getLambdaPSFforTime(int time) {
+        int row = (int) Math.min(time / dt, numberTimeSteps - 1);
+        return lambdaPSF.get(row).copy();
     }
 
     public Scalar getLambdaforTime(int time, int vNodeindex) {
@@ -251,11 +252,20 @@ public class TravelData implements Serializable {
         return pij.Get(timestep, from, to);
     }
 
-    public Tensor getAlphaijforTime(int time) {
+    public Tensor getpijPSFforTime(int time) {
+        int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
+        return pijPSF.get(timestep).copy();
+    }
+
+    public Scalar getpijPSFforTime(int time, int from, int to) {
+        int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
+        return pijPSF.Get(timestep, from, to);
+    }
+
+    public Tensor getAlphaijPSFforTime(int time) {
         int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
         return alphaijPSF.get(timestep).copy();
     }
-
 
     protected void fillSerializationInfo(VirtualNetwork virtalNetworkIn) {
         // check if TravelData object was created with the supplied virtualNetwork
@@ -267,11 +277,15 @@ public class TravelData implements Serializable {
         return virtualNetworkID;
     }
 
+    public int getNumbertimeSteps() {
+        return numberTimeSteps;
+    }
+
     /**
      * @param T
      *            tensor which will be normed for row-stochasticity
      */
-    private Tensor normToRowStochastic(Tensor Tin) {
+    public Tensor normToRowStochastic(Tensor Tin) {
         List<Integer> dims = Dimensions.of(Tin);
         int rows = dims.get(0);
         Tensor T = Tin.copy();
@@ -279,7 +293,7 @@ public class TravelData implements Serializable {
         // for every row
         for (int i = 0; i < rows; ++i) {
             Scalar sum = Total.of(T.get(i)).Get();
-            T.set(v -> v.multiply(InvertUnlessZero.function.apply(sum)), i);
+            T.set(v -> v.multiply(InvertUnlessZero.of(sum)), i);
         }
         return T;
     }

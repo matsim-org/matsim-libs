@@ -9,10 +9,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.red.Mean;
@@ -74,7 +75,7 @@ public enum RequestAnalysis {
      */
     public static double calcEMD(TravelData tData, VirtualNetwork virtualNetwork, LeastCostPathCalculator dijkstra, //
                                  int dt, int time) {
-        Tensor alphaij = tData.getAlphaijforTime(time);
+        Tensor alphaij = tData.getAlphaijPSFforTime(time);
         AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
         if (vlDist.length() == 0) {
             vlDist = Tensors.matrix((i, j) -> vLinkDistance(i, j, virtualNetwork, dijkstra, abstractVirtualNodeDest), //
@@ -110,7 +111,7 @@ public enum RequestAnalysis {
         return network.getLinks().values().stream().mapToDouble(Link::getFreespeed).min().getAsDouble(); // smallest freespeed in network
     }
     
-    private static RealScalar vLinkDistance(int i, int j, VirtualNetwork virtualNetwork, //
+    private static Scalar vLinkDistance(int i, int j, VirtualNetwork virtualNetwork, //
                                            LeastCostPathCalculator dijkstra, //
                                            AbstractVirtualNodeDest abstractVirtualNodeDest) {
         VirtualNode vi = virtualNetwork.getVirtualNode(i);

@@ -5,8 +5,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
@@ -25,11 +23,8 @@ public class NetworkLoader {
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
-        //Scenario scenario = ScenarioUtils.loadScenario(config);
+        Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        Network network = NetworkUtils.createNetwork();
-        new MatsimNetworkReader(network).readFile(config.network().getInputFile());
-
-        return network;
+        return scenario.getNetwork();
     }
 }

@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.zip.DataFormatException;
 
 import org.gnu.glpk.GLPKConstants;
@@ -37,15 +36,14 @@ import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
 import playground.clruch.dispatcher.utils.FeasibleRebalanceCreator;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
-import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
 import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
-import playground.clruch.dispatcher.utils.RandomVirtualNodeDest;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
+import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
@@ -54,9 +52,9 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
+public class LPFBDispatcher extends PartitionedDispatcher {
     public final int rebalancingPeriod;
-    public final int redispatchPeriod;
+    public final int dispatchPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
     final int numberOfAVs;
@@ -64,7 +62,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
     Tensor printVals = Tensors.empty();
     LPVehicleRebalancing lpVehicleRebalancing;
 
-    public LPFeedbackLIPDispatcher( //
+    public LPFBDispatcher( //
             AVDispatcherConfig config, //
             AVGeneratorConfig generatorConfig, //
             TravelTime travelTime, //
@@ -79,16 +77,14 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         rebalancingPeriod = getRebalancingPeriod(config); // Integer.parseInt(config.getParams().get("rebalancingPeriod"));
-        redispatchPeriod = getDispatchPeriod(config); // Integer.parseInt(config.getParams().get("redispatchPeriod"));
         // setup linear program
         lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
+        SafeConfig safeConfig = SafeConfig.wrap(config);
+        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
     }
 
     @Override
     public void redispatch(double now) {
-        // PART 0: match vehicles at a customer link
-        new InOrderOfArrivalMatcher(this::setAcceptRequest) //
-                .match(getStayVehicles(), getAVRequestsAtLinks());
 
         // PART I: rebalance all vehicles periodically
         final long round_now = Math.round(now);
@@ -99,7 +95,6 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
             // II.i compute rebalancing vehicles and send to virtualNodes
             {
                 Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
-                // Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeAvailableVehicles();
                 int totalAvailable = 0;
                 for (List<VehicleLinkPair> vlpl : availableVehicles.values()) {
                     totalAvailable += vlpl.size();
@@ -162,20 +157,19 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
 
                 // send rebalancing vehicles using the setVehicleRebalance command
                 for (VirtualNode virtualNode : destinationLinks.keySet()) {
-                    Map<VehicleLinkPair, Link> rebalanceMatching = vehicleDestMatcher.match(availableVehicles.get(virtualNode),
+                    Map<VehicleLinkPair, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode),
                             destinationLinks.get(virtualNode));
-                    rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v, rebalanceMatching.get(v)));
+                    rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v.avVehicle, rebalanceMatching.get(v)));
                 }
 
             }
         }
 
         // Part II: outside rebalancing periods, permanently assign destinations to vehicles using bipartite matching
-        if (round_now % redispatchPeriod == 0) {
-            printVals = HungarianUtils.globalBipartiteMatching(this, //
-                    () -> getVirtualNodeDivertableNotRebalancingVehicles().values() //
-                            .stream().flatMap(v -> v.stream()).collect(Collectors.toList()), //
-                    this.getAVRequestsAtLinks());
+        if (round_now % dispatchPeriod == 0) {
+            BipartiteMatchingUtils bpmu = new BipartiteMatchingUtils();
+            printVals = bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), this.getAVRequests());
+            bpmu.executePickup(this);
         }
     }
 
@@ -201,7 +195,6 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         private EventsManager eventsManager;
 
         @Inject
-        @Named("trb_reduced")
         private Network network;
 
         public static VirtualNetwork virtualNetwork;
@@ -210,7 +203,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
 
-            AbstractVirtualNodeDest abstractVirtualNodeDest = new RandomVirtualNodeDest();
+            AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
 
             final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
@@ -226,7 +219,7 @@ public class LPFeedbackLIPDispatcher extends PartitionedDispatcher {
                 }
             }
 
-            return new LPFeedbackLIPDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, abstractVirtualNodeDest,
+            return new LPFBDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, abstractVirtualNodeDest,
                     abstractVehicleDestMatcher);
         }
     }

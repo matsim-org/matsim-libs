@@ -19,8 +19,8 @@ public class AVTravelTimeModule extends AbstractModule {
         bind(AVTravelTimeTracker.class).asEagerSingleton();
         addEventHandlerBinding().to(AVTravelTimeTracker.class).asEagerSingleton();
 
-        //bind(TravelTime.class).annotatedWith(Names.named(AVModule.AV_MODE))
-        //        .to(AVTravelTime.class);
+        bind(TravelTime.class).annotatedWith(Names.named(AVModule.AV_MODE))
+                .to(AVTravelTime.class);
     }
 
     @Provides @Singleton

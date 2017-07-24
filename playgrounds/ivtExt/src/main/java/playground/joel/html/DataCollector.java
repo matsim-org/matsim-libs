@@ -13,7 +13,6 @@ import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.Time;
 import playground.clruch.ScenarioServer;
-import playground.clruch.net.StorageUtils;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.GlobalAssert;
@@ -35,9 +34,9 @@ import java.util.zip.DataFormatException;
  */
 public class DataCollector {
 
-    public static File avConfigOld;
+    static File avConfigOld;
     static File folder;
-    public static File avOld;
+    static File avOld;
     static File avConfig;
     static File av;
 
@@ -45,11 +44,12 @@ public class DataCollector {
     public static AnalyzeSummary analyzeSummary;
 
     public static void store(String[] args, Controler controler, MinimumFleetSizeCalculator minimumFleetSizeCalculator, //
+                             PerformanceFleetSizeCalculator performanceFleetSizeCalculator, //
                              AnalyzeSummary analyzeSummaryIn, ScenarioParameters scenarioParametersIn) throws Exception {
 
         scenarioParameters = scenarioParametersIn; // new ScenarioParameters();
         analyzeSummary = analyzeSummaryIn;
-        collectData(controler, minimumFleetSizeCalculator);
+        collectData(controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator);
         readStopwatch(args);
 
         saveConfigs(args);
@@ -59,7 +59,11 @@ public class DataCollector {
     }
 
     public static File report(String[] args) {
-        return new File(StorageUtils.OUTPUT, "report");
+        avConfigOld = new File(args[0]);
+        folder = avConfigOld.getParentFile();
+        avOld = new File(folder, "av.xml");
+
+        return new File(folder, "output/report");
     }
 
     public static void saveConfigs(String[] args) throws Exception {
@@ -89,7 +93,8 @@ public class DataCollector {
         return Import.object(new File(report(args), "analyzeSummary.obj"));
     }
 
-    public static void collectData(Controler controler, MinimumFleetSizeCalculator minimumFleetSizeCalculator) {
+    public static void collectData(Controler controler, MinimumFleetSizeCalculator minimumFleetSizeCalculator, //
+                                   PerformanceFleetSizeCalculator performanceFleetSizeCalculator) throws InterruptedException {
 
         Scenario scenario = controler.getScenario();
         scenarioParameters.populationSize = scenario.getPopulation().getPersons().values().size();
@@ -101,12 +106,13 @@ public class DataCollector {
             scenarioParameters.minFleet = minimumFleetSizeCalculator.calculateMinFleet();
             scenarioParameters.EMDks = minimumFleetSizeCalculator.EMDks;
             scenarioParameters.minimumFleet = minimumFleetSizeCalculator.minimumFleet;
+            scenarioParameters.availabilities =  performanceFleetSizeCalculator.calculateAvailabilities();
         }
 
     }
 
     public static void readStopwatch(String[] args) {
-        File stopwatch = new File(StorageUtils.OUTPUT, "stopwatch.txt");
+        File stopwatch = new File((new File(args[0])).getParent(), "output/stopwatch.txt");
         try {
             BufferedReader reader = new BufferedReader(new FileReader(stopwatch));
             String startTime = "00:00:00";

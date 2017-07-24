@@ -22,19 +22,21 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.red.Mean;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveldata.TravelData;
+import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveldata.TravelDataUtils;
-import playground.clruch.trb18.scenario.TRBScenarioConfig;
+import playground.clruch.utils.GlobalAssert;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.joel.helpers.EasyDijkstra;
 import playground.joel.html.DataCollector;
@@ -54,14 +56,6 @@ public class MinimumFleetSizeCalculator {
     public static double minimumFleet;
 
     public static void main(String[] args) throws Exception {
-        // for test purpose only
-        int samples = 30;
-
-        /*
-         * PrintStream originalStream = System.out; System.setOut(new PrintStream(new OutputStream(){
-         * 
-         * @Override public void write(int b) {} }));
-         */
 
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
@@ -69,19 +63,14 @@ public class MinimumFleetSizeCalculator {
         File configFile = new File(args[0]);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup,
                 new BlackListedTimeAllocationMutatorConfigGroup());
-        config.facilities().setInputFile(null);
-
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        // Network network = scenario.getNetwork();
-
-        Network network = NetworkUtils.createNetwork();
-        new MatsimNetworkReader(network).readFile(new TRBScenarioConfig().filteredNetworkOutputPath);
-
+        Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();
-        TheApocalypse.decimatesThe(population).toNoMoreThan(1000).people();
 
-        MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, //
-                population, 40, 108000 / samples);
+        VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
+        TravelData travelData = TravelDataGet.readDefault(network, virtualNetwork);
+
+        MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, population, virtualNetwork, travelData);
 
         // System.setOut(originalStream);
         Tensor minFleet = minimumFleetSizeCalculator.calculateMinFleet();
@@ -94,26 +83,14 @@ public class MinimumFleetSizeCalculator {
         System.out.println("min Fleet size: " + minimumFleet);
     }
 
-    public MinimumFleetSizeCalculator(Network networkIn, Population populationIn, int numVirtualNodes, int dtIn) {
+    public MinimumFleetSizeCalculator(Network networkIn, Population populationIn, VirtualNetwork virtualNetworkIn, TravelData travelDataIn) {
+        network = networkIn;
         population = populationIn;
-
-        // create a network containing only car nodes
-        System.out.println("number of links in original network: " + networkIn.getLinks().size());
-        final TransportModeNetworkFilter filter = new TransportModeNetworkFilter(networkIn);
-        network = NetworkUtils.createNetwork();
-        filter.filter(network, Collections.singleton("car"));
-        System.out.println("number of links in car network: " + network.getLinks().size());
-
-        // create virtualNetwork based on input network
-        KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
-        virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, true);
-
-        int dayduration = 108000;
-        // ensure that dayduration / timeInterval is integer value
-        dt = TravelDataUtils.greatestNonRestDt(dtIn, dayduration);
-        numberTimeSteps = dayduration / dt;
-
-        tData = new TravelData(virtualNetwork, network, population, dt);
+        virtualNetwork = virtualNetworkIn;
+        tData = travelDataIn;
+        numberTimeSteps = tData.getNumbertimeSteps();
+        GlobalAssert.that(108000 % numberTimeSteps == 0);
+        dt = 108000 / numberTimeSteps;
     }
 
     public Tensor calculateMinFleet() {
@@ -175,21 +152,18 @@ public class MinimumFleetSizeCalculator {
 
                     if (pE2 instanceof Leg) {
                         Leg leg = (Leg) pE2;
+                        double submissionTime = leg.getDepartureTime();
+                        if (timeStart <= submissionTime && submissionTime < timeEnd) {
+                            Activity a1 = (Activity) pE1;
+                            Activity a3 = (Activity) pE3;
 
-                        if (leg.getMode().equals("av")) { // FIX: Only AV legs!!!
-                            double submissionTime = leg.getDepartureTime();
-                            if (timeStart <= submissionTime && submissionTime < timeEnd) {
-                                Activity a1 = (Activity) pE1;
-                                Activity a3 = (Activity) pE3;
+                            Id<Link> startLinkID = a1.getLinkId();
+                            Id<Link> endLinkID = a3.getLinkId();
 
-                                Id<Link> startLinkID = a1.getLinkId();
-                                Id<Link> endLinkID = a3.getLinkId();
+                            Link startLink = network.getLinks().get(startLinkID);
+                            Link endLink = network.getLinks().get(endLinkID);
 
-                                Link startLink = network.getLinks().get(startLinkID);
-                                Link endLink = network.getLinks().get(endLinkID);
-
-                                returnRequests.add(new RequestObj(submissionTime, startLink, endLink));
-                            }
+                            returnRequests.add(new RequestObj(submissionTime, startLink, endLink));
                         }
                     }
                 }

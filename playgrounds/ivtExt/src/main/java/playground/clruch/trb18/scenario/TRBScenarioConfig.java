@@ -1,13 +1,9 @@
 package playground.clruch.trb18.scenario;
 
-import contrib.baseline.preparation.ZHCutter;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.core.config.ReflectiveConfigGroup;
-
 public class TRBScenarioConfig {
     public double centerX = 2683518.0;
     public double centerY = 1246836.0;
-    public double radius = 15000.0;
+    public double radius = 1000.0;
     public boolean removeBackgroundTraffic = true;
     public boolean allowMultimodalPlans = true;
     public double avShare = 1.0;
@@ -32,7 +28,8 @@ public class TRBScenarioConfig {
     public int dtTravelData = 300;
     public String travelDataFileName = "travelData";
 
-    public long maximumNumberOfAgents = Long.MAX_VALUE;
+    public long maximumNumberOfAgents = 200;//Long.MAX_VALUE;
 
-    public String shapefileInputPath = "stadtkreis/Stadtkreis.shp";
+//    public String shapefileInputPath = "stadtkreis/Stadtkreis.shp";
+    public String shapefileInputPath = null;
 }

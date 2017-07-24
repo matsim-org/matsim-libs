@@ -1,6 +1,5 @@
 package playground.joel.html;
 
-import playground.clruch.net.StorageUtils;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.sca.Ceiling;
 import org.matsim.core.utils.misc.Time;
@@ -30,7 +29,7 @@ public class ReportGenerator {
 
     public static void from(String[] args) throws Exception {
         File config = new File(args[0]);
-        File file = new File(StorageUtils.OUTPUT, "report");
+        File file = new File(config.getParent(), "output/report");
         file.mkdir();
 
         ScenarioParameters scenarioParameters = DataCollector.loadScenarioData(args);
@@ -182,6 +181,10 @@ public class ReportGenerator {
             htmlUtils.insertImg(IMAGE_FOLDER + "/minFleet.png", 800, 600);
             htmlUtils.insertImg(IMAGE_FOLDER + "/EMD.png", 800, 600);
         }
+        
+        
+        htmlUtils.insertImg(IMAGE_FOLDER + "/availbilitiesByNumberVehicles.png",800,600);
+        
 
         // ----------------------------------------------
         htmlUtils.footer();
