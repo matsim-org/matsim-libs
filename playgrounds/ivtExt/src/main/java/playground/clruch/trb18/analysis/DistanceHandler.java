@@ -13,7 +13,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class DistanceHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, VehicleLeavesTrafficEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+public class DistanceHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
     final private Network network;
     final private DataFrame dataFrame;
     final private BinCalculator binCalculator;
@@ -49,17 +49,17 @@ public class DistanceHandler implements LinkEnterEventHandler, LinkLeaveEventHan
         }
     }
 
-    @Override
+    /*@Override
     public void handleEvent(VehicleEntersTrafficEvent event) {
         if (event.getVehicleId().toString().startsWith("av_")) {
             enterEvents.put(event.getVehicleId(), new LinkEnterEvent(event.getTime(), event.getVehicleId(), event.getLinkId()));
         }
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void handleEvent(VehicleLeavesTrafficEvent event) {
         enterEvents.remove(event.getVehicleId());
-    }
+    }*/
 
     @Override
     public void reset(int iteration) {}

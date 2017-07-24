@@ -3,6 +3,7 @@ package playground.clruch;
 import java.io.File;
 import java.net.MalformedURLException;
 
+import com.google.inject.name.Names;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -12,9 +13,11 @@ import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.clruch.data.ReferenceFrame;
@@ -29,6 +32,8 @@ import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
 import playground.clruch.trb18.TRBModule;
 import playground.clruch.trb18.scenario.TRBScenarioConfig;
+import playground.clruch.trb18.traveltime.reloading.TravelTimeReader;
+import playground.clruch.trb18.traveltime.reloading.WriteTravelTimesModule;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.joel.analysis.AnalyzeAll;
@@ -122,13 +127,25 @@ public class ScenarioServer {
         
         //TheApocalypse.decimatesThe(population).toNoMoreThan(maxPopulationSize).people();
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
+
+        File inputFile = new File("travelTimes.txt.gz");
+
+        if (inputFile.exists()) {
+            TravelTimeReader travelTimeReader = new TravelTimeReader(300.0, 3600.0 * 30.0);
+            controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(travelTimeReader.readTravelTimes(inputFile), 0.05));
+        } else {
+            controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
+        }
+
         controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule()); // added only to listen to iteration counter
         //controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
         controler.addOverridingModule(new AVTravelTimeModule());
         controler.addOverridingModule(new TRBModule(reducedNetwork));
+        controler.addOverridingModule(new WriteTravelTimesModule());
+
+
         
 //        controler.addOverridingModule(new AbstractModule() {
 //            @Override
