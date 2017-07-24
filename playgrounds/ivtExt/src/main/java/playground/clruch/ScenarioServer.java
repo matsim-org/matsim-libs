@@ -102,7 +102,7 @@ public class ScenarioServer {
         TravelData travelData = TravelDataGet.readDefault(network, virtualNetwork);
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
-        int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.1);
+        int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
         int vehicleSteps = Math.max(10, maxNumberVehiclesPerformanceCalculator / 400);
 
         if (virtualNetwork != null) {
