@@ -49,8 +49,6 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
             printVals = bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), this.getAVRequests());
             bpmu.executePickup(this);
         }
-
-        super.endofStepTasks();
     }
 
     @Override

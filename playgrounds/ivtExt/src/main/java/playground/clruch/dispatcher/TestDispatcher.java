@@ -99,11 +99,6 @@ public class TestDispatcher extends RebalancingDispatcher {
                 e.printStackTrace();
             }
         }
-        
-        
-        
-        // mandatory call
-        super.endofStepTasks();
     }
 
     @Override

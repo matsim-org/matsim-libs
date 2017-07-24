@@ -34,193 +34,215 @@ import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 abstract class BaseMpcDispatcher extends PartitionedDispatcher {
-    protected final int samplingPeriod;
-    final InstantPathFactory instantPathFactory;
+	protected final int samplingPeriod;
+	final InstantPathFactory instantPathFactory;
 
-    BaseMpcDispatcher( //
-            AVDispatcherConfig config, //
-            TravelTime travelTime, //
-            ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
-            EventsManager eventsManager, //
-            VirtualNetwork virtualNetwork) {
-        super(config, travelTime, parallelLeastCostPathCalculator, eventsManager, virtualNetwork);
-        this.instantPathFactory = new InstantPathFactory(parallelLeastCostPathCalculator, travelTime);
+	BaseMpcDispatcher( //
+			AVDispatcherConfig config, //
+			TravelTime travelTime, //
+			ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
+			EventsManager eventsManager, //
+			VirtualNetwork virtualNetwork) {
+		super(config, travelTime, parallelLeastCostPathCalculator, eventsManager, virtualNetwork);
+		this.instantPathFactory = new InstantPathFactory(parallelLeastCostPathCalculator, travelTime);
 
-        samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod")); // period between calls to MPC
-    }
+		samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod")); // period
+																						// between
+																						// calls
+																						// to
+																						// MPC
+	}
 
-    private static final int NOLINKFOUND = -1;
+	private static final int NOLINKFOUND = -1;
 
-    protected Tensor countVehiclesPerVLink(Map<AVVehicle, Link> map) {
-        final int m = virtualNetwork.getvLinksCount();
-        final Tensor vector = Array.zeros(m + virtualNetwork.getvNodesCount()); // self loops
-        for (Entry<AVVehicle, Link> entry : map.entrySet()) { // for each vehicle
-            final AVVehicle avVehicle = entry.getKey();
-            final Link current = entry.getValue();
-            Task task = avVehicle.getSchedule().getCurrentTask();
-            int vli = -1;
-            if (task instanceof AVPickupTask) {
-                List<? extends Task> list = avVehicle.getSchedule().getTasks();
-                int taskIndex = list.indexOf(task); //
-                task = list.get(taskIndex + 1); // immediately try next condition with task as AVDriveTask
-            } // <- do not put "else" here
-            if (task instanceof AVDriveTask) {
-                vli = getVirtualLinkOfVehicle((AVDriveTask) task, current);
-                if (NOLINKFOUND == vli) {
-                    // if no transition between virtual nodes is detected, ...
-                    // then the vehicle is considered to remain within current virtual node
-                    VirtualNode vnode = virtualNetwork.getVirtualNode(current);
-                    vector.set(Increment.ONE, m + vnode.index); // self loop
-                } else {
-                    vector.set(Increment.ONE, vli);
-                }
-            }
-            if (task instanceof AVDropoffTask) {
-                // consider the vehicle on the self loop of current virtual node
-                VirtualNode vnode = virtualNetwork.getVirtualNode(current);
-                vector.set(Increment.ONE, m + vnode.index); // self loop
-            }
-        }
-        return vector;
-    }
+	protected Tensor countVehiclesPerVLink(Map<AVVehicle, Link> map) {
+		final int m = virtualNetwork.getvLinksCount();
+		final Tensor vector = Array.zeros(m + virtualNetwork.getvNodesCount()); // self
+																				// loops
+		for (Entry<AVVehicle, Link> entry : map.entrySet()) { // for each
+																// vehicle
+			final AVVehicle avVehicle = entry.getKey();
+			final Link current = entry.getValue();
+			Task task = avVehicle.getSchedule().getCurrentTask();
+			int vli = -1;
+			if (task instanceof AVPickupTask) {
+				List<? extends Task> list = avVehicle.getSchedule().getTasks();
+				int taskIndex = list.indexOf(task); //
+				task = list.get(taskIndex + 1); // immediately try next
+												// condition with task as
+												// AVDriveTask
+			} // <- do not put "else" here
+			if (task instanceof AVDriveTask) {
+				vli = getVirtualLinkOfVehicle((AVDriveTask) task, current);
+				if (NOLINKFOUND == vli) {
+					// if no transition between virtual nodes is detected, ...
+					// then the vehicle is considered to remain within current
+					// virtual node
+					VirtualNode vnode = virtualNetwork.getVirtualNode(current);
+					vector.set(Increment.ONE, m + vnode.index); // self loop
+				} else {
+					vector.set(Increment.ONE, vli);
+				}
+			}
+			if (task instanceof AVDropoffTask) {
+				// consider the vehicle on the self loop of current virtual node
+				VirtualNode vnode = virtualNetwork.getVirtualNode(current);
+				vector.set(Increment.ONE, m + vnode.index); // self loop
+			}
+		}
+		return vector;
+	}
 
-    /**
-     * @param driveTask
-     * @param current
-     * @return virtual link index on which vehicle of drive task is traversing on, or
-     *         NOLINKFOUND if such link cannot be identified
-     */
-    private int getVirtualLinkOfVehicle(AVDriveTask driveTask, Link current) {
-        return getNextVirtualLinkOnPath(driveTask.getPath(), current);
-    }
+	/**
+	 * @param driveTask
+	 * @param current
+	 * @return virtual link index on which vehicle of drive task is traversing
+	 *         on, or NOLINKFOUND if such link cannot be identified
+	 */
+	private int getVirtualLinkOfVehicle(AVDriveTask driveTask, Link current) {
+		return getNextVirtualLinkOnPath(driveTask.getPath(), current);
+	}
 
-    int getNextVirtualLinkOnPath(VrpPath vrpPath, Link current) {
-        VirtualNode fromIn = null;
-        VirtualNode toIn = null;
-        boolean fused = false;
-        for (Link link : vrpPath) {
-            fused |= link == current;
-            if (fused) {
-                if (fromIn == null)
-                    fromIn = virtualNetwork.getVirtualNode(link);
-                else {
-                    VirtualNode candidate = virtualNetwork.getVirtualNode(link);
-                    if (fromIn != candidate) {
-                        toIn = candidate;
-                        VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
-                        return virtualLink.index;
-                    }
-                }
-            }
-        }
-        // we can reach this point if vehicle is in last virtual node of path
-        // System.out.println("failed to find virtual link of transition.");
-        return NOLINKFOUND;
-    }
+	int getNextVirtualLinkOnPath(VrpPath vrpPath, Link current) {
+		VirtualNode fromIn = null;
+		VirtualNode toIn = null;
+		boolean fused = false;
+		for (Link link : vrpPath) {
+			fused |= link == current;
+			if (fused) {
+				if (fromIn == null)
+					fromIn = virtualNetwork.getVirtualNode(link);
+				else {
+					VirtualNode candidate = virtualNetwork.getVirtualNode(link);
+					if (fromIn != candidate) {
+						toIn = candidate;
+						VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
+						return virtualLink.index;
+					}
+				}
+			}
+		}
+		// we can reach this point if vehicle is in last virtual node of path
+		// System.out.println("failed to find virtual link of transition.");
+		return NOLINKFOUND;
+	}
 
-    // requests that haven't received a pickup order yet
-    final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
-    // requests that have received a pickup order but are not yet "pickedup"
-    private final Map<AVRequest, AVVehicle> matchings = new HashMap<>();
+	// requests that haven't received a pickup order yet
+	final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
 
-    protected Map<AVRequest, AVVehicle> getMatchings() {
-        return matchings;
-    }
+	// requests that have received a pickup order but are not yet "pickedup"
+	// private final Map<AVRequest, AVVehicle> matchings = new HashMap<>();
+	//
+	protected Map<AVRequest, AVVehicle> getMatchings() {
+		return pickupRegister;
+	}
 
-    @Override
-    protected final void protected_setAcceptRequest_postProcessing(AVVehicle avVehicle, AVRequest avRequest) {
-        boolean succPR = pendingRequests.remove(avRequest);
-        GlobalAssert.that(succPR);
-        {
-            AVVehicle former = matchings.remove(avRequest);
-            GlobalAssert.that(former != null);
-        }
-        {
-            MpcRequest former = mpcRequestsMap.remove(avRequest);
-            GlobalAssert.that(former != null);
-        }
-    }
+	// @Override
+	// protected final void protected_setAcceptRequest_postProcessing(AVVehicle
+	// avVehicle, AVRequest avRequest) {
+	// boolean succPR = pendingRequests.remove(avRequest);
+	// GlobalAssert.that(succPR);
+	// {
+	// AVVehicle former = matchings.remove(avRequest);
+	// GlobalAssert.that(former != null);
+	// }
+	// {
+	// MpcRequest former = mpcRequestsMap.remove(avRequest);
+	// GlobalAssert.that(former != null);
+	// }
+	// }
 
-    Map<VirtualNode, List<VehicleLinkPair>> getDivertableNotRebalancingNotPickupVehicles() {
-        Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
-        Set<AVVehicle> pickupBusy = getMatchings().values().stream().collect(Collectors.toSet());
-        Map<VirtualNode, List<VehicleLinkPair>> map = new HashMap<>();
-        for (Entry<VirtualNode, List<VehicleLinkPair>> entry : availableVehicles.entrySet()) {
-            List<VehicleLinkPair> list = entry.getValue().stream() //
-                    .filter(vlp -> !pickupBusy.contains(vlp.avVehicle)) //
-                    .collect(Collectors.toList());
-            map.put(entry.getKey(), list);
-        }
-        return map;
-    }
+//	Map<VirtualNode, List<VehicleLinkPair>> getDivertableNotRebalancingNotPickupVehicles() {
+//		Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+//		Set<AVVehicle> pickupBusy = getMatchings().values().stream().collect(Collectors.toSet());
+//		Map<VirtualNode, List<VehicleLinkPair>> map = new HashMap<>();
+//		for (Entry<VirtualNode, List<VehicleLinkPair>> entry : availableVehicles.entrySet()) {
+//			List<VehicleLinkPair> list = entry.getValue().stream() //
+//					.filter(vlp -> !pickupBusy.contains(vlp.avVehicle)) //
+//					.collect(Collectors.toList());
+//			map.put(entry.getKey(), list);
+//		}
+//		return map;
+//	}
 
-    /**
-     * @return requests that have received a pickup order (and are therefore contained in considerItDone)
-     */
-    Map<Link, List<AVRequest>> override_getAVRequestsAtLinks() {
-        // intentionally not parallel to guarantee ordering of requests
-        return getAVRequests().stream() //
-                .filter(avRequest -> matchings.containsKey(avRequest)) //
-                .collect(Collectors.groupingBy(AVRequest::getFromLink));
-    }
+	Map<VirtualNode, List<VehicleLinkPair>> getDivertableNotRebalancingNotPickupVehicles() {
+		return getVirtualNodeDivertableUnassignedNotRebalancingVehicleLinkPairs();
+	}
 
-    Collection<AVRequest> getAVRequestsUnserved() {
-        Collection<AVRequest> collection = new LinkedList<>();
-        for (AVRequest avRequest : getAVRequests()) // all current requests
-            // only count request that haven't received a pickup order yet
-            if (!matchings.containsKey(avRequest))
-                collection.add(avRequest);
-        return collection;
+	/**
+	 * @return requests that have received a pickup order (and are therefore
+	 *         contained in considerItDone)
+	 */
+	Map<Link, List<AVRequest>> override_getAVRequestsAtLinks() {
+		// intentionally not parallel to guarantee ordering of requests
+		return getAVRequests().stream() //
+				.filter(avRequest -> getMatchings().containsKey(avRequest)) //
+				.collect(Collectors.groupingBy(AVRequest::getFromLink));
+	}
 
-    }
+	Collection<AVRequest> getAVRequestsUnserved() {
+		Collection<AVRequest> collection = new LinkedList<>();
+		for (AVRequest avRequest : getAVRequests()) // all current requests
+			// only count request that haven't received a pickup order yet
+			if (!getMatchings().containsKey(avRequest))
+				collection.add(avRequest);
+		return collection;
 
-    Set<AVVehicle> getAVVehicleInMatching() {
-        return getMatchings().values().stream().collect(Collectors.toSet());
-    }
+	}
 
-    /**
-     * function computes mpcRequest objects for unserved requests
-     * 
-     * @param now
-     */
-    void manageIncomingRequests(double now) {
-        final int m = virtualNetwork.getvLinksCount();
+	Set<AVVehicle> getAVVehicleInMatching() {
+		return getMatchings().values().stream().collect(Collectors.toSet());
+	}
 
-        for (AVRequest avRequest : getAVRequestsUnserved()) // all current requests
-            // only count request that haven't received a pickup order yet
-            // or haven't been processed yet, i.e. if request has been seen/computed before
-            if (!mpcRequestsMap.containsKey(avRequest)) {
-                // check if origin and dest are from same virtualNode
-                final VirtualNode vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
-                final VirtualNode vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
-                GlobalAssert.that(vnFrom.equals(vnTo) == (vnFrom.index == vnTo.index));
-                if (vnFrom.equals(vnTo)) {
-                    // self loop
-                    mpcRequestsMap.put(avRequest, new MpcRequest(avRequest, m, vnFrom));
-                } else {
-                    // non-self loop
-                    boolean success = false;
-                    VrpPath vrpPath = instantPathFactory.getVrpPathWithTravelData( //
-                            avRequest.getFromLink(), avRequest.getToLink(), now); // TODO perhaps add expected waitTime
-                    VirtualNode fromIn = null;
-                    for (Link link : vrpPath) {
-                        final VirtualNode toIn = virtualNetwork.getVirtualNode(link);
-                        if (fromIn == null)
-                            fromIn = toIn;
-                        else //
-                        if (fromIn != toIn) { // found adjacent node
-                            VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
-                            mpcRequestsMap.put(avRequest, new MpcRequest(avRequest, virtualLink));
-                            success = true;
-                            break;
-                        }
-                    }
-                    if (!success) {
-                        new RuntimeException("VirtualLink of request could not be identified") //
-                                .printStackTrace();
-                    }
-                }
-            }
-    }
+	/**
+	 * function computes mpcRequest objects for unserved requests
+	 * 
+	 * @param now
+	 */
+	void manageIncomingRequests(double now) {
+		final int m = virtualNetwork.getvLinksCount();
+
+		for (AVRequest avRequest : getAVRequestsUnserved()) // all current
+															// requests
+			// only count request that haven't received a pickup order yet
+			// or haven't been processed yet, i.e. if request has been
+			// seen/computed before
+			if (!mpcRequestsMap.containsKey(avRequest)) {
+				// check if origin and dest are from same virtualNode
+				final VirtualNode vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
+				final VirtualNode vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
+				GlobalAssert.that(vnFrom.equals(vnTo) == (vnFrom.index == vnTo.index));
+				if (vnFrom.equals(vnTo)) {
+					// self loop
+					mpcRequestsMap.put(avRequest, new MpcRequest(avRequest, m, vnFrom));
+				} else {
+					// non-self loop
+					boolean success = false;
+					VrpPath vrpPath = instantPathFactory.getVrpPathWithTravelData( //
+							avRequest.getFromLink(), avRequest.getToLink(), now); // TODO
+																					// perhaps
+																					// add
+																					// expected
+																					// waitTime
+					VirtualNode fromIn = null;
+					for (Link link : vrpPath) {
+						final VirtualNode toIn = virtualNetwork.getVirtualNode(link);
+						if (fromIn == null)
+							fromIn = toIn;
+						else //
+						if (fromIn != toIn) { // found adjacent node
+							VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
+							mpcRequestsMap.put(avRequest, new MpcRequest(avRequest, virtualLink));
+							success = true;
+							break;
+						}
+					}
+					if (!success) {
+						new RuntimeException("VirtualLink of request could not be identified") //
+								.printStackTrace();
+					}
+				}
+			}
+	}
 
 }

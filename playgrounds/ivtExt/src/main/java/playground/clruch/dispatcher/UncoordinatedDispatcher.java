@@ -112,7 +112,6 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
                 }
             }
         }
-        super.endofStepTasks();
     }
 
     /**

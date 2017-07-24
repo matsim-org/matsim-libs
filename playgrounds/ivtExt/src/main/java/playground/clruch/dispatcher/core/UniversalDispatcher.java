@@ -328,16 +328,20 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         return link;
     }
 
-    protected void endofStepTasks() {
+    final void endofStepTasks() {
         // stop all vehicles which are not on a pickup or rebalancing mission.
         Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicleLinkPairs();
         for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
             boolean isOnPickup = pickupRegister.values().contains(vehicleLinkPair.avVehicle);
-            if (!isOnPickup) {
+            boolean isOnExtra = extraCheck(vehicleLinkPair);
+            if (!isOnPickup && !isOnExtra) {
                 setVehicleDiversion(vehicleLinkPair.avVehicle, vehicleLinkPair.getDivertableLocation());
             }
         }
-
+    }
+    
+    boolean extraCheck(VehicleLinkPair vehicleLinkPair) {
+    	return true;
     }
 
     @Override

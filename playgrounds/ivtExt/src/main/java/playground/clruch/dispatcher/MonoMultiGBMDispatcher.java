@@ -60,9 +60,6 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
             bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), rebalanceRequests);
             bpmu.executeRebalance(this);
         }
-
-        super.endofStepTasks();
-
     }
 
     /**

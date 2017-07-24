@@ -240,12 +240,16 @@ abstract class VehicleMaintainer implements AVDispatcher {
         notifySimulationSubscribers(Math.round(now));
 
         redispatch(now);
+        endofStepTasks();
+        
         private_now = null; // <- time unavailable
         private_vehicleDirectives.values().stream() //
                 .parallel() //
                 .forEach(AbstractDirective::execute);
         private_vehicleDirectives.clear();
     }
+    
+    /* package */ abstract void endofStepTasks();
 
     /**
      * derived classes should override this function to add details

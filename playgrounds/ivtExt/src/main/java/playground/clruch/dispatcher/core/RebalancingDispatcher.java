@@ -4,7 +4,9 @@ package playground.clruch.dispatcher.core;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -46,7 +48,11 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
         return Collections.unmodifiableMap(rebalancingVehicles);
     }
     
-    
+	protected List<VehicleLinkPair> getDivertableUnassignedNotRebalancingVehicleLinkPairs() {
+		return getDivertableUnassignedVehicleLinkPairs().stream() //
+				.filter(v -> !rebalancingVehicles.containsKey(v.avVehicle)) //
+				.collect(Collectors.toList());
+	}
     
     @Override
     public final void setVehiclePickup(AVVehicle avVehicle, AVRequest avRequest) {
@@ -72,19 +78,8 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
     
     
     @Override
-    protected void endofStepTasks() {
-        // stop all vehicles which are not on a pickup or rebalancing mission.
-        Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicleLinkPairs();
-        for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
-            boolean isOnPickup = super.pickupRegister.values().contains(vehicleLinkPair.avVehicle);
-            boolean isOnRebalance = rebalancingVehicles.containsKey(vehicleLinkPair.avVehicle);
-
-            if (!isOnPickup && !isOnRebalance) {
-                setVehicleDiversion(vehicleLinkPair.avVehicle, vehicleLinkPair.getDivertableLocation());
-            }
-        }
-
+    boolean extraCheck(VehicleLinkPair vehicleLinkPair) {
+		return rebalancingVehicles.containsKey(vehicleLinkPair.avVehicle);
     }
-
 
 }

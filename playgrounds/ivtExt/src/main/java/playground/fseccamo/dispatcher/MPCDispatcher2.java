@@ -132,7 +132,7 @@ public class MPCDispatcher2 extends BaseMpcDispatcher {
             final int pendingSize = getAVRequests().size();
             final int matchingSize = getMatchings().size();
 
-            new PredefinedMatchingMatcher(this::setAcceptRequest).matchPredefined(getMatchings(), stayVehiclesAtLinks);
+//            new PredefinedMatchingMatcher(this::setAcceptRequest).matchPredefined(getMatchings(), stayVehiclesAtLinks);
 
             final int delta = pendingSize - getAVRequests().size();
 
@@ -367,26 +367,41 @@ public class MPCDispatcher2 extends BaseMpcDispatcher {
                                 }
 
                                 // 2) build List<link> with requests locations
-                                List<Link> requestLinksNode = new  ArrayList<>();
-                                for (int count = 0; count < min; ++count) {
-                                    MpcRequest mpcRequest = requests.get(count);
-                                    requestLinksNode.add(mpcRequest.avRequest.getFromLink());
+                                
+//                                List<Link> requestLinksNode = new  ArrayList<>();
+//                                for (int count = 0; count < min; ++count) {
+//                                    MpcRequest mpcRequest = requests.get(count);
+//                                    requestLinksNode.add(mpcRequest.avRequest.getFromLink());
+//                                }
+                                
+                                List<AVRequest> requestsAtNode = new ArrayList<>();
+                                for(MpcRequest mpcReq : requests){
+                                	requestsAtNode.add(mpcReq.avRequest);
                                 }
+                                
+                                
 
                                 // 3) feed to matcher
-                                Map<VehicleLinkPair, Link> matching = vehicleDestMatcher.match(unassignedVehiclesNode, requestLinksNode);
+                                //Map<VehicleLinkPair, Link> matching = vehicleDestMatcher.match(unassignedVehiclesNode, requestLinksNode);
 
+                                Map<VehicleLinkPair, AVRequest> matching = vehicleDestMatcher.matchAVRequest(unassignedVehiclesNode, requestsAtNode);
+                                
+                                
                                 // 4) execute the computed matching
-                                for (Entry<VehicleLinkPair, Link> entry : matching.entrySet()) {
+                                for (Entry<VehicleLinkPair, AVRequest> entry : matching.entrySet()) {
                                     AVVehicle avVehicle = entry.getKey().avVehicle;
                                     GlobalAssert.that(!getAVVehicleInMatching().contains(avVehicle));
-                                    Link pickupLocation = entry.getValue();
-                                    setStayVehicleDiversion(avVehicle, pickupLocation); // send car to customer
+                 //                   Link pickupLocation = entry.getValue();
+                                    
+                                    setVehiclePickup(avVehicle, entry.getValue());
+                                    
+                                    //setVehiclePickup(avVehicle, entry);(avVehicle, pickupLocation); // send car to customer
                                     // find some mpc request with this link and remove it
                                     Optional<MpcRequest> optMpcRequst = requests.stream()
-                                            .filter(v -> v.avRequest.getFromLink().equals(entry.getValue())).findAny();
+                                            .filter(v -> v.avRequest.equals(entry.getValue())).findAny();
                                     GlobalAssert.that(optMpcRequst.isPresent());
-                                    getMatchings().put(optMpcRequst.get().avRequest, avVehicle);
+                                    //getMatchings().put(optMpcRequst.get().avRequest, avVehicle);
+                                    
                                     requests.remove(optMpcRequst.get());
                                     ++totalPickupEffective;
                                 }
@@ -478,7 +493,7 @@ public class MPCDispatcher2 extends BaseMpcDispatcher {
                                                         // vnTo.getLinks() //
                                                         candidateLinks //
                                                 ).get(random.nextInt(candidateLinks.size()));
-                                        setVehicleRebalance(vehicleLinkPair, rebalanceDest); // send car to adjacent virtual node
+                                        setVehicleRebalance(vehicleLinkPair.avVehicle, rebalanceDest); // send car to adjacent virtual node
                                         ++totalRebalanceEffective;
                                         if (vnFrom.equals(vnTo))
                                             ++selfRebalanceEffective;
