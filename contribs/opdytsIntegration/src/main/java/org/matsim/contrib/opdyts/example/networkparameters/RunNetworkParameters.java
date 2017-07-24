@@ -3,22 +3,20 @@ package org.matsim.contrib.opdyts.example.networkparameters;
 import java.io.FileNotFoundException;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
+import floetteroed.opdyts.DecisionVariableRandomizer;
+import floetteroed.opdyts.ObjectiveFunction;
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.opdyts.MATSimSimulator2;
 import org.matsim.contrib.opdyts.car.DifferentiatedLinkOccupancyAnalyzer;
-import org.matsim.contrib.opdyts.utils.MATSimConfiguredFactories;
+import org.matsim.contrib.opdyts.utils.MATSimOpdytsControler;
 import org.matsim.contrib.opdyts.utils.OpdytsConfigGroup;
 import org.matsim.contrib.opdyts.utils.TimeDiscretization;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import floetteroed.opdyts.DecisionVariableRandomizer;
-import floetteroed.opdyts.ObjectiveFunction;
-import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
-import floetteroed.opdyts.searchalgorithms.RandomSearch;
 
 /**
  * Simple optimization example. Selects flow capacity, number of lanes and max.
@@ -63,7 +61,7 @@ public class RunNetworkParameters {
 
 		// <<<<<<<<<< SHOULD COME FROM FILE <<<<<<<<<<
 
-		MATSimConfiguredFactories<NetworkParameters> factories = new MATSimConfiguredFactories<>(config);
+		MATSimOpdytsControler<NetworkParameters> factories = new MATSimOpdytsControler<>(scenario);
 
 		/*
 		 * Define convergence criterion.
@@ -86,7 +84,11 @@ public class RunNetworkParameters {
 		 * decision variable and its random variation.
 		 */
 
-		final ConvergenceCriterion convergenceCriterion = factories.newFixedIterationNumberConvergenceCriterion();
+		//optional (if not set, will be used a default) :Amit July'17
+		final ConvergenceCriterion convergenceCriterion = new FixedIterationNumberConvergenceCriterion(
+				opdytsConfig.getNumberOfIterationsForConvergence(),
+				opdytsConfig.getNumberOfIterationsForAveraging());
+		factories.setFixedIterationNumberConvergenceCriterion(convergenceCriterion);
 
 		/*
 		 * Creation of MATSim state objects. A basic MATSim state class
@@ -125,7 +127,11 @@ public class RunNetworkParameters {
 		 * resources.
 		 */
 
-		final TimeDiscretization timeDiscretization = factories.newTimeDiscretization();
+		//optional (if not set, will be used a default) :Amit July'17
+		final TimeDiscretization timeDiscretization = new TimeDiscretization(opdytsConfig.getStartTime(),
+				opdytsConfig.getBinSize(),
+				opdytsConfig.getBinCount());
+		factories.setTimeDiscretization(timeDiscretization);
 
 		/*
 		 * Packages MATSim for use with Opdyts.
@@ -152,8 +158,9 @@ public class RunNetworkParameters {
 		 * Create the search algorithm.
 		 */
 
-		final RandomSearch<NetworkParameters> randomSearch = factories.newRandomSearch(matsim, randomizer,
-				initialDecisionVariable, convergenceCriterion, objectiveFunction);
+		// changed it a bit.
+//		final RandomSearch<NetworkParameters> randomSearch = factories.newRandomSearch(matsim, randomizer,
+//				initialDecisionVariable, convergenceCriterion, objectiveFunction);
 
 		/*
 		 * Finally, run it.
@@ -170,7 +177,8 @@ public class RunNetworkParameters {
 		 * 
 		 */
 
-		randomSearch.run();
+//		randomSearch.run();
+		factories.run(matsim, randomizer, initialDecisionVariable, objectiveFunction);
 
 		System.out.println("... DONE.");
 	}
