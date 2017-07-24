@@ -293,6 +293,9 @@ public class PerformanceFleetSizeCalculator {
      */
     public static Tensor getRelativeThroughputOfi(Tensor transitionProb) throws InterruptedException {
         int size = Dimensions.of(transitionProb).get(0);
+        
+        
+        
         Tensor IminusPki = IdentityMatrix.of(size).subtract(Transpose.of(transitionProb));
         Tensor relativeThroughput = Chop.of(NullSpace.usingSvd(IminusPki)); // chopped to avoid numerical errors
 
@@ -304,7 +307,7 @@ public class PerformanceFleetSizeCalculator {
             int selectedSolution = -1;
             boolean isNegativeScaled = false;
 
-            System.out.println("multiple throughput solutions: selecting first with equal sign");
+            System.out.println("multiple throughput solutions: selecting first with equal signs");
 
             for (int i = 0; i < Dimensions.of(relativeThroughput).get(0); ++i) {
                 int positiveSigns = 0;
@@ -327,7 +330,15 @@ public class PerformanceFleetSizeCalculator {
                     break;
                 }
             }
-            GlobalAssert.that(selectedSolution != -1); // ensure solution found
+            if(selectedSolution == -1){
+                System.out.println("no solution found");
+                System.out.println(transitionProb);
+                
+                GlobalAssert.that(false);                
+            }
+            
+            
+
 
             Tensor selectedRelativeThroughput = relativeThroughput.get(selectedSolution);
 
