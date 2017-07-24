@@ -256,7 +256,7 @@ public class PerformanceFleetSizeCalculator {
 
         try {
             AnalyzeAll.saveFile(a, "availabilitiesFull");
-            AnalyzeAll.saveFile(meanByVehicles, "availabilities");
+            AnalyzeAll.saveFile(meanByVehicles, "availabilitiesOffPeak");
             AnalyzeAll.saveFile(meanByVehiclesPeak, "availabilitiesPeak");
             plot(meanByVehicles, meanByVehiclesPeak, vehicleSteps);
         } catch (Exception e) {
