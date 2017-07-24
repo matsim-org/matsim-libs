@@ -176,11 +176,12 @@ public class TravelData implements Serializable {
 
             // ensure positivity of solution (small negative values possible due to solver
             // accuracy)
+
             rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-12));
             // make negative values positive to ensure no problems in subsequent steps
-            // rebalancingRate.flatten(-1).filter(v->v.Get().number().doubleValue()<0.0).forEach(v->v=v.multiply(RealScalar.of(-1.0)));
             rebalancingRate.flatten(-1).filter(v -> v.Get().number().doubleValue() < 0.0).forEach(v -> v = RealScalar.ZERO);
 
+            
             alphaijPSF.set(rebalancingRate, t);
 
         }
