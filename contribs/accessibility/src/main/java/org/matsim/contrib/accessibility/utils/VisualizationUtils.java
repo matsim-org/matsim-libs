@@ -33,18 +33,24 @@ public class VisualizationUtils {
 	public static final Logger log = Logger.getLogger(VisualizationUtils.class);
 	private VisualizationUtils(){} // do not instantiate
 
-    public static void createQGisOutput(String actType, String mode, Envelope envelope,
-                                        String workingDirectory, String crs, boolean includeDensityLayer, Double lowerBound,
-                                        Double upperBound, Integer range, int symbolSize, int populationThreshold) {
-	    createQGisOutput(actType, mode, envelope, workingDirectory, crs, includeDensityLayer, lowerBound, upperBound,
-                range, ColorRangeUtils.ColorRange.DEFAULT_RED_TO_BLUE, symbolSize, populationThreshold);
+	
+	
+	public static void createQGisOutputGraduated(String actType, String mode, Envelope envelope,
+			String workingDirectory, String crs, boolean includeDensityLayer,
+			Double lowerBound, Double upperBound, Integer range,
+			int symbolSize, int populationThreshold) {
+	    createQGisOutputGraduated(actType, mode, envelope,
+	    		workingDirectory, crs, includeDensityLayer, lowerBound, upperBound,
+                range, ColorRangeUtils.ColorRange.DEFAULT_RED_TO_BLUE, 
+                symbolSize, populationThreshold);
     }
 	
-	public static void createQGisOutput(String actType, String mode, Envelope envelope,
-                                        String workingDirectory, String crs, boolean includeDensityLayer, Double lowerBound,
-                                        Double upperBound, Integer range, ColorRangeUtils.ColorRange colorRange, int symbolSize, int populationThreshold) {
-		
-		// create Mapnik file that is needed to have OSM layer in QGis project
+    public static void createQGisOutputGraduated(String actType, String mode, Envelope envelope,
+    		String workingDirectory, String crs, boolean includeDensityLayer,
+    		Double lowerBound, Double upperBound, Integer range,
+    		ColorRangeUtils.ColorRange colorRange, int symbolSize, int populationThreshold) {
+
+    	// Create Mapnik file that is needed for OSM layer
 		QGisMapnikFileCreator.writeMapnikFile(workingDirectory + "osm_mapnik.xml");
 
 		// Write QGis project file
@@ -52,20 +58,17 @@ public class VisualizationUtils {
 		String qGisProjectFile = "QGisProjectFile_" + mode + ".qgs";
 		writer.setEnvelope(envelope);
 
-		// osm raster layer
-		// working directory needs to be the storage location of the file
-		writer.changeWorkingDirectory(workingDirectory);
+		// Osm raster layer
+		writer.changeWorkingDirectory(workingDirectory); // has to be the storage location of the file
 
 		RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "/osm_mapnik.xml");
 		new AccessibilityXmlRenderer(mapnikLayer);
 		mapnikLayer.setSrs("WGS84_Pseudo_Mercator");
 		writer.addLayer(0,mapnikLayer);
 
-		// working directory needs to be the storage location of the file
-		String actSpecificWorkingDirectory =  workingDirectory + actType + "/";
+		String actSpecificWorkingDirectory =  workingDirectory + actType + "/";  // has to be the storage location of the file
 		writer.changeWorkingDirectory(actSpecificWorkingDirectory);
 
-		// density layer
 		if (includeDensityLayer) {
 			VectorLayer densityLayer = new VectorLayer(
 					"density", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
@@ -76,7 +79,6 @@ public class VisualizationUtils {
 			writer.addLayer(densityLayer);
 		}
 
-		// accessibility layer
 		VectorLayer accessibilityLayer = new VectorLayer(
 				"accessibility", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
 		// there are two ways to set x and y fields for csv geometry files
@@ -86,17 +88,67 @@ public class VisualizationUtils {
 		accessibilityLayer.setYField(Labels.Y_COORDINATE);
 //		AccessibilityRenderer renderer = new AccessibilityRenderer(accessibilityLayer, lowerBound, upperBound,
 //				range, symbolSize);
-        RuleBasedRenderer renderer = new RuleBasedRenderer(accessibilityLayer, lowerBound, upperBound, range,
-                symbolSize, colorRange,mode.toString() + "_accessibility",
-                Labels.POPULATION_DENSITIY, populationThreshold);
+		GraduatedSymbolRenderer renderer = new GraduatedSymbolRenderer(accessibilityLayer, lowerBound, upperBound,
+				range, symbolSize, colorRange);
 			renderer.setRenderingAttribute(mode.toString() + "_accessibility");
 		writer.addLayer(accessibilityLayer);
 
-		// write the project file
 		writer.write(qGisProjectFile);
-	}		
-
+	}
 	
+    
+    public static void createQGisOutputRuleBased(String actType, String mode, Envelope envelope,
+			String workingDirectory, String crs, boolean includeDensityLayer,
+			Double lowerBound, Double upperBound, Integer range,
+			int symbolSize, int populationThreshold) {
+	    createQGisOutputGraduated(actType, mode, envelope,
+	    		workingDirectory, crs, includeDensityLayer, lowerBound, upperBound,
+                range, ColorRangeUtils.ColorRange.DEFAULT_RED_TO_BLUE, 
+                symbolSize, populationThreshold);
+    }
+	
+    
+	public static void createQGisOutputRuleBased(String actType, String mode, Envelope envelope,
+			String workingDirectory, String crs, boolean includeDensityLayer,
+			Double lowerBound, Double upperBound, Integer range,
+			ColorRangeUtils.ColorRange colorRange, int symbolSize, int populationThreshold) {
+
+		// Create Mapnik file that is needed for OSM layer
+		QGisMapnikFileCreator.writeMapnikFile(workingDirectory + "osm_mapnik.xml");
+
+		// Write QGis project file
+		QGisWriter writer = new QGisWriter(crs, workingDirectory);
+		String qGisProjectFile = "QGisProjectFile_" + mode + ".qgs";
+		writer.setEnvelope(envelope);
+
+		// Osm raster layer
+		writer.changeWorkingDirectory(workingDirectory); // has to be the storage location of the file
+
+		RasterLayer mapnikLayer = new RasterLayer("osm_mapnik_xml", workingDirectory + "/osm_mapnik.xml");
+		new AccessibilityXmlRenderer(mapnikLayer);
+		mapnikLayer.setSrs("WGS84_Pseudo_Mercator");
+		writer.addLayer(0,mapnikLayer);
+
+		String actSpecificWorkingDirectory =  workingDirectory + actType + "/";  // has to be the storage location of the file
+		writer.changeWorkingDirectory(actSpecificWorkingDirectory);
+
+		VectorLayer accessibilityLayer = new VectorLayer(
+				"accessibility", actSpecificWorkingDirectory + "accessibilities.csv", QGisConstants.geometryType.Point, true);
+		// there are two ways to set x and y fields for csv geometry files
+		// 1) if there is a header, you can set the members xField and yField to the name of the column headers
+		// 2) if there is no header, you can write the column index into the member (e.g. field_1, field_2,...), but works also if there is a header
+		accessibilityLayer.setXField(Labels.X_COORDINATE);
+		accessibilityLayer.setYField(Labels.Y_COORDINATE);
+		RuleBasedRenderer renderer = new RuleBasedRenderer(accessibilityLayer, lowerBound, upperBound, range,
+				symbolSize, colorRange, mode.toString() + "_accessibility",
+				Labels.POPULATION_DENSITIY, populationThreshold);
+		renderer.setRenderingAttribute(mode.toString() + "_accessibility");
+		writer.addLayer(accessibilityLayer);
+
+		writer.write(qGisProjectFile);
+	}
+
+
 	/**
 	 * This method creates a snapshot of the accessibility map that is held in the created QGis file.
 	 * The syntax within the method is different dependent on the operating system.

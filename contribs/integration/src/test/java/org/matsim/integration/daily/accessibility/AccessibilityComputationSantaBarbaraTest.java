@@ -30,10 +30,11 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
+import org.matsim.contrib.accessibility.utils.AccessibilityNetworkUtils;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.core.config.Config;
@@ -87,7 +88,7 @@ public class AccessibilityComputationSantaBarbaraTest {
 		HttpURLConnection connection = (HttpURLConnection) osm.openConnection();
 		HttpURLConnection connection2 = (HttpURLConnection) osm.openConnection(); // TODO There might be more elegant option without creating this twice
 		
-	    Network network = CreateNetwork.createNetwork(connection.getInputStream(), scenarioCRS);
+	    Network network = AccessibilityNetworkUtils.createNetwork(connection.getInputStream(), scenarioCRS, false, false, false);
 	    
 	    double buildingTypeFromVicinityRange = 0.;
 		ActivityFacilities facilities = RunCombinedOsmReaderKibera.createFacilites(connection2.getInputStream(), scenarioCRS, buildingTypeFromVicinityRange);
@@ -150,7 +151,7 @@ public class AccessibilityComputationSantaBarbaraTest {
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
-					VisualizationUtils.createQGisOutput(actType, mode.toString(), envelope, workingDirectory, scenarioCRS, includeDensityLayer,
+					VisualizationUtils.createQGisOutputGraduated(actType, mode.toString(), envelope, workingDirectory, scenarioCRS, includeDensityLayer,
 							lowerBound, upperBound, range, cellSize.intValue(), populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
 				}

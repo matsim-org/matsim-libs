@@ -128,7 +128,7 @@ public class AccessibilityComputationCapeTownTest {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					// TODO maybe use envelope and crs from above
-					VisualizationUtils.createQGisOutput(actType, mode.toString(), new Envelope(-520000, -488000, -3733000, -3698000), workingDirectory, TransformationFactory.WGS84_SA_Albers, includeDensityLayer,
+					VisualizationUtils.createQGisOutputGraduated(actType, mode.toString(), new Envelope(-520000, -488000, -3733000, -3698000), workingDirectory, TransformationFactory.WGS84_SA_Albers, includeDensityLayer,
 							lowerBound, upperBound, range, cellSize.intValue(), populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
 				}

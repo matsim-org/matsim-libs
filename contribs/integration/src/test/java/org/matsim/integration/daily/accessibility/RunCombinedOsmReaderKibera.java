@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.osm.CombinedOsmReader;
+import org.matsim.contrib.accessibility.utils.AccessibilityFacilityUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.Facility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -68,18 +69,22 @@ public class RunCombinedOsmReaderKibera {
 		// the type of land use of the area which the build belongs to.
 		double buildingTypeFromVicinityRange = 0.;
 		
-		createFacilites(osmFile, facilityFile, attributeFile, outputCRS, buildingTypeFromVicinityRange);
+		createFacilitesAndWriteToFile(osmFile, facilityFile, attributeFile, outputCRS, buildingTypeFromVicinityRange);
 	}
 	
 		
-	public static void createFacilites(String osmFile, String facilityFile, String attributeFile,
+	public static void createFacilitesAndWriteToFile(String osmFile, String facilityFile, String attributeFile,
 			String outputCRS, double buildingTypeFromVicinityRange) {
-		LOG.info("Parsing land use from OpenStreetMap.");
+		LOG.info("Parsing facility information from OpenStreetMap input file.");
 
-		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(outputCRS,
-				buildOsmLandUseToMatsimTypeMap(), buildOsmBuildingToMatsimTypeMap(),
-				buildOsmAmenityToMatsimTypeMap(), buildOsmLeisureToMatsimTypeMap(),
-				buildOsmTourismToMatsimTypeMap(), buildUnmannedEntitiesList(),
+		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(
+				outputCRS,
+				AccessibilityFacilityUtils.buildOsmLandUseToMatsimTypeMap(),
+				AccessibilityFacilityUtils.buildOsmBuildingToMatsimTypeMap(),
+				buildOsmAmenityToMatsimTypeMap(), // local
+				AccessibilityFacilityUtils.buildOsmLeisureToMatsimTypeMap(),
+				AccessibilityFacilityUtils.buildOsmTourismToMatsimTypeMap(),
+				AccessibilityFacilityUtils.buildUnmannedEntitiesList(),
 				buildingTypeFromVicinityRange);
 		try {
 			combinedOsmReader.parseFile(osmFile);
@@ -93,165 +98,24 @@ public class RunCombinedOsmReaderKibera {
 	
 	
 	public static ActivityFacilities createFacilites(InputStream osmInputStream, String outputCRS, double buildingTypeFromVicinityRange) {
-		LOG.info("Parsing land use from OpenStreetMap.");
+		LOG.info("Parsing facility information from OpenStreetMap input stream.");
 
-		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(outputCRS,
-				buildOsmLandUseToMatsimTypeMap(), buildOsmBuildingToMatsimTypeMap(),
-				buildOsmAmenityToMatsimTypeMap(), buildOsmLeisureToMatsimTypeMap(),
-				buildOsmTourismToMatsimTypeMap(), buildUnmannedEntitiesList(),
+		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(
+				outputCRS,
+				AccessibilityFacilityUtils.buildOsmLandUseToMatsimTypeMap(),
+				AccessibilityFacilityUtils.buildOsmBuildingToMatsimTypeMap(),
+				buildOsmAmenityToMatsimTypeMap(), //local
+				AccessibilityFacilityUtils.buildOsmLeisureToMatsimTypeMap(),
+				AccessibilityFacilityUtils.buildOsmTourismToMatsimTypeMap(),
+				AccessibilityFacilityUtils.buildUnmannedEntitiesList(),
 				buildingTypeFromVicinityRange);
 			combinedOsmReader.parseFile(osmInputStream);
 			ActivityFacilities facilities = combinedOsmReader.getActivityFacilities();
 
 			return facilities;
 	}
-	
-	
-	private static Map<String, String> buildOsmLandUseToMatsimTypeMap(){
-		Map<String, String> map = new TreeMap<String, String>();
-		
-		// see http://wiki.openstreetmap.org/wiki/DE:Key:landuse
-		
-		// land use types where nobody lives and works or where only
-		// somebody lives occasionally or where only very few people
-		// per building area work are ignored
-		
-		map.put("allotments", FacilityTypes.IGNORE);
-		map.put("basin", FacilityTypes.IGNORE);
-		map.put("brownfield", FacilityTypes.IGNORE);
-		map.put("cemetery", FacilityTypes.IGNORE);
-		
-		map.put("commercial", FacilityTypes.WORK);
-		
-		map.put("conservation", FacilityTypes.IGNORE);
-		map.put("construction", FacilityTypes.IGNORE);
-		map.put("farmland", FacilityTypes.IGNORE);
-		map.put("farmyard", FacilityTypes.IGNORE);
-		map.put("forest", FacilityTypes.IGNORE);
-		map.put("garages", FacilityTypes.IGNORE);
-		map.put("grass", FacilityTypes.IGNORE);
-		map.put("greenfield", FacilityTypes.IGNORE);
-		map.put("greenhouse_horticulture", FacilityTypes.IGNORE);
-		
-		map.put("industrial", FacilityTypes.WORK);
-		
-		map.put("landfill", FacilityTypes.IGNORE);
-		map.put("meadow", FacilityTypes.IGNORE);
-		map.put("military", FacilityTypes.IGNORE);
-		map.put("orchard", FacilityTypes.IGNORE);
-		map.put("pasture", FacilityTypes.IGNORE);
-		map.put("peat_cutting", FacilityTypes.IGNORE);
-		map.put("plant_nursery", FacilityTypes.IGNORE);
-		
-		map.put("port", FacilityTypes.WORK);
-		
-		map.put("quarry", FacilityTypes.IGNORE);
-		map.put("railway", FacilityTypes.IGNORE);
-		map.put("recreation_ground", FacilityTypes.IGNORE);
-		map.put("reservoir", FacilityTypes.IGNORE);
-		
-		map.put("residential", FacilityTypes.HOME);
-		map.put("retail", FacilityTypes.WORK);
-		
-		map.put("salt_pond", FacilityTypes.IGNORE);
-		map.put("village_green", FacilityTypes.IGNORE);
-		map.put("vineyard", FacilityTypes.IGNORE);
 
-		return map;
-	}
 	
-	
-	private static Map<String, String> buildOsmBuildingToMatsimTypeMap(){
-		Map<String, String> map = new TreeMap<String, String>();
-		
-		// see http://wiki.openstreetmap.org/wiki/DE:Key:building
-		
-		// building types where nobody lives and works or where only
-		// somebody lives occasionally or where only very few people
-		// per building area work are ignored
-		
-		map.put("apartments", FacilityTypes.HOME);
-		map.put("farm", FacilityTypes.HOME);
-		
-		map.put("hotel", FacilityTypes.WORK);
-		
-		map.put("house", FacilityTypes.HOME);
-		map.put("detached", FacilityTypes.HOME);
-		map.put("residential", FacilityTypes.HOME);
-		map.put("dormitory", FacilityTypes.HOME);
-		map.put("terrace", FacilityTypes.HOME);
-		map.put("houseboat", FacilityTypes.HOME);
-		map.put("static_caravan", FacilityTypes.HOME);
-		
-		map.put("commercial", FacilityTypes.WORK);
-		map.put("office", FacilityTypes.WORK);
-		map.put("industrial", FacilityTypes.WORK);
-		
-		map.put("retail", FacilityTypes.SHOPPING);
-		
-		map.put("warehouse", FacilityTypes.IGNORE);		
-		map.put("chapel", FacilityTypes.IGNORE);
-		
-//		map.put("church", FacilityTypes.OTHER);
-//		map.put("mosque", FacilityTypes.OTHER);
-//		map.put("temple", FacilityTypes.OTHER);
-//		map.put("synagoge", FacilityTypes.OTHER);
-		map.put("church", FacilityTypes.IGNORE);
-		map.put("mosque", FacilityTypes.IGNORE);
-		map.put("temple", FacilityTypes.IGNORE);
-		map.put("synagoge", FacilityTypes.IGNORE);
-		
-		map.put("shrine", FacilityTypes.IGNORE);
-	
-		map.put("civic", FacilityTypes.WORK);
-		
-//		map.put("hospital", FacilityTypes.MEDICAL);
-//		map.put("school", FacilityTypes.EDUCATION);
-		map.put("hospital", FacilityTypes.IGNORE);
-		map.put("school", FacilityTypes.IGNORE);
-		
-//		map.put("stadium", FacilityTypes.LEISURE);
-		map.put("stadium", FacilityTypes.IGNORE);
-		
-		map.put("train_station", FacilityTypes.IGNORE);
-		map.put("transportation", FacilityTypes.IGNORE);
-		
-//		map.put("university", FacilityTypes.EDUCATION);
-		map.put("university", FacilityTypes.IGNORE);
-		
-		map.put("public", FacilityTypes.WORK);
-		map.put("greenhouse", FacilityTypes.WORK);
-		
-		map.put("barn", FacilityTypes.IGNORE);
-		map.put("bridge", FacilityTypes.IGNORE);
-		map.put("bunker", FacilityTypes.IGNORE);
-		map.put("cabin", FacilityTypes.IGNORE);
-		map.put("construction", FacilityTypes.IGNORE);
-		map.put("cowshed", FacilityTypes.IGNORE);
-		map.put("farm_auxiliary", FacilityTypes.IGNORE);
-		map.put("garage", FacilityTypes.IGNORE);
-		map.put("garages", FacilityTypes.IGNORE);
-		map.put("greenhouse", FacilityTypes.IGNORE);
-		
-		map.put("hangar", FacilityTypes.WORK);
-		
-		map.put("hut", FacilityTypes.IGNORE);
-		map.put("roof", FacilityTypes.IGNORE);
-		map.put("shed", FacilityTypes.IGNORE);
-		map.put("stable", FacilityTypes.IGNORE);
-		map.put("sty", FacilityTypes.IGNORE);
-		map.put("transformer_tower", FacilityTypes.IGNORE);
-		map.put("service", FacilityTypes.IGNORE);
-		
-		map.put("kiosk", FacilityTypes.WORK);
-		
-		map.put("ruins", FacilityTypes.IGNORE);
-
-		return map;
-	}
-	
-	
-	// copied from "RunAmenityReaderForBe"
 	private static Map<String, String> buildOsmAmenityToMatsimTypeMap(){
 		Map<String, String> map = new TreeMap<String, String>();
 
@@ -419,114 +283,5 @@ public class RunCombinedOsmReaderKibera {
 		map.put("water_point", FacilityTypes.IGNORE);
 
 		return map;
-	}
-	//
-
-
-	private static Map<String, String> buildOsmLeisureToMatsimTypeMap(){
-		Map<String, String> map = new TreeMap<String, String>();
-
-		map.put("adult_gaming_centre", FacilityTypes.LEISURE);
-		map.put("amusement_arcade", FacilityTypes.LEISURE);
-		map.put("beach_resort", FacilityTypes.LEISURE);
-		
-		map.put("bandstand", FacilityTypes.IGNORE);
-		map.put("bird_hide", FacilityTypes.IGNORE);
-		
-		map.put("dance", FacilityTypes.LEISURE);
-		map.put("dog_park", FacilityTypes.LEISURE);
-		map.put("firepit", FacilityTypes.LEISURE);
-		
-		map.put("fishing", FacilityTypes.IGNORE);
-		
-		map.put("garden", FacilityTypes.LEISURE);
-		map.put("golf_course", FacilityTypes.LEISURE);
-		map.put("hackerspace", FacilityTypes.LEISURE);
-		map.put("ice_rink", FacilityTypes.LEISURE);
-		
-		map.put("marina", FacilityTypes.IGNORE);
-		
-		map.put("miniature_golf", FacilityTypes.LEISURE);
-		
-		map.put("nature_reserve", FacilityTypes.IGNORE);
-		map.put("park", FacilityTypes.IGNORE);
-		
-		map.put("pitch", FacilityTypes.LEISURE);
-		map.put("playground", FacilityTypes.LEISURE);
-		
-		map.put("slipway", FacilityTypes.IGNORE);
-		
-		map.put("sports_centre", FacilityTypes.LEISURE);
-		map.put("stadium", FacilityTypes.LEISURE);
-		map.put("summer_camp", FacilityTypes.LEISURE);
-		map.put("swimming_pool", FacilityTypes.LEISURE);
-		map.put("swimming_area", FacilityTypes.LEISURE);
-		map.put("track", FacilityTypes.LEISURE);
-		map.put("water_park", FacilityTypes.LEISURE);
-		
-		map.put("wildlife_hide", FacilityTypes.IGNORE);
-
-		return map;
-	}
-	
-	
-	private static Map<String, String> buildOsmTourismToMatsimTypeMap(){
-		Map<String, String> map = new TreeMap<String, String>();
-		
-		map.put("alpine_hut", FacilityTypes.LEISURE);
-		
-		map.put("apartment", FacilityTypes.IGNORE);
-		map.put("attraction", FacilityTypes.IGNORE);
-		map.put("artwork", FacilityTypes.IGNORE);
-		
-		map.put("camp_site", FacilityTypes.LEISURE);
-		
-		map.put("chalet", FacilityTypes.IGNORE);
-		
-		map.put("gallery", FacilityTypes.LEISURE);
-		
-		map.put("guest_house", FacilityTypes.IGNORE);
-		map.put("hostel", FacilityTypes.IGNORE);
-		map.put("hotel", FacilityTypes.IGNORE);
-		map.put("information", FacilityTypes.IGNORE);
-		map.put("motel", FacilityTypes.IGNORE);
-		
-		map.put("museum", FacilityTypes.LEISURE);
-		
-		map.put("picnic_site", FacilityTypes.LEISURE);
-		
-		map.put("theme_park", FacilityTypes.LEISURE);
-		
-		map.put("viewpoint", FacilityTypes.IGNORE);
-		
-		map.put("wilderness_hut", FacilityTypes.LEISURE);
-		
-		map.put("zoo", FacilityTypes.LEISURE);
-
-		return map;
-	}
-	
-	
-	private static List<String> buildUnmannedEntitiesList(){
-		List<String> list = new LinkedList<String>();
-		
-		list.add("bicycle_rental");
-		list.add("car_wash");
-		list.add("atm");
-		list.add("photo_booth");
-		//list.add("vending_machine"); // currently ignored
-		list.add("dance");
-		list.add("dog_park");
-		list.add("firepit");
-		list.add("garden");
-		list.add("pitch");
-		list.add("playground");
-		list.add("swimming_area");
-		list.add("track");
-		list.add("camp_site");
-		list.add("picnic_site");
-		list.add("wilderness_hut");
-		
-		return list;
 	}
 }
