@@ -116,7 +116,7 @@ public class PerformanceFleetSizeCalculator {
     }
 
     //public static Function<Scalar, Scalar> NICE = s -> Round.toMultipleOf(DecimalScalar.of(new BigDecimal("0.0001"))).apply(s);
-
+ 
     public Tensor calculateAvailabilities() throws InterruptedException {
 
         // find relevant time steps when more than MINPERCENTAGEARRIVAL of maximum arrivals happen
@@ -154,7 +154,7 @@ public class PerformanceFleetSizeCalculator {
 
         // Tensor of all availabilities(virtualnode, timestep, vehiclestep)
         // only the results for station virtual nodes are saved, not for road nodes
-        Tensor a = Array.zeros(numberRoads, numberTimeSteps, vehicleBins + 1);
+        Tensor a = Array.zeros(numberStations, numberTimeSteps, vehicleBins + 1);
 
         // iterate through timesteps to compute availabilities
         for (int k : relevantTimeSteps) {
@@ -251,7 +251,7 @@ public class PerformanceFleetSizeCalculator {
 
                 // availabilities at timestep k with v vehicles for every virtualNode
                 Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(serviceRatesPerVehicles.get(vehBin)));
-
+                
                 for (int i = 0; i < numberStations; ++i) {
                     a.set(Aveh.Get(i), i, k, vehBin);
                 }
