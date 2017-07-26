@@ -34,6 +34,7 @@ import playground.clruch.trb18.traveltime.reloading.WriteTravelTimesModule;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.joel.analysis.AnalyzeAll;
+import playground.joel.analysis.AnalyzeFleetSize;
 import playground.joel.analysis.AnalyzeSummary;
 import playground.joel.analysis.MinimumFleetSizeCalculator;
 import playground.joel.analysis.PerformanceFleetSizeCalculator;
@@ -78,18 +79,16 @@ public class ScenarioServer {
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
-        
+
         Network network = scenario.getNetwork();
 
         Network reducedNetwork = NetworkUtils.createNetwork();
         new MatsimNetworkReader(reducedNetwork).readFile(new TRBScenarioConfig().filteredNetworkOutputPath);
-        
+
         MatsimStaticDatabase.initializeSingletonInstance( //
 
-                network, ReferenceFrame.SIOUXFALLS);
-        
-        
-        
+                network, ReferenceFrame.SWITZERLAND);
+
         for (String type : new String[] { "home", "shop", "leisure", "escort_kids", "escort_other", "work", "education", "remote_work",
                 "remote_home" }) {
             for (int i = 0; i <= 20; i++) {
@@ -119,18 +118,16 @@ public class ScenarioServer {
         controler.addOverridingModule(new TRBModule(reducedNetwork));
         controler.addOverridingModule(new WriteTravelTimesModule());
 
-
-        
-//        controler.addOverridingModule(new AbstractModule() {
-//            @Override
-//            public void install() {
-//                bind(new TypeLiteral<Collection<Link>>() {}).annotatedWith(Names.named("zurich")).toInstance(filteredPermissibleLinks);
-//                //AVUtils.registerDispatcherFactory(binder(), "ZurichDispatcher", ZurichDispatcher.ZurichDispatcherFactory.class);
-//                AVUtils.registerGeneratorFactory(binder(), "ZurichGenerator", ZurichGenerator.ZurichGeneratorFactory.class);
-//
-//                addPlanStrategyBinding("ZurichModeChoice").toProvider(ZurichPlanStrategyProvider.class);
-//            }
-//        });
+        // controler.addOverridingModule(new AbstractModule() {
+        // @Override
+        // public void install() {
+        // bind(new TypeLiteral<Collection<Link>>() {}).annotatedWith(Names.named("zurich")).toInstance(filteredPermissibleLinks);
+        // //AVUtils.registerDispatcherFactory(binder(), "ZurichDispatcher", ZurichDispatcher.ZurichDispatcherFactory.class);
+        // AVUtils.registerGeneratorFactory(binder(), "ZurichGenerator", ZurichGenerator.ZurichGeneratorFactory.class);
+        //
+        // addPlanStrategyBinding("ZurichModeChoice").toProvider(ZurichPlanStrategyProvider.class);
+        // }
+        // });
 
         StorageUtils.OUTPUT = new File(config.controler().getOutputDirectory());
         StorageUtils.DIRECTORY = new File(StorageUtils.OUTPUT, "simobj");
@@ -140,16 +137,20 @@ public class ScenarioServer {
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
         AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
+
+        // AnalyzeFleetSize.analyze(args);
+
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         TravelData travelData = TravelDataGet.readDefault(network, virtualNetwork);
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
+
         int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
         int vehicleSteps = Math.max(10, maxNumberVehiclesPerformanceCalculator / 400);
 
         if (virtualNetwork != null) {
-            minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network,population,virtualNetwork,travelData);
-            performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetwork, travelData,
+            minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(reducedNetwork, population, virtualNetwork, travelData);
+            performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(reducedNetwork, virtualNetwork, travelData,
                     maxNumberVehiclesPerformanceCalculator, vehicleSteps);
         }
 
