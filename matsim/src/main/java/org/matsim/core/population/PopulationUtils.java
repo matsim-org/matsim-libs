@@ -797,6 +797,7 @@ public final class PopulationUtils {
 				throw new IllegalArgumentException("unrecognized plan element type discovered");
 			}
 		}
+		AttributesUtils.copyAttributesFromTo(in, out );
 	}
 
 	public static void copyFromTo(Leg in, Leg out) {
@@ -806,7 +807,7 @@ public final class PopulationUtils {
 		if (in.getRoute() != null) {
 			out.setRoute(in.getRoute().clone());
 		}
-		AttributesUtils.copyAttributesTo( in , out );
+		AttributesUtils.copyAttributesFromTo( in , out );
 	}
 	
 	public static void copyFromTo(Activity act, Activity newAct) {
@@ -820,7 +821,7 @@ public final class PopulationUtils {
 		newAct.setMaximumDuration(act.getMaximumDuration());
 		newAct.setFacilityId(act.getFacilityId());
 
-		AttributesUtils.copyAttributesTo( act , newAct );
+		AttributesUtils.copyAttributesFromTo( act , newAct );
 	}
 	
 	// --- copy factories:

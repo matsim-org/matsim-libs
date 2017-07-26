@@ -22,7 +22,7 @@ public class AttributesUtils {
 	 * Adds the mappings from "from" to "to". Nothing is done to copy the Object themselves,
 	 * which should be fine for 99.9% of the usecases of Attributes (value objects)
 	 */
-	public static <T extends Attributable> void copyAttributesTo( T from , T to ) {
+	public static <T extends Attributable> void copyAttributesFromTo( T from , T to ) {
 		copyTo( from.getAttributes() , to.getAttributes() );
 	}
 }
