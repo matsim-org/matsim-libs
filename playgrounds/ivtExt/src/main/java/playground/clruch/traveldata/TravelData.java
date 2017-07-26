@@ -34,6 +34,7 @@ import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
+import playground.clruch.tensorUtils.TensorOperations;
 import playground.clruch.utils.GlobalAssert;
 
 /**
@@ -126,7 +127,7 @@ public class TravelData implements Serializable {
         // norm pij such that it is row stochastic, i.e. sum(p_ij)_j = 1 for all i and all time indexes
         // count the total of the rows
         for (int t = 0; t < numberTimeSteps; ++t) {
-            pij.set(normToRowStochastic(pij.get(t)), t);
+            pij.set(TensorOperations.normToRowStochastic(pij.get(t)), t);
         }
 
         // compute lambdaPSF, pijPSF
@@ -151,7 +152,7 @@ public class TravelData implements Serializable {
             }
         }
         for (int t = 0; t < numberTimeSteps; ++t) {
-            pijPSF.set(normToRowStochastic(pijPSF.get(t)), t);
+            pijPSF.set(TensorOperations.normToRowStochastic(pijPSF.get(t)), t);
         }
 
         // compute alphaij rates according to Pavone, Marco, Stephen L. Smith, and Emilio Frazzoli Daniela Rus. "Load balancing for mobility-on-demand
@@ -281,22 +282,7 @@ public class TravelData implements Serializable {
         return numberTimeSteps;
     }
 
-    /**
-     * @param T
-     *            tensor which will be normed for row-stochasticity
-     */
-    public Tensor normToRowStochastic(Tensor Tin) {
-        List<Integer> dims = Dimensions.of(Tin);
-        int rows = dims.get(0);
-        Tensor T = Tin.copy();
 
-        // for every row
-        for (int i = 0; i < rows; ++i) {
-            Scalar sum = Total.of(T.get(i)).Get();
-            T.set(v -> v.multiply(InvertUnlessZero.of(sum)), i);
-        }
-        return T;
-    }
 
     /**
      * Perform consistency checks after completion of constructor operations.
