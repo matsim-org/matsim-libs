@@ -33,7 +33,8 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
             Network network, AbstractRequestSelector abstractRequestSelector) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
-        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
+        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod",
+                                                            // 10);
     }
 
     @Override
@@ -44,10 +45,7 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
         // .match(getStayVehicles(), getAVRequestsAtLinks());
 
         if (round_now % dispatchPeriod == 0) {
-            BipartiteMatchingUtils bpmu = new BipartiteMatchingUtils();
-            // dispatch vehicles to pickup locations
-            printVals = bpmu.globalBipartiteMatching(getDivertableVehicleLinkPairs(), this.getAVRequests());
-            bpmu.executePickup(this);
+            printVals = BipartiteMatchingUtils.executePickup(this, getDivertableVehicleLinkPairs(), getAVRequests());
         }
     }
 
