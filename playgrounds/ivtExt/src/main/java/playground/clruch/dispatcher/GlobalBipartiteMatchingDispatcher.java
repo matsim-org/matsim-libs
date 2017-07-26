@@ -46,7 +46,7 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
         if (round_now % dispatchPeriod == 0) {
             BipartiteMatchingUtils bpmu = new BipartiteMatchingUtils();
             // dispatch vehicles to pickup locations
-            printVals = bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), this.getAVRequests());
+            printVals = bpmu.globalBipartiteMatching(getDivertableVehicleLinkPairs(), this.getAVRequests());
             bpmu.executePickup(this);
         }
     }

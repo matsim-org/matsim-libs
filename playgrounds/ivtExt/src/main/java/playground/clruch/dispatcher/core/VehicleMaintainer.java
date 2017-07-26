@@ -44,7 +44,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
     private Double private_now = null;
     private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
     private int infoLinePeriod = 0;
-    protected Map<AVVehicle, VehicleLinkPair> avVehicleVehicleLinkPairMap = new HashMap<>();
+    private Map<AVVehicle, VehicleLinkPair> avVehicleVehicleLinkPairMap = new HashMap<>();
 
     VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
@@ -241,14 +241,14 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
         redispatch(now);
         endofStepTasks();
-        
+
         private_now = null; // <- time unavailable
         private_vehicleDirectives.values().stream() //
                 .parallel() //
                 .forEach(AbstractDirective::execute);
         private_vehicleDirectives.clear();
     }
-    
+
     /* package */ abstract void endofStepTasks();
 
     /**

@@ -148,7 +148,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
         // Part II: outside rebalancing periods, permanently assign destinations to vehicles using bipartite matching
         if (round_now % dispatchPeriod == 0) {
             BipartiteMatchingUtils bpmu = new BipartiteMatchingUtils();
-            printVals = bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), this.getAVRequests());
+            printVals = bpmu.globalBipartiteMatching(getDivertableVehicleLinkPairs(), getAVRequests());
             bpmu.executePickup(this);
         }
     }

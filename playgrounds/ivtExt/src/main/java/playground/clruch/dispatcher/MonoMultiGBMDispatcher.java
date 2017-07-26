@@ -52,12 +52,12 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
         if (round_now % dispatchPeriod == 0) {
             BipartiteMatchingUtils bpmu = new BipartiteMatchingUtils();
             // dispatch vehicles to pickup locations
-            printVals = bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), this.getAVRequests());
+            printVals = bpmu.globalBipartiteMatching(getDivertableVehicleLinkPairs(), getAVRequests());
             bpmu.executePickup(this);
 
             // perform rebalancing with remaining vehicles
-            Collection<AVRequest> rebalanceRequests = getMultipleRebalanceRequests(this.getAVRequests(), rebVehperRequest);
-            bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), rebalanceRequests);
+            Collection<AVRequest> rebalanceRequests = getMultipleRebalanceRequests(getAVRequests(), rebVehperRequest);
+            bpmu.globalBipartiteMatching(getDivertableVehicleLinkPairs(), rebalanceRequests);
             bpmu.executeRebalance(this);
         }
     }

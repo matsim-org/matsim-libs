@@ -34,10 +34,11 @@ public class BipartiteMatchingUtils {
      *            open requests
      * @return does assignment according to globalBipartiteMatching and returns a tensor with infoline Information
      */
-    public Tensor globalBipartiteMatching(Supplier<Collection<VehicleLinkPair>> supplier, Collection<AVRequest> requests) {
+    // TODO insert collection instead of supplier
+    public Tensor globalBipartiteMatching(Collection<VehicleLinkPair> divertableVehicles, Collection<AVRequest> requests) {
 
         Tensor returnTensor = Tensors.empty(); // contains information for InfoLine
-        Collection<VehicleLinkPair> divertableVehicles = supplier.get(); // save initial problem size
+//        Collection<VehicleLinkPair> divertableVehicles = supplier.get(); // save initial problem size
         returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requests.size()));
 
         // 1) In case divertableVehicles >> requests reduce search space using kd-trees
