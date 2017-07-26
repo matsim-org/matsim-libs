@@ -200,7 +200,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
 
             TravelData travelData = null;
             try {
-                travelData = TravelDataIO.fromByte(network, virtualNetwork, new File(virtualnetworkDir, "travelData"));
+                travelData = TravelDataIO.fromByte(virtualNetwork, new File(virtualnetworkDir, "travelData"));
             } catch (ClassNotFoundException | DataFormatException | IOException e) {
                 System.out.println("problem reading travelData");
                 e.printStackTrace();

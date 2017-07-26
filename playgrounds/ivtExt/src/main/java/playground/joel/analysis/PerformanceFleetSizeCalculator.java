@@ -3,42 +3,31 @@ package playground.joel.analysis;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.io.File;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import ch.ethz.idsc.tensor.DecimalScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
-import ch.ethz.idsc.tensor.alg.Transpose;
-import ch.ethz.idsc.tensor.io.Pretty;
-import ch.ethz.idsc.tensor.mat.IdentityMatrix;
-import ch.ethz.idsc.tensor.mat.NullSpace;
 import ch.ethz.idsc.tensor.red.Norm;
 import ch.ethz.idsc.tensor.red.Total;
-import ch.ethz.idsc.tensor.sca.Chop;
 import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
-import ch.ethz.idsc.tensor.sca.Rationalize;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
@@ -46,26 +35,27 @@ import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.tensorUtils.TensorOperations;
 import playground.clruch.traveldata.TravelData;
-import playground.clruch.traveldata.TravelDataIO;
+import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveldata.TravelDataUtils;
 import playground.clruch.utils.GlobalAssert;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.joel.analysis.utils.ThroughputCalculator;
 
-/**
- * Claudio on July 17, 2017
+/** Claudio on July 17, 2017
  * 
- * Procedure is according to publication "Control of Robotic Mobility-On-Demand Systems: a Queueing-Theoretical Perspective" by Rick Zhang and Marco
+ * Procedure is according to publication "Control of Robotic Mobility-On-Demand Systems: a
+ * Queueing-Theoretical Perspective" by Rick Zhang and Marco
  * Pavone, page 5 B. Computation of performance metrics
  * 
- * TODO: Note: numerical instabilities for very low arrival rates observed, where availabilities do not approach 1 indepenntly of the number of cars
- * added to the system. Therfore only timesteps are considered when more than 0.5 % of the peak arrivals happen. This is reasonable because e.g. in
- * Sioux falls with 45 min timestep the maximum number of arrivals is ~ 21,654, if only 0.5%of this, i.e. 100 arrive in 45 mins any reasonable fleet
- * for peak times will be able to serve with availability 1.
- * 
- */
+ * TODO: Note: numerical instabilities for very low arrival rates observed, where availabilities do
+ * not approach 1 indepenntly of the number of cars
+ * added to the system. Therfore only timesteps are considered when more than 0.5 % of the peak
+ * arrivals happen. This is reasonable because e.g. in
+ * Sioux falls with 45 min timestep the maximum number of arrivals is ~ 21,654, if only 0.5%of this,
+ * i.e. 100 arrive in 45 mins any reasonable fleet
+ * for peak times will be able to serve with availability 1. */
 public class PerformanceFleetSizeCalculator {
-    final Network network;
+    // final Network network;
     final VirtualNetwork virtualNetwork;
     final TravelData tData;
     final int numberTimeSteps;
@@ -88,20 +78,16 @@ public class PerformanceFleetSizeCalculator {
         Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup,
                 new BlackListedTimeAllocationMutatorConfigGroup());
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        Network network = scenario.getNetwork();
-        final File virtualnetworkDir = new File("virtualNetwork");
         VirtualNetwork virtualNetworkLoad = VirtualNetworkGet.readDefault(scenario.getNetwork());
-        TravelData travelDataLoad = TravelDataIO.fromByte(network, virtualNetworkLoad, new File(virtualnetworkDir, "travelData"));
-
-        // call the performancefleetsizecalculator and calculate the availabilities
-        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetworkLoad,
-                travelDataLoad, 5000, 10);
+        TravelData travelDataLoad = TravelDataGet.readDefault(virtualNetworkLoad);
+        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(virtualNetworkLoad, travelDataLoad, 5000, 10);
         Tensor Availabilities = performanceFleetSizeCalculator.calculateAvailabilities();
     }
 
-    public PerformanceFleetSizeCalculator(Network networkIn, VirtualNetwork virtualNetworkIn, TravelData travelDataIn, int numVehiclesMaxIn,
-            int vehicleStepsIn) {
-        network = networkIn;
+    // public PerformanceFleetSizeCalculator(Network networkIn, VirtualNetwork virtualNetworkIn,
+    // TravelData travelDataIn, int numVehiclesMaxIn,
+    public PerformanceFleetSizeCalculator(VirtualNetwork virtualNetworkIn, TravelData travelDataIn, int numVehiclesMaxIn, int vehicleStepsIn) {
+        // network = networkIn;
         virtualNetwork = virtualNetworkIn;
         tData = travelDataIn;
         numberTimeSteps = tData.getNumbertimeSteps();
@@ -115,8 +101,9 @@ public class PerformanceFleetSizeCalculator {
         GlobalAssert.that(numberRoads == virtualNetwork.getvLinksCount());
     }
 
-    //public static Function<Scalar, Scalar> NICE = s -> Round.toMultipleOf(DecimalScalar.of(new BigDecimal("0.0001"))).apply(s);
- 
+    // public static Function<Scalar, Scalar> NICE = s -> Round.toMultipleOf(DecimalScalar.of(new
+    // BigDecimal("0.0001"))).apply(s);
+
     public Tensor calculateAvailabilities() throws InterruptedException {
 
         // find relevant time steps when more than MINPERCENTAGEARRIVAL of maximum arrivals happen
@@ -158,7 +145,7 @@ public class PerformanceFleetSizeCalculator {
 
         // iterate through timesteps to compute availabilities
         for (int k : relevantTimeSteps) {
-            System.out.println(k + " /  "+ relevantTimeSteps.size());
+            System.out.println(k + " /  " + relevantTimeSteps.size());
 
             // Step 1: Calculate the customer flows cf (i->j)
             Tensor lambdaii = tData.getLambdaPSFforTime(k * dt);
@@ -175,10 +162,9 @@ public class PerformanceFleetSizeCalculator {
             // service rates for stations, then for roads
             Tensor flowReb = tData.getAlphaijPSFforTime(k * dt);
             Tensor flowTot = flowCust.add(flowReb);
-            
+
             flowTot = flowTot.multiply(RealScalar.of(1000000)).map(Round.FUNCTION);
             Tensor pijTot = TensorOperations.normToRowStochastic(flowTot);
-            
 
             Tensor serviceRateStations = Tensors.empty();
             for (int i = 0; i < Dimensions.of(lambdaii).get(0); ++i) {
@@ -251,14 +237,15 @@ public class PerformanceFleetSizeCalculator {
 
                 // availabilities at timestep k with v vehicles for every virtualNode
                 Tensor Aveh = (Lveh.pmul(InvertUnlessZero.of(Wveh))).pmul(InvertUnlessZero.of(serviceRatesPerVehicles.get(vehBin)));
-                
+
                 for (int i = 0; i < numberStations; ++i) {
                     a.set(Aveh.Get(i), i, k, vehBin);
                 }
             }
         }
 
-        // based on the a matrix calculate overall availabilities as a function of the number of vehicles
+        // based on the a matrix calculate overall availabilities as a function of the number of
+        // vehicles
         Tensor meanByVehicles = calcMeanByVehicles(a, offpeakSteps);
         Tensor meanByVehiclesPeak = calcMeanByVehicles(a, peakSteps);
 
@@ -291,8 +278,6 @@ public class PerformanceFleetSizeCalculator {
         return meanByVehicles;
 
     }
-
-
 
     private void plot(Tensor values, Tensor valuesPeak, int vehicleSteps) throws Exception {
         XYSeries series = new XYSeries("Availability");

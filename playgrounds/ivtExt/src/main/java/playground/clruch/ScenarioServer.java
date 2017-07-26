@@ -140,7 +140,7 @@ public class ScenarioServer {
         // AnalyzeFleetSize.analyze(args);
 
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
-        TravelData travelData = TravelDataGet.readDefault(network, virtualNetwork);
+        TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
 
@@ -149,7 +149,7 @@ public class ScenarioServer {
 
         if (virtualNetwork != null) {
             minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(reducedNetwork, population, virtualNetwork, travelData);
-            performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(reducedNetwork, virtualNetwork, travelData,
+            performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(virtualNetwork, travelData,
                     maxNumberVehiclesPerformanceCalculator, vehicleSteps);
         }
 

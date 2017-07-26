@@ -68,7 +68,7 @@ public class MinimumFleetSizeCalculator {
         Population population = scenario.getPopulation();
 
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
-        TravelData travelData = TravelDataGet.readDefault(network, virtualNetwork);
+        TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, population, virtualNetwork, travelData);
 

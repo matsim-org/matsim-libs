@@ -141,7 +141,7 @@ public class TrbScenarioServer {
 
         AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
-        TravelData travelData = TravelDataGet.readDefault(network, virtualNetwork);
+        TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
         int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
@@ -149,7 +149,7 @@ public class TrbScenarioServer {
 
         if (virtualNetwork != null) {
             minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network,population,virtualNetwork,travelData);
-            performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetwork, travelData,
+            performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(virtualNetwork, travelData,
                     maxNumberVehiclesPerformanceCalculator, vehicleSteps);
         }
 
