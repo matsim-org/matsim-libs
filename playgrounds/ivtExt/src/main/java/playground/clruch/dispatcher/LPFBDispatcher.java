@@ -72,9 +72,9 @@ public class LPFBDispatcher extends PartitionedDispatcher {
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
-        this.virtualNodeDest = abstractVirtualNodeDest;
+        virtualNodeDest = abstractVirtualNodeDest;
 
-        this.vehicleDestMatcher = abstractVehicleDestMatcher;
+        vehicleDestMatcher = abstractVehicleDestMatcher;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         rebalancingPeriod = getRebalancingPeriod(config); // Integer.parseInt(config.getParams().get("rebalancingPeriod"));
         // setup linear program

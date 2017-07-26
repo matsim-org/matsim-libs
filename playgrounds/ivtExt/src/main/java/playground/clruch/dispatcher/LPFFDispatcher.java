@@ -83,9 +83,9 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
             TravelData arrivalInformationIn) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
-        this.virtualNodeDest = abstractVirtualNodeDest;
-        this.requestSelector = abstractRequestSelector;
-        this.vehicleDestMatcher = abstractVehicleDestMatcher;
+        virtualNodeDest = abstractVirtualNodeDest;
+        requestSelector = abstractRequestSelector;
+        vehicleDestMatcher = abstractVehicleDestMatcher;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         rebalancingPeriod = getRebalancingPeriod(config); // Integer.parseInt(config.getParams().get("rebalancingPeriod"));
         travelData = arrivalInformationIn;

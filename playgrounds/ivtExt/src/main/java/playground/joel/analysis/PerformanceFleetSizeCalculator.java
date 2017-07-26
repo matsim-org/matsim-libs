@@ -61,7 +61,7 @@ public class PerformanceFleetSizeCalculator {
     final int numberTimeSteps;
     final int dt;
     final int dayduration = 108000;
-    final int numVehicles;
+    final int maxNumVehicles;
     final int vehicleSteps;
     final int vehicleBins;
     final int numberRoads;
@@ -86,18 +86,18 @@ public class PerformanceFleetSizeCalculator {
 
     // public PerformanceFleetSizeCalculator(Network networkIn, VirtualNetwork virtualNetworkIn,
     // TravelData travelDataIn, int numVehiclesMaxIn,
-    public PerformanceFleetSizeCalculator(VirtualNetwork virtualNetworkIn, TravelData travelDataIn, int numVehiclesMaxIn, int vehicleStepsIn) {
+    public PerformanceFleetSizeCalculator(VirtualNetwork virtualNetwork, TravelData tData, int maxNumVehicles, int vehicleSteps) {
         // network = networkIn;
-        virtualNetwork = virtualNetworkIn;
-        tData = travelDataIn;
-        numberTimeSteps = tData.getNumbertimeSteps();
+        this.virtualNetwork = virtualNetwork;
+        this.tData = tData;
+        this.numberTimeSteps = tData.getNumbertimeSteps();
         GlobalAssert.that(dayduration % numberTimeSteps == 0);
-        dt = dayduration / numberTimeSteps;
-        numVehicles = numVehiclesMaxIn;
-        vehicleSteps = vehicleStepsIn;
-        vehicleBins = numVehicles / TravelDataUtils.greatestNonRestDt(vehicleSteps, numVehicles);
-        numberStations = virtualNetwork.getvNodesCount();
-        numberRoads = numberStations * numberStations - numberStations;
+        this.dt = dayduration / numberTimeSteps;
+        this.maxNumVehicles = maxNumVehicles;
+        this.vehicleSteps = vehicleSteps;
+        this.vehicleBins = maxNumVehicles / TravelDataUtils.greatestNonRestDt(vehicleSteps, maxNumVehicles);
+        this.numberStations = virtualNetwork.getvNodesCount();
+        this.numberRoads = numberStations * numberStations - numberStations;
         GlobalAssert.that(numberRoads == virtualNetwork.getvLinksCount());
     }
 
@@ -198,7 +198,7 @@ public class PerformanceFleetSizeCalculator {
 
             Tensor serviceRatesPerVehicles = Tensors.empty();
 
-            for (int i = 0; i <= numVehicles; ++i) {
+            for (int i = 0; i <= maxNumVehicles; ++i) {
                 Tensor lineupd = serviceRateStations.copy();
                 Tensor roadServ = serviceRateRoadsVector.multiply(RealScalar.of(i));
                 roadServ.flatten(-1).forEach(v -> lineupd.append(v));
@@ -226,7 +226,7 @@ public class PerformanceFleetSizeCalculator {
             }
 
             // Step 4: conduct mean value analysis
-            MeanValueAnalysis mva = new MeanValueAnalysis(numVehicles, serviceRatesPerVehicles, throughPut);
+            MeanValueAnalysis mva = new MeanValueAnalysis(maxNumVehicles, serviceRatesPerVehicles, throughPut);
 
             // Step 5: compute availabilities
             Tensor Ak = Tensors.empty();
