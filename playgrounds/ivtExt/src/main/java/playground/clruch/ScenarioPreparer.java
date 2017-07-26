@@ -9,6 +9,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -23,6 +25,7 @@ import playground.clruch.prep.PopulationTools;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
+import playground.clruch.trb18.scenario.TRBScenarioConfig;
 import playground.clruch.utils.GZHandler;
 import playground.clruch.utils.GlobalAssert;
 
@@ -77,6 +80,8 @@ public class ScenarioPreparer {
         Config config = ConfigUtils.loadConfig(configFile.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
+
+        
         Population population = scenario.getPopulation();
 
         {// 1) cut network (and reduce population to new network)

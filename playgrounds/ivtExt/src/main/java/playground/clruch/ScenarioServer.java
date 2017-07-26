@@ -34,7 +34,6 @@ import playground.clruch.trb18.traveltime.reloading.WriteTravelTimesModule;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.joel.analysis.AnalyzeAll;
-import playground.joel.analysis.AnalyzeFleetSize;
 import playground.joel.analysis.AnalyzeSummary;
 import playground.joel.analysis.MinimumFleetSizeCalculator;
 import playground.joel.analysis.PerformanceFleetSizeCalculator;
