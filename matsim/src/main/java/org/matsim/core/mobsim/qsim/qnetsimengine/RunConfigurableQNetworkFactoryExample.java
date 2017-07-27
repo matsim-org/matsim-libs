@@ -56,6 +56,7 @@ public class RunConfigurableQNetworkFactoryExample {
 			@Override public void install() {
 				final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
 				factory.setLinkSpeedCalculator(null); // fill with something reasonable
+				factory.setTurnAcceptanceLogic(null); // fill with something reasonable
 				bind( QNetworkFactory.class ).toInstance( factory ) ;
 				// NOTE: Other than when using a provider, this uses the same factory instance over all iterations, re-configuring 
 				// it in every iteration via the initializeFactory(...) method. kai, mar'16 
