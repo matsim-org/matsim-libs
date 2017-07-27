@@ -38,7 +38,7 @@ public class VirtualLink implements Serializable {
         return to;
     }
     
-    public double getTtime(){
+    public double getDistance(){
         return distance;
     }
 

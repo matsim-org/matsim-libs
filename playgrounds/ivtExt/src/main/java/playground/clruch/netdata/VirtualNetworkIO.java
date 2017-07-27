@@ -124,7 +124,7 @@ public class VirtualNetworkIO {
             virtualLinkelem.setAttribute(new Attribute(IDNAME, virtualLink.getId()));
             virtualLinkelem.setAttribute(new Attribute(FROMNAME, virtualLink.getFrom().getId()));
             virtualLinkelem.setAttribute(new Attribute(TONAME, virtualLink.getTo().getId()));
-            virtualLinkelem.setAttribute(new Attribute(LINKTRAVELTIMENAME, Double.toString(virtualLink.getTtime())));
+            virtualLinkelem.setAttribute(new Attribute(LINKTRAVELTIMENAME, Double.toString(virtualLink.getDistance())));
             virtualLinkselem.addContent(virtualLinkelem);
         }
         rootElement.addContent(virtualLinkselem);
