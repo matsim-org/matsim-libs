@@ -64,14 +64,14 @@ public class HybridNetworkFactory extends QNetworkFactory {
 	}
 
 	@Override
-	public QNode createNetsimNode(Node node) {
-		QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
+	public QNodeI createNetsimNode(Node node) {
+		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
 		return builder.build( node ) ;
 	}
 
 
 	@Override
-	public QLinkI createNetsimLink(Link link, QNode queueNode) {
+	public QLinkI createNetsimLink(Link link, QNodeI queueNode) {
 		if (link.getAllowedModes().contains("2ext")) {
 			return new QSimExternalTransitionLink(link, this.externalEngine, context, netsimEngine, queueNode );
 		}

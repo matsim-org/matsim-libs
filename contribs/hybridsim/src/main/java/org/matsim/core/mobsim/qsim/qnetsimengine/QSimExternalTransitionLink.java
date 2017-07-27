@@ -41,9 +41,9 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	private final EventsManager em;
 	private FakeLane fakeLane = new FakeLane();
 	private final NetsimEngineContext context ;
-	private final QNode toQNode ;
+	private final QNodeI toQNode ;
 
-	QSimExternalTransitionLink(Link link, ExternalEngine e, NetsimEngineContext context, NetsimInternalInterface netsimEngine, QNode toQNode) {
+	QSimExternalTransitionLink(Link link, ExternalEngine e, NetsimEngineContext context, NetsimInternalInterface netsimEngine, QNodeI toQNode) {
 		super(link, toQNode, context, netsimEngine);
 		this.e = e;
 		this.em = e.getEventsManager();
@@ -89,7 +89,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	}
 
 	@Override
-	QNode getToNode() {
+	QNodeI getToNode() {
 		throw new RuntimeException("not yet implemented");
 	}
 
