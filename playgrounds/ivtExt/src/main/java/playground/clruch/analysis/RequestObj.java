@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.joel.analysis;
+package playground.clruch.analysis;
 
 import org.matsim.api.core.v01.network.Link;
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.joel.analysis;
+package playground.clruch.analysis;
 
 import java.io.File;
 import java.util.HashSet;
@@ -29,6 +29,7 @@ import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveldata.TravelDataUtils;
 import playground.clruch.utils.GlobalAssert;
+import playground.joel.analysis.PerformanceFleetSizeCalculatorClean;
 import playground.joel.analysis.utils.ThroughputCalculator;
 
 /** @author Claudio Ruch */
@@ -52,7 +53,7 @@ public class PerformanceFleetSizeCalculator {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
-        PerformanceFleetSizeCalculatorClean performcalc = new PerformanceFleetSizeCalculatorClean(virtualNetwork, travelData, 1600);
+        PerformanceFleetSizeCalculator performcalc = new PerformanceFleetSizeCalculator(virtualNetwork, travelData, 1600);
         performcalc.calcAvailab();
     }
 
@@ -68,7 +69,7 @@ public class PerformanceFleetSizeCalculator {
         GlobalAssert.that(numVLink == virtualNetwork.getvLinksCount());
     }
 
-    void calcAvailab() throws InterruptedException {
+    public Tensor calcAvailab() throws InterruptedException {
 
         Set<Integer> offPeakSteps = new HashSet();
         for (int i = 0; i < timeSteps; ++i)
@@ -141,6 +142,8 @@ public class PerformanceFleetSizeCalculator {
             System.out.println("Error saving the availabilities");
             e.printStackTrace(System.out);
         }
+        
+        return a;
     }
 
 }

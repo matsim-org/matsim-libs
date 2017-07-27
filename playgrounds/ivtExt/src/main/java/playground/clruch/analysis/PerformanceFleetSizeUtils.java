@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.joel.analysis;
+package playground.clruch.analysis;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

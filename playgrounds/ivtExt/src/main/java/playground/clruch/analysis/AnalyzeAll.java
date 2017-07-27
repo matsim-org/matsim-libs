@@ -1,4 +1,4 @@
-package playground.joel.analysis;
+package playground.clruch.analysis;
 
 import static playground.clruch.utils.NetworkLoader.loadNetwork;
 
@@ -18,10 +18,10 @@ import ch.ethz.idsc.tensor.io.CsvFormat;
 import ch.ethz.idsc.tensor.io.MathematicaFormat;
 import ch.ethz.idsc.tensor.io.MatlabExport;
 import playground.clruch.data.ReferenceFrame;
+import playground.clruch.html.DataCollector;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
 import playground.joel.data.TotalData;
-import playground.joel.html.DataCollector;
 
 /**
  * Created by Joel on 05.04.2017.

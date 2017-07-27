@@ -1,4 +1,4 @@
-package playground.joel.analysis;
+package playground.clruch.analysis;
 
 import ch.ethz.idsc.tensor.*;
 import ch.ethz.idsc.tensor.red.Max;

@@ -1,4 +1,4 @@
-package playground.joel.html;
+package playground.clruch.html;
 
 import playground.clruch.utils.GlobalAssert;
 

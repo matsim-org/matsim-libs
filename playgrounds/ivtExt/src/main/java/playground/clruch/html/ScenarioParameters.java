@@ -1,4 +1,4 @@
-package playground.joel.html;
+package playground.clruch.html;
 
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
