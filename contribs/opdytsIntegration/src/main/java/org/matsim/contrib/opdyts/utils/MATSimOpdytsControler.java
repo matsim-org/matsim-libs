@@ -43,12 +43,12 @@ public class MATSimOpdytsControler<U extends DecisionVariable> {
 
 	// -------------------- IMPLEMENTATION --------------------
 
-	FixedIterationNumberConvergenceCriterion newFixedIterationNumberConvergenceCriterion() {
+	private FixedIterationNumberConvergenceCriterion newFixedIterationNumberConvergenceCriterion() {
 		return new FixedIterationNumberConvergenceCriterion(this.opdytsConfig.getNumberOfIterationsForConvergence(),
 				this.opdytsConfig.getNumberOfIterationsForAveraging());
 	}
 
-	TimeDiscretization newTimeDiscretization() {
+	private TimeDiscretization newTimeDiscretization() {
 		return new TimeDiscretization(this.opdytsConfig.getStartTime(), this.opdytsConfig.getBinSize(),
 				this.opdytsConfig.getBinCount());
 	}

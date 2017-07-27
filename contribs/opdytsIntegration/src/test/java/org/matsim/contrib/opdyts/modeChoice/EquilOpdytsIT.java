@@ -81,14 +81,14 @@ public class EquilOpdytsIT {
     private void runOpdyts(final List<String> modes2consider, final Scenario scenario, final String outDir){
 
         OpdytsConfigGroup opdytsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), OpdytsConfigGroup.class);
-        opdytsConfigGroup.setNumberOfIterationsForAveraging(5);
-        opdytsConfigGroup.setNumberOfIterationsForConvergence(10);
+        opdytsConfigGroup.setNumberOfIterationsForAveraging(2);
+        opdytsConfigGroup.setNumberOfIterationsForConvergence(5);
 
-        opdytsConfigGroup.setMaxTransition(4);
+        opdytsConfigGroup.setMaxIteration(4);
         opdytsConfigGroup.setOutputDirectory(scenario.getConfig().controler().getOutputDirectory());
         opdytsConfigGroup.setVariationSizeOfRandomizeDecisionVariable(0.5);
         opdytsConfigGroup.setUseAllWarmUpIterations(false);
-        opdytsConfigGroup.setWarmUpIterations(5); //this should be tested (parametrized).
+        opdytsConfigGroup.setWarmUpIterations(1); //this should be tested (parametrized).
 
         MATSimOpdytsControler<ModeChoiceDecisionVariable> runner = new MATSimOpdytsControler(scenario);
 
