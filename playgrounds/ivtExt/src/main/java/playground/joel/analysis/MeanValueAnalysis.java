@@ -1,52 +1,44 @@
 package playground.joel.analysis;
 
-import java.math.BigDecimal;
-import java.util.function.Function;
-
-import ch.ethz.idsc.tensor.DecimalScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
-import ch.ethz.idsc.tensor.io.Pretty;
+import ch.ethz.idsc.tensor.sca.Increment;
 import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
-import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.utils.GlobalAssert;
 
-/**
- * @author Claudio Ruch Performns mean value analysis for a system with i nodes, relative throughputs pii, arrival rates mui
- */
-
-
+/** @author Claudio Ruch Performns mean value analysis for a system with i nodes, relative
+ *         throughputs pii, arrival rates mui */
 
 public class MeanValueAnalysis {
-    
-    public static Function<Scalar, Scalar> NICE = s -> Round.toMultipleOf(DecimalScalar.of(new BigDecimal("0.0001"))).apply(s);
-    
+
     final int maxAgents;
     final int numNodes;
     final Tensor mui;
     final Tensor pii;
     final Tensor muiInv;
+    final int numStation;
 
     Tensor W;
     Tensor L;
+    final Tensor A = Tensors.empty();
 
-    public MeanValueAnalysis(int maxAgentsIn, Tensor muiIn, Tensor piiIn) {
-        maxAgents = maxAgentsIn;
-        mui = muiIn;
-        pii = piiIn;
+    public MeanValueAnalysis(Tensor muiIn, Tensor piiIn, int numStation) {
+        maxAgents = Dimensions.of(muiIn).get(0) - 1;
+        numNodes = Dimensions.of(piiIn).get(0);
+        mui = muiIn.copy();
+        pii = piiIn.copy();
+        this.numStation = numStation;
         muiInv = InvertUnlessZero.of(mui);
         GlobalAssert.that(Dimensions.of(mui).get(1).equals(Dimensions.of(pii).get(0)));
-        numNodes = Dimensions.of(pii).get(0);
-        W = Tensors.matrix((i, j) -> RealScalar.ZERO, maxAgentsIn + 1, numNodes);
-        L = Tensors.matrix((i, j) -> RealScalar.ZERO, maxAgentsIn + 1, numNodes);        
+
+        W = Array.zeros(maxAgents + 1, numNodes);
+        L = Array.zeros(maxAgents + 1, numNodes);
         perform();
-        
-        
-        
-        
+
     }
 
     private void perform() {
@@ -55,11 +47,13 @@ public class MeanValueAnalysis {
         for (int agents = 1; agents <= maxAgents; ++agents) {
             updateW(agents);
             updateL(agents);
+
         }
+        calcAvailabilities();
     }
 
     private void updateW(int agents) {
-        Tensor OnePlusLi = L.get(agents - 1).add(Tensors.vector(i_ -> RealScalar.ONE, numNodes));
+        Tensor OnePlusLi = L.get(agents - 1).map(Increment.ONE);
         W.set(muiInv.get(agents).pmul(OnePlusLi), agents);
     }
 
@@ -70,7 +64,14 @@ public class MeanValueAnalysis {
 
     }
 
-    // external getter methods
+    private void calcAvailabilities() {
+        for (int i = 0; i <= maxAgents; ++i) {
+            Tensor Li = getL(i);
+            Tensor Wi = getW(i);
+            A.append((Li.pmul(InvertUnlessZero.of(Wi))).pmul(InvertUnlessZero.of(mui.get(i))));
+        }
+    }
+
     public Tensor getW() {
         return W.copy();
     }
@@ -86,4 +87,13 @@ public class MeanValueAnalysis {
     public Tensor getL(int agents) {
         return L.get(agents);
     }
+
+    public Tensor getA() {
+        return A.copy();
+    }
+
+    public Tensor getA(int agents) {
+        return A.get(agents);
+    }
+
 }
