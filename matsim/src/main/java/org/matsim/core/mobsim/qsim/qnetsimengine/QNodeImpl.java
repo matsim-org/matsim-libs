@@ -48,13 +48,17 @@ public class QNodeImpl extends QNodeI {
 	private static final Logger log = Logger.getLogger(QNodeImpl.class);
 	public static class Builder {
 		private final NetsimInternalInterface netsimEngine;
-		private NetsimEngineContext context;
+		private final NetsimEngineContext context;
 		public Builder( NetsimInternalInterface netsimEngine2, NetsimEngineContext context ) {
 			this.netsimEngine = netsimEngine2;
 			this.context = context;
 		}
+		private TurnAcceptanceLogic turnAcceptanceLogic = new DefaultTurnAcceptanceLogic() ;
+		public final void setTurnAcceptanceLogic( TurnAcceptanceLogic turnAcceptanceLogic ) {
+			this.turnAcceptanceLogic = turnAcceptanceLogic ;
+		}
 		public QNodeImpl build( Node n ) {
-			return new QNodeImpl( n, context, netsimEngine ) ;
+			return new QNodeImpl( n, context, netsimEngine, turnAcceptanceLogic ) ;
 		}
 	}
 
@@ -80,11 +84,14 @@ public class QNodeImpl extends QNodeI {
 	private final Random random;
 	private final NetsimEngineContext context;
 	private final NetsimInternalInterface netsimEngine;
+	
+	private final TurnAcceptanceLogic turnAcceptanceLogic ;
 
-	private QNodeImpl(final Node n, NetsimEngineContext context, NetsimInternalInterface netsimEngine2) {
+	private QNodeImpl(final Node n, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, TurnAcceptanceLogic turnAcceptanceLogic) {
 		this.node = n;
 		this.netsimEngine = netsimEngine2 ;
 		this.context = context ;
+		this.turnAcceptanceLogic = turnAcceptanceLogic;
 		int nofInLinks = this.node.getInLinks().size();
 		this.inLinksArrayCache = new QLinkI[nofInLinks];
 		this.tempLinks = new QLinkI[nofInLinks];
@@ -236,29 +243,6 @@ public class QNodeImpl extends QNodeI {
 	}
 
 
-	private static boolean checkNextLinkSemantics(Link currentLink, Id<Link> nextLinkId, QLinkI nextQLink, QVehicle veh){
-		// we need nextLinkId and nextQLink, because the link lookup may have failed and then nextQLink is null
-		if (nextQLink == null){
-			log.warn("The link id " + nextLinkId + " is not available in the simulation network, but vehicle " + veh.getId() + 
-					" plans to travel on that link from link " + veh.getCurrentLink().getId());
-			return false ;
-		}
-		if (currentLink.getToNode() != nextQLink.getLink().getFromNode()) {
-			log.warn("Cannot move vehicle " + veh.getId() + " from link " + currentLink.getId() + " to link " + nextQLink.getLink().getId());
-			return false ;
-		}
-//		if ( !nextQLink.getLink().getAllowedModes().contains( veh.getDriver().getMode() ) ) {
-//			final String message = "The link with id " + nextLinkId + " does not allow the current mode, which is " + veh.getDriver().getMode();
-//			throw new RuntimeException( message ) ;
-////			log.warn(message );
-////			return false ;
-//			// yyyy is rather nonsensical to get the mode from the driver, not from the vehicle.  However, this seems to be 
-//			// how it currently works: network links are defined for modes, not for vehicle types.  kai, may'16
-//		}
-		// currently does not work, see MATSIM-533 
-		
-		return true ;
-	}
 
 	// ////////////////////////////////////////////////////////////////////
 	// Queue related movement code
@@ -276,7 +260,7 @@ public class QNodeImpl extends QNodeI {
 				return false;
 		}
 
-        Link currentLink = veh.getCurrentLink();
+		Link currentLink = veh.getCurrentLink();
 		if (nextLinkId == null) {
 			log.error( "Agent has no or wrong route! agentId=" + veh.getDriver().getId()
 					+ " currentLink=" + currentLink.getId().toString()
@@ -286,7 +270,7 @@ public class QNodeImpl extends QNodeI {
 		}
 		
 		QLinkI nextQueueLink = this.netsimEngine.getNetsimNetwork().getNetsimLinks().get(nextLinkId);
-		if ( !checkNextLinkSemantics(currentLink, nextLinkId, nextQueueLink, veh) ) {
+		if ( !turnAcceptanceLogic.isAcceptingTurn(currentLink, nextLinkId, nextQueueLink, veh) ) {
 			moveVehicleFromInlinkToAbort( veh, fromLaneBuffer, now, currentLink.getId() ) ;
 			return true ;
 		}

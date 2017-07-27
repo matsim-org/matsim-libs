@@ -79,6 +79,10 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 	@Override
 	QNodeI createNetsimNode(final Node node) {
 		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+		
+		builder.setTurnAcceptanceLogic( new DefaultTurnAcceptanceLogic() ) ;
+//		builder.setTurnAcceptanceLogic( new OtherTurnAcceptanceLogic( netsimEngine) ) ;
+		
 		return builder.build( node ) ;
 	}
 	public final void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
