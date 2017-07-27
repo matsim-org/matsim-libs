@@ -16,14 +16,14 @@ public class VirtualLink implements Serializable {
     private final String id;
     private final VirtualNode from;
     private final VirtualNode to;
-    private final double travelTime;
+    private final double distance;
 
-    VirtualLink(int index, String idIn, VirtualNode fromIn, VirtualNode toIn, double travelTimeIn) {
+    VirtualLink(int index, String idIn, VirtualNode fromIn, VirtualNode toIn, double distance) {
         this.index = index;
         id = idIn;
         from = fromIn;
         to = toIn;
-        travelTime = travelTimeIn;
+        this.distance = distance;
     }
 
     public String getId() {
@@ -39,7 +39,7 @@ public class VirtualLink implements Serializable {
     }
     
     public double getTtime(){
-        return travelTime;
+        return distance;
     }
 
     public int getIndex() {return  index; }
