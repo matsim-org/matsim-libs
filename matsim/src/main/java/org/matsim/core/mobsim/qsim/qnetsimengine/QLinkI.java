@@ -52,7 +52,7 @@ abstract class QLinkI implements NetsimLink, TimeVariantLink {
 	// registerAdditionalAgentOnLink( MobsimAgent agent, String reason ) ;
 	
 
-	abstract QNode getToNode() ;
+	abstract QNodeI getToNode() ;
 
 	/**
 	 * add vehicle at "activity" location

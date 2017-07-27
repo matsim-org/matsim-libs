@@ -73,7 +73,7 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 	@Override
 	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
 		this.netsimEngine = netsimEngine1 ;
-		double effectiveCellSize = ((Network) network).getEffectiveCellSize() ;
+		double effectiveCellSize = network.getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){
@@ -85,7 +85,7 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 	}
 
 	@Override
-	public QLinkI createNetsimLink(Link link, QNode queueNode) {
+	public QLinkI createNetsimLink(Link link, QNodeI queueNode) {
 		QLinkI ql = null;
 		LanesToLinkAssignment l2l = this.laneDefinitions.getLanesToLinkAssignments().get(link.getId());
 		if (l2l != null){
@@ -99,7 +99,7 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 	}
 
 	@Override
-	public QNode createNetsimNode(Node node) {
+	public QNodeI createNetsimNode(Node node) {
 		return this.delegate.createNetsimNode(node);
 	}
 

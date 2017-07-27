@@ -44,8 +44,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInt
 /**
  * Represents a node in the QSimulation.
  */
-public class QNode implements NetsimNode {
-	private static final Logger log = Logger.getLogger(QNode.class);
+public class QNodeImpl extends QNodeI {
+	private static final Logger log = Logger.getLogger(QNodeImpl.class);
 	public static class Builder {
 		private final NetsimInternalInterface netsimEngine;
 		private NetsimEngineContext context;
@@ -53,8 +53,8 @@ public class QNode implements NetsimNode {
 			this.netsimEngine = netsimEngine2;
 			this.context = context;
 		}
-		public QNode build( Node n ) {
-			return new QNode( n, context, netsimEngine ) ;
+		public QNodeImpl build( Node n ) {
+			return new QNodeImpl( n, context, netsimEngine ) ;
 		}
 	}
 
@@ -81,7 +81,7 @@ public class QNode implements NetsimNode {
 	private final NetsimEngineContext context;
 	private final NetsimInternalInterface netsimEngine;
 
-	private QNode(final Node n, NetsimEngineContext context, NetsimInternalInterface netsimEngine2) {
+	private QNodeImpl(final Node n, NetsimEngineContext context, NetsimInternalInterface netsimEngine2) {
 		this.node = n;
 		this.netsimEngine = netsimEngine2 ;
 		this.context = context ;
@@ -104,6 +104,7 @@ public class QNode implements NetsimNode {
 	 * the queueLinks. Should be called by QueueNetwork, after creating all
 	 * QueueNodes and QueueLinks.
 	 */
+	@Override
 	/*package*/ void init() {
 		int i = 0;
 		for (Link l : this.node.getInLinks().values()) {
@@ -127,15 +128,18 @@ public class QNode implements NetsimNode {
 		return this.node;
 	}
 
-	/*
+	/**
 	 * The ParallelQSim replaces the activator with the QSimEngineRunner 
 	 * that handles this node.
 	 */
 	/*package*/ void setNetElementActivationRegistry(NetElementActivationRegistry activator) {
+		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
+		// not be a stable/robust API.  kai, jul'17
+		
 		this.activator = activator;
 	}
 
-	/*
+	/**
 	 * This method is called from QueueWithBuffer.addToBuffer(...) which is triggered at 
 	 * some placed, but always initially by a QLink's doSomStep(...) method. I.e. QNodes
 	 * are only activated while moveNodes(...) is performed. However, multiple threads
@@ -143,6 +147,9 @@ public class QNode implements NetsimNode {
 	 * cdobler, sep'14 
 	 */
 	/*package*/ final void activateNode() {	
+		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
+		// not be a stable/robust API.  kai, jul'17
+
 		/*
 		 * this.active.compareAndSet(boolean expected, boolean update)
 		 * We expect the value to be false, i.e. the node is de-activated. If this is
@@ -154,6 +161,9 @@ public class QNode implements NetsimNode {
 	}
 
 	final boolean isActive() {
+		// yyyy I cannot say if this needs to be in QNodeI or not.  The mechanics of this are tricky to implement, so it would 
+		// not be a stable/robust API.  kai, jul'17
+
 		return this.active.get();
 	}
 
@@ -174,6 +184,7 @@ public class QNode implements NetsimNode {
 	 * @return 
 	 * 		Whether the QNode stays active or not.
 	 */
+	@Override
 	/*package*/ boolean doSimStep(final double now) {
 		
 		int inLinksCounter = 0;

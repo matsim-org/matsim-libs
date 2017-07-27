@@ -627,7 +627,7 @@ public final class QLinkTest extends MatsimTestCase {
     private static void dummify(QNetwork network) {
         NetElementActivationRegistry netElementActivator = new NetElementActivationRegistry() {
             @Override
-            protected void registerNodeAsActive(QNode node) {
+            protected void registerNodeAsActive(QNodeImpl node) {
 
             }
 
@@ -646,11 +646,15 @@ public final class QLinkTest extends MatsimTestCase {
                 return 0;
             }
         };
-        for (QNode node : network.getNetsimNodes().values()) {
-            node.setNetElementActivationRegistry(netElementActivator);
+        for (QNodeI node : network.getNetsimNodes().values()) {
+        	if ( node instanceof QNodeImpl ) {
+        		((QNodeImpl) node).setNetElementActivationRegistry(netElementActivator);
+        	}
         }
         for (QLinkI link : network.getNetsimLinks().values()) {
-            ((QLinkImpl) link).setNetElementActivationRegistry(netElementActivator);
+        	if ( link instanceof QLinkImpl ) {
+        		((QLinkImpl) link).setNetElementActivationRegistry(netElementActivator);
+        	}
         }
     }
 

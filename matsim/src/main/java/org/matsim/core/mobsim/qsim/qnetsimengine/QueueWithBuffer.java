@@ -226,9 +226,12 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 			// need to reset the lastMovedTime.  If, in contrast, there was already a vehicle in the buffer before, we can
 			// use the lastMovedTime that was (somehow) computed for that vehicle.)
 		}
-		qLink.getToNode().activateNode();
-		// yy for an "upstream" QLane, this activates the toNode too early.  Yet I think I founds this
-		// also in the original QLane code.  kai, sep'13
+		final QNodeI toNode = qLink.getToNode();
+		if ( toNode instanceof QNodeImpl ) {
+			((QNodeImpl) toNode).activateNode();
+			// yy for an "upstream" QLane, this activates the toNode too early.  Yet I think I founds this
+			// also in the original QLane code.  kai, sep'13
+		}
 	}
 
 	@Override

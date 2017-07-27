@@ -88,13 +88,13 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 				mobsimTimer, linkWidthCalculator );
 	}
 	@Override
-	QLinkI createNetsimLink(final Link link, final QNode toQueueNode) {
+	QLinkI createNetsimLink(final Link link, final QNodeI toQueueNode) {
 		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override
-	QNode createNetsimNode(final Node node) {
-		QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
+	QNodeI createNetsimNode(final Node node) {
+		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
 		return builder.build( node ) ;
 	}
 }

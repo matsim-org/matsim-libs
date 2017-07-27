@@ -60,7 +60,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 			this.context = context ;
 			this.netsimEngine = netsimEngine2;
 		} 
-		QLinkImpl build( Link link, QNode toNode ) {
+		QLinkImpl build( Link link, QNodeI toNode ) {
 			if ( laneFactory == null ) {
 				laneFactory = new QueueWithBuffer.Builder( context ) ;
 			}
@@ -88,7 +88,7 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	private NetsimEngineContext context;
 	
-	private QLinkImpl(final Link link2, final QNode toNode, final LaneFactory roadFactory, NetsimEngineContext context, NetsimInternalInterface netsimEngine) {
+	private QLinkImpl(final Link link2, final QNodeI toNode, final LaneFactory roadFactory, NetsimEngineContext context, NetsimInternalInterface netsimEngine) {
 		super(link2, toNode, context, netsimEngine) ;
 		this.context = context ;
 		// The next line must must by contract stay within the constructor,

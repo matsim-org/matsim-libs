@@ -101,20 +101,20 @@ abstract class AbstractQLink extends QLinkI {
 
 	private TransitQLink transitQLink;
 	
-	private final QNode toQNode ;
+	private final QNodeI toQNode ;
 
 	private final NetsimEngineContext context;
 
 	private final NetsimInternalInterface netsimEngine;
 
-	AbstractQLink(Link link, QNode toQNode, NetsimEngineContext context, NetsimInternalInterface netsimEngine2) {
+	AbstractQLink(Link link, QNodeI toNode, NetsimEngineContext context, NetsimInternalInterface netsimEngine2) {
 		this.link = link ;
-		this.toQNode = toQNode ;
+		this.toQNode = toNode ;
 		this.context = context;
 		this.netsimEngine = netsimEngine2;
 	}
 
-	@Override QNode getToNode() {
+	@Override QNodeI getToNode() {
 		return toQNode ;
 	}
 

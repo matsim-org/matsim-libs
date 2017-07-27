@@ -65,12 +65,12 @@ public class RunFlexibleQNetworkFactoryExample {
 			
 			this.netsimEngine = netsimEngine1 ;
 		}
-		@Override QNode createNetsimNode(Node node) {
-			QNode.Builder builder = new QNode.Builder( netsimEngine, context ) ;
+		@Override QNodeI createNetsimNode(Node node) {
+			QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
 			return builder.build( node ) ;
 			
 		}
-		@Override QLinkI createNetsimLink(Link link, QNode queueNode) {
+		@Override QLinkI createNetsimLink(Link link, QNodeI queueNode) {
 			QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder(context) ;
 			
 			QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;

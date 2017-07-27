@@ -124,7 +124,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
 	 */
-	private final QNode toQueueNode;
+	private final QNodeI toQueueNode;
 	/**
 	 * The QueueLane instance which always exists.
 	 */
@@ -154,10 +154,10 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 * @param context TODO
 	 * @param netsimEngine TODO
 	 */
-	QLinkLanesImpl(final Link link2, final QNode toNode, List<ModelLane> lanes, NetsimEngineContext context, NetsimInternalInterface netsimEngine) {
-		super(link2, toNode, context, netsimEngine);
+	QLinkLanesImpl(final Link link2, final QNodeI queueNode, List<ModelLane> lanes, NetsimEngineContext context, NetsimInternalInterface netsimEngine) {
+		super(link2, queueNode, context, netsimEngine);
 		this.context = context ;
-		this.toQueueNode = toNode;
+		this.toQueueNode = queueNode;
 		this.laneQueues = new LinkedHashMap<>();
 		this.toNodeLaneQueues = new ArrayList<>();
 		this.lanes = lanes;
@@ -476,7 +476,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	public QNode getToNode() {
+	public QNodeI getToNode() {
 		return this.toQueueNode;
 	}
 

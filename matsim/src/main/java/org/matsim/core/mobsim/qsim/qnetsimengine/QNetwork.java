@@ -45,7 +45,7 @@ public class QNetwork implements NetsimNetwork {
 
 	private final Map<Id<Link>, QLinkI> links;
 
-	private final Map<Id<Node>, QNode> nodes;
+	private final Map<Id<Node>, QNodeI> nodes;
 
 	private final Network network;
 
@@ -69,7 +69,7 @@ public class QNetwork implements NetsimNetwork {
 			final QLinkI qlink = this.queueNetworkFactory.createNetsimLink(l, this.nodes.get(l.getToNode().getId()));
 			this.links.put(l.getId(), qlink);
 		}
-		for (QNode n : this.nodes.values()) {
+		for (QNodeI n : this.nodes.values()) {
 			n.init();
 		}
 	}
@@ -90,7 +90,7 @@ public class QNetwork implements NetsimNetwork {
 	}
 
 	@Override
-	public Map<Id<Node>, QNode> getNetsimNodes() {
+	public Map<Id<Node>, QNodeI> getNetsimNodes() {
 		return Collections.unmodifiableMap(this.nodes);
 	}
 

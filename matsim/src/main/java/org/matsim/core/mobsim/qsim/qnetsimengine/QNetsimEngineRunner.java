@@ -52,7 +52,7 @@ class QNetsimEngineRunner extends NetElementActivationRegistry implements Runnab
 	 * possible anymore.
 	 * cdobler, sep'14
 	 */
-	private final Queue<QNode> nodesQueue = new ConcurrentLinkedQueue<>();
+	private final Queue<QNodeImpl> nodesQueue = new ConcurrentLinkedQueue<>();
 
 	/*
 	 * Needs not to be thread-safe since links are only activated from nodes which
@@ -167,8 +167,8 @@ class QNetsimEngineRunner extends NetElementActivationRegistry implements Runnab
 	private void moveNodes() {
 		boolean remainsActive;
 		this.lockNodes = true;
-		QNode node;
-		Iterator<QNode> simNodes = this.nodesQueue.iterator();
+		QNodeImpl node;
+		Iterator<QNodeImpl> simNodes = this.nodesQueue.iterator();
 		while (simNodes.hasNext()) {
 			node = simNodes.next();
 			remainsActive = node.doSimStep(time);
@@ -213,7 +213,7 @@ class QNetsimEngineRunner extends NetElementActivationRegistry implements Runnab
 	 * cdobler, sep'14
 	 */
 	@Override
-	protected void registerNodeAsActive(QNode node) {
+	protected void registerNodeAsActive(QNodeImpl node) {
 		if (!this.lockNodes) this.nodesQueue.add(node);
 		else throw new RuntimeException("Tried to activate a QNode at a time where this was not allowed. Aborting!");
 	}
