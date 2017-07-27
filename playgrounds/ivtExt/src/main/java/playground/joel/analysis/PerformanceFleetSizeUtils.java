@@ -63,6 +63,8 @@ public enum PerformanceFleetSizeUtils {
     }
 
     /* package */ static Tensor calctpTot(Tensor tpStation, Tensor pij) {
+        int numdisjointSol = Dimensions.of(tpStation).get(0);
+        System.out.println("number of disjoint solutions =  " + numdisjointSol);
         int numVNode = Dimensions.of(pij).get(0);
 
         Tensor tpRoad = Array.zeros(numVNode, numVNode);
@@ -75,21 +77,26 @@ public enum PerformanceFleetSizeUtils {
             }
         }
 
-        Tensor tp = tpStation.get(0);
+        Tensor tp = Tensors.empty();
 
-        for (int i = 0; i < numVNode; ++i) {
-            for (int j = 0; j < numVNode; ++j) {
-                if (i != j) {
-                    tp.append(tpRoad.Get(i, j));
+        for (int sol = 0; sol < numdisjointSol; ++sol) {
+            Tensor tpsol = tpStation.get(sol);
+
+            for (int i = 0; i < numVNode; ++i) {
+                for (int j = 0; j < numVNode; ++j) {
+                    if (i != j) {
+                        tpsol.append(tpRoad.Get(i, j));
+                    }
                 }
             }
+            tp.append(tpsol);
         }
 
         return tp;
 
     }
 
-    /* package */static Tensor calcSRRoad(int numVehicles, VirtualNetwork virtualNetwork, int avSpeed) {
+    /* package */static Tensor calcSRRoad(VirtualNetwork virtualNetwork) {
         int numVNode = virtualNetwork.getvNodesCount();
         Tensor serviceRateRoads = Array.zeros(numVNode, numVNode);
         for (int i = 0; i < numVNode; ++i) {
@@ -114,10 +121,10 @@ public enum PerformanceFleetSizeUtils {
                 }
             }
         }
-
-        return serviceRateRoadsVector.multiply(RealScalar.of(numVehicles)).multiply(RealScalar.of(avSpeed).invert());
-
+        return serviceRateRoadsVector;
     }
+    
+    
 
     /* package */ static Tensor calcMeanByVehicles(Tensor a, Set<Integer> steps) {
         int numVNode = Dimensions.of(a).get(0);
@@ -141,14 +148,14 @@ public enum PerformanceFleetSizeUtils {
 
     }
 
-    /* package */ static void plot(Tensor values, Tensor valuesPeak, int vehicleSteps) throws Exception {
+    /* package */ static void plot(Tensor values, Tensor valuesPeak) throws Exception {
         XYSeries series = new XYSeries("Availability");
         for (int i = 0; i < Dimensions.of(values).get(0); ++i) {
-            series.add(i * vehicleSteps, values.Get(i).number().doubleValue());
+            series.add(i, values.Get(i).number().doubleValue());
         }
         XYSeries seriesPeak = new XYSeries("Availability Peak");
         for (int i = 0; i < Dimensions.of(values).get(0); ++i) {
-            seriesPeak.add(i * vehicleSteps, valuesPeak.Get(i).number().doubleValue());
+            seriesPeak.add(i, valuesPeak.Get(i).number().doubleValue());
         }
 
         XYSeriesCollection dataset = new XYSeriesCollection();
