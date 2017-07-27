@@ -54,6 +54,8 @@ public class TravelData implements Serializable {
     private Tensor pijPSF;
     private Tensor alphaijPSF; // tensor of dimension (numberofTimeSteps, numberVirtualNodes, numberVirtualNodes) alpha(t,i,j) static rebalancing rates from i
                        // to j at timestep t
+    private Tensor lambdaPSFij;
+    
     private int numberTimeSteps;
     private final int dt; // used as lookup
     public final long populationSize;
@@ -110,7 +112,7 @@ public class TravelData implements Serializable {
                             int vNodeIndexTo = virtualNetwork.getVirtualNode(linkTo).getIndex();
 
                             // add customer/dt to arrival rate
-                            lambda.set(s -> s.add(RealScalar.of(1.0 / (double) dt)), timeIndex, vNodeIndexFrom);
+                            lambda.set(s -> s.add(RealScalar.of(dt).invert()), timeIndex, vNodeIndexFrom);
                             // old implementation, TODO remove
                             // Scalar val = lambda.Get(timeIndex, vNodeIndexFrom);
                             // Scalar valAdded = val.add(RealScalar.of(1.0 / (double) dt));
@@ -160,6 +162,22 @@ public class TravelData implements Serializable {
                 lambdaPSF.set(labmdaold.subtract(labmdaold.multiply((Scalar) pii)), t, i);
             }
         }
+        
+        
+        // compute lambdaPSFij
+        // lambdaPSFij (i,j) = lambdaPSF (i) * pijPSF (i,j)
+        lambdaPSFij = pijPSF.copy();
+        for (int t = 0; t < numberTimeSteps; ++t) {
+            for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
+                Tensor replace = lambdaPSFij.get(t,i).multiply(lambdaPSF.Get(t,i));
+                lambdaPSFij.set(replace,t,i);
+            }
+        }
+        
+
+       
+        
+        
 
 
         // compute alphaij rates according to Pavone, Marco, Stephen L. Smith, and Emilio Frazzoli Daniela Rus. "Load balancing for mobility-on-demand
@@ -264,6 +282,12 @@ public class TravelData implements Serializable {
         int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
         return pijPSF.get(timestep).copy();
     }
+    
+    public Tensor getlambdaijPSFforTime(int time) {
+        int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
+        return lambdaPSFij.get(timestep).copy();
+    }
+    
 
     public Scalar getpijPSFforTime(int time, int from, int to) {
         int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
