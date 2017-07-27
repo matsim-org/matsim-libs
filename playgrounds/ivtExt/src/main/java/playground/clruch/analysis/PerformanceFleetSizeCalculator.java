@@ -29,7 +29,6 @@ import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveldata.TravelDataUtils;
 import playground.clruch.utils.GlobalAssert;
-import playground.joel.analysis.PerformanceFleetSizeCalculatorClean;
 import playground.joel.analysis.utils.ThroughputCalculator;
 
 /** @author Claudio Ruch */
