@@ -96,7 +96,7 @@ public enum PerformanceFleetSizeUtils {
 
     }
 
-    /* package */static Tensor calcSRRoad(VirtualNetwork virtualNetwork) {
+    /* package */static Tensor calcSRRoad(VirtualNetwork virtualNetwork, int avSpeed) {
         int numVNode = virtualNetwork.getvNodesCount();
         Tensor serviceRateRoads = Array.zeros(numVNode, numVNode);
         for (int i = 0; i < numVNode; ++i) {
@@ -106,7 +106,8 @@ public enum PerformanceFleetSizeUtils {
                 Scalar serviceRate = RealScalar.ZERO;
                 if (i != j) {
                     VirtualLink vLink = virtualNetwork.getVirtualLink(from, to);
-                    serviceRate = RealScalar.of(vLink.getTtime());
+                    Scalar distance = (Scalar) RealScalar.of(vLink.getDistance());   
+                    serviceRate = RealScalar.of(avSpeed).divide(distance);
                 }
                 serviceRateRoads.set(serviceRate, i, j);
             }
