@@ -51,18 +51,18 @@ public class ScenarioPreparer {
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
 
-        final int maxPopulationSize = 20000;
+        final int maxPopulationSize = 100000;
 
-        final int numVirtualNodes = 5;
-        final int dtTravelData = 1800;
+        final int numVirtualNodes = 20;
+        final int dtTravelData = 3600;
         final boolean completeGraph = true;
 
         // LocationSpec object to specify city location and center, radius for cutting
-        LocationSpec ls = LocationSpec.ZURICH_NOCUT;
+        LocationSpec ls = LocationSpec.SIOUXFALLS_CITY;
 
         final boolean populationeliminateFreight = false;
         final boolean populationeliminateWalking = false;
-        final boolean populationchangeModeToAV = false; // TODO check if this is still needed !?
+        final boolean populationchangeModeToAV = true; // TODO check if this is still needed !?
 
         // output file names
         final String VIRTUALNETWORKFOLDERNAME = "virtualNetwork";
