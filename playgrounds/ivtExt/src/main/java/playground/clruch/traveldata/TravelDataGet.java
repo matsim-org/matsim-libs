@@ -20,9 +20,8 @@ public enum TravelDataGet {
      try {
          return TravelDataIO.fromByte(virtualNetwork, travelDataFile);
      } catch (Exception e) {
-         // e.printStackTrace();
          System.out.println("cannot load default " + travelDataFile);
-         // throw new RuntimeException();
+         e.printStackTrace();
      }
      return null;
  }
