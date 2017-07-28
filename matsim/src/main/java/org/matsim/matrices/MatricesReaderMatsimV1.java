@@ -76,7 +76,7 @@ public class MatricesReaderMatsimV1<T> extends MatsimXmlParser {
 	}
 
 	private void startEntry(final Attributes  atts) {
-		this.currMatrix.createEntry(atts.getValue("from_id"), atts.getValue("to_id"), Double.parseDouble(atts.getValue("value")));
+		this.currMatrix.createAndAddEntry(atts.getValue("from_id"), atts.getValue("to_id"), Double.parseDouble(atts.getValue("value")));
 	}
 
 }

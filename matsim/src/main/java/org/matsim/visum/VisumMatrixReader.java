@@ -203,7 +203,7 @@ public class VisumMatrixReader {
 				if (!from.equals(to)) {
 					value = Double.parseDouble(data[2]);
 				}
-				this.matrix.createEntry(from, to, value);
+				this.matrix.createAndAddEntry(from, to, value);
 
 			} else if (this.state == STATE_HEADER) {
 

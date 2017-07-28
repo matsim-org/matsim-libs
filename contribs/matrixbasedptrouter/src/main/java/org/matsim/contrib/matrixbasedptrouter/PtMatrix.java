@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
@@ -121,9 +120,9 @@ public final class PtMatrix {
 					double travelTime = distance / plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt);
 
 					// create entry - travel times in seconds
-					originDestinationTravelTimeMatrix.createEntry(originStop.getId().toString(), destinationStop.getId().toString(), travelTime);			
+					originDestinationTravelTimeMatrix.createAndAddEntry(originStop.getId().toString(), destinationStop.getId().toString(), travelTime);
 					// create entry - travel distances in meter
-					originDestinationTravelDistanceMatrix.createEntry(originStop.getId().toString(), destinationStop.getId().toString(), distance);	
+					originDestinationTravelDistanceMatrix.createAndAddEntry(originStop.getId().toString(), destinationStop.getId().toString(), distance);
 				}
 			}
 			log.info("Done creating OD matrices with pt stop to pt stop travel times and distances.");

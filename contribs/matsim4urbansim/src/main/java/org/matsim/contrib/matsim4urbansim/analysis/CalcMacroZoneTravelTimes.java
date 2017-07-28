@@ -185,7 +185,7 @@ public class CalcMacroZoneTravelTimes implements PersonDepartureEventHandler,
 	private void init(Matrix matrix) {
 		for(int i = 1; i < 8; i++){
 			for(int j = 1; j < 8; j++){
-				matrix.createEntry(Integer.toString(i), Integer.toString(j), 0.);
+				matrix.createAndAddEntry(Integer.toString(i), Integer.toString(j), 0.);
 			}
 		}
 	}

@@ -21,6 +21,8 @@
 package org.matsim.matrices;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -59,7 +61,7 @@ public final class Matrix {
 	// create methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final Entry createEntry(final String fromLocId, final String toLocId, final double value) {
+	public final Entry createAndAddEntry(final String fromLocId, final String toLocId, final double value) {
 
 		// create an entry
 		Entry e = new Entry(fromLocId, toLocId, value);
@@ -96,7 +98,7 @@ public final class Matrix {
 	public final Entry setEntry(final String fromLocId, final String toLocId, final double value) {
 		Entry e = getEntry(fromLocId, toLocId);
 		if (e == null) {
-			return createEntry(fromLocId, toLocId, value);
+			return createAndAddEntry(fromLocId, toLocId, value);
 		}
 		e.setValue(value);
 		return e;
@@ -153,19 +155,19 @@ public final class Matrix {
 		return this.desc;
 	}
 
-	public final TreeMap<String, ArrayList<Entry>> getFromLocations() {
+	public final Map<String, ArrayList<Entry>> getFromLocations() {
 		return this.fromLocs;
 	}
 
-	public final TreeMap<String, ArrayList<Entry>> getToLocations() {
+	public final Map<String, ArrayList<Entry>> getToLocations() {
 		return this.toLocs;
 	}
 
-	public final ArrayList<Entry> getFromLocEntries(final String fromLocationId) {
+	public final List<Entry> getFromLocEntries(final String fromLocationId) {
 		return this.fromLocs.get(fromLocationId);
 	}
 
-	public final ArrayList<Entry> getToLocEntries(final String toLocationId) {
+	public final List<Entry> getToLocEntries(final String toLocationId) {
 		return this.toLocs.get(toLocationId);
 	}
 

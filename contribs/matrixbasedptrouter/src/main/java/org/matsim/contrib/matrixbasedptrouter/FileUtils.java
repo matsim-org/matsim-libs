@@ -144,7 +144,7 @@ final class FileUtils {
 							ptStopHashMap.containsKey(destinationPtStopID)){
 
 						// add to od matrix
-						odMatrix.createEntry(originPtStopID.toString(), destinationPtStopID.toString(), value);
+						odMatrix.createAndAddEntry(originPtStopID.toString(), destinationPtStopID.toString(), value);
 					}
 					else{
 						// Print the warn count after reading is finished. We want to know exactly how many stops are missing. Daniel, may '13

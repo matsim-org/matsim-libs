@@ -367,7 +367,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 							originDestinationMatrix.setEntry(lastZoneId, zone_ID, trips);
 						}
 						else	
-							originDestinationMatrix.createEntry(lastZoneId, zone_ID, 1.);
+							originDestinationMatrix.createAndAddEntry(lastZoneId, zone_ID, 1.);
 							// see PtPlanToPlanStepBasedOnEvents.addPersonToVehicleContainer (or zone coordinate addition)
 					}
 					lastZoneId = zone_ID; // stores the first activity (e. g. "home")
