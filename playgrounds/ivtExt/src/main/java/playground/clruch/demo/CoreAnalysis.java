@@ -10,7 +10,7 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
-import ch.ethz.idsc.tensor.alg.Join;
+import ch.ethz.idsc.tensor.alg.Flatten;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Quantile;
 import playground.clruch.export.AVStatus;
@@ -83,12 +83,12 @@ class CoreAnalysis {
             }
 
             // Distance ratio
-            Tensor row = Join.of( //
-                    Tensors.of(time, requestsSize), //
+            Tensor row = Flatten.of( //
+                    Tensors.of(time, requestsSize, //
                     waitTimeQuantile, //
                     waitTimeMean, //
                     numStatus, //
-                    occupancyRatio);
+                    occupancyRatio), -1);
 
             table.append(row);
 

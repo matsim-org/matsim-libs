@@ -78,7 +78,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             EventsManager eventsManager //
     ) {
         super(eventsManager);
-        this.futurePathFactory = new FuturePathFactory(parallelLeastCostPathCalculator, travelTime);
+        futurePathFactory = new FuturePathFactory(parallelLeastCostPathCalculator, travelTime);
 
         pickupDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getPickupDurationPerStop();
         dropoffDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getDropoffDurationPerStop();
@@ -339,9 +339,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             }
         }
     }
-    
+
     boolean extraCheck(VehicleLinkPair vehicleLinkPair) {
-    	return true;
+        return true;
     }
 
     @Override

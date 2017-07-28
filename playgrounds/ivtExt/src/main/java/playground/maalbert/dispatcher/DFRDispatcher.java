@@ -509,10 +509,13 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 try {
                     long populationSize = population.getPersons().size();
                     int rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
-                    arrivalInformation = new TravelData(virtualNetwork, lambdaXML, pijFile, alphaijFile, //
-                            populationSize, //
-                            rebalancingPeriod //
-                    );
+                    GlobalAssert.that(false);
+                    arrivalInformation = null;
+                    // TODO load from serialized data not XML, XML load function deleted. 
+//                    arrivalInformation = new TravelData(virtualNetwork, lambdaXML, pijFile, alphaijFile, //
+//                            populationSize, //
+//                            rebalancingPeriod //
+//                    );
                 } catch (Exception e) {
                     e.printStackTrace();
                     GlobalAssert.that(false);

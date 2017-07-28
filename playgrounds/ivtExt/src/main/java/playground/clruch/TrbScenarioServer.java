@@ -17,7 +17,14 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.clruch.analysis.AnalyzeAll;
+import playground.clruch.analysis.AnalyzeSummary;
+import playground.clruch.analysis.MinimumFleetSizeCalculator;
+import playground.clruch.analysis.PerformanceFleetSizeCalculator;
 import playground.clruch.data.ReferenceFrame;
+import playground.clruch.html.DataCollector;
+import playground.clruch.html.ReportGenerator;
+import playground.clruch.html.ScenarioParameters;
 import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
@@ -33,13 +40,6 @@ import playground.clruch.trb18.traveltime.reloading.TravelTimeReader;
 import playground.clruch.trb18.traveltime.reloading.WriteTravelTimesModule;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
-import playground.joel.analysis.AnalyzeAll;
-import playground.joel.analysis.AnalyzeSummary;
-import playground.joel.analysis.MinimumFleetSizeCalculator;
-import playground.joel.analysis.PerformanceFleetSizeCalculator;
-import playground.joel.html.DataCollector;
-import playground.joel.html.ReportGenerator;
-import playground.joel.html.ScenarioParameters;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -141,7 +141,7 @@ public class TrbScenarioServer {
 
         AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
-        TravelData travelData = TravelDataGet.readDefault(network, virtualNetwork);
+        TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
         int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
@@ -149,8 +149,8 @@ public class TrbScenarioServer {
 
         if (virtualNetwork != null) {
             minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network,population,virtualNetwork,travelData);
-            performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(network, virtualNetwork, travelData,
-                    maxNumberVehiclesPerformanceCalculator, vehicleSteps);
+            performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(virtualNetwork, travelData,
+                    maxNumberVehiclesPerformanceCalculator);
         }
 
         DataCollector.store(args, controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator, //

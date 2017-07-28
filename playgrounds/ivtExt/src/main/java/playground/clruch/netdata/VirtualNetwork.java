@@ -106,10 +106,10 @@ public class VirtualNetwork implements Serializable {
         return virtualNode;
     }
 
-    /* package */ void addVirtualLink(String idIn, VirtualNode fromIn, VirtualNode toIn, double travelTime) {
+    /* package */ void addVirtualLink(String idIn, VirtualNode fromIn, VirtualNode toIn, double distance) {
         GlobalAssert.that(Objects.nonNull(fromIn));
         GlobalAssert.that(Objects.nonNull(toIn));
-        VirtualLink virtualLink = new VirtualLink(virtualLinks.size(), idIn, fromIn, toIn, travelTime);
+        VirtualLink virtualLink = new VirtualLink(virtualLinks.size(), idIn, fromIn, toIn, distance);
         virtualLinks.add(virtualLink);
         virtualLinkPairs.put(nodePair_key(fromIn, toIn), virtualLink);
     }

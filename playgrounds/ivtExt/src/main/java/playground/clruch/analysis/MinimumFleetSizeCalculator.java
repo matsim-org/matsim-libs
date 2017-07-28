@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.joel.analysis;
+package playground.clruch.analysis;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -29,6 +29,7 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.red.Mean;
+import playground.clruch.html.DataCollector;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
@@ -39,7 +40,6 @@ import playground.clruch.traveldata.TravelDataUtils;
 import playground.clruch.utils.GlobalAssert;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.joel.helpers.EasyDijkstra;
-import playground.joel.html.DataCollector;
 
 /**
  * @author Claudio Ruch
@@ -68,7 +68,7 @@ public class MinimumFleetSizeCalculator {
         Population population = scenario.getPopulation();
 
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
-        TravelData travelData = TravelDataGet.readDefault(network, virtualNetwork);
+        TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, population, virtualNetwork, travelData);
 

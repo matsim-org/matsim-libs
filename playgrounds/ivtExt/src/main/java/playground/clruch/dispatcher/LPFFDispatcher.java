@@ -83,9 +83,9 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
             TravelData arrivalInformationIn) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
-        this.virtualNodeDest = abstractVirtualNodeDest;
-        this.requestSelector = abstractRequestSelector;
-        this.vehicleDestMatcher = abstractVehicleDestMatcher;
+        virtualNodeDest = abstractVirtualNodeDest;
+        requestSelector = abstractRequestSelector;
+        vehicleDestMatcher = abstractVehicleDestMatcher;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         rebalancingPeriod = getRebalancingPeriod(config); // Integer.parseInt(config.getParams().get("rebalancingPeriod"));
         travelData = arrivalInformationIn;
@@ -147,9 +147,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
 
         // Part II: outside rebalancing periods, permanently assign destinations to vehicles using bipartite matching
         if (round_now % dispatchPeriod == 0) {
-            BipartiteMatchingUtils bpmu = new BipartiteMatchingUtils();
-            printVals = bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), this.getAVRequests());
-            bpmu.executePickup(this);
+            printVals = BipartiteMatchingUtils.executePickup(this, getDivertableVehicleLinkPairs(), getAVRequests());
         }
     }
 
@@ -200,7 +198,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
 
             TravelData travelData = null;
             try {
-                travelData = TravelDataIO.fromByte(network, virtualNetwork, new File(virtualnetworkDir, "travelData"));
+                travelData = TravelDataIO.fromByte(virtualNetwork, new File(virtualnetworkDir, "travelData"));
             } catch (ClassNotFoundException | DataFormatException | IOException e) {
                 System.out.println("problem reading travelData");
                 e.printStackTrace();

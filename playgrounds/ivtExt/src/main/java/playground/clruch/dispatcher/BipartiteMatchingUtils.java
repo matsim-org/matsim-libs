@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Supplier;
 
 import org.matsim.api.core.v01.network.Link;
 
@@ -21,24 +20,36 @@ import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
-public class BipartiteMatchingUtils {
+public enum BipartiteMatchingUtils {
+    ;
 
-    Map<VehicleLinkPair, AVRequest> gbpMatch = null;
+    public static Tensor executePickup(UniversalDispatcher dispatcher, Collection<VehicleLinkPair> divertableVehicles, Collection<AVRequest> requests) {
+        Tensor infoLine = Tensors.empty();
+        Map<VehicleLinkPair, AVRequest> gbpMatch = globalBipartiteMatching(divertableVehicles, requests, infoLine);
+        for (Entry<VehicleLinkPair, AVRequest> entry : gbpMatch.entrySet()) {
+            AVVehicle av = entry.getKey().avVehicle;
+            AVRequest avRequest = entry.getValue();
+            dispatcher.setVehiclePickup(av, avRequest);
+        }
+        return infoLine;
+    }
 
-    /**
-     * @param dispatcher
-     *            univeralDispatcher from where call takes place
-     * @param supplier
-     *            supplier for VehicleLinkPairs (divertable Vehicles)
-     * @param requests
-     *            open requests
-     * @return does assignment according to globalBipartiteMatching and returns a tensor with infoline Information
-     */
-    public Tensor globalBipartiteMatching(Supplier<Collection<VehicleLinkPair>> supplier, Collection<AVRequest> requests) {
+    public static Tensor executeRebalance(RebalancingDispatcher dispatcher, Collection<VehicleLinkPair> divertableVehicles, Collection<AVRequest> requests) {
+        Tensor infoLine = Tensors.empty();
+        Map<VehicleLinkPair, AVRequest> gbpMatch = globalBipartiteMatching(divertableVehicles, requests, infoLine);
+        for (Entry<VehicleLinkPair, AVRequest> entry : gbpMatch.entrySet()) {
+            AVVehicle av = entry.getKey().avVehicle;
+            AVRequest avRequest = entry.getValue();
+            dispatcher.setVehicleRebalance(av, avRequest.getFromLink());
+        }
+        return infoLine;
+    }
 
-        Tensor returnTensor = Tensors.empty(); // contains information for InfoLine
-        Collection<VehicleLinkPair> divertableVehicles = supplier.get(); // save initial problem size
-        returnTensor.append(Tensors.vectorInt(divertableVehicles.size(), requests.size()));
+    private static Map<VehicleLinkPair, AVRequest> globalBipartiteMatching(Collection<VehicleLinkPair> divertableVehicles, Collection<AVRequest> requests,
+            Tensor infoLine) {
+
+        // save initial problemsize
+        infoLine.append(Tensors.vectorInt(divertableVehicles.size(), requests.size()));
 
         // 1) In case divertableVehicles >> requests reduce search space using kd-trees
         Collection<VehicleLinkPair> divertableVehiclesReduced = reduceVehiclesKDTree(requests, divertableVehicles);
@@ -46,32 +57,17 @@ public class BipartiteMatchingUtils {
         // 2) In case requests >> divertablevehicles reduce the search space using kd-trees
         Collection<AVRequest> requestsReduced = reduceRequestsKDTree(requests, divertableVehicles);
 
-        // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method and set new pickup commands
-        returnTensor.append(Tensors.vectorInt(divertableVehiclesReduced.size(), requestsReduced.size())); // initial problem size
+        // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method and
+        // set new pickup commands
+        infoLine.append(Tensors.vectorInt(divertableVehiclesReduced.size(), requestsReduced.size())); // initial
+                                                                                                      // problem
+                                                                                                      // size
 
-        gbpMatch = (new HungarBiPartVehicleDestMatcher()).matchAVRequest(divertableVehiclesReduced, requestsReduced); //
+        return (new HungarBiPartVehicleDestMatcher()).matchAVRequest(divertableVehiclesReduced, requestsReduced); //
 
-        // return infoLine
-        return returnTensor;
     }
 
-    public void executePickup(UniversalDispatcher dispatcher) {
-        for (Entry<VehicleLinkPair, AVRequest> entry : gbpMatch.entrySet()) {
-            AVVehicle av = entry.getKey().avVehicle;
-            AVRequest avRequest = entry.getValue();
-            dispatcher.setVehiclePickup(av, avRequest);
-        }
-    }
-
-    public void executeRebalance(RebalancingDispatcher dispatcher) {
-        for (Entry<VehicleLinkPair, AVRequest> entry : gbpMatch.entrySet()) {
-            AVVehicle av = entry.getKey().avVehicle;
-            AVRequest avRequest = entry.getValue();
-            dispatcher.setVehicleRebalance(av, avRequest.getFromLink());
-        }
-    }
-
-    private Collection<AVRequest> reduceRequestsKDTree(Collection<AVRequest> requests, Collection<VehicleLinkPair> divertableVehicles) {
+    private static Collection<AVRequest> reduceRequestsKDTree(Collection<AVRequest> requests, Collection<VehicleLinkPair> divertableVehicles) {
         // for less requests than cars, don't do anything
         if (requests.size() < divertableVehicles.size())
             return requests;
@@ -96,7 +92,8 @@ public class BipartiteMatchingUtils {
             reqIter++;
         }
 
-        // for all divertable vehicles, start nearestNeighborSearch until union is as large as the number of vehicles
+        // for all divertable vehicles, start nearestNeighborSearch until union is as large as the
+        // number of vehicles
         // start with only one request per vehicle
         Collection<AVRequest> requestsChosen = new HashSet<>();
         int iter = 1;
@@ -115,7 +112,7 @@ public class BipartiteMatchingUtils {
 
     }
 
-    private Collection<VehicleLinkPair> reduceVehiclesKDTree(Collection<AVRequest> requests, Collection<VehicleLinkPair> divertableVehicles) {
+    private static Collection<VehicleLinkPair> reduceVehiclesKDTree(Collection<AVRequest> requests, Collection<VehicleLinkPair> divertableVehicles) {
         // for less requests than cars, don't do anything
         if (divertableVehicles.size() < requests.size())
             return divertableVehicles;
@@ -139,9 +136,11 @@ public class BipartiteMatchingUtils {
             // vehIter++;
         }
 
-        // for all requests, start nearestNeighborSearch until union is as large as the number of requests
+        // for all requests, start nearestNeighborSearch until union is as large as the number of
+        // requests
         // start with only one vehicle per request
-        HashSet<VehicleLinkPair> vehiclesChosen = new HashSet(); // note: must be HashSet to avoid duplicate elements.
+        HashSet<VehicleLinkPair> vehiclesChosen = new HashSet(); // note: must be HashSet to avoid
+                                                                 // duplicate elements.
         int iter = 1;
         do {
             vehiclesChosen.clear();

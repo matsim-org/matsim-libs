@@ -140,7 +140,7 @@ public class LPVehicleRebalancing {
                 int linkIndex = varIDLinkID.get(variableId);
                 if (linkIndex > -1) {
                     VirtualLink vLink = virtualNetwork.getVirtualLink(linkIndex);
-                    GLPK.glp_set_obj_coef(lp, variableId, vLink.getTtime());
+                    GLPK.glp_set_obj_coef(lp, variableId, vLink.getDistance());
                 } else {
                     GLPK.glp_set_obj_coef(lp, variableId, 0.0);
                 }

@@ -72,9 +72,9 @@ public class LPFBDispatcher extends PartitionedDispatcher {
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
-        this.virtualNodeDest = abstractVirtualNodeDest;
+        virtualNodeDest = abstractVirtualNodeDest;
 
-        this.vehicleDestMatcher = abstractVehicleDestMatcher;
+        vehicleDestMatcher = abstractVehicleDestMatcher;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         rebalancingPeriod = getRebalancingPeriod(config); // Integer.parseInt(config.getParams().get("rebalancingPeriod"));
         // setup linear program
@@ -167,9 +167,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
 
         // Part II: outside rebalancing periods, permanently assign destinations to vehicles using bipartite matching
         if (round_now % dispatchPeriod == 0) {
-            BipartiteMatchingUtils bpmu = new BipartiteMatchingUtils();
-            printVals = bpmu.globalBipartiteMatching(() -> getDivertableVehicleLinkPairs(), this.getAVRequests());
-            bpmu.executePickup(this);
+            printVals = BipartiteMatchingUtils.executePickup(this, getDivertableVehicleLinkPairs(), getAVRequests());
         }
     }
 

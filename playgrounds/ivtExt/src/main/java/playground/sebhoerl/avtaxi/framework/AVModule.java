@@ -28,6 +28,7 @@ import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
+import playground.clruch.dispatcher.DriveByDispatcher;
 import playground.clruch.dispatcher.EdgyDispatcher;
 import playground.clruch.dispatcher.GlobalBipartiteMatchingDispatcher;
 import playground.clruch.dispatcher.LPFBDispatcher;
@@ -35,13 +36,8 @@ import playground.clruch.dispatcher.LPFFDispatcher;
 import playground.clruch.dispatcher.MonoMultiGBMDispatcher;
 import playground.clruch.dispatcher.NewSingleHeuristicDispatcher;
 import playground.clruch.dispatcher.UncoordinatedDispatcher;
-import playground.clruch.dispatcher.DriveByDispatcher;
-import playground.clruch.dispatcher.SelfishDispatcher;
-import playground.clruch.dispatcher.TestDispatcher;
 import playground.fseccamo.dispatcher.MPCDispatcher1;
 import playground.fseccamo.dispatcher.MPCDispatcher2;
-import playground.joel.dispatcher.MultiGBM.PolyMultiGBMDispatcher;
-import playground.maalbert.dispatcher.DFRDispatcher;
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVConfigReader;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -51,9 +47,6 @@ import playground.sebhoerl.avtaxi.data.AVLoader;
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.data.AVOperatorFactory;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
-import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.MultiODHeuristic;
-import playground.sebhoerl.avtaxi.dispatcher.single_fifo.SingleFIFODispatcher;
-import playground.sebhoerl.avtaxi.dispatcher.single_heuristic.SingleHeuristicDispatcher;
 import playground.sebhoerl.avtaxi.generator.AVGenerator;
 import playground.sebhoerl.avtaxi.generator.PopulationDensityGenerator;
 import playground.sebhoerl.avtaxi.generator.RandomDensityGenerator;
@@ -127,9 +120,6 @@ public class AVModule extends AbstractModule {
         bind(GlobalBipartiteMatchingDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), GlobalBipartiteMatchingDispatcher.class.getSimpleName())
                 .to(GlobalBipartiteMatchingDispatcher.Factory.class);
-
-        bind(TestDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), TestDispatcher.class.getSimpleName()).to(TestDispatcher.Factory.class);
 
         // bind(SelfishDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);

@@ -1,4 +1,4 @@
-package playground.joel.analysis;
+package playground.clruch.analysis;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Transpose;
@@ -11,6 +11,7 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.TimeTableXYDataset;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.util.SortOrder;
+
 import playground.clruch.utils.GlobalAssert;
 
 import java.awt.*;

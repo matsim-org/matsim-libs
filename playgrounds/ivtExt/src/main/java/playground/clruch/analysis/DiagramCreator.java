@@ -1,4 +1,4 @@
-package playground.joel.analysis;
+package playground.clruch.analysis;
 
 import java.awt.*;
 import java.io.File;

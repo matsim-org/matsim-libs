@@ -1,4 +1,4 @@
-package playground.joel.html;
+package playground.clruch.html;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.io.Export;
@@ -13,6 +13,10 @@ import org.matsim.core.config.groups.VehiclesConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.Time;
 import playground.clruch.ScenarioServer;
+import playground.clruch.analysis.AnalyzeSummary;
+import playground.clruch.analysis.MinimumFleetSizeCalculator;
+import playground.clruch.analysis.PerformanceFleetSizeCalculator;
+import playground.clruch.analysis.TripDistances;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.GlobalAssert;
@@ -106,7 +110,7 @@ public class DataCollector {
             scenarioParameters.minFleet = minimumFleetSizeCalculator.calculateMinFleet();
             scenarioParameters.EMDks = minimumFleetSizeCalculator.EMDks;
             scenarioParameters.minimumFleet = minimumFleetSizeCalculator.minimumFleet;
-            scenarioParameters.availabilities =  performanceFleetSizeCalculator.calculateAvailabilities();
+            scenarioParameters.availabilities =  performanceFleetSizeCalculator.calcAvailab();
         }
 
     }

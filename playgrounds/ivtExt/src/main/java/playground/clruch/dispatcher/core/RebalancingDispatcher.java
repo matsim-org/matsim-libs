@@ -68,6 +68,7 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
         if (pickupRegister.containsValue(avVehicle)){
             AVRequest avRequest = pickupRegister.inverse().get(avVehicle);
             pickupRegister.forcePut(avRequest, null);
+            // TODO do not use forcePut(avRequest,null) because it violates bijection. 
         }
         
         // redivert the vehicle, then generate a rebalancing event and add to list of currently rebalancing vehicles

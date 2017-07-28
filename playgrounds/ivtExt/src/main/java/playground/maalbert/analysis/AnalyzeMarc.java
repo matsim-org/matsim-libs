@@ -13,10 +13,10 @@ import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.CsvFormat;
+import playground.clruch.analysis.DiagramCreator;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
-import playground.joel.analysis.DiagramCreator;
 import playground.joel.data.TotalData;
 
 
