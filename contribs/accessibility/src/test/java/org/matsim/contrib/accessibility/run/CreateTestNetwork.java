@@ -71,6 +71,7 @@ class CreateTestNetwork {
 		 * 	|		 |
 		 * (3)		(6)------(9)
 		 */
+		// TODO 2.7m/s does obviously not correspond to 50km/h; changing this will alter results, dz, july'17
 		double freespeed = 2.7;	// this is m/s and corresponds to 50km/h
 		double capacity = 500.;
 		double numLanes = 1.;

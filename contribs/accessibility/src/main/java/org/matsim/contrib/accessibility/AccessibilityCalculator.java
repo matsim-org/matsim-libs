@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AccessibilityMeasureType;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AggregationObject;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
@@ -136,12 +137,18 @@ public final class AccessibilityCalculator {
 				Map<String, Double> accessibilities  = new LinkedHashMap<>();
 
 				for (String mode : calculators.keySet()) {
-					if(!acg.isUsingRawSumsWithoutLn()){
-						// logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
+					if (acg.getAccessibilityMeasureType() == AccessibilityMeasureType.logSum) {
 						accessibilities.put(mode, (1/this.cnScoringGroup.getBrainExpBeta()) * Math.log(expSums.get(mode)));
-					} else {
-						// this was used by IVT within SustainCity.  Not sure if we should maintain this; they could, after all, just exp the log results. kai, may'15
+					} else if (acg.getAccessibilityMeasureType() == AccessibilityMeasureType.rawSum) {
+						// this was used by IVT within SustainCity. Not sure if we should maintain this; they could, after all, just exp the log results. kai, may'15
+						// The above comment is from the time when the switch "isUsingRawSumsWithoutLn" was a "special case". I think the question is
+						// now resolved as "rawSum" has become one of the "AccessibilityMeasureType" options aiming to provide a means to use
+						// other potentially useful measure types. dz, july'17
 						accessibilities.put(mode, expSums.get(mode));
+					} else if (acg.getAccessibilityMeasureType() == AccessibilityMeasureType.gravity) {
+						throw new IllegalArgumentException("This accessibility measure is not yet implemented.");
+					} else {
+						throw new IllegalArgumentException("No valid accessibility measure type chosen.");
 					}
 				}
 				
@@ -179,22 +186,36 @@ public final class AccessibilityCalculator {
 			double distance_m = NetworkUtils.getEuclideanDistance(opportunity.getCoord(), nearestNode.getCoord());
 			
 			// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-			double walkBetaTT_utils_h = this.cnScoringGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - this.cnScoringGroup.getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
+			double walkBetaTT_utils_h = this.cnScoringGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()
+					- this.cnScoringGroup.getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
 			double VjkWalkTravelTime = walkBetaTT_utils_h * (distance_m / this.walkSpeed_m_h);
+			System.out.println("VjkWalkTravelTime = " + VjkWalkTravelTime);
 			
 			// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist:
 			double walkBetaTD_utils_m = cnScoringGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance(); // default value: 0.
 			double VjkWalkDistance = walkBetaTD_utils_m * distance_m;
+			System.out.println("VjkWalkDistance = " + VjkWalkDistance);
 			
 			double expVjk = Math.exp(this.cnScoringGroup.getBrainExpBeta() * (VjkWalkTravelTime + VjkWalkDistance));
 
 			// add Vjk to sum
 			AggregationObject jco = opportunityClusterMap.get(nearestNode.getId()); // Why "jco"?
 			if (jco == null) {
-				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0.); // initialize with zero!
+				jco = new AggregationObject(opportunity.getId(), null, null, nearestNode, 0.); // Important: Initialize with zero!
+				// This is a bit counter-intuitive. The first opportunity is added twice to the aggregation object, but the first time with zero
+				// "impact". Leave it as is for the time being as urbanSim code uses this, dz, july'17
 				opportunityClusterMap.put(nearestNode.getId(), jco); 
-			} // TODO This is wrong! There must be an "else" here as opportunities that are the first to be added the AggregationObject when it is created will be counted twice!
-			jco.addObject(opportunity.getId(), expVjk);
+			}
+			if (acg.getUseOpportunityWeights()) {
+				if (opportunity.getCustomAttributes().get("weight") == null) {
+					throw new RuntimeException("If option \"useOpportunityWeights\" is used, the facilities must have an attribute with key \"weight\"");
+				} else {
+					double weight = (double) opportunity.getCustomAttributes().get("weight");
+					jco.addObject(opportunity.getId(), expVjk * Math.pow(weight, acg.getWeightExponent()));
+				}
+			} else {
+				jco.addObject(opportunity.getId(), expVjk);
+			}
 //			LOG.info("--- numberOfObjects = " + jco.getNumberOfObjects() + " --- objectIds = " + jco.getObjectIds());
 		}
 		LOG.warn("Here is an error in the aggregation! Fix this soon with other changes that alter test reults!");

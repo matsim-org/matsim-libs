@@ -44,7 +44,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 	private final double betaWalkTT;
 	private final double betaWalkTD;
-	private final double walkSpeedMeterPerHour;
+	private final double walkSpeed_m_s;
 
 	private Node fromNode = null;
 	private final LeastCostPathTreeExtended lcpt;
@@ -81,7 +81,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		betaWalkTT		= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaWalkTD		= planCalcScoreConfigGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 
-		this.walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get( TransportMode.walk ) * 3600;
+		this.walkSpeed_m_s = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
 	}
 
 
@@ -103,24 +103,23 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		// TODO: extract this walk part?
 		// In the state found before modularization (june 15), this was anyway not consistent accross modes
 		// (different for PtMatrix), pointing to the fact that making this mode-specific might make sense. (comment by thibaut?)
-		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / this.walkSpeedMeterPerHour;
+		double walkTravelTimeMeasuringPoint2Road_h 	= distance.getDistancePoint2Intersection() / (this.walkSpeed_m_s * 3600);
 		
 		// (a) disutilities to get on or off the network
-		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) 
+		double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT)
 				+ (distance.getDistancePoint2Intersection() * betaWalkTD);
-		double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
 		
 		// (b) TRAVEL ON NETWORK to FIRST NODE:
 		double toll_money = getTollMoney(departureTime, nearestLink, distance);
-		double carSpeedOnNearestLink_meterpersec= nearestLink.getLength() / travelTime.getLinkTravelTime(nearestLink, departureTime, null, null);
-		double road2NodeCongestedCarTime_h 			= distance.getDistanceIntersection2Node() / (carSpeedOnNearestLink_meterpersec * 3600.);
+		double carSpeedOnNearestLink_m_s = nearestLink.getLength() / travelTime.getLinkTravelTime(nearestLink, departureTime, null, null);
+		double road2NodeCongestedCarTime_h = distance.getDistanceIntersection2Node() / (carSpeedOnNearestLink_m_s * 3600.);
 		
 		double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) 
 				+ (distance.getDistanceIntersection2Node() * betaCarTD) + (toll_money * betaCarTMC);
 //		// yyyyyy dzdzdz: replace the above by link disutility multiplied by fraction of link that is used according to the entry point.  (toll should be in there automatically??)
 
 		// === (2) REMAINING TRAVEL ON NETWORK:
-		double congestedCarDisutility = - lcpt.getTree().get(destination.getNearestNode().getId()).getCost();	
+		double congestedCarDisutility = - lcpt.getTree().get(destination.getNearestNode().getId()).getCost();
 		// travel disutility congested car on road network (including toll)
 		
 		// === (3) Pre-computed effect of all opportunities reachable from destination network node:
@@ -128,9 +127,9 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl;
 		// works because something like exp(A+c1) + exp(A+c2) + ... = exp(A) * [ exp(c1) + exp(c2) + ...]  =: exp(A) * sumExpVjkWalk
 		
 		// === (4) Everything together:
-		// note that exp(a+b+c) = exp(a) * exp(b) * exp(c), so for b and c the exponentiation has already been done.
-		return Math.exp(logitScaleParameter * (constCar + congestedCarDisutilityRoad2Node + congestedCarDisutility) ) *
-				expVhiWalk * sumExpVjkWalk;
+		// note that exp(a+b) = exp(a) * exp(b), so for b the exponentiation has already been done.
+		return Math.exp(this.logitScaleParameter * (walkDisutilityMeasuringPoint2Road + constCar + congestedCarDisutilityRoad2Node
+				+ congestedCarDisutility) ) * sumExpVjkWalk;
 	}
 
 

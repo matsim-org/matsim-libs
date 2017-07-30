@@ -16,9 +16,10 @@ public final class AggregationObject {
 	private double sum = 0. ;
 	private double cnt = 0. ;
 	
-	public AggregationObject(Id objectID, Id parcelId, Id zoneId, double value){
-		this(objectID, parcelId, zoneId, null, value);
-	}
+	// not used anywhere, dz, jul'17
+//	public AggregationObject(Id objectID, Id parcelId, Id zoneId, double value){
+//		this(objectID, parcelId, zoneId, null, value);
+//	}
 	
 	public AggregationObject(Id objectID, Id parcelId, Id zoneId, Node nearestNode, double value){
 		if(this.objectIdList == null)

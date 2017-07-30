@@ -29,6 +29,9 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 
 import com.vividsolutions.jts.geom.Envelope;
 
+/**
+ * @author thomas, nagel, dziemke
+ */
 public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	// yyyy todo: change in similar way as with other modes ("_mode") 
 	
@@ -37,15 +40,21 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private static final String BOUNDING_BOX_BOTTOM = "boundingBoxBottom";
 
 	@SuppressWarnings("unused")
-	private static Logger log = Logger.getLogger( AccessibilityConfigGroup.class ) ;
+	private static Logger log = Logger.getLogger(AccessibilityConfigGroup.class);
 
 	public static final String GROUP_NAME = "accessibility";
 	
-	private static final String USING_RAW_SUMS_WITHOUT_LN = "usingRawSumsWithoutLn";
+	private static final String ACCESSIBILITY_MEASURE_TYPE = "accessibilityMeasureType";
+	public static enum AccessibilityMeasureType{logSum, rawSum, gravity}
+	private AccessibilityMeasureType accessibilityMeasureType = AccessibilityMeasureType.logSum;
+	
+	private static final String USE_OPPORTUNITY_WEIGHTS = "useOpportunityWeights";
+	private boolean useOpportunityWeights = false;
+	private static final String WEIGHT_EXPONENT = "weightExponent";
+	private Double weightExponent = 1.;
+	
 	private static final String ACCESSIBILITY_DESTINATION_SAMPLING_RATE = "accessibilityDestinationSamplingRate";
-	// ===
 	private Double accessibilityDestinationSamplingRate;
-	private Boolean usingRawSumsWithoutLn = false ;
 
 	private double boundingBoxTop;
 	private double boundingBoxLeft;
@@ -55,17 +64,15 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	private Long cellSizeCellBasedAccessibility;
 	private String shapeFileCellBasedAccessibility;
 	
-	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation" ; 
-	public static enum AreaOfAccesssibilityComputation{ fromNetwork, fromBoundingBox, fromShapeFile, fromFile } 
-	private AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork ;
+	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation"; 
+	public static enum AreaOfAccesssibilityComputation{fromNetwork, fromBoundingBox, fromShapeFile, fromFile} 
+	private AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork;
 	private Set<Modes4Accessibility> isComputingMode = EnumSet.noneOf(Modes4Accessibility.class);
 	
-	// ---
-	private String outputCrs = null ;
-	private static final String OUTPUT_CRS="outputCRS" ;
+	private String outputCrs = null;
+	private static final String OUTPUT_CRS="outputCRS";
 
 	
-	// ===
 	@StringGetter(OUTPUT_CRS)
 	public final String getOutputCrs() {
 		return this.outputCrs;
@@ -100,23 +107,22 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	public Map<String,String> getComments() {
 		Map<String,String> map = new TreeMap<>() ;
 		
-		map.put(TIME_OF_DAY, "time of day at which trips for accessibility computations are assumed to start") ;
+		map.put(TIME_OF_DAY, "time of day at which trips for accessibility computations are assumed to start");
 		
 		map.put(ACCESSIBILITY_DESTINATION_SAMPLING_RATE, "if only a sample of destinations should be used " +
-				"(reduces accuracy -- not recommended except when necessary for computational speed reasons)" ) ;
+				"(reduces accuracy -- not recommended except when necessary for computational speed reasons)");
 		
-		map.put(USING_RAW_SUMS_WITHOUT_LN, "econometric accessibility usually returns the logsum. " +
-				"Set to true if you just want the sum (without the ln)") ;
+		map.put(ACCESSIBILITY_MEASURE_TYPE, "defines type of measure for accessibility computation.");
 		
-		map.put(USING_CUSTOM_BOUNDING_BOX, "true if custom bounding box should be used for accessibility computation (otherwise e.g. extent of network will be used)") ;
-		map.put(BOUNDING_BOX_BOTTOM,"custom bounding box parameters for accessibility computation (if enabled)") ;
+		map.put(USING_CUSTOM_BOUNDING_BOX, "true if custom bounding box should be used for accessibility computation (otherwise e.g. extent of network will be used)");
+		map.put(BOUNDING_BOX_BOTTOM,"custom bounding box parameters for accessibility computation (if enabled)");
 		
 		StringBuilder stb = new StringBuilder() ;
-		for ( AreaOfAccesssibilityComputation val : AreaOfAccesssibilityComputation.values() ) {
+		for (AreaOfAccesssibilityComputation val : AreaOfAccesssibilityComputation.values()) {
 			stb.append(val.toString() ) ;
 			stb.append( " " ) ;
 		}
-		map.put(AREA_OF_ACC_COMP, "method to determine the area for which the accessibility will be computed; possible values: " + stb ) ;
+		map.put(AREA_OF_ACC_COMP, "method to determine the area for which the accessibility will be computed; possible values: " + stb);
 		
 		map.put(MEASURING_POINTS_FILE, "if the accibility is computed using the `fromFile` option, " +
 				"the this must be the file containing the measuring points' coordinates. ");
@@ -191,13 +197,29 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	public void setAccessibilityDestinationSamplingRate(Double sampleRate){
 		this.accessibilityDestinationSamplingRate = sampleRate;
 	}
-    @StringGetter(USING_RAW_SUMS_WITHOUT_LN)
-    public Boolean isUsingRawSumsWithoutLn() {
-        return usingRawSumsWithoutLn;
+    @StringGetter(ACCESSIBILITY_MEASURE_TYPE)
+    public AccessibilityMeasureType getAccessibilityMeasureType() {
+        return this.accessibilityMeasureType;
     }
-    @StringSetter(USING_RAW_SUMS_WITHOUT_LN)
-    public void setUsingRawSumsWithoutLn(Boolean value) {
-        this.usingRawSumsWithoutLn = value;
+    @StringSetter(ACCESSIBILITY_MEASURE_TYPE)
+    public void setAccessibilityMeasureType(AccessibilityMeasureType accessibilityMeasureType) {
+        this.accessibilityMeasureType = accessibilityMeasureType;
+    }
+    @StringGetter(USE_OPPORTUNITY_WEIGHTS)
+    public Boolean getUseOpportunityWeights() {
+    	return useOpportunityWeights;
+    }
+    @StringSetter(USE_OPPORTUNITY_WEIGHTS)
+    public void setUseOpportunityWeights(Boolean useOpportunityWeights) {
+    	this.useOpportunityWeights = useOpportunityWeights;
+    }
+    @StringGetter(WEIGHT_EXPONENT)
+    public double getWeightExponent() {
+    	return weightExponent;
+    }
+    @StringSetter(WEIGHT_EXPONENT)
+    public void setWeightExponent(double weightExponent) {
+    	this.weightExponent = weightExponent;
     }
     @StringGetter("boundingBoxTop")
     public double getBoundingBoxTop() {
@@ -248,18 +270,7 @@ public final class AccessibilityConfigGroup extends ReflectiveConfigGroup{
 	}
 
     @StringSetter(AREA_OF_ACC_COMP)
-	public void setAreaOfAccessibilityComputation( AreaOfAccesssibilityComputation areaOfAccessibilityComputation) {
+	public void setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation areaOfAccessibilityComputation) {
 	    this.areaOfAccessibilityComputation = areaOfAccessibilityComputation ;
-//    	boolean problem = true ;
-//    	for ( AreaOfAccesssibilityComputation var : AreaOfAccesssibilityComputation.values() ) {
-//    		if ( var.toString().equals(areaOfAccessibilityComputation) ) {
-//    			this.areaOfAccessibilityComputation = var ;
-//    			problem = false ;
-//    		}
-//    	}
-//    	if ( problem ){
-//    		throw new RuntimeException("string typo error") ;
-//    	}
 	}
-    
 }

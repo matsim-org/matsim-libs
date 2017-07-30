@@ -20,9 +20,7 @@
 package org.matsim.contrib.accessibility.run;
 
 import java.io.File;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -111,9 +109,7 @@ public class AccessibilityIntegrationTest {
 	public void testWithBoundingBox() {
 		final Config config = createTestConfig();
 
-		// set bounding box manually in this test
-		// test values to define bounding box; these values usually come from a config file
-		double min = 0.;
+		double min = 0.; // Values for bounding box usually come from a config file
 		double max = 200.;
 
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
@@ -131,8 +127,49 @@ public class AccessibilityIntegrationTest {
 		Controler controler = new Controler(sc);
 
 		final AccessibilityModule module = new AccessibilityModule();
-//		final EvaluateTestResults evaluateListener = new EvaluateTestResults(true, true, true, true, true, true);
-		final EvaluateTestResults evaluateListener = new EvaluateTestResults();
+		final EvaluateTestResults evaluateListener = new EvaluateTestResults(false);
+		module.addSpatialGridDataExchangeListener(evaluateListener);
+		controler.addOverridingModule(module);
+		controler.addOverridingModule(new AbstractModule() {			
+			@Override
+			public void install() {
+				bind(PtMatrix.class).toInstance(ptMatrix);
+			}
+		});
+
+		controler.run();
+
+		// Compare some results -> done in EvaluateTestResults. Check here that this was done at all
+		Assert.assertTrue( evaluateListener.isDone() ) ;
+	}
+	
+	
+	@Test
+	public void testWithBoundingBoxUsingOpportunityWeights() {
+		final Config config = createTestConfig();
+
+		double min = 0.; // Values for bounding box usually come from a config file
+		double max = 200.;
+
+		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class) ;
+		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
+		acg.setBoundingBoxBottom(min);
+		acg.setBoundingBoxTop(max);
+		acg.setBoundingBoxLeft(min);
+		acg.setBoundingBoxRight(max);
+		
+		acg.setUseOpportunityWeights(true);
+		acg.setWeightExponent(2.);
+		
+		final Scenario sc = createTestScenarioUsingOpportunityWeights(config) ;
+		MatrixBasedPtRouterConfigGroup mbConfig = ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.class ) ;
+		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
+		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
+		
+		Controler controler = new Controler(sc);
+
+		final AccessibilityModule module = new AccessibilityModule();
+		final EvaluateTestResults evaluateListener = new EvaluateTestResults(true);
 		module.addSpatialGridDataExchangeListener(evaluateListener);
 		controler.addOverridingModule(module);
 		controler.addOverridingModule(new AbstractModule() {			
@@ -161,8 +198,7 @@ public class AccessibilityIntegrationTest {
 		Controler controler = new Controler(sc);
 
 		final AccessibilityModule module = new AccessibilityModule();
-		final EvaluateTestResults evaluateListener = new EvaluateTestResults();
-//		final EvaluateTestResults evaluateListener = new EvaluateTestResults(true, true, true, true, false, true);
+		final EvaluateTestResults evaluateListener = new EvaluateTestResults(false);
 		module.addSpatialGridDataExchangeListener(evaluateListener);
 		controler.addOverridingModule(module);
 		controler.addOverridingModule(new AbstractModule() {			
@@ -206,8 +242,7 @@ public class AccessibilityIntegrationTest {
 		Controler controler = new Controler(sc);
 
 		final AccessibilityModule module = new AccessibilityModule();
-		final EvaluateTestResults evaluateListener = new EvaluateTestResults();
-//		final EvaluateTestResults evaluateListener = new EvaluateTestResults(true, true, true, true, false, true);
+		final EvaluateTestResults evaluateListener = new EvaluateTestResults(false);
 		module.addSpatialGridDataExchangeListener(evaluateListener) ;
 		controler.addOverridingModule(module);
 		controler.addOverridingModule(new AbstractModule() {			
@@ -292,7 +327,6 @@ public class AccessibilityIntegrationTest {
 		mbConfig.setUsingTravelTimesAndDistances(true);
 		config.addModule(mbConfig);
 
-//		config.controler().setLastIteration(10);
 		config.controler().setLastIteration(0);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -312,6 +346,20 @@ public class AccessibilityIntegrationTest {
 		}
 		return scenario;
 	}
+	
+	
+	private static Scenario createTestScenarioUsingOpportunityWeights(final Config config) {
+		final Scenario scenario = ScenarioUtils.loadScenario(config);
+
+		// Creating test opportunities (facilities); one on each link with same ID as link and coord on center of link; with a weight
+		final ActivityFacilities opportunities = scenario.getActivityFacilities();
+		for (Link link : scenario.getNetwork().getLinks().values()) {
+			ActivityFacility facility = opportunities.getFactory().createActivityFacility(Id.create(link.getId(), ActivityFacility.class), link.getCoord());
+			facility.getCustomAttributes().put("weight", 2.);
+			opportunities.addActivityFacility(facility);
+		}
+		return scenario;
+	}
 
 	
 	/**
@@ -323,18 +371,11 @@ public class AccessibilityIntegrationTest {
 	 */
 	 static class EvaluateTestResults implements SpatialGridDataExchangeInterface{
 
-//		private Map<String,Boolean> isComputingMode = new HashMap<>();
-		
-		private boolean isDone = false ;
+		private boolean useOpportunityWeights = false;
+		private boolean isDone = false;
 
-		public EvaluateTestResults(){
-//		public EvaluateTestResults(boolean usingFreeSpeedGrid, boolean usingCarGrid, boolean usingBikeGrid, boolean usingWalkGrid, boolean usingPtGrid, boolean usingMatrixBasedPtGrid){
-//			this.isComputingMode.put("freespeed", usingFreeSpeedGrid);
-//			this.isComputingMode.put(TransportMode.car, usingCarGrid);
-//			this.isComputingMode.put(TransportMode.bike, usingBikeGrid);
-//			this.isComputingMode.put(TransportMode.walk, usingWalkGrid);
-//			this.isComputingMode.put(TransportMode.pt, usingPtGrid);
-//			this.isComputingMode.put("matrixBasedPt", usingMatrixBasedPtGrid);
+		public EvaluateTestResults(boolean useOpportunityWeights){
+			this.useOpportunityWeights = useOpportunityWeights;
 		}
 
 		/**
@@ -347,53 +388,70 @@ public class AccessibilityIntegrationTest {
 
 			LOG.info("Evaluating resuts ...");
 
-//			for (Modes4Accessibility modeEnum : Modes4Accessibility.values()) {
-//				String mode = modeEnum.toString(); // TODO only temporarily
-//				LOG.info("mode=" + mode);
-//				Gbl.assertNotNull(spatialGrids);
-////				if (this.isComputingMode.get(mode) != null) {
-//					// this was without the !=null yesterday but I cannot say what it was doing or why it was working or not.  kai, dec'16
-//				if (this.isComputingMode.get(mode)) { // I think it should check for "not false" rather than "not null". dz, mar'17
-//					Assert.assertNotNull(spatialGrids.get(mode));
-//				} else {
-//					Assert.assertNull(spatialGrids.get(mode));
-//				}
-//			}
-
 			for(double x = 50; x < 200; x += 100){
 				for(double y = 50; y < 200; y += 100){
 					final AccessibilityResults expected = new AccessibilityResults();
 
-					if (x == 50 && y == 50) {
-						expected.accessibilityFreespeed = 2.1486094237531126;
-						expected.accessibilityCar = 2.1482840466191093;
-						expected.accessibilityBike = 2.2257398663221;
-						expected.accessibilityWalk = 1.70054725728361;
-						expected.accessibilityPt = 2.1581641260040683;
-						expected.accessibilityMatrixBasedPt = 0.461863556339195;
-					} else if (x == 150 && y == 50) {
-						expected.accessibilityFreespeed = 2.1486094237531126;
-						expected.accessibilityCar = 2.1482840466191093;
-						expected.accessibilityBike = 2.2257398663221;
-						expected.accessibilityWalk = 1.70054725728361;
-						expected.accessibilityPt = 2.0032465393091434;
-						expected.accessibilityMatrixBasedPt = 0.461863556339195;
-					} else if (x == 50 && y == 150) {
-						expected.accessibilityFreespeed = 2.1766435716006005;
-						expected.accessibilityCar = 2.176238564675181;
-						expected.accessibilityBike = 2.2445468698643367;
-						// expected.accessibilityBike = 1.; // deliberately wrong for testing
-						expected.accessibilityWalk = 1.7719146868026079;
-						expected.accessibilityPt = 2.057596373646452;
-						expected.accessibilityMatrixBasedPt = 0.461863556339195;
-						// expected.accessibilityMatrixBasedPt = 1.; // deliberately wrong for testing
-					} else if (x == 150 && y == 150) {
-						expected.accessibilityFreespeed = 2.2055702759681273;
-						expected.accessibilityCar = 2.2052225231109226;
-						expected.accessibilityBike = 2.2637376515333636;
-						expected.accessibilityWalk = 1.851165291193725;
-						expected.accessibilityPt = 1.9202710265495115;
-						expected.accessibilityMatrixBasedPt = 0.624928280738513;
+					if (!useOpportunityWeights) {
+						if (x == 50 && y == 50) {
+							expected.accessibilityFreespeed = 2.1486094237531126;
+							expected.accessibilityCar = 2.1482840466191093;
+							expected.accessibilityBike = 2.2257398663221;
+							expected.accessibilityWalk = 1.70054725728361;
+							expected.accessibilityPt = 2.1581641260040683;
+							expected.accessibilityMatrixBasedPt = 0.461863556339195;
+						} else if (x == 150 && y == 50) {
+							expected.accessibilityFreespeed = 2.1486094237531126;
+							expected.accessibilityCar = 2.1482840466191093;
+							expected.accessibilityBike = 2.2257398663221;
+							expected.accessibilityWalk = 1.70054725728361;
+							expected.accessibilityPt = 2.0032465393091434;
+							expected.accessibilityMatrixBasedPt = 0.461863556339195;
+						} else if (x == 50 && y == 150) {
+							expected.accessibilityFreespeed = 2.1766435716006005;
+							expected.accessibilityCar = 2.176238564675181;
+							expected.accessibilityBike = 2.2445468698643367;
+							expected.accessibilityWalk = 1.7719146868026079;
+							expected.accessibilityPt = 2.057596373646452;
+							expected.accessibilityMatrixBasedPt = 0.461863556339195;
+						} else if (x == 150 && y == 150) {
+							expected.accessibilityFreespeed = 2.2055702759681273;
+							expected.accessibilityCar = 2.2052225231109226;
+							expected.accessibilityBike = 2.2637376515333636;
+							expected.accessibilityWalk = 1.851165291193725;
+							expected.accessibilityPt = 1.9202710265495115;
+							expected.accessibilityMatrixBasedPt = 0.624928280738513;
+						}
+					} else {
+						if (x == 50 && y == 50) {
+							expected.accessibilityFreespeed = 3.534903784873003;
+							expected.accessibilityCar = 3.534578407739;
+							expected.accessibilityBike = 3.6120342274419914;
+							expected.accessibilityWalk = 3.086841618403501;
+							expected.accessibilityPt = 3.5444584871239586;
+							expected.accessibilityMatrixBasedPt = 1.8481579174590859;
+						} else if (x == 150 && y == 50) {
+							expected.accessibilityFreespeed = 3.534903784873003;
+							expected.accessibilityCar = 3.534578407739;
+							expected.accessibilityBike = 3.6120342274419914;
+							expected.accessibilityWalk = 3.086841618403501;
+							expected.accessibilityPt = 3.389540900429034;
+							expected.accessibilityMatrixBasedPt = 1.8481579174590859;
+						} else if (x == 50 && y == 150) {
+							expected.accessibilityFreespeed = 3.562937932720491;
+							expected.accessibilityCar = 3.5625329257950717;
+							expected.accessibilityBike = 3.6308412309842275;
+							expected.accessibilityWalk = 3.1582090479224982;
+							expected.accessibilityPt = 3.443890734766343;
+							expected.accessibilityMatrixBasedPt = 1.8481579174590859;
+						} else if (x == 150 && y == 150) {
+							expected.accessibilityFreespeed = 3.5918646370880176;
+							expected.accessibilityCar = 3.591516884230813;
+							expected.accessibilityBike = 3.6500320126532544;
+							expected.accessibilityWalk = 3.2374596523136154;
+							expected.accessibilityPt = 3.3065653876694023;
+							expected.accessibilityMatrixBasedPt = 2.0112226418584043;
+						}
 					}
 
 					final AccessibilityResults actual = new AccessibilityResults();
