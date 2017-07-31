@@ -64,7 +64,8 @@ public class MATSimOpdytsControler<U extends DecisionVariable> {
 				this.opdytsConfig.getPopulationSize(), objectiveFunction);
 
 		result.setLogPath(this.opdytsConfig.getOutputDirectory());
-		result.setMaxTotalMemory(Integer.MAX_VALUE);
+		result.setMaxTotalMemory(this.opdytsConfig.getMaxTotalMemory());
+		result.setMaxMemoryPerTrajectory(this.opdytsConfig.getMaxMemoryPerTrajectory());
 		result.setIncludeCurrentBest(this.opdytsConfig.isIncludeCurrentBest());
 		result.setRandom(MatsimRandom.getRandom());
 		result.setInterpolate(this.opdytsConfig.isInterpolate());

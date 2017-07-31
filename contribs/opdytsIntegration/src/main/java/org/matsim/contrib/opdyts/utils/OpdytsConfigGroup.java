@@ -93,12 +93,39 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	private static final String UNIFORMITY_GAP_WEIGHT = "uniformityGapWeight";
 	private double uniformityGapWeight = 0.;
 
-	// BEGIN_NEW : amit June'17
 	private static final String WARM_UP_ITERATIONS = "warmUpIterations";
 	private int warmUpIterations = 1;
 
 	private static final String USE_ALL_WARM_UP_ITERATIONS = "useAllWarmUpIterations";
 	private boolean useAllWarmUpIterations = false;
+
+	// NEW, amit July17
+	private static final String MAX_TOTAL_MEMORY = "maxTotalMemory";
+	private int maxTotalMemory = Integer.MAX_VALUE;
+
+	private static final String MAX_MEMORY_PER_TRAJECTORY =  "setMaxMemoryPerTrajectory";
+	private int maxMemoryPerTrajectory = Integer.MAX_VALUE;
+
+	@StringGetter(MAX_TOTAL_MEMORY)
+	public int getMaxTotalMemory() {
+		return maxTotalMemory;
+	}
+
+	@StringSetter(MAX_TOTAL_MEMORY)
+	public void setMaxTotalMemory(int maxTotalMemory) {
+		this.maxTotalMemory = maxTotalMemory;
+	}
+
+	@StringGetter(MAX_MEMORY_PER_TRAJECTORY)
+	public int getMaxMemoryPerTrajectory() {
+		return maxMemoryPerTrajectory;
+	}
+
+	@StringSetter(MAX_MEMORY_PER_TRAJECTORY)
+	public void setMaxMemoryPerTrajectory(int maxMemoryPerTrajectory) {
+		this.maxMemoryPerTrajectory = maxMemoryPerTrajectory;
+	}
+	// NEW, amit July17
 
 	@StringGetter(WARM_UP_ITERATIONS)
 	public int getWarmUpIterations() {
@@ -119,8 +146,6 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	public void setUseAllWarmUpIterations(boolean useAllWarmUpIterations) {
 		this.useAllWarmUpIterations = useAllWarmUpIterations;
 	}
-
-	// END_NEW : amit June'17
 
 	@StringGetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
 	public double getVariationSizeOfRandomizeDecisionVariable() {
