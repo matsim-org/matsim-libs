@@ -41,7 +41,7 @@ public class PerformanceFleetSizeCalculator {
     final int maxVehicles;
     final int vehicleSteps = 50;
     final double PEAKPERCENTAGE = 0.5;
-    final int avSpeed = 15;
+    final int avSpeed = 5;
     final int vehicleBins;
     final int numVNode;
     final int numVLink;

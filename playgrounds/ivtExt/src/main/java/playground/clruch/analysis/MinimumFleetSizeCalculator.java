@@ -90,7 +90,7 @@ public class MinimumFleetSizeCalculator {
         tData = travelDataIn;
         numberTimeSteps = tData.getNumbertimeSteps();
         GlobalAssert.that(108000 % numberTimeSteps == 0);
-        dt = 108000 / numberTimeSteps;
+        dt = tData.getdt();
     }
 
     public Tensor calculateMinFleet() {
