@@ -23,6 +23,7 @@ package org.matsim.utils.gis.matsim2esri.network;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -60,6 +61,7 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 		typeBuilder.add("capacity", Double.class);
 		typeBuilder.add("lanes", Double.class);
 		typeBuilder.add("visWidth", Double.class);
+		typeBuilder.add("type", String.class);
 
 		this.builder = new SimpleFeatureBuilder(typeBuilder.buildFeatureType());
 	}
@@ -71,7 +73,7 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 		LineString ls = this.geofac.createLineString(new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()),
 				MGC.coord2Coordinate(link.getToNode().getCoord())});
 
-		Object [] attribs = new Object[9];
+		Object [] attribs = new Object[10];
 		attribs[0] = ls;
 		attribs[1] = link.getId().toString();
 		attribs[2] = link.getFromNode().getId().toString();
@@ -81,6 +83,7 @@ public class LineStringBasedFeatureGenerator implements FeatureGenerator{
 		attribs[6] = link.getCapacity();
 		attribs[7] = link.getNumberOfLanes();
 		attribs[8] = width;
+		attribs[9] = NetworkUtils.getType(link);
 
 		try {
 			return this.builder.buildFeature(null, attribs);
