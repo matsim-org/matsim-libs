@@ -72,12 +72,21 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 		this.addScoringParameters( new ScoringParameterSet() );
 
-		this.addParameterSet( new ModeParams( TransportMode.car ) );
-		this.addParameterSet( new ModeParams( TransportMode.pt ) );
-		this.addParameterSet( new ModeParams( TransportMode.walk ) );
-		this.addParameterSet( new ModeParams( TransportMode.bike ) );
-		this.addParameterSet( new ModeParams( TransportMode.ride ) ); 
-		this.addParameterSet( new ModeParams( TransportMode.other ) ); 
+		this.addModeParams( new ModeParams( TransportMode.car ) );
+		this.addModeParams( new ModeParams( TransportMode.pt ) );
+		this.addModeParams( new ModeParams( TransportMode.walk ) );
+		this.addModeParams( new ModeParams( TransportMode.bike ) );
+		this.addModeParams( new ModeParams( TransportMode.ride ) );
+		this.addModeParams( new ModeParams( TransportMode.other ) );
+		
+		{
+			ActivityParams params = new ActivityParams("dummy");
+			params.setTypicalDuration(2.*3600.);
+			this.addActivityParams(params);
+			// (this is there so that an empty config prints out at least one activity type,
+			// so that the explanations of this important concept show up e.g.
+			// in defaultConfig.xml, created from the GUI.  kai, jul'17
+		}
 
 		// yyyyyy find better solution for this. kai, dec'15
 		{
@@ -573,10 +582,72 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	public static class ActivityParams extends ReflectiveConfigGroup implements MatsimParameters {
 		// in normal pgm execution, code will presumably lock instance of PlanCalcScoreConfigGroup, but not instance of
 		// ActivityParams.  I will try to pass the locked setting through the getters. kai, jun'15
+		
+		final static String SET_TYPE = "activityParams";
+		
+		// ---
 
 		private static final String TYPICAL_DURATION_SCORE_COMPUTATION = "typicalDurationScoreComputation";
-		final static String SET_TYPE = "activityParams";
+		private TypicalDurationScoreComputation typicalDurationScoreComputation = TypicalDurationScoreComputation.relative ;
+
+		// --- typical duration:
+		
+		public static final String TYPICAL_DURATION = "typicalDuration";
+		public static final String TYPICAL_DURATION_CMT="typical duration of activity.  needs to be defined and non-zero.  in sec.";
+		
+		/**
+		 * {@value TYPICAL_DURATION_CMT}
+		 */
+		@StringGetter(TYPICAL_DURATION)
+		private String getTypicalDurationString() {
+			return Time.writeTime( getTypicalDuration() );
+		}
+		/**
+		 * {@value TYPICAL_DURATION_CMT}
+		 */
+		public double getTypicalDuration() {
+			return this.typicalDuration;
+		}
+		/**
+		 * {@value TYPICAL_DURATION_CMT}
+		 */
+		@StringSetter( TYPICAL_DURATION )
+		private void setTypicalDuration(final String typicalDuration) {
+			testForLocked() ;
+			setTypicalDuration( Time.parseTime( typicalDuration ) );
+		}
+		/**
+		 * {@value TYPICAL_DURATION_CMT}
+		 */
+		public void setTypicalDuration(final double typicalDuration) {
+			testForLocked() ;
+			this.typicalDuration = typicalDuration;
+		}
+
+		// --- activity type:
+
+		public static final String ACTIVITY_TYPE = "activityType";
 		private String type;
+		public static final String ACVITITY_TYPE_CMT = "all activity types that occur in the plans file need to be defined by their own sections here" ;
+		
+		/**
+		 * {@value -- ACVITITY_TYPE_CMT}
+		 */
+		@StringGetter(ACTIVITY_TYPE)
+		public String getActivityType() {
+			return this.type;
+		}
+		/**
+		 * {@value -- ACVITITY_TYPE_CMT}
+		 */
+		@StringSetter( ACTIVITY_TYPE )
+		public void setActivityType(final String type) {
+			testForLocked() ;
+			this.type = type;
+		}
+
+// ---
+
 		private double priority = 1.0;
 		private double typicalDuration = Time.UNDEFINED_TIME;
 		private double minimalDuration = Time.UNDEFINED_TIME;
@@ -586,7 +657,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		private double closingTime = Time.UNDEFINED_TIME;
 		private boolean scoringThisActivityAtAll = true ;
 
-		private TypicalDurationScoreComputation typicalDurationScoreComputation = TypicalDurationScoreComputation.relative ;
 
 
 		public ActivityParams() {
@@ -610,6 +680,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			str.append( "Use " + TypicalDurationScoreComputation.uniform.name() + " for backwards compatibility (all activities same score; higher proba to drop long acts)." ) ;
 			map.put( TYPICAL_DURATION_SCORE_COMPUTATION,  str.toString() ) ;
 			// ---
+			map.put(TYPICAL_DURATION, TYPICAL_DURATION_CMT);
+			// ---
 			return map ;
 		}
 
@@ -623,17 +695,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.typicalDurationScoreComputation = str ;
 		}
 
-		@StringGetter( "activityType" )
-		public String getActivityType() {
-			return this.type;
-		}
-
-		@StringSetter( "activityType" )
-		public void setActivityType(final String type) {
-			testForLocked() ;
-			this.type = type;
-		}
-
 		@StringGetter( "priority" )
 		public double getPriority() {
 			return this.priority;
@@ -645,25 +706,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.priority = priority;
 		}
 
-		@StringGetter( "typicalDuration" )
-		private String getTypicalDurationString() {
-			return Time.writeTime( getTypicalDuration() );
-		}
-
-		public double getTypicalDuration() {
-			return this.typicalDuration;
-		}
-
-		@StringSetter( "typicalDuration" )
-		private void setTypicalDuration(final String typicalDuration) {
-			testForLocked() ;
-			setTypicalDuration( Time.parseTime( typicalDuration ) );
-		}
-
-		public void setTypicalDuration(final double typicalDuration) {
-			testForLocked() ;
-			this.typicalDuration = typicalDuration;
-		}
 
 		@StringGetter( "minimalDuration" )
 		private String getMinimalDurationString() {
