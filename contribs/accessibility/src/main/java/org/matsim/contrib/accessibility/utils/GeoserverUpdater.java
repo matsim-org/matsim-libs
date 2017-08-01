@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.interfaces.FacilityDataExchangeInterface;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -44,8 +45,9 @@ import org.matsim.facilities.ActivityFacility;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class GeoserverUpdater implements FacilityDataExchangeInterface {
 
@@ -80,9 +82,10 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 		builder.setName(name);
 		builder.setCRS(MGC.getCRS(TransformationFactory.WGS84));
 
-		builder.add("the_geom", Point.class);
-		builder.add("x", Double.class);
-		builder.add("y", Double.class);
+//		builder.add("the_geom", Point.class);
+//		builder.add("x", Double.class);
+//		builder.add("y", Double.class);
+		builder.add("the_geom", Polygon.class);
 //		builder.add("time", Double.class); // new since 2015-12-02
 
 		for (Modes4Accessibility mode : Modes4Accessibility.values()) {
@@ -108,9 +111,14 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 			Double timeOfDay = entry.getKey().getSecond();
 			Coord coord = facility.getCoord() ;
 
-			featureBuilder.add(geometryFactory.createPoint(MGC.coord2Coordinate(transformation.transform(coord))));
-			featureBuilder.add(coord.getX());
-			featureBuilder.add(coord.getY());
+//			featureBuilder.add(geometryFactory.createPoint(MGC.coord2Coordinate(transformation.transform(coord))));
+//			featureBuilder.add(coord.getX());
+//			featureBuilder.add(coord.getY());
+			Coordinate coord1 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() - 50, coord.getY() - 50)));
+			Coordinate coord2 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() + 50, coord.getY() - 50)));
+			Coordinate coord3 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() + 50, coord.getY() + 50)));
+			Coordinate coord4 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() - 50, coord.getY() + 50)));
+			featureBuilder.add(geometryFactory.createPolygon(new Coordinate[]{coord1, coord2, coord3, coord4, coord1}));
 //			featureBuilder.add(timeOfDay);
 
 			Map<String, Double> accessibilities = entry.getValue();
