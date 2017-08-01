@@ -16,53 +16,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.demandGenerationWithFacilities;
+package tutorial.mobsim.ownMobsimAgentWithPerception;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
+import java.util.Map;
 
-import tutorial.population.demandGenerationWithFacilities.RunCreateFacilities;
-import tutorial.population.demandGenerationWithFacilities.RunCreatePopulationAndDemand;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
 /**
  * @author nagel
  *
  */
-public class IT {
+class MyGuidance {
 	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	private MyObserver observer;
+	private Scenario scenario;
 
-	@SuppressWarnings("static-method")
-	@Test
-	public final void test() {
-		
-		try {
-			RunCreateFacilities.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
-		
 
-		try {
-			RunCreatePopulationAndDemand.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
-
-		// We don't want to check in the input network.
-//		try {
-//			RunCreateNetwork.main(null);
-//		} catch ( Exception eee ) {
-//			eee.printStackTrace();
-//			Assert.fail();
-//		}
-
-		// The above test only tests if it runs, not if the output is reasonable.  Please go ahead and improve this. kai, jul'15
-		
+	MyGuidance( MyObserver observer, Scenario sc ) {
+		this.observer = observer ;
+		this.scenario = sc ;
 	}
+
+	public Id<Link> getBestOutgoingLink(Id<Link> linkId) {
+		Link currentLink = this.scenario.getNetwork().getLinks().get( linkId ) ;
+		Node outNode = currentLink.getToNode() ;
+		Map<Id<Link>, ? extends Link> outLinks = outNode.getOutLinks() ;
+		Id<Link> bestLinkId = null ;
+		double bestLinkCongestion = Double.POSITIVE_INFINITY ;
+		for ( Link outLink : outLinks.values() ) {
+			if ( this.observer.congestionLevel( outLink.getId() ) < bestLinkCongestion ) {
+				bestLinkCongestion = this.observer.congestionLevel( outLink.getId() ) ;
+				bestLinkId = outLink.getId();
+			}
+		}
+		return bestLinkId ;
+	}
+	
+
 
 }

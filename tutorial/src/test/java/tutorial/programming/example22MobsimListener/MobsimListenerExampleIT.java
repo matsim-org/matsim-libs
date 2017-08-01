@@ -25,6 +25,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.testcases.MatsimTestUtils;
 
+import tutorial.mobsim.example22MobsimListener.RunMobsimListenerExample;
+
 /**
  * @author tthunig
  *

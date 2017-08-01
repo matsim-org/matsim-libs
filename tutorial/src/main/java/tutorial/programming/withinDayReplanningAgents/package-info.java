@@ -8,7 +8,7 @@
  * This package contains the <i>second</i> variant.  <i>The other one is described in another tutorial package.</i>
  * At this point, all code is contained in a single file.  The Main class is necessary to plug everything together and run it.  The MyAgent class is an
  * example for an agent that randomly moves around in the system.  It should be enough to explain the general functionality.
- * See {@link tutorial.programming.ownMobsimAgentWithPerception} and {@link tutorial.programming.ownMobsimAgentUsingRouter} for
+ * See {@link tutorial.mobsim.ownMobsimAgentWithPerception} and {@link tutorial.mobsim.ownMobsimAgentUsingRouter} for
  * more complete examples.
  * Please address yourself to Kai Nagel or Michael Zilske for support.
  */

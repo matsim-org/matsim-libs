@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
+ * GeneratedDemandRunner
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,53 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.demandGenerationWithFacilities;
+package tutorial.population.demandGenerationFromShapefile;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.run.Controler;
 
-import tutorial.population.demandGenerationWithFacilities.RunCreateFacilities;
-import tutorial.population.demandGenerationWithFacilities.RunCreatePopulationAndDemand;
 
 /**
- * @author nagel
+ * Runs the generated demand and displays the 0th iteration in OTFVis
+ * @author dgrether
  *
  */
-public class IT {
-	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+class GeneratedDemandRunner {
+	// NOT naming this RunXxx since there are already similar examples elsewhere.  kai, feb'15
 
-	@SuppressWarnings("static-method")
-	@Test
-	public final void test() {
-		
-		try {
-			RunCreateFacilities.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
-		
 
-		try {
-			RunCreatePopulationAndDemand.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
-
-		// We don't want to check in the input network.
-//		try {
-//			RunCreateNetwork.main(null);
-//		} catch ( Exception eee ) {
-//			eee.printStackTrace();
-//			Assert.fail();
-//		}
-
-		// The above test only tests if it runs, not if the output is reasonable.  Please go ahead and improve this. kai, jul'15
-		
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Controler controler = new Controler("../matsimExamples/tutorial/example8DemandGeneration/config.xml");
+		controler.setOverwriteFiles(true) ;
+		controler.run();		
 	}
 
 }

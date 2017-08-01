@@ -11,9 +11,9 @@ buttons in javadoc.) </p>
  
 <h1>Initial demand generation</h1>
 
-<p> Generate demand from shape file: {@link tutorial.programming.demandGenerationFromShapefile} </p> 
+<p> Generate demand from shape file: {@link tutorial.population.demandGenerationFromShapefile} </p> 
 
-<p> Generate demand with facilities: {@link tutorial.programming.demandGenerationWithFacilities} </p>
+<p> Generate demand with facilities: {@link tutorial.population.demandGenerationWithFacilities} </p>
 
 <h1>Behavioral modules</h1>
 
@@ -35,7 +35,7 @@ buttons in javadoc.) </p>
 
 <h2>Convert to other tools</h2>
 
-<p> Convert network to shp file: {@link tutorial.programming.createNetworkSHP} </p>
+<p> Convert network to shp file: {@link tutorial.network.createNetworkSHP} </p>
 
 
 */

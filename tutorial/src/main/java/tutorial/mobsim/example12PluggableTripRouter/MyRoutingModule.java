@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,53 +16,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.demandGenerationWithFacilities;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
+/**
+ * 
+ */
+package tutorial.mobsim.example12PluggableTripRouter;
 
-import tutorial.population.demandGenerationWithFacilities.RunCreateFacilities;
-import tutorial.population.demandGenerationWithFacilities.RunCreatePopulationAndDemand;
+import java.util.Collections;
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.RoutingModule;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.facilities.Facility;
 
 /**
  * @author nagel
  *
  */
-public class IT {
+public class MyRoutingModule implements RoutingModule {
+
+	private Object iterationData;
 	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
-
-	@SuppressWarnings("static-method")
-	@Test
-	public final void test() {
-		
-		try {
-			RunCreateFacilities.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
-		
-
-		try {
-			RunCreatePopulationAndDemand.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
-
-		// We don't want to check in the input network.
-//		try {
-//			RunCreateNetwork.main(null);
-//		} catch ( Exception eee ) {
-//			eee.printStackTrace();
-//			Assert.fail();
-//		}
-
-		// The above test only tests if it runs, not if the output is reasonable.  Please go ahead and improve this. kai, jul'15
-		
+	@Inject
+	public MyRoutingModule(MySimulationObserver observer) {
+		this.iterationData = observer.getIterationData();
 	}
+
+	@Override
+	public List<? extends PlanElement> calcRoute(Facility fromFacility,
+			Facility toFacility, double departureTime, Person person) {
+		// calculate a route based on iterationData
+		System.out.println(iterationData);
+		return Collections.emptyList();
+	}
+
+	@Override
+	public StageActivityTypes getStageActivityTypes() {
+		return EmptyStageActivityTypes.INSTANCE;
+	}
+
 
 }

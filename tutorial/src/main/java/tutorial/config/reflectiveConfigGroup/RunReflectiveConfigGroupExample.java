@@ -16,52 +16,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.demandGenerationWithFacilities;
+package tutorial.config.reflectiveConfigGroup;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-
-import tutorial.population.demandGenerationWithFacilities.RunCreateFacilities;
-import tutorial.population.demandGenerationWithFacilities.RunCreatePopulationAndDemand;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.ControlerUtils;
 
 /**
  * @author nagel
  *
  */
-public class IT {
-	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+public class RunReflectiveConfigGroupExample {
 
-	@SuppressWarnings("static-method")
-	@Test
-	public final void test() {
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+
+		Config config = ConfigUtils.loadConfig( args[0], new MyConfigGroup() ) ;
 		
-		try {
-			RunCreateFacilities.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
+		// with cast:
+//		MyConfigGroup myConfigGroup = (MyConfigGroup) config.getModule( MyConfigGroup.GROUP_NAME ) ;
 		
-
-		try {
-			RunCreatePopulationAndDemand.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
-
-		// We don't want to check in the input network.
-//		try {
-//			RunCreateNetwork.main(null);
-//		} catch ( Exception eee ) {
-//			eee.printStackTrace();
-//			Assert.fail();
-//		}
-
-		// The above test only tests if it runs, not if the output is reasonable.  Please go ahead and improve this. kai, jul'15
+		// or without cast:
+		MyConfigGroup myConfigGroup = ConfigUtils.addOrGetModule(config, MyConfigGroup.GROUP_NAME, MyConfigGroup.class ) ;
+		
+		myConfigGroup.setDoubleField(-99.13) ;
+		
+		config.checkConsistency(); 
+		
+		ControlerUtils.checkConfigConsistencyAndWriteToLog(config, "test");
 		
 	}
 

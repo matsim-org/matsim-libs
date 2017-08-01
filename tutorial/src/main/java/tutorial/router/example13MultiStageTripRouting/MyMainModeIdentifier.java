@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,53 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.demandGenerationWithFacilities;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
+package tutorial.router.example13MultiStageTripRouting;
 
-import tutorial.population.demandGenerationWithFacilities.RunCreateFacilities;
-import tutorial.population.demandGenerationWithFacilities.RunCreatePopulationAndDemand;
+import java.util.List;
+
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.MainModeIdentifier;
 
 /**
- * @author nagel
- *
+ * @author thibautd
  */
-public class IT {
-	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+public class MyMainModeIdentifier implements MainModeIdentifier {
+	private final MainModeIdentifier defaultModeIdentifier;
 
-	@SuppressWarnings("static-method")
-	@Test
-	public final void test() {
-		
-		try {
-			RunCreateFacilities.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
-		
-
-		try {
-			RunCreatePopulationAndDemand.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
-
-		// We don't want to check in the input network.
-//		try {
-//			RunCreateNetwork.main(null);
-//		} catch ( Exception eee ) {
-//			eee.printStackTrace();
-//			Assert.fail();
-//		}
-
-		// The above test only tests if it runs, not if the output is reasonable.  Please go ahead and improve this. kai, jul'15
-		
+	public MyMainModeIdentifier(final MainModeIdentifier defaultModeIdentifier) {
+		this.defaultModeIdentifier = defaultModeIdentifier;
 	}
 
+	@Override
+	public String identifyMainMode(List<? extends PlanElement> tripElements) {
+		for ( PlanElement pe : tripElements ) {
+			if ( pe instanceof Leg && ((Leg) pe).getMode().equals( MyRoutingModule.TELEPORTATION_LEG_MODE ) ) {
+				return MyRoutingModule.TELEPORTATION_MAIN_MODE;
+			}
+		}
+		// if the trip doesn't contain a teleportation leg,
+		// fall back to the default identification method.
+		return defaultModeIdentifier.identifyMainMode( tripElements );
+	}
 }

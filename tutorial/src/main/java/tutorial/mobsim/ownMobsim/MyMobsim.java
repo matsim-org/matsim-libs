@@ -16,53 +16,53 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.demandGenerationWithFacilities;
+package tutorial.mobsim.ownMobsim;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
+import javax.inject.Inject;
 
-import tutorial.population.demandGenerationWithFacilities.RunCreateFacilities;
-import tutorial.population.demandGenerationWithFacilities.RunCreatePopulationAndDemand;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.vehicles.Vehicle;
 
 /**
  * @author nagel
  *
  */
-public class IT {
-	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+final class MyMobsim implements Mobsim {
+	@Inject Scenario scenario ;
+	@Inject EventsManager events ;
 
-	@SuppressWarnings("static-method")
-	@Test
-	public final void test() {
-		
-		try {
-			RunCreateFacilities.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
+	@Override
+	public void run() {
+		for ( Node node : scenario.getNetwork().getNodes().values() ) {
+			// construct mobsim node from data input
 		}
-		
-
-		try {
-			RunCreatePopulationAndDemand.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
+		for ( Link link : scenario.getNetwork().getLinks().values() ) {
+			// construct mobsim link from data input
+		}
+		for ( Person person : scenario.getPopulation().getPersons().values() ) {
+			// construct mobsim agents from data input 
 		}
 
-		// We don't want to check in the input network.
-//		try {
-//			RunCreateNetwork.main(null);
-//		} catch ( Exception eee ) {
-//			eee.printStackTrace();
-//			Assert.fail();
-//		}
+		// then run the mobsim.  time-stepped is one way; obviously there are others
+		for ( long time = 0 ; time <= 36*3600 ; time++ ) {
 
-		// The above test only tests if it runs, not if the output is reasonable.  Please go ahead and improve this. kai, jul'15
-		
+			// ...
+			
+			// events are pushed into the events manager:
+			Id<Link> linkId = null;
+			Id<Vehicle> vehicleId = null;
+			events.processEvent(new LinkLeaveEvent(time, vehicleId, linkId));
+			
+			// ...
+		}
+
 	}
 
 }

@@ -16,53 +16,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.demandGenerationWithFacilities;
+package tutorial.mobsim.ownMobsim;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-
-import tutorial.population.demandGenerationWithFacilities.RunCreateFacilities;
-import tutorial.population.demandGenerationWithFacilities.RunCreatePopulationAndDemand;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author nagel
  *
  */
-public class IT {
-	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+final class RunOwnMobsimExample {
 
-	@SuppressWarnings("static-method")
-	@Test
-	public final void test() {
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+
+		Config config = ConfigUtils.createConfig() ;
 		
-		try {
-			RunCreateFacilities.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
+		Scenario scenario = ScenarioUtils.createScenario(config) ;
 		
-
-		try {
-			RunCreatePopulationAndDemand.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
-
-		// We don't want to check in the input network.
-//		try {
-//			RunCreateNetwork.main(null);
-//		} catch ( Exception eee ) {
-//			eee.printStackTrace();
-//			Assert.fail();
-//		}
-
-		// The above test only tests if it runs, not if the output is reasonable.  Please go ahead and improve this. kai, jul'15
+		Controler controler = new Controler( scenario ) ;
 		
+		controler.addOverridingModule(new AbstractModule(){
+			@Override
+			public void install() {
+				this.bindMobsim().to(MyMobsim.class) ;
+			}
+		});
+		
+		controler.run();
 	}
 
 }

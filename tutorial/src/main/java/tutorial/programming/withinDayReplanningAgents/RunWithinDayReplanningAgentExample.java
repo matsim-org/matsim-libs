@@ -107,7 +107,7 @@ public class RunWithinDayReplanningAgentExample {
 }
 
 /**
- * See {@link tutorial.programming.ownMobsimAgentWithPerception} and {@link tutorial.programming.ownMobsimAgentUsingRouter} for
+ * See {@link tutorial.mobsim.ownMobsimAgentWithPerception} and {@link tutorial.mobsim.ownMobsimAgentUsingRouter} for
  * more complete examples.
  *
  * @author nagel

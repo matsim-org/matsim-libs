@@ -16,52 +16,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.demandGenerationWithFacilities;
+package tutorial.scenario.scenarioElement;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-
-import tutorial.population.demandGenerationWithFacilities.RunCreateFacilities;
-import tutorial.population.demandGenerationWithFacilities.RunCreatePopulationAndDemand;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author nagel
  *
  */
-public class IT {
-	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+public class RunScenarioElementExample {
 
-	@SuppressWarnings("static-method")
-	@Test
-	public final void test() {
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+
+		Config config = ConfigUtils.createConfig();
 		
-		try {
-			RunCreateFacilities.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
+		Scenario scenario = ScenarioUtils.createScenario(config) ;
+		
+		// NOTE: The below mechanism is probably superseded by the injection syntax.
+
+		{
+			final MyScenarioElement myScenarioElement = new MyScenarioElement();
+			myScenarioElement.addInformation("this is a text") ;
+			scenario.addScenarioElement( MyScenarioElement.NAME, myScenarioElement );
 		}
 		
-
-		try {
-			RunCreatePopulationAndDemand.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
+		// ...
+		
+		// This can later be retrieved at arbitrary places where the scenario is availabe by
+		{
+			MyScenarioElement mm = (MyScenarioElement) scenario.getScenarioElement( MyScenarioElement.NAME ) ;
+			for ( String str : mm.retrieveInformation() ) {
+				System.out.println( str );
+			}
 		}
-
-		// We don't want to check in the input network.
-//		try {
-//			RunCreateNetwork.main(null);
-//		} catch ( Exception eee ) {
-//			eee.printStackTrace();
-//			Assert.fail();
-//		}
-
-		// The above test only tests if it runs, not if the output is reasonable.  Please go ahead and improve this. kai, jul'15
+		
+		// NOTE: The above mechanism is probably superseded by the injection syntax.
 		
 	}
 

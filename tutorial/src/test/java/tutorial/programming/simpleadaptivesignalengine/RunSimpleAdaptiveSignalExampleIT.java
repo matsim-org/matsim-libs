@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.testcases.MatsimTestUtils;
 
-import tutorial.programming.simpleAdaptiveSignalEngine.RunSimpleAdaptiveSignalExample;
+import tutorial.mobsim.simpleAdaptiveSignalEngine.RunSimpleAdaptiveSignalExample;
 
 /**
  * @author tthunig

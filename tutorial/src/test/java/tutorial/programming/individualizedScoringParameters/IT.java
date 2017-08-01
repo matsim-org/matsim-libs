@@ -3,6 +3,8 @@ package tutorial.programming.individualizedScoringParameters;
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 
+import tutorial.scoring.individualizedScoringParameters.RunExampleIndividualizedScoring;
+
 import java.io.File;
 
 /**
