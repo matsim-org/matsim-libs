@@ -76,11 +76,8 @@
 	<module name="strategy">
 		<param name="maxAgentPlanMemorySize" value="5" /> <!-- 0 means unlimited -->
 
-		<!-- For subpopulations, we only add a 'default' strategy -->
-		<param name="ModuleProbability_1" value="1.0" />
-		<param name="Module_1" value="ChangeExpBeta" />
-		<param name="ModuleSubpopulation_1" value="time,reroute" />
-
+		<!-- Set via the code. To see how to set strategies for different subpopulations via the config, run the example and have a look at the output config. -->
+		
 	</module>
 
 <!-- ====================================================================== -->
