@@ -41,6 +41,7 @@ public class BicycleTravelTime implements TravelTime {
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 
+		// TODO can we just use bicycle free speed here?
 		double travelTime = link.getLength()/link.getFreespeed();
 		return travelTime;	
 	}

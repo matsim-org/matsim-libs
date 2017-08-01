@@ -1,73 +1,47 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v1.dtd">
-<network>
 
-<!-- ====================================================================== -->
-
-	<nodes>
-		<node id="-10" x="4594056.246772228" y="5815823.958524446" />
-		<node id="-12" x="4594021.989799074" y="5817284.798195195" />
-		<node id="-14" x="4594335.301430554" y="5817292.149040115" />
-		<node id="-16" x="4597026.006385821" y="5817356.102029738" />
-		<node id="-18" x="4596721.7805273635" y="5817348.7971126875" />
-		<node id="-20" x="4596624.123941699" y="5816537.4736762345" />
-		<node id="-22" x="4596617.359424192" y="5818118.692744157" />
-		<node id="-24" x="4596404.418901548" y="5817889.744181052" />
-		<node id="-26" x="4596374.388512419" y="5816763.890782872" />
-		<node id="-28" x="4596220.042778929" y="5816929.998548134" />
-		<node id="-30" x="4596240.638430104" y="5817726.303008006" />
-		<node id="-32" x="4596115.464452818" y="5817599.084398603" />
-		<node id="-34" x="4596122.393761084" y="5817081.211679075" />
-		<node id="-8" x="4597061.15798372" y="5815895.2771292785" />
-	</nodes>
-
-<!-- ====================================================================== -->
-
-	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
-		<link id="1" from="-14" to="-20" length="2410.0297492711575" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-306" />
-		<link id="10" from="-26" to="-14" length="2106.4028374866566" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-310" />
-		<link id="11" from="-26" to="-18" length="680.2915747717827" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-310" />
-		<link id="12" from="-18" to="-26" length="680.2915747717827" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-310" />
-		<link id="13" from="-14" to="-28" length="1919.2193540903547" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-312" />
-		<link id="14" from="-28" to="-14" length="1919.2193540903547" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-312" />
-		<link id="15" from="-28" to="-18" length="653.554133852936" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-312" />
-		<link id="16" from="-18" to="-28" length="653.554133852936" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-312" />
-		<link id="17" from="-14" to="-30" length="1954.1746978424958" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-314" />
-		<link id="18" from="-30" to="-14" length="1954.1746978424958" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-314" />
-		<link id="19" from="-30" to="-18" length="611.5622770869885" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-314" />
-		<link id="2" from="-20" to="-14" length="2410.0297492711575" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-306" />
-		<link id="20" from="-18" to="-30" length="611.5622770869885" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-314" />
-		<link id="21" from="-18" to="-16" length="304.3135468020588" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-300" />
-		<link id="22" from="-16" to="-18" length="304.3135468020588" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-300" />
-		<link id="23" from="-16" to="-8" length="1461.2477629195478" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-300" />
-		<link id="24" from="-8" to="-16" length="1461.2477629195478" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-300" />
-		<link id="25" from="-14" to="-32" length="1806.430098322635" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-316" />
-		<link id="26" from="-32" to="-14" length="1806.430098322635" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-316" />
-		<link id="27" from="-32" to="-18" length="655.9442870726475" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-316" />
-		<link id="28" from="-18" to="-32" length="655.9442870726475" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-316" />
-		<link id="29" from="-18" to="-14" length="2387.151332369691" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-302" />
-		<link id="3" from="-20" to="-18" length="817.1796175025185" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-306" />
-		<link id="30" from="-14" to="-18" length="2387.151332369691" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-302" />
-		<link id="31" from="-14" to="-34" length="1799.4981434063088" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-318" />
-		<link id="32" from="-34" to="-14" length="1799.4981434063088" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-318" />
-		<link id="33" from="-34" to="-18" length="656.4041894078428" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-318" />
-		<link id="34" from="-18" to="-34" length="656.4041894078428" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-318" />
-		<link id="35" from="-14" to="-22" length="2427.1306477032535" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-304" />
-		<link id="36" from="-22" to="-14" length="2427.1306477032535" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-304" />
-		<link id="37" from="-22" to="-18" length="776.9446892435294" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-304" />
-		<link id="38" from="-18" to="-22" length="776.9446892435294" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-304" />
-		<link id="39" from="-10" to="-12" length="1461.2412818712821" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-320" />
-		<link id="4" from="-18" to="-20" length="817.1796175025185" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-306" />
-		<link id="40" from="-12" to="-10" length="1461.2412818712821" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-320" />
-		<link id="41" from="-12" to="-14" length="313.39785152715683" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-320" />
-		<link id="42" from="-14" to="-12" length="313.39785152715683" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-320" />
-		<link id="5" from="-14" to="-24" length="2153.686853106193" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-308" />
-		<link id="6" from="-24" to="-14" length="2153.686853106193" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-308" />
-		<link id="7" from="-24" to="-18" length="627.1699389419153" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-308" />
-		<link id="8" from="-18" to="-24" length="627.1699389419153" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-308" />
-		<link id="9" from="-14" to="-26" length="2106.4028374866566" freespeed="5.0" capacity="1500.0" permlanes="1.0" oneway="1" modes="bike" origid="-310" />
-	</links>
-
-<!-- ====================================================================== -->
-
+<network name="equil test network; different link lengths; for bikes">
+   <nodes>
+      <node id="1" x="-20000" y="0"/>
+      <node id="2" x="-15000" y="0"/>
+      <node id="3" x="-865" y="5925"/>
+      <node id="4" x="-2498" y="4331"/>
+      <node id="5" x="-3829" y="3215"/>
+      <node id="6" x="-4698" y="1711"/>
+      <node id="7" x="-5000" y="0"/>
+      <node id="8" x="-4698" y="-1711"/>
+      <node id="9" x="-3829" y="-3215"/>
+      <node id="10" x="-2498" y="-4331"/>
+      <node id="11" x="-865" y="-5925"/>
+      <node id="12" x="0" y="0"/>
+      <node id="13" x="5000" y="0"/>
+      <node id="14" x="5000" y="-10000"/>
+      <node id="15" x="-20000" y="-10000"/>
+   </nodes>
+   <links capperiod="01:00:00">
+      <link id="1" from="1" to="2" length="10000.00" capacity="36000" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="2" from="2" to="3" length="13000.00" capacity="3600" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="3" from="2" to="4" length="12000.00" capacity="3600" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="4" from="2" to="5" length="11000.00" capacity="3600" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="5" from="2" to="6" length="10500.00" capacity="3600" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="6" from="2" to="7" length="10000.00" capacity="3600" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="7" from="2" to="8" length="10500.00" capacity="3600" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="8" from="2" to="9" length="11000.00" capacity="3600" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="9" from="2" to="10" length="12000.00" capacity="3600" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="10" from="2" to="11" length="13000.00" capacity="3600" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="11" from="3" to="12" length="5000.00" capacity="1000" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="12" from="4" to="12" length="5000.00" capacity="1000" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="13" from="5" to="12" length="5000.00" capacity="1000" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="14" from="6" to="12" length="5000.00" capacity="1000" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="15" from="7" to="12" length="5000.00" capacity="1000" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="16" from="8" to="12" length="5000.00" capacity="1000" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="17" from="9" to="12" length="5000.00" capacity="1000" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="18" from="10" to="12" length="5000.00" capacity="1000" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="19" from="11" to="12" length="5000.00" capacity="1000" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="20" from="12" to="13" length="10000.00" capacity="36000" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="21" from="13" to="14" length="10000.00" capacity="36000" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="22" from="14" to="15" length="35000.00" capacity="36000" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+      <link id="23" from="15" to="1" length="10000.00" capacity="36000" freespeed="5" permlanes="1" oneway="1" modes="bike" origid="" />
+   </links>
 </network>

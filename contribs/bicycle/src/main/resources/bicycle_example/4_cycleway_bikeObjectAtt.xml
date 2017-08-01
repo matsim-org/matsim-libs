@@ -3,7 +3,6 @@
 
 <objectAttributes>
 	<object id="1">
-		<attribute name="cyclewaytype" class="java.lang.String">lane</attribute>
 		<attribute name="highway" class="java.lang.String">primary</attribute>
 	</object>
 	<object id="2">
@@ -19,15 +18,12 @@
 		<attribute name="highway" class="java.lang.String">primary</attribute>
 	</object>
 	<object id="5">
-		<attribute name="cyclewaytype" class="java.lang.String">lane</attribute>
 		<attribute name="highway" class="java.lang.String">primary</attribute>
 	</object>
 	<object id="6">
-		<attribute name="cyclewaytype" class="java.lang.String">lane</attribute>
 		<attribute name="highway" class="java.lang.String">primary</attribute>
 	</object>
 	<object id="7">
-		<attribute name="cyclewaytype" class="java.lang.String">lane</attribute>
 		<attribute name="highway" class="java.lang.String">primary</attribute>
 	</object>
 	<object id="8">
@@ -55,15 +51,12 @@
 		<attribute name="highway" class="java.lang.String">primary</attribute>
 	</object>
 	<object id="14">
-		<attribute name="cyclewaytype" class="java.lang.String">lane</attribute>
 		<attribute name="highway" class="java.lang.String">primary</attribute>
 	</object>
 	<object id="15">
-		<attribute name="cyclewaytype" class="java.lang.String">lane</attribute>
 		<attribute name="highway" class="java.lang.String">primary</attribute>
 	</object>
 	<object id="16">
-		<attribute name="cyclewaytype" class="java.lang.String">lane</attribute>
 		<attribute name="highway" class="java.lang.String">primary</attribute>
 	</object>
 	<object id="17">
@@ -79,7 +72,6 @@
 		<attribute name="highway" class="java.lang.String">primary</attribute>
 	</object>
 	<object id="20">
-		<attribute name="cyclewaytype" class="java.lang.String">lane</attribute>
 		<attribute name="highway" class="java.lang.String">primary</attribute>
 	</object>
 	<object id="21">
@@ -89,67 +81,6 @@
 		<attribute name="highway" class="java.lang.String">primary</attribute>
 	</object>
 	<object id="23">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="24">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="25">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="26">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="27">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="28">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="29">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="30">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="31">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="32">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="33">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="34">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="35">
-		<attribute name="cyclewaytype" class="java.lang.String">lane</attribute>
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="36">
-		<attribute name="cyclewaytype" class="java.lang.String">lane</attribute>
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="37">
-		<attribute name="cyclewaytype" class="java.lang.String">lane</attribute>
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="38">
-		<attribute name="cyclewaytype" class="java.lang.String">lane</attribute>
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="39">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="40">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="41">
-		<attribute name="highway" class="java.lang.String">primary</attribute>
-	</object>
-	<object id="42">
 		<attribute name="highway" class="java.lang.String">primary</attribute>
 	</object>
 </objectAttributes>
