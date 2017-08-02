@@ -70,12 +70,17 @@ public class BicycleTravelDisutility implements TravelDisutility {
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 
+		// time
+		double travelTime = link.getLength()/link.getFreespeed();
+
+		double disutility = getTravelDisutilityBasedOnTTime(link, time, person, vehicle, travelTime);
+
+		return disutility;
+	}
+	private double getTravelDisutilityBasedOnTTime(Link link, double enterTime, Person person, Vehicle vehicle, double travelTime) {
 		String surface= (String) bicycleAttributes.getAttribute(link.getId().toString(), "surface");
 		String highway= (String) bicycleAttributes.getAttribute(link.getId().toString(), "highway");
 		String cyclewaytype= (String) bicycleAttributes.getAttribute(link.getId().toString(), "cyclewaytype");
-
-		// time
-		double travelTime = link.getLength()/link.getFreespeed();
 
 		// distance
 		double distance = link.getLength();
@@ -229,7 +234,6 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		double streettypeDisutility 	= streettypeDisutility_util_m * distance;
 
 		double disutility = (travelTimeDisutility + distanceDisutility + streettypeDisutility + surfaceDisutility) * randomfactor;
-
 		return disutility;
 	}
 
