@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +54,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final FuturePathFactory futurePathFactory;
 
     protected final Set<AVRequest> pendingRequests = new LinkedHashSet<>(); // access via getAVRequests()
-    private final Set<AVRequest> matchedRequests = new HashSet<>(); // for data integrity, private!
     private final Set<AVRequest> publishPeriodMatchedRequests = new HashSet<>(); // requests which are matched within a publish period.
     private final Map<AVVehicle, Link> vehiclesWithCustomer = new HashMap<>();
     // TODO visibility of map to private
@@ -92,14 +92,19 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     void updateDatastructures(Collection<AVVehicle> stayVehicles) {
         stayVehicles.forEach(vehiclesWithCustomer::remove);
 
-        // complete all matchings if vehicle has arrived on link
+        // complete all matchings if vehicle has arrived on link        
+        Set<AVRequest> reqToRemove = new HashSet<>();
         for (AVRequest avRequest : pickupRegister.keySet()) {
             AVVehicle pickupVehicle = pickupRegister.get(avRequest);
             Link pickupVehicleLink = getStayVehiclesUnique().get(pickupVehicle);
             if (avRequest.getFromLink().equals(pickupVehicleLink) && pendingRequests.contains(avRequest)) {
                 setAcceptRequest(pickupVehicle, avRequest);
+                boolean status = reqToRemove.add(avRequest);
+                GlobalAssert.that(status);
             }
         }
+        reqToRemove.stream().forEach(v->pickupRegister.remove(v));
+        
 
         // ---
         @SuppressWarnings("unused")
@@ -129,9 +134,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @return collection of all requests that have not been matched
      */
     protected synchronized final Collection<AVRequest> getAVRequests() {
-        pendingRequests.removeAll(matchedRequests);
-        matchedRequests.stream().forEach(v -> pickupRegister.remove(v));
-        matchedRequests.clear();
         return Collections.unmodifiableCollection(pendingRequests);
     }
 
@@ -248,13 +250,11 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private synchronized final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
         GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
 
-        boolean status = matchedRequests.add(avRequest);
-        GlobalAssert.that(status);
-        // TODO this causes an error if there are open requests at the end of the simulation
+        boolean statusPen = pendingRequests.remove(avRequest);
+        GlobalAssert.that(statusPen);
 
         // save avRequests which are matched for one publishPeriod to ensure
         // no requests are lost in the recording.
-
         publishPeriodMatchedRequests.add(avRequest);
 
         final Schedule schedule = avVehicle.getSchedule();
