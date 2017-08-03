@@ -63,7 +63,7 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
     
 
     // This function has to be called only after getVirtualNodeRebalancingVehicles
-    public synchronized final void setVehicleRebalance(final AVVehicle avVehicle, final Link destination) {
+    protected synchronized final void setVehicleRebalance(final AVVehicle avVehicle, final Link destination) {
         // in case vehicle is picking up, remove from pickup register
         if (pickupRegister.containsValue(avVehicle)){
             AVRequest avRequest = pickupRegister.inverse().get(avVehicle);
