@@ -41,7 +41,7 @@ public class PerformanceFleetSizeCalculator {
     final int maxVehicles;
     final int vehicleSteps = 50;
     final double PEAKPERCENTAGE = 0.5;
-    final int avSpeed = 5;
+    final int avSpeed = 1;
     final int vehicleBins;
     final int numVNode;
     final int numVLink;
@@ -52,7 +52,7 @@ public class PerformanceFleetSizeCalculator {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
-        PerformanceFleetSizeCalculator performcalc = new PerformanceFleetSizeCalculator(virtualNetwork, travelData, 1600);
+        PerformanceFleetSizeCalculator performcalc = new PerformanceFleetSizeCalculator(virtualNetwork, travelData, 1800);
         performcalc.calcAvailab();
     }
 

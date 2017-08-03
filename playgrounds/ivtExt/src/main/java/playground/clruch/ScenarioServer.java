@@ -81,8 +81,8 @@ public class ScenarioServer {
 
         Network network = scenario.getNetwork();
 
-//        Network reducedNetwork = NetworkUtils.createNetwork();
-//        new MatsimNetworkReader(reducedNetwork).readFile(new TRBScenarioConfig().filteredNetworkOutputPath);
+        Network reducedNetwork = NetworkUtils.createNetwork();
+        new MatsimNetworkReader(reducedNetwork).readFile(new TRBScenarioConfig().filteredNetworkOutputPath);
 
         MatsimStaticDatabase.initializeSingletonInstance( //
 
@@ -114,7 +114,7 @@ public class ScenarioServer {
         controler.addOverridingModule(new DatabaseModule()); // added only to listen to iteration counter
         controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
         controler.addOverridingModule(new AVTravelTimeModule());
-//        controler.addOverridingModule(new TRBModule(reducedNetwork));
+        controler.addOverridingModule(new TRBModule(reducedNetwork));
         controler.addOverridingModule(new WriteTravelTimesModule());
 
         // controler.addOverridingModule(new AbstractModule() {

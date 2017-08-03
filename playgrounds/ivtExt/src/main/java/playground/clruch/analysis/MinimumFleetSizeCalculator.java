@@ -41,10 +41,7 @@ import playground.clruch.utils.GlobalAssert;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.joel.helpers.EasyDijkstra;
 
-/**
- * @author Claudio Ruch
- *
- */
+/** @author Claudio Ruch */
 public class MinimumFleetSizeCalculator {
     final Network network;
     final Population population;
@@ -100,12 +97,15 @@ public class MinimumFleetSizeCalculator {
         Tensor minFleet = Tensors.empty();
         double num = 0.0;
         double den = 0.0;
+        Tensor totalArrivals = RealScalar.ZERO;
         for (int k = 0; k < numberTimeSteps; ++k) {
             // extract all relevant requests
             ArrayList<RequestObj> relevantRequests = getRelevantRequests(population, k * dt, (k + 1) * dt);
 
             // arrival rate
             double lambdak = RequestAnalysis.calcArrivalRate(relevantRequests, dt);
+            Tensor totalArrivalsDT = RealScalar.of(lambdak).multiply(RealScalar.of(dt));
+            totalArrivals = totalArrivals.add(totalArrivalsDT);
 
             // calculate average trip distance
             double dODk = RequestAnalysis.calcavDistance(dijkstra, relevantRequests);
@@ -126,16 +126,15 @@ public class MinimumFleetSizeCalculator {
             den += vk;
 
         }
+        System.out.println("total arrivals for calculating minimum fleet size: " + totalArrivals);
         minimumFleet = num / den;
         return minFleet;
     }
 
-    /**
-     * @param population
+    /** @param population
      * @param timeStart
      * @param timeEnd
-     * @return AV served requests in with submission time in interval [timeStart, timeEnd]
-     */
+     * @return AV served requests in with submission time in interval [timeStart, timeEnd] */
     ArrayList<RequestObj> getRelevantRequests(Population population, double timeStart, double timeEnd) {
         ArrayList<RequestObj> returnRequests = new ArrayList<>();
 
@@ -152,18 +151,20 @@ public class MinimumFleetSizeCalculator {
 
                     if (pE2 instanceof Leg) {
                         Leg leg = (Leg) pE2;
-                        double submissionTime = leg.getDepartureTime();
-                        if (timeStart <= submissionTime && submissionTime < timeEnd) {
-                            Activity a1 = (Activity) pE1;
-                            Activity a3 = (Activity) pE3;
+                        if (leg.getMode().equals("av")) {
+                            double submissionTime = leg.getDepartureTime();
+                            if (timeStart <= submissionTime && submissionTime < timeEnd) {
+                                Activity a1 = (Activity) pE1;
+                                Activity a3 = (Activity) pE3;
 
-                            Id<Link> startLinkID = a1.getLinkId();
-                            Id<Link> endLinkID = a3.getLinkId();
+                                Id<Link> startLinkID = a1.getLinkId();
+                                Id<Link> endLinkID = a3.getLinkId();
 
-                            Link startLink = network.getLinks().get(startLinkID);
-                            Link endLink = network.getLinks().get(endLinkID);
+                                Link startLink = network.getLinks().get(startLinkID);
+                                Link endLink = network.getLinks().get(endLinkID);
 
-                            returnRequests.add(new RequestObj(submissionTime, startLink, endLink));
+                                returnRequests.add(new RequestObj(submissionTime, startLink, endLink));
+                            }
                         }
                     }
                 }

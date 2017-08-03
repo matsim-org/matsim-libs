@@ -40,12 +40,17 @@ public enum PerformanceFleetSizeUtils {
 
         // list arrivals per time step
         List<Double> arrivalNumbers = new ArrayList<>();
+        Tensor totalArrivals = RealScalar.ZERO;
         for (int k = 0; k < numberTimeSteps; ++k) {
             Tensor lambdaii = tData.getLambdaPSFforTime(k * dt);
             Tensor totalArrivalRate = Total.of(lambdaii);
+            Tensor totalArivalTS = (totalArrivalRate.multiply(RealScalar.of(dt)));
+            System.out.println("arrivals in this time step: " + totalArivalTS);
+            totalArrivals = totalArrivals.add(totalArivalTS);
             RealScalar arrivals = (RealScalar) totalArrivalRate.multiply(RealScalar.of(dt));
             arrivalNumbers.add(arrivals.number().doubleValue());
         }
+        System.out.println("arrivals in total: " + totalArrivals);
 
         double maxArrival = Collections.max(arrivalNumbers);
 
