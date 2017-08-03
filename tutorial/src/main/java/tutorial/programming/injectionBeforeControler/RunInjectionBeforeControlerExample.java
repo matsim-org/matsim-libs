@@ -16,8 +16,9 @@ import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
+ * See NewControlerTest (which cannot be referenced via javadoc because tests cannot be referenced).
+ * 
  * @author kainagel
- * @see {@link NewControlerTest}
  */
 public class RunInjectionBeforeControlerExample {
 
