@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
-import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.*;
 import playground.clruch.netdata.*;
 import playground.clruch.traveldata.TravelData;
@@ -141,7 +141,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
               // Initialize
               // ------------------------------------------------------------------------------------------------------
               // Get System State
-                Map<VirtualNode, List<VehicleLinkPair>> available_Vehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+                Map<VirtualNode, List<RoboTaxi>> available_Vehicles = getVirtualNodeDivertableNotRebalancingVehicles();
                 Map<VirtualNode, Set<AVVehicle>> v_ij_reb = getVirtualNodeRebalancingToVehicles();
                 // Declare System State Matrices
                 Tensor rebalancingTovStation = Array.zeros(N_vStations);
@@ -373,7 +373,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 // TODO Count Rebalanced cars correctly!
                 // What happens if to many vehicles sent? does it send the ones it has and over or none if?or what happens here?
                 for (VirtualNode virtualNode : destinationLinks.keySet()) {
-                    Map<VehicleLinkPair, Link> rebalanceMatching = vehicleDestMatcher.matchLink(available_Vehicles.get(virtualNode),
+                    Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(available_Vehicles.get(virtualNode),
                             destinationLinks.get(virtualNode));
                     rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v.avVehicle, rebalanceMatching.get(v)));
                 }
@@ -394,7 +394,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 }
 
                 // collect available vehicles per vNode
-                Map<VirtualNode, List<VehicleLinkPair>> available_Vehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+                Map<VirtualNode, List<RoboTaxi>> available_Vehicles = getVirtualNodeDivertableNotRebalancingVehicles();
 
                 // assign destinations to the available vehicles
                 {

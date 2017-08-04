@@ -20,10 +20,10 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 public enum BipartiteMatchingUtils {
     ;
 
-    public static Tensor executePickup(UniversalDispatcher dispatcher, Collection<VehicleLinkPair> divertableVehicles, Collection<AVRequest> requests) {
+    public static Tensor executePickup(UniversalDispatcher dispatcher, Collection<RoboTaxi> divertableVehicles, Collection<AVRequest> requests) {
         Tensor infoLine = Tensors.empty();
-        Map<VehicleLinkPair, AVRequest> gbpMatch = globalBipartiteMatching(divertableVehicles, requests, infoLine);
-        for (Entry<VehicleLinkPair, AVRequest> entry : gbpMatch.entrySet()) {
+        Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(divertableVehicles, requests, infoLine);
+        for (Entry<RoboTaxi, AVRequest> entry : gbpMatch.entrySet()) {
             AVVehicle av = entry.getKey().avVehicle;
             AVRequest avRequest = entry.getValue();
             dispatcher.setVehiclePickup(av, avRequest);
@@ -31,10 +31,10 @@ public enum BipartiteMatchingUtils {
         return infoLine;
     }
 
-    public static Tensor executeRebalance(RebalancingDispatcher dispatcher, Collection<VehicleLinkPair> divertableVehicles, Collection<AVRequest> requests) {
+    public static Tensor executeRebalance(RebalancingDispatcher dispatcher, Collection<RoboTaxi> divertableVehicles, Collection<AVRequest> requests) {
         Tensor infoLine = Tensors.empty();
-        Map<VehicleLinkPair, AVRequest> gbpMatch = globalBipartiteMatching(divertableVehicles, requests, infoLine);
-        for (Entry<VehicleLinkPair, AVRequest> entry : gbpMatch.entrySet()) {
+        Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(divertableVehicles, requests, infoLine);
+        for (Entry<RoboTaxi, AVRequest> entry : gbpMatch.entrySet()) {
             AVVehicle av = entry.getKey().avVehicle;
             AVRequest avRequest = entry.getValue();
             dispatcher.setVehicleRebalance(av, avRequest.getFromLink());
@@ -42,14 +42,14 @@ public enum BipartiteMatchingUtils {
         return infoLine;
     }
 
-    private static Map<VehicleLinkPair, AVRequest> globalBipartiteMatching(Collection<VehicleLinkPair> divertableVehicles, Collection<AVRequest> requests,
+    private static Map<RoboTaxi, AVRequest> globalBipartiteMatching(Collection<RoboTaxi> divertableVehicles, Collection<AVRequest> requests,
             Tensor infoLine) {
 
         // save initial problemsize
         infoLine.append(Tensors.vectorInt(divertableVehicles.size(), requests.size()));
 
         // 1) In case divertableVehicles >> requests reduce search space using kd-trees
-        Collection<VehicleLinkPair> divertableVehiclesReduced = reduceVehiclesKDTree(requests, divertableVehicles);
+        Collection<RoboTaxi> divertableVehiclesReduced = reduceVehiclesKDTree(requests, divertableVehicles);
 
         // 2) In case requests >> divertablevehicles reduce the search space using kd-trees
         Collection<AVRequest> requestsReduced = reduceRequestsKDTree(requests, divertableVehicles);
@@ -64,7 +64,7 @@ public enum BipartiteMatchingUtils {
 
     }
 
-    private static Collection<AVRequest> reduceRequestsKDTree(Collection<AVRequest> requests, Collection<VehicleLinkPair> divertableVehicles) {
+    private static Collection<AVRequest> reduceRequestsKDTree(Collection<AVRequest> requests, Collection<RoboTaxi> divertableVehicles) {
         // for less requests than cars, don't do anything
         if (requests.size() < divertableVehicles.size())
             return requests;
@@ -96,7 +96,7 @@ public enum BipartiteMatchingUtils {
         int iter = 1;
         do {
             requestsChosen.clear();
-            for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
+            for (RoboTaxi vehicleLinkPair : divertableVehicles) {
                 double[] vehLoc = new double[] { vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getX(),
                         vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getY() };
                 Cluster<AVRequest> nearestCluster = KDTree.buildCluster(vehLoc, iter, new EuclideanDistancer());
@@ -109,7 +109,7 @@ public enum BipartiteMatchingUtils {
 
     }
 
-    private static Collection<VehicleLinkPair> reduceVehiclesKDTree(Collection<AVRequest> requests, Collection<VehicleLinkPair> divertableVehicles) {
+    private static Collection<RoboTaxi> reduceVehiclesKDTree(Collection<AVRequest> requests, Collection<RoboTaxi> divertableVehicles) {
         // for less requests than cars, don't do anything
         if (divertableVehicles.size() < requests.size())
             return divertableVehicles;
@@ -120,11 +120,11 @@ public enum BipartiteMatchingUtils {
         int maxDensity = divertableVehicles.size();
         double maxCoordinate = 1000000000000.0;
         int maxDepth = divertableVehicles.size();
-        MyTree<VehicleLinkPair> KDTree = new MyTree<>(dimensions, maxDensity, maxCoordinate, maxDepth);
+        MyTree<RoboTaxi> KDTree = new MyTree<>(dimensions, maxDensity, maxCoordinate, maxDepth);
 
         // add uniquely identifiable requests to KD tree
         // int vehIter = 0; // not read
-        for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
+        for (RoboTaxi vehicleLinkPair : divertableVehicles) {
             double d1 = vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getX();
             double d2 = vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getY();
             GlobalAssert.that(Double.isFinite(d1));
@@ -136,7 +136,7 @@ public enum BipartiteMatchingUtils {
         // for all requests, start nearestNeighborSearch until union is as large as the number of
         // requests
         // start with only one vehicle per request
-        HashSet<VehicleLinkPair> vehiclesChosen = new HashSet(); // note: must be HashSet to avoid
+        HashSet<RoboTaxi> vehiclesChosen = new HashSet(); // note: must be HashSet to avoid
                                                                  // duplicate elements.
         int iter = 1;
         do {
@@ -144,7 +144,7 @@ public enum BipartiteMatchingUtils {
             for (AVRequest avRequest : requests) {
                 Link link = avRequest.getFromLink();
                 double[] reqloc = new double[] { link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY() };
-                Cluster<VehicleLinkPair> nearestCluster = KDTree.buildCluster(reqloc, iter, new EuclideanDistancer());
+                Cluster<RoboTaxi> nearestCluster = KDTree.buildCluster(reqloc, iter, new EuclideanDistancer());
                 nearestCluster.getValues().stream().forEach(v -> vehiclesChosen.add(v));
             }
             ++iter;

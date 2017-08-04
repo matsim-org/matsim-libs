@@ -46,8 +46,8 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
     /**
      * @return returns the divertable vehicles per virtualNode
      */
-    protected Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeAvailableVehicles() {
-        Map<VirtualNode, List<VehicleLinkPair>> returnMap = getDivertableVehicleLinkPairs().stream() //
+    protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeAvailableVehicles() {
+        Map<VirtualNode, List<RoboTaxi>> returnMap = getDivertableVehicleLinkPairs().stream() //
                 .parallel() //
                 .collect(Collectors.groupingBy(vlp -> virtualNetwork.getVirtualNode(vlp.getDivertableLocation())));
 
@@ -62,8 +62,8 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
     /**
      * @return returns the divertable vehicles per virtualNode
      */
-    protected Map<VirtualNode, List<VehicleLinkPair>> getVirtualNodeDivertableUnassignedNotRebalancingVehicleLinkPairs() {
-        Map<VirtualNode, List<VehicleLinkPair>> returnMap = getDivertableUnassignedNotRebalancingVehicleLinkPairs().stream() //
+    protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeDivertableUnassignedNotRebalancingVehicleLinkPairs() {
+        Map<VirtualNode, List<RoboTaxi>> returnMap = getDivertableUnassignedNotRebalancingVehicleLinkPairs().stream() //
                 .parallel() //
                 .collect(Collectors.groupingBy(vlp -> virtualNetwork.getVirtualNode(vlp.getDivertableLocation())));
 
@@ -138,14 +138,14 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
      *
      * @return
      */
-    protected synchronized NavigableMap<VirtualNode, List<VehicleLinkPair>> getVirtualNodeDivertableNotRebalancingVehicles() {
+    protected synchronized NavigableMap<VirtualNode, List<RoboTaxi>> getVirtualNodeDivertableNotRebalancingVehicles() {
         // return list of vehicles
-        NavigableMap<VirtualNode, List<VehicleLinkPair>> nonRebalanceMap = new TreeMap<>();
+        NavigableMap<VirtualNode, List<RoboTaxi>> nonRebalanceMap = new TreeMap<>();
 
         // remove vehicles which are rebalancing
         final Map<AVVehicle, Link> rebalancingVehicles = getRebalancingVehicles();
-        Map<VirtualNode, List<VehicleLinkPair>> returnMap = getVirtualNodeAvailableVehicles();
-        for (Map.Entry<VirtualNode, List<VehicleLinkPair>> entry : returnMap.entrySet()) {
+        Map<VirtualNode, List<RoboTaxi>> returnMap = getVirtualNodeAvailableVehicles();
+        for (Map.Entry<VirtualNode, List<RoboTaxi>> entry : returnMap.entrySet()) {
             nonRebalanceMap.put(entry.getKey(),
                     entry.getValue().stream() //
                             .filter(v -> !rebalancingVehicles.containsKey(v.avVehicle)) //

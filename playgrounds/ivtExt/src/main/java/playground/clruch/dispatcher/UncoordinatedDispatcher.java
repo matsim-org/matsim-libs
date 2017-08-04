@@ -17,7 +17,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
-import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
@@ -77,15 +77,15 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
               // currently not tested, not verified simplistic implementation.
 
                 // I: for every unassigned request, send one vehicle from the same virtualNode
-                List<VehicleLinkPair> vehicles = getDivertableUnassignedVehicleLinkPairs();
+                List<RoboTaxi> vehicles = getDivertableUnassignedVehicleLinkPairs();
                 List<AVRequest> unassignedRequests = getUnassignedAVRequests();
 
                 for (AVRequest avr : unassignedRequests) {
                     VirtualNode vn = virtualNetwork.getVirtualNode(avr.getFromLink());
-                    Optional<VehicleLinkPair> optVh = vehicles.stream()
+                    Optional<RoboTaxi> optVh = vehicles.stream()
                             .filter(v -> virtualNetwork.getVirtualNode(v.getDivertableLocation()).equals(vn)).findAny();
                     if (optVh.isPresent()) {
-                        VehicleLinkPair vehicleToSend = optVh.get();
+                        RoboTaxi vehicleToSend = optVh.get();
                         setVehiclePickup(vehicleToSend.avVehicle, avr);
                         vehicles.remove(vehicleToSend);
                     }
@@ -95,9 +95,9 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
                 unassignedRequests = getUnassignedAVRequests();
                 for (AVRequest avr : unassignedRequests) {
                     if (now - avr.getSubmissionTime() > maxWaitTime) {
-                        Optional<VehicleLinkPair> optVh = vehicles.stream().findAny();
+                        Optional<RoboTaxi> optVh = vehicles.stream().findAny();
                         if (optVh.isPresent()) {
-                            VehicleLinkPair vehicleToSend = optVh.get();
+                            RoboTaxi vehicleToSend = optVh.get();
                             setVehiclePickup(vehicleToSend.avVehicle, avr);
                             vehicles.remove(vehicleToSend);
                         }
@@ -106,7 +106,7 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
 
                 // III: return all idle vehicles to wait Link
                 vehicles = getDivertableUnassignedVehicleLinkPairs();
-                for (VehicleLinkPair vlp : vehicles) {
+                for (RoboTaxi vlp : vehicles) {
                     VirtualNode vn = virtualNetwork.getVirtualNode(vlp.getDivertableLocation());
                     setVehicleRebalance(vlp.avVehicle, waitLocations.get(vn));
                 }

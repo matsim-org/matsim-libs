@@ -24,7 +24,7 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
  */
 final class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
 
-    DriveVehicleDiversionDirective(VehicleLinkPair vehicleLinkPair, Link destination, FuturePathContainer futurePathContainer) {
+    DriveVehicleDiversionDirective(RoboTaxi vehicleLinkPair, Link destination, FuturePathContainer futurePathContainer) {
         super(vehicleLinkPair, destination, futurePathContainer);
     }
 

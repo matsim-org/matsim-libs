@@ -43,7 +43,7 @@ import ch.ethz.idsc.tensor.sca.Chop;
 import ch.ethz.idsc.tensor.sca.Increment;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.dispatcher.core.DispatcherUtils;
-import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
@@ -186,11 +186,11 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                          * STAY vehicles + vehicles without task inside VirtualNode
                          */
                         // all vehicles except the ones with a customer on board and the ones which are rebalancing
-                        Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
+                        Map<VirtualNode, List<RoboTaxi>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
                         availableVehicles.values().stream().flatMap(List::stream).map(vlp -> vlp.avVehicle) //
                                 .forEach(accountedVehicles::add);
                         double[] array = new double[n];
-                        for (Entry<VirtualNode, List<VehicleLinkPair>> entry : availableVehicles.entrySet())
+                        for (Entry<VirtualNode, List<RoboTaxi>> entry : availableVehicles.entrySet())
                             array[entry.getKey().index] = entry.getValue().size(); // could use tensor notation
 
                         DoubleArray doubleArray = new DoubleArray("availableVehiclesPerVNode", new int[] { array.length }, array);
@@ -398,7 +398,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                     virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
                             final VirtualNode vnTo = vectorIndex < m ? //
                                     virtualNetwork.getVirtualLink(vectorIndex).getTo() : virtualNetwork.getVirtualNode(vectorIndex - m);
-                            final Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
+                            final Map<VirtualNode, List<RoboTaxi>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
 
                             List<Link> candidateLinks = new ArrayList<>();
                             for (AVRequest avRequest : getAVRequestsUnserved()) {
@@ -411,7 +411,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
 
                             // ---
                             if (availableVehicles.containsKey(vnFrom)) {
-                                final List<VehicleLinkPair> cars = availableVehicles.get(vnFrom); // find cars
+                                final List<RoboTaxi> cars = availableVehicles.get(vnFrom); // find cars
                                 final int desiredRebalance = rebalanceVector.Get(vectorIndex).number().intValue();
                                 @SuppressWarnings("unused")
                                 int pickupPerNode = 0;
@@ -422,7 +422,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                     Random random = new Random();
                                     int min = Math.min(desiredRebalance, cars.size());
                                     for (int count = 0; count < min; ++count) {
-                                        VehicleLinkPair vehicleLinkPair = cars.get(0);
+                                        RoboTaxi vehicleLinkPair = cars.get(0);
                                         cars.remove(0);
                                         Link rebalanceDest =
                                                 // centerLink.get(vnTo);

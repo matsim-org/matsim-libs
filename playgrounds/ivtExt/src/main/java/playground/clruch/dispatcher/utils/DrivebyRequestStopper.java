@@ -8,7 +8,7 @@ import java.util.function.BiConsumer;
 
 import org.matsim.api.core.v01.network.Link;
 
-import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
@@ -22,11 +22,11 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 public enum DrivebyRequestStopper {
     ;
 
-    public static int stopDrivingBy(Map<Link, List<AVRequest>> requestLocs, Collection<VehicleLinkPair> divertableVehicles,
+    public static int stopDrivingBy(Map<Link, List<AVRequest>> requestLocs, Collection<RoboTaxi> divertableVehicles,
             BiConsumer<AVVehicle, AVRequest> biConsumer) {
         int numDriveByPickup = 0;
 
-        for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
+        for (RoboTaxi vehicleLinkPair : divertableVehicles) {
             Link link = vehicleLinkPair.getDivertableLocation();
             if (requestLocs.containsKey(link)) {
                 List<AVRequest> requestList = requestLocs.get(link);

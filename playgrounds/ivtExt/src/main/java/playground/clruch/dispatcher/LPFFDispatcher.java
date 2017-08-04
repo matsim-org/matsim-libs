@@ -32,7 +32,7 @@ import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.dispatcher.core.BipartiteMatchingUtils;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
-import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
@@ -113,7 +113,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             rebalanceCount = rebalanceCount.subtract(rebalanceCountInteger);
 
             // ensure that not more vehicles are sent away than available
-            Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+            Map<VirtualNode, List<RoboTaxi>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
             Tensor feasibleRebalanceCount = FeasibleRebalanceCreator.returnFeasibleRebalance(rebalanceCountInteger.unmodifiable(), availableVehicles);
             total_rebalanceCount += (Integer) ((Scalar) Total.of(Tensor.of(feasibleRebalanceCount.flatten(-1)))).number();
 
@@ -137,7 +137,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
 
             // send rebalancing vehicles using the setVehicleRebalance command
             for (VirtualNode virtualNode : destinationLinks.keySet()) {
-                Map<VehicleLinkPair, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode),
+                Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode),
                         destinationLinks.get(virtualNode));
                 rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v.avVehicle, rebalanceMatching.get(v)));
             }

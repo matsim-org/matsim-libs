@@ -6,7 +6,7 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 
-public class VehicleLinkPair {
+public class RoboTaxi {
     public final AVVehicle avVehicle;
     public final LinkTimePair linkTimePair;
     private final Link currentDriveDestination; // null for stay task
@@ -17,7 +17,7 @@ public class VehicleLinkPair {
      * @param currentDriveDestination
      *            null if the vehicle is in stay task
      */
-    public VehicleLinkPair(AVVehicle avVehicle, LinkTimePair linkTimePair, Link currentDriveDestination) {
+    public RoboTaxi(AVVehicle avVehicle, LinkTimePair linkTimePair, Link currentDriveDestination) {
         this.avVehicle = avVehicle;
         this.linkTimePair = linkTimePair;
         this.currentDriveDestination = currentDriveDestination;

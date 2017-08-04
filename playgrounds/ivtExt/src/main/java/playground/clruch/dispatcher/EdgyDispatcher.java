@@ -22,7 +22,7 @@ import com.google.inject.name.Named;
 
 import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
-import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
 import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.utils.SafeConfig;
@@ -76,7 +76,7 @@ public class EdgyDispatcher extends RebalancingDispatcher {
             // iterate over all requests and send vehicles to some arbitrary request closer than distClose m
             // or to a request waiting for more than double waitMax
             Iterator<AVRequest> requestIterator = getAVRequests().iterator();
-            for (VehicleLinkPair vehicleLinkPair : getDivertableVehicleLinkPairs()) {
+            for (RoboTaxi vehicleLinkPair : getDivertableVehicleLinkPairs()) {
                 Link dest = vehicleLinkPair.getCurrentDriveDestination();
                 if (dest == null) { // vehicle in stay task
                     if (requestIterator.hasNext()) {

@@ -164,10 +164,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * 
      * @return available vehicles which are yet unassigned to a request as vehicle Link pairs
      */
-    protected List<VehicleLinkPair> getDivertableUnassignedVehicleLinkPairs() {
+    protected List<RoboTaxi> getDivertableUnassignedVehicleLinkPairs() {
         // get the staying vehicles and requests
-        List<VehicleLinkPair> divertableUnassignedVehiclesLinkPairs = new ArrayList<>();
-        for (VehicleLinkPair vehicleLinkPair : getDivertableVehicleLinkPairs()) {
+        List<RoboTaxi> divertableUnassignedVehiclesLinkPairs = new ArrayList<>();
+        for (RoboTaxi vehicleLinkPair : getDivertableVehicleLinkPairs()) {
             if (!pickupRegister.containsValue(vehicleLinkPair.avVehicle)) {
                 // if (!pickupRegister.inverse().containsKey(vehicleLinkPair.avVehicle)) {
                 divertableUnassignedVehiclesLinkPairs.add(vehicleLinkPair);
@@ -330,8 +330,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     final void endofStepTasks() {
         // stop all vehicles which are not on a pickup or rebalancing mission.
-        Collection<VehicleLinkPair> divertableVehicles = getDivertableVehicleLinkPairs();
-        for (VehicleLinkPair vehicleLinkPair : divertableVehicles) {
+        Collection<RoboTaxi> divertableVehicles = getDivertableVehicleLinkPairs();
+        for (RoboTaxi vehicleLinkPair : divertableVehicles) {
             boolean isOnPickup = pickupRegister.values().contains(vehicleLinkPair.avVehicle);
             boolean isOnExtra = extraCheck(vehicleLinkPair);
             if (!isOnPickup && !isOnExtra) {
@@ -340,7 +340,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         }
     }
 
-    boolean extraCheck(VehicleLinkPair vehicleLinkPair) {
+    boolean extraCheck(RoboTaxi vehicleLinkPair) {
         return true;
     }
 

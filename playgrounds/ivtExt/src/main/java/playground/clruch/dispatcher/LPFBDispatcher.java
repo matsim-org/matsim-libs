@@ -32,7 +32,7 @@ import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.dispatcher.core.BipartiteMatchingUtils;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
-import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
 import playground.clruch.dispatcher.utils.FeasibleRebalanceCreator;
@@ -95,9 +95,9 @@ public class LPFBDispatcher extends PartitionedDispatcher {
             Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
             // II.i compute rebalancing vehicles and send to virtualNodes
             {
-                Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+                Map<VirtualNode, List<RoboTaxi>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
                 int totalAvailable = 0;
-                for (List<VehicleLinkPair> vlpl : availableVehicles.values()) {
+                for (List<RoboTaxi> vlpl : availableVehicles.values()) {
                     totalAvailable += vlpl.size();
                 }
 
@@ -152,13 +152,13 @@ public class LPFBDispatcher extends PartitionedDispatcher {
 
                 // consistency check: rebalancing destination links must not exceed available
                 // vehicles in virtual node
-                Map<VirtualNode, List<VehicleLinkPair>> finalAvailableVehicles = availableVehicles;
+                Map<VirtualNode, List<RoboTaxi>> finalAvailableVehicles = availableVehicles;
                 GlobalAssert.that(!virtualNetwork.getVirtualNodes().stream()
                         .filter(v -> finalAvailableVehicles.get(v).size() < destinationLinks.get(v).size()).findAny().isPresent());
 
                 // send rebalancing vehicles using the setVehicleRebalance command
                 for (VirtualNode virtualNode : destinationLinks.keySet()) {
-                    Map<VehicleLinkPair, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode),
+                    Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode),
                             destinationLinks.get(virtualNode));
                     rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v.avVehicle, rebalanceMatching.get(v)));
                 }

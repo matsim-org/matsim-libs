@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 
-import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.export.AVStatus;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
@@ -78,8 +78,8 @@ public class SimulationObjectCompiler {
         }
     }
 
-    private void addDivertableVehicles(Collection<VehicleLinkPair> divertableVehicles, Map<AVVehicle, Link> vehicleLocations) {
-        for (VehicleLinkPair vlp : divertableVehicles) {
+    private void addDivertableVehicles(Collection<RoboTaxi> divertableVehicles, Map<AVVehicle, Link> vehicleLocations) {
+        for (RoboTaxi vlp : divertableVehicles) {
             final String key = vlp.avVehicle.getId().toString();
             if (!vehicleMap.containsKey(key)) {
                 AVVehicle avVehicle = vlp.avVehicle;
@@ -99,7 +99,7 @@ public class SimulationObjectCompiler {
         }
     }
 
-    public SimulationObject compile(Collection<VehicleLinkPair> divertableVehicles, Map<AVVehicle, Link> vehicleLocations) {
+    public SimulationObject compile(Collection<RoboTaxi> divertableVehicles, Map<AVVehicle, Link> vehicleLocations) {
         addDivertableVehicles(divertableVehicles, vehicleLocations);
         simulationObject.vehicles = vehicleMap.values().stream().collect(Collectors.toList());
         return simulationObject;

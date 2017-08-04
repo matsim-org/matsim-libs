@@ -44,7 +44,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
     private Double private_now = null;
     private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
     private int infoLinePeriod = 0;
-    private Map<AVVehicle, VehicleLinkPair> avVehicleVehicleLinkPairMap = new HashMap<>();
+    private Map<AVVehicle, RoboTaxi> avVehicleVehicleLinkPairMap = new HashMap<>();
 
     VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
@@ -171,7 +171,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
                             if (linkTimePair != null)
                                 // collection.add(new VehicleLinkPair(avVehicle, linkTimePair, avDriveTask.getPath().getToLink()));
                                 avVehicleVehicleLinkPairMap.put(avVehicle,
-                                        new VehicleLinkPair(avVehicle, linkTimePair, avDriveTask.getPath().getToLink()));
+                                        new RoboTaxi(avVehicle, linkTimePair, avDriveTask.getPath().getToLink()));
                         }
                     }
 
@@ -182,7 +182,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
                             GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow()); // <- self evident?
                             LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
                             // collection.add(new VehicleLinkPair(avVehicle, linkTimePair, null));
-                            avVehicleVehicleLinkPairMap.put(avVehicle, new VehicleLinkPair(avVehicle, linkTimePair, null));
+                            avVehicleVehicleLinkPairMap.put(avVehicle, new RoboTaxi(avVehicle, linkTimePair, null));
                         }
                     }
                 };
@@ -193,7 +193,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
     }
 
-    protected final Collection<VehicleLinkPair> getDivertableVehicleLinkPairs() {
+    protected final Collection<RoboTaxi> getDivertableVehicleLinkPairs() {
         getDivertableVehicles();
         return avVehicleVehicleLinkPairMap.values();
     }
@@ -202,7 +202,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
         return avVehicleVehicleLinkPairMap.get(avVehicle).linkTimePair;
     }
 
-    protected final VehicleLinkPair getVehicleLinkPair(AVVehicle avVehicle) {
+    protected final RoboTaxi getVehicleLinkPair(AVVehicle avVehicle) {
         return avVehicleVehicleLinkPairMap.get(avVehicle);
     }
 

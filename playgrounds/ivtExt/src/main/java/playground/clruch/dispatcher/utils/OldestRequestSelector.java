@@ -4,7 +4,7 @@ package playground.clruch.dispatcher.utils;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /**
@@ -14,7 +14,7 @@ public class OldestRequestSelector extends AbstractRequestSelector {
 
     @Override
     public Collection<AVRequest> selectRequests( //
-            Collection<VehicleLinkPair> vehicleLinkPairs, //
+            Collection<RoboTaxi> vehicleLinkPairs, //
             Collection<AVRequest> avRequests, int size) {
         return avRequests.stream() //
                 .sorted((r1, r2) -> Double.compare(r1.getSubmissionTime(), r2.getSubmissionTime())) //

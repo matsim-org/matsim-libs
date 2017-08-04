@@ -15,7 +15,7 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import playground.clruch.dispatcher.core.UniversalDispatcher;
-import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
 import playground.clruch.utils.GlobalAssert;
@@ -59,7 +59,7 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
 
             // get open requests and available vehicles
             // TODO use the normal call functions and implement in UniveralDispatcher a setVehiclePickupBinding function instead
-            List<VehicleLinkPair> vehicles = getDivertableUnassignedVehicleLinkPairs();
+            List<RoboTaxi> vehicles = getDivertableUnassignedVehicleLinkPairs();
             addUnassignedVehicles(getDivertableUnassignedVehicleLinkPairs());
 
             List<AVRequest> requests = getUnassignedAVRequests();
@@ -81,7 +81,7 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
                 }
             }
             if (!oversupply && canMatch) { // UNDERSUPPLY CASE
-                for (VehicleLinkPair vlp : vehicles) {
+                for (RoboTaxi vlp : vehicles) {
 
                     AVRequest closestReq = findClosestRequest(vlp);
                     if (closestReq != null) {
@@ -128,8 +128,8 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
      * @param vehicleLinkPair
      *            ensures that new unassignedVehicles are added to a list with all unassigned vehicles
      */
-    private void addUnassignedVehicles(List<VehicleLinkPair> vehicleLinkPair) {
-        for (VehicleLinkPair avLinkPair : vehicleLinkPair) {
+    private void addUnassignedVehicles(List<RoboTaxi> vehicleLinkPair) {
+        for (RoboTaxi avLinkPair : vehicleLinkPair) {
             if (!unassignedVehicles.contains(avLinkPair.avVehicle)) {
                 Coord toMatchVehicleCoord = getVehicleLocation(avLinkPair.avVehicle).getCoord();
                 boolean uaSucc = unassignedVehicles.add(avLinkPair.avVehicle);
@@ -149,7 +149,7 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
      *            (open requests)
      * @return the closest Request to vehicleLinkPair.avVehicle found with tree-search
      */
-    private AVRequest findClosestRequest(VehicleLinkPair vehicleLinkPair) {
+    private AVRequest findClosestRequest(RoboTaxi vehicleLinkPair) {
         Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
         return pendingRequestsTree.getClosest(vehicleCoord.getX(), vehicleCoord.getY());
     }

@@ -8,7 +8,7 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.sca.Floor;
-import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.netdata.VirtualNode;
 
 public class FeasibleRebalanceCreator {
@@ -18,7 +18,7 @@ public class FeasibleRebalanceCreator {
      * @return returns a scaled rebalanceInput which is feasible considering the available number of vehicles
      */
     public static Tensor returnFeasibleRebalance(Tensor rebalanceInput, Map<VirtualNode, //
-            List<VehicleLinkPair>> availableVehicles) {
+            List<RoboTaxi>> availableVehicles) {
         Tensor feasibleRebalance = rebalanceInput.copy();
         for (int i = 0; i < Dimensions.of(rebalanceInput).get(0); ++i) {
             // count number of outgoing vehicles per vNode
