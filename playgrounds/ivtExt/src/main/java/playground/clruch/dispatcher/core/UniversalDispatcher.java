@@ -215,6 +215,59 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             }
         };
     }
+    
+    
+    
+    protected final void setRoboTaxiDiversion(RoboTaxi robotaxi, Link destination){
+        final Schedule schedule = robotaxi.getAVVehicle().getSchedule();
+        Task task = schedule.getCurrentTask(); // <- implies that task is started
+        new AVTaskAdapter(task) {
+            @Override
+            public void handle(AVDriveTask avDriveTask) {
+                if (!avDriveTask.getPath().getToLink().equals(destination)) { // ignore when vehicle is already going there
+                    FuturePathContainer futurePathContainer = futurePathFactory.createFuturePathContainer( //
+                            robotaxi.getDivertableLocation(), destination, robotaxi.getDivertableTime());
+
+                    assignDirective(robotaxi, new DriveVehicleDiversionDirective( //
+                            robotaxi, destination, futurePathContainer));
+                } else
+                    
+                    assignDirective(robotaxi, new EmptyDirective());
+            }
+
+            @Override
+            public void handle(AVStayTask avStayTask) {
+                if (!avStayTask.getLink().equals(destination)) { // ignore request where location == target
+                    FuturePathContainer futurePathContainer = futurePathFactory.createFuturePathContainer( //
+                            robotaxi.getDivertableLocation(), destination, robotaxi.getDivertableTime());
+
+                    assignDirective(robotaxi, new StayVehicleDiversionDirective( //
+                            robotaxi, destination, futurePathContainer));
+                } else
+                    assignDirective(robotaxi, new EmptyDirective());
+            }
+        };
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     /**
      * function for convenience
@@ -286,8 +339,20 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
         // 2) set vehicle diversion of AVVehicle
         setVehicleDiversion(avVehicle, avRequest.getFromLink());
-
     }
+    
+    
+    
+    
+    protected void setRoboTaxiPickup(RoboTaxi robotaxi, AVRequest avRequest){
+        // 1) enter information into pickup table
+        pickupRegister.forcePut(avRequest,robotaxi.getAVVehicle());
+        
+        // 2) set vehicle diversion
+        setRoboTaxiDiversion(robotaxi, avRequest.getFromLink());
+    }
+    
+    
 
     /**
      * called when a new request enters the system

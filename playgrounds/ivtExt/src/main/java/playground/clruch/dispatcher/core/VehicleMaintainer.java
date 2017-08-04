@@ -1,6 +1,7 @@
 // code by jph
 package playground.clruch.dispatcher.core;
 
+import java.awt.Robot;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -69,11 +70,23 @@ abstract class VehicleMaintainer implements AVDispatcher {
         private_vehicleDirectives.put(avVehicle, abstractDirective);
     }
 
+    synchronized void assignDirective(RoboTaxi robotaxi, AbstractDirective abstractDirective) {
+        GlobalAssert.that(isWithoutDirective(robotaxi));
+        robotaxi.setDirective(abstractDirective);
+    }
+
     /** @param avVehicle
      * @return true if given {@link AVVehicle} doesn't have a {@link AbstractDirective} assigned to
      *         it */
     private synchronized boolean isWithoutDirective(AVVehicle avVehicle) {
         return !private_vehicleDirectives.containsKey(avVehicle);
+    }
+
+    private synchronized boolean isWithoutDirective(RoboTaxi robotaxi) {
+        if (robotaxi.getDirective() == null) {
+            return true;
+        }
+        return false;
     }
 
     /** @return collection of AVVehicles that have started their schedule */
@@ -84,7 +97,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     /** @return collection of AVVehicles that have started their schedule */
-    /* package */ final Collection<RoboTaxi> getRoboTaxis() {
+    protected final Collection<RoboTaxi> getRoboTaxis() {
         if (roboTaxis.isEmpty() || !roboTaxis.get(0).getAVVehicle().getSchedule().getStatus().equals(Schedule.ScheduleStatus.STARTED))
             return Collections.emptyList();
         return roboTaxis;
@@ -201,6 +214,16 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
     }
 
+    protected final Collection<RoboTaxi> getDivertableRoboTaxis() {
+        Collection<RoboTaxi> divertableRoboTaxis = new ArrayList<>();
+        for (RoboTaxi robotaxi : roboTaxis) {
+            if (robotaxi.getDirective() == null) {
+                divertableRoboTaxis.add(robotaxi);
+            }
+        }
+        return divertableRoboTaxis;
+    }
+
     private final void updateDivertableLocations() {
         for (RoboTaxi robotaxi : getRoboTaxis()) {
             if (isWithoutDirective(robotaxi.getAVVehicle())) {
@@ -293,6 +316,14 @@ abstract class VehicleMaintainer implements AVDispatcher {
                 .parallel() //
                 .forEach(AbstractDirective::execute);
         private_vehicleDirectives.clear();
+
+//        for (RoboTaxi robotaxi : roboTaxis) {
+//            if (robotaxi.getDirective() != null) {
+//                robotaxi.getDirective().execute();
+//                robotaxi.setDirective(null);
+//            }
+//        }
+
     }
 
     private void updateRoboTaxisStart() {
