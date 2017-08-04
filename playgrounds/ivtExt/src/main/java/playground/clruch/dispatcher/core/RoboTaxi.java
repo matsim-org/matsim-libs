@@ -10,6 +10,7 @@ public class RoboTaxi {
     private final AVVehicle avVehicle;
     private LinkTimePair linkTimePair;
     private Link currentDriveDestination; // null for stay task
+    private AbstractDirective directive;
 
     /**
      * @param avVehicle
@@ -22,6 +23,7 @@ public class RoboTaxi {
         this.avVehicle = avVehicle;
         this.linkTimePair = linkTimePair;
         this.currentDriveDestination = currentDriveDestination;
+        this.directive = null;
     }
 
     public Link getDivertableLocation() {
@@ -70,6 +72,17 @@ public class RoboTaxi {
     public AVVehicle getAVVehicle(){
         return avVehicle;
     }
+    
+    
+    public AbstractDirective getDirective(){
+        return directive;
+    }
+    
+    
+    public void setDirective(AbstractDirective directive){
+        this.directive = directive;
+    }
+    
     
 
 }
