@@ -50,7 +50,7 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
     
 	protected List<RoboTaxi> getDivertableUnassignedNotRebalancingVehicleLinkPairs() {
 		return getDivertableUnassignedVehicleLinkPairs().stream() //
-				.filter(v -> !rebalancingVehicles.containsKey(v.avVehicle)) //
+				.filter(v -> !rebalancingVehicles.containsKey(v.getAVVehicle())) //
 				.collect(Collectors.toList());
 	}
     
@@ -80,7 +80,7 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
     
     @Override
     boolean extraCheck(RoboTaxi vehicleLinkPair) {
-		return rebalancingVehicles.containsKey(vehicleLinkPair.avVehicle);
+		return rebalancingVehicles.containsKey(vehicleLinkPair.getAVVehicle());
     }
 
 }

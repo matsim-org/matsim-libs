@@ -84,7 +84,7 @@ public class EdgyDispatcher extends RebalancingDispatcher {
                         Link link = nextRequest.getFromLink();
                         if (CoordUtils.calcEuclideanDistance(link.getCoord(), vehicleLinkPair.getDivertableLocation().getCoord()) < DISTCLOSE
                                 || now - nextRequest.getSubmissionTime() > MAXWAIT) {
-                            setVehicleRebalance(vehicleLinkPair.avVehicle, link);
+                            setVehicleRebalance(vehicleLinkPair.getAVVehicle(), link);
                             ++total_driveOrder;
                         }
                     } else

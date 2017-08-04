@@ -187,7 +187,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                          */
                         // all vehicles except the ones with a customer on board and the ones which are rebalancing
                         Map<VirtualNode, List<RoboTaxi>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
-                        availableVehicles.values().stream().flatMap(List::stream).map(vlp -> vlp.avVehicle) //
+                        availableVehicles.values().stream().flatMap(List::stream).map(vlp -> vlp.getAVVehicle()) //
                                 .forEach(accountedVehicles::add);
                         double[] array = new double[n];
                         for (Entry<VirtualNode, List<RoboTaxi>> entry : availableVehicles.entrySet())
@@ -430,7 +430,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                                         // vnTo.getLinks() //
                                                         candidateLinks //
                                                 ).get(random.nextInt(candidateLinks.size()));
-                                        setVehicleRebalance(vehicleLinkPair.avVehicle, rebalanceDest); // send car to adjacent virtual node
+                                        setVehicleRebalance(vehicleLinkPair.getAVVehicle(), rebalanceDest); // send car to adjacent virtual node
                                         ++totalRebalanceEffective;
                                         if (vnFrom.equals(vnTo))
                                             ++selfRebalanceEffective;

@@ -24,7 +24,7 @@ public enum BipartiteMatchingUtils {
         Tensor infoLine = Tensors.empty();
         Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(divertableVehicles, requests, infoLine);
         for (Entry<RoboTaxi, AVRequest> entry : gbpMatch.entrySet()) {
-            AVVehicle av = entry.getKey().avVehicle;
+            AVVehicle av = entry.getKey().getAVVehicle();
             AVRequest avRequest = entry.getValue();
             dispatcher.setVehiclePickup(av, avRequest);
         }
@@ -35,7 +35,7 @@ public enum BipartiteMatchingUtils {
         Tensor infoLine = Tensors.empty();
         Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(divertableVehicles, requests, infoLine);
         for (Entry<RoboTaxi, AVRequest> entry : gbpMatch.entrySet()) {
-            AVVehicle av = entry.getKey().avVehicle;
+            AVVehicle av = entry.getKey().getAVVehicle();
             AVRequest avRequest = entry.getValue();
             dispatcher.setVehicleRebalance(av, avRequest.getFromLink());
         }

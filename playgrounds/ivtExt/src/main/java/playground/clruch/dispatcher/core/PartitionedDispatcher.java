@@ -148,7 +148,7 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
         for (Map.Entry<VirtualNode, List<RoboTaxi>> entry : returnMap.entrySet()) {
             nonRebalanceMap.put(entry.getKey(),
                     entry.getValue().stream() //
-                            .filter(v -> !rebalancingVehicles.containsKey(v.avVehicle)) //
+                            .filter(v -> !rebalancingVehicles.containsKey(v.getAVVehicle())) //
                             .collect(Collectors.toList()));
         }
 

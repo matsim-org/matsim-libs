@@ -85,8 +85,8 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
 
                     AVRequest closestReq = findClosestRequest(vlp);
                     if (closestReq != null) {
-                        setVehiclePickup(vlp.avVehicle, closestReq);
-                        removeFromTrees(vlp.avVehicle, closestReq);
+                        setVehiclePickup(vlp.getAVVehicle(), closestReq);
+                        removeFromTrees(vlp.getAVVehicle(), closestReq);
                     }
                 }
             }
@@ -130,13 +130,13 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
      */
     private void addUnassignedVehicles(List<RoboTaxi> vehicleLinkPair) {
         for (RoboTaxi avLinkPair : vehicleLinkPair) {
-            if (!unassignedVehicles.contains(avLinkPair.avVehicle)) {
-                Coord toMatchVehicleCoord = getVehicleLocation(avLinkPair.avVehicle).getCoord();
-                boolean uaSucc = unassignedVehicles.add(avLinkPair.avVehicle);
+            if (!unassignedVehicles.contains(avLinkPair.getAVVehicle())) {
+                Coord toMatchVehicleCoord = getVehicleLocation(avLinkPair.getAVVehicle()).getCoord();
+                boolean uaSucc = unassignedVehicles.add(avLinkPair.getAVVehicle());
                 boolean qtSucc = unassignedVehiclesTree.put( //
                         toMatchVehicleCoord.getX(), //
                         toMatchVehicleCoord.getY(), //
-                        avLinkPair.avVehicle);
+                        avLinkPair.getAVVehicle());
                 GlobalAssert.that(uaSucc && qtSucc);
             }
         }

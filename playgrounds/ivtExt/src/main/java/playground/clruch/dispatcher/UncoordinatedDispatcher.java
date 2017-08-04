@@ -86,7 +86,7 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
                             .filter(v -> virtualNetwork.getVirtualNode(v.getDivertableLocation()).equals(vn)).findAny();
                     if (optVh.isPresent()) {
                         RoboTaxi vehicleToSend = optVh.get();
-                        setVehiclePickup(vehicleToSend.avVehicle, avr);
+                        setVehiclePickup(vehicleToSend.getAVVehicle(), avr);
                         vehicles.remove(vehicleToSend);
                     }
                 }
@@ -98,7 +98,7 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
                         Optional<RoboTaxi> optVh = vehicles.stream().findAny();
                         if (optVh.isPresent()) {
                             RoboTaxi vehicleToSend = optVh.get();
-                            setVehiclePickup(vehicleToSend.avVehicle, avr);
+                            setVehiclePickup(vehicleToSend.getAVVehicle(), avr);
                             vehicles.remove(vehicleToSend);
                         }
                     }
@@ -108,7 +108,7 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
                 vehicles = getDivertableUnassignedVehicleLinkPairs();
                 for (RoboTaxi vlp : vehicles) {
                     VirtualNode vn = virtualNetwork.getVirtualNode(vlp.getDivertableLocation());
-                    setVehicleRebalance(vlp.avVehicle, waitLocations.get(vn));
+                    setVehicleRebalance(vlp.getAVVehicle(), waitLocations.get(vn));
                 }
             }
         }

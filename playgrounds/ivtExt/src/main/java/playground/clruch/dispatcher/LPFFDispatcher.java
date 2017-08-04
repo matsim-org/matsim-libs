@@ -139,7 +139,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             for (VirtualNode virtualNode : destinationLinks.keySet()) {
                 Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode),
                         destinationLinks.get(virtualNode));
-                rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v.avVehicle, rebalanceMatching.get(v)));
+                rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v.getAVVehicle(), rebalanceMatching.get(v)));
             }
 
             // reset vector

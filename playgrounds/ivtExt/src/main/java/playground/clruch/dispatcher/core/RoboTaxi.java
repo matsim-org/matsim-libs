@@ -7,9 +7,9 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 
 public class RoboTaxi {
-    public final AVVehicle avVehicle;
-    public final LinkTimePair linkTimePair;
-    private final Link currentDriveDestination; // null for stay task
+    private final AVVehicle avVehicle;
+    private LinkTimePair linkTimePair;
+    private Link currentDriveDestination; // null for stay task
 
     /**
      * @param avVehicle
@@ -17,6 +17,7 @@ public class RoboTaxi {
      * @param currentDriveDestination
      *            null if the vehicle is in stay task
      */
+    
     public RoboTaxi(AVVehicle avVehicle, LinkTimePair linkTimePair, Link currentDriveDestination) {
         this.avVehicle = avVehicle;
         this.linkTimePair = linkTimePair;
@@ -27,6 +28,19 @@ public class RoboTaxi {
         return linkTimePair.link;
     }
 
+    public double getDivertableTime() {
+        return linkTimePair.time;
+    }
+
+    // TODO remove this function
+    public LinkTimePair getLinkTimePair(){
+        return linkTimePair;
+    }
+    
+    public void setLinkTimePair(LinkTimePair linkTimePair){
+        this.linkTimePair = linkTimePair;
+    }
+    
     /**
      * @return null if vehicle is currently not driving, else
      *         the final {@link Link} of the path that the vehicles is currently driving on
@@ -35,6 +49,11 @@ public class RoboTaxi {
         return currentDriveDestination;
     }
 
+    
+    public void setCurrentDriveDestination(Link currentDriveDestination){
+        this.currentDriveDestination = currentDriveDestination;        
+    }
+    
     /**
      * @return true if vehicle is driving and divertible link is also destination link of drive task;
      *         false if vehicle is in stay task, or divertible link is not destination of drive task of vehicle.
@@ -46,5 +65,11 @@ public class RoboTaxi {
     public boolean isVehicleInStayTask() {
         return getCurrentDriveDestination() == null;
     }
+    
+    // TODO remove this function as AVVehicle should not be used in dispatching layers.
+    public AVVehicle getAVVehicle(){
+        return avVehicle;
+    }
+    
 
 }

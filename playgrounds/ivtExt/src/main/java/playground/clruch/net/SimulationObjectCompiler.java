@@ -80,14 +80,14 @@ public class SimulationObjectCompiler {
 
     private void addDivertableVehicles(Collection<RoboTaxi> divertableVehicles, Map<AVVehicle, Link> vehicleLocations) {
         for (RoboTaxi vlp : divertableVehicles) {
-            final String key = vlp.avVehicle.getId().toString();
+            final String key = vlp.getAVVehicle().getId().toString();
             if (!vehicleMap.containsKey(key)) {
-                AVVehicle avVehicle = vlp.avVehicle;
+                AVVehicle avVehicle = vlp.getAVVehicle();
                 VehicleContainer vehicleContainer = new VehicleContainer();
                 vehicleContainer.vehicleIndex = db.getVehicleIndex(avVehicle);
                 final Link fromLink = vehicleLocations.get(avVehicle);
-                GlobalAssert.that(fromLink == vlp.linkTimePair.link);
-                vehicleContainer.linkIndex = db.getLinkIndex(vlp.linkTimePair.link);
+                GlobalAssert.that(fromLink == vlp.getDivertableLocation());
+                vehicleContainer.linkIndex = db.getLinkIndex(vlp.getDivertableLocation());
                 if (vlp.isVehicleInStayTask()) {
                     vehicleContainer.avStatus = AVStatus.STAY;
                 } else {

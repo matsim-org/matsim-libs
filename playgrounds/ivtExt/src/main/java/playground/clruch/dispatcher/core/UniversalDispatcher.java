@@ -168,7 +168,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         // get the staying vehicles and requests
         List<RoboTaxi> divertableUnassignedVehiclesLinkPairs = new ArrayList<>();
         for (RoboTaxi vehicleLinkPair : getDivertableVehicleLinkPairs()) {
-            if (!pickupRegister.containsValue(vehicleLinkPair.avVehicle)) {
+            if (!pickupRegister.containsValue(vehicleLinkPair.getAVVehicle())) {
                 // if (!pickupRegister.inverse().containsKey(vehicleLinkPair.avVehicle)) {
                 divertableUnassignedVehiclesLinkPairs.add(vehicleLinkPair);
             }
@@ -332,10 +332,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         // stop all vehicles which are not on a pickup or rebalancing mission.
         Collection<RoboTaxi> divertableVehicles = getDivertableVehicleLinkPairs();
         for (RoboTaxi vehicleLinkPair : divertableVehicles) {
-            boolean isOnPickup = pickupRegister.values().contains(vehicleLinkPair.avVehicle);
+            boolean isOnPickup = pickupRegister.values().contains(vehicleLinkPair.getAVVehicle());
             boolean isOnExtra = extraCheck(vehicleLinkPair);
             if (!isOnPickup && !isOnExtra) {
-                setVehicleDiversion(vehicleLinkPair.avVehicle, vehicleLinkPair.getDivertableLocation());
+                setVehicleDiversion(vehicleLinkPair.getAVVehicle(), vehicleLinkPair.getDivertableLocation());
             }
         }
     }

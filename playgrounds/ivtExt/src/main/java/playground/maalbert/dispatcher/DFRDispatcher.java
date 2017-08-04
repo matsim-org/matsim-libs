@@ -375,7 +375,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 for (VirtualNode virtualNode : destinationLinks.keySet()) {
                     Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(available_Vehicles.get(virtualNode),
                             destinationLinks.get(virtualNode));
-                    rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v.avVehicle, rebalanceMatching.get(v)));
+                    rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v.getAVVehicle(), rebalanceMatching.get(v)));
                 }
             }
         }

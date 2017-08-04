@@ -32,7 +32,7 @@ public enum DrivebyRequestStopper {
                 List<AVRequest> requestList = requestLocs.get(link);
                 if (!requestList.isEmpty()) {
                     AVRequest request = requestList.get(0);
-                    biConsumer.accept(vehicleLinkPair.avVehicle, request);
+                    biConsumer.accept(vehicleLinkPair.getAVVehicle(), request);
                     ++numDriveByPickup;
                 }
             }

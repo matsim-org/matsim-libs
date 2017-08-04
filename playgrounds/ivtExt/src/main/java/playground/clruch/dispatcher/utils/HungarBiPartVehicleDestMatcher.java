@@ -52,7 +52,7 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
             int j = -1;
             for (AVRequest avRequest : ordered_requests) {
                 Link dest = avRequest.getFromLink();
-                distancematrix[i][++j] = getDistance(vehicleLinkPair.linkTimePair.link, dest);
+                distancematrix[i][++j] = getDistance(vehicleLinkPair.getDivertableLocation(), dest);
             }
         }
 
@@ -91,7 +91,7 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
             ++i;
             int j = -1;
             for (Link link : ordered_Links) {
-                distancematrix[i][++j] = getDistance(vehicleLinkPair.linkTimePair.link, link);
+                distancematrix[i][++j] = getDistance(vehicleLinkPair.getDivertableLocation(), link);
             }
         }
 
