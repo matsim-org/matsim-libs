@@ -22,6 +22,8 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import com.ctc.wstx.sw.ISOLatin1XmlWriter;
+
 import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
@@ -213,16 +215,23 @@ abstract class VehicleMaintainer implements AVDispatcher {
         // return collection;
 
     }
+    
 
     protected final Collection<RoboTaxi> getDivertableRoboTaxis() {
         Collection<RoboTaxi> divertableRoboTaxis = new ArrayList<>();
         for (RoboTaxi robotaxi : roboTaxis) {
-            if (robotaxi.getDirective() == null) {
+            boolean noDirectiveReceived = (robotaxi.getDirective() == null);
+            boolean isWithoutCustomer = robotaxi.getCustomerStatus();
+            if (noDirectiveReceived && isWithoutCustomer) {
                 divertableRoboTaxis.add(robotaxi);
             }
         }
         return divertableRoboTaxis;
     }
+    
+    
+    
+    
 
     private final void updateDivertableLocations() {
         for (RoboTaxi robotaxi : getRoboTaxis()) {
@@ -241,6 +250,9 @@ abstract class VehicleMaintainer implements AVDispatcher {
                             if (linkTimePair != null)
                                 robotaxi.setLinkTimePair(linkTimePair);
                             robotaxi.setCurrentDriveDestination(avDriveTask.getPath().getToLink());
+                            robotaxi.setCustomerStatus(true);
+                        }else{
+                            robotaxi.setCustomerStatus(false);
                         }
                     }
 
@@ -254,6 +266,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
                             // collection.add(new VehicleLinkPair(avVehicle, linkTimePair, null));
                             robotaxi.setLinkTimePair(linkTimePair);
                             robotaxi.setCurrentDriveDestination(null);
+                            robotaxi.setCustomerStatus(true);
                         }
                     }
                 };
@@ -311,18 +324,18 @@ abstract class VehicleMaintainer implements AVDispatcher {
         redispatch(now);
         endofStepTasks();
 
-        private_now = null; // <- time unavailable
-        private_vehicleDirectives.values().stream() //
-                .parallel() //
-                .forEach(AbstractDirective::execute);
+//        private_now = null; // <- time unavailable
+//        private_vehicleDirectives.values().stream() //
+//                .parallel() //
+//                .forEach(AbstractDirective::execute);
         private_vehicleDirectives.clear();
 
-//        for (RoboTaxi robotaxi : roboTaxis) {
-//            if (robotaxi.getDirective() != null) {
-//                robotaxi.getDirective().execute();
-//                robotaxi.setDirective(null);
-//            }
-//        }
+        for (RoboTaxi robotaxi : roboTaxis) {
+            if (robotaxi.getDirective() != null) {
+                robotaxi.getDirective().execute();
+                robotaxi.setDirective(null);
+            }
+        }
 
     }
 

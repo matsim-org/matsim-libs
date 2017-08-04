@@ -11,6 +11,7 @@ public class RoboTaxi {
     private LinkTimePair linkTimePair;
     private Link currentDriveDestination; // null for stay task
     private AbstractDirective directive;
+    private boolean isWithoutCustomer;
 
     /**
      * @param avVehicle
@@ -24,6 +25,7 @@ public class RoboTaxi {
         this.linkTimePair = linkTimePair;
         this.currentDriveDestination = currentDriveDestination;
         this.directive = null;
+        this.isWithoutCustomer = true;
     }
 
     public Link getDivertableLocation() {
@@ -81,6 +83,14 @@ public class RoboTaxi {
     
     public void setDirective(AbstractDirective directive){
         this.directive = directive;
+    }
+    
+    public void setCustomerStatus(boolean isWithoutCustomer){
+        this.isWithoutCustomer = isWithoutCustomer;
+    }
+    
+    public boolean getCustomerStatus(){
+        return isWithoutCustomer;
     }
     
     
