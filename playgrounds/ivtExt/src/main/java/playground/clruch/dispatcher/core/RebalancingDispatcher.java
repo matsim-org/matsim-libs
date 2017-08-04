@@ -18,9 +18,7 @@ import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-/**
- * rebalancing capability (without virtual network)
- */
+/** rebalancing capability (without virtual network) */
 public abstract class RebalancingDispatcher extends UniversalDispatcher {
 
     private final Map<AVVehicle, Link> rebalancingVehicles = new HashMap<>();
@@ -34,53 +32,67 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
     final void updateDatastructures(Collection<AVVehicle> stayVehicles) {
         // mandatory call
         super.updateDatastructures(stayVehicles);
-        
-        
+
         // 1) remove rebalancing vehicles that have reached their destination
         // TODO currently the vehicles are removed when arriving at final link,
         // ... could be removed as soon as they reach rebalancing destination virtualNode instead
         stayVehicles.forEach(rebalancingVehicles::remove);
-        
+
     }
 
     @Override
     protected Map<AVVehicle, Link> getRebalancingVehicles() {
         return Collections.unmodifiableMap(rebalancingVehicles);
     }
-    
-	protected List<RoboTaxi> getDivertableUnassignedNotRebalancingVehicleLinkPairs() {
-		return getDivertableUnassignedVehicleLinkPairs().stream() //
-				.filter(v -> !rebalancingVehicles.containsKey(v.getAVVehicle())) //
-				.collect(Collectors.toList());
-	}
-    
+
+    protected List<RoboTaxi> getDivertableUnassignedNotRebalancingVehicleLinkPairs() {
+        return getDivertableUnassignedVehicleLinkPairs().stream() //
+                .filter(v -> !rebalancingVehicles.containsKey(v.getAVVehicle())) //
+                .collect(Collectors.toList());
+    }
+
     @Override
     public final void setVehiclePickup(AVVehicle avVehicle, AVRequest avRequest) {
         super.setVehiclePickup(avVehicle, avRequest);
-        if(rebalancingVehicles.containsKey(avVehicle))rebalancingVehicles.remove(avVehicle);
+        if (rebalancingVehicles.containsKey(avVehicle))
+            rebalancingVehicles.remove(avVehicle);
     }
-    
-    
 
     // This function has to be called only after getVirtualNodeRebalancingVehicles
     protected synchronized final void setVehicleRebalance(final AVVehicle avVehicle, final Link destination) {
         // in case vehicle is picking up, remove from pickup register
-        if (pickupRegister.containsValue(avVehicle)){
+        if (pickupRegister.containsValue(avVehicle)) {
             AVRequest avRequest = pickupRegister.inverse().get(avVehicle);
             pickupRegister.forcePut(avRequest, null);
-            // TODO do not use forcePut(avRequest,null) because it violates bijection. 
+            // TODO do not use forcePut(avRequest,null) because it violates bijection.
         }
-        
-        // redivert the vehicle, then generate a rebalancing event and add to list of currently rebalancing vehicles
+
+        // redivert the vehicle, then generate a rebalancing event and add to list of currently
+        // rebalancing vehicles
         setVehicleDiversion(avVehicle, destination);
         eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), avVehicle, destination));
         Link returnVal = rebalancingVehicles.put(avVehicle, destination);
     }
-    
-    
+
+    protected synchronized final void setRoboTaxiRebalance(final RoboTaxi robotaxi, final Link destination) {
+        // in case vehicle is picking up, remove from pickup register
+        if (pickupRegister.containsValue(robotaxi.getAVVehicle())) {
+            AVRequest avRequest = pickupRegister.inverse().get(robotaxi.getAVVehicle());
+            pickupRegister.forcePut(avRequest, null);
+            // TODO do not use forcePut(avRequest,null) because it violates bijection.
+        }
+
+        // redivert the vehicle, then generate a rebalancing event and add to list of currently
+        // rebalancing vehicles
+        setRoboTaxiDiversion(robotaxi, destination); 
+        eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), robotaxi.getAVVehicle(), destination));
+        Link returnVal = rebalancingVehicles.put(robotaxi.getAVVehicle(), destination);
+
+    }
+
     @Override
     boolean extraCheck(RoboTaxi vehicleLinkPair) {
-		return rebalancingVehicles.containsKey(vehicleLinkPair.getAVVehicle());
+        return rebalancingVehicles.containsKey(vehicleLinkPair.getAVVehicle());
     }
 
 }
