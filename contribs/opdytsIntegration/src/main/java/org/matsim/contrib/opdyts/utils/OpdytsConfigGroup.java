@@ -103,7 +103,7 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	private static final String MAX_TOTAL_MEMORY = "maxTotalMemory";
 	private int maxTotalMemory = Integer.MAX_VALUE;
 
-	private static final String MAX_MEMORY_PER_TRAJECTORY =  "setMaxMemoryPerTrajectory";
+	private static final String MAX_MEMORY_PER_TRAJECTORY =  "maxMemoryPerTrajectory";
 	private int maxMemoryPerTrajectory = Integer.MAX_VALUE;
 
 	@StringGetter(MAX_TOTAL_MEMORY)
