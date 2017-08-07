@@ -168,6 +168,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
      *         setVehicleDiversion(...) or setAcceptRequest(...) that invoke assignDirective(...),
      *         the vehicle is not included in the successive call
      *         to getDivertableVehicles() until it becomes <i>divertable</i> again. */
+    @Deprecated
     protected final Collection<AVVehicle> getDivertableVehicles() {
         avVehicleVehicleLinkPairMap.clear();
         // Collection<VehicleLinkPair> collection = new LinkedList<>();

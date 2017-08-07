@@ -29,7 +29,6 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
     }
 
-    
     // TODO get rid of the AVVehicle here
     @Override
     final void updateDatastructures(Collection<AVVehicle> stayVehicles) {
@@ -37,8 +36,8 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
         super.updateDatastructures(stayVehicles);
 
         // remove rebalancing vehicles that have reached their destination
-        for(AVVehicle avVehicle : stayVehicles){
-            Optional<RoboTaxi> optRob = getRoboTaxis().stream().filter(v->v.getAVVehicle().equals(avVehicle)).findAny();
+        for (AVVehicle avVehicle : stayVehicles) {
+            Optional<RoboTaxi> optRob = getRoboTaxis().stream().filter(v -> v.getAVVehicle().equals(avVehicle)).findAny();
             GlobalAssert.that(optRob.isPresent());
             rebalancingVehicles.remove(optRob.get());
         }
@@ -56,11 +55,10 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
     }
 
     protected synchronized final void setRoboTaxiRebalance(final RoboTaxi roboTaxi, final Link destination) {
-        System.out.println("setRoboTaxiRebalance " +  roboTaxi.getAVVehicle().getId() + "  to  " +  destination.getId().toString());
-        
+        System.out.println("setRoboTaxiRebalance " + roboTaxi.getAVVehicle().getId() + "  to  " + destination.getId().toString());
+
         // in case vehicle is picking up, remove from pickup register
         if (pickupRegister.containsValue(roboTaxi)) {
-            System.out.println("vehicle was previously picking up");
             pickupRegister.remove(pickupRegister.inverse().get(roboTaxi), roboTaxi);
         }
 
@@ -68,22 +66,17 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
         setRoboTaxiDiversion(roboTaxi, destination);
         eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), roboTaxi.getAVVehicle(), destination));
         Link returnVal = rebalancingVehicles.put(roboTaxi, destination);
-        printRebalancingVehicles();
-        
-
     }
 
     @Override
     boolean extraCheck(RoboTaxi roboTaxi) {
         return rebalancingVehicles.containsKey(roboTaxi);
     }
-    
-    
-    
-    
-    private void printRebalancingVehicles(){
-        System.out.println("rebalancingVehicles: ==============================");
-        for(RoboTaxi roboTaxi : rebalancingVehicles.keySet()){
+
+    private void printRebalancingVehicles() {
+        System.out.println("==============================");
+        System.out.println("rebalancingVehicles:");
+        for (RoboTaxi roboTaxi : rebalancingVehicles.keySet()) {
             System.out.println(roboTaxi.getAVVehicle().getId() + "    to    " + rebalancingVehicles.get(roboTaxi).getId().toString());
         }
     }
