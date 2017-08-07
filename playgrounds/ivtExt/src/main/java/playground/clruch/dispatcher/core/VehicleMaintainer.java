@@ -332,6 +332,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
         for (RoboTaxi robotaxi : roboTaxis) {
             if (robotaxi.getDirective() != null) {
+                System.out.println("executing directive for roboTaxi " +  robotaxi.getAVVehicle().getId());
                 robotaxi.getDirective().execute();
                 robotaxi.setDirective(null);
             }

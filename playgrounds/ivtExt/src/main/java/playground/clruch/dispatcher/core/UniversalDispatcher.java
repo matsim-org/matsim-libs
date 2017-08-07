@@ -60,7 +60,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                                                                                  // period.
     private final Map<AVVehicle, Link> vehiclesWithCustomer = new HashMap<>();
     // TODO visibility of map to private
-    protected final BiMap<AVRequest, AVVehicle> pickupRegister = HashBiMap.create();
+    protected final BiMap<AVRequest, RoboTaxi> pickupRegister = HashBiMap.create();
 
     /** map stores most recently known location of vehicles. map is used in case obtaining the
      * vehicle location fails */
@@ -97,8 +97,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         // complete all matchings if vehicle has arrived on link
         Set<AVRequest> reqToRemove = new HashSet<>();
         for (AVRequest avRequest : pickupRegister.keySet()) {
-            AVVehicle pickupVehicle = pickupRegister.get(avRequest);
-            Link pickupVehicleLink = getStayVehiclesUnique().get(pickupVehicle);
+            RoboTaxi pickupVehicle = pickupRegister.get(avRequest);
+            Link pickupVehicleLink = getStayVehiclesUnique().get(pickupVehicle.getAVVehicle());
             if (avRequest.getFromLink().equals(pickupVehicleLink) && pendingRequests.contains(avRequest)) {
                 System.out.println("WE GOT TO THIS POINT, ZEAH =============================");
                 setAcceptRequest(pickupVehicle, avRequest);
@@ -279,6 +279,14 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @param avRequest
      *            provided by getAVRequests() */
     private synchronized final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
+        System.out.println("matched " + avVehicle.getId() + "  and  " + avRequest.getId());
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
 
         boolean statusPen = pendingRequests.remove(avRequest);
@@ -305,20 +313,60 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         ++total_matchedRequests;
     }
 
-    /** @param entry
-     *            <VehicleLinkPair,AVRequest> sets AVVehicle to pickup AVRequest */
-    // TODO find a way to make this protected again.
-    protected void setVehiclePickup(AVVehicle avVehicle, AVRequest avRequest) {
-        // 1) enter information into pickup table
-        pickupRegister.forcePut(avRequest, avVehicle);
+    /** Function called from derived class to match a vehicle with a request. The function appends
+     * the pick-up, drive, and drop-off tasks for the car.
+     * 
+     * @param avVehicle
+     *            vehicle in {@link AVStayTask} in order to match the request
+     * @param avRequest
+     *            provided by getAVRequests() */
+    private synchronized final void setAcceptRequest(RoboTaxi roboTaxi, AVRequest avRequest) {
+        GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
 
-        // 2) set vehicle diversion of AVVehicle
-        setVehicleDiversion(avVehicle, avRequest.getFromLink());
+        boolean statusPen = pendingRequests.remove(avRequest);
+        GlobalAssert.that(statusPen);
+
+        // save avRequests which are matched for one publishPeriod to ensure
+        // no requests are lost in the recording.
+        publishPeriodMatchedRequests.add(avRequest);
+
+        final Schedule schedule = roboTaxi.getAVVehicle().getSchedule();
+        // check that current task is last task in schedule
+        GlobalAssert.that(schedule.getCurrentTask() == Schedules.getLastTask(schedule));
+
+        final double endPickupTime = getTimeNow() + pickupDurationPerStop;
+        FuturePathContainer futurePathContainer = futurePathFactory.createFuturePathContainer( //
+                avRequest.getFromLink(), avRequest.getToLink(), endPickupTime);
+
+        assignDirective(roboTaxi, new AcceptRequestDirective( //
+                roboTaxi.getAVVehicle(), avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
+
+        // assignDirective(avVehicle, new AcceptRequestDirective( //
+        // avVehicle, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
+
+        Link returnVal = vehiclesWithCustomer.put(roboTaxi.getAVVehicle(), avRequest.getToLink());
+        GlobalAssert.that(returnVal == null);
+
+        ++total_matchedRequests;
     }
+
+    // /** @param entry
+    // * <VehicleLinkPair,AVRequest> sets AVVehicle to pickup AVRequest */
+    // // TODO find a way to make this protected again.
+    // protected void setVehiclePickup(AVVehicle avVehicle, AVRequest avRequest) {
+    // // 1) enter information into pickup table
+    // pickupRegister.forcePut(avRequest, avVehicle);
+    //
+    // // 2) set vehicle diversion of AVVehicle
+    // setVehicleDiversion(avVehicle, avRequest.getFromLink());
+    // }
 
     protected void setRoboTaxiPickup(RoboTaxi robotaxi, AVRequest avRequest) {
         // 1) enter information into pickup table
-        pickupRegister.forcePut(avRequest, robotaxi.getAVVehicle());
+        System.out.println("pickup register addition " + robotaxi.getAVVehicle().getId() + " to request " + avRequest.getId());
+        pickupRegister.forcePut(avRequest, robotaxi);
+
+        printPickupRegister();
 
         // 2) set vehicle diversion
         setRoboTaxiDiversion(robotaxi, avRequest.getFromLink());
@@ -343,7 +391,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     /** {@link PartitionedDispatcher} overrides the function
      * 
      * @return map of rebalancing vehicles and their destination links */
-    protected Map<AVVehicle, Link> getRebalancingVehicles() {
+    protected Map<RoboTaxi, Link> getRebalancingVehicles() {
         return Collections.emptyMap();
     }
 
@@ -358,12 +406,16 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     @Override
     final void endofStepTasks() {
         // stop all vehicles which are not on a pickup or rebalancing mission.
+//        printPickupRegister();
         for (RoboTaxi roboTaxi : getRoboTaxis()) {
-            boolean isOnPickup = pickupRegister.values().contains(roboTaxi.getAVVehicle());
+            boolean isOnPickup = pickupRegister.containsValue(roboTaxi); // pickupRegister.values().contains(roboTaxi.getAVVehicle());
             boolean isOnExtra = extraCheck(roboTaxi);
-            if (!isOnPickup && !isOnExtra && roboTaxi.getDirective() == null) {
+            boolean isStaying = roboTaxi.isVehicleInStayTask();
+            if (!isOnPickup && !isOnExtra && roboTaxi.getDirective() == null && !isStaying) {
                 setRoboTaxiDiversion(roboTaxi, roboTaxi.getDivertableLocation());
-             }
+                System.out.println("stopping robotaxi " + roboTaxi.getAVVehicle().getId() + " at " + roboTaxi.getDivertableLocation().getId());
+
+            }
         }
 
         // // stop all vehicles which are not on a pickup or rebalancing mission.
@@ -429,11 +481,26 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         ScenarioServer.scenarioParameters.redispatchPeriod = redispatchPeriod;
         return redispatchPeriod;
     }
-
-    public int getRebalancingPeriod(AVDispatcherConfig config) {
-        int rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+    
+    public int getRebalancingPeriod(SafeConfig safeConfig, int alt){
+        int rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", alt);
         ScenarioServer.scenarioParameters.rebalancingPeriod = rebalancingPeriod;
         return rebalancingPeriod;
+    }
+
+    // public int getRebalancingPeriod(AVDispatcherConfig config) {
+    // int rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+    // ScenarioServer.scenarioParameters.rebalancingPeriod = rebalancingPeriod;
+    // return rebalancingPeriod;
+    // }
+
+    private void printPickupRegister() {
+        System.out.println("=============================");
+        System.out.println("printing pickup register:");
+        for (AVRequest avR : pickupRegister.keySet()) {
+            System.out.println("RoboTaxi " + pickupRegister.get(avR).getAVVehicle().getId() + " and AVRequest " + avR.getId());
+        }
+        System.out.println("=============================");
     }
 
 }
