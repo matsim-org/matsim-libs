@@ -14,59 +14,53 @@ import playground.clruch.simonton.Cluster;
 import playground.clruch.simonton.EuclideanDistancer;
 import playground.clruch.simonton.MyTree;
 import playground.clruch.utils.GlobalAssert;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public enum BipartiteMatchingUtils {
     ;
 
-    public static Tensor executePickup(UniversalDispatcher dispatcher, Collection<RoboTaxi> divertableVehicles, Collection<AVRequest> requests) {
+    public static Tensor executePickup(UniversalDispatcher dispatcher, Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests) {
         Tensor infoLine = Tensors.empty();
-        Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(divertableVehicles, requests, infoLine);
+        Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(roboTaxis, requests, infoLine);
         for (Entry<RoboTaxi, AVRequest> entry : gbpMatch.entrySet()) {
-            AVVehicle av = entry.getKey().getAVVehicle();
-            AVRequest avRequest = entry.getValue();
-            dispatcher.setVehiclePickup(av, avRequest);
+            dispatcher.setRoboTaxiPickup(entry.getKey(), entry.getValue());
         }
         return infoLine;
     }
 
-    public static Tensor executeRebalance(RebalancingDispatcher dispatcher, Collection<RoboTaxi> divertableVehicles, Collection<AVRequest> requests) {
+    public static Tensor executeRebalance(RebalancingDispatcher dispatcher, Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests) {
         Tensor infoLine = Tensors.empty();
-        Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(divertableVehicles, requests, infoLine);
+        Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(roboTaxis, requests, infoLine);
         for (Entry<RoboTaxi, AVRequest> entry : gbpMatch.entrySet()) {
-            AVVehicle av = entry.getKey().getAVVehicle();
-            AVRequest avRequest = entry.getValue();
-            dispatcher.setVehicleRebalance(av, avRequest.getFromLink());
+            dispatcher.setRoboTaxiRebalance(entry.getKey(), entry.getValue().getFromLink());
         }
         return infoLine;
     }
 
-    private static Map<RoboTaxi, AVRequest> globalBipartiteMatching(Collection<RoboTaxi> divertableVehicles, Collection<AVRequest> requests,
-            Tensor infoLine) {
+    private static Map<RoboTaxi, AVRequest> globalBipartiteMatching(Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests, Tensor infoLine) {
 
         // save initial problemsize
-        infoLine.append(Tensors.vectorInt(divertableVehicles.size(), requests.size()));
+        infoLine.append(Tensors.vectorInt(roboTaxis.size(), requests.size()));
 
-        // 1) In case divertableVehicles >> requests reduce search space using kd-trees
-        Collection<RoboTaxi> divertableVehiclesReduced = reduceVehiclesKDTree(requests, divertableVehicles);
+        // 1) In case roboTaxis >> requests reduce search space using kd-trees
+        Collection<RoboTaxi> roboTaxisReduced = reduceVehiclesKDTree(requests, roboTaxis);
 
-        // 2) In case requests >> divertablevehicles reduce the search space using kd-trees
-        Collection<AVRequest> requestsReduced = reduceRequestsKDTree(requests, divertableVehicles);
+        // 2) In case requests >> roboTaxis reduce the search space using kd-trees
+        Collection<AVRequest> requestsReduced = reduceRequestsKDTree(requests, roboTaxis);
 
         // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method and
         // set new pickup commands
-        infoLine.append(Tensors.vectorInt(divertableVehiclesReduced.size(), requestsReduced.size())); // initial
+        infoLine.append(Tensors.vectorInt(roboTaxisReduced.size(), requestsReduced.size())); // initial
                                                                                                       // problem
                                                                                                       // size
 
-        return (new HungarBiPartVehicleDestMatcher()).matchAVRequest(divertableVehiclesReduced, requestsReduced); //
+        return (new HungarBiPartVehicleDestMatcher()).matchAVRequest(roboTaxisReduced, requestsReduced); //
 
     }
 
-    private static Collection<AVRequest> reduceRequestsKDTree(Collection<AVRequest> requests, Collection<RoboTaxi> divertableVehicles) {
+    private static Collection<AVRequest> reduceRequestsKDTree(Collection<AVRequest> requests, Collection<RoboTaxi> roboTaxis) {
         // for less requests than cars, don't do anything
-        if (requests.size() < divertableVehicles.size())
+        if (requests.size() < roboTaxis.size())
             return requests;
 
         // otherwise create KD tree and return reduced amount of requestlocs
@@ -89,47 +83,47 @@ public enum BipartiteMatchingUtils {
             reqIter++;
         }
 
-        // for all divertable vehicles, start nearestNeighborSearch until union is as large as the
+        // for all roboTaxis vehicles, start nearestNeighborSearch until union is as large as the
         // number of vehicles
         // start with only one request per vehicle
         Collection<AVRequest> requestsChosen = new HashSet<>();
         int iter = 1;
         do {
             requestsChosen.clear();
-            for (RoboTaxi vehicleLinkPair : divertableVehicles) {
-                double[] vehLoc = new double[] { vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getX(),
-                        vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getY() };
+            for (RoboTaxi roboTaxi : roboTaxis) {
+                double[] vehLoc = new double[] { roboTaxi.getDivertableLocation().getToNode().getCoord().getX(),
+                        roboTaxi.getDivertableLocation().getToNode().getCoord().getY() };
                 Cluster<AVRequest> nearestCluster = KDTree.buildCluster(vehLoc, iter, new EuclideanDistancer());
                 nearestCluster.getValues().stream().forEach(v -> requestsChosen.add(v));
             }
             ++iter;
-        } while (requestsChosen.size() < divertableVehicles.size() && iter <= divertableVehicles.size());
+        } while (requestsChosen.size() < roboTaxis.size() && iter <= roboTaxis.size());
 
         return requestsChosen;
 
     }
 
-    private static Collection<RoboTaxi> reduceVehiclesKDTree(Collection<AVRequest> requests, Collection<RoboTaxi> divertableVehicles) {
+    private static Collection<RoboTaxi> reduceVehiclesKDTree(Collection<AVRequest> requests, Collection<RoboTaxi> roboTaxis) {
         // for less requests than cars, don't do anything
-        if (divertableVehicles.size() < requests.size())
-            return divertableVehicles;
+        if (roboTaxis.size() < requests.size())
+            return roboTaxis;
 
         // otherwise create KD tree and return reduced amount of requestlocs
         // create KD tree
         int dimensions = 2;
-        int maxDensity = divertableVehicles.size();
+        int maxDensity = roboTaxis.size();
         double maxCoordinate = 1000000000000.0;
-        int maxDepth = divertableVehicles.size();
+        int maxDepth = roboTaxis.size();
         MyTree<RoboTaxi> KDTree = new MyTree<>(dimensions, maxDensity, maxCoordinate, maxDepth);
 
         // add uniquely identifiable requests to KD tree
         // int vehIter = 0; // not read
-        for (RoboTaxi vehicleLinkPair : divertableVehicles) {
-            double d1 = vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getX();
-            double d2 = vehicleLinkPair.getDivertableLocation().getToNode().getCoord().getY();
+        for (RoboTaxi roboTaxi : roboTaxis) {
+            double d1 = roboTaxi.getDivertableLocation().getToNode().getCoord().getX();
+            double d2 = roboTaxi.getDivertableLocation().getToNode().getCoord().getY();
             GlobalAssert.that(Double.isFinite(d1));
             GlobalAssert.that(Double.isFinite(d2));
-            KDTree.add(new double[] { d1, d2 }, vehicleLinkPair);
+            KDTree.add(new double[] { d1, d2 }, roboTaxi);
             // vehIter++;
         }
 
@@ -137,7 +131,7 @@ public enum BipartiteMatchingUtils {
         // requests
         // start with only one vehicle per request
         HashSet<RoboTaxi> vehiclesChosen = new HashSet(); // note: must be HashSet to avoid
-                                                                 // duplicate elements.
+                                                          // duplicate elements.
         int iter = 1;
         do {
             vehiclesChosen.clear();

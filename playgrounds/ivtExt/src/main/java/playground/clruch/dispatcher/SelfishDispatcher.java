@@ -21,7 +21,6 @@ import com.google.inject.name.Named;
 import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
-import playground.clruch.dispatcher.utils.InOrderOfArrivalMatcher;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
@@ -33,6 +32,9 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
+@Deprecated
+//ATTENTION: THIS DISPATCHER HAS NOT BEEN TESTED WITH THE NEW INTERFACE, LIKELY NOT TO 
+// FUNCTION CORRECTLY.
 public class SelfishDispatcher extends RebalancingDispatcher {
 
     private final int dispatchPeriod;
@@ -116,8 +118,8 @@ public class SelfishDispatcher extends RebalancingDispatcher {
                     if (subStrategy.equals("noComm")) { // send every vehicle to closest customer
                         for (RoboTaxi vehicleLinkPair : getDivertableVehicleLinkPairs()) {
                             Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
-                            AVRequest closestRequest = pendingRequestsTree.getClosest(vehicleCoord.getX(), vehicleCoord.getY());  
-                            setVehiclePickup(vehicleLinkPair.getAVVehicle(), closestRequest);
+                            AVRequest closestRequest = pendingRequestsTree.getClosest(vehicleCoord.getX(), vehicleCoord.getY()); 
+                            setRoboTaxiPickup(vehicleLinkPair, closestRequest);
                         }
                     } else if (subStrategy.equals("voronoi")) { // use the Voronoi sets in the selfish strategy
                         HashMap<AVVehicle, QuadTree<AVRequest>> voronoiSets = computeVoronoiSets();
@@ -127,7 +129,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
                             if (voronoiSet.size() > 0) {
                                 AVRequest closestRequest = voronoiSet.getClosest(vehicleCoord.getX(), vehicleCoord.getY());
                                 // AVRequest closestRequest = findClosestRequest(vehicleLinkPair, voronoiSet.values());
-                                setVehiclePickup(vehicleLinkPair.getAVVehicle(), closestRequest);
+                                setRoboTaxiPickup(vehicleLinkPair, closestRequest);
                             }
                         }   
                     } else if (subStrategy.equals("selfishLoiter")) { //
@@ -137,7 +139,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
                             } else {
                             RoboTaxi closestDivertableVehicle = findClosestDivertableVehicle(pendingRequest);
                             // TODO instead of just diverting, MATCH the closest vehicle with the pending request
-                            setVehiclePickup(closestDivertableVehicle.getAVVehicle(), pendingRequest);
+                            setRoboTaxiPickup(closestDivertableVehicle, pendingRequest);
                             // setAcceptRequest(closestDivertableVehicle.avVehicle, pendingRequest); // TODO throws error 
                             }
                         }
@@ -150,7 +152,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
                     Link link = refPositions.get(vehicleLinkPair.getAVVehicle());
                     GlobalAssert.that(link != null);
                     // setVehicleDiversion(vehicleLinkPair, link);
-                    setVehicleRebalance(vehicleLinkPair.getAVVehicle(), link);
+                    setRoboTaxiRebalance(vehicleLinkPair, link);
                 }
             }
         }

@@ -64,7 +64,8 @@ public class SimulationObjectCompiler {
         }
     }
 
-    public void addRebalancingVehicles(Map<AVVehicle, Link> rebalancingVehicles, Map<AVVehicle, Link> vehicleLocations) {
+    @Deprecated
+    public void addRebalancingVehiclesOld(Map<AVVehicle, Link> rebalancingVehicles, Map<AVVehicle, Link> vehicleLocations) {
         for (Entry<AVVehicle, Link> entry : rebalancingVehicles.entrySet()) {
             VehicleContainer vehicleContainer = new VehicleContainer();
             AVVehicle avVehicle = entry.getKey();
@@ -77,6 +78,24 @@ public class SimulationObjectCompiler {
             vehicleMap.put(key, vehicleContainer);
         }
     }
+    
+    
+    public void addRebalancingVehicles(Map<RoboTaxi, Link> rebalancingVehicles, Map<AVVehicle, Link> vehicleLocations) {
+        for (Entry<RoboTaxi, Link> entry : rebalancingVehicles.entrySet()) {
+            VehicleContainer vehicleContainer = new VehicleContainer();
+            AVVehicle avVehicle = entry.getKey().getAVVehicle();
+            final String key = avVehicle.getId().toString();
+            final Link fromLink = vehicleLocations.get(avVehicle);
+            vehicleContainer.vehicleIndex = db.getVehicleIndex(avVehicle);
+            vehicleContainer.linkIndex = db.getLinkIndex(fromLink);
+            vehicleContainer.avStatus = AVStatus.REBALANCEDRIVE;
+            vehicleContainer.destinationLinkIndex = db.getLinkIndex(entry.getValue());
+            vehicleMap.put(key, vehicleContainer);
+        }
+    }
+    
+    
+    
 
     private void addDivertableVehicles(Collection<RoboTaxi> divertableVehicles, Map<AVVehicle, Link> vehicleLocations) {
         for (RoboTaxi vlp : divertableVehicles) {

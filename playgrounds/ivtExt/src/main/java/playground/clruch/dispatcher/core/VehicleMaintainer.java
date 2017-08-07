@@ -1,7 +1,6 @@
 // code by jph
 package playground.clruch.dispatcher.core;
 
-import java.awt.Robot;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,8 +20,6 @@ import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
-
-import com.ctc.wstx.sw.ISOLatin1XmlWriter;
 
 import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.GlobalAssert;
@@ -275,6 +272,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
         }
     }
 
+    @Deprecated
     protected final Collection<RoboTaxi> getDivertableVehicleLinkPairs() {
         getDivertableVehicles();
         return avVehicleVehicleLinkPairMap.values();
@@ -309,6 +307,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
         private_now = now; // <- time available to derived class via getTimeNow()
 
         updateDatastructures(Collections.unmodifiableCollection(getStayVehiclesCollection()));
+        
 
         if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0) {
             String infoLine = getInfoLine();
@@ -330,10 +329,11 @@ abstract class VehicleMaintainer implements AVDispatcher {
 //                .parallel() //
 //                .forEach(AbstractDirective::execute);
         private_vehicleDirectives.clear();
+        
+        
 
         for (RoboTaxi robotaxi : roboTaxis) {
             if (robotaxi.getDirective() != null) {
-                System.out.println("executing directive for roboTaxi " +  robotaxi.getAVVehicle().getId());
                 robotaxi.getDirective().execute();
                 robotaxi.setDirective(null);
             }

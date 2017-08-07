@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -100,7 +99,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             RoboTaxi pickupVehicle = pickupRegister.get(avRequest);
             Link pickupVehicleLink = getStayVehiclesUnique().get(pickupVehicle.getAVVehicle());
             if (avRequest.getFromLink().equals(pickupVehicleLink) && pendingRequests.contains(avRequest)) {
-                System.out.println("WE GOT TO THIS POINT, ZEAH =============================");
                 setAcceptRequest(pickupVehicle, avRequest);
                 boolean status = reqToRemove.add(avRequest);
                 GlobalAssert.that(status);
@@ -363,10 +361,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     protected void setRoboTaxiPickup(RoboTaxi robotaxi, AVRequest avRequest) {
         // 1) enter information into pickup table
-        System.out.println("pickup register addition " + robotaxi.getAVVehicle().getId() + " to request " + avRequest.getId());
         pickupRegister.forcePut(avRequest, robotaxi);
-
-        printPickupRegister();
 
         // 2) set vehicle diversion
         setRoboTaxiDiversion(robotaxi, avRequest.getFromLink());
@@ -406,32 +401,19 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     @Override
     final void endofStepTasks() {
         // stop all vehicles which are not on a pickup or rebalancing mission.
-//        printPickupRegister();
         for (RoboTaxi roboTaxi : getRoboTaxis()) {
             boolean isOnPickup = pickupRegister.containsValue(roboTaxi); // pickupRegister.values().contains(roboTaxi.getAVVehicle());
             boolean isOnExtra = extraCheck(roboTaxi);
             boolean isStaying = roboTaxi.isVehicleInStayTask();
             if (!isOnPickup && !isOnExtra && roboTaxi.getDirective() == null && !isStaying) {
                 setRoboTaxiDiversion(roboTaxi, roboTaxi.getDivertableLocation());
-                System.out.println("stopping robotaxi " + roboTaxi.getAVVehicle().getId() + " at " + roboTaxi.getDivertableLocation().getId());
-
             }
         }
-
-        // // stop all vehicles which are not on a pickup or rebalancing mission.
-        // Collection<RoboTaxi> divertableVehicles = getDivertableVehicleLinkPairs();
-        // for (RoboTaxi vehicleLinkPair : divertableVehicles) {
-        // boolean isOnPickup = pickupRegister.values().contains(vehicleLinkPair.getAVVehicle());
-        // boolean isOnExtra = extraCheck(vehicleLinkPair);
-        // if (!isOnPickup && !isOnExtra) {
-        // setVehicleDiversion(vehicleLinkPair.getAVVehicle(),
-        // vehicleLinkPair.getDivertableLocation());
-        // }
-        // }
+        GlobalAssert.that(pickupRegister.size() <= pendingRequests.size());
     }
 
     boolean extraCheck(RoboTaxi vehicleLinkPair) {
-        return true;
+        return false;
     }
 
     @Override
@@ -481,8 +463,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         ScenarioServer.scenarioParameters.redispatchPeriod = redispatchPeriod;
         return redispatchPeriod;
     }
-    
-    public int getRebalancingPeriod(SafeConfig safeConfig, int alt){
+
+    public int getRebalancingPeriod(SafeConfig safeConfig, int alt) {
         int rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", alt);
         ScenarioServer.scenarioParameters.rebalancingPeriod = rebalancingPeriod;
         return rebalancingPeriod;
