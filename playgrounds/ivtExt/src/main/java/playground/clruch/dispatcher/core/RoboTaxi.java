@@ -2,6 +2,8 @@
 package playground.clruch.dispatcher.core;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.sebhoerl.avtaxi.data.AVVehicle;
@@ -93,6 +95,11 @@ public class RoboTaxi {
         return isWithoutCustomer;
     }
     
+    public boolean isInStayTask(){
+        Task task = Schedules.getLastTask(getAVVehicle().getSchedule());
+        if (task.getStatus().equals(Task.TaskStatus.STARTED)) return true;
+        return false;
+    }
     
 
 }

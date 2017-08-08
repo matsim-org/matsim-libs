@@ -59,14 +59,13 @@ abstract class VehicleMaintainer implements AVDispatcher {
     public final void setInfoLinePeriod(int infoLinePeriod) {
         this.infoLinePeriod = infoLinePeriod;
     }
-    
+
     /** @return time of current re-dispatching iteration step
      * @throws NullPointerException
      *             if dispatching has not started yet */
     protected final double getTimeNow() {
         return private_now;
     }
-    
 
     synchronized void assignDirective(RoboTaxi robotaxi, AbstractDirective abstractDirective) {
         GlobalAssert.that(isWithoutDirective(robotaxi));
@@ -99,9 +98,10 @@ abstract class VehicleMaintainer implements AVDispatcher {
         return divertableRoboTaxis;
     }
 
+
     private final void updateDivertableLocations() {
         for (RoboTaxi robotaxi : getRoboTaxis()) {
-            if (isWithoutDirective(robotaxi.getAVVehicle())) {
+            if (isWithoutDirective(robotaxi)) {
                 Schedule schedule = robotaxi.getAVVehicle().getSchedule();
                 new AVTaskAdapter(schedule.getCurrentTask()) {
                     @Override
@@ -147,8 +147,6 @@ abstract class VehicleMaintainer implements AVDispatcher {
         eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
     }
 
-
-
     abstract void notifySimulationSubscribers(long round_now);
 
     /** invoked at the beginning of every iteration dispatchers can update their data structures
@@ -173,15 +171,11 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
         notifySimulationSubscribers(Math.round(now));
 
+        consistencyCheck();
         beforeStepTasks();
         redispatch(now);
         afterStepTasks();
-
-        // private_now = null; // <- time unavailable
-        // private_vehicleDirectives.values().stream() //
-        // .parallel() //
-        // .forEach(AbstractDirective::execute);
-        // private_vehicleDirectives.clear();
+        consistencyCheck();
 
         for (RoboTaxi robotaxi : roboTaxis) {
             if (robotaxi.getDirective() != null) {
@@ -196,16 +190,24 @@ abstract class VehicleMaintainer implements AVDispatcher {
         // update divertable locations of RoboTaxis
         updateDivertableLocations();
         executePickups();
-
     }
 
     private void afterStepTasks() {
         stopUnusedVehicles();
     }
 
+    
+    private void consistencyCheck(){
+        consistencySubCheck();
+        
+    }
+    
+    
     /* package */ abstract void executePickups();
 
     /* package */ abstract void stopUnusedVehicles();
+    
+    /* package */ abstract void consistencySubCheck();
 
     /** derived classes should override this function to add details
      * 
@@ -219,8 +221,6 @@ abstract class VehicleMaintainer implements AVDispatcher {
                 getDivertableVehicles().size() //
         );
     }
-
-
 
     /** derived classes should override this function
      * 
@@ -362,27 +362,6 @@ abstract class VehicleMaintainer implements AVDispatcher {
     @Deprecated
     protected final RoboTaxi getVehicleLinkPair(AVVehicle avVehicle) {
         return avVehicleVehicleLinkPairMap.get(avVehicle);
-    }
-
-    @Deprecated
-    public final Map<AVVehicle, Link> getStayVehiclesUnique() {
-        Map<AVVehicle, Link> map = new HashMap<>();
-        for (AVVehicle avVehicle : getFunctioningVehicles())
-            if (isWithoutDirective(avVehicle)) {
-                Task task = Schedules.getLastTask(avVehicle.getSchedule()); // <- last task
-                if (task.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
-                    new AVTaskAdapter(task) {
-                        @Override
-                        public void handle(AVStayTask avStayTask) { // <- type of task is STAY
-                            final Link link = avStayTask.getLink();
-
-                            map.put(avVehicle, link);
-
-                        }
-                    };
-            }
-        return Collections.unmodifiableMap(map);
-
     }
 
     /** @return collection of AVVehicles that are in stay mode */

@@ -97,21 +97,14 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         Set<AVRequest> reqToRemove = new HashSet<>();
         for (AVRequest avRequest : pickupRegister.keySet()) {
             RoboTaxi pickupVehicle = pickupRegister.get(avRequest);
-            Link pickupVehicleLink = getStayVehiclesUnique().get(pickupVehicle.getAVVehicle());
-            if (avRequest.getFromLink().equals(pickupVehicleLink) && pendingRequests.contains(avRequest)) {
-                pickupVehicle.setCustomerStatus(false);
+            Link pickupVehicleLink = pickupVehicle.getDivertableLocation();
+            if (avRequest.getFromLink().equals(pickupVehicleLink) && pendingRequests.contains(avRequest) && pickupVehicle.isInStayTask()) {
+                pickupVehicle.setCustomerStatus(false);                
                 setAcceptRequest(pickupVehicle, avRequest);
                 boolean status = reqToRemove.add(avRequest);
                 GlobalAssert.that(status);
             }
-        }
-        // size before
-        
-        for(AVRequest avR : reqToRemove){
-            System.out.println("removing from pickup register: " +"( " + avR.getId() + " )   ( " + pickupRegister.get(avR).getAVVehicle().getId() + " )");
-            System.out.println("customer status of AV " +pickupRegister.get(avR).getAVVehicle().getId() + " is " + pickupRegister.get(avR).isWithoutCustomer());
-        }
-        
+        }        
         reqToRemove.stream().forEach(v -> pickupRegister.remove(v));
     }
     
@@ -293,22 +286,13 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     // }
 
     protected void setRoboTaxiPickup(RoboTaxi roboTaxi, AVRequest avRequest) {
-        System.out.println("set pickup for roboTaxi : " + roboTaxi.getAVVehicle().getId() + " to request " + avRequest.getId());
-        
         GlobalAssert.that(roboTaxi.isWithoutCustomer());
 
         // 1) enter information into pickup table
-        if(pickupRegister.containsKey(avRequest)){
-            System.out.println("removing from pickup register: " +"( " + avRequest.getId() + " )   ( " + pickupRegister.get(avRequest).getAVVehicle().getId() + " )");
-        }
         RoboTaxi beforeTaxi = pickupRegister.forcePut(avRequest, roboTaxi);
-        System.out.println("new entry in pickup register:");
-        System.out.println("( " + avRequest.getId() + " )   ( " + pickupRegister.get(avRequest).getAVVehicle().getId() + " )");
 
         // 2) set vehicle diversion
         setRoboTaxiDiversion(roboTaxi, avRequest.getFromLink());
-        
-        printPickupRegister();
     }
 
     /** called when a new request enters the system */
@@ -334,13 +318,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         return Collections.emptyMap();
     }
 
-    /** @param avVehicle
-     * @return estimated current location of avVehicle, never null */
-    protected Link getVehicleLocation(AVVehicle avVehicle) {
-        Link link = vehicleLocations.get(avVehicle);
-        GlobalAssert.that(link != null);
-        return link;
-    }
+
 
     @Override
     final void stopUnusedVehicles() {
@@ -359,6 +337,14 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     boolean extraCheck(RoboTaxi vehicleLinkPair) {
         return false;
     }
+    
+    
+    @Override
+    final void consistencySubCheck(){
+        // there cannot be more pickup vehicles than open reqests
+        GlobalAssert.that(pickupRegister.size()<= pendingRequests.size());
+    }
+    
 
     @Override
     final void notifySimulationSubscribers(long round_now) {
@@ -532,6 +518,16 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     assignDirective(avVehicle, new EmptyDirective());
             }
         };
+    }
+    
+    
+    /** @param avVehicle
+     * @return estimated current location of avVehicle, never null */
+    @Deprecated // use robotaxi.getDivertableLocation istead
+    protected Link getVehicleLocation(AVVehicle avVehicle) {
+        Link link = vehicleLocations.get(avVehicle);
+        GlobalAssert.that(link != null);
+        return link;
     }
 
 }

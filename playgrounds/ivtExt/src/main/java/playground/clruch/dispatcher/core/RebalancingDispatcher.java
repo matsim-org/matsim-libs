@@ -54,13 +54,8 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
                 .collect(Collectors.toList());
     }
 
-    protected synchronized final void setRoboTaxiRebalance(final RoboTaxi roboTaxi, final Link destination) {
-        super.printPickupRegister();
-        System.out.println("rebalancing roboTaxi : " + roboTaxi.getAVVehicle().getId() + " to destination " +  destination.getId());
-        System.out.println("customer status of " +  roboTaxi.getAVVehicle().getId() + " is " + roboTaxi.isWithoutCustomer());
-        
+    protected synchronized final void setRoboTaxiRebalance(final RoboTaxi roboTaxi, final Link destination) {        
         GlobalAssert.that(roboTaxi.isWithoutCustomer());        
-        
         // in case vehicle is picking up, remove from pickup register
         if (pickupRegister.containsValue(roboTaxi)) {
             pickupRegister.remove(pickupRegister.inverse().get(roboTaxi), roboTaxi);

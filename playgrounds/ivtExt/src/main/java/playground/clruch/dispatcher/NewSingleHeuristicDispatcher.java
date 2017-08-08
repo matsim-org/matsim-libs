@@ -14,15 +14,12 @@ import org.matsim.core.utils.collections.QuadTree;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.clruch.dispatcher.utils.AbstractRequestSelector;
-import playground.clruch.dispatcher.utils.OldestRequestSelector;
+import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -34,15 +31,15 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
     private final double[] networkBounds;
     private final QuadTree<AVRequest> pendingRequestsTree;
     private final HashSet<AVRequest> openRequests = new HashSet<>(); // two data structures are used to enable fast "contains" searching
-    private final QuadTree<AVVehicle> unassignedVehiclesTree;
-    private final HashSet<AVVehicle> unassignedVehicles = new HashSet<>(); // two data structures are used to enable fast "contains" searching
+    private final QuadTree<RoboTaxi> unassignedVehiclesTree;
+    private final HashSet<RoboTaxi> unassignedVehicles = new HashSet<>(); // two data structures are used to enable fast "contains" searching
 
     private NewSingleHeuristicDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager, //
-            Network network, AbstractRequestSelector abstractRequestSelector) {
+            Network network) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
@@ -58,9 +55,8 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
         if (round_now % dispatchPeriod == 0) {
 
             // get open requests and available vehicles
-            // TODO use the normal call functions and implement in UniveralDispatcher a setVehiclePickupBinding function instead
-            List<RoboTaxi> vehicles = getDivertableUnassignedVehicleLinkPairs();
-            addUnassignedVehicles(getDivertableUnassignedVehicleLinkPairs());
+            Collection<RoboTaxi> robotaxisDivertable = getDivertableUnassignedRoboTaxis();
+            addUnassignedVehicles(getDivertableUnassignedRoboTaxis());
 
             List<AVRequest> requests = getUnassignedAVRequests();
             addOpenRequests(requests);
@@ -73,27 +69,27 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
 
             if (oversupply && canMatch) { // OVERSUPPLY CASE
                 for (AVRequest avr : requests) {
-                    AVVehicle cloestVeh = findClosestVehicle(avr);
-                    if (cloestVeh != null) {
-                        setVehiclePickup(cloestVeh, avr);
-                        removeFromTrees(cloestVeh, avr);
+                    RoboTaxi closestRobotaxi = findClosestVehicle(avr);
+                    if (closestRobotaxi != null) {
+                        setRoboTaxiPickup(closestRobotaxi , avr);
+                        removeFromTrees(closestRobotaxi, avr);
                     }
                 }
             }
             if (!oversupply && canMatch) { // UNDERSUPPLY CASE
-                for (RoboTaxi vlp : vehicles) {
+                for (RoboTaxi robotaxi : robotaxisDivertable) {
 
-                    AVRequest closestReq = findClosestRequest(vlp);
+                    AVRequest closestReq = findClosestRequest(robotaxi);
                     if (closestReq != null) {
-                        setVehiclePickup(vlp.getAVVehicle(), closestReq);
-                        removeFromTrees(vlp.getAVVehicle(), closestReq);
+                        setRoboTaxiPickup(robotaxi, closestReq);
+                        removeFromTrees(robotaxi, closestReq);
                     }
                 }
             }
         }
     }
 
-    private boolean removeFromTrees(AVVehicle avVehicle, AVRequest avRequest) {
+    private boolean removeFromTrees(RoboTaxi robotaxi, AVRequest avRequest) {
         // remove avRequest
         boolean succRM = openRequests.remove(avRequest);
         boolean succRT = pendingRequestsTree.remove(avRequest.getFromLink().getFromNode().getCoord().getX(),
@@ -101,10 +97,10 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
         boolean removeSuccessR = succRT && succRM;
         GlobalAssert.that(removeSuccessR);
 
-        // remove avVehicle
-        boolean succVM = unassignedVehicles.remove(avVehicle);
-        boolean succVT = unassignedVehiclesTree.remove(getVehicleLocation(avVehicle).getCoord().getX(),
-                getVehicleLocation(avVehicle).getCoord().getY(), avVehicle);
+        // remove robotaxi
+        boolean succVM = unassignedVehicles.remove(robotaxi);
+        boolean succVT = unassignedVehiclesTree.remove(robotaxi.getDivertableLocation().getCoord().getX(),
+                robotaxi.getDivertableLocation().getCoord().getY(), robotaxi);
         boolean removeSuccessV = succVT && succVM;
         GlobalAssert.that(removeSuccessV);
 
@@ -114,29 +110,27 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
     /**
      * @param avRequest
      *            some request
-     * @param avVehicles
-     *            list of currently unassigned VehicleLinkPairs
-     * @return the AVVehicle closest to the given request
+     * @return the RoboTaxi closest to the given request
      */
-    private AVVehicle findClosestVehicle(AVRequest avRequest) {
+    private RoboTaxi findClosestVehicle(AVRequest avRequest) {
         Coord requestCoord = avRequest.getFromLink().getCoord();
         // System.out.println("treesize " + unassignedVehiclesTree.size());
         return unassignedVehiclesTree.getClosest(requestCoord.getX(), requestCoord.getY());
     }
 
     /**
-     * @param vehicleLinkPair
+     * @param roboTaxis
      *            ensures that new unassignedVehicles are added to a list with all unassigned vehicles
      */
-    private void addUnassignedVehicles(List<RoboTaxi> vehicleLinkPair) {
-        for (RoboTaxi avLinkPair : vehicleLinkPair) {
-            if (!unassignedVehicles.contains(avLinkPair.getAVVehicle())) {
-                Coord toMatchVehicleCoord = getVehicleLocation(avLinkPair.getAVVehicle()).getCoord();
-                boolean uaSucc = unassignedVehicles.add(avLinkPair.getAVVehicle());
+    private void addUnassignedVehicles(Collection<RoboTaxi> roboTaxis) {
+        for (RoboTaxi roboTaxi : roboTaxis) {
+            if (!unassignedVehicles.contains(roboTaxi)) {
+                Coord toMatchVehicleCoord = roboTaxi.getDivertableLocation().getCoord(); 
+                boolean uaSucc = unassignedVehicles.add(roboTaxi);
                 boolean qtSucc = unassignedVehiclesTree.put( //
                         toMatchVehicleCoord.getX(), //
                         toMatchVehicleCoord.getY(), //
-                        avLinkPair.getAVVehicle());
+                        roboTaxi);
                 GlobalAssert.that(uaSucc && qtSucc);
             }
         }
@@ -144,13 +138,13 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
 
     /**
      * 
-     * @param vehicleLinkPair
+     * @param robotaxi
      * @param avRequests
      *            (open requests)
-     * @return the closest Request to vehicleLinkPair.avVehicle found with tree-search
+     * @return the closest Request to robotaxi found with tree-search
      */
-    private AVRequest findClosestRequest(RoboTaxi vehicleLinkPair) {
-        Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
+    private AVRequest findClosestRequest(RoboTaxi robotaxi) {
+        Coord vehicleCoord = robotaxi.getDivertableLocation().getFromNode().getCoord();
         return pendingRequestsTree.getClosest(vehicleCoord.getX(), vehicleCoord.getY());
     }
 
@@ -189,9 +183,8 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
-            AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             return new NewSingleHeuristicDispatcher( //
-                    config, travelTime, router, eventsManager, network, abstractRequestSelector);
+                    config, travelTime, router, eventsManager, network);
         }
     }
 }
