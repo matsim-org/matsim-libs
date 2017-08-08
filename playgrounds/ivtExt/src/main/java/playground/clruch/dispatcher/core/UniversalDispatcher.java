@@ -57,13 +57,13 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                                                                                  // are matched
                                                                                  // within a publish
                                                                                  // period.
-    private final Map<AVVehicle, Link> vehiclesWithCustomer = new HashMap<>();
+    // private final Map<AVVehicle, Link> vehiclesWithCustomer = new HashMap<>();
     // TODO visibility of map to private
     protected final BiMap<AVRequest, RoboTaxi> pickupRegister = HashBiMap.create();
 
     /** map stores most recently known location of vehicles. map is used in case obtaining the
      * vehicle location fails */
-    private final Map<AVVehicle, Link> vehicleLocations = new HashMap<>();
+    // private final Map<AVVehicle, Link> vehicleLocations = new HashMap<>();
 
     private final double pickupDurationPerStop;
     private final double dropoffDurationPerStop;
@@ -89,49 +89,62 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         publishPeriod = safeConfig.getInteger("publishPeriod", 10);
     }
 
-    
-    
     @Override
-    void executePickups(){
+    void executePickups() {
         // complete all matchings if vehicle has arrived on link
         Set<AVRequest> reqToRemove = new HashSet<>();
         for (AVRequest avRequest : pickupRegister.keySet()) {
             RoboTaxi pickupVehicle = pickupRegister.get(avRequest);
             Link pickupVehicleLink = pickupVehicle.getDivertableLocation();
             if (avRequest.getFromLink().equals(pickupVehicleLink) && pendingRequests.contains(avRequest) && pickupVehicle.isInStayTask()) {
-                pickupVehicle.setCustomerStatus(false);                
                 setAcceptRequest(pickupVehicle, avRequest);
                 boolean status = reqToRemove.add(avRequest);
                 GlobalAssert.that(status);
             }
-        }        
+        }
         reqToRemove.stream().forEach(v -> pickupRegister.remove(v));
     }
-    
-    
+
     @Override
     void updateDatastructures(Collection<AVVehicle> stayVehicles) {
-        stayVehicles.forEach(vehiclesWithCustomer::remove); // TODO still needed
 
-
-        // ---
         @SuppressWarnings("unused")
         int failed = 0;
-        Collection<AVVehicle> collection = getFunctioningVehicles();
-        if (!collection.isEmpty()) {
-            for (AVVehicle avVehicle : collection) {
-                final Link link = AVLocation.of(avVehicle);
-                if (link != null)
-                    vehicleLocations.put(avVehicle, link);
-                else
+        Collection<RoboTaxi> robotaxis = getRoboTaxis();
+        if (!robotaxis.isEmpty()) {
+            for (RoboTaxi robotaxi : robotaxis) {
+                final Link link = AVLocation.of(robotaxi.getAVVehicle());
+                if (link != null) {
+                    robotaxi.setCurrentLocation(link);
+                } else {
                     ++failed;
+                }
+
             }
             if (AVVEHILCECOUNT == null)
-                AVVEHILCECOUNT = vehicleLocations.size();
-            // TODO this check was taken out because the zurich scenario doesn't satisfy this :-(
-            // GlobalAssert.that(AVVEHILCECOUNT == collection.size());
-            // GlobalAssert.that(AVVEHILCECOUNT == vehicleLocations.size());
+                AVVEHILCECOUNT = getRoboTaxis().size();
         }
+
+        // stayVehicles.forEach(vehiclesWithCustomer::remove); // TODO still needed?
+
+        // // ---
+        // @SuppressWarnings("unused")
+        // int failed = 0;
+        // Collection<AVVehicle> collection = getFunctioningVehicles();
+        // if (!collection.isEmpty()) {
+        // for (AVVehicle avVehicle : collection) {
+        // final Link link = AVLocation.of(avVehicle);
+        // if (link != null)
+        // vehicleLocations.put(avVehicle, link);
+        // else
+        // ++failed;
+        // }
+        // if (AVVEHILCECOUNT == null)
+        // AVVEHILCECOUNT = vehicleLocations.size();
+        // // TODO this check was taken out because the zurich scenario doesn't satisfy this :-(
+        // // GlobalAssert.that(AVVEHILCECOUNT == collection.size());
+        // // GlobalAssert.that(AVVEHILCECOUNT == vehicleLocations.size());
+        // }
         // if (0 < failed)
         // System.out.println("failed to extract location for " + failed + " vehicles");
     }
@@ -250,6 +263,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         boolean statusPen = pendingRequests.remove(avRequest);
         GlobalAssert.that(statusPen);
 
+        roboTaxi.setAVStatus(AVStatus.DRIVEWITHCUSTOMER);
+
         // save avRequests which are matched for one publishPeriod to ensure
         // no requests are lost in the recording.
         publishPeriodMatchedRequests.add(avRequest);
@@ -268,8 +283,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         // assignDirective(avVehicle, new AcceptRequestDirective( //
         // avVehicle, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
 
-        Link returnVal = vehiclesWithCustomer.put(roboTaxi.getAVVehicle(), avRequest.getToLink());
-        GlobalAssert.that(returnVal == null);
+        // Link returnVal = vehiclesWithCustomer.put(roboTaxi.getAVVehicle(),
+        // avRequest.getToLink());
+        // GlobalAssert.that(returnVal == null);
 
         ++total_matchedRequests;
     }
@@ -287,6 +303,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     protected void setRoboTaxiPickup(RoboTaxi roboTaxi, AVRequest avRequest) {
         GlobalAssert.that(roboTaxi.isWithoutCustomer());
+        roboTaxi.setAVStatus(AVStatus.DRIVETOCUSTMER);
 
         // 1) enter information into pickup table
         RoboTaxi beforeTaxi = pickupRegister.forcePut(avRequest, roboTaxi);
@@ -307,18 +324,16 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     }
 
     /** @return map of vehicles that carry a customer and their destination links */
-    protected final Map<AVVehicle, Link> getVehiclesWithCustomer() {
-        return Collections.unmodifiableMap(vehiclesWithCustomer);
+    protected final List<RoboTaxi> getRoboTaxisWithCustomer() {
+        return getRoboTaxis().stream().filter(v -> v.getAVStatus().equals(AVStatus.DRIVEWITHCUSTOMER)).collect(Collectors.toList());
     }
 
     /** {@link PartitionedDispatcher} overrides the function
      * 
      * @return map of rebalancing vehicles and their destination links */
-    protected Map<RoboTaxi, Link> getRebalancingVehicles() {
-        return Collections.emptyMap();
+    protected List<RoboTaxi> getRebalancingRoboTaxis() {
+        return Collections.emptyList();
     }
-
-
 
     @Override
     final void stopUnusedVehicles() {
@@ -327,7 +342,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             boolean isOnPickup = pickupRegister.containsValue(roboTaxi); // pickupRegister.values().contains(roboTaxi.getAVVehicle());
             boolean isOnExtra = extraCheck(roboTaxi);
             boolean isStaying = roboTaxi.isVehicleInStayTask();
-            if (!isOnPickup && !isOnExtra && roboTaxi.getDirective() == null && !isStaying) {
+            boolean isWithoutCustomer = roboTaxi.isWithoutCustomer();
+            if (!isOnPickup && !isOnExtra && roboTaxi.getDirective() == null && !isStaying && isWithoutCustomer) {
                 setRoboTaxiDiversion(roboTaxi, roboTaxi.getDivertableLocation());
             }
         }
@@ -337,14 +353,12 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     boolean extraCheck(RoboTaxi vehicleLinkPair) {
         return false;
     }
-    
-    
+
     @Override
-    final void consistencySubCheck(){
+    final void consistencySubCheck() {
         // there cannot be more pickup vehicles than open reqests
-        GlobalAssert.that(pickupRegister.size()<= pendingRequests.size());
+        GlobalAssert.that(pickupRegister.size() <= pendingRequests.size());
     }
-    
 
     @Override
     final void notifySimulationSubscribers(long round_now) {
@@ -352,24 +366,28 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             SimulationObjectCompiler simulationObjectCompiler = SimulationObjectCompiler.create( //
                     round_now, getInfoLine(), total_matchedRequests);
 
-            simulationObjectCompiler.addRequests(publishPeriodMatchedRequests); // adding requests
-                                                                                // submittend and
-                                                                                // matched within
-                                                                                // current publish
-                                                                                // period
-            simulationObjectCompiler.addRequests(getAVRequests()); // adding requests open in >=1
-                                                                   // publish periods
-            simulationObjectCompiler.addVehiclesWithCustomer(getVehiclesWithCustomer(), vehicleLocations);
-            simulationObjectCompiler.addRebalancingVehicles(getRebalancingVehicles(), vehicleLocations);
-            SimulationObject simulationObject = simulationObjectCompiler.compile( //
-                    getDivertableVehicleLinkPairs(), vehicleLocations);
+            // adding requests submitted and matched within current publish period
+            simulationObjectCompiler.addRequests(publishPeriodMatchedRequests);
+            // adding requests open in >=1 publish periods
+            simulationObjectCompiler.addRequests(getAVRequests());
 
+            
+            // OLD VERSION 
+            // simulationObjectCompiler.addVehiclesWithCustomerNew(getRoboTaxisWithCustomer());
+            // simulationObjectCompiler.addRebalancingVehiclesNew(getRebalancingRoboTaxis());
+            // SimulationObject simulationObject =
+            // simulationObjectCompiler.compile(getDivertableRoboTaxis());
+            // OLD VERSION END
+            
+            simulationObjectCompiler.addVehicles(super.getRoboTaxis());
+            SimulationObject simulationObject = simulationObjectCompiler.compile();
+            
             // in the first pass, the vehicles is typically empty
             // in that case, the simObj will not be stored or communicated
             if (SimulationObjects.hasVehicles(simulationObject)) {
                 // GlobalAssert.that(AVVEHILCECOUNT == simulationObject.vehicles.size());
-                SimulationDistribution.of(simulationObject); // store simObj and distribute to
-                                                             // clients
+                // store simObj and distribute to clients
+                SimulationDistribution.of(simulationObject);
             }
             publishPeriodMatchedRequests.clear();
         }
@@ -456,8 +474,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         assignDirective(avVehicle, new AcceptRequestDirective( //
                 avVehicle, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
 
-        Link returnVal = vehiclesWithCustomer.put(avVehicle, avRequest.getToLink());
-        GlobalAssert.that(returnVal == null);
+        // Link returnVal = vehiclesWithCustomer.put(avVehicle, avRequest.getToLink());
+        // GlobalAssert.that(returnVal == null);
 
         ++total_matchedRequests;
     }
@@ -519,15 +537,14 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             }
         };
     }
-    
-    
-    /** @param avVehicle
-     * @return estimated current location of avVehicle, never null */
-    @Deprecated // use robotaxi.getDivertableLocation istead
-    protected Link getVehicleLocation(AVVehicle avVehicle) {
-        Link link = vehicleLocations.get(avVehicle);
-        GlobalAssert.that(link != null);
-        return link;
-    }
 
 }
+
+/// ** @param avVehicle
+// * @return estimated current location of avVehicle, never null */
+// @Deprecated // use robotaxi.getDivertableLocation istead
+// protected Link getVehicleLocation(AVVehicle avVehicle) {
+// Link link = vehicleLocations.get(avVehicle);
+// GlobalAssert.that(link != null);
+// return link;
+// }

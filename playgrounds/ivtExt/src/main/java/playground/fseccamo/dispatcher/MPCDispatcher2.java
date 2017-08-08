@@ -203,7 +203,7 @@ public class MPCDispatcher2 extends BaseMpcDispatcher {
                         /**
                          * rebalancing vehicles still within node_i traveling on link_k = (node_i, node_j)
                          */
-                        Map<AVVehicle, Link> map = getRebalancingVehicles();
+                        Map<AVVehicle, Link> map = getRebalancingRoboTaxis();
                         accountedVehicles.addAll(map.keySet());
                         final Tensor vector = countVehiclesPerVLink(map);
                         double[] array = Primitives.toArrayDouble(vector);
@@ -361,8 +361,12 @@ public class MPCDispatcher2 extends BaseMpcDispatcher {
                                 // 1) build List<VehicleLinkPair> with stay vehicles and links
                                 List<RoboTaxi> unassignedVehiclesNode = new ArrayList<>();
                                 for (AVVehicle avVehicle : cars) {
-                                    LinkTimePair ltp = new LinkTimePair(getVehicleLocation(avVehicle), now);
-                                    unassignedVehiclesNode.add(new RoboTaxi(avVehicle, ltp, getVehicleLocation(avVehicle)));
+                                    // TODO switch to roboTaxi
+                                    //LinkTimePair ltp = new LinkTimePair(getVehicleLocation(avVehicle), now);
+                                    LinkTimePair ltp = new LinkTimePair(null, now);
+                                 // TODO switch to roboTaxi
+                                    //unassignedVehiclesNode.add(new RoboTaxi(avVehicle, ltp, getVehicleLocation(avVehicle)));
+                                   unassignedVehiclesNode.add(new RoboTaxi(avVehicle, ltp, null));
                                 }
 
                                 // 2) build List<link> with requests locations

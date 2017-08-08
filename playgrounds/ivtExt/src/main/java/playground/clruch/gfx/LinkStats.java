@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
-import playground.clruch.export.AVStatus;
+import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.VehicleContainer;

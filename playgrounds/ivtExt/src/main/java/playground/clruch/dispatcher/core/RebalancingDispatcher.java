@@ -1,13 +1,9 @@
 // code by clruch and jph
 package playground.clruch.dispatcher.core;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -15,69 +11,48 @@ import org.matsim.core.router.util.TravelTime;
 
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /** rebalancing capability (without virtual network) */
 public abstract class RebalancingDispatcher extends UniversalDispatcher {
 
-    private final Map<RoboTaxi, Link> rebalancingVehicles = new HashMap<>();
+    // private final Map<RoboTaxi, Link> rebalancingVehicles = new HashMap<>();
 
     protected RebalancingDispatcher(AVDispatcherConfig avDispatcherConfig, TravelTime travelTime,
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, EventsManager eventsManager) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
     }
 
-    // TODO get rid of the AVVehicle here
-    @Override
-    final void updateDatastructures(Collection<AVVehicle> stayVehicles) {
-        // mandatory call
-        super.updateDatastructures(stayVehicles);
+    protected synchronized final void setRoboTaxiRebalance(final RoboTaxi roboTaxi, final Link destination) {
+        GlobalAssert.that(roboTaxi.isWithoutCustomer());
+        roboTaxi.setAVStatus(AVStatus.REBALANCEDRIVE);
 
-        // remove rebalancing vehicles that have reached their destination
-        for (AVVehicle avVehicle : stayVehicles) {
-            Optional<RoboTaxi> optRob = getRoboTaxis().stream().filter(v -> v.getAVVehicle().equals(avVehicle)).findAny();
-            GlobalAssert.that(optRob.isPresent());
-            rebalancingVehicles.remove(optRob.get());
-        }
-    }
-
-    @Override
-    protected Map<RoboTaxi, Link> getRebalancingVehicles() {
-        return Collections.unmodifiableMap(rebalancingVehicles);
-    }
-
-    protected List<RoboTaxi> getDivertableUnassignedNotRebalancingVehicleLinkPairs() {
-        return getDivertableUnassignedVehicleLinkPairs().stream() //
-                .filter(v -> !rebalancingVehicles.containsKey(v.getAVVehicle())) //
-                .collect(Collectors.toList());
-    }
-
-    protected synchronized final void setRoboTaxiRebalance(final RoboTaxi roboTaxi, final Link destination) {        
-        GlobalAssert.that(roboTaxi.isWithoutCustomer());        
         // in case vehicle is picking up, remove from pickup register
         if (pickupRegister.containsValue(roboTaxi)) {
             pickupRegister.remove(pickupRegister.inverse().get(roboTaxi), roboTaxi);
         }
 
-        // redivert roboTaxi, generate rebalancing event, add to rebalancing list
+        // redivert roboTaxi, generate rebalancing event
         setRoboTaxiDiversion(roboTaxi, destination);
         eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), roboTaxi.getAVVehicle(), destination));
-        Link returnVal = rebalancingVehicles.put(roboTaxi, destination);
     }
 
     @Override
     boolean extraCheck(RoboTaxi roboTaxi) {
-        return rebalancingVehicles.containsKey(roboTaxi);
+        return roboTaxi.getAVStatus().equals(AVStatus.REBALANCEDRIVE);
     }
-
-    private void printRebalancingVehicles() {
-        System.out.println("==============================");
-        System.out.println("rebalancingVehicles:");
-        for (RoboTaxi roboTaxi : rebalancingVehicles.keySet()) {
-            System.out.println(roboTaxi.getAVVehicle().getId() + "    to    " + rebalancingVehicles.get(roboTaxi).getId().toString());
+    
+    
+    @Override
+    protected List<RoboTaxi> getRebalancingRoboTaxis() {
+        List<RoboTaxi> rebalancingRobotaxis = new ArrayList<>();
+        for(RoboTaxi robotaxi : getRoboTaxis()){
+            if(robotaxi.getAVStatus().equals(AVStatus.REBALANCEDRIVE)){
+                rebalancingRobotaxis.add(robotaxi);
+            }
         }
+        return rebalancingRobotaxis;
+
     }
 
 }
@@ -104,4 +79,27 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
 // setVehicleDiversion(avVehicle, destination);
 // eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), avVehicle, destination));
 // Link returnVal = rebalancingVehicles.put(RoboTaxi, destination);
+// }
+
+//// TODO get rid of the AVVehicle here
+// @Override
+// final void updateDatastructures(Collection<AVVehicle> stayVehicles) {
+// // mandatory call
+// super.updateDatastructures(stayVehicles);
+//
+// // remove rebalancing vehicles that have reached their destination
+// for (AVVehicle avVehicle : stayVehicles) {
+// Optional<RoboTaxi> optRob = getRoboTaxis().stream().filter(v ->
+//// v.getAVVehicle().equals(avVehicle)).findAny();
+// GlobalAssert.that(optRob.isPresent());
+// rebalancingVehicles.remove(optRob.get());
+// }
+// }
+
+
+
+// protected List<RoboTaxi> getDivertableUnassignedNotRebalancingVehicleLinkPairs() {
+// return getDivertableUnassignedVehicleLinkPairs().stream() //
+// .filter(v -> !rebalancingVehicles.containsKey(v.getAVVehicle())) //
+// .collect(Collectors.toList());
 // }

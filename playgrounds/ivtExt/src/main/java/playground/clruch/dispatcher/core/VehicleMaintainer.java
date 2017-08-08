@@ -80,7 +80,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     /** @return collection of AVVehicles that have started their schedule */
-    protected final Collection<RoboTaxi> getRoboTaxis() {
+    protected final List<RoboTaxi> getRoboTaxis() {
         if (roboTaxis.isEmpty() || !roboTaxis.get(0).getAVVehicle().getSchedule().getStatus().equals(Schedule.ScheduleStatus.STARTED))
             return Collections.emptyList();
         return roboTaxis;
@@ -116,9 +116,8 @@ abstract class VehicleMaintainer implements AVDispatcher {
                             if (linkTimePair != null)
                                 robotaxi.setLinkTimePair(linkTimePair);
                             robotaxi.setCurrentDriveDestination(avDriveTask.getPath().getToLink());
-                            robotaxi.setCustomerStatus(true);
                         } else {
-                            robotaxi.setCustomerStatus(false);
+                            robotaxi.setAVStatus(AVStatus.DRIVEWITHCUSTOMER);
                         }
                     }
 
@@ -131,8 +130,8 @@ abstract class VehicleMaintainer implements AVDispatcher {
                             LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
                             // collection.add(new VehicleLinkPair(avVehicle, linkTimePair, null));
                             robotaxi.setLinkTimePair(linkTimePair);
-                            robotaxi.setCurrentDriveDestination(null);
-                            robotaxi.setCustomerStatus(true);
+                            robotaxi.setCurrentDriveDestination(avStayTask.getLink());
+                            robotaxi.setAVStatus(AVStatus.STAY);
                         }
                     }
                 };
@@ -143,6 +142,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
     @Override
     public final void registerVehicle(AVVehicle vehicle) {
         vehicles.add(vehicle);
+        GlobalAssert.that(vehicle.getStartLink() != null);
         roboTaxis.add(new RoboTaxi(vehicle, new LinkTimePair(vehicle.getStartLink(), -1.0), vehicle.getStartLink()));
         eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
     }
@@ -309,7 +309,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
                                                                                           // evident?
                             LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
                             // collection.add(new VehicleLinkPair(avVehicle, linkTimePair, null));
-                            avVehicleVehicleLinkPairMap.put(avVehicle, new RoboTaxi(avVehicle, linkTimePair, null));
+                            avVehicleVehicleLinkPairMap.put(avVehicle, new RoboTaxi(avVehicle, linkTimePair, avStayTask.getLink()));
                         }
                     }
                 };

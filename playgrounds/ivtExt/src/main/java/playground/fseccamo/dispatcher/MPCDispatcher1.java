@@ -202,7 +202,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                         /**
                          * rebalancing vehicles still within node_i traveling on link_k = (node_i, node_j)
                          */
-                        Map<AVVehicle, Link> map = getRebalancingVehicles();
+                        Map<AVVehicle, Link> map = getRebalancingRoboTaxis();
                         accountedVehicles.addAll(map.keySet());
                         final Tensor vector = countVehiclesPerVLink(map);
                         double[] array = Primitives.toArrayDouble(vector);
@@ -359,7 +359,8 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                     final QuadTree<AVVehicle> unassignedVehiclesTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
 
                                     for (AVVehicle avVehicle : cars) {
-                                        Link link = getVehicleLocation(avVehicle);
+                                        // TODO swith to RoboTaxi 
+                                        Link link = null;//getVehicleLocation(avVehicle);
                                         unassignedVehiclesTree.put(link.getCoord().getX(), link.getCoord().getY(), avVehicle);
                                     }
 

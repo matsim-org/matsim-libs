@@ -33,14 +33,12 @@ import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.dispatcher.core.BipartiteMatchingUtils;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
 import playground.clruch.dispatcher.utils.FeasibleRebalanceCreator;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
 import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
-import playground.clruch.dispatcher.utils.OldestRequestSelector;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
@@ -59,7 +57,6 @@ public class LPFFDispatcher extends PartitionedDispatcher {
     public final int dispatchPeriod;
     public final int rebalancingPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
-    final AbstractRequestSelector requestSelector;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
     final int numberOfAVs;
     private int total_rebalanceCount = 0;
@@ -80,23 +77,21 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             EventsManager eventsManager, //
             VirtualNetwork virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
-            AbstractRequestSelector abstractRequestSelector, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
-            TravelData arrivalInformationIn) {
+            TravelData travelData) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         virtualNodeDest = abstractVirtualNodeDest;
-        requestSelector = abstractRequestSelector;
         vehicleDestMatcher = abstractVehicleDestMatcher;
         numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
-        rebalancingPeriod = getRebalancingPeriod(config); // Integer.parseInt(config.getParams().get("rebalancingPeriod"));
-        travelData = arrivalInformationIn;
+        this.travelData = travelData;
         nVNodes = virtualNetwork.getvNodesCount();
         nVLinks = virtualNetwork.getvLinksCount();
         rebalanceCount = Array.zeros(nVNodes, nVNodes);
         rebalanceCountInteger = Array.zeros(nVNodes, nVNodes);
         lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(config);
-        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
+        dispatchPeriod = getDispatchPeriod(safeConfig, 20); 
+        rebalancingPeriod = getRebalancingPeriod(safeConfig, 20); 
     }
 
     @Override
@@ -113,12 +108,12 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             rebalanceCount = rebalanceCount.subtract(rebalanceCountInteger);
 
             // ensure that not more vehicles are sent away than available
-            Map<VirtualNode, List<RoboTaxi>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+            Map<VirtualNode, List<RoboTaxi>> availableVehicles = getVirtualNodeDivertablenotRebalancingRoboTaxis();
             Tensor feasibleRebalanceCount = FeasibleRebalanceCreator.returnFeasibleRebalance(rebalanceCountInteger.unmodifiable(), availableVehicles);
             total_rebalanceCount += (Integer) ((Scalar) Total.of(Tensor.of(feasibleRebalanceCount.flatten(-1)))).number();
 
             // generate routing instructions for rebalancing vehicles
-            Map<VirtualNode, List<Link>> destinationLinks = createvNodeLinksMap();
+            Map<VirtualNode, List<Link>> destinationLinks = virtualNetwork.createvNodeLinksMap();
 
             // fill rebalancing destinations
             for (int i = 0; i < nVLinks; ++i) {
@@ -132,23 +127,23 @@ public class LPFFDispatcher extends PartitionedDispatcher {
 
             // consistency check: rebalancing destination links must not exceed
             // available vehicles in virtual node
-            GlobalAssert.that(!virtualNetwork.getVirtualNodes().stream().filter(v -> availableVehicles.get(v).size() < destinationLinks.get(v).size())
-                    .findAny().isPresent());
+            GlobalAssert.that(!virtualNetwork.getVirtualNodes().stream().filter(v -> availableVehicles.get(v).size() < destinationLinks.get(v).size()).findAny()
+                    .isPresent());
 
             // send rebalancing vehicles using the setVehicleRebalance command
             for (VirtualNode virtualNode : destinationLinks.keySet()) {
-                Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode),
-                        destinationLinks.get(virtualNode));
-                rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v.getAVVehicle(), rebalanceMatching.get(v)));
+                Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode));
+                rebalanceMatching.keySet().forEach(v ->  setRoboTaxiRebalance(v, rebalanceMatching.get(v)));
             }
 
             // reset vector
             rebalanceCountInteger = Array.zeros(nVNodes, nVNodes);
         }
 
-        // Part II: outside rebalancing periods, permanently assign destinations to vehicles using bipartite matching
+        // Part II: outside rebalancing periods, permanently assign destinations to vehicles using
+        // bipartite matching
         if (round_now % dispatchPeriod == 0) {
-            printVals = BipartiteMatchingUtils.executePickup(this, getDivertableVehicleLinkPairs(), getAVRequests());
+            printVals = BipartiteMatchingUtils.executePickup(this, getDivertableRoboTaxis(), getAVRequests());
         }
     }
 
@@ -182,7 +177,6 @@ public class LPFFDispatcher extends PartitionedDispatcher {
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
-            AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
 
             final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
@@ -206,7 +200,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             }
 
             return new LPFFDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, abstractVirtualNodeDest,
-                    abstractRequestSelector, abstractVehicleDestMatcher, travelData);
+                    abstractVehicleDestMatcher, travelData);
         }
     }
 }

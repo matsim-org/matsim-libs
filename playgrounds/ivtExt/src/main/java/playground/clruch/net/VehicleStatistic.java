@@ -9,13 +9,14 @@ import java.util.stream.DoubleStream;
 
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.red.Total;
+import playground.clruch.dispatcher.core.AVStatus;
+
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
-import playground.clruch.export.AVStatus;
 
 // TODO group files that have "statistics" and "analysis" in the name
 public class VehicleStatistic {

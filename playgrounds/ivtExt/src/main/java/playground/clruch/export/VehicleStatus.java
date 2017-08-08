@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RebalanceVehicleEvent;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.HelperPredicates;
