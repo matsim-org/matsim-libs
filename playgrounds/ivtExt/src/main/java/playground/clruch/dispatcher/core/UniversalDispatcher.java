@@ -370,14 +370,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             simulationObjectCompiler.addRequests(publishPeriodMatchedRequests);
             // adding requests open in >=1 publish periods
             simulationObjectCompiler.addRequests(getAVRequests());
-
-            
-            // OLD VERSION 
-            // simulationObjectCompiler.addVehiclesWithCustomerNew(getRoboTaxisWithCustomer());
-            // simulationObjectCompiler.addRebalancingVehiclesNew(getRebalancingRoboTaxis());
-            // SimulationObject simulationObject =
-            // simulationObjectCompiler.compile(getDivertableRoboTaxis());
-            // OLD VERSION END
             
             simulationObjectCompiler.addVehicles(super.getRoboTaxis());
             SimulationObject simulationObject = simulationObjectCompiler.compile();
