@@ -47,6 +47,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
     private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
     private int infoLinePeriod = 0;
     private Map<AVVehicle, RoboTaxi> avVehicleVehicleLinkPairMap = new HashMap<>();
+    private String previousInfoMarker = "";
 
     VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
@@ -58,27 +59,18 @@ abstract class VehicleMaintainer implements AVDispatcher {
     public final void setInfoLinePeriod(int infoLinePeriod) {
         this.infoLinePeriod = infoLinePeriod;
     }
-
-    /** maps given {@link AVVehicle} to given {@link AbstractDirective}
-     *
-     * @param avVehicle
-     * @param abstractDirective */
-    /* package */
-    synchronized void assignDirective(AVVehicle avVehicle, AbstractDirective abstractDirective) {
-        GlobalAssert.that(isWithoutDirective(avVehicle));
-        private_vehicleDirectives.put(avVehicle, abstractDirective);
+    
+    /** @return time of current re-dispatching iteration step
+     * @throws NullPointerException
+     *             if dispatching has not started yet */
+    protected final double getTimeNow() {
+        return private_now;
     }
+    
 
     synchronized void assignDirective(RoboTaxi robotaxi, AbstractDirective abstractDirective) {
         GlobalAssert.that(isWithoutDirective(robotaxi));
         robotaxi.setDirective(abstractDirective);
-    }
-
-    /** @param avVehicle
-     * @return true if given {@link AVVehicle} doesn't have a {@link AbstractDirective} assigned to
-     *         it */
-    private synchronized boolean isWithoutDirective(AVVehicle avVehicle) {
-        return !private_vehicleDirectives.containsKey(avVehicle);
     }
 
     private synchronized boolean isWithoutDirective(RoboTaxi robotaxi) {
@@ -89,75 +81,189 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     /** @return collection of AVVehicles that have started their schedule */
-    /* package */ final Collection<AVVehicle> getFunctioningVehicles() {
-        if (vehicles.isEmpty() || !vehicles.get(0).getSchedule().getStatus().equals(Schedule.ScheduleStatus.STARTED))
-            return Collections.emptyList();
-        return Collections.unmodifiableList(vehicles);
-    }
-
-    /** @return collection of AVVehicles that have started their schedule */
     protected final Collection<RoboTaxi> getRoboTaxis() {
         if (roboTaxis.isEmpty() || !roboTaxis.get(0).getAVVehicle().getSchedule().getStatus().equals(Schedule.ScheduleStatus.STARTED))
             return Collections.emptyList();
         return roboTaxis;
     }
 
-    /** @return collection of all vehicles available to {@link VehicleMaintainer} */
-    protected final Collection<AVVehicle> getMaintainedVehicles() {
-        return Collections.unmodifiableList(vehicles);
+    protected final Collection<RoboTaxi> getDivertableRoboTaxis() {
+        Collection<RoboTaxi> divertableRoboTaxis = new ArrayList<>();
+        for (RoboTaxi robotaxi : roboTaxis) {
+            boolean noDirectiveReceived = (robotaxi.getDirective() == null);
+            boolean isWithoutCustomer = robotaxi.isWithoutCustomer();
+            if (noDirectiveReceived && isWithoutCustomer) {
+                divertableRoboTaxis.add(robotaxi);
+            }
+        }
+        return divertableRoboTaxis;
     }
 
-    /** function call leaves the state of the {@link UniversalDispatcher} unchanged. successive
-     * calls to the function return the identical collection.
+    private final void updateDivertableLocations() {
+        for (RoboTaxi robotaxi : getRoboTaxis()) {
+            if (isWithoutDirective(robotaxi.getAVVehicle())) {
+                Schedule schedule = robotaxi.getAVVehicle().getSchedule();
+                new AVTaskAdapter(schedule.getCurrentTask()) {
+                    @Override
+                    public void handle(AVDriveTask avDriveTask) {
+                        // for empty cars the drive task is second to last task
+                        if (Schedules.isNextToLastTask(avDriveTask)) {
+                            TaskTracker taskTracker = avDriveTask.getTaskTracker();
+                            OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
+                            LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint();
+                            // there is a slim chance that function returns null
+                            // update divertibleLocation and currentDriveDestination
+                            if (linkTimePair != null)
+                                robotaxi.setLinkTimePair(linkTimePair);
+                            robotaxi.setCurrentDriveDestination(avDriveTask.getPath().getToLink());
+                            robotaxi.setCustomerStatus(true);
+                        } else {
+                            robotaxi.setCustomerStatus(false);
+                        }
+                    }
+
+                    @Override
+                    public void handle(AVStayTask avStayTask) {
+                        // for empty vehicles the current task has to be the last task
+                        if (Schedules.isLastTask(avStayTask)) {
+                            GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow()); // <- self
+                                                                                          // evident?
+                            LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
+                            // collection.add(new VehicleLinkPair(avVehicle, linkTimePair, null));
+                            robotaxi.setLinkTimePair(linkTimePair);
+                            robotaxi.setCurrentDriveDestination(null);
+                            robotaxi.setCustomerStatus(true);
+                        }
+                    }
+                };
+            }
+        }
+    }
+
+    @Override
+    public final void registerVehicle(AVVehicle vehicle) {
+        vehicles.add(vehicle);
+        roboTaxis.add(new RoboTaxi(vehicle, new LinkTimePair(vehicle.getStartLink(), -1.0), vehicle.getStartLink()));
+        eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
+    }
+
+
+
+    abstract void notifySimulationSubscribers(long round_now);
+
+    /** invoked at the beginning of every iteration dispatchers can update their data structures
+     * based on the stay vehicle set function is not meant
+     * for issuing directives */
+    abstract void updateDatastructures(Collection<AVVehicle> stayVehicles);
+
+    @Override
+    public final void onNextTimestep(double now) {
+        private_now = now; // <- time available to derived class via getTimeNow()
+
+        updateDatastructures(Collections.unmodifiableCollection(getStayVehiclesCollection()));
+
+        if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0) {
+            String infoLine = getInfoLine();
+            String marker = infoLine.substring(16);
+            if (!marker.equals(previousInfoMarker)) {
+                previousInfoMarker = marker;
+                System.out.println(infoLine);
+            }
+        }
+
+        notifySimulationSubscribers(Math.round(now));
+
+        beforeStepTasks();
+        redispatch(now);
+        afterStepTasks();
+
+        // private_now = null; // <- time unavailable
+        // private_vehicleDirectives.values().stream() //
+        // .parallel() //
+        // .forEach(AbstractDirective::execute);
+        // private_vehicleDirectives.clear();
+
+        for (RoboTaxi robotaxi : roboTaxis) {
+            if (robotaxi.getDirective() != null) {
+                robotaxi.getDirective().execute();
+                robotaxi.setDirective(null);
+            }
+        }
+
+    }
+
+    private void beforeStepTasks() {
+        // update divertable locations of RoboTaxis
+        updateDivertableLocations();
+        executePickups();
+
+    }
+
+    private void afterStepTasks() {
+        stopUnusedVehicles();
+    }
+
+    /* package */ abstract void executePickups();
+
+    /* package */ abstract void stopUnusedVehicles();
+
+    /** derived classes should override this function to add details
+     * 
+     * @return */
+    public String getInfoLine() {
+        final String string = getClass().getSimpleName() + "        ";
+        return String.format("%s@%6d V=(%4ds,%4dd)", //
+                string.substring(0, 6), //
+                (long) getTimeNow(), //
+                getStayVehicles().values().stream().mapToInt(Queue::size).sum(), //
+                getDivertableVehicles().size() //
+        );
+    }
+
+
+
+    /** derived classes should override this function
+     * 
+     * @param now */
+    protected abstract void redispatch(double now);
+
+    @Override
+    public final void onNextTaskStarted(AVTask task) {
+        // intentionally empty
+    }
+
+    // ===========================================================================================================
+    // ===========================================================================================================
+    // ===========================================================================================================
+    // OLD FUNCTIONS TO DELETE
+    // ===========================================================================================================
+    // ===========================================================================================================
+    // ===========================================================================================================
+
+    @Deprecated
+    protected final Collection<RoboTaxi> getDivertableVehicleLinkPairs() {
+        getDivertableVehicles();
+        return avVehicleVehicleLinkPairMap.values();
+    }
+
+    /** @param avVehicle
+     * @return true if given {@link AVVehicle} doesn't have a {@link AbstractDirective} assigned
+     *         to
+     *         it */
+    @Deprecated
+    private synchronized boolean isWithoutDirective(AVVehicle avVehicle) {
+        return !private_vehicleDirectives.containsKey(avVehicle);
+    }
+
+    /** maps given {@link AVVehicle} to given {@link AbstractDirective}
      *
-     * @return collection of all vehicles that currently are in the last task, which is of type
-     *         STAY */
-    public final Map<Link, Queue<AVVehicle>> getStayVehicles() {
-        Map<Link, Queue<AVVehicle>> map = new HashMap<>();
-        for (AVVehicle avVehicle : getFunctioningVehicles())
-            if (isWithoutDirective(avVehicle)) {
-                Task task = Schedules.getLastTask(avVehicle.getSchedule()); // <- last task
-                if (task.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
-                    new AVTaskAdapter(task) {
-                        @Override
-                        public void handle(AVStayTask avStayTask) { // <- type of task is STAY
-                            final Link link = avStayTask.getLink();
-                            if (!map.containsKey(link))
-                                map.put(link, new LinkedList<>());
-                            map.get(link).add(avVehicle); // <- append vehicle to list of vehicles
-                                                          // at link
-                        }
-                    };
-            }
-        return Collections.unmodifiableMap(map);
-    }
-
-    public final Map<AVVehicle, Link> getStayVehiclesUnique() {
-        Map<AVVehicle, Link> map = new HashMap<>();
-        for (AVVehicle avVehicle : getFunctioningVehicles())
-            if (isWithoutDirective(avVehicle)) {
-                Task task = Schedules.getLastTask(avVehicle.getSchedule()); // <- last task
-                if (task.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
-                    new AVTaskAdapter(task) {
-                        @Override
-                        public void handle(AVStayTask avStayTask) { // <- type of task is STAY
-                            final Link link = avStayTask.getLink();
-
-                            map.put(avVehicle, link);
-
-                        }
-                    };
-            }
-        return Collections.unmodifiableMap(map);
-
-    }
-
-    /** @return collection of AVVehicles that are in stay mode */
-    private final Collection<AVVehicle> getStayVehiclesCollection() {
-        return getFunctioningVehicles().stream() //
-                .filter(this::isWithoutDirective) //
-                .filter(v -> Schedules.getLastTask(v.getSchedule()).getStatus().equals(Task.TaskStatus.STARTED)) //
-                .collect(Collectors.toList());
+     * @param avVehicle
+     * @param abstractDirective */
+    /* package */
+    @Deprecated
+    synchronized void assignDirective(AVVehicle avVehicle, AbstractDirective abstractDirective) {
+        GlobalAssert.that(isWithoutDirective(avVehicle));
+        private_vehicleDirectives.put(avVehicle, abstractDirective);
     }
 
     /** @return collection of cars that are in the driving state without customer, or stay task. if
@@ -213,169 +319,79 @@ abstract class VehicleMaintainer implements AVDispatcher {
         // return collection;
 
     }
-    
 
-    protected final Collection<RoboTaxi> getDivertableRoboTaxis() {
-        Collection<RoboTaxi> divertableRoboTaxis = new ArrayList<>();
-        for (RoboTaxi robotaxi : roboTaxis) {
-            boolean noDirectiveReceived = (robotaxi.getDirective() == null);
-            boolean isWithoutCustomer = robotaxi.getCustomerStatus();
-            if (noDirectiveReceived && isWithoutCustomer) {
-                divertableRoboTaxis.add(robotaxi);
-            }
-        }
-        return divertableRoboTaxis;
+    /** @return collection of AVVehicles that have started their schedule */
+    @Deprecated
+    /* package */ final Collection<AVVehicle> getFunctioningVehicles() {
+        if (vehicles.isEmpty() || !vehicles.get(0).getSchedule().getStatus().equals(Schedule.ScheduleStatus.STARTED))
+            return Collections.emptyList();
+        return Collections.unmodifiableList(vehicles);
     }
-    
-    
-    
-    
 
-    private final void updateDivertableLocations() {
-        for (RoboTaxi robotaxi : getRoboTaxis()) {
-            if (isWithoutDirective(robotaxi.getAVVehicle())) {
-                Schedule schedule = robotaxi.getAVVehicle().getSchedule();
-                new AVTaskAdapter(schedule.getCurrentTask()) {
-                    @Override
-                    public void handle(AVDriveTask avDriveTask) {
-                        // for empty cars the drive task is second to last task
-                        if (Schedules.isNextToLastTask(avDriveTask)) {
-                            TaskTracker taskTracker = avDriveTask.getTaskTracker();
-                            OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
-                            LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint();
-                            // there is a slim chance that function returns null
-                            // update divertibleLocation and currentDriveDestination
-                            if (linkTimePair != null)
-                                robotaxi.setLinkTimePair(linkTimePair);
-                            robotaxi.setCurrentDriveDestination(avDriveTask.getPath().getToLink());
-                            robotaxi.setCustomerStatus(true);
-                        }else{
-                            robotaxi.setCustomerStatus(false);
+    /** function call leaves the state of the {@link UniversalDispatcher} unchanged. successive
+     * calls to the function return the identical collection.
+     *
+     * @return collection of all vehicles that currently are in the last task, which is of type
+     *         STAY */
+    @Deprecated
+    public final Map<Link, Queue<AVVehicle>> getStayVehicles() {
+        Map<Link, Queue<AVVehicle>> map = new HashMap<>();
+        for (AVVehicle avVehicle : getFunctioningVehicles())
+            if (isWithoutDirective(avVehicle)) {
+                Task task = Schedules.getLastTask(avVehicle.getSchedule()); // <- last task
+                if (task.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
+                    new AVTaskAdapter(task) {
+                        @Override
+                        public void handle(AVStayTask avStayTask) { // <- type of task is STAY
+                            final Link link = avStayTask.getLink();
+                            if (!map.containsKey(link))
+                                map.put(link, new LinkedList<>());
+                            map.get(link).add(avVehicle); // <- append vehicle to list of vehicles
+                                                          // at link
                         }
-                    }
-
-                    @Override
-                    public void handle(AVStayTask avStayTask) {
-                        // for empty vehicles the current task has to be the last task
-                        if (Schedules.isLastTask(avStayTask)) {
-                            GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow()); // <- self
-                                                                                          // evident?
-                            LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
-                            // collection.add(new VehicleLinkPair(avVehicle, linkTimePair, null));
-                            robotaxi.setLinkTimePair(linkTimePair);
-                            robotaxi.setCurrentDriveDestination(null);
-                            robotaxi.setCustomerStatus(true);
-                        }
-                    }
-                };
+                    };
             }
-        }
+        return Collections.unmodifiableMap(map);
     }
 
     @Deprecated
-    protected final Collection<RoboTaxi> getDivertableVehicleLinkPairs() {
-        getDivertableVehicles();
-        return avVehicleVehicleLinkPairMap.values();
-    }
-
     protected final LinkTimePair getLinkTimePair(AVVehicle avVehicle) {
         return avVehicleVehicleLinkPairMap.get(avVehicle).getLinkTimePair();
     }
 
+    @Deprecated
     protected final RoboTaxi getVehicleLinkPair(AVVehicle avVehicle) {
         return avVehicleVehicleLinkPairMap.get(avVehicle);
     }
 
-    @Override
-    public final void registerVehicle(AVVehicle vehicle) {
-        vehicles.add(vehicle);
-        roboTaxis.add(new RoboTaxi(vehicle, new LinkTimePair(vehicle.getStartLink(), -1.0), vehicle.getStartLink()));
-        eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
-    }
+    @Deprecated
+    public final Map<AVVehicle, Link> getStayVehiclesUnique() {
+        Map<AVVehicle, Link> map = new HashMap<>();
+        for (AVVehicle avVehicle : getFunctioningVehicles())
+            if (isWithoutDirective(avVehicle)) {
+                Task task = Schedules.getLastTask(avVehicle.getSchedule()); // <- last task
+                if (task.getStatus().equals(Task.TaskStatus.STARTED)) // <- task is STARTED
+                    new AVTaskAdapter(task) {
+                        @Override
+                        public void handle(AVStayTask avStayTask) { // <- type of task is STAY
+                            final Link link = avStayTask.getLink();
 
-    private String previousInfoMarker = "";
+                            map.put(avVehicle, link);
 
-    abstract void notifySimulationSubscribers(long round_now);
-
-    /** invoked at the beginning of every iteration dispatchers can update their data structures
-     * based on the stay vehicle set function is not meant
-     * for issuing directives */
-    abstract void updateDatastructures(Collection<AVVehicle> stayVehicles);
-
-    @Override
-    public final void onNextTimestep(double now) {
-        private_now = now; // <- time available to derived class via getTimeNow()
-
-        updateDatastructures(Collections.unmodifiableCollection(getStayVehiclesCollection()));
-        
-
-        if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0) {
-            String infoLine = getInfoLine();
-            String marker = infoLine.substring(16);
-            if (!marker.equals(previousInfoMarker)) {
-                previousInfoMarker = marker;
-                System.out.println(infoLine);
+                        }
+                    };
             }
-        }
-
-        notifySimulationSubscribers(Math.round(now));
-
-        updateRoboTaxisStart();
-        redispatch(now);
-        endofStepTasks();
-
-//        private_now = null; // <- time unavailable
-//        private_vehicleDirectives.values().stream() //
-//                .parallel() //
-//                .forEach(AbstractDirective::execute);
-        private_vehicleDirectives.clear();
-        
-        
-
-        for (RoboTaxi robotaxi : roboTaxis) {
-            if (robotaxi.getDirective() != null) {
-                robotaxi.getDirective().execute();
-                robotaxi.setDirective(null);
-            }
-        }
+        return Collections.unmodifiableMap(map);
 
     }
 
-    private void updateRoboTaxisStart() {
-        // update divertable locations of RoboTaxis
-        updateDivertableLocations();
-
+    /** @return collection of AVVehicles that are in stay mode */
+    @Deprecated
+    private final Collection<AVVehicle> getStayVehiclesCollection() {
+        return getFunctioningVehicles().stream() //
+                .filter(this::isWithoutDirective) //
+                .filter(v -> Schedules.getLastTask(v.getSchedule()).getStatus().equals(Task.TaskStatus.STARTED)) //
+                .collect(Collectors.toList());
     }
 
-    /* package */ abstract void endofStepTasks();
-
-    /** derived classes should override this function to add details
-     * 
-     * @return */
-    public String getInfoLine() {
-        final String string = getClass().getSimpleName() + "        ";
-        return String.format("%s@%6d V=(%4ds,%4dd)", //
-                string.substring(0, 6), //
-                (long) getTimeNow(), //
-                getStayVehicles().values().stream().mapToInt(Queue::size).sum(), //
-                getDivertableVehicles().size() //
-        );
-    }
-
-    /** @return time of current re-dispatching iteration step
-     * @throws NullPointerException
-     *             if dispatching has not started yet */
-    protected final double getTimeNow() {
-        return private_now;
-    }
-
-    /** derived classes should override this function
-     * 
-     * @param now */
-    protected abstract void redispatch(double now);
-
-    @Override
-    public final void onNextTaskStarted(AVTask task) {
-        // intentionally empty
-    }
 }

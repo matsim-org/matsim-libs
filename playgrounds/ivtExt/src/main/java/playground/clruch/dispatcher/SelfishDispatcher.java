@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -221,9 +222,12 @@ public class SelfishDispatcher extends RebalancingDispatcher {
      * update the reference positions of all AVs
      */
     private void updateRefPositions() {
-        GlobalAssert.that(!getMaintainedVehicles().isEmpty());
+        GlobalAssert.that(!getRoboTaxis().isEmpty());
         GlobalAssert.that(0 < networkLinksTree.size());
-        for (AVVehicle thisAV : getMaintainedVehicles()) {
+        
+        Set<AVVehicle> replaceMeSet = new HashSet<>(); // use getRoboTaxis and iterate over RoboTaxis // TODO
+        
+        for (AVVehicle thisAV : replaceMeSet) {
             Link initialGuess = refPositions.get(thisAV); // initialize with previous Weber link
             Link weberLink;
             if ( subStrategy.equals("noComm")  || subStrategy.equals("voronoi") ) {
@@ -232,7 +236,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
             } else {
                 List<AVRequest> allPastRequests = new ArrayList<>();
                 ArrayList<Double> weights = new ArrayList<>();
-                for (AVVehicle otherAV : getMaintainedVehicles()) {
+                for (AVVehicle otherAV : replaceMeSet) {
                     allPastRequests.addAll(requestsServed.get(otherAV));
                     ArrayList<Double> avWeights = new ArrayList<>(requestsServed.get(otherAV).size());
                     for (int idx = 0; idx < requestsServed.get(otherAV).size(); idx++) {
@@ -257,7 +261,9 @@ public class SelfishDispatcher extends RebalancingDispatcher {
     private HashMap<AVVehicle, QuadTree<AVRequest>> computeVoronoiSets() {
         
         HashMap<AVVehicle, QuadTree<AVRequest>> voronoiSets = new HashMap<>();
-        for (AVVehicle avVehicle : getMaintainedVehicles()) {
+        // INSTEAD OF MAINTAINEDVEHICLES USE getRoboTaxis();
+        Set<AVVehicle> replaceMeSet = new HashSet<>();
+        for (AVVehicle avVehicle : replaceMeSet) {
             voronoiSets.put(avVehicle, new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]));
         }
         
@@ -389,7 +395,9 @@ public class SelfishDispatcher extends RebalancingDispatcher {
         for (Link link : networkLinksCol) {
             networkLinks.add(link);
         }
-        for (AVVehicle avVehicle : getMaintainedVehicles()) {
+        // use getRoboTaxis and iterate over RoboTaxis
+        Set<AVVehicle> replaceMeSet = new HashSet<>();
+        for (AVVehicle avVehicle : replaceMeSet) {
             requestsServed.put(avVehicle, new ArrayList<>());
             Collections.shuffle(networkLinks);
 

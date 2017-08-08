@@ -89,7 +89,7 @@ public class RoboTaxi {
         this.isWithoutCustomer = isWithoutCustomer;
     }
     
-    public boolean getCustomerStatus(){
+    public boolean isWithoutCustomer(){
         return isWithoutCustomer;
     }
     

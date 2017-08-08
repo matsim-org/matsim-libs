@@ -63,21 +63,6 @@ public class SimulationObjectCompiler {
             vehicleMap.put(key, vehicleContainer);
         }
     }
-
-    @Deprecated
-    public void addRebalancingVehiclesOld(Map<AVVehicle, Link> rebalancingVehicles, Map<AVVehicle, Link> vehicleLocations) {
-        for (Entry<AVVehicle, Link> entry : rebalancingVehicles.entrySet()) {
-            VehicleContainer vehicleContainer = new VehicleContainer();
-            AVVehicle avVehicle = entry.getKey();
-            final String key = avVehicle.getId().toString();
-            final Link fromLink = vehicleLocations.get(avVehicle);
-            vehicleContainer.vehicleIndex = db.getVehicleIndex(avVehicle);
-            vehicleContainer.linkIndex = db.getLinkIndex(fromLink);
-            vehicleContainer.avStatus = AVStatus.REBALANCEDRIVE;
-            vehicleContainer.destinationLinkIndex = db.getLinkIndex(entry.getValue());
-            vehicleMap.put(key, vehicleContainer);
-        }
-    }
     
     
     public void addRebalancingVehicles(Map<RoboTaxi, Link> rebalancingVehicles, Map<AVVehicle, Link> vehicleLocations) {
@@ -124,3 +109,22 @@ public class SimulationObjectCompiler {
         return simulationObject;
     }
 }
+
+
+
+
+//@Deprecated
+//public void addRebalancingVehiclesOld(Map<AVVehicle, Link> rebalancingVehicles, Map<AVVehicle, Link> vehicleLocations) {
+//    for (Entry<AVVehicle, Link> entry : rebalancingVehicles.entrySet()) {
+//        VehicleContainer vehicleContainer = new VehicleContainer();
+//        AVVehicle avVehicle = entry.getKey();
+//        final String key = avVehicle.getId().toString();
+//        final Link fromLink = vehicleLocations.get(avVehicle);
+//        vehicleContainer.vehicleIndex = db.getVehicleIndex(avVehicle);
+//        vehicleContainer.linkIndex = db.getLinkIndex(fromLink);
+//        vehicleContainer.avStatus = AVStatus.REBALANCEDRIVE;
+//        vehicleContainer.destinationLinkIndex = db.getLinkIndex(entry.getValue());
+//        vehicleMap.put(key, vehicleContainer);
+//    }
+//}
+//
