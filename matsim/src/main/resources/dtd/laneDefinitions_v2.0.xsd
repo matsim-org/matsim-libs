@@ -64,7 +64,7 @@ the simulation -->
           </xs:complexType>
         </xs:element>
         <xs:element name="alignment" type="xs:int"></xs:element>
-        <xs:element name="attributes">
+        <xs:element name="attributes" minOccurs="0" maxOccurs="1">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"></xs:element>

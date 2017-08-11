@@ -144,7 +144,7 @@ public class LanesReader implements MatsimReader {
 
 				lane.setAlignment(laneType.getAlignment());
 				
-				if (!laneType.getAttributes().getAttributeList().isEmpty()) {
+				if (laneType.getAttributes()!=null && !laneType.getAttributes().getAttributeList().isEmpty()) {
 					for (XMLAttributeType att : laneType.getAttributes().getAttributeList()){
 						lane.getAttributes().putAttribute(att.getKey(), attributesReader.convertObjectFromXSDFormat(att.getValue(), att.getClazz()));
 					}
