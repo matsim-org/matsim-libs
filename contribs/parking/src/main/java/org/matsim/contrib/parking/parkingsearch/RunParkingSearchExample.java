@@ -51,7 +51,7 @@ public class RunParkingSearchExample {
 		//all further input files are set in the config.
 		
 		// set to false, if you don't require visualisation, then the example will run for 11 iterations, with OTFVis, only one iteration is performed. 
-		boolean otfvis = false;
+		boolean otfvis = true;
 		if (otfvis) {
 			config.controler().setLastIteration(0);
 		} else {

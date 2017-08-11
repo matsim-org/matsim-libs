@@ -55,7 +55,9 @@ public class SetupParking {
 	static public void installParkingModules(Controler controler) {
 		// No need to route car routes in Routing module in advance, as they are
 		// calculated on the fly
+		if (!controler.getConfig().getModules().containsKey(DvrpConfigGroup.GROUP_NAME)){
 		controler.getConfig().addModule(new DvrpConfigGroup());
+		}
 		final DynRoutingModule routingModuleCar = new DynRoutingModule(TransportMode.car);
 		StageActivityTypes stageActivityTypesCar = new StageActivityTypes() {
 			@Override

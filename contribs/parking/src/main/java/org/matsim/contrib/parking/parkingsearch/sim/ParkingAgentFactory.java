@@ -38,6 +38,7 @@ import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
 import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
 import org.matsim.contrib.parking.parkingsearch.search.RandomParkingSearchLogic;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
@@ -65,8 +66,7 @@ public class ParkingAgentFactory implements AgentFactory {
 	Network network;
 	@Inject
 	VehicleTeleportationLogic teleportationLogic;
-
-	private final QSim qsim;
+	QSim qsim;
 
 	/**
 	 * 
