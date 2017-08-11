@@ -73,7 +73,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 			}
 		}
 
-		((FleetImpl)fleet).resetSchedules();
+		fleet.resetSchedules();
 		for (Vehicle veh : fleet.getVehicles().values()) {
 			veh.getSchedule()
 					.addTask(new TaxiStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));

@@ -28,4 +28,9 @@ import org.matsim.api.core.v01.Id;
  */
 public interface Fleet {
 	Map<Id<Vehicle>, ? extends Vehicle> getVehicles();
+
+	/**
+	 * 
+	 */
+	void resetSchedules();
 }
