@@ -36,10 +36,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.jaxb.lanedefinitions20.ObjectFactory;
+import org.matsim.jaxb.lanedefinitions20.XMLAttributeType;
 import org.matsim.jaxb.lanedefinitions20.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions20.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions20.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions20.XMLLanesToLinkAssignmentType;
+import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.xml.sax.SAXException;
 
 /**
@@ -56,6 +58,8 @@ public class LanesReader implements MatsimReader {
 	
 	private Lanes lanes;
 	private LanesFactory factory;
+	
+	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
 
 	public LanesReader(Scenario scenario) {
 		this.lanes = scenario.getLanes();
@@ -139,6 +143,12 @@ public class LanesReader implements MatsimReader {
 				lane.setStartsAtMeterFromLinkEnd(laneType.getStartsAt().getMeterFromLinkEnd());
 
 				lane.setAlignment(laneType.getAlignment());
+				
+				if (!laneType.getAttributes().getAttributeList().isEmpty()) {
+					for (XMLAttributeType att : laneType.getAttributes().getAttributeList()){
+						lane.getAttributes().putAttribute(att.getKey(), attributesReader.convertObjectFromXSDFormat(att.getValue(), att.getClazz()));
+					}
+				}
 
 				l2lAssignment.addLane(lane);
 			}

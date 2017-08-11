@@ -68,6 +68,25 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;/complexType>
  *         &lt;/element>
  *         &lt;element name="alignment" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="attributes">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                   &lt;element name="attribute" minOccurs="0" maxOccurs="unbounded">
+ *                     &lt;complexType>
+ *                       &lt;complexContent>
+ *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                           &lt;attribute name="key" use="required" type="{http://www.w3.org/2001/XMLSchema}String"/>
+ *                           &lt;attribute name="clazz" use="required" type="{http://www.w3.org/2001/XMLSchema}String"/>
+ *                           &lt;attribute name="value" use="required" type="{http://www.w3.org/2001/XMLSchema}String"/>
+ *                         &lt;/restriction>
+ *                       &lt;/complexContent>
+ *                     &lt;/complexType>
+ *                   &lt;/element>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
  *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>
@@ -82,7 +101,8 @@ import javax.xml.bind.annotation.XmlType;
     "representedLanes",
     "capacity",
     "startsAt",
-    "alignment"
+    "alignment",
+    "attributes"
 })
 public class XMLLaneType
     extends XMLMatsimObjectType
@@ -94,6 +114,7 @@ public class XMLLaneType
     protected XMLLaneType.XMLCapacity capacity;
     protected XMLLaneType.XMLStartsAt startsAt;
     protected int alignment;
+    protected XMLLaneType.XMLAttributes attributes;
 
     /**
      * Gets the value of the leadsTo property.
@@ -207,8 +228,24 @@ public class XMLLaneType
         this.alignment = value;
     }
 
-
     /**
+     * Gets the value of the attributes property.
+     * 
+     */
+    public XMLLaneType.XMLAttributes getAttributes() {
+    	return attributes;
+    }
+    
+    /**
+     * Sets the value of the attributes property.
+     * 
+     */
+    public void setAttributes(XMLLaneType.XMLAttributes attributes) {
+		this.attributes = attributes;
+	}
+
+
+	/**
      * <p>Java class for anonymous complex type.
      * 
      * <p>The following schema fragment specifies the expected content contained within this class.
@@ -462,5 +499,69 @@ public class XMLLaneType
         }
 
     }
+
+	/**
+	 * <p>
+	 * Java class for anonymous complex type.
+	 * 
+	 * <p>
+	 * The following schema fragment specifies the expected content contained within this class.
+	 * 
+	 * <pre>
+	 * &lt;complexType>
+	 *   &lt;complexContent>
+	 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+	 *         &lt;element name="attribute" minOccurs="0" maxOccurs="unbounded">
+	 *           &lt;complexType>
+	 *             &lt;complexContent>
+	 *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+	 *                 &lt;attribute name="key" use="required" type="{http://www.w3.org/2001/XMLSchema}String"/>
+	 *                 &lt;attribute name="clazz" use="required" type="{http://www.w3.org/2001/XMLSchema}String"/>
+	 *                 &lt;attribute name="value" use="required" type="{http://www.w3.org/2001/XMLSchema}String"/>
+	 *               &lt;/restriction>
+	 *             &lt;/complexContent>
+	 *           &lt;/complexType>
+	 *         &lt;/element>
+	 *     &lt;/restriction>
+	 *   &lt;/complexContent>
+	 * &lt;/complexType>
+	 * </pre>
+	 * 
+	 * 
+	 */
+	@XmlAccessorType(XmlAccessType.FIELD)
+	@XmlType(name = "", propOrder={"attribute"})
+	public static class XMLAttributes {
+		protected List<XMLAttributeType> attribute;
+
+        /**
+         * Gets the value of the attributes property.
+         * 
+         * <p>
+         * This accessor method returns a reference to the live list,
+         * not a snapshot. Therefore any modification you make to the
+         * returned list will be present inside the JAXB object.
+         * This is why there is not a <CODE>set</CODE> method for the attribute property.
+         * 
+         * <p>
+         * For example, to add a new item, do as follows:
+         * <pre>
+         *    getAttributeList().add(newItem);
+         * </pre>
+         * 
+         * 
+         * <p>
+         * Objects of the following type(s) are allowed in the list
+         * {@link XMLAttributeType }
+         * 
+         * 
+         */
+        public List<XMLAttributeType> getAttributeList() {
+            if (attribute == null) {
+                attribute = new ArrayList<XMLAttributeType>();
+            }
+            return this.attribute;
+        }
+	}
 
 }

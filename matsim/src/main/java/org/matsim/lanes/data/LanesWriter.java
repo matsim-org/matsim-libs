@@ -38,6 +38,7 @@ import org.matsim.jaxb.lanedefinitions20.XMLIdRefType;
 import org.matsim.jaxb.lanedefinitions20.XMLLaneDefinitions;
 import org.matsim.jaxb.lanedefinitions20.XMLLaneType;
 import org.matsim.jaxb.lanedefinitions20.XMLLanesToLinkAssignmentType;
+import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
 /**
  * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
@@ -51,6 +52,8 @@ public class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSomeWriter
 			.getLogger(LanesWriter.class);
 
 	private Lanes laneDefinitions;
+	
+	private final AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 
 	/**
 	 * Writer for the http://www.matsim.org/files/dtd/laneDefinitions_v2.0.xsd
@@ -132,6 +135,12 @@ public class LanesWriter extends MatsimJaxbXmlWriter implements MatsimSomeWriter
 				xmllane.setStartsAt(startsAt);
 
 				xmllane.setAlignment(bl.getAlignment());
+				
+				if (bl.getAttributes() != null) {
+					xmllane.setAttributes(fac.createXMLLaneTypeXMLAttributes());
+					// this needs to be separated in AttributeJAXBWriter because one can not iterate over all attributes from outside the package. theresa, aug'17
+					attributesWriter.writeAttributesToXSDFormat(xmllane.getAttributes().getAttributeList(), bl.getAttributes(), fac);
+				}
 				
 				xmlltla.getLane().add(xmllane);
 			}

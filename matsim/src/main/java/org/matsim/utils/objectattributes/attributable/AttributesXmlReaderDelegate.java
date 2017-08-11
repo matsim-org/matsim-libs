@@ -1,11 +1,19 @@
 package org.matsim.utils.objectattributes.attributable;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
+
 import org.apache.log4j.Logger;
 import org.matsim.utils.objectattributes.AttributeConverter;
-import org.matsim.utils.objectattributes.attributeconverters.*;
-
-import java.util.*;
+import org.matsim.utils.objectattributes.attributeconverters.BooleanConverter;
+import org.matsim.utils.objectattributes.attributeconverters.DoubleConverter;
+import org.matsim.utils.objectattributes.attributeconverters.FloatConverter;
+import org.matsim.utils.objectattributes.attributeconverters.IntegerConverter;
+import org.matsim.utils.objectattributes.attributeconverters.LongConverter;
+import org.matsim.utils.objectattributes.attributeconverters.StringConverter;
 
 /**
  * This class is meant to be used as a delegate by any reader that reads an {@link Attributable} object
@@ -90,5 +98,21 @@ public class AttributesXmlReaderDelegate {
 	 */
 	public AttributeConverter<?> removeAttributeConverter(final Class<?> clazz) {
 		return this.converters.remove(clazz.getCanonicalName());
+	}
+	
+	/**
+	 * Convert the String into an Object of the given Class.
+	 * Needed for custom attributes in xsd format files like lanes or signals.
+	 */
+	public final Object convertObjectFromXSDFormat(String object, String clazz) {
+		AttributeConverter<?> c = this.converters.get(clazz);
+		if (c == null) {
+			if (missingConverters.add(this.currentAttributeClass)) {
+				log.warn("No AttributeConverter found for class " + clazz + ". Read as String.");
+			}
+			return object;
+		} else {
+			return c.convert(object);
+		}
 	}
 }

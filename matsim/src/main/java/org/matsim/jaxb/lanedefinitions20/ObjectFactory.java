@@ -79,6 +79,14 @@ public class ObjectFactory {
     public XMLLaneType.XMLLeadsTo createXMLLaneTypeXMLLeadsTo() {
         return new XMLLaneType.XMLLeadsTo();
     }
+    
+    /**
+     * Create an instance of {@link XMLLaneType.XMLAttributes }
+     * 
+     */
+    public XMLLaneType.XMLAttributes createXMLLaneTypeXMLAttributes() {
+    	return new XMLLaneType.XMLAttributes();
+    }
 
     /**
      * Create an instance of {@link XMLMatsimObjectType }
@@ -118,6 +126,14 @@ public class ObjectFactory {
      */
     public XMLIdRefType createXMLIdRefType() {
         return new XMLIdRefType();
+    }
+    
+    /**
+     * Create an instance of {@link XMLAttributeType }
+     * 
+     */
+    public XMLAttributeType createXMLAttributeType() {
+    	return new XMLAttributeType();
     }
 
     /**

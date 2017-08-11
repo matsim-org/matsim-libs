@@ -64,9 +64,22 @@ the simulation -->
           </xs:complexType>
         </xs:element>
         <xs:element name="alignment" type="xs:int"></xs:element>
+        <xs:element name="attributes">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="attribute" type="attributeType" minOccurs="0" maxOccurs="unbounded"></xs:element>
+            </xs:sequence> 
+          </xs:complexType>
+        </xs:element>
       </xs:sequence>    
     </xs:extension>
   </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="attributeType">
+  <xs:attribute name="key" type="xs:string"/>
+  <xs:attribute name="clazz" type="xs:string"/>
+  <xs:attribute name="value" type="xs:string"/>
 </xs:complexType>
 
 </xs:schema>
