@@ -393,7 +393,9 @@ public class MPCDispatcher2 extends BaseMpcDispatcher {
                                 
                                 // 4) execute the computed matching
                                 for (Entry<RoboTaxi, AVRequest> entry : matching.entrySet()) {
-                                    AVVehicle avVehicle = entry.getKey().getAVVehicle();
+//                                    AVVehicle avVehicle = entry.getKey().getAVVehicle();
+                                    // TODO adapt to new API
+                                    AVVehicle avVehicle = null;
                                     GlobalAssert.that(!getRoboTaxiInMatching().contains(avVehicle));
                  //                   Link pickupLocation = entry.getValue();
                                     

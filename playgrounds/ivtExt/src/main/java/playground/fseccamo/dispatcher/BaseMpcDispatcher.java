@@ -1,12 +1,11 @@
 package playground.fseccamo.dispatcher;
 
-import java.awt.Robot;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,7 +27,6 @@ import playground.clruch.netdata.VirtualNode;
 import playground.clruch.router.InstantPathFactory;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
@@ -61,14 +59,14 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
 		final int m = virtualNetwork.getvLinksCount();
 		final Tensor vector = Array.zeros(m + virtualNetwork.getvNodesCount()); // self
 																				// loops
-		for (RoboTaxi entry : map) { // for each
+		for (RoboTaxi robotaxi : map) { // for each
 																// vehicle
-			final AVVehicle avVehicle = entry.getAVVehicle();
-			final Link current = entry.getCurrentDriveDestination();
-			Task task = avVehicle.getSchedule().getCurrentTask();
+			//final AVVehicle avVehicle = entry.getAVVehicle();
+			final Link current = robotaxi.getCurrentDriveDestination();
+			Task task = robotaxi.getSchedule().getCurrentTask();
 			int vli = -1;
 			if (task instanceof AVPickupTask) {
-				List<? extends Task> list = avVehicle.getSchedule().getTasks();
+				List<? extends Task> list = robotaxi.getSchedule().getTasks();
 				int taskIndex = list.indexOf(task); //
 				task = list.get(taskIndex + 1); // immediately try next
 												// condition with task as

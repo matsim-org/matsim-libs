@@ -52,8 +52,8 @@ public class SimulationObjectCompiler {
     public void addVehicles(List<RoboTaxi> robotaxis) {
         for (RoboTaxi robotaxi : robotaxis) {
             VehicleContainer vehicleContainer = new VehicleContainer();
-            final String key = robotaxi.getAVVehicle().getId().toString();
-            vehicleContainer.vehicleIndex = db.getVehicleIndex(robotaxi.getAVVehicle());
+            final String key = robotaxi.getId().toString();
+            vehicleContainer.vehicleIndex = db.getVehicleIndex(robotaxi);
             final Link fromLink = robotaxi.getCurrentLocation();
             GlobalAssert.that(fromLink != null);
             vehicleContainer.linkIndex = db.getLinkIndex(fromLink);

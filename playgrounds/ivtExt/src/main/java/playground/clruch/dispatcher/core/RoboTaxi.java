@@ -1,7 +1,10 @@
 // code by jph
 package playground.clruch.dispatcher.core;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
@@ -64,6 +67,11 @@ public class RoboTaxi {
     public Link getCurrentLocation() {
         return currentLocation;
     }
+    
+    public Schedule getSchedule(){
+        return avVehicle.getSchedule();
+    }
+    
 
     public void setCurrentDriveDestination(Link currentDriveDestination) {
         GlobalAssert.that(currentDriveDestination != null);
@@ -82,10 +90,15 @@ public class RoboTaxi {
         return status.equals(AVStatus.STAY);
     }
 
-    // TODO remove this function as AVVehicle should not be used in dispatching layers.
-    public AVVehicle getAVVehicle() {
+    // TODO can AVVehicle be removed from more layers? 
+    /*package*/ AVVehicle getAVVehicle() {
         return avVehicle;
     }
+    
+    public Id<Vehicle> getId(){
+        return avVehicle.getId();
+    }
+    
 
     public AbstractDirective getDirective() {
         return directive;

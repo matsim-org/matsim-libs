@@ -5,7 +5,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 
-import playground.sebhoerl.avtaxi.data.AVVehicle;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 
 public class ScheduleUtils {
@@ -29,8 +29,8 @@ public class ScheduleUtils {
         return stringBuilder.toString().trim();
     }
 
-    public static String scheduleOf(AVVehicle avVehicle) {
-        Schedule schedule = avVehicle.getSchedule();
+    public static String scheduleOf(RoboTaxi robotaxi) {
+        Schedule schedule = robotaxi.getSchedule();
         return toString(schedule);
     }
 
@@ -42,9 +42,9 @@ public class ScheduleUtils {
      * @param destination
      */
     public static void makeWhole( //
-            AVVehicle avVehicle, double taskEndTime, double scheduleEndTime, Link destination) {
+            RoboTaxi robotaxi, double taskEndTime, double scheduleEndTime, Link destination) {
         if (taskEndTime < scheduleEndTime) {
-            Schedule schedule = avVehicle.getSchedule();
+            Schedule schedule = robotaxi.getSchedule();
             schedule.addTask(new AVStayTask(taskEndTime, scheduleEndTime, destination));
         } else {
             throw new IllegalArgumentException("taskEndTime " + taskEndTime + " > scheduleEndTime " + scheduleEndTime);

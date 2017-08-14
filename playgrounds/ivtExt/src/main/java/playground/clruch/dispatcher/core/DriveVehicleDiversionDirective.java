@@ -24,13 +24,13 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
  */
 final class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
 
-    DriveVehicleDiversionDirective(RoboTaxi vehicleLinkPair, Link destination, FuturePathContainer futurePathContainer) {
-        super(vehicleLinkPair, destination, futurePathContainer);
+    DriveVehicleDiversionDirective(RoboTaxi robotaxi, Link destination, FuturePathContainer futurePathContainer) {
+        super(robotaxi, destination, futurePathContainer);
     }
 
     @Override
     void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData) {
-        final Schedule schedule = vehicleLinkPair.getAVVehicle().getSchedule();
+        final Schedule schedule = robotaxi.getAVVehicle().getSchedule();
         final AVDriveTask avDriveTask = (AVDriveTask) schedule.getCurrentTask(); // <- implies that task is started
         final AVStayTask avStayTask = (AVStayTask) Schedules.getLastTask(schedule);
         final double scheduleEndTime = avStayTask.getEndTime();
@@ -55,7 +55,7 @@ final class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
             GlobalAssert.that(avDriveTask.getEndTime() == newEndTime);
 
             schedule.removeLastTask(); // remove former stay task with old destination
-            ScheduleUtils.makeWhole(vehicleLinkPair.getAVVehicle(), newEndTime, scheduleEndTime, destination);
+            ScheduleUtils.makeWhole(robotaxi, newEndTime, scheduleEndTime, destination);
 
         } else
             reportExecutionBypass(newEndTime - scheduleEndTime);

@@ -20,7 +20,7 @@ import ch.ethz.idsc.tensor.alg.TensorMap;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.red.Median;
 import playground.clruch.data.ReferenceFrame;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public class MatsimStaticDatabase {
@@ -109,8 +109,8 @@ public class MatsimStaticDatabase {
         return requestIdIntegerDatabase.getId(avRequest.getId().toString());
     }
 
-    public int getVehicleIndex(AVVehicle avVehicle) {
-        return vehicleIdIntegerDatabase.getId(avVehicle.getId().toString());
+    public int getVehicleIndex(RoboTaxi robotaxi) {
+        return vehicleIdIntegerDatabase.getId(robotaxi.getId().toString());
     }
 
     void setIteration(Integer iteration) {

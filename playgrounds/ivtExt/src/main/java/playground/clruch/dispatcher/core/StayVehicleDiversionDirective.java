@@ -26,7 +26,7 @@ final class StayVehicleDiversionDirective extends VehicleDiversionDirective {
 
     @Override
     void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData) {
-        final Schedule schedule = vehicleLinkPair.getAVVehicle().getSchedule();
+        final Schedule schedule = robotaxi.getSchedule();
         final AVStayTask avStayTask = (AVStayTask) schedule.getCurrentTask(); // <- implies that task is started
         final double scheduleEndTime = avStayTask.getEndTime(); // typically 108000.0
         GlobalAssert.that(scheduleEndTime == schedule.getEndTime());
@@ -37,11 +37,11 @@ final class StayVehicleDiversionDirective extends VehicleDiversionDirective {
         if (endDriveTask < scheduleEndTime) {
 
             GlobalAssert.that(avStayTask.getStatus() == Task.TaskStatus.STARTED);
-            avStayTask.setEndTime(vehicleLinkPair.getDivertableTime());
+            avStayTask.setEndTime(robotaxi.getDivertableTime());
 
             schedule.addTask(avDriveTask);
 
-            ScheduleUtils.makeWhole(vehicleLinkPair.getAVVehicle(), endDriveTask, scheduleEndTime, destination);
+            ScheduleUtils.makeWhole(robotaxi, endDriveTask, scheduleEndTime, destination);
 
         } else
             reportExecutionBypass(endDriveTask - scheduleEndTime);

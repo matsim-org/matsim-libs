@@ -278,7 +278,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 avRequest.getFromLink(), avRequest.getToLink(), endPickupTime);
 
         assignDirective(roboTaxi, new AcceptRequestDirective( //
-                roboTaxi.getAVVehicle(), avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
+                roboTaxi, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
 
         // assignDirective(avVehicle, new AcceptRequestDirective( //
         // avVehicle, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
@@ -421,7 +421,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             System.out.println("=============================");
             System.out.println("printing pickup register:");
             for (AVRequest avR : pickupRegister.keySet()) {
-                System.out.println("RoboTaxi " + pickupRegister.get(avR).getAVVehicle().getId() + " and AVRequest " + avR.getId());
+                System.out.println("RoboTaxi " + pickupRegister.get(avR).getId() + " and AVRequest " + avR.getId());
             }
             System.out.println("=============================");
         }
@@ -436,41 +436,42 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     // ===========================================================================================================
     // ===========================================================================================================
 
-    /** Function called from derived class to match a vehicle with a request. The function appends
-     * the pick-up, drive, and drop-off tasks for the car.
-     * 
-     * @param avVehicle
-     *            vehicle in {@link AVStayTask} in order to match the request
-     * @param avRequest
-     *            provided by getAVRequests() */
-    @Deprecated
-    private synchronized final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
-        System.out.println("matched " + avVehicle.getId() + "  and  " + avRequest.getId());
-        GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
-
-        boolean statusPen = pendingRequests.remove(avRequest);
-        GlobalAssert.that(statusPen);
-
-        // save avRequests which are matched for one publishPeriod to ensure
-        // no requests are lost in the recording.
-        publishPeriodMatchedRequests.add(avRequest);
-
-        final Schedule schedule = avVehicle.getSchedule();
-        // check that current task is last task in schedule
-        GlobalAssert.that(schedule.getCurrentTask() == Schedules.getLastTask(schedule));
-
-        final double endPickupTime = getTimeNow() + pickupDurationPerStop;
-        FuturePathContainer futurePathContainer = futurePathFactory.createFuturePathContainer( //
-                avRequest.getFromLink(), avRequest.getToLink(), endPickupTime);
-
-        assignDirective(avVehicle, new AcceptRequestDirective( //
-                avVehicle, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
-
-        // Link returnVal = vehiclesWithCustomer.put(avVehicle, avRequest.getToLink());
-        // GlobalAssert.that(returnVal == null);
-
-        ++total_matchedRequests;
-    }
+    // /** Function called from derived class to match a vehicle with a request. The function
+    // appends
+    // * the pick-up, drive, and drop-off tasks for the car.
+    // *
+    // * @param avVehicle
+    // * vehicle in {@link AVStayTask} in order to match the request
+    // * @param avRequest
+    // * provided by getAVRequests() */
+    // @Deprecated
+    // private synchronized final void setAcceptRequest(AVVehicle avVehicle, AVRequest avRequest) {
+    // System.out.println("matched " + avVehicle.getId() + " and " + avRequest.getId());
+    // GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
+    //
+    // boolean statusPen = pendingRequests.remove(avRequest);
+    // GlobalAssert.that(statusPen);
+    //
+    // // save avRequests which are matched for one publishPeriod to ensure
+    // // no requests are lost in the recording.
+    // publishPeriodMatchedRequests.add(avRequest);
+    //
+    // final Schedule schedule = avVehicle.getSchedule();
+    // // check that current task is last task in schedule
+    // GlobalAssert.that(schedule.getCurrentTask() == Schedules.getLastTask(schedule));
+    //
+    // final double endPickupTime = getTimeNow() + pickupDurationPerStop;
+    // FuturePathContainer futurePathContainer = futurePathFactory.createFuturePathContainer( //
+    // avRequest.getFromLink(), avRequest.getToLink(), endPickupTime);
+    //
+    // assignDirective(avVehicle, new AcceptRequestDirective( //
+    // avVehicle, avRequest, futurePathContainer, getTimeNow(), dropoffDurationPerStop));
+    //
+    // // Link returnVal = vehiclesWithCustomer.put(avVehicle, avRequest.getToLink());
+    // // GlobalAssert.that(returnVal == null);
+    //
+    // ++total_matchedRequests;
+    // }
 
     @Deprecated
     /** @return available vehicles which are yet unassigned to a request as vehicle Link pairs */
