@@ -46,11 +46,8 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
 		super(config, travelTime, parallelLeastCostPathCalculator, eventsManager, virtualNetwork);
 		this.instantPathFactory = new InstantPathFactory(parallelLeastCostPathCalculator, travelTime);
 
-		samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod")); // period
-																						// between
-																						// calls
-																						// to
-																						// MPC
+		// period between calls to MPC
+		samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod")); 
 	}
 
 	private static final int NOLINKFOUND = -1;
