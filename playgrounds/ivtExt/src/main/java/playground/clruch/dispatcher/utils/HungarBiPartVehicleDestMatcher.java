@@ -34,10 +34,10 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
     }
 
     @Override
-    protected Map<RoboTaxi, AVRequest> protected_matchAVRequest(Collection<RoboTaxi> vehicleLinkPairs, Collection<AVRequest> requests) {
+    protected Map<RoboTaxi, AVRequest> protected_matchAVRequest(Collection<RoboTaxi> robotaxis, Collection<AVRequest> requests) {
 
         // since Collection::iterator does not make guarantees about the order we store the pairs in a list
-        final List<RoboTaxi> ordered_vehicleLinkPairs = new ArrayList<>(vehicleLinkPairs);
+        final List<RoboTaxi> ordered_vehicleLinkPairs = new ArrayList<>(robotaxis);
         final List<AVRequest> ordered_requests = new ArrayList<>(requests);
 
         // cost of assigning vehicle i to dest j, i.e. distance from vehicle i to destination j

@@ -38,7 +38,6 @@ import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
 import playground.clruch.dispatcher.utils.FeasibleRebalanceCreator;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
-import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
@@ -58,7 +57,6 @@ public class LPFFDispatcher extends PartitionedDispatcher {
     public final int rebalancingPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
-    final int numberOfAVs;
     private int total_rebalanceCount = 0;
     private final int nVNodes;
     private final int nVLinks;
@@ -67,7 +65,6 @@ public class LPFFDispatcher extends PartitionedDispatcher {
     Tensor rebalancingRate;
     Tensor rebalanceCount;
     Tensor rebalanceCountInteger;
-    LPVehicleRebalancing lpVehicleRebalancing;
 
     public LPFFDispatcher( //
             AVDispatcherConfig config, //
@@ -82,16 +79,14 @@ public class LPFFDispatcher extends PartitionedDispatcher {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         virtualNodeDest = abstractVirtualNodeDest;
         vehicleDestMatcher = abstractVehicleDestMatcher;
-        numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         this.travelData = travelData;
         nVNodes = virtualNetwork.getvNodesCount();
         nVLinks = virtualNetwork.getvLinksCount();
         rebalanceCount = Array.zeros(nVNodes, nVNodes);
         rebalanceCountInteger = Array.zeros(nVNodes, nVNodes);
-        lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(config);
-        dispatchPeriod = getDispatchPeriod(safeConfig, 20); 
-        rebalancingPeriod = getRebalancingPeriod(safeConfig, 20); 
+        dispatchPeriod = getDispatchPeriod(safeConfig, 30);
+        rebalancingPeriod = getRebalancingPeriod(safeConfig, 30);
     }
 
     @Override
@@ -125,15 +120,15 @@ public class LPFFDispatcher extends PartitionedDispatcher {
                 destinationLinks.get(fromNode).addAll(rebalanceTargets);
             }
 
-            // consistency check: rebalancing destination links must not exceed
-            // available vehicles in virtual node
+            // consistency check: rebalancing destination links must not exceed available vehicles
+            // in virtual node
             GlobalAssert.that(!virtualNetwork.getVirtualNodes().stream().filter(v -> availableVehicles.get(v).size() < destinationLinks.get(v).size()).findAny()
                     .isPresent());
 
             // send rebalancing vehicles using the setVehicleRebalance command
             for (VirtualNode virtualNode : destinationLinks.keySet()) {
                 Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode));
-                rebalanceMatching.keySet().forEach(v ->  setRoboTaxiRebalance(v, rebalanceMatching.get(v)));
+                rebalanceMatching.keySet().forEach(v -> setRoboTaxiRebalance(v, rebalanceMatching.get(v)));
             }
 
             // reset vector
