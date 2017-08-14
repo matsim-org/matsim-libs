@@ -29,7 +29,7 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
             EventsManager eventsManager) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
-        dispatchPeriod = getDispatchPeriod(safeConfig, 10);
+        dispatchPeriod = getDispatchPeriod(safeConfig, 30);
     }
 
     @Override
