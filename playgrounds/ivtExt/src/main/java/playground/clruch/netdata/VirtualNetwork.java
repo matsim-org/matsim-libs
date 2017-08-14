@@ -164,7 +164,7 @@ public class VirtualNetwork implements Serializable {
     }
     
     /** @return return virtualNode related HashMaps */
-    public <Type> Map<VirtualNode, List<Type>> createvNodeLinksMap() {
+    public <Type> Map<VirtualNode, List<Type>> createVNodeTypeMap() {
         Map<VirtualNode, List<Type>> returnMap = new HashMap<>();
         for (VirtualNode virtualNode : this.getVirtualNodes())
             returnMap.put(virtualNode, new ArrayList<>());

@@ -2,6 +2,7 @@
 package playground.clruch.dispatcher.core;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,13 +48,43 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
 
     protected synchronized Map<VirtualNode, List<RoboTaxi>> getVirtualNodeDivertablenotRebalancingRoboTaxis() {
         // return list of vehicles
-        Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createvNodeLinksMap();
+        Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
         for (RoboTaxi robotaxi : getDivertableNotRebalancingRoboTaxis()) {
             Link link = robotaxi.getDivertableLocation();
             returnMap.get(virtualNetwork.getVirtualNode(link)).add(robotaxi);
         }
         return returnMap;
     }
+    
+
+    
+    
+    protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeRebalancingToRoboTaxis(){
+        Map<VirtualNode, List<RoboTaxi>> returnMap =  virtualNetwork.createVNodeTypeMap();
+        for(RoboTaxi robotaxi : getRebalancingRoboTaxis()){
+            VirtualNode toNode = virtualNetwork.getVirtualNode(robotaxi.getCurrentDriveDestination());
+            returnMap.get(toNode).add(robotaxi);
+        }
+        return returnMap;
+        
+    }
+    
+    
+    
+    protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeArrivingWithCustomerRoboTaxis(){
+        Map<VirtualNode, List<RoboTaxi>> returnMap =  virtualNetwork.createVNodeTypeMap();
+        for(RoboTaxi robotaxi : getRoboTaxisWithCustomer()){
+            VirtualNode toNode = virtualNetwork.getVirtualNode(robotaxi.getCurrentDriveDestination());
+            returnMap.get(toNode).add(robotaxi);            
+        }
+        return returnMap;
+    }
+
+    
+    
+    
+    
+    
 
     // ===========================================================================================================
     // ===========================================================================================================
@@ -123,45 +154,13 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
     // return returnMap;
     // }
     //
-    // /** @return <VirtualNode, Set<AVVehicle>> with the rebalancing vehicles AVVehicle rebalancing
-    // to
-    // * every node VirtualNode */
-    // @Deprecated
-    // protected synchronized Map<VirtualNode, Set<AVVehicle>> getVirtualNodeRebalancingToVehicles()
-    // {
-    // // create set
-    // Map<VirtualNode, Set<AVVehicle>> returnMap = new HashMap<>();
-    // for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-    // returnMap.put(virtualNode, new HashSet<>());
-    // }
-    // final Map<AVVehicle, Link> rebalancingVehicles = getRebalancingVehicles();
-    // for (AVVehicle avVehicle : rebalancingVehicles.keySet()) {
-    // boolean successAdd =
-    // returnMap.get(virtualNetwork.getVirtualNode(rebalancingVehicles.get(avVehicle))).add(avVehicle);
-    // GlobalAssert.that(successAdd);
-    // }
-    //
-    // // return set
-    // return Collections.unmodifiableMap(returnMap);
-    // }
     //
     //
     //
     //
     //
     // /** @return */
-    // @Deprecated
-    // protected synchronized Map<VirtualNode, Set<AVVehicle>>
-    // getVirtualNodeArrivingWCustomerVehicles() {
-    // final Map<AVVehicle, Link> customMap = getVehiclesWithCustomer();
-    // final HashMap<VirtualNode, Set<AVVehicle>> customVehiclesMap = new HashMap<>();
-    // for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
-    // customVehiclesMap.put(virtualNode, new HashSet<>());
-    // customMap.entrySet().stream() //
-    // .forEach(e ->
-    // customVehiclesMap.get(virtualNetwork.getVirtualNode(e.getValue())).add(e.getKey()));
-    // return customVehiclesMap;
-    // }
+
     //
     //
     //

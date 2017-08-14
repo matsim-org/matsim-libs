@@ -347,7 +347,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 // ======================================================================================================
                 // Execute Rebalancing Order
                 // ======================================================================================================
-                Map<VirtualNode, List<Link>> destinationLinks = createvNodeLinksMap();
+                Map<VirtualNode, List<Link>> destinationLinks = createVNodeTypeMap();
 
                 // Fill destinationLinks Map
                 for (int rebalanceFromidx = 0; rebalanceFromidx < N_vStations; rebalanceFromidx++) {
@@ -386,7 +386,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
             // II.ii if vehilces remain in vNode, send to customers
             {
                 // collect destinations per vNode
-                Map<VirtualNode, List<Link>> destinationLinks = createvNodeLinksMap();
+                Map<VirtualNode, List<Link>> destinationLinks = createVNodeTypeMap();
 
                 for (VirtualNode vNode : virtualNetwork.getVirtualNodes()) {
                     destinationLinks.get(vNode).addAll( // stores from links

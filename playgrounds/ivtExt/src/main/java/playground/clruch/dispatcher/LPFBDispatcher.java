@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.zip.DataFormatException;
 
 import org.gnu.glpk.GLPKConstants;
@@ -35,6 +34,7 @@ import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
+import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
 import playground.clruch.dispatcher.utils.FeasibleRebalanceCreator;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
@@ -47,7 +47,6 @@ import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -58,7 +57,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
     public final int dispatchPeriod;
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
-    final int numberOfAVs;
+    final int numRobotaxi;
     private int total_rebalanceCount = 0;
     Tensor printVals = Tensors.empty();
     LPVehicleRebalancing lpVehicleRebalancing;
@@ -74,14 +73,12 @@ public class LPFBDispatcher extends PartitionedDispatcher {
             AbstractVehicleDestMatcher abstractVehicleDestMatcher) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         virtualNodeDest = abstractVirtualNodeDest;
-
         vehicleDestMatcher = abstractVehicleDestMatcher;
-        numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
-        rebalancingPeriod = getRebalancingPeriod(config); // Integer.parseInt(config.getParams().get("rebalancingPeriod"));
-        // setup linear program
+        numRobotaxi = (int) generatorConfig.getNumberOfVehicles();
         lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(config);
-        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
+        dispatchPeriod = getDispatchPeriod(safeConfig, 30);
+        rebalancingPeriod = getRebalancingPeriod(safeConfig, 300);
     }
 
     @Override
@@ -90,27 +87,27 @@ public class LPFBDispatcher extends PartitionedDispatcher {
         // PART I: rebalance all vehicles periodically
         final long round_now = Math.round(now);
 
-        if (round_now % rebalancingPeriod == 0) {
+        if (round_now % rebalancingPeriod == 0 && round_now > 10) { //needed because of problems with robotaxi inititalization. 
 
             Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
             // II.i compute rebalancing vehicles and send to virtualNodes
             {
                 Map<VirtualNode, List<RoboTaxi>> availableVehicles = getVirtualNodeDivertablenotRebalancingRoboTaxis();
                 int totalAvailable = 0;
-                for (List<RoboTaxi> vlpl : availableVehicles.values()) {
-                    totalAvailable += vlpl.size();
+                for (List<RoboTaxi> robotaxiList : availableVehicles.values()) {
+                    totalAvailable += robotaxiList.size();
                 }
 
                 // calculate desired vehicles per vNode
                 int num_requests = requests.values().stream().mapToInt(List::size).sum();
-                double vi_desired_num = ((numberOfAVs - num_requests) / (double) virtualNetwork.getvNodesCount());
+                double vi_desired_num = ((numRobotaxi - num_requests) / (double) virtualNetwork.getvNodesCount());
                 int vi_desired_numint = (int) Math.floor(vi_desired_num);
                 Tensor vi_desiredT = Tensors.vector(i -> RationalScalar.of(vi_desired_numint, 1), virtualNetwork.getvNodesCount());
 
                 // calculate excess vehicles per virtual Node i, where v_i excess = vi_own - c_i =
                 // v_i + sum_j (v_ji) - c_i
-                Map<VirtualNode, Set<AVVehicle>> v_ij_reb = getVirtualNodeRebalancingToVehicles();
-                Map<VirtualNode, Set<AVVehicle>> v_ij_cust = getVirtualNodeArrivingWCustomerVehicles();
+                Map<VirtualNode, List<RoboTaxi>> v_ij_reb = getVirtualNodeRebalancingToRoboTaxis();
+                Map<VirtualNode, List<RoboTaxi>> v_ij_cust = getVirtualNodeArrivingWithCustomerRoboTaxis();
                 Tensor vi_excessT = Array.zeros(virtualNetwork.getvNodesCount());
                 for (VirtualNode virtualNode : availableVehicles.keySet()) {
                     int viExcessVal = availableVehicles.get(virtualNode).size() + v_ij_reb.get(virtualNode).size() + v_ij_cust.get(virtualNode).size()
@@ -119,7 +116,8 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                 }
 
                 // solve the linear program with updated right-hand side
-                // fill right-hand-side // TODO if MATSim would never produce zero available vehicles, we could save these lines
+                // fill right-hand-side // TODO if MATSim would never produce zero available
+                // vehicles, we could save these lines
                 Tensor rhs = vi_desiredT.subtract(vi_excessT);
                 Tensor rebalanceCount2 = Tensors.empty();
                 if (totalAvailable > 0) {
@@ -130,15 +128,15 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                 Tensor rebalanceCount = Round.of(rebalanceCount2);
                 // TODO this should never become active, can be possibly removed later
                 // assert that solution is integer and does not contain negative values
-                GlobalAssert.that(!rebalanceCount.flatten(-1).map(Scalar.class::cast).map(s -> s.number().doubleValue()).filter(e -> e < 0).findAny()
-                        .isPresent());
+                GlobalAssert
+                        .that(!rebalanceCount.flatten(-1).map(Scalar.class::cast).map(s -> s.number().doubleValue()).filter(e -> e < 0).findAny().isPresent());
 
                 // ensure that not more vehicles are sent away than available
                 Tensor feasibleRebalanceCount = FeasibleRebalanceCreator.returnFeasibleRebalance(rebalanceCount.unmodifiable(), availableVehicles);
                 total_rebalanceCount += (Integer) ((Scalar) Total.of(Tensor.of(feasibleRebalanceCount.flatten(-1)))).number();
 
                 // generate routing instructions for rebalancing vehicles
-                Map<VirtualNode, List<Link>> destinationLinks = virtualNetwork.createvNodeLinksMap();
+                Map<VirtualNode, List<Link>> destinationLinks = virtualNetwork.createVNodeTypeMap();
 
                 // fill rebalancing destinations
                 for (int i = 0; i < virtualNetwork.getvLinksCount(); ++i) {
@@ -153,22 +151,22 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                 // consistency check: rebalancing destination links must not exceed available
                 // vehicles in virtual node
                 Map<VirtualNode, List<RoboTaxi>> finalAvailableVehicles = availableVehicles;
-                GlobalAssert.that(!virtualNetwork.getVirtualNodes().stream()
-                        .filter(v -> finalAvailableVehicles.get(v).size() < destinationLinks.get(v).size()).findAny().isPresent());
+                GlobalAssert.that(!virtualNetwork.getVirtualNodes().stream().filter(v -> finalAvailableVehicles.get(v).size() < destinationLinks.get(v).size())
+                        .findAny().isPresent());
 
                 // send rebalancing vehicles using the setVehicleRebalance command
                 for (VirtualNode virtualNode : destinationLinks.keySet()) {
-                    Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode),
-                            destinationLinks.get(virtualNode));
-                    rebalanceMatching.keySet().forEach(v -> setVehicleRebalance(v.getAVVehicle(), rebalanceMatching.get(v)));
+                    Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode));
+                    rebalanceMatching.keySet().forEach(v -> setRoboTaxiRebalance(v, rebalanceMatching.get(v)));
                 }
 
             }
         }
 
-        // Part II: outside rebalancing periods, permanently assign destinations to vehicles using bipartite matching
+        // Part II: outside rebalancing periods, permanently assign destinations to vehicles using
+        // bipartite matching
         if (round_now % dispatchPeriod == 0) {
-            printVals = BipartiteMatchingUtils.executePickup(this, getDivertableVehicleLinkPairs(), getAVRequests());
+            printVals = BipartiteMatchingUtils.executePickup(this, getDivertableRoboTaxis(), getAVRequests());
         }
     }
 
@@ -195,15 +193,14 @@ public class LPFBDispatcher extends PartitionedDispatcher {
 
         @Inject
         private Network network;
-
+        
         public static VirtualNetwork virtualNetwork;
-        public static Map<VirtualLink, Double> travelTimes;
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
-            AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
+            AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
 
             final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
             GlobalAssert.that(virtualnetworkDir.isDirectory());
@@ -213,7 +210,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                 try {
                     virtualNetwork = VirtualNetworkIO.fromByte(network, virtualnetworkFile);
                 } catch (ClassNotFoundException | DataFormatException | IOException e) {
-                    // TODO Auto-generated catch block
+                    System.err.println("virtualNetwork not correctly loaded in LPFB dispatcher.");;
                     e.printStackTrace();
                 }
             }
