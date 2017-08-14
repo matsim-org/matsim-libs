@@ -110,8 +110,10 @@ public class RoboTaxi {
 
     public boolean isInStayTask() {
         Task task = Schedules.getLastTask(getAVVehicle().getSchedule());
-        if (task.getStatus().equals(Task.TaskStatus.STARTED))
+        if (task.getStatus().equals(Task.TaskStatus.STARTED)){
+            GlobalAssert.that(getDivertableLocation() == getCurrentLocation());
             return true;
+        }
         return false;
     }
 

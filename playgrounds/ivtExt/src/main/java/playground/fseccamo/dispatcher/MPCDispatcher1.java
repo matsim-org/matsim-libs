@@ -42,10 +42,10 @@ import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Chop;
 import ch.ethz.idsc.tensor.sca.Increment;
 import ch.ethz.idsc.tensor.sca.Round;
-import playground.clruch.dispatcher.core.DispatcherUtils;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
+import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
 import playground.clruch.netdata.VirtualLink;
@@ -55,7 +55,6 @@ import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -123,7 +122,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
 
             // PART 0: match vehicles at a customer link only if the request has received a pickup order
 
-            Map<AVVehicle, Link> stayVehiclesAtLinks = DispatcherUtils.vehicleMapper(getStayVehicles());
+            //Map<AVVehicle, Link> stayVehiclesAtLinks = DispatcherUtils.vehicleMapper(getStayVehicles());
             // match all matched av/request pairs which are at same link
 
             final int pendingSize = getAVRequests().size();
@@ -180,15 +179,14 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                         }
                     }
                     Scalar vehicleTotal = RealScalar.ZERO;
-                    Set<AVVehicle> accountedVehicles = new HashSet<>();
+                    Set<RoboTaxi> accountedVehicles = new HashSet<>();
                     { // done
                         /**
                          * STAY vehicles + vehicles without task inside VirtualNode
                          */
                         // all vehicles except the ones with a customer on board and the ones which are rebalancing
                         Map<VirtualNode, List<RoboTaxi>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
-                        availableVehicles.values().stream().flatMap(List::stream).map(vlp -> vlp.getAVVehicle()) //
-                                .forEach(accountedVehicles::add);
+                        availableVehicles.values().stream().flatMap(List::stream).forEach(accountedVehicles::add); 
                         double[] array = new double[n];
                         for (Entry<VirtualNode, List<RoboTaxi>> entry : availableVehicles.entrySet())
                             array[entry.getKey().index] = entry.getValue().size(); // could use tensor notation
@@ -202,8 +200,8 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                         /**
                          * rebalancing vehicles still within node_i traveling on link_k = (node_i, node_j)
                          */
-                        Map<AVVehicle, Link> map = getRebalancingRoboTaxis();
-                        accountedVehicles.addAll(map.keySet());
+                        List<RoboTaxi> map = getRebalancingRoboTaxis();
+                        accountedVehicles.addAll(map);
                         final Tensor vector = countVehiclesPerVLink(map);
                         double[] array = Primitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("movingRebalancingVehiclesPerVLink", new int[] { array.length }, array);
@@ -215,15 +213,15 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                         /**
                          * Vehicles with customers still within node_i traveling on link_k = (node_i, node_j)
                          */
-                        Map<AVVehicle, Link> map = getVehiclesWithCustomer();
+                        List<RoboTaxi> map = getRoboTaxisWithCustomer();
                         final Tensor vector = countVehiclesPerVLink(map);
-                        accountedVehicles.addAll(map.keySet());
+                        accountedVehicles.addAll(map);
                         {
                             // vehicles on pickup drive appear here
-                            for (Entry<AVRequest, AVVehicle> entry : getMatchings().entrySet()) {
+                            for (Entry<AVRequest, RoboTaxi> entry : getMatchings().entrySet()) {
                                 AVRequest avRequest = entry.getKey();
-                                AVVehicle avVehicle = entry.getValue();
-                                if (!accountedVehicles.contains(avVehicle)) {
+                                RoboTaxi robotaxi = entry.getValue();
+                                if (!accountedVehicles.contains(robotaxi)) {
                                     // request
                                     int index = -1;
                                     if (mpcRequestsMap.containsKey(avRequest))
@@ -233,7 +231,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                         new RuntimeException("map should provide request info").printStackTrace();
                                     }
                                     vector.set(Increment.ONE, index);
-                                    accountedVehicles.add(avVehicle);
+                                    accountedVehicles.add(robotaxi);
                                 }
                             }
                         }
@@ -327,10 +325,10 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                             // ---
                             final VirtualNode vnFrom = vectorIndex < m ? //
                                     virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
-                            final Map<VirtualNode, List<AVVehicle>> availableVehicles = getVirtualNodeStayVehicles();
+                            final Map<VirtualNode, List<RoboTaxi>> availableVehicles = getVirtualNodeStayVehicles();
 
-                            final List<AVVehicle> cars = availableVehicles.get(vnFrom); // find cars
-                            cars.removeAll(getAVVehicleInMatching());
+                            final List<RoboTaxi> cars = availableVehicles.get(vnFrom); // find cars
+                            cars.removeAll(getRoboTaxiInMatching());
                             final int pickupOffset = 0; // <- should be 0 !!! only 1 for testing
                             final int desiredPickup = requestVector.Get(vectorIndex).number().intValue() + pickupOffset;
                             // int pickupPerNode = 0;
@@ -356,28 +354,26 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
 
                                     final MpcRequest mpcRequest = requests.get(count);
 
-                                    final QuadTree<AVVehicle> unassignedVehiclesTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
+                                    final QuadTree<RoboTaxi> unassignedVehiclesTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
 
-                                    for (AVVehicle avVehicle : cars) {
-                                        // TODO swith to RoboTaxi 
-                                        Link link = null;//getVehicleLocation(avVehicle);
-                                        unassignedVehiclesTree.put(link.getCoord().getX(), link.getCoord().getY(), avVehicle);
+                                    for (RoboTaxi robotaxi : cars) {
+                                        unassignedVehiclesTree.put(robotaxi.getDivertableLocation().getCoord().getX(), robotaxi.getDivertableLocation().getCoord().getY(), robotaxi);
                                     }
 
-                                    AVVehicle avVehicle = unassignedVehiclesTree.getClosest( //
+                                    RoboTaxi robotaxi = unassignedVehiclesTree.getClosest( //
                                             mpcRequest.avRequest.getFromLink().getCoord().getX(), //
                                             mpcRequest.avRequest.getFromLink().getCoord().getY());
-                                    GlobalAssert.that(!getAVVehicleInMatching().contains(avVehicle));
+                                    GlobalAssert.that(!getRoboTaxiInMatching().contains(robotaxi));
                                     {
-                                        boolean removed = cars.remove(avVehicle);
+                                        boolean removed = cars.remove(robotaxi);
                                         GlobalAssert.that(removed);
                                     }
                                     Link pickupLocation = mpcRequest.avRequest.getFromLink(); // where the customer is waiting right now
-                                    setVehiclePickup(avVehicle, mpcRequest.avRequest);
+                                    setRoboTaxiPickup(robotaxi, mpcRequest.avRequest);
                                     //setStayVehicleDiversion(avVehicle, pickupLocation); // send car to customer
                                     ++totalPickupEffective;
                                     // ++pickupPerNode;
-                                    getMatchings().put(mpcRequest.avRequest, avVehicle);
+                                    getMatchings().put(mpcRequest.avRequest, robotaxi);
                                 }
 
                             }
@@ -423,7 +419,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                     Random random = new Random();
                                     int min = Math.min(desiredRebalance, cars.size());
                                     for (int count = 0; count < min; ++count) {
-                                        RoboTaxi vehicleLinkPair = cars.get(0);
+                                        RoboTaxi robotaxi = cars.get(0);
                                         cars.remove(0);
                                         Link rebalanceDest =
                                                 // centerLink.get(vnTo);
@@ -431,7 +427,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                                         // vnTo.getLinks() //
                                                         candidateLinks //
                                                 ).get(random.nextInt(candidateLinks.size()));
-                                        setVehicleRebalance(vehicleLinkPair.getAVVehicle(), rebalanceDest); // send car to adjacent virtual node
+                                        setRoboTaxiRebalance(robotaxi, rebalanceDest); // send car to adjacent virtual node
                                         ++totalRebalanceEffective;
                                         if (vnFrom.equals(vnTo))
                                             ++selfRebalanceEffective;
@@ -483,7 +479,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
-            AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
+            AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
             virtualNetwork = VirtualNetworkGet.readDefault(network);
 
             return new MPCDispatcher1(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, network, abstractVirtualNodeDest, abstractVehicleDestMatcher,

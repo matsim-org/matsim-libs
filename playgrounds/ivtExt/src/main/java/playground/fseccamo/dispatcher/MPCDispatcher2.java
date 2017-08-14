@@ -48,6 +48,7 @@ import playground.clruch.dispatcher.core.DispatcherUtils;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
+import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
 import playground.clruch.netdata.VirtualLink;
@@ -332,7 +333,7 @@ public class MPCDispatcher2 extends BaseMpcDispatcher {
                             final Map<VirtualNode, List<AVVehicle>> availableVehicles = getVirtualNodeStayVehicles();
 
                             final List<AVVehicle> cars = availableVehicles.get(vnFrom); // find cars
-                            cars.removeAll(getAVVehicleInMatching());
+                            cars.removeAll(getRoboTaxiInMatching());
                             final int pickupOffset = 0; // <- should be 0 !!! only 1 for testing
                             final int desiredPickup = requestVector.Get(vectorIndex).number().intValue() + pickupOffset;
                             // int pickupPerNode = 0;
@@ -393,7 +394,7 @@ public class MPCDispatcher2 extends BaseMpcDispatcher {
                                 // 4) execute the computed matching
                                 for (Entry<RoboTaxi, AVRequest> entry : matching.entrySet()) {
                                     AVVehicle avVehicle = entry.getKey().getAVVehicle();
-                                    GlobalAssert.that(!getAVVehicleInMatching().contains(avVehicle));
+                                    GlobalAssert.that(!getRoboTaxiInMatching().contains(avVehicle));
                  //                   Link pickupLocation = entry.getValue();
                                     
                                     setVehiclePickup(avVehicle, entry.getValue());
@@ -548,7 +549,7 @@ public class MPCDispatcher2 extends BaseMpcDispatcher {
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
-            AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
+            AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
             virtualNetwork = VirtualNetworkGet.readDefault(network);
 
             return new MPCDispatcher2(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, network, abstractVirtualNodeDest,

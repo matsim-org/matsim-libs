@@ -1,5 +1,6 @@
 package playground.fseccamo.dispatcher;
 
+import java.awt.Robot;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -18,6 +19,7 @@ import org.matsim.core.router.util.TravelTime;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.sca.Increment;
+import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.netdata.VirtualLink;
@@ -55,14 +57,14 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
 
 	private static final int NOLINKFOUND = -1;
 
-	protected Tensor countVehiclesPerVLink(Map<AVVehicle, Link> map) {
+	protected Tensor countVehiclesPerVLink(List<RoboTaxi> map) {
 		final int m = virtualNetwork.getvLinksCount();
 		final Tensor vector = Array.zeros(m + virtualNetwork.getvNodesCount()); // self
 																				// loops
-		for (Entry<AVVehicle, Link> entry : map.entrySet()) { // for each
+		for (RoboTaxi entry : map) { // for each
 																// vehicle
-			final AVVehicle avVehicle = entry.getKey();
-			final Link current = entry.getValue();
+			final AVVehicle avVehicle = entry.getAVVehicle();
+			final Link current = entry.getCurrentDriveDestination();
 			Task task = avVehicle.getSchedule().getCurrentTask();
 			int vli = -1;
 			if (task instanceof AVPickupTask) {
@@ -133,7 +135,7 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
 	// requests that have received a pickup order but are not yet "pickedup"
 	// private final Map<AVRequest, AVVehicle> matchings = new HashMap<>();
 	//
-	protected Map<AVRequest, AVVehicle> getMatchings() {
+	protected Map<AVRequest, RoboTaxi> getMatchings() {
 		return pickupRegister;
 	}
 
@@ -166,7 +168,17 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
 //	}
 
 	Map<VirtualNode, List<RoboTaxi>> getDivertableNotRebalancingNotPickupVehicles() {
-		return getVirtualNodeDivertableUnassignedNotRebalancingVehicleLinkPairs();
+	    Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
+	    Map<VirtualNode, List<RoboTaxi>> allVehicles = getVirtualNodeDivertablenotRebalancingRoboTaxis();
+	    for(VirtualNode vn : allVehicles.keySet()){
+	        for(RoboTaxi robotaxi : allVehicles.get(vn)){
+	            if(!robotaxi.getAVStatus().equals(AVStatus.DRIVETOCUSTMER)){
+	                returnMap.get(vn).add(robotaxi);
+	            }
+	        }
+	    }
+	    
+	    return returnMap;
 	}
 
 	/**
@@ -190,7 +202,7 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
 
 	}
 
-	Set<AVVehicle> getAVVehicleInMatching() {
+	Set<RoboTaxi> getRoboTaxiInMatching() {
 		return getMatchings().values().stream().collect(Collectors.toSet());
 	}
 
@@ -244,5 +256,18 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
 				}
 			}
 	}
+	
+    final Map<VirtualNode, List<RoboTaxi>> getVirtualNodeStayVehicles(){
+        Map<VirtualNode,List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
+        for(RoboTaxi robotaxi :getRoboTaxis()){
+            if(robotaxi.isInStayTask()){
+                VirtualNode vnode = virtualNetwork.getVirtualNode(robotaxi.getDivertableLocation());
+                returnMap.get(vnode).add(robotaxi);
+            }
+        }
+        return returnMap;
+    };
+	
+	
 
 }
