@@ -25,9 +25,11 @@ import com.google.inject.name.Named;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.dispatcher.core.BipartiteMatchingUtils;
@@ -35,6 +37,7 @@ import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
+import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
 import playground.clruch.dispatcher.utils.FeasibleRebalanceCreator;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
@@ -101,6 +104,8 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             rebalanceCount = rebalanceCount.add(rebalancingRate.multiply(RealScalar.of(rebalancingPeriod)));
             rebalanceCountInteger = Floor.of(rebalanceCount);
             rebalanceCount = rebalanceCount.subtract(rebalanceCountInteger);
+            
+            
 
             // ensure that not more vehicles are sent away than available
             Map<VirtualNode, List<RoboTaxi>> availableVehicles = getVirtualNodeDivertablenotRebalancingRoboTaxis();
@@ -172,7 +177,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
-            AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher();
+            AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
 
             final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
             GlobalAssert.that(virtualnetworkDir.isDirectory());

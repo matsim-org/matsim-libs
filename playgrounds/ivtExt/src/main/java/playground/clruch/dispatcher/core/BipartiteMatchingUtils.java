@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.simonton.Cluster;
 import playground.clruch.simonton.EuclideanDistancer;
@@ -50,11 +51,9 @@ public enum BipartiteMatchingUtils {
 
         // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method and
         // set new pickup commands
-        infoLine.append(Tensors.vectorInt(roboTaxisReduced.size(), requestsReduced.size())); // initial
-                                                                                                      // problem
-                                                                                                      // size
-
-        return (new HungarBiPartVehicleDestMatcher()).matchAVRequest(roboTaxisReduced, requestsReduced); //
+        infoLine.append(Tensors.vectorInt(roboTaxisReduced.size(), requestsReduced.size())); // initial problem  size
+        
+        return ((new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction())).matchAVRequest(roboTaxisReduced, requestsReduced)); //
 
     }
 

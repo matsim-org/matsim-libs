@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.clruch.dispatcher.core.RoboTaxi;
@@ -21,17 +20,13 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 // TODO in here there is some dupliate code that could be removed. 
 public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
 
-    private static Coord getLinkCoord(Link link) {
-        return link.getFromNode().getCoord();
+    private final DistanceFunction distancer;
+    
+    public HungarBiPartVehicleDestMatcher(DistanceFunction distancer){
+        this.distancer = distancer;
+        
     }
-
-    private static double getDistance(Link link1, Link link2) {
-        final Coord c1 = getLinkCoord(link1);
-        final Coord c2 = getLinkCoord(link2);
-        return Math.hypot( //
-                c1.getX() - c2.getX(), //
-                c1.getY() - c2.getY());
-    }
+    
 
     @Override
     protected Map<RoboTaxi, AVRequest> protected_matchAVRequest(Collection<RoboTaxi> robotaxis, Collection<AVRequest> requests) {
@@ -52,7 +47,7 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
             int j = -1;
             for (AVRequest avRequest : ordered_requests) {
                 Link dest = avRequest.getFromLink();
-                distancematrix[i][++j] = getDistance(vehicleLinkPair.getDivertableLocation(), dest);
+                distancematrix[i][++j] = distancer.getDistance(vehicleLinkPair, dest);
             }
         }
 
@@ -91,7 +86,7 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
             ++i;
             int j = -1;
             for (Link link : ordered_Links) {
-                distancematrix[i][++j] = getDistance(vehicleLinkPair.getDivertableLocation(), link);
+                distancematrix[i][++j] = distancer.getDistance(vehicleLinkPair, link);
             }
         }
 

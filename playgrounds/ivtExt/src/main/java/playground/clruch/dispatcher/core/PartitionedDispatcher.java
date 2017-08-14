@@ -1,17 +1,9 @@
 // code by clruch and jph
 package playground.clruch.dispatcher.core;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.NavigableMap;
-import java.util.Queue;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
@@ -22,7 +14,6 @@ import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
@@ -57,10 +48,9 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
     protected synchronized Map<VirtualNode, List<RoboTaxi>> getVirtualNodeDivertablenotRebalancingRoboTaxis() {
         // return list of vehicles
         Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createvNodeLinksMap();
-        for (RoboTaxi robotaxi : getRebalancingRoboTaxis()) {
+        for (RoboTaxi robotaxi : getDivertableNotRebalancingRoboTaxis()) {
             Link link = robotaxi.getDivertableLocation();
-            VirtualNode virtualNode = virtualNetwork.getVirtualNode(link);
-            returnMap.get(virtualNode).add(robotaxi);
+            returnMap.get(virtualNetwork.getVirtualNode(link)).add(robotaxi);
         }
         return returnMap;
     }

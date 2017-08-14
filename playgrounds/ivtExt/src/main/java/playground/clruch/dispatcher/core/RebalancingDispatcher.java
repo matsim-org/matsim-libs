@@ -2,7 +2,6 @@
 package playground.clruch.dispatcher.core;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
@@ -41,18 +40,28 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
     boolean extraCheck(RoboTaxi roboTaxi) {
         return roboTaxi.getAVStatus().equals(AVStatus.REBALANCEDRIVE);
     }
-    
-    
+
     @Override
     protected List<RoboTaxi> getRebalancingRoboTaxis() {
         List<RoboTaxi> rebalancingRobotaxis = new ArrayList<>();
-        for(RoboTaxi robotaxi : getRoboTaxis()){
-            if(robotaxi.getAVStatus().equals(AVStatus.REBALANCEDRIVE)){
+        for (RoboTaxi robotaxi : getRoboTaxis()) {
+            if (robotaxi.getAVStatus().equals(AVStatus.REBALANCEDRIVE)) {
                 rebalancingRobotaxis.add(robotaxi);
             }
         }
         return rebalancingRobotaxis;
 
+    }
+
+    protected List<RoboTaxi> getDivertableNotRebalancingRoboTaxis() {
+        // return list of vehicles
+        List<RoboTaxi> returnList = new ArrayList<>();
+        for (RoboTaxi robotaxi : getDivertableRoboTaxis()) {
+            if (!robotaxi.getAVStatus().equals(AVStatus.REBALANCEDRIVE)) {
+                returnList.add(robotaxi);
+            }
+        }
+        return returnList;
     }
 
 }
@@ -95,8 +104,6 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
 // rebalancingVehicles.remove(optRob.get());
 // }
 // }
-
-
 
 // protected List<RoboTaxi> getDivertableUnassignedNotRebalancingVehicleLinkPairs() {
 // return getDivertableUnassignedVehicleLinkPairs().stream() //
