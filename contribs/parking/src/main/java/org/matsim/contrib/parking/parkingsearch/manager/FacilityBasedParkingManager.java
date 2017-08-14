@@ -196,7 +196,9 @@ public class FacilityBasedParkingManager implements ParkingSearchManager {
 	@Override
 	public boolean unParkVehicleHere(Id<Vehicle> vehicleId, Id<Link> linkId, double time) {
 		if (!this.parkingLocations.containsKey(vehicleId)) {
+			this.parkingLocationsOutsideFacilities.remove(vehicleId);
 			return true;
+			
 			// we assume the person parks somewhere else
 		} else {
 			Id<ActivityFacility> fac = this.parkingLocations.remove(vehicleId);
