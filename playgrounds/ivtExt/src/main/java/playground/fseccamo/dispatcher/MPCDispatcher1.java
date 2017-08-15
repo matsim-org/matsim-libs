@@ -60,12 +60,10 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-/**
- * MPC Dispatcher 1 contains the implementation that generated the results
+/** MPC Dispatcher 1 contains the implementation that generated the results
  * in Francesco's Master thesis.
  * 
- * MPC dispatcher requires yalmip running in matlab
- */
+ * MPC dispatcher requires yalmip running in matlab */
 public class MPCDispatcher1 extends BaseMpcDispatcher {
     final AbstractVirtualNodeDest virtualNodeDest;
     final AbstractVehicleDestMatcher vehicleDestMatcher;
@@ -120,15 +118,18 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
         final long round_now = Math.round(now);
         if (round_now % samplingPeriod != 0) {
 
-            // PART 0: match vehicles at a customer link only if the request has received a pickup order
+            // PART 0: match vehicles at a customer link only if the request has received a pickup
+            // order
 
-            //Map<AVVehicle, Link> stayVehiclesAtLinks = DispatcherUtils.vehicleMapper(getStayVehicles());
+            // Map<AVVehicle, Link> stayVehiclesAtLinks =
+            // DispatcherUtils.vehicleMapper(getStayVehicles());
             // match all matched av/request pairs which are at same link
 
             final int pendingSize = getAVRequests().size();
             final int matchingSize = getMatchings().size();
 
-			// new PredefinedMatchingMatcher(this::setAcceptRequest).matchPredefined(getMatchings(), stayVehiclesAtLinks);
+            // new PredefinedMatchingMatcher(this::setAcceptRequest).matchPredefined(getMatchings(),
+            // stayVehiclesAtLinks);
 
             final int delta = pendingSize - getAVRequests().size();
 
@@ -150,15 +151,20 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                 { // build and send problem description to MATLAB as input to MPC
                     Container container = new Container(String.format("problem@%06d", Math.round(now)));
                     { // done
-                        /**
-                         * number of waiting customers that begin their journey on link_k = (node_i, node_j)
+                        /** number of waiting customers that begin their journey on link_k =
+                         * (node_i, node_j)
                          * also:
-                         * max waiting time in seconds of customers that begin their journey on link_k = (node_i, node_j)
-                         */
-                        Tensor waitCustomersPerVLink = Array.zeros(m + n); // +n accounts for self loop
-                        Tensor maxWaitingTimePerVLink = Array.zeros(m + n); // +n accounts for self loop
-                        for (AVRequest avRequest : getAVRequestsUnserved()) { // requests that haven't received a dispatch yet
-                            MpcRequest mpcRequest = mpcRequestsMap.get(avRequest); // must not be null
+                         * max waiting time in seconds of customers that begin their journey on
+                         * link_k = (node_i, node_j) */
+                        Tensor waitCustomersPerVLink = Array.zeros(m + n); // +n accounts for self
+                                                                           // loop
+                        Tensor maxWaitingTimePerVLink = Array.zeros(m + n); // +n accounts for self
+                                                                            // loop
+                        for (AVRequest avRequest : getAVRequestsUnserved()) { // requests that
+                                                                              // haven't received a
+                                                                              // dispatch yet
+                            MpcRequest mpcRequest = mpcRequestsMap.get(avRequest); // must not be
+                                                                                   // null
                             waitCustomersPerVLink.set(Increment.ONE, mpcRequest.vectorIndex);
                             double waitTime = now - mpcRequest.avRequest.getSubmissionTime();
                             GlobalAssert.that(0 <= waitTime);
@@ -181,15 +187,16 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                     Scalar vehicleTotal = RealScalar.ZERO;
                     Set<RoboTaxi> accountedVehicles = new HashSet<>();
                     { // done
-                        /**
-                         * STAY vehicles + vehicles without task inside VirtualNode
-                         */
-                        // all vehicles except the ones with a customer on board and the ones which are rebalancing
+                        /** STAY vehicles + vehicles without task inside VirtualNode */
+                        // all vehicles except the ones with a customer on board and the ones which
+                        // are rebalancing
                         Map<VirtualNode, List<RoboTaxi>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
-                        availableVehicles.values().stream().flatMap(List::stream).forEach(accountedVehicles::add); 
+                        availableVehicles.values().stream().flatMap(List::stream).forEach(accountedVehicles::add);
                         double[] array = new double[n];
                         for (Entry<VirtualNode, List<RoboTaxi>> entry : availableVehicles.entrySet())
-                            array[entry.getKey().index] = entry.getValue().size(); // could use tensor notation
+                            array[entry.getKey().index] = entry.getValue().size(); // could use
+                                                                                   // tensor
+                                                                                   // notation
 
                         DoubleArray doubleArray = new DoubleArray("availableVehiclesPerVNode", new int[] { array.length }, array);
                         container.add(doubleArray);
@@ -197,9 +204,8 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                         System.out.println("availableVehiclesPerVNode=" + Total.of(Tensors.vectorDouble(array)));
                     }
                     { // done
-                        /**
-                         * rebalancing vehicles still within node_i traveling on link_k = (node_i, node_j)
-                         */
+                        /** rebalancing vehicles still within node_i traveling on link_k = (node_i,
+                         * node_j) */
                         List<RoboTaxi> map = getRebalancingRoboTaxis();
                         accountedVehicles.addAll(map);
                         final Tensor vector = countVehiclesPerVLink(map);
@@ -210,9 +216,8 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                         System.out.println("movingRebalancingVehiclesPerVLink=" + Total.of(Tensors.vectorDouble(array)));
                     }
                     { // done
-                        /**
-                         * Vehicles with customers still within node_i traveling on link_k = (node_i, node_j)
-                         */
+                        /** Vehicles with customers still within node_i traveling on link_k =
+                         * (node_i, node_j) */
                         List<RoboTaxi> map = getRoboTaxisWithCustomer();
                         final Tensor vector = countVehiclesPerVLink(map);
                         accountedVehicles.addAll(map);
@@ -241,8 +246,8 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                         vehicleTotal = vehicleTotal.add(Total.of(Tensors.vectorDouble(array)));
                         System.out.println("movingVehiclesWithCustomersPerVLink=" + Total.of(Tensors.vectorDouble(array)));
                     }
-                    
-                    if (!Chop._10.close(vehicleTotal,RealScalar.of(numberOfVehicles))) {
+
+                    if (!Chop._10.close(vehicleTotal, RealScalar.of(numberOfVehicles))) {
                         new RuntimeException("#vehiclesTotal=" + vehicleTotal).printStackTrace();
                     }
                     if (numberOfVehicles != accountedVehicles.size())
@@ -254,11 +259,14 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                 { // recv
 
                     // USE THE RETURN VALUE TO MAKE COMMANDS IN MATSIM:
-                    // 1) <VirtualLink, Integer> pickupPerVLink: the number of vehicles at VirtualLink ij which should take a request and
+                    // 1) <VirtualLink, Integer> pickupPerVLink: the number of vehicles at
+                    // VirtualLink ij which should take a request and
                     // transport the person to a virtualNode
-                    // for all these u_ij select u_ij customers in vNode i which have any shortest path that with sequence (vN1i, vNj, , ... )
+                    // for all these u_ij select u_ij customers in vNode i which have any shortest
+                    // path that with sequence (vN1i, vNj, , ... )
 
-                    // 2) <VirtualLink, Integer> rebalancingPerVLink : for every VirtualLink select this number of vehicles vehicle in the fromVNode and
+                    // 2) <VirtualLink, Integer> rebalancingPerVLink : for every VirtualLink select
+                    // this number of vehicles vehicle in the fromVNode and
                     // send it to the to VNode / use existing commands
 
                     // this waits until a reply has been received:
@@ -270,7 +278,10 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                     Tensor rebalanceVector = null;
                     {
                         DoubleArray doubleArray = container.get("pickupPerVLink");
-                        requestVector = Round.of(Tensors.vectorDouble(doubleArray.value)); // integer values = # person
+                        requestVector = Round.of(Tensors.vectorDouble(doubleArray.value)); // integer
+                                                                                           // values
+                                                                                           // = #
+                                                                                           // person
                         GlobalAssert.that(requestVector.length() == m + n);
                     }
                     {
@@ -341,7 +352,8 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                         virtualLinkRequestsMap.get(vectorIndex) : Collections.emptyList();
                                 Collections.sort(requests, MpcRequestComparator.INSTANCE);
 
-                                { // assert that requests are sorted, oldest requests are served first
+                                { // assert that requests are sorted, oldest requests are served
+                                  // first
                                     double last = 0;
                                     for (MpcRequest mpcRequest : requests) {
                                         GlobalAssert.that(last <= mpcRequest.avRequest.getSubmissionTime());
@@ -350,37 +362,74 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                 }
 
                                 int min = Math.min(Math.min(desiredPickup, requests.size()), cars.size());
-                                for (int count = 0; count < min; ++count) {
 
-                                    final MpcRequest mpcRequest = requests.get(count);
-
-                                    final QuadTree<RoboTaxi> unassignedVehiclesTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
-
-                                    for (RoboTaxi robotaxi : cars) {
-                                        unassignedVehiclesTree.put(robotaxi.getDivertableLocation().getCoord().getX(), robotaxi.getDivertableLocation().getCoord().getY(), robotaxi);
-                                    }
-
-                                    RoboTaxi robotaxi = unassignedVehiclesTree.getClosest( //
-                                            mpcRequest.avRequest.getFromLink().getCoord().getX(), //
-                                            mpcRequest.avRequest.getFromLink().getCoord().getY());
-                                    GlobalAssert.that(!getRoboTaxiInMatching().contains(robotaxi));
-                                    {
-                                        boolean removed = cars.remove(robotaxi);
-                                        GlobalAssert.that(removed);
-                                    }
-                                    Link pickupLocation = mpcRequest.avRequest.getFromLink(); // where the customer is waiting right now
-                                    setRoboTaxiPickup(robotaxi, mpcRequest.avRequest);
-                                    //setStayVehicleDiversion(avVehicle, pickupLocation); // send car to customer
-                                    ++totalPickupEffective;
-                                    // ++pickupPerNode;
-                                    getMatchings().put(mpcRequest.avRequest, robotaxi);
+                                // MPC1 variant:
+                                Map<RoboTaxi, AVRequest> pickupAssignments = new HashMap<>();
+                                totalPickupEffective += MPCAuxiliary.MPC1Opation(min, requests, networkBounds, cars, this, pickupAssignments);
+                                for (Entry<RoboTaxi, AVRequest> entry : pickupAssignments.entrySet()) {
+                                    setRoboTaxiPickup(entry.getKey(), entry.getValue());
                                 }
+                                
+                                
+                                // MPC2 variant:
+                                
+                                
+                                
+                                
+                                
+                                // old MPC1 Variant, implemented in MPCAuxiliary
+
+                                // // ========================================
+                                // // Difference MPC1 MPC2 starts here
+                                //
+                                // for (int count = 0; count < min; ++count) {
+                                //
+                                // final MpcRequest mpcRequest = requests.get(count);
+                                //
+                                // final QuadTree<RoboTaxi> unassignedVehiclesTree = new
+                                // QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2],
+                                // networkBounds[3]);
+                                //
+                                // for (RoboTaxi robotaxi : cars) {
+                                // unassignedVehiclesTree.put(robotaxi.getDivertableLocation().getCoord().getX(),
+                                // robotaxi.getDivertableLocation().getCoord().getY(), robotaxi);
+                                // }
+                                //
+                                // RoboTaxi robotaxi = unassignedVehiclesTree.getClosest( //
+                                // mpcRequest.avRequest.getFromLink().getCoord().getX(), //
+                                // mpcRequest.avRequest.getFromLink().getCoord().getY());
+                                // GlobalAssert.that(!getRoboTaxiInMatching().contains(robotaxi));
+                                // {
+                                // boolean removed = cars.remove(robotaxi);
+                                // GlobalAssert.that(removed);
+                                // }
+                                // Link pickupLocation = mpcRequest.avRequest.getFromLink(); //
+                                // where
+                                // // the
+                                // // customer
+                                // // is
+                                // // waiting
+                                // // right
+                                // // now
+                                // setRoboTaxiPickup(robotaxi, mpcRequest.avRequest);
+                                // // setStayVehicleDiversion(avVehicle, pickupLocation); // send
+                                // // car to customer
+                                // ++totalPickupEffective;
+                                // // ++pickupPerNode;
+                                // getMatchings().put(mpcRequest.avRequest, robotaxi);
+                                //
+                                // }
+                                //
+                                // // Difference MPC1 MPC 2 ends here
+                                // // ========================================
 
                             }
                             // if (pickupPerNode != desiredPickup)
-                            // new RuntimeException("pickup inconsistent:" + pickupPerNode + " != " + desiredPickup).printStackTrace();
+                            // new RuntimeException("pickup inconsistent:" + pickupPerNode + " != "
+                            // + desiredPickup).printStackTrace();
 
                         }
+
                         if (totalPickupEffective != totalPickupDesired)
                             System.out.println(" !!! pickup delta: " + totalPickupEffective + " < " + totalPickupDesired);
 
@@ -408,14 +457,16 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
 
                             // ---
                             if (availableVehicles.containsKey(vnFrom)) {
-                                final List<RoboTaxi> cars = availableVehicles.get(vnFrom); // find cars
+                                final List<RoboTaxi> cars = availableVehicles.get(vnFrom); // find
+                                                                                           // cars
                                 final int desiredRebalance = rebalanceVector.Get(vectorIndex).number().intValue();
                                 @SuppressWarnings("unused")
                                 int pickupPerNode = 0;
                                 if (0 < desiredRebalance) {
                                     String infoString = vnFrom.equals(vnTo) ? "DEST==ORIG" : "";
                                     if (vnFrom.equals(vnTo))
-                                        System.out.println(String.format("vl=%3d  cars=%3d  reb=%3d  %s", vectorIndex, cars.size(), desiredRebalance, infoString));
+                                        System.out.println(
+                                                String.format("vl=%3d  cars=%3d  reb=%3d  %s", vectorIndex, cars.size(), desiredRebalance, infoString));
                                     Random random = new Random();
                                     int min = Math.min(desiredRebalance, cars.size());
                                     for (int count = 0; count < min; ++count) {
@@ -427,7 +478,11 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                                         // vnTo.getLinks() //
                                                         candidateLinks //
                                                 ).get(random.nextInt(candidateLinks.size()));
-                                        setRoboTaxiRebalance(robotaxi, rebalanceDest); // send car to adjacent virtual node
+                                        setRoboTaxiRebalance(robotaxi, rebalanceDest); // send car
+                                                                                       // to
+                                                                                       // adjacent
+                                                                                       // virtual
+                                                                                       // node
                                         ++totalRebalanceEffective;
                                         if (vnFrom.equals(vnTo))
                                             ++selfRebalanceEffective;
@@ -435,7 +490,8 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                     }
                                 }
                                 // if (pickupPerNode != desiredRebalance)
-                                // new RuntimeException("rebalance inconsistent:" + pickupPerNode + " != " + desiredRebalance).printStackTrace();
+                                // new RuntimeException("rebalance inconsistent:" + pickupPerNode +
+                                // " != " + desiredRebalance).printStackTrace();
                             } else {
                                 System.out.println("no available vehicles inside vnode " + vectorIndex + " " + vnFrom.index);
                             }
@@ -482,8 +538,8 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
             virtualNetwork = VirtualNetworkGet.readDefault(network);
 
-            return new MPCDispatcher1(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, network, abstractVirtualNodeDest, abstractVehicleDestMatcher,
-                    travelTimes);
+            return new MPCDispatcher1(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, network, abstractVirtualNodeDest,
+                    abstractVehicleDestMatcher, travelTimes);
         }
     }
 }
