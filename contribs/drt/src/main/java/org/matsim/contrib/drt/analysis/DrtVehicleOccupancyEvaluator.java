@@ -59,6 +59,7 @@ import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -92,7 +93,7 @@ public class DrtVehicleOccupancyEvaluator implements PersonEntersVehicleEventHan
 	private Map<Id<Person>, Double> taxiDriversInStayTask = new HashMap<>();
 
 	@Inject
-	public DrtVehicleOccupancyEvaluator(Config config, EventsManager events) {
+	public DrtVehicleOccupancyEvaluator(Config config, EventsManager events, Fleet fleet) {
 		this.startTime = (int)config.qsim().getStartTime();
 		if (startTime < 0)
 			startTime = 0;
@@ -103,6 +104,21 @@ public class DrtVehicleOccupancyEvaluator implements PersonEntersVehicleEventHan
 			endTime = config.qsim().getEndTime();
 		this.bins = (int)(endTime - startTime);
 		events.addHandler(this);
+		maxcap = findMaxCap(fleet);
+	}
+
+	/**
+	 * @param fleet
+	 * @return
+	 */
+	private int findMaxCap(Fleet fleet) {
+		int maxCap = 0;
+		for (org.matsim.contrib.dvrp.data.Vehicle v : fleet.getVehicles().values()){
+			if (v.getCapacity()>maxCap){
+				maxCap = (int) v.getCapacity();
+			}
+		}
+		return maxCap;
 	}
 
 	public DrtVehicleOccupancyEvaluator(double start, double end, int maxCapacity) {
