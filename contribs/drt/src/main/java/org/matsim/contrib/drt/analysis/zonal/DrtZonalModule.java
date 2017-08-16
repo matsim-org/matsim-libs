@@ -26,11 +26,9 @@ import org.matsim.core.controler.AbstractModule;
 
 /**
  * @author  jbischoff
- *
+ * A module to analyse DRT trips based on a zonal grid system.
  */
-/**
- *
- */
+
 public class DrtZonalModule extends AbstractModule {
 
 	/* (non-Javadoc)

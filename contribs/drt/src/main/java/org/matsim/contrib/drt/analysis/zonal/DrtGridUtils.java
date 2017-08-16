@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Polygon;
 /**
  *
  */
-public class GridUtils {
+public class DrtGridUtils {
 
 	public static Map<String,Geometry> createGridFromNetwork(Network network, double cellsize){
 		

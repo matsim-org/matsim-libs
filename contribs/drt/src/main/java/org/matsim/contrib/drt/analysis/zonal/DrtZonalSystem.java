@@ -53,7 +53,7 @@ public class DrtZonalSystem {
 	 */
 	public DrtZonalSystem(Network network, double cellsize) {
 		this.network = network;
-		zones = GridUtils.createGridFromNetwork(network, cellsize);
+		zones = DrtGridUtils.createGridFromNetwork(network, cellsize);
 		
 	}
 	
