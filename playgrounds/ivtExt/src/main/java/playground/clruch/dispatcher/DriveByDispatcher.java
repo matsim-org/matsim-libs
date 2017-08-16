@@ -29,8 +29,8 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * @author Claudio Ruch */
 public class DriveByDispatcher extends RebalancingDispatcher {
     private final List<Link> links;
-    double rebPos = 0.1;
-    Random randGen = new Random(1234);
+    private final double rebPos = 0.1;
+    private final Random randGen = new Random(1234);
     private final int rebalancingPeriod;
     private int total_abortTrip = 0;
 
@@ -42,7 +42,7 @@ public class DriveByDispatcher extends RebalancingDispatcher {
             Network network) {
         super(config, travelTime, router, eventsManager);
         links = new ArrayList<>(network.getLinks().values());
-        Collections.shuffle(links);
+        Collections.shuffle(links,randGen);
         SafeConfig safeConfig = SafeConfig.wrap(config);
         rebalancingPeriod = getRebalancingPeriod(safeConfig, 120);
     }

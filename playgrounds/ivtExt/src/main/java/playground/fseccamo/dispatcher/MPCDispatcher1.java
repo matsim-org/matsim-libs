@@ -363,15 +363,23 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
 
                                 int min = Math.min(Math.min(desiredPickup, requests.size()), cars.size());
 
-                                // MPC1 variant:
+                                // MPC1 code:
+                                // ==========================
+                                // Map<RoboTaxi, AVRequest> pickupAssignments = new HashMap<>();
+                                // totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption1(min,
+                                // requests, networkBounds, cars, this, pickupAssignments);
+                                // for (Entry<RoboTaxi, AVRequest> entry :
+                                // pickupAssignments.entrySet()) {
+                                // setRoboTaxiPickup(entry.getKey(), entry.getValue());
+                                // }                                
+                                
+                                // MPC2 code:
+                                // ==========================
                                 Map<RoboTaxi, AVRequest> pickupAssignments = new HashMap<>();
-                                totalPickupEffective += MPCAuxiliary.MPC1Opation(min, requests, networkBounds, cars, this, pickupAssignments);
+                                totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption2(min,requests, cars, this, pickupAssignments);
                                 for (Entry<RoboTaxi, AVRequest> entry : pickupAssignments.entrySet()) {
                                     setRoboTaxiPickup(entry.getKey(), entry.getValue());
                                 }
-                                
-                                
-                                // MPC2 variant:
                                 
                                 
                                 

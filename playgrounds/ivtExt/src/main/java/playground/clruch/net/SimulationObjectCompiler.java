@@ -14,6 +14,7 @@ import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 // TODO general cleanup, can be made shorter! 
+// TODO see where this gets called and if it is at the best location. 
 
 public class SimulationObjectCompiler {
 

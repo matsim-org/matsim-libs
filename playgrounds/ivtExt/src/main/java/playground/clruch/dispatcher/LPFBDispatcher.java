@@ -53,14 +53,14 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class LPFBDispatcher extends PartitionedDispatcher {
-    public final int rebalancingPeriod;
-    public final int dispatchPeriod;
-    final AbstractVirtualNodeDest virtualNodeDest;
-    final AbstractVehicleDestMatcher vehicleDestMatcher;
-    final int numRobotaxi;
+    private final int rebalancingPeriod;
+    private final int dispatchPeriod;
+    private final AbstractVirtualNodeDest virtualNodeDest;
+    private final AbstractVehicleDestMatcher vehicleDestMatcher;
+    private final int numRobotaxi;
     private int total_rebalanceCount = 0;
-    Tensor printVals = Tensors.empty();
-    LPVehicleRebalancing lpVehicleRebalancing;
+    private Tensor printVals = Tensors.empty();
+    private final LPVehicleRebalancing lpVehicleRebalancing;
 
     public LPFBDispatcher( //
             AVDispatcherConfig config, //
@@ -129,14 +129,14 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                 // TODO this should never become active, can be possibly removed later
                 // assert that solution is integer and does not contain negative values
                 GlobalAssert
-                        .that(!rebalanceCount.flatten(-1).map(Scalar.class::cast).map(s -> s.number().doubleValue()).filter(e -> e < 0).findAny().isPresent());
+                        .that(rebalanceCount.flatten(-1).map(Scalar.class::cast).map(s -> s.number().doubleValue()).allMatch(e -> e >= 0));
 
                 // ensure that not more vehicles are sent away than available
                 Tensor feasibleRebalanceCount = FeasibleRebalanceCreator.returnFeasibleRebalance(rebalanceCount.unmodifiable(), availableVehicles);
                 total_rebalanceCount += (Integer) ((Scalar) Total.of(Tensor.of(feasibleRebalanceCount.flatten(-1)))).number();
 
                 // generate routing instructions for rebalancing vehicles
-                Map<VirtualNode, List<Link>> destinationLinks = virtualNetwork.createVNodeTypeMap();
+                Map<VirtualNode, List<Link>> rebalanceDestinations = virtualNetwork.createVNodeTypeMap();
 
                 // fill rebalancing destinations
                 for (int i = 0; i < virtualNetwork.getvLinksCount(); ++i) {
@@ -145,18 +145,17 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                     VirtualNode fromNode = virtualLink.getFrom();
                     int numreb = (Integer) (feasibleRebalanceCount.Get(fromNode.index, toNode.index)).number();
                     List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(toNode, numreb);
-                    destinationLinks.get(fromNode).addAll(rebalanceTargets);
+                    rebalanceDestinations.get(fromNode).addAll(rebalanceTargets);
                 }
 
                 // consistency check: rebalancing destination links must not exceed available
                 // vehicles in virtual node
                 Map<VirtualNode, List<RoboTaxi>> finalAvailableVehicles = availableVehicles;
-                GlobalAssert.that(!virtualNetwork.getVirtualNodes().stream().filter(v -> finalAvailableVehicles.get(v).size() < destinationLinks.get(v).size())
-                        .findAny().isPresent());
+                GlobalAssert.that(virtualNetwork.getVirtualNodes().stream().allMatch(v -> finalAvailableVehicles.get(v).size() >= rebalanceDestinations.get(v).size()));
 
                 // send rebalancing vehicles using the setVehicleRebalance command
-                for (VirtualNode virtualNode : destinationLinks.keySet()) {
-                    Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode), destinationLinks.get(virtualNode));
+                for (VirtualNode virtualNode : rebalanceDestinations.keySet()) {
+                    Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode), rebalanceDestinations.get(virtualNode));
                     rebalanceMatching.keySet().forEach(v -> setRoboTaxiRebalance(v, rebalanceMatching.get(v)));
                 }
 
@@ -171,7 +170,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
     }
 
     @Override
-    public String getInfoLine() {
+    protected String getInfoLine() {
         return String.format("%s RV=%s H=%s", //
                 super.getInfoLine(), //
                 total_rebalanceCount, //

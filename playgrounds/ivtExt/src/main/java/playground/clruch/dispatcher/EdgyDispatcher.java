@@ -59,6 +59,7 @@ public class EdgyDispatcher extends RebalancingDispatcher {
 
             // iterate requests: send vehicles to some request closer than distClose m
             // or to a request waiting for more than double waitMax
+            // TODO requests get lost, funny implementation, change this
             Iterator<AVRequest> requestIterator = getAVRequests().iterator();
             for (RoboTaxi roboTaxi : getDivertableRoboTaxis()) {
                 if (roboTaxi.isVehicleInStayTask()) {

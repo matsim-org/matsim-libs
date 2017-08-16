@@ -3,6 +3,7 @@ package playground.clruch.dispatcher;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
@@ -30,9 +31,12 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
     private final int dispatchPeriod;
     private final double[] networkBounds;
     private final QuadTree<AVRequest> pendingRequestsTree;
-    private final HashSet<AVRequest> openRequests = new HashSet<>(); // two data structures are used to enable fast "contains" searching
+    private final Set<AVRequest> openRequests = new HashSet<>(); // two data structures are used to
+                                                                 // enable fast "contains" searching
     private final QuadTree<RoboTaxi> unassignedVehiclesTree;
-    private final HashSet<RoboTaxi> unassignedVehicles = new HashSet<>(); // two data structures are used to enable fast "contains" searching
+    private final Set<RoboTaxi> unassignedVehicles = new HashSet<>(); // two data structures are
+                                                                      // used to enable fast
+                                                                      // "contains" searching
 
     private NewSingleHeuristicDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -42,7 +46,8 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
             Network network) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
-        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
+        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod",
+                                                            // 10);
         networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         pendingRequestsTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
         unassignedVehiclesTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
@@ -71,7 +76,7 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
                 for (AVRequest avr : requests) {
                     RoboTaxi closestRobotaxi = findClosestVehicle(avr);
                     if (closestRobotaxi != null) {
-                        setRoboTaxiPickup(closestRobotaxi , avr);
+                        setRoboTaxiPickup(closestRobotaxi, avr);
                         removeFromTrees(closestRobotaxi, avr);
                     }
                 }
@@ -99,33 +104,30 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
 
         // remove robotaxi
         boolean succVM = unassignedVehicles.remove(robotaxi);
-        boolean succVT = unassignedVehiclesTree.remove(robotaxi.getDivertableLocation().getCoord().getX(),
-                robotaxi.getDivertableLocation().getCoord().getY(), robotaxi);
+        boolean succVT = unassignedVehiclesTree.remove(robotaxi.getDivertableLocation().getCoord().getX(), robotaxi.getDivertableLocation().getCoord().getY(),
+                robotaxi);
         boolean removeSuccessV = succVT && succVM;
         GlobalAssert.that(removeSuccessV);
 
         return removeSuccessR && removeSuccessV;
     }
 
-    /**
-     * @param avRequest
+    /** @param avRequest
      *            some request
-     * @return the RoboTaxi closest to the given request
-     */
+     * @return the RoboTaxi closest to the given request */
     private RoboTaxi findClosestVehicle(AVRequest avRequest) {
         Coord requestCoord = avRequest.getFromLink().getCoord();
         // System.out.println("treesize " + unassignedVehiclesTree.size());
         return unassignedVehiclesTree.getClosest(requestCoord.getX(), requestCoord.getY());
     }
 
-    /**
-     * @param roboTaxis
-     *            ensures that new unassignedVehicles are added to a list with all unassigned vehicles
-     */
+    /** @param roboTaxis
+     *            ensures that new unassignedVehicles are added to a list with all unassigned
+     *            vehicles */
     private void addUnassignedVehicles(Collection<RoboTaxi> roboTaxis) {
         for (RoboTaxi roboTaxi : roboTaxis) {
             if (!unassignedVehicles.contains(roboTaxi)) {
-                Coord toMatchVehicleCoord = roboTaxi.getDivertableLocation().getCoord(); 
+                Coord toMatchVehicleCoord = roboTaxi.getDivertableLocation().getCoord();
                 boolean uaSucc = unassignedVehicles.add(roboTaxi);
                 boolean qtSucc = unassignedVehiclesTree.put( //
                         toMatchVehicleCoord.getX(), //
@@ -136,22 +138,17 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
         }
     }
 
-    /**
-     * 
-     * @param robotaxi
+    /** @param robotaxi
      * @param avRequests
      *            (open requests)
-     * @return the closest Request to robotaxi found with tree-search
-     */
+     * @return the closest Request to robotaxi found with tree-search */
     private AVRequest findClosestRequest(RoboTaxi robotaxi) {
         Coord vehicleCoord = robotaxi.getDivertableLocation().getFromNode().getCoord();
         return pendingRequestsTree.getClosest(vehicleCoord.getX(), vehicleCoord.getY());
     }
 
-    /**
-     * @param avRequests
-     *            ensures that new open requests are added to a list with all open requests
-     */
+    /** @param avRequests
+     *            ensures that new open requests are added to a list with all open requests */
     private void addOpenRequests(Collection<AVRequest> avRequests) {
         for (AVRequest avRequest : avRequests) {
             if (!openRequests.contains(avRequest)) {

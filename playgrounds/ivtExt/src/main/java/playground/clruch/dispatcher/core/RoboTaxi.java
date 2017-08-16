@@ -12,6 +12,12 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 
+// add a lot of documentation // TODO
+// TODO are there functions, which can be used only in certain Dispatchers, e. g. UniversalDispatcher? 
+// TODO which functions are designed for who? 
+// TODO which function is allowed at which time?
+// TODO check all access rights and restrict to minimum
+
 public class RoboTaxi {
     private final AVVehicle avVehicle;
     private LinkTimePair linkTimePair;
@@ -73,7 +79,7 @@ public class RoboTaxi {
     }
     
 
-    public void setCurrentDriveDestination(Link currentDriveDestination) {
+   /*package*/ void setCurrentDriveDestination(Link currentDriveDestination) {
         GlobalAssert.that(currentDriveDestination != null);
         this.currentDriveDestination = currentDriveDestination;
     }
@@ -86,9 +92,21 @@ public class RoboTaxi {
         return getDivertableLocation() == getCurrentDriveDestination();
     }
 
+    
+    // TODO remove one of the two
     public boolean isVehicleInStayTask() {
         return status.equals(AVStatus.STAY);
     }
+    
+    public boolean isInStayTask() {
+        Task task = Schedules.getLastTask(getAVVehicle().getSchedule());
+        if (task.getStatus().equals(Task.TaskStatus.STARTED)){
+            GlobalAssert.that(getDivertableLocation() == getCurrentLocation());
+            return true;
+        }
+        return false;
+    }
+    
 
     // TODO can AVVehicle be removed from more layers? 
     /*package*/ AVVehicle getAVVehicle() {
@@ -119,15 +137,6 @@ public class RoboTaxi {
 
     public boolean isWithoutCustomer() {
         return !status.equals(AVStatus.DRIVEWITHCUSTOMER);
-    }
-
-    public boolean isInStayTask() {
-        Task task = Schedules.getLastTask(getAVVehicle().getSchedule());
-        if (task.getStatus().equals(Task.TaskStatus.STARTED)){
-            GlobalAssert.that(getDivertableLocation() == getCurrentLocation());
-            return true;
-        }
-        return false;
     }
 
 }

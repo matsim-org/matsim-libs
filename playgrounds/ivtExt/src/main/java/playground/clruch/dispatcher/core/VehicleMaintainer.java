@@ -67,11 +67,13 @@ abstract class VehicleMaintainer implements AVDispatcher {
         return private_now;
     }
 
+    // TODO put this inside RoboTaxi
     synchronized void assignDirective(RoboTaxi robotaxi, AbstractDirective abstractDirective) {
         GlobalAssert.that(isWithoutDirective(robotaxi));
         robotaxi.setDirective(abstractDirective);
     }
 
+    // TODO put this inside RoboTaxi
     private synchronized boolean isWithoutDirective(RoboTaxi robotaxi) {
         if (robotaxi.getDirective() == null) {
             return true;
@@ -83,22 +85,19 @@ abstract class VehicleMaintainer implements AVDispatcher {
     protected final List<RoboTaxi> getRoboTaxis() {
         if (roboTaxis.isEmpty() || !roboTaxis.get(0).getAVVehicle().getSchedule().getStatus().equals(Schedule.ScheduleStatus.STARTED))
             return Collections.emptyList();
-        return roboTaxis;
+        return Collections.unmodifiableList(roboTaxis);
     }
 
+    // TODO make a function for rt.getDirective() == null
     protected final Collection<RoboTaxi> getDivertableRoboTaxis() {
-        Collection<RoboTaxi> divertableRoboTaxis = new ArrayList<>();
-        for (RoboTaxi robotaxi : roboTaxis) {
-            boolean noDirectiveReceived = (robotaxi.getDirective() == null);
-            boolean isWithoutCustomer = robotaxi.isWithoutCustomer();
-            if (noDirectiveReceived && isWithoutCustomer) {
-                divertableRoboTaxis.add(robotaxi);
-            }
-        }
-        return divertableRoboTaxis;
+        return roboTaxis.stream().filter(rt-> (rt.getDirective() == null))
+                .filter(RoboTaxi::isWithoutCustomer)
+        .collect(Collectors.toList());
     }
 
 
+    // TODO what happens with the other AVTasks? 
+    // TODO this function is important, check thoroughly
     private final void updateDivertableLocations() {
         for (RoboTaxi robotaxi : getRoboTaxis()) {
             if (isWithoutDirective(robotaxi)) {
@@ -113,10 +112,12 @@ abstract class VehicleMaintainer implements AVDispatcher {
                             LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint();
                             // there is a slim chance that function returns null
                             // update divertibleLocation and currentDriveDestination
+                            // TODO put this as an info into RoboTaxi and make sure it cannot be used in the iteration
                             if (linkTimePair != null)
                                 robotaxi.setLinkTimePair(linkTimePair);
                             robotaxi.setCurrentDriveDestination(avDriveTask.getPath().getToLink());
                         } else {
+                            // TODO is this actually necessary?
                             robotaxi.setAVStatus(AVStatus.DRIVEWITHCUSTOMER);
                         }
                     }
@@ -212,7 +213,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
     /** derived classes should override this function to add details
      * 
      * @return */
-    public String getInfoLine() {
+    protected String getInfoLine() {
         final String string = getClass().getSimpleName() + "        ";
         return String.format("%s@%6d V=(%4ds,%4dd)", //
                 string.substring(0, 6), //

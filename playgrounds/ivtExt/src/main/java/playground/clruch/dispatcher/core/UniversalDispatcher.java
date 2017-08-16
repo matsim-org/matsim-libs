@@ -4,6 +4,7 @@ package playground.clruch.dispatcher.core;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -50,8 +51,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * {@link AbstractDispatcher}. */
 public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final FuturePathFactory futurePathFactory;
-
-    protected final Set<AVRequest> pendingRequests = new LinkedHashSet<>(); // access via
+    private final Set<AVRequest> pendingRequests = new LinkedHashSet<>(); // access via
                                                                             // getAVRequests()
     private final Set<AVRequest> publishPeriodMatchedRequests = new HashSet<>(); // requests which
                                                                                  // are matched
@@ -157,6 +157,34 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         return Collections.unmodifiableCollection(pendingRequests);
     }
 
+    
+    /** Example
+     * getRoboTaxiSubset(EnumSet.of(AVStatus.DRIVETOCUSTMER, AVStatus.STAY));
+     * 
+     * @param status
+     * @return
+     */
+    // TODO extend these two functions and see if other functions can be removed with this method. 
+    private final List<RoboTaxi> getRoboTaxiSubset(Set<AVStatus> status){        
+        return getRoboTaxis().stream().filter(status::contains).collect(Collectors.toList());
+    }
+    
+    /**
+     * Example call
+     * getRoboTaxiSubset(AVStatus.STAY, AVStatus.DRIVEWITHCUSTOMER)
+     * @param status
+     * @return
+     */
+    public final List<RoboTaxi> getRoboTaxiSubset(AVStatus... status){
+        Set<AVStatus> enumSet = EnumSet.noneOf(AVStatus.class);
+        for (AVStatus s : status) {
+            enumSet.add(s);            
+        }
+        return getRoboTaxiSubset(enumSet);
+    }
+    
+    
+    
     /** function call leaves the state of the {@link UniversalDispatcher} unchanged. successive
      * calls to the function return the identical collection.
      * 
@@ -391,7 +419,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     }
 
     @Override
-    public String getInfoLine() {
+    protected String getInfoLine() {
         return String.format("%s R=(%5d) MR=%6d", //
                 super.getInfoLine(), //
                 getAVRequests().size(), //

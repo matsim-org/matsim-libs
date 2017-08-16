@@ -40,11 +40,8 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  */
 public class UncoordinatedDispatcher extends PartitionedDispatcher {
     private final int dispatchPeriod;
-
-    final int numberOfAVs;
-    final double maxWaitTime = 5 * 60.0;;
-    final Network network; // <- for verifying link references
-    final Map<VirtualNode, Link> waitLocations;
+    private final double maxWaitTime = 5 * 60.0;;
+    private final Map<VirtualNode, Link> waitLocations;
 
     private UncoordinatedDispatcher( //
             AVDispatcherConfig config, //
@@ -56,10 +53,8 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
             VirtualNetwork virtualNetwork) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(config);
-        this.network = network;
-        numberOfAVs = (int) generatorConfig.getNumberOfVehicles();
         dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
-        waitLocations = fillWaitLocations(network, virtualNetwork);
+        waitLocations = fillWaitLocations(network, virtualNetwork, (int) generatorConfig.getNumberOfVehicles());
     }
 
     int total_abortTrip = 0;
@@ -124,8 +119,8 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
      * @param virtualNetwork
      * @return HashMap<VirtualNode, Link> with one wait location per VirtualNode
      */
-    Map<VirtualNode, Link> fillWaitLocations(Network network, VirtualNetwork virtualNetwork) {
-        double carsPerVNode = ((double) numberOfAVs) / virtualNetwork.getvNodesCount();
+    private static Map<VirtualNode, Link> fillWaitLocations(Network network, VirtualNetwork virtualNetwork, int numberofRoboTaxis) {
+        double carsPerVNode = ((double) numberofRoboTaxis) / virtualNetwork.getvNodesCount();
 
         Map<VirtualNode, Link> waitLocations = new HashMap<>();
         for (VirtualNode vn : virtualNetwork.getVirtualNodes()) {
@@ -141,7 +136,7 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
     }
 
     @Override
-    public String getInfoLine() {
+    protected String getInfoLine() {
         return String.format("%s AT=%5d do=%5d", //
                 super.getInfoLine(), //
                 total_abortTrip, //
