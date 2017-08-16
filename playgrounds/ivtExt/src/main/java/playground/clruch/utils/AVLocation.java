@@ -8,7 +8,7 @@ import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import playground.sebhoerl.avtaxi.data.AVVehicle;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
@@ -20,8 +20,8 @@ public class AVLocation extends AVTaskAdapter {
      * @param avVehicle
      * @return link or null with a small chance
      */
-    public static Link of(AVVehicle avVehicle) {
-        Schedule schedule = avVehicle.getSchedule();
+    public static Link of(RoboTaxi robotaxi) {
+        Schedule schedule = robotaxi.getSchedule();
         return new AVLocation(schedule.getCurrentTask()).link;
     }
 

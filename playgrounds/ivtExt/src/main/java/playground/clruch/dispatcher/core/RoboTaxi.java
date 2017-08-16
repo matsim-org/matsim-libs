@@ -25,7 +25,6 @@ public class RoboTaxi {
     private Link currentLocation;
     private AbstractDirective directive;
     private AVStatus status;
-    // private boolean isWithoutCustomer;
 
     /** @param avVehicle
      * @param linkTimePair
@@ -38,7 +37,6 @@ public class RoboTaxi {
         this.linkTimePair = linkTimePair;
         this.currentDriveDestination = currentDriveDestination;
         this.directive = null;
-        // this.isWithoutCustomer = true;
         this.status = AVStatus.STAY;
     }
 
@@ -46,16 +44,11 @@ public class RoboTaxi {
         return linkTimePair.link;
     }
 
-    public double getDivertableTime() {
+    /* package */ double getDivertableTime() {
         return linkTimePair.time;
     }
 
-    // TODO remove this function
-    public LinkTimePair getLinkTimePair() {
-        return linkTimePair;
-    }
-
-    public void setLinkTimePair(LinkTimePair linkTimePair) {
+    /* package */ void setLinkTimePair(LinkTimePair linkTimePair) {
         this.linkTimePair = linkTimePair;
     }
 
@@ -65,7 +58,7 @@ public class RoboTaxi {
         return currentDriveDestination;
     }
 
-    public void setCurrentLocation(Link currentLocation) {
+    /* package */ void setCurrentLocation(Link currentLocation) {
         GlobalAssert.that(currentLocation != null);
         this.currentLocation = currentLocation;
     }
@@ -73,60 +66,35 @@ public class RoboTaxi {
     public Link getCurrentLocation() {
         return currentLocation;
     }
-    
-    public Schedule getSchedule(){
+
+    public Schedule getSchedule() {
         return avVehicle.getSchedule();
     }
-    
 
-   /*package*/ void setCurrentDriveDestination(Link currentDriveDestination) {
+    /* package */ void setCurrentDriveDestination(Link currentDriveDestination) {
         GlobalAssert.that(currentDriveDestination != null);
         this.currentDriveDestination = currentDriveDestination;
     }
 
-    /** @return true if vehicle is driving and divertible link is also destination link of drive
-     *         task;
-     *         false if vehicle is in stay task, or divertible link is not destination of drive task
-     *         of vehicle. */
-    public boolean isDivertableLocationAlsoDriveTaskDestination() {
-        return getDivertableLocation() == getCurrentDriveDestination();
-    }
-
-    
-    // TODO remove one of the two
-    public boolean isVehicleInStayTask() {
-        return status.equals(AVStatus.STAY);
-    }
-    
     public boolean isInStayTask() {
-        Task task = Schedules.getLastTask(getAVVehicle().getSchedule());
-        if (task.getStatus().equals(Task.TaskStatus.STARTED)){
-            GlobalAssert.that(getDivertableLocation() == getCurrentLocation());
-            return true;
-        }
-        return false;
-    }
-    
+        boolean statusStay = status.equals(AVStatus.STAY);
+        boolean scheduleStay = false;
 
-    // TODO can AVVehicle be removed from more layers? 
-    /*package*/ AVVehicle getAVVehicle() {
-        return avVehicle;
+        Task task = Schedules.getLastTask(avVehicle.getSchedule());
+        if (task.getStatus().equals(Task.TaskStatus.STARTED)) {
+            GlobalAssert.that(getDivertableLocation() == getCurrentLocation());
+            scheduleStay = true;
+        }
+
+        GlobalAssert.that(statusStay == scheduleStay);
+        return statusStay;
     }
-    
-    public Id<Vehicle> getId(){
+
+    public Id<Vehicle> getId() {
         return avVehicle.getId();
     }
-    
 
-    public AbstractDirective getDirective() {
-        return directive;
-    }
-
-    public void setDirective(AbstractDirective directive) {
-        this.directive = directive;
-    }
-
-    public void setAVStatus(AVStatus status) {
+    /* package */ void setAVStatus(AVStatus status) {
         GlobalAssert.that(status != null);
         this.status = status;
     }
@@ -135,8 +103,24 @@ public class RoboTaxi {
         return status;
     }
 
-    public boolean isWithoutCustomer() {
+    protected boolean isWithoutCustomer() {
         return !status.equals(AVStatus.DRIVEWITHCUSTOMER);
+    }
+
+    /* package */ void assignDirective(AbstractDirective abstractDirective) {
+        GlobalAssert.that(isWithoutDirective());
+        this.directive = abstractDirective;
+    }
+
+    /* package */ boolean isWithoutDirective() {
+        if (directive == null)
+            return true;
+        return false;
+    }
+
+    /* package */ void executeDirective() {
+        directive.execute();
+        directive = null;
     }
 
 }

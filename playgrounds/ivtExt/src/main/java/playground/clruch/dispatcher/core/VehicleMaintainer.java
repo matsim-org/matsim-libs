@@ -1,13 +1,11 @@
 // code by jph
+// API change by clruch
 package playground.clruch.dispatcher.core;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -35,26 +33,16 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * {@link ParallelLeastCostPathCalculator}. */
 abstract class VehicleMaintainer implements AVDispatcher {
     protected final EventsManager eventsManager;
-
-    private final List<AVVehicle> vehicles = new ArrayList<>(); // access via function
-                                                                // getFunctioningVehicles()
     private final List<RoboTaxi> roboTaxis = new ArrayList<>();
     private Double private_now = null;
-    private Map<AVVehicle, AbstractDirective> private_vehicleDirectives = new LinkedHashMap<>();
     private int infoLinePeriod = 0;
-    private Map<AVVehicle, RoboTaxi> avVehicleVehicleLinkPairMap = new HashMap<>();
     private String previousInfoMarker = "";
 
     VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
     }
 
-    /** @param infoLinePeriod
-     *            positive values determine the period, negative values or 0 will disable the
-     *            printout */
-    public final void setInfoLinePeriod(int infoLinePeriod) {
-        this.infoLinePeriod = infoLinePeriod;
-    }
+
 
     /** @return time of current re-dispatching iteration step
      * @throws NullPointerException
@@ -63,38 +51,26 @@ abstract class VehicleMaintainer implements AVDispatcher {
         return private_now;
     }
 
-    // TODO put this inside RoboTaxi
-    synchronized void assignDirective(RoboTaxi robotaxi, AbstractDirective abstractDirective) {
-        GlobalAssert.that(isWithoutDirective(robotaxi));
-        robotaxi.setDirective(abstractDirective);
-    }
-
-    // TODO put this inside RoboTaxi
-    private synchronized boolean isWithoutDirective(RoboTaxi robotaxi) {
-        if (robotaxi.getDirective() == null) {
-            return true;
-        }
-        return false;
-    }
 
     /** @return collection of AVVehicles that have started their schedule */
     protected final List<RoboTaxi> getRoboTaxis() {
-        if (roboTaxis.isEmpty() || !roboTaxis.get(0).getAVVehicle().getSchedule().getStatus().equals(Schedule.ScheduleStatus.STARTED))
+        if (roboTaxis.isEmpty() || !roboTaxis.get(0).getSchedule().getStatus().equals(Schedule.ScheduleStatus.STARTED))
             return Collections.emptyList();
         return Collections.unmodifiableList(roboTaxis);
     }
 
-    // TODO make a function for rt.getDirective() == null
     protected final Collection<RoboTaxi> getDivertableRoboTaxis() {
-        return roboTaxis.stream().filter(rt -> (rt.getDirective() == null)).filter(RoboTaxi::isWithoutCustomer).collect(Collectors.toList());
+        return roboTaxis.stream().filter(rt -> (rt.isWithoutDirective()))
+                .filter(RoboTaxi::isWithoutCustomer)
+                .collect(Collectors.toList());
     }
 
     // TODO what happens with the other AVTasks?
     // TODO this function is important, check thoroughly
     private final void updateDivertableLocations() {
         for (RoboTaxi robotaxi : getRoboTaxis()) {
-            if (isWithoutDirective(robotaxi)) {
-                Schedule schedule = robotaxi.getAVVehicle().getSchedule();
+            if (robotaxi.isWithoutDirective()) {
+                Schedule schedule = robotaxi.getSchedule();
                 new AVTaskAdapter(schedule.getCurrentTask()) {
                     @Override
                     public void handle(AVDriveTask avDriveTask) {
@@ -136,18 +112,13 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
     @Override
     public final void registerVehicle(AVVehicle vehicle) {
-        vehicles.add(vehicle);
         GlobalAssert.that(vehicle.getStartLink() != null);
         roboTaxis.add(new RoboTaxi(vehicle, new LinkTimePair(vehicle.getStartLink(), -1.0), vehicle.getStartLink()));
         eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
     }
 
-    abstract void notifySimulationSubscribers(long round_now);
 
-    /** invoked at the beginning of every iteration dispatchers can update their data structures
-     * based on the stay vehicle set function is not meant
-     * for issuing directives */
-    abstract void updateDatastructures(Collection<AVVehicle> stayVehicles);
+
 
     @Override
     public final void onNextTimestep(double now) {
@@ -173,9 +144,8 @@ abstract class VehicleMaintainer implements AVDispatcher {
         consistencyCheck();
 
         for (RoboTaxi robotaxi : roboTaxis) {
-            if (robotaxi.getDirective() != null) {
-                robotaxi.getDirective().execute();
-                robotaxi.setDirective(null);
+            if (!robotaxi.isWithoutDirective()) {
+                robotaxi.executeDirective();
             }
         }
 
@@ -201,7 +171,33 @@ abstract class VehicleMaintainer implements AVDispatcher {
     /* package */ abstract void stopUnusedVehicles();
 
     /* package */ abstract void consistencySubCheck();
+    
+    /* package */ abstract void notifySimulationSubscribers(long round_now);
+    
+    
+    /** invoked at the beginning of every iteration dispatchers can update their data structures
+     * based on the stay vehicle set function is not meant
+     * for issuing directives */
+    /* package */ abstract void updateDatastructures(Collection<AVVehicle> stayVehicles);
 
+    
+
+    @Override
+    public final void onNextTaskStarted(AVTask task) {
+        // intentionally empty
+    }
+    
+
+    /** derived classes should override this function
+     * 
+     * @param now */
+    protected abstract void redispatch(double now);
+
+    
+
+    // ===================================================================================
+    // INFOLINE functions
+    
     /** derived classes should override this function to add details
      * 
      * @return */
@@ -215,16 +211,12 @@ abstract class VehicleMaintainer implements AVDispatcher {
                         .count());
     }
 
-    /** derived classes should override this function
-     * 
-     * @param now */
-    protected abstract void redispatch(double now);
-
-    @Override
-    public final void onNextTaskStarted(AVTask task) {
-        // intentionally empty
+    /** @param infoLinePeriod
+     *            positive values determine the period, negative values or 0 will disable the
+     *            printout */
+    public final void setInfoLinePeriod(int infoLinePeriod) {
+        this.infoLinePeriod = infoLinePeriod;
     }
-
 
 
 

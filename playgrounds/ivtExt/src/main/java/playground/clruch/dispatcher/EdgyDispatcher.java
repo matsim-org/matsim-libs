@@ -62,7 +62,7 @@ public class EdgyDispatcher extends RebalancingDispatcher {
             
             // 1) send stay vehicles to some closeby request closer than DISTCLOSE
             for (RoboTaxi robotaxi : getDivertableRoboTaxis()) {
-                if (robotaxi.isVehicleInStayTask()) {
+                if (robotaxi.isInStayTask()) {
                     Optional<AVRequest> someCloseRequest = requests.stream()
                             .filter(v -> CoordUtils.calcEuclideanDistance(v.getFromLink().getCoord(), robotaxi.getDivertableLocation().getCoord()) < DISTCLOSE)
                             .findAny();

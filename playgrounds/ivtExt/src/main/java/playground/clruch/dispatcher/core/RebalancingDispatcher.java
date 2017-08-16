@@ -27,7 +27,7 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
 
         // redivert roboTaxi, generate rebalancing event
         setRoboTaxiDiversion(roboTaxi, destination,AVStatus.REBALANCEDRIVE);
-        eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), roboTaxi.getAVVehicle(), destination));
+        eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), roboTaxi, destination));
     }
 
     @Override

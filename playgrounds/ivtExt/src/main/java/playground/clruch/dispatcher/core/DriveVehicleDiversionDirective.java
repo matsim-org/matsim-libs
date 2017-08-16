@@ -30,7 +30,7 @@ final class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
 
     @Override
     void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData) {
-        final Schedule schedule = robotaxi.getAVVehicle().getSchedule();
+        final Schedule schedule = robotaxi.getSchedule();
         final AVDriveTask avDriveTask = (AVDriveTask) schedule.getCurrentTask(); // <- implies that task is started
         final AVStayTask avStayTask = (AVStayTask) Schedules.getLastTask(schedule);
         final double scheduleEndTime = avStayTask.getEndTime();
