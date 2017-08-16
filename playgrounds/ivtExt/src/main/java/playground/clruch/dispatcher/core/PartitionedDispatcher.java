@@ -73,7 +73,7 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
     
     protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeArrivingWithCustomerRoboTaxis(){
         Map<VirtualNode, List<RoboTaxi>> returnMap =  virtualNetwork.createVNodeTypeMap();
-        for(RoboTaxi robotaxi : getRoboTaxisWithCustomer()){
+        for(RoboTaxi robotaxi : getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER)){
             VirtualNode toNode = virtualNetwork.getVirtualNode(robotaxi.getCurrentDriveDestination());
             returnMap.get(toNode).add(robotaxi);            
         }

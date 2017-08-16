@@ -219,7 +219,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                     { // done
                         /** Vehicles with customers still within node_i traveling on link_k =
                          * (node_i, node_j) */
-                        List<RoboTaxi> map = getRoboTaxisWithCustomer();
+                        List<RoboTaxi> map = getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER);
                         final Tensor vector = countVehiclesPerVLink(map);
                         accountedVehicles.addAll(map);
                         {

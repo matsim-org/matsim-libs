@@ -35,7 +35,6 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
         return roboTaxi.getAVStatus().equals(AVStatus.REBALANCEDRIVE);
     }
 
-    @Override
     protected List<RoboTaxi> getRebalancingRoboTaxis() {
         List<RoboTaxi> rebalancingRobotaxis = new ArrayList<>();
         for (RoboTaxi robotaxi : getRoboTaxis()) {
