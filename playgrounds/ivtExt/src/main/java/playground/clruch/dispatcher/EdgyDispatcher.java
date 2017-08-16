@@ -1,7 +1,9 @@
 // code by jph
 package playground.clruch.dispatcher;
 
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -14,6 +16,7 @@ import com.google.inject.name.Named;
 import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
+import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -29,10 +32,8 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * or requests which are waiting for more then MAXWAIT */
 public class EdgyDispatcher extends RebalancingDispatcher {
     private final int dispatchPeriod;
-
-    // final Network network; // <- for verifying link references
     private final double MAXWAIT = 10 * 60;
-    private final double DISTCLOSE = 3000.0;
+    private final double DISTCLOSE = 1000.0;
 
     private EdgyDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -57,22 +58,28 @@ public class EdgyDispatcher extends RebalancingDispatcher {
         final long round_now = Math.round(now);
         if (round_now % dispatchPeriod == 0) {
 
-            // iterate requests: send vehicles to some request closer than distClose m
-            // or to a request waiting for more than double waitMax
-            // TODO requests get lost, funny implementation, change this
-            Iterator<AVRequest> requestIterator = getAVRequests().iterator();
-            for (RoboTaxi roboTaxi : getDivertableRoboTaxis()) {
-                if (roboTaxi.isVehicleInStayTask()) {
-                    if (requestIterator.hasNext()) {
-                        AVRequest nextRequest = requestIterator.next();
-                        Link link = nextRequest.getFromLink();
-                        if (CoordUtils.calcEuclideanDistance(link.getCoord(), roboTaxi.getDivertableLocation().getCoord()) < DISTCLOSE
-                                || now - nextRequest.getSubmissionTime() > MAXWAIT) {
-                            setRoboTaxiRebalance(roboTaxi, link);
-                            ++total_driveOrder;
-                        }
-                    } else
-                        break;
+            Collection<AVRequest> requests = getAVRequests();
+            
+            // 1) send stay vehicles to some closeby request closer than DISTCLOSE
+            for (RoboTaxi robotaxi : getDivertableRoboTaxis()) {
+                if (robotaxi.isVehicleInStayTask()) {
+                    Optional<AVRequest> someCloseRequest = requests.stream()
+                            .filter(v -> CoordUtils.calcEuclideanDistance(v.getFromLink().getCoord(), robotaxi.getDivertableLocation().getCoord()) < DISTCLOSE)
+                            .findAny();
+                    if (someCloseRequest.isPresent()){
+                        setRoboTaxiRebalance(robotaxi, someCloseRequest.get().getFromLink()); 
+                    }
+                }
+            }
+            
+            
+            // 2) send some vehicle to requests waiting longer than MAXWAIT
+            for( AVRequest avRequest : requests){
+                if(now-avRequest.getSubmissionTime() > MAXWAIT){
+                    Optional<RoboTaxi> robotaxi =  getDivertableRoboTaxis().stream().findAny();
+                    if(robotaxi.isPresent()){
+                        setRoboTaxiRebalance(robotaxi.get(), avRequest.getFromLink());
+                    }
                 }
             }
         }
