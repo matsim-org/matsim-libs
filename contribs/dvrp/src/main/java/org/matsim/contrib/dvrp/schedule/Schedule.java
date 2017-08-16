@@ -28,6 +28,8 @@ import java.util.List;
  * <ul>
  * <li>This interface makes fairly strong assumptions on its implementation. I am wondering a bit if the design purpose
  * might not be better expressed by removing the interfaces and simply have the implementation. kai, feb'17
+ * <li>I am happy with Task as an interface. Otherwise casts like (List<DrtTask>)getTasks() would not work (directly).
+ * michalm, aug'17
  * </ul>
  * 
  * @author michalm
