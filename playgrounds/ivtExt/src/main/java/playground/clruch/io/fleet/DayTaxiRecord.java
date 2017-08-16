@@ -1,3 +1,4 @@
+// code by jph
 package playground.clruch.io.fleet;
 
 import java.util.ArrayList;
@@ -31,10 +32,9 @@ public class DayTaxiRecord {
 		int key = (int) ((taxiStamp.time - midnight) / 1000);
 		key -= key % modulus;
 
-		if (!sortedMap.containsKey(key)) {
-			// System.out.println(key);
+		if (!sortedMap.containsKey(key))
 			sortedMap.put(key, new ArrayList<>());
-		}
+
 		sortedMap.get(key).add(taxiStamp);
 	}
 
