@@ -395,11 +395,11 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     round_now, getInfoLine(), total_matchedRequests);
 
             // adding requests submitted and matched within current publish period
-            simulationObjectCompiler.addRequests(publishPeriodMatchedRequests);
+            simulationObjectCompiler.insertRequests(publishPeriodMatchedRequests);
             // adding requests open in >=1 publish periods
-            simulationObjectCompiler.addRequests(getAVRequests());
+            simulationObjectCompiler.insertRequests(getAVRequests());
             
-            simulationObjectCompiler.addVehicles(super.getRoboTaxis());
+            simulationObjectCompiler.insertVehicles(super.getRoboTaxis());
             SimulationObject simulationObject = simulationObjectCompiler.compile();
             
             // in the first pass, the vehicles is typically empty
