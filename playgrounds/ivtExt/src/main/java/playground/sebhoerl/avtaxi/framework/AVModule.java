@@ -37,7 +37,6 @@ import playground.clruch.dispatcher.MonoMultiGBMDispatcher;
 import playground.clruch.dispatcher.NewSingleHeuristicDispatcher;
 import playground.clruch.dispatcher.UncoordinatedDispatcher;
 import playground.fseccamo.dispatcher.MPCDispatcher1;
-import playground.fseccamo.dispatcher.MPCDispatcher2;
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVConfigReader;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -148,9 +147,6 @@ public class AVModule extends AbstractModule {
 
         bind(MPCDispatcher1.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), MPCDispatcher1.class.getSimpleName()).to(MPCDispatcher1.Factory.class);
-
-        bind(MPCDispatcher2.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), MPCDispatcher2.class.getSimpleName()).to(MPCDispatcher2.Factory.class);
 
     }
 

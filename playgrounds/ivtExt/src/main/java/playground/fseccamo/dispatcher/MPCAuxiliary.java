@@ -75,12 +75,12 @@ public class MPCAuxiliary {
         
         // execute the computed matching
         for (Entry<RoboTaxi, AVRequest> entry : matching.entrySet()) {
-            
-            pickupAssignments.put(entry.getKey(), entry.getValue());
-            mpcDispatcher.getMatchings().put(entry.getValue(), entry.getKey());
-            ++totalPickupEffectiveAdd;
-        }
-        
+            if(totalPickupEffectiveAdd < min){
+                pickupAssignments.put(entry.getKey(), entry.getValue());
+                mpcDispatcher.getMatchings().put(entry.getValue(), entry.getKey());
+                ++totalPickupEffectiveAdd;                
+            }
+        }        
         return totalPickupEffectiveAdd;
     }
     
