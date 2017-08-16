@@ -107,7 +107,15 @@ public class SelfishDispatcher extends RebalancingDispatcher {
                 GlobalAssert.that(openRequests.size() == pendingRequestsTree.size());
                 
                 // ensure all requests recorded properly
-                GlobalAssert.that(requestsServed.values().stream().mapToInt(List::size).sum() == getTotalMatchedRequests());
+                GlobalAssert.that(false);
+                // TODO getTotalMatchedRequests was removed from API, find different solution. 
+                
+                // /** @return total matched request until now */
+                // public int getTotalMatchedRequests() {
+                // return total_matchedRequests;
+                // }
+                
+                //GlobalAssert.that(requestsServed.values().stream().mapToInt(List::size).sum() == getTotalMatchedRequests());
 
                 // update reference positions periodically
                 if ((round_now % updateRefPeriod == 0) && (requestsServed.size() > 10)) {

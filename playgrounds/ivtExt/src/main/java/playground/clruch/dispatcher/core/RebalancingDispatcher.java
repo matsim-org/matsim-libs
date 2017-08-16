@@ -24,15 +24,9 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
 
     protected synchronized final void setRoboTaxiRebalance(final RoboTaxi roboTaxi, final Link destination) {
         GlobalAssert.that(roboTaxi.isWithoutCustomer());
-        roboTaxi.setAVStatus(AVStatus.REBALANCEDRIVE);
-
-        // in case vehicle is picking up, remove from pickup register
-        if (pickupRegister.containsValue(roboTaxi)) {
-            pickupRegister.remove(pickupRegister.inverse().get(roboTaxi), roboTaxi);
-        }
 
         // redivert roboTaxi, generate rebalancing event
-        setRoboTaxiDiversion(roboTaxi, destination);
+        setRoboTaxiDiversion(roboTaxi, destination,AVStatus.REBALANCEDRIVE);
         eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), roboTaxi.getAVVehicle(), destination));
     }
 
