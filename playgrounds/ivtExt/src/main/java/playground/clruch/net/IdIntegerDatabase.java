@@ -12,4 +12,8 @@ public class IdIntegerDatabase {
             map.put(string, map.size());
         return map.get(string);
     }
+
+	public int size() {
+		return map.size();
+	}
 }
