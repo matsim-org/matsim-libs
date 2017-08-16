@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.utils.collections.QuadTree;
 
+import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
@@ -41,7 +42,7 @@ public class MPCAuxiliary {
                     mpcRequest.avRequest.getFromLink().getCoord().getY());
             
             
-            GlobalAssert.that(!mpcDispatcher.getRoboTaxiInMatching().contains(robotaxi));
+            GlobalAssert.that(!mpcDispatcher.getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER).contains(robotaxi));
             {
                 boolean removed = cars.remove(robotaxi);
                 GlobalAssert.that(removed);
@@ -50,7 +51,6 @@ public class MPCAuxiliary {
             
             // dispatch the car and bookkeeping
             pickupAssignments.put(robotaxi, mpcRequest.avRequest);
-            mpcDispatcher.getMatchings().put(mpcRequest.avRequest, robotaxi);
             ++totalPickupEffectiveAdd;
         }
 
@@ -77,7 +77,6 @@ public class MPCAuxiliary {
         for (Entry<RoboTaxi, AVRequest> entry : matching.entrySet()) {
             if(totalPickupEffectiveAdd < min){
                 pickupAssignments.put(entry.getKey(), entry.getValue());
-                mpcDispatcher.getMatchings().put(entry.getValue(), entry.getKey());
                 ++totalPickupEffectiveAdd;                
             }
         }        

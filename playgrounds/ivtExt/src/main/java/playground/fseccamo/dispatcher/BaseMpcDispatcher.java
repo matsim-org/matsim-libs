@@ -127,40 +127,7 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
 	// requests that haven't received a pickup order yet
 	final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
 
-	// requests that have received a pickup order but are not yet "pickedup"
-	// private final Map<AVRequest, AVVehicle> matchings = new HashMap<>();
-	//
-	protected Map<AVRequest, RoboTaxi> getMatchings() {
-		return pickupRegister;
-	}
 
-	// @Override
-	// protected final void protected_setAcceptRequest_postProcessing(AVVehicle
-	// avVehicle, AVRequest avRequest) {
-	// boolean succPR = pendingRequests.remove(avRequest);
-	// GlobalAssert.that(succPR);
-	// {
-	// AVVehicle former = matchings.remove(avRequest);
-	// GlobalAssert.that(former != null);
-	// }
-	// {
-	// MpcRequest former = mpcRequestsMap.remove(avRequest);
-	// GlobalAssert.that(former != null);
-	// }
-	// }
-
-//	Map<VirtualNode, List<VehicleLinkPair>> getDivertableNotRebalancingNotPickupVehicles() {
-//		Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
-//		Set<AVVehicle> pickupBusy = getMatchings().values().stream().collect(Collectors.toSet());
-//		Map<VirtualNode, List<VehicleLinkPair>> map = new HashMap<>();
-//		for (Entry<VirtualNode, List<VehicleLinkPair>> entry : availableVehicles.entrySet()) {
-//			List<VehicleLinkPair> list = entry.getValue().stream() //
-//					.filter(vlp -> !pickupBusy.contains(vlp.avVehicle)) //
-//					.collect(Collectors.toList());
-//			map.put(entry.getKey(), list);
-//		}
-//		return map;
-//	}
 
 	Map<VirtualNode, List<RoboTaxi>> getDivertableNotRebalancingNotPickupVehicles() {
 	    Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
@@ -176,30 +143,18 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
 	    return returnMap;
 	}
 
-	/**
-	 * @return requests that have received a pickup order (and are therefore
-	 *         contained in considerItDone)
-	 */
-	Map<Link, List<AVRequest>> override_getAVRequestsAtLinks() {
-		// intentionally not parallel to guarantee ordering of requests
-		return getAVRequests().stream() //
-				.filter(avRequest -> getMatchings().containsKey(avRequest)) //
-				.collect(Collectors.groupingBy(AVRequest::getFromLink));
-	}
+//	/**
+//	 * @return requests that have received a pickup order (and are therefore
+//	 *         contained in considerItDone)
+//	 */
+//	Map<Link, List<AVRequest>> override_getAVRequestsAtLinks() {
+//		// intentionally not parallel to guarantee ordering of requests
+//		return getAVRequests().stream() //
+//				.filter(avRequest -> getMatchings().containsKey(avRequest)) //
+//				.collect(Collectors.groupingBy(AVRequest::getFromLink));
+//	}
 
-	Collection<AVRequest> getAVRequestsUnserved() {
-		Collection<AVRequest> collection = new LinkedList<>();
-		for (AVRequest avRequest : getAVRequests()) // all current requests
-			// only count request that haven't received a pickup order yet
-			if (!getMatchings().containsKey(avRequest))
-				collection.add(avRequest);
-		return collection;
 
-	}
-
-	Set<RoboTaxi> getRoboTaxiInMatching() {
-		return getMatchings().values().stream().collect(Collectors.toSet());
-	}
 
 	/**
 	 * function computes mpcRequest objects for unserved requests
@@ -209,7 +164,7 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
 	void manageIncomingRequests(double now) {
 		final int m = virtualNetwork.getvLinksCount();
 
-		for (AVRequest avRequest : getAVRequestsUnserved()) // all current
+		for (AVRequest avRequest : getUnassignedAVRequests()) // all current
 															// requests
 			// only count request that haven't received a pickup order yet
 			// or haven't been processed yet, i.e. if request has been
@@ -266,3 +221,33 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
 	
 
 }
+
+
+
+// @Override
+// protected final void protected_setAcceptRequest_postProcessing(AVVehicle
+// avVehicle, AVRequest avRequest) {
+// boolean succPR = pendingRequests.remove(avRequest);
+// GlobalAssert.that(succPR);
+// {
+// AVVehicle former = matchings.remove(avRequest);
+// GlobalAssert.that(former != null);
+// }
+// {
+// MpcRequest former = mpcRequestsMap.remove(avRequest);
+// GlobalAssert.that(former != null);
+// }
+// }
+
+//Map<VirtualNode, List<VehicleLinkPair>> getDivertableNotRebalancingNotPickupVehicles() {
+//  Map<VirtualNode, List<VehicleLinkPair>> availableVehicles = getVirtualNodeDivertableNotRebalancingVehicles();
+//  Set<AVVehicle> pickupBusy = getMatchings().values().stream().collect(Collectors.toSet());
+//  Map<VirtualNode, List<VehicleLinkPair>> map = new HashMap<>();
+//  for (Entry<VirtualNode, List<VehicleLinkPair>> entry : availableVehicles.entrySet()) {
+//      List<VehicleLinkPair> list = entry.getValue().stream() //
+//              .filter(vlp -> !pickupBusy.contains(vlp.avVehicle)) //
+//              .collect(Collectors.toList());
+//      map.put(entry.getKey(), list);
+//  }
+//  return map;
+//}

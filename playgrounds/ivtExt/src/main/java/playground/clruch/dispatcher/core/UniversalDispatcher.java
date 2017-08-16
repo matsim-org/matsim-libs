@@ -55,8 +55,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final FuturePathFactory futurePathFactory;
     private final Set<AVRequest> pendingRequests = new LinkedHashSet<>();
     private final Set<AVRequest> publishPeriodMatchedRequests = new HashSet<>(); 
-
-    // TODO visibility of map to private
     private final BiMap<AVRequest, RoboTaxi> pickupRegister = HashBiMap.create();
 
     /** map stores most recently known location of vehicles. map is used in case obtaining the
@@ -373,6 +371,10 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         }
     }
     
+    
+    protected final AVRequest getRoboTaxiPickupRequest(RoboTaxi robotaxi){
+        return pickupRegister.inverse().get(robotaxi);
+    }
 
 
     protected int getDispatchPeriod(SafeConfig safeConfig, int alt) {
