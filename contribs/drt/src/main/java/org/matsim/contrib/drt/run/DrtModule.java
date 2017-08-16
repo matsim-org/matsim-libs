@@ -3,6 +3,8 @@ package org.matsim.contrib.drt.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.validator.*;
+import org.matsim.contrib.drt.optimizer.depot.*;
+import org.matsim.contrib.drt.optimizer.rebalancing.*;
 import org.matsim.contrib.drt.routing.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
@@ -23,6 +25,8 @@ public final class DrtModule extends AbstractModule {
 
 		bind(Fleet.class).toProvider(DefaultDrtFleetProvider.class).asEagerSingleton();
 		bind(DrtRequestValidator.class).to(DefaultDrtRequestValidator.class);
+		bind(DepotFinder.class).to(NearestStartLinkAsDepot.class);
+		bind(RebalancingStrategy.class).to(SendToStartLinkStrategy.class);
 
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:

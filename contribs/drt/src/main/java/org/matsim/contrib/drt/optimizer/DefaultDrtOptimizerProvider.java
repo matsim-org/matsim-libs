@@ -21,9 +21,10 @@ package org.matsim.contrib.drt.optimizer;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
-import org.matsim.contrib.drt.optimizer.depot.*;
+import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.insertion.filter.*;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.*;
 import org.matsim.contrib.dvrp.data.Fleet;
@@ -49,6 +50,8 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 	private final TravelTime travelTime;
 	private final QSim qSim;
 	private final DrtRequestValidator requestValidator;
+	private final DepotFinder depotFinder;
+	private final RebalancingStrategy rebalancingStrategy;
 
 	@Inject(optional = true)
 	private @Named(DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory;
@@ -56,13 +59,15 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 	@Inject
 	public DefaultDrtOptimizerProvider(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
 			Fleet fleet, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim,
-			DrtRequestValidator requestValidator) {
+			DrtRequestValidator requestValidator, DepotFinder depotFinder, RebalancingStrategy rebalancingStrategy) {
 		this.drtCfg = drtCfg;
 		this.network = network;
 		this.fleet = fleet;
 		this.travelTime = travelTime;
 		this.qSim = qSim;
 		this.requestValidator = requestValidator;
+		this.depotFinder = depotFinder;
+		this.rebalancingStrategy = rebalancingStrategy;
 	}
 
 	@Override
@@ -76,10 +81,10 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 		TravelDisutility travelDisutility = travelDisutilityFactory == null ? new TimeAsTravelDisutility(travelTime)
 				: travelDisutilityFactory.createTravelDisutility(travelTime);
 
-		DepotFinder depotFinder = drtCfg.getIdleVehiclesReturnToDepots() ? new NearestStartLinkAsDepot(fleet) : null;
-
 		DrtOptimizerContext optimContext = new DrtOptimizerContext(fleet, network, qSim.getSimTimer(), travelTime,
-				travelDisutility, scheduler, qSim.getEventsManager(), filter, requestValidator, depotFinder, null);
+				travelDisutility, scheduler, qSim.getEventsManager(), filter, requestValidator,
+				drtCfg.getIdleVehiclesReturnToDepots() ? depotFinder : null,
+				drtCfg.getRebalancingInterval() != 0 ? rebalancingStrategy : null);
 
 		return new InsertionDrtOptimizer(optimContext, drtCfg);
 	}

@@ -68,7 +68,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private double AStarEuclideanOverdoFactor = 1.;// >= 1.0
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
-	private int rebalancingInterval = 5 * 60;// [s], 5 minutes by default
+	private int rebalancingInterval = 0;// [s], if 0 then no rebalancing
 	private boolean idleVehiclesReturnToDepots = false;
 	private OperationalScheme operationalScheme = OperationalScheme.door2door;
 
@@ -120,7 +120,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		map.put(PLOT_VEH_STATS,
 				"Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration. "
 						+ "False by default.");
-		map.put(REBALANCING_INTERVAL, "Specifies how often empty vehicle rebalancing is executed");
+		map.put(REBALANCING_INTERVAL,
+				"Specifies how often empty vehicle rebalancing is executed. 0 means no rebalancing.");
 		map.put(IDLE_VEHICLES_RETURN_TO_DEPOTS,
 				"Idle vehicles return to the nearest of all start links. See: Vehicle.getStartLink()");
 		map.put(OPERATIONAL_SCHEME, "Operational Scheme, either door2door or stationbased. door2door by default");

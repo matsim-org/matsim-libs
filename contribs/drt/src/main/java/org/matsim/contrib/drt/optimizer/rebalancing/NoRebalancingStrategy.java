@@ -17,49 +17,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.optimizer.depot;
+package org.matsim.contrib.drt.optimizer.rebalancing;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.util.distance.DistanceUtils;
-
-import com.google.inject.Inject;
+import org.matsim.contrib.dvrp.data.Vehicle;
 
 /**
  * @author michalm
  */
-public class NearestStartLinkAsDepot implements DepotFinder {
-	private final Set<Link> startLinks = new HashSet<>();
-
-	@Inject
-	public NearestStartLinkAsDepot(Fleet fleet) {
-		for (Vehicle v : fleet.getVehicles().values()) {
-			startLinks.add(v.getStartLink());
-		}
-	}
-
-	// TODO a simple straight-line search (for the time being)... MultiNodeDijkstra should be the ultimate solution
+public class NoRebalancingStrategy implements RebalancingStrategy {
 	@Override
-	public Link findDepot(Vehicle vehicle) {
-		DrtStayTask currentTask = (DrtStayTask)vehicle.getSchedule().getCurrentTask();
-		Link currentLink = currentTask.getLink();
-		if (startLinks.contains(currentLink)) {
-			return null;// stay where it is
-		}
-
-		Link bestLink = null;
-		double bestDistance = Double.MAX_VALUE;
-		for (Link l : startLinks) {
-			double currentDistance = DistanceUtils.calculateSquaredDistance(currentLink.getCoord(), l.getCoord());
-			if (currentDistance < bestDistance) {
-				bestDistance = currentDistance;
-				bestLink = l;
-			}
-		}
-
-		return bestLink;
+	public List<Relocation> calcRelocations(Iterable<? extends Vehicle> rebalancableVehicles) {
+		return Collections.emptyList();
 	}
 }

@@ -40,8 +40,8 @@ import com.google.common.collect.Iterables;
 public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 	private final DrtOptimizerContext optimContext;
 	private final Collection<DrtRequest> unplannedRequests;
-	private final int rebalancingPeriod = 5 * 60; // 5 minutes
 	private final EmptyVehicleRelocator relocator;
+	private final int rebalancingInterval;
 
 	private boolean requiresReoptimization = false;
 
@@ -49,6 +49,7 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 			Collection<DrtRequest> unplannedRequests) {
 		this.optimContext = optimContext;
 		this.unplannedRequests = unplannedRequests;
+		this.rebalancingInterval = drtCfg.getRebalancingInterval();
 
 		relocator = new EmptyVehicleRelocator(optimContext.network, optimContext.travelTime,
 				optimContext.travelDisutility, optimContext.scheduler);
@@ -65,7 +66,7 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 			requiresReoptimization = false;
 		}
 
-		if (optimContext.rebalancingStrategy != null && e.getSimulationTime() % rebalancingPeriod == 0) {
+		if (optimContext.rebalancingStrategy != null && e.getSimulationTime() % rebalancingInterval == 0) {
 			rebalanceFleet();
 		}
 	}
@@ -74,14 +75,10 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 		// right now we relocate only idle vehicles (vehicles that are being relocated cannot be relocated)
 		Iterable<? extends Vehicle> rebalancableVehicles = Iterables
 				.filter(getOptimContext().fleet.getVehicles().values(), optimContext.scheduler::isIdle);
-
 		List<Relocation> relocations = optimContext.rebalancingStrategy.calcRelocations(rebalancableVehicles);
 
 		for (Relocation r : relocations) {
-			relocator.relocateVehicle(r.vehicle, r.link, optimContext.timer.getTimeOfDay());
-			DrtStayTask currentTask = (DrtStayTask)r.vehicle.getSchedule().getCurrentTask();
-			Link currentLink = currentTask.getLink();
-
+			Link currentLink = ((DrtStayTask)r.vehicle.getSchedule().getCurrentTask()).getLink();
 			if (currentLink != r.link) {
 				relocator.relocateVehicle(r.vehicle, r.link, optimContext.timer.getTimeOfDay());
 			}
@@ -106,6 +103,8 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 	@Override
 	public void nextTask(Vehicle vehicle) {
 		optimContext.scheduler.updateBeforeNextTask(vehicle);
+
+		vehicle.getSchedule().nextTask();
 
 		// if STOP->STAY then choose the best depot
 		if (optimContext.depotFinder != null && Depots.isSwitchingFromStopToStay(vehicle)) {
