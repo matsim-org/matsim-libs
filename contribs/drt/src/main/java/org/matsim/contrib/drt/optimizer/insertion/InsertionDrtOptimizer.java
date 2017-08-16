@@ -45,7 +45,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 	private final boolean printWarnings;
 
 	public InsertionDrtOptimizer(DrtOptimizerContext optimContext, DrtConfigGroup drtCfg) {
-		super(optimContext, new TreeSet<DrtRequest>(Requests.ABSOLUTE_COMPARATOR));
+		super(optimContext, drtCfg, new TreeSet<DrtRequest>(Requests.ABSOLUTE_COMPARATOR));
 		this.eventsManager = optimContext.eventsManager;
 		printWarnings = drtCfg.isPrintDetailedWarnings();
 

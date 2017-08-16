@@ -40,6 +40,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public static final String A_STAR_EUCLIDEAN_OVERDO_FACTOR = "AStarEuclideanOverdoFactor";
 	public static final String CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE = "changeStartLinkToLastLinkInSchedule";
 
+	public static final String REBALANCING_INTERVAL = "rebalancingInterval";
 	public static final String IDLE_VEHICLES_RETURN_TO_DEPOTS = "idleVehiclesReturnToDepots";
 	private static final String OPERATIONAL_SCHEME = "operationalScheme";
 
@@ -67,6 +68,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private double AStarEuclideanOverdoFactor = 1.;// >= 1.0
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
+	private int rebalancingInterval = 5 * 60;// [s], 5 minutes by default
 	private boolean idleVehiclesReturnToDepots = false;
 	private OperationalScheme operationalScheme = OperationalScheme.door2door;
 
@@ -83,12 +85,10 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 	private int kNearestVehicles = 0;
-	
+
 	public enum OperationalScheme {
 		stationbased, door2door
 	}
-	
-	
 
 	public DrtConfigGroup() {
 		super(GROUP_NAME);
@@ -120,6 +120,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		map.put(PLOT_VEH_STATS,
 				"Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration. "
 						+ "False by default.");
+		map.put(REBALANCING_INTERVAL, "Specifies how often empty vehicle rebalancing is executed");
 		map.put(IDLE_VEHICLES_RETURN_TO_DEPOTS,
 				"Idle vehicles return to the nearest of all start links. See: Vehicle.getStartLink()");
 		map.put(OPERATIONAL_SCHEME, "Operational Scheme, either door2door or stationbased. door2door by default");
@@ -135,7 +136,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 						+ "If unset, the number of threads is equal to the number of logical cores available to JVM.");
 		map.put(PRINT_WARNINGS,
 				"Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.");
-		map.put(K_NEAREST_VEHICLES, "Filters the k nearest vehicles to the request. Speeds up simulation with big fleets, but could lead to a worse solution. Default: k==0 (no filtering used)");
+		map.put(K_NEAREST_VEHICLES,
+				"Filters the k nearest vehicles to the request. Speeds up simulation with big fleets, but could lead to a worse solution. Default: k==0 (no filtering used)");
 		return map;
 	}
 
@@ -194,7 +196,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 		return changeStartLinkToLastLinkInSchedule;
 	}
 
-	
 	/**
 	 * @return the kNearestVehicles
 	 */
@@ -202,15 +203,16 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public int getkNearestVehicles() {
 		return kNearestVehicles;
 	}
-	
+
 	/**
-	 * @param kNearestVehicles the kNearestVehicles to set
+	 * @param kNearestVehicles
+	 *            the kNearestVehicles to set
 	 */
 	@StringSetter(K_NEAREST_VEHICLES)
 	public void setkNearestVehicles(int kNearestVehicles) {
 		this.kNearestVehicles = kNearestVehicles;
 	}
-	
+
 	@StringSetter(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE)
 	public void setChangeStartLinkToLastLinkInSchedule(boolean changeStartLinkToLastLinkInSchedule) {
 		this.changeStartLinkToLastLinkInSchedule = changeStartLinkToLastLinkInSchedule;
@@ -228,6 +230,16 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	public URL getVehiclesFileUrl(URL context) {
 		return ConfigGroup.getInputFileURL(context, this.vehiclesFile);
+	}
+
+	@StringGetter(REBALANCING_INTERVAL)
+	public int getRebalancingInterval() {
+		return rebalancingInterval;
+	}
+
+	@StringSetter(REBALANCING_INTERVAL)
+	public void setRebalancingInterval(int rebalancingInterval) {
+		this.rebalancingInterval = rebalancingInterval;
 	}
 
 	@StringGetter(IDLE_VEHICLES_RETURN_TO_DEPOTS)

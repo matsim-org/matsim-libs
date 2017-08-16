@@ -21,7 +21,8 @@ package org.matsim.contrib.drt.optimizer;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
-import org.matsim.contrib.drt.optimizer.insertion.*;
+import org.matsim.contrib.drt.optimizer.depot.*;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.insertion.filter.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.scheduler.*;
@@ -75,10 +76,11 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 		TravelDisutility travelDisutility = travelDisutilityFactory == null ? new TimeAsTravelDisutility(travelTime)
 				: travelDisutilityFactory.createTravelDisutility(travelTime);
 
-		DrtOptimizerContext optimContext = new DrtOptimizerContext(fleet, network, qSim.getSimTimer(), travelTime,
-				travelDisutility, scheduler, qSim.getEventsManager(), filter, requestValidator);
+		DepotFinder depotFinder = drtCfg.getIdleVehiclesReturnToDepots() ? new NearestStartLinkAsDepot(fleet) : null;
 
-		return drtCfg.getIdleVehiclesReturnToDepots() ? new InsertionDrtOptimizerWithDepots(optimContext, drtCfg)
-				: new InsertionDrtOptimizer(optimContext, drtCfg);
+		DrtOptimizerContext optimContext = new DrtOptimizerContext(fleet, network, qSim.getSimTimer(), travelTime,
+				travelDisutility, scheduler, qSim.getEventsManager(), filter, requestValidator, depotFinder, null);
+
+		return new InsertionDrtOptimizer(optimContext, drtCfg);
 	}
 }

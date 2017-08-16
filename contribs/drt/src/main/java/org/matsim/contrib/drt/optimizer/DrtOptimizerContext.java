@@ -2,7 +2,9 @@ package org.matsim.contrib.drt.optimizer;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
+import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.scheduler.DrtScheduler;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -22,10 +24,13 @@ public class DrtOptimizerContext {
 	public final EventsManager eventsManager;
 	public final DrtVehicleFilter vehicleFilter;
 	public final DrtRequestValidator requestValidator;
+	public final DepotFinder depotFinder;
+	public final RebalancingStrategy rebalancingStrategy;
 
 	public DrtOptimizerContext(Fleet fleet, Network network, MobsimTimer timer, TravelTime travelTime,
 			TravelDisutility travelDisutility, DrtScheduler scheduler, EventsManager eventsManager,
-			DrtVehicleFilter filter, DrtRequestValidator validator) {
+			DrtVehicleFilter filter, DrtRequestValidator validator, DepotFinder depotFinder,
+			RebalancingStrategy rebalancingStrategy) {
 		this.fleet = fleet;
 		this.network = network;
 		this.timer = timer;
@@ -35,5 +40,7 @@ public class DrtOptimizerContext {
 		this.eventsManager = eventsManager;
 		this.vehicleFilter = filter;
 		this.requestValidator = validator;
+		this.depotFinder = depotFinder;
+		this.rebalancingStrategy = rebalancingStrategy;
 	}
 }

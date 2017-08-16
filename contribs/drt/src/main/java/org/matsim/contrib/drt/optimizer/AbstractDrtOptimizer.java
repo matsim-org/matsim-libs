@@ -19,15 +19,20 @@
 
 package org.matsim.contrib.drt.optimizer;
 
-import java.util.Collection;
+import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.data.DrtRequest;
+import org.matsim.contrib.drt.optimizer.depot.Depots;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
-import org.matsim.contrib.drt.schedule.DrtTask;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+
+import com.google.common.collect.Iterables;
 
 /**
  * @author michalm
@@ -35,12 +40,18 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 	private final DrtOptimizerContext optimContext;
 	private final Collection<DrtRequest> unplannedRequests;
+	private final int rebalancingPeriod = 5 * 60; // 5 minutes
+	private final EmptyVehicleRelocator relocator;
 
 	private boolean requiresReoptimization = false;
 
-	public AbstractDrtOptimizer(DrtOptimizerContext optimContext, Collection<DrtRequest> unplannedRequests) {
+	public AbstractDrtOptimizer(DrtOptimizerContext optimContext, DrtConfigGroup drtCfg,
+			Collection<DrtRequest> unplannedRequests) {
 		this.optimContext = optimContext;
 		this.unplannedRequests = unplannedRequests;
+
+		relocator = new EmptyVehicleRelocator(optimContext.network, optimContext.travelTime,
+				optimContext.travelDisutility, optimContext.scheduler);
 	}
 
 	@Override
@@ -52,6 +63,28 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 
 			scheduleUnplannedRequests();
 			requiresReoptimization = false;
+		}
+
+		if (optimContext.rebalancingStrategy != null && e.getSimulationTime() % rebalancingPeriod == 0) {
+			rebalanceFleet();
+		}
+	}
+
+	private void rebalanceFleet() {
+		// right now we relocate only idle vehicles (vehicles that are being relocated cannot be relocated)
+		Iterable<? extends Vehicle> rebalancableVehicles = Iterables
+				.filter(getOptimContext().fleet.getVehicles().values(), optimContext.scheduler::isIdle);
+
+		List<Relocation> relocations = optimContext.rebalancingStrategy.calcRelocations(rebalancableVehicles);
+
+		for (Relocation r : relocations) {
+			relocator.relocateVehicle(r.vehicle, r.link, optimContext.timer.getTimeOfDay());
+			DrtStayTask currentTask = (DrtStayTask)r.vehicle.getSchedule().getCurrentTask();
+			Link currentLink = currentTask.getLink();
+
+			if (currentLink != r.link) {
+				relocator.relocateVehicle(r.vehicle, r.link, optimContext.timer.getTimeOfDay());
+			}
 		}
 	}
 
@@ -73,15 +106,14 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 	@Override
 	public void nextTask(Vehicle vehicle) {
 		optimContext.scheduler.updateBeforeNextTask(vehicle);
-		
-		Task newCurrentTask = vehicle.getSchedule().nextTask();
-		if (!requiresReoptimization && newCurrentTask != null) {// schedule != COMPLETED
-			requiresReoptimization = doReoptimizeAfterNextTask((DrtTask)newCurrentTask);
-		}
-	}
 
-	protected boolean doReoptimizeAfterNextTask(DrtTask newCurrentTask) {
-		return false;
+		// if STOP->STAY then choose the best depot
+		if (optimContext.depotFinder != null && Depots.isSwitchingFromStopToStay(vehicle)) {
+			Link depotLink = optimContext.depotFinder.findDepot(vehicle);
+			if (depotLink != null) {
+				relocator.relocateVehicle(vehicle, depotLink, optimContext.timer.getTimeOfDay());
+			}
+		}
 	}
 
 	@Override
