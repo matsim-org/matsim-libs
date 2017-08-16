@@ -125,14 +125,14 @@ public class SelfishDispatcher extends RebalancingDispatcher {
                 // if requests present ...
                 if (!getAVRequests().isEmpty()) { 
                     if (subStrategy.equals("noComm")) { // send every vehicle to closest customer
-                        for (RoboTaxi vehicleLinkPair : getDivertableVehicleLinkPairs()) {
+                        for (RoboTaxi vehicleLinkPair : getDivertableRoboTaxis()) {
                             Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
                             AVRequest closestRequest = pendingRequestsTree.getClosest(vehicleCoord.getX(), vehicleCoord.getY()); 
                             setRoboTaxiPickup(vehicleLinkPair, closestRequest);
                         }
                     } else if (subStrategy.equals("voronoi")) { // use the Voronoi sets in the selfish strategy
                         HashMap<AVVehicle, QuadTree<AVRequest>> voronoiSets = computeVoronoiSets();
-                        for (RoboTaxi vehicleLinkPair : getDivertableVehicleLinkPairs()) {
+                        for (RoboTaxi vehicleLinkPair : getDivertableRoboTaxis()) {
                             Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
                             // TODO adapt to new API
                             GlobalAssert.that(false);
@@ -146,7 +146,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
                         }   
                     } else if (subStrategy.equals("selfishLoiter")) { //
                         for (AVRequest pendingRequest : getAVRequests()) {
-                            if (getDivertableVehicles().size() == 0) {
+                            if (getDivertableRoboTaxis().size() == 0) {
                                 continue;
                             } else {
                             RoboTaxi closestDivertableVehicle = findClosestDivertableVehicle(pendingRequest);
@@ -159,7 +159,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
                 }
                 
                 // send remaining vehicles to their reference position
-                for (RoboTaxi vehicleLinkPair : getDivertableVehicleLinkPairs()) {
+                for (RoboTaxi vehicleLinkPair : getDivertableRoboTaxis()) {
                     // TODO adapt to new API
 //                    GlobalAssert.that(refPositions.containsKey(vehicleLinkPair.getAVVehicle()));
                     GlobalAssert.that(refPositions.containsKey(null));
@@ -220,7 +220,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
         Coord requestCoord = avRequest.getFromLink().getCoord();
         RoboTaxi closestVehicle = null;
         double closestDistance = Double.POSITIVE_INFINITY;
-        for (RoboTaxi vehicleLinkPair : getDivertableVehicleLinkPairs()) {
+        for (RoboTaxi vehicleLinkPair : getDivertableRoboTaxis()) {
             Coord vehicleCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
             double distance = Math.hypot(requestCoord.getX() - vehicleCoord.getX(), requestCoord.getY() - vehicleCoord.getY());
             if (distance < closestDistance) {
@@ -286,7 +286,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
             Coord requestCoord = avRequest.getFromLink().getFromNode().getCoord();
             AVVehicle closestVehicle = null;
             double closestDistance = Double.POSITIVE_INFINITY;
-            for (RoboTaxi vehicleLinkPair : getDivertableVehicleLinkPairs()) {
+            for (RoboTaxi vehicleLinkPair : getDivertableRoboTaxis()) {
                 
                 // Coord avCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
                 GlobalAssert.that(false);
