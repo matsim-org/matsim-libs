@@ -148,7 +148,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
     }
 
     @Override
-    public String getInfoLine() {
+    protected String getInfoLine() {
         return String.format("%s RV=%s H=%s", //
                 super.getInfoLine(), //
                 total_rebalanceCount, //

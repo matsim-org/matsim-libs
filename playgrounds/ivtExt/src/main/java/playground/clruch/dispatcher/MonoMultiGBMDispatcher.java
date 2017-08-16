@@ -74,7 +74,7 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
     }
 
     @Override
-    public String getInfoLine() {
+    protected String getInfoLine() {
         return String.format("%s H=%s", //
                 super.getInfoLine(), //
                 printVals.toString() //

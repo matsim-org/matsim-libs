@@ -86,7 +86,7 @@ public class EdgyDispatcher extends RebalancingDispatcher {
     }
 
     @Override
-    public String getInfoLine() {
+    protected String getInfoLine() {
         return String.format("%s AT=%5d do=%5d", //
                 super.getInfoLine(), //
                 total_abortTrip, //

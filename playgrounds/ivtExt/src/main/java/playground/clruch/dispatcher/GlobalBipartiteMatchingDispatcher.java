@@ -42,7 +42,7 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
     }
 
     @Override
-    public String getInfoLine() {
+    protected String getInfoLine() {
         return String.format("%s H=%s", //
                 super.getInfoLine(), //
                 printVals.toString() //
