@@ -64,12 +64,10 @@ public class PlanToDynAgentLogicAdapter implements DynAgentLogic {
 		if (planElem instanceof Activity) {
 			Activity act = (Activity)planElem;
 			return new StaticDynActivity(act.getType(), act.getEndTime());
-		} else if (planElem instanceof Leg) {
-			// only the 'car' mode supported right now
-			Leg leg = (Leg)planElem;
-			return new StaticDriverDynLeg(leg.getMode(), (NetworkRoute)leg.getRoute());
-		} else {
-			throw new IllegalStateException();
 		}
+
+		// only the 'car' mode supported right now
+		Leg leg = (Leg)planElem;
+		return new StaticDriverDynLeg(leg.getMode(), (NetworkRoute)leg.getRoute());
 	}
 }

@@ -29,8 +29,8 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 public class Schedules {
-	public static final Predicate<Task> STAY_TASK_PREDICATE = input -> input instanceof StayTask;
-	public static final Predicate<Task> DRIVE_TASK_PREDICATE = input -> input instanceof DriveTask;
+	public static final Predicate<Task> STAY_TASK_PREDICATE = t -> t instanceof StayTask;
+	public static final Predicate<Task> DRIVE_TASK_PREDICATE = t -> t instanceof DriveTask;
 	public static final Comparator<Task> TASK_SCHEDULE_IDX_COMPARATOR = (t1, t2) -> t1.getTaskIdx() - t2.getTaskIdx();
 
 	public static Task getFirstTask(Schedule schedule) {

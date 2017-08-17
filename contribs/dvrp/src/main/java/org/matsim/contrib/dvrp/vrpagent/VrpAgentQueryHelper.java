@@ -77,7 +77,6 @@ public class VrpAgentQueryHelper implements NonPlanAgentQueryHelper {
 				if (t instanceof DriveTask) {
 					planElements.add(createLeg((DriveTask)t));
 				} else {
-
 					planElements.add(createActivity((StayTask)t));
 				}
 			}
