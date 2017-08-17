@@ -121,7 +121,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 				"Writes out detailed vehicle stats in each iteration. Creates one file per vehicle and iteration. "
 						+ "False by default.");
 		map.put(REBALANCING_INTERVAL,
-				"Specifies how often empty vehicle rebalancing is executed. 0 means no rebalancing.");
+				"Specifies how often empty vehicle rebalancing is executed. 0 means no rebalancing (the default).");
 		map.put(IDLE_VEHICLES_RETURN_TO_DEPOTS,
 				"Idle vehicles return to the nearest of all start links. See: Vehicle.getStartLink()");
 		map.put(OPERATIONAL_SCHEME, "Operational Scheme, either door2door or stationbased. door2door by default");
