@@ -9,9 +9,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.matsim.api.core.v01.Coord;
-
-import playground.clruch.net.IdIntegerDatabase;
 import playground.clruch.utils.GlobalAssert;
 
 public class CsvFleetReader {
@@ -20,7 +17,7 @@ public class CsvFleetReader {
 		return Stream.of(line.split(";")).collect(Collectors.toList());
 	}
 
-	final DayTaxiRecord dayTaxiRecord;
+	private final DayTaxiRecord dayTaxiRecord;
 
 	public CsvFleetReader(DayTaxiRecord dayTaxiRecord) {
 		this.dayTaxiRecord = dayTaxiRecord;
@@ -28,7 +25,6 @@ public class CsvFleetReader {
 
 	public DayTaxiRecord populate(File file) throws Exception {
 		GlobalAssert.that(file.isFile());
-		IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();
 
 		int dataline = 0;
 		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -48,21 +44,16 @@ public class CsvFleetReader {
 					break;
 				List<String> list = csvLineToList(line);
 
-				TaxiStamp taxiStamp = new TaxiStamp();
-				taxiStamp.time = DateParser.from(list.get(0));
-				taxiStamp.id = vehicleIdIntegerDatabase.getId(list.get(1));
-				taxiStamp.gps = new Coord( //
-						Double.parseDouble(list.get(10)), //
-						Double.parseDouble(list.get(11)));
-				dayTaxiRecord.insert(list.get(0), taxiStamp);
+				dayTaxiRecord.insert(list);
 				++dataline;
 			}
 		} finally {
 			// ---
 		}
 		System.out.println("lines      " + dataline);
-		System.out.println("vehicles   " + vehicleIdIntegerDatabase.size());
-		System.out.println("timestamps " + dayTaxiRecord.keySet().size());
+		System.out.println("vehicles   " + dayTaxiRecord.size());
+		// System.out.println("timestamps " + dayTaxiRecord.keySet().size());
+		System.out.println(dayTaxiRecord.status);
 		return dayTaxiRecord;
 	}
 }
