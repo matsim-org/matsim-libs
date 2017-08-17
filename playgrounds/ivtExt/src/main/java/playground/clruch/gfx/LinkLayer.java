@@ -92,7 +92,7 @@ import playground.clruch.utils.gui.SpinnerLabel;
             Tensor weight;
             if (1 < width) {
                 weight = Subdivide.of(RealScalar.of(1), RealScalar.of(.1), width - 1);
-                weight = weight.multiply(Total.of(weight).Get().invert());
+                weight = weight.divide(Total.of(weight).Get());
             } else {
                 weight = Tensors.of(RealScalar.ONE);
             }

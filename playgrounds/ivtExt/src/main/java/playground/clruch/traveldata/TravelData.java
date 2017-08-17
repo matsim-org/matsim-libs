@@ -113,7 +113,7 @@ public class TravelData implements Serializable {
                             int vNodeIndexTo = virtualNetwork.getVirtualNode(linkTo).getIndex();
 
                             // add customer/dt to arrival rate
-                            lambda.set(s -> s.add(RealScalar.of(dt).invert()), timeIndex, vNodeIndexFrom);
+                            lambda.set(s -> s.add(RealScalar.of(dt).reciprocal()), timeIndex, vNodeIndexFrom);
                             // old implementation, TODO remove
                             // Scalar val = lambda.Get(timeIndex, vNodeIndexFrom);
                             // Scalar valAdded = val.add(RealScalar.of(1.0 / (double) dt));

@@ -27,6 +27,7 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
+import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.dispatcher.core.BipartiteMatchingUtils;
@@ -119,6 +120,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                 // fill right-hand-side // TODO if MATSim would never produce zero available
                 // vehicles, we could save these lines
                 Tensor rhs = vi_desiredT.subtract(vi_excessT);
+                System.out.println("rhs = " + Pretty.of(rhs));
                 Tensor rebalanceCount2 = Tensors.empty();
                 if (totalAvailable > 0) {
                     rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs, GLPKConstants.GLP_LO);
