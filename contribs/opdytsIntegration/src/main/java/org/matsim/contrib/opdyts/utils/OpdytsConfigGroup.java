@@ -79,7 +79,7 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 
 	// self tuner
 	private static final String INERTIA = "inertia";
-	private double inertia = 0.95;
+	private double inertia = 0.90;
 
 	private static final String NOISY_SYSTEM = "noisySystem";
 	private boolean noisySystem = true;
