@@ -1,8 +1,9 @@
 package tutorial.fixedTimeSignals;
 
 import org.junit.Assert;
+import org.junit.Test;
 
-public class RunVisualizeSignalScenarioWithLanesGUI {
+public class RunVisualizeSignalScenarioWithLanesGUITest {
 
 	public static void main(String[] args) {
 		try {
@@ -11,6 +12,11 @@ public class RunVisualizeSignalScenarioWithLanesGUI {
 			ee.printStackTrace();
 			Assert.fail("something went wrong") ;
 		}
+	}
+	
+	@Test
+	public void testSignalExampleVisualization(){
+		main(null);
 	}
 
 }
