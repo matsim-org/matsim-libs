@@ -5,119 +5,142 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 
-// add a lot of documentation // TODO
-// TODO are there functions, which can be used only in certain Dispatchers, e. g. UniversalDispatcher? 
-// TODO which functions are designed for who? 
-// TODO which function is allowed at which time?
-// TODO check all access rights and restrict to minimum
-
+/** RoboTaxi is central classs to be used in all dispatchers.
+ * Dispatchers control a fleet of RoboTaxis, each is uniquely
+ * associated to an AVVehicle object in MATSim.
+ * 
+ * @author Claudio Ruch */
 public class RoboTaxi {
     private final AVVehicle avVehicle;
-    private LinkTimePair linkTimePair;
-    private Link currentDriveDestination; // null for stay task
-    private Link currentLocation;
-    private AbstractDirective directive;
     private AVStatus status;
 
-    /** @param avVehicle
-     * @param linkTimePair
-     * @param currentDriveDestination
-     *            null if the vehicle is in stay task */
+    private Link location; // current location of the RoboTaxi
+    private Link driveDestination; // drive destination of the RoboTaxi, null for stay task
+    private LinkTimePair divertableLinkTime; // location / time pair from where / when RoboTaxi path
+                                             // can be altered.
+    private AbstractDirective directive;
 
-    public RoboTaxi(AVVehicle avVehicle, LinkTimePair linkTimePair, Link currentDriveDestination) {
-        GlobalAssert.that(currentDriveDestination != null);
+    /** Standard constructor
+     * 
+     * @param avVehicle binding association to MATSim AVVehicle object
+     * @param linkTimePair
+     * @param driveDestination */
+    public RoboTaxi(AVVehicle avVehicle, LinkTimePair divertableLinkTime, Link driveDestination) {
+        GlobalAssert.that(driveDestination != null);
         this.avVehicle = avVehicle;
-        this.linkTimePair = linkTimePair;
-        this.currentDriveDestination = currentDriveDestination;
+        this.divertableLinkTime = divertableLinkTime;
+        this.driveDestination = driveDestination;
         this.directive = null;
         this.status = AVStatus.STAY;
     }
 
+    // ===================================================================================
+    // methods to be used by dispatchers, public
+
+    /** @return {@link} location at which robotaxi can be diverted */
     public Link getDivertableLocation() {
-        return linkTimePair.link;
+        return divertableLinkTime.link;
     }
 
+    /** @return time when robotaxi can be diverted */
     /* package */ double getDivertableTime() {
-        return linkTimePair.time;
-    }
-
-    /* package */ void setLinkTimePair(LinkTimePair linkTimePair) {
-        this.linkTimePair = linkTimePair;
+        return divertableLinkTime.time;
     }
 
     /** @return null if vehicle is currently not driving, else
      *         the final {@link Link} of the path that the vehicles is currently driving on */
     public Link getCurrentDriveDestination() {
-        return currentDriveDestination;
+        return driveDestination;
     }
 
-    /* package */ void setCurrentLocation(Link currentLocation) {
-        GlobalAssert.that(currentLocation != null);
-        this.currentLocation = currentLocation;
-    }
-
+    /** @return last konwn {@link} location of the RoboTaxi, meant for
+     *         data capturing, current location is not necessarily divertablelocation
+     *         from where RoboTaxi could change its path, therefore use
+     *         getDivertableLocation() for computations. */
     public Link getCurrentLocation() {
-        return currentLocation;
+        return location;
     }
 
-    public Schedule getSchedule() {
-        return avVehicle.getSchedule();
-    }
-
-    /* package */ void setCurrentDriveDestination(Link currentDriveDestination) {
-        GlobalAssert.that(currentDriveDestination != null);
-        this.currentDriveDestination = currentDriveDestination;
-    }
-
+    /** @return true if vehicle is staying */
     public boolean isInStayTask() {
-        boolean statusStay = status.equals(AVStatus.STAY);
-        boolean scheduleStay = false;
-
-        Task task = Schedules.getLastTask(avVehicle.getSchedule());
-        if (task.getStatus().equals(Task.TaskStatus.STARTED)) {
-            GlobalAssert.that(getDivertableLocation() == getCurrentLocation());
-            scheduleStay = true;
-        }
-
-        GlobalAssert.that(statusStay == scheduleStay);
-        return statusStay;
+        return status.equals(AVStatus.STAY);
     }
 
+    /** @return true if customer is without a customer */
+    protected boolean isWithoutCustomer() {
+        return !status.equals(AVStatus.DRIVEWITHCUSTOMER);
+    }
+
+    /** @return {@Id<Link>} of the RoboTaxi, robotaxi ID is the same as AVVehicle ID */
     public Id<Vehicle> getId() {
         return avVehicle.getId();
     }
 
+    /** @return {@AVStatus} of the vehicle */
+    public AVStatus getAVStatus() {
+        return status;
+    }
+
+    // ===================================================================================
+    // methods to be used by Core package
+
+    /** @param divertableLinkTime update the divertableLinkTime of the RoboTaxi, to be used
+     *            only from VehicleMaintainer */
+    /* package */ void setDivertableLinkTime(LinkTimePair divertableLinkTime) {
+        this.divertableLinkTime = divertableLinkTime;
+    }
+
+    /** @param currentLocation {@link} last known link of RoboTaxi location, to be used only
+     *            by VehicleMaintainer in update steps. */
+    /* package */ void setCurrentLocation(Link currentLocation) {
+        GlobalAssert.that(currentLocation != null);
+        this.location = currentLocation;
+    }
+
+    /** @param currentDriveDestination {@link} roboTaxi is driving to, to be used only
+     *            by core package, use setVehiclePickup and setVehicleRebalance in dispatchers */
+    /* package */ void setCurrentDriveDestination(Link currentDriveDestination) {
+        GlobalAssert.that(currentDriveDestination != null);
+        this.driveDestination = currentDriveDestination;
+    }
+
+    /** @param {@AVStatus} for robotaxi to be updated to, to be used only by
+     *            core package, in dispatcher implementations, status will be adapted
+     *            automatically. */
     /* package */ void setAVStatus(AVStatus status) {
         GlobalAssert.that(status != null);
         this.status = status;
     }
 
-    public AVStatus getAVStatus() {
-        return status;
+    /** @return {@Schedule} of the RoboTaxi, to be used only inside core package, the schedule will
+     *         be used automatically for all updates associated to pickups, rebalance tasks */
+    /* package */ Schedule getSchedule() {
+        return avVehicle.getSchedule();
     }
 
-    protected boolean isWithoutCustomer() {
-        return !status.equals(AVStatus.DRIVEWITHCUSTOMER);
-    }
-
+    /** @param abstractDirective to be issued to RoboTaxi when commands change, to be used only
+     *            in the core package, directives will be issued automatically when
+     *            setVehiclePickup,
+     *            setVehicleRebalance are called. */
     /* package */ void assignDirective(AbstractDirective abstractDirective) {
         GlobalAssert.that(isWithoutDirective());
         this.directive = abstractDirective;
     }
 
+    /** @return true if RoboTaxi is without an unexecuted directive, to be used only inside
+     *         core package */
     /* package */ boolean isWithoutDirective() {
         if (directive == null)
             return true;
         return false;
     }
 
+    /** execute the directive of a RoboTaxi, to be used only inside core package */
     /* package */ void executeDirective() {
         directive.execute();
         directive = null;

@@ -44,6 +44,7 @@ import ch.ethz.idsc.tensor.sca.Increment;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RoboTaxi;
+import playground.clruch.dispatcher.core.VehicleOnVirtualLinkCalculator;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
 import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
@@ -207,9 +208,9 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                     { // done
                         /** rebalancing vehicles still within node_i traveling on link_k = (node_i,
                          * node_j) */
-                        List<RoboTaxi> map = getRebalancingRoboTaxis();
-                        accountedVehicles.addAll(map);
-                        final Tensor vector = countVehiclesPerVLink(map);
+                        List<RoboTaxi> rebalancingRoboTaxis = getRebalancingRoboTaxis();
+                        accountedVehicles.addAll(rebalancingRoboTaxis);
+                        final Tensor vector = VehicleOnVirtualLinkCalculator.countVehiclesPerVLink(rebalancingRoboTaxis,virtualNetwork);
                         double[] array = Primitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("movingRebalancingVehiclesPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
@@ -220,7 +221,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                         /** Vehicles with customers still within node_i traveling on link_k =
                          * (node_i, node_j) */
                         List<RoboTaxi> map = getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER);
-                        final Tensor vector = countVehiclesPerVLink(map);
+                        final Tensor vector = VehicleOnVirtualLinkCalculator.countVehiclesPerVLink(map,virtualNetwork);
                         accountedVehicles.addAll(map);
                         {
                             // vehicles on pickup drive appear here

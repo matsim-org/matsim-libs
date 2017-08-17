@@ -8,7 +8,6 @@ import org.matsim.contrib.dvrp.schedule.Task;
 
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.utils.GlobalAssert;
-import playground.clruch.utils.ScheduleUtils;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 

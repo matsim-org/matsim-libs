@@ -1,5 +1,5 @@
 // code by jph
-package playground.clruch.utils;
+package playground.clruch.dispatcher.core;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -8,7 +8,7 @@ import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import playground.clruch.dispatcher.core.RoboTaxi;
+import playground.clruch.utils.AVTaskAdapter;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;

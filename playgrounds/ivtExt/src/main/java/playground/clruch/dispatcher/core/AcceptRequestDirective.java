@@ -9,7 +9,6 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.utils.GlobalAssert;
-import playground.clruch.utils.ScheduleUtils;
 import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;

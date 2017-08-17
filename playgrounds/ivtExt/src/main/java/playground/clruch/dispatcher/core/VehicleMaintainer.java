@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
@@ -37,12 +38,11 @@ abstract class VehicleMaintainer implements AVDispatcher {
     private Double private_now = null;
     private int infoLinePeriod = 0;
     private String previousInfoMarker = "";
+    private Integer AVVEHILCECOUNT = null;
 
     VehicleMaintainer(EventsManager eventsManager) {
         this.eventsManager = eventsManager;
     }
-
-
 
     /** @return time of current re-dispatching iteration step
      * @throws NullPointerException
@@ -50,7 +50,6 @@ abstract class VehicleMaintainer implements AVDispatcher {
     protected final double getTimeNow() {
         return private_now;
     }
-
 
     /** @return collection of AVVehicles that have started their schedule */
     protected final List<RoboTaxi> getRoboTaxis() {
@@ -60,9 +59,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     protected final Collection<RoboTaxi> getDivertableRoboTaxis() {
-        return roboTaxis.stream().filter(rt -> (rt.isWithoutDirective()))
-                .filter(RoboTaxi::isWithoutCustomer)
-                .collect(Collectors.toList());
+        return roboTaxis.stream().filter(rt -> (rt.isWithoutDirective())).filter(RoboTaxi::isWithoutCustomer).collect(Collectors.toList());
     }
 
     // TODO what happens with the other AVTasks?
@@ -84,7 +81,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
                             // TODO put this as an info into RoboTaxi and make sure it cannot be
                             // used in the iteration
                             if (linkTimePair != null)
-                                robotaxi.setLinkTimePair(linkTimePair);
+                                robotaxi.setDivertableLinkTime(linkTimePair);
                             robotaxi.setCurrentDriveDestination(avDriveTask.getPath().getToLink());
                         } else {
                             // TODO is this actually necessary?
@@ -98,9 +95,10 @@ abstract class VehicleMaintainer implements AVDispatcher {
                         if (Schedules.isLastTask(avStayTask)) {
                             GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow()); // <- self
                                                                                           // evident?
-                            LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(), getTimeNow());
+                            // LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(),
+                            // getTimeNow());
                             // collection.add(new VehicleLinkPair(avVehicle, linkTimePair, null));
-                            robotaxi.setLinkTimePair(linkTimePair);
+                            robotaxi.setDivertableLinkTime(new LinkTimePair(avStayTask.getLink(), getTimeNow()));
                             robotaxi.setCurrentDriveDestination(avStayTask.getLink());
                             robotaxi.setAVStatus(AVStatus.STAY);
                         }
@@ -117,14 +115,9 @@ abstract class VehicleMaintainer implements AVDispatcher {
         eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
     }
 
-
-
-
     @Override
     public final void onNextTimestep(double now) {
         private_now = now; // <- time available to derived class via getTimeNow()
-
-        updateDatastructures(Collections.unmodifiableCollection(null));
 
         if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0) {
             String infoLine = getInfoLine();
@@ -135,10 +128,9 @@ abstract class VehicleMaintainer implements AVDispatcher {
             }
         }
 
-        notifySimulationSubscribers(Math.round(now));
-
         consistencyCheck();
         beforeStepTasks();
+        notifySimulationSubscribers(Math.round(now));
         redispatch(now);
         afterStepTasks();
         consistencyCheck();
@@ -152,8 +144,16 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     private void beforeStepTasks() {
+
         // update divertable locations of RoboTaxis
         updateDivertableLocations();
+
+        // update current locations of RoboTaxis
+        if(private_now>0){ // at time 0, tasks are not started. 
+            updateCurrentLocations();            
+        }
+
+
         executePickups();
     }
 
@@ -166,38 +166,49 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
     }
 
+    void updateCurrentLocations() {
+        int failed = 0;
+        if (!roboTaxis.isEmpty()) {
+            for (RoboTaxi robotaxi : roboTaxis) {
+                final Link link = AVLocation.of(robotaxi);
+                if (link != null) {
+                    robotaxi.setCurrentLocation(link);
+                } else {
+                    ++failed;
+                }
+
+            }
+            if (AVVEHILCECOUNT == null)
+                AVVEHILCECOUNT = getRoboTaxis().size();
+        }
+    }
+
     /* package */ abstract void executePickups();
 
     /* package */ abstract void stopUnusedVehicles();
 
     /* package */ abstract void consistencySubCheck();
-    
+
     /* package */ abstract void notifySimulationSubscribers(long round_now);
-    
-    
+
     /** invoked at the beginning of every iteration dispatchers can update their data structures
      * based on the stay vehicle set function is not meant
      * for issuing directives */
-    /* package */ abstract void updateDatastructures(Collection<AVVehicle> stayVehicles);
-
-    
+    /// * package */ abstract void updateDatastructures();
 
     @Override
     public final void onNextTaskStarted(AVTask task) {
         // intentionally empty
     }
-    
 
     /** derived classes should override this function
      * 
      * @param now */
     protected abstract void redispatch(double now);
 
-    
-
     // ===================================================================================
     // INFOLINE functions
-    
+
     /** derived classes should override this function to add details
      * 
      * @return */
@@ -217,7 +228,5 @@ abstract class VehicleMaintainer implements AVDispatcher {
     public final void setInfoLinePeriod(int infoLinePeriod) {
         this.infoLinePeriod = infoLinePeriod;
     }
-
-
 
 }

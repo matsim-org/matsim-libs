@@ -1,11 +1,10 @@
 // code by jph
-package playground.clruch.utils;
+package playground.clruch.dispatcher.core;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 
-import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 
 public class ScheduleUtils {

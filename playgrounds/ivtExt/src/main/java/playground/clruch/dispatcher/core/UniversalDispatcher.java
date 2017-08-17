@@ -32,7 +32,6 @@ import playground.clruch.net.SimulationObjectCompiler;
 import playground.clruch.net.SimulationObjects;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
-import playground.clruch.utils.AVLocation;
 import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
@@ -57,7 +56,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final double dropoffDurationPerStop;
     protected int publishPeriod; // not final, so that dispatchers can disable, or manipulate
     private int total_matchedRequests = 0;
-    private Integer AVVEHILCECOUNT = null;
+
 
     protected UniversalDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
@@ -285,28 +284,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         reqToRemove.stream().forEach(v -> pickupRegister.remove(v));
     }
 
-    @Override
-    // TODO remove unused argument
-    void updateDatastructures(Collection<AVVehicle> stayVehicles) {
 
-        @SuppressWarnings("unused")
-        int failed = 0;
-        Collection<RoboTaxi> robotaxis = getRoboTaxis();
-        if (!robotaxis.isEmpty()) {
-            for (RoboTaxi robotaxi : robotaxis) {
-                final Link link = AVLocation.of(robotaxi);
-                if (link != null) {
-                    robotaxi.setCurrentLocation(link);
-                } else {
-                    ++failed;
-                }
-
-            }
-            if (AVVEHILCECOUNT == null)
-                AVVEHILCECOUNT = getRoboTaxis().size();
-        }
-
-    }
 
     /** called when a new request enters the system */
     @Override
