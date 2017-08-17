@@ -123,7 +123,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     }
 
     private final List<RoboTaxi> getRoboTaxiSubset(Set<AVStatus> status) {
-        return getRoboTaxis().stream().filter(status::contains).collect(Collectors.toList());
+        return getRoboTaxis().stream().filter(rt->status.contains(rt.getAVStatus())).collect(Collectors.toList());
     }
 
     /** @return divertable robotaxis which currently not on a pickup drive */
@@ -146,7 +146,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     protected void setRoboTaxiPickup(RoboTaxi roboTaxi, AVRequest avRequest) {
         GlobalAssert.that(roboTaxi.isWithoutCustomer());
-        roboTaxi.setAVStatus(AVStatus.DRIVETOCUSTMER);
 
         // 1) enter information into pickup table
         RoboTaxi beforeTaxi = pickupRegister.forcePut(avRequest, roboTaxi);
@@ -223,10 +222,12 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private synchronized final void setAcceptRequest(RoboTaxi robotaxi, AVRequest avRequest) {
         GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
 
+        robotaxi.setAVStatus(AVStatus.DRIVEWITHCUSTOMER);
+        
         boolean statusPen = pendingRequests.remove(avRequest);
         GlobalAssert.that(statusPen);
 
-        robotaxi.setAVStatus(AVStatus.DRIVEWITHCUSTOMER);
+
 
         // save avRequests which are matched for one publishPeriod to ensure
         // no requests are lost in the recording.

@@ -22,6 +22,8 @@ import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
+import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
+import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
@@ -62,49 +64,45 @@ abstract class VehicleMaintainer implements AVDispatcher {
         return roboTaxis.stream().filter(rt -> (rt.isWithoutDirective())).filter(RoboTaxi::isWithoutCustomer).collect(Collectors.toList());
     }
 
-    // TODO what happens with the other AVTasks?
-    // TODO this function is important, check thoroughly
     private final void updateDivertableLocations() {
         for (RoboTaxi robotaxi : getRoboTaxis()) {
-            if (robotaxi.isWithoutDirective()) {
-                Schedule schedule = robotaxi.getSchedule();
-                new AVTaskAdapter(schedule.getCurrentTask()) {
-                    @Override
-                    public void handle(AVDriveTask avDriveTask) {
-                        // for empty cars the drive task is second to last task
-                        if (Schedules.isNextToLastTask(avDriveTask)) {
-                            TaskTracker taskTracker = avDriveTask.getTaskTracker();
-                            OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
-                            LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint();
-                            // there is a slim chance that function returns null
-                            // update divertibleLocation and currentDriveDestination
-                            // TODO put this as an info into RoboTaxi and make sure it cannot be
-                            // used in the iteration
-                            if (linkTimePair != null)
-                                robotaxi.setDivertableLinkTime(linkTimePair);
-                            robotaxi.setCurrentDriveDestination(avDriveTask.getPath().getToLink());
-                        } else {
-                            // TODO is this actually necessary?
-                            robotaxi.setAVStatus(AVStatus.DRIVEWITHCUSTOMER);
-                        }
-                    }
+            GlobalAssert.that(robotaxi.isWithoutDirective());
+            Schedule schedule = robotaxi.getSchedule();
+            new AVTaskAdapter(schedule.getCurrentTask()) {
+                @Override
+                public void handle(AVDriveTask avDriveTask) {
+                    // for empty cars the drive task is second to last task
+                    if (Schedules.isNextToLastTask(avDriveTask)) {
+                        TaskTracker taskTracker = avDriveTask.getTaskTracker();
+                        OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
+                        LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint();
+                        robotaxi.setDivertableLinkTime(linkTimePair);
+                        robotaxi.setCurrentDriveDestination(avDriveTask.getPath().getToLink());
+                    } else
+                        GlobalAssert.that(robotaxi.getAVStatus().equals(AVStatus.DRIVEWITHCUSTOMER));
+                }
 
-                    @Override
-                    public void handle(AVStayTask avStayTask) {
-                        // for empty vehicles the current task has to be the last task
-                        if (Schedules.isLastTask(avStayTask)) {
-                            GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow()); // <- self
-                                                                                          // evident?
-                            // LinkTimePair linkTimePair = new LinkTimePair(avStayTask.getLink(),
-                            // getTimeNow());
-                            // collection.add(new VehicleLinkPair(avVehicle, linkTimePair, null));
-                            robotaxi.setDivertableLinkTime(new LinkTimePair(avStayTask.getLink(), getTimeNow()));
-                            robotaxi.setCurrentDriveDestination(avStayTask.getLink());
-                            robotaxi.setAVStatus(AVStatus.STAY);
-                        }
+                @Override
+                public void handle(AVPickupTask avPickupTask) {
+                    GlobalAssert.that(robotaxi.getAVStatus().equals(AVStatus.DRIVEWITHCUSTOMER));
+                }
+
+                @Override
+                public void handle(AVDropoffTask avDropOffTask) {
+                    GlobalAssert.that(robotaxi.getAVStatus().equals(AVStatus.DRIVEWITHCUSTOMER));
+                }
+
+                @Override
+                public void handle(AVStayTask avStayTask) {
+                    // for empty vehicles the current task has to be the last task
+                    if (Schedules.isLastTask(avStayTask)) {
+                        GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow());
+                        robotaxi.setDivertableLinkTime(new LinkTimePair(avStayTask.getLink(), getTimeNow()));
+                        robotaxi.setCurrentDriveDestination(avStayTask.getLink());
+                        robotaxi.setAVStatus(AVStatus.STAY);
                     }
-                };
-            }
+                }
+            };
         }
     }
 
@@ -130,9 +128,10 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
         consistencyCheck();
         beforeStepTasks();
-        notifySimulationSubscribers(Math.round(now));
+        executePickups();
         redispatch(now);
         afterStepTasks();
+        notifySimulationSubscribers(Math.round(now));
         consistencyCheck();
 
         for (RoboTaxi robotaxi : roboTaxis) {
@@ -149,12 +148,10 @@ abstract class VehicleMaintainer implements AVDispatcher {
         updateDivertableLocations();
 
         // update current locations of RoboTaxis
-        if(private_now>0){ // at time 0, tasks are not started. 
-            updateCurrentLocations();            
+        if (private_now > 0) { // at time 0, tasks are not started.
+            updateCurrentLocations();
         }
 
-
-        executePickups();
     }
 
     private void afterStepTasks() {
