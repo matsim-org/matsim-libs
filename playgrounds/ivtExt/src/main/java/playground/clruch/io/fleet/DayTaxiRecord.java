@@ -2,23 +2,21 @@
 package playground.clruch.io.fleet;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.Set;
 
-import playground.clruch.utils.GlobalAssert;
+import playground.clruch.net.IdIntegerDatabase;
 
 public class DayTaxiRecord {
-	private final SortedMap<Integer, List<TaxiStamp>> sortedMap = new TreeMap<>();
-	private final int modulus;
+	private final IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();
+	private final List<TaxiTrail> trails = new ArrayList<>();
 	private Long midnight = null;
+	public final Set<String> status = new HashSet<>();
 
-	public DayTaxiRecord(int modulus) {
-		this.modulus = modulus;
-	}
-
-	public void insert(String timeStamp, TaxiStamp taxiStamp) {
+	public void insert(List<String> list) {
+		final String timeStamp = list.get(0);
+		final long taxiStamp_millis = DateParser.from(timeStamp);
 		long cmp = DateParser.from(timeStamp.substring(0, 11) + "00:00:00");
 		if (midnight == null) {
 			midnight = cmp;
@@ -29,21 +27,22 @@ public class DayTaxiRecord {
 				// throw new RuntimeException();
 			}
 		}
-		int key = (int) ((taxiStamp.time - midnight) / 1000);
-		key -= key % modulus;
+		final int now = (int) ((taxiStamp_millis - midnight) / 1000);
+		// now -= now % modulus;
 
-		if (!sortedMap.containsKey(key))
-			sortedMap.put(key, new ArrayList<>());
+		final int taxiStamp_id = vehicleIdIntegerDatabase.getId(list.get(1));
+		if (taxiStamp_id == trails.size())
+			trails.add(new TaxiTrail());
 
-		sortedMap.get(key).add(taxiStamp);
+		trails.get(taxiStamp_id).insert(now, list);
+		status.add(list.get(3));
 	}
 
-	public Collection<Integer> keySet() {
-		return sortedMap.keySet();
+	public int size() {
+		return trails.size();
 	}
 
-	public Collection<TaxiStamp> get(int now) {
-		GlobalAssert.that(now % modulus == 0);
-		return sortedMap.containsKey(now) ? sortedMap.get(now) : new ArrayList<>();
+	public TaxiTrail get(int vehicleIndex) {
+		return trails.get(vehicleIndex);
 	}
 }

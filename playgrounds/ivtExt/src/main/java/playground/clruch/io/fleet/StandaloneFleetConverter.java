@@ -14,7 +14,7 @@ enum StandaloneFleetConverter {
 	public static void main(String[] args) throws Exception {
 		ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
 		File file = new File("/media/datahaki/media/ethz/taxi", "2017-06-27 - GPS Fahrtstrecken-Protokoll.csv");
-		DayTaxiRecord dayTaxiRecord = new DayTaxiRecord(10); // bin size = 10s
+		DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
 		// extract from csv file
 		CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);
 		reader.populate(file);

@@ -3,8 +3,9 @@ package playground.clruch.io.fleet;
 
 import org.matsim.api.core.v01.Coord;
 
-public class TaxiStamp {
-	public long time = -1;
-	public int id = -1;
+import playground.clruch.export.AVStatus;
+
+class TaxiStamp {
+	public AVStatus avStatus;
 	public Coord gps;
 }
