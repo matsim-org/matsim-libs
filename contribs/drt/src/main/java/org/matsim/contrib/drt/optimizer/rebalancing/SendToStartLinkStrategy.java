@@ -30,7 +30,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
  */
 public class SendToStartLinkStrategy implements RebalancingStrategy {
 	@Override
-	public List<Relocation> calcRelocations(Iterable<? extends Vehicle> rebalancableVehicles) {
+	public List<Relocation> calcRelocations(Iterable<? extends Vehicle> rebalancableVehicles, double time) {
 		List<Relocation> relocations = new ArrayList<>();
 		for (Vehicle v : rebalancableVehicles) {
 			relocations.add(new Relocation(v, v.getStartLink()));

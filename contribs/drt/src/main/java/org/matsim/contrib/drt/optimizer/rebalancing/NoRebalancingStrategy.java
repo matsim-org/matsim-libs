@@ -28,7 +28,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
  */
 public class NoRebalancingStrategy implements RebalancingStrategy {
 	@Override
-	public List<Relocation> calcRelocations(Iterable<? extends Vehicle> rebalancableVehicles) {
+	public List<Relocation> calcRelocations(Iterable<? extends Vehicle> rebalancableVehicles, double time) {
 		return Collections.emptyList();
 	}
 }

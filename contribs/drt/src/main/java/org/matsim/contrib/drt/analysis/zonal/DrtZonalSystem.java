@@ -26,10 +26,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -64,6 +66,10 @@ public class DrtZonalSystem {
 	}
 	
 
+	public Geometry getZone(String zone){
+		return zones.get(zone);
+	}
+	
 	public String getZoneForLinkId(Id<Link> linkId){
 		if (this.link2zone.containsKey(linkId)){
 			return link2zone.get(linkId);
@@ -87,4 +93,15 @@ public class DrtZonalSystem {
 public Map<String, Geometry> getZones() {
 	return zones;
 }
+
+	public Link getLinkNearZoneCentroid(String zoneId){
+		
+		Geometry zone = zones.get(zoneId);
+		if (zone == null){
+			Logger.getLogger(getClass()).error("Zone "+zoneId+" not found.");
+			return null;
+		}
+		Coord c = MGC.point2Coord(zone.getCentroid());
+		return (NetworkUtils.getNearestLink(network, c));
+	}
 }

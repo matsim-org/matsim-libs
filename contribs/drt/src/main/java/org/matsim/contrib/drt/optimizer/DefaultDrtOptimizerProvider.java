@@ -85,7 +85,7 @@ public class DefaultDrtOptimizerProvider implements Provider<DrtOptimizer> {
 				travelDisutility, scheduler, qSim.getEventsManager(), filter, requestValidator,
 				drtCfg.getIdleVehiclesReturnToDepots() ? depotFinder : null,
 				drtCfg.getRebalancingInterval() != 0 ? rebalancingStrategy : null);
-
+		
 		return new InsertionDrtOptimizer(optimContext, drtCfg);
 	}
 }

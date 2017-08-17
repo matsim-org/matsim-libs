@@ -75,7 +75,7 @@ public abstract class AbstractDrtOptimizer implements DrtOptimizer {
 		// right now we relocate only idle vehicles (vehicles that are being relocated cannot be relocated)
 		Iterable<? extends Vehicle> rebalancableVehicles = Iterables
 				.filter(getOptimContext().fleet.getVehicles().values(), optimContext.scheduler::isIdle);
-		List<Relocation> relocations = optimContext.rebalancingStrategy.calcRelocations(rebalancableVehicles);
+		List<Relocation> relocations = optimContext.rebalancingStrategy.calcRelocations(rebalancableVehicles,getOptimContext().timer.getTimeOfDay());
 
 		for (Relocation r : relocations) {
 			Link currentLink = ((DrtStayTask)r.vehicle.getSchedule().getCurrentTask()).getLink();

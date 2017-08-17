@@ -49,6 +49,7 @@ public class ZonalDemandAggregator implements PersonDepartureEventHandler {
 	private final String mode;
 	private final int binsize = 1800; 
 	private Map<Double,Map<String,MutableInt>> departures = new HashMap<>();
+	private Map<Double,Map<String,MutableInt>> previousIterationDepartures = new HashMap<>();
 	/**
 	 * 
 	 */
@@ -58,8 +59,16 @@ public class ZonalDemandAggregator implements PersonDepartureEventHandler {
 		events.addHandler(this);
 		DvrpConfigGroup dvrpconfig = DvrpConfigGroup.get(config);
 		this.mode = dvrpconfig.getMode();
-		prepareZones();
 		
+	}
+	
+	@Override
+	public void reset(int iteration){
+		previousIterationDepartures.clear();
+		previousIterationDepartures.putAll(departures);
+		departures.clear();
+		prepareZones();
+
 	}
 
 	/* (non-Javadoc)
@@ -91,14 +100,20 @@ public class ZonalDemandAggregator implements PersonDepartureEventHandler {
 				zonesPerSlot.put(zone, new MutableInt());
 			}
 			departures.put(Double.valueOf(i),zonesPerSlot);
-			Logger.getLogger(getClass()).error(i); 
 
 		}
 	}
 	
-	Double getBinForTime(double time){
+	private Double getBinForTime(double time){
 		
 		return Math.floor(time/binsize); 
 	}
+	
+	public Map<String,MutableInt> getExpectedDemandForTimeBin(double time){
+		Double bin = getBinForTime(time);
+		return previousIterationDepartures.get(bin);
+		
+	}
+	
 }
 

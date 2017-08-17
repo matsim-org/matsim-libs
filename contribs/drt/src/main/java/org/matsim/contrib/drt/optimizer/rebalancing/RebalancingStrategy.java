@@ -38,5 +38,5 @@ public interface RebalancingStrategy {
 		}
 	}
 
-	List<Relocation> calcRelocations(Iterable<? extends Vehicle> rebalancableVehicles);
+	List<Relocation> calcRelocations(Iterable<? extends Vehicle> rebalancableVehicles, double time);
 }
