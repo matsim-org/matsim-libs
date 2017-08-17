@@ -25,6 +25,7 @@ import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.contrib.signals.otfvis.OTFVisWithSignals;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -38,6 +39,7 @@ public class VisualizeSignalScenarioWithLanes {
 
 	private void run() {
 		Config config = ConfigUtils.loadConfig(INPUT_DIR + "config.xml");
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 		OTFVisWithSignals.playScenario(scenario);
