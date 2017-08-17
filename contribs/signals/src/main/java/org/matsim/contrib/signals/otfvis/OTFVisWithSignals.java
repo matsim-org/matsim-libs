@@ -38,6 +38,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.ControlerDefaultsModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.controler.NewControlerModule;
+import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -75,6 +76,8 @@ public class OTFVisWithSignals {
 	
 		EventsManager events = injector.getInstance(EventsManager.class);
 		events.initProcessing();
+		
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario, events).run();
 		
 		QSim qSim = (QSim) injector.getInstance(Mobsim.class);
 		Collection<Provider<MobsimListener>> mobsimListeners = (Collection<Provider<MobsimListener>>) injector.getInstance(Key.get(Types.collectionOf(Types.providerOf(MobsimListener.class))));
