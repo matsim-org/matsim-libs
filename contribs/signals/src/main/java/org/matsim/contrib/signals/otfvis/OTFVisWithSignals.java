@@ -60,7 +60,7 @@ import com.google.inject.util.Types;
 
 public class OTFVisWithSignals {
 
-	public static void playScenario(final Scenario scenario){
+	public static void playScenario(final Scenario scenario, boolean startOtfvis){
 		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
 			@Override
 			public void install() {
@@ -85,8 +85,10 @@ public class OTFVisWithSignals {
 			qSim.addQueueSimulationListeners(provider.get());
 		}
 
-		OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
-		OTFClientLiveWithSignals.run(scenario.getConfig(), server);
+		if (startOtfvis) {
+			OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
+			OTFClientLiveWithSignals.run(scenario.getConfig(), server);
+		}
 
 		qSim.run();
 	}
