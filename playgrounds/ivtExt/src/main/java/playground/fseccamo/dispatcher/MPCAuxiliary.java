@@ -9,11 +9,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RoboTaxi;
+import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -83,6 +85,19 @@ public class MPCAuxiliary {
         return totalPickupEffectiveAdd;
     }
     
+    
+    /*package */ computeCenterLinks(){
+        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+            final QuadTree<Link> quadTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
+            for (Link link : virtualNode.getLinks())
+                quadTree.put(link.getCoord().getX(), link.getCoord().getY(), link);
+            Link center = quadTree.getClosest(virtualNode.getCoord().getX(), virtualNode.getCoord().getY());
+            centerLink.put(virtualNode, center);
+        }
+
+        
+    }
+
     
     
 }

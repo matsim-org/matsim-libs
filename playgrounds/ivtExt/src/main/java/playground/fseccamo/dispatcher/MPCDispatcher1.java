@@ -45,11 +45,6 @@ import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.core.VehicleOnVirtualLinkCalculator;
-import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
-import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
-import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
-import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
-import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
@@ -67,8 +62,6 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * 
  * MPC dispatcher requires yalmip running in matlab */
 public class MPCDispatcher1 extends BaseMpcDispatcher {
-    final AbstractVirtualNodeDest virtualNodeDest;
-    final AbstractVehicleDestMatcher vehicleDestMatcher;
     final Map<VirtualLink, Double> travelTimes;
     final int numberOfVehicles;
     private final double[] networkBounds;
@@ -85,23 +78,12 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
             EventsManager eventsManager, //
             VirtualNetwork virtualNetwork, //
             Network network, //
-            AbstractVirtualNodeDest abstractVirtualNodeDest, //
-            AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
             Map<VirtualLink, Double> travelTimesIn) {
         super(config, travelTime, parallelLeastCostPathCalculator, eventsManager, virtualNetwork);
-        this.virtualNodeDest = abstractVirtualNodeDest;
-        this.vehicleDestMatcher = abstractVehicleDestMatcher;
         travelTimes = travelTimesIn;
         networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         numberOfVehicles = (int) generatorConfig.getNumberOfVehicles();
 
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-            final QuadTree<Link> quadTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
-            for (Link link : virtualNode.getLinks())
-                quadTree.put(link.getCoord().getX(), link.getCoord().getY(), link);
-            Link center = quadTree.getClosest(virtualNode.getCoord().getX(), virtualNode.getCoord().getY());
-            centerLink.put(virtualNode, center);
-        }
 
         try {
             javaContainerSocket = new JavaContainerSocket(new Socket("localhost", MfileContainerServer.DEFAULT_PORT));
@@ -148,7 +130,8 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                 final int m = virtualNetwork.getvLinksCount();
                 final int n = virtualNetwork.getvNodesCount();
 
-                System.out.println("open requests: " + getAVRequests().size() + "  in the process of pickup: " + getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER).size());
+                System.out.println(
+                        "open requests: " + getAVRequests().size() + "  in the process of pickup: " + getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER).size());
 
                 { // build and send problem description to MATLAB as input to MPC
                     Container container = new Container(String.format("problem@%06d", Math.round(now)));
@@ -163,8 +146,8 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                         Tensor maxWaitingTimePerVLink = Array.zeros(m + n); // +n accounts for self
                                                                             // loop
                         for (AVRequest avRequest : getUnassignedAVRequests()) { // requests that
-                                                                              // haven't received a
-                                                                              // dispatch yet
+                                                                                // haven't received a
+                                                                                // dispatch yet
                             MpcRequest mpcRequest = mpcRequestsMap.get(avRequest); // must not be
                                                                                    // null
                             waitCustomersPerVLink.set(Increment.ONE, mpcRequest.vectorIndex);
@@ -210,7 +193,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                          * node_j) */
                         List<RoboTaxi> rebalancingRoboTaxis = getRebalancingRoboTaxis();
                         accountedVehicles.addAll(rebalancingRoboTaxis);
-                        final Tensor vector = VehicleOnVirtualLinkCalculator.countVehiclesPerVLink(rebalancingRoboTaxis,virtualNetwork);
+                        final Tensor vector = VehicleOnVirtualLinkCalculator.countVehiclesPerVLink(rebalancingRoboTaxis, virtualNetwork);
                         double[] array = Primitives.toArrayDouble(vector);
                         DoubleArray doubleArray = new DoubleArray("movingRebalancingVehiclesPerVLink", new int[] { array.length }, array);
                         container.add(doubleArray);
@@ -221,13 +204,13 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                         /** Vehicles with customers still within node_i traveling on link_k =
                          * (node_i, node_j) */
                         List<RoboTaxi> map = getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER);
-                        final Tensor vector = VehicleOnVirtualLinkCalculator.countVehiclesPerVLink(map,virtualNetwork);
+                        final Tensor vector = VehicleOnVirtualLinkCalculator.countVehiclesPerVLink(map, virtualNetwork);
                         accountedVehicles.addAll(map);
                         {
                             // vehicles on pickup drive appear here
-                            for(RoboTaxi robotaxi : getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER)){
-                                
-//                            for (Entry<AVRequest, RoboTaxi> entry : getMatchings().entrySet()) {
+                            for (RoboTaxi robotaxi : getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER)) {
+
+                                // for (Entry<AVRequest, RoboTaxi> entry : getMatchings().entrySet()) {
                                 AVRequest avRequest = getRoboTaxiPickupRequest(robotaxi);
                                 GlobalAssert.that(avRequest != null);
 
@@ -376,20 +359,16 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                                 // for (Entry<RoboTaxi, AVRequest> entry :
                                 // pickupAssignments.entrySet()) {
                                 // setRoboTaxiPickup(entry.getKey(), entry.getValue());
-                                // }                                
-                                
+                                // }
+
                                 // MPC2 code:
                                 // ==========================
                                 Map<RoboTaxi, AVRequest> pickupAssignments = new HashMap<>();
-                                totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption2(min,requests, cars, this, pickupAssignments);
+                                totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption2(min, requests, cars, this, pickupAssignments);
                                 for (Entry<RoboTaxi, AVRequest> entry : pickupAssignments.entrySet()) {
                                     setRoboTaxiPickup(entry.getKey(), entry.getValue());
                                 }
-                                
-                                
-                                
-                                
-                                
+
                                 // old MPC1 Variant, implemented in MPCAuxiliary
 
                                 // // ========================================
@@ -547,12 +526,9 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
 
-            AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
-            AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
             virtualNetwork = VirtualNetworkGet.readDefault(network);
 
-            return new MPCDispatcher1(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, network, abstractVirtualNodeDest,
-                    abstractVehicleDestMatcher, travelTimes);
+            return new MPCDispatcher1(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, network, travelTimes);
         }
     }
 }
