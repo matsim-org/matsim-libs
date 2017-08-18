@@ -26,6 +26,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 
 /**
  * @author michalm
+ * Idle vehicles (=StayTask) may be re-allocated using this interface.
  */
 public interface RebalancingStrategy {
 	public class Relocation {
@@ -38,5 +39,9 @@ public interface RebalancingStrategy {
 		}
 	}
 
+	/**
+	 * This method is called at each re-balancing step (interval defined in config).
+	 * 
+	 */
 	List<Relocation> calcRelocations(Iterable<? extends Vehicle> rebalancableVehicles, double time);
 }
