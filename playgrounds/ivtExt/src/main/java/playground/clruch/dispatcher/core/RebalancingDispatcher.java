@@ -26,7 +26,7 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
         GlobalAssert.that(roboTaxi.isWithoutCustomer());
 
         // redivert roboTaxi, generate rebalancing event
-        setRoboTaxiDiversion(roboTaxi, destination,AVStatus.REBALANCEDRIVE);
+        setRoboTaxiDiversion(roboTaxi, destination, AVStatus.REBALANCEDRIVE);
         eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), roboTaxi, destination));
     }
 
@@ -58,48 +58,3 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
     }
 
 }
-
-// @Override
-// public final void setVehiclePickup(AVVehicle avVehicle, AVRequest avRequest) {
-// super.setVehiclePickup(avVehicle, avRequest);
-// if (rebalancingVehicles.containsKey(avVehicle))
-// rebalancingVehicles.remove(avVehicle);
-// }
-
-//// This function has to be called only after getVirtualNodeRebalancingVehicles
-// protected synchronized final void setVehicleRebalance(final AVVehicle avVehicle, final Link
-//// destination) {
-// // in case vehicle is picking up, remove from pickup register
-// if (pickupRegister.containsValue(avVehicle)) {
-// AVRequest avRequest = pickupRegister.inverse().get(avVehicle);
-// pickupRegister.forcePut(avRequest, null);
-// // TODO do not use forcePut(avRequest,null) because it violates bijection.
-// }
-//
-// // redivert the vehicle, then generate a rebalancing event and add to list of currently
-// // rebalancing vehicles
-// setVehicleDiversion(avVehicle, destination);
-// eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), avVehicle, destination));
-// Link returnVal = rebalancingVehicles.put(RoboTaxi, destination);
-// }
-
-//// TODO get rid of the AVVehicle here
-// @Override
-// final void updateDatastructures(Collection<AVVehicle> stayVehicles) {
-// // mandatory call
-// super.updateDatastructures(stayVehicles);
-//
-// // remove rebalancing vehicles that have reached their destination
-// for (AVVehicle avVehicle : stayVehicles) {
-// Optional<RoboTaxi> optRob = getRoboTaxis().stream().filter(v ->
-//// v.getAVVehicle().equals(avVehicle)).findAny();
-// GlobalAssert.that(optRob.isPresent());
-// rebalancingVehicles.remove(optRob.get());
-// }
-// }
-
-// protected List<RoboTaxi> getDivertableUnassignedNotRebalancingVehicleLinkPairs() {
-// return getDivertableUnassignedVehicleLinkPairs().stream() //
-// .filter(v -> !rebalancingVehicles.containsKey(v.getAVVehicle())) //
-// .collect(Collectors.toList());
-// }

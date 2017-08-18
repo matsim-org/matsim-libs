@@ -18,6 +18,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.GlobalAssert;
+import playground.clruch.utils.SafeConfig;
+import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
@@ -38,12 +40,16 @@ abstract class VehicleMaintainer implements AVDispatcher {
     protected final EventsManager eventsManager;
     private final List<RoboTaxi> roboTaxis = new ArrayList<>();
     private Double private_now = null;
+    public InfoLine infoLine = null;
     private int infoLinePeriod = 0;
     private String previousInfoMarker = "";
-    private Integer AVVEHILCECOUNT = null;
 
-    VehicleMaintainer(EventsManager eventsManager) {
+    VehicleMaintainer(EventsManager eventsManager, AVDispatcherConfig avDispatcherConfig) {
+        SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
+        this.infoLinePeriod = safeConfig.getInteger("infoLinePeriod", 10);
         this.eventsManager = eventsManager;
+        this.infoLine = new InfoLine(safeConfig.getInteger("infoLinePeriod", 10));
+
     }
 
     /** @return time of current re-dispatching iteration step
@@ -61,10 +67,13 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     protected final Collection<RoboTaxi> getDivertableRoboTaxis() {
-        return roboTaxis.stream().filter(rt -> (rt.isWithoutDirective())).filter(RoboTaxi::isWithoutCustomer).collect(Collectors.toList());
+        return roboTaxis.stream() //
+                .filter(RoboTaxi::isWithoutDirective) //
+                .filter(RoboTaxi::isWithoutCustomer) //
+                .collect(Collectors.toList());
     }
 
-    private final void updateDivertableLocations() {
+    private void updateDivertableLocations() {
         for (RoboTaxi robotaxi : getRoboTaxis()) {
             GlobalAssert.that(robotaxi.isWithoutDirective());
             Schedule schedule = robotaxi.getSchedule();
@@ -78,6 +87,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
                         LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint();
                         robotaxi.setDivertableLinkTime(linkTimePair);
                         robotaxi.setCurrentDriveDestination(avDriveTask.getPath().getToLink());
+                        GlobalAssert.that(!robotaxi.getAVStatus().equals(AVStatus.DRIVEWITHCUSTOMER));
                     } else
                         GlobalAssert.that(robotaxi.getAVStatus().equals(AVStatus.DRIVEWITHCUSTOMER));
                 }
@@ -117,26 +127,31 @@ abstract class VehicleMaintainer implements AVDispatcher {
     public final void onNextTimestep(double now) {
         private_now = now; // <- time available to derived class via getTimeNow()
 
-        if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0) {
-            String infoLine = getInfoLine();
-            String marker = infoLine.substring(16);
-            if (!marker.equals(previousInfoMarker)) {
-                previousInfoMarker = marker;
-                System.out.println(infoLine);
-            }
-        }
-
+        updateInfoLine();
         consistencyCheck();
         beforeStepTasks();
         executePickups();
         redispatch(now);
         afterStepTasks();
         notifySimulationSubscribers(Math.round(now));
+        executeDirectives();
         consistencyCheck();
 
-        for (RoboTaxi robotaxi : roboTaxis) {
-            if (!robotaxi.isWithoutDirective()) {
-                robotaxi.executeDirective();
+    }
+
+    protected String getInfoLine() {
+        return infoLine.getInfoLine(getRoboTaxis(), getTimeNow());
+
+    }
+
+    protected void updateInfoLine() {
+
+        if (0 < infoLinePeriod && Math.round(private_now) % infoLinePeriod == 0) {
+            String infoLine = getInfoLine();
+            String marker = infoLine.substring(16);
+            if (!marker.equals(previousInfoMarker)) {
+                previousInfoMarker = marker;
+                System.out.println(infoLine);
             }
         }
 
@@ -163,20 +178,22 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
     }
 
-    void updateCurrentLocations() {
+    private void executeDirectives() {
+        roboTaxis.stream().filter(rt -> !rt.isWithoutDirective()).forEach(RoboTaxi::executeDirective);
+    }
+
+    private void updateCurrentLocations() {
         int failed = 0;
         if (!roboTaxis.isEmpty()) {
             for (RoboTaxi robotaxi : roboTaxis) {
                 final Link link = AVLocation.of(robotaxi);
                 if (link != null) {
-                    robotaxi.setCurrentLocation(link);
+                    robotaxi.setLastKnownLocation(link);
                 } else {
                     ++failed;
                 }
 
             }
-            if (AVVEHILCECOUNT == null)
-                AVVEHILCECOUNT = getRoboTaxis().size();
         }
     }
 
@@ -202,28 +219,5 @@ abstract class VehicleMaintainer implements AVDispatcher {
      * 
      * @param now */
     protected abstract void redispatch(double now);
-
-    // ===================================================================================
-    // INFOLINE functions
-
-    /** derived classes should override this function to add details
-     * 
-     * @return */
-    protected String getInfoLine() {
-        final String string = getClass().getSimpleName() + "        ";
-        return String.format("%s@%6d V=(%4ds,%4dd)", //
-                string.substring(0, 6), //
-                (long) getTimeNow(), //
-                getRoboTaxis().stream().filter(rt -> rt.isInStayTask()).count(), //
-                getRoboTaxis().stream().filter(rt -> (rt.getAVStatus().equals(AVStatus.DRIVETOCUSTMER) || rt.getAVStatus().equals(AVStatus.DRIVETOCUSTMER)))
-                        .count());
-    }
-
-    /** @param infoLinePeriod
-     *            positive values determine the period, negative values or 0 will disable the
-     *            printout */
-    public final void setInfoLinePeriod(int infoLinePeriod) {
-        this.infoLinePeriod = infoLinePeriod;
-    }
 
 }

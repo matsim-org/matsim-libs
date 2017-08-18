@@ -55,133 +55,24 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
         }
         return returnMap;
     }
-    
 
-    
-    
-    protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeRebalancingToRoboTaxis(){
-        Map<VirtualNode, List<RoboTaxi>> returnMap =  virtualNetwork.createVNodeTypeMap();
-        for(RoboTaxi robotaxi : getRebalancingRoboTaxis()){
+    protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeRebalancingToRoboTaxis() {
+        Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
+        for (RoboTaxi robotaxi : getRebalancingRoboTaxis()) {
             VirtualNode toNode = virtualNetwork.getVirtualNode(robotaxi.getCurrentDriveDestination());
             returnMap.get(toNode).add(robotaxi);
         }
         return returnMap;
-        
+
     }
-    
-    
-    
-    protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeArrivingWithCustomerRoboTaxis(){
-        Map<VirtualNode, List<RoboTaxi>> returnMap =  virtualNetwork.createVNodeTypeMap();
-        for(RoboTaxi robotaxi : getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER)){
+
+    protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeArrivingWithCustomerRoboTaxis() {
+        Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
+        for (RoboTaxi robotaxi : getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER)) {
             VirtualNode toNode = virtualNetwork.getVirtualNode(robotaxi.getCurrentDriveDestination());
-            returnMap.get(toNode).add(robotaxi);            
+            returnMap.get(toNode).add(robotaxi);
         }
         return returnMap;
     }
 
-    
-    
-    
-    
-    
-
-    // ===========================================================================================================
-    // ===========================================================================================================
-    // ===========================================================================================================
-    // OLD FUNCTIONS TO DELETE
-    // ===========================================================================================================
-    // ===========================================================================================================
-    // ===========================================================================================================
-
-    /** @return map */
-    // possibly not needed but still keep around...
-    // protected Map<VirtualNode, List<AVVehicle>> getVirtualNodeVehiclesWithCustomer() {
-    // Map<AVVehicle, Link> map = getVehiclesWithCustomer();
-    // return map.keySet().stream() //
-    // .collect(Collectors.groupingBy(vehicle -> virtualNetwork.getVirtualNode(map.get(vehicle))));
-    // }
-
-    //
-    //
-    //
-    //
-    // /** @return returns the divertable vehicles per virtualNode */
-    // @Deprecated
-    // protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeAvailableVehicles() {
-    // Map<VirtualNode, List<RoboTaxi>> returnMap = getDivertableVehicleLinkPairs().stream() //
-    // .parallel() //
-    // .collect(Collectors.groupingBy(vlp ->
-    // virtualNetwork.getVirtualNode(vlp.getDivertableLocation())));
-    //
-    // for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
-    // if (!returnMap.containsKey(virtualNode))
-    // returnMap.put(virtualNode, Collections.emptyList());
-    //
-    // GlobalAssert.that(returnMap.size() == virtualNetwork.getvNodesCount());
-    // return returnMap;
-    // }
-    //
-    // /** @return returns the divertable vehicles per virtualNode */
-    // @Deprecated
-    // protected Map<VirtualNode, List<RoboTaxi>>
-    // getVirtualNodeDivertableUnassignedNotRebalancingVehicleLinkPairs() {
-    // Map<VirtualNode, List<RoboTaxi>> returnMap =
-    // getDivertableUnassignedNotRebalancingVehicleLinkPairs().stream() //
-    // .parallel() //
-    // .collect(Collectors.groupingBy(vlp ->
-    // virtualNetwork.getVirtualNode(vlp.getDivertableLocation())));
-    //
-    // for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
-    // if (!returnMap.containsKey(virtualNode))
-    // returnMap.put(virtualNode, Collections.emptyList());
-    //
-    // GlobalAssert.that(returnMap.size() == virtualNetwork.getvNodesCount());
-    // return returnMap;
-    // }
-    //
-    // /** @return returns the stay vehicles per virtualNode */
-    // @Deprecated
-    // protected Map<VirtualNode, List<AVVehicle>> getVirtualNodeStayVehicles() {
-    // Map<VirtualNode, List<AVVehicle>> returnMap = new HashMap<>();
-    // for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes())
-    // returnMap.put(virtualNode, new ArrayList<>());
-    // for (Entry<Link, Queue<AVVehicle>> entry : getStayVehicles().entrySet()) {
-    // Link link = entry.getKey();
-    // VirtualNode virtualNode = virtualNetwork.getVirtualNode(link);
-    // returnMap.get(virtualNode).addAll(entry.getValue());
-    // }
-    // return returnMap;
-    // }
-    //
-    //
-    //
-    //
-    //
-    //
-    // /** @return */
-
-    //
-    //
-    //
-
 }
-
-// @Deprecated
-// protected synchronized NavigableMap<VirtualNode, List<RoboTaxi>>
-// getVirtualNodeDivertableNotRebalancingVehicles() {
-// // return list of vehicles
-// NavigableMap<VirtualNode, List<RoboTaxi>> nonRebalanceMap = new TreeMap<>();
-//
-// // remove vehicles which are rebalancing
-// final Map<AVVehicle, Link> rebalancingVehicles = getRebalancingVehicles();
-// Map<VirtualNode, List<RoboTaxi>> returnMap = getVirtualNodeAvailableVehicles();
-// for (Map.Entry<VirtualNode, List<RoboTaxi>> entry : returnMap.entrySet()) {
-// nonRebalanceMap.put(entry.getKey(),
-// entry.getValue().stream() //
-// .filter(v -> !rebalancingVehicles.containsKey(v.getAVVehicle())) //
-// .collect(Collectors.toList()));
-// }
-//
-// return nonRebalanceMap;
-// }

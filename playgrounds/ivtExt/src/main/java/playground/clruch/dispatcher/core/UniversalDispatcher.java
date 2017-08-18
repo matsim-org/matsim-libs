@@ -57,21 +57,20 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     protected int publishPeriod; // not final, so that dispatchers can disable, or manipulate
     private int total_matchedRequests = 0;
 
-
     protected UniversalDispatcher( //
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager //
     ) {
-        super(eventsManager);
+        super(eventsManager, avDispatcherConfig);
+
         futurePathFactory = new FuturePathFactory(parallelLeastCostPathCalculator, travelTime);
 
         pickupDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getPickupDurationPerStop();
         dropoffDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getDropoffDurationPerStop();
 
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
-        setInfoLinePeriod(safeConfig.getInteger("infoLinePeriod", 10));
         publishPeriod = safeConfig.getInteger("publishPeriod", 10);
     }
 
@@ -122,8 +121,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         return getRoboTaxiSubset(enumSet);
     }
 
-    private final List<RoboTaxi> getRoboTaxiSubset(Set<AVStatus> status) {
-        return getRoboTaxis().stream().filter(rt->status.contains(rt.getAVStatus())).collect(Collectors.toList());
+    private List<RoboTaxi> getRoboTaxiSubset(Set<AVStatus> status) {
+        return getRoboTaxis().stream().filter(rt -> status.contains(rt.getAVStatus())).collect(Collectors.toList());
     }
 
     /** @return divertable robotaxis which currently not on a pickup drive */
@@ -223,11 +222,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
 
         robotaxi.setAVStatus(AVStatus.DRIVEWITHCUSTOMER);
-        
+
         boolean statusPen = pendingRequests.remove(avRequest);
         GlobalAssert.that(statusPen);
-
-
 
         // save avRequests which are matched for one publishPeriod to ensure
         // no requests are lost in the recording.
@@ -284,8 +281,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         }
         reqToRemove.stream().forEach(v -> pickupRegister.remove(v));
     }
-
-
 
     /** called when a new request enters the system */
     @Override

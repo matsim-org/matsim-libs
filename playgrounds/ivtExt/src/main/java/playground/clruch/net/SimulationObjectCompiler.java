@@ -61,7 +61,7 @@ public class SimulationObjectCompiler {
         VehicleContainer vehicleContainer = new VehicleContainer();
         final String key = robotaxi.getId().toString();
         vehicleContainer.vehicleIndex = db.getVehicleIndex(robotaxi);
-        final Link fromLink = robotaxi.getCurrentLocation();
+        final Link fromLink = robotaxi.getLastKnownLocation();
         GlobalAssert.that(fromLink != null);
         vehicleContainer.linkIndex = db.getLinkIndex(fromLink);
         vehicleContainer.avStatus = robotaxi.getAVStatus();

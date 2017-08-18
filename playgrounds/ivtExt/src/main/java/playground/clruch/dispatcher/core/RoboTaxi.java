@@ -21,10 +21,10 @@ public class RoboTaxi {
     private final AVVehicle avVehicle;
     private AVStatus status;
 
-    private Link location; // current location of the RoboTaxi
+    private Link lastKnownLocation; // last known location of the RoboTaxi
     private Link driveDestination; // drive destination of the RoboTaxi, null for stay task
-    private Optional<LinkTimePair> divertableLinkTime; // location / time pair from where / when RoboTaxi path
-                                             // can be altered.
+    /** location/time pair from where / when RoboTaxi path can be altered. */
+    private Optional<LinkTimePair> divertableLinkTime;
     private AbstractDirective directive;
 
     /** Standard constructor
@@ -32,7 +32,7 @@ public class RoboTaxi {
      * @param avVehicle binding association to MATSim AVVehicle object
      * @param linkTimePair
      * @param driveDestination */
-    public RoboTaxi(AVVehicle avVehicle, LinkTimePair divertableLinkTime, Link driveDestination) {
+    /* package */ RoboTaxi(AVVehicle avVehicle, LinkTimePair divertableLinkTime, Link driveDestination) {
         GlobalAssert.that(driveDestination != null);
         this.avVehicle = avVehicle;
         this.divertableLinkTime = Optional.of(divertableLinkTime);
@@ -46,7 +46,7 @@ public class RoboTaxi {
 
     /** @return {@link} location at which robotaxi can be diverted */
     public Link getDivertableLocation() {
-        return divertableLinkTime.get().link;        
+        return divertableLinkTime.get().link;
     }
 
     /** @return time when robotaxi can be diverted */
@@ -64,18 +64,13 @@ public class RoboTaxi {
      *         data capturing, current location is not necessarily divertablelocation
      *         from where RoboTaxi could change its path, therefore use
      *         getDivertableLocation() for computations. */
-    public Link getCurrentLocation() {
-        return location;
+    public Link getLastKnownLocation() {
+        return lastKnownLocation;
     }
 
     /** @return true if vehicle is staying */
     public boolean isInStayTask() {
         return status.equals(AVStatus.STAY);
-    }
-
-    /** @return true if customer is without a customer */
-    protected boolean isWithoutCustomer() {
-        return !status.equals(AVStatus.DRIVEWITHCUSTOMER);
     }
 
     /** @return {@Id<Link>} of the RoboTaxi, robotaxi ID is the same as AVVehicle ID */
@@ -99,9 +94,9 @@ public class RoboTaxi {
 
     /** @param currentLocation {@link} last known link of RoboTaxi location, to be used only
      *            by VehicleMaintainer in update steps. */
-    /* package */ void setCurrentLocation(Link currentLocation) {
+    /* package */ void setLastKnownLocation(Link currentLocation) {
         GlobalAssert.that(currentLocation != null);
-        this.location = currentLocation;
+        this.lastKnownLocation = currentLocation;
     }
 
     /** @param currentDriveDestination {@link} roboTaxi is driving to, to be used only
@@ -117,6 +112,11 @@ public class RoboTaxi {
     /* package */ void setAVStatus(AVStatus status) {
         GlobalAssert.that(status != null);
         this.status = status;
+    }
+
+    /** @return true if customer is without a customer */
+    /* package */ boolean isWithoutCustomer() {
+        return !status.equals(AVStatus.DRIVEWITHCUSTOMER);
     }
 
     /** @return {@Schedule} of the RoboTaxi, to be used only inside core package, the schedule will
