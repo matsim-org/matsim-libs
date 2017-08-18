@@ -7,6 +7,7 @@ import java.util.List;
 
 /** @author Claudio Ruch */
 public class InfoLine {
+    /** positive values determine the period, negative values or 0 will disable the printout */
     private int infoLinePeriod = 0;
     private String previousInfoMarker = "";
 
@@ -15,9 +16,6 @@ public class InfoLine {
 
     }
 
-    /** derived classes should override this function to add details
-     * 
-     * @return */
     /* package */ String getInfoLine(List<RoboTaxi> robotaxis, double timeNow) {
         final String string = getClass().getSimpleName() + "        ";
         return String.format("%s@%6d V=(%4ds,%4dd)", //
@@ -28,13 +26,15 @@ public class InfoLine {
                         .count());
     }
 
-    /** @param infoLinePeriod
-     *            positive values determine the period, negative values or 0 will disable the
-     *            printout */
+    /** @param infoLinePeriod */
     public final void setInfoLinePeriod(int infoLinePeriod) {
         this.infoLinePeriod = infoLinePeriod;
     }
 
+    /** prints infoLine to console and simulation
+     * 
+     * @param infoLine string to be printed
+     * @param now current time */
     /* package */ void updateInfoLine(String infoLine, double now) {
 
         if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0) {

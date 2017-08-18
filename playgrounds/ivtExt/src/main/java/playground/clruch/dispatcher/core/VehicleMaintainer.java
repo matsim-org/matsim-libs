@@ -141,6 +141,9 @@ abstract class VehicleMaintainer implements AVDispatcher {
         this.infoLine.updateInfoLine(infoLine, getTimeNow());
     }
 
+    /** derived classes should override this function to add details
+     * 
+     * @return String with infoLine content */
     protected String getInfoLine() {
         return infoLine.getInfoLine(getRoboTaxis(), getTimeNow());
 
