@@ -41,12 +41,9 @@ abstract class VehicleMaintainer implements AVDispatcher {
     private final List<RoboTaxi> roboTaxis = new ArrayList<>();
     private Double private_now = null;
     public InfoLine infoLine = null;
-    private int infoLinePeriod = 0;
-    private String previousInfoMarker = "";
 
     VehicleMaintainer(EventsManager eventsManager, AVDispatcherConfig avDispatcherConfig) {
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
-        this.infoLinePeriod = safeConfig.getInteger("infoLinePeriod", 10);
         this.eventsManager = eventsManager;
         this.infoLine = new InfoLine(safeConfig.getInteger("infoLinePeriod", 10));
 
@@ -139,21 +136,13 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
     }
 
-    protected String getInfoLine() {
-        return infoLine.getInfoLine(getRoboTaxis(), getTimeNow());
-
+    protected void updateInfoLine() {
+        String infoLine = getInfoLine();
+        this.infoLine.updateInfoLine(infoLine, getTimeNow());
     }
 
-    protected void updateInfoLine() {
-
-        if (0 < infoLinePeriod && Math.round(private_now) % infoLinePeriod == 0) {
-            String infoLine = getInfoLine();
-            String marker = infoLine.substring(16);
-            if (!marker.equals(previousInfoMarker)) {
-                previousInfoMarker = marker;
-                System.out.println(infoLine);
-            }
-        }
+    protected String getInfoLine() {
+        return infoLine.getInfoLine(getRoboTaxis(), getTimeNow());
 
     }
 

@@ -8,6 +8,7 @@ import java.util.List;
 /** @author Claudio Ruch */
 public class InfoLine {
     private int infoLinePeriod = 0;
+    private String previousInfoMarker = "";
 
     InfoLine(int infoLinePeriod) {
         this.infoLinePeriod = infoLinePeriod;
@@ -34,4 +35,14 @@ public class InfoLine {
         this.infoLinePeriod = infoLinePeriod;
     }
 
+    /* package */ void updateInfoLine(String infoLine, double now) {
+
+        if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0) {
+            String marker = infoLine.substring(16);
+            if (!marker.equals(previousInfoMarker)) {
+                previousInfoMarker = marker;
+                System.out.println(infoLine);
+            }
+        }
+    }
 }
