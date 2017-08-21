@@ -25,11 +25,9 @@ import com.google.inject.name.Named;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
-import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
-import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.dispatcher.core.BipartiteMatchingUtils;
@@ -88,8 +86,8 @@ public class LPFFDispatcher extends PartitionedDispatcher {
         rebalanceCount = Array.zeros(nVNodes, nVNodes);
         rebalanceCountInteger = Array.zeros(nVNodes, nVNodes);
         SafeConfig safeConfig = SafeConfig.wrap(config);
-        dispatchPeriod = getDispatchPeriod(safeConfig, 30);
-        rebalancingPeriod = getRebalancingPeriod(safeConfig, 30);
+        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
+        rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 30);
     }
 
     @Override

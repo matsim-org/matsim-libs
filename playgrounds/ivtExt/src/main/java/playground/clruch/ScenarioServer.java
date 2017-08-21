@@ -38,8 +38,11 @@ import playground.clruch.trb18.TRBModule;
 import playground.clruch.trb18.scenario.TRBScenarioConfig;
 import playground.clruch.trb18.traveltime.reloading.TravelTimeReader;
 import playground.clruch.trb18.traveltime.reloading.WriteTravelTimesModule;
+import playground.clruch.utils.SafeConfig;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
+import playground.sebhoerl.avtaxi.config.AVConfig;
+import playground.sebhoerl.avtaxi.config.AVConfigReader;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -77,6 +80,26 @@ public class ScenarioServer {
         File configFile = new File(args[0]);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
 
+
+        // extract data for scenarioParameters
+        File basePath = new File(config.getContext().getPath()).getParentFile();
+        File configPath = new File(basePath,"av.xml");
+        AVConfig avConfig = new AVConfig();
+        AVConfigReader reader = new AVConfigReader(avConfig);
+        reader.readFile(configPath.getAbsolutePath());
+        SafeConfig safeConfig = SafeConfig.wrap(avConfig);
+        int redispatchPeriod = safeConfig.getInteger("dispatchPeriod", -1);
+        int rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", -1);
+        ScenarioServer.scenarioParameters.redispatchPeriod = redispatchPeriod;
+        ScenarioServer.scenarioParameters.rebalancingPeriod = rebalancingPeriod;
+        
+        
+        
+        
+        
+        
+        
+        
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
 

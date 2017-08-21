@@ -2,10 +2,8 @@
 package playground.clruch.dispatcher;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Optional;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -17,7 +15,6 @@ import playground.clruch.dispatcher.core.DispatcherUtils;
 import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
-import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -44,7 +41,7 @@ public class EdgyDispatcher extends RebalancingDispatcher {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         // this.network = network;
-        dispatchPeriod = getDispatchPeriod(safeConfig, 10);
+        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
     }
 
     int total_abortTrip = 0;

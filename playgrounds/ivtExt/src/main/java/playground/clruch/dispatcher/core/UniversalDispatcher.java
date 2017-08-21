@@ -260,25 +260,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     
 
 
-
-    // ===================================================================================
-    // OTHER get functions
-
-    // TODO replace these with old solution and delete these two functions. 
-    // TODO take care, scenarioParameters.redispatchPeriod needs to be correctly initilized
-    
-    protected int getDispatchPeriod(SafeConfig safeConfig, int alt) {
-        int redispatchPeriod = safeConfig.getInteger("dispatchPeriod", alt);
-        ScenarioServer.scenarioParameters.redispatchPeriod = redispatchPeriod;
-        return redispatchPeriod;
-    }
-
-    protected int getRebalancingPeriod(SafeConfig safeConfig, int alt) {
-        int rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", alt);
-        ScenarioServer.scenarioParameters.rebalancingPeriod = rebalancingPeriod;
-        return rebalancingPeriod;
-    }
-
     // ===================================================================================
     // ITERATION STEP RELATED methods
 

@@ -46,8 +46,7 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
             Network network) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
-        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod",
-                                                            // 10);
+        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
         networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         pendingRequestsTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
         unassignedVehiclesTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);

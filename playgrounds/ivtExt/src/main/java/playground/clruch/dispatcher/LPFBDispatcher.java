@@ -24,15 +24,11 @@ import com.google.inject.name.Named;
 import ch.ethz.idsc.tensor.RationalScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
-import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
-import ch.ethz.idsc.tensor.io.Pretty;
-import ch.ethz.idsc.tensor.red.Tally;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
-import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.BipartiteMatchingUtils;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
@@ -83,8 +79,8 @@ public class LPFBDispatcher extends PartitionedDispatcher {
         numRobotaxi = (int) generatorConfig.getNumberOfVehicles();
         lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(config);
-        dispatchPeriod = getDispatchPeriod(safeConfig, 30);
-        rebalancingPeriod = getRebalancingPeriod(safeConfig, 300);
+        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
+        rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 300);
     }
 
     @Override

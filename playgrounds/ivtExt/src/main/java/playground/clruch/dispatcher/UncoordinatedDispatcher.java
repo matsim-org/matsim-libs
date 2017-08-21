@@ -54,7 +54,7 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
             VirtualNetwork virtualNetwork) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(config);
-        dispatchPeriod = getDispatchPeriod(safeConfig, 10); // safeConfig.getInteger("dispatchPeriod", 10);
+        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
         waitLocations = fillWaitLocations(network, virtualNetwork, (int) generatorConfig.getNumberOfVehicles());
     }
 

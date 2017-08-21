@@ -45,7 +45,7 @@ public class DriveByDispatcher extends RebalancingDispatcher {
         links = new ArrayList<>(network.getLinks().values());
         Collections.shuffle(links, randGen);
         SafeConfig safeConfig = SafeConfig.wrap(config);
-        rebalancingPeriod = getRebalancingPeriod(safeConfig, 120);
+        rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 120);
     }
 
     @Override

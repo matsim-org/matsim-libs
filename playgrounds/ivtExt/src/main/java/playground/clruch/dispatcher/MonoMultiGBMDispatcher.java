@@ -39,7 +39,7 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
             AbstractRequestSelector abstractRequestSelector) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
-        dispatchPeriod = getDispatchPeriod(safeConfig, 30);
+        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         rebVehperRequest = safeConfig.getInteger("vehiclesPerRequest", 1);
         GlobalAssert.that(rebVehperRequest > 0);
         if (rebVehperRequest == 1)
