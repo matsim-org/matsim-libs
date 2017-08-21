@@ -30,10 +30,6 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
         eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), roboTaxi, destination));
     }
 
-    @Override
-    boolean extraCheck(RoboTaxi roboTaxi) {
-        return roboTaxi.getAVStatus().equals(AVStatus.REBALANCEDRIVE);
-    }
 
     protected List<RoboTaxi> getRebalancingRoboTaxis() {
         List<RoboTaxi> rebalancingRobotaxis = new ArrayList<>();

@@ -295,24 +295,19 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
     // TODO can this be replaced by a simple command in the forcePut line at SetVehiclePickup. 
     @Override
-    /*package*/ final void stopUnusedVehicles() {
-        // stop all vehicles which are not on a pickup or rebalancing mission.
-        for (RoboTaxi roboTaxi : getRoboTaxis()) {
-            boolean isOnPickup = pickupRegister.containsValue(roboTaxi); // pickupRegister.values().contains(roboTaxi.getAVVehicle());
-            boolean isOnExtra = extraCheck(roboTaxi);
-            boolean isStaying = roboTaxi.isInStayTask();
-            boolean isWithoutCustomer = roboTaxi.isWithoutCustomer();
-            if (!isOnPickup && !isOnExtra && roboTaxi.isWithoutDirective() && !isStaying && isWithoutCustomer) {
-                GlobalAssert.that(roboTaxi.getAVStatus().equals(AVStatus.DRIVETOCUSTMER));
-                setRoboTaxiDiversion(roboTaxi, roboTaxi.getDivertableLocation(), AVStatus.REBALANCEDRIVE);
-            }
-        }
+    /*package*/ final void stopAbortedPickupRoboTaxis() {
+        
+        // stop vehicles still driving to a request but other taxi serving that request already
+        getRoboTaxis().stream()
+        .filter(rt->rt.getAVStatus().equals(AVStatus.DRIVETOCUSTMER))
+        .filter(rt->!pickupRegister.containsValue(rt))
+        .filter(rt->!rt.isInStayTask())
+        .filter(RoboTaxi::isWithoutCustomer)
+        .forEach(rt->setRoboTaxiDiversion(rt, rt.getDivertableLocation(), AVStatus.REBALANCEDRIVE));
+                        
         GlobalAssert.that(pickupRegister.size() <= pendingRequests.size());
     }
 
-    /* package */ boolean extraCheck(RoboTaxi vehicleLinkPair) {
-        return false;
-    }
 
     @Override
     protected final void consistencySubCheck() {

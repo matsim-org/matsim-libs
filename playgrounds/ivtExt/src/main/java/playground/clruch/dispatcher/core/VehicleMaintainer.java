@@ -156,7 +156,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
     }
 
     private void afterStepTasks() {
-        stopUnusedVehicles();
+        stopAbortedPickupRoboTaxis();
     }
 
     private void consistencyCheck() {
@@ -185,7 +185,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
     /* package */ abstract void executePickups();
 
-    /* package */ abstract void stopUnusedVehicles();
+    /* package */ abstract void stopAbortedPickupRoboTaxis();
 
     /* package */ abstract void consistencySubCheck();
 
