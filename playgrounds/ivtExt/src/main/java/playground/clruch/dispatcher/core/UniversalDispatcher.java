@@ -9,10 +9,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -137,6 +139,17 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                 .collect(Collectors.toList());
     }
 
+
+    
+    protected final Map<RoboTaxi,AVRequest> getPickupRoboTaxis() {
+        Map<RoboTaxi,AVRequest> pickupPairs = new HashMap<>();
+        for(Entry<AVRequest,RoboTaxi> entry : pickupRegister.entrySet() ){
+            GlobalAssert.that(entry.getValue().getAVStatus().equals(AVStatus.DRIVETOCUSTMER));
+            pickupPairs.put(entry.getValue(),entry.getKey());
+        }
+        return pickupPairs;
+    }
+
     
 
     // ===================================================================================
@@ -244,10 +257,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
         ++total_matchedRequests;
     }
+    
 
-    protected final AVRequest getRoboTaxiPickupRequest(RoboTaxi robotaxi) {
-        return pickupRegister.inverse().get(robotaxi);
-    }
+
 
     // ===================================================================================
     // OTHER get functions

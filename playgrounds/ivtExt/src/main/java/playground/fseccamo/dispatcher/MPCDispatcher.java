@@ -96,7 +96,7 @@ public class MPCDispatcher extends BaseMpcDispatcher {
             MPCDataCollection mpcDataCollection = new MPCDataCollection(virtualNetwork, getUnassignedAVRequests(), //
                     getRoboTaxiSubset(AVStatus.STAY), getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER), //
                     getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER), getRoboTaxiSubset(AVStatus.REBALANCEDRIVE));
-            Container containerSend = mpcDataCollection.collectData(now, rt -> getRoboTaxiPickupRequest(rt), this);
+            Container containerSend = mpcDataCollection.collectData(now, getPickupRoboTaxis(), this);
             javaContainerSocket.writeContainer(containerSend);
 
             // B) COMPUTE MPC OUTSIDE OF MATSIM

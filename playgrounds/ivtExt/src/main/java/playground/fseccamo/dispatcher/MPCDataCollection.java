@@ -59,12 +59,12 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
         this.rebRoboTaxis = rebRoboTaxis;
     }
 
-    /* package */public Container collectData(double now, Function<RoboTaxi, AVRequest> getRoboTaxiPickupRequest, MPCDispatcher mpcDispatcher) {
+    /* package */public Container collectData(double now, Map<RoboTaxi, AVRequest> pickupPairs, MPCDispatcher mpcDispatcher) {
 
         GlobalAssert.that(styRoboTaxis.size() + d2cRoboTaxis.size() + dwcRoboTaxis.size() + rebRoboTaxis.size() == mpcDispatcher.numberOfVehicles);
         Container container = new Container(String.format("problem@%06d", Math.round(now)));
         addWaitInformation(container, mpcDispatcher, now);
-        addVehicleInformation(container, mpcDispatcher, getRoboTaxiPickupRequest);
+        addVehicleInformation(container, mpcDispatcher, pickupPairs);
         return container;
     }
 
@@ -96,7 +96,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
     }
     
     
-    private void addVehicleInformation(Container container,MPCDispatcher mpcDispatcher,Function<RoboTaxi, AVRequest> getRoboTaxiPickupRequest){
+    private void addVehicleInformation(Container container,MPCDispatcher mpcDispatcher,Map<RoboTaxi, AVRequest> pickupPairs){
 
 
         Scalar vehicleTotal = RealScalar.ZERO;
@@ -132,8 +132,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
             System.out.println("movingRebalancingVehiclesPerVLink=" + Total.of(Tensors.vectorDouble(array)));
         }
         { // done
-            /** Vehicles with customers still within node_i traveling on link_k =
-             * (node_i, node_j) */
+            /** Vehicles with customers still within node_i traveling on link_k = (node_i, node_j) */
             // List<RoboTaxi> map = getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER);
             final Tensor vector = VehicleOnVirtualLinkCalculator.countVehiclesPerVLink(dwcRoboTaxis, virtualNetwork);
             accountedVehicles.addAll(dwcRoboTaxis);
@@ -142,7 +141,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
                 for (RoboTaxi robotaxi : d2cRoboTaxis) {
 
                     // for (Entry<AVRequest, RoboTaxi> entry : getMatchings().entrySet()) {
-                    AVRequest avRequest = getRoboTaxiPickupRequest.apply(robotaxi);
+                    AVRequest avRequest = pickupPairs.get(robotaxi);
                     GlobalAssert.that(avRequest != null);
 
                     if (!accountedVehicles.contains(robotaxi)) {
