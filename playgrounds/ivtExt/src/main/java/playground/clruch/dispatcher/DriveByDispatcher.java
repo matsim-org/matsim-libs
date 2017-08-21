@@ -13,6 +13,7 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import playground.clruch.dispatcher.core.DispatcherUtils;
 import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
@@ -42,7 +43,7 @@ public class DriveByDispatcher extends RebalancingDispatcher {
             Network network) {
         super(config, travelTime, router, eventsManager);
         links = new ArrayList<>(network.getLinks().values());
-        Collections.shuffle(links,randGen);
+        Collections.shuffle(links, randGen);
         SafeConfig safeConfig = SafeConfig.wrap(config);
         rebalancingPeriod = getRebalancingPeriod(safeConfig, 120);
     }
@@ -51,7 +52,8 @@ public class DriveByDispatcher extends RebalancingDispatcher {
     public void redispatch(double now) {
 
         // stop all vehicles which are driving by an open request
-        total_abortTrip += DrivebyRequestStopper.stopDrivingBy(getAVRequestsAtLinks(), getDivertableRoboTaxis(), this::setRoboTaxiPickup);
+        total_abortTrip += DrivebyRequestStopper //
+                .stopDrivingBy(DispatcherUtils.getAVRequestsAtLinks(getAVRequests()), getDivertableRoboTaxis(), this::setRoboTaxiPickup);
 
         // send vehicles to travel around the city to random links (random loitering)
         final long round_now = Math.round(now);

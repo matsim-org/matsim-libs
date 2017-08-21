@@ -53,6 +53,7 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
  * {@link RunAVScenario} */
 public class ScenarioServer {
 
+    // TODO get rid of this and the corresponding functions in the  UniversalDispatcher
     public static ScenarioParameters scenarioParameters;
 
     public static void main(String[] args) throws MalformedURLException, Exception {

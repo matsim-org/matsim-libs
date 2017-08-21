@@ -1,4 +1,5 @@
 // TODO update documentation
+// TODO can bimap be replaced with a regular map?
 
 // code by jph
 // refactoring, large changes by clruch
@@ -36,7 +37,6 @@ import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AbstractDispatcher;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -85,16 +85,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         return Collections.unmodifiableCollection(pendingRequests);
     }
 
-    /** function call leaves the state of the {@link UniversalDispatcher} unchanged. successive
-     * calls to the function return the identical collection.
-     * 
-     * @return list of {@link AVRequest}s grouped by link */
-    public final Map<Link, List<AVRequest>> getAVRequestsAtLinks() {
-        return getAVRequests().stream() // <- intentionally not parallel to guarantee ordering of
-                                        // requests
-                .collect(Collectors.groupingBy(AVRequest::getFromLink));
-    }
-
     /** @return AVRequests which are currently not assigned to a vehicle */
     protected synchronized final List<AVRequest> getUnassignedAVRequests() {
         List<AVRequest> unassignedRequests = new ArrayList<>();
@@ -139,14 +129,24 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
         return divertableUnassignedRoboTaxis;
     }
+    
+    protected final Collection<RoboTaxi> getDivertableRoboTaxis() {
+        return getRoboTaxis().stream() //
+                .filter(RoboTaxi::isWithoutDirective) //
+                .filter(RoboTaxi::isWithoutCustomer) //
+                .collect(Collectors.toList());
+    }
+
+    
 
     // ===================================================================================
     // SET ROBOTAXI functions
 
+    // TODO note why forcePut is used in documentation
     protected void setRoboTaxiPickup(RoboTaxi roboTaxi, AVRequest avRequest) {
         GlobalAssert.that(roboTaxi.isWithoutCustomer());
 
-        // 1) enter information into pickup table
+        // 1) enter information into pickup table 
         RoboTaxi beforeTaxi = pickupRegister.forcePut(avRequest, roboTaxi);
 
         // 2) set vehicle diversion
@@ -163,7 +163,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @param vehicleLinkPair
      *            is provided from super.getDivertableVehicles()
      * @param destination */
-    protected final void setRoboTaxiDiversion(RoboTaxi robotaxi, Link destination, AVStatus avstatus) {
+    /*package*/ final void setRoboTaxiDiversion(RoboTaxi robotaxi, Link destination, AVStatus avstatus) {
         GlobalAssert.that(robotaxi.isWithoutCustomer());
 
         robotaxi.setAVStatus(avstatus);
@@ -190,7 +190,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                             robotaxi, destination, futurePathContainer));
                 } else
 
-                    robotaxi.assignDirective(new EmptyDirective());
+                    robotaxi.assignDirective(EmptyDirective.INSTANCE);
             }
 
             @Override
@@ -203,7 +203,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
                     robotaxi.assignDirective(new StayVehicleDiversionDirective( //
                             robotaxi, destination, futurePathContainer));
                 } else
-                    robotaxi.assignDirective(new EmptyDirective());
+                    robotaxi.assignDirective(EmptyDirective.INSTANCE);
             }
         };
     }
@@ -251,6 +251,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     // ===================================================================================
     // OTHER get functions
 
+    // TODO replace these with old solution and delete these two functions. 
+    // TODO take care, scenarioParameters.redispatchPeriod needs to be correctly initilized
+    
     protected int getDispatchPeriod(SafeConfig safeConfig, int alt) {
         int redispatchPeriod = safeConfig.getInteger("dispatchPeriod", alt);
         ScenarioServer.scenarioParameters.redispatchPeriod = redispatchPeriod;
@@ -275,8 +278,8 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             Link pickupVehicleLink = pickupVehicle.getDivertableLocation();
             if (avRequest.getFromLink().equals(pickupVehicleLink) && pendingRequests.contains(avRequest) && pickupVehicle.isInStayTask()) {
                 setAcceptRequest(pickupVehicle, avRequest);
-                boolean status = reqToRemove.add(avRequest);
-                GlobalAssert.that(status);
+                boolean added = reqToRemove.add(avRequest);
+                GlobalAssert.that(added);
             }
         }
         reqToRemove.stream().forEach(v -> pickupRegister.remove(v));
@@ -285,12 +288,13 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     /** called when a new request enters the system */
     @Override
     public final void onRequestSubmitted(AVRequest request) {
-        boolean status = pendingRequests.add(request); // <- store request
-        GlobalAssert.that(status);
+        boolean added = pendingRequests.add(request); // <- store request
+        GlobalAssert.that(added);
     }
 
+    // TODO can this be replaced by a simple command in the forcePut line at SetVehiclePickup. 
     @Override
-    protected final void stopUnusedVehicles() {
+    /*package*/ final void stopUnusedVehicles() {
         // stop all vehicles which are not on a pickup or rebalancing mission.
         for (RoboTaxi roboTaxi : getRoboTaxis()) {
             boolean isOnPickup = pickupRegister.containsValue(roboTaxi); // pickupRegister.values().contains(roboTaxi.getAVVehicle());

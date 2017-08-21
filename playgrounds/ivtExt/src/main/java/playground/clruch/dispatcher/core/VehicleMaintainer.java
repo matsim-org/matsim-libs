@@ -63,12 +63,6 @@ abstract class VehicleMaintainer implements AVDispatcher {
         return Collections.unmodifiableList(roboTaxis);
     }
 
-    protected final Collection<RoboTaxi> getDivertableRoboTaxis() {
-        return roboTaxis.stream() //
-                .filter(RoboTaxi::isWithoutDirective) //
-                .filter(RoboTaxi::isWithoutCustomer) //
-                .collect(Collectors.toList());
-    }
 
     private void updateDivertableLocations() {
         for (RoboTaxi robotaxi : getRoboTaxis()) {

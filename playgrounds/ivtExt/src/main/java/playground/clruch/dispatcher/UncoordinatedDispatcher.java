@@ -17,6 +17,7 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import playground.clruch.dispatcher.core.DispatcherUtils;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
@@ -67,7 +68,9 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
         if (round_now % dispatchPeriod == 0 && round_now > 100) {
 
             // stop all vehicles which are driving by an open request
-            total_abortTrip += DrivebyRequestStopper.stopDrivingBy(getAVRequestsAtLinks(), getDivertableRoboTaxis(), this::setRoboTaxiPickup);
+            total_abortTrip += DrivebyRequestStopper //
+                    .stopDrivingBy(DispatcherUtils.getAVRequestsAtLinks(getAVRequests()), getDivertableRoboTaxis(), this::setRoboTaxiPickup);
+
 
             
             { // TODO implement some logic here that matches the behavior of a currently operating taxi company.
