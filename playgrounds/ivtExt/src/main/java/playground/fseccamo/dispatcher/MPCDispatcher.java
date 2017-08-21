@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
@@ -33,8 +34,6 @@ import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
-import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
@@ -57,6 +56,7 @@ public class MPCDispatcher extends BaseMpcDispatcher {
     private String infoLineExtension = "";
 
     final JavaContainerSocket javaContainerSocket;
+    final double[] networkBounds;
 
     public MPCDispatcher( //
             AVDispatcherConfig config, //
@@ -79,6 +79,8 @@ public class MPCDispatcher extends BaseMpcDispatcher {
             exception.printStackTrace();
             throw new RuntimeException(); // dispatcher will not work if constructor has issues
         }
+        networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
+
     }
 
     @Override
@@ -161,7 +163,7 @@ public class MPCDispatcher extends BaseMpcDispatcher {
                 // MPC1 code:
                 // ==========================
                 Map<RoboTaxi, AVRequest> pickupAssignments = new HashMap<>();
-                totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption1(min, requests, network, cars, this, pickupAssignments);
+                totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption1(min, requests, networkBounds, cars, this, pickupAssignments);
                 for (Entry<RoboTaxi, AVRequest> entry : pickupAssignments.entrySet()) {
                     setRoboTaxiPickup(entry.getKey(), entry.getValue());
                 }
