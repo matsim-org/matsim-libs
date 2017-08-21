@@ -85,7 +85,7 @@ public class MPCDispatcher extends BaseMpcDispatcher {
     public void redispatch(double now) {
 
         final long round_now = Math.round(now);
-        if (round_now % samplingPeriod == 0) {
+        if (0 < round_now && round_now % samplingPeriod == 0) {
             final StringBuilder stringBuilder = new StringBuilder();
             manageIncomingRequests(now);
             GlobalAssert.that(getAVRequests().size() >= getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER).size());
@@ -160,22 +160,20 @@ public class MPCDispatcher extends BaseMpcDispatcher {
 
                 // MPC1 code:
                 // ==========================
-                // Map<RoboTaxi, AVRequest> pickupAssignments = new HashMap<>();
-                // totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption1(min,
-                // requests, networkBounds, cars, this, pickupAssignments);
-                // for (Entry<RoboTaxi, AVRequest> entry :
-                // pickupAssignments.entrySet()) {
-                // setRoboTaxiPickup(entry.getKey(), entry.getValue());
-                // }
-
-                // MPC2 code:
-                // ==========================
                 Map<RoboTaxi, AVRequest> pickupAssignments = new HashMap<>();
-                totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption2(min, requests, cars, this, pickupAssignments,
-                        new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction()));
+                totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption1(min, requests, network, cars, this, pickupAssignments);
                 for (Entry<RoboTaxi, AVRequest> entry : pickupAssignments.entrySet()) {
                     setRoboTaxiPickup(entry.getKey(), entry.getValue());
                 }
+
+                // MPC2 code:
+                // ==========================
+                // Map<RoboTaxi, AVRequest> pickupAssignments = new HashMap<>();
+                // totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption2(min, requests, cars, this, pickupAssignments,
+                // new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction()));
+                // for (Entry<RoboTaxi, AVRequest> entry : pickupAssignments.entrySet()) {
+                // setRoboTaxiPickup(entry.getKey(), entry.getValue());
+                // }
             }
         }
         final int totalPickupDesired = Total.of(requestVector).Get().number().intValue();
