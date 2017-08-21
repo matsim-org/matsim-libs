@@ -165,6 +165,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @param destination */
     /*package*/ final void setRoboTaxiDiversion(RoboTaxi robotaxi, Link destination, AVStatus avstatus) {
         GlobalAssert.that(robotaxi.isWithoutCustomer());
+        GlobalAssert.that(robotaxi.isWithoutDirective());
 
         robotaxi.setAVStatus(avstatus);
 
@@ -302,6 +303,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             boolean isStaying = roboTaxi.isInStayTask();
             boolean isWithoutCustomer = roboTaxi.isWithoutCustomer();
             if (!isOnPickup && !isOnExtra && roboTaxi.isWithoutDirective() && !isStaying && isWithoutCustomer) {
+                GlobalAssert.that(roboTaxi.getAVStatus().equals(AVStatus.DRIVETOCUSTMER));
                 setRoboTaxiDiversion(roboTaxi, roboTaxi.getDivertableLocation(), AVStatus.REBALANCEDRIVE);
             }
         }
