@@ -51,14 +51,14 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * in Francesco's Master thesis.
  * 
  * MPC dispatcher requires yalmip running in matlab */
-public class MPCDispatcher1 extends BaseMpcDispatcher {
+public class MPCDispatcher extends BaseMpcDispatcher {
     final Map<VirtualLink, Double> travelTimes;
     final int numberOfVehicles;
     private String infoLineExtension = "";
 
     final JavaContainerSocket javaContainerSocket;
 
-    public MPCDispatcher1( //
+    public MPCDispatcher( //
             AVDispatcherConfig config, //
             AVGeneratorConfig generatorConfig, //
             TravelTime travelTime, //
@@ -299,7 +299,7 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
 
             virtualNetwork = VirtualNetworkGet.readDefault(network);
 
-            return new MPCDispatcher1(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, network, travelTimes);
+            return new MPCDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, network, travelTimes);
         }
     }
 }

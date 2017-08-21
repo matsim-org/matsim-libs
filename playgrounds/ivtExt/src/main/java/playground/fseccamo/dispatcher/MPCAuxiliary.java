@@ -26,7 +26,7 @@ public class MPCAuxiliary {
     /** @param min
      * @param requests */
     /* package */ static int cellMatchingMPCOption1(int min, List<MpcRequest> requests, double[] networkBounds, List<RoboTaxi> cars,
-            MPCDispatcher1 mpcDispatcher, Map<RoboTaxi, AVRequest> pickupAssignments) {
+            MPCDispatcher mpcDispatcher, Map<RoboTaxi, AVRequest> pickupAssignments) {
 
         int totalPickupEffectiveAdd = 0;
         for (int count = 0; count < min; ++count) {
@@ -58,7 +58,7 @@ public class MPCAuxiliary {
 
     }
 
-    /* package */ static int cellMatchingMPCOption2(int min, List<MpcRequest> requests, List<RoboTaxi> cars, MPCDispatcher1 mpcDispatcher,
+    /* package */ static int cellMatchingMPCOption2(int min, List<MpcRequest> requests, List<RoboTaxi> cars, MPCDispatcher mpcDispatcher,
             Map<RoboTaxi, AVRequest> pickupAssignments, AbstractVehicleDestMatcher vehicleDestMatcher) {
         int totalPickupEffectiveAdd = 0;
 

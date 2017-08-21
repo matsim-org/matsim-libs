@@ -59,7 +59,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
         this.rebRoboTaxis = rebRoboTaxis;
     }
 
-    /* package */public Container collectData(double now, Function<RoboTaxi, AVRequest> getRoboTaxiPickupRequest, MPCDispatcher1 mpcDispatcher) {
+    /* package */public Container collectData(double now, Function<RoboTaxi, AVRequest> getRoboTaxiPickupRequest, MPCDispatcher mpcDispatcher) {
 
         GlobalAssert.that(styRoboTaxis.size() + d2cRoboTaxis.size() + dwcRoboTaxis.size() + rebRoboTaxis.size() == mpcDispatcher.numberOfVehicles);
         Container container = new Container(String.format("problem@%06d", Math.round(now)));
@@ -141,7 +141,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
         return container;
     }
 
-    private void addWaitInformation(Container container, MPCDispatcher1 mpcDispatcher, double now) {
+    private void addWaitInformation(Container container, MPCDispatcher mpcDispatcher, double now) {
         { // done
             /** number of waiting customers that begin their journey on link_k =
              * (node_i, node_j)
