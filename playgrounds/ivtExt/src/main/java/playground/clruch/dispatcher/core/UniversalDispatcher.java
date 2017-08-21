@@ -293,7 +293,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(added);
     }
 
-    // TODO can this be replaced by a simple command in the forcePut line at SetVehiclePickup. 
     @Override
     /*package*/ final void stopAbortedPickupRoboTaxis() {
         
