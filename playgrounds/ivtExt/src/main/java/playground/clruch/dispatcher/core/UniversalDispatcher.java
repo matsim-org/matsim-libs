@@ -304,6 +304,20 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         .filter(RoboTaxi::isWithoutCustomer)
         .forEach(rt->setRoboTaxiDiversion(rt, rt.getDivertableLocation(), AVStatus.REBALANCEDRIVE));
                         
+        
+       
+
+        System.out.println("printing pickup register: ");
+        for(AVRequest avr : pickupRegister.keySet()){
+            System.out.println(avr.getId().toString() +  " picked up by " +  pickupRegister.get(avr).getId().toString());
+        }
+        
+        System.out.println("printing pending requests");
+        for(AVRequest avr : pendingRequests){
+            System.out.println(avr.getId().toString());
+        }
+        
+        
         GlobalAssert.that(pickupRegister.size() <= pendingRequests.size());
     }
 
