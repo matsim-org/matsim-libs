@@ -7,11 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.clruch.dispatcher.core.AVStatus;
@@ -20,7 +18,6 @@ import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /** @author Claudio Ruch */

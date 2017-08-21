@@ -92,10 +92,10 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
             System.out.println("open requests: " + getAVRequests().size() + "  in the process of pickup: " + getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER).size());
 
             // A) BUILD AND SEND PROBLEM DESCRIPTION TO MATLAB AS INPUT TO MPC
-            Container containerSend = MPCDataCollection.collectData(this, now, virtualNetwork, //
-                    rt -> getRoboTaxiPickupRequest(rt), getUnassignedAVRequests(), //
-                    getRoboTaxiSubset(AVStatus.STAY), getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER), getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER),
-                    getRoboTaxiSubset(AVStatus.REBALANCEDRIVE));
+            MPCDataCollection mpcDataCollection = new MPCDataCollection(virtualNetwork, getUnassignedAVRequests(), //
+                    getRoboTaxiSubset(AVStatus.STAY), getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER), //
+                    getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER), getRoboTaxiSubset(AVStatus.REBALANCEDRIVE));
+            Container containerSend = mpcDataCollection.collectData(now, rt -> getRoboTaxiPickupRequest(rt), this);
             javaContainerSocket.writeContainer(containerSend);
 
             // B) COMPUTE MPC OUTSIDE OF MATSIM
@@ -104,7 +104,6 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
             // this waits until a reply has been received:
             Container container = javaContainerSocket.blocking_getContainer();
             System.out.println("received: " + container);
-
 
             performPickup(stringBuilder, container, virtualNetwork);
             performRebalance(stringBuilder, container, virtualNetwork);
@@ -115,10 +114,8 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
 
     private void performPickup(StringBuilder stringBuilder, Container container, VirtualNetwork virtualNetwork) {
 
-        // 1) <VirtualLink, Integer> pickupPerVLink: the number of vehicles at
-        // VirtualLink ij which should take a request and
-        // transport the person to a virtualNode
-        // for all these u_ij select u_ij customers in vNode i which have any shortest
+        // <VirtualLink, Integer> pickupPerVLink: the number of vehicles at VirtualLink ij which should take a request and
+        // transport the person to a virtualNode for all these u_ij select u_ij customers in vNode i which have any shortest
         // path that with sequence (vN1i, vNj, , ... )
 
         final int m = virtualNetwork.getvLinksCount();
@@ -130,9 +127,6 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
         DoubleArray doubleArray = container.get("pickupPerVLink");
         requestVector = Round.of(Tensors.vectorDouble(doubleArray.value)); // integer values = # person
         GlobalAssert.that(requestVector.length() == m + n);
-
-        final int totalPickupDesired = Total.of(requestVector).Get().number().intValue();
-        stringBuilder.append(String.format("%2dp", totalPickupDesired));
 
         int totalPickupEffective = 0;
 
@@ -146,26 +140,20 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
             final Map<VirtualNode, List<RoboTaxi>> availableVehicles = getVirtualNodeStayVehicles();
 
             final List<RoboTaxi> cars = availableVehicles.get(vnFrom); // find cars
-            cars.removeAll(getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER));
             final int pickupOffset = 0; // <- should be 0 !!! only 1 for testing
             final int desiredPickup = requestVector.Get(vectorIndex).number().intValue() + pickupOffset;
-            // int pickupPerNode = 0;
             if (0 < desiredPickup) {
-                // if (pickupOffset < desiredPickup)
-                // System.out.println(String.format("vl=%3d cars=%3d pick=%3d ", //
-                // vectorIndex, cars.size(), desiredPickup));
-                // handle requests
+
                 final List<MpcRequest> requests = virtualLinkRequestsMap.containsKey(vectorIndex) ? //
                         virtualLinkRequestsMap.get(vectorIndex) : Collections.emptyList();
                 Collections.sort(requests, MpcRequestComparator.INSTANCE);
 
-                { // assert that requests are sorted, oldest requests are served
-                  // first
-                    double last = 0;
-                    for (MpcRequest mpcRequest : requests) {
-                        GlobalAssert.that(last <= mpcRequest.avRequest.getSubmissionTime());
-                        last = mpcRequest.avRequest.getSubmissionTime();
-                    }
+                // assert that requests are sorted, oldest requests are served
+                // first
+                double last = 0;
+                for (MpcRequest mpcRequest : requests) {
+                    GlobalAssert.that(last <= mpcRequest.avRequest.getSubmissionTime());
+                    last = mpcRequest.avRequest.getSubmissionTime();
                 }
 
                 int min = Math.min(Math.min(desiredPickup, requests.size()), cars.size());
@@ -190,6 +178,8 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                 }
             }
         }
+        final int totalPickupDesired = Total.of(requestVector).Get().number().intValue();
+        stringBuilder.append(String.format("%2dp", totalPickupDesired));
 
         if (totalPickupEffective != totalPickupDesired)
             System.out.println(" !!! pickup delta: " + totalPickupEffective + " < " + totalPickupDesired);
@@ -199,19 +189,16 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
     }
 
     private void performRebalance(StringBuilder stringBuilder, Container container, VirtualNetwork virtualNetwork) {
-        
+
         // 2) <VirtualLink, Integer> rebalancingPerVLink : for every VirtualLink select
         // this number of vehicles vehicle in the fromVNode and
-        // send it to the to VNode / use existing commands
-
+        // send it to the toVNode using existing commands
 
         final int m = virtualNetwork.getvLinksCount();
         final int n = virtualNetwork.getvNodesCount();
 
-        Tensor rebalanceVector = null;
-
         DoubleArray doubleArray = container.get("rebalancingPerVLink");
-        rebalanceVector = Round.of(Tensors.vectorDouble(doubleArray.value));
+        Tensor rebalanceVector = Round.of(Tensors.vectorDouble(doubleArray.value));
         GlobalAssert.that(rebalanceVector.length() == m + n);
 
         for (int vl = 0; vl < m; vl += 2) {
@@ -230,9 +217,6 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                 rebalanceVector.set(s -> s.subtract(surplus), vl + 1);
             }
         }
-
-        final int totalRebalanceDesired = Total.of(rebalanceVector).Get().number().intValue();
-        stringBuilder.append(String.format("%2dr ", totalRebalanceDesired));
 
         int totalRebalanceEffective = 0;
         int selfRebalanceEffective = 0;
@@ -253,45 +237,32 @@ public class MPCDispatcher1 extends BaseMpcDispatcher {
                 candidateLinks.addAll(vnTo.getLinks());
 
             // ---
-            if (availableVehicles.containsKey(vnFrom)) {
-                final List<RoboTaxi> cars = availableVehicles.get(vnFrom); // find
-                                                                           // cars
-                final int desiredRebalance = rebalanceVector.Get(vectorIndex).number().intValue();
-                @SuppressWarnings("unused")
-                int pickupPerNode = 0;
-                if (0 < desiredRebalance) {
-                    String infoString = vnFrom.equals(vnTo) ? "DEST==ORIG" : "";
+
+            final List<RoboTaxi> cars = availableVehicles.get(vnFrom); // find
+                                                                       // cars
+            final int desiredRebalance = rebalanceVector.Get(vectorIndex).number().intValue();
+            if (0 < desiredRebalance) {
+                String infoString = vnFrom.equals(vnTo) ? "DEST==ORIG" : "";
+                if (vnFrom.equals(vnTo))
+                    System.out.println(String.format("vl=%3d  cars=%3d  reb=%3d  %s", vectorIndex, cars.size(), desiredRebalance, infoString));
+                Random random = new Random();
+                int min = Math.min(desiredRebalance, cars.size());
+                for (int count = 0; count < min; ++count) {
+                    RoboTaxi robotaxi = cars.get(0);
+                    cars.remove(0);
+                    Link rebalanceDest = candidateLinks.get(random.nextInt(candidateLinks.size()));
+                    setRoboTaxiRebalance(robotaxi, rebalanceDest); // send car to adjacent virtual node
+                    ++totalRebalanceEffective;
                     if (vnFrom.equals(vnTo))
-                        System.out.println(String.format("vl=%3d  cars=%3d  reb=%3d  %s", vectorIndex, cars.size(), desiredRebalance, infoString));
-                    Random random = new Random();
-                    int min = Math.min(desiredRebalance, cars.size());
-                    for (int count = 0; count < min; ++count) {
-                        RoboTaxi robotaxi = cars.get(0);
-                        cars.remove(0);
-                        Link rebalanceDest =
-                                // centerLink.get(vnTo);
-                                new ArrayList<>( //
-                                        // vnTo.getLinks() //
-                                        candidateLinks //
-                                ).get(random.nextInt(candidateLinks.size()));
-                        setRoboTaxiRebalance(robotaxi, rebalanceDest); // send car
-                                                                       // to
-                                                                       // adjacent
-                                                                       // virtual
-                                                                       // node
-                        ++totalRebalanceEffective;
-                        if (vnFrom.equals(vnTo))
-                            ++selfRebalanceEffective;
-                        ++pickupPerNode;
-                    }
+                        ++selfRebalanceEffective;
                 }
-                // if (pickupPerNode != desiredRebalance)
-                // new RuntimeException("rebalance inconsistent:" + pickupPerNode +
-                // " != " + desiredRebalance).printStackTrace();
-            } else {
-                System.out.println("no available vehicles inside vnode " + vectorIndex + " " + vnFrom.index);
             }
+
         }
+
+        final int totalRebalanceDesired = Total.of(rebalanceVector).Get().number().intValue();
+        stringBuilder.append(String.format("%2dr ", totalRebalanceDesired));
+
         if (totalRebalanceEffective != totalRebalanceDesired)
             System.out.println(" !!! rebalance delta: " + totalRebalanceEffective + " < " + totalRebalanceDesired);
 

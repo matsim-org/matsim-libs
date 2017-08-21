@@ -32,49 +32,40 @@ import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /** @author Claudio Ruch */
-/* package */ enum MPCDataCollection {
-    ;
+/* package */ class MPCDataCollection {
 
-    /* package */static Container collectData(MPCDispatcher1 mpcDispatcher, double now, VirtualNetwork virtualNetwork,
-            Function<RoboTaxi, AVRequest> getRoboTaxiPickupRequest, //
-            Collection<AVRequest> unassignedRequests, List<RoboTaxi> styRoboTaxis, List<RoboTaxi> d2cRoboTaxis, List<RoboTaxi> dwcRoboTaxis,
-            List<RoboTaxi> rebRoboTaxis) {
+    private final int m;
+    private final int n;
+    private final VirtualNetwork virtualNetwork;
+    private final Collection<AVRequest> unassignedRequests;
+    private final List<RoboTaxi> styRoboTaxis;
+    private final List<RoboTaxi> d2cRoboTaxis;
+    private final List<RoboTaxi> dwcRoboTaxis;
+    private final List<RoboTaxi> rebRoboTaxis;
+
+    /**
+     * 
+     */
+    public MPCDataCollection(VirtualNetwork virtualNetwork, Collection<AVRequest> unassignedRequests, //
+            List<RoboTaxi> styRoboTaxis, List<RoboTaxi> d2cRoboTaxis, List<RoboTaxi> dwcRoboTaxis, List<RoboTaxi> rebRoboTaxis) {
+
+        m = virtualNetwork.getvLinksCount();
+        n = virtualNetwork.getvNodesCount();
+        this.virtualNetwork = virtualNetwork;
+        this.unassignedRequests = unassignedRequests;
+        this.styRoboTaxis = styRoboTaxis;
+        this.d2cRoboTaxis = d2cRoboTaxis;
+        this.dwcRoboTaxis = dwcRoboTaxis;
+        this.rebRoboTaxis = rebRoboTaxis;
+    }
+
+    /* package */public Container collectData(double now, Function<RoboTaxi, AVRequest> getRoboTaxiPickupRequest, MPCDispatcher1 mpcDispatcher) {
 
         GlobalAssert.that(styRoboTaxis.size() + d2cRoboTaxis.size() + dwcRoboTaxis.size() + rebRoboTaxis.size() == mpcDispatcher.numberOfVehicles);
-
-        final int m = virtualNetwork.getvLinksCount();
-        final int n = virtualNetwork.getvNodesCount();
-
         Container container = new Container(String.format("problem@%06d", Math.round(now)));
-        { // done
-            /** number of waiting customers that begin their journey on link_k =
-             * (node_i, node_j)
-             * also:
-             * max waiting time in seconds of customers that begin their journey on
-             * link_k = (node_i, node_j) */
-            Tensor waitCustomersPerVLink = Array.zeros(m + n); // +n accounts for self loop
-            Tensor maxWaitingTimePerVLink = Array.zeros(m + n); // +n accounts for self loop
-            for (AVRequest avRequest : unassignedRequests) { // requests that haven't received a dispatch yet
-                MpcRequest mpcRequest = mpcDispatcher.mpcRequestsMap.get(avRequest); // must not be null
-                waitCustomersPerVLink.set(Increment.ONE, mpcRequest.vectorIndex);
-                double waitTime = now - mpcRequest.avRequest.getSubmissionTime();
-                GlobalAssert.that(0 <= waitTime);
-                maxWaitingTimePerVLink.set(Max.function(DoubleScalar.of(waitTime)), mpcRequest.vectorIndex);
-            }
-            {
-                double[] array = Primitives.toArrayDouble(waitCustomersPerVLink);
-                DoubleArray doubleArray = new DoubleArray("waitCustomersPerVLink", new int[] { array.length }, array);
-                container.add(doubleArray);
-                System.out.println("waitCustomersPerVLink=" + Total.of(Tensors.vectorDouble(array)));
-            }
-            {
-                double[] array = Primitives.toArrayDouble(maxWaitingTimePerVLink);
-                DoubleArray doubleArray = new DoubleArray("maxWaitingTimePerVLink", new int[] { array.length }, array);
-                container.add(doubleArray);
-                System.out.println("maxWaitingTimePerVLink=" + Tensors.vectorDouble(array) //
-                        .flatten(0).map(Scalar.class::cast).reduce(Max::of).get());
-            }
-        }
+        addWaitInformation(container, mpcDispatcher, now);
+        
+
         Scalar vehicleTotal = RealScalar.ZERO;
         Set<RoboTaxi> accountedVehicles = new HashSet<>();
         { // done
@@ -148,6 +139,39 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
         GlobalAssert.that(mpcDispatcher.numberOfVehicles == accountedVehicles.size());
         return container;
+    }
+
+    private void addWaitInformation(Container container, MPCDispatcher1 mpcDispatcher, double now) {
+        { // done
+            /** number of waiting customers that begin their journey on link_k =
+             * (node_i, node_j)
+             * also:
+             * max waiting time in seconds of customers that begin their journey on
+             * link_k = (node_i, node_j) */
+            Tensor waitCustomersPerVLink = Array.zeros(m + n); // +n accounts for self loop
+            Tensor maxWaitingTimePerVLink = Array.zeros(m + n); // +n accounts for self loop
+            for (AVRequest avRequest : unassignedRequests) { // requests that haven't received a dispatch yet
+                MpcRequest mpcRequest = mpcDispatcher.mpcRequestsMap.get(avRequest); // must not be null
+                waitCustomersPerVLink.set(Increment.ONE, mpcRequest.vectorIndex);
+                double waitTime = now - mpcRequest.avRequest.getSubmissionTime();
+                GlobalAssert.that(0 <= waitTime);
+                maxWaitingTimePerVLink.set(Max.function(DoubleScalar.of(waitTime)), mpcRequest.vectorIndex);
+            }
+            {
+                double[] array = Primitives.toArrayDouble(waitCustomersPerVLink);
+                DoubleArray doubleArray = new DoubleArray("waitCustomersPerVLink", new int[] { array.length }, array);
+                container.add(doubleArray);
+                System.out.println("waitCustomersPerVLink=" + Total.of(Tensors.vectorDouble(array)));
+            }
+            {
+                double[] array = Primitives.toArrayDouble(maxWaitingTimePerVLink);
+                DoubleArray doubleArray = new DoubleArray("maxWaitingTimePerVLink", new int[] { array.length }, array);
+                container.add(doubleArray);
+                System.out.println("maxWaitingTimePerVLink=" + Tensors.vectorDouble(array) //
+                        .flatten(0).map(Scalar.class::cast).reduce(Max::of).get());
+            }
+        }
+
     }
 
 }
