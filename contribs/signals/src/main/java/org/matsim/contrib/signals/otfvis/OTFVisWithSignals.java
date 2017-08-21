@@ -23,6 +23,7 @@
 package org.matsim.contrib.signals.otfvis;
 
 import java.util.Collection;
+import java.util.Collections;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -61,7 +62,7 @@ import com.google.inject.util.Types;
 public class OTFVisWithSignals {
 
 	public static void playScenario(final Scenario scenario, boolean startOtfvis){
-		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override(Collections.singleton(new AbstractModule() {
 			@Override
 			public void install() {
 				// defaults
@@ -69,10 +70,8 @@ public class OTFVisWithSignals {
 				install(new ControlerDefaultCoreListenersModule());
 				install(new ControlerDefaultsModule());
 				install(new ScenarioByInstanceModule(scenario));
-				// signal specific module
-				install(new SignalsModule());
 			}
-		});
+		}), new SignalsModule()));
 	
 		EventsManager events = injector.getInstance(EventsManager.class);
 		events.initProcessing();
