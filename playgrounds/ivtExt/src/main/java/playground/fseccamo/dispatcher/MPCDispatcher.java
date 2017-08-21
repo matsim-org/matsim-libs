@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -131,9 +130,19 @@ public class MPCDispatcher extends BaseMpcDispatcher {
         GlobalAssert.that(requestVector.length() == m + n);
 
         int totalPickupEffective = 0;
-
-        final NavigableMap<Integer, List<MpcRequest>> virtualLinkRequestsMap = new TreeMap<>(mpcRequestsMap.values().stream() //
-                .collect(Collectors.groupingBy(mpcRequest -> mpcRequest.vectorIndex)));
+        
+        final NavigableMap<Integer, List<AVRequest>> virtualLinkRequestMap = new TreeMap<>();
+        for(Entry<AVRequest,Integer> entry: requestVectorIndexMap.entrySet()){
+            if(virtualLinkRequestMap.containsKey(entry.getValue())){
+                virtualLinkRequestMap.get(entry.getValue()).add(entry.getKey());
+            }else{
+                virtualLinkRequestMap.put(entry.getValue(), new ArrayList<>());
+                virtualLinkRequestMap.get(entry.getValue()).add(entry.getKey());
+            }            
+        }
+        
+        
+        
 
         for (int vectorIndex = 0; vectorIndex < m + n; ++vectorIndex) {
             // ---
@@ -145,25 +154,26 @@ public class MPCDispatcher extends BaseMpcDispatcher {
             final int pickupOffset = 0; // <- should be 0 !!! only 1 for testing
             final int desiredPickup = requestVector.Get(vectorIndex).number().intValue() + pickupOffset;
             if (0 < desiredPickup) {
+                
+                final List<AVRequest> requestsAV = virtualLinkRequestMap.containsKey(vectorIndex) ? //
+                        virtualLinkRequestMap.get(vectorIndex) : Collections.emptyList();
 
-                final List<MpcRequest> requests = virtualLinkRequestsMap.containsKey(vectorIndex) ? //
-                        virtualLinkRequestsMap.get(vectorIndex) : Collections.emptyList();
-                Collections.sort(requests, MpcRequestComparator.INSTANCE);
+                Collections.sort(requestsAV, AVRequestComparator.INSTANCE);
 
                 // assert that requests are sorted, oldest requests are served
                 // first
                 double last = 0;
-                for (MpcRequest mpcRequest : requests) {
-                    GlobalAssert.that(last <= mpcRequest.avRequest.getSubmissionTime());
-                    last = mpcRequest.avRequest.getSubmissionTime();
+                for (AVRequest avr :requestsAV) {
+                    GlobalAssert.that(last <= avr.getSubmissionTime());
+                    last = avr.getSubmissionTime();
                 }
 
-                int min = Math.min(Math.min(desiredPickup, requests.size()), cars.size());
+                int min = Math.min(Math.min(desiredPickup, requestsAV.size()), cars.size());
 
                 // MPC1 code:
                 // ==========================
                 Map<RoboTaxi, AVRequest> pickupAssignments = new HashMap<>();
-                totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption1(min, requests, networkBounds, cars, this, pickupAssignments);
+                totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption1(min, requestsAV, networkBounds, cars, this, pickupAssignments);
                 for (Entry<RoboTaxi, AVRequest> entry : pickupAssignments.entrySet()) {
                     setRoboTaxiPickup(entry.getKey(), entry.getValue());
                 }
@@ -171,7 +181,7 @@ public class MPCDispatcher extends BaseMpcDispatcher {
                 // MPC2 code:
                 // ==========================
                 // Map<RoboTaxi, AVRequest> pickupAssignments = new HashMap<>();
-                // totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption2(min, requests, cars, this, pickupAssignments,
+                // totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption2(min, requestsAV, cars, this, pickupAssignments,
                 // new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction()));
                 // for (Entry<RoboTaxi, AVRequest> entry : pickupAssignments.entrySet()) {
                 // setRoboTaxiPickup(entry.getKey(), entry.getValue());

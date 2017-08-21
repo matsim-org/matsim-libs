@@ -25,7 +25,8 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
     protected final int samplingPeriod;
     final InstantPathFactory instantPathFactory;
     // requests that haven't received a pickup order yet
-    final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
+    // final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
+    final Map<AVRequest, Integer> requestVectorIndexMap = new HashMap<>();
 
     BaseMpcDispatcher( //
             AVDispatcherConfig config, //
@@ -39,8 +40,6 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
         // period between calls to MPC
         samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod"));
     }
-
-
 
     Map<VirtualNode, List<RoboTaxi>> getDivertableNotRebalancingNotPickupVehicles() {
         Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
@@ -56,30 +55,30 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
         return returnMap;
     }
 
+
     /** function computes mpcRequest objects for unserved requests
      * 
      * @param now */
     void manageIncomingRequests(double now) {
         final int m = virtualNetwork.getvLinksCount();
 
-        for (AVRequest avRequest : getUnassignedAVRequests()) // all current
-                                                              // requests
-            // only count request that haven't received a pickup order yet
-            // or haven't been processed yet, i.e. if request has been
-            // seen/computed before
-            if (!mpcRequestsMap.containsKey(avRequest)) {
+        for (AVRequest avRequest : getUnassignedAVRequests())
+            // all current requests only count request that haven't received a pickup order yet
+            // or haven't been processed yet, i.e. if request has been seen/computed before
+            if (!requestVectorIndexMap.containsKey(avRequest)) {
+
                 // check if origin and dest are from same virtualNode
                 final VirtualNode vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
                 final VirtualNode vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
                 GlobalAssert.that(vnFrom.equals(vnTo) == (vnFrom.index == vnTo.index));
                 if (vnFrom.equals(vnTo)) {
                     // self loop
-                    mpcRequestsMap.put(avRequest, new MpcRequest(avRequest, m, vnFrom));
+                    requestVectorIndexMap.put(avRequest, m + vnFrom.index);
                 } else {
                     // non-self loop
                     boolean success = false;
                     VrpPath vrpPath = instantPathFactory.getVrpPathWithTravelData( //
-                            avRequest.getFromLink(), avRequest.getToLink(), now); 
+                            avRequest.getFromLink(), avRequest.getToLink(), now);
                     // TODO perhaps add expected waitTime
                     VirtualNode fromIn = null;
                     for (Link link : vrpPath) {
@@ -89,7 +88,7 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
                         else //
                         if (fromIn != toIn) { // found adjacent node
                             VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
-                            mpcRequestsMap.put(avRequest, new MpcRequest(avRequest, virtualLink));
+                            requestVectorIndexMap.put(avRequest, virtualLink.getIndex());
                             success = true;
                             break;
                         }

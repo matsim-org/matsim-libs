@@ -74,11 +74,10 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
         Tensor waitCustomersPerVLink = Array.zeros(m + n); // +n accounts for self loop
         Tensor maxWaitingTimePerVLink = Array.zeros(m + n); // +n accounts for self loop
         for (AVRequest avRequest : unassignedRequests) { // requests that haven't received a dispatch yet
-            MpcRequest mpcRequest = mpcDispatcher.mpcRequestsMap.get(avRequest); // must not be null
-            waitCustomersPerVLink.set(Increment.ONE, mpcRequest.vectorIndex);
-            double waitTime = now - mpcRequest.avRequest.getSubmissionTime();
+            waitCustomersPerVLink.set(Increment.ONE, mpcDispatcher.requestVectorIndexMap.get(avRequest));
+            double waitTime = now - avRequest.getSubmissionTime();
             GlobalAssert.that(0 <= waitTime);
-            maxWaitingTimePerVLink.set(Max.function(DoubleScalar.of(waitTime)), mpcRequest.vectorIndex); // TODO is this correct
+            maxWaitingTimePerVLink.set(Max.function(DoubleScalar.of(waitTime)), mpcDispatcher.requestVectorIndexMap.get(avRequest)); // TODO is this correct
         }
         {
             double[] array = Primitives.toArrayDouble(waitCustomersPerVLink);
@@ -149,8 +148,8 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
                     if (!accountedVehicles.contains(robotaxi)) {
                         // request
                         int index = -1;
-                        if (mpcDispatcher.mpcRequestsMap.containsKey(avRequest))
-                            index = mpcDispatcher.mpcRequestsMap.get(avRequest).vectorIndex;
+                        if (mpcDispatcher.requestVectorIndexMap.containsKey(avRequest))
+                            index = mpcDispatcher.requestVectorIndexMap.get(avRequest);
                         else {
                             index = m + virtualNetwork.getVirtualNode(avRequest.getFromLink()).index;
                             new RuntimeException("map should provide request info").printStackTrace();

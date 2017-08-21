@@ -3,7 +3,6 @@
  */
 package playground.fseccamo.dispatcher;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,14 +24,14 @@ public class MPCAuxiliary {
 
     /** @param min
      * @param requests */
-    /* package */ static int cellMatchingMPCOption1(int min, List<MpcRequest> requests, double[] networkBounds, List<RoboTaxi> cars,
+    /* package */ static int cellMatchingMPCOption1(int min, List<AVRequest> requests, double[] networkBounds, List<RoboTaxi> cars,
             MPCDispatcher mpcDispatcher, Map<RoboTaxi, AVRequest> pickupAssignments) {
 
         int totalPickupEffectiveAdd = 0;
         for (int count = 0; count < min; ++count) {
 
             // take a request
-            final MpcRequest mpcRequest = requests.get(count);
+            final AVRequest avRequest =  requests.get(count);
 
             // build tree with robotaxis and get robotaxi closest to request
             final QuadTree<RoboTaxi> unassignedVehiclesTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
@@ -40,8 +39,8 @@ public class MPCAuxiliary {
                 unassignedVehiclesTree.put(robotaxi.getDivertableLocation().getCoord().getX(), robotaxi.getDivertableLocation().getCoord().getY(), robotaxi);
             }
             RoboTaxi robotaxi = unassignedVehiclesTree.getClosest( //
-                    mpcRequest.avRequest.getFromLink().getCoord().getX(), //
-                    mpcRequest.avRequest.getFromLink().getCoord().getY());
+                    avRequest.getFromLink().getCoord().getX(), //
+                    avRequest.getFromLink().getCoord().getY());
 
             GlobalAssert.that(!mpcDispatcher.getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER).contains(robotaxi));
             {
@@ -50,7 +49,7 @@ public class MPCAuxiliary {
             }
 
             // dispatch the car and bookkeeping
-            pickupAssignments.put(robotaxi, mpcRequest.avRequest);
+            pickupAssignments.put(robotaxi, avRequest);
             ++totalPickupEffectiveAdd;
         }
 
@@ -58,17 +57,13 @@ public class MPCAuxiliary {
 
     }
 
-    /* package */ static int cellMatchingMPCOption2(int min, List<MpcRequest> requests, List<RoboTaxi> cars, MPCDispatcher mpcDispatcher,
+    /* package */ static int cellMatchingMPCOption2(int min, List<AVRequest> requests, List<RoboTaxi> cars, MPCDispatcher mpcDispatcher,
             Map<RoboTaxi, AVRequest> pickupAssignments, AbstractVehicleDestMatcher vehicleDestMatcher) {
         int totalPickupEffectiveAdd = 0;
 
-        List<AVRequest> requestsAtNode = new ArrayList<>();
-        for (MpcRequest mpcReq : requests) {
-            requestsAtNode.add(mpcReq.avRequest);
-        }
 
         // feed to matcher
-        Map<RoboTaxi, AVRequest> matching = vehicleDestMatcher.matchAVRequest(cars, requestsAtNode);
+        Map<RoboTaxi, AVRequest> matching = vehicleDestMatcher.matchAVRequest(cars, requests);
 
         // execute the computed matching
         for (Entry<RoboTaxi, AVRequest> entry : matching.entrySet()) {
