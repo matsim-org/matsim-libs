@@ -24,6 +24,8 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 abstract class BaseMpcDispatcher extends PartitionedDispatcher {
     protected final int samplingPeriod;
     final InstantPathFactory instantPathFactory;
+    // requests that haven't received a pickup order yet
+    final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
 
     BaseMpcDispatcher( //
             AVDispatcherConfig config, //
@@ -38,8 +40,7 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
         samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod"));
     }
 
-    // requests that haven't received a pickup order yet
-    final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
+
 
     Map<VirtualNode, List<RoboTaxi>> getDivertableNotRebalancingNotPickupVehicles() {
         Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
@@ -78,11 +79,8 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
                     // non-self loop
                     boolean success = false;
                     VrpPath vrpPath = instantPathFactory.getVrpPathWithTravelData( //
-                            avRequest.getFromLink(), avRequest.getToLink(), now); // TODO
-                                                                                  // perhaps
-                                                                                  // add
-                                                                                  // expected
-                                                                                  // waitTime
+                            avRequest.getFromLink(), avRequest.getToLink(), now); 
+                    // TODO perhaps add expected waitTime
                     VirtualNode fromIn = null;
                     for (Link link : vrpPath) {
                         final VirtualNode toIn = virtualNetwork.getVirtualNode(link);
