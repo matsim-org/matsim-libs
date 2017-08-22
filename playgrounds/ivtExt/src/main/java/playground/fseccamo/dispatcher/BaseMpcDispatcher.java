@@ -43,7 +43,7 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
 
     Map<VirtualNode, List<RoboTaxi>> getDivertableNotRebalancingNotPickupVehicles() {
         Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
-        Map<VirtualNode, List<RoboTaxi>> allVehicles = getVirtualNodeDivertablenotRebalancingRoboTaxis();
+        Map<VirtualNode, List<RoboTaxi>> allVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
         for (VirtualNode vn : allVehicles.keySet()) {
             for (RoboTaxi robotaxi : allVehicles.get(vn)) {
                 if (!robotaxi.getAVStatus().equals(AVStatus.DRIVETOCUSTMER)) {

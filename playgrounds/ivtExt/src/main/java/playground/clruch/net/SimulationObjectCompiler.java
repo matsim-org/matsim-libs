@@ -15,11 +15,7 @@ import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public class SimulationObjectCompiler {
-
-    private final SimulationObject simulationObject;
-    private final Map<String, VehicleContainer> vehicleMap = new HashMap<>();
-    private final MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
-
+    
     public static SimulationObjectCompiler create( //
             long now, String infoLine, int total_matchedRequests) {
         final MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
@@ -30,6 +26,13 @@ public class SimulationObjectCompiler {
         simulationObject.total_matchedRequests = total_matchedRequests;
         return new SimulationObjectCompiler(simulationObject);
     }
+    
+
+    private final SimulationObject simulationObject;
+    private final Map<String, VehicleContainer> vehicleMap = new HashMap<>();
+    private final MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
+
+
 
     private SimulationObjectCompiler(SimulationObject simulationObject) {
         this.simulationObject = simulationObject;

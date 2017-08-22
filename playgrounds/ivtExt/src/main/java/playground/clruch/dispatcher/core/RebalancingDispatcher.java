@@ -26,7 +26,7 @@ public abstract class RebalancingDispatcher extends UniversalDispatcher {
      * 
      * @param roboTaxi
      * @param destination */
-    protected synchronized final void setRoboTaxiRebalance(final RoboTaxi roboTaxi, final Link destination) {
+    protected final void setRoboTaxiRebalance(final RoboTaxi roboTaxi, final Link destination) {
         GlobalAssert.that(roboTaxi.isWithoutCustomer());
         setRoboTaxiDiversion(roboTaxi, destination, AVStatus.REBALANCEDRIVE);
         eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), roboTaxi, destination));

@@ -141,7 +141,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
               // Initialize
               // ------------------------------------------------------------------------------------------------------
               // Get System State
-                Map<VirtualNode, List<RoboTaxi>> available_Vehicles = getVirtualNodeDivertablenotRebalancingRoboTaxis();
+                Map<VirtualNode, List<RoboTaxi>> available_Vehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
                 Map<VirtualNode, List<RoboTaxi>> v_ij_reb = getVirtualNodeRebalancingToRoboTaxis();
                 // Declare System State Matrices
                 Tensor rebalancingTovStation = Array.zeros(N_vStations);
@@ -394,7 +394,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 }
 
                 // collect available vehicles per vNode
-                Map<VirtualNode, List<RoboTaxi>> available_Vehicles = getVirtualNodeDivertablenotRebalancingRoboTaxis();
+                Map<VirtualNode, List<RoboTaxi>> available_Vehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
 
                 // assign destinations to the available vehicles
                 {

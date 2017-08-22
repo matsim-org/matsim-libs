@@ -97,7 +97,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
             Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
             // II.i compute rebalancing vehicles and send to virtualNodes
             {
-                Map<VirtualNode, List<RoboTaxi>> availableVehicles = getVirtualNodeDivertablenotRebalancingRoboTaxis();
+                Map<VirtualNode, List<RoboTaxi>> availableVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
                 int totalAvailable = 0;
                 for (List<RoboTaxi> robotaxiList : availableVehicles.values()) {
                     totalAvailable += robotaxiList.size();
