@@ -1,11 +1,8 @@
 // code by clruch and jph
 package playground.clruch.dispatcher.core;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -18,7 +15,10 @@ import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-/** a {@link PartitionedDispatcher} has a {@link VirtualNetwork} */
+/** All dispatchers wich perform rebalancing and use a virtualNetwork dividing the city into zones are derived from {@link PartitionedDispatcher}.
+ * A {@link PartitionedDispatcher} always has a {@link VirtualNetwork}
+ * 
+ * @author Claudio Ruch */
 public abstract class PartitionedDispatcher extends RebalancingDispatcher {
     protected final VirtualNetwork virtualNetwork; //
 
@@ -33,45 +33,39 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
         GlobalAssert.that(virtualNetwork != null);
     }
 
+    /** @return {@link java.util.Map} where all {@link AVRequest} are listed at the {@link VirtualNode} where their {@link AVRequest.fromLink} is. */
     protected Map<VirtualNode, List<AVRequest>> getVirtualNodeRequests() {
-        Map<VirtualNode, List<AVRequest>> returnMap = getAVRequests().stream() //
-                .parallel() //
-                .collect(Collectors.groupingBy(req -> virtualNetwork.getVirtualNode(req.getFromLink())));
-
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
-            if (!returnMap.containsKey(virtualNode)) {
-                returnMap.put(virtualNode, Collections.emptyList());
-            }
-        }
+        Map<VirtualNode, List<AVRequest>> returnMap = virtualNetwork.createVNodeTypeMap();
+        getAVRequests().stream()//
+                .forEach(avr -> returnMap.get(virtualNetwork.getVirtualNode(avr.getFromLink())).add(avr));
         return returnMap;
     }
 
+    /** @return {@link java.util.Map} where all divertable not rebalancing {@link RoboTaxi} are listed at the {@link VirtualNode} where their {@link Link}
+     *         divertableLocation is. */
     protected synchronized Map<VirtualNode, List<RoboTaxi>> getVirtualNodeDivertablenotRebalancingRoboTaxis() {
-        // return list of vehicles
         Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
-        for (RoboTaxi robotaxi : getDivertableNotRebalancingRoboTaxis()) {
-            Link link = robotaxi.getDivertableLocation();
-            returnMap.get(virtualNetwork.getVirtualNode(link)).add(robotaxi);
-        }
+        getDivertableNotRebalancingRoboTaxis().stream()//
+                .forEach(rt -> returnMap.get(virtualNetwork.getVirtualNode(rt.getDivertableLocation())).add(rt));
         return returnMap;
     }
 
+    /** @return {@link java.util.Map} where all rebalancing {@link RoboTaxi} are listed at the {@link VirtualNode} where their {@link Link} current
+     *         driveDestination is. */
     protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeRebalancingToRoboTaxis() {
         Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
-        for (RoboTaxi robotaxi : getRebalancingRoboTaxis()) {
-            VirtualNode toNode = virtualNetwork.getVirtualNode(robotaxi.getCurrentDriveDestination());
-            returnMap.get(toNode).add(robotaxi);
-        }
+        getRebalancingRoboTaxis().stream()//
+                .forEach(rt -> returnMap.get(virtualNetwork.getVirtualNode(rt.getCurrentDriveDestination())).add(rt));
         return returnMap;
 
     }
 
+    /** @return {@link java.util.Map} where all roboTaxis with customer {@link RoboTaxi} are listed at the {@link VirtualNode} where their {@link Link} current
+     *         driveDestination is. */
     protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeArrivingWithCustomerRoboTaxis() {
         Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
-        for (RoboTaxi robotaxi : getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER)) {
-            VirtualNode toNode = virtualNetwork.getVirtualNode(robotaxi.getCurrentDriveDestination());
-            returnMap.get(toNode).add(robotaxi);
-        }
+        getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER).stream()//
+                .forEach(rt -> returnMap.get(virtualNetwork.getVirtualNode(rt.getCurrentDriveDestination())).add(rt));
         return returnMap;
     }
 
