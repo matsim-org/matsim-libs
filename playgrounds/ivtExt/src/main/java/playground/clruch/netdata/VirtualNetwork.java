@@ -158,7 +158,7 @@ public class VirtualNetwork implements Serializable {
     /** @param col {@link Collection} of objects associated to a {@link Link}
      * @param function bijection linking a object from @param col to a {@link Link}
      * @return {@link java.util.Map} where all objects in @param col are sorted at {@link VirtualNode} that the link supplied by @param function belongs to */
-    private <T> Map<VirtualNode, List<T>> SortatVirtualNode(Collection<T> col, Function<T, Link> function) {
+    public <T> Map<VirtualNode, List<T>> sortaAtVirtualNode(Collection<T> col, Function<T, Link> function) {
         Map<VirtualNode, List<T>> returnMap = createVNodeTypeMap();
         col.stream()//
                 .forEach(c -> returnMap.get(getVirtualNode(function.apply(c))).add(c));

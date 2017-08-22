@@ -53,7 +53,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 
-//TODO remove comments. 
+
 public class LPFBDispatcher extends PartitionedDispatcher {
     private final int rebalancingPeriod;
     private final int dispatchPeriod;
@@ -107,8 +107,6 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                 int num_requests = requests.values().stream().mapToInt(List::size).sum();
                 double vi_desired_num = ((numRobotaxi - num_requests) / (double) virtualNetwork.getvNodesCount());
                 int vi_desired_numint = (int) Math.floor(vi_desired_num);
-//                System.out.println("vi_desired_num = " + vi_desired_num);
-//                System.out.println("vi_desired_numint = " + vi_desired_numint);
                 Tensor vi_desiredT = Tensors.vector(i -> RationalScalar.of(vi_desired_numint, 1), virtualNetwork.getvNodesCount());
 
                 // calculate excess vehicles per virtual Node i, where v_i excess = vi_own - c_i =
@@ -122,45 +120,9 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                     vi_excessT.set(RealScalar.of(viExcessVal), virtualNode.index);
                 }
 
-//                System.out.println("TALLY MID="+Tally.sorted(Tensors.vectorInt(getRoboTaxis().stream().mapToInt(rt -> rt.getAVStatus().ordinal()).toArray())));
-//                // getRoboTaxiSubset(AVStatus.STAY).size();
-//
-//                int totalavailable = 0;
-//                System.out.print("availableVehicles = [ ");
-//                for (VirtualNode vn : availableVehicles.keySet()) {
-//                    System.out.print(availableVehicles.get(vn).size() + " ");
-//                    totalavailable += availableVehicles.get(vn).size();
-//                }
-//                System.out.println("");
-//                System.out.print("requests = [ ");
-//                for (VirtualNode vn : requests.keySet()) {
-//                    System.out.print(requests.get(vn).size() + " ");
-//                }
-//
-//                System.out.println(" ]");
-//                System.out.println("total avaialable vehicles = " + totalAvailable);
-//
-//                System.out.print("v_ij_reb = [ ");
-//                for (VirtualNode vn : v_ij_reb.keySet()) {
-//                    System.out.print(v_ij_reb.get(vn).size() + " ");
-//                }
-//                System.out.println(" ]");
-//                System.out.print("v_ij_cust = [ ");
-//                for (VirtualNode vn : v_ij_cust.keySet()) {
-//                    System.out.print(v_ij_cust.get(vn).size() + " ");
-//                }
-//                System.out.println(" ]");
-//                System.out.println(" vi_desiredT = " + Pretty.of(vi_desiredT));
-//                System.out.println(" vi_excessT = " + Pretty.of(vi_excessT));
-//                System.out.println("total excess = " + Total.of(vi_excessT));
-//                System.out.println("number of virtual nodes : " + virtualNetwork.getvNodesCount());
 
                 // solve the linear program with updated right-hand side
-                // fill right-hand-side // TODO if MATSim would never produce zero available
-                // vehicles, we could save these lines
                 Tensor rhs = vi_desiredT.subtract(vi_excessT);
-//                System.out.println("rhs = " + Pretty.of(rhs));
-//                System.out.println("total of rhs = " + Pretty.of(Total.of(rhs)));
                 Tensor rebalanceCount2 = Tensors.empty();
                 if (totalAvailable > 0) {
                     rebalanceCount2 = lpVehicleRebalancing.solveUpdatedLP(rhs, GLPKConstants.GLP_LO);
@@ -168,7 +130,6 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                     rebalanceCount2 = Array.zeros(virtualNetwork.getvNodesCount(), virtualNetwork.getvNodesCount());
                 }
                 Tensor rebalanceCount = Round.of(rebalanceCount2);
-                // TODO this should never become active, can be possibly removed later
                 // assert that solution is integer and does not contain negative values
                 GlobalAssert.that(rebalanceCount.flatten(-1).map(Scalar.class::cast).map(s -> s.number().doubleValue()).allMatch(e -> e >= 0));
 

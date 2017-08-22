@@ -20,7 +20,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * 
  * @author Claudio Ruch
  * @param <T> */
-public abstract class PartitionedDispatcher<T> extends RebalancingDispatcher {
+public abstract class PartitionedDispatcher extends RebalancingDispatcher {
     protected final VirtualNetwork virtualNetwork; //
 
     public PartitionedDispatcher( //
@@ -36,41 +36,25 @@ public abstract class PartitionedDispatcher<T> extends RebalancingDispatcher {
 
     /** @return {@link java.util.Map} where all {@link AVRequest} are listed at the {@link VirtualNode} where their {@link AVRequest.fromLink} is. */
     protected Map<VirtualNode, List<AVRequest>> getVirtualNodeRequests() {
-        Map<VirtualNode, List<AVRequest>> returnMap = virtualNetwork.createVNodeTypeMap();
-        getAVRequests().stream()//
-                .forEach(avr -> returnMap.get(virtualNetwork.getVirtualNode(avr.getFromLink())).add(avr));
-        return returnMap;
+        return virtualNetwork.sortaAtVirtualNode(getAVRequests(), AVRequest::getFromLink);
     }
 
     /** @return {@link java.util.Map} where all divertable not rebalancing {@link RoboTaxi} are listed at the {@link VirtualNode} where their {@link Link}
      *         divertableLocation is. */
     protected synchronized Map<VirtualNode, List<RoboTaxi>> getVirtualNodeDivertablenotRebalancingRoboTaxis() {
-        Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
-        getDivertableNotRebalancingRoboTaxis().stream()//
-                .forEach(rt -> returnMap.get(virtualNetwork.getVirtualNode(rt.getDivertableLocation())).add(rt));
-        return returnMap;
+        return virtualNetwork.sortaAtVirtualNode(getDivertableNotRebalancingRoboTaxis(), RoboTaxi::getDivertableLocation);
     }
 
     /** @return {@link java.util.Map} where all rebalancing {@link RoboTaxi} are listed at the {@link VirtualNode} where their {@link Link} current
      *         driveDestination is. */
     protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeRebalancingToRoboTaxis() {
-        Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
-        getRebalancingRoboTaxis().stream()//
-                .forEach(rt -> returnMap.get(virtualNetwork.getVirtualNode(rt.getCurrentDriveDestination())).add(rt));
-        return returnMap;
-
+        return virtualNetwork.sortaAtVirtualNode(getRebalancingRoboTaxis(), RoboTaxi::getCurrentDriveDestination);
     }
 
     /** @return {@link java.util.Map} where all roboTaxis with customer {@link RoboTaxi} are listed at the {@link VirtualNode} where their {@link Link} current
      *         driveDestination is. */
     protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeArrivingWithCustomerRoboTaxis() {
-        Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
-        getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER).stream()//
-                .forEach(rt -> returnMap.get(virtualNetwork.getVirtualNode(rt.getCurrentDriveDestination())).add(rt));
-        return returnMap;
+        return virtualNetwork.sortaAtVirtualNode(getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER), RoboTaxi::getCurrentDriveDestination);
     }
-
-    
-
 
 }
