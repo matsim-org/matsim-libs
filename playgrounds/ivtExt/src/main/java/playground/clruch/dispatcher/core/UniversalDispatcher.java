@@ -144,7 +144,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
             pickupRegister.remove(avRequest); // remove AVRequest/RoboTaxi pair corresponding to avRequest
             pickupRegister.put(avRequest, roboTaxi); // add new pair
         }
-
+        GlobalAssert.that(pickupRegister.size() == pickupRegister.values().stream().distinct().count());
 
         // 2) set vehicle diversion
         setRoboTaxiDiversion(roboTaxi, avRequest.getFromLink(), AVStatus.DRIVETOCUSTMER);
