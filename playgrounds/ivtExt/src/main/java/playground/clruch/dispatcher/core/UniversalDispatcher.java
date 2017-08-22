@@ -201,7 +201,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @param robotaxi
      * @param avRequest */
     private synchronized final void setAcceptRequest(RoboTaxi robotaxi, AVRequest avRequest) {
-        GlobalAssert.that(pendingRequests.contains(avRequest)); // request is known to the system
         robotaxi.setAVStatus(AVStatus.DRIVEWITHCUSTOMER);
         boolean statusPen = pendingRequests.remove(avRequest);
         GlobalAssert.that(statusPen);
