@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.QuadTree;
@@ -24,14 +25,14 @@ public class MPCAuxiliary {
 
     /** @param min
      * @param requests */
-    /* package */ static int cellMatchingMPCOption1(int min, List<AVRequest> requests, double[] networkBounds, List<RoboTaxi> cars,
-            MPCDispatcher mpcDispatcher, Map<RoboTaxi, AVRequest> pickupAssignments) {
+    /* package */ static int cellMatchingMPCOption1(int min, List<AVRequest> requests, double[] networkBounds, List<RoboTaxi> cars, MPCDispatcher mpcDispatcher,
+            BiConsumer<RoboTaxi, AVRequest> biConsumer) {
 
         int totalPickupEffectiveAdd = 0;
         for (int count = 0; count < min; ++count) {
 
             // take a request
-            final AVRequest avRequest =  requests.get(count);
+            final AVRequest avRequest = requests.get(count);
 
             // build tree with robotaxis and get robotaxi closest to request
             final QuadTree<RoboTaxi> unassignedVehiclesTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
@@ -49,10 +50,15 @@ public class MPCAuxiliary {
             }
 
             // dispatch the car and bookkeeping
-            pickupAssignments.put(robotaxi, avRequest);
+            // pickupAssignments.put(robotaxi, avRequest);
+            biConsumer.accept(robotaxi, avRequest);
+            System.out.println(" pickup " + robotaxi.getId() + " " + avRequest.getId());
             ++totalPickupEffectiveAdd;
         }
 
+        // GlobalAssert.that(totalPickupEffectiveAdd == min);
+        if (totalPickupEffectiveAdd != 0 || min != 0)
+            System.out.println("PICKUP " + totalPickupEffectiveAdd + " <= " + min);
         return totalPickupEffectiveAdd;
 
     }
@@ -60,7 +66,6 @@ public class MPCAuxiliary {
     /* package */ static int cellMatchingMPCOption2(int min, List<AVRequest> requests, List<RoboTaxi> cars, MPCDispatcher mpcDispatcher,
             Map<RoboTaxi, AVRequest> pickupAssignments, AbstractVehicleDestMatcher vehicleDestMatcher) {
         int totalPickupEffectiveAdd = 0;
-
 
         // feed to matcher
         Map<RoboTaxi, AVRequest> matching = vehicleDestMatcher.matchAVRequest(cars, requests);

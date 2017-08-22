@@ -28,6 +28,7 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.red.Min;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
@@ -128,21 +129,20 @@ public class MPCDispatcher extends BaseMpcDispatcher {
         DoubleArray doubleArray = container.get("pickupPerVLink");
         requestVector = Round.of(Tensors.vectorDouble(doubleArray.value)); // integer values = # person
         GlobalAssert.that(requestVector.length() == m + n);
+        if (21600 < getTimeNow()) // as of 6 am
+            System.out.println(" reqVec=" + Pretty.of(requestVector));
 
         int totalPickupEffective = 0;
-        
+
         final NavigableMap<Integer, List<AVRequest>> virtualLinkRequestMap = new TreeMap<>();
-        for(Entry<AVRequest,Integer> entry: requestVectorIndexMap.entrySet()){
-            if(virtualLinkRequestMap.containsKey(entry.getValue())){
+        for (Entry<AVRequest, Integer> entry : requestVectorIndexMap.entrySet()) {
+            if (virtualLinkRequestMap.containsKey(entry.getValue())) {
                 virtualLinkRequestMap.get(entry.getValue()).add(entry.getKey());
-            }else{
+            } else {
                 virtualLinkRequestMap.put(entry.getValue(), new ArrayList<>());
                 virtualLinkRequestMap.get(entry.getValue()).add(entry.getKey());
-            }            
+            }
         }
-        
-        
-        
 
         for (int vectorIndex = 0; vectorIndex < m + n; ++vectorIndex) {
             // ---
@@ -154,7 +154,7 @@ public class MPCDispatcher extends BaseMpcDispatcher {
             final int pickupOffset = 0; // <- should be 0 !!! only 1 for testing
             final int desiredPickup = requestVector.Get(vectorIndex).number().intValue() + pickupOffset;
             if (0 < desiredPickup) {
-                
+
                 final List<AVRequest> requestsAV = virtualLinkRequestMap.containsKey(vectorIndex) ? //
                         virtualLinkRequestMap.get(vectorIndex) : Collections.emptyList();
 
@@ -163,7 +163,7 @@ public class MPCDispatcher extends BaseMpcDispatcher {
                 // assert that requests are sorted, oldest requests are served
                 // first
                 double last = 0;
-                for (AVRequest avr :requestsAV) {
+                for (AVRequest avr : requestsAV) {
                     GlobalAssert.that(last <= avr.getSubmissionTime());
                     last = avr.getSubmissionTime();
                 }
@@ -172,11 +172,8 @@ public class MPCDispatcher extends BaseMpcDispatcher {
 
                 // MPC1 code:
                 // ==========================
-                Map<RoboTaxi, AVRequest> pickupAssignments = new HashMap<>();
-                totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption1(min, requestsAV, networkBounds, cars, this, pickupAssignments);
-                for (Entry<RoboTaxi, AVRequest> entry : pickupAssignments.entrySet()) {
-                    setRoboTaxiPickup(entry.getKey(), entry.getValue());
-                }
+                totalPickupEffective += //
+                        MPCAuxiliary.cellMatchingMPCOption1(min, requestsAV, networkBounds, cars, this, this::setRoboTaxiPickup);
 
                 // MPC2 code:
                 // ==========================

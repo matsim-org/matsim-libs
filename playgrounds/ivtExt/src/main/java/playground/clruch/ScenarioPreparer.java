@@ -53,7 +53,7 @@ public class ScenarioPreparer {
 
         final int maxPopulationSize = 3000;
 
-        final int numVirtualNodes = 40;
+        final int numVirtualNodes = 10;
         final int dtTravelData = 1800;
         final boolean completeGraph = true;
 

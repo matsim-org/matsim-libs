@@ -77,7 +77,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     /** @return AVRequests which are currently not assigned to a vehicle */
     protected synchronized final List<AVRequest> getUnassignedAVRequests() {
         return pendingRequests.stream() //
-                .filter(r -> pickupRegister.keySet().contains(r)) //
+                .filter(r -> !pickupRegister.containsKey(r)) //
                 .collect(Collectors.toList());
     }
 
