@@ -18,8 +18,9 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 /** All dispatchers wich perform rebalancing and use a virtualNetwork dividing the city into zones are derived from {@link PartitionedDispatcher}.
  * A {@link PartitionedDispatcher} always has a {@link VirtualNetwork}
  * 
- * @author Claudio Ruch */
-public abstract class PartitionedDispatcher extends RebalancingDispatcher {
+ * @author Claudio Ruch
+ * @param <T> */
+public abstract class PartitionedDispatcher<T> extends RebalancingDispatcher {
     protected final VirtualNetwork virtualNetwork; //
 
     public PartitionedDispatcher( //
@@ -68,5 +69,8 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
                 .forEach(rt -> returnMap.get(virtualNetwork.getVirtualNode(rt.getCurrentDriveDestination())).add(rt));
         return returnMap;
     }
+
+    
+
 
 }

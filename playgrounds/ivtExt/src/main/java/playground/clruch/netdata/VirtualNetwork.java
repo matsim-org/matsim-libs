@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -19,9 +20,7 @@ import org.matsim.api.core.v01.network.Network;
 
 import playground.clruch.utils.GlobalAssert;
 
-/**
- * Created by Claudio on 2/8/2017.
- */
+/** Created by Claudio on 2/8/2017. */
 public class VirtualNetwork implements Serializable {
 
     /**
@@ -35,7 +34,6 @@ public class VirtualNetwork implements Serializable {
     // is stored but only used to create references LINK
     private final Map<String, VirtualNode> linkVNodeMapRAWVERYPRIVATE = new HashMap<>();
     private final Map<Point, VirtualLink> virtualLinkPairs = new HashMap<>();
-    
 
     /* package */ VirtualNetwork() {
         virtualNetworkID = System.currentTimeMillis();
@@ -51,27 +49,21 @@ public class VirtualNetwork implements Serializable {
         return Collections.unmodifiableList(virtualLinks);
     }
 
-    /**
-     * @return number of virtual Nodes
-     */
+    /** @return number of virtual Nodes */
     public int getvNodesCount() {
         return virtualNodes.size();
     }
 
-    /**
-     * @return number of virtual Links
-     */
+    /** @return number of virtual Links */
     public int getvLinksCount() {
         return virtualLinks.size();
     }
 
-    /**
-     * Gets the virtual node belonging to a link of the network. The lookup is fast.
+    /** Gets the virtual node belonging to a link of the network. The lookup is fast.
      *
      * @param link
      *            of the network
-     * @return virtual node belonging to link
-     */
+     * @return virtual node belonging to link */
     public final VirtualNode getVirtualNode(Link link) {
         GlobalAssert.that(link != null);
         if (!linkVNodeMap.containsKey(link)) {
@@ -81,10 +73,8 @@ public class VirtualNetwork implements Serializable {
         return linkVNodeMap.get(link);
     }
 
-    /**
-     * @param index
-     * @return the virtualLink belonging to a certain index.
-     */
+    /** @param index
+     * @return the virtualLink belonging to a certain index. */
     public final VirtualLink getVirtualLink(int index) {
         return virtualLinks.get(index);
     }
@@ -120,30 +110,24 @@ public class VirtualNetwork implements Serializable {
         return new Point(fromIn.index, toIn.index);
     }
 
-    /**
-     * @param fromIn
+    /** @param fromIn
      * @param toIn
      * @return VirtualLink object between fromIn and toIn, or null if such a VirtualLink is not
-     *         defined
-     */
+     *         defined */
     public VirtualLink getVirtualLink(VirtualNode fromIn, VirtualNode toIn) {
         return virtualLinkPairs.get(nodePair_key(fromIn, toIn));
     }
 
-    /**
-     * @param fromIn
+    /** @param fromIn
      * @param toIn
-     * @return true if VirtualLink object between fromIn and toIn is defined
-     */
+     * @return true if VirtualLink object between fromIn and toIn is defined */
     public boolean containsVirtualLink(VirtualNode fromIn, VirtualNode toIn) {
         return virtualLinkPairs.containsKey(nodePair_key(fromIn, toIn));
     }
 
-    /**
-     * Completes the missing references after the virtualNetwork was read from a serialized bitmap.
+    /** Completes the missing references after the virtualNetwork was read from a serialized bitmap.
      * 
-     * @param network
-     */
+     * @param network */
     public void fillSerializationInfo(Network network) {
         fillLinkVNodeMap(network);
         virtualNodes.stream().forEach(v -> v.setLinksAfterSerialization(network));
@@ -162,7 +146,7 @@ public class VirtualNetwork implements Serializable {
         }
         checkConsistency();
     }
-    
+
     /** @return return virtualNode related HashMaps */
     public <Type> Map<VirtualNode, List<Type>> createVNodeTypeMap() {
         Map<VirtualNode, List<Type>> returnMap = new HashMap<>();
@@ -170,8 +154,16 @@ public class VirtualNetwork implements Serializable {
             returnMap.put(virtualNode, new ArrayList<>());
         return returnMap;
     }
-    
-    
+
+    /** @param col {@link Collection} of objects associated to a {@link Link}
+     * @param function bijection linking a object from @param col to a {@link Link}
+     * @return {@link java.util.Map} where all objects in @param col are sorted at {@link VirtualNode} that the link supplied by @param function belongs to */
+    private <T> Map<VirtualNode, List<T>> SortatVirtualNode(Collection<T> col, Function<T, Link> function) {
+        Map<VirtualNode, List<T>> returnMap = createVNodeTypeMap();
+        col.stream()//
+                .forEach(c -> returnMap.get(getVirtualNode(function.apply(c))).add(c));
+        return returnMap;
+    }
 
     protected void fillVNodeMapRAWVERYPRIVATE() {
         GlobalAssert.that(!linkVNodeMap.isEmpty());
@@ -187,11 +179,10 @@ public class VirtualNetwork implements Serializable {
         GlobalAssert.that(!linkVNodeMapRAWVERYPRIVATE.isEmpty());
         GlobalAssert.that(linkVNodeMap != null);
     }
-    
-    public long getvNetworkID(){
+
+    public long getvNetworkID() {
         return virtualNetworkID;
     }
-    
 
     // TODO don't delete this function but move outside into class e.g. VirtualNetworkHelper
     public void printForTesting(Network network) {
@@ -211,7 +202,5 @@ public class VirtualNetwork implements Serializable {
         }
         System.out.println("total: #vNodes=" + getVirtualNodes().size() + ", #vLinks=" + getVirtualLinks().size());
     }
-    
-    
 
 }
