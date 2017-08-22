@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -44,7 +45,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final FuturePathFactory futurePathFactory;
     private final Set<AVRequest> pendingRequests = new LinkedHashSet<>();
     private final Set<AVRequest> publishPeriodMatchedRequests = new HashSet<>();
-    private final HashMap<AVRequest, RoboTaxi> pickupRegister = new HashMap<>();
+    private final Map<AVRequest, RoboTaxi> pickupRegister = new HashMap<>();
     private final double pickupDurationPerStop;
     private final double dropoffDurationPerStop;
     protected int publishPeriod; // not final, so that dispatchers can disable, or manipulate
@@ -165,7 +166,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(robotaxi.isWithoutDirective());
         robotaxi.setAVStatus(avstatus);
 
-
         // udpate schedule of RoboTaxi
         final Schedule schedule = robotaxi.getSchedule();
         Task task = schedule.getCurrentTask(); // <- implies that task is started
@@ -202,8 +202,14 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
      * @param avRequest */
     private synchronized final void setAcceptRequest(RoboTaxi robotaxi, AVRequest avRequest) {
         robotaxi.setAVStatus(AVStatus.DRIVEWITHCUSTOMER);
-        boolean statusPen = pendingRequests.remove(avRequest);
-        GlobalAssert.that(statusPen);
+        {
+            boolean statusPen = pendingRequests.remove(avRequest);
+            GlobalAssert.that(statusPen);
+        }
+        {
+            RoboTaxi former = pickupRegister.remove(avRequest);
+            GlobalAssert.that(robotaxi == former);
+        }
 
         // save avRequests which are matched for one publishPeriod to ensure no requests are lost in the recording.
         publishPeriodMatchedRequests.add(avRequest);
@@ -226,17 +232,20 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     /** complete all matchings if a {@link RoboTaxi} has arrived at the fromLink of an {@link AVRequest} */
     @Override
     void executePickups() {
-        Set<AVRequest> reqToRemove = new HashSet<>();
-        for (AVRequest avRequest : pickupRegister.keySet()) {
-            RoboTaxi pickupVehicle = pickupRegister.get(avRequest);
+        // Set<AVRequest> reqToRemove = new HashSet<>();
+        Map<AVRequest, RoboTaxi> pickupRegisterCopy = new HashMap<>(pickupRegister);
+        for (Entry<AVRequest, RoboTaxi> entry : pickupRegisterCopy.entrySet()) {
+            AVRequest avRequest = entry.getKey();
+            GlobalAssert.that(pendingRequests.contains(avRequest));
+            RoboTaxi pickupVehicle = entry.getValue();
             Link pickupVehicleLink = pickupVehicle.getDivertableLocation();
-            if (avRequest.getFromLink().equals(pickupVehicleLink) && pendingRequests.contains(avRequest) && pickupVehicle.isInStayTask()) {
+            if (avRequest.getFromLink().equals(pickupVehicleLink) && pickupVehicle.isInStayTask()) {
                 setAcceptRequest(pickupVehicle, avRequest);
-                boolean added = reqToRemove.add(avRequest);
-                GlobalAssert.that(added);
+                // boolean added = reqToRemove.add(avRequest);
+                // GlobalAssert.that(added);
             }
         }
-        reqToRemove.stream().forEach(v -> pickupRegister.remove(v));
+        // reqToRemove.stream().forEach(v -> pickupRegister.remove(v));
     }
 
     /** called when a new request enters the system, adds request to {@link pendingRequests}, needs to be public because called from
