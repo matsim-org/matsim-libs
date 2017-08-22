@@ -63,7 +63,6 @@ abstract class VehicleMaintainer implements AVDispatcher {
         return Collections.unmodifiableList(roboTaxis);
     }
 
-
     private void updateDivertableLocations() {
         for (RoboTaxi robotaxi : getRoboTaxis()) {
             GlobalAssert.that(robotaxi.isWithoutDirective());
@@ -139,7 +138,13 @@ abstract class VehicleMaintainer implements AVDispatcher {
      * 
      * @return String with infoLine content */
     protected String getInfoLine() {
-        return infoLine.getInfoLine(getRoboTaxis(), getTimeNow());
+        final String string = getClass().getSimpleName() + "        ";
+        return String.format("%s@%6d V=(%4ds,%4dd)", //
+                string.substring(0, 6), //
+                (long) getTimeNow(), //
+                roboTaxis.stream().filter(rt -> rt.isInStayTask()).count(), //
+                roboTaxis.stream().filter(rt -> (rt.getAVStatus().equals(AVStatus.DRIVETOCUSTMER) || rt.getAVStatus().equals(AVStatus.DRIVETOCUSTMER)))
+                        .count());
 
     }
 

@@ -1,6 +1,5 @@
 // code by jph
 package playground.clruch.dispatcher.core;
-// TODO make this as singleton instance
 
 /**
  * {@link EmptyDirective} is assigned to a vehicle that already
