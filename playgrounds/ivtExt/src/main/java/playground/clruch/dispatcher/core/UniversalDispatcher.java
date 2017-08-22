@@ -5,6 +5,7 @@ package playground.clruch.dispatcher.core;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -18,9 +19,6 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
-
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 
 import playground.clruch.net.SimulationDistribution;
 import playground.clruch.net.SimulationObject;
@@ -46,7 +44,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     private final FuturePathFactory futurePathFactory;
     private final Set<AVRequest> pendingRequests = new LinkedHashSet<>();
     private final Set<AVRequest> publishPeriodMatchedRequests = new HashSet<>();
-    private final BiMap<AVRequest, RoboTaxi> pickupRegister = HashBiMap.create();
+    private final HashMap<AVRequest, RoboTaxi> pickupRegister = new HashMap<>();
     private final double pickupDurationPerStop;
     private final double dropoffDurationPerStop;
     protected int publishPeriod; // not final, so that dispatchers can disable, or manipulate
@@ -137,8 +135,16 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(roboTaxi.isWithoutCustomer());
 
         // 1) enter information into pickup table
-        @SuppressWarnings({ "unused" })
-        RoboTaxi beforeTaxi = pickupRegister.forcePut(avRequest, roboTaxi);
+        if (!pickupRegister.containsValue(roboTaxi)) { // roboTaxi was not picking up
+            pickupRegister.put(avRequest, roboTaxi);
+        } else {
+            AVRequest toRemove = pickupRegister.entrySet().stream()//
+                    .filter(e -> e.getValue().equals(roboTaxi)).findAny().get().getKey();
+            pickupRegister.remove(toRemove); // remove AVRequest/RoboTaxi pair served before by roboTaxi
+            pickupRegister.remove(avRequest); // remove AVRequest/RoboTaxi pair corresponding to avRequest
+            pickupRegister.put(avRequest, roboTaxi); // add new pair
+        }
+
 
         // 2) set vehicle diversion
         setRoboTaxiDiversion(roboTaxi, avRequest.getFromLink(), AVStatus.DRIVETOCUSTMER);
@@ -159,12 +165,6 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(robotaxi.isWithoutDirective());
         robotaxi.setAVStatus(avstatus);
 
-        // in case vehicle was previously picking up, remove from pickup register
-        if (!avstatus.equals(AVStatus.DRIVETOCUSTMER)) {
-            if (pickupRegister.containsValue(robotaxi)) {
-                pickupRegister.remove(pickupRegister.inverse().get(robotaxi), robotaxi);
-            }
-        }
 
         // udpate schedule of RoboTaxi
         final Schedule schedule = robotaxi.getSchedule();
@@ -270,6 +270,9 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
 
         // containment check pickupRegister and pendingRequests
         pickupRegister.keySet().forEach(r -> GlobalAssert.that(pendingRequests.contains(r)));
+
+        // ensure no robotaxi is scheduled to pickup two requests
+        GlobalAssert.that(pickupRegister.size() == pickupRegister.values().stream().distinct().count());
 
     }
 
