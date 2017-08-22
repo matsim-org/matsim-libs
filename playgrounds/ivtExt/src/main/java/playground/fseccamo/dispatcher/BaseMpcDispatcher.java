@@ -26,6 +26,7 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
     final InstantPathFactory instantPathFactory;
     // requests that haven't received a pickup order yet
     // final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
+    // TODO consistency check that all keys are pending requests!
     final Map<AVRequest, Integer> requestVectorIndexMap = new HashMap<>();
 
     BaseMpcDispatcher( //
@@ -54,7 +55,6 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
 
         return returnMap;
     }
-
 
     /** function computes mpcRequest objects for unserved requests
      * 
@@ -101,15 +101,6 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
             }
     }
 
-    final Map<VirtualNode, List<RoboTaxi>> getVirtualNodeStayVehicles() {
-        Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
-        for (RoboTaxi robotaxi : getRoboTaxis()) {
-            if (robotaxi.isInStayTask()) {
-                VirtualNode vnode = virtualNetwork.getVirtualNode(robotaxi.getDivertableLocation());
-                returnMap.get(vnode).add(robotaxi);
-            }
-        }
-        return returnMap;
-    };
+
 
 }

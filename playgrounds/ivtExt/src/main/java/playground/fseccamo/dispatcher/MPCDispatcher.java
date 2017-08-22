@@ -135,20 +135,22 @@ public class MPCDispatcher extends BaseMpcDispatcher {
         int totalPickupEffective = 0;
 
         final NavigableMap<Integer, List<AVRequest>> virtualLinkRequestMap = new TreeMap<>();
-        for (Entry<AVRequest, Integer> entry : requestVectorIndexMap.entrySet()) {
-            if (virtualLinkRequestMap.containsKey(entry.getValue())) {
-                virtualLinkRequestMap.get(entry.getValue()).add(entry.getKey());
-            } else {
-                virtualLinkRequestMap.put(entry.getValue(), new ArrayList<>());
-                virtualLinkRequestMap.get(entry.getValue()).add(entry.getKey());
+        for (Entry<AVRequest, Integer> entry : requestVectorIndexMap.entrySet())
+            if (getUnassignedAVRequests().contains(entry.getKey())) {
+                if (virtualLinkRequestMap.containsKey(entry.getValue())) {
+                    virtualLinkRequestMap.get(entry.getValue()).add(entry.getKey());
+                } else {
+                    virtualLinkRequestMap.put(entry.getValue(), new ArrayList<>());
+                    virtualLinkRequestMap.get(entry.getValue()).add(entry.getKey());
+                }
             }
-        }
 
         for (int vectorIndex = 0; vectorIndex < m + n; ++vectorIndex) {
             // ---
             final VirtualNode vnFrom = vectorIndex < m ? //
                     virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
-            final Map<VirtualNode, List<RoboTaxi>> availableVehicles = getVirtualNodeStayVehicles();
+            final Map<VirtualNode, List<RoboTaxi>> availableVehicles = // 
+                    getVirtualNodeStayVehicles();
 
             final List<RoboTaxi> cars = availableVehicles.get(vnFrom); // find cars
             final int pickupOffset = 0; // <- should be 0 !!! only 1 for testing

@@ -95,7 +95,7 @@ abstract class VehicleMaintainer implements AVDispatcher {
                 @Override
                 public void handle(AVStayTask avStayTask) {
                     // for empty vehicles the current task has to be the last task
-                    if (Schedules.isLastTask(avStayTask)) {
+                    if (Schedules.isLastTask(avStayTask) && !isInPickupRegister(robotaxi)) {
                         GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow());
                         robotaxi.setDivertableLinkTime(new LinkTimePair(avStayTask.getLink(), getTimeNow()));
                         robotaxi.setCurrentDriveDestination(avStayTask.getLink());
@@ -118,11 +118,17 @@ abstract class VehicleMaintainer implements AVDispatcher {
         private_now = now; // <- time available to derived class via getTimeNow()
 
         updateInfoLine();
+
+        printPickupRegister("BEFORE----");
         consistencyCheck();
         beforeStepTasks();
+        printPickupRegister("BEFORE EXECUTE----");
         executePickups();
+        printPickupRegister("AFTER EXECUTE----");
         redispatch(now);
+        printPickupRegister("AFTER REDISPATCH----");
         afterStepTasks();
+        printPickupRegister("AFTER STEPTASKS----");
         notifySimulationSubscribers(Math.round(now));
         executeDirectives();
         consistencyCheck();
@@ -195,6 +201,10 @@ abstract class VehicleMaintainer implements AVDispatcher {
     /* package */ abstract void consistencySubCheck();
 
     /* package */ abstract void notifySimulationSubscribers(long round_now);
+    
+    /* package */ abstract boolean isInPickupRegister(RoboTaxi robotaxi);
+    
+    abstract void printPickupRegister(String title); // FIXME
 
     /** invoked at the beginning of every iteration dispatchers can update their data structures
      * based on the stay vehicle set function is not meant

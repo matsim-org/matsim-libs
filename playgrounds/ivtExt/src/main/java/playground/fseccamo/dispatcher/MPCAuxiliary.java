@@ -25,7 +25,8 @@ public class MPCAuxiliary {
 
     /** @param min
      * @param requests */
-    /* package */ static int cellMatchingMPCOption1(int min, List<AVRequest> requests, double[] networkBounds, List<RoboTaxi> cars, MPCDispatcher mpcDispatcher,
+    /* package */ static int cellMatchingMPCOption1( //
+            int min, List<AVRequest> requests, double[] networkBounds, List<RoboTaxi> cars, MPCDispatcher mpcDispatcher, //
             BiConsumer<RoboTaxi, AVRequest> biConsumer) {
 
         int totalPickupEffectiveAdd = 0;
@@ -52,6 +53,7 @@ public class MPCAuxiliary {
             // dispatch the car and bookkeeping
             // pickupAssignments.put(robotaxi, avRequest);
             biConsumer.accept(robotaxi, avRequest);
+            // int vLinkId = mpcDispatcher.requestVectorIndexMap.remove(avRequest); //
             System.out.println(" pickup " + robotaxi.getId() + " " + avRequest.getId());
             ++totalPickupEffectiveAdd;
         }
@@ -63,6 +65,7 @@ public class MPCAuxiliary {
 
     }
 
+    // TODO update function to new API
     /* package */ static int cellMatchingMPCOption2(int min, List<AVRequest> requests, List<RoboTaxi> cars, MPCDispatcher mpcDispatcher,
             Map<RoboTaxi, AVRequest> pickupAssignments, AbstractVehicleDestMatcher vehicleDestMatcher) {
         int totalPickupEffectiveAdd = 0;
