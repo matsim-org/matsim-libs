@@ -30,7 +30,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * @author Claudio Ruch */
 public class DriveByDispatcher extends RebalancingDispatcher {
     private final List<Link> links;
-    private final double rebPos = 0.1;
+    private final double rebPos = 0.99;
     private final Random randGen = new Random(1234);
     private final int rebalancingPeriod;
     private int total_abortTrip = 0;

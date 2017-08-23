@@ -66,8 +66,8 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
     }
 
     // ===================================================================================
-    // GET AVREQUEST functions
-
+    // Methods to use EXTERNALLY in derived dispatchers
+    
     /** @return {@Collection} of all {@AVRequests} which are currently open. Requests are removed from list in setAcceptRequest function */
     protected synchronized final Collection<AVRequest> getAVRequests() {
         return Collections.unmodifiableCollection(pendingRequests);
@@ -79,9 +79,6 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
                 .filter(r -> !pickupRegister.containsKey(r)) //
                 .collect(Collectors.toList());
     }
-
-    // ===================================================================================
-    // GET ROBOTAXI functions
 
     /** Example call: getRoboTaxiSubset(AVStatus.STAY, AVStatus.DRIVEWITHCUSTOMER)
      * 
@@ -124,9 +121,6 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
         return pickupPairs;
     }
 
-    // ===================================================================================
-    // SET ROBOTAXI functions
-
     /** Diverts {@roboTaxi} to Link if {@avRequest} and adds pair to pickupRegister. If the {@roboTaxi} was scheduled to pickup another {@AVRequest}, then this
      * pair is silently revmoved from the pickup register which is a bijection of {@RoboTaxi} and open {@AVRequest}.
      * 
@@ -152,6 +146,9 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
         setRoboTaxiDiversion(roboTaxi, avRequest.getFromLink(), AVStatus.DRIVETOCUSTMER);
     }
 
+    // ===================================================================================
+    // INTERNAL Methods, do not call from derived dispatchers.
+
     /** For UniversalDispatcher, VehicleMaintainer internal use only. Use {@link UniveralDispatcher.setRoboTaxiPickup} or
      * {@link setRoboTaxiRebalance} from dispatchers. Assigns new destination to vehicle, if vehicle is already located at destination, nothing
      * happens. In one pass of {@redispatch(...)} in {@VehicleMaintainer}, the function setVehicleDiversion(...) may only be invoked
@@ -165,6 +162,7 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
         // updated status of robotaxi
         GlobalAssert.that(robotaxi.isWithoutCustomer());
         GlobalAssert.that(robotaxi.isWithoutDirective());
+        
         robotaxi.setAVStatus(avstatus);
 
         // udpate schedule of robotaxi
@@ -192,9 +190,6 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
             }
         };
     }
-
-    // ===================================================================================
-    // ROBOTAXI HANDLING functions
 
     /** Function called from {@link UniversalDispatcher.executePickups} if a RoboTaxi scheduled for pickup has reached the
      * from link of the {@link AVRequest}.
@@ -228,9 +223,6 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
 
         ++total_matchedRequests;
     }
-
-    // ===================================================================================
-    // ITERATION STEP RELATED methods
 
     @Override
     /* package */ final boolean isInPickupRegister(RoboTaxi robotaxi) {
@@ -270,9 +262,9 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
         getRoboTaxis().stream()//
                 .filter(rt -> rt.getAVStatus().equals(AVStatus.DRIVETOCUSTMER))//
                 .filter(rt -> !pickupRegister.containsValue(rt))//
-                .filter(rt -> !rt.isInStayTask()).filter(RoboTaxi::isWithoutCustomer)//
+                .filter(RoboTaxi::isWithoutCustomer)//
+                .filter(RoboTaxi::isWithoutDirective)//
                 .forEach(rt -> setRoboTaxiDiversion(rt, rt.getDivertableLocation(), AVStatus.REBALANCEDRIVE));
-
         GlobalAssert.that(pickupRegister.size() <= pendingRequests.size());
     }
 
@@ -289,8 +281,6 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
         GlobalAssert.that(pickupRegister.size() == pickupRegister.values().stream().distinct().count());
 
     }
-
-
 
     /** save simulation data into {@link SimulationObject} for later analysis and visualization. */
     @Override
