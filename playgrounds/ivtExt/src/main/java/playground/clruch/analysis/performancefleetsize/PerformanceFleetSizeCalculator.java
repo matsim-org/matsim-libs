@@ -46,7 +46,9 @@ public class PerformanceFleetSizeCalculator implements Serializable {
     final int vehicleBins;
     final int numVNode;
     final int numVLink;
-    private Tensor a = Tensors.empty();
+    private Tensor a;
+    private Tensor meanByVehiclesPeak;
+    private Tensor meanByVehiclesOffPeak;
 
     public PerformanceFleetSizeCalculator(VirtualNetwork virtualNetwork, TravelData travelData, int maxVehicles) throws InterruptedException {
         this.timeSteps = travelData.getNumbertimeSteps();
@@ -56,6 +58,9 @@ public class PerformanceFleetSizeCalculator implements Serializable {
         this.numVNode = virtualNetwork.getvNodesCount();
         this.numVLink = numVNode * numVNode - numVNode;
         GlobalAssert.that(numVLink == virtualNetwork.getvLinksCount());
+        a = Tensors.empty();
+        meanByVehiclesPeak = Tensors.empty();
+        meanByVehiclesOffPeak = Tensors.empty();
         calcAvailab(virtualNetwork, travelData);
     }
 
@@ -120,10 +125,14 @@ public class PerformanceFleetSizeCalculator implements Serializable {
             GlobalAssert.that(ArrayQ.of(atemp));
         }
         a = Transpose.of(atemp, 1, 2, 0);
-        Tensor meanByVehiclesPeak = PerformanceFleetSizeUtils.calcMeanByVehicles(a, peakSteps);
-        Tensor meanByVehiclesOffPeak = PerformanceFleetSizeUtils.calcMeanByVehicles(a, offPeakSteps);
+        meanByVehiclesPeak = PerformanceFleetSizeUtils.calcMeanByVehicles(a, peakSteps);
+        meanByVehiclesOffPeak = PerformanceFleetSizeUtils.calcMeanByVehicles(a, offPeakSteps);
+        return a;
 
-        try {
+    }
+    
+    public void saveAndPlot(){
+        try {            
             AnalyzeAll.saveFile(a, "availabilitiesFull");
             AnalyzeAll.saveFile(meanByVehiclesOffPeak, "availabilitiesOffPeak");
             AnalyzeAll.saveFile(meanByVehiclesPeak, "availabilitiesPeak");
@@ -132,8 +141,6 @@ public class PerformanceFleetSizeCalculator implements Serializable {
             System.out.println("Error saving the availabilities");
             e.printStackTrace(System.out);
         }
-
-        return a;
     }
     
     public Tensor getAvailabilities(){

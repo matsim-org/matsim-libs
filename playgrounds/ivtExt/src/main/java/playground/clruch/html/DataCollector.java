@@ -18,7 +18,7 @@ import ch.ethz.idsc.tensor.io.Export;
 import ch.ethz.idsc.tensor.io.Import;
 import playground.clruch.analysis.AnalyzeSummary;
 //import playground.clruch.analysis.TripDistances;
-import playground.clruch.analysis.TripDistancesNew;
+import playground.clruch.analysis.TripDistances;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.netdata.VirtualNetwork;
@@ -54,11 +54,11 @@ public class DataCollector {
         saveConfigs(args);
 
         minimumFleetSizeCalculator.plot(args);
+        performanceFleetSizeCalculator.saveAndPlot();
+        
         LeastCostPathCalculator dijkstra = EasyDijkstra.prepDijkstra(network);
-        TripDistancesNew tdn = new TripDistancesNew(dijkstra, travelData, population, network);
-        
-        
-//        TripDistances.analyze();
+        TripDistances tdn = new TripDistances(dijkstra, travelData, population, network);
+       
     }
 
     public static File report(String[] args) {
