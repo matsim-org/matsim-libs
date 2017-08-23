@@ -167,7 +167,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(robotaxi.isWithoutDirective());
         robotaxi.setAVStatus(avstatus);
 
-        // udpate schedule of RoboTaxi
+        // udpate schedule of robotaxi
         final Schedule schedule = robotaxi.getSchedule();
         Task task = schedule.getCurrentTask(); // <- implies that task is started
         new AVTaskAdapter(task) {
@@ -240,23 +240,17 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
     /** complete all matchings if a {@link RoboTaxi} has arrived at the fromLink of an {@link AVRequest} */
     @Override
     void executePickups() {
-        // Set<AVRequest> reqToRemove = new HashSet<>();
         Map<AVRequest, RoboTaxi> pickupRegisterCopy = new HashMap<>(pickupRegister);
         for (Entry<AVRequest, RoboTaxi> entry : pickupRegisterCopy.entrySet()) {
             AVRequest avRequest = entry.getKey();
             GlobalAssert.that(pendingRequests.contains(avRequest));
             RoboTaxi pickupVehicle = entry.getValue();
             Link pickupVehicleLink = pickupVehicle.getDivertableLocation();
-            // formerly: pickupVehicle.isInStayTask()
-            // GlobalAssert.that();
             boolean isOk = pickupVehicle.getSchedule().getCurrentTask() == Schedules.getLastTask(pickupVehicle.getSchedule());
             if (avRequest.getFromLink().equals(pickupVehicleLink) && isOk) {
                 setAcceptRequest(pickupVehicle, avRequest);
-                // boolean added = reqToRemove.add(avRequest);
-                // GlobalAssert.that(added);
             }
         }
-        // reqToRemove.stream().forEach(v -> pickupRegister.remove(v));
     }
 
     /** called when a new request enters the system, adds request to {@link pendingRequests}, needs to be public because called from
@@ -289,37 +283,14 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(pickupRegister.size() <= pendingRequests.size());
 
         // containment check pickupRegister and pendingRequests
-        for (Entry<AVRequest, RoboTaxi> entry : pickupRegister.entrySet()) {
-            AVRequest avRequest = entry.getKey();
-            RoboTaxi roboTaxi = entry.getValue();
-            if (!pendingRequests.contains(avRequest)) {
-                System.out.println(avRequest.getId() + " " + roboTaxi.getId());
-            }
-        }
-        // pickupRegister.keySet().forEach(r -> GlobalAssert.that(pendingRequests.contains(r)));
+        pickupRegister.keySet().forEach(r -> GlobalAssert.that(pendingRequests.contains(r)));
 
         // ensure no robotaxi is scheduled to pickup two requests
         GlobalAssert.that(pickupRegister.size() == pickupRegister.values().stream().distinct().count());
 
     }
 
-    void printPickupRegister(String title) {
-        if (pendingRequests.isEmpty() && pickupRegister.isEmpty())
-            // System.out.println("empty");
-            return;
-        System.out.println("----->>> " + title);
-        System.out.println("PENDING");
-        for (AVRequest avRequest : pendingRequests) {
-            System.out.println(avRequest.getId());
-        }
-        System.out.println("PICKUP");
-        for (Entry<AVRequest, RoboTaxi> entry : pickupRegister.entrySet()) {
-            AVRequest avRequest = entry.getKey();
-            RoboTaxi roboTaxi = entry.getValue();
-            System.out.println(avRequest.getId() + " " + roboTaxi.getId());
-        }
 
-    }
 
     /** save simulation data into {@link SimulationObject} for later analysis and visualization. */
     @Override

@@ -3,10 +3,8 @@
 package playground.clruch.dispatcher.core;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
@@ -119,16 +117,11 @@ abstract class VehicleMaintainer implements AVDispatcher {
 
         updateInfoLine();
 
-        printPickupRegister("BEFORE----");
         consistencyCheck();
         beforeStepTasks();
-        printPickupRegister("BEFORE EXECUTE----");
         executePickups();
-        printPickupRegister("AFTER EXECUTE----");
         redispatch(now);
-        printPickupRegister("AFTER REDISPATCH----");
         afterStepTasks();
-        printPickupRegister("AFTER STEPTASKS----");
         notifySimulationSubscribers(Math.round(now));
         executeDirectives();
         consistencyCheck();
@@ -201,15 +194,8 @@ abstract class VehicleMaintainer implements AVDispatcher {
     /* package */ abstract void consistencySubCheck();
 
     /* package */ abstract void notifySimulationSubscribers(long round_now);
-    
-    /* package */ abstract boolean isInPickupRegister(RoboTaxi robotaxi);
-    
-    abstract void printPickupRegister(String title); // FIXME
 
-    /** invoked at the beginning of every iteration dispatchers can update their data structures
-     * based on the stay vehicle set function is not meant
-     * for issuing directives */
-    /// * package */ abstract void updateDatastructures();
+    /* package */ abstract boolean isInPickupRegister(RoboTaxi robotaxi);
 
     @Override
     public final void onNextTaskStarted(AVTask task) {

@@ -34,6 +34,8 @@ import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RoboTaxi;
+import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
+import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
@@ -149,7 +151,7 @@ public class MPCDispatcher extends BaseMpcDispatcher {
             // ---
             final VirtualNode vnFrom = vectorIndex < m ? //
                     virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
-            final Map<VirtualNode, List<RoboTaxi>> availableVehicles = // 
+            final Map<VirtualNode, List<RoboTaxi>> availableVehicles = //
                     getVirtualNodeStayVehicles();
 
             final List<RoboTaxi> cars = availableVehicles.get(vnFrom); // find cars
@@ -179,12 +181,9 @@ public class MPCDispatcher extends BaseMpcDispatcher {
 
                 // MPC2 code:
                 // ==========================
-                // Map<RoboTaxi, AVRequest> pickupAssignments = new HashMap<>();
-                // totalPickupEffective += MPCAuxiliary.cellMatchingMPCOption2(min, requestsAV, cars, this, pickupAssignments,
+                // totalPickupEffective += //
+                // MPCAuxiliary.cellMatchingMPCOption2(min, requestsAV, cars, this, this::setRoboTaxiPickup, //
                 // new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction()));
-                // for (Entry<RoboTaxi, AVRequest> entry : pickupAssignments.entrySet()) {
-                // setRoboTaxiPickup(entry.getKey(), entry.getValue());
-                // }
             }
         }
         final int totalPickupDesired = Total.of(requestVector).Get().number().intValue();

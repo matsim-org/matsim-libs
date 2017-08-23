@@ -24,9 +24,6 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 abstract class BaseMpcDispatcher extends PartitionedDispatcher {
     protected final int samplingPeriod;
     final InstantPathFactory instantPathFactory;
-    // requests that haven't received a pickup order yet
-    // final Map<AVRequest, MpcRequest> mpcRequestsMap = new HashMap<>();
-    // TODO consistency check that all keys are pending requests!
     final Map<AVRequest, Integer> requestVectorIndexMap = new HashMap<>();
 
     BaseMpcDispatcher( //

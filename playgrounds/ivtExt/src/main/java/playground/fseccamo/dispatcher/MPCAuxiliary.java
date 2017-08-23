@@ -51,23 +51,17 @@ public class MPCAuxiliary {
             }
 
             // dispatch the car and bookkeeping
-            // pickupAssignments.put(robotaxi, avRequest);
             biConsumer.accept(robotaxi, avRequest);
-            // int vLinkId = mpcDispatcher.requestVectorIndexMap.remove(avRequest); //
-            System.out.println(" pickup " + robotaxi.getId() + " " + avRequest.getId());
             ++totalPickupEffectiveAdd;
         }
 
-        // GlobalAssert.that(totalPickupEffectiveAdd == min);
-        if (totalPickupEffectiveAdd != 0 || min != 0)
-            System.out.println("PICKUP " + totalPickupEffectiveAdd + " <= " + min);
+        GlobalAssert.that(totalPickupEffectiveAdd == min);
         return totalPickupEffectiveAdd;
 
     }
 
-    // TODO update function to new API
-    /* package */ static int cellMatchingMPCOption2(int min, List<AVRequest> requests, List<RoboTaxi> cars, MPCDispatcher mpcDispatcher,
-            Map<RoboTaxi, AVRequest> pickupAssignments, AbstractVehicleDestMatcher vehicleDestMatcher) {
+    /* package */ static int cellMatchingMPCOption2(int min, List<AVRequest> requests, List<RoboTaxi> cars, MPCDispatcher mpcDispatcher, //
+            BiConsumer<RoboTaxi,AVRequest> biConsumer,  AbstractVehicleDestMatcher vehicleDestMatcher) {
         int totalPickupEffectiveAdd = 0;
 
         // feed to matcher
@@ -76,7 +70,7 @@ public class MPCAuxiliary {
         // execute the computed matching
         for (Entry<RoboTaxi, AVRequest> entry : matching.entrySet()) {
             if (totalPickupEffectiveAdd < min) {
-                pickupAssignments.put(entry.getKey(), entry.getValue());
+                biConsumer.accept(entry.getKey(), entry.getValue());
                 ++totalPickupEffectiveAdd;
             }
         }
