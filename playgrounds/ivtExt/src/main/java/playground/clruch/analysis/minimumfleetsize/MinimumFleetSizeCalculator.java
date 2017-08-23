@@ -7,15 +7,8 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
@@ -31,7 +24,6 @@ import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.DiagramCreator;
 import playground.clruch.analysis.RequestAnalysis;
 import playground.clruch.analysis.RequestObj;
-import playground.clruch.html.DataCollector;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
@@ -44,7 +36,7 @@ import playground.joel.helpers.EasyDijkstra;
 public class MinimumFleetSizeCalculator implements Serializable {
     final int numberTimeSteps;
     final int dt;
-    final public static Tensor minFleet = Tensors.empty();
+    private Tensor minFleet;
     private Tensor EMDks;
     public double minimumFleet;
 
@@ -54,7 +46,7 @@ public class MinimumFleetSizeCalculator implements Serializable {
         GlobalAssert.that(108000 % numberTimeSteps == 0);
         dt = travelData.getdt();
         EMDks = Tensors.empty();
-        
+        minFleet = Tensors.empty();
         //calculation
         calculateMinFleet(network, population, virtualNetwork, travelData);
     }
@@ -103,12 +95,18 @@ public class MinimumFleetSizeCalculator implements Serializable {
 
     public void plot(String[] args) throws Exception {
         DiagramCreator.createDiagram(AnalyzeAll.RELATIVE_DIRECTORY, "EMD", "Earth Movers Distance", //
-                DataCollector.loadScenarioData(args).EMDks.multiply(RealScalar.of(0.001)), "km");
+                EMDks.multiply(RealScalar.of(0.001)), "km");
         DiagramCreator.createDiagram(AnalyzeAll.RELATIVE_DIRECTORY, "minFleet", "Minimum Fleet Size", //
-                DataCollector.loadScenarioData(args).minFleet, "vehicles");
+                minFleet, "vehicles");
+                //                DataCollector.loadScenarioData(args).minFleet, "vehicles");
     }
     
-    public double getMinFleet(){
+    public Tensor getMinFleet(){
+        return minFleet.copy();
+    }
+    
+    
+    public double getMinFleetNumber(){
         return minimumFleet;
     }
     
@@ -147,7 +145,7 @@ public class MinimumFleetSizeCalculator implements Serializable {
         System.out.println("Minimallly required fleet sizes " + minFleet);
         double minVeh = AnalysisUtils.maximum(minFleet).number().doubleValue();
         System.out.println(minVeh + " -> " + Math.ceil(minVeh));
-        System.out.println("min Fleet size: " + minimumFleetSizeCalculator.getMinFleet());
+        System.out.println("min Fleet size: " + minimumFleetSizeCalculator.getMinFleetNumber());
     }
 
 }

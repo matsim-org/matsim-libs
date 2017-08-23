@@ -107,7 +107,7 @@ public class DataCollector {
         if (virtualNetwork != null) {
             scenarioParameters.virtualNodes = virtualNetwork.getvNodesCount();
             // TODO load from file instead of calculating
-            scenarioParameters.minFleet = minimumFleetSizeCalculator.minFleet;
+            scenarioParameters.minFleet = minimumFleetSizeCalculator.getMinFleet();
             scenarioParameters.EMDks = minimumFleetSizeCalculator.getEMDk();
             scenarioParameters.minimumFleet = minimumFleetSizeCalculator.minimumFleet;
             scenarioParameters.availabilities =  performanceFleetSizeCalculator.getAvailabilities();
