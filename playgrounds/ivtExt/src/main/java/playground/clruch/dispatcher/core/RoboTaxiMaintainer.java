@@ -34,13 +34,13 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * manages assignments of {@link AbstractDirective} to {@link AVVehicle}s. path computations
  * attached to assignments are computed in parallel
  * {@link ParallelLeastCostPathCalculator}. */
-abstract class VehicleMaintainer implements AVDispatcher {
+abstract class RoboTaxiMaintainer implements AVDispatcher {
     protected final EventsManager eventsManager;
     private final List<RoboTaxi> roboTaxis = new ArrayList<>();
     private Double private_now = null;
     public InfoLine infoLine = null;
 
-    VehicleMaintainer(EventsManager eventsManager, AVDispatcherConfig avDispatcherConfig) {
+    RoboTaxiMaintainer(EventsManager eventsManager, AVDispatcherConfig avDispatcherConfig) {
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         this.eventsManager = eventsManager;
         this.infoLine = new InfoLine(safeConfig.getInteger("infoLinePeriod", 10));

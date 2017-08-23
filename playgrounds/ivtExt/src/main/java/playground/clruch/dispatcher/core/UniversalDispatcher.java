@@ -41,7 +41,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 /** purpose of {@link UniversalDispatcher} is to collect and manage {@link AVRequest}s alternative
  * implementation of {@link AVDispatcher}; supersedes
  * {@link AbstractDispatcher}. */
-public abstract class UniversalDispatcher extends VehicleMaintainer {
+public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
     private final FuturePathFactory futurePathFactory;
     private final Set<AVRequest> pendingRequests = new LinkedHashSet<>();
     private final Set<AVRequest> publishPeriodMatchedRequests = new HashSet<>();
@@ -276,7 +276,7 @@ public abstract class UniversalDispatcher extends VehicleMaintainer {
         GlobalAssert.that(pickupRegister.size() <= pendingRequests.size());
     }
 
-    /** Consistency checks to be called by {@link VehicleMaintainer.consistencyCheck} in each iteration. */
+    /** Consistency checks to be called by {@link RoboTaxiMaintainer.consistencyCheck} in each iteration. */
     @Override
     protected final void consistencySubCheck() {
         // there cannot be more pickup vehicles than open reqests
