@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.clruch.analysis;
+package playground.clruch.analysis.performancefleetsize;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -25,6 +25,8 @@ import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.red.Norm;
 import ch.ethz.idsc.tensor.red.Total;
+import playground.clruch.analysis.AnalyzeAll;
+import playground.clruch.analysis.DiagramCreator;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;

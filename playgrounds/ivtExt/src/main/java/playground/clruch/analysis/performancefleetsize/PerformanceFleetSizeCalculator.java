@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.clruch.analysis;
+package playground.clruch.analysis.performancefleetsize;
 
 import java.io.File;
 import java.util.HashSet;
@@ -22,6 +22,8 @@ import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.N;
 import ch.ethz.idsc.tensor.sca.Round;
+import playground.clruch.analysis.AnalyzeAll;
+import playground.clruch.analysis.MeanValueAnalysis;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.tensorUtils.TensorOperations;

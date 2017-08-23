@@ -15,7 +15,11 @@ import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
+import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeIO;
+import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.data.LocationSpec;
+import playground.clruch.html.DataCollector;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
@@ -29,13 +33,10 @@ import playground.clruch.trb18.scenario.TRBScenarioConfig;
 import playground.clruch.utils.GZHandler;
 import playground.clruch.utils.GlobalAssert;
 
-/**
- * Class to prepare a given scenario for MATSim, includes preparation of netowrk, population, creation of virtualNetwork
+/** Class to prepare a given scenario for MATSim, includes preparation of netowrk, population, creation of virtualNetwork
  * and travelData objects.
  * 
- * @author clruch
- *
- */
+ * @author clruch */
 public class ScenarioPreparer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
@@ -67,6 +68,7 @@ public class ScenarioPreparer {
         // output file names
         final String VIRTUALNETWORKFOLDERNAME = "virtualNetwork";
         final String VIRTUALNETWORKFILENAME = "virtualNetwork";
+        final String MINIMUMFLEETSIZEFILENAME = "minimumFleetSizeCalculator";
         final String TRAVELDATAFILENAME = "travelData";
         final String NETWORKUPDATEDNAME = "networkConverted";
         final String POPULATIONUPDATEDNAME = "populationConverted";
@@ -81,7 +83,6 @@ public class ScenarioPreparer {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
 
-        
         Population population = scenario.getPopulation();
 
         {// 1) cut network (and reduce population to new network)
@@ -138,21 +139,31 @@ public class ScenarioPreparer {
             }
         }
 
-        {// 3) create virtual Network
-            KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
-            VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
-            final File vnDir = new File(dir, VIRTUALNETWORKFOLDERNAME);
-            vnDir.mkdir(); // create folder if necessary
-            VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
-            VirtualNetworkIO.toXML(new File(vnDir, VIRTUALNETWORKFILENAME + ".xml").toString(), virtualNetwork);
-            System.out.println("saved virtual network byte format to : " + new File(vnDir, VIRTUALNETWORKFILENAME));
+        // 3) create virtual Network
+        KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
+        VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
+        final File vnDir = new File(dir, VIRTUALNETWORKFOLDERNAME);
+        vnDir.mkdir(); // create folder if necessary
+        VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
+        VirtualNetworkIO.toXML(new File(vnDir, VIRTUALNETWORKFILENAME + ".xml").toString(), virtualNetwork);
+        System.out.println("saved virtual network byte format to : " + new File(vnDir, VIRTUALNETWORKFILENAME));
+        PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);
+        prs.exportCsv();
+        // 3) generate travelData
+        TravelData travelData = new TravelData(virtualNetwork, network, scenario.getPopulation(), dtTravelData);
+        TravelDataIO.toByte(new File(vnDir, TRAVELDATAFILENAME), travelData);
+        System.out.println("saved travelData byte format to : " + new File(vnDir, TRAVELDATAFILENAME));
 
-            PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);
-            prs.exportCsv();
-            // 3) generate travelData
-            TravelData travelData = new TravelData(virtualNetwork, network, scenario.getPopulation(), dtTravelData);
-            TravelDataIO.toByte(new File(vnDir, TRAVELDATAFILENAME), travelData);
-            System.out.println("saved travelData byte format to : " + new File(vnDir, TRAVELDATAFILENAME));
+        {// 4) calculate performance and min fleet size and save results
+            MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, population, virtualNetwork, travelData);
+            MinimumFleetSizeIO.toByte(new File(vnDir, MINIMUMFLEETSIZEFILENAME), minimumFleetSizeCalculator);
+            
+
+            // int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
+            // PerformanceFleetSizeCalculator performanceFleetSizeCalculator = //
+            // new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberVehiclesPerformanceCalculator);
+            // performanceFleetSizeCalculator.calcAvailab();
+
         }
 
         System.out.println("successfully converted simulation data files from " + args[0]);

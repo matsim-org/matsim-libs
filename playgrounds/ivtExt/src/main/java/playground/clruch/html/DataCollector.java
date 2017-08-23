@@ -14,9 +14,9 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.misc.Time;
 import playground.clruch.ScenarioServer;
 import playground.clruch.analysis.AnalyzeSummary;
-import playground.clruch.analysis.MinimumFleetSizeCalculator;
-import playground.clruch.analysis.PerformanceFleetSizeCalculator;
 import playground.clruch.analysis.TripDistances;
+import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
+import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.GlobalAssert;
@@ -107,7 +107,8 @@ public class DataCollector {
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(network);
         if (virtualNetwork != null) {
             scenarioParameters.virtualNodes = virtualNetwork.getvNodesCount();
-            scenarioParameters.minFleet = minimumFleetSizeCalculator.calculateMinFleet();
+            // TODO load from file instead of calculating
+            scenarioParameters.minFleet = minimumFleetSizeCalculator.minFleet;
             scenarioParameters.EMDks = minimumFleetSizeCalculator.EMDks;
             scenarioParameters.minimumFleet = minimumFleetSizeCalculator.minimumFleet;
             scenarioParameters.availabilities =  performanceFleetSizeCalculator.calcAvailab();

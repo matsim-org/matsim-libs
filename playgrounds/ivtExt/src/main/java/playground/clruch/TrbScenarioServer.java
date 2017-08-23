@@ -19,8 +19,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.AnalyzeSummary;
-import playground.clruch.analysis.MinimumFleetSizeCalculator;
-import playground.clruch.analysis.PerformanceFleetSizeCalculator;
+import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
+import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.html.DataCollector;
 import playground.clruch.html.ReportGenerator;
@@ -63,7 +63,7 @@ public class TrbScenarioServer {
 
         // END: CUSTOMIZE -------------------------------------------------
 
-        scenarioParameters = new ScenarioParameters();
+
 
         // open server port for clients to connect to
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
@@ -75,6 +75,8 @@ public class TrbScenarioServer {
         File configFile = new File(args[0]);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup,
                 new BlackListedTimeAllocationMutatorConfigGroup());
+        
+        scenarioParameters = new ScenarioParameters(config);
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();

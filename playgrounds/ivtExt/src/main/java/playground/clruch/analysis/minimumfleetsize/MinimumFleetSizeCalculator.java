@@ -1,11 +1,11 @@
 /**
  * 
  */
-package playground.clruch.analysis;
+package playground.clruch.analysis.minimumfleetsize;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -20,87 +20,51 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import ch.ethz.idsc.tensor.red.Mean;
+import playground.clruch.analysis.AnalysisUtils;
+import playground.clruch.analysis.AnalyzeAll;
+import playground.clruch.analysis.DiagramCreator;
+import playground.clruch.analysis.RequestAnalysis;
+import playground.clruch.analysis.RequestObj;
 import playground.clruch.html.DataCollector;
-import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
-import playground.clruch.traveldata.TravelDataUtils;
 import playground.clruch.utils.GlobalAssert;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.joel.helpers.EasyDijkstra;
 
 /** @author Claudio Ruch */
-public class MinimumFleetSizeCalculator {
-    final Network network;
-    final Population population;
-    final VirtualNetwork virtualNetwork;
-    final TravelData tData;
+public class MinimumFleetSizeCalculator implements Serializable {
     final int numberTimeSteps;
     final int dt;
+    final public static Tensor minFleet = Tensors.empty();
     final public static Tensor EMDks = Tensors.empty();
-    public static double minimumFleet;
+    public double minimumFleet;
 
-    public static void main(String[] args) throws Exception {
-
-        DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
-        dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
-
-        File configFile = new File(args[0]);
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup,
-                new BlackListedTimeAllocationMutatorConfigGroup());
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-        Network network = scenario.getNetwork();
-        Population population = scenario.getPopulation();
-
-        VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
-        TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
-
-        MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, population, virtualNetwork, travelData);
-
-        // System.setOut(originalStream);
-        Tensor minFleet = minimumFleetSizeCalculator.calculateMinFleet();
-
-        System.out.println("Population size: " + population.getPersons().size());
-        System.out.println("Earth movers distances: " + EMDks);
-        System.out.println("Minimallly required fleet sizes " + minFleet);
-        double minVeh = AnalysisUtils.maximum(minFleet).number().doubleValue();
-        System.out.println(minVeh + " -> " + Math.ceil(minVeh));
-        System.out.println("min Fleet size: " + minimumFleet);
-    }
-
-    public MinimumFleetSizeCalculator(Network networkIn, Population populationIn, VirtualNetwork virtualNetworkIn, TravelData travelDataIn) {
-        network = networkIn;
-        population = populationIn;
-        virtualNetwork = virtualNetworkIn;
-        tData = travelDataIn;
-        numberTimeSteps = tData.getNumbertimeSteps();
+    public MinimumFleetSizeCalculator(Network network, Population population, VirtualNetwork virtualNetwork, TravelData travelData) {
+        numberTimeSteps = travelData.getNumbertimeSteps();
         GlobalAssert.that(108000 % numberTimeSteps == 0);
-        dt = tData.getdt();
+        dt = travelData.getdt();
+        calculateMinFleet(network, population, virtualNetwork, travelData);
     }
 
-    public Tensor calculateMinFleet() {
+    private Tensor calculateMinFleet(Network network, Population population, VirtualNetwork virtualNetwork, TravelData travelData) {
 
         LeastCostPathCalculator dijkstra = EasyDijkstra.prepDijkstra(network);
 
-        Tensor minFleet = Tensors.empty();
         double num = 0.0;
         double den = 0.0;
         Tensor totalArrivals = RealScalar.ZERO;
         for (int k = 0; k < numberTimeSteps; ++k) {
             // extract all relevant requests
-            ArrayList<RequestObj> relevantRequests = getRelevantRequests(population, k * dt, (k + 1) * dt);
+            ArrayList<RequestObj> relevantRequests = getRelevantRequests(population, network, k * dt, (k + 1) * dt);
 
             // arrival rate
             double lambdak = RequestAnalysis.calcArrivalRate(relevantRequests, dt);
@@ -112,7 +76,7 @@ public class MinimumFleetSizeCalculator {
 
             // calculate earth movers distance
             // FIXME time and timesteps wrong, was: (..., dt, dt + 1)
-            double EMDk = RequestAnalysis.calcEMD(tData, virtualNetwork, dijkstra, dt, k * dt);
+            double EMDk = RequestAnalysis.calcEMD(travelData, virtualNetwork, dijkstra, dt, k * dt);
             double EMDkav = EMDk / relevantRequests.size(); // EMD per request
             EMDks.append(RealScalar.of(EMDk));
 
@@ -135,7 +99,7 @@ public class MinimumFleetSizeCalculator {
      * @param timeStart
      * @param timeEnd
      * @return AV served requests in with submission time in interval [timeStart, timeEnd] */
-    ArrayList<RequestObj> getRelevantRequests(Population population, double timeStart, double timeEnd) {
+    ArrayList<RequestObj> getRelevantRequests(Population population, Network network, double timeStart, double timeEnd) {
         ArrayList<RequestObj> returnRequests = new ArrayList<>();
 
         for (Person person : population.getPersons().values()) {
@@ -178,6 +142,44 @@ public class MinimumFleetSizeCalculator {
                 DataCollector.loadScenarioData(args).EMDks.multiply(RealScalar.of(0.001)), "km");
         DiagramCreator.createDiagram(AnalyzeAll.RELATIVE_DIRECTORY, "minFleet", "Minimum Fleet Size", //
                 DataCollector.loadScenarioData(args).minFleet, "vehicles");
+    }
+    
+    public double getMinFleet(){
+        return minimumFleet;
+    }
+
+    /* package */ void checkConsistency() {
+        // TODO implement this
+
+    }
+
+    public static void main(String[] args) throws Exception {
+
+        DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+        dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
+
+        File configFile = new File(args[0]);
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup,
+                new BlackListedTimeAllocationMutatorConfigGroup());
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+        Network network = scenario.getNetwork();
+        Population population = scenario.getPopulation();
+
+        VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
+        TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
+
+        MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, population, virtualNetwork, travelData);
+
+        // System.setOut(originalStream);
+        Tensor minFleet = minimumFleetSizeCalculator.calculateMinFleet(network, population, virtualNetwork, travelData);
+        ;
+
+        System.out.println("Population size: " + population.getPersons().size());
+        System.out.println("Earth movers distances: " + EMDks);
+        System.out.println("Minimallly required fleet sizes " + minFleet);
+        double minVeh = AnalysisUtils.maximum(minFleet).number().doubleValue();
+        System.out.println(minVeh + " -> " + Math.ceil(minVeh));
+        System.out.println("min Fleet size: " + minimumFleetSizeCalculator.getMinFleet());
     }
 
 }
