@@ -26,4 +26,12 @@ public enum ReferenceFrame {
         this.coords_fromWGS84 = c2;
 
     }
+    
+    
+    public static ReferenceFrame fromString(String stringRef){
+        for(ReferenceFrame rframe : ReferenceFrame.values()){
+            if(rframe.toString().equals(stringRef)) return rframe;
+        }
+        return null;
+    }
 }
