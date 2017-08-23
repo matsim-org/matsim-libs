@@ -18,8 +18,8 @@ import java.io.File;
  */
 public enum NetworkLoader {
     ;
-    public static Network loadNetwork(String[] args) {
-        Config config = ConfigUtils.loadConfig((new File(args[0])).toString());
+    public static Network loadNetwork(File file) {
+        Config config = ConfigUtils.loadConfig(file.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         return scenario.getNetwork();
     }
