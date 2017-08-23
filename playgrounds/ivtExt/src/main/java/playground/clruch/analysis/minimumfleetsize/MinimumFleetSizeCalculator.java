@@ -49,11 +49,14 @@ public class MinimumFleetSizeCalculator implements Serializable {
     public double minimumFleet;
 
     public MinimumFleetSizeCalculator(Network network, Population population, VirtualNetwork virtualNetwork, TravelData travelData) {
+        // data preparation
         numberTimeSteps = travelData.getNumbertimeSteps();
         GlobalAssert.that(108000 % numberTimeSteps == 0);
         dt = travelData.getdt();
-        calculateMinFleet(network, population, virtualNetwork, travelData);
         EMDks = Tensors.empty();
+        
+        //calculation
+        calculateMinFleet(network, population, virtualNetwork, travelData);
     }
 
     private Tensor calculateMinFleet(Network network, Population population, VirtualNetwork virtualNetwork, TravelData travelData) {
