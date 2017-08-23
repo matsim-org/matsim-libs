@@ -11,7 +11,6 @@ import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -19,8 +18,8 @@ import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.AnalyzeSummary;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeGet;
-import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeIO;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
+import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeGet;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.html.DataCollector;
 import playground.clruch.html.ReportGenerator;
@@ -34,7 +33,6 @@ import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
-import playground.clruch.trb18.traveltime.reloading.TravelTimeReader;
 import playground.clruch.trb18.traveltime.reloading.WriteTravelTimesModule;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
@@ -103,20 +101,18 @@ public class ScenarioServer {
         // perform analysis of results
         AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
-        TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
-
-        int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
-
+        TravelData travelData = null;
         if (virtualNetwork != null) {
             minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
-            performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberVehiclesPerformanceCalculator);
+            performanceFleetSizeCalculator = PerformanceFleetSizeGet.readDefault();
+            travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
         DataCollector.store(args, controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
-                analyzeSummary, scenarioParameters);
+                analyzeSummary, scenarioParameters, network, population, travelData);
 
         // generate report  
         ReportGenerator.from(args);

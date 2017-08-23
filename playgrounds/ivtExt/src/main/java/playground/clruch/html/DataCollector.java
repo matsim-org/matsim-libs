@@ -1,37 +1,31 @@
 package playground.clruch.html;
 
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.io.Export;
-import ch.ethz.idsc.tensor.io.Import;
-import ch.ethz.idsc.tensor.io.Serialization;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Arrays;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.NetworkConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.VehiclesConfigGroup;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.misc.Time;
-import playground.clruch.ScenarioServer;
+
+import ch.ethz.idsc.tensor.io.Export;
+import ch.ethz.idsc.tensor.io.Import;
 import playground.clruch.analysis.AnalyzeSummary;
-import playground.clruch.analysis.TripDistances;
+//import playground.clruch.analysis.TripDistances;
+import playground.clruch.analysis.TripDistancesNew;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
+import playground.clruch.traveldata.TravelData;
 import playground.clruch.utils.GlobalAssert;
-import playground.joel.analysis.*;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
-import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
-
-import java.io.*;
-import java.nio.file.Files;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.zip.DataFormatException;
+import playground.joel.helpers.EasyDijkstra;
 
 /**
  * Created by Joel on 27.06.2017.
@@ -49,7 +43,8 @@ public class DataCollector {
 
     public static void store(String[] args, Controler controler, MinimumFleetSizeCalculator minimumFleetSizeCalculator, //
                              PerformanceFleetSizeCalculator performanceFleetSizeCalculator, //
-                             AnalyzeSummary analyzeSummaryIn, ScenarioParameters scenarioParametersIn) throws Exception {
+                             AnalyzeSummary analyzeSummaryIn, ScenarioParameters scenarioParametersIn,//
+                             Network network, Population population, TravelData travelData) throws Exception {
 
         scenarioParameters = scenarioParametersIn; // new ScenarioParameters();
         analyzeSummary = analyzeSummaryIn;
@@ -59,7 +54,11 @@ public class DataCollector {
         saveConfigs(args);
 
         minimumFleetSizeCalculator.plot(args);
-        TripDistances.analyze();
+        LeastCostPathCalculator dijkstra = EasyDijkstra.prepDijkstra(network);
+        TripDistancesNew tdn = new TripDistancesNew(dijkstra, travelData, population, network);
+        
+        
+//        TripDistances.analyze();
     }
 
     public static File report(String[] args) {
@@ -109,9 +108,9 @@ public class DataCollector {
             scenarioParameters.virtualNodes = virtualNetwork.getvNodesCount();
             // TODO load from file instead of calculating
             scenarioParameters.minFleet = minimumFleetSizeCalculator.minFleet;
-            scenarioParameters.EMDks = minimumFleetSizeCalculator.EMDks;
+            scenarioParameters.EMDks = minimumFleetSizeCalculator.getEMDk();
             scenarioParameters.minimumFleet = minimumFleetSizeCalculator.minimumFleet;
-            scenarioParameters.availabilities =  performanceFleetSizeCalculator.calcAvailab();
+            scenarioParameters.availabilities =  performanceFleetSizeCalculator.getAvailabilities();
         }
 
     }

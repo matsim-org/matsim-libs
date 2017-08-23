@@ -18,6 +18,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeIO;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
+import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeIO;
 import playground.clruch.data.LocationSpec;
 import playground.clruch.html.DataCollector;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
@@ -52,7 +53,7 @@ public class ScenarioPreparer {
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
 
-        final int maxPopulationSize = 3000;
+        final int maxPopulationSize = 500;
 
         final int numVirtualNodes = 10;
         final int dtTravelData = 1800;
@@ -69,6 +70,7 @@ public class ScenarioPreparer {
         final String VIRTUALNETWORKFOLDERNAME = "virtualNetwork";
         final String VIRTUALNETWORKFILENAME = "virtualNetwork";
         final String MINIMUMFLEETSIZEFILENAME = "minimumFleetSizeCalculator";
+        final String PERFORMANCEFLEETSIZEFILENAME = "performanceFleetSizeCalculator";
         final String TRAVELDATAFILENAME = "travelData";
         final String NETWORKUPDATEDNAME = "networkConverted";
         final String POPULATIONUPDATEDNAME = "populationConverted";
@@ -154,15 +156,14 @@ public class ScenarioPreparer {
         TravelDataIO.toByte(new File(vnDir, TRAVELDATAFILENAME), travelData);
         System.out.println("saved travelData byte format to : " + new File(vnDir, TRAVELDATAFILENAME));
 
-        {// 4) calculate performance and min fleet size and save results
+        {// 4) calculate minimum and performance fleet size and save results
             MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, population, virtualNetwork, travelData);
             MinimumFleetSizeIO.toByte(new File(vnDir, MINIMUMFLEETSIZEFILENAME), minimumFleetSizeCalculator);
-            
 
-            // int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
-            // PerformanceFleetSizeCalculator performanceFleetSizeCalculator = //
-            // new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberVehiclesPerformanceCalculator);
-            // performanceFleetSizeCalculator.calcAvailab();
+            int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
+            PerformanceFleetSizeCalculator performanceFleetSizeCalculator = //
+                    new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberVehiclesPerformanceCalculator);
+            PerformanceFleetSizeIO.toByte(new File(vnDir, PERFORMANCEFLEETSIZEFILENAME), performanceFleetSizeCalculator);
 
         }
 

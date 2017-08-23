@@ -45,7 +45,7 @@ public class MinimumFleetSizeCalculator implements Serializable {
     final int numberTimeSteps;
     final int dt;
     final public static Tensor minFleet = Tensors.empty();
-    final public static Tensor EMDks = Tensors.empty();
+    private Tensor EMDks;
     public double minimumFleet;
 
     public MinimumFleetSizeCalculator(Network network, Population population, VirtualNetwork virtualNetwork, TravelData travelData) {
@@ -53,6 +53,7 @@ public class MinimumFleetSizeCalculator implements Serializable {
         GlobalAssert.that(108000 % numberTimeSteps == 0);
         dt = travelData.getdt();
         calculateMinFleet(network, population, virtualNetwork, travelData);
+        EMDks = Tensors.empty();
     }
 
     private Tensor calculateMinFleet(Network network, Population population, VirtualNetwork virtualNetwork, TravelData travelData) {
@@ -64,7 +65,7 @@ public class MinimumFleetSizeCalculator implements Serializable {
         Tensor totalArrivals = RealScalar.ZERO;
         for (int k = 0; k < numberTimeSteps; ++k) {
             // extract all relevant requests
-            ArrayList<RequestObj> relevantRequests = getRelevantRequests(population, network, k * dt, (k + 1) * dt);
+            ArrayList<RequestObj> relevantRequests = RequestAnalysis.getRelevantRequests(population, network, k * dt, (k + 1) * dt);
 
             // arrival rate
             double lambdak = RequestAnalysis.calcArrivalRate(relevantRequests, dt);
@@ -95,47 +96,7 @@ public class MinimumFleetSizeCalculator implements Serializable {
         return minFleet;
     }
 
-    /** @param population
-     * @param timeStart
-     * @param timeEnd
-     * @return AV served requests in with submission time in interval [timeStart, timeEnd] */
-    ArrayList<RequestObj> getRelevantRequests(Population population, Network network, double timeStart, double timeEnd) {
-        ArrayList<RequestObj> returnRequests = new ArrayList<>();
 
-        for (Person person : population.getPersons().values()) {
-            for (Plan plan : person.getPlans()) {
-                PlanElement pE1 = null;
-                PlanElement pE2 = null;
-                PlanElement pE3 = null;
-
-                for (PlanElement planElem : plan.getPlanElements()) {
-                    pE1 = pE2;
-                    pE2 = pE3;
-                    pE3 = planElem;
-
-                    if (pE2 instanceof Leg) {
-                        Leg leg = (Leg) pE2;
-                        if (leg.getMode().equals("av")) {
-                            double submissionTime = leg.getDepartureTime();
-                            if (timeStart <= submissionTime && submissionTime < timeEnd) {
-                                Activity a1 = (Activity) pE1;
-                                Activity a3 = (Activity) pE3;
-
-                                Id<Link> startLinkID = a1.getLinkId();
-                                Id<Link> endLinkID = a3.getLinkId();
-
-                                Link startLink = network.getLinks().get(startLinkID);
-                                Link endLink = network.getLinks().get(endLinkID);
-
-                                returnRequests.add(new RequestObj(submissionTime, startLink, endLink));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return returnRequests;
-    }
 
     public void plot(String[] args) throws Exception {
         DiagramCreator.createDiagram(AnalyzeAll.RELATIVE_DIRECTORY, "EMD", "Earth Movers Distance", //
@@ -146,6 +107,10 @@ public class MinimumFleetSizeCalculator implements Serializable {
     
     public double getMinFleet(){
         return minimumFleet;
+    }
+    
+    public Tensor getEMDk(){
+        return EMDks.copy();
     }
 
     /* package */ void checkConsistency() {
@@ -175,7 +140,7 @@ public class MinimumFleetSizeCalculator implements Serializable {
         ;
 
         System.out.println("Population size: " + population.getPersons().size());
-        System.out.println("Earth movers distances: " + EMDks);
+        System.out.println("Earth movers distances: " + minimumFleetSizeCalculator.getEMDk());
         System.out.println("Minimallly required fleet sizes " + minFleet);
         double minVeh = AnalysisUtils.maximum(minFleet).number().doubleValue();
         System.out.println(minVeh + " -> " + Math.ceil(minVeh));
