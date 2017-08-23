@@ -10,15 +10,12 @@ import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.NetworkLoader;
 
-/**
- * the viewer allows to connect to the scenario server
- */
+/** the viewer allows to connect to the scenario server or to view saved
+ * simulation results. */
 public class ScenarioViewer {
-    /**
-     * @param args
+    /** @param args
      *            complete path to av_config.xml file, e.g.
-     *            /media/bubba/data/ethz/2017_03_13_Sioux_LP_improved/av_config.xml
-     */
+     *            /media/bubba/data/ethz/2017_03_13_Sioux_LP_improved/av_config.xml */
     public static void main(String[] args) {
         // BEGIN: CUSTOMIZE -----------------------------------------------
         // set manually depending on the scenario:
