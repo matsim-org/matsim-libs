@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -237,9 +238,10 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
             AVRequest avRequest = entry.getKey();
             GlobalAssert.that(pendingRequests.contains(avRequest));
             RoboTaxi pickupVehicle = entry.getValue();
-            Link pickupVehicleLink = pickupVehicle.getDivertableLocation();
+            Optional<Link> pickupVehicleLink = Optional.ofNullable(pickupVehicle.getDivertableLocation());
             boolean isOk = pickupVehicle.getSchedule().getCurrentTask() == Schedules.getLastTask(pickupVehicle.getSchedule());
-            if (avRequest.getFromLink().equals(pickupVehicleLink) && isOk) {
+            boolean vehicleLocationKnown = pickupVehicleLink.isPresent();
+            if (avRequest.getFromLink().equals(pickupVehicleLink) && isOk && vehicleLocationKnown) {
                 setAcceptRequest(pickupVehicle, avRequest);
             }
         }
