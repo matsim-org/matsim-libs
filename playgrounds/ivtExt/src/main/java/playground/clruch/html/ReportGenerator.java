@@ -25,16 +25,16 @@ public class ReportGenerator {
     final static double link2km = 0.001;
 
     public static void main(String[] args) throws Exception {
-        from(args);
+        from(new File(args[0]));
     }
 
-    public static void from(String[] args) throws Exception {
-        File config = new File(args[0]);
-        File file = new File(config.getParent(), "output/report");
+    public static void from(File configFile) throws Exception {
+
+        File file = new File(configFile.getParent(), "output/report");
         file.mkdir();
 
-        ScenarioParameters scenarioParameters = DataCollector.loadScenarioData(args);
-        AnalyzeSummary analyzeSummary = DataCollector.loadAnalysisData(args);
+        ScenarioParameters scenarioParameters = DataCollector.loadScenarioData(configFile);
+        AnalyzeSummary analyzeSummary = DataCollector.loadAnalysisData(configFile);
 
         // write report
         // -------------------------------------------------------------------------------------------------------------

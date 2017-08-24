@@ -44,13 +44,11 @@ import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 
-/**
- * main entry point
+/** main entry point
  * 
  * only one ScenarioServer can run at one time, since a fixed network port is reserved to serve the simulation status
  * 
- * if you wish to run multiple simulations at the same time use for instance {@link RunAVScenario}
- */
+ * if you wish to run multiple simulations at the same time use for instance {@link RunAVScenario} */
 public class TrbScenarioServer {
 
     public static ScenarioParameters scenarioParameters;
@@ -63,8 +61,6 @@ public class TrbScenarioServer {
 
         // END: CUSTOMIZE -------------------------------------------------
 
-
-
         // open server port for clients to connect to
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
         SimulationServer.INSTANCE.setWaitForClients(waitForClients);
@@ -73,27 +69,23 @@ public class TrbScenarioServer {
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 
         File configFile = new File(args[0]);
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup,
-                new BlackListedTimeAllocationMutatorConfigGroup());
-        
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
+
         scenarioParameters = new ScenarioParameters(config);
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
-        
+
         Network network = scenario.getNetwork();
 
         Network reducedNetwork = NetworkUtils.createNetwork();
         new MatsimNetworkReader(reducedNetwork).readFile(new TRBScenarioConfig().filteredNetworkOutputPath);
-        
+
         MatsimStaticDatabase.initializeSingletonInstance( //
 
                 network, ReferenceFrame.SIOUXFALLS);
-        
-        
-        
-        for (String type : new String[] { "home", "shop", "leisure", "escort_kids", "escort_other", "work", "education", "remote_work",
-                "remote_home" }) {
+
+        for (String type : new String[] { "home", "shop", "leisure", "escort_kids", "escort_other", "work", "education", "remote_work", "remote_home" }) {
             for (int i = 0; i <= 20; i++) {
                 ActivityParams params = new ActivityParams();
                 params.setActivityType(type + "_" + i);
@@ -121,18 +113,16 @@ public class TrbScenarioServer {
         controler.addOverridingModule(new TRBModule(reducedNetwork));
         controler.addOverridingModule(new WriteTravelTimesModule());
 
-
-        
-//        controler.addOverridingModule(new AbstractModule() {
-//            @Override
-//            public void install() {
-//                bind(new TypeLiteral<Collection<Link>>() {}).annotatedWith(Names.named("zurich")).toInstance(filteredPermissibleLinks);
-//                //AVUtils.registerDispatcherFactory(binder(), "ZurichDispatcher", ZurichDispatcher.ZurichDispatcherFactory.class);
-//                AVUtils.registerGeneratorFactory(binder(), "ZurichGenerator", ZurichGenerator.ZurichGeneratorFactory.class);
-//
-//                addPlanStrategyBinding("ZurichModeChoice").toProvider(ZurichPlanStrategyProvider.class);
-//            }
-//        });
+        // controler.addOverridingModule(new AbstractModule() {
+        // @Override
+        // public void install() {
+        // bind(new TypeLiteral<Collection<Link>>() {}).annotatedWith(Names.named("zurich")).toInstance(filteredPermissibleLinks);
+        // //AVUtils.registerDispatcherFactory(binder(), "ZurichDispatcher", ZurichDispatcher.ZurichDispatcherFactory.class);
+        // AVUtils.registerGeneratorFactory(binder(), "ZurichGenerator", ZurichGenerator.ZurichGeneratorFactory.class);
+        //
+        // addPlanStrategyBinding("ZurichModeChoice").toProvider(ZurichPlanStrategyProvider.class);
+        // }
+        // });
 
         StorageUtils.OUTPUT = new File(config.controler().getOutputDirectory());
         StorageUtils.DIRECTORY = new File(StorageUtils.OUTPUT, "simobj");
@@ -141,7 +131,7 @@ public class TrbScenarioServer {
 
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
-        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(args);
+        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(new File(args[0]));
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
@@ -150,15 +140,14 @@ public class TrbScenarioServer {
         int vehicleSteps = Math.max(10, maxNumberVehiclesPerformanceCalculator / 400);
 
         if (virtualNetwork != null) {
-            minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network,population,virtualNetwork,travelData);
-            performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(virtualNetwork, travelData,
-                    maxNumberVehiclesPerformanceCalculator);
+            minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, population, virtualNetwork, travelData);
+            performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberVehiclesPerformanceCalculator);
         }
 
-        DataCollector.store(args, controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
-                analyzeSummary, scenarioParameters,network, population, travelData);
+        DataCollector.store(configFile, controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
+                analyzeSummary, scenarioParameters, network, population, travelData);
 
-        ReportGenerator.from(args);
+        ReportGenerator.from(configFile);
 
     }
 }

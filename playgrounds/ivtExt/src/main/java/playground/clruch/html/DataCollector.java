@@ -41,7 +41,7 @@ public class DataCollector {
     public static ScenarioParameters scenarioParameters;
     public static AnalyzeSummary analyzeSummary;
 
-    public static void store(String[] args, Controler controler, MinimumFleetSizeCalculator minimumFleetSizeCalculator, //
+    public static void store(File configFile, Controler controler, MinimumFleetSizeCalculator minimumFleetSizeCalculator, //
                              PerformanceFleetSizeCalculator performanceFleetSizeCalculator, //
                              AnalyzeSummary analyzeSummaryIn, ScenarioParameters scenarioParametersIn,//
                              Network network, Population population, TravelData travelData) throws Exception {
@@ -49,11 +49,11 @@ public class DataCollector {
         scenarioParameters = scenarioParametersIn; // new ScenarioParameters();
         analyzeSummary = analyzeSummaryIn;
         collectData(controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator);
-        readStopwatch(args);
+        readStopwatch(configFile);
 
-        saveConfigs(args);
+        saveConfigs(configFile);
 
-        minimumFleetSizeCalculator.plot(args);
+        minimumFleetSizeCalculator.plot();
         performanceFleetSizeCalculator.saveAndPlot();
         
         LeastCostPathCalculator dijkstra = EasyDijkstra.prepDijkstra(network);
@@ -61,16 +61,15 @@ public class DataCollector {
        
     }
 
-    public static File report(String[] args) {
-        avConfigOld = new File(args[0]);
-        folder = avConfigOld.getParentFile();
+    public static File report(File configFile) {
+        folder = configFile.getParentFile();
         avOld = new File(folder, "av.xml");
 
         return new File(folder, "output/report");
     }
 
-    public static void saveConfigs(String[] args) throws Exception {
-        File report = report(args);
+    public static void saveConfigs(File configFile) throws Exception {
+        File report = report(configFile);
         report.mkdir();
         Export.object(new File(report, "scenarioParameters.obj"), scenarioParameters);
         Export.object(new File(report, "analyzeSummary.obj"), analyzeSummary);
@@ -88,12 +87,12 @@ public class DataCollector {
         GlobalAssert.that(av.exists() && avConfig.exists());
     }
 
-    public static ScenarioParameters loadScenarioData(String[] args) throws Exception {
-        return Import.object(new File(report(args), "scenarioParameters.obj"));
+    public static ScenarioParameters loadScenarioData(File configFile) throws Exception {
+        return Import.object(new File(report(configFile), "scenarioParameters.obj"));
     }
 
-    public static AnalyzeSummary loadAnalysisData(String[] args) throws Exception {
-        return Import.object(new File(report(args), "analyzeSummary.obj"));
+    public static AnalyzeSummary loadAnalysisData(File configFile) throws Exception {
+        return Import.object(new File(report(configFile), "analyzeSummary.obj"));
     }
 
     public static void collectData(Controler controler, MinimumFleetSizeCalculator minimumFleetSizeCalculator, //
@@ -115,8 +114,8 @@ public class DataCollector {
 
     }
 
-    public static void readStopwatch(String[] args) {
-        File stopwatch = new File((new File(args[0])).getParent(), "output/stopwatch.txt");
+    public static void readStopwatch(File configFile) {
+        File stopwatch = new File(configFile.getParent(), "output/stopwatch.txt");
         try {
             BufferedReader reader = new BufferedReader(new FileReader(stopwatch));
             String startTime = "00:00:00";

@@ -93,7 +93,7 @@ public class MinimumFleetSizeCalculator implements Serializable {
 
 
 
-    public void plot(String[] args) throws Exception {
+    public void plot() throws Exception {
         DiagramCreator.createDiagram(AnalyzeAll.RELATIVE_DIRECTORY, "EMD", "Earth Movers Distance", //
                 EMDks.multiply(RealScalar.of(0.001)), "km");
         DiagramCreator.createDiagram(AnalyzeAll.RELATIVE_DIRECTORY, "minFleet", "Minimum Fleet Size", //
