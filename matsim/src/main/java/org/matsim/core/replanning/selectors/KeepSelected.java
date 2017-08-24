@@ -26,12 +26,18 @@ import org.matsim.api.core.v01.population.HasPlansAndId;
 /**
  * Keeps the currently selected plan selected and returns it.
  * 
+ * 
+ * 
  * @author mrieser
  */
 public class KeepSelected<T extends BasicPlan, I> implements PlanSelector<T, I> {
 
 	/**
 	 * returns the already selected plan for this person
+	 * 
+	 * One must be careful when using it, since the last executed plan might not be selected
+	 * since it might have been removed at the start of the new iteration
+	 * (because of the maxnumberofplans limit). balac aug '17
 	 */
 	@Override
 	public T selectPlan(HasPlansAndId<T, I> person) {
