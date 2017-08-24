@@ -20,7 +20,7 @@
 /**
  * 
  */
-package robotest;
+package vwExamples.robotaxiVWExample;
 
 import java.util.Arrays;
 import java.util.List;
@@ -63,7 +63,7 @@ public class RunTaxiBatchScenario {
 			config.controler().setWriteEventsInterval(1);
 			config.controler().setWritePlansInterval(1);
 			config.controler().setOutputDirectory("D:/Axer/MatsimDataStore/WOB_Taxi_ServiceQuality/optFleet/output/"+runId);
-			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_Taxi_ServiceQuality/population/carReplaceOnly/run120.100.WOB_taxi_"+pct.toString()+".xml.gz");
+			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_Taxi_ServiceQuality/population/carReplaceOnly/run124.100.WOB_taxi_"+pct.toString()+".xml.gz");
 			
 			// erstellt den Controler aus dem Robotaxiexample auf basis der aktuellen Config
 			Controler controler = RunRobotaxiExample.createControler(config, false);

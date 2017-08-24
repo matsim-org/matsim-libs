@@ -20,7 +20,7 @@
 /**
  * 
  */
-package peoplemovertest;
+package vwExamples.peoplemoverVWExample;
 
 
 import java.util.Random;

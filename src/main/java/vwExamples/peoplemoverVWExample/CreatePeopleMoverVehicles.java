@@ -20,7 +20,7 @@
 /**
  * 
  */
-package peoplemovertest;
+package vwExamples.peoplemoverVWExample;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,11 +49,11 @@ public class CreatePeopleMoverVehicles {
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		int numberofVehicles = 300;
+		int numberofVehicles = 3000;
 		double operationStartTime = 0.; //t0
 		double operationEndTime = 36*3600.;	//t1
 		int seats = 8;
-		String networkfile = "D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/network/networkpt-feb.xml.gz";
+		String networkfile = "D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/network/June2017/run124.10.output_network.xml.gz";
 		String taxisFile = "D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/taxifleets/pm_"+numberofVehicles+".xml";
 		List<Vehicle> vehicles = new ArrayList<>();
 		Random random = MatsimRandom.getLocalInstance();
@@ -68,7 +68,7 @@ public class CreatePeopleMoverVehicles {
 			}
 			while (!startLink.getAllowedModes().contains("av"));
 			//for multi-modal networks: Only links where cars can ride should be used.
-			Vehicle v = new VehicleImpl(Id.create("taxi"+i, Vehicle.class), startLink, seats, operationStartTime, operationEndTime);
+			Vehicle v = new VehicleImpl(Id.create("tr"+i, Vehicle.class), startLink, seats, operationStartTime, operationEndTime);
 		    vehicles.add(v);    
 			
 		}
