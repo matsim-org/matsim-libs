@@ -1,8 +1,10 @@
 package playground.clruch;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Properties;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -30,11 +32,25 @@ import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.utils.GZHandler;
 import playground.clruch.utils.GlobalAssert;
 
+// TODO update doc
 /** Class to prepare a given scenario for MATSim, includes preparation of netowrk, population, creation of virtualNetwork
  * and travelData objects.
  * 
+ *         // INPUT ARGUMENT: path to a config.xml file which contains references to the original xml files (population.xml)
+        // if the xml file with the converted files is supplied, no changes are implemented by the ScenarioPreparer.
+
+ * 
  * @author clruch */
 public class ScenarioPreparer {
+    // output file names
+    private final static String VIRTUALNETWORKFOLDERNAME = "virtualNetwork";
+    private final static String VIRTUALNETWORKFILENAME = "virtualNetwork";
+    private final static String MINIMUMFLEETSIZEFILENAME = "minimumFleetSizeCalculator";
+    private final static String PERFORMANCEFLEETSIZEFILENAME = "performanceFleetSizeCalculator";
+    private final static String TRAVELDATAFILENAME = "travelData";
+    private final static String NETWORKUPDATEDNAME = "networkConverted";
+    private final static String POPULATIONUPDATEDNAME = "populationConverted";
+
 
     public static void main(String[] args) throws MalformedURLException, Exception {
         run(args);
@@ -42,36 +58,27 @@ public class ScenarioPreparer {
 
     public static void run(String[] args) throws MalformedURLException, Exception {
 
-        // INPUT ARGUMENT: path to a config.xml file which contains references to the original xml files (population.xml)
-        // if the xml file with the converted files is supplied, no changes are implemented by the ScenarioPreparer.
-        System.out.println("converting simulation data files from " + args[0]);
+        // load options
+        Properties preparerOptions = new Properties(DefaultOptions.getPreparerDefault());
+        if (args.length > 0 && new File(args[0]).exists()) {
+            preparerOptions.load(new FileInputStream(new File(args[0])));
+        }
 
-        // BEGIN: CUSTOMIZE -----------------------------------------------
-        // set manually depending on the scenario:
-        final int maxPopulationSize = 40000;
-        final int numVirtualNodes = 40;
-        final int dtTravelData = 60;
-        final boolean completeGraph = true;
+        File configFile = new File(preparerOptions.getProperty("av_config_full.xml"));
+        LocationSpec  ls = LocationSpec.fromString(preparerOptions.getProperty("LocationSpec")); 
+        int maxPopulationSize = Integer.valueOf(preparerOptions.getProperty("maxPopulationSize"));
+        int dtTravelData = Integer.valueOf(preparerOptions.getProperty("dtTravelData"));
+        int numVirtualNodes = Integer.valueOf(preparerOptions.getProperty("numVirtualNodes"));
+        boolean completeGraph = Boolean.valueOf(preparerOptions.getProperty("completeGraph"));
+        boolean populationeliminateFreight = Boolean.valueOf(preparerOptions.getProperty("populationeliminateFreight"));
+        boolean populationeliminateWalking = Boolean.valueOf(preparerOptions.getProperty("populationeliminateWalking"));
+        boolean populationchangeModeToAV = Boolean.valueOf(preparerOptions.getProperty("populationchangeModeToAV"));
+        
 
-        // LocationSpec object to specify city location and center, radius for cutting
-        LocationSpec ls = LocationSpec.SIOUXFALLS_CITY;
-
-        final boolean populationeliminateFreight = false;
-        final boolean populationeliminateWalking = false;
-        final boolean populationchangeModeToAV = true; // TODO check if this is still needed !?
-
-        // output file names
-        final String VIRTUALNETWORKFOLDERNAME = "virtualNetwork";
-        final String VIRTUALNETWORKFILENAME = "virtualNetwork";
-        final String MINIMUMFLEETSIZEFILENAME = "minimumFleetSizeCalculator";
-        final String PERFORMANCEFLEETSIZEFILENAME = "performanceFleetSizeCalculator";
-        final String TRAVELDATAFILENAME = "travelData";
-        final String NETWORKUPDATEDNAME = "networkConverted";
-        final String POPULATIONUPDATEDNAME = "populationConverted";
-
-        // END: CUSTOMIZE -------------------------------------------------
-
-        File configFile = new File(args[0]);
+        
+        
+        // start preparation
+        System.out.println("converting simulation data files from " + configFile.toString());
         File dir = configFile.getParentFile();
 
         // 0) load files
@@ -161,6 +168,6 @@ public class ScenarioPreparer {
 
         }
 
-        System.out.println("successfully converted simulation data files from " + args[0]);
+        System.out.println("successfully converted simulation data files from " + (new File(preparerOptions.getProperty("av_config_full.xml"))).toString());
     }
 }
