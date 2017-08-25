@@ -40,4 +40,13 @@ public enum LocationSpec {
         this.center = center;
         this.radius = radius;
     }
+    
+    
+    public static LocationSpec fromString(String stringRef){
+        for(LocationSpec locSpec : LocationSpec.values()){
+            if(locSpec.toString().equals(stringRef)) return locSpec;
+        }
+        return null;
+    }
+
 }
