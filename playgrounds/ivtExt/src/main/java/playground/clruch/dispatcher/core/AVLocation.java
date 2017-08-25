@@ -9,6 +9,7 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import playground.clruch.utils.AVTaskAdapter;
+import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
@@ -22,6 +23,12 @@ public class AVLocation extends AVTaskAdapter {
      */
     public static Link of(RoboTaxi robotaxi) {
         Schedule schedule = robotaxi.getSchedule();
+        GlobalAssert.that(schedule!=null);
+        System.out.println("this will fail soon:");
+        System.out.println(schedule.getBeginTime());
+        System.out.println(schedule.getEndTime());
+        System.out.println(schedule.getTaskCount());
+        System.out.println(schedule.getStatus());       
         return new AVLocation(schedule.getCurrentTask()).link;
     }
 

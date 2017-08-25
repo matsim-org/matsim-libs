@@ -15,6 +15,7 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 
+import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
@@ -73,7 +74,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
                     if (Schedules.isNextToLastTask(avDriveTask)) {
                         TaskTracker taskTracker = avDriveTask.getTaskTracker();
                         OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
-                        LinkTimePair linkTimePair = ((OnlineDriveTaskTrackerImpl)onlineDriveTaskTracker).getSafeDiversionPoint();
+                        LinkTimePair linkTimePair = ((OnlineDriveTaskTrackerImpl) onlineDriveTaskTracker).getSafeDiversionPoint();
                         GlobalAssert.that(linkTimePair != null);
                         robotaxi.setDivertableLinkTime(linkTimePair);
                         robotaxi.setCurrentDriveDestination(avDriveTask.getPath().getToLink());
