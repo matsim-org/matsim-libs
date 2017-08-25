@@ -73,8 +73,8 @@ public class DataCollector {
         report.mkdir();
         Export.object(new File(report, "scenarioParameters.obj"), scenarioParameters);
         Export.object(new File(report, "analyzeSummary.obj"), analyzeSummary);
-        avConfig = new File(report, "av_config.xml");
-        av = new File(report, "av.xml");
+        avConfig = new File(configFile.getParentFile(), "av_config.xml");
+        av = new File(configFile.getParentFile(), "av.xml");
 
         try {
             Files.deleteIfExists(avConfig.toPath());
@@ -84,6 +84,8 @@ public class DataCollector {
         } catch (Exception e) {
             System.out.println("ERROR: unable to create backups!");
         }
+        System.out.println(av.getAbsolutePath());
+        System.out.println(avConfig.getAbsolutePath());
         GlobalAssert.that(av.exists() && avConfig.exists());
     }
 
