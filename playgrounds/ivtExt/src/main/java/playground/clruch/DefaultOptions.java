@@ -26,7 +26,6 @@ public enum DefaultOptions {
         returnP.setProperty("populationeliminateWalking", "false");
         returnP.setProperty("populationchangeModeToAV", "true");
         returnP.setProperty("waitForClients", "false");
-        returnP.setProperty("av_config.xml", "/home/clruch/Simulations/2017_07_13_Sioux_TestBed/av_config.xml");
         returnP.setProperty("ReferenceFrame", "SIOUXFALLS");
         return returnP;
     }

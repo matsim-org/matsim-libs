@@ -24,11 +24,6 @@ public class AVLocation extends AVTaskAdapter {
     public static Link of(RoboTaxi robotaxi) {
         Schedule schedule = robotaxi.getSchedule();
         GlobalAssert.that(schedule!=null);
-        System.out.println("this will fail soon:");
-        System.out.println(schedule.getBeginTime());
-        System.out.println(schedule.getEndTime());
-        System.out.println(schedule.getTaskCount());
-        System.out.println(schedule.getStatus());
         return new AVLocation(schedule.getCurrentTask()).link;
     }
 

@@ -56,21 +56,29 @@ public class ScenarioServer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
 
-        Properties serverOptions = new Properties(DefaultOptions.getServerDefault());
-        if (args.length > 0 && new File(args[0]).exists()) {
-            serverOptions.load(new FileInputStream(new File(args[0])));
+        File wd = new File("");
+        System.out.println("working in " + wd.getAbsoluteFile());
+
+        Thread.sleep(5000);
+
+        Properties simOptions = new Properties(DefaultOptions.getDefault());
+        if (new File(wd, "IDSCOptions.properties").exists()) {
+            simOptions.load(new FileInputStream(new File(wd, "IDSCOptions.properties")));
         } else
-            DefaultOptions.saveServerDefault();
+            DefaultOptions.saveDefault();
 
         // set to true in order to make server wait for at least 1 client, for instance viewer client
-        boolean waitForClients = Boolean.valueOf(serverOptions.getProperty("waitForClients"));
+        boolean waitForClients = Boolean.valueOf(simOptions.getProperty("waitForClients"));
 
         // open server port for clients to connect to
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
         SimulationServer.INSTANCE.setWaitForClients(waitForClients);
 
         // load MATSim configs
-        File configFile = new File(serverOptions.getProperty("av_config.xml"));
+        File configFile = new File(wd.getCanonicalFile(), simOptions.getProperty("fullConfig"));
+        System.out.println("loading config file " + configFile.getAbsoluteFile());
+        Thread.sleep(5000);
+
         GlobalAssert.that(configFile.exists());
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
@@ -108,7 +116,7 @@ public class ScenarioServer {
         SimulationServer.INSTANCE.stopAccepting();
 
         // perform analysis of results
-        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(new File(serverOptions.getProperty("av_config.xml")));
+        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(new File(simOptions.getProperty("av_config.xml")));
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
@@ -120,11 +128,11 @@ public class ScenarioServer {
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
-        DataCollector.store(new File(serverOptions.getProperty("av_config.xml")), controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
+        DataCollector.store(new File(simOptions.getProperty("av_config.xml")), controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
                 analyzeSummary, scenarioParameters, network, population, travelData);
 
         // generate report
-        ReportGenerator.from(new File(serverOptions.getProperty("av_config.xml")));
+        ReportGenerator.from(new File(simOptions.getProperty("av_config.xml")));
 
     }
 }
