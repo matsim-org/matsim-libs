@@ -29,7 +29,7 @@ public class ScenarioViewer {
         Properties viewerOptions = new Properties(DefaultOptions.getViewerDefault());
         if (args.length > 0 && new File(args[0]).exists()) {
             viewerOptions.load(new FileInputStream(new File(args[0])));
-        }
+        }else DefaultOptions.saveViewerDefault();
 
         ReferenceFrame referenceFrame = ReferenceFrame.fromString(//
                 viewerOptions.getProperty("ReferenceFrame"));

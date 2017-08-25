@@ -36,7 +36,7 @@ public enum DefaultOptions {
     }
 
     public static void savePreparerDefault() throws IOException {
-        saveProperties(getServerDefault(), "ServerDefaultOptions");
+        saveProperties(getPreparerDefault(), "PreparerDefaultOptions");
     }
 
     /** "av_config.xml" is a MATSim config file

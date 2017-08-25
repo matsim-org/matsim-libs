@@ -62,7 +62,8 @@ public class ScenarioPreparer {
         Properties preparerOptions = new Properties(DefaultOptions.getPreparerDefault());
         if (args.length > 0 && new File(args[0]).exists()) {
             preparerOptions.load(new FileInputStream(new File(args[0])));
-        }
+        }else DefaultOptions.savePreparerDefault();
+       
 
         File configFile = new File(preparerOptions.getProperty("av_config_full.xml"));
         LocationSpec  ls = LocationSpec.fromString(preparerOptions.getProperty("LocationSpec")); 

@@ -55,16 +55,10 @@ public class ScenarioServer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
 
-        // // BEGIN: CUSTOMIZE -----------------------------------------------
-
-        // boolean waitForClients = false;
-        //
-        // // END: CUSTOMIZE -------------------------------------------------
-
         Properties serverOptions = new Properties(DefaultOptions.getServerDefault());
         if (args.length > 0 && new File(args[0]).exists()) {
             serverOptions.load(new FileInputStream(new File(args[0])));
-        }
+        }else DefaultOptions.saveServerDefault();
 
         // set to true in order to make server wait for at least 1 client, for instance viewer client
         boolean waitForClients = Boolean.valueOf(serverOptions.getProperty("waitForClients"));
