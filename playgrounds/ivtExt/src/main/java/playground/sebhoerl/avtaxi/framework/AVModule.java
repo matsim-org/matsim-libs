@@ -35,6 +35,7 @@ import playground.clruch.dispatcher.LPFBDispatcher;
 import playground.clruch.dispatcher.LPFFDispatcher;
 import playground.clruch.dispatcher.MonoMultiGBMDispatcher;
 import playground.clruch.dispatcher.NewSingleHeuristicDispatcher;
+import playground.clruch.dispatcher.TestBedDispatcher;
 import playground.clruch.dispatcher.UncoordinatedDispatcher;
 import playground.fseccamo.dispatcher.MPCDispatcher;
 import playground.sebhoerl.avtaxi.config.AVConfig;
@@ -128,7 +129,12 @@ public class AVModule extends AbstractModule {
 
         bind(MonoMultiGBMDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), MonoMultiGBMDispatcher.class.getSimpleName()).to(MonoMultiGBMDispatcher.Factory.class);
-        //
+        
+        bind(TestBedDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), TestBedDispatcher.class.getSimpleName()).to(TestBedDispatcher.Factory.class);
+        
+        
+        
         // bind(PolyMultiGBMDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), PolyMultiGBMDispatcher.class.getSimpleName()).to(PolyMultiGBMDispatcher.Factory.class);
 
