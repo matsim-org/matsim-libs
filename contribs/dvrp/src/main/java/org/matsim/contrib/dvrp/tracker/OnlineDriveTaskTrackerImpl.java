@@ -105,7 +105,7 @@ public class OnlineDriveTaskTrackerImpl // jan made this public
      * @author Claudio Ruch
      * @return diversion point at end of path
      */
-    public LinkTimePair getPathEndDiversionPoint(){
+    private LinkTimePair getPathEndDiversionPoint(){
         return new LinkTimePair(path.getToLink(), predictLinkExitTime());        
     }
 

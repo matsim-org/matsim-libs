@@ -36,7 +36,7 @@ public enum DefaultOptions {
     }
 
     public static void savePreparerDefault() throws IOException {
-        saveProperties(getPreparerDefault(), "PreparerDefaultOptions");
+        saveProperties(getPreparerDefault(), "DefaultPreparerOptions");
     }
 
     /** "av_config.xml" is a MATSim config file
@@ -52,7 +52,7 @@ public enum DefaultOptions {
     }
 
     public static void saveServerDefault() throws IOException {
-        saveProperties(getServerDefault(), "ServerDefaultOptions");
+        saveProperties(getServerDefault(), "DefaultServerOptions");
     }
 
     /** "av_config.xml" is a MATSim config file
@@ -67,7 +67,7 @@ public enum DefaultOptions {
     }
 
     public static void saveViewerDefault() throws IOException {
-        saveProperties(getViewerDefault(), "ViewerDefaultOptions");
+        saveProperties(getViewerDefault(), "DefaultViewerOptions");
     }
 
     private static void saveProperties(Properties prop, String filename) throws IOException {

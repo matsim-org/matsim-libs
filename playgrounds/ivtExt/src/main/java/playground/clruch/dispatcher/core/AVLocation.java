@@ -28,7 +28,7 @@ public class AVLocation extends AVTaskAdapter {
         System.out.println(schedule.getBeginTime());
         System.out.println(schedule.getEndTime());
         System.out.println(schedule.getTaskCount());
-        System.out.println(schedule.getStatus());       
+        System.out.println(schedule.getStatus());
         return new AVLocation(schedule.getCurrentTask()).link;
     }
 

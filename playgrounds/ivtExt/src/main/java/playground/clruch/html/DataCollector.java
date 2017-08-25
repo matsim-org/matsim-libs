@@ -74,8 +74,7 @@ public class DataCollector {
         Export.object(new File(report, "scenarioParameters.obj"), scenarioParameters);
         Export.object(new File(report, "analyzeSummary.obj"), analyzeSummary);
         avConfig = new File(configFile.getParentFile(), "av_config.xml");
-        av = new File(configFile.getParentFile(), "av.xml");
-
+        av = new File(configFile.getParentFile(), "av.xml");    
         try {
             Files.deleteIfExists(avConfig.toPath());
             Files.copy(avConfigOld.toPath(), avConfig.toPath());
