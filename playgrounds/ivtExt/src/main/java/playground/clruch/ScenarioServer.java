@@ -36,6 +36,7 @@ import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
 import playground.clruch.trb18.traveltime.reloading.WriteTravelTimesModule;
+import playground.clruch.utils.GlobalAssert;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
@@ -58,7 +59,8 @@ public class ScenarioServer {
         Properties serverOptions = new Properties(DefaultOptions.getServerDefault());
         if (args.length > 0 && new File(args[0]).exists()) {
             serverOptions.load(new FileInputStream(new File(args[0])));
-        }else DefaultOptions.saveServerDefault();
+        } else
+            DefaultOptions.saveServerDefault();
 
         // set to true in order to make server wait for at least 1 client, for instance viewer client
         boolean waitForClients = Boolean.valueOf(serverOptions.getProperty("waitForClients"));
@@ -69,6 +71,7 @@ public class ScenarioServer {
 
         // load MATSim configs
         File configFile = new File(serverOptions.getProperty("av_config.xml"));
+        GlobalAssert.that(configFile.exists());
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
@@ -78,8 +81,11 @@ public class ScenarioServer {
 
         // load scenario for simulation
         Scenario scenario = ScenarioUtils.loadScenario(config);
+        GlobalAssert.that(scenario != null);
         Network network = scenario.getNetwork();
+        GlobalAssert.that(network != null);
         Population population = scenario.getPopulation();
+        GlobalAssert.that(population != null);
         MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SWITZERLAND);
         Controler controler = new Controler(scenario);
 
