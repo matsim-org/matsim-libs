@@ -32,17 +32,12 @@ import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.utils.GZHandler;
 import playground.clruch.utils.GlobalAssert;
 
-// TODO update doc
 /** Class to prepare a given scenario for MATSim, includes preparation of netowrk, population, creation of virtualNetwork
  * and travelData objects.
  * 
- *         // INPUT ARGUMENT: path to a config.xml file which contains references to the original xml files (population.xml)
-        // if the xml file with the converted files is supplied, no changes are implemented by the ScenarioPreparer.
-
- * 
  * @author clruch */
 public class ScenarioPreparer {
-    // output file names
+
     private final static String VIRTUALNETWORKFOLDERNAME = "virtualNetwork";
     private final static String VIRTUALNETWORKFILENAME = "virtualNetwork";
     private final static String MINIMUMFLEETSIZEFILENAME = "minimumFleetSizeCalculator";
@@ -51,36 +46,29 @@ public class ScenarioPreparer {
     private final static String NETWORKUPDATEDNAME = "networkConverted";
     private final static String POPULATIONUPDATEDNAME = "populationConverted";
 
-
     public static void main(String[] args) throws MalformedURLException, Exception {
         run(args);
     }
 
     public static void run(String[] args) throws MalformedURLException, Exception {
 
-        // load options
-        Properties preparerOptions = new Properties(DefaultOptions.getPreparerDefault());
-        if (args.length > 0 && new File(args[0]).exists()) {
-            preparerOptions.load(new FileInputStream(new File(args[0])));
-        }else DefaultOptions.savePreparerDefault();
-       
+        File wd = new File(".");
+        System.out.println("working in " + wd.getAbsolutePath());
 
-        File configFile = new File(preparerOptions.getProperty("av_config_full.xml"));
-        LocationSpec  ls = LocationSpec.fromString(preparerOptions.getProperty("LocationSpec")); 
-        int maxPopulationSize = Integer.valueOf(preparerOptions.getProperty("maxPopulationSize"));
-        int dtTravelData = Integer.valueOf(preparerOptions.getProperty("dtTravelData"));
-        int numVirtualNodes = Integer.valueOf(preparerOptions.getProperty("numVirtualNodes"));
-        boolean completeGraph = Boolean.valueOf(preparerOptions.getProperty("completeGraph"));
-        boolean populationeliminateFreight = Boolean.valueOf(preparerOptions.getProperty("populationeliminateFreight"));
-        boolean populationeliminateWalking = Boolean.valueOf(preparerOptions.getProperty("populationeliminateWalking"));
-        boolean populationchangeModeToAV = Boolean.valueOf(preparerOptions.getProperty("populationchangeModeToAV"));
-        
+        Properties simOptions = new Properties(DefaultOptions.getDefault());
+        if (new File(wd, "IDSCOptions.properties").exists()) {
+            simOptions.load(new FileInputStream(new File(wd, "IDSCOptions.properties")));
+        }else DefaultOptions.saveDefault();
 
-        
-        
-        // start preparation
-        System.out.println("converting simulation data files from " + configFile.toString());
-        File dir = configFile.getParentFile();
+        File configFile = new File(wd, simOptions.getProperty("fullConfig"));
+        boolean populationeliminateFreight = Boolean.valueOf(simOptions.getProperty("populationeliminateFreight"));
+        boolean populationeliminateWalking = Boolean.valueOf(simOptions.getProperty("populationeliminateWalking"));
+        boolean populationchangeModeToAV = Boolean.valueOf(simOptions.getProperty("populationchangeModeToAV"));
+        LocationSpec ls = LocationSpec.fromString(simOptions.getProperty("LocationSpec")); 
+        int numVirtualNodes = Integer.valueOf(simOptions.getProperty("numVirtualNodes"));
+        boolean completeGraph = Boolean.valueOf(simOptions.getProperty("completeGraph"));
+        int maxPopulationSize = Integer.valueOf(simOptions.getProperty("maxPopulationSize"));
+        int dtTravelData = Integer.valueOf(simOptions.getProperty("dtTravelData"));
 
         // 0) load files
         Config config = ConfigUtils.loadConfig(configFile.toString());
@@ -91,8 +79,8 @@ public class ScenarioPreparer {
 
         {// 1) cut network (and reduce population to new network)
             NetworkCutClean.elminateOutsideRadius(network, ls.center, ls.radius);
-            final File fileExportGz = new File(dir, NETWORKUPDATEDNAME + ".xml.gz");
-            final File fileExport = new File(dir, NETWORKUPDATEDNAME + ".xml");
+            final File fileExportGz = new File(wd, NETWORKUPDATEDNAME + ".xml.gz");
+            final File fileExport = new File(wd, NETWORKUPDATEDNAME + ".xml");
             {
                 // write the modified population to file
                 NetworkWriter nw = new NetworkWriter(network);
@@ -104,7 +92,7 @@ public class ScenarioPreparer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("saved converted network to: " + dir + NETWORKUPDATEDNAME + ".xml");
+            System.out.println("saved converted network to: " + wd + NETWORKUPDATEDNAME + ".xml");
         }
 
         {// 2) adapt the population to new network
@@ -126,8 +114,8 @@ public class ScenarioPreparer {
             System.out.println("Population after decimation:" + population.getPersons().values().size());
             GlobalAssert.that(population.getPersons().size() > 0);
 
-            final File fileExportGz = new File(dir, POPULATIONUPDATEDNAME + ".xml.gz");
-            final File fileExport = new File(dir, POPULATIONUPDATEDNAME + ".xml");
+            final File fileExportGz = new File(wd, POPULATIONUPDATEDNAME + ".xml.gz");
+            final File fileExport = new File(wd, POPULATIONUPDATEDNAME + ".xml");
 
             {
                 // write the modified population to file
@@ -146,7 +134,7 @@ public class ScenarioPreparer {
         // 3) create virtual Network
         KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
         VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
-        final File vnDir = new File(dir, VIRTUALNETWORKFOLDERNAME);
+        final File vnDir = new File(wd, VIRTUALNETWORKFOLDERNAME);
         vnDir.mkdir(); // create folder if necessary
         VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
         VirtualNetworkIO.toXML(new File(vnDir, VIRTUALNETWORKFILENAME + ".xml").toString(), virtualNetwork);
@@ -169,6 +157,6 @@ public class ScenarioPreparer {
 
         }
 
-        System.out.println("successfully converted simulation data files from " + (new File(preparerOptions.getProperty("av_config_full.xml"))).toString());
+        System.out.println("successfully converted simulation data files from in " + wd.getAbsolutePath());
     }
 }
