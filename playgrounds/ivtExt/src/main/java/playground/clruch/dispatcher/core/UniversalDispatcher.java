@@ -11,7 +11,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -68,7 +67,7 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
 
     // ===================================================================================
     // Methods to use EXTERNALLY in derived dispatchers
-    
+
     /** @return {@Collection} of all {@AVRequests} which are currently open. Requests are removed from list in setAcceptRequest function */
     protected synchronized final Collection<AVRequest> getAVRequests() {
         return Collections.unmodifiableCollection(pendingRequests);
@@ -163,7 +162,7 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
         // updated status of robotaxi
         GlobalAssert.that(robotaxi.isWithoutCustomer());
         GlobalAssert.that(robotaxi.isWithoutDirective());
-        
+
         robotaxi.setAVStatus(avstatus);
 
         // udpate schedule of robotaxi
@@ -238,10 +237,9 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
             AVRequest avRequest = entry.getKey();
             GlobalAssert.that(pendingRequests.contains(avRequest));
             RoboTaxi pickupVehicle = entry.getValue();
-            Optional<Link> pickupVehicleLink = Optional.ofNullable(pickupVehicle.getDivertableLocation());
+            Link pickupVehicleLink = pickupVehicle.getDivertableLocation();
             boolean isOk = pickupVehicle.getSchedule().getCurrentTask() == Schedules.getLastTask(pickupVehicle.getSchedule());
-            boolean vehicleLocationKnown = pickupVehicleLink.isPresent();
-            if (avRequest.getFromLink().equals(pickupVehicleLink) && isOk && vehicleLocationKnown) {
+            if (avRequest.getFromLink().equals(pickupVehicleLink) && isOk) {
                 setAcceptRequest(pickupVehicle, avRequest);
             }
         }

@@ -1,8 +1,6 @@
 // code by jph
 package playground.clruch.dispatcher.core;
 
-import java.util.Optional;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -24,7 +22,7 @@ public class RoboTaxi {
     private Link lastKnownLocation; // last known location of the RoboTaxi
     private Link driveDestination; // drive destination of the RoboTaxi, null for stay task
     /** location/time pair from where / when RoboTaxi path can be altered. */
-    private Optional<LinkTimePair> divertableLinkTime;
+    private LinkTimePair divertableLinkTime;
     private AbstractDirective directive;
 
     /** Standard constructor
@@ -35,7 +33,7 @@ public class RoboTaxi {
     /* package */ RoboTaxi(AVVehicle avVehicle, LinkTimePair divertableLinkTime, Link driveDestination) {
         GlobalAssert.that(driveDestination != null);
         this.avVehicle = avVehicle;
-        this.divertableLinkTime = Optional.of(divertableLinkTime);
+        this.divertableLinkTime = divertableLinkTime;
         this.driveDestination = driveDestination;
         this.directive = null;
         this.status = AVStatus.STAY;
@@ -46,12 +44,12 @@ public class RoboTaxi {
 
     /** @return {@link} location at which robotaxi can be diverted */
     public Link getDivertableLocation() {
-        return divertableLinkTime.get().link;
+        return divertableLinkTime.link;
     }
 
     /** @return time when robotaxi can be diverted */
     /* package */ double getDivertableTime() {
-        return divertableLinkTime.get().time;
+        return divertableLinkTime.time;
     }
 
     /** @return null if vehicle is currently not driving, else
@@ -89,7 +87,8 @@ public class RoboTaxi {
     /** @param divertableLinkTime update the divertableLinkTime of the RoboTaxi, to be used
      *            only from VehicleMaintainer */
     /* package */ void setDivertableLinkTime(LinkTimePair divertableLinkTime) {
-        this.divertableLinkTime = Optional.ofNullable(divertableLinkTime);
+        GlobalAssert.that(divertableLinkTime != null);
+        this.divertableLinkTime = divertableLinkTime;
     }
 
     /** @param currentLocation {@link} last known link of RoboTaxi location, to be used only

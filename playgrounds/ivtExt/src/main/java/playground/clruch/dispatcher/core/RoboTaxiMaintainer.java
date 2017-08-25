@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
+import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTrackerImpl;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -54,7 +55,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
         return private_now;
     }
 
-    /** @return collection of AVVehicles that have started their schedule */
+    /** @return collection of RoboTaxis */
     protected final List<RoboTaxi> getRoboTaxis() {
         if (roboTaxis.isEmpty() || !roboTaxis.get(0).getSchedule().getStatus().equals(Schedule.ScheduleStatus.STARTED))
             return Collections.emptyList();
@@ -72,7 +73,8 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
                     if (Schedules.isNextToLastTask(avDriveTask)) {
                         TaskTracker taskTracker = avDriveTask.getTaskTracker();
                         OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
-                        LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint();
+                        LinkTimePair linkTimePair = ((OnlineDriveTaskTrackerImpl)onlineDriveTaskTracker).getSafeDiversionPoint();
+                        GlobalAssert.that(linkTimePair != null);
                         robotaxi.setDivertableLinkTime(linkTimePair);
                         robotaxi.setCurrentDriveDestination(avDriveTask.getPath().getToLink());
                         GlobalAssert.that(!robotaxi.getAVStatus().equals(AVStatus.DRIVEWITHCUSTOMER));
@@ -95,6 +97,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
                     // for empty vehicles the current task has to be the last task
                     if (Schedules.isLastTask(avStayTask) && !isInPickupRegister(robotaxi)) {
                         GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow());
+                        GlobalAssert.that(avStayTask.getLink() != null);
                         robotaxi.setDivertableLinkTime(new LinkTimePair(avStayTask.getLink(), getTimeNow()));
                         robotaxi.setCurrentDriveDestination(avStayTask.getLink());
                         robotaxi.setAVStatus(AVStatus.STAY);
@@ -107,7 +110,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
     @Override
     public final void registerVehicle(AVVehicle vehicle) {
         GlobalAssert.that(vehicle.getStartLink() != null);
-        roboTaxis.add(new RoboTaxi(vehicle, new LinkTimePair(vehicle.getStartLink(), -1.0), vehicle.getStartLink()));
+        roboTaxis.add(new RoboTaxi(vehicle, new LinkTimePair(vehicle.getStartLink(), 0.0), vehicle.getStartLink()));
         eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));
     }
 
