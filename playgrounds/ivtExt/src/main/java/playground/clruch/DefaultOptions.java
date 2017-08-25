@@ -32,7 +32,7 @@ public enum DefaultOptions {
     }
 
     public static void saveDefault() throws IOException {
-        saveProperties(getDefault(), "OptionsIDSC.properties");
+        saveProperties(getDefault(), "IDSCOptions.properties");
     }
 
     private static void saveProperties(Properties prop, String filename) throws IOException {

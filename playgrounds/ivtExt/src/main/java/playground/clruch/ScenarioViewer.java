@@ -26,15 +26,19 @@ public class ScenarioViewer {
      * @throws IOException */
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
-        Properties viewerOptions = new Properties(DefaultOptions.getViewerDefault());
-        if (args.length > 0 && new File(args[0]).exists()) {
-            viewerOptions.load(new FileInputStream(new File(args[0])));
-        }else DefaultOptions.saveViewerDefault();
+        File wd = new File(".");
+        System.out.println("working in " + wd.getAbsolutePath());
+
+        Properties simOptions = new Properties(DefaultOptions.getDefault());
+        if (new File(wd, "IDSCOptions.properties").exists()) {
+            simOptions.load(new FileInputStream(new File(wd, "IDSCOptions.properties")));
+        }else DefaultOptions.saveDefault();
+        
 
         ReferenceFrame referenceFrame = ReferenceFrame.fromString(//
-                viewerOptions.getProperty("ReferenceFrame"));
+                simOptions.getProperty("ReferenceFrame"));
 
-        Network network = NetworkLoader.loadNetwork(new File(viewerOptions.getProperty("av_config.xml")));
+        Network network = NetworkLoader.loadNetwork(new File(simOptions.getProperty("av_config.xml")));
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         MatsimMapComponent matsimJMapViewer = new MatsimMapComponent(MatsimStaticDatabase.INSTANCE);
 
