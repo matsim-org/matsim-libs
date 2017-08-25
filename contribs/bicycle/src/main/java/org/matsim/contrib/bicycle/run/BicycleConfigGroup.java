@@ -25,7 +25,7 @@ import java.util.TreeMap;
 
 public class BicycleConfigGroup extends ConfigGroup {
 
-	public static final String GROUP_NAME = "bike";
+	public static final String GROUP_NAME = "bicycle";
 
 	private static final String INPUT_NETWORK_ATTRIBUTE_FILE = "inputNetworkObjectattributeFile";
 //	private static final String INPUT_REFERENCE_BIKE_SPEED = "referenceBikeSpeed";

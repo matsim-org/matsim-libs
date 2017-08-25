@@ -73,7 +73,7 @@ class BicyclePrepareForSimImpl implements PrepareForSim {
 			car.add("car");
 			
 			Set<String> bicycle = new HashSet<>();
-			bicycle.add("bike");
+			bicycle.add("bicycle");
 			
 			new TransportModeNetworkFilter(network).filter(carNetwork, car);
 			new TransportModeNetworkFilter(network).filter(bicyleNetwork, bicycle);

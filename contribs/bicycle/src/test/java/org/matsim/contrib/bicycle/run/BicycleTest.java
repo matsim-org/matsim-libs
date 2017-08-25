@@ -40,6 +40,7 @@ public class BicycleTest {
 	@Test
 	public final void test() {
 		
+		// This works when the data is stored under "/matsim/contribs/bicycle/src/main/resurces/bicycle_example"
 		Config config = ConfigUtils.loadConfig("bicycle_example/config.xml", new BicycleConfigGroup());
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		

@@ -28,7 +28,7 @@
 		<param name="timeVariantNetwork" value="false" />
 	</module>
 
-	<module name="bike" >
+	<module name="bicycle" >
 		<param name="inputNetworkObjectattributeFile" value="./src/main/resources/bicycle_example/&SZENARIONAME;_bikeObjectAtt.xml" />
 		<!-- <param name="inputNetworkObjectattributeFile" value="&SZENARIONAME;_bikeObjectAtt.xml" /> -->
 		<!-- <param name="marginalUtilityOfComfort" value="-0.2" /> -->
@@ -37,7 +37,7 @@
 	</module>
 	
 	<module name="qsim">
-		<param name="mainMode" value="bike,car" />
+		<param name="mainMode" value="bicycle,car" />
 	</module>
 	
 	<module name="planCalcScore">
@@ -73,7 +73,7 @@
 			<!-- [utils/hr] additional marginal utility of traveling.  normally negative.  this comes on top of the opportunity cost of time -->
 			<param name="marginalUtilityOfTraveling_util_hr" value="-3600.0" />
 
-			<param name="mode" value="bike" />
+			<param name="mode" value="bicycle" />
 			<param name="monetaryDistanceRate" value="0.0" />
 		</parameterset>
 	</module>
@@ -94,7 +94,7 @@
 	
 	
 	<module name="planscalcroute" >
-		<param name="networkModes" value="bike,car" />
+		<param name="networkModes" value="bicycle,car" />
 		
 		<parameterset type="teleportedModeParameters" >
 			<param name="beelineDistanceFactor" value="1.3" />

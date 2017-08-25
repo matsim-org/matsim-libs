@@ -5,13 +5,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_0">
+	<person id="bicycle_home1_work1_0">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:00:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:00:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:00:00" />
 		</plan>
@@ -20,13 +20,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_1">
+	<person id="bicycle_home1_work1_1">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:01:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:01:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:01:00" />
 		</plan>
@@ -35,13 +35,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_10">
+	<person id="bicycle_home1_work1_10">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:10:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:10:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:10:00" />
 		</plan>
@@ -50,13 +50,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_11">
+	<person id="bicycle_home1_work1_11">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:11:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:11:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:11:00" />
 		</plan>
@@ -65,13 +65,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_12">
+	<person id="bicycle_home1_work1_12">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:12:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:12:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:12:00" />
 		</plan>
@@ -80,13 +80,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_13">
+	<person id="bicycle_home1_work1_13">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:13:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:13:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:13:00" />
 		</plan>
@@ -95,13 +95,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_14">
+	<person id="bicycle_home1_work1_14">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:14:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:14:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:14:00" />
 		</plan>
@@ -110,13 +110,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_15">
+	<person id="bicycle_home1_work1_15">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:15:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:15:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:15:00" />
 		</plan>
@@ -125,13 +125,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_16">
+	<person id="bicycle_home1_work1_16">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:16:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:16:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:16:00" />
 		</plan>
@@ -140,13 +140,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_17">
+	<person id="bicycle_home1_work1_17">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:17:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:17:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:17:00" />
 		</plan>
@@ -155,13 +155,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_18">
+	<person id="bicycle_home1_work1_18">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:18:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:18:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:18:00" />
 		</plan>
@@ -170,13 +170,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_19">
+	<person id="bicycle_home1_work1_19">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:19:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:19:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:19:00" />
 		</plan>
@@ -185,13 +185,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_2">
+	<person id="bicycle_home1_work1_2">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:02:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:02:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:02:00" />
 		</plan>
@@ -200,13 +200,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_3">
+	<person id="bicycle_home1_work1_3">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:03:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:03:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:03:00" />
 		</plan>
@@ -215,13 +215,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_4">
+	<person id="bicycle_home1_work1_4">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:04:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:04:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:04:00" />
 		</plan>
@@ -230,13 +230,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_5">
+	<person id="bicycle_home1_work1_5">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:05:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:05:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:05:00" />
 		</plan>
@@ -245,13 +245,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_6">
+	<person id="bicycle_home1_work1_6">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:06:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:06:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:06:00" />
 		</plan>
@@ -260,13 +260,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_7">
+	<person id="bicycle_home1_work1_7">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:07:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:07:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:07:00" />
 		</plan>
@@ -275,13 +275,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_8">
+	<person id="bicycle_home1_work1_8">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:08:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:08:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:08:00" />
 		</plan>
@@ -290,13 +290,13 @@
 
 <!-- ====================================================================== -->
 
-	<person id="bike_home1_work1_9">
+	<person id="bicycle_home1_work1_9">
 		<plan selected="yes">
 			<act type="home" x="-20000" y="-10000" end_time="10:09:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="work" x="5000" y="-10000" end_time="17:09:00" />
-			<leg mode="bike">
+			<leg mode="bicycle">
 			</leg>
 			<act type="home" x="-20000" y="-10000" end_time="10:09:00" />
 		</plan>

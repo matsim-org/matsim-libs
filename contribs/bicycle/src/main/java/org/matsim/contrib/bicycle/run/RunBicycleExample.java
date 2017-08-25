@@ -30,9 +30,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
+/**
+ * @author dziemke
+ */
 public class RunBicycleExample {
 
 	public static void main(String[] args) {
+		// This works when the data is stored under "/matsim/contribs/bicycle/src/main/resurces/bicycle_example"
 		Config config = ConfigUtils.loadConfig("bicycle_example/config.xml", new BicycleConfigGroup());
 		new RunBicycleExample().run(config);
 	}
@@ -50,7 +54,7 @@ public class RunBicycleExample {
 		car.setPcuEquivalents(1.0);
 		scenario.getVehicles().addVehicleType(car);
 
-		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(Id.create("bike", VehicleType.class));
+		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
 		bicycle.setMaximumVelocity(30.0/3.6);
 		bicycle.setPcuEquivalents(0.0);
 		scenario.getVehicles().addVehicleType(bicycle);
