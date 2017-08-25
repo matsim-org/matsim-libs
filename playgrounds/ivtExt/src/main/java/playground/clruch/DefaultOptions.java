@@ -17,9 +17,9 @@ public enum DefaultOptions {
         Properties returnP = new Properties();
         returnP.setProperty("fullConfig", "av_config_full.xml");
         returnP.setProperty("simuConfig", "av_config.xml");
-        returnP.setProperty("maxPopulationSize", "5000");
-        returnP.setProperty("numVirtualNodes", "40");
-        returnP.setProperty("dtTravelData", "900");
+        returnP.setProperty("maxPopulationSize", "2000");
+        returnP.setProperty("numVirtualNodes", "10");
+        returnP.setProperty("dtTravelData", "3600");
         returnP.setProperty("completeGraph", "true");
         returnP.setProperty("LocationSpec", "SIOUXFALLS_CITY");
         returnP.setProperty("populationeliminateFreight", "false");
@@ -32,7 +32,7 @@ public enum DefaultOptions {
     }
 
     public static void saveDefault() throws IOException {
-        saveProperties(getDefault(), "DefaultPreparerOptions");
+        saveProperties(getDefault(), "OptionsIDSC.properties");
     }
 
     private static void saveProperties(Properties prop, String filename) throws IOException {
