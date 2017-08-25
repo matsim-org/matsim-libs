@@ -73,7 +73,7 @@ public enum DefaultOptions {
     private static void saveProperties(Properties prop, String filename) throws IOException {
         File defaultFile = new File(filename);
         FileOutputStream ostream = new FileOutputStream(defaultFile);
-        prop.store(ostream, "These is a sample config file.");
+        prop.store(ostream, "This is a sample config file.");
     }
 
 }
