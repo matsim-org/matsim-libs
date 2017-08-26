@@ -24,7 +24,6 @@ import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalcu
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.html.DataCollector;
 import playground.clruch.html.ReportGenerator;
-import playground.clruch.html.ScenarioParameters;
 import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
@@ -51,7 +50,6 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
  * if you wish to run multiple simulations at the same time use for instance {@link RunAVScenario} */
 public class TrbScenarioServer {
 
-    public static ScenarioParameters scenarioParameters;
 
     public static void main(String[] args) throws MalformedURLException, Exception {
 
@@ -71,7 +69,6 @@ public class TrbScenarioServer {
         File configFile = new File(args[0]);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
 
-        scenarioParameters = new ScenarioParameters(config);
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
