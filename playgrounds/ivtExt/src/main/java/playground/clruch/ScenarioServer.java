@@ -24,7 +24,6 @@ import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeGet;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.html.DataCollector;
 import playground.clruch.html.ReportGenerator;
-import playground.clruch.html.ScenarioParameters;
 import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
@@ -51,12 +50,10 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
  * {@link RunAVScenario} */
 public class ScenarioServer {
 
-    public static ScenarioParameters scenarioParameters;
-
     public static void main(String[] args) throws MalformedURLException, Exception {
 
         File workingDirectory = new File("").getCanonicalFile();
-        Properties simOptions = DefaultOptions.load(workingDirectory);        
+        Properties simOptions = DefaultOptions.load(workingDirectory);
 
         // set to true in order to make server wait for at least 1 client, for instance viewer client
         boolean waitForClients = Boolean.valueOf(simOptions.getProperty("waitForClients"));
@@ -72,18 +69,15 @@ public class ScenarioServer {
         GlobalAssert.that(configFile.exists());
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
-
-        // extract data for scenarioParameters
-        scenarioParameters = new ScenarioParameters(config);
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, //
+                new BlackListedTimeAllocationMutatorConfigGroup());
 
         // load scenario for simulation
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        GlobalAssert.that(scenario != null);
         Network network = scenario.getNetwork();
-        GlobalAssert.that(network != null);
         Population population = scenario.getPopulation();
-        GlobalAssert.that(population != null);
+        GlobalAssert.that(scenario != null && network != null && population != null);
+        
         MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.fromString(simOptions.getProperty("ReferenceFrame")));
         Controler controler = new Controler(scenario);
 
@@ -118,8 +112,9 @@ public class ScenarioServer {
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
-        DataCollector.store(new File(simOptions.getProperty("simuConfig")), controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
-                analyzeSummary, scenarioParameters, network, population, travelData);
+        DataCollector.store(new File(simOptions.getProperty("simuConfig")), controler, //
+                minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
+                analyzeSummary, network, population, travelData);
 
         // generate report
         ReportGenerator.from(new File(simOptions.getProperty("simuConfig")));

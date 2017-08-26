@@ -17,19 +17,17 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 
 public class AVLocation extends AVTaskAdapter {
 
-    /**
-     * @param avVehicle
-     * @return link or null with a small chance
-     */
+    /** @param avVehicle
+     * @return link or null with a small chance */
     public static Link of(RoboTaxi robotaxi) {
         Schedule schedule = robotaxi.getSchedule();
-        GlobalAssert.that(schedule!=null);
+        GlobalAssert.that(schedule != null);
+        /** {@link ScheduleImpl.failIfNotStarted} triggers, very likely you have
+         * entered a simulation start time other than 0:00. Check that in the av_config.xml file. */
         return new AVLocation(schedule.getCurrentTask()).link;
     }
 
-    /**
-     * DO NOT INITIALIZE THE LINK VARIABLE !!!
-     */
+    /** DO NOT INITIALIZE THE LINK VARIABLE !!! */
     private Link link;
 
     private AVLocation(Task task) {

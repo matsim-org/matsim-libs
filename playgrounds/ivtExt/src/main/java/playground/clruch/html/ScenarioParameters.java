@@ -1,6 +1,7 @@
 package playground.clruch.html;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -33,7 +34,7 @@ public class ScenarioParameters implements Serializable {
 
     public Tensor availabilities;
 
-    public ScenarioParameters(Config config) {
+    public ScenarioParameters(Config config) throws IOException {
         user = System.getProperty("user.name");
         date = new SimpleDateFormat("yyyy/MM/dd - HH:mm:ss").format(new Date());
         fillDispatcherInfo(config);

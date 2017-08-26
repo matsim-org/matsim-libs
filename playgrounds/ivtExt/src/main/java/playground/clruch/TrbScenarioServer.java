@@ -145,7 +145,7 @@ public class TrbScenarioServer {
         }
 
         DataCollector.store(configFile, controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
-                analyzeSummary, scenarioParameters, network, population, travelData);
+                analyzeSummary, network, population, travelData);
 
         ReportGenerator.from(configFile);
 
