@@ -29,7 +29,10 @@ public enum DefaultOptions {
         returnP.setProperty("populationeliminateWalking", "false");
         returnP.setProperty("populationchangeModeToAV", "true");
         returnP.setProperty("waitForClients", "false");
-        returnP.setProperty("ReferenceFrame", "SIOUXFALLS");
+        returnP.setProperty("ReferenceFrame", "SIOUXFALLS"); /** see (@link ReferenceFrame) class */
+        returnP.setProperty("virtualNetworkDir", "virtualNetwork");
+        returnP.setProperty("virtualNetworkName", "virtualNetwork");
+        returnP.setProperty("travelDataName", "travelData");
         return returnP;
     }
 

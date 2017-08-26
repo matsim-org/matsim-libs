@@ -22,6 +22,7 @@ import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
 import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
@@ -166,18 +167,7 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
 
-            final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
-            GlobalAssert.that(virtualnetworkDir.isDirectory());
-            {
-                final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork");
-                GlobalAssert.that(virtualnetworkFile.isFile());
-                try {
-                    virtualNetwork = VirtualNetworkIO.fromByte(network, virtualnetworkFile);
-                } catch (ClassNotFoundException | DataFormatException | IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
+            virtualNetwork = VirtualNetworkGet.readDefault(network);
             return new UncoordinatedDispatcher( //
                     config, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork);
         }

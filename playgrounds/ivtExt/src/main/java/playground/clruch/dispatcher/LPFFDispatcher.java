@@ -41,9 +41,11 @@ import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.traveldata.TravelData;
+import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
@@ -177,25 +179,8 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
 
-            final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
-            GlobalAssert.that(virtualnetworkDir.isDirectory());
-            {
-                final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork");
-                GlobalAssert.that(virtualnetworkFile.isFile());
-                try {
-                    virtualNetwork = VirtualNetworkIO.fromByte(network, virtualnetworkFile);
-                } catch (ClassNotFoundException | DataFormatException | IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            TravelData travelData = null;
-            try {
-                travelData = TravelDataIO.fromByte(virtualNetwork, new File(virtualnetworkDir, "travelData"));
-            } catch (ClassNotFoundException | DataFormatException | IOException e) {
-                System.out.println("problem reading travelData");
-                e.printStackTrace();
-            }
+            virtualNetwork = VirtualNetworkGet.readDefault(network);
+            TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
 
             return new LPFFDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, abstractVirtualNodeDest,
                     abstractVehicleDestMatcher, travelData);

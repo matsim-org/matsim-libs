@@ -41,6 +41,7 @@ import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
 import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
@@ -51,8 +52,6 @@ import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
-
-
 
 public class LPFBDispatcher extends PartitionedDispatcher {
     private final int rebalancingPeriod;
@@ -89,11 +88,10 @@ public class LPFBDispatcher extends PartitionedDispatcher {
         // PART I: rebalance all vehicles periodically
         final long round_now = Math.round(now);
 
-//        System.out.println("TALLY BEG="+Tally.sorted(Tensors.vectorInt(getRoboTaxis().stream().mapToInt(rt -> rt.getAVStatus().ordinal()).toArray())));
+        // System.out.println("TALLY BEG="+Tally.sorted(Tensors.vectorInt(getRoboTaxis().stream().mapToInt(rt -> rt.getAVStatus().ordinal()).toArray())));
         if (round_now % rebalancingPeriod == 0 && round_now > 10) { // needed because of problems with robotaxi
                                                                     // inititalization.
 
-            
             Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
             // II.i compute rebalancing vehicles and send to virtualNodes
             {
@@ -119,7 +117,6 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                             - requests.get(virtualNode).size();
                     vi_excessT.set(RealScalar.of(viExcessVal), virtualNode.index);
                 }
-
 
                 // solve the linear program with updated right-hand side
                 Tensor rhs = vi_desiredT.subtract(vi_excessT);
@@ -204,20 +201,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
-
-            final File virtualnetworkDir = new File(config.getParams().get("virtualNetworkDirectory"));
-            GlobalAssert.that(virtualnetworkDir.isDirectory());
-            {
-                final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork");
-                System.out.println("" + virtualnetworkFile.getAbsoluteFile());
-                try {
-                    virtualNetwork = VirtualNetworkIO.fromByte(network, virtualnetworkFile);
-                } catch (ClassNotFoundException | DataFormatException | IOException e) {
-                    System.err.println("virtualNetwork not correctly loaded in LPFB dispatcher.");
-                    ;
-                    e.printStackTrace();
-                }
-            }
+            virtualNetwork = VirtualNetworkGet.readDefault(network);
 
             return new LPFBDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, abstractVirtualNodeDest,
                     abstractVehicleDestMatcher);

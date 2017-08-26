@@ -149,8 +149,8 @@ public class LPVehicleRebalancing {
                 }
             }
 
-            // Write model to file
-            GLPK.glp_write_lp(lp, null, "rebalancing_linearprogram_initial.lp");
+            // write model to file
+            // GLPK.glp_write_lp(lp, null, "rebalancing_linearprogram_initial.lp");
         } catch (GlpkException ex){
             ex.printStackTrace();
         }
@@ -181,7 +181,8 @@ public class LPVehicleRebalancing {
         }
 
         // Solve model
-        GLPK.glp_write_lp(lp, null, "rebalancing_linearprogram_updated.lp");
+        // write model to file
+        //GLPK.glp_write_lp(lp, null, "rebalancing_linearprogram_updated.lp");
         GLPK.glp_init_smcp(parm);
         int ret = GLPK.glp_simplex(lp, parm); // ret==0 indicates of the algorithm ran correctly
         GlobalAssert.that(ret==0);

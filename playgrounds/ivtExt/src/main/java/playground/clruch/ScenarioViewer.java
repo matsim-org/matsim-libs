@@ -2,7 +2,6 @@
 package playground.clruch;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
@@ -13,9 +12,7 @@ import playground.clruch.data.ReferenceFrame;
 import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.net.MatsimStaticDatabase;
-import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.NetworkLoader;
 
 /** the viewer allows to connect to the scenario server or to view saved

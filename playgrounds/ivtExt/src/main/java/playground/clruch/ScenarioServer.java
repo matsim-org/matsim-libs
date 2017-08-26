@@ -1,7 +1,6 @@
 package playground.clruch;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.net.MalformedURLException;
 import java.util.Properties;
 
@@ -85,7 +84,7 @@ public class ScenarioServer {
         GlobalAssert.that(network != null);
         Population population = scenario.getPopulation();
         GlobalAssert.that(population != null);
-        MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SWITZERLAND);
+        MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.fromString(simOptions.getProperty("ReferenceFrame")));
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
@@ -107,7 +106,7 @@ public class ScenarioServer {
         SimulationServer.INSTANCE.stopAccepting();
 
         // perform analysis of results
-        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(new File(simOptions.getProperty("av_config.xml")));
+        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(new File(simOptions.getProperty("simuConfig")));
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
@@ -119,11 +118,11 @@ public class ScenarioServer {
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
-        DataCollector.store(new File(simOptions.getProperty("av_config.xml")), controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
+        DataCollector.store(new File(simOptions.getProperty("simuConfig")), controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
                 analyzeSummary, scenarioParameters, network, population, travelData);
 
         // generate report
-        ReportGenerator.from(new File(simOptions.getProperty("av_config.xml")));
+        ReportGenerator.from(new File(simOptions.getProperty("simuConfig")));
 
     }
 }
