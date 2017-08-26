@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Population;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
@@ -112,7 +113,7 @@ public class TravelData implements Serializable {
                             int vNodeIndexTo = virtualNetwork.getVirtualNode(linkTo).getIndex();
 
                             // add customer/dt to arrival rate
-                            lambda.set(s -> s.add(RealScalar.of(dt).invert()), timeIndex, vNodeIndexFrom);
+                            lambda.set(s -> s.add(RealScalar.of(dt).reciprocal()), timeIndex, vNodeIndexFrom);
                             // old implementation, TODO remove
                             // Scalar val = lambda.Get(timeIndex, vNodeIndexFrom);
                             // Scalar valAdded = val.add(RealScalar.of(1.0 / (double) dt));
@@ -205,8 +206,13 @@ public class TravelData implements Serializable {
 
             rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-12));
             // make negative values positive to ensure no problems in subsequent steps
-            rebalancingRate.flatten(-1).filter(v -> v.Get().number().doubleValue() < 0.0).forEach(v -> v = RealScalar.ZERO);
-
+            for(int i = 0; i<Dimensions.of(rebalancingRate).get(0);++i){
+                for(int j = 0;j<Dimensions.of(rebalancingRate).get(1);++j){
+                    if( Scalars.lessEquals(rebalancingRate.Get(i,j), RealScalar.ZERO)){
+                        rebalancingRate.set(RealScalar.ZERO, i,j);                        
+                    };
+                }
+            }            
             
             alphaijPSF.set(rebalancingRate, t);
 

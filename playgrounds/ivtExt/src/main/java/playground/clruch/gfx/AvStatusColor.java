@@ -3,7 +3,7 @@ package playground.clruch.gfx;
 
 import java.awt.Color;
 
-import playground.clruch.export.AVStatus;
+import playground.clruch.dispatcher.core.AVStatus;
 
 /* package */ enum AvStatusColor {
     Standard( //

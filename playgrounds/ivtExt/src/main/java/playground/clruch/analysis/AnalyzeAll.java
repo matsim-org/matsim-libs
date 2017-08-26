@@ -47,7 +47,7 @@ public class AnalyzeAll {
     public static double distanceRatio;
 
     public static void main(String[] args) throws Exception {
-        analyze(args);
+        analyze(new File(args[0]));
     }
 
     public static void saveFile(Tensor table, String name) throws Exception {
@@ -71,7 +71,7 @@ public class AnalyzeAll {
         plot(csv, name, title, from, to, 1.05);
     }
 
-    static void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis, String[] args) throws Exception {
+    static void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis) throws Exception {
         Tensor summary = Join.of(1, coreAnalysis.summary, distanceAnalysis.summary);
         saveFile(summary, "summary");
         System.out.println("Size of data summary: " + Dimensions.of(summary));
@@ -152,14 +152,13 @@ public class AnalyzeAll {
         return analyzeSummary;
     }
 
-    public static AnalyzeSummary analyze(String[] args) throws Exception {
+    public static AnalyzeSummary analyze(File config) throws Exception {
 
-        File config = new File(args[0]);
         File data = new File(config.getParent(), "output/data");
         data.mkdir();
 
         // load system network
-        Network network = loadNetwork(args);
+        Network network = loadNetwork(config);
 
         // load coordinate system
         // TODO later remove hard-coded
@@ -180,7 +179,7 @@ public class AnalyzeAll {
             e.printStackTrace();
         }
 
-        collectAndPlot(coreAnalysis, distanceAnalysis, args);
+        collectAndPlot(coreAnalysis, distanceAnalysis);
 
         return summarize(coreAnalysis, distanceAnalysis);
 

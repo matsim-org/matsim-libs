@@ -9,9 +9,7 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.utils.GlobalAssert;
-import playground.clruch.utils.ScheduleUtils;
 import playground.clruch.utils.VrpPathUtils;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
@@ -27,15 +25,15 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
  *  5) append new stay task
  */
 final class AcceptRequestDirective extends FuturePathDirective {
-    final AVVehicle avVehicle;
+    final RoboTaxi robotaxi;
     final AVRequest avRequest;
     final double getTimeNow;
     final double dropoffDurationPerStop;
 
-    public AcceptRequestDirective(AVVehicle avVehicle, AVRequest avRequest, //
+    public AcceptRequestDirective(RoboTaxi robotaxi, AVRequest avRequest, //
             FuturePathContainer futurePathContainer, final double getTimeNow, double dropoffDurationPerStop) {
         super(futurePathContainer);
-        this.avVehicle = avVehicle;
+        this.robotaxi = robotaxi;
         this.avRequest = avRequest;
         this.getTimeNow = getTimeNow;
         this.dropoffDurationPerStop = dropoffDurationPerStop;
@@ -43,7 +41,7 @@ final class AcceptRequestDirective extends FuturePathDirective {
 
     @Override
     void executeWithPath(final VrpPathWithTravelData vrpPathWithTravelData) {
-        final Schedule schedule = avVehicle.getSchedule();
+        final Schedule schedule = robotaxi.getSchedule();
         final AVStayTask avStayTask = (AVStayTask) Schedules.getLastTask(schedule);
         final double scheduleEndTime = avStayTask.getEndTime();
         GlobalAssert.that(scheduleEndTime == schedule.getEndTime());
@@ -70,7 +68,7 @@ final class AcceptRequestDirective extends FuturePathDirective {
                     avRequest.getToLink(), // location of dropoff
                     Arrays.asList(avRequest)));
 
-            ScheduleUtils.makeWhole(avVehicle, endDropoffTime, scheduleEndTime, avRequest.getToLink());
+            ScheduleUtils.makeWhole(robotaxi, endDropoffTime, scheduleEndTime, avRequest.getToLink());
 
             // jan: following computation is mandatory for the internal scoring function
             final double distance = VrpPathUtils.getDistance(vrpPathWithTravelData);

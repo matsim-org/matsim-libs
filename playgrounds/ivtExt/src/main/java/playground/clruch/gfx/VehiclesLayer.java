@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.JCheckBox;
 
-import playground.clruch.export.AVStatus;
+import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.net.AbstractContainer;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.SimulationObject;

@@ -1,11 +1,7 @@
 // code by clruch and jph
 package playground.clruch.dispatcher.core;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
@@ -14,73 +10,41 @@ import org.matsim.core.router.util.TravelTime;
 
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-/**
- * rebalancing capability (without virtual network)
- */
+/** @author Claudio Ruch class for wich all Dispatchers performing rebalancing, i.e., replacement of empty vehicles should be derived */
 public abstract class RebalancingDispatcher extends UniversalDispatcher {
-
-    private final Map<AVVehicle, Link> rebalancingVehicles = new HashMap<>();
 
     protected RebalancingDispatcher(AVDispatcherConfig avDispatcherConfig, TravelTime travelTime,
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, EventsManager eventsManager) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
     }
 
-    @Override
-    final void updateDatastructures(Collection<AVVehicle> stayVehicles) {
-        // mandatory call
-        super.updateDatastructures(stayVehicles);
-        
-        
-        // 1) remove rebalancing vehicles that have reached their destination
-        // TODO currently the vehicles are removed when arriving at final link,
-        // ... could be removed as soon as they reach rebalancing destination virtualNode instead
-        stayVehicles.forEach(rebalancingVehicles::remove);
-        
+    /** Commant do rebalance {@link RoboTaxi} to a certain {@link Link} destination. The {@link RoboTaxi} appears as
+     * Rebalancing in the visualizer afterwards. Can only be used for {@link RoboTaxi} which are without a customer.
+     * Function can only be invoked one time in each iteration of {@link VehicleMainatainer.redispatch}
+     * 
+     * @param roboTaxi
+     * @param destination */
+    protected final void setRoboTaxiRebalance(final RoboTaxi roboTaxi, final Link destination) {
+        GlobalAssert.that(roboTaxi.isWithoutCustomer());
+        setRoboTaxiDiversion(roboTaxi, destination, AVStatus.REBALANCEDRIVE);
+        eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), roboTaxi, destination));
     }
 
-    @Override
-    protected Map<AVVehicle, Link> getRebalancingVehicles() {
-        return Collections.unmodifiableMap(rebalancingVehicles);
+    /** @return {@link java.util.List } of all {@link RoboTaxi} which are currently rebalancing. */
+    protected List<RoboTaxi> getRebalancingRoboTaxis() {
+        return getRoboTaxis().stream()//
+                .filter(rt -> rt.getAVStatus().equals(AVStatus.REBALANCEDRIVE))//
+                .collect(Collectors.toList());
     }
-    
-	protected List<VehicleLinkPair> getDivertableUnassignedNotRebalancingVehicleLinkPairs() {
-		return getDivertableUnassignedVehicleLinkPairs().stream() //
-				.filter(v -> !rebalancingVehicles.containsKey(v.avVehicle)) //
-				.collect(Collectors.toList());
-	}
-    
-    @Override
-    public final void setVehiclePickup(AVVehicle avVehicle, AVRequest avRequest) {
-        super.setVehiclePickup(avVehicle, avRequest);
-        if(rebalancingVehicles.containsKey(avVehicle))rebalancingVehicles.remove(avVehicle);
-    }
-    
-    
 
-    // This function has to be called only after getVirtualNodeRebalancingVehicles
-    public synchronized final void setVehicleRebalance(final AVVehicle avVehicle, final Link destination) {
-        // in case vehicle is picking up, remove from pickup register
-        if (pickupRegister.containsValue(avVehicle)){
-            AVRequest avRequest = pickupRegister.inverse().get(avVehicle);
-            pickupRegister.forcePut(avRequest, null);
-            // TODO do not use forcePut(avRequest,null) because it violates bijection. 
-        }
-        
-        // redivert the vehicle, then generate a rebalancing event and add to list of currently rebalancing vehicles
-        setVehicleDiversion(avVehicle, destination);
-        eventsManager.processEvent(RebalanceVehicleEvent.create(getTimeNow(), avVehicle, destination));
-        Link returnVal = rebalancingVehicles.put(avVehicle, destination);
-    }
-    
-    
-    @Override
-    boolean extraCheck(VehicleLinkPair vehicleLinkPair) {
-		return rebalancingVehicles.containsKey(vehicleLinkPair.avVehicle);
+    /** @return {@link java.util.List} of all {@link RoboTaxi} which are divertable and not in a rebalacing
+     *         task. */
+    protected List<RoboTaxi> getDivertableNotRebalancingRoboTaxis() {
+        return getDivertableRoboTaxis().stream()//
+                .filter(rt -> !rt.getAVStatus().equals(AVStatus.REBALANCEDRIVE))//
+                .collect(Collectors.toList());
     }
 
 }

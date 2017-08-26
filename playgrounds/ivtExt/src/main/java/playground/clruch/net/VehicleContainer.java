@@ -3,7 +3,7 @@ package playground.clruch.net;
 
 import java.io.Serializable;
 
-import playground.clruch.export.AVStatus;
+import playground.clruch.dispatcher.core.AVStatus;
 
 public class VehicleContainer implements Serializable {
 

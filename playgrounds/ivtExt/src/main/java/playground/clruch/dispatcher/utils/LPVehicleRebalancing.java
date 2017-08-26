@@ -14,8 +14,11 @@ import org.gnu.glpk.glp_prob;
 import org.gnu.glpk.glp_smcp;
 
 import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.red.Total;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
@@ -146,8 +149,8 @@ public class LPVehicleRebalancing {
                 }
             }
 
-            // Write model to file
-            GLPK.glp_write_lp(lp, null, "rebalancing_linearprogram_initial.lp");
+            // write model to file
+            // GLPK.glp_write_lp(lp, null, "rebalancing_linearprogram_initial.lp");
         } catch (GlpkException ex){
             ex.printStackTrace();
         }
@@ -178,12 +181,22 @@ public class LPVehicleRebalancing {
         }
 
         // Solve model
-        GLPK.glp_write_lp(lp, null, "rebalancing_linearprogram_updated.lp");
+        // write model to file
+        //GLPK.glp_write_lp(lp, null, "rebalancing_linearprogram_updated.lp");
         GLPK.glp_init_smcp(parm);
         int ret = GLPK.glp_simplex(lp, parm); // ret==0 indicates of the algorithm ran correctly
         GlobalAssert.that(ret==0);
         int stat = GLPK.glp_get_status(lp);
-        GlobalAssert.that(stat != GLPK.GLP_NOFEAS);
+        
+        boolean rhsLessEqualsZero = Scalars.lessEquals((Scalar) Total.of(rhs),RealScalar.ZERO );
+        boolean lpFeasibleSolution = stat != GLPK.GLP_NOFEAS;
+        
+        if(!rhsLessEqualsZero || !lpFeasibleSolution){
+            System.out.println("sum of right-hand-side less or equal than zero: " + rhsLessEqualsZero);
+            System.out.println("LP has feasible solution: " + lpFeasibleSolution);
+            GlobalAssert.that(false);
+        }        
+        //GlobalAssert.that(stat != GLPK.GLP_NOFEAS);
 
 
         // fill result vector, rebalance from i to j is equal to variable  (i*n)+ j +1

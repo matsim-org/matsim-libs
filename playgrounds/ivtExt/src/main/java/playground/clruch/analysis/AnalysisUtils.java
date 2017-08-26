@@ -21,7 +21,7 @@ public class AnalysisUtils {
 
 
     static Tensor binCount(Tensor tensor, Scalar binSize) {
-        Tensor floor = Floor.of(tensor.multiply(binSize.invert()));
+        Tensor floor = Floor.of(tensor.divide(binSize));
         Map<Tensor, Long> map = Tally.of(floor);
         Scalar max = maximum(floor);
         return Tensors.vector(i->map.containsKey(RealScalar.of(i)) ? //
@@ -30,7 +30,7 @@ public class AnalysisUtils {
     }
 
     static Scalar adaptBinSize(Tensor tensor, Scalar binSize, Scalar step) {
-        if(AnalysisUtils.maximum(tensor).multiply(binSize.invert()).number().doubleValue() > 40.0) {
+        if(AnalysisUtils.maximum(tensor).divide(binSize).number().doubleValue() > 40.0) {
             binSize = binSize.add(step);
             binSize = adaptBinSize(tensor, binSize, step);
         }

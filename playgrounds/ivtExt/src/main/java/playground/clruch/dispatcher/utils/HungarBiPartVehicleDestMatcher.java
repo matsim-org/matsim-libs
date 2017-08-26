@@ -7,10 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
-import playground.clruch.dispatcher.core.VehicleLinkPair;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.HungarianAlgorithm;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -21,23 +20,19 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 // TODO in here there is some dupliate code that could be removed. 
 public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
 
-    private static Coord getLinkCoord(Link link) {
-        return link.getFromNode().getCoord();
+    private final DistanceFunction distancer;
+    
+    public HungarBiPartVehicleDestMatcher(DistanceFunction distancer){
+        this.distancer = distancer;
+        
     }
-
-    private static double getDistance(Link link1, Link link2) {
-        final Coord c1 = getLinkCoord(link1);
-        final Coord c2 = getLinkCoord(link2);
-        return Math.hypot( //
-                c1.getX() - c2.getX(), //
-                c1.getY() - c2.getY());
-    }
+    
 
     @Override
-    protected Map<VehicleLinkPair, AVRequest> protected_matchAVRequest(Collection<VehicleLinkPair> vehicleLinkPairs, Collection<AVRequest> requests) {
+    protected Map<RoboTaxi, AVRequest> protected_matchAVRequest(Collection<RoboTaxi> robotaxis, Collection<AVRequest> requests) {
 
         // since Collection::iterator does not make guarantees about the order we store the pairs in a list
-        final List<VehicleLinkPair> ordered_vehicleLinkPairs = new ArrayList<>(vehicleLinkPairs);
+        final List<RoboTaxi> ordered_vehicleLinkPairs = new ArrayList<>(robotaxis);
         final List<AVRequest> ordered_requests = new ArrayList<>(requests);
 
         // cost of assigning vehicle i to dest j, i.e. distance from vehicle i to destination j
@@ -47,12 +42,12 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
         final double[][] distancematrix = new double[n][m];
 
         int i = -1;
-        for (VehicleLinkPair vehicleLinkPair : ordered_vehicleLinkPairs) {
+        for (RoboTaxi vehicleLinkPair : ordered_vehicleLinkPairs) {
             ++i;
             int j = -1;
             for (AVRequest avRequest : ordered_requests) {
                 Link dest = avRequest.getFromLink();
-                distancematrix[i][++j] = getDistance(vehicleLinkPair.linkTimePair.link, dest);
+                distancematrix[i][++j] = distancer.getDistance(vehicleLinkPair, dest);
             }
         }
 
@@ -60,9 +55,9 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
         int[] matchinghungarianAlgorithm = new HungarianAlgorithm(distancematrix).execute(); // O(n^3)
 
         // do the assignment according to the Hungarian algorithm (only for the matched elements, otherwise keep current drive destination)
-        final Map<VehicleLinkPair, AVRequest> map = new HashMap<>();
+        final Map<RoboTaxi, AVRequest> map = new HashMap<>();
         i = -1;
-        for (VehicleLinkPair vehicleLinkPair : ordered_vehicleLinkPairs) {
+        for (RoboTaxi vehicleLinkPair : ordered_vehicleLinkPairs) {
             ++i;
             if (0 <= matchinghungarianAlgorithm[i]) {
                 map.put(vehicleLinkPair, ordered_requests.get(matchinghungarianAlgorithm[i]));
@@ -74,10 +69,10 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
     }
 
     @Override
-    protected Map<VehicleLinkPair, Link> protected_matchLink(Collection<VehicleLinkPair> vehicleLinkPairs, Collection<Link> links) {
+    protected Map<RoboTaxi, Link> protected_matchLink(Collection<RoboTaxi> vehicleLinkPairs, Collection<Link> links) {
 
         // since Collection::iterator does not make guarantees about the order we store the pairs in a list
-        final List<VehicleLinkPair> ordered_vehicleLinkPairs = new ArrayList<>(vehicleLinkPairs);
+        final List<RoboTaxi> ordered_vehicleLinkPairs = new ArrayList<>(vehicleLinkPairs);
         final List<Link> ordered_Links = new ArrayList<>(links);
 
         // cost of assigning vehicle i to dest j, i.e. distance from vehicle i to destination j
@@ -87,11 +82,11 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
         final double[][] distancematrix = new double[n][m];
 
         int i = -1;
-        for (VehicleLinkPair vehicleLinkPair : ordered_vehicleLinkPairs) {
+        for (RoboTaxi vehicleLinkPair : ordered_vehicleLinkPairs) {
             ++i;
             int j = -1;
             for (Link link : ordered_Links) {
-                distancematrix[i][++j] = getDistance(vehicleLinkPair.linkTimePair.link, link);
+                distancematrix[i][++j] = distancer.getDistance(vehicleLinkPair, link);
             }
         }
 
@@ -99,9 +94,9 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
         int[] matchinghungarianAlgorithm = new HungarianAlgorithm(distancematrix).execute(); // O(n^3)
 
         // do the assignment according to the Hungarian algorithm (only for the matched elements, otherwise keep current drive destination)
-        final Map<VehicleLinkPair, Link> map = new HashMap<>();
+        final Map<RoboTaxi, Link> map = new HashMap<>();
         i = -1;
-        for (VehicleLinkPair vehicleLinkPair : ordered_vehicleLinkPairs) {
+        for (RoboTaxi vehicleLinkPair : ordered_vehicleLinkPairs) {
             ++i;
             if (0 <= matchinghungarianAlgorithm[i]) {
                 map.put(vehicleLinkPair, ordered_Links.get(matchinghungarianAlgorithm[i]));

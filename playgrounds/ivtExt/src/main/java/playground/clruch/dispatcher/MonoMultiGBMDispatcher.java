@@ -12,6 +12,7 @@ import com.google.inject.name.Named;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import playground.clruch.dispatcher.core.BipartiteMatchingUtils;
 import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
@@ -35,14 +36,14 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager, //
-            Network network, AbstractRequestSelector abstractRequestSelector) {
+            AbstractRequestSelector abstractRequestSelector) {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
-        dispatchPeriod = getDispatchPeriod(safeConfig, 20);
+        dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         rebVehperRequest = safeConfig.getInteger("vehiclesPerRequest", 1);
         GlobalAssert.that(rebVehperRequest > 0);
         if (rebVehperRequest == 1)
-            System.out.println("ATTENTION: only one vehicle is sent to each request, standard HungarianDispatcher");
+            System.out.println("ATTENTION: only one vehicle is sent to each request, standard GlobalBipartiteMatchingDispatcher");
     }
 
     @Override
@@ -51,20 +52,17 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
 
         if (round_now % dispatchPeriod == 0) {
             // dispatch vehicles to pickup locations
-            printVals = BipartiteMatchingUtils.executePickup(this, getDivertableVehicleLinkPairs(), getAVRequests());
-            
+            printVals = BipartiteMatchingUtils.executePickup(this, getDivertableRoboTaxis(), getAVRequests());
+
             // perform rebalancing with remaining vehicles
             Collection<AVRequest> rebalanceRequests = getMultipleRebalanceRequests(getAVRequests(), rebVehperRequest);
-            Tensor notUsed = BipartiteMatchingUtils.executeRebalance(this, getDivertableVehicleLinkPairs(), rebalanceRequests);
+            Tensor notUsed = BipartiteMatchingUtils.executeRebalance(this, getDivertableRoboTaxis(), rebalanceRequests);
         }
     }
 
-    /**
-     * 
-     * @param avRequests all open avRequests
+    /** @param avRequests all open avRequests
      * @param multipl number of rebalancingVehicles to send of every request
-     * @return artificial set of Requests to feed to GBPMatcher
-     */
+     * @return artificial set of Requests to feed to GBPMatcher */
     private final Collection<AVRequest> getMultipleRebalanceRequests(Collection<AVRequest> avRequests, int multipl) {
         Collection<AVRequest> rebalanceRequests = new ArrayList<>();
         for (AVRequest avRequest : avRequests) {
@@ -76,7 +74,7 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
     }
 
     @Override
-    public String getInfoLine() {
+    protected String getInfoLine() {
         return String.format("%s H=%s", //
                 super.getInfoLine(), //
                 printVals.toString() //
@@ -102,7 +100,7 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             return new MonoMultiGBMDispatcher( //
-                    config, travelTime, router, eventsManager, network, abstractRequestSelector);
+                    config, travelTime, router, eventsManager, abstractRequestSelector);
         }
     }
 }

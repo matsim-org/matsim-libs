@@ -6,10 +6,12 @@ package playground.clruch.dispatcher.core;
  * is in the desired state but should not be available to
  * be assigned yet another Directive within the iteration.
  */
-class EmptyDirective extends AbstractDirective {
+enum EmptyDirective implements AbstractDirective {
+    INSTANCE
+    ;
 
     @Override
-    void execute() {
+    public void execute() {
         // intentionally blank
     }
 

@@ -103,7 +103,7 @@ public class AnalyzeMarc {
         data.mkdir();
 
         // load system network
-        Network network = loadNetwork(args);
+        Network network = loadNetwork(new File(args[0]));
 
         // load coordinate system
         // TODO later remove hard-coded

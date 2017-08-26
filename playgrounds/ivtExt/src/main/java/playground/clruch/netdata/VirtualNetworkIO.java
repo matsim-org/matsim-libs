@@ -61,7 +61,7 @@ public class VirtualNetworkIO {
     
     
     /**
-     * loads virtualNetwork from a bitmap file
+     * loads virtualNetwork from a bitmap file, if possible use {@link VirtualNetworkGet.readDefault} 
      * @param network
      * @param file
      * @return
@@ -69,7 +69,7 @@ public class VirtualNetworkIO {
      * @throws DataFormatException
      * @throws IOException
      */
-    public static VirtualNetwork fromByte(Network network, File file) throws ClassNotFoundException, DataFormatException, IOException{
+    /*package*/ static VirtualNetwork fromByte(Network network, File file) throws ClassNotFoundException, DataFormatException, IOException{
         VirtualNetwork virtualNetwork = ObjectFormat.parse(Files.readAllBytes(file.toPath())); 
         virtualNetwork.fillSerializationInfo(network);
         GlobalAssert.that(virtualNetwork.linkVNodeMap!=null);

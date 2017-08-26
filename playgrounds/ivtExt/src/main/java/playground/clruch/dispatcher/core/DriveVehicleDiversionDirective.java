@@ -11,7 +11,6 @@ import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.utils.GlobalAssert;
-import playground.clruch.utils.ScheduleUtils;
 import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
@@ -24,13 +23,13 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
  */
 final class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
 
-    DriveVehicleDiversionDirective(VehicleLinkPair vehicleLinkPair, Link destination, FuturePathContainer futurePathContainer) {
-        super(vehicleLinkPair, destination, futurePathContainer);
+    DriveVehicleDiversionDirective(RoboTaxi robotaxi, Link destination, FuturePathContainer futurePathContainer) {
+        super(robotaxi, destination, futurePathContainer);
     }
 
     @Override
     void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData) {
-        final Schedule schedule = vehicleLinkPair.avVehicle.getSchedule();
+        final Schedule schedule = robotaxi.getSchedule();
         final AVDriveTask avDriveTask = (AVDriveTask) schedule.getCurrentTask(); // <- implies that task is started
         final AVStayTask avStayTask = (AVStayTask) Schedules.getLastTask(schedule);
         final double scheduleEndTime = avStayTask.getEndTime();
@@ -55,7 +54,7 @@ final class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
             GlobalAssert.that(avDriveTask.getEndTime() == newEndTime);
 
             schedule.removeLastTask(); // remove former stay task with old destination
-            ScheduleUtils.makeWhole(vehicleLinkPair.avVehicle, newEndTime, scheduleEndTime, destination);
+            ScheduleUtils.makeWhole(robotaxi, newEndTime, scheduleEndTime, destination);
 
         } else
             reportExecutionBypass(newEndTime - scheduleEndTime);

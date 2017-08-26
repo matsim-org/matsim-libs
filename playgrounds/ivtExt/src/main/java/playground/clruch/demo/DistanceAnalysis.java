@@ -1,5 +1,6 @@
 package playground.clruch.demo;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
@@ -72,7 +73,7 @@ class DistanceAnalysis {
     }
 
     public static void main(String[] args) {
-        Network network = NetworkLoader.loadNetwork(args);
+        Network network = NetworkLoader.loadNetwork(new File(args[0]));
 
         // load coordinate system
         MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SIOUXFALLS);

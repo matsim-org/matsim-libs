@@ -1,6 +1,11 @@
 // code by clruch and jph
 package playground.clruch;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
+
 import org.matsim.api.core.v01.network.Network;
 
 import playground.clruch.data.ReferenceFrame;
@@ -10,29 +15,28 @@ import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.NetworkLoader;
 
-/**
- * the viewer allows to connect to the scenario server
- */
+/** the viewer allows to connect to the scenario server or to view saved
+ * simulation results. */
 public class ScenarioViewer {
-    /**
-     * @param args
-     *            complete path to av_config.xml file, e.g.
-     *            /media/bubba/data/ethz/2017_03_13_Sioux_LP_improved/av_config.xml
-     */
-    public static void main(String[] args) {
-        // BEGIN: CUSTOMIZE -----------------------------------------------
-        // set manually depending on the scenario:
 
-        ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
+    /** @param args a java Properties type file with the options for the viewer, an example file
+     *            can be created with DefaultOptions.saveViewerDefault();
+     * @throws FileNotFoundException
+     * @throws IOException */
+    public static void main(String[] args) throws FileNotFoundException, IOException {
 
-        // END: CUSTOMIZE -------------------------------------------------
+        File workingDirectory = new File("").getCanonicalFile();
+        Properties simOptions = DefaultOptions.load(workingDirectory);        
 
-        Network network = NetworkLoader.loadNetwork(args);
+        ReferenceFrame referenceFrame = ReferenceFrame.fromString(//
+                simOptions.getProperty("ReferenceFrame"));
+
+        Network network = NetworkLoader.loadNetwork(new File(workingDirectory, simOptions.getProperty("simuConfig")));
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         MatsimMapComponent matsimJMapViewer = new MatsimMapComponent(MatsimStaticDatabase.INSTANCE);
 
         // this is optional and should not cause problems if file does not exist.
-        // temporary solution
+        // temporary solution 
         matsimJMapViewer.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
         MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer);

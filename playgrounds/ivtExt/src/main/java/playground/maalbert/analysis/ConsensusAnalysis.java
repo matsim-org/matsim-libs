@@ -58,7 +58,7 @@ class ConsensusAnalysis {
 
         //DEBUG START
 
-        Network network = loadNetwork(args);
+        Network network = loadNetwork(new File(args[0]));
         final File virtualnetworkFile = new File("vN_40vS_L1_v2\\virtualNetwork.xml");
         GlobalAssert.that(virtualnetworkFile.isFile());
         VirtualNetwork virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);

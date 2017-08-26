@@ -8,7 +8,6 @@ import org.matsim.contrib.dvrp.schedule.Task;
 
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.utils.GlobalAssert;
-import playground.clruch.utils.ScheduleUtils;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 
@@ -20,13 +19,13 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
  */
 final class StayVehicleDiversionDirective extends VehicleDiversionDirective {
 
-    StayVehicleDiversionDirective(VehicleLinkPair vehicleLinkPair, Link destination, FuturePathContainer futurePathContainer) {
+    StayVehicleDiversionDirective(RoboTaxi vehicleLinkPair, Link destination, FuturePathContainer futurePathContainer) {
         super(vehicleLinkPair, destination, futurePathContainer);
     }
 
     @Override
     void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData) {
-        final Schedule schedule = vehicleLinkPair.avVehicle.getSchedule();
+        final Schedule schedule = robotaxi.getSchedule();
         final AVStayTask avStayTask = (AVStayTask) schedule.getCurrentTask(); // <- implies that task is started
         final double scheduleEndTime = avStayTask.getEndTime(); // typically 108000.0
         GlobalAssert.that(scheduleEndTime == schedule.getEndTime());
@@ -37,11 +36,11 @@ final class StayVehicleDiversionDirective extends VehicleDiversionDirective {
         if (endDriveTask < scheduleEndTime) {
 
             GlobalAssert.that(avStayTask.getStatus() == Task.TaskStatus.STARTED);
-            avStayTask.setEndTime(vehicleLinkPair.linkTimePair.time);
+            avStayTask.setEndTime(robotaxi.getDivertableTime());
 
             schedule.addTask(avDriveTask);
 
-            ScheduleUtils.makeWhole(vehicleLinkPair.avVehicle, endDriveTask, scheduleEndTime, destination);
+            ScheduleUtils.makeWhole(robotaxi, endDriveTask, scheduleEndTime, destination);
 
         } else
             reportExecutionBypass(endDriveTask - scheduleEndTime);

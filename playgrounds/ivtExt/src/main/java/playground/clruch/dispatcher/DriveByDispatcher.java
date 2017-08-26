@@ -13,29 +13,26 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import playground.clruch.dispatcher.core.DispatcherUtils;
 import playground.clruch.dispatcher.core.RebalancingDispatcher;
-import playground.clruch.dispatcher.core.UniversalDispatcher;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-/**
- * Dispatcher sends vehicles to all links in the network and lets them pickup any customers which are waiting along the road.
+/** Dispatcher sends vehicles to all links in the network and lets them pickup any customers which
+ * are waiting along the road.
  * 
- * @author Claudio Ruch
- *
- */
+ * @author Claudio Ruch */
 public class DriveByDispatcher extends RebalancingDispatcher {
     private final List<Link> links;
-    int index = 0;
-    double rebPos = 0.1;
-    Random randGen = new Random(1234);
-    private final int dispatchPeriod;
+    private final double rebPos = 0.99;
+    private final Random randGen = new Random(1234);
+    private final int rebalancingPeriod;
     private int total_abortTrip = 0;
 
     private DriveByDispatcher(//
@@ -46,36 +43,37 @@ public class DriveByDispatcher extends RebalancingDispatcher {
             Network network) {
         super(config, travelTime, router, eventsManager);
         links = new ArrayList<>(network.getLinks().values());
-        Collections.shuffle(links);
+        Collections.shuffle(links, randGen);
         SafeConfig safeConfig = SafeConfig.wrap(config);
-        dispatchPeriod = getDispatchPeriod(safeConfig, 120); // safeConfig.getInteger("dispatchPeriod", 120);
+        rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 120);
     }
 
     @Override
     public void redispatch(double now) {
 
         // stop all vehicles which are driving by an open request
-        total_abortTrip += DrivebyRequestStopper.stopDrivingBy(getAVRequestsAtLinks(), getDivertableVehicleLinkPairs(), this::setVehiclePickup);
+        total_abortTrip += DrivebyRequestStopper //
+                .stopDrivingBy(DispatcherUtils.getAVRequestsAtLinks(getAVRequests()), getDivertableRoboTaxis(), this::setRoboTaxiPickup);
 
+        // send vehicles to travel around the city to random links (random loitering)
         final long round_now = Math.round(now);
-        if (round_now % dispatchPeriod == 0 && 0 < getAVRequests().size()) {
-            // send vehicles to travel around the city
-            for (AVVehicle avVehicle : getDivertableVehicles())
+        if (round_now % rebalancingPeriod == 0 && 0 < getAVRequests().size()) {
+            for (RoboTaxi roboTaxi : getDivertableRoboTaxis()) {
                 if (rebPos > randGen.nextDouble()) {
-                    setVehicleRebalance(avVehicle, pollNextDestination());
+                    setRoboTaxiRebalance(roboTaxi, pollNextDestination());
                 }
+            }
         }
     }
 
     private Link pollNextDestination() {
+        int index = randGen.nextInt(links.size());
         Link link = links.get(index);
-        ++index;
-        index %= links.size();
         return link;
     }
 
     @Override
-    public String getInfoLine() {
+    protected String getInfoLine() {
         return String.format("%s AT=%5d", //
                 super.getInfoLine(), //
                 total_abortTrip //

@@ -15,6 +15,7 @@ import playground.clruch.netdata.VirtualNetworkGet;
 /**
  * Created by Joel on 05.04.2017.
  */
+@Deprecated
 public class AnalyzeVirtualNetwork {
     public static void main(String[] args) throws Exception {
         analyze(args);
@@ -27,7 +28,7 @@ public class AnalyzeVirtualNetwork {
         data.mkdir();
 
         // load system network
-        Network network = loadNetwork(args);
+        Network network = loadNetwork(new File(args[0]));
 
         MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SIOUXFALLS);
 

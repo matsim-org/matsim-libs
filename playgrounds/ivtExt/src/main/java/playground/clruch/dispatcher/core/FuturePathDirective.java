@@ -10,7 +10,7 @@ import playground.clruch.router.FuturePathContainer;
  * while the path is being computer.
  * the resulting path is available upon the function call execute(...)
  */
-abstract class FuturePathDirective extends AbstractDirective {
+abstract class FuturePathDirective implements AbstractDirective {
     protected final FuturePathContainer futurePathContainer;
 
     FuturePathDirective(FuturePathContainer futurePathContainer) {
@@ -18,7 +18,7 @@ abstract class FuturePathDirective extends AbstractDirective {
     }
 
     @Override
-    final void execute() {
+    public final void execute() {
         VrpPathWithTravelData vrpPathWithTravelData = futurePathContainer.getVrpPathWithTravelData();
         executeWithPath(vrpPathWithTravelData);
     }

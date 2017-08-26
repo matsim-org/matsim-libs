@@ -3,18 +3,21 @@ package playground.clruch;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Properties;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
+import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeIO;
+import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
+import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeIO;
 import playground.clruch.data.LocationSpec;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
@@ -25,18 +28,22 @@ import playground.clruch.prep.PopulationTools;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
-import playground.clruch.trb18.scenario.TRBScenarioConfig;
 import playground.clruch.utils.GZHandler;
 import playground.clruch.utils.GlobalAssert;
 
-/**
- * Class to prepare a given scenario for MATSim, includes preparation of netowrk, population, creation of virtualNetwork
+/** Class to prepare a given scenario for MATSim, includes preparation of netowrk, population, creation of virtualNetwork
  * and travelData objects.
  * 
- * @author clruch
- *
- */
+ * @author clruch */
 public class ScenarioPreparer {
+
+    private final static String VIRTUALNETWORKFOLDERNAME = "virtualNetwork";
+    private final static String VIRTUALNETWORKFILENAME = "virtualNetwork";
+    private final static String MINIMUMFLEETSIZEFILENAME = "minimumFleetSizeCalculator";
+    private final static String PERFORMANCEFLEETSIZEFILENAME = "performanceFleetSizeCalculator";
+    private final static String TRAVELDATAFILENAME = "travelData";
+    private final static String NETWORKUPDATEDNAME = "networkConverted";
+    private final static String POPULATIONUPDATEDNAME = "populationConverted";
 
     public static void main(String[] args) throws MalformedURLException, Exception {
         run(args);
@@ -44,50 +51,34 @@ public class ScenarioPreparer {
 
     public static void run(String[] args) throws MalformedURLException, Exception {
 
-        // INPUT ARGUMENT: path to a config.xml file which contains references to the original xml files (population.xml)
-        // if the xml file with the converted files is supplied, no changes are implemented by the ScenarioPreparer.
-        System.out.println("converting simulation data files from " + args[0]);
+        File workingDirectory = new File("").getCanonicalFile();
+        Properties simOptions = DefaultOptions.load(workingDirectory);        
 
-        // BEGIN: CUSTOMIZE -----------------------------------------------
-        // set manually depending on the scenario:
 
-        final int maxPopulationSize = 100000;
+        File configFile = new File(workingDirectory, simOptions.getProperty("fullConfig"));
+        System.out.println("loading config file to get data " + configFile.getAbsoluteFile());        
 
-        final int numVirtualNodes = 20;
-        final int dtTravelData = 3600;
-        final boolean completeGraph = true;
-
-        // LocationSpec object to specify city location and center, radius for cutting
-        LocationSpec ls = LocationSpec.SIOUXFALLS_CITY;
-
-        final boolean populationeliminateFreight = false;
-        final boolean populationeliminateWalking = false;
-        final boolean populationchangeModeToAV = true; // TODO check if this is still needed !?
-
-        // output file names
-        final String VIRTUALNETWORKFOLDERNAME = "virtualNetwork";
-        final String VIRTUALNETWORKFILENAME = "virtualNetwork";
-        final String TRAVELDATAFILENAME = "travelData";
-        final String NETWORKUPDATEDNAME = "networkConverted";
-        final String POPULATIONUPDATEDNAME = "populationConverted";
-
-        // END: CUSTOMIZE -------------------------------------------------
-
-        File configFile = new File(args[0]);
-        File dir = configFile.getParentFile();
+        
+        boolean populationeliminateFreight = Boolean.valueOf(simOptions.getProperty("populationeliminateFreight"));
+        boolean populationeliminateWalking = Boolean.valueOf(simOptions.getProperty("populationeliminateWalking"));
+        boolean populationchangeModeToAV = Boolean.valueOf(simOptions.getProperty("populationchangeModeToAV"));
+        LocationSpec ls = LocationSpec.fromString(simOptions.getProperty("LocationSpec")); 
+        int numVirtualNodes = Integer.valueOf(simOptions.getProperty("numVirtualNodes"));
+        boolean completeGraph = Boolean.valueOf(simOptions.getProperty("completeGraph"));
+        int maxPopulationSize = Integer.valueOf(simOptions.getProperty("maxPopulationSize"));
+        int dtTravelData = Integer.valueOf(simOptions.getProperty("dtTravelData"));
 
         // 0) load files
         Config config = ConfigUtils.loadConfig(configFile.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
 
-        
         Population population = scenario.getPopulation();
 
         {// 1) cut network (and reduce population to new network)
             NetworkCutClean.elminateOutsideRadius(network, ls.center, ls.radius);
-            final File fileExportGz = new File(dir, NETWORKUPDATEDNAME + ".xml.gz");
-            final File fileExport = new File(dir, NETWORKUPDATEDNAME + ".xml");
+            final File fileExportGz = new File(workingDirectory, NETWORKUPDATEDNAME + ".xml.gz");
+            final File fileExport = new File(workingDirectory, NETWORKUPDATEDNAME + ".xml");
             {
                 // write the modified population to file
                 NetworkWriter nw = new NetworkWriter(network);
@@ -99,7 +90,7 @@ public class ScenarioPreparer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("saved converted network to: " + dir + NETWORKUPDATEDNAME + ".xml");
+            System.out.println("saved converted network to: " +workingDirectory + NETWORKUPDATEDNAME + ".xml");
         }
 
         {// 2) adapt the population to new network
@@ -121,8 +112,8 @@ public class ScenarioPreparer {
             System.out.println("Population after decimation:" + population.getPersons().values().size());
             GlobalAssert.that(population.getPersons().size() > 0);
 
-            final File fileExportGz = new File(dir, POPULATIONUPDATEDNAME + ".xml.gz");
-            final File fileExport = new File(dir, POPULATIONUPDATEDNAME + ".xml");
+            final File fileExportGz = new File(workingDirectory, POPULATIONUPDATEDNAME + ".xml.gz");
+            final File fileExport = new File(workingDirectory, POPULATIONUPDATEDNAME + ".xml");
 
             {
                 // write the modified population to file
@@ -138,23 +129,32 @@ public class ScenarioPreparer {
             }
         }
 
-        {// 3) create virtual Network
-            KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
-            VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
-            final File vnDir = new File(dir, VIRTUALNETWORKFOLDERNAME);
-            vnDir.mkdir(); // create folder if necessary
-            VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
-            VirtualNetworkIO.toXML(new File(vnDir, VIRTUALNETWORKFILENAME + ".xml").toString(), virtualNetwork);
-            System.out.println("saved virtual network byte format to : " + new File(vnDir, VIRTUALNETWORKFILENAME));
+        // 3) create virtual Network
+        KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
+        VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
+        final File vnDir = new File(workingDirectory, VIRTUALNETWORKFOLDERNAME);
+        vnDir.mkdir(); // create folder if necessary
+        VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
+        VirtualNetworkIO.toXML(new File(vnDir, VIRTUALNETWORKFILENAME + ".xml").toString(), virtualNetwork);
+        System.out.println("saved virtual network byte format to : " + new File(vnDir, VIRTUALNETWORKFILENAME));
+        PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);
+        prs.exportCsv();
+        // 3) generate travelData
+        TravelData travelData = new TravelData(virtualNetwork, network, scenario.getPopulation(), dtTravelData);
+        TravelDataIO.toByte(new File(vnDir, TRAVELDATAFILENAME), travelData);
+        System.out.println("saved travelData byte format to : " + new File(vnDir, TRAVELDATAFILENAME));
 
-            PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);
-            prs.exportCsv();
-            // 3) generate travelData
-            TravelData travelData = new TravelData(virtualNetwork, network, scenario.getPopulation(), dtTravelData);
-            TravelDataIO.toByte(new File(vnDir, TRAVELDATAFILENAME), travelData);
-            System.out.println("saved travelData byte format to : " + new File(vnDir, TRAVELDATAFILENAME));
+        {// 4) calculate minimum and performance fleet size and save results
+            MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, population, virtualNetwork, travelData);
+            MinimumFleetSizeIO.toByte(new File(vnDir, MINIMUMFLEETSIZEFILENAME), minimumFleetSizeCalculator);
+
+            int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
+            PerformanceFleetSizeCalculator performanceFleetSizeCalculator = //
+                    new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberVehiclesPerformanceCalculator);
+            PerformanceFleetSizeIO.toByte(new File(vnDir, PERFORMANCEFLEETSIZEFILENAME), performanceFleetSizeCalculator);
+
         }
 
-        System.out.println("successfully converted simulation data files from " + args[0]);
+        System.out.println("successfully converted simulation data files from in " + workingDirectory);
     }
 }

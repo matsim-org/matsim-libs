@@ -1,18 +1,18 @@
 package playground.clruch.html;
 
-import ch.ethz.idsc.tensor.red.Mean;
-import ch.ethz.idsc.tensor.sca.Ceiling;
-import playground.clruch.analysis.AnalysisUtils;
-import playground.clruch.analysis.AnalyzeSummary;
+import java.io.File;
+import java.nio.file.Files;
+import java.text.DecimalFormat;
 
 import org.matsim.core.utils.misc.Time;
 
-import java.io.File;
-import java.text.DecimalFormat;
+import ch.ethz.idsc.tensor.io.Export;
+import ch.ethz.idsc.tensor.io.Import;
+import ch.ethz.idsc.tensor.red.Mean;
+import playground.clruch.analysis.AnalyzeSummary;
+import playground.clruch.utils.GlobalAssert;
 
-/**
- * Created by Joel on 28.06.2017.
- */
+/** @author Claudio Ruch based on initial version by gjoel */
 public class ReportGenerator {
 
     final static String REPORT_NAME = "report";
@@ -24,17 +24,25 @@ public class ReportGenerator {
 
     final static double link2km = 0.001;
 
+    private static File reportFolder;
+
     public static void main(String[] args) throws Exception {
-        from(args);
+        from(new File(args[0]));
     }
 
-    public static void from(String[] args) throws Exception {
-        File config = new File(args[0]);
-        File file = new File(config.getParent(), "output/report");
-        file.mkdir();
+    public static void from(File configFile) throws Exception {
 
-        ScenarioParameters scenarioParameters = DataCollector.loadScenarioData(args);
-        AnalyzeSummary analyzeSummary = DataCollector.loadAnalysisData(args);
+        Thread.sleep(5000);
+
+        // create folder
+        reportFolder = new File(configFile.getParent(), "output/report");
+        reportFolder.mkdir();
+
+        // extract necessary data
+        ScenarioParameters scenarioParametersingleton = ScenarioParameters.INSTANCE;
+        Export.object(new File("output/data/scenarioParameters.obj"), scenarioParametersingleton);
+        AnalyzeSummary analyzeSummary = Import.object(new File("output/data/analyzeSummary.obj"));
+        saveConfigs(configFile);
 
         // write report
         // -------------------------------------------------------------------------------------------------------------
@@ -55,11 +63,11 @@ public class ReportGenerator {
         htmlUtils.insertSubTitle("General/Aggregate Information");
         htmlUtils.insertTextLeft("User:" + //
                 "\nTimestamp:");
-        htmlUtils.insertTextLeft(scenarioParameters.user + //
-                "\n" + scenarioParameters.date);
+        htmlUtils.insertTextLeft(scenarioParametersingleton.user + //
+                "\n" + scenarioParametersingleton.date);
         htmlUtils.newLine();
         htmlUtils.insertTextLeft("Iterations:");
-        htmlUtils.insertTextLeft(String.valueOf(scenarioParameters.iterations));
+        htmlUtils.insertTextLeft(String.valueOf(scenarioParametersingleton.iterations));
         htmlUtils.newLine();
         htmlUtils.insertLink("av.xml", "AV File");
         htmlUtils.insertLink("av_config.xml", "AV_Config File");
@@ -68,18 +76,18 @@ public class ReportGenerator {
                 "\nVehicles:" + //
                 "\nRebalancing Period:" + //
                 "\nRedispatching Period:");
-        htmlUtils.insertTextLeft(scenarioParameters.dispatcher + //
+        htmlUtils.insertTextLeft(scenarioParametersingleton.dispatcher + //
                 "\n" + analyzeSummary.numVehicles + //
-                "\n" + Time.writeTime(scenarioParameters.rebalancingPeriod) + //
-                "\n" + Time.writeTime(scenarioParameters.redispatchPeriod));
+                "\n" + Time.writeTime(scenarioParametersingleton.rebalancingPeriod) + //
+                "\n" + Time.writeTime(scenarioParametersingleton.redispatchPeriod));
         htmlUtils.newLine();
         htmlUtils.insertTextLeft("Network:" + //
                 "\nVirtual Nodes:" + //
                 "\nPopulation:" + //
                 "\nRequests:");
-        htmlUtils.insertTextLeft(scenarioParameters.networkName + //
-                "\n" + scenarioParameters.virtualNodes + //
-                "\n" + scenarioParameters.populationSize + //
+        htmlUtils.insertTextLeft(scenarioParametersingleton.networkName + //
+                "\n" + scenarioParametersingleton.virtualNodes + //
+                "\n" + scenarioParametersingleton.populationSize + //
                 "\n" + analyzeSummary.numRequests);
 
         htmlUtils.insertSubTitle("Aggregate Results");
@@ -109,26 +117,25 @@ public class ReportGenerator {
                 "\n" + Time.writeTime(analyzeSummary.totalWaitTimeQuantile.Get(2).number().doubleValue()) + //
                 "\n" + Time.writeTime(analyzeSummary.maximumWaitTime) + //
                 "\n" + //
-                "\n" + d.format(analyzeSummary.occupancyRatio*100) + "%" + //
-                "\n" + d.format(analyzeSummary.distanceRatio*100)+ "%" + //
+                "\n" + d.format(analyzeSummary.occupancyRatio * 100) + "%" + //
+                "\n" + d.format(analyzeSummary.distanceRatio * 100) + "%" + //
                 "\n\n" + //
-                "\n" + d.format(analyzeSummary.distance*link2km) + " km" + //
-                "\n" + d.format(analyzeSummary.distanceRebalance*link2km) + " km (" + //
-                d.format(100*analyzeSummary.distanceRebalance/analyzeSummary.distance) + "%)" + //
-                "\n" + d.format(analyzeSummary.distancePickup*link2km) + " km (" + //
-                d.format(100*analyzeSummary.distancePickup/analyzeSummary.distance) + "%)" + //
-                "\n" + d.format(analyzeSummary.distanceWithCust*link2km) + " km (" + //
-                d.format(100*analyzeSummary.distanceWithCust/analyzeSummary.distance) + "%)" + //
+                "\n" + d.format(analyzeSummary.distance * link2km) + " km" + //
+                "\n" + d.format(analyzeSummary.distanceRebalance * link2km) + " km (" + //
+                d.format(100 * analyzeSummary.distanceRebalance / analyzeSummary.distance) + "%)" + //
+                "\n" + d.format(analyzeSummary.distancePickup * link2km) + " km (" + //
+                d.format(100 * analyzeSummary.distancePickup / analyzeSummary.distance) + "%)" + //
+                "\n" + d.format(analyzeSummary.distanceWithCust * link2km) + " km (" + //
+                d.format(100 * analyzeSummary.distanceWithCust / analyzeSummary.distance) + "%)" + //
                 "\n" + //
-                "\n" + d.format(link2km*analyzeSummary.distanceWithCust/analyzeSummary.numRequests) + " km"
-        );
+                "\n" + d.format(link2km * analyzeSummary.distanceWithCust / analyzeSummary.numRequests) + " km");
         htmlUtils.insertImgRight(IMAGE_FOLDER + "/stackedDistance.png", 250, 400);
-        if (scenarioParameters.EMDks != null) {
+        if (scenarioParametersingleton.EMDks != null) {
             htmlUtils.newLine();
             htmlUtils.insertTextLeft("Minimum Fleet Size:" + //
                     "\nAverage Earth Movers Distance:");
-            htmlUtils.insertTextLeft((int) Math.ceil(scenarioParameters.minimumFleet) + //
-                    "\n" + d.format(Mean.of(scenarioParameters.EMDks).Get().number().doubleValue()*link2km) + " km");
+            htmlUtils.insertTextLeft((int) Math.ceil(scenarioParametersingleton.minimumFleet) + //
+                    "\n" + d.format(Mean.of(scenarioParametersingleton.EMDks).Get().number().doubleValue() * link2km) + " km");
         }
 
         htmlUtils.insertSubTitle("Wait Times");
@@ -152,16 +159,16 @@ public class ReportGenerator {
         htmlUtils.insertSubTitle("Fleet Performance");
         htmlUtils.insertTextLeft( //
                 "Occupancy Ratio:" + //
-                "\nDistance Ratio:" //
+                        "\nDistance Ratio:" //
         );
         htmlUtils.insertTextLeft( //
-                d.format(analyzeSummary.occupancyRatio*100) + "%" + //
-                "\n" + d.format(analyzeSummary.distanceRatio*100)+ "%" //
+                d.format(analyzeSummary.occupancyRatio * 100) + "%" + //
+                        "\n" + d.format(analyzeSummary.distanceRatio * 100) + "%" //
         );
         htmlUtils.newLine();
         htmlUtils.insertImg(IMAGE_FOLDER + "/binnedTimeRatios.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/binnedDistanceRatios.png", 800, 600);
-        if (scenarioParameters.EMDks != null) {
+        if (scenarioParametersingleton.EMDks != null) {
             htmlUtils.insertTextLeft("Average Trip Distance:");
             htmlUtils.insertTextLeft(d.format( //
                     link2km * analyzeSummary.distanceWithCust / analyzeSummary.numRequests) + " km");
@@ -172,20 +179,18 @@ public class ReportGenerator {
         htmlUtils.insertImg(IMAGE_FOLDER + "/totalDistanceVehicle.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/dwcVehicle.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/statusDistribution.png", 800, 600);
-        if (scenarioParameters.EMDks != null) {
+        if (scenarioParametersingleton.EMDks != null) {
             htmlUtils.newLine();
             htmlUtils.insertTextLeft("Minimum Fleet Size:" + //
                     "\nAverage Earth Movers Distance:");
-            htmlUtils.insertTextLeft((int) Math.ceil(scenarioParameters.minimumFleet) + //
-                    "\n" + d.format(Mean.of(scenarioParameters.EMDks).Get().number().doubleValue()*link2km) + " km");
+            htmlUtils.insertTextLeft((int) Math.ceil(scenarioParametersingleton.minimumFleet) + //
+                    "\n" + d.format(Mean.of(scenarioParametersingleton.EMDks).Get().number().doubleValue() * link2km) + " km");
             htmlUtils.newLine();
             htmlUtils.insertImg(IMAGE_FOLDER + "/minFleet.png", 800, 600);
             htmlUtils.insertImg(IMAGE_FOLDER + "/EMD.png", 800, 600);
         }
-        
-        
-        htmlUtils.insertImg(IMAGE_FOLDER + "/availbilitiesByNumberVehicles.png",800,600);
-        
+
+        htmlUtils.insertImg(IMAGE_FOLDER + "/availbilitiesByNumberVehicles.png", 800, 600);
 
         // ----------------------------------------------
         htmlUtils.footer();
@@ -204,4 +209,16 @@ public class ReportGenerator {
         }
     }
 
+    private static void saveConfigs(File configFile) throws Exception {
+        // copy configFile
+        GlobalAssert.that(configFile.exists());
+        Files.copy(configFile.toPath(), new File(reportFolder, "av_config.xml").toPath());
+        GlobalAssert.that(configFile.exists());
+
+        // copy av.xml file
+        File avFile = new File(configFile.getParentFile(), "av.xml");
+        GlobalAssert.that(avFile.exists());
+        Files.copy(avFile.toPath(), new File(reportFolder, "av.xml").toPath());
+        GlobalAssert.that(avFile.exists());
+    }
 }

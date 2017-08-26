@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.clruch.analysis;
+package playground.clruch.analysis.performancefleetsize;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -25,6 +25,8 @@ import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.red.Norm;
 import ch.ethz.idsc.tensor.red.Total;
+import playground.clruch.analysis.AnalyzeAll;
+import playground.clruch.analysis.DiagramCreator;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
@@ -40,12 +42,17 @@ public enum PerformanceFleetSizeUtils {
 
         // list arrivals per time step
         List<Double> arrivalNumbers = new ArrayList<>();
+        Tensor totalArrivals = RealScalar.ZERO;
         for (int k = 0; k < numberTimeSteps; ++k) {
             Tensor lambdaii = tData.getLambdaPSFforTime(k * dt);
             Tensor totalArrivalRate = Total.of(lambdaii);
+            Tensor totalArivalTS = (totalArrivalRate.multiply(RealScalar.of(dt)));
+            System.out.println("arrivals in this time step: " + totalArivalTS);
+            totalArrivals = totalArrivals.add(totalArivalTS);
             RealScalar arrivals = (RealScalar) totalArrivalRate.multiply(RealScalar.of(dt));
             arrivalNumbers.add(arrivals.number().doubleValue());
         }
+        System.out.println("arrivals in total: " + totalArrivals);
 
         double maxArrival = Collections.max(arrivalNumbers);
 

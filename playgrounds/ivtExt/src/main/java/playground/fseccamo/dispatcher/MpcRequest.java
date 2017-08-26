@@ -4,6 +4,7 @@ import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNode;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
+@Deprecated
 public class MpcRequest {
     final AVRequest avRequest;
     final int vectorIndex; // up to m refers to virtual link, beyond m refers to virtual node (as self loop)

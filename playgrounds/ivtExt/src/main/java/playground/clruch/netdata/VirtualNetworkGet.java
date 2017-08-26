@@ -2,21 +2,27 @@
 package playground.clruch.netdata;
 
 import java.io.File;
+import java.util.Properties;
 
 import org.matsim.api.core.v01.network.Network;
+
+import playground.clruch.DefaultOptions;
+import playground.clruch.utils.GlobalAssert;
 
 public enum VirtualNetworkGet {
     ;
 
     public static VirtualNetwork readDefault(Network network) {
-        final File virtualnetworkFile = new File("virtualNetwork/virtualNetwork");
-        System.out.println("" + virtualnetworkFile.getAbsoluteFile());
+        Properties simOptions = DefaultOptions.getDefault();
+        final File virtualnetworkFile = new File(simOptions.getProperty("virtualNetworkDir") + "/" + //
+                simOptions.getProperty("virtualNetworkName"));
+        System.out.println("reading network from" + virtualnetworkFile.getAbsoluteFile());
+        GlobalAssert.that(virtualnetworkFile.exists());
         try {
             return VirtualNetworkIO.fromByte(network, virtualnetworkFile);
         } catch (Exception e) {
-            // e.printStackTrace();
             System.out.println("cannot load default " + virtualnetworkFile);
-            // throw new RuntimeException();
+
         }
         return null;
     }

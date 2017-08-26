@@ -1,5 +1,6 @@
 package playground.clruch.demo;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -74,7 +75,7 @@ class CongestionAnalysis {
     }
 
     public static void main(String[] args) {
-        Network network = NetworkLoader.loadNetwork(args);
+        Network network = NetworkLoader.loadNetwork(new File(args[0]));
 
         // load coordinate system
         MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SIOUXFALLS);

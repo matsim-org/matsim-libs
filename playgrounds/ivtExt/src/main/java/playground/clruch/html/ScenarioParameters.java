@@ -1,36 +1,103 @@
+/**
+ * 
+ */
 package playground.clruch.html;
 
-import ch.ethz.idsc.tensor.Scalar;
-import ch.ethz.idsc.tensor.Tensor;
-
-import java.io.Serializable;
+import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
 
-/**
- * Created by Joel on 28.06.2017.
- */
-public class ScenarioParameters implements Serializable {
-    public int populationSize;
-    public int iterations;
-    public int redispatchPeriod;
-    public int rebalancingPeriod;
-    public int virtualNodes;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 
-    public String dispatcher;
-    public String networkName;
-    public String user;
-    public String date;
+import ch.ethz.idsc.tensor.Tensor;
+import playground.clruch.DefaultOptions;
+import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
+import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeGet;
+import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
+import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeGet;
+import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.netdata.VirtualNetworkGet;
+import playground.clruch.utils.GlobalAssert;
+import playground.clruch.utils.SafeConfig;
+import playground.sebhoerl.avtaxi.config.AVConfig;
+import playground.sebhoerl.avtaxi.config.AVConfigReader;
+import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
+import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
 
-    public Tensor EMDks;
-    public Tensor minFleet;
-    public double minimumFleet;
+/** @author Claudio Ruch */
+public enum ScenarioParameters {
+    INSTANCE;
 
-    public Tensor availabilities;
+    public final int populationSize;
+    public final int iterations;
+    public final int redispatchPeriod;
+    public final int rebalancingPeriod;
+    public final int virtualNodes;
 
-    public ScenarioParameters() {
+    public final String dispatcher;
+    public final String networkName;
+    public final String user;
+    public final String date;
+
+    public final Tensor EMDks;
+    public final Tensor minFleet;
+    public final double minimumFleet;
+
+    public final Tensor availabilities;
+
+    private ScenarioParameters() {
+        File workingDirectory = null;
+        Properties simOptions = null;
+        try {
+            workingDirectory = new File("").getCanonicalFile();
+            simOptions = DefaultOptions.load(workingDirectory);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        File configFile = new File(workingDirectory, simOptions.getProperty("simuConfig"));
+        Config config = ConfigUtils.loadConfig(configFile.toString());
+
         user = System.getProperty("user.name");
         date = new SimpleDateFormat("yyyy/MM/dd - HH:mm:ss").format(new Date());
+
+        File basePath = new File(config.getContext().getPath()).getParentFile();
+        File configPath = new File(basePath, "av.xml");
+        AVConfig avConfig = new AVConfig();
+        AVConfigReader reader = new AVConfigReader(avConfig);
+        reader.readFile(configPath.getAbsolutePath());
+        AVOperatorConfig oc = avConfig.getOperatorConfigs().iterator().next();
+        AVDispatcherConfig avdispatcherconfig = oc.getDispatcherConfig();
+        SafeConfig safeConfig = SafeConfig.wrap(avdispatcherconfig);
+
+        redispatchPeriod = safeConfig.getInteger("dispatchPeriod", -1);
+        rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", -1);
+        dispatcher = avdispatcherconfig.getStrategyName();
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+
+        populationSize = scenario.getPopulation().getPersons().values().size();
+
+        Network network = scenario.getNetwork();
+        networkName = network.getName();
+
+        VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(network);
+        MinimumFleetSizeCalculator minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
+        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = PerformanceFleetSizeGet.readDefault();
+        GlobalAssert.that(virtualNetwork != null);
+
+        virtualNodes = virtualNetwork.getvNodesCount();
+        minFleet = minimumFleetSizeCalculator.getMinFleet();
+        EMDks = minimumFleetSizeCalculator.getEMDk();
+        minimumFleet = minimumFleetSizeCalculator.minimumFleet;
+        availabilities = performanceFleetSizeCalculator.getAvailabilities();
+        
+        iterations = config.controler().getLastIteration();
+
     }
 
 }
