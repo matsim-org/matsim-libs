@@ -52,15 +52,18 @@ public class ScenarioPreparer {
 
     public static void run(String[] args) throws MalformedURLException, Exception {
 
-        File wd = new File(".");
-        System.out.println("working in " + wd.getAbsolutePath());
+        File wd = new File("");        
+        System.out.println("working in directory " + wd.getAbsolutePath());
 
         Properties simOptions = new Properties(DefaultOptions.getDefault());
         if (new File(wd, "IDSCOptions.properties").exists()) {
             simOptions.load(new FileInputStream(new File(wd, "IDSCOptions.properties")));
         }else DefaultOptions.saveDefault();
 
-        File configFile = new File(wd, simOptions.getProperty("fullConfig"));
+        File configFile = new File(wd.getCanonicalFile(), simOptions.getProperty("fullConfig"));
+        System.out.println("loading config file to get data " + configFile.getAbsoluteFile());        
+
+        
         boolean populationeliminateFreight = Boolean.valueOf(simOptions.getProperty("populationeliminateFreight"));
         boolean populationeliminateWalking = Boolean.valueOf(simOptions.getProperty("populationeliminateWalking"));
         boolean populationchangeModeToAV = Boolean.valueOf(simOptions.getProperty("populationchangeModeToAV"));
@@ -79,8 +82,8 @@ public class ScenarioPreparer {
 
         {// 1) cut network (and reduce population to new network)
             NetworkCutClean.elminateOutsideRadius(network, ls.center, ls.radius);
-            final File fileExportGz = new File(wd, NETWORKUPDATEDNAME + ".xml.gz");
-            final File fileExport = new File(wd, NETWORKUPDATEDNAME + ".xml");
+            final File fileExportGz = new File(wd.getCanonicalFile(), NETWORKUPDATEDNAME + ".xml.gz");
+            final File fileExport = new File(wd.getCanonicalFile(), NETWORKUPDATEDNAME + ".xml");
             {
                 // write the modified population to file
                 NetworkWriter nw = new NetworkWriter(network);
@@ -92,7 +95,7 @@ public class ScenarioPreparer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("saved converted network to: " + wd + NETWORKUPDATEDNAME + ".xml");
+            System.out.println("saved converted network to: " + wd.getCanonicalFile() + NETWORKUPDATEDNAME + ".xml");
         }
 
         {// 2) adapt the population to new network
@@ -114,8 +117,8 @@ public class ScenarioPreparer {
             System.out.println("Population after decimation:" + population.getPersons().values().size());
             GlobalAssert.that(population.getPersons().size() > 0);
 
-            final File fileExportGz = new File(wd, POPULATIONUPDATEDNAME + ".xml.gz");
-            final File fileExport = new File(wd, POPULATIONUPDATEDNAME + ".xml");
+            final File fileExportGz = new File(wd.getCanonicalFile(), POPULATIONUPDATEDNAME + ".xml.gz");
+            final File fileExport = new File(wd.getCanonicalFile(), POPULATIONUPDATEDNAME + ".xml");
 
             {
                 // write the modified population to file
@@ -134,7 +137,7 @@ public class ScenarioPreparer {
         // 3) create virtual Network
         KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
         VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
-        final File vnDir = new File(wd, VIRTUALNETWORKFOLDERNAME);
+        final File vnDir = new File(wd.getCanonicalFile(), VIRTUALNETWORKFOLDERNAME);
         vnDir.mkdir(); // create folder if necessary
         VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
         VirtualNetworkIO.toXML(new File(vnDir, VIRTUALNETWORKFILENAME + ".xml").toString(), virtualNetwork);
