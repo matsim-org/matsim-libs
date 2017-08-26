@@ -39,7 +39,7 @@ public class ReportGenerator {
         reportFolder.mkdir();
 
         // extract necessary data
-        ScenarioParametersSingleTon scenarioParametersingleton = ScenarioParametersSingleTon.INSTANCE;
+        ScenarioParameters scenarioParametersingleton = ScenarioParameters.INSTANCE;
         Export.object(new File("output/data/scenarioParameters.obj"), scenarioParametersingleton);
         AnalyzeSummary analyzeSummary = Import.object(new File("output/data/analyzeSummary.obj"));
         saveConfigs(configFile);

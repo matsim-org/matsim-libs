@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Arrays;
 
 import org.matsim.api.core.v01.network.Network;
@@ -14,7 +13,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.misc.Time;
 
 import ch.ethz.idsc.tensor.io.Export;
-import ch.ethz.idsc.tensor.io.Import;
 import playground.clruch.analysis.AnalyzeSummary;
 import playground.clruch.analysis.TripDistances;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;

@@ -31,7 +31,7 @@ import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
 
 /** @author Claudio Ruch */
-public enum ScenarioParametersSingleTon {
+public enum ScenarioParameters {
     INSTANCE;
 
     public final int populationSize;
@@ -51,7 +51,7 @@ public enum ScenarioParametersSingleTon {
 
     public final Tensor availabilities;
 
-    private ScenarioParametersSingleTon() {
+    private ScenarioParameters() {
         File workingDirectory = null;
         Properties simOptions = null;
         try {
