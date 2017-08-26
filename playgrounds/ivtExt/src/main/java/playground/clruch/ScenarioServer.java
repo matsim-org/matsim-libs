@@ -56,16 +56,8 @@ public class ScenarioServer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
 
-        File wd = new File("");
-        System.out.println("working in " + wd.getAbsoluteFile());
-
-        Thread.sleep(5000);
-
-        Properties simOptions = new Properties(DefaultOptions.getDefault());
-        if (new File(wd, "IDSCOptions.properties").exists()) {
-            simOptions.load(new FileInputStream(new File(wd, "IDSCOptions.properties")));
-        } else
-            DefaultOptions.saveDefault();
+        File workingDirectory = new File("").getCanonicalFile();
+        Properties simOptions = DefaultOptions.load(workingDirectory);        
 
         // set to true in order to make server wait for at least 1 client, for instance viewer client
         boolean waitForClients = Boolean.valueOf(simOptions.getProperty("waitForClients"));
@@ -75,9 +67,8 @@ public class ScenarioServer {
         SimulationServer.INSTANCE.setWaitForClients(waitForClients);
 
         // load MATSim configs
-        File configFile = new File(wd.getCanonicalFile(), simOptions.getProperty("fullConfig"));
+        File configFile = new File(workingDirectory, simOptions.getProperty("simuConfig"));
         System.out.println("loading config file " + configFile.getAbsoluteFile());
-        Thread.sleep(5000);
 
         GlobalAssert.that(configFile.exists());
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();

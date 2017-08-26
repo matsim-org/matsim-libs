@@ -13,7 +13,9 @@ import playground.clruch.data.ReferenceFrame;
 import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.net.MatsimStaticDatabase;
+import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
+import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.NetworkLoader;
 
 /** the viewer allows to connect to the scenario server or to view saved
@@ -26,24 +28,18 @@ public class ScenarioViewer {
      * @throws IOException */
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
-        File wd = new File(".");
-        System.out.println("working in " + wd.getAbsolutePath());
-
-        Properties simOptions = new Properties(DefaultOptions.getDefault());
-        if (new File(wd, "IDSCOptions.properties").exists()) {
-            simOptions.load(new FileInputStream(new File(wd, "IDSCOptions.properties")));
-        }else DefaultOptions.saveDefault();
-        
+        File workingDirectory = new File("").getCanonicalFile();
+        Properties simOptions = DefaultOptions.load(workingDirectory);        
 
         ReferenceFrame referenceFrame = ReferenceFrame.fromString(//
                 simOptions.getProperty("ReferenceFrame"));
 
-        Network network = NetworkLoader.loadNetwork(new File(simOptions.getProperty("av_config.xml")));
+        Network network = NetworkLoader.loadNetwork(new File(workingDirectory, simOptions.getProperty("simuConfig")));
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         MatsimMapComponent matsimJMapViewer = new MatsimMapComponent(MatsimStaticDatabase.INSTANCE);
 
         // this is optional and should not cause problems if file does not exist.
-        // temporary solution
+        // temporary solution 
         matsimJMapViewer.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
         MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer);

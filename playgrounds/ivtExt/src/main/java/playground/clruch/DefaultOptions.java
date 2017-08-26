@@ -4,6 +4,7 @@
 package playground.clruch;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -12,6 +13,8 @@ import java.util.Properties;
 /** @author Claudio Ruch */
 public enum DefaultOptions {
     ;
+    
+    public static final String OPTIONSFILENAME = "IDSCOptions.properties";
 
     public static Properties getDefault() {
         Properties returnP = new Properties();
@@ -31,7 +34,7 @@ public enum DefaultOptions {
     }
 
     public static void saveDefault() throws IOException {
-        saveProperties(getDefault(), "IDSCOptions.properties");
+        saveProperties(getDefault(), OPTIONSFILENAME);
     }
 
     private static void saveProperties(Properties prop, String filename) throws IOException {
@@ -39,5 +42,20 @@ public enum DefaultOptions {
         FileOutputStream ostream = new FileOutputStream(defaultFile);
         prop.store(ostream, "This is a sample config file.");
     }
+    
+    
+    public static Properties load(File workingDirectory) throws IOException{
+        System.out.println("working in directory " + workingDirectory.getCanonicalFile());
+
+        Properties simOptions = new Properties(getDefault());
+        File simOptionsFile = new File(workingDirectory, OPTIONSFILENAME);
+        if (simOptionsFile.exists()) {
+            simOptions.load(new FileInputStream(simOptionsFile));
+        }else DefaultOptions.saveDefault();
+
+        return simOptions;
+    }
+
+    
 
 }

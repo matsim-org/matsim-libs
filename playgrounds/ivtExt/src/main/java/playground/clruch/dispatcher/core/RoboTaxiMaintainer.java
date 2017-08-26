@@ -118,9 +118,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
     @Override
     public final void onNextTimestep(double now) {
         private_now = now; // <- time available to derived class via getTimeNow()
-
         updateInfoLine();
-
         consistencyCheck();
         beforeStepTasks();
         executePickups();
@@ -129,7 +127,6 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
         notifySimulationSubscribers(Math.round(now));
         executeDirectives();
         consistencyCheck();
-
     }
 
     protected void updateInfoLine() {
