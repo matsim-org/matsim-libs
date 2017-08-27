@@ -42,7 +42,7 @@ public class RunBicycleExample {
 	}
 
 	public void run(Config config) {
-		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+//		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 		config.global().setNumberOfThreads(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(0);
@@ -63,6 +63,7 @@ public class RunBicycleExample {
 
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new BicycleModule());
+		
 		controler.run();
 	}
 }

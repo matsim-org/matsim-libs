@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.Vehicle;
@@ -35,20 +36,28 @@ import org.matsim.vehicles.Vehicle;
  * 
  * following parameters may be added in the future
  * smoothness? (vs surface), weather/wind?, #crossings (info in nodes), on-street-parking cars?, prefere routes that are offical bike routes
+ * 
+ * @author smetzler
  */
 public class BicycleTravelDisutility implements TravelDisutility {
 
-	int linkCount=0;
-	double individualDis;
+//	int linkCount=0;
+//	double individualDis;
 
-	ObjectAttributes bicycleAttributes;
-	double marginalUtilityOfTime;
-	double marginalUtilityOfDistance;
+	private ObjectAttributes bicycleAttributes;
+	private double marginalUtilityOfTime;
+	private double marginalUtilityOfDistance;
 	//	double marginalUtilityOfComfort;
-	double marginalUtilityOfStreettype;
-	double marginalUtilityOfSurfacetype;
+	private double marginalUtilityOfStreettype;
+	private double marginalUtilityOfSurfacetype;
+	
+	//
+	private TravelTime timeCalculator;
+	//
 
-	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup) {
+	
+//	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup) {
+	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup, TravelTime timeCalculator) {
 		//get infos from ObjectAttributes
 		bicycleAttributes = new ObjectAttributes();
 		new ObjectAttributesXmlReader(bicycleAttributes).readFile(bicycleConfigGroup.getNetworkAttFile());
@@ -58,6 +67,10 @@ public class BicycleTravelDisutility implements TravelDisutility {
 
 		marginalUtilityOfStreettype = 	Double.valueOf(bicycleConfigGroup.getMarginalUtilityOfStreettype()).doubleValue();
 		marginalUtilityOfSurfacetype = 	Double.valueOf(bicycleConfigGroup.getMarginalUtilityOfSurfacetype()).doubleValue();
+		
+		//
+		this.timeCalculator = timeCalculator;
+		//
 
 		//deprectated
 		//referenceBikeSpeed = Double.valueOf(bikeConfigGroup.getReferenceBikeSpeed()).doubleValue();
@@ -70,14 +83,13 @@ public class BicycleTravelDisutility implements TravelDisutility {
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 
-		// time
-		double travelTime = link.getLength()/link.getFreespeed();
-
-		double disutility = getTravelDisutilityBasedOnTTime(link, time, person, vehicle, travelTime);
-
-		return disutility;
+		double travelTime = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
+//		double travelTime = link.getLength()/link.getFreespeed();
+		return getTravelDisutilityBasedOnTTime(link, time, person, vehicle, travelTime);
 	}
-	private double getTravelDisutilityBasedOnTTime(Link link, double enterTime, Person person, Vehicle vehicle, double travelTime) {
+	
+	
+	public double getTravelDisutilityBasedOnTTime(Link link, double enterTime, Person person, Vehicle vehicle, double travelTime) {
 		String surface= (String) bicycleAttributes.getAttribute(link.getId().toString(), "surface");
 		String highway= (String) bicycleAttributes.getAttribute(link.getId().toString(), "highway");
 		String cyclewaytype= (String) bicycleAttributes.getAttribute(link.getId().toString(), "cyclewaytype");
@@ -234,6 +246,8 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		double streettypeDisutility 	= streettypeDisutility_util_m * distance;
 
 		double disutility = (travelTimeDisutility + distanceDisutility + streettypeDisutility + surfaceDisutility) * randomfactor;
+		System.out.println("travelTimeDisutility = " + travelTimeDisutility + " -- distanceDisutility = " + distanceDisutility + " -- streettypeDisutility = "
+				+ streettypeDisutility + " -- surfaceDisutility = " + surfaceDisutility + " -- randomfactor = " + randomfactor);
 		return disutility;
 	}
 

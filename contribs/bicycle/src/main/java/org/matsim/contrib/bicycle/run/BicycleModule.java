@@ -20,14 +20,21 @@ package org.matsim.contrib.bicycle.run;
 
 import org.matsim.core.controler.AbstractModule;
 
+/**
+ * @author smetzler, dziemke
+ */
 public class BicycleModule extends AbstractModule {
 
 	@Override
 	public void install() {
+		bind(BicycleTravelTime.class).asEagerSingleton();
 		addTravelTimeBinding("bicycle").to(BicycleTravelTime.class);
+		bind(BicycleTravelDisutilityFactory.class).asEagerSingleton();
 		addTravelDisutilityFactoryBinding("bicycle").to(BicycleTravelDisutilityFactory.class);
 
 		// cf. RunMobsimWithMultipleModeVehiclesExample; needed to be able to set maxSpeed und PCU
 		bindMobsim().toProvider(BicycleQSimFactory.class);
+		
+		this.bindScoringFunctionFactory().toInstance(new BicycleScoringFunctionFactory());
 	}
 }

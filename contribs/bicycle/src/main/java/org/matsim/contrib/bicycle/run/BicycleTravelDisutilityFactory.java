@@ -25,6 +25,9 @@ import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
 
+/**
+ * @author smetzler, dziemke
+ */
 public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
 
 	@Inject	BicycleConfigGroup bicycleConfigGroup;
@@ -32,6 +35,6 @@ public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
 	
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		return new BicycleTravelDisutility(bicycleConfigGroup, cnScoringGroup);
+		return new BicycleTravelDisutility(bicycleConfigGroup, cnScoringGroup, timeCalculator);
 	}
 }

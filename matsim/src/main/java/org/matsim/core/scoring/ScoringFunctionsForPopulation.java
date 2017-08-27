@@ -34,6 +34,8 @@ import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -62,7 +64,7 @@ import gnu.trove.list.array.TDoubleArrayList;
  * @author michaz
  *
  */
-class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
+public class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
 
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
@@ -87,7 +89,7 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.L
 	 * For something like the bicycle scoring, we need to know individual links at the level of the scoring function.  This is a first sketch how this could be implemented.
 	 * kai, mar'17
 	 */
-	private static boolean passLinkEventsToPerson = false ;
+	private boolean passLinkEventsToPerson = false;
 	
 	private Vehicle2DriverEventHandler delegate = new Vehicle2DriverEventHandler();
 
@@ -142,6 +144,14 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.L
 			}
 		}
 		if ( passLinkEventsToPerson ) {
+			// Establish and end connection between driver and vehicle
+			if (o instanceof VehicleEntersTrafficEvent) {
+				delegate.handleEvent((VehicleEntersTrafficEvent) o);
+			}
+			if (o instanceof VehicleLeavesTrafficEvent) {
+				delegate.handleEvent((VehicleLeavesTrafficEvent) o);
+			}
+			// Pass LinkEnterEvent to person scoring, required e.g. for bicycle where link attributes are observed in scoring
 			if ( o instanceof LinkEnterEvent ) {
 				Id<Vehicle> vehicleId = ((LinkEnterEvent)o).getVehicleId() ;
 				Id<Person> driverId = delegate.getDriverOfVehicle(vehicleId) ;
@@ -236,5 +246,13 @@ class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.L
 	@Override
 	public void reset(int iteration) {
 
+	}
+
+	public boolean isPassLinkEventsToPerson() {
+		return passLinkEventsToPerson;
+	}
+
+	public void setPassLinkEventsToPerson(boolean passLinkEventsToPerson) {
+		this.passLinkEventsToPerson = passLinkEventsToPerson;
 	}
 }
