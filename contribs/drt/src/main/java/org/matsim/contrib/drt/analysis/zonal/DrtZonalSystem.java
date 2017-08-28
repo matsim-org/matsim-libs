@@ -94,7 +94,7 @@ public Map<String, Geometry> getZones() {
 	return zones;
 }
 
-	public Link getLinkNearZoneCentroid(String zoneId){
+public Coord getZoneCentroid(String zoneId){
 		
 		Geometry zone = zones.get(zoneId);
 		if (zone == null){
@@ -102,6 +102,6 @@ public Map<String, Geometry> getZones() {
 			return null;
 		}
 		Coord c = MGC.point2Coord(zone.getCentroid());
-		return (NetworkUtils.getNearestLink(network, c));
+		return c;
 	}
 }

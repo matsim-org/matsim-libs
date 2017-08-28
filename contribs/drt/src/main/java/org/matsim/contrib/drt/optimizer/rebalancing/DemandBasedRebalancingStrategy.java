@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
 import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleCollector;
@@ -45,14 +46,17 @@ import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
 import org.matsim.contrib.drt.scheduler.DrtScheduler;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.misc.Time;
 
+import com.google.inject.name.Named;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -67,16 +71,18 @@ public class DemandBasedRebalancingStrategy implements RebalancingStrategy {
 	private ZonalIdleVehicleCollector idleVehicles;
 	private ZonalDemandAggregator demandAggregator;
 	private DrtZonalSystem zonalSystem;
+	private Network network;
 	
 
 	/**
 	 * 
 	 */
 	@Inject
-	public DemandBasedRebalancingStrategy(ZonalIdleVehicleCollector idleVehicles, ZonalDemandAggregator demandAggregator, DrtZonalSystem zonalSystem) {
+	public DemandBasedRebalancingStrategy(ZonalIdleVehicleCollector idleVehicles, ZonalDemandAggregator demandAggregator, DrtZonalSystem zonalSystem, @Named(DvrpModule.DVRP_ROUTING) Network network) {
 		this.idleVehicles = idleVehicles;
 		this.demandAggregator = demandAggregator;
 		this.zonalSystem = zonalSystem;
+		this.network = network;
 		
 	}
 	
@@ -107,7 +113,7 @@ public class DemandBasedRebalancingStrategy implements RebalancingStrategy {
 					
 					if (v!=null){
 						idleVehiclesMap.remove(v.getId());
-						relocations.add(new Relocation(v, zonalSystem.getLinkNearZoneCentroid(zone)));
+						relocations.add(new Relocation(v, NetworkUtils.getNearestLink(network, zonalSystem.getZoneCentroid(zone))));
 					}
 				}
 			}
