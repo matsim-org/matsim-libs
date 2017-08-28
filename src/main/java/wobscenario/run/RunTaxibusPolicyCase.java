@@ -31,8 +31,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.taxibus.run.configuration.TaxibusControlerCreator;
-import org.matsim.contrib.taxibus.run.configuration.TaxibusConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
@@ -49,6 +47,9 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
+
+import taxibus.run.configuration.TaxibusConfigGroup;
+import taxibus.run.configuration.TaxibusControlerCreator;
 
 /**
  * @author jbischoff
