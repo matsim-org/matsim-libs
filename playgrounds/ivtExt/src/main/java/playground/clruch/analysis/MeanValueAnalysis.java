@@ -21,16 +21,17 @@ public class MeanValueAnalysis {
     final Tensor pii;
     final Tensor muiInv;
     final int numStation;
+    final int vehicleStep;
 
     Tensor W;
     Tensor L;
     final Tensor A = Tensors.empty();
 
-    public MeanValueAnalysis(Tensor muiIn, Tensor piiIn, int numStation) {
-        maxAgents = Dimensions.of(muiIn).get(0) - 1;
-        numNodes = Dimensions.of(piiIn).get(0);
-        mui = muiIn.copy();
-        pii = piiIn.copy();
+    public MeanValueAnalysis(Tensor mui, Tensor pii, int numStation, int vehicleStep) {
+        maxAgents = Dimensions.of(mui).get(0) - 1;
+        numNodes = Dimensions.of(pii).get(0);
+        this.mui = mui.copy();
+        this.pii = pii.copy();
         this.numStation = numStation;
         muiInv = InvertUnlessZero.of(mui);
         GlobalAssert.that(Dimensions.of(mui).get(1).equals(Dimensions.of(pii).get(0)));
@@ -38,6 +39,8 @@ public class MeanValueAnalysis {
         W = Array.zeros(maxAgents + 1, numNodes);
         L = Array.zeros(maxAgents + 1, numNodes);
         perform();
+
+        this.vehicleStep = vehicleStep;
 
     }
 
@@ -64,11 +67,12 @@ public class MeanValueAnalysis {
 
     }
 
+    /** only the availabilities of the station nodes are saved for memory efficiency */
     private void calcAvailabilities() {
         for (int i = 0; i <= maxAgents; ++i) {
             Tensor Li = getL(i);
             Tensor Wi = getW(i);
-            A.append((Li.pmul(InvertUnlessZero.of(Wi))).pmul(InvertUnlessZero.of(mui.get(i))));
+            A.append((Li.pmul(InvertUnlessZero.of(Wi))).pmul(InvertUnlessZero.of(mui.get(i))).extract(0, numStation));
         }
     }
 

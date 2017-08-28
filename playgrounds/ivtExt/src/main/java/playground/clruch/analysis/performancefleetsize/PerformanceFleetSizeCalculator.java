@@ -6,6 +6,7 @@ package playground.clruch.analysis.performancefleetsize;
 import java.io.File;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
@@ -23,6 +24,7 @@ import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.N;
 import ch.ethz.idsc.tensor.sca.Round;
+import playground.clruch.ScenarioOptions;
 import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.MeanValueAnalysis;
 import playground.clruch.netdata.VirtualNetwork;
@@ -46,7 +48,6 @@ public class PerformanceFleetSizeCalculator implements Serializable {
     final int vehicleBins;
     final int numVNode;
     final int numVLink;
-    private Tensor a;
     private Tensor meanByVehiclesPeak;
     private Tensor meanByVehiclesOffPeak;
 
@@ -58,15 +59,16 @@ public class PerformanceFleetSizeCalculator implements Serializable {
         this.numVNode = virtualNetwork.getvNodesCount();
         this.numVLink = numVNode * numVNode - numVNode;
         GlobalAssert.that(numVLink == virtualNetwork.getvLinksCount());
-        a = Tensors.empty();
         meanByVehiclesPeak = Tensors.empty();
         meanByVehiclesOffPeak = Tensors.empty();
         calcAvailab(virtualNetwork, travelData);
     }
 
-    private Tensor calcAvailab(VirtualNetwork virtualNetwork, TravelData travelData) throws InterruptedException {
+    private void calcAvailab(VirtualNetwork virtualNetwork, TravelData travelData) throws InterruptedException {
 
-        Set<Integer> offPeakSteps = new HashSet();
+        Tensor a = Tensors.empty();
+
+        Set<Integer> offPeakSteps = new HashSet<Integer>();
         for (int i = 0; i < timeSteps; ++i)
             offPeakSteps.add(i);
 
@@ -110,8 +112,8 @@ public class PerformanceFleetSizeCalculator implements Serializable {
             Tensor AvehRef = Array.zeros(maxVehicles + 1, numVNode);
             for (int sol = 0; sol < numdisjointSol; ++sol) {
                 Tensor tpNumsol = tpNum.get(sol);
-                MeanValueAnalysis mvasol = new MeanValueAnalysis(srTotVehiclesNum, tpNumsol, numVNode);
-                Tensor AvehRefSol = Transpose.of(Transpose.of(mvasol.getA()).extract(0, numVNode));
+                MeanValueAnalysis mvasol = new MeanValueAnalysis(srTotVehiclesNum, tpNumsol, numVNode,10);
+                Tensor AvehRefSol = Transpose.of(Transpose.of(mvasol.getA()));
                 AvehRef = AvehRef.add(AvehRefSol);
             }
 
@@ -127,13 +129,11 @@ public class PerformanceFleetSizeCalculator implements Serializable {
         a = Transpose.of(atemp, 1, 2, 0);
         meanByVehiclesPeak = PerformanceFleetSizeUtils.calcMeanByVehicles(a, peakSteps);
         meanByVehiclesOffPeak = PerformanceFleetSizeUtils.calcMeanByVehicles(a, offPeakSteps);
-        return a;
 
     }
-    
-    public void saveAndPlot(){
-        try {            
-            AnalyzeAll.saveFile(a, "availabilitiesFull");
+
+    public void saveAndPlot() {
+        try {
             AnalyzeAll.saveFile(meanByVehiclesOffPeak, "availabilitiesOffPeak");
             AnalyzeAll.saveFile(meanByVehiclesPeak, "availabilitiesPeak");
             PerformanceFleetSizeUtils.plot(meanByVehiclesOffPeak, meanByVehiclesPeak);
@@ -142,23 +142,20 @@ public class PerformanceFleetSizeCalculator implements Serializable {
             e.printStackTrace(System.out);
         }
     }
-    
-    public Tensor getAvailabilities(){
-        return a;
-    }
-
-    public void checkConsistency() {
-        // TODO implement this
-    }
 
     public static void main(String[] args) throws Exception {
-        File configFile = new File(args[0]);
+        File workingDirectory = new File("").getCanonicalFile();
+        Properties simOptions = ScenarioOptions.load(workingDirectory);
+        File configFile = new File(workingDirectory, simOptions.getProperty("simuConfig"));
         Config config = ConfigUtils.loadConfig(configFile.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
-        PerformanceFleetSizeCalculator performcalc = new PerformanceFleetSizeCalculator(virtualNetwork, travelData, 1800);
-        performcalc.calcAvailab(virtualNetwork, travelData);
+        int maxNumberRoboTaxis = (int) (scenario.getPopulation().getPersons().size());
+        long startTime = System.currentTimeMillis();
+        PerformanceFleetSizeCalculator performcalc = new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberRoboTaxis);
+        performcalc.saveAndPlot();
+        System.out.println("runtime: " + ((System.currentTimeMillis()-startTime) / 1000.0) + " [s]");
     }
 
 }

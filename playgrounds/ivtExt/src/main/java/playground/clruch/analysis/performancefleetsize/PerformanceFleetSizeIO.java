@@ -23,7 +23,6 @@ public class PerformanceFleetSizeIO {
      * @param performanceFleetSizeCalculator
      * @throws IOException */
     public static void toByte(File file, PerformanceFleetSizeCalculator performanceFleetSizeCalculator) throws IOException {
-        performanceFleetSizeCalculator.checkConsistency();
         Files.write(file.toPath(), ObjectFormat.of(performanceFleetSizeCalculator));
     }
 
@@ -36,8 +35,7 @@ public class PerformanceFleetSizeIO {
      * @throws IOException */
     public static PerformanceFleetSizeCalculator fromByte(File file) throws ClassNotFoundException, DataFormatException, IOException {
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = ObjectFormat.parse(Files.readAllBytes(file.toPath()));
-        performanceFleetSizeCalculator.checkConsistency();
-        return performanceFleetSizeCalculator;
+         return performanceFleetSizeCalculator;
     }
 
 }

@@ -49,8 +49,6 @@ public enum ScenarioParameters {
     public final Tensor minFleet;
     public final double minimumFleet;
 
-    public final Tensor availabilities;
-
     private ScenarioParameters() {
         File workingDirectory = null;
         Properties simOptions = null;
@@ -94,7 +92,6 @@ public enum ScenarioParameters {
         minFleet = minimumFleetSizeCalculator.getMinFleet();
         EMDks = minimumFleetSizeCalculator.getEMDk();
         minimumFleet = minimumFleetSizeCalculator.minimumFleet;
-        availabilities = performanceFleetSizeCalculator.getAvailabilities();
         
         iterations = config.controler().getLastIteration();
 
