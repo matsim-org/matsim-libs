@@ -46,6 +46,10 @@ public class RunBicycleExample {
 		config.global().setNumberOfThreads(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setLastIteration(0);
+		
+		// New, yet to be applied
+		config.plansCalcRoute().setRoutingRandomness(0.2);
+		//
 				
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

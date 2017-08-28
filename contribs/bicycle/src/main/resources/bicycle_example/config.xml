@@ -63,5 +63,8 @@
 
 	<module name="planscalcroute" >
 		<param name="networkModes" value="bicycle,car" />
+		
+		<!-- Does not seem to be interpretable yet
+		<param name="routingRandomness" value="3.0" /> -->
 	</module>
 </config>

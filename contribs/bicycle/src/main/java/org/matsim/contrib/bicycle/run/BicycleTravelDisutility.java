@@ -24,6 +24,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -47,13 +48,15 @@ public class BicycleTravelDisutility implements TravelDisutility {
 	private final ObjectAttributes bicycleAttributes;
 	private final double marginalUtilityOfTime_s;
 	private final double marginalUtilityOfDistance_m;
-		private final double marginalUtilityOfStreettype_m;
+	private final double marginalUtilityOfStreettype_m;
 	private final double marginalUtilityOfSurfacetype_m;
+	private final double sigma;	
+	private final TravelTime timeCalculator;
 	
-	private TravelTime timeCalculator;
+	private static int normalisationWrnCnt = 0;
 
 	
-	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup, TravelTime timeCalculator) {
+	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup, PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, TravelTime timeCalculator) {
 		// Get infos from ObjectAttributes
 		bicycleAttributes = new ObjectAttributes();
 		new ObjectAttributesXmlReader(bicycleAttributes).readFile(bicycleConfigGroup.getNetworkAttFile());
@@ -66,6 +69,8 @@ public class BicycleTravelDisutility implements TravelDisutility {
 
 		this.marginalUtilityOfStreettype_m = bicycleConfigGroup.getMarginalUtilityOfStreettype();
 		this.marginalUtilityOfSurfacetype_m = bicycleConfigGroup.getMarginalUtilityOfSurfacetype();
+		
+		this.sigma = plansCalcRouteConfigGroup.getRoutingRandomness();
 		
 		this.timeCalculator = timeCalculator;
 	}
@@ -108,7 +113,32 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		// TODO Activity
 		
 		// TODO Other influence factors
-
+		
+		
+		// New randomization
+		// yyyyyy in the randomized toll disutility this is LOGnormal.  Should be made consistent, or an argument provided why in the different cases different
+		// mathematical forms make sense.  kai, feb'17
+		// This following should address this comment, dz, aug'17
+//		double normalization = 1;
+//		if (sigma != 0.) {
+//			normalization = 1. / Math.exp(this.sigma * this.sigma / 2);
+//			if (normalisationWrnCnt < 10) {
+//				normalisationWrnCnt++;
+//				LOG.info("Sigma = " + this.sigma + " -- resulting normalization: " + normalization);
+//			}
+//		}
+//		Random random2 = MatsimRandom.getLocalInstance(); // Make sure that stream of random variables is reproducible. dz, aug'17
+//		double logNormalRnd = Math.exp(sigma * random2.nextGaussian());
+//		logNormalRnd *= normalization;
+		//
+		
+		// Old randomization from Simon
+		 Random random = MatsimRandom.getLocalInstance(); // Make sure that stream of random variables is reproducible. dz, aug'17
+		 double standardDeviation = 0.2;
+		 int mean = 1;
+		 double randomfactor = random.nextGaussian() * standardDeviation + mean;
+		//
+		
 		double travelTimeDisutility = -(marginalUtilityOfTime_s * travelTime);
 		double distanceDisutility = -(marginalUtilityOfDistance_m * distance);
 
@@ -119,22 +149,21 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		double infrastructureDisutility = -(marginalUtilityOfStreettype_m  * (100 - infrastructureFactor) / 100) * distance;
 		
 		
-		
-		// yyyyyy in the randomized toll disutility this is LOGnormal.  Should be made consistent, or an argument provided why in the different cases different
-		// mathematical forms make sense.  kai, feb'17
-		// adding a randomfactor to disutility calculation
-		Random random = MatsimRandom.getLocalInstance(); // Make sure that stream of random variables is reproducible. dz, aug'17
-		double standardDeviation = 0.2;
-		int mean = 1;
-		double randomfactor = random.nextGaussian() * standardDeviation + mean;
-
-		double disutility = (travelTimeDisutility + distanceDisutility + infrastructureDisutility + comfortDisutility) * randomfactor;
-		
+		// Old disutility
 		LOG.info("travelTimeDisutility = " + travelTimeDisutility + " -- distanceDisutility = " + distanceDisutility + " -- streettypeDisutility = "
 				+ infrastructureDisutility + " -- surfaceDisutility = " + comfortDisutility + " -- randomfactor = " + randomfactor);
+		return (travelTimeDisutility + distanceDisutility + infrastructureDisutility + comfortDisutility) * randomfactor;
+		// Example from RandomizingTimeDistanceTravelDisutility: return this.marginalCostOfTime * travelTime + logNormalRnd * this.marginalCostOfDistance * link.getLength();
+
 		
-		return disutility;
-		// Example: return this.marginalCostOfTime * travelTime + logNormalRnd * this.marginalCostOfDistance * link.getLength();
+		// Intermediate solution
+//		return travelTimeDisutility + randomfactor * (distanceDisutility + infrastructureDisutility + comfortDisutility);
+
+		
+		// New disutility
+//		LOG.info("travelTimeDisutility = " + travelTimeDisutility + " -- distanceDisutility = " + distanceDisutility + " -- streettypeDisutility = "
+//				+ infrastructureDisutility + " -- surfaceDisutility = " + comfortDisutility + " -- randomfactor = " + logNormalRnd);
+//		return travelTimeDisutility + logNormalRnd * (distanceDisutility + infrastructureDisutility + comfortDisutility);		
 	}
 	
 	
