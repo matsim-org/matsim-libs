@@ -11,10 +11,10 @@ import java.util.Properties;
 
 //TODO comment this file
 /** @author Claudio Ruch */
-public enum DefaultOptions {
+public enum ScenarioOptions {
     ;
-    
-    public static final String OPTIONSFILENAME = "IDSCOptions.properties";
+
+    private static final String OPTIONSFILENAME = "IDSCOptions.properties";
 
     public static Properties getDefault() {
         Properties returnP = new Properties();
@@ -24,12 +24,10 @@ public enum DefaultOptions {
         returnP.setProperty("numVirtualNodes", "10");
         returnP.setProperty("dtTravelData", "3600");
         returnP.setProperty("completeGraph", "true");
-        returnP.setProperty("LocationSpec", "SIOUXFALLS_CITY");
         returnP.setProperty("populationeliminateFreight", "false");
         returnP.setProperty("populationeliminateWalking", "false");
         returnP.setProperty("populationchangeModeToAV", "true");
         returnP.setProperty("waitForClients", "false");
-        returnP.setProperty("ReferenceFrame", "SIOUXFALLS"); /** see (@link ReferenceFrame) class */
         returnP.setProperty("virtualNetworkDir", "virtualNetwork");
         returnP.setProperty("virtualNetworkName", "virtualNetwork");
         returnP.setProperty("travelDataName", "travelData");
@@ -42,23 +40,25 @@ public enum DefaultOptions {
 
     private static void saveProperties(Properties prop, String filename) throws IOException {
         File defaultFile = new File(filename);
-        FileOutputStream ostream = new FileOutputStream(defaultFile);
-        prop.store(ostream, "This is a sample config file.");
+        try (FileOutputStream ostream = new FileOutputStream(defaultFile)){
+            prop.store(ostream, "This is a sample config file.");            
+        }
     }
-    
-    
-    public static Properties load(File workingDirectory) throws IOException{
-        System.out.println("working in directory " + workingDirectory.getCanonicalFile());
+
+    /** @param workingDirectory with simulation data an dan IDSC.Options.properties file
+     * @return Properties object with default options and any options found in folder
+     * @throws IOException */
+    public static Properties load(File workingDirectory) throws IOException {
+        System.out.println("working in directory \n" + workingDirectory.getCanonicalFile());
 
         Properties simOptions = new Properties(getDefault());
         File simOptionsFile = new File(workingDirectory, OPTIONSFILENAME);
         if (simOptionsFile.exists()) {
             simOptions.load(new FileInputStream(simOptionsFile));
-        }else DefaultOptions.saveDefault();
+        } else
+            ScenarioOptions.saveDefault();
 
         return simOptions;
     }
-
-    
 
 }

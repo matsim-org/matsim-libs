@@ -40,12 +40,12 @@ public final class FuturePathContainer {
 
     public final VrpPathWithTravelData getVrpPathWithTravelData() {
         if (vrpPathWithTravelData == null)
-            vrpPathWithTravelData = FuturePathContainer.getRouteBlocking( //
+            vrpPathWithTravelData = getRouteBlocking( //
                     startLink, destLink, startTime, leastCostPathFuture, travelTime);
         return vrpPathWithTravelData;
     }
 
-    static VrpPathWithTravelData getRouteBlocking(Link startLink, Link destLink, double startTime, LeastCostPathFuture leastCostPathFuture, TravelTime travelTime) {
+    private static VrpPathWithTravelData getRouteBlocking(Link startLink, Link destLink, double startTime, LeastCostPathFuture leastCostPathFuture, TravelTime travelTime) {
         try {
             Thread.sleep(0, 100000);
             while (!leastCostPathFuture.isDone())

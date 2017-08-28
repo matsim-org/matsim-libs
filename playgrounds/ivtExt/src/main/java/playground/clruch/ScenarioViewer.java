@@ -26,7 +26,7 @@ public class ScenarioViewer {
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
         File workingDirectory = new File("").getCanonicalFile();
-        Properties simOptions = DefaultOptions.load(workingDirectory);        
+        Properties simOptions = ScenarioOptions.load(workingDirectory);        
 
         ReferenceFrame referenceFrame = ReferenceFrame.fromString(//
                 simOptions.getProperty("ReferenceFrame"));

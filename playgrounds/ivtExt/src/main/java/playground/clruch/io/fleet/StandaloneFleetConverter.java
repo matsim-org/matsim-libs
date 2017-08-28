@@ -18,7 +18,7 @@ enum StandaloneFleetConverter {
 		// extract from csv file
 		CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);
 		reader.populate(file);
-		Network network = NetworkLoader.loadNetwork(args);
+		Network network = NetworkLoader.loadNetwork(new File(args[0]));
 		MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
 		// generate sim objects and store
 		SimulationFleetDump.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE);

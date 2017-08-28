@@ -3,7 +3,7 @@ package playground.clruch.io.fleet;
 
 import org.matsim.api.core.v01.Coord;
 
-import playground.clruch.export.AVStatus;
+import playground.clruch.dispatcher.core.AVStatus;
 
 class TaxiStamp {
 	public AVStatus avStatus;

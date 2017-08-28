@@ -89,28 +89,22 @@ public class OnlineDriveTaskTrackerImpl // jan made this public
         double predictedNextLinkExitTime = predictLinkExitTime() + nextLinkTT;
         return new LinkTimePair(path.getLink(currentLinkIdx + 1), predictedNextLinkExitTime);
     }
-    
-    
-    
-    
+
     /** @author Claudio Ruch
      * @return */
     public LinkTimePair getSafeDiversionPoint() {
-        if(getDiversionPoint()!= null) return getDiversionPoint();
-        else return getPathEndDiversionPoint();
+        if (getDiversionPoint() != null)
+            return getDiversionPoint();
+        return getPathEndDiversionPoint();
     }
 
-        
-    /**
-     * @author Claudio Ruch
-     * @return diversion point at end of path
-     */
-    private LinkTimePair getPathEndDiversionPoint(){
-        return new LinkTimePair(path.getToLink(), predictLinkExitTime());        
+    /** @author Claudio Ruch
+     * @return diversion point at end of path */
+    private LinkTimePair getPathEndDiversionPoint() {
+        return new LinkTimePair(path.getToLink(), predictLinkExitTime());
     }
 
-
-
+    @Override
     public void divertPath(VrpPathWithTravelData newSubPath) {
         LinkTimePair diversionPoint = getDiversionPoint(); // FIXME this may return null but is not handled here
 

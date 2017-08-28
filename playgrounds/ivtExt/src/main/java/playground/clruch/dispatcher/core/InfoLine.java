@@ -5,6 +5,8 @@ package playground.clruch.dispatcher.core;
 
 /** @author Claudio Ruch */
 public class InfoLine {
+
+    private static final int COMPARELENGTH = 16;
     /** positive values determine the period, negative values or 0 will disable the printout */
     private int infoLinePeriod = 0;
     private String previousInfoMarker = "";
@@ -26,7 +28,7 @@ public class InfoLine {
     /* package */ void updateInfoLine(String infoLine, double now) {
 
         if (0 < infoLinePeriod && Math.round(now) % infoLinePeriod == 0) {
-            String marker = infoLine.substring(16);
+            String marker = infoLine.substring(COMPARELENGTH);
             if (!marker.equals(previousInfoMarker)) {
                 previousInfoMarker = marker;
                 System.out.println(infoLine);

@@ -18,6 +18,7 @@ import org.jdom.output.XMLOutputter;
 /**
  * Created by Claudio on 1/26/2017.
  */
+
 abstract class AbstractEventXML<Type> {
     String xmlTitle;
     String L1ElName;

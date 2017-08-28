@@ -7,10 +7,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.path.VrpPath;
 
-/**
- * print out links and nodes
- */
-public class VrpPathUtils {
+/** print out links and nodes */
+public enum VrpPathUtils {
+    ;
     public static double getDistance(VrpPath vrpPath) {
         double distance = 0;
         for (Link link : vrpPath)

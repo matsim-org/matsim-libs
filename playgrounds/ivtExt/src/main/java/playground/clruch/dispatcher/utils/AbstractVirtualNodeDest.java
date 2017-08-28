@@ -11,17 +11,14 @@ import playground.clruch.netdata.VirtualNode;
 public abstract class AbstractVirtualNodeDest {
     public abstract List<Link> selectLinkSet(VirtualNode virtualNode, int size);
 
-    /**
-     *
-     * @param vNode
+    /** @param vNode
      * @param endNode
-     * @return a single node according to the strategy of selectLinkSet
-     */
-    public Node virtualToReal(VirtualNode vNode, boolean endNode) {
+     * @return a single node according to the strategy of selectLinkSet */
+    public final Node virtualToReal(VirtualNode vNode, boolean endNode) {
         if (endNode)
-            return this.selectLinkSet(vNode, 1).get(0).getToNode();
-        return this.selectLinkSet(vNode, 1).get(0).getFromNode();
+            return selectLinkSet(vNode, 1).get(0).getToNode();
+        return selectLinkSet(vNode, 1).get(0).getFromNode();
     }
-    
+
     // maybe insert option to treat case of local=within node behaviour
 }

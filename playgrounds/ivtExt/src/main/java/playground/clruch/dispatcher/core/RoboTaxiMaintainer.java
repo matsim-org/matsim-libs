@@ -30,7 +30,7 @@ import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-/** The purpose of VehicleMaintainer is to register {@link AVVehicle} and provide the collection of
+/** The purpose of RoboTaxiMaintainer is to register {@link AVVehicle} and provide the collection of
  * available vehicles to derived class.
  * <p>
  * manages assignments of {@link AbstractDirective} to {@link AVVehicle}s. path computations
