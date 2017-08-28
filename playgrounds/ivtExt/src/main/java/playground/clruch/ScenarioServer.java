@@ -53,7 +53,7 @@ public class ScenarioServer {
     public static void main(String[] args) throws MalformedURLException, Exception {
 
         File workingDirectory = new File("").getCanonicalFile();
-        Properties simOptions = DefaultOptions.load(workingDirectory);
+        Properties simOptions = ScenarioOptions.load(workingDirectory);
 
         // set to true in order to make server wait for at least 1 client, for instance viewer client
         boolean waitForClients = Boolean.valueOf(simOptions.getProperty("waitForClients"));

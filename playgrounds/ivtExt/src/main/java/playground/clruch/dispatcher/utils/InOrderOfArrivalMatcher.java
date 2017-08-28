@@ -24,7 +24,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
  * more available cars at a link, or no more requests. customers who have waited longer are picked
  * up first.
  */
-public class InOrderOfArrivalMatcher extends AbstractVehicleRequestMatcher {
+public class InOrderOfArrivalMatcher implements AbstractVehicleRequestMatcher {
     final BiConsumer<AVVehicle, AVRequest> biConsumer;
 
     public InOrderOfArrivalMatcher(BiConsumer<AVVehicle, AVRequest> biConsumer) {

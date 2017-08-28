@@ -6,15 +6,15 @@ import java.util.Properties;
 
 import org.matsim.api.core.v01.network.Network;
 
-import playground.clruch.DefaultOptions;
+import playground.clruch.ScenarioOptions;
 import playground.clruch.utils.GlobalAssert;
 
 public enum VirtualNetworkGet {
     ;
 
     public static VirtualNetwork readDefault(Network network) {
-        Properties simOptions = DefaultOptions.getDefault();
-        final File virtualnetworkFile = new File(simOptions.getProperty("virtualNetworkDir") + "/" + //
+        Properties simOptions = ScenarioOptions.getDefault();
+        final File virtualnetworkFile = new File(simOptions.getProperty("virtualNetworkDir"), //
                 simOptions.getProperty("virtualNetworkName"));
         System.out.println("reading network from" + virtualnetworkFile.getAbsoluteFile());
         GlobalAssert.that(virtualnetworkFile.exists());

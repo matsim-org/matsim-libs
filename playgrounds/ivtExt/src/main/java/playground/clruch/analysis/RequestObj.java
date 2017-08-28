@@ -14,10 +14,10 @@ public class RequestObj {
     public Link fromLink;
     public Link toLink;
 
-    public RequestObj(double submissionTimIn, Link fromLinkIn, Link toLinkIn) {
-        submissionTime = submissionTimIn;
-        fromLink = fromLinkIn;
-        toLink = toLinkIn;
+    public RequestObj(double submissionTime, Link fromLink, Link toLink) {
+        this.submissionTime = submissionTime;
+        this.fromLink = fromLink;
+        this.toLink = toLink;
     }
 
 }

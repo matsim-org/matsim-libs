@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.network.Link;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
-public abstract class AbstractVehicleRequestMatcher {
-    public abstract int match(Map<Link, Queue<AVVehicle>> stayVehicles, Map<Link, List<AVRequest>> requestsAtLinks);
+public interface AbstractVehicleRequestMatcher {
+    int match(Map<Link, Queue<AVVehicle>> stayVehicles, Map<Link, List<AVRequest>> requestsAtLinks);
 
 }

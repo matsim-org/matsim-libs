@@ -2,6 +2,7 @@
 // refactoring, API change by @author clruch
 package playground.clruch.dispatcher.core;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -84,12 +85,9 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
      * 
      * @param status {@AVStatus} of desired robotaxis, e.g., STAY,DRIVETOCUSTOMER,...
      * @return list of robotaxis which are in {@AVStatus} status */
-    public final List<RoboTaxi> getRoboTaxiSubset(AVStatus... status) {
-        Set<AVStatus> enumSet = EnumSet.noneOf(AVStatus.class);
-        for (AVStatus s : status)
-            enumSet.add(s);
-        return getRoboTaxiSubset(enumSet);
-    }
+    public final List<RoboTaxi> getRoboTaxiSubset(AVStatus... status) {   
+        return getRoboTaxiSubset(EnumSet.copyOf(Arrays.asList(status)));
+    }    
 
     private List<RoboTaxi> getRoboTaxiSubset(Set<AVStatus> status) {
         return getRoboTaxis().stream().filter(rt -> status.contains(rt.getAVStatus())).collect(Collectors.toList());

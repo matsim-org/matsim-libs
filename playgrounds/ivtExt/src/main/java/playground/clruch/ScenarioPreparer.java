@@ -37,6 +37,7 @@ import playground.clruch.utils.GlobalAssert;
  * @author clruch */
 public class ScenarioPreparer {
 
+    // TODO load these from String
     private final static String VIRTUALNETWORKFOLDERNAME = "virtualNetwork";
     private final static String VIRTUALNETWORKFILENAME = "virtualNetwork";
     private final static String MINIMUMFLEETSIZEFILENAME = "minimumFleetSizeCalculator";
@@ -52,13 +53,13 @@ public class ScenarioPreparer {
     public static void run(String[] args) throws MalformedURLException, Exception {
 
         File workingDirectory = new File("").getCanonicalFile();
-        Properties simOptions = DefaultOptions.load(workingDirectory);        
+        Properties simOptions = ScenarioOptions.load(workingDirectory);        
 
 
         File configFile = new File(workingDirectory, simOptions.getProperty("fullConfig"));
         System.out.println("loading config file to get data " + configFile.getAbsoluteFile());        
 
-        
+        // TODO wrap properties with new class, class contains function getBoolean... 
         boolean populationeliminateFreight = Boolean.valueOf(simOptions.getProperty("populationeliminateFreight"));
         boolean populationeliminateWalking = Boolean.valueOf(simOptions.getProperty("populationeliminateWalking"));
         boolean populationchangeModeToAV = Boolean.valueOf(simOptions.getProperty("populationchangeModeToAV"));

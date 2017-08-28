@@ -16,7 +16,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.tensor.Tensor;
-import playground.clruch.DefaultOptions;
+import playground.clruch.ScenarioOptions;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeGet;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
@@ -56,7 +56,7 @@ public enum ScenarioParameters {
         Properties simOptions = null;
         try {
             workingDirectory = new File("").getCanonicalFile();
-            simOptions = DefaultOptions.load(workingDirectory);
+            simOptions = ScenarioOptions.load(workingDirectory);
         } catch (IOException e) {
             e.printStackTrace();
         }

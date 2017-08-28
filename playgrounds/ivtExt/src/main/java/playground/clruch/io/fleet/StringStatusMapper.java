@@ -1,6 +1,6 @@
 package playground.clruch.io.fleet;
 
-import playground.clruch.export.AVStatus;
+import playground.clruch.dispatcher.core.AVStatus;
 
 public enum StringStatusMapper {
 	;
