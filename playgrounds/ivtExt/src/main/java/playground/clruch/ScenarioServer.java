@@ -2,7 +2,6 @@ package playground.clruch;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.util.Properties;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -35,37 +34,33 @@ import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
 import playground.clruch.trb18.traveltime.reloading.WriteTravelTimesModule;
 import playground.clruch.utils.GlobalAssert;
+import playground.clruch.utils.PropertiesExt;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 
-/** main entry point
- * 
- * only one ScenarioServer can run at one time, since a fixed network port is reserved to serve the
- * simulation status
- * 
- * if you wish to run multiple simulations at the same time use for instance
- * {@link RunAVScenario} */
+/** only one ScenarioServer can run at one time, since a fixed network port is reserved to serve the
+ * simulation status */
 public class ScenarioServer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
-
+        // load options
         File workingDirectory = new File("").getCanonicalFile();
-        Properties simOptions = ScenarioOptions.load(workingDirectory);
+        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
 
-        // set to true in order to make server wait for at least 1 client, for instance viewer client
-        boolean waitForClients = Boolean.valueOf(simOptions.getProperty("waitForClients"));
+        /** set to true in order to make server wait for at least 1 client, for instance viewer client */
+        boolean waitForClients = simOptions.getBoolean("waitForClients");
+        File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
+        ReferenceFrame referenceFrame = simOptions.getReferenceFrame();
 
         // open server port for clients to connect to
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
         SimulationServer.INSTANCE.setWaitForClients(waitForClients);
 
         // load MATSim configs
-        File configFile = new File(workingDirectory, simOptions.getProperty("simuConfig"));
         System.out.println("loading config file " + configFile.getAbsoluteFile());
-
         GlobalAssert.that(configFile.exists());
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
@@ -77,8 +72,8 @@ public class ScenarioServer {
         Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();
         GlobalAssert.that(scenario != null && network != null && population != null);
-        
-        MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.fromString(simOptions.getProperty("ReferenceFrame")));
+
+        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
@@ -100,7 +95,7 @@ public class ScenarioServer {
         SimulationServer.INSTANCE.stopAccepting();
 
         // perform analysis of results
-        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(new File(simOptions.getProperty("simuConfig")));
+        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(configFile);
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
@@ -112,12 +107,12 @@ public class ScenarioServer {
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
-        DataCollector.store(new File(simOptions.getProperty("simuConfig")), controler, //
+        DataCollector.store(configFile, controler, //
                 minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
                 analyzeSummary, network, population, travelData);
 
         // generate report
-        ReportGenerator.from(new File(simOptions.getProperty("simuConfig")));
+        ReportGenerator.from(configFile);
 
     }
 }

@@ -13,7 +13,8 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.clruch.export.EventFileToProcessingXML;
+// TODO we don't use XML anymore, update or delete this file plz
+//import playground.clruch.export.EventFileToProcessingXML;
 import playground.clruch.prep.TheApocalypse;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
@@ -21,10 +22,7 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 
 import playground.joel.data.EventFileToDataXML;
 
-
-/**
- * main entry point
- */
+/** main entry point */
 public class RunAVScenario {
     public static void main(String[] args) throws MalformedURLException {
         File configFile = new File("C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_03_22_Sioux_Hungarian_check1av/av_config.xml");
@@ -46,8 +44,8 @@ public class RunAVScenario {
 
         controler.run();
 
-        EventFileToProcessingXML.convert(dir);
+        // TODO we don't use XML anymore, update or delete this file plz
+        // EventFileToProcessingXML.convert(dir);
         EventFileToDataXML.convert(dir);
     }
 }
-
