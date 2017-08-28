@@ -3,7 +3,6 @@ package playground.clruch;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Properties;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -30,6 +29,7 @@ import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
 import playground.clruch.utils.GZHandler;
 import playground.clruch.utils.GlobalAssert;
+import playground.clruch.utils.PropertiesExt;
 
 /** Class to prepare a given scenario for MATSim, includes preparation of netowrk, population, creation of virtualNetwork
  * and travelData objects.
@@ -37,12 +37,6 @@ import playground.clruch.utils.GlobalAssert;
  * @author clruch */
 public class ScenarioPreparer {
 
-    // TODO load these from String
-    private final static String VIRTUALNETWORKFOLDERNAME = "virtualNetwork";
-    private final static String VIRTUALNETWORKFILENAME = "virtualNetwork";
-    private final static String MINIMUMFLEETSIZEFILENAME = "minimumFleetSizeCalculator";
-    private final static String PERFORMANCEFLEETSIZEFILENAME = "performanceFleetSizeCalculator";
-    private final static String TRAVELDATAFILENAME = "travelData";
     private final static String NETWORKUPDATEDNAME = "networkConverted";
     private final static String POPULATIONUPDATEDNAME = "populationConverted";
 
@@ -52,22 +46,27 @@ public class ScenarioPreparer {
 
     public static void run(String[] args) throws MalformedURLException, Exception {
 
+        // load options
         File workingDirectory = new File("").getCanonicalFile();
-        Properties simOptions = ScenarioOptions.load(workingDirectory);        
+        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
 
+        File configFile = new File(workingDirectory, simOptions.getString("fullConfig"));
+        System.out.println("loading config file to get data " + configFile.getAbsoluteFile());
 
-        File configFile = new File(workingDirectory, simOptions.getProperty("fullConfig"));
-        System.out.println("loading config file to get data " + configFile.getAbsoluteFile());        
-
-        // TODO wrap properties with new class, class contains function getBoolean... 
-        boolean populationeliminateFreight = Boolean.valueOf(simOptions.getProperty("populationeliminateFreight"));
-        boolean populationeliminateWalking = Boolean.valueOf(simOptions.getProperty("populationeliminateWalking"));
-        boolean populationchangeModeToAV = Boolean.valueOf(simOptions.getProperty("populationchangeModeToAV"));
-        LocationSpec ls = LocationSpec.fromString(simOptions.getProperty("LocationSpec")); 
-        int numVirtualNodes = Integer.valueOf(simOptions.getProperty("numVirtualNodes"));
-        boolean completeGraph = Boolean.valueOf(simOptions.getProperty("completeGraph"));
-        int maxPopulationSize = Integer.valueOf(simOptions.getProperty("maxPopulationSize"));
-        int dtTravelData = Integer.valueOf(simOptions.getProperty("dtTravelData"));
+        // TODO wrap properties with new class, class contains function getBoolean...
+        boolean populationeliminateFreight = simOptions.getBoolean("populationeliminateFreight");
+        boolean populationeliminateWalking = simOptions.getBoolean("populationeliminateWalking");
+        boolean populationchangeModeToAV = simOptions.getBoolean("populationchangeModeToAV");
+        LocationSpec ls = simOptions.getLocationSpec();
+        int numVirtualNodes = simOptions.getInt("numVirtualNodes");
+        boolean completeGraph = simOptions.getBoolean("completeGraph");
+        int maxPopulationSize = simOptions.getInt("maxPopulationSize");
+        int dtTravelData = simOptions.getInt("dtTravelData");
+        String VIRTUALNETWORKFOLDERNAME = simOptions.getString("virtualNetworkDir");
+        String VIRTUALNETWORKFILENAME = simOptions.getString("virtualNetworkName");
+        String TRAVELDATAFILENAME = simOptions.getString("travelDataName");
+        String MINIMUMFLEETSIZEFILENAME = simOptions.getString("minimumFleetSizeFileName");
+        String PERFORMANCEFLEETSIZEFILENAME = simOptions.getString("performanceFleetSizeFileName");
 
         // 0) load files
         Config config = ConfigUtils.loadConfig(configFile.toString());
@@ -91,7 +90,7 @@ public class ScenarioPreparer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("saved converted network to: " +workingDirectory + NETWORKUPDATEDNAME + ".xml");
+            System.out.println("saved converted network to: " + workingDirectory + NETWORKUPDATEDNAME + ".xml");
         }
 
         {// 2) adapt the population to new network

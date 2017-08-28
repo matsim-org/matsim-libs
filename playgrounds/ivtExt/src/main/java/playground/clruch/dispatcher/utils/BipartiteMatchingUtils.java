@@ -1,39 +1,39 @@
-package playground.clruch.dispatcher.core;
+package playground.clruch.dispatcher.utils;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
-import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
+import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.simonton.Cluster;
 import playground.clruch.simonton.EuclideanDistancer;
 import playground.clruch.simonton.MyTree;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
-// TODO move this out of core
+
 public enum BipartiteMatchingUtils {
     ;
 
-    public static Tensor executePickup(UniversalDispatcher dispatcher, Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests) {
+    public static Tensor executePickup(BiConsumer<RoboTaxi, AVRequest> setFunction, Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests) {
         Tensor infoLine = Tensors.empty();
         Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(roboTaxis, requests, infoLine);
         for (Entry<RoboTaxi, AVRequest> entry : gbpMatch.entrySet()) {
-            dispatcher.setRoboTaxiPickup(entry.getKey(), entry.getValue());
+            setFunction.accept(entry.getKey(), entry.getValue());
         }
         return infoLine;
     }
 
-    public static Tensor executeRebalance(RebalancingDispatcher dispatcher, Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests) {
+    public static Tensor executeRebalance(BiConsumer<RoboTaxi, Link> setFunction, Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests) {
         Tensor infoLine = Tensors.empty();
         Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(roboTaxis, requests, infoLine);
         for (Entry<RoboTaxi, AVRequest> entry : gbpMatch.entrySet()) {
-            dispatcher.setRoboTaxiRebalance(entry.getKey(), entry.getValue().getFromLink());
+            setFunction.accept(entry.getKey(), entry.getValue().getFromLink());
         }
         return infoLine;
     }
@@ -51,8 +51,8 @@ public enum BipartiteMatchingUtils {
 
         // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method and
         // set new pickup commands
-        infoLine.append(Tensors.vectorInt(roboTaxisReduced.size(), requestsReduced.size())); // initial problem  size
-        
+        infoLine.append(Tensors.vectorInt(roboTaxisReduced.size(), requestsReduced.size())); // initial problem size
+
         return ((new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction())).matchAVRequest(roboTaxisReduced, requestsReduced)); //
 
     }
