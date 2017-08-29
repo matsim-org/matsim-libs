@@ -53,21 +53,21 @@ public class ScenarioPreparer {
     public static void run(String[] args) throws MalformedURLException, Exception {
 
         File workingDirectory = new File("").getCanonicalFile();
-        Properties simOptions = ScenarioOptions.load(workingDirectory);        
-
+        Properties simOptions = ScenarioOptions.load(workingDirectory);
 
         File configFile = new File(workingDirectory, simOptions.getProperty("fullConfig"));
-        System.out.println("loading config file to get data " + configFile.getAbsoluteFile());        
+        System.out.println("loading config file to get data " + configFile.getAbsoluteFile());
 
-        // TODO wrap properties with new class, class contains function getBoolean... 
+        // TODO wrap properties with new class, class contains function getBoolean...
         boolean populationeliminateFreight = Boolean.valueOf(simOptions.getProperty("populationeliminateFreight"));
         boolean populationeliminateWalking = Boolean.valueOf(simOptions.getProperty("populationeliminateWalking"));
         boolean populationchangeModeToAV = Boolean.valueOf(simOptions.getProperty("populationchangeModeToAV"));
-        LocationSpec ls = LocationSpec.fromString(simOptions.getProperty("LocationSpec")); 
+        LocationSpec ls = LocationSpec.fromString(simOptions.getProperty("LocationSpec"));
         int numVirtualNodes = Integer.valueOf(simOptions.getProperty("numVirtualNodes"));
         boolean completeGraph = Boolean.valueOf(simOptions.getProperty("completeGraph"));
         int maxPopulationSize = Integer.valueOf(simOptions.getProperty("maxPopulationSize"));
         int dtTravelData = Integer.valueOf(simOptions.getProperty("dtTravelData"));
+        boolean calculatePerformanceFleetSize = Boolean.valueOf(simOptions.getProperty("calculatePerformanceFleetSize"));
 
         // 0) load files
         Config config = ConfigUtils.loadConfig(configFile.toString());
@@ -91,7 +91,7 @@ public class ScenarioPreparer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("saved converted network to: " +workingDirectory + NETWORKUPDATEDNAME + ".xml");
+            System.out.println("saved converted network to: " + workingDirectory + NETWORKUPDATEDNAME + ".xml");
         }
 
         {// 2) adapt the population to new network
@@ -149,13 +149,13 @@ public class ScenarioPreparer {
             MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, population, virtualNetwork, travelData);
             MinimumFleetSizeIO.toByte(new File(vnDir, MINIMUMFLEETSIZEFILENAME), minimumFleetSizeCalculator);
 
-            int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
-            PerformanceFleetSizeCalculator performanceFleetSizeCalculator = //
-                    new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberVehiclesPerformanceCalculator);
-            PerformanceFleetSizeIO.toByte(new File(vnDir, PERFORMANCEFLEETSIZEFILENAME), performanceFleetSizeCalculator);
-
+            if (calculatePerformanceFleetSize) {
+                int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
+                PerformanceFleetSizeCalculator performanceFleetSizeCalculator = //
+                        new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberVehiclesPerformanceCalculator);
+                PerformanceFleetSizeIO.toByte(new File(vnDir, PERFORMANCEFLEETSIZEFILENAME), performanceFleetSizeCalculator);
+            }
         }
-
         System.out.println("successfully converted simulation data files from in " + workingDirectory);
     }
 }

@@ -20,7 +20,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.AnalyzeSummary;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
+import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeGet;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
+import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeGet;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.html.DataCollector;
 import playground.clruch.html.ReportGenerator;
@@ -50,7 +52,6 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
  * if you wish to run multiple simulations at the same time use for instance {@link RunAVScenario} */
 public class TrbScenarioServer {
 
-
     public static void main(String[] args) throws MalformedURLException, Exception {
 
         // BEGIN: CUSTOMIZE -----------------------------------------------
@@ -68,7 +69,6 @@ public class TrbScenarioServer {
 
         File configFile = new File(args[0]);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
-
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
@@ -130,21 +130,25 @@ public class TrbScenarioServer {
 
         AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(new File(args[0]));
         VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
-        TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
-        MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
-        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
         int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
         int vehicleSteps = Math.max(10, maxNumberVehiclesPerformanceCalculator / 400);
 
+        MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
+        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
+        TravelData travelData = null;
         if (virtualNetwork != null) {
-            minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, population, virtualNetwork, travelData);
-            performanceFleetSizeCalculator = new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberVehiclesPerformanceCalculator);
+            minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
+            performanceFleetSizeCalculator = PerformanceFleetSizeGet.readDefault();
+            if (performanceFleetSizeCalculator != null)
+                performanceFleetSizeCalculator.saveAndPlot();
+            travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
-        DataCollector.store(configFile, controler, minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
-                analyzeSummary, network, population, travelData);
+        DataCollector.store(new File(args[0]), controler, //
+                minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
 
-        ReportGenerator.from(configFile);
+        // generate report
+        ReportGenerator.from(new File(args[0]));
 
     }
 }

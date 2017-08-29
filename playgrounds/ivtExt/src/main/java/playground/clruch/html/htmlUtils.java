@@ -7,10 +7,11 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
+import java.util.Properties;
 
-/**
- * Created by Joel on 26.06.2017.
- */
+import playground.clruch.ScenarioOptions;
+
+/** Created by Joel on 26.06.2017. */
 public abstract class htmlUtils {
     public static StringBuilder stringBuilder = new StringBuilder();
     public static boolean html = false;
@@ -21,13 +22,14 @@ public abstract class htmlUtils {
     public static boolean footer = false;
     public static boolean style = false;
 
-    /**
-     * called at the begin and end of document
-     */
+    /** called at the begin and end of document */
     public static void html() {
-        if (html) {stringBuilder.append("</html>"); html = false;}
-        else {
-            stringBuilder.append("<html>"); html = true;
+        if (html) {
+            stringBuilder.append("</html>");
+            html = false;
+        } else {
+            stringBuilder.append("<html>");
+            html = true;
             htmlUtils.insertCSS("header, footer {font-family: arial;", //
                     "background-color: #000099;", //
                     "color: white;", //
@@ -38,79 +40,92 @@ public abstract class htmlUtils {
                     "font-size: 16px;", //
                     "line-height: 1.75;}", //
                     "img {padding: 5px;}", //
-                    "#footer_link {color: white;}"
-            );
+                    "#footer_link {color: white;}");
         }
     }
 
-    /**
-     * called at the begin and end of head
-     */
+    /** called at the begin and end of head */
     public static void head() {
-        if (head) {stringBuilder.append("</head>"); head = false;}
-        else {stringBuilder.append("<head>"); head = true;}
+        if (head) {
+            stringBuilder.append("</head>");
+            head = false;
+        } else {
+            stringBuilder.append("<head>");
+            head = true;
+        }
     }
 
-    /**
-     * called at the begin and end of header
-     */
+    /** called at the begin and end of header */
     public static void header() {
-        if (header) {stringBuilder.append("</header>"); header = false;}
-        else {stringBuilder.append("<header>"); header = true;}
+        if (header) {
+            stringBuilder.append("</header>");
+            header = false;
+        } else {
+            stringBuilder.append("<header>");
+            header = true;
+        }
     }
 
-    /**
-     * called at the begin and end of document
-     */
+    /** called at the begin and end of document */
     public static void body() {
-        if (body) {stringBuilder.append("</body>"); body = false;}
-        else {stringBuilder.append("<body>"); body = true;}
+        if (body) {
+            stringBuilder.append("</body>");
+            body = false;
+        } else {
+            stringBuilder.append("<body>");
+            body = true;
+        }
     }
 
-    /**
-     * called at the begin and end of paragraph
-     */
+    /** called at the begin and end of paragraph */
     public static void paragraph() {
-        if (paragraph) {stringBuilder.append("</p>"); paragraph = false;}
-        else {stringBuilder.append("<p>"); paragraph = true;}
+        if (paragraph) {
+            stringBuilder.append("</p>");
+            paragraph = false;
+        } else {
+            stringBuilder.append("<p>");
+            paragraph = true;
+        }
     }
 
     public static void newLine() {
         stringBuilder.append("<br style=\"clear:both\">");
     }
 
-    /**
-     * called at the begin and end of footer
-     */
+    /** called at the begin and end of footer */
     public static void footer() {
-        if (footer) {stringBuilder.append("</footer>"); header = false;}
-        else {stringBuilder.append("<footer>"); footer = true;}
+        if (footer) {
+            stringBuilder.append("</footer>");
+            header = false;
+        } else {
+            stringBuilder.append("<footer>");
+            footer = true;
+        }
     }
 
-    /**
-     * called at the begin and end of CSS
-     */
+    /** called at the begin and end of CSS */
     public static void style() {
-        if (style) {stringBuilder.append("</style>"); style = false;}
-        else {stringBuilder.append("<style>"); style = true;}
+        if (style) {
+            stringBuilder.append("</style>");
+            style = false;
+        } else {
+            stringBuilder.append("<style>");
+            style = true;
+        }
     }
 
-    /**
-     * tab title
+    /** tab title
      *
-     * @param title
-     */
+     * @param title */
     public static void setTitle(String title) {
         head();
         stringBuilder.append("<title>" + title + "</title>");
         head();
     }
 
-    /**
-     * page title
+    /** page title
      *
-     * @param title
-     */
+     * @param title */
     public static void insertTitle(String title) {
         header();
         stringBuilder.append("<h1>" + title + "</h1>");
@@ -147,9 +162,10 @@ public abstract class htmlUtils {
 
     public static void insertLink(String url, String link) {
         htmlUtils.insertCSS("a {font-family: arial;}");
-        if (footer || header) stringBuilder.append("<a id=\"footer_link\" target=\"_blank\"" +
-                " href=\"" + url + "\"> <b>" + link + "</b></a>");
-        else stringBuilder.append("<a target=\"_blank\" href=\"" + url + "\"> <b>" + link + "</b></a>");
+        if (footer || header)
+            stringBuilder.append("<a id=\"footer_link\" target=\"_blank\"" + " href=\"" + url + "\"> <b>" + link + "</b></a>");
+        else
+            stringBuilder.append("<a target=\"_blank\" href=\"" + url + "\"> <b>" + link + "</b></a>");
     }
 
     public static void insertCSS(String... line) {
@@ -170,30 +186,44 @@ public abstract class htmlUtils {
                 width + "px;height:" + heigth + "px;\">");
     }
 
+    public static void insertImgIfExists(String relPath, String reportLoc, int width, int heigth) {
+
+        File imgFile = new File(reportLoc,relPath);
+        System.out.println("relative Path = "  + relPath);
+        System.out.println("searching for file " + imgFile.getAbsolutePath());
+        if (imgFile.exists()) {
+            stringBuilder.append("<img src=" + relPath + " alt=\"Image not found\" style=\"width:" + //
+                    width + "px;height:" + heigth + "px;\">");
+        }
+        else System.out.println("file "+ imgFile.getAbsolutePath() + " not found.");
+    }
+
     public static void insertImgRight(String relPath, int width, int heigth) {
         stringBuilder.append("<img id=\"img_right\" float=\"right\" src=" + relPath + " " + //
                 "alt=\"Image not found\" style=\"width:" + width + "px;height:" + heigth + "px;\">");
     }
 
-    /**
-     * first elements are automatically set as headings
+    /** first elements are automatically set as headings
      *
      * @param columns
      * @param rows
      * @param borders
-     * @param content
-     */
+     * @param content */
     public static void insertTable(int columns, int rows, boolean borders, String... content) {
-        if (content.length != columns*rows) stringBuilder.append("unable to create table");
+        if (content.length != columns * rows)
+            stringBuilder.append("unable to create table");
         else {
-            if (borders) insertCSS("th, td {border: 1px solid black;}");
+            if (borders)
+                insertCSS("th, td {border: 1px solid black;}");
             insertCSS("th, td {padding: 5px; margin: 5px}");
             stringBuilder.append("<table style=\"border-collapse: collapse;\">");
             for (int i = 0; i < rows; i++) {
                 stringBuilder.append("<tr>");
                 for (int j = 0; j < columns; j++) {
-                    if (i == 0) stringBuilder.append("<th>" + content[j] + "</th>");
-                    else stringBuilder.append("<td>" + content[i*columns + j] + "</td>");
+                    if (i == 0)
+                        stringBuilder.append("<th>" + content[j] + "</th>");
+                    else
+                        stringBuilder.append("<td>" + content[i * columns + j] + "</td>");
                 }
                 stringBuilder.append("</tr>");
             }
@@ -217,7 +247,7 @@ public abstract class htmlUtils {
         // if file does exists, then delete and create a new file
         Files.deleteIfExists(file.toPath());
 
-        //write to file with OutputStreamWriter
+        // write to file with OutputStreamWriter
         OutputStream outputStream = new FileOutputStream(file.getAbsoluteFile());
         Writer writer = new OutputStreamWriter(outputStream);
         writer.write(stringBuilder.toString());

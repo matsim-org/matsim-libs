@@ -28,7 +28,6 @@ public class DataCollector {
 
     public static void store(File configFile, Controler controler, //
             MinimumFleetSizeCalculator minimumFleetSizeCalculator, //
-            PerformanceFleetSizeCalculator performanceFleetSizeCalculator, //
             AnalyzeSummary analyzeSummaryIn, //
             Network network, Population population, TravelData travelData) throws Exception {
 
@@ -38,7 +37,6 @@ public class DataCollector {
         readStopwatch(configFile);
 
         minimumFleetSizeCalculator.plot();
-        performanceFleetSizeCalculator.saveAndPlot();
 
         LeastCostPathCalculator dijkstra = EasyDijkstra.prepDijkstra(network);
         new TripDistances(dijkstra, travelData, population, network);
