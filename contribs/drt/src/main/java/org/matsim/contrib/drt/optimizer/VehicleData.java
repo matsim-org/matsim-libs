@@ -102,7 +102,7 @@ public class VehicleData {
 		int idx = entries.indexOf(vEntry);// TODO inefficient! ==> use map instead of list for storing entries...
 		Entry e = createVehicleData(vEntry.vehicle);
 		if (e != null) {
-			entries.set(idx, createVehicleData(vEntry.vehicle));
+			entries.set(idx, e);
 		} else {
 			entries.remove(idx);
 		}
