@@ -57,7 +57,9 @@ public class EmptyVehicleRelocator {
 
 		if (currentLink != link) {
 			VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(currentLink, link, time, router, travelTime);
+			if (path.getArrivalTime()<vehicle.getServiceEndTime()){
 			scheduler.relocateEmptyVehicle(vehicle, path);
+			}
 		}
 	}
 }
