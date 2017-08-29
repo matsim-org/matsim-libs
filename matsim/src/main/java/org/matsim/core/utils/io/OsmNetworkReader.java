@@ -532,16 +532,12 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		// check tag "oneway"
 		String onewayTag = way.tags.get(TAG_ONEWAY);
 		if (onewayTag != null) {
-			if ("yes".equals(onewayTag)) {
+			if ("yes".equals(onewayTag) || "true".equals(onewayTag) || "1".equals(onewayTag)) {
 				oneway = true;
-			} else if ("true".equals(onewayTag)) {
-				oneway = true;
-			} else if ("1".equals(onewayTag)) {
-				oneway = true;
-			} else if ("-1".equals(onewayTag)) {
+			} else if ("-1".equals(onewayTag) || "reverse".equals(onewayTag)) {
 				onewayReverse = true;
 				oneway = false;
-			} else if ("no".equals(onewayTag)) {
+			} else if ("no".equals(onewayTag) || "false".equals(onewayTag) || "0".equals(onewayTag)) {
 				oneway = false; // may be used to overwrite defaults
             }
 			else {
@@ -563,6 +559,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		if (maxspeedTag != null) {
 			try {
 				freespeed = Double.parseDouble(maxspeedTag) / 3.6; // convert km/h to m/s
+				// TODO In some places where mph is common, speeds are tagged as "xx mph" (note the space!); consider this here, dz, aug'17
 			} catch (NumberFormatException e) {
 				if (!this.unknownMaxspeedTags.contains(maxspeedTag)) {
 					this.unknownMaxspeedTags.add(maxspeedTag);
@@ -577,8 +574,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			try {
 				double totalNofLanes = Double.parseDouble(lanesTag);
 				if (totalNofLanes > 0) {
-					//If there is a tag "lanes:forward" or "lanes:backward" set, differ the values for both directions
-					//If not, handle lanes as usual.
+					// If the tag "lanes:forward" or "lanes:backward" is set, use them.
+					// If not, give either direction half of the total number of lanes.
 					//fzwick,nkuehnel, apr'17
 					String lanesForwardTag = way.tags.get(TAG_LANES_FORWARD);
 					if (lanesForwardTag != null) {
@@ -619,7 +616,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			}
 		}
 
-		// create the link(s)
 		double capacityForward = nofLanesForward * laneCapacity;
 		double capacityBackward = nofLanesBackward * laneCapacity;
 
@@ -639,32 +635,39 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacityForward);
 				l.setNumberOfLanes(nofLanesForward);
-				if (l instanceof Link) {
-					final String id1 = origId;
-					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
-					final String type = highway;
-					NetworkUtils.setType( ((Link) l), type);
-				}
+				NetworkUtils.setOrigId(l, origId);
+				NetworkUtils.setType(l, highway);
+				setAdditionalLinkAttributes(l, way);
 				network.addLink(l);
 				this.id++;
 			}
-			if (!oneway) {
+			if (reverseDirectionExists(oneway, way)) {
 				Link l = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
 				l.setLength(length);
 				l.setFreespeed(freespeed);
 				l.setCapacity(capacityBackward);
 				l.setNumberOfLanes(nofLanesBackward);
-				if (l instanceof Link) {
-					final String id1 = origId;
-					NetworkUtils.setOrigId( ((Link) l), id1 ) ;
-					final String type = highway;
-					NetworkUtils.setType( ((Link) l), type);
-				}
+				NetworkUtils.setOrigId(l, origId);
+				NetworkUtils.setType(l, highway);
+				setAdditionalLinkAttributes(l, way);
 				network.addLink(l);
 				this.id++;
 			}
-
 		}
+	}
+	
+	/**
+	 * Override this method if you want to add additional attributes to the link, e.g. modes
+	 */
+	protected void setAdditionalLinkAttributes(Link l, OsmWay way) {
+	}
+
+	/**
+	 * Override this method if you want to determine in a more sophisticated way if one can travel on this link
+	 * also in reverse direction.
+	 */
+	protected boolean reverseDirectionExists(boolean oneway, OsmWay way) {
+		return !oneway;
 	}
 
 	private static interface OsmFilter {
