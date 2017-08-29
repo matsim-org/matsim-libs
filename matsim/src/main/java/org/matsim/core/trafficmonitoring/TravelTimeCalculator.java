@@ -291,9 +291,15 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 		return data;
 	}
 	
-	public double getLinkTravelTime(final Id<Link> linkId, final double time) {
+	/*
+	 * Use the link as argument here! In case the DataContainer is array-based and the link is from a routing network,
+	 * the DataContainer uses the link's index to access its data structures instead of performing a map lookup, which
+	 * increases the router performance by 20-30%!
+	 * cdobler, aug'17
+	 */
+	public double getLinkTravelTime(final Link link, final double time) {
 		if (this.calculateLinkTravelTimes) {
-			DataContainer data = this.dataContainerProvider.getTravelTimeData(linkId, true);
+			DataContainer data = this.dataContainerProvider.getTravelTimeData(link, true);
 			if (data.needsConsolidation) {
 				consolidateData(data);
 			}
@@ -419,7 +425,7 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 
 			@Override
 			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-				return TravelTimeCalculator.this.getLinkTravelTime(link.getId(), time);
+				return TravelTimeCalculator.this.getLinkTravelTime(link, time);
 			}
 
 		};
