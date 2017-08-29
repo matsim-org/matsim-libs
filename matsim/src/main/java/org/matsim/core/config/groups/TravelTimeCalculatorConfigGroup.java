@@ -19,9 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
-import java.util.Locale;
 import java.util.Map;
-
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
@@ -190,7 +188,9 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 
 	@StringSetter( ANALYZEDMODES )
 	public void setAnalyzedModes(final String analyzedModes) {
-		this.analyzedModes = analyzedModes.toLowerCase(Locale.ROOT);
+//		this.analyzedModes = analyzedModes.toLowerCase(Locale.ROOT);
+		// lower case is confusing here because at other places (qsimConfigGroup, planCalcRoute), it takes mode string as it is. Amit Aug'17
+		this.analyzedModes = analyzedModes;
 	}
 
 	@StringGetter(SEPARATEMODES)
