@@ -100,7 +100,12 @@ public class VehicleData {
 
 	public void updateEntry(Entry vEntry) {
 		int idx = entries.indexOf(vEntry);// TODO inefficient! ==> use map instead of list for storing entries...
-		entries.set(idx, createVehicleData(vEntry.vehicle));
+		Entry e = createVehicleData(vEntry.vehicle);
+		if (e != null) {
+			entries.set(idx, createVehicleData(vEntry.vehicle));
+		} else {
+			entries.remove(idx);
+		}
 	}
 
 	private Entry createVehicleData(Vehicle vehicle) {
