@@ -112,7 +112,7 @@ public class Raptor implements TransitRouter {
 		double directWalkCost = getWalkDisutility(fromFacility.getCoord(), toFacility.getCoord());
 		double pathCost = p.getTravelCost();
 
-		if (directWalkCost < pathCost) {
+		if (directWalkCost * getConfig().getDirectWalkFactor() < pathCost) {
 			return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
 		}
 		return convertPathToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
