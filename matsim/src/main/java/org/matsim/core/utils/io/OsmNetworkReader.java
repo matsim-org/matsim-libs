@@ -95,7 +95,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private final Set<String> unknownMaxspeedTags = new HashSet<String>();
 	private final Set<String> unknownLanesTags = new HashSet<String>();
 	private long id = 0;
-	/*package*/ final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
+	protected final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
 	private final Network network;
 	private final CoordinateTransformation transform;
 	private boolean keepPaths = false;
@@ -519,36 +519,14 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		double laneCapacity = defaults.laneCapacity;
 		double freespeed = defaults.freespeed;
 		double freespeedFactor = defaults.freespeedFactor;
-		boolean oneway = defaults.oneway;
-		boolean onewayReverse = false;
-
-		// check if there are tags that overwrite defaults
-		// - check tag "junction"
-		if ("roundabout".equals(way.tags.get(TAG_JUNCTION))) {
-			// if "junction" is not set in tags, get() returns null and equals() evaluates to false
-			oneway = true;
-		}
-
-		// check tag "oneway"
-		String onewayTag = way.tags.get(TAG_ONEWAY);
-		if (onewayTag != null) {
-			if ("yes".equals(onewayTag) || "true".equals(onewayTag) || "1".equals(onewayTag)) {
-				oneway = true;
-			} else if ("-1".equals(onewayTag) || "reverse".equals(onewayTag)) {
-				onewayReverse = true;
-				oneway = false;
-			} else if ("no".equals(onewayTag) || "false".equals(onewayTag) || "0".equals(onewayTag)) {
-				oneway = false; // may be used to overwrite defaults
-            }
-			else {
-                log.warn("Could not interpret oneway tag:" + onewayTag + ". Ignoring it.");
-			}
-		}
+		
+		boolean oneway = isOneway(way);
+		boolean onewayReverse = isOnewayReverse(way);
 
         // In case trunks, primary and secondary roads are marked as oneway,
         // the default number of lanes should be two instead of one.
         if(highway.equalsIgnoreCase("trunk") || highway.equalsIgnoreCase("primary") || highway.equalsIgnoreCase("secondary")){
-			if((oneway) && nofLanesForward == 1.0){
+			if (oneway && nofLanesForward == 1.0) {
 				nofLanesForward = 2.0;
 			} else if(onewayReverse && nofLanesBackward == 1.0){
 				nofLanesBackward = 2.0;
@@ -629,7 +607,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		if(network.getNodes().get(fromId) != null && network.getNodes().get(toId) != null){
 			String origId = Long.toString(way.id);
 
-			if (!onewayReverse) {
+			// Forward direction (in relation to the direction of the OSM way object)
+			if (forwardDirectionExists(way)) {
 				Link l = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId), network.getNodes().get(toId));
 				l.setLength(length);
 				l.setFreespeed(freespeed);
@@ -637,11 +616,12 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setNumberOfLanes(nofLanesForward);
 				NetworkUtils.setOrigId(l, origId);
 				NetworkUtils.setType(l, highway);
-				setAdditionalLinkAttributes(l, way);
+				setAdditionalLinkAttributes(l, way, true);
 				network.addLink(l);
 				this.id++;
 			}
-			if (reverseDirectionExists(oneway, way)) {
+			// Backward/reverse direction (in relation to the direction of the OSM way object)
+			if (reverseDirectionExists(way)) {
 				Link l = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(toId), network.getNodes().get(fromId));
 				l.setLength(length);
 				l.setFreespeed(freespeed);
@@ -649,25 +629,75 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				l.setNumberOfLanes(nofLanesBackward);
 				NetworkUtils.setOrigId(l, origId);
 				NetworkUtils.setType(l, highway);
-				setAdditionalLinkAttributes(l, way);
+				setAdditionalLinkAttributes(l, way, false);
 				network.addLink(l);
 				this.id++;
 			}
 		}
 	}
 	
+	protected boolean isOneway(OsmWay way) {
+		String onewayTag = way.tags.get(TAG_ONEWAY);
+		if (onewayTag != null) {
+			if ("yes".equals(onewayTag) || "true".equals(onewayTag) || "1".equals(onewayTag)) {
+				return true;
+			} else if ("-1".equals(onewayTag) || "reverse".equals(onewayTag)) {
+				return false;
+			} else if ("no".equals(onewayTag) || "false".equals(onewayTag) || "0".equals(onewayTag)) {
+				return false; // may be used to overwrite defaults
+			}
+			else {
+				log.warn("Could not interpret oneway tag:" + onewayTag + ". Ignoring it.");
+			}
+		}
+		// If no oneway tag was found, see if it is a link in a roundabout
+		if ("roundabout".equals(way.tags.get(TAG_JUNCTION))) {
+			// if "junction" is not set in tags, get() returns null and equals() evaluates to false
+			return true;
+		}
+		// If no direction-specific tag was found, use default value
+		OsmHighwayDefaults defaults = this.highwayDefaults.get(way.tags.get(TAG_HIGHWAY));
+		return defaults.oneway;
+	}
+
+	protected boolean isOnewayReverse(OsmWay way) {
+		String onewayTag = way.tags.get(TAG_ONEWAY);
+		if (onewayTag != null) {
+			if ("yes".equals(onewayTag) || "true".equals(onewayTag) || "1".equals(onewayTag)) {
+				return false;
+			} else if ("-1".equals(onewayTag) || "reverse".equals(onewayTag)) {
+				return true;
+			} else if ("no".equals(onewayTag) || "false".equals(onewayTag) || "0".equals(onewayTag)) {
+				return false; // may be used to overwrite defaults
+			}
+			else {
+				log.warn("Could not interpret oneway tag:" + onewayTag + ". Ignoring it.");
+			}
+		}
+		// Was set like this before; rather get this from defaults like for (forward) oneway? tt, aug'17
+		return false;
+	}
+	
 	/**
-	 * Override this method if you want to add additional attributes to the link, e.g. modes
+	 * Override this method if you want to add additional attributes to the link, e.g. modes.
 	 */
-	protected void setAdditionalLinkAttributes(Link l, OsmWay way) {
+	protected void setAdditionalLinkAttributes(Link l, OsmWay way, boolean forwardDirection) {
 	}
 
 	/**
 	 * Override this method if you want to determine in a more sophisticated way if one can travel on this link
 	 * also in reverse direction.
 	 */
-	protected boolean reverseDirectionExists(boolean oneway, OsmWay way) {
-		return !oneway;
+	protected boolean reverseDirectionExists(OsmWay way) {
+		return !isOneway(way);
+	}
+	
+	/**
+	 * Override this method if you want to determine in a more sophisticated way if one can travel on this link
+	 * also in forward direction.
+	 */
+	protected boolean forwardDirectionExists(OsmWay way) {
+		return !isOnewayReverse(way);
 	}
 
 	private static interface OsmFilter {
@@ -721,7 +751,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		}
 	}
 
-	private static class OsmWay {
+	protected static class OsmWay {
 		public final long id;
 		public final List<Long> nodes = new ArrayList<Long>(4);
 		public final Map<String, String> tags = new HashMap<String, String>(4);
@@ -732,7 +762,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		}
 	}
 
-	private static class OsmHighwayDefaults {
+	protected static class OsmHighwayDefaults {
 
 		public final int hierarchy;
 		public final double lanesPerDirection;
