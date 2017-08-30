@@ -7,9 +7,6 @@ import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Provider;
 
 /**
@@ -36,25 +33,30 @@ public class CarsharingTripModeChoice extends AbstractMultithreadedModule{
 		// try to get the modes from the "changeLegMode" module of the config file
 
 		
-		boolean useOneway = Boolean.parseBoolean(this.scenario.getConfig().getModule("OneWayCarsharing").getValue("useOneWayCarsharing"));
-		boolean useFf = Boolean.parseBoolean(this.scenario.getConfig().getModule("FreeFloating").getValue("useFreeFloating"));
-		boolean useBs = Boolean.parseBoolean(this.scenario.getConfig().getModule("Bikeshare").getValue("useBikeshare"));
-
-		List<String> modes = new ArrayList<String>();
+		if (Boolean.parseBoolean(this.scenario.getConfig().getModule("OneWayCarsharing").getValue("useOneWayCarsharing") )) {
+			
+			this.availableModes = new String[1];
+			this.availableModes[0] = "oneway";
+		}
+		if (Boolean.parseBoolean(this.scenario.getConfig().getModule("FreeFloating").getValue("useFreeFloating") )) {
+			if (this.availableModes == null) {
+				this.availableModes = new String[1];
+				this.availableModes[0] = "freefloating";
+			}
+			else {
+				this.availableModes = new String[2];
+				this.availableModes[0] = "oneway";
+			this.availableModes[1] = "freefloating";
+			}
+		}
 		
-		if (useOneway)
-			modes.add("oneway");
-		if (useFf)
-			modes.add("freefloating");
-		if (useBs)
-			modes.add("bikeshare");
-		
-		
-		if (!useBs && !useOneway && !useFf) {
+		if (!Boolean.parseBoolean(this.scenario.getConfig().getModule("FreeFloating").getValue("useFreeFloating") ) && !Boolean.parseBoolean(this.scenario.getConfig().getModule("OneWayCarsharing").getValue("useOneWayCarsharing") )) {
 			this.availableModes = new String[1];
 		}
-		else
-			this.availableModes = (String[]) modes.toArray();
+				
+
+		
+
 	}
 	
 	
