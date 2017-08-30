@@ -104,7 +104,9 @@ public class Raptor implements TransitRouter {
 		RaptorRoute p = this.raptorWalker.calcLeastCostPath(fromStops, toStops);
 
 		if (p == null) {
-			return null;
+			// return null;
+			// returning at least walk legs if no PT route is found. Amit Aug'17
+			return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
 		}
 
 		double directWalkCost = getWalkDisutility(fromFacility.getCoord(), toFacility.getCoord());
