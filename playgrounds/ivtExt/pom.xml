@@ -114,6 +114,11 @@
 	  </dependency>
 	  <dependency>
 		  <groupId>ch.ethz.idsc</groupId>
+		  <artifactId>owly</artifactId>
+		  <version>0.0.3</version>
+	  </dependency>
+	  <dependency>
+		  <groupId>ch.ethz.idsc</groupId>
 		  <artifactId>jmex</artifactId>
 		  <version>0.0.2</version>
 	  </dependency>
@@ -133,6 +138,14 @@
 		<repository>
 			<id>tensor-mvn-repo</id>
 			<url>https://raw.github.com/idsc-frazzoli/tensor/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>owly-mvn-repo</id>
+			<url>https://raw.github.com/idsc-frazzoli/owly/mvn-repo/</url>
 			<snapshots>
 				<enabled>true</enabled>
 				<updatePolicy>always</updatePolicy>

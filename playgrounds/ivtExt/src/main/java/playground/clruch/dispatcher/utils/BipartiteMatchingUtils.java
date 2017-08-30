@@ -4,10 +4,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.OptionalDouble;
 import java.util.function.BiConsumer;
 
 import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.owly.data.nd.NdCluster;
+import ch.ethz.idsc.owly.data.nd.NdDistanceInterface;
+import ch.ethz.idsc.owly.data.nd.NdTreeMap;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.dispatcher.core.RoboTaxi;
@@ -43,20 +47,108 @@ public enum BipartiteMatchingUtils {
         // save initial problemsize
         infoLine.append(Tensors.vectorInt(roboTaxis.size(), requests.size()));
 
+        // NEW TRY
         // 1) In case roboTaxis >> requests reduce search space using kd-trees
-        Collection<RoboTaxi> roboTaxisReduced = reduceVehiclesKDTree(requests, roboTaxis);
+        Collection<RoboTaxi> roboTaxisReduced = reduceRoboTaxis(requests, roboTaxis);
+        //
+        // // 2) In case requests >> roboTaxis reduce the search space using kd-trees
+        // Collection<AVRequest> requestsReduced = reduceRequestsKDTree(requests, roboTaxis);
 
-        // 2) In case requests >> roboTaxis reduce the search space using kd-trees
-        Collection<AVRequest> requestsReduced = reduceRequestsKDTree(requests, roboTaxis);
+        // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method and set new pickup commands
+        infoLine.append(Tensors.vectorInt(roboTaxisReduced.size(), requests.size()));
 
-        // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method and
-        // set new pickup commands
-        infoLine.append(Tensors.vectorInt(roboTaxisReduced.size(), requestsReduced.size())); // initial problem size
+        return ((new HungarBiPartVehicleDestMatcher(//
+                new EuclideanDistanceFunction())).matchAVRequest(roboTaxis, requests));
 
-        return ((new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction())).matchAVRequest(roboTaxisReduced, requestsReduced)); //
+        // // OLD IMPLEMENTATION
+        // // 1) In case roboTaxis >> requests reduce search space using kd-trees
+        // Collection<RoboTaxi> roboTaxisReduced = reduceVehiclesKDTree(requests, roboTaxis);
+        //
+        // // 2) In case requests >> roboTaxis reduce the search space using kd-trees
+        // Collection<AVRequest> requestsReduced = reduceRequestsKDTree(requests, roboTaxis);
+        //
+        // // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method and
+        // // set new pickup commands
+        // infoLine.append(Tensors.vectorInt(roboTaxisReduced.size(), requestsReduced.size())); // initial problem size
+        //
+        // return ((new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction())).matchAVRequest(roboTaxisReduced, requestsReduced)); //
 
     }
 
+    private static Collection<RoboTaxi> reduceRoboTaxis(Collection<AVRequest> requests, Collection<RoboTaxi> roboTaxis) {
+        // for less requests than cars, don't do anything
+        if (roboTaxis.size() < requests.size() || roboTaxis.size() < 10)
+            return roboTaxis;
+
+        // otherwise create Quadtree and return minimum amount of RoboTaxis
+        // Build the ND tree
+
+        Tensor lbounds = findBoundsRT(requests, roboTaxis, -1);
+        Tensor ubounds = findBoundsRT(requests, roboTaxis, 1);
+        NdTreeMap<RoboTaxi> ndTree = new NdTreeMap<>(lbounds, ubounds, 10, roboTaxis.size());
+
+        // add roboTaxis to ND Tree
+        for (RoboTaxi robotaxi : roboTaxis) {
+            double d1 = robotaxi.getDivertableLocation().getToNode().getCoord().getX();
+            double d2 = robotaxi.getDivertableLocation().getToNode().getCoord().getY();
+            GlobalAssert.that(Double.isFinite(d1));
+            GlobalAssert.that(Double.isFinite(d2));
+            ndTree.add(Tensors.vectorDouble(d1, d2), robotaxi);
+        }
+
+        // for all robotaxis, start nearestNeighborSearch until union is as large as the number of requests
+        // start with only one vehicle per request
+        HashSet<RoboTaxi> vehiclesChosen = new HashSet(); // note: must be HashSet to avoid duplicate elements.
+        int roboTaxiPerRequest = 1;
+        do {
+            vehiclesChosen.clear();
+            for (AVRequest avRequest : requests) {
+                Link link = avRequest.getFromLink();
+                Tensor center = Tensors.vectorDouble(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+                NdCluster<RoboTaxi> nearestCluster = ndTree.buildCluster(center, roboTaxiPerRequest, NdDistanceInterface.EUCLIDEAN);
+                nearestCluster.stream().forEach(ndentry -> vehiclesChosen.add(ndentry.value));
+            }
+            ++roboTaxiPerRequest;
+        } while (vehiclesChosen.size() < requests.size() && roboTaxiPerRequest <= requests.size());
+
+        return vehiclesChosen;
+    }
+
+    private static Tensor findBoundsRT(Collection<AVRequest> requests, Collection<RoboTaxi> roboTaxis, int lowhigh) {
+        GlobalAssert.that(lowhigh != 0);
+        GlobalAssert.that(roboTaxis.size() > 0);
+
+        if (lowhigh < 0) { // find lower bounds
+            double minX = roboTaxis.stream().mapToDouble(r -> r.getDivertableLocation().getToNode().getCoord().getX()).min().getAsDouble();
+            double minY = roboTaxis.stream().mapToDouble(r -> r.getDivertableLocation().getToNode().getCoord().getY()).min().getAsDouble();
+
+            OptionalDouble minXReq = requests.stream().mapToDouble(r -> r.getFromLink().getFromNode().getCoord().getX()).min();
+            if (minXReq.isPresent())
+                minX = Math.min(minX, minXReq.getAsDouble());
+
+            OptionalDouble minYReq = requests.stream().mapToDouble(r -> r.getFromLink().getFromNode().getCoord().getY()).min();
+            if (minYReq.isPresent())
+                minY = Math.min(minY, minYReq.getAsDouble());
+
+            return Tensors.vectorDouble(minX, minY);
+
+        } else {
+            double maxX = roboTaxis.stream().mapToDouble(r -> r.getDivertableLocation().getToNode().getCoord().getX()).max().getAsDouble();
+            double maxY = roboTaxis.stream().mapToDouble(r -> r.getDivertableLocation().getToNode().getCoord().getY()).max().getAsDouble();
+
+            OptionalDouble maxXReq = requests.stream().mapToDouble(r -> r.getFromLink().getFromNode().getCoord().getX()).max();
+            if (maxXReq.isPresent())
+                maxX = Math.max(maxX, maxXReq.getAsDouble());
+
+            OptionalDouble maxYReq = requests.stream().mapToDouble(r -> r.getFromLink().getFromNode().getCoord().getY()).max();
+            if (maxYReq.isPresent())
+                maxY = Math.max(maxY, maxYReq.getAsDouble());
+
+            return Tensors.vectorDouble(maxX, maxY);
+        }
+    }
+
+    @Deprecated
     private static Collection<AVRequest> reduceRequestsKDTree(Collection<AVRequest> requests, Collection<RoboTaxi> roboTaxis) {
         // for less requests than cars, don't do anything
         if (requests.size() < roboTaxis.size())
@@ -102,6 +194,7 @@ public enum BipartiteMatchingUtils {
 
     }
 
+    @Deprecated
     private static Collection<RoboTaxi> reduceVehiclesKDTree(Collection<AVRequest> requests, Collection<RoboTaxi> roboTaxis) {
         // for less requests than cars, don't do anything
         if (roboTaxis.size() < requests.size())
@@ -145,4 +238,5 @@ public enum BipartiteMatchingUtils {
 
         return vehiclesChosen;
     }
+
 }
