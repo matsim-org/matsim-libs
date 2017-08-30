@@ -14,6 +14,7 @@ playgrounds/jjoubert/data
 /playgrounds/southAfrica/test/input/playground/southafrica/freight/digicore/extract/TurnkeyExtractorTest/test.csv
 /playgrounds/jjoubert/src/main/java/playground/jjoubert/TemporaryCode/NetworkV2toV1.java
 /playgrounds/ivtExt/src/main/java/playground/clruch/TestBed.java
+IDSCOptions.properties
 
 # jan added:
 tutorial/output/

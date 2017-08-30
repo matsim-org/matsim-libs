@@ -62,6 +62,7 @@ public class ScenarioPreparer {
         boolean completeGraph = simOptions.getBoolean("completeGraph");
         int maxPopulationSize = simOptions.getInt("maxPopulationSize");
         int dtTravelData = simOptions.getInt("dtTravelData");
+        boolean calculatePerformanceFleetSize = simOptions.getBoolean("calculatePerformanceFleetSize");
         String VIRTUALNETWORKFOLDERNAME = simOptions.getString("virtualNetworkDir");
         String VIRTUALNETWORKFILENAME = simOptions.getString("virtualNetworkName");
         String TRAVELDATAFILENAME = simOptions.getString("travelDataName");
@@ -148,13 +149,13 @@ public class ScenarioPreparer {
             MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, population, virtualNetwork, travelData);
             MinimumFleetSizeIO.toByte(new File(vnDir, MINIMUMFLEETSIZEFILENAME), minimumFleetSizeCalculator);
 
-            int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
-            PerformanceFleetSizeCalculator performanceFleetSizeCalculator = //
-                    new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberVehiclesPerformanceCalculator);
-            PerformanceFleetSizeIO.toByte(new File(vnDir, PERFORMANCEFLEETSIZEFILENAME), performanceFleetSizeCalculator);
-
+            if (calculatePerformanceFleetSize) {
+                int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
+                PerformanceFleetSizeCalculator performanceFleetSizeCalculator = //
+                        new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberVehiclesPerformanceCalculator);
+                PerformanceFleetSizeIO.toByte(new File(vnDir, PERFORMANCEFLEETSIZEFILENAME), performanceFleetSizeCalculator);
+            }
         }
-
         System.out.println("successfully converted simulation data files from in " + workingDirectory);
     }
 }

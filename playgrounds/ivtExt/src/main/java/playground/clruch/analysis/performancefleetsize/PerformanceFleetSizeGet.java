@@ -19,9 +19,10 @@ public enum PerformanceFleetSizeGet {
         try {
             return PerformanceFleetSizeIO.fromByte(performanceFleetSizeFile);
         } catch (Exception e) {
-            System.out.println("cannot load minimum fleet size calculation " + performanceFleetSizeFile);
-            throw new RuntimeException();
+            System.err.println("cannot load minimum fleet size calculation  " + performanceFleetSizeFile);
+            return null;
         }
+
     }
 
 

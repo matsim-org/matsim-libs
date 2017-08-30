@@ -104,12 +104,12 @@ public class ScenarioServer {
         if (virtualNetwork != null) {
             minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
             performanceFleetSizeCalculator = PerformanceFleetSizeGet.readDefault();
+            if(performanceFleetSizeCalculator!=null) performanceFleetSizeCalculator.saveAndPlot();
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
         DataCollector.store(configFile, controler, //
-                minimumFleetSizeCalculator, performanceFleetSizeCalculator, //
-                analyzeSummary, network, population, travelData);
+                minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
 
         // generate report
         ReportGenerator.from(configFile);
