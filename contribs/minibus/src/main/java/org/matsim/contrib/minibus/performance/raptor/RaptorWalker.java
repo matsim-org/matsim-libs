@@ -227,8 +227,18 @@ public class RaptorWalker {
 					atLeastOneRouteStopImproved = false;
 
 					double earliestArrivalTimeAtStartRouteStop = sourcePointerRouteStop[indexOfStartRouteStop].earliestArrivalTime;
+
+					// It appears that if departure time is after midnight, it needs to be updated here
+					// so that an earliest connection for next day can be looked.
+					// However, the arrival time in the array is actual time. Amit Aug'17
+					double adjustedEarliestArrivalTimeAtStartRouteStop  = earliestArrivalTimeAtStartRouteStop;
+
+					if (adjustedEarliestArrivalTimeAtStartRouteStop >= RaptorDisutility.MIDNIGHT ) {
+						adjustedEarliestArrivalTimeAtStartRouteStop = adjustedEarliestArrivalTimeAtStartRouteStop % RaptorDisutility.MIDNIGHT;
+					}
+
 					int indexOfRouteStopWithinRouteSequence = routeToCheck.numberOfRouteStops - startStop.numberOfRemainingStopsInThisRoute - 1;
-					int indexOfEarliestDepartureTime = this.getIndexOfEarliestDepartureTime(earliestArrivalTimeAtStartRouteStop, routeToCheck, indexOfRouteStopWithinRouteSequence);
+					int indexOfEarliestDepartureTime = this.getIndexOfEarliestDepartureTime(adjustedEarliestArrivalTimeAtStartRouteStop, routeToCheck, indexOfRouteStopWithinRouteSequence);
 
 					if(indexOfEarliestDepartureTime > -1) {
 						// we have found a valid departure time - process all upcoming stops of the route
@@ -239,6 +249,10 @@ public class RaptorWalker {
 							RouteStopEntry routeStopToCheck =  this.raptorSearchData.routeStops[indexOfRouteStopToCheck];
 
 							double arrivalTimeAtTheFollowingRouteStop = this.raptorSearchData.arrivalTimes[indexOfEarliestDepartureTime];
+
+							if (arrivalTimeAtTheFollowingRouteStop < earliestArrivalTimeAtStartRouteStop ) {
+								arrivalTimeAtTheFollowingRouteStop += RaptorDisutility.MIDNIGHT;
+							}
 
 							if (arrivalTimeAtTheFollowingRouteStop < earliestArrivalTimeAtRouteStop[routeStopToCheck.indexOfRouteStop]) {
 								// this really is better than anything before - set arrival and source and mark the stop to be checked for transfers
@@ -259,6 +273,7 @@ public class RaptorWalker {
 					} else {
 						// there is no further departure
 						// TODO search for the earliest departure and add 24h
+						// implemented above by adjusting the time; still keeping the comment until all tests are happy. Amit Aug'17
 					}
 				}
 
