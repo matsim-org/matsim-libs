@@ -32,6 +32,8 @@ public enum ScenarioOptions {
         returnP.setProperty("virtualNetworkName", "virtualNetwork");
         returnP.setProperty("travelDataName", "travelData");
         returnP.setProperty("calculatePerformanceFleetSize", "false");
+        returnP.setProperty("minimumFleetSizeFileName", "minimumFleetSizeCalculator");
+        returnP.setProperty("performanceFleetSizeFileName", "performanceFleetSizeCalculator");
         return returnP;
     }
 
