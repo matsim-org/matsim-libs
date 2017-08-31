@@ -76,24 +76,17 @@ public enum BipartiteMatchingUtils {
 
         // add uniquely identifiable requests to KD tree
         for (AVRequest avRequest : requests) {
-            Link link = avRequest.getFromLink();
-            double d1 = link.getFromNode().getCoord().getX();
-            double d2 = link.getFromNode().getCoord().getY();
-            GlobalAssert.that(Double.isFinite(d1));
-            GlobalAssert.that(Double.isFinite(d2));
-            ndTree.add(Tensors.vectorDouble(d1, d2), avRequest);
+            ndTree.add(EuclideanLocation.of(avRequest), avRequest);
         }
 
         // for all roboTaxis vehicles, start nearestNeighborSearch until union is as large as the
-        // number of vehicles
-        // start with only one request per vehicle
+        // number of vehicles start with only one request per vehicle
         Collection<AVRequest> requestsChosen = new HashSet<>();
         int iter = 1;
         do {
             requestsChosen.clear();
             for (RoboTaxi roboTaxi : roboTaxis) {
-                Tensor center = Tensors.vectorDouble(roboTaxi.getDivertableLocation().getToNode().getCoord().getX(),
-                        roboTaxi.getDivertableLocation().getToNode().getCoord().getY());
+                Tensor center = EuclideanLocation.of(roboTaxi);
                 NdCluster<AVRequest> nearestCluster = ndTree.buildCluster(center, iter, NdDistanceInterface.EUCLIDEAN);
                 nearestCluster.stream().forEach(ndentry -> requestsChosen.add(ndentry.value));
             }
@@ -118,11 +111,7 @@ public enum BipartiteMatchingUtils {
 
         // add roboTaxis to ND Tree
         for (RoboTaxi robotaxi : roboTaxis) {
-            double d1 = robotaxi.getDivertableLocation().getToNode().getCoord().getX();
-            double d2 = robotaxi.getDivertableLocation().getToNode().getCoord().getY();
-            GlobalAssert.that(Double.isFinite(d1));
-            GlobalAssert.that(Double.isFinite(d2));
-            ndTree.add(Tensors.vectorDouble(d1, d2), robotaxi);
+            ndTree.add(EuclideanLocation.of(robotaxi), robotaxi);
         }
 
         // for all robotaxis, start nearestNeighborSearch until union is as large as the number of requests
@@ -132,8 +121,7 @@ public enum BipartiteMatchingUtils {
         do {
             vehiclesChosen.clear();
             for (AVRequest avRequest : requests) {
-                Link link = avRequest.getFromLink();
-                Tensor center = Tensors.vectorDouble(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY());
+                Tensor center = EuclideanLocation.of(avRequest);
                 NdCluster<RoboTaxi> nearestCluster = ndTree.buildCluster(center, roboTaxiPerRequest, NdDistanceInterface.EUCLIDEAN);
                 nearestCluster.stream().forEach(ndentry -> vehiclesChosen.add(ndentry.value));
             }

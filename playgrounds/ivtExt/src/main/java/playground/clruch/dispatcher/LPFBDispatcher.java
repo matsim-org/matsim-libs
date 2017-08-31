@@ -6,11 +6,8 @@
 
 package playground.clruch.dispatcher;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.DataFormatException;
 
 import org.gnu.glpk.GLPKConstants;
 import org.matsim.api.core.v01.network.Link;
@@ -43,7 +40,6 @@ import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
@@ -64,6 +60,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
     private Tensor printVals = Tensors.empty();
     private final LPVehicleRebalancing lpVehicleRebalancing;
     private final NetworkDistanceFunction ndf;
+    private final Network network;
 
     public LPFBDispatcher( //
             AVDispatcherConfig config, //
@@ -83,7 +80,9 @@ public class LPFBDispatcher extends PartitionedDispatcher {
         SafeConfig safeConfig = SafeConfig.wrap(config);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 300);
+        this.network = network;
         this.ndf = new NetworkDistanceFunction(network);
+
     }
 
     @Override
@@ -170,7 +169,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
         // Part II: outside rebalancing periods, permanently assign destinations to vehicles using
         // bipartite matching
         if (round_now % dispatchPeriod == 0) {
-            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(),ndf);
+            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(), ndf, network);
         }
     }
 

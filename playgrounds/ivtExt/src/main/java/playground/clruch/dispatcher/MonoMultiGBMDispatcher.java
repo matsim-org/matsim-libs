@@ -31,8 +31,10 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
     private final int dispatchPeriod;
     private final int rebVehperRequest;
     private Tensor printVals = Tensors.empty();
+    private final Network network;
 
     private MonoMultiGBMDispatcher( //
+            Network network, //
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
@@ -43,6 +45,7 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         rebVehperRequest = safeConfig.getInteger("vehiclesPerRequest", 1);
         GlobalAssert.that(rebVehperRequest > 0);
+        this.network = network;
         if (rebVehperRequest == 1)
             System.out.println("ATTENTION: only one vehicle is sent to each request, standard GlobalBipartiteMatchingDispatcher");
     }
@@ -53,11 +56,13 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
 
         if (round_now % dispatchPeriod == 0) {
             // dispatch vehicles to pickup locations
-            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(), new EuclideanDistanceFunction());
+            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(), //
+                    new EuclideanDistanceFunction(), network);
 
             // perform rebalancing with remaining vehicles
             Collection<AVRequest> rebalanceRequests = getMultipleRebalanceRequests(getAVRequests(), rebVehperRequest);
-            Tensor notUsed = BipartiteMatchingUtils.executeRebalance(this::setRoboTaxiRebalance, getDivertableRoboTaxis(), rebalanceRequests, new EuclideanDistanceFunction());
+            Tensor notUsed = BipartiteMatchingUtils.executeRebalance(this::setRoboTaxiRebalance, getDivertableRoboTaxis(), rebalanceRequests, //
+                    new EuclideanDistanceFunction(), network);
         }
     }
 
@@ -101,7 +106,7 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             return new MonoMultiGBMDispatcher( //
-                    config, travelTime, router, eventsManager, abstractRequestSelector);
+                    network, config, travelTime, router, eventsManager, abstractRequestSelector);
         }
     }
 }

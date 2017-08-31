@@ -63,11 +63,13 @@ public class LPFFDispatcher extends PartitionedDispatcher {
     private int total_rebalanceCount = 0;
     private final int nVNodes;
     private final int nVLinks;
+    private final Network network; 
     Tensor printVals = Tensors.empty();
     TravelData travelData;
     Tensor rebalancingRate;
     Tensor rebalanceCount;
     Tensor rebalanceCountInteger;
+    
 
     public LPFFDispatcher( //
             AVDispatcherConfig config, //
@@ -75,6 +77,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
+            Network network,//
             VirtualNetwork virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
@@ -83,6 +86,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
         virtualNodeDest = abstractVirtualNodeDest;
         vehicleDestMatcher = abstractVehicleDestMatcher;
         this.travelData = travelData;
+        this.network = network;
         nVNodes = virtualNetwork.getvNodesCount();
         nVLinks = virtualNetwork.getvLinksCount();
         rebalanceCount = Array.zeros(nVNodes, nVNodes);
@@ -143,7 +147,8 @@ public class LPFFDispatcher extends PartitionedDispatcher {
         // Part II: outside rebalancing periods, permanently assign destinations to vehicles using
         // bipartite matching
         if (round_now % dispatchPeriod == 0) {
-            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(), new EuclideanDistanceFunction());
+            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(),//
+                    new EuclideanDistanceFunction(),network);
         }
     }
 
@@ -182,7 +187,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             virtualNetwork = VirtualNetworkGet.readDefault(network);
             TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
 
-            return new LPFFDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, abstractVirtualNodeDest,
+            return new LPFFDispatcher(config, generatorConfig, travelTime, router, eventsManager, network,virtualNetwork, abstractVirtualNodeDest,
                     abstractVehicleDestMatcher, travelData);
         }
     }
