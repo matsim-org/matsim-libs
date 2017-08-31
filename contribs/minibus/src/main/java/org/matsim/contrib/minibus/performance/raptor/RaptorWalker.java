@@ -274,6 +274,10 @@ public class RaptorWalker {
 						// there is no further departure
 						// TODO search for the earliest departure and add 24h
 						// implemented above by adjusting the time; still keeping the comment until all tests are happy. Amit Aug'17
+
+						// another possibility, there is no futher departures on this stop for this route (routeToCheck), but let's say agent is here and now make another transfer.
+						// this will increase the effective "maxBeelineWalkConnectionDistance"... Amit Aug'17
+						transferTransitStopsToCheck[startStop.indexOfStopFacility] = true;
 					}
 				}
 
