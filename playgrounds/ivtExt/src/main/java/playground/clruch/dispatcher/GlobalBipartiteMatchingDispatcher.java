@@ -25,6 +25,7 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
     private final int dispatchPeriod;
     private Tensor printVals = Tensors.empty();
     private final NetworkDistanceFunction ndf;
+    private final Network network;
 
     private GlobalBipartiteMatchingDispatcher( //
             Network network,//
@@ -36,6 +37,7 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         this.ndf = new NetworkDistanceFunction(network);
+        this.network = network; 
     }
 
     @Override
@@ -44,7 +46,7 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
 
         if (round_now % dispatchPeriod == 0) {
             printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(),//
-                    new EuclideanDistanceFunction());
+                    new EuclideanDistanceFunction(), network);
         }
     }
 
