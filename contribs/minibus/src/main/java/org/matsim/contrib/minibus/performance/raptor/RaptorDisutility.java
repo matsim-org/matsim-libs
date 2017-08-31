@@ -69,11 +69,15 @@ public class RaptorDisutility {
 	protected final double getTransferCost(final Coord fromStop, final Coord toStop) {
 		double cost;
 		
-		double transfertime = getTravelTime(fromStop, toStop);
+		double transfertime = getTransferTime(fromStop, toStop);
 		double waittime = this.config.getAdditionalTransferTime();
 		
 		// say that the effective walk time is the transfer time minus some "buffer"
 		double walktime = transfertime - waittime;
+
+		if ( walktime < 0. ) {
+			throw new RuntimeException( "negative walk time; should not happen; needs to be repaired" ) ;
+		}
 		
 		double walkDistance = CoordUtils.calcEuclideanDistance(fromStop, toStop);
 		
