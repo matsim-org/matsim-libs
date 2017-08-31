@@ -7,6 +7,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.*;
 import org.matsim.vehicles.Vehicle;
 
+import ch.ethz.idsc.owly.data.GlobalAssert;
+
 /**
  * Created by Joel on 06.07.2017.
  */
@@ -41,6 +43,9 @@ public abstract class EasyDijkstra {
 
     public static LeastCostPathCalculator.Path executeDijkstra(LeastCostPathCalculator dijkstra, Node from, Node to) {
         // depending on implementation of traveldisutility and traveltime, starttime, person and vehicle are needed
+        GlobalAssert.that(dijkstra!=null);
+        GlobalAssert.that(from!=null);
+        GlobalAssert.that(to!=null);
         return dijkstra.calcLeastCostPath(from, to, 0.0, null, null);
     }
 

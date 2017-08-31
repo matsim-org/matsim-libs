@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.OptionalDouble;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 import org.matsim.api.core.v01.network.Link;
@@ -24,25 +25,28 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 public enum BipartiteMatchingUtils {
     ;
 
-    public static Tensor executePickup(BiConsumer<RoboTaxi, AVRequest> setFunction, Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests) {
+    public static Tensor executePickup(BiConsumer<RoboTaxi, AVRequest> setFunction, Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests, //
+            DistanceFunction distanceFunction) {
         Tensor infoLine = Tensors.empty();
-        Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(roboTaxis, requests, infoLine);
+        Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(roboTaxis, requests, distanceFunction, infoLine);
         for (Entry<RoboTaxi, AVRequest> entry : gbpMatch.entrySet()) {
             setFunction.accept(entry.getKey(), entry.getValue());
         }
         return infoLine;
     }
 
-    public static Tensor executeRebalance(BiConsumer<RoboTaxi, Link> setFunction, Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests) {
+    public static Tensor executeRebalance(BiConsumer<RoboTaxi, Link> setFunction, Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests, //
+            DistanceFunction distanceFunction) {
         Tensor infoLine = Tensors.empty();
-        Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(roboTaxis, requests, infoLine);
+        Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(roboTaxis, requests, distanceFunction, infoLine);
         for (Entry<RoboTaxi, AVRequest> entry : gbpMatch.entrySet()) {
             setFunction.accept(entry.getKey(), entry.getValue().getFromLink());
         }
         return infoLine;
     }
 
-    private static Map<RoboTaxi, AVRequest> globalBipartiteMatching(Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests, Tensor infoLine) {
+    private static Map<RoboTaxi, AVRequest> globalBipartiteMatching(Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests, //
+            DistanceFunction distanceFunction, Tensor infoLine) {
 
         // save initial problemsize
         infoLine.append(Tensors.vectorInt(roboTaxis.size(), requests.size()));
@@ -58,8 +62,9 @@ public enum BipartiteMatchingUtils {
         infoLine.append(Tensors.vectorInt(roboTaxisReduced.size(), requests.size()));
 
         return ((new HungarBiPartVehicleDestMatcher(//
-                new EuclideanDistanceFunction())).matchAVRequest(roboTaxis, requests));
+                distanceFunction)).matchAVRequest(roboTaxisReduced, requests));
 
+        // TODO put networkdistancefunction.
         // // OLD IMPLEMENTATION
         // // 1) In case roboTaxis >> requests reduce search space using kd-trees
         // Collection<RoboTaxi> roboTaxisReduced = reduceVehiclesKDTree(requests, roboTaxis);
@@ -85,7 +90,7 @@ public enum BipartiteMatchingUtils {
 
         Tensor lbounds = findBoundsRT(requests, roboTaxis, -1);
         Tensor ubounds = findBoundsRT(requests, roboTaxis, 1);
-        NdTreeMap<RoboTaxi> ndTree = new NdTreeMap<>(lbounds, ubounds, 10, roboTaxis.size());
+        NdTreeMap<RoboTaxi> ndTree = new NdTreeMap<>(lbounds, ubounds, 10, 24);
 
         // add roboTaxis to ND Tree
         for (RoboTaxi robotaxi : roboTaxis) {
@@ -98,7 +103,7 @@ public enum BipartiteMatchingUtils {
 
         // for all robotaxis, start nearestNeighborSearch until union is as large as the number of requests
         // start with only one vehicle per request
-        HashSet<RoboTaxi> vehiclesChosen = new HashSet(); // note: must be HashSet to avoid duplicate elements.
+        Set<RoboTaxi> vehiclesChosen = new HashSet<>(); // note: must be HashSet to avoid duplicate elements.
         int roboTaxiPerRequest = 1;
         do {
             vehiclesChosen.clear();

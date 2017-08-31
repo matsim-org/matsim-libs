@@ -1,5 +1,6 @@
 package playground.clruch.dispatcher;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
@@ -10,6 +11,8 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.utils.BipartiteMatchingUtils;
+import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
+import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -21,8 +24,10 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
 
     private final int dispatchPeriod;
     private Tensor printVals = Tensors.empty();
+    private final NetworkDistanceFunction ndf;
 
     private GlobalBipartiteMatchingDispatcher( //
+            Network network,//
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
@@ -30,6 +35,7 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
         super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
+        this.ndf = new NetworkDistanceFunction(network);
     }
 
     @Override
@@ -37,7 +43,8 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
         final long round_now = Math.round(now);
 
         if (round_now % dispatchPeriod == 0) {
-            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests());
+            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(),//
+                    new EuclideanDistanceFunction());
         }
     }
 
@@ -60,11 +67,14 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
 
         @Inject
         private EventsManager eventsManager;
+        
+        @Inject
+        private Network network;
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             return new GlobalBipartiteMatchingDispatcher( //
-                    config, travelTime, router, eventsManager);
+                    network, config, travelTime, router, eventsManager);
         }
     }
 }

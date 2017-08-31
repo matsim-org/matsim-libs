@@ -52,7 +52,7 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
         }
 
         // vehicle at position i is assigned to destination matchinghungarianAlgorithm[j]
-        int[] matchinghungarianAlgorithm = new HungarianAlgorithm(distancematrix).execute(); // O(n^3)
+        int[] matchinghungarianAlgorithm = new HungarianAlgorithm(distancematrix).executeClruch(); // O(n^3)
 
         // do the assignment according to the Hungarian algorithm (only for the matched elements, otherwise keep current drive destination)
         final Map<RoboTaxi, AVRequest> map = new HashMap<>();

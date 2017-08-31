@@ -39,6 +39,7 @@ import playground.clruch.dispatcher.utils.FeasibleRebalanceCreator;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
 import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
+import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
@@ -62,6 +63,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
     private int total_rebalanceCount = 0;
     private Tensor printVals = Tensors.empty();
     private final LPVehicleRebalancing lpVehicleRebalancing;
+    private final NetworkDistanceFunction ndf;
 
     public LPFBDispatcher( //
             AVDispatcherConfig config, //
@@ -69,6 +71,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
+            Network network, //
             VirtualNetwork virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher) {
@@ -80,6 +83,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
         SafeConfig safeConfig = SafeConfig.wrap(config);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 300);
+        this.ndf = new NetworkDistanceFunction(network);
     }
 
     @Override
@@ -166,7 +170,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
         // Part II: outside rebalancing periods, permanently assign destinations to vehicles using
         // bipartite matching
         if (round_now % dispatchPeriod == 0) {
-            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests());
+            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(),ndf);
         }
     }
 
@@ -203,7 +207,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
             virtualNetwork = VirtualNetworkGet.readDefault(network);
 
-            return new LPFBDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, abstractVirtualNodeDest,
+            return new LPFBDispatcher(config, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork, abstractVirtualNodeDest,
                     abstractVehicleDestMatcher);
         }
     }

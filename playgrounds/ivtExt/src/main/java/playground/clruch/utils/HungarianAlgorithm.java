@@ -109,6 +109,64 @@ public class HungarianAlgorithm {
             }
         }
     }
+    
+    
+    
+    /**
+     * Compute an initial feasible solution by assigning zero labels to the
+     * workers and by assigning to each job a label equal to the minimum cost
+     * among its incident edges.
+     */
+    protected void computeInitialWarmStartFeasibleSolution() {
+        for (int j = 0; j < dim; j++) {
+            labelByJob[j] = Double.POSITIVE_INFINITY;
+        }
+        for (int w = 0; w < dim; w++) {
+            for (int j = 0; j < dim; j++) {
+                if (costMatrix[w][j] < labelByJob[j]) {
+                    labelByJob[j] = costMatrix[w][j];
+                }
+            }
+        }
+    }
+    
+    
+    /**
+     * Execute the algorithm.
+     *
+     * @return the minimum cost matching of workers to jobs based upon the
+     *         provided cost matrix. A matching value of -1 indicates that the
+     *         corresponding worker is unassigned.
+     *         
+     *         Addition by clruch, the initial feasible solution is chosen
+     *         as close as possible to the last solution (warm-start). 
+     */
+    public int[] executeClruch() {
+    /*
+     * Heuristics to improve performance: Reduce rows and columns by their
+     * smallest element, compute an initial non-zero dual feasible solution and
+     * create a greedy matching from workers to jobs of the cost matrix.
+     */
+        reduce();
+        computeInitialWarmStartFeasibleSolution();
+        greedyMatch();
+
+        int w = fetchUnmatchedWorker();
+        while (w < dim) {
+            initializePhase(w);
+            executePhase();
+            w = fetchUnmatchedWorker();
+        }
+        int[] result = Arrays.copyOf(matchJobByWorker, rows);
+        for (w = 0; w < result.length; w++) {
+            if (result[w] >= cols) {
+                result[w] = -1;
+            }
+        }
+        return result;
+    }
+    
+    
 
     /**
      * Execute the algorithm.

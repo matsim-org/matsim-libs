@@ -15,6 +15,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.BipartiteMatchingUtils;
+import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
 import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
@@ -52,11 +53,11 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
 
         if (round_now % dispatchPeriod == 0) {
             // dispatch vehicles to pickup locations
-            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests());
+            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(), new EuclideanDistanceFunction());
 
             // perform rebalancing with remaining vehicles
             Collection<AVRequest> rebalanceRequests = getMultipleRebalanceRequests(getAVRequests(), rebVehperRequest);
-            Tensor notUsed = BipartiteMatchingUtils.executeRebalance(this::setRoboTaxiRebalance, getDivertableRoboTaxis(), rebalanceRequests);
+            Tensor notUsed = BipartiteMatchingUtils.executeRebalance(this::setRoboTaxiRebalance, getDivertableRoboTaxis(), rebalanceRequests, new EuclideanDistanceFunction());
         }
     }
 
