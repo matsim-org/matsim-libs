@@ -37,6 +37,7 @@ import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
 import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
 import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
+import playground.clruch.dispatcher.utils.RandomVirtualNodeDest;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
@@ -170,7 +171,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
         // bipartite matching
         if (round_now % dispatchPeriod == 0) {
             printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(), 
-                    ndf, network,false);
+                    new EuclideanDistanceFunction(), network,false);
         }
     }
 
@@ -203,7 +204,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
 
-            AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
+            AbstractVirtualNodeDest abstractVirtualNodeDest = new RandomVirtualNodeDest();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
             virtualNetwork = VirtualNetworkGet.readDefault(network);
 

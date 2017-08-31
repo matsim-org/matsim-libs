@@ -9,9 +9,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.queuey.math.HungarianAlgorithm;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.utils.GlobalAssert;
-import playground.clruch.utils.HungarianAlgorithm;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /**
