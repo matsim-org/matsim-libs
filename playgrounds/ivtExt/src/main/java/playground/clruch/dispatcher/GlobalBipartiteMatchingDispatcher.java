@@ -28,7 +28,7 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
     private final Network network;
 
     private GlobalBipartiteMatchingDispatcher( //
-            Network network,//
+            Network network, //
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
@@ -37,7 +37,7 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         this.ndf = new NetworkDistanceFunction(network);
-        this.network = network; 
+        this.network = network;
     }
 
     @Override
@@ -45,8 +45,11 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
         final long round_now = Math.round(now);
 
         if (round_now % dispatchPeriod == 0) {
-            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(),//
-                    new EuclideanDistanceFunction(), network);
+            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, //
+                    getDivertableRoboTaxis(), getAVRequests(), //
+                    new EuclideanDistanceFunction(), network, false);
+            // ndf, network,false);
+
         }
     }
 
@@ -69,7 +72,7 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
 
         @Inject
         private EventsManager eventsManager;
-        
+
         @Inject
         private Network network;
 

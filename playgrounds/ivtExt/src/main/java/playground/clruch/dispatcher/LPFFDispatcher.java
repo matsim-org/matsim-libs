@@ -148,7 +148,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
         // bipartite matching
         if (round_now % dispatchPeriod == 0) {
             printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(),//
-                    new EuclideanDistanceFunction(),network);
+                    new EuclideanDistanceFunction(),network,false);
         }
     }
 
