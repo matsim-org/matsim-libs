@@ -35,6 +35,7 @@ import playground.clruch.dispatcher.LPFBDispatcher;
 import playground.clruch.dispatcher.LPFFDispatcher;
 import playground.clruch.dispatcher.NewSingleHeuristicDispatcher;
 import playground.clruch.dispatcher.TestBedDispatcher;
+import playground.clruch.dispatcher.TestStrategiesDispatcher;
 import playground.clruch.dispatcher.UncoordinatedDispatcher;
 import playground.fseccamo.dispatcher.MPCDispatcher;
 import playground.sebhoerl.avtaxi.config.AVConfig;
@@ -145,7 +146,13 @@ public class AVModule extends AbstractModule {
 
         bind(MPCDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), MPCDispatcher.class.getSimpleName()).to(MPCDispatcher.Factory.class);
+        
+        bind(TestStrategiesDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), TestStrategiesDispatcher.class.getSimpleName()).to(TestStrategiesDispatcher.Factory.class);
 
+        
+        
+        
     }
 
     private void configureGeneratorStrategies() {
