@@ -32,6 +32,7 @@ enum StandaloneFleetConverter {
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         // generate sim objects and store
         SimulationFleetDump.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE);
+        
     }
 
 }
