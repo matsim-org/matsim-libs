@@ -57,12 +57,12 @@ public class MonoMultiGBMDispatcher extends RebalancingDispatcher {
         if (round_now % dispatchPeriod == 0) {
             // dispatch vehicles to pickup locations
             printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(), //
-                    new EuclideanDistanceFunction(), network,false);
+                    new EuclideanDistanceFunction(), network, false);
 
             // perform rebalancing with remaining vehicles
             Collection<AVRequest> rebalanceRequests = getMultipleRebalanceRequests(getAVRequests(), rebVehperRequest);
-            Tensor notUsed = BipartiteMatchingUtils.executeRebalance(this::setRoboTaxiRebalance, getDivertableRoboTaxis(), rebalanceRequests, //
-                    new EuclideanDistanceFunction(), network,false);
+            Tensor notUsed = BipartiteMatchingUtils.executeRebalance(this::setRoboTaxiRebalance, getDivertableRoboTaxis(), //
+                    rebalanceRequests, new EuclideanDistanceFunction(), network, false);
         }
     }
 
