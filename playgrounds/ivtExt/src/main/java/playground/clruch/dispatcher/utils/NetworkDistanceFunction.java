@@ -8,16 +8,17 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
+import ch.ethz.idsc.owly.data.GlobalAssert;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.joel.helpers.EasyDijkstra;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /** @author Claudio Ruch */
 public class NetworkDistanceFunction implements DistanceFunction {
-    LeastCostPathCalculator dijkstra = null;
+    private final LeastCostPathCalculator dijkstra;
     
-    NetworkDistanceFunction(Network network){
-        EasyDijkstra.prepDijkstra(network);        
+    public NetworkDistanceFunction(Network network){
+        dijkstra =EasyDijkstra.prepDijkstra(network);        
     }
 
 
@@ -42,6 +43,8 @@ public class NetworkDistanceFunction implements DistanceFunction {
     }
 
     private double distNetwork(Node from, Node to) {
+        GlobalAssert.that(from!=null);
+        GlobalAssert.that(to!=null);
         double dist = 0.0;
         LeastCostPathCalculator.Path path = EasyDijkstra.executeDijkstra(dijkstra, from, to);
         for (Link link : path.links) {

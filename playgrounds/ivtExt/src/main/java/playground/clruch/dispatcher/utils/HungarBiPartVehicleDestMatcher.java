@@ -9,9 +9,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.queuey.math.HungarianAlgorithm;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.utils.GlobalAssert;
-import playground.clruch.utils.HungarianAlgorithm;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /**
@@ -52,7 +52,7 @@ public class HungarBiPartVehicleDestMatcher extends AbstractVehicleDestMatcher {
         }
 
         // vehicle at position i is assigned to destination matchinghungarianAlgorithm[j]
-        int[] matchinghungarianAlgorithm = new HungarianAlgorithm(distancematrix).execute(); // O(n^3)
+        int[] matchinghungarianAlgorithm = new HungarianAlgorithm(distancematrix).executeClruch(); // O(n^3)
 
         // do the assignment according to the Hungarian algorithm (only for the matched elements, otherwise keep current drive destination)
         final Map<RoboTaxi, AVRequest> map = new HashMap<>();

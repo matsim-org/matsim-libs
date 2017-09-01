@@ -1,148 +1,68 @@
 package playground.clruch.dispatcher.utils;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.clruch.simonton.Cluster;
-import playground.clruch.simonton.EuclideanDistancer;
-import playground.clruch.simonton.MyTree;
 import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public enum BipartiteMatchingUtils {
     ;
 
-    public static Tensor executePickup(BiConsumer<RoboTaxi, AVRequest> setFunction, Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests) {
+    public static Tensor executePickup(BiConsumer<RoboTaxi, AVRequest> setFunction, Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests, //
+            DistanceFunction distanceFunction, Network network, boolean reducewithKDTree) {
         Tensor infoLine = Tensors.empty();
-        Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(roboTaxis, requests, infoLine);
+        Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(roboTaxis, requests, distanceFunction, network, infoLine, reducewithKDTree);
         for (Entry<RoboTaxi, AVRequest> entry : gbpMatch.entrySet()) {
             setFunction.accept(entry.getKey(), entry.getValue());
         }
         return infoLine;
     }
 
-    public static Tensor executeRebalance(BiConsumer<RoboTaxi, Link> setFunction, Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests) {
+    public static Tensor executeRebalance(BiConsumer<RoboTaxi, Link> setFunction, Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests, //
+            DistanceFunction distanceFunction, Network network, boolean reducewithKDTree) {
         Tensor infoLine = Tensors.empty();
-        Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(roboTaxis, requests, infoLine);
+        Map<RoboTaxi, AVRequest> gbpMatch = globalBipartiteMatching(roboTaxis, requests, distanceFunction, network, infoLine, reducewithKDTree);
         for (Entry<RoboTaxi, AVRequest> entry : gbpMatch.entrySet()) {
             setFunction.accept(entry.getKey(), entry.getValue().getFromLink());
         }
         return infoLine;
     }
 
-    private static Map<RoboTaxi, AVRequest> globalBipartiteMatching(Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests, Tensor infoLine) {
+    private static Map<RoboTaxi, AVRequest> globalBipartiteMatching(Collection<RoboTaxi> roboTaxis, Collection<AVRequest> requests, //
+            DistanceFunction distanceFunction, Network network, Tensor infoLine, boolean reducewithKDTree) {
+
+        if (reducewithKDTree == true && !(distanceFunction instanceof EuclideanDistanceFunction)) {
+            System.err.println("cannot use requestReducing technique with other distance function than Euclidean.");
+            GlobalAssert.that(false);
+        }
 
         // save initial problemsize
         infoLine.append(Tensors.vectorInt(roboTaxis.size(), requests.size()));
 
-        // 1) In case roboTaxis >> requests reduce search space using kd-trees
-        Collection<RoboTaxi> roboTaxisReduced = reduceVehiclesKDTree(requests, roboTaxis);
+        if (reducewithKDTree) {
+            // 1) In case roboTaxis >> requests reduce search space using kd-trees
+            Collection<RoboTaxi> roboTaxisReduced = NDTreeReducer.reduceRoboTaxis(requests, roboTaxis, network);
 
-        // 2) In case requests >> roboTaxis reduce the search space using kd-trees
-        Collection<AVRequest> requestsReduced = reduceRequestsKDTree(requests, roboTaxis);
+            // 2) In case requests >> roboTaxis reduce the search space using kd-trees
+            Collection<AVRequest> requestsReduced = NDTreeReducer.reduceRequests(requests, roboTaxis, network);
 
-        // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method and
-        // set new pickup commands
-        infoLine.append(Tensors.vectorInt(roboTaxisReduced.size(), requestsReduced.size())); // initial problem size
+            // 3) compute Euclidean bipartite matching for all vehicles using the Hungarian method and set new pickup commands
+            infoLine.append(Tensors.vectorInt(roboTaxisReduced.size(), requestsReduced.size()));
 
-        return ((new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction())).matchAVRequest(roboTaxisReduced, requestsReduced)); //
-
-    }
-
-    private static Collection<AVRequest> reduceRequestsKDTree(Collection<AVRequest> requests, Collection<RoboTaxi> roboTaxis) {
-        // for less requests than cars, don't do anything
-        if (requests.size() < roboTaxis.size())
-            return requests;
-
-        // otherwise create KD tree and return reduced amount of requestlocs
-        // create KD tree
-        int dimensions = 2;
-        int maxDensity = requests.size();
-        double maxCoordinate = 1000000000000.0;
-        int maxDepth = requests.size();
-        MyTree<AVRequest> KDTree = new MyTree<>(dimensions, maxDensity, maxCoordinate, maxDepth);
-
-        // add uniquely identifiable requests to KD tree
-        int reqIter = 0;
-        for (AVRequest avRequest : requests) {
-            Link link = avRequest.getFromLink();
-            double d1 = link.getFromNode().getCoord().getX();
-            double d2 = link.getFromNode().getCoord().getY();
-            GlobalAssert.that(Double.isFinite(d1));
-            GlobalAssert.that(Double.isFinite(d2));
-            KDTree.add(new double[] { d1, d2 }, avRequest);
-            reqIter++;
+            return ((new HungarBiPartVehicleDestMatcher(//
+                    distanceFunction)).matchAVRequest(roboTaxisReduced, requestsReduced));
+        } else {
+            return ((new HungarBiPartVehicleDestMatcher(//
+                    distanceFunction)).matchAVRequest(roboTaxis, requests));
         }
-
-        // for all roboTaxis vehicles, start nearestNeighborSearch until union is as large as the
-        // number of vehicles
-        // start with only one request per vehicle
-        Collection<AVRequest> requestsChosen = new HashSet<>();
-        int iter = 1;
-        do {
-            requestsChosen.clear();
-            for (RoboTaxi roboTaxi : roboTaxis) {
-                double[] vehLoc = new double[] { roboTaxi.getDivertableLocation().getToNode().getCoord().getX(),
-                        roboTaxi.getDivertableLocation().getToNode().getCoord().getY() };
-                Cluster<AVRequest> nearestCluster = KDTree.buildCluster(vehLoc, iter, new EuclideanDistancer());
-                nearestCluster.getValues().stream().forEach(v -> requestsChosen.add(v));
-            }
-            ++iter;
-        } while (requestsChosen.size() < roboTaxis.size() && iter <= roboTaxis.size());
-
-        return requestsChosen;
-
-    }
-
-    private static Collection<RoboTaxi> reduceVehiclesKDTree(Collection<AVRequest> requests, Collection<RoboTaxi> roboTaxis) {
-        // for less requests than cars, don't do anything
-        if (roboTaxis.size() < requests.size())
-            return roboTaxis;
-
-        // otherwise create KD tree and return reduced amount of requestlocs
-        // create KD tree
-        int dimensions = 2;
-        int maxDensity = roboTaxis.size();
-        double maxCoordinate = 1000000000000.0;
-        int maxDepth = roboTaxis.size();
-        MyTree<RoboTaxi> KDTree = new MyTree<>(dimensions, maxDensity, maxCoordinate, maxDepth);
-
-        // add uniquely identifiable requests to KD tree
-        // int vehIter = 0; // not read
-        for (RoboTaxi roboTaxi : roboTaxis) {
-            double d1 = roboTaxi.getDivertableLocation().getToNode().getCoord().getX();
-            double d2 = roboTaxi.getDivertableLocation().getToNode().getCoord().getY();
-            GlobalAssert.that(Double.isFinite(d1));
-            GlobalAssert.that(Double.isFinite(d2));
-            KDTree.add(new double[] { d1, d2 }, roboTaxi);
-            // vehIter++;
-        }
-
-        // for all requests, start nearestNeighborSearch until union is as large as the number of
-        // requests
-        // start with only one vehicle per request
-        HashSet<RoboTaxi> vehiclesChosen = new HashSet(); // note: must be HashSet to avoid
-                                                          // duplicate elements.
-        int iter = 1;
-        do {
-            vehiclesChosen.clear();
-            for (AVRequest avRequest : requests) {
-                Link link = avRequest.getFromLink();
-                double[] reqloc = new double[] { link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY() };
-                Cluster<RoboTaxi> nearestCluster = KDTree.buildCluster(reqloc, iter, new EuclideanDistancer());
-                nearestCluster.getValues().stream().forEach(v -> vehiclesChosen.add(v));
-            }
-            ++iter;
-        } while (vehiclesChosen.size() < requests.size() && iter <= requests.size());
-
-        return vehiclesChosen;
     }
 }

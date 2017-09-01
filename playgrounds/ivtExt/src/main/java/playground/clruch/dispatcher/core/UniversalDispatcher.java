@@ -196,6 +196,7 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
      * @param avRequest */
     private synchronized final void setAcceptRequest(RoboTaxi robotaxi, AVRequest avRequest) {
         robotaxi.setAVStatus(AVStatus.DRIVEWITHCUSTOMER);
+        robotaxi.setCurrentDriveDestination(avRequest.getFromLink());
         {
             boolean statusPen = pendingRequests.remove(avRequest);
             GlobalAssert.that(statusPen);

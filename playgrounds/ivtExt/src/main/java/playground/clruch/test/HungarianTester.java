@@ -1,7 +1,7 @@
 // code by clruch
 package playground.clruch.test;
 
-import playground.clruch.utils.HungarianAlgorithm;
+import ch.ethz.idsc.queuey.math.HungarianAlgorithm;
 
 /**
  * Created by Claudio on 2/27/2017.

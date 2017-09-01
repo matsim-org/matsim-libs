@@ -13,47 +13,51 @@ import playground.clruch.utils.GlobalAssert;
 
 public class CsvFleetReader {
 
-	public static List<String> csvLineToList(String line) {
-		return Stream.of(line.split(";")).collect(Collectors.toList());
-	}
+    public static List<String> csvLineToList(String line) {
+        return Stream.of(line.split(";")).collect(Collectors.toList());
+    }
 
-	private final DayTaxiRecord dayTaxiRecord;
+    private final DayTaxiRecord dayTaxiRecord;
 
-	public CsvFleetReader(DayTaxiRecord dayTaxiRecord) {
-		this.dayTaxiRecord = dayTaxiRecord;
-	}
+    public CsvFleetReader(DayTaxiRecord dayTaxiRecord) {
+        this.dayTaxiRecord = dayTaxiRecord;
+    }
 
-	public DayTaxiRecord populate(File file) throws Exception {
-		GlobalAssert.that(file.isFile());
+    public DayTaxiRecord populateFrom(List<File> files) throws Exception {
+        files.stream().forEach(f -> GlobalAssert.that(f.isFile()));
+        int dataline = 0;
+        for (File file : files) {
 
-		int dataline = 0;
-		try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-			{
-				String line = br.readLine();
-				List<String> list = csvLineToList(line);
-				int count = 0;
-				System.out.println("CSV HEADER");
-				for (String token : list) {
-					System.out.println(" col " + count + " = " + token);
-					++count;
-				}
-			}
-			while (true) {
-				String line = br.readLine();
-				if (Objects.isNull(line))
-					break;
-				List<String> list = csvLineToList(line);
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                {
+                    String line = br.readLine();
+                    List<String> list = csvLineToList(line);
+                    int count = 0;
+                    System.out.println("CSV HEADER");
+                    for (String token : list) {
+                        System.out.println(" col " + count + " = " + token);
+                        ++count;
+                    }
+                }
+                while (true) {
+                    String line = br.readLine();
+                    if (Objects.isNull(line))
+                        break;
+                    List<String> list = csvLineToList(line);
 
-				dayTaxiRecord.insert(list);
-				++dataline;
-			}
-		} finally {
-			// ---
-		}
-		System.out.println("lines      " + dataline);
-		System.out.println("vehicles   " + dayTaxiRecord.size());
-		// System.out.println("timestamps " + dayTaxiRecord.keySet().size());
-		System.out.println(dayTaxiRecord.status);
-		return dayTaxiRecord;
-	}
+                    dayTaxiRecord.insert(list);
+                    ++dataline;
+                }
+            } finally {
+                // ---
+            }
+
+        }
+
+        System.out.println("lines      " + dataline);
+        System.out.println("vehicles   " + dayTaxiRecord.size());
+        // System.out.println("timestamps " + dayTaxiRecord.keySet().size());
+        System.out.println(dayTaxiRecord.status);
+        return dayTaxiRecord;
+    }
 }

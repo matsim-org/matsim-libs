@@ -20,3 +20,4 @@ IDSCOptions.properties
 tutorial/output/
 tutorial/pop.xml.gz
 
+.gitignore

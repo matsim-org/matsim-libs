@@ -42,7 +42,8 @@ public class RoboTaxi {
     // ===================================================================================
     // methods to be used by dispatchers, public
 
-    /** @return {@link} location at which robotaxi can be diverted */
+    /** @return {@link} location at which robotaxi can be diverted, i.e. a Link with an endnode
+     *         at which the robotaxi path can be altered */
     public Link getDivertableLocation() {
         return divertableLinkTime.link;
     }

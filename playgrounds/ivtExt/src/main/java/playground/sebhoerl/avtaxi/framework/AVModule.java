@@ -33,7 +33,6 @@ import playground.clruch.dispatcher.EdgyDispatcher;
 import playground.clruch.dispatcher.GlobalBipartiteMatchingDispatcher;
 import playground.clruch.dispatcher.LPFBDispatcher;
 import playground.clruch.dispatcher.LPFFDispatcher;
-import playground.clruch.dispatcher.MonoMultiGBMDispatcher;
 import playground.clruch.dispatcher.NewSingleHeuristicDispatcher;
 import playground.clruch.dispatcher.TestBedDispatcher;
 import playground.clruch.dispatcher.UncoordinatedDispatcher;
@@ -73,8 +72,7 @@ public class AVModule extends AbstractModule {
 
         // Bind the AV travel time to the DVRP estimated travel time
         // TODO add different travel time to avoid congestions
-        bind(TravelTime.class).annotatedWith(Names.named(AVModule.AV_MODE))
-                .to(Key.get(TravelTime.class, Names.named(VrpTravelTimeModules.DVRP_ESTIMATED)));
+        bind(TravelTime.class).annotatedWith(Names.named(AVModule.AV_MODE)).to(Key.get(TravelTime.class, Names.named(VrpTravelTimeModules.DVRP_ESTIMATED)));
 
         bind(VehicleType.class).annotatedWith(Names.named(AVModule.AV_MODE)).toInstance(VehicleUtils.getDefaultVehicleType());
 
@@ -118,8 +116,7 @@ public class AVModule extends AbstractModule {
         AVUtils.bindDispatcherFactory(binder(), UncoordinatedDispatcher.class.getSimpleName()).to(UncoordinatedDispatcher.Factory.class);
 
         bind(GlobalBipartiteMatchingDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), GlobalBipartiteMatchingDispatcher.class.getSimpleName())
-                .to(GlobalBipartiteMatchingDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), GlobalBipartiteMatchingDispatcher.class.getSimpleName()).to(GlobalBipartiteMatchingDispatcher.Factory.class);
 
         // bind(SelfishDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);
@@ -127,14 +124,9 @@ public class AVModule extends AbstractModule {
         bind(NewSingleHeuristicDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), NewSingleHeuristicDispatcher.class.getSimpleName()).to(NewSingleHeuristicDispatcher.Factory.class);
 
-        bind(MonoMultiGBMDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), MonoMultiGBMDispatcher.class.getSimpleName()).to(MonoMultiGBMDispatcher.Factory.class);
-        
         bind(TestBedDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), TestBedDispatcher.class.getSimpleName()).to(TestBedDispatcher.Factory.class);
-        
-        
-        
+
         // bind(PolyMultiGBMDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), PolyMultiGBMDispatcher.class.getSimpleName()).to(PolyMultiGBMDispatcher.Factory.class);
 
@@ -240,8 +232,7 @@ public class AVModule extends AbstractModule {
 
     @Provides
     @Singleton
-    public Map<Id<AVOperator>, List<AVVehicle>> provideVehicles(Map<Id<AVOperator>, AVOperator> operators,
-            Map<Id<AVOperator>, AVGenerator> generators) {
+    public Map<Id<AVOperator>, List<AVVehicle>> provideVehicles(Map<Id<AVOperator>, AVOperator> operators, Map<Id<AVOperator>, AVGenerator> generators) {
         Map<Id<AVOperator>, List<AVVehicle>> vehicles = new HashMap<>();
 
         for (AVOperator operator : operators.values()) {
