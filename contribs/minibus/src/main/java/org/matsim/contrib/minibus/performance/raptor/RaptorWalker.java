@@ -276,6 +276,7 @@ public class RaptorWalker {
 								}
 							} else {
 								atLeastOneRouteStopImproved = false;
+								break;
 							}
 						}
 					} else {
