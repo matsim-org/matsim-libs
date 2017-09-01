@@ -216,6 +216,11 @@ public class RaptorWalker {
 				// TODO do not proceed if this stop's best arrival time has just got updated in this round
 				// updates at this part of the round can only occur by parsing the same route but from one of the upstream stops
 				// thus all following downstream stops were already updated as well and have all a better arrival time as possibly this stop's departure would yield
+
+				// this is not entirely true because if one of the intermediate stop get a better arrival time (by transfer).
+				// This means, if any of the intermediate stop is not improved, let it run if the same route is encounterd again.
+				// doing this by setting "atLeastOneRouteStopImproved = false;" later. Amit Sep'17
+
 				if (indexOfLastRouteProcessed == startStop.indexOfRoute && atLeastOneRouteStopImproved) {
 					// we process the same route again
 					// since route stops have increasing indices we only need to process all downstream stops again if the last try could not improve the arrival times
@@ -269,6 +274,8 @@ public class RaptorWalker {
 									sourcePointerTransitStops[routeStopToCheck.indexOfStopFacility] = source;
 									transferTransitStopsToCheck[routeStopToCheck.indexOfStopFacility] = true;
 								}
+							} else {
+								atLeastOneRouteStopImproved = false;
 							}
 						}
 					} else {
