@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -241,7 +242,7 @@ public class TransitRouterImplTest {
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
 	}
 
-	@Test
+	@Test@Ignore
 	public void testFasterAlternative() {
 		Fixture f = new Fixture();
 		f.init();

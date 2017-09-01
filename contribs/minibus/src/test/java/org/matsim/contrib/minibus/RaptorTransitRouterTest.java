@@ -39,8 +39,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  */
 
 
-public class TransitRouterImplTestFromCore extends TransitRouterImplTest {
-	private static final Logger log = Logger.getLogger(TransitRouterImplTestFromCore.class) ;
+public class RaptorTransitRouterTest extends TransitRouterImplTest {
+	private static final Logger log = Logger.getLogger(RaptorTransitRouterTest.class) ;
 	
 	private String routerType ;
 	// yyyyyy probably better make type a String ... no point to have an enum in the core that needs to be touched every time a new router is
@@ -49,14 +49,15 @@ public class TransitRouterImplTestFromCore extends TransitRouterImplTest {
 	@Parameters(name = "{index}: TransitRouter == {0}")
 	public static Collection<Object> createRouterTypes() {
 		Object[] router = new Object [] { 
-//				"standard",
+				"standard",
                 "raptor",
-//                "connectionScan"
+//                "connectionScan",
+//                "otp"
 		};
 		return Arrays.asList(router);
 	}
 
-	public TransitRouterImplTestFromCore(String routerType ) {
+	public RaptorTransitRouterTest(String routerType ) {
 		super( routerType ) ;
 		log.warn( "using router=" + routerType ) ;
 		this.routerType = routerType;
