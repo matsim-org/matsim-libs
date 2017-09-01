@@ -219,7 +219,7 @@ public class RaptorWalker {
 
 				// this is not entirely true because if one of the intermediate stop get a better arrival time (by transfer).
 				// This means, if any of the intermediate stop is not improved, let it run if the same route is encounterd again.
-				// doing this by setting "atLeastOneRouteStopImproved = false;" later. Amit Sep'17
+				// doing this by setting "atLeastOneRouteStopImproved = false;" and breaking the process of updating arrival times of rest of the stops of the route. Amit Sep'17
 
 				if (indexOfLastRouteProcessed == startStop.indexOfRoute && atLeastOneRouteStopImproved) {
 					// we process the same route again
@@ -233,17 +233,20 @@ public class RaptorWalker {
 
 					double earliestArrivalTimeAtStartRouteStop = sourcePointerRouteStop[indexOfStartRouteStop].earliestArrivalTime;
 
+					int indexOfRouteStopWithinRouteSequence = routeToCheck.numberOfRouteStops - startStop.numberOfRemainingStopsInThisRoute - 1;
+					int indexOfEarliestDepartureTime = this.getIndexOfEarliestDepartureTime(earliestArrivalTimeAtStartRouteStop, routeToCheck, indexOfRouteStopWithinRouteSequence);
+
 					// It appears that if departure time is after midnight, it needs to be updated here
 					// so that an earliest connection for next day can be looked.
 					// However, the arrival time in the array is actual time. Amit Aug'17
 					double adjustedEarliestArrivalTimeAtStartRouteStop  = earliestArrivalTimeAtStartRouteStop;
 
-					if (adjustedEarliestArrivalTimeAtStartRouteStop >= RaptorDisutility.MIDNIGHT ) {
+					// transit router may have departures after midnight, so if there is no available departure for rest of the day, take earliest departure next day.
+					if (indexOfEarliestDepartureTime <= -1 && adjustedEarliestArrivalTimeAtStartRouteStop >= RaptorDisutility.MIDNIGHT ) {
 						adjustedEarliestArrivalTimeAtStartRouteStop = adjustedEarliestArrivalTimeAtStartRouteStop % RaptorDisutility.MIDNIGHT;
 					}
 
-					int indexOfRouteStopWithinRouteSequence = routeToCheck.numberOfRouteStops - startStop.numberOfRemainingStopsInThisRoute - 1;
-					int indexOfEarliestDepartureTime = this.getIndexOfEarliestDepartureTime(adjustedEarliestArrivalTimeAtStartRouteStop, routeToCheck, indexOfRouteStopWithinRouteSequence);
+					indexOfEarliestDepartureTime = this.getIndexOfEarliestDepartureTime(adjustedEarliestArrivalTimeAtStartRouteStop, routeToCheck, indexOfRouteStopWithinRouteSequence);
 
 					if(indexOfEarliestDepartureTime > -1) {
 						// we have found a valid departure time - process all upcoming stops of the route
