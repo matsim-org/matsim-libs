@@ -19,84 +19,95 @@
 package org.matsim.contrib.bicycle.network;
 
 import java.awt.image.Raster;
-import java.io.File;
+import java.io.IOException;
 
 import org.geotools.coverage.grid.GridCoordinates2D;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.GridGeometry2D;
+import org.geotools.coverage.grid.InvalidGridGeometryException;
+import org.geotools.data.DataSourceException;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.geometry.DirectPosition2D;
-import org.opengis.geometry.DirectPosition;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.geotools.referencing.CRS;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.opengis.referencing.operation.TransformException;
 
+/**
+ * @author smetzler, dziemke
+ */
 public class ElevationDataParser {
 
 	private static GridCoverage2D grid;
-	private static  Raster gridData;
-		
-	public double parseGeoTiff(double xCoord, double yCoord, boolean firsttime) throws Exception {
-		if (firsttime) {
-		initTif();}		
-		return getValue(xCoord, yCoord);
-	}
-
-	private void initTif() throws Exception {
-		
-		//Where to download elevation Raw Data?
+	private static Raster gridData;
+	private CoordinateTransformation ct;
+	
+	public static void main(String[] args) {
+		// Data sources:
 		// SRTM1:  http://earthexplorer.usgs.gov/ (login in required)
 		// SRTM3:  http://srtm.csi.cgiar.org/SELECTION/inputCoord.asp
 		// EU-DEM: http://data.eox.at/eudem
 		
+		String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_berlin/BerlinEUDEM.tif"; // Berlin EU-DEM
+		// String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_berlin/srtm3/srtm_39_02.tif"; // Berlin SRTM3
+		// String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_stuttgart/stuttgartEUDEM.tif"; // Stuttgart EU-DEM
+		// String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_stuttgart/srtm_38_03.tif"; // Stuttgart SRTM3		
+		// String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_brasilia/srtm_27_16.tif"; // Brasilia SRTM3
 		
-		//berlin SRTM3
-//		File tiffFile = new File(
-//				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_berlin/srtm3/srtm_39_02.tif");
+		String scenarioCRS = "EPSG:4326"; // WGS84 as the coorinates to test below are stated like this
 		
-	    //berlin EU-DEM
-		File tiffFile = new File(
-				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_berlin/BerlinEUDEM.tif");
+		ElevationDataParser elevationDataParser = new ElevationDataParser(tiffFile, scenarioCRS);
 		
-//		//stuttgart EUDEM
-//		File tiffFile = new File(
-//				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_stuttgart/stuttgartEUDEM.tif");		
-//		
-//		//stuttgart SRTM3
-//		File tiffFile = new File(
-//				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_stuttgart/srtm_38_03.tif");
-//		
-//		//brasilia SRTM3
-//		File tiffFile = new File(
-//				"../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_brasilia/srtm_27_16.tif");
-		
-		
-		GeoTiffReader reader = new GeoTiffReader(tiffFile);
-
-		grid = reader.read(null);
-		gridData = grid.getRenderedImage().getData();
-
+		System.out.println("Teufelsberg: " + elevationDataParser.getElevation(13.2407, 52.4971));
+		System.out.println("Tempelhofer Feld: " + elevationDataParser.getElevation(13.3989, 52.4755));
+		System.out.println("Müggelsee: " + elevationDataParser.getElevation(13.6354, 52.4334));
+		System.out.println("Müggelberg: " + elevationDataParser.getElevation(13.64048, 52.41594));
+		System.out.println("Alexanderplatz: " + elevationDataParser.getElevation(13.40993, 52.52191));
+		System.out.println("Kreuzberg (Berg): " + elevationDataParser.getElevation(13.379491, 52.487610));
+		System.out.println("Herrmannplatz: " + elevationDataParser.getElevation(13.422301,52.486477));
+		System.out.println("U-Bahnhof Boddinstraße: " + elevationDataParser.getElevation(13.423210,52.480278));
 	}
-
-	private double getValue(double x, double y) throws Exception {
-
-		GridGeometry2D gg = grid.getGridGeometry();
-
+	
+	
+	public ElevationDataParser(String tiffFile, String scenarioCRS) {
+		this.ct = TransformationFactory.getCoordinateTransformation(scenarioCRS, "EPSG:4326");
 		
-		//convert the the projection used in the MATSim Berlin scenario (DHDN / 3-degree Gauss-Kruger zone 4) to one used in the elevation data (Geotiff, WGS84) 
-		//new
-		CoordinateReferenceSystem sourceCRS = CRS.decode("EPSG:31468", true); // DHDN / 3-degree Gauss-Kruger zone 4
-		CoordinateReferenceSystem targetCRS = CRS.decode("EPSG:4326", true);  //WGS84
+		GeoTiffReader reader = null;
+		try {
+			reader = new GeoTiffReader(tiffFile);
+		} catch (DataSourceException e) {
+			e.printStackTrace();
+		}
 
-		MathTransform mathTransform = CRS.findMathTransform(sourceCRS, targetCRS, true);
+		try {
+			grid = reader.read(null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		gridData = grid.getRenderedImage().getData();
+	}
+	
+	
+	public double getElevation(double x, double y) {
+		return getElevation(CoordUtils.createCoord(x, y));
+	}
+	
+	
+	public double getElevation(Coord coord) {
+		GridGeometry2D gg = grid.getGridGeometry();
+		
+		Coord transformedCoord = ct.transform(coord);
+		
+		GridCoordinates2D posGrid = null;
+		try {
+			posGrid = gg.worldToGrid(new DirectPosition2D(transformedCoord.getX(), transformedCoord.getY()));
+		} catch (InvalidGridGeometryException e) {
+			e.printStackTrace();
+		} catch (TransformException e) {
+			e.printStackTrace();
+		}
 
-		DirectPosition transformedCoords = mathTransform.transform(new DirectPosition2D(x, y), null);
-
-
-		DirectPosition2D posWorld = new DirectPosition2D(transformedCoords); 
-		GridCoordinates2D posGrid = gg.worldToGrid(posWorld);
-
-		// envelope is the size in the target projection
 		double[] pixel = new double[1];
 		double[] data = gridData.getPixel(posGrid.x, posGrid.y, pixel);
 		return data[0];
