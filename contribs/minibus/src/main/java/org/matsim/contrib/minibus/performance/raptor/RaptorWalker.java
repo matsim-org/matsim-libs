@@ -250,8 +250,9 @@ public class RaptorWalker {
 
 							double arrivalTimeAtTheFollowingRouteStop = this.raptorSearchData.arrivalTimes[indexOfEarliestDepartureTime];
 
-							if (arrivalTimeAtTheFollowingRouteStop < earliestArrivalTimeAtStartRouteStop ) {
+							while (arrivalTimeAtTheFollowingRouteStop < earliestArrivalTimeAtStartRouteStop ) {
 								arrivalTimeAtTheFollowingRouteStop += RaptorDisutility.MIDNIGHT;
+								// (add enough "MIDNIGHT"s until we are _after_ the desired departure time)
 							}
 
 							if (arrivalTimeAtTheFollowingRouteStop < earliestArrivalTimeAtRouteStop[routeStopToCheck.indexOfRouteStop]) {
