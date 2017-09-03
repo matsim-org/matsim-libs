@@ -31,7 +31,7 @@ public final class LinkNetworkRouteFactory implements RouteFactory {
 
 	@Override
 	public Route createRoute(final Id<Link> startLinkId, final Id<Link> endLinkId) {
-		return new LinkNetworkRouteImpl(startLinkId, endLinkId);
+		return RouteUtils.createLinkNetworkRouteImpl(startLinkId, endLinkId);
 	}
 
 	@Override

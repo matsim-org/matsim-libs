@@ -82,4 +82,8 @@ public interface NetworkRoute extends Route {
 	// Does it really make sense to couple the vehicle to the route?  I would have coupled it to the leg.  kai, aug'10
 	// Well, I guess now it belongs to the route. :-)  kai, aug'10
 
+	@Override
+	public NetworkRoute clone();
+	// to get the correct interface type.  kai, sep'17
+
 }

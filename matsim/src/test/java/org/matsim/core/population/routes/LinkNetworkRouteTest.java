@@ -36,7 +36,7 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 
 	@Override
 	public NetworkRoute getNetworkRouteInstance(final Id<Link> fromLinkId, final Id<Link> toLinkId, final Network network) {
-		return new LinkNetworkRouteImpl(fromLinkId, toLinkId);
+		return RouteUtils.createLinkNetworkRouteImpl(fromLinkId, toLinkId);
 	}
 
 	@Test
@@ -51,14 +51,14 @@ public class LinkNetworkRouteTest extends AbstractNetworkRouteTest {
 		Link link3 = new FakeLink(id3);
 		Link link4 = new FakeLink(id4);
 		Link link5 = new FakeLink(id5);
-		LinkNetworkRouteImpl route1 = new LinkNetworkRouteImpl(startLink.getId(), endLink.getId());
+		NetworkRoute route1 = RouteUtils.createLinkNetworkRouteImpl(startLink.getId(), endLink.getId());
 		ArrayList<Id<Link>> srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(link3.getId());
 		srcRoute.add(link4.getId());
 		route1.setLinkIds(startLink.getId(), srcRoute, endLink.getId());
 		Assert.assertEquals(2, route1.getLinkIds().size());
 
-		LinkNetworkRouteImpl route2 = route1.clone();
+		NetworkRoute route2 = (NetworkRoute) route1.clone();
 
 		srcRoute.add(link5.getId());
 		route1.setLinkIds(startLink.getId(), srcRoute, endLink.getId());

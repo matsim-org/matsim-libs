@@ -40,8 +40,9 @@ import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -126,10 +127,7 @@ public class VehicleWaitingTest {
 			for ( int lap=0; lap < nLaps; lap++ ) {
 				final Leg leg = popFact.createLeg( TransportMode.car );
 				final NetworkRoute route =
-					new LinkNetworkRouteImpl(
-							link1.getId(),
-							Collections.singletonList( link2.getId() ),
-							link3.getId());
+					RouteUtils.createLinkNetworkRouteImpl(link1.getId(), Collections.singletonList( link2.getId() ), link3.getId());
 				route.setVehicleId( Id.create(personId1, Vehicle.class) ); // QSim creates a vehicle per person, with the ids of the persons
 				leg.setRoute( route );
 				plan.addLeg( leg );
@@ -142,10 +140,7 @@ public class VehicleWaitingTest {
 
 				final Leg secondLeg = popFact.createLeg( TransportMode.car );
 				final NetworkRoute secondRoute =
-					new LinkNetworkRouteImpl(
-							link3.getId(),
-							Collections.<Id<Link>>emptyList(),
-							link1.getId());
+					RouteUtils.createLinkNetworkRouteImpl(link3.getId(), Collections.<Id<Link>>emptyList(), link1.getId());
 
 				secondRoute.setVehicleId( Id.create(personId1, Vehicle.class) ); // QSim creates a vehicle per person, with the ids of the persons
 				secondLeg.setRoute( secondRoute );

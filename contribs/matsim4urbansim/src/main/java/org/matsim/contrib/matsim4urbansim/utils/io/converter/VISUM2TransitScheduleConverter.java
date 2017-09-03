@@ -37,8 +37,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.matsim4urbansim.utils.io.HeaderParser;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
@@ -462,7 +463,7 @@ public class VISUM2TransitScheduleConverter {
 		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
 		linkIds.add(Id.create(origin.getId() +""+ destination.getId(), Link.class));
 		
-		NetworkRoute route = new LinkNetworkRouteImpl(origin.getLinkId(), destination.getLinkId());
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(origin.getLinkId(), destination.getLinkId());
 		route.setLinkIds(origin.getLinkId(), linkIds, destination.getLinkId());
 
 		TransitRoute transitRoute = tsfi.createTransitRoute(Id.create(transitStopOrigin+"to"+transitStopDestination, TransitRoute.class), route, stops, mode);

@@ -60,7 +60,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -1351,7 +1351,7 @@ public class QSimTest {
 		Activity act1_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act1_1.setEndTime(simEndTime - 20);
 		Leg leg1 = pb.createLeg(TransportMode.car);
-		NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
+		NetworkRoute route1 = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link2.getId());
 		leg1.setRoute(route1);
 		leg1.setTravelTime(5.0*3600);
 		Activity act1_2 = pb.createActivityFromLinkId("w", link2.getId());

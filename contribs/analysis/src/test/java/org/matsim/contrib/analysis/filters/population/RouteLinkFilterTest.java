@@ -36,8 +36,8 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -80,7 +80,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		Activity a = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		a.setEndTime(7.0 * 3600);
 		leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
+		route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("6 15"), link20.getId());
 		leg.setRoute(route);
 		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link20.getId());
@@ -91,7 +91,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		Activity a2 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		a2.setEndTime(7.0 * 3600 + 5.0 * 60);
 		leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
+		route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("6 15"), link20.getId());
 		leg.setRoute(route);
 		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link20.getId());
@@ -102,7 +102,7 @@ public class RouteLinkFilterTest extends MatsimTestCase {
 		Activity a3 = PopulationUtils.createAndAddActivityFromLinkId(plan, "h", link1.getId());
 		a3.setEndTime(7.0 * 3600 + 10.0 * 60);
 		leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
-		route = new LinkNetworkRouteImpl(link1.getId(), link20.getId());
+		route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link20.getId());
 		route.setLinkIds(link1.getId(), NetworkUtils.getLinkIds("5 14"), link20.getId());
 		leg.setRoute(route);
 		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link20.getId());

@@ -6,8 +6,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -50,7 +51,7 @@ public class UmlaufInterpolator {
 			throw new RuntimeException("No route found from node "
 					+ startNode.getId() + " to node " + endNode.getId() + ".");
 		}
-		NetworkRoute route = new LinkNetworkRouteImpl(fromLinkId, toLinkId);
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(fromLinkId, toLinkId);
 		route.setLinkIds(fromLinkId, NetworkUtils.getLinkIds(wendenPath.links), toLinkId);
 		umlauf.getUmlaufStuecke().add(new Wenden(route));
 	}

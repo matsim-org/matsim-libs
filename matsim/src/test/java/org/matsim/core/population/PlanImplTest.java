@@ -39,7 +39,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 
@@ -230,7 +230,7 @@ public class PlanImplTest {
 		PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		PopulationUtils.createAndAddActivityFromCoord(plan, "w", new Coord(100, 200));
-		Route route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
+		Route route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link2.getId());
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
 

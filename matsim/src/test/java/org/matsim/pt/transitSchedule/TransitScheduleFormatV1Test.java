@@ -32,8 +32,9 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -128,7 +129,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		assertEquals(schedule1, schedule2);
 
 		// now add route info to the schedule
-		NetworkRoute route = new LinkNetworkRouteImpl(l1.getId(), l4.getId());
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(l1.getId(), l4.getId());
 		List<Id<Link>> links = new ArrayList<Id<Link>>(2);
 		links.add(l2.getId());
 		links.add(l3.getId());

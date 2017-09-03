@@ -38,7 +38,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -96,7 +97,7 @@ public class OptimizeVehicleAllocationAtTourLevelTest {
 		plan.addActivity( firstAct );
 
 		final Leg l = popFact.createLeg( MODE );
-		l.setRoute( new LinkNetworkRouteImpl( Id.create( 1 , Link.class ) , Id.create( 12 , Link.class ) ) );
+		l.setRoute( RouteUtils.createLinkNetworkRouteImpl(Id.create( 1 , Link.class ), Id.create( 12 , Link.class )) );
 		l.setTravelTime( random.nextDouble() * 36000 );
 		plan.addLeg( l );
 

@@ -14,7 +14,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -31,7 +32,7 @@ public class OneWayCarsharingRoutingModule implements RoutingModule{
 		final List<PlanElement> trip = new ArrayList<PlanElement>();		
 		
 		final Leg csLeg = PopulationUtils.createLeg("oneway");
-		LinkNetworkRouteImpl csRoute = new LinkNetworkRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
+		NetworkRoute csRoute = RouteUtils.createLinkNetworkRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
 		csLeg.setRoute(csRoute);
 		trip.add( csLeg );	
 	

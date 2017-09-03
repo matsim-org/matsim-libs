@@ -29,8 +29,9 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -68,7 +69,7 @@ public class TransitScheduleFactoryTest {
 	public void testCreateTransitRoute() {
 		TransitScheduleFactory builder = createTransitScheduleBuilder();
 		Id<TransitRoute> id = Id.create(2, TransitRoute.class);
-		NetworkRoute route = new LinkNetworkRouteImpl(Id.create(3, Link.class), Id.create(4, Link.class));
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(Id.create(3, Link.class), Id.create(4, Link.class));
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitRouteStop stop1 = new TransitRouteStopImpl(null, 50, 60);
 		stops.add(stop1);

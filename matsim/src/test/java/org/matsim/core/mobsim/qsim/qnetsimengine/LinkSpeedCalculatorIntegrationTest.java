@@ -52,7 +52,8 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -294,7 +295,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 			Activity homeAct = pf.createActivityFromLinkId("home", linkIds[1]);
 			homeAct.setEndTime(7*3600);
 			Leg leg = pf.createLeg("car");
-			Route route = new LinkNetworkRouteImpl(linkIds[1], new Id[] { linkIds[2] }, linkIds[3]);
+			Route route = RouteUtils.createLinkNetworkRouteImpl(linkIds[1], new Id[] { linkIds[2] }, linkIds[3]);
 			leg.setRoute(route);
 			Activity workAct = pf.createActivityFromLinkId("work", linkIds[1]);
 

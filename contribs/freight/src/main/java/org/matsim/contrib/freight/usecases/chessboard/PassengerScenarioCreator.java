@@ -16,7 +16,8 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -82,7 +83,7 @@ public class PassengerScenarioCreator {
 			plan.addActivity(act1);
 			Leg leg1 = popFactory.createLeg(TransportMode.car);
 			Path path1 = lcpa.calcLeastCostPath(scenario.getNetwork().getLinks().get(homeId).getToNode(), scenario.getNetwork().getLinks().get(workId).getFromNode(), act1.getEndTime(), person, null);
-			LinkNetworkRouteImpl linkNetworkRoute = new LinkNetworkRouteImpl(homeId, getLinkIds(path1), workId);
+			NetworkRoute linkNetworkRoute = RouteUtils.createLinkNetworkRouteImpl(homeId, getLinkIds(path1), workId);
 			leg1.setRoute(linkNetworkRoute);
 			plan.addLeg(leg1);
 
@@ -92,7 +93,7 @@ public class PassengerScenarioCreator {
 
 			Leg leg2 = popFactory.createLeg(TransportMode.car);
 			Path path2 = lcpa.calcLeastCostPath(scenario.getNetwork().getLinks().get(workId).getToNode(), scenario.getNetwork().getLinks().get(homeId).getFromNode(), act1.getEndTime(), person, null);
-			LinkNetworkRouteImpl linkNetworkRoute2 = new LinkNetworkRouteImpl(workId, getLinkIds(path2), homeId);
+			NetworkRoute linkNetworkRoute2 = RouteUtils.createLinkNetworkRouteImpl(workId, getLinkIds(path2), homeId);
 			leg2.setRoute(linkNetworkRoute2);
 			plan.addLeg(leg2);
 

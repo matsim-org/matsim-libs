@@ -13,8 +13,8 @@ import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
@@ -111,7 +111,7 @@ public class TimeAndSpaceTourRouter {
 	private void route(Leg prevLeg, Id fromLinkId, Id toLinkId, Person person, Vehicle vehicle) {
 		if(fromLinkId.equals(toLinkId)){
 			prevLeg.setExpectedTransportTime(0);
-			LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(fromLinkId,toLinkId);
+			NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(fromLinkId, toLinkId);
 			route.setDistance(0.0);
 			route.setTravelTime(0.0);
 //			route.setVehicleId(vehicle.getId());
@@ -133,7 +133,7 @@ public class TimeAndSpaceTourRouter {
 	}
 	
 	private NetworkRoute createRoute(Id fromLink, Path path, Id toLink) {
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(fromLink, toLink);
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(fromLink, toLink);
 		route.setLinkIds(fromLink, getLinkIds(path.links), toLink);
 		return route;
 	}

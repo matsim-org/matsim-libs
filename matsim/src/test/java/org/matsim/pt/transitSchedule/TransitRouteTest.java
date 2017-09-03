@@ -27,8 +27,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -62,7 +63,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		Id<TransitRoute> id = Id.create(9791, TransitRoute.class);
 		Link fromLink = new FakeLink(Id.create(10, Link.class), null, null);
 		Link toLink = new FakeLink(Id.create(5, Link.class), null, null);
-		NetworkRoute route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId());
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(fromLink.getId(), toLink.getId());
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitRouteStop stop = new TransitRouteStopImpl(null, 50, 60);
 		stops.add(stop);
@@ -174,8 +175,8 @@ public class TransitRouteTest extends MatsimTestCase {
 		Link link1 = new FakeLink(Id.create(1, Link.class), null, null);
 		Link link2 = new FakeLink(Id.create(2, Link.class), null, null);
 		Link link3 = new FakeLink(Id.create(3, Link.class), null, null);
-		NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
-		NetworkRoute route2 = new LinkNetworkRouteImpl(link1.getId(), link3.getId());
+		NetworkRoute route1 = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link2.getId());
+		NetworkRoute route2 = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link3.getId());
 
 		f.tRoute.setRoute(route1);
 		assertEquals(route1, f.tRoute.getRoute());
@@ -187,7 +188,7 @@ public class TransitRouteTest extends MatsimTestCase {
 		Id<TransitRoute> id = Id.create(9791, TransitRoute.class);
 		Link fromLink = new FakeLink(Id.create(10, Link.class), null, null);
 		Link toLink = new FakeLink(Id.create(5, Link.class), null, null);
-		NetworkRoute route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId());
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(fromLink.getId(), toLink.getId());
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitStopFacility stopFacility1 = new TransitStopFacilityImpl(Id.create(1, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
 		TransitStopFacility stopFacility2 = new TransitStopFacilityImpl(Id.create(2, TransitStopFacility.class), new Coord((double) 0, (double) 0), false);
@@ -241,7 +242,7 @@ public class TransitRouteTest extends MatsimTestCase {
 			Id<TransitRoute> id = Id.create(9791, TransitRoute.class);
 			Link fromLink = new FakeLink(Id.create(10, Link.class), null, null);
 			Link toLink = new FakeLink(Id.create(5, Link.class), null, null);
-			NetworkRoute route = new LinkNetworkRouteImpl(fromLink.getId(), toLink.getId());
+			NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(fromLink.getId(), toLink.getId());
 			this.stops = new ArrayList<TransitRouteStop>();
 			TransitRouteStop stop = new TransitRouteStopImpl(null, 50, 60);
 			this.stops.add(stop);

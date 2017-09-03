@@ -9,8 +9,8 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 
 /**
  * This is a tour of a carrier which is a sequence of activities and legs.
@@ -255,7 +255,7 @@ public class Tour {
 		 * @see NetworkRoute
 		 */
 		public NetworkRoute createRoute(Id<Link> startLinkId, List<Id<Link>> linkIds, Id<Link> endLinkId) {
-			LinkNetworkRouteImpl linkNetworkRouteImpl = new LinkNetworkRouteImpl(startLinkId, endLinkId);
+			NetworkRoute linkNetworkRouteImpl = RouteUtils.createLinkNetworkRouteImpl(startLinkId, endLinkId);
 			if (linkIds != null && !linkIds.isEmpty()) {
 				linkNetworkRouteImpl.setLinkIds(startLinkId, linkIds, endLinkId);
 			}

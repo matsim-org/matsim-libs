@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package org.matsim.integration.lanes11;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -27,16 +30,24 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.Lane;
-import org.matsim.lanes.data.v11.*;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.matsim.lanes.data.v11.LaneData11;
+import org.matsim.lanes.data.v11.LaneDefinitions11;
+import org.matsim.lanes.data.v11.LaneDefinitions11Impl;
+import org.matsim.lanes.data.v11.LaneDefinitionsFactory11;
+import org.matsim.lanes.data.v11.LaneDefinitionsV11ToV20Conversion;
+import org.matsim.lanes.data.v11.LanesToLinkAssignment11;
 
 
 /**
@@ -171,7 +182,7 @@ public class MixedLaneTestFixture {
 		act.setEndTime(3600.0);
 		plan.addActivity(act);
 		Leg leg = pb.createLeg(TransportMode.car);
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(id0, id2);
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(id0, id2);
 		List<Id<Link>> routeList = new ArrayList<Id<Link>>();
 		routeList.add(id1);
 		route.setLinkIds(id0, routeList, id2);
@@ -187,7 +198,7 @@ public class MixedLaneTestFixture {
 		act.setEndTime(3600.0);
 		plan.addActivity(act);
 		leg = pb.createLeg(TransportMode.car);
-		route = new LinkNetworkRouteImpl(id0, id3);
+		route = RouteUtils.createLinkNetworkRouteImpl(id0, id3);
 		route.setLinkIds(id3, routeList, id3);
 		leg.setRoute(route);
 		plan.addLeg(leg);
@@ -208,7 +219,7 @@ public class MixedLaneTestFixture {
 		act.setEndTime(3600.0);
 		plan.addActivity(act);
 		Leg leg = pb.createLeg(TransportMode.car);
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(id1, id2);
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(id1, id2);
 		List<Id<Link>> routeList = new ArrayList<Id<Link>>();
 //		routeList.add(id1);
 		route.setLinkIds(id1, routeList, id2);

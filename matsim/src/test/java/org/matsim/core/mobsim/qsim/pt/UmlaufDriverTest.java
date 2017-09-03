@@ -43,8 +43,9 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.SingletonUmlaufBuilderImpl;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -98,7 +99,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Link link5 = NetworkUtils.createAndAddLink(network,Id.create("5", Link.class), fromNode4, toNode4, 1000.0, 10.0, 3600.0, (double) 1 );
 
 		Collections.addAll(linkIds, link2.getId(), link3.getId(), link4.getId());
-		NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link5.getId());
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link5.getId());
 		route.setLinkIds(link1.getId(), linkIds, link5.getId());
 		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, Collections.<TransitRouteStop>emptyList(), "bus");
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
@@ -158,7 +159,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 	public void testInitializationDeparture() {
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
-		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, Collections.<TransitRouteStop>emptyList(), "bus");
 		double depTime = 9876.5;
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), depTime);
@@ -182,7 +183,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitLine tLine = builder.createTransitLine(Id.create("L", TransitLine.class));
-		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
 
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		TransitStopFacility stop1 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 500, (double) 0), false);
@@ -239,7 +240,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
-		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
@@ -313,7 +314,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		stop2.setLinkId(Id.create("dummy", Link.class));
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
-		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
@@ -376,7 +377,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 1000, (double) 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 100, 110));
-		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
@@ -417,7 +418,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitStopFacility stop2 = builder.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord((double) 1000, (double) 0), false);
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 100, 110));
-		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
@@ -468,7 +469,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		TransitRouteStop routeStop3 = builder.createTransitRouteStop(stop3, Time.UNDEFINED_TIME, departureOffset3);
 		routeStop3.setAwaitDepartureTime(true);
 		stops.add(routeStop3);
-		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
 		double departureTime = 9876.0;
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), departureTime);
@@ -520,7 +521,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		stops.add(builder.createTransitRouteStop(stop1, 50, 60));
 		stops.add(builder.createTransitRouteStop(stop2, 150, 160));
 		stops.add(builder.createTransitRouteStop(stop3, 250, 260));
-		NetworkRoute route = new LinkNetworkRouteImpl(null, null);
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(null, null);
 		TransitRoute tRoute = builder.createTransitRoute(Id.create("L", TransitRoute.class), route, stops, "bus");
 		Departure dep = builder.createDeparture(Id.create("L1.1", Departure.class), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);

@@ -28,8 +28,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -85,7 +86,7 @@ public class VehicularPlanLinkIdentifierTest {
 		plan1.setPerson( fact.createPerson( personId ) );
 		final Leg leg1 = fact.createLeg( TransportMode.car );
 		plan1.addLeg( leg1 );
-		final NetworkRoute route1 = new LinkNetworkRouteImpl( null , null );
+		final NetworkRoute route1 = RouteUtils.createLinkNetworkRouteImpl(null, null);
 		leg1.setRoute( route1 );
 		route1.setVehicleId( vehicleId );
 

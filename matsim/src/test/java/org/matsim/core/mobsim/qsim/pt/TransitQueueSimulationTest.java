@@ -52,7 +52,7 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine.TransitAgentTriesToTeleportException;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
@@ -138,7 +138,7 @@ public class TransitQueueSimulationTest {
         stop3.setLinkId(link2.getId());
         stop4.setLinkId(link2.getId());
 
-        NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
+        NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link2.getId());
         ArrayList<Id<Link>> links = new ArrayList<>(0);
         route.setLinkIds(link1.getId(), links, link2.getId());
 
@@ -417,7 +417,7 @@ public class TransitQueueSimulationTest {
         stop3.setLinkId(link4.getId());
         stop4.setLinkId(link5.getId()); // one stop on the last link of the network route, as that one may be specially handled
 
-        NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link5.getId());
+        NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link5.getId());
         ArrayList<Id<Link>> links = new ArrayList<>();
         Collections.addAll(links, link2.getId(), link3.getId(), link4.getId());
         route.setLinkIds(link1.getId(), links, link5.getId());
@@ -653,7 +653,7 @@ public class TransitQueueSimulationTest {
         stopFacility1.setLinkId(link1.getId());
         stopFacility2.setLinkId(link2.getId());
         TransitLine tLine = sb.createTransitLine(Id.create("1", TransitLine.class));
-        NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
+        NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link2.getId());
         TransitRouteStop stop1 = sb.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0.0);
         TransitRouteStop stop2 = sb.createTransitRouteStop(stopFacility2, 100.0, 100.0);
         List<TransitRouteStop> stops = new ArrayList<>(2);
@@ -746,7 +746,7 @@ public class TransitQueueSimulationTest {
         stopFacility1.setLinkId(link1.getId());
         stopFacility2.setLinkId(link2.getId());
         TransitLine tLine = sb.createTransitLine(Id.create("1", TransitLine.class));
-        NetworkRoute route = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
+        NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link2.getId());
         TransitRouteStop stop1 = sb.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0.0);
         TransitRouteStop stop2 = sb.createTransitRouteStop(stopFacility2, 100.0, 100.0);
         List<TransitRouteStop> stops = new ArrayList<>(2);

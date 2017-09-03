@@ -41,8 +41,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -191,7 +192,7 @@ public class TwoLinesDemo {
 		schedule.addStopFacility(stop6);
 
 		TransitLine tLine1 = builder.createTransitLine(Id.create(1, TransitLine.class));
-		NetworkRoute networkRoute = new LinkNetworkRouteImpl(link1.getId(), link13.getId());
+		NetworkRoute networkRoute = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link13.getId());
 		ArrayList<Id<Link>> linkIdList = new ArrayList<>(6);
 		Collections.addAll(linkIdList, link3.getId(), link5.getId(), link7.getId(), link8.getId(), link9.getId(), link11.getId());
 		networkRoute.setLinkIds(link1.getId(), linkIdList, link13.getId());
@@ -213,7 +214,7 @@ public class TwoLinesDemo {
 		schedule.addTransitLine(tLine1);
 
 		TransitLine tLine2 = builder.createTransitLine(Id.create(2, TransitLine.class));
-		networkRoute = new LinkNetworkRouteImpl(link2.getId(), link12.getId());
+		networkRoute = RouteUtils.createLinkNetworkRouteImpl(link2.getId(), link12.getId());
 		linkIdList = new ArrayList<>(6);
 		Collections.addAll(linkIdList, link4.getId(), link6.getId(), link7.getId(), link8.getId(), link9.getId(), link10.getId());
 		networkRoute.setLinkIds(link2.getId(), linkIdList, link12.getId());

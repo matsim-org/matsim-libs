@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 
@@ -98,7 +98,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
 
-		NetworkRoute r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
+		NetworkRoute r = RouteUtils.createLinkNetworkRouteImpl(l6.getId(), l7.getId());
 		ArrayList<Id<Link>> srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(l1.getId());
 		r.setLinkIds(l6.getId(), srcRoute, l7.getId());
@@ -120,7 +120,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
 		Plan p2 = PopulationUtils.createPlan(person);
-		r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
+		r = RouteUtils.createLinkNetworkRouteImpl(l6.getId(), l7.getId());
 		srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(l2.getId());
 		srcRoute.add(l3.getId());
@@ -140,7 +140,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
 		Plan p3 = PopulationUtils.createPlan(person);
-		r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
+		r = RouteUtils.createLinkNetworkRouteImpl(l6.getId(), l7.getId());
 		srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(l2.getId());
 		srcRoute.add(l4.getId());
@@ -168,7 +168,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
-		r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
+		r = RouteUtils.createLinkNetworkRouteImpl(l6.getId(), l7.getId());
 		srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(l1.getId());
 		r.setLinkIds(l6.getId(), srcRoute, l7.getId());
@@ -200,7 +200,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
 
-		NetworkRoute r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
+		NetworkRoute r = RouteUtils.createLinkNetworkRouteImpl(l6.getId(), l7.getId());
 		ArrayList<Id<Link>> srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(l1.getId());
 		r.setLinkIds(l6.getId(), srcRoute, l7.getId());
@@ -234,7 +234,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setDepartureTime(0.0);
 		leg.setTravelTime(10.0);
 		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
-		NetworkRoute r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
+		NetworkRoute r = RouteUtils.createLinkNetworkRouteImpl(l6.getId(), l7.getId());
 		ArrayList<Id<Link>> srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(l1.getId());
 		r.setLinkIds(l6.getId(), srcRoute, l7.getId());
@@ -253,7 +253,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
 		Plan p2 = PopulationUtils.createPlan(person);
-		r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
+		r = RouteUtils.createLinkNetworkRouteImpl(l6.getId(), l7.getId());
 		srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(l2.getId());
 		srcRoute.add(l3.getId());
@@ -273,7 +273,7 @@ public class PathSizeLogitSelectorTest extends AbstractPlanSelectorTest {
 		leg.setTravelTime(10.0);
 		leg.setTravelTime( 10.0 - leg.getDepartureTime() );
 		Plan p3 = PopulationUtils.createPlan(person);
-		r = new LinkNetworkRouteImpl(l6.getId(), l7.getId());
+		r = RouteUtils.createLinkNetworkRouteImpl(l6.getId(), l7.getId());
 		srcRoute = new ArrayList<Id<Link>>();
 		srcRoute.add(l2.getId());
 		srcRoute.add(l4.getId());

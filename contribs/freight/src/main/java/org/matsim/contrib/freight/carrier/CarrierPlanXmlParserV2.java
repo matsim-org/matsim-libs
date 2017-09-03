@@ -13,7 +13,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.Builder;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.EngineInformation;
@@ -353,10 +354,10 @@ class CarrierPlanXmlParserV2 extends MatsimXmlParser {
 	}
 
 	private void finishLeg(Id<Link> toLocation) {
-		LinkNetworkRouteImpl route = null;
+		NetworkRoute route = null;
 		if (previousRouteContent != null) {
 			List<Id<Link>> linkIds = NetworkUtils.getLinkIds(previousRouteContent);
-			route = new LinkNetworkRouteImpl(previousActLoc, toLocation);
+			route = RouteUtils.createLinkNetworkRouteImpl(previousActLoc, toLocation);
 			if (!linkIds.isEmpty()) {
 				route.setLinkIds(previousActLoc, linkIds, toLocation);
 			}

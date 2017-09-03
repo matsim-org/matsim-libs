@@ -40,8 +40,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -83,7 +84,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 			}
 			else {
 				final Leg l = popFact.createLeg( MODE );
-				l.setRoute( new LinkNetworkRouteImpl( Id.createLinkId( 1 ) , Id.createLinkId( 12 ) ) );
+				l.setRoute( RouteUtils.createLinkNetworkRouteImpl(Id.createLinkId( 1 ), Id.createLinkId( 12 )) );
 				plan.addLeg( l );
 			}
 			plan.addActivity( popFact.createActivityFromLinkId( "h" , Id.createLinkId( 42 ) ) );
@@ -105,7 +106,7 @@ public class AllocateVehicleToPlansInGroupPlanAlgorithmTest {
 				}
 				else {
 					final Leg l = popFact.createLeg( MODE );
-					l.setRoute( new LinkNetworkRouteImpl( Id.createLinkId( 1 ) , Id.createLinkId( 12 ) ) );
+					l.setRoute( RouteUtils.createLinkNetworkRouteImpl(Id.createLinkId( 1 ), Id.createLinkId( 12 )) );
 					plan.addLeg( l );
 				}
 				plan.addActivity( popFact.createActivityFromLinkId( "h" , Id.createLinkId( 42 ) ) );

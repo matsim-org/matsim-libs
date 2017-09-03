@@ -31,7 +31,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.contrib.socnetsim.framework.population.JointPlan;
 import org.matsim.contrib.socnetsim.framework.population.JointPlanFactory;
 import org.matsim.contrib.socnetsim.jointtrips.JointTravelUtils.DriverTrip;
@@ -73,7 +74,7 @@ public class JointTravelUtilsTest {
 		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, link2);
 		Leg driverLeg = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER );
 		driverLeg.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link2 , link3 ),
+					RouteUtils.createLinkNetworkRouteImpl(link2, link3),
 					Arrays.asList( passenger1.getId() )));
 		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, link3);
 		PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
@@ -134,13 +135,13 @@ public class JointTravelUtilsTest {
 		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, link2);
 		final Leg driverLeg = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER );
 		driverLeg.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link2 , link3 ),
+					RouteUtils.createLinkNetworkRouteImpl(link2, link3),
 					Arrays.asList( passenger1.getId() )));
 
 		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, link3);
 		Leg driverLeg2 = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER );
 		driverLeg2.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link3 , link4 ),
+					RouteUtils.createLinkNetworkRouteImpl(link3, link4),
 					Arrays.asList(
 						passenger1.getId(),
 						passenger2.getId())));
@@ -226,13 +227,13 @@ public class JointTravelUtilsTest {
 		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, link2);
 		final Leg driverLeg = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER );
 		driverLeg.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link2 , link3 ),
+					RouteUtils.createLinkNetworkRouteImpl(link2, link3),
 					Arrays.asList( passenger1.getId() )));
 
 		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, link3);
 		final Leg driverLeg2 = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER );
 		driverLeg2.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link3 , link4 ),
+					RouteUtils.createLinkNetworkRouteImpl(link3, link4),
 					Arrays.asList(
 						passenger1.getId(),
 						passenger2.getId())));
@@ -243,7 +244,7 @@ public class JointTravelUtilsTest {
 		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, link3);
 		final Leg driverLeg3 = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER );
 		driverLeg3.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link3 , link1 ),
+					RouteUtils.createLinkNetworkRouteImpl(link3, link1),
 					Arrays.asList(
 						passenger1.getId())));
 		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, link1);
@@ -347,20 +348,20 @@ public class JointTravelUtilsTest {
 		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, link2);
 		final Leg driverLeg = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER );
 		driverLeg.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link2 , link3 ),
+					RouteUtils.createLinkNetworkRouteImpl(link2, link3),
 					Arrays.asList( passenger1.getId() )));
 
 		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, link3);
 		final Leg driverLeg2 = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER );
 		driverLeg2.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link3 , link4 ),
+					RouteUtils.createLinkNetworkRouteImpl(link3, link4),
 					Arrays.asList(
 						passenger1.getId(),
 						passenger2.getId())));
 		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, link4);
 		final Leg driverLeg3 = PopulationUtils.createAndAddLeg( plan, JointActingTypes.DRIVER );
 		driverLeg3.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link4 , link1 ),
+					RouteUtils.createLinkNetworkRouteImpl(link4, link1),
 					Arrays.asList(
 						passenger1.getId())));
 		PopulationUtils.createAndAddActivityFromLinkId(plan, JointActingTypes.INTERACTION, link1);
@@ -442,7 +443,7 @@ public class JointTravelUtilsTest {
 		PopulationUtils.createAndAddActivityFromLinkId(dPlan, JointActingTypes.INTERACTION, link2);
 		final Leg driverLeg1 = PopulationUtils.createAndAddLeg( dPlan, JointActingTypes.DRIVER );
 		driverLeg1.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link2 , link3 ),
+					RouteUtils.createLinkNetworkRouteImpl(link2, link3),
 					Arrays.asList( passenger1.getId() )));
 		PopulationUtils.createAndAddActivityFromLinkId(dPlan, JointActingTypes.INTERACTION, link3);
 		PopulationUtils.createAndAddLeg( dPlan, TransportMode.walk );
@@ -451,7 +452,7 @@ public class JointTravelUtilsTest {
 		PopulationUtils.createAndAddActivityFromLinkId(dPlan, JointActingTypes.INTERACTION, link2);
 		final Leg driverLeg2 = PopulationUtils.createAndAddLeg( dPlan, JointActingTypes.DRIVER );
 		driverLeg2.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link2 , link3 ),
+					RouteUtils.createLinkNetworkRouteImpl(link2, link3),
 					Arrays.asList( passenger1.getId() )));
 		PopulationUtils.createAndAddActivityFromLinkId(dPlan, JointActingTypes.INTERACTION, link3);
 		PopulationUtils.createAndAddLeg( dPlan, TransportMode.walk );
@@ -532,7 +533,7 @@ public class JointTravelUtilsTest {
 		PopulationUtils.createAndAddActivityFromLinkId(d1Plan, JointActingTypes.INTERACTION, link2);
 		final Leg driverLeg1 = PopulationUtils.createAndAddLeg( d1Plan, JointActingTypes.DRIVER );
 		driverLeg1.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link2 , link3 ),
+					RouteUtils.createLinkNetworkRouteImpl(link2, link3),
 					Arrays.asList( passenger1.getId() )));
 		PopulationUtils.createAndAddActivityFromLinkId(d1Plan, JointActingTypes.INTERACTION, link3);
 		PopulationUtils.createAndAddLeg( d1Plan, TransportMode.walk );
@@ -546,7 +547,7 @@ public class JointTravelUtilsTest {
 		PopulationUtils.createAndAddActivityFromLinkId(d2Plan, JointActingTypes.INTERACTION, link2);
 		final Leg driverLeg2 = PopulationUtils.createAndAddLeg( d2Plan, JointActingTypes.DRIVER );
 		driverLeg2.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link2 , link3 ),
+					RouteUtils.createLinkNetworkRouteImpl(link2, link3),
 					Arrays.asList( passenger1.getId() )));
 		PopulationUtils.createAndAddActivityFromLinkId(d2Plan, JointActingTypes.INTERACTION, link3);
 		PopulationUtils.createAndAddLeg( d2Plan, TransportMode.walk );
@@ -628,7 +629,7 @@ public class JointTravelUtilsTest {
 		PopulationUtils.createAndAddActivityFromLinkId(d1Plan, JointActingTypes.INTERACTION, link2);
 		final Leg driverLeg1 = PopulationUtils.createAndAddLeg( d1Plan, JointActingTypes.DRIVER );
 		driverLeg1.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link2 , link3 ),
+					RouteUtils.createLinkNetworkRouteImpl(link2, link3),
 					Arrays.asList( passenger1.getId() )));
 		PopulationUtils.createAndAddActivityFromLinkId(d1Plan, JointActingTypes.INTERACTION, link3);
 		PopulationUtils.createAndAddLeg( d1Plan, TransportMode.walk );
@@ -642,7 +643,7 @@ public class JointTravelUtilsTest {
 		PopulationUtils.createAndAddActivityFromLinkId(d2Plan, JointActingTypes.INTERACTION, link2);
 		final Leg driverLeg2 = PopulationUtils.createAndAddLeg( d2Plan, JointActingTypes.DRIVER );
 		driverLeg2.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link2 , link3 ),
+					RouteUtils.createLinkNetworkRouteImpl(link2, link3),
 					Arrays.asList( passenger1.getId() )));
 		PopulationUtils.createAndAddActivityFromLinkId(d2Plan, JointActingTypes.INTERACTION, link3);
 		PopulationUtils.createAndAddLeg( d2Plan, TransportMode.walk );
@@ -728,7 +729,7 @@ public class JointTravelUtilsTest {
 		PopulationUtils.createAndAddActivityFromLinkId(dPlan, JointActingTypes.INTERACTION, link2);
 		final Leg driverLeg1 = PopulationUtils.createAndAddLeg( dPlan, JointActingTypes.DRIVER );
 		driverLeg1.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link2 , link3 ),
+					RouteUtils.createLinkNetworkRouteImpl(link2, link3),
 					Arrays.asList( passenger1.getId() )));
 		PopulationUtils.createAndAddActivityFromLinkId(dPlan, JointActingTypes.INTERACTION, link3);
 		PopulationUtils.createAndAddLeg( dPlan, TransportMode.walk );
@@ -737,7 +738,7 @@ public class JointTravelUtilsTest {
 		PopulationUtils.createAndAddActivityFromLinkId(dPlan, JointActingTypes.INTERACTION, link3);
 		final Leg driverLeg2 = PopulationUtils.createAndAddLeg( dPlan, JointActingTypes.DRIVER );
 		driverLeg2.setRoute( new DriverRoute(
-					new LinkNetworkRouteImpl( link3 , link2 ),
+					RouteUtils.createLinkNetworkRouteImpl(link3, link2),
 					Arrays.asList( passenger1.getId() )));
 		PopulationUtils.createAndAddActivityFromLinkId(dPlan, JointActingTypes.INTERACTION, link2);
 		PopulationUtils.createAndAddLeg( dPlan, TransportMode.walk );

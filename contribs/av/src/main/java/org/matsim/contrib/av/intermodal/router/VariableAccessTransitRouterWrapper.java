@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.RoutingModule;
@@ -124,7 +123,7 @@ public class VariableAccessTransitRouterWrapper implements RoutingModule {
 	    	if (leg.getMode().equals(TransportMode.car)){
 	    		Id<Link> startLinkId =  leg.getRoute().getStartLinkId();
 	    		Id<Link> endLinkId =  leg.getRoute().getEndLinkId();
-	    		NetworkRoute nr = new LinkNetworkRouteImpl(startLinkId, endLinkId);
+	    		NetworkRoute nr = RouteUtils.createLinkNetworkRouteImpl(startLinkId, endLinkId);
 	    		
 	    		Path path = routeAlgo.calcLeastCostPath(network.getLinks().get(startLinkId).getToNode(), network.getLinks().get(endLinkId).getFromNode(), departureTime, person, null);
 	    		nr.setLinkIds(startLinkId, NetworkUtils.getLinkIds(path.links), endLinkId);

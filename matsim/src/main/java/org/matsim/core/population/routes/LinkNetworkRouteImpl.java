@@ -34,25 +34,25 @@ import org.matsim.vehicles.Vehicle;
  *
  * @author mrieser
  */
-public final class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute, Cloneable {
+final class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute {
 
 	/*package*/ final static String ROUTE_TYPE = "links";
 	
-	private ArrayList<Id<Link>> route = new ArrayList<Id<Link>>();
+	private ArrayList<Id<Link>> route = new ArrayList<>();
 	private List<Id<Link>> safeRoute = Collections.unmodifiableList(this.route);
 	private double travelCost = Double.NaN;
 	private Id<Vehicle> vehicleId = null;
 
-	public LinkNetworkRouteImpl(final Id<Link> startLinkId, final Id<Link> endLinkId) {
+	LinkNetworkRouteImpl(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
 	}
 	
-	public LinkNetworkRouteImpl(final Id<Link> startLinkId, final List<Id<Link>> linkIds, final Id<Link> endLinkId) {
+	LinkNetworkRouteImpl(final Id<Link> startLinkId, final List<Id<Link>> linkIds, final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
 		setLinkIds(startLinkId, linkIds, endLinkId);
 	}
 	
-	public LinkNetworkRouteImpl(final Id<Link> startLinkId, final Id<Link>[] linkIds, final Id<Link> endLinkId) {
+	LinkNetworkRouteImpl(final Id<Link> startLinkId, final Id<Link>[] linkIds, final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
         Collections.addAll(this.route, linkIds);
 		this.route.trimToSize();
@@ -62,7 +62,7 @@ public final class LinkNetworkRouteImpl extends AbstractRoute implements Network
 	public LinkNetworkRouteImpl clone() {
 		LinkNetworkRouteImpl cloned = (LinkNetworkRouteImpl) super.clone();
 		ArrayList<Id<Link>> tmp = cloned.route;
-		cloned.route = new ArrayList<Id<Link>>(tmp); // deep copy of route
+		cloned.route = new ArrayList<>(tmp); // deep copy of route
 		cloned.safeRoute = Collections.unmodifiableList(cloned.route);
 		return cloned;
 	}
@@ -119,7 +119,7 @@ public final class LinkNetworkRouteImpl extends AbstractRoute implements Network
 				throw new IllegalArgumentException("Cannot create subroute because toLinkId is not part of the route.");
 			}
 		}
-		LinkNetworkRouteImpl ret = new LinkNetworkRouteImpl(fromLinkId, toLinkId);
+		NetworkRoute ret = RouteUtils.createLinkNetworkRouteImpl(fromLinkId, toLinkId);
 		if (toIndex > fromIndex) {
 			ret.setLinkIds(fromLinkId, this.route.subList(fromIndex, toIndex), toLinkId);
 		} else {

@@ -44,7 +44,8 @@ import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.data.Lane;
@@ -181,8 +182,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 					"dummy", Id.createLinkId("2"));
 			// create a dummy leg
 			Leg leg = population.getFactory().createLeg(TransportMode.car);
-			leg.setRoute(new LinkNetworkRouteImpl(Id.createLinkId("0"), 
-					Collections.singletonList(Id.createLinkId("1")), Id.createLinkId("2")));
+			leg.setRoute(RouteUtils.createLinkNetworkRouteImpl(Id.createLinkId("0"), Collections.singletonList(Id.createLinkId("1")), Id.createLinkId("2")));
 			// create a plan for the person that contains all this information
 			Plan plan = population.getFactory().createPlan();
 			plan.addActivity(startAct);

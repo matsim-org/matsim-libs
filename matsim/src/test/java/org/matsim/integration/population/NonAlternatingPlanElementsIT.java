@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -123,11 +123,11 @@ public class NonAlternatingPlanElementsIT {
 		leg1.getRoute().setTravelTime(0.); // retrofitting to repair failing test. kai, apr'15
 
 		Leg leg2 = pf.createLeg("pt");
-		leg2.setRoute(new LinkNetworkRouteImpl(Id.create(14, Link.class), new Id[] {Id.create(20, Link.class)}, Id.create(21, Link.class)));
+		leg2.setRoute(RouteUtils.createLinkNetworkRouteImpl(Id.create(14, Link.class), new Id[] {Id.create(20, Link.class)}, Id.create(21, Link.class)));
 		leg2.getRoute().setTravelTime(0.); // retrofitting to repair failing test. kai, apr'15
 
 		Leg leg3 = pf.createLeg("transit_walk");
-		leg3.setRoute(new LinkNetworkRouteImpl(Id.create(14, Link.class), new Id[0], Id.create(14, Link.class)));
+		leg3.setRoute(RouteUtils.createLinkNetworkRouteImpl(Id.create(14, Link.class), new Id[0], Id.create(14, Link.class)));
 		leg3.getRoute().setTravelTime(0.); // retrofitting to repair failing test. kai, apr'15
 
 		Activity work = pf.createActivityFromLinkId("w", Id.create(21, Link.class));
@@ -136,7 +136,7 @@ public class NonAlternatingPlanElementsIT {
 		((Activity) work).setCoord(new Coord((double) 5000, y));
 
 		Leg leg4 = pf.createLeg("car");
-		leg4.setRoute(new LinkNetworkRouteImpl(Id.create(21, Link.class), new Id[] {Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
+		leg4.setRoute(RouteUtils.createLinkNetworkRouteImpl(Id.create(21, Link.class), new Id[] {Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
 		leg4.getRoute().setTravelTime(0.); // retrofitting to repair failing test. kai, apr'15
 
 		Activity home2 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
@@ -179,7 +179,7 @@ public class NonAlternatingPlanElementsIT {
 		((Activity) shop).setCoord(new Coord((double) 5000, y));
 
 		Leg leg2 = pf.createLeg("car");
-		leg2.setRoute(new LinkNetworkRouteImpl(Id.create(21, Link.class), new Id[] {Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
+		leg2.setRoute(RouteUtils.createLinkNetworkRouteImpl(Id.create(21, Link.class), new Id[] {Id.create(22, Link.class), Id.create(23, Link.class)}, Id.create(1, Link.class)));
 		leg2.getRoute().setTravelTime(0.); // retrofitting failing test. kai, apr'15
 
 		Activity home2 = pf.createActivityFromLinkId("h", Id.create(1, Link.class));
@@ -222,7 +222,7 @@ public class NonAlternatingPlanElementsIT {
 		schedule.addStopFacility(stopFacility2);
 		
 		TransitLine line1 = f.createTransitLine(Id.create(1, TransitLine.class));
-		NetworkRoute netRoute = new LinkNetworkRouteImpl(Id.create("14", Link.class), new Id[] { Id.create("20", Link.class) }, Id.create("21", Link.class));
+		NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(Id.create("14", Link.class), new Id[] { Id.create("20", Link.class) }, Id.create("21", Link.class));
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		stops.add(f.createTransitRouteStop(stopFacility1, Time.UNDEFINED_TIME, 0));
 		stops.add(f.createTransitRouteStop(stopFacility2, 180, Time.UNDEFINED_TIME));

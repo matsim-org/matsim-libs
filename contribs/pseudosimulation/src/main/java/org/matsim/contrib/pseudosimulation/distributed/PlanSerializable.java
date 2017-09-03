@@ -18,7 +18,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.pseudosimulation.distributed.plans.PlanGenome;
 import org.matsim.contrib.pseudosimulation.distributed.scoring.PlanScoreComponent;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.facilities.ActivityFacility;
@@ -203,7 +203,7 @@ class PlanSerializable implements Serializable {
         public Route getRoute(String mode) {
             Id<Link> startLinkId = Id.createLinkId(startLinkIdString);
             Id<Link> endLinkId = Id.createLinkId(endLinkIdString);
-            NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
+            NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(startLinkId, endLinkId);
             route.setDistance(distance);
             List<Id<Link>> linkIds = new ArrayList<>();
             for (String linkId : linkIdStrings)

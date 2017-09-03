@@ -110,7 +110,7 @@ public class NetworkFactoryTest extends MatsimTestCase {
 
 		// test default
 		Route carRoute = factory.getRouteFactories().createRoute(NetworkRoute.class, null, null);
-		Assert.assertTrue(carRoute instanceof LinkNetworkRouteImpl);
+		Assert.assertTrue(carRoute instanceof NetworkRoute);
 
 		Route route = factory.getRouteFactories().createRoute(Route.class, null, null);
 		Assert.assertTrue(route instanceof GenericRouteImpl);

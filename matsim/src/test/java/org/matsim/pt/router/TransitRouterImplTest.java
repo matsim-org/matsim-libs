@@ -47,8 +47,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DefaultRoutingModules;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TransitRouterWrapper;
@@ -700,7 +701,7 @@ public class TransitRouterImplTest {
 			{ // line 1
 				TransitLine tLine = sb.createTransitLine(Id.create("1", TransitLine.class));
 				{
-					NetworkRoute netRoute = new LinkNetworkRouteImpl(link1.getId(), link1.getId());
+					NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link1.getId());
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
 					stops.add(sb.createTransitRouteStop(this.stop1, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop2, 50, 50));
@@ -714,7 +715,7 @@ public class TransitRouterImplTest {
 			{ // line 2
 				TransitLine tLine = sb.createTransitLine(Id.create("2", TransitLine.class));
 				{
-					NetworkRoute netRoute = new LinkNetworkRouteImpl(link2.getId(), link3.getId());
+					NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(link2.getId(), link3.getId());
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(3);
 					stops.add(sb.createTransitRouteStop(this.stop3, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop4, 50, 50));
@@ -729,7 +730,7 @@ public class TransitRouterImplTest {
 			{ // line 3
 				TransitLine tLine = sb.createTransitLine(Id.create("3", TransitLine.class));
 				{
-					NetworkRoute netRoute = new LinkNetworkRouteImpl(link4.getId(), link4.getId());
+					NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(link4.getId(), link4.getId());
 					List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>(2);
 					stops.add(sb.createTransitRouteStop(this.stop6, 0, 0));
 					stops.add(sb.createTransitRouteStop(this.stop7, 50, 50));
@@ -832,7 +833,7 @@ public class TransitRouterImplTest {
 			{ 
 				TransitLine line0to1 = sb.createTransitLine(Id.create("0to1", TransitLine.class));
 				this.schedule.addTransitLine(line0to1);
-				NetworkRoute netRoute = new LinkNetworkRouteImpl(link0.getId(), link0.getId());
+				NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(link0.getId(), link0.getId());
 				List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
 				netRoute.setLinkIds(link0.getId(), routeLinks, link0.getId());
 				List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
@@ -852,7 +853,7 @@ public class TransitRouterImplTest {
 			{ 
 				TransitLine line2to3 = sb.createTransitLine(Id.create("2to3", TransitLine.class));
 				this.schedule.addTransitLine(line2to3);
-				NetworkRoute netRoute = new LinkNetworkRouteImpl(link1.getId(), link1.getId());
+				NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link1.getId());
 				List<Id<Link>> routeLinks = new ArrayList<Id<Link>>();
 				netRoute.setLinkIds(link1.getId(), routeLinks, link1.getId());
 				List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();

@@ -26,8 +26,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import junit.framework.TestCase;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -58,11 +56,10 @@ import org.matsim.core.mobsim.qsim.pt.TransitQVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.fakes.FakeAgent;
@@ -79,6 +76,8 @@ import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
+
+import junit.framework.TestCase;
 
 
 public class TransitQueueNetworkTest extends TestCase {
@@ -1040,7 +1039,7 @@ public class TransitQueueNetworkTest extends TestCase {
             Activity act = pb.createActivityFromLinkId("home", linkId1);
             plan.addActivity(act);
             Leg leg = pb.createLeg(TransportMode.car);
-            LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId());
+            NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(links[1].getId(), links[3].getId());
             List<Id<Link>> linkIds_2 = new ArrayList<Id<Link>>();
             linkIds_2.add(links[2].getId());
             route.setLinkIds(links[1].getId(), linkIds_2, links[3].getId());
@@ -1062,7 +1061,7 @@ public class TransitQueueNetworkTest extends TestCase {
                 stop2.setLinkId(links[secondStopLocation].getId());
             }
             TransitLine tLine = builder.createTransitLine(Id.create("1", TransitLine.class));
-            NetworkRoute netRoute = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId());
+            NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(links[1].getId(), links[3].getId());
             netRoute.setLinkIds(links[1].getId(), linkIds_2, links[3].getId());
             ArrayList<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
             stops.add(builder.createTransitRouteStop(stop1, 50, 60));
@@ -1156,7 +1155,7 @@ public class TransitQueueNetworkTest extends TestCase {
                 act2.setEndTime(120);
                 plan2.addActivity(act2);
                 Leg leg2 = pb.createLeg(TransportMode.car);
-                LinkNetworkRouteImpl route2 = new LinkNetworkRouteImpl(links[1].getId(), links[3].getId());
+                NetworkRoute route2 = RouteUtils.createLinkNetworkRouteImpl(links[1].getId(), links[3].getId());
                 route2.setLinkIds(links[1].getId(), linkIds_2, links[3].getId());
                 leg2.setRoute(route2);
                 plan2.addLeg(leg2);

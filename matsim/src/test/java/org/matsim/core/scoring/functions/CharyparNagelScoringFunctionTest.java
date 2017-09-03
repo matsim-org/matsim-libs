@@ -53,7 +53,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationSco
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -759,7 +759,7 @@ public class CharyparNagelScoringFunctionTest {
 			Leg leg = PopulationUtils.createAndAddLeg( this.plan, TransportMode.car );
 			leg.setDepartureTime(firstLegStartTime);
 			leg.setTravelTime(firstLegTravelTime);
-			NetworkRoute route1 = new LinkNetworkRouteImpl(link1.getId(), link3.getId());
+			NetworkRoute route1 = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link3.getId());
 			route1.setLinkIds(link1.getId(), Arrays.asList(link2.getId()), link3.getId());
 			route1.setTravelTime(firstLegTravelTime);
 			route1.setDistance(RouteUtils.calcDistanceExcludingStartEndLink(route1, this.network));

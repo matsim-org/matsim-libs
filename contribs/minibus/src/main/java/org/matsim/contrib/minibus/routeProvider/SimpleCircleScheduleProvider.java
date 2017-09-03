@@ -28,8 +28,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.minibus.operator.Operator;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -135,7 +136,7 @@ final class SimpleCircleScheduleProvider implements PRouteProvider {
 		completeLinkList.add(this.net.getLinks().get(endStop.getLinkId()));
 		completeLinkList.addAll(back.links);
 
-		NetworkRoute route = new LinkNetworkRouteImpl(startStop.getLinkId(), startStop.getLinkId());
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(startStop.getLinkId(), startStop.getLinkId());
 		route.setLinkIds(startStop.getLinkId(), NetworkUtils.getLinkIds(completeLinkList), startStop.getLinkId());		
 		
 		// get stops at Route

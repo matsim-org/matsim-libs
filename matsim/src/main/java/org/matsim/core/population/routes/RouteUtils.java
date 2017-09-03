@@ -174,7 +174,7 @@ public class RouteUtils {
 		Id<Link> startLinkId = routeLinkIds.get(0);
 		List<Id<Link>> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<>(0);
 		Id<Link> endLinkId = routeLinkIds.get(routeLinkIds.size() - 1);
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
+		NetworkRoute route = createLinkNetworkRouteImpl(startLinkId, endLinkId);
 		route.setLinkIds(startLinkId, linksBetween, endLinkId);
 		return route;
 	}
@@ -244,6 +244,20 @@ public class RouteUtils {
 
 	public static Route createGenericRouteImpl(Id<Link> startLinkId, Id<Link> endLinkId) {
 		return new GenericRouteImpl(startLinkId, endLinkId);
+	}
+
+	public static NetworkRoute createLinkNetworkRouteImpl(Id<Link> startLinkId, Id<Link> endLinkId) {
+		return new LinkNetworkRouteImpl(startLinkId, endLinkId);
+	}
+
+	public static NetworkRoute createLinkNetworkRouteImpl(Id<Link> startLinkId, List<Id<Link>> linkIds,
+			Id<Link> endLinkId) {
+		return new LinkNetworkRouteImpl(startLinkId, linkIds, endLinkId);
+	}
+
+	public static NetworkRoute createLinkNetworkRouteImpl(Id<Link> startLinkId, Id<Link>[] linkIds,
+			Id<Link> endLinkId) {
+		return new LinkNetworkRouteImpl(startLinkId, linkIds, endLinkId);
 	}
 
 }

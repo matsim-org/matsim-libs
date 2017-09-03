@@ -46,7 +46,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkInternalIAdapter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 
 public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceGrpc.MATSimInterfaceService {
 
@@ -163,7 +163,7 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 
 
 		Leg leg = (Leg) driver.getCurrentPlanElement();
-		List<Id<Link>> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
+		List<Id<Link>> linkIds = ((NetworkRoute) leg.getRoute()).getLinkIds();
 
 
 		boolean extRd = false;

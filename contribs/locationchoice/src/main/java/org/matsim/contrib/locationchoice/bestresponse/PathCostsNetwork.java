@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -36,7 +36,7 @@ public class PathCostsNetwork extends PathCosts {
 	
 	public void createRoute(Id<Link> fromLinkId, Path path, Id<Link> toLinkId) {
 		
-		NetworkRoute networkRoute = new LinkNetworkRouteImpl(fromLinkId, toLinkId);
+		NetworkRoute networkRoute = RouteUtils.createLinkNetworkRouteImpl(fromLinkId, toLinkId);
 		if (!fromLinkId.equals(toLinkId)) {
 			// do not drive/walk around, if we stay on the same link
 //			path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);

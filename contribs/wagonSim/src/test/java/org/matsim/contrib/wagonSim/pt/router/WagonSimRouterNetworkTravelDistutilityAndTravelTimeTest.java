@@ -42,8 +42,9 @@ import org.matsim.contrib.wagonSim.mobsim.qsim.framework.listeners.WagonSimVehic
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.FakeFacility;
@@ -304,7 +305,7 @@ public class WagonSimRouterNetworkTravelDistutilityAndTravelTimeTest extends Mat
 		stops.add(s1);
 		stops.add(s2);
 		
-		NetworkRoute networkRoute = new LinkNetworkRouteImpl(Id.create("l1", Link.class), new ArrayList<Id<Link>>(), Id.create("l2", Link.class)); 
+		NetworkRoute networkRoute = RouteUtils.createLinkNetworkRouteImpl(Id.create("l1", Link.class), new ArrayList<Id<Link>>(), Id.create("l2", Link.class)); 
 		TransitRoute route = schedFactory.createTransitRoute(Id.create("wagonRoute", TransitRoute.class), networkRoute, stops, TransportMode.pt);
 		Departure d = schedFactory.createDeparture(Id.create("d1", Departure.class), 100);
 		d.setVehicleId(Id.create("v1", Vehicle.class));

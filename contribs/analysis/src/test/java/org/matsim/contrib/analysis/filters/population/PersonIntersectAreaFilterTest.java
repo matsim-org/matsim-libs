@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -88,7 +88,7 @@ final Node toNode4 = node4;
 
 		PopulationUtils.createAndAddActivityFromLinkId(plan, "w", link5.getId());
 
-		NetworkRoute route = new LinkNetworkRouteImpl(link0.getId(), link5.getId());
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(link0.getId(), link5.getId());
 		leg.setRoute(route);
 
 		// prepare route
@@ -126,7 +126,7 @@ final Node toNode4 = node4;
 
 		// prepare bee-line tests
 		leg.setMode(TransportMode.walk);
-		leg.setRoute(new LinkNetworkRouteImpl(link0.getId(), link5.getId())); // empty route
+		leg.setRoute(RouteUtils.createLinkNetworkRouteImpl(link0.getId(), link5.getId())); // empty route
 
 		// test bee-line without alternative aoi
 		aoi.clear();

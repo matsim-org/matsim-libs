@@ -40,7 +40,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -82,7 +82,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 		withVeh.addPlan( planWithVeh );
 		planWithVeh.addActivity( scenario.getPopulation().getFactory().createActivityFromLinkId( "h" , link ) );
 		final Leg legWithVeh = scenario.getPopulation().getFactory().createLeg( TransportMode.car );
-		final NetworkRoute routeWithVeh = new LinkNetworkRouteImpl( link , Collections.<Id<Link>>emptyList() , link );
+		final NetworkRoute routeWithVeh = RouteUtils.createLinkNetworkRouteImpl(link, Collections.<Id<Link>>emptyList(), link);
 		routeWithVeh.setVehicleId( Id.create( "a_pink_pony" , Vehicle.class) );
 		legWithVeh.setRoute( routeWithVeh );
 		planWithVeh.addLeg( legWithVeh );
@@ -94,7 +94,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 		withoutVeh.addPlan( planWithoutVeh );
 		planWithoutVeh.addActivity( scenario.getPopulation().getFactory().createActivityFromLinkId( "h" , link ) );
 		final Leg legWithoutVeh = scenario.getPopulation().getFactory().createLeg( TransportMode.car );
-		final NetworkRoute routeWithoutVeh = new LinkNetworkRouteImpl( link , Collections.<Id<Link>>emptyList() , link );
+		final NetworkRoute routeWithoutVeh = RouteUtils.createLinkNetworkRouteImpl(link, Collections.<Id<Link>>emptyList(), link);
 		legWithoutVeh.setRoute( routeWithoutVeh );
 		planWithoutVeh.addLeg( legWithoutVeh );
 
@@ -159,7 +159,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 		walkLegWithVeh.setRoute( RouteUtils.createGenericRouteImpl(link, link) );
 		planWithVeh.addLeg( walkLegWithVeh );
 		final Leg legWithVeh = scenario.getPopulation().getFactory().createLeg( TransportMode.car );
-		final NetworkRoute routeWithVeh = new LinkNetworkRouteImpl( link , Collections.<Id<Link>>emptyList() , link );
+		final NetworkRoute routeWithVeh = RouteUtils.createLinkNetworkRouteImpl(link, Collections.<Id<Link>>emptyList(), link);
 		if (vehicles) routeWithVeh.setVehicleId( Id.create( "a_pink_pony" , Vehicle.class) );
 		legWithVeh.setRoute( routeWithVeh );
 		planWithVeh.addLeg( legWithVeh );
@@ -171,7 +171,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 		withoutVeh.addPlan( planWithoutVeh );
 		planWithoutVeh.addActivity( scenario.getPopulation().getFactory().createActivityFromLinkId( "h" , link ) );
 		final Leg legWithoutVeh = scenario.getPopulation().getFactory().createLeg( TransportMode.car );
-		final NetworkRoute routeWithoutVeh = new LinkNetworkRouteImpl( link , Collections.<Id<Link>>emptyList() , link );
+		final NetworkRoute routeWithoutVeh = RouteUtils.createLinkNetworkRouteImpl(link, Collections.<Id<Link>>emptyList(), link);
 		if (vehicles) routeWithoutVeh.setVehicleId( Id.create( "a_hummer" , Vehicle.class) );
 		legWithoutVeh.setRoute( routeWithoutVeh );
 		planWithoutVeh.addLeg( legWithoutVeh );

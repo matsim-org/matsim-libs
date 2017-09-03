@@ -36,8 +36,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -72,7 +73,7 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 		final Leg leg = factory.createLeg( TransportMode.car );
 		plan.addLeg( leg );
-		final NetworkRoute route = new LinkNetworkRouteImpl( linkId , Collections.<Id<Link>>emptyList() , linkId );
+		final NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(linkId, Collections.<Id<Link>>emptyList(), linkId);
 		route.setVehicleId( vehicleId );
 		leg.setRoute( route );
 
@@ -113,13 +114,14 @@ public class PlanRouterWithVehicleRessourcesTest {
 
 						for (int i=0; i < 5; i++) {
 							final Leg l = factory.createLeg( TransportMode.car );	
-							l.setRoute( new LinkNetworkRouteImpl( fromFacility.getLinkId() , Collections.<Id<Link>>emptyList() , fromFacility.getLinkId() ) );
+							l.setRoute( RouteUtils.createLinkNetworkRouteImpl(fromFacility.getLinkId(), Collections.<Id<Link>>emptyList(),
+									fromFacility.getLinkId()) );
 							legs.add( l );
 							legs.add( factory.createActivityFromLinkId( stage , fromFacility.getLinkId() ) );
 						}
 
 						final Leg l = factory.createLeg( TransportMode.car );	
-						l.setRoute( new LinkNetworkRouteImpl( fromFacility.getLinkId() , Collections.<Id<Link>>emptyList() , toFacility.getLinkId() ) );
+						l.setRoute( RouteUtils.createLinkNetworkRouteImpl(fromFacility.getLinkId(), Collections.<Id<Link>>emptyList(), toFacility.getLinkId()) );
 						legs.add( l );
 
 						return legs ;

@@ -19,6 +19,14 @@
 
 package org.matsim.contrib.minibus.routeProvider;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -27,15 +35,19 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.minibus.operator.Operator;
 import org.matsim.contrib.minibus.operator.PPlan;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.*;
 
 
 /**
@@ -153,7 +165,7 @@ final class ComplexCircleScheduleProvider implements PRouteProvider {
 		}
 
 		links.remove(0);
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLinkId, lastLinkId);
+		NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(startLinkId, lastLinkId);
 		route.setLinkIds(startLinkId, NetworkUtils.getLinkIds(links), lastLinkId);
 
 		// get stops at Route

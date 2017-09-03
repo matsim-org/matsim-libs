@@ -31,8 +31,9 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -89,7 +90,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		stops.add(stop1);
 		stops.add(stop2);
 
-		NetworkRoute netRoute = new LinkNetworkRouteImpl(link1.getId(), link2.getId());
+		NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(link1.getId(), link2.getId());
 		netRoute.setLinkIds(link1.getId(), Collections.<Id<Link>>emptyList(), link2.getId());
 		TransitRoute tRoute1 = sBuilder.createTransitRoute(Id.create("1", TransitRoute.class), netRoute, stops, "bus");
 

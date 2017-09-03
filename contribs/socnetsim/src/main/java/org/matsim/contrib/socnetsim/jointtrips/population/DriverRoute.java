@@ -31,8 +31,9 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 
 /**
  * @author thibautd
@@ -42,11 +43,11 @@ public class DriverRoute implements Route , NetworkRoute {
 	private final Set<Id<Person>> passengers = new TreeSet<Id<Person>>();
 
 	public DriverRoute(final Id<Link> startLink , final Id<Link> endLink) {
-		netRoute = new LinkNetworkRouteImpl( startLink , endLink );
+		netRoute = RouteUtils.createLinkNetworkRouteImpl(startLink, endLink);
 	}
 
 	public DriverRoute(final NetworkRoute r, final Collection<Id<Person>> passengers) {
-		netRoute = r != null ? (NetworkRoute) r.clone() : new LinkNetworkRouteImpl( null , null );
+		netRoute = r != null ? (NetworkRoute) r.clone() : RouteUtils.createLinkNetworkRouteImpl(null, null);
 		this.passengers.addAll( passengers );
 	}
 

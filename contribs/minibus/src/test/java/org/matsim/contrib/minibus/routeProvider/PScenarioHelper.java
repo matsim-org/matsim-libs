@@ -42,8 +42,9 @@ import org.matsim.contrib.minibus.replanning.PStrategy;
 import org.matsim.contrib.minibus.schedule.CreatePStops;
 import org.matsim.contrib.minibus.schedule.CreateStopsForAllCarLinks;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -293,7 +294,7 @@ public class PScenarioHelper {
 
 		
 		line = sf.createTransitLine(Id.create("Blue Line", TransitLine.class));
-		NetworkRoute netRoute = new LinkNetworkRouteImpl(Id.create("11", Link.class), Id.create("11", Link.class));
+		NetworkRoute netRoute = RouteUtils.createLinkNetworkRouteImpl(Id.create("11", Link.class), Id.create("11", Link.class));
 		List<Id<Link>> linkIds = new ArrayList<>();
 		Collections.addAll(linkIds, Id.create("12", Link.class), Id.create("23", Link.class), Id.create("33", Link.class), Id.create("32", Link.class), Id.create("21", Link.class));
 		netRoute.setLinkIds(Id.create("11", Link.class), linkIds,  Id.create("11", Link.class));
