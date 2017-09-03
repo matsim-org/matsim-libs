@@ -17,7 +17,7 @@ import org.matsim.vehicles.Vehicles;
  * @author michaz
  *
  */
-public class ScenarioUtils {
+public final class ScenarioUtils {
 
 	private ScenarioUtils() {
 		// make it private, so it cannot be instantiated

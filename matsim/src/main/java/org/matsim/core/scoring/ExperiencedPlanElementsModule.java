@@ -6,7 +6,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 
 import javax.inject.Inject;
 
-public class ExperiencedPlanElementsModule extends AbstractModule {
+public final class ExperiencedPlanElementsModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(EventsToActivities.class).asEagerSingleton();

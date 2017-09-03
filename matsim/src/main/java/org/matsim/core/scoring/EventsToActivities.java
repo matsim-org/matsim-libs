@@ -53,7 +53,7 @@ import javax.inject.Inject;
  * @author michaz
  *
  */
-public class EventsToActivities implements ActivityStartEventHandler, ActivityEndEventHandler {
+public final class EventsToActivities implements ActivityStartEventHandler, ActivityEndEventHandler {
 	
 	public interface ActivityHandler {
 	    void handleActivity(PersonExperiencedActivity activity);

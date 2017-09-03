@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 
-public class PersonExperiencedActivity {
+public final class PersonExperiencedActivity {
 	private final Id<Person> agentId;
 	private final Activity activity;
 

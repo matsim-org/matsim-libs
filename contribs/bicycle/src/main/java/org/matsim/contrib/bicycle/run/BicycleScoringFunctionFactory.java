@@ -38,7 +38,10 @@ import com.google.inject.Inject;
  */
 public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 	@Inject ScoringParametersForPerson parameters;
+
 	@Inject ScoringFunctionsForPopulation scoringFunctionsForPopulation;
+	
+	
 	@Inject Scenario scenario;
 	@Inject BicycleTravelTime bicycleTravelTime;
 	@Inject BicycleTravelDisutilityFactory bicycleTravelDisutilityFactory;
@@ -54,6 +57,8 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 		scoringFunctionsForPopulation.setPassLinkEventsToPerson(true);
+		// yyyyyy this is the ONLY place where we need to make ScoringFunctionsForPopulation public.  Somehow,
+		// this would imply to me that we should attach this switch to something else. kai, sep'17
 		
 		BicycleScoring bicycleScoring = new BicycleScoring(scenario, bicycleTravelTime, bicycleTravelDisutilityFactory);
 		sumScoringFunction.addScoringFunction(bicycleScoring);

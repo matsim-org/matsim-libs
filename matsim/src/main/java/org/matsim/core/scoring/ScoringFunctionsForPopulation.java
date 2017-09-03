@@ -64,8 +64,10 @@ import gnu.trove.list.array.TDoubleArrayList;
  * @author michaz
  *
  */
-public class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
-
+public final class ScoringFunctionsForPopulation implements BasicEventHandler, EventsToLegs.LegHandler, EventsToActivities.ActivityHandler {
+	// yyyyyy there is currently only one place outside package where this is used, and I think it
+	// can be changed there.  kai, sep'17
+	
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(ScoringFunctionsForPopulation.class);
 	private final Population population;

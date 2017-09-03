@@ -16,7 +16,7 @@ import org.matsim.vehicles.Vehicles;
 import javax.inject.Inject;
 import javax.inject.Provider;
 
-public class ScenarioByInstanceModule extends AbstractModule {
+public final class ScenarioByInstanceModule extends AbstractModule {
 
 	private final Scenario scenario;
 

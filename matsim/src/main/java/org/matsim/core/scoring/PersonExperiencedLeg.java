@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 
-public class PersonExperiencedLeg {
+public final class PersonExperiencedLeg {
 	private final Id<Person> agentId;
 	private final Leg leg;
 

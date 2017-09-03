@@ -51,7 +51,7 @@ public final class MutableScenario implements Scenario, Lockable {
 
 	private boolean locked = false ;
 
-	private final Map<String, Object> elements = new HashMap<String, Object>();
+	private final Map<String, Object> elements = new HashMap<>();
 
 	//mandatory attributes
 	private final Config config;

@@ -68,7 +68,7 @@ import org.matsim.run.CreateFullConfig;
  *
  * @author mrieser
  */
-public class Config implements MatsimExtensionPoint {
+public final class Config implements MatsimExtensionPoint {
 
 	// ////////////////////////////////////////////////////////////////////
 	// member variables

@@ -3,7 +3,7 @@ package org.matsim.core.scoring;
 
 import org.matsim.core.controler.AbstractModule;
 
-public class ExperiencedPlansModule extends AbstractModule {
+public final class ExperiencedPlansModule extends AbstractModule {
 	@Override
 	public void install() {
 		install(new ExperiencedPlanElementsModule());
