@@ -68,13 +68,13 @@ public abstract class AbstractRoute implements Route, Cloneable {
 	}
 
 	@Override
-	public void setEndLinkId(final Id<Link> linkId) {
+	public  void setEndLinkId(final Id<Link> linkId) {
 		// overridden in Compressed...
 		this.endLinkId = linkId;
 	}
 
 	@Override
-	public void setStartLinkId(final Id<Link> linkId) {
+	public  void setStartLinkId(final Id<Link> linkId) {
 		// overridden in Compressed...
 		this.startLinkId = linkId;
 	}

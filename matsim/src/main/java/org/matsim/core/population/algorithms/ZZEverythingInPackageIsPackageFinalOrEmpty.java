@@ -7,6 +7,6 @@ package org.matsim.core.population.algorithms;
  * @author nagel
  *
  */
-public class ZZEverythingPackageFinalOrEmpty {
+public class ZZEverythingInPackageIsPackageFinalOrEmpty {
 
 }
