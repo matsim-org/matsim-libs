@@ -38,7 +38,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -148,7 +148,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 		builder.setCurrentActivityExpectedEndTime(  250d );
 
 		builder.startLeg( TransportMode.walk );
-		final Route walkRoute = new GenericRouteImpl( link2 , link3 );
+		final Route walkRoute = RouteUtils.createGenericRouteImpl(link2, link3);
 		walkRoute.setTravelTime( 50 );
 		builder.setCurrentLegRoute( walkRoute );
 
@@ -241,7 +241,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 		builder.setCurrentActivityExpectedEndTime( 0 );
 
 		builder.startLeg( TransportMode.walk );
-		final Route walkRoute = new GenericRouteImpl( link2 , link3 );
+		final Route walkRoute = RouteUtils.createGenericRouteImpl(link2, link3);
 		walkRoute.setTravelTime( 500000000 );
 		builder.setCurrentLegRoute( walkRoute );
 

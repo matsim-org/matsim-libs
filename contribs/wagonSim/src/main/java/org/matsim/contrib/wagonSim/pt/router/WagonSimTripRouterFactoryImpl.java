@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TransitRouterWrapper;
@@ -143,7 +143,7 @@ public final class WagonSimTripRouterFactoryImpl implements Provider<TripRouter>
 						// handle all stages except the last one
 						pe.add(a); // insert an additional stage act
 						Leg ll = PopulationUtils.createLeg(TransportMode.transit_walk);
-						Route r = new GenericRouteImpl(a.getLinkId(), a.getLinkId());
+						Route r = RouteUtils.createGenericRouteImpl(a.getLinkId(), a.getLinkId());
 						r.setTravelTime(minShuntingTime);
 						ll.setRoute(r);
 						ll.setTravelTime(minShuntingTime);

@@ -52,9 +52,9 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine.TransitAgentTriesToTeleportException;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -767,7 +767,7 @@ public class TransitQueueSimulationTest {
         Activity act1 = pb.createActivityFromLinkId("h", link1.getId());
         act1.setEndTime(depTime - 60.0);
         Leg leg1 = pb.createLeg(TransportMode.walk);
-        Route route1 = new GenericRouteImpl(link1.getId(), link1.getId());
+        Route route1 = RouteUtils.createGenericRouteImpl(link1.getId(), link1.getId());
         route1.setTravelTime(10.0);
         route1.setDistance(10.0);
         leg1.setRoute(route1);
@@ -780,7 +780,7 @@ public class TransitQueueSimulationTest {
         Activity act3 = pb.createActivityFromLinkId(PtConstants.TRANSIT_ACTIVITY_TYPE, link1.getId());
         act3.setEndTime(0.0);
         Leg leg3 = pb.createLeg(TransportMode.walk);
-        Route route3 = new GenericRouteImpl(link2.getId(), link2.getId());
+        Route route3 = RouteUtils.createGenericRouteImpl(link2.getId(), link2.getId());
         route3.setTravelTime(10.0);
         route3.setDistance(10.0);
         leg3.setRoute(route3);

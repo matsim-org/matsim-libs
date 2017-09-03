@@ -48,7 +48,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
@@ -213,7 +213,7 @@ public class GroupCompositionPenalizerTest {
 
 	private Leg createLeg( final PopulationFactory factory ) {
 		final Leg l = factory.createLeg( "stay here" );
-		l.setRoute( new GenericRouteImpl( linkId , linkId ) );
+		l.setRoute( RouteUtils.createGenericRouteImpl(linkId, linkId) );
 		l.setTravelTime( 0 );
 		return l;
 	}

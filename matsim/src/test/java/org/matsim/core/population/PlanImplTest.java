@@ -34,16 +34,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 
 public class PlanImplTest {
 
@@ -263,7 +261,7 @@ public class PlanImplTest {
 		PopulationUtils.createAndAddActivityFromCoord(plan, "h", new Coord(0, 0));
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.car );
 		PopulationUtils.createAndAddActivityFromCoord(plan, "w", new Coord(100, 200));
-		Route route = new GenericRouteImpl(link1.getId(), link2.getId());
+		Route route = RouteUtils.createGenericRouteImpl(link1.getId(), link2.getId());
 		route.setTravelTime(98.76);
 		leg.setRoute(route);
 
@@ -273,7 +271,7 @@ public class PlanImplTest {
 		assertEquals("person must not be copied.", Id.create(2, Person.class), plan2.getPerson().getId());
 		assertEquals("wrong number of plan elements.", plan.getPlanElements().size(), plan2.getPlanElements().size());
 		Route route2 = ((Leg) plan.getPlanElements().get(1)).getRoute();
-		assertTrue(route2 instanceof GenericRouteImpl);
+//		assertTrue(route2 instanceof GenericRouteImpl);
 		assertEquals(98.76, route2.getTravelTime(), 1e-8);
 	}
 

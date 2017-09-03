@@ -24,7 +24,7 @@ import java.util.*;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.*;
 import org.matsim.facilities.Facility;
 
@@ -39,7 +39,7 @@ public class DynRoutingModule implements RoutingModule {
 	@Override
 	public List<? extends PlanElement> calcRoute(Facility<?> fromFacility, Facility<?> toFacility, double departureTime,
 			Person person) {
-		Route route = new GenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
+		Route route = RouteUtils.createGenericRouteImpl(fromFacility.getLinkId(), toFacility.getLinkId());
 		route.setDistance(Double.NaN);
 		route.setTravelTime(Double.NaN);
 		

@@ -40,9 +40,9 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 
@@ -156,7 +156,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 		withVeh.addPlan( planWithVeh );
 		planWithVeh.addActivity( scenario.getPopulation().getFactory().createActivityFromLinkId( "h" , link ) );
 		final Leg walkLegWithVeh = scenario.getPopulation().getFactory().createLeg( TransportMode.walk );
-		walkLegWithVeh.setRoute( new GenericRouteImpl( link , link ) );
+		walkLegWithVeh.setRoute( RouteUtils.createGenericRouteImpl(link, link) );
 		planWithVeh.addLeg( walkLegWithVeh );
 		final Leg legWithVeh = scenario.getPopulation().getFactory().createLeg( TransportMode.car );
 		final NetworkRoute routeWithVeh = new LinkNetworkRouteImpl( link , Collections.<Id<Link>>emptyList() , link );

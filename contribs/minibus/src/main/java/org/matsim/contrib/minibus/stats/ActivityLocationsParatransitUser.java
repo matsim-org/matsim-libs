@@ -19,22 +19,6 @@
 
 package org.matsim.contrib.minibus.stats;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.minibus.PConfigGroup;
-import org.matsim.contrib.minibus.genericUtils.GridNode;
-import org.matsim.core.api.internal.MatsimReader;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.routes.GenericRouteImpl;
-import org.matsim.core.scenario.MutableScenario;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.PtConstants;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -44,6 +28,26 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.inject.Inject;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.minibus.PConfigGroup;
+import org.matsim.contrib.minibus.genericUtils.GridNode;
+import org.matsim.core.api.internal.MatsimReader;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.scenario.MutableScenario;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.PtConstants;
 
 /**
  * Accumulates the number of activities right before and after a paratransit trip. Ignores pt interactions.
@@ -125,8 +129,8 @@ final class ActivityLocationsParatransitUser implements IterationEndsListener {
 					// check, if it is a paratransit user
 					Leg leg = (Leg) pE;
 					
-					if (leg.getRoute() instanceof GenericRouteImpl) {
-						GenericRouteImpl route = (GenericRouteImpl) leg.getRoute();
+//					if (leg.getRoute() instanceof GenericRouteImpl) {
+						Route route = leg.getRoute();
 						
 						if (route.getRouteDescription() != null) {
 							if (route.getRouteDescription().contains(this.pIdentifier)) {
@@ -134,7 +138,7 @@ final class ActivityLocationsParatransitUser implements IterationEndsListener {
 								lastLegUsesParatransit = true;
 							}
 						}
-					}
+//					}
 				}
 			}
 		}

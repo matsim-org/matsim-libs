@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.algorithms.SubsequentLinksAnalyzer;
 
-public class CompressedNetworkRouteFactory implements RouteFactory {
+public final class CompressedNetworkRouteFactory implements RouteFactory {
 
 	private Map<Id<Link>, Id<Link>> subsequentLinks = null;
 	private final Network network;

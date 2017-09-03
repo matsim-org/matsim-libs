@@ -31,7 +31,7 @@ import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 /**
  * @author mrieser / senozon
  */
-public class RouteFactories {
+public final class RouteFactories {
 	private final Map<Class<? extends Route>, RouteFactory> routeFactories = new HashMap<>();
 	private RouteFactory defaultFactory = new GenericRouteFactory();
 	private final Map<String, Class<? extends Route>> type2class = new HashMap<>();

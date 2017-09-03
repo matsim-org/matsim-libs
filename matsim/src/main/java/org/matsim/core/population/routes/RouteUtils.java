@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -38,6 +39,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * @author mrieser
  */
 public class RouteUtils {
+	private RouteUtils(){} // do not instantiate
 
 	/**
 	 * Returns all nodes the route passes between the start- and the end-link of the route.
@@ -48,7 +50,7 @@ public class RouteUtils {
 	 */
 	public static List<Node> getNodes(final NetworkRoute route, final Network network) {
 		List<Id<Link>> linkIds = route.getLinkIds();
-		List<Node> nodes = new ArrayList<Node>(linkIds.size() + 1);
+		List<Node> nodes = new ArrayList<>(linkIds.size() + 1);
 		if ((linkIds.size() > 0)) {
 			nodes.add(network.getLinks().get(linkIds.get(0)).getFromNode());
 			for (Id<Link> linkId : linkIds) {
@@ -62,7 +64,7 @@ public class RouteUtils {
 	}
 
 	public static List<Link> getLinksFromNodes(final List<Node> nodes) {
-		ArrayList<Link> links = new ArrayList<Link>(nodes.size());
+		ArrayList<Link> links = new ArrayList<>(nodes.size());
 		Node prevNode = null;
 		for (Node node : nodes) {
 			if (prevNode != null) {
@@ -78,7 +80,7 @@ public class RouteUtils {
 	}
 
 	public static List<Link> getLinksFromNodeIds(final Network network, final List<Id<Node>> nodeIds) {
-		ArrayList<Link> links = new ArrayList<Link>(nodeIds.size());
+		ArrayList<Link> links = new ArrayList<>(nodeIds.size());
 		Node prevNode = null;
 		for (Id<Node> nodeId : nodeIds) {
 			Node node = network.getNodes().get(nodeId);
@@ -170,7 +172,7 @@ public class RouteUtils {
 
 	public static NetworkRoute createNetworkRoute(List<Id<Link>> routeLinkIds, final Network network) {
 		Id<Link> startLinkId = routeLinkIds.get(0);
-		List<Id<Link>> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<Id<Link>>(0);
+		List<Id<Link>> linksBetween = (routeLinkIds.size() > 2) ? routeLinkIds.subList(1, routeLinkIds.size() - 1) : new ArrayList<>(0);
 		Id<Link> endLinkId = routeLinkIds.get(routeLinkIds.size() - 1);
 		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
 		route.setLinkIds(startLinkId, linksBetween, endLinkId);
@@ -238,6 +240,10 @@ public class RouteUtils {
 		} else {
 			return 1. ; // route has zero length = fully covered by any other route.  (but they are not similar!?!?!?)
 		}
+	}
+
+	public static Route createGenericRouteImpl(Id<Link> startLinkId, Id<Link> endLinkId) {
+		return new GenericRouteImpl(startLinkId, endLinkId);
 	}
 
 }

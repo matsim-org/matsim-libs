@@ -22,7 +22,6 @@ package org.matsim.core.api.internal;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.network.TimeDependentNetwork;
-import org.matsim.core.population.routes.CompressedNetworkRouteImpl;
 import org.matsim.core.population.routes.RouteFactory;
 
 /**

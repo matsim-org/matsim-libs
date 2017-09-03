@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.integration.population.routes;
+package org.matsim.core.population.routes;
 
 import org.junit.Assert;
 import org.junit.Rule;

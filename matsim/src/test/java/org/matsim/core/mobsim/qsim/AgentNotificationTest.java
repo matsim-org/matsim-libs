@@ -31,7 +31,7 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
@@ -317,7 +317,7 @@ public class AgentNotificationTest {
 			}
 			{
 				Leg leg = pb.createLeg(TransportMode.walk);
-				Route route = new GenericRouteImpl(link.getId(), link.getId());
+				Route route = RouteUtils.createGenericRouteImpl(link.getId(), link.getId());
 				route.setTravelTime(5.0*3600);
 				route.setDistance(100.0);
 				leg.setRoute(route);

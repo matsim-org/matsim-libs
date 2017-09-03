@@ -32,7 +32,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 
@@ -62,7 +62,7 @@ public class CharyparNagelWithSubpopulationsTest {
 		leg.setDepartureTime( 10 );
 		leg.setTravelTime(10);
 
-		final Route route = new GenericRouteImpl( null , null );
+		final Route route = RouteUtils.createGenericRouteImpl(null, null);
 		route.setDistance( 10 );
 		route.setTravelTime( 10 );
 		leg.setRoute( route );

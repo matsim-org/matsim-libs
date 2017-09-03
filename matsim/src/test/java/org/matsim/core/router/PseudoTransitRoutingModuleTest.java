@@ -19,7 +19,6 @@
 
 package org.matsim.core.router;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.Assert;
@@ -46,14 +45,11 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
-
-import com.google.inject.Binding;
 
 public class PseudoTransitRoutingModuleTest {
 
@@ -80,7 +76,7 @@ public class PseudoTransitRoutingModuleTest {
 					f.s.getNetwork(), routeAlgo, params).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 			Assert.assertEquals(400.0, tt, 1e-8);
 			Assert.assertEquals(400.0, leg.getTravelTime(), 1e-8);
-			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
+//			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
 			Assert.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
 		}{
 			ModeRoutingParams params = new ModeRoutingParams("mode") ;
@@ -122,7 +118,7 @@ public class PseudoTransitRoutingModuleTest {
 			Leg newLeg = (Leg) result.get(0) ;
 			
 			Assert.assertEquals(800.0, newLeg.getTravelTime(), 1e-8);
-			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
+//			Assert.assertTrue(leg.getRoute() instanceof GenericRouteImpl);
 			Assert.assertEquals(3000.0, newLeg.getRoute().getDistance(), 1e-8);
 		}
 	}

@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.PtConstants;
@@ -159,7 +158,7 @@ public class TransitRouterWrapper implements RoutingModule {
 		// (take distance from newly computed walk leg, but take travelTime from elsewhere).  Possibly, the problem is that the TransitRouter 
 		// historically just does not compute the distances.  kai, may'17
 		
-		Route route = new GenericRouteImpl(fromFacility.getLinkId(), firstToFacility.getLinkId());
+		Route route = RouteUtils.createGenericRouteImpl(fromFacility.getLinkId(), firstToFacility.getLinkId());
 		final List<? extends PlanElement> walkRoute = walkRouter.calcRoute(fromFacility, firstToFacility, departureTime, person);
 		route.setDistance(((Leg) walkRoute.get(0)).getRoute().getDistance());
 		route.setTravelTime(travelTime);

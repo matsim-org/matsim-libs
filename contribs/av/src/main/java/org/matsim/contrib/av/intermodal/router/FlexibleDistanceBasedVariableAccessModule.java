@@ -43,7 +43,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -109,7 +109,7 @@ public class FlexibleDistanceBasedVariableAccessModule implements VariableAccess
 		Leg leg = PopulationUtils.createLeg(mode);
 		Link startLink = NetworkUtils.getNearestLink(carnetwork, coord);
 		Link endLink = NetworkUtils.getNearestLink(carnetwork, toCoord);
-		Route route = new GenericRouteImpl(startLink.getId(),endLink.getId());
+		Route route = RouteUtils.createGenericRouteImpl(startLink.getId(), endLink.getId());
 		leg.setRoute(route);
 		if (this.teleportedModes.get(mode)){
 			double distf = config.plansCalcRoute().getModeRoutingParams().get(mode).getBeelineDistanceFactor();

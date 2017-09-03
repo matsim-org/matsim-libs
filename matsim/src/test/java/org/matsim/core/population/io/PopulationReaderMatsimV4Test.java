@@ -42,8 +42,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.PopulationReaderMatsimV4;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -273,7 +271,7 @@ public class PopulationReaderMatsimV4Test {
 		Route route3 = leg3.getRoute();
 		
 		Assert.assertTrue(route1 instanceof NetworkRoute);
-		Assert.assertTrue(route2 instanceof GenericRouteImpl);
+//		Assert.assertTrue(route2 instanceof GenericRouteImpl);
 		Assert.assertTrue(route3 instanceof ExperimentalTransitRoute);
 	}
 

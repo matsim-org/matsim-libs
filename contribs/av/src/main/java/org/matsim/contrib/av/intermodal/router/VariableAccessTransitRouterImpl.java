@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -212,7 +212,8 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 								leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 								//							    double walkTime = getWalkTime(person, accessStop.getCoord(), egressStop.getCoord());
 								double transferTime = getTransferTime(person, accessStop.getCoord(), egressStop.getCoord());
-								Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
+								Route walkRoute = RouteUtils.createGenericRouteImpl(accessStop.getLinkId(),
+										egressStop.getLinkId());
 								// (yy I would have expected this from egressStop to accessStop. kai, jul'16)
 								
 								//							    walkRoute.setTravelTime(walkTime);
@@ -243,7 +244,8 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 									legs.add(leg); //access leg
 									time += leg.getTravelTime();
 									
-									Route walkRoute = new GenericRouteImpl(leg.getRoute().getEndLinkId(), egressStop.getLinkId());
+									Route walkRoute = RouteUtils.createGenericRouteImpl(
+											leg.getRoute().getEndLinkId(), egressStop.getLinkId());
 									double walkTime = getTransferTime(person, network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord(), egressStop.getCoord());
 									walkRoute.setTravelTime(walkTime);
 									walkRoute.setDistance(config.getBeelineDistanceFactor() * 
@@ -309,7 +311,7 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 					leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 					double walkTime = getTransferTime(person, accessStop.getCoord(), network.getLinks().get(eleg.getRoute().getStartLinkId()).getCoord());
 					leg.setTravelTime(walkTime);
-					Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), eleg.getRoute().getStartLinkId());
+					Route walkRoute = RouteUtils.createGenericRouteImpl(accessStop.getLinkId(), eleg.getRoute().getStartLinkId());
 					walkRoute.setDistance(config.getBeelineDistanceFactor() * 
 											NetworkUtils.getEuclideanDistance(accessStop.getCoord(),network.getLinks().get(eleg.getRoute().getStartLinkId()).getCoord()));
 					leg.setRoute(walkRoute);

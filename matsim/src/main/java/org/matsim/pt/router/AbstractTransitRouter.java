@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -70,7 +70,7 @@ public class AbstractTransitRouter {
 		Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 		double walkTime = getWalkTime(person, fromCoord, toCoord);
 		leg.setTravelTime(walkTime);
-		Route walkRoute = new GenericRouteImpl(null, null);
+		Route walkRoute = RouteUtils.createGenericRouteImpl(null, null);
 		walkRoute.setTravelTime(walkTime);
 		leg.setRoute(walkRoute);
 		legs.add(leg);
@@ -132,7 +132,8 @@ public class AbstractTransitRouter {
 									leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 									//							    double walkTime = getWalkTime(person, accessStop.getCoord(), egressStop.getCoord());
 									double transferTime = getTransferTime(person, accessStop.getCoord(), egressStop.getCoord());
-									Route walkRoute = new GenericRouteImpl(accessStop.getLinkId(), egressStop.getLinkId());
+									Route walkRoute = RouteUtils.createGenericRouteImpl(
+											accessStop.getLinkId(), egressStop.getLinkId());
 									// (yy I would have expected this from egressStop to accessStop. kai, jul'16)
 									
 									//							    walkRoute.setTravelTime(walkTime);
@@ -152,7 +153,8 @@ public class AbstractTransitRouter {
 								} else { // accessStop == null, so it must be the first walk-leg
 									leg = PopulationUtils.createLeg(TransportMode.transit_walk);
 									double walkTime = getWalkTime(person, fromCoord, egressStop.getCoord());
-									Route walkRoute = new GenericRouteImpl(null, egressStop.getLinkId());
+									Route walkRoute = RouteUtils.createGenericRouteImpl(null,
+											egressStop.getLinkId());
 									walkRoute.setTravelTime(walkTime);
 									
 	//								walkRoute.setDistance( currentDistance );

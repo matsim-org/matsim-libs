@@ -18,9 +18,9 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.pseudosimulation.distributed.plans.PlanGenome;
 import org.matsim.contrib.pseudosimulation.distributed.scoring.PlanScoreComponent;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.pt.routes.ExperimentalTransitRouteFactory;
 import org.matsim.vehicles.Vehicle;
@@ -241,7 +241,7 @@ class PlanSerializable implements Serializable {
             if (mode.equals(TransportMode.pt) && isUseTransit) {
                 route = new ExperimentalTransitRouteFactory().createRoute(startLinkId, endLinkId);
             } else {
-                route = new GenericRouteImpl(startLinkId, endLinkId);
+                route = RouteUtils.createGenericRouteImpl(startLinkId, endLinkId);
             }
             route.setDistance(distance);
             route.setTravelTime(travelTime);

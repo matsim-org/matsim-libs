@@ -51,7 +51,7 @@ import org.matsim.vehicles.Vehicle;
  *
  * @author mrieser
  */
-public class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkRoute, Cloneable {
+final class CompressedNetworkRouteImpl extends AbstractRoute implements NetworkRoute, Cloneable {
 
 	private final static Logger log = Logger.getLogger(CompressedNetworkRouteImpl.class);
 
@@ -120,17 +120,18 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 		}
 	}
 
-	@Override
-	public void setEndLinkId(final Id<Link> linkId) {
-		this.modCount++;
-		super.setEndLinkId(linkId);
-	}
-
-	@Override
-	public void setStartLinkId(final Id<Link> linkId) {
-		this.modCount++;
-		super.setStartLinkId(linkId);
-	}
+//	@Override
+//	public void setEndLinkId(final Id<Link> linkId) {
+//		this.modCount++;
+//		super.setEndLinkId(linkId);
+//	}
+//
+//	@Override
+//	public void setStartLinkId(final Id<Link> linkId) {
+//		this.modCount++;
+//		super.setStartLinkId(linkId);
+//	}
+	// AbstractRoute is now implements Lockable and I have addressed this via that feature.  kai, sep/17
 
 	@Override
 	public NetworkRoute getSubRoute(Id<Link> fromLinkId, Id<Link> toLinkId) {
@@ -209,6 +210,8 @@ public class CompressedNetworkRouteImpl extends AbstractRoute implements Network
 		this.route.trimToSize();
 		this.uncompressedLength = srcRoute.size();
 //		System.out.println("uncompressed size: \t" + this.uncompressedLength + "\tcompressed size: \t" + this.route.size());
+		
+		this.setLocked() ;
 	}
 
 	@Override

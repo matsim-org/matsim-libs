@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
@@ -57,7 +57,7 @@ public class PopulationWriterHandlerImplV4Test extends MatsimTestCase {
 		plan.setPerson(person);
 		plan.addActivity(pb.createActivityFromLinkId("h", link1.getId()));
 		Leg leg = pb.createLeg("undefined");
-		Route route = new GenericRouteImpl(link1.getId(), link2.getId());
+		Route route = RouteUtils.createGenericRouteImpl(link1.getId(), link2.getId());
 		route.setTravelTime(123);
 		leg.setRoute(route);
 		plan.addLeg(leg);

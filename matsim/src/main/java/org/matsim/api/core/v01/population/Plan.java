@@ -42,9 +42,9 @@ public interface Plan extends MatsimPopulationObject, Customizable, BasicPlan, A
 
 	public abstract void addActivity(final Activity act);
 
-    public abstract String getType();
+	public abstract String getType();
 
-    public abstract void setType(final String type);
+	public abstract void setType(final String type);
 
 	public abstract Person getPerson();
 

@@ -39,7 +39,6 @@ import org.matsim.contrib.freight.carrier.Tour.TourElement;
 import org.matsim.contrib.freight.scoring.FreightActivity;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -105,7 +104,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 				else{
 					startLink = event.getLinkId();
 				}
-				Route genericRoute = new GenericRouteImpl(startLink, event.getLinkId());    
+				Route genericRoute = RouteUtils.createGenericRouteImpl(startLink, event.getLinkId());    
 				genericRoute.setDistance(0.0);
 				currentLeg.setRoute(genericRoute);
 			}

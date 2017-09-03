@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -52,7 +52,7 @@ public class WalkLegFactory {
 		Leg leg = PopulationUtils.createLeg(walkMode);
 		double walkDistance = CoordUtils.calcEuclideanDistance(network.getLinks().get(from).getCoord(), network.getLinks().get(to).getCoord())*beelinedistancefactor;
 		double walkTime = walkDistance / walkspeed;
-		Route route = new GenericRouteImpl(from, to);
+		Route route = RouteUtils.createGenericRouteImpl(from, to);
 		route.setDistance(walkDistance);
 		route.setTravelTime(walkTime);
 		leg.setRoute(route);

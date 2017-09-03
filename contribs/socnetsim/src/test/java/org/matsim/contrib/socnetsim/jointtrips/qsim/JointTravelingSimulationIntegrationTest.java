@@ -57,8 +57,8 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.contrib.socnetsim.jointtrips.population.DriverRoute;
@@ -514,7 +514,7 @@ public class JointTravelingSimulationIntegrationTest {
 
 				Leg l = factory.createLeg( TransportMode.walk );
 				double tt = random.nextDouble() * 1234;
-				Route walkRoute = new GenericRouteImpl( fixture.originLink , fixture.puLink );
+				Route walkRoute = RouteUtils.createGenericRouteImpl(fixture.originLink, fixture.puLink);
 				walkRoute.setTravelTime( tt );
 				l.setTravelTime( tt );
 				l.setRoute( walkRoute );
@@ -547,7 +547,7 @@ public class JointTravelingSimulationIntegrationTest {
 
 				l = factory.createLeg( TransportMode.walk );
 				tt = random.nextDouble() * 1234;
-				walkRoute = new GenericRouteImpl( fixture.doLink , fixture.destinationLink );
+				walkRoute = RouteUtils.createGenericRouteImpl(fixture.doLink, fixture.destinationLink);
 				walkRoute.setTravelTime( tt );
 				l.setTravelTime( tt );
 				l.setRoute( walkRoute );
@@ -559,7 +559,7 @@ public class JointTravelingSimulationIntegrationTest {
 
 				l = factory.createLeg( TransportMode.walk );
 				tt = random.nextDouble() * 1234;
-				walkRoute = new GenericRouteImpl( fixture.destinationLink , fixture.originLink );
+				walkRoute = RouteUtils.createGenericRouteImpl(fixture.destinationLink, fixture.originLink);
 				walkRoute.setTravelTime( tt );
 				l.setTravelTime( tt );
 				l.setRoute( walkRoute );

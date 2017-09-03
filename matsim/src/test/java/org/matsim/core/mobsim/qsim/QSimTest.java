@@ -59,10 +59,10 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
@@ -502,7 +502,7 @@ public class QSimTest {
 		Activity act = PopulationUtils.createAndAddActivityFromLinkId(plan, "home", f.link1.getId());
 		act.setEndTime(6.0 * 3600);
 		Leg leg = PopulationUtils.createAndAddLeg( plan, TransportMode.walk );
-		leg.setRoute(new GenericRouteImpl(f.link1.getId(), f.link2.getId()));
+		leg.setRoute(RouteUtils.createGenericRouteImpl(f.link1.getId(), f.link2.getId()));
 		leg.getRoute().setTravelTime(0.); // retrofitting to repair failing test.  kai, apr'15
 		act = PopulationUtils.createAndAddActivityFromLinkId(plan, "work", f.link2.getId());
 		act.setEndTime(6.0 * 3600 + 60);
@@ -1280,7 +1280,7 @@ public class QSimTest {
 		Activity act1 = pb.createActivityFromLinkId("h", link.getId());
 		act1.setEndTime(7.0*3600);
 		Leg leg = pb.createLeg(TransportMode.walk);
-		Route route = new GenericRouteImpl(link.getId(), link.getId());
+		Route route = RouteUtils.createGenericRouteImpl(link.getId(), link.getId());
         route.setTravelTime(5.0*3600);
         leg.setRoute(route);
 		Activity act2 = pb.createActivityFromLinkId("w", link.getId());
@@ -1366,7 +1366,7 @@ public class QSimTest {
 		Activity act2_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act2_1.setEndTime(simEndTime - 1000);
 		Leg leg2 = pb.createLeg(TransportMode.walk);
-		Route route2 = new GenericRouteImpl(link1.getId(), link2.getId());
+		Route route2 = RouteUtils.createGenericRouteImpl(link1.getId(), link2.getId());
 		leg2.setRoute(route2);
 		leg2.setTravelTime(2000);
 		Activity act2_2 = pb.createActivityFromLinkId("w", link2.getId());
@@ -1381,7 +1381,7 @@ public class QSimTest {
 		Activity act3_1 = pb.createActivityFromLinkId("h", link1.getId());
 		act3_1.setEndTime(simEndTime + 1000);
 		Leg leg3 = pb.createLeg(TransportMode.walk);
-		Route route3 = new GenericRouteImpl(link1.getId(), link2.getId());
+		Route route3 = RouteUtils.createGenericRouteImpl(link1.getId(), link2.getId());
 		leg3.setRoute(route3);
 		leg3.setTravelTime(1000);
 		Activity act3_2 = pb.createActivityFromLinkId("w", link2.getId());

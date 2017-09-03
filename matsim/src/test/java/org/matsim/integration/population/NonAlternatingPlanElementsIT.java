@@ -30,9 +30,9 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.*;
@@ -119,7 +119,7 @@ public class NonAlternatingPlanElementsIT {
 		home1.setEndTime(7.0 * 3600);
 
 		Leg leg1 = pf.createLeg("transit_walk");
-		leg1.setRoute(new GenericRouteImpl(Id.create(1, Link.class), Id.create(14, Link.class)));
+		leg1.setRoute(RouteUtils.createGenericRouteImpl(Id.create(1, Link.class), Id.create(14, Link.class)));
 		leg1.getRoute().setTravelTime(0.); // retrofitting to repair failing test. kai, apr'15
 
 		Leg leg2 = pf.createLeg("pt");
@@ -165,7 +165,7 @@ public class NonAlternatingPlanElementsIT {
 		home1.setEndTime(7.0 * 3600);
 
 		Leg leg1 = pf.createLeg("walk");
-		leg1.setRoute(new GenericRouteImpl(Id.create(1, Link.class), Id.create(21, Link.class)));
+		leg1.setRoute(RouteUtils.createGenericRouteImpl(Id.create(1, Link.class), Id.create(21, Link.class)));
 		leg1.getRoute().setTravelTime(0.); // retrofitting failing test. kai, apr'15
 
 		Activity work = pf.createActivityFromLinkId("w", Id.create(21, Link.class));

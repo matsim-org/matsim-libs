@@ -56,7 +56,6 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -278,7 +277,7 @@ TeleportationArrivalEventHandler, TransitDriverStartsEventHandler, PersonEntersV
 			// i.e. experiencedRoute.size()==1 and no pendingTransitTravel
 
 			TeleportationArrivalEvent travelEvent = routelessTravels.remove(event.getPersonId());
-			Route genericRoute = new GenericRouteImpl(experiencedRoute.get(0), event.getLinkId());
+			Route genericRoute = RouteUtils.createGenericRouteImpl(experiencedRoute.get(0), event.getLinkId());
 			genericRoute.setTravelTime(travelTime);
 			if (travelEvent != null) {
 				genericRoute.setDistance(travelEvent.getDistance());
