@@ -46,7 +46,7 @@ public class RouteFactoryImplTest {
 		Id<Link> linkId = Id.create(1, Link.class);
 		final Id<Link> startLinkId = linkId;
 		final Id<Link> endLinkId = linkId;
-		Assert.assertEquals(NetworkRoute.class, pf.getRouteFactories().createRoute(NetworkRoute.class, startLinkId, endLinkId).getClass());
+		Assert.assertEquals(GenericRouteImpl.class, pf.getRouteFactories().createRoute(Route.class, startLinkId, endLinkId).getClass());
 	}
 
 	@Test
@@ -59,7 +59,7 @@ public class RouteFactoryImplTest {
 		Id<Link> linkId = Id.create(1, Link.class);
 		final Id<Link> startLinkId = linkId;
 		final Id<Link> endLinkId = linkId;
-		Assert.assertEquals(NetworkRoute.class, pf.getRouteFactories().createRoute(NetworkRoute.class, startLinkId, endLinkId).getClass());
+		Assert.assertEquals(LinkNetworkRouteImpl.class, pf.getRouteFactories().createRoute(NetworkRoute.class, startLinkId, endLinkId).getClass());
 	}
 
 	@Test
