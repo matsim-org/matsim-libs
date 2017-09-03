@@ -161,14 +161,14 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		network.addLink(link5);
 		network.addLink(endLink);
 
-		Map<Id<Link>, Id<Link>> subsequentLinks = new TreeMap<Id<Link>, Id<Link>>();
+		Map<Id<Link>, Id<Link>> subsequentLinks = new TreeMap<>();
 		subsequentLinks.put(startLink.getId(), link3.getId());
 		subsequentLinks.put(link3.getId(), link4.getId());
 		subsequentLinks.put(link4.getId(), link5.getId());
 		subsequentLinks.put(link5.getId(), endLink.getId());
 
 		CompressedNetworkRouteImpl route1 = new CompressedNetworkRouteImpl(startLink.getId(), endLink.getId(), network, subsequentLinks);
-		ArrayList<Id<Link>> srcRoute = new ArrayList<Id<Link>>(5);
+		ArrayList<Id<Link>> srcRoute = new ArrayList<>(5);
 		Collections.addAll(srcRoute, link3.getId(), link4.getId());
 		route1.setLinkIds(startLink.getId(), srcRoute, link5.getId());
 		Assert.assertEquals(2, route1.getLinkIds().size());
@@ -176,10 +176,10 @@ public class CompressedNetworkRouteTest extends AbstractNetworkRouteTest {
 		CompressedNetworkRouteImpl route2 = route1.clone();
 
 		srcRoute.add(link5.getId());
-		route1.setLinkIds(startLink.getId(), srcRoute, endLink.getId());
+		route2.setLinkIds(startLink.getId(), srcRoute, endLink.getId());
 
-		Assert.assertEquals(3, route1.getLinkIds().size());
-		Assert.assertEquals(2, route2.getLinkIds().size());
+		Assert.assertEquals(2, route1.getLinkIds().size());
+		Assert.assertEquals(3, route2.getLinkIds().size());
 	}
 
 }

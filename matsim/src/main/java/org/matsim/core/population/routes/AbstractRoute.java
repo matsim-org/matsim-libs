@@ -111,7 +111,9 @@ public abstract class AbstractRoute implements Route, Cloneable {
 		// The method can only be called if a class implements "Cloneable"; otherwise, it leads to a runtime exception (!).
 		// It is, however, sufficient to have clone available as protected.
 		try {
-			return (AbstractRoute) super.clone();
+			final AbstractRoute clone = (AbstractRoute) super.clone();
+			clone.locked = false ; // not obvious that this is the right way to go.
+			return clone;
 		} catch (CloneNotSupportedException e) {
 			throw new AssertionError(e);
 		}
