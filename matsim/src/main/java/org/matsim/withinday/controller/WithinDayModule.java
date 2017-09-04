@@ -48,7 +48,6 @@ public class WithinDayModule extends AbstractModule {
         bind(WithinDayEngine.class);
         bind(Mobsim.class).toProvider(WithinDayQSimFactory.class);
         bind(FixedOrderSimulationListener.class).asEagerSingleton();
-        addMobsimListenerBinding().to(FixedOrderSimulationListener.class);
         bind(WithinDayControlerListener.class).asEagerSingleton();
         addControlerListenerBinding().to(WithinDayControlerListener.class);
         bind(MobsimDataProvider.class).asEagerSingleton();

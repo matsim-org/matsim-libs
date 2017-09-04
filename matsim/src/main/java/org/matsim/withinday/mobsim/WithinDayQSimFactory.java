@@ -25,8 +25,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 import javax.inject.Inject;
 
@@ -37,12 +39,16 @@ public class WithinDayQSimFactory implements Provider<Mobsim> {
 	private final Scenario scenario;
 	private final EventsManager eventsManager;
 	private final WithinDayEngine withinDayEngine;
+	private final FixedOrderSimulationListener fixedOrderSimulationListener;
+	private final TravelTimeCollector travelTimeCollector;
 
 	@Inject
-	WithinDayQSimFactory(Scenario scenario, EventsManager eventsManager, WithinDayEngine withinDayEngine) {
+	WithinDayQSimFactory(Scenario scenario, EventsManager eventsManager, WithinDayEngine withinDayEngine, FixedOrderSimulationListener fixedOrderSimulationListener, TravelTimeCollector travelTimeCollector) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.withinDayEngine = withinDayEngine;
+		this.fixedOrderSimulationListener = fixedOrderSimulationListener;
+		this.travelTimeCollector = travelTimeCollector;
 	}
 
 	@Override
@@ -50,6 +56,8 @@ public class WithinDayQSimFactory implements Provider<Mobsim> {
 		QSim mobsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
 		log.info("Adding WithinDayEngine to Mobsim.");
 		mobsim.addMobsimEngine(withinDayEngine);
+		mobsim.addQueueSimulationListeners(fixedOrderSimulationListener);
+		mobsim.addQueueSimulationListeners(travelTimeCollector);
 		return mobsim;
 	}
 }

@@ -6,7 +6,6 @@ public class TravelTimeCollectorModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(TravelTimeCollector.class);
-		addMobsimListenerBinding().to(TravelTimeCollector.class);
 		addEventHandlerBinding().to(TravelTimeCollector.class);
 		bindNetworkTravelTime().to(TravelTimeCollector.class);
 	}
