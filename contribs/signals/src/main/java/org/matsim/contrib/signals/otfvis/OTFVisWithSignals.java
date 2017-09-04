@@ -22,7 +22,6 @@
 
 package org.matsim.contrib.signals.otfvis;
 
-import java.util.Collection;
 import java.util.Collections;
 
 import org.matsim.api.core.v01.Scenario;
@@ -42,7 +41,6 @@ import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
@@ -54,10 +52,6 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 import org.matsim.vis.otfvis.handler.FacilityDrawer;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
-
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.util.Types;
 
 public class OTFVisWithSignals {
 
@@ -74,7 +68,6 @@ public class OTFVisWithSignals {
 		}), new SignalsModule()));
 	
 		EventsManager events = injector.getInstance(EventsManager.class);
-		events.initProcessing();
 		
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario, events).run();
 		
