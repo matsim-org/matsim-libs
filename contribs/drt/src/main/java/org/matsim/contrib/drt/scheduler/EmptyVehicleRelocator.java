@@ -20,11 +20,18 @@
 package org.matsim.contrib.drt.scheduler;
 
 import org.matsim.api.core.v01.network.*;
+import org.matsim.contrib.drt.optimizer.AbstractDrtOptimizer;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.router.*;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.*;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * @author michalm
@@ -35,10 +42,14 @@ public class EmptyVehicleRelocator {
 	private final DrtScheduler scheduler;
 	private final FastAStarEuclidean router;
 
-	public EmptyVehicleRelocator(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
+	@Inject
+	public EmptyVehicleRelocator(@Named(DvrpModule.DVRP_ROUTING) Network network,
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			@Named(AbstractDrtOptimizer.DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory,
 			DrtScheduler scheduler) {
 		this.travelTime = travelTime;
 		this.scheduler = scheduler;
+		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 
 		PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(travelDisutility);
 		preProcessEuclidean.run(network);

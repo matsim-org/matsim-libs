@@ -29,6 +29,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
@@ -87,8 +88,8 @@ public class VehicleData {
 	private final List<Entry> entries = new ArrayList<>();
 	private final double currTime;
 
-	public VehicleData(DrtOptimizerContext optimContext, Iterable<? extends Vehicle> vehicles) {
-		currTime = optimContext.timer.getTimeOfDay();
+	public VehicleData(MobsimTimer mobsimTimer, Iterable<? extends Vehicle> vehicles) {
+		currTime = mobsimTimer.getTimeOfDay();
 
 		for (Vehicle v : vehicles) {
 			Entry e = createVehicleData(v);

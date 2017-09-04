@@ -52,7 +52,8 @@ public class ParallelMultiVehicleInsertionProblem {
 	private final ExecutorService executorService;
 	private final DrtVehicleFilter filter;
 
-	public ParallelMultiVehicleInsertionProblem(SingleVehicleInsertionProblem[] singleInsertionProblems, DrtVehicleFilter filter) {
+	public ParallelMultiVehicleInsertionProblem(SingleVehicleInsertionProblem[] singleInsertionProblems,
+			DrtVehicleFilter filter) {
 		threads = singleInsertionProblems.length;
 		this.filter = filter;
 		this.taskGroups = new TaskGroup[threads];
@@ -68,7 +69,6 @@ public class ParallelMultiVehicleInsertionProblem {
 		return findBestInsertion(submitTasks(drtRequest));
 	}
 
-	
 	private void divideTasksIntoGroups(List<Entry> filteredVehicles) {
 		Iterator<Entry> vEntryIter = filteredVehicles.iterator();
 		int div = filteredVehicles.size() / threads;

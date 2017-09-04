@@ -34,10 +34,14 @@ import org.matsim.contrib.dvrp.path.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.*;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * @author michalm
@@ -48,7 +52,9 @@ public class DrtScheduler implements ScheduleInquiry {
 	private final MobsimTimer timer;
 	private final TravelTime travelTime;
 
-	public DrtScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer, TravelTime travelTime) {
+	@Inject
+	public DrtScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer,
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime) {
 		this.fleet = fleet;
 		this.stopDuration = drtCfg.getStopDuration();
 		this.timer = timer;

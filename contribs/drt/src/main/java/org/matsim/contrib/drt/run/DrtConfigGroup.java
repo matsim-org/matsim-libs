@@ -201,7 +201,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	 * @return the kNearestVehicles
 	 */
 	@StringGetter(K_NEAREST_VEHICLES)
-	public int getkNearestVehicles() {
+	public int getKNearestVehicles() {
 		return kNearestVehicles;
 	}
 

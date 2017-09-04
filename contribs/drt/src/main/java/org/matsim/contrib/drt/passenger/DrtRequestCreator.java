@@ -22,13 +22,12 @@ package org.matsim.contrib.drt.passenger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizerProvider;
+import org.matsim.contrib.drt.optimizer.AbstractDrtOptimizer;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -51,19 +50,16 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	private final EventsManager eventsManager;
 	private final MobsimTimer timer;
 
-	@Inject(optional = true)
-	private @Named(DefaultDrtOptimizerProvider.DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory;
-
 	@Inject
 	public DrtRequestCreator(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim) {
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim,
+			@Named(AbstractDrtOptimizer.DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory) {
 		this.drtCfg = drtCfg;
 		this.travelTime = travelTime;
 		this.eventsManager = qSim.getEventsManager();
 		this.timer = qSim.getSimTimer();
 
-		TravelDisutility travelDisutility = travelDisutilityFactory == null ? new TimeAsTravelDisutility(travelTime)
-				: travelDisutilityFactory.createTravelDisutility(travelTime);
+		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 
 		PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(travelDisutility);
 		preProcessEuclidean.run(network);
@@ -87,9 +83,9 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		double optimisticTravelTime = unsharedRidePath.getTravelTime();
 		double maxTravelTime = drtCfg.getMaxTravelTimeAlpha() * optimisticTravelTime + drtCfg.getMaxTravelTimeBeta();
 		double latestArrivalTime = departureTime + maxTravelTime;
-		
+
 		double unsharedDistance = VrpPaths.calcPathDistance(unsharedRidePath);
-		
+
 		eventsManager.processEvent(new DrtRequestSubmittedEvent(timer.getTimeOfDay(), id, passenger.getId(),
 				fromLink.getId(), toLink.getId(), unsharedRidePath.getTravelTime(), unsharedDistance));
 

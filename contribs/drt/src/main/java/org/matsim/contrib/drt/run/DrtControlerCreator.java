@@ -26,20 +26,28 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
 import org.matsim.contrib.drt.optimizer.*;
+import org.matsim.contrib.drt.optimizer.insertion.*;
+import org.matsim.contrib.drt.optimizer.insertion.filter.*;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
+import org.matsim.contrib.drt.scheduler.*;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
+import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.google.inject.Provider;
+import com.google.inject.*;
+import com.google.inject.name.Names;
 
 /**
  * @author jbischoff
@@ -64,8 +72,8 @@ public final class DrtControlerCreator {
 		}
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule(
-				DrtControlerCreator.createModuleForQSimPlugin(DefaultDrtOptimizerProvider.class), DrtOptimizer.class));
+		controler.addOverridingModule(new DvrpModule(DrtControlerCreator.createModuleForQSimPlugin(),
+				DrtOptimizer.class, InsertionDrtOptimizer.class));
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
 		if (otfvis) {
@@ -75,15 +83,33 @@ public final class DrtControlerCreator {
 		return controler;
 	}
 
-	public static com.google.inject.AbstractModule createModuleForQSimPlugin(
-			final Class<? extends Provider<? extends DrtOptimizer>> providerClass) {
+	public static com.google.inject.AbstractModule createModuleForQSimPlugin() {
 		return new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
-				bind(DrtOptimizer.class).toProvider(providerClass).asEagerSingleton();
+				bind(DrtOptimizer.class).to(AbstractDrtOptimizer.class).asEagerSingleton();
 				bind(VrpOptimizer.class).to(DrtOptimizer.class);
+				bind(InsertionDrtOptimizer.class).asEagerSingleton();
+				bind(UnplannedRequestInserter.class).to(InsertionDrtOptimizer.class);
+				bind(EmptyVehicleRelocator.class).asEagerSingleton();
+				bind(TravelDisutilityFactory.class).annotatedWith(Names.named(AbstractDrtOptimizer.DRT_OPTIMIZER))
+						.toInstance(timeCalculator -> new TimeAsTravelDisutility(timeCalculator));
+				bind(DrtScheduler.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(DrtActionCreator.class).asEagerSingleton();
 				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
+			}
+
+			@Provides
+			@Singleton
+			private DrtVehicleFilter getFilter(DrtConfigGroup drtCfg) {
+				return drtCfg.getKNearestVehicles() > 0 ? new KNearestVehicleFilter(drtCfg.getKNearestVehicles())
+						: new NoFilter();
+			}
+
+			@Provides
+			@Singleton
+			private MobsimTimer getTimer(QSim qSim) {
+				return qSim.getSimTimer();
 			}
 		};
 	}

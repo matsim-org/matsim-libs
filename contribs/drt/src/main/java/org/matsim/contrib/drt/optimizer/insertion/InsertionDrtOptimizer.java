@@ -22,57 +22,77 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.*;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.*;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
+import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
 import org.matsim.contrib.drt.passenger.events.*;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.data.Requests;
+import org.matsim.contrib.drt.scheduler.DrtScheduler;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.locationchoice.router.*;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.*;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.misc.Time;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * @author michalm
  */
-public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements MobsimBeforeCleanupListener {
-	private final ParallelMultiVehicleInsertionProblem insertionProblem;
+public class InsertionDrtOptimizer implements UnplannedRequestInserter, MobsimBeforeCleanupListener {
+	private final DrtConfigGroup drtCfg;
+	private final Fleet fleet;
+	private final MobsimTimer mobsimTimer;
 	private final EventsManager eventsManager;
-	private final boolean printWarnings;
+	private final DrtScheduler scheduler;
 
-	public InsertionDrtOptimizer(DrtOptimizerContext optimContext, DrtConfigGroup drtCfg) {
-		super(optimContext, drtCfg, new TreeSet<DrtRequest>(Requests.ABSOLUTE_COMPARATOR));
-		this.eventsManager = optimContext.eventsManager;
-		printWarnings = drtCfg.isPrintDetailedWarnings();
+	private final ParallelMultiVehicleInsertionProblem insertionProblem;
+
+	@Inject
+	public InsertionDrtOptimizer(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network, Fleet fleet,
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			@Named(AbstractDrtOptimizer.DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory,
+			MobsimTimer mobsimTimer, DrtVehicleFilter vehicleFilter, EventsManager eventsManager,
+			DrtScheduler scheduler) {
+		this.drtCfg = drtCfg;
+		this.fleet = fleet;
+		this.mobsimTimer = mobsimTimer;
+		this.eventsManager = eventsManager;
+		this.scheduler = scheduler;
 
 		// TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
 		// PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
-		// preProcessDijkstra.run(optimContext.network);
+		// preProcessDijkstra.run(network);
 		PreProcessDijkstra preProcessDijkstra = null;
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessDijkstra)
-				.createRoutingNetwork(optimContext.network);
+				.createRoutingNetwork(network);
 		RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory(preProcessDijkstra)
-				.createRoutingNetwork(optimContext.network);
+				.createRoutingNetwork(network);
+		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 
 		SingleVehicleInsertionProblem[] singleVehicleInsertionProblems = new SingleVehicleInsertionProblem[drtCfg
 				.getNumberOfThreads()];
 		for (int i = 0; i < singleVehicleInsertionProblems.length; i++) {
-			FastMultiNodeDijkstra router = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility,
-					optimContext.travelTime, preProcessDijkstra, fastRouterFactory, true);
+			FastMultiNodeDijkstra router = new FastMultiNodeDijkstra(routingNetwork, travelDisutility, travelTime,
+					preProcessDijkstra, fastRouterFactory, true);
 			BackwardFastMultiNodeDijkstra backwardRouter = new BackwardFastMultiNodeDijkstra(inverseRoutingNetwork,
-					optimContext.travelDisutility, optimContext.travelTime, preProcessDijkstra, fastRouterFactory,
-					true);
+					travelDisutility, travelTime, preProcessDijkstra, fastRouterFactory, true);
 			singleVehicleInsertionProblems[i] = new SingleVehicleInsertionProblem(router, backwardRouter,
-					drtCfg.getStopDuration(), drtCfg.getMaxWaitTime(), optimContext.timer);
+					drtCfg.getStopDuration(), drtCfg.getMaxWaitTime(), mobsimTimer);
 		}
 
-		insertionProblem = new ParallelMultiVehicleInsertionProblem(singleVehicleInsertionProblems,
-				optimContext.vehicleFilter);
+		insertionProblem = new ParallelMultiVehicleInsertionProblem(singleVehicleInsertionProblems, vehicleFilter);
 	}
 
 	@Override
@@ -81,32 +101,31 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 	}
 
 	@Override
-	protected void scheduleUnplannedRequests() {
-		if (getUnplannedRequests().isEmpty()) {
+	public void scheduleUnplannedRequests(Collection<DrtRequest> unplannedRequests) {
+		if (unplannedRequests.isEmpty()) {
 			return;
 		}
 
-		VehicleData vData = new VehicleData(getOptimContext(), getOptimContext().fleet.getVehicles().values());
+		VehicleData vData = new VehicleData(mobsimTimer, fleet.getVehicles().values());
 
-		Iterator<DrtRequest> reqIter = getUnplannedRequests().iterator();
+		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {
 
 			DrtRequest req = reqIter.next();
 			BestInsertion best = insertionProblem.findBestInsertion(req, vData);
 			if (best == null) {
-				eventsManager
-						.processEvent(new DrtRequestRejectedEvent(getOptimContext().timer.getTimeOfDay(), req.getId()));
-				if (printWarnings) {
+				eventsManager.processEvent(new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), req.getId()));
+				if (drtCfg.isPrintDetailedWarnings()) {
 					Logger.getLogger(getClass())
 							.warn("No vehicle found for drt request from passenger \t" + req.getPassenger().getId()
 									+ "\tat\t" + Time.writeTime(req.getSubmissionTime()) + "\tfrom Link\t"
 									+ req.getFromLink().getId());
 				}
 			} else {
-				getOptimContext().scheduler.insertRequest(best.vehicleEntry, req, best.insertion);
+				scheduler.insertRequest(best.vehicleEntry, req, best.insertion);
 				vData.updateEntry(best.vehicleEntry);
-				eventsManager.processEvent(new DrtRequestScheduledEvent(getOptimContext().timer.getTimeOfDay(),
-						req.getId(), best.vehicleEntry.vehicle.getId(), req.getPickupTask().getEndTime(),
+				eventsManager.processEvent(new DrtRequestScheduledEvent(mobsimTimer.getTimeOfDay(), req.getId(),
+						best.vehicleEntry.vehicle.getId(), req.getPickupTask().getEndTime(),
 						req.getDropoffTask().getBeginTime()));
 			}
 			reqIter.remove();
