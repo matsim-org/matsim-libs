@@ -99,12 +99,12 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		StartupEvent event = new StartupEvent(this.controler);
 		StartupListener[] listener = this.coreListenerList.getListeners(StartupListener.class);
         for (StartupListener aListener : listener) {
-            log.info("calling notifyStartup on " + aListener.getClass().getCanonicalName());
+            log.info("calling notifyStartup on " + aListener.getClass().getName());
             aListener.notifyStartup(event);
         }
 		listener = this.listenerList.getListeners(StartupListener.class);
         for (StartupListener aListener : listener) {
-            log.info("calling notifyStartup on " + aListener.getClass().getCanonicalName());
+            log.info("calling notifyStartup on " + aListener.getClass().getName());
             aListener.notifyStartup(event);
         }
 		log.info("all ControlerStartupListeners called." );
@@ -118,12 +118,12 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		ShutdownEvent event = new ShutdownEvent(this.controler, unexpected);
         ShutdownListener[] listener = this.coreListenerList.getListeners(ShutdownListener.class);
         for (ShutdownListener aListener : listener) {
-            log.info("calling notifyShutdown on " + aListener.getClass().getCanonicalName());
+            log.info("calling notifyShutdown on " + aListener.getClass().getName());
             aListener.notifyShutdown(event);
         }
         listener = this.listenerList.getListeners(ShutdownListener.class);
         for (ShutdownListener aListener : listener) {
-            log.info("calling notifyShutdown on " + aListener.getClass().getCanonicalName());
+            log.info("calling notifyShutdown on " + aListener.getClass().getName());
             aListener.notifyShutdown(event);
         }
         log.info("all ControlerShutdownListeners called.");
@@ -137,12 +137,12 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		IterationStartsEvent event = new IterationStartsEvent(this.controler, iteration);
 		IterationStartsListener[] listener = this.coreListenerList.getListeners(IterationStartsListener.class);
         for (IterationStartsListener aListener : listener) {
-            log.info("calling notifyIterationStarts on " + aListener.getClass().getCanonicalName());
+            log.info("calling notifyIterationStarts on " + aListener.getClass().getName());
             aListener.notifyIterationStarts(event);
         }
 		listener = this.listenerList.getListeners(IterationStartsListener.class);
         for (IterationStartsListener aListener : listener) {
-            log.info("calling notifyIterationStarts on " + aListener.getClass().getCanonicalName());
+            log.info("calling notifyIterationStarts on " + aListener.getClass().getName());
             aListener.notifyIterationStarts(event);
         }
 		log.info("[it." + iteration + "] all ControlerIterationStartsListeners called.");
@@ -157,14 +157,14 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		{
 			IterationEndsListener[] listener = this.coreListenerList.getListeners(IterationEndsListener.class);
             for (IterationEndsListener aListener : listener) {
-                log.info("calling notifyIterationEnds on " + aListener.getClass().getCanonicalName());
+                log.info("calling notifyIterationEnds on " + aListener.getClass().getName());
                 aListener.notifyIterationEnds(event);
             }
 		}
 		{
 			IterationEndsListener[] listener = this.listenerList.getListeners(IterationEndsListener.class);
             for (IterationEndsListener aListener : listener) {
-                log.info("calling notifyIterationEnds on " + aListener.getClass().getCanonicalName());
+                log.info("calling notifyIterationEnds on " + aListener.getClass().getName());
                 aListener.notifyIterationEnds(event);
             }
 		}
@@ -180,14 +180,14 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		{
 			ScoringListener[] listener = this.coreListenerList.getListeners(ScoringListener.class);
             for (ScoringListener aListener : listener) {
-                log.info("calling notifyScoring on " + aListener.getClass().getCanonicalName());
+                log.info("calling notifyScoring on " + aListener.getClass().getName());
                 aListener.notifyScoring(event);
             }
 		}
 		{
 			ScoringListener[] listener = this.listenerList.getListeners(ScoringListener.class);
             for (ScoringListener aListener : listener) {
-                log.info("calling notifyScoring on " + aListener.getClass().getCanonicalName());
+                log.info("calling notifyScoring on " + aListener.getClass().getName());
                 aListener.notifyScoring(event);
             }
 		}
@@ -202,12 +202,12 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		ReplanningEvent event = new ReplanningEvent(this.controler, iteration);
 		ReplanningListener[] listener = this.coreListenerList.getListeners(ReplanningListener.class);
         for (ReplanningListener aListener : listener) {
-            log.info("calling notifyReplanning on " + aListener.getClass().getCanonicalName());
+            log.info("calling notifyReplanning on " + aListener.getClass().getName());
             aListener.notifyReplanning(event);
         }
 		listener = this.listenerList.getListeners(ReplanningListener.class);
         for (ReplanningListener aListener : listener) {
-            log.info("calling notifyReplanning on " + aListener.getClass().getCanonicalName());
+            log.info("calling notifyReplanning on " + aListener.getClass().getName());
             aListener.notifyReplanning(event);
         }
 		log.info("[it." + iteration + "] all ControlerReplanningListeners called.");
@@ -221,12 +221,12 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		BeforeMobsimEvent event = new BeforeMobsimEvent(this.controler, iteration);
 		BeforeMobsimListener[] listener = this.coreListenerList.getListeners(BeforeMobsimListener.class);
         for (BeforeMobsimListener aListener : listener) {
-            log.info("calling notifyBeforeMobsim on " + aListener.getClass().getCanonicalName());
+            log.info("calling notifyBeforeMobsim on " + aListener.getClass().getName());
             aListener.notifyBeforeMobsim(event);
         }
 		listener = this.listenerList.getListeners(BeforeMobsimListener.class);
         for (BeforeMobsimListener aListener : listener) {
-            log.info("calling notifyBeforeMobsim on " + aListener.getClass().getCanonicalName());
+            log.info("calling notifyBeforeMobsim on " + aListener.getClass().getName());
             aListener.notifyBeforeMobsim(event);
         }
 		log.info("[it." + iteration + "] all ControlerBeforeMobsimListeners called.");
@@ -240,12 +240,12 @@ public final class ControlerListenerManagerImpl implements ControlerListenerMana
 		AfterMobsimEvent event = new AfterMobsimEvent(this.controler, iteration);
 		AfterMobsimListener[] listener = this.coreListenerList.getListeners(AfterMobsimListener.class);
         for (AfterMobsimListener aListener : listener) {
-            log.info("calling notifyAfterMobsim on " + aListener.getClass().getCanonicalName());
+            log.info("calling notifyAfterMobsim on " + aListener.getClass().getName());
             aListener.notifyAfterMobsim(event);
         }
 		listener = this.listenerList.getListeners(AfterMobsimListener.class);
         for (AfterMobsimListener aListener : listener) {
-            log.info("calling notifyAfterMobsim on " + aListener.getClass().getCanonicalName());
+            log.info("calling notifyAfterMobsim on " + aListener.getClass().getName());
             aListener.notifyAfterMobsim(event);
         }
 		log.info("[it." + iteration + "] all ControlerAfterMobsimListeners called.");
