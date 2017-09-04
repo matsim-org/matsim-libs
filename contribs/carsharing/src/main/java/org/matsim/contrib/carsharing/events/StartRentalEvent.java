@@ -1,5 +1,8 @@
 package org.matsim.contrib.carsharing.events;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
@@ -72,4 +75,34 @@ public class StartRentalEvent extends Event implements HasPersonId{
 	public String getCompanyId() {
 		return this.companyId;
 	}
+	
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = new LinkedHashMap<String, String>();
+		attr.put(ATTRIBUTE_TIME, Double.toString(super.getTime()));
+		attr.put(ATTRIBUTE_TYPE, getEventType());
+		attr.put("originlinkId", originlinkId.toString());
+		attr.put("pickuplinkId", pickuplinkId.toString());
+		attr.put("destinationLinkId", destinationLinkId.toString());
+		attr.put("carsharingType", carsharingType);
+		attr.put("companyId", companyId);		
+		attr.put("Vehicleid", vehicleId);
+		attr.put("personid", personId.toString());
+
+		return attr;
+	}	
+	
+	@Override
+	public String toString() {
+		Map<String,String> attr = this.getAttributes() ;
+		StringBuilder eventXML = new StringBuilder("\t<event ");
+		for (Map.Entry<String, String> entry : attr.entrySet()) {
+			eventXML.append(entry.getKey());
+			eventXML.append("=\"");
+			eventXML.append(entry.getValue());
+			eventXML.append("\" ");
+		}
+		eventXML.append(" />");
+		return eventXML.toString();
+	} 
 }
