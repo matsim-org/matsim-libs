@@ -126,7 +126,7 @@ public class RoutingIT {
 			}
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new AStarEuclideanFactory(network, costCalc);
+				return new AStarEuclideanFactory();
 			}
 		});
 	}
@@ -152,7 +152,7 @@ public class RoutingIT {
 			}
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new AStarLandmarksFactory(network, costCalc);
+				return new AStarLandmarksFactory();
 			}
 		});
 	}

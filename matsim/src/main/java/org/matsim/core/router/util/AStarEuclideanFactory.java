@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package org.matsim.core.router.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.AStarEuclidean;
 
@@ -27,19 +30,19 @@ import org.matsim.core.router.AStarEuclidean;
  */
 public class AStarEuclideanFactory implements LeastCostPathCalculatorFactory {
 
-	private PreProcessEuclidean preProcessData;
-
-	public AStarEuclideanFactory(Network network, final TravelDisutility fsttc){
-		synchronized (this) {
-				this.preProcessData = new PreProcessEuclidean(fsttc);
-				this.preProcessData.run(network);
-		}
-	}
+	private final Map<Network, PreProcessEuclidean> preProcessData = new HashMap<>();
 
 	@Override
-	public LeastCostPathCalculator createPathCalculator(Network network,
-			TravelDisutility travelCosts, TravelTime travelTimes) {
-		return new AStarEuclidean(network, this.preProcessData, travelCosts, travelTimes, 1);
+	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
+		PreProcessEuclidean preProcessEuclidean = this.preProcessData.get(network);
+		if (preProcessEuclidean == null) {
+			preProcessEuclidean = new PreProcessEuclidean(travelCosts);
+			preProcessEuclidean.run(network);
+			this.preProcessData.put(network, preProcessEuclidean);
+		}
+		
+		final double overdoFactor = 1.0;
+		return new AStarEuclidean(network, preProcessEuclidean, travelCosts, travelTimes, overdoFactor);
 	}
 
 }

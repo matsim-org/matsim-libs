@@ -139,7 +139,7 @@ public class TollTravelCostCalculatorTest {
 		
 		TravelDisutility costCalc = new TravelDisutilityIncludingToll((TravelDisutility)timeCalc, toll, config); // we use freespeedTravelCosts as base costs
 
-		AStarLandmarksFactory aStarLandmarksFactory = new AStarLandmarksFactory(network, (TravelDisutility)timeCalc);
+		AStarLandmarksFactory aStarLandmarksFactory = new AStarLandmarksFactory();
 
 		PreProcessLandmarks commonRouterData = new PreProcessLandmarks((TravelDisutility)timeCalc);
 		commonRouterData.run(network);
@@ -221,7 +221,7 @@ public class TollTravelCostCalculatorTest {
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
-		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
+		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory();
 
 		PreProcessLandmarks commonRouterData = new PreProcessLandmarks(timeCostCalc);
 		commonRouterData.run(network);
@@ -316,7 +316,7 @@ public class TollTravelCostCalculatorTest {
 		FreespeedTravelTimeAndDisutility timeCostCalc = new FreespeedTravelTimeAndDisutility(config.planCalcScore());
 		TravelDisutility costCalc = new TravelDisutilityIncludingToll(timeCostCalc, toll, config); // we use freespeedTravelCosts as base costs
 
-		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory(network, timeCostCalc);
+		AStarLandmarksFactory routerFactory = new AStarLandmarksFactory();
 
 		int carLegIndex = 1 ;
 		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
