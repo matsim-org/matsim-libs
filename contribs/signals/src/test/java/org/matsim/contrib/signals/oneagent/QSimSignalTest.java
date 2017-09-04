@@ -174,12 +174,6 @@ public class QSimSignalTest implements
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario, events).run();
 
 		Mobsim mobsim = injector.getInstance(Mobsim.class);
-		Collection<Provider<MobsimListener>> mobsimListeners = (Collection<Provider<MobsimListener>>) 
-				injector.getInstance(Key.get(Types.collectionOf(Types.providerOf(MobsimListener.class))));
-		for (Provider<MobsimListener> provider : mobsimListeners){
-			((ObservableMobsim) mobsim).addQueueSimulationListeners(provider.get());
-		}
-		
 		mobsim.run();
 	}
 

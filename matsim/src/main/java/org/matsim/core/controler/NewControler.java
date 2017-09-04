@@ -29,11 +29,9 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.corelisteners.*;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.ObservableMobsim;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
 import javax.inject.Inject;
-import java.util.*;
+import java.util.Set;
 
 class NewControler extends AbstractController implements ControlerI {
 
@@ -50,12 +48,11 @@ class NewControler extends AbstractController implements ControlerI {
 	private final TerminationCriterion terminationCriterion;
 	private final DumpDataAtEnd dumpDataAtEnd;
 	private final Set<ControlerListener> controlerListenersDeclaredByModules;
-	private final Collection<Provider<MobsimListener>> mobsimListeners;
 	private final ControlerConfigGroup controlerConfigGroup;
 	private final OutputDirectoryHierarchy outputDirectoryHierarchy;
 
 	@Inject
-	NewControler(Config config, ControlerListenerManagerImpl controlerListenerManager, MatsimServices matsimServices, IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling, PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider, PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd, Set<ControlerListener> controlerListenersDeclaredByModules, Collection<Provider<MobsimListener>> mobsimListeners, ControlerConfigGroup controlerConfigGroup, OutputDirectoryHierarchy outputDirectoryHierarchy) {
+	NewControler(Config config, ControlerListenerManagerImpl controlerListenerManager, MatsimServices matsimServices, IterationStopWatch stopWatch, PrepareForSim prepareForSim, EventsHandling eventsHandling, PlansDumping plansDumping, PlansReplanning plansReplanning, Provider<Mobsim> mobsimProvider, PlansScoring plansScoring, TerminationCriterion terminationCriterion, DumpDataAtEnd dumpDataAtEnd, Set<ControlerListener> controlerListenersDeclaredByModules, ControlerConfigGroup controlerConfigGroup, OutputDirectoryHierarchy outputDirectoryHierarchy) {
 		super(controlerListenerManager, stopWatch, matsimServices);
 		this.config = config;
 		this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
@@ -68,7 +65,6 @@ class NewControler extends AbstractController implements ControlerI {
 		this.terminationCriterion = terminationCriterion;
 		this.dumpDataAtEnd = dumpDataAtEnd;
 		this.controlerListenersDeclaredByModules = controlerListenersDeclaredByModules;
-		this.mobsimListeners = mobsimListeners;
 		this.controlerConfigGroup = controlerConfigGroup;
 		this.outputDirectoryHierarchy = outputDirectoryHierarchy;
 	}
@@ -111,13 +107,7 @@ class NewControler extends AbstractController implements ControlerI {
 
 	@Override
 	protected final void runMobSim() {
-		Mobsim simulation = this.mobsimProvider.get();
-		if (simulation instanceof ObservableMobsim) {
-			for (Provider<MobsimListener> l : this.mobsimListeners) {
-				((ObservableMobsim) simulation).addQueueSimulationListeners(l.get());
-			}
-		}
-		simulation.run();
+		this.mobsimProvider.get().run();
 	}
 
 	@Override

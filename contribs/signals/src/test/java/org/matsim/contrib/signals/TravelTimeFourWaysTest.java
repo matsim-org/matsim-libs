@@ -20,10 +20,6 @@
 
 package org.matsim.contrib.signals;
 
-import java.util.Collection;
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.util.Types;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,8 +35,6 @@ import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.ObservableMobsim;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -119,11 +113,6 @@ public class TravelTimeFourWaysTest {
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario, events).run();
 		Mobsim mobsim = injector.getInstance(Mobsim.class);
-		Collection<Provider<MobsimListener>> mobsimListeners = (Collection<Provider<MobsimListener>>) 
-				injector.getInstance(Key.get(Types.collectionOf(Types.providerOf(MobsimListener.class))));
-		for (Provider<MobsimListener> provider : mobsimListeners){
-			((ObservableMobsim) mobsim).addQueueSimulationListeners(provider.get());
-		}
 		mobsim.run();
 		
 		eventsXmlWriter.closeFile();

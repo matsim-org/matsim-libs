@@ -79,10 +79,6 @@ public class OTFVisWithSignals {
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario, events).run();
 		
 		QSim qSim = (QSim) injector.getInstance(Mobsim.class);
-		Collection<Provider<MobsimListener>> mobsimListeners = (Collection<Provider<MobsimListener>>) injector.getInstance(Key.get(Types.collectionOf(Types.providerOf(MobsimListener.class))));
-		for (Provider<MobsimListener> provider : mobsimListeners) {
-			qSim.addQueueSimulationListeners(provider.get());
-		}
 
 		if (startOtfvis) {
 			OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
