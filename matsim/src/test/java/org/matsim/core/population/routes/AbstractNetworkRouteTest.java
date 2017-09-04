@@ -72,14 +72,18 @@ public abstract class AbstractNetworkRouteTest {
 		Id<Link> link1 = Id.create("1", Link.class);
 		Id<Link> link4 = Id.create("4", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
-		route.setLinkIds(link1, NetworkUtils.getLinkIds("22 12 -23 3"), link4);
-		List<Id<Link>> linkIds = route.getLinkIds();
-		Assert.assertEquals("number of links in route.", 4, linkIds.size());
-
-		Id<Link> link2 = Id.create("2", Link.class);
-		route.setLinkIds(link1, null, link2);
-		linkIds = route.getLinkIds();
-		Assert.assertEquals("number of links in route.", 0, linkIds.size());
+		{
+			//		route.setLinkIds(link1, NetworkUtils.getLinkIds("22 12 -23 3"), link4);
+			//		List<Id<Link>> linkIds = route.getLinkIds();
+			//		Assert.assertEquals("number of links in route.", 4, linkIds.size());
+			// setting link ids twice is not allowed any more.  kai, sep'17
+		}
+		{
+			Id<Link> link2 = Id.create("2", Link.class);
+			route.setLinkIds(link1, null, link2);
+			List<Id<Link>> linkIds2 = route.getLinkIds();
+			Assert.assertEquals("number of links in route.", 0, linkIds2.size());
+		}
 	}
 
 	@Test
@@ -88,13 +92,17 @@ public abstract class AbstractNetworkRouteTest {
 		Id<Link> link1 = Id.create("1", Link.class);
 		Id<Link> link4 = Id.create("4", Link.class);
 		NetworkRoute route = getNetworkRouteInstance(link1, link4, network);
-		route.setLinkIds(link1, NetworkUtils.getLinkIds("22 12 -23 3"), link4);
-		List<Id<Link>> linkIds = route.getLinkIds();
-		Assert.assertEquals("number of links in route.", 4, linkIds.size());
-
-		route.setLinkIds(null, null, null);
-		linkIds = route.getLinkIds();
-		Assert.assertEquals("number of nodes in route.", 0, linkIds.size());
+		{
+//			route.setLinkIds(link1, NetworkUtils.getLinkIds("22 12 -23 3"), link4);
+//			List<Id<Link>> linkIds = route.getLinkIds();
+//			Assert.assertEquals("number of links in route.", 4, linkIds.size());
+			// setting link ids twice is not allowed any more.  kai, sep'17
+		}
+		{
+			route.setLinkIds(null, null, null);
+			List<Id<Link>> linkIds = route.getLinkIds();
+			Assert.assertEquals("number of nodes in route.", 0, linkIds.size());
+		}
 	}
 
 	@Test
