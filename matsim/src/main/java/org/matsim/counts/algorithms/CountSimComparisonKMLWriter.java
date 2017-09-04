@@ -74,7 +74,7 @@ import org.matsim.vis.kml.NetworkFeatureFactory;
 /**
  * @author dgrether
  */
-public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
+public class CountSimComparisonKMLWriter<T> extends CountSimComparisonWriter {
 	/**
 	 * constant for the name of the links
 	 */
@@ -122,7 +122,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	private final String graphname;
 
 	private final Network network;
-	private final Counts<Link> counts;
+	private final Counts<T> counts;
 	
 	private CoordinateTransformation coordTransform = null;
 	private ObjectFactory kmlObjectFactory = new ObjectFactory();
@@ -171,7 +171,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 * Sets the data to the fields of this class.  We either accept "network" or "counts" to localize the counting stations.
 	 * @param graphname TODO
 	 */
-	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final Counts<Link> counts, final CoordinateTransformation coordTransform, String graphname) {
+	public CountSimComparisonKMLWriter(final List<CountSimComparison> countSimCompList, final Counts<T> counts, final CoordinateTransformation coordTransform, String graphname) {
 		super(countSimCompList);
 		this.network = null;
 		this.counts = counts;
@@ -530,7 +530,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 		double gehValue;
 		PointType point;
 		for (CountSimComparison csc : countSimComparisonList) {
-			Id<Link> itemId = csc.getId();
+			Id<T> itemId = csc.getId();
 			Coord coord = null;
 //			String description = csc.getCsId();
 			

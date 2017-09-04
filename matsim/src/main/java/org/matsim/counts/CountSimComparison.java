@@ -30,12 +30,12 @@ import org.matsim.api.core.v01.network.Link;
  * 
  * @author dgrether
  */
-public interface CountSimComparison {
+public interface CountSimComparison<T> {
 
 	/**
 	 * @return The Id of the link
 	 */
-	public Id<Link> getId();
+	public Id<T> getId();
 
 	/**
 	 * 
