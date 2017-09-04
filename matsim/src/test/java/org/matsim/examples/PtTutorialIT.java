@@ -83,7 +83,7 @@ public class PtTutorialIT {
 		}
 		final String it1Plans = "ITERS/it.1/1.plans.xml.gz";
 		Assert.assertTrue(new File(config.controler().getOutputDirectory(), it1Plans).exists());
-		Assert.assertTrue(new File(config.controler().getOutputDirectory(), "output_config.xml.gz").exists());
+		Assert.assertTrue(new File(config.controler().getOutputDirectory(), "output_config.xml").exists());
 		
 		log.info( AbstractController.DIVIDER ) ;
 		log.info( AbstractController.DIVIDER ) ;
