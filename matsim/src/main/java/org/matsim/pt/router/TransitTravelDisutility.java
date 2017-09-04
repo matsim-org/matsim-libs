@@ -46,9 +46,9 @@ public interface TransitTravelDisutility {
 	 * as well as for the "direct" walk from start to finish without using a pt line at all.
 	 * It is not used for transfer links (these are handled by the transitTravelDisutility).
 	 */
-	double getTravelTime(Person person, Coord coord, Coord toCoord);
+	double getWalkTravelTime(Person person, Coord coord, Coord toCoord);
 
-	double getTravelDisutility(Person person, Coord coord, Coord toCoord);
+	double getWalkTravelDisutility(Person person, Coord coord, Coord toCoord);
 	
 	
 }

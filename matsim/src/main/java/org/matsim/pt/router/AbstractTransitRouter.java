@@ -58,11 +58,11 @@ public class AbstractTransitRouter {
 	}
 
 	protected final double getWalkTime(Person person, Coord coord, Coord toCoord) {
-		return getTravelDisutility().getTravelTime(person, coord, toCoord);
+		return getTravelDisutility().getWalkTravelTime(person, coord, toCoord);
 	}
 
 	protected final double getTransferTime(Person person, Coord coord, Coord toCoord) {
-		return getTravelDisutility().getTravelTime(person, coord, toCoord) + this.getConfig().getAdditionalTransferTime();
+		return getTravelDisutility().getWalkTravelTime(person, coord, toCoord) + this.getConfig().getAdditionalTransferTime();
 	}
 
 	protected final List<Leg> createDirectWalkLegList(Person person, Coord fromCoord, Coord toCoord) {
@@ -228,7 +228,7 @@ public class AbstractTransitRouter {
 	}
 
 	protected final double getWalkDisutility(Person person, Coord coord, Coord toCoord) {
-		return getTravelDisutility().getTravelDisutility(person, coord, toCoord);
+		return getTravelDisutility().getWalkTravelDisutility(person, coord, toCoord);
 	}
 
 	protected final Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime) {

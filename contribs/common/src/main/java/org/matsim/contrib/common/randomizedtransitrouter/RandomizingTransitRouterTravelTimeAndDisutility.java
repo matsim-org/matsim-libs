@@ -133,9 +133,9 @@ public class RandomizingTransitRouterTravelTimeAndDisutility  extends TransitRou
 	}
 	
 	@Override
-	public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
+	public double getWalkTravelDisutility(Person person, Coord coord, Coord toCoord) {
 		regenerateUtilityParametersIfPersonHasChanged(person);
-		return - getTravelTime(person, coord, toCoord) * localMarginalUtilityOfTravelTimeWalk_utl_s ;
+		return - getWalkTravelTime(person, coord, toCoord) * localMarginalUtilityOfTravelTimeWalk_utl_s ;
 	}
 	
 	public final void setDataCollection( DataCollection item, Boolean bbb ) {
