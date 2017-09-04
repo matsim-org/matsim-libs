@@ -20,36 +20,46 @@
 
 package org.matsim.core.router.util;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.router.Dijkstra;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.router.Dijkstra;
+
 @Singleton
 public class DijkstraFactory implements LeastCostPathCalculatorFactory {
 
-	private final PreProcessDijkstra preProcessData;
+	private final boolean usePreProcessData;
+	private final Map<Network, PreProcessDijkstra> preProcessData = new HashMap<>();
 
 	@Inject
 	public DijkstraFactory() {
-		this.preProcessData = null;
+		this.usePreProcessData = false;
 	}
 
-	public DijkstraFactory(final PreProcessDijkstra preProcessData) {
-		this.preProcessData = preProcessData;
+	public DijkstraFactory(final boolean usePreProcessData) {
+		this.usePreProcessData = usePreProcessData;
 	}
 
+	// yy there is no guarantee that "createPathCalculator" is called with the same network as the one that was used for "preProcessData".
+	// This can happen for example when LinkToLink routing is switched on.  kai & theresa, feb'15
+	// To fix this, we create the PreProcessData when the first LeastCostPathCalculator object is created and store it in a map using
+	// the network as key. For the PreProcessDijkstra data this is fine, since it does not take travel times and disutilities into account.
+	// For the AStarLandmarks data, we would have to include the other two arguments into the lookup value as well... cdobler, sep'17 
 	@Override
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		if (this.preProcessData == null) {
-			return new Dijkstra(network, travelCosts, travelTimes);
+	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
+		if (this.usePreProcessData) {
+			PreProcessDijkstra preProcessDijkstra = this.preProcessData.get(network);
+			if (preProcessDijkstra == null) {
+				preProcessDijkstra = new PreProcessDijkstra();
+				preProcessDijkstra.run(network);
+				this.preProcessData.put(network, preProcessDijkstra);
+			}
+			return new Dijkstra(network, travelCosts, travelTimes, preProcessDijkstra);
 		}
-		return new Dijkstra(network, travelCosts, travelTimes, preProcessData);
-
-		// yy there is no guarantee that "createPathCalculator" is called with the same network as the one that was used for "preProcessData".
-		// This can happen for example when LinkToLink routing is switched on.  kai & theresa, feb'15,
-		
+		return new Dijkstra(network, travelCosts, travelTimes);
 	}
-
 }

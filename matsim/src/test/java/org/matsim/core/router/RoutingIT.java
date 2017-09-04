@@ -98,9 +98,7 @@ public class RoutingIT {
 			}
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
-				preProcessData.run(network);
-				return new DijkstraFactory(preProcessData);
+				return new DijkstraFactory(true);
 			}
 		});
 	}
