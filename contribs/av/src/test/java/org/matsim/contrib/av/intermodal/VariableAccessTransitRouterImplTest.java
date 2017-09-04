@@ -7,6 +7,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -15,6 +16,8 @@ import org.matsim.contrib.av.intermodal.router.VariableAccessTransitRouterImpl;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -59,6 +62,9 @@ public class VariableAccessTransitRouterImplTest {
 		}
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
+		
+		PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore();
+		
 		TransitRouterConfig trConfig = new TransitRouterConfig(config);
 		trConfig.setSearchRadius(1300.0); // default 1000m
 		trConfig.setBeelineWalkConnectionDistance(150.0); // default 100.0m
@@ -87,7 +93,7 @@ public class VariableAccessTransitRouterImplTest {
 		variableAccessModule.registerMode("bike", 4000, true);
 		variableAccessModule.registerMode("car", 4900, false);
 		
-		VariableAccessTransitRouterImpl router = new VariableAccessTransitRouterImpl(trConfig, 
+		VariableAccessTransitRouterImpl router = new VariableAccessTransitRouterImpl(pcsConfig, trConfig, 
 				preparedTransitSchedule, ptRouterNetwork, travelTime, travelDisutility, 
 				variableAccessModule, scenario.getNetwork());
 		
