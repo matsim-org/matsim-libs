@@ -49,7 +49,7 @@ import com.google.inject.name.Named;
 /**
  * @author michalm
  */
-public class InsertionDrtOptimizer implements UnplannedRequestInserter, MobsimBeforeCleanupListener {
+public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter, MobsimBeforeCleanupListener {
 	private final DrtConfigGroup drtCfg;
 	private final Fleet fleet;
 	private final MobsimTimer mobsimTimer;
@@ -59,9 +59,9 @@ public class InsertionDrtOptimizer implements UnplannedRequestInserter, MobsimBe
 	private final ParallelMultiVehicleInsertionProblem insertionProblem;
 
 	@Inject
-	public InsertionDrtOptimizer(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network, Fleet fleet,
+	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network, Fleet fleet,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(AbstractDrtOptimizer.DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory,
+			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory,
 			MobsimTimer mobsimTimer, DrtVehicleFilter vehicleFilter, EventsManager eventsManager,
 			DrtScheduler scheduler) {
 		this.drtCfg = drtCfg;

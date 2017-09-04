@@ -43,7 +43,7 @@ import com.google.inject.Inject;
 /**
  * @author michalm
  */
-public class AbstractDrtOptimizer implements DrtOptimizer {
+public class DefaultDrtOptimizer implements DrtOptimizer {
 	public static final String DRT_OPTIMIZER = "drt_optimizer";
 
 	private final DrtConfigGroup drtCfg;
@@ -61,7 +61,7 @@ public class AbstractDrtOptimizer implements DrtOptimizer {
 	private boolean requiresReoptimization = false;
 
 	@Inject
-	public AbstractDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
+	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, DrtRequestValidator requestValidator, DepotFinder depotFinder,
 			RebalancingStrategy rebalancingStrategy, DrtScheduler scheduler,
 			EmptyVehicleRelocator relocator, UnplannedRequestInserter requestInserter) {

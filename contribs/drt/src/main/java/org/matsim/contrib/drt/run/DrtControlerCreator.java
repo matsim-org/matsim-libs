@@ -73,7 +73,7 @@ public final class DrtControlerCreator {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule(DrtControlerCreator.createModuleForQSimPlugin(),
-				DrtOptimizer.class, InsertionDrtOptimizer.class));
+				DrtOptimizer.class, DefaultUnplannedRequestInserter.class));
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
 		if (otfvis) {
@@ -87,12 +87,12 @@ public final class DrtControlerCreator {
 		return new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
-				bind(DrtOptimizer.class).to(AbstractDrtOptimizer.class).asEagerSingleton();
+				bind(DrtOptimizer.class).to(DefaultDrtOptimizer.class).asEagerSingleton();
 				bind(VrpOptimizer.class).to(DrtOptimizer.class);
-				bind(InsertionDrtOptimizer.class).asEagerSingleton();
-				bind(UnplannedRequestInserter.class).to(InsertionDrtOptimizer.class);
+				bind(DefaultUnplannedRequestInserter.class).asEagerSingleton();
+				bind(UnplannedRequestInserter.class).to(DefaultUnplannedRequestInserter.class);
 				bind(EmptyVehicleRelocator.class).asEagerSingleton();
-				bind(TravelDisutilityFactory.class).annotatedWith(Names.named(AbstractDrtOptimizer.DRT_OPTIMIZER))
+				bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultDrtOptimizer.DRT_OPTIMIZER))
 						.toInstance(timeCalculator -> new TimeAsTravelDisutility(timeCalculator));
 				bind(DrtScheduler.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(DrtActionCreator.class).asEagerSingleton();

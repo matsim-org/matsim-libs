@@ -22,7 +22,7 @@ package org.matsim.contrib.drt.passenger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.optimizer.AbstractDrtOptimizer;
+import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Request;
@@ -53,7 +53,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	@Inject
 	public DrtRequestCreator(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim,
-			@Named(AbstractDrtOptimizer.DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory) {
+			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory) {
 		this.drtCfg = drtCfg;
 		this.travelTime = travelTime;
 		this.eventsManager = qSim.getEventsManager();
