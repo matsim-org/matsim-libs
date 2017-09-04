@@ -79,9 +79,9 @@ class CountsReaderCar {
 						}
 						// this.count.get(id).put(values[0],
 						
-						this.count.get(id).put(values[1],
+						this.count.get(id).put(values[2],
 								// new double[] { Double.parseDouble(values[1]), Double.parseDouble(values[2]), Double.parseDouble(values[3]) });
-								new double[] { Double.parseDouble(values[2]), Double.parseDouble(values[3])});
+								new double[] { Double.parseDouble(values[3]), Double.parseDouble(values[4])});
 					}
 				}
 			//}
