@@ -68,7 +68,7 @@ public class InsertionDrtOptimizer extends AbstractDrtOptimizer implements Mobsi
 					optimContext.travelDisutility, optimContext.travelTime, preProcessDijkstra, fastRouterFactory,
 					true);
 			singleVehicleInsertionProblems[i] = new SingleVehicleInsertionProblem(router, backwardRouter,
-					optimContext.scheduler.getParams().stopDuration, drtCfg.getMaxWaitTime(), optimContext.timer);
+					drtCfg.getStopDuration(), drtCfg.getMaxWaitTime(), optimContext.timer);
 		}
 
 		insertionProblem = new ParallelMultiVehicleInsertionProblem(singleVehicleInsertionProblems,
