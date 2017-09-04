@@ -20,12 +20,9 @@
 
 package org.matsim.core.controler;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
+import com.google.inject.Key;
+import com.google.inject.Provider;
+import com.google.inject.TypeLiteral;
 import org.apache.log4j.Layout;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
@@ -55,9 +52,10 @@ import org.matsim.core.scenario.ScenarioByConfigModule;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.TypeLiteral;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * The Controler is responsible for complete simulation runs, including the
@@ -79,7 +77,7 @@ public final class Controler implements ControlerI, MatsimServices {
 	public static final String FILENAME_NETWORK = "output_network.xml.gz";
 	public static final String FILENAME_HOUSEHOLDS = "output_households.xml.gz";
 	public static final String FILENAME_LANES = "output_lanes.xml.gz";
-	public static final String FILENAME_CONFIG = "output_config.xml.gz";
+	public static final String FILENAME_CONFIG = "output_config.xml";
 	public static final String FILENAME_PERSON_ATTRIBUTES = "output_personAttributes.xml.gz" ; 
 	public static final String FILENAME_COUNTS = "output_counts.xml.gz" ;
 
@@ -102,7 +100,7 @@ public final class Controler implements ControlerI, MatsimServices {
 	// DefaultControlerModule includes submodules. If you want less than what the Controler does
     // by default, you can leave ControlerDefaultsModule out, look at what it does,
     // and only include what you want.
-    private List<AbstractModule> modules = new ArrayList<>(Arrays.<AbstractModule>asList(new ControlerDefaultsModule()));
+    private List<AbstractModule> modules = Collections.singletonList(new ControlerDefaultsModule());
 
 	// The module which is currently defined by the sum of the setXX methods called on this Controler.
     private AbstractModule overrides = AbstractModule.emptyModule();
@@ -425,7 +423,7 @@ public final class Controler implements ControlerI, MatsimServices {
         if (this.injectorCreated) {
             throw new RuntimeException("Too late for configuring the Controler. This can only be done before calling run.");
         }
-        this.overrides = AbstractModule.override(Arrays.asList(this.overrides), abstractModule);
+        this.overrides = AbstractModule.override(Collections.singletonList(this.overrides), abstractModule);
     }
 
     public final void setModules(AbstractModule... modules) {
