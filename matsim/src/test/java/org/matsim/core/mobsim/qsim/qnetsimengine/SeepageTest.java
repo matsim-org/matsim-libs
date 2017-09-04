@@ -140,7 +140,7 @@ public class SeepageTest {
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTimes));
 
-		PrepareForSimUtils.createDefaultPrepareForSim(sc,manager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 
 		QSim qSim = QSimUtils.createDefaultQSim(sc, manager);
 		qSim.run();

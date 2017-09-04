@@ -143,7 +143,7 @@ public class MixedLaneTest {
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(this.fixture);
 		events.addHandler(handler);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(this.fixture.sc, events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(this.fixture.sc).run();
 		QSim qsim = QSimUtils.createDefaultQSim(this.fixture.sc, events);
 		qsim.run();
 		Assert.assertNotNull(handler.lastAgentDepartureEvent);
@@ -214,7 +214,7 @@ public class MixedLaneTest {
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(this.fixture);
 		events.addHandler(handler);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(this.fixture.sc, events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(this.fixture.sc).run();
 		QSim qsim = (QSim) QSimUtils.createDefaultQSim(this.fixture.sc, events);
 		qsim.run();
 		
@@ -264,7 +264,7 @@ public class MixedLaneTest {
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(fixture);
 		events.addHandler(handler);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(this.fixture.sc, events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(this.fixture.sc).run();
 		QSim qsim = (QSim) QSimUtils.createDefaultQSim(fixture.sc, events);
 		qsim.run();
 		

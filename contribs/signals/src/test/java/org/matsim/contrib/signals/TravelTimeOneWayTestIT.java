@@ -121,7 +121,7 @@ public class TravelTimeOneWayTestIT {
 		StubLinkEnterEventHandler eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario, events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSimUtils.createDefaultQSim(scenario, events).run();
 		MeasurementPoint resultsWoSignals = eventHandler.beginningOfLink2;
 		if (resultsWoSignals != null) {
@@ -182,7 +182,7 @@ public class TravelTimeOneWayTestIT {
 			events.addHandler(handler);
 		}
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario, events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		Mobsim mobsim = injector.getInstance(Mobsim.class);
 		mobsim.run();
 	}

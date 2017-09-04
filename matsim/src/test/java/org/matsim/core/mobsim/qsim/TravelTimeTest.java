@@ -61,7 +61,7 @@ public class TravelTimeTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSimUtils.createDefaultQSim(scenario, events).run();
 
 		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
@@ -90,7 +90,7 @@ public class TravelTimeTest {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSimUtils.createDefaultQSim(scenario, events).run();
 
 		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));

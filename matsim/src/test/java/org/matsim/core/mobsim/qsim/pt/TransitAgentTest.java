@@ -87,7 +87,7 @@ public class TransitAgentTest extends TestCase {
 		plan.addActivity(workAct);
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,eventsManager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, eventsManager);
 		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
 		sim.insertAgentIntoMobsim(agent);
@@ -131,7 +131,7 @@ public class TransitAgentTest extends TestCase {
 		plan.addActivity(workAct);
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,eventsManager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, eventsManager);
 		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
 		sim.insertAgentIntoMobsim(agent);

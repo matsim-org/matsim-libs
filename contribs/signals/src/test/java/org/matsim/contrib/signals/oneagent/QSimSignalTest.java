@@ -19,12 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals.oneagent;
 
-import java.util.Collection;
 import java.util.Collections;
 
-import com.google.inject.Key;
-import com.google.inject.Provider;
-import com.google.inject.util.Types;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -47,8 +43,6 @@ import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.controler.*;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.ObservableMobsim;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -170,7 +164,7 @@ public class QSimSignalTest implements
 			events.addHandler(this);
 		}
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario, events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 
 		Mobsim mobsim = injector.getInstance(Mobsim.class);
 		mobsim.run();

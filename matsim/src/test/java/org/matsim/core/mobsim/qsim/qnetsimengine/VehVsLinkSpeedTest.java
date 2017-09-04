@@ -110,7 +110,7 @@ public class VehVsLinkSpeedTest {
 		car.setPcuEquivalents(1.0);
 		net.scenario.getVehicles().addVehicleType(car);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario,manager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario).run();
 		QSim qSim = QSimUtils.createDefaultQSim(net.scenario, manager);
 		qSim.run();
 

@@ -89,7 +89,7 @@ public class JavaRoundingErrorInQsimTest {
 		EventsManager manager = EventsUtils.createEventsManager();
 		manager.addHandler(new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTime));
 
-		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario,manager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario).run();
 		QSim qSim = QSimUtils.createDefaultQSim(net.scenario, manager);
 		qSim.run();
 

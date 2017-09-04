@@ -111,7 +111,7 @@ public class OccupancyAnalyzerTest {
 		OccupancyAnalyzer oa = new OccupancyAnalyzer(3600, 12*3600);
 		eventsManager.addHandler(oa);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario,eventsManager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 

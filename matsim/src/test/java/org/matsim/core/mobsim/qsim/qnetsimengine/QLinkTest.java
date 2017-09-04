@@ -325,7 +325,7 @@ public final class QLinkTest extends MatsimTestCase {
 		Link link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, 1.0, 1.0, 1.0, 1.0 );
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,eventsManager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim qsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
 		NetsimNetwork queueNetwork = qsim.getNetsimNetwork();
 		dummify((QNetwork) queueNetwork);
@@ -565,7 +565,7 @@ public final class QLinkTest extends MatsimTestCase {
 		}
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,eventsManager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
 
 		EventsCollector collector = new EventsCollector();
@@ -617,7 +617,7 @@ public final class QLinkTest extends MatsimTestCase {
 			final Node toNode1 = node3;
 			this.link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0 );
 			EventsManager eventsManager = EventsUtils.createEventsManager();
-			PrepareForSimUtils.createDefaultPrepareForSim(scenario,eventsManager).run();
+			PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 			sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
 			this.queueNetwork = (QNetwork) sim.getNetsimNetwork();
 

@@ -54,7 +54,6 @@ import org.matsim.core.network.VariableIntervalTimeVariantLinkFactory;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -100,7 +99,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1.getId(), person2.getId(), link2.getId());
 		events.addHandler(ttcalc);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
 		qsim.run();
 
@@ -165,7 +164,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1.getId(), person2.getId(), link2.getId());
 		events.addHandler(ttcalc);
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
         qsim.run();
 		/*
@@ -252,7 +251,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			}
 		});
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
         qsim.run();
 

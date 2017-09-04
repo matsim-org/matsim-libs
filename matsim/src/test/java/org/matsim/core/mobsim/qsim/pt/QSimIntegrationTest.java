@@ -91,7 +91,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class);
 		eventsManager.addHandler(coll);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario,eventsManager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
@@ -151,7 +151,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class);
 		eventsManager.addHandler(coll);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario,eventsManager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
@@ -227,7 +227,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class, PersonEntersVehicleEvent.class, PersonLeavesVehicleEvent.class);
 		eventsManager.addHandler(coll);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario,eventsManager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
@@ -310,7 +310,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class, PersonEntersVehicleEvent.class, PersonLeavesVehicleEvent.class);
 		eventsManager.addHandler(coll);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario,eventsManager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 
@@ -385,7 +385,7 @@ public class QSimIntegrationTest {
 				LinkEnterEvent.class);
 		eventsManager.addHandler(coll);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario,eventsManager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
 		sim.run();
 

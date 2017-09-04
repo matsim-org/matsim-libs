@@ -69,7 +69,7 @@ public class OTFVisWithSignals {
 	
 		EventsManager events = injector.getInstance(EventsManager.class);
 		
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario, events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		
 		QSim qSim = (QSim) injector.getInstance(Mobsim.class);
 

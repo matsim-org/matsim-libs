@@ -66,7 +66,7 @@ public class SignalsMixedLaneTest {
 		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(this.fixture);
 		events.addHandler(handler);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(this.fixture.sc, events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(this.fixture.sc).run();
 		QSim qsim = (QSim) QSimUtils.createDefaultQSim(this.fixture.sc, events);
 		qsim.run();
 

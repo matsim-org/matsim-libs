@@ -70,7 +70,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		EventWriterXML writer = new EventWriterXML(eventsFileName);
 		events.addHandler(writer);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim qSim = QSimUtils.createDefaultQSim(scenario,events);
 
 		log.info("START testOnePercent10s SIM");
@@ -111,7 +111,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		EventWriterXML writer = new EventWriterXML(eventsFileName);
 		eventsManager.addHandler(writer);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,eventsManager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim qSim = QSimUtils.createDefaultQSim(scenario,eventsManager);
 
 		log.info("START testOnePercent10s SIM");

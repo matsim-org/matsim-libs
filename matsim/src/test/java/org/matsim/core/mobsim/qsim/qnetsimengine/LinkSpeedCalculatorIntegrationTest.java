@@ -52,7 +52,6 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -74,7 +73,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		f.events.addHandler(collector);
 		f.events.addHandler(new EventsLogger());
 
-		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario,f.events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 		QSim qsim = configureQSim(f, null);
 		qsim.run();
 		
@@ -128,7 +127,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		eventsManager.addHandler(collector);
 		eventsManager.addHandler(new EventsLogger());
 
-		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario,f.events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 		injector.getInstance( Mobsim.class ).run();
 		
 		List<Event> events = collector.getEvents();
@@ -183,7 +182,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		eventsManager.addHandler(collector);
 		eventsManager.addHandler(new EventsLogger());
 
-		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario,f.events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 		injector.getInstance( Mobsim.class ).run();
 		
 		List<Event> events = collector.getEvents();

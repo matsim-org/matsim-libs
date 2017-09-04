@@ -104,7 +104,7 @@ public class PassingTest {
 
 		storeVehicleTypeInfo(net);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario,manager).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario).run();
 
 		QSim qSim = QSimUtils.createDefaultQSim(net.scenario,manager);
 		qSim.run();

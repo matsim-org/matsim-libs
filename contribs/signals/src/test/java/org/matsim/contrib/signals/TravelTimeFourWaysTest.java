@@ -111,7 +111,7 @@ public class TravelTimeFourWaysTest {
 		EventWriterXML eventsXmlWriter = new EventWriterXML(eventsOut);
 		events.addHandler(eventsXmlWriter);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario, events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		Mobsim mobsim = injector.getInstance(Mobsim.class);
 		mobsim.run();
 		

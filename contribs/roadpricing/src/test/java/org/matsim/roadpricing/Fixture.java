@@ -42,7 +42,6 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -259,7 +258,7 @@ import junit.framework.TestCase;
 		EventsManager events = EventsUtils.createEventsManager();
 		EventsToScore scoring = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), events);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario, events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		scoring.beginIteration(0);
 		sim.run();

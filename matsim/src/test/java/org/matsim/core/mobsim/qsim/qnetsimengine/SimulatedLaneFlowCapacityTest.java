@@ -44,7 +44,6 @@ import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -211,7 +210,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		EventsManager events = EventsUtils.createEventsManager();
 		SimulatedCapacityHandler simulatedCapacity = new SimulatedCapacityHandler();
 		events.addHandler(simulatedCapacity);
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim queueSim = QSimUtils.createDefaultQSim(scenario, events);
 		queueSim.run();
 		
@@ -238,7 +237,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		SimulatedCapacityHandler simulatedCapacity = new SimulatedCapacityHandler();
 		events.addHandler(simulatedCapacity);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim queueSim = QSimUtils.createDefaultQSim(scenario, events);
 		queueSim.run();
 				
@@ -266,7 +265,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		EventsManager events = EventsUtils.createEventsManager();
 		SimulatedCapacityHandler simulatedCapacity = new SimulatedCapacityHandler();
 		events.addHandler(simulatedCapacity);
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim queueSim = QSimUtils.createDefaultQSim(scenario, events);
 		queueSim.run();
 		
@@ -296,7 +295,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		EventsManager events = EventsUtils.createEventsManager();
 		SimulatedCapacityHandler simulatedCapacity = new SimulatedCapacityHandler();
 		events.addHandler(simulatedCapacity);
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		QSim queueSim = QSimUtils.createDefaultQSim(scenario, events);
 		queueSim.run();
 		

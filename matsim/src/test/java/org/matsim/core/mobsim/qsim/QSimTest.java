@@ -61,7 +61,6 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -93,7 +92,7 @@ public class QSimTest {
 	
 	private QSim createQSim(MutableScenario scenario, EventsManager events) {
 		// vehicles are moved to prepareForSim, thus, this must be explicitly called before qsim. Amit May'17
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 
 		QSim qSim1 = new QSim(scenario, events);
 		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
@@ -111,7 +110,7 @@ public class QSimTest {
 
 	private QSim createQSim(Fixture f, EventsManager events) {
 		// vehicles are moved to prepareForSim, thus, this must be explicitly called before qsim. Amit May'17
-		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 
 		Scenario sc = f.scenario;
 		QSim qSim1 = new QSim(sc, events);

@@ -203,7 +203,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		// ---
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		EventsToScore scorer =
 				EventsToScore.createWithScoreUpdating(
@@ -261,7 +261,7 @@ public class SimulateAndScoreTest extends MatsimTestCase {
 		scenario.getPopulation().addPerson(person);
 
 		EventsManager events = EventsUtils.createEventsManager();
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario,events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		Netsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		PlanCalcScoreConfigGroup.ActivityParams h = new PlanCalcScoreConfigGroup.ActivityParams("h");
 		h.setTypicalDuration(16 * 3600);

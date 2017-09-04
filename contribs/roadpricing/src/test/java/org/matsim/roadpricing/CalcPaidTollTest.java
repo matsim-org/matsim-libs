@@ -207,7 +207,7 @@ public class CalcPaidTollTest extends MatsimTestCase {
 		EventsToScore scoring = EventsToScore.createWithScoreUpdating(scenario, new CharyparNagelScoringFunctionFactory(scenario), events);
 		scoring.beginIteration(0);
 
-		PrepareForSimUtils.createDefaultPrepareForSim(scenario, events).run();
+		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
 		sim.run();
 
