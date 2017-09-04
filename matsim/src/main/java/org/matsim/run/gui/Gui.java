@@ -1,10 +1,11 @@
 package org.matsim.run.gui;
 
-import java.awt.Desktop;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.run.Controler;
 
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
@@ -23,13 +24,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingUtilities;
-
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.run.Controler;
+import java.awt.Desktop;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * @author mrieser / Senozon AG
@@ -50,7 +49,8 @@ public class Gui extends JFrame {
 	private JProgressBar progressBar;
 	private JTextArea textStdOut;
 	private JScrollPane scrollPane;
-	
+	private JButton btnEdit;
+
 	private ExeRunner exeRunner = null;
 	private JMenuBar menuBar;
 	private JMenu mnTools;
@@ -62,8 +62,10 @@ public class Gui extends JFrame {
 	private PopulationSampler popSampler = null;
 	private JTextArea textErrOut;
 	private final String mainClass;
-	
+
+	private File configFile;
 	private File lastUsedDirectory;
+	private ConfigEditor editor = null;
 	
 	private Gui(final String title, final Class<?> mainClass) {
 		setTitle(title);
@@ -79,7 +81,7 @@ public class Gui extends JFrame {
 		
 		btnStartMatsim = new JButton("Start MATSim");
 		btnStartMatsim.setEnabled(false);
-		
+
 		this.lblWorkDirectory = new JLabel("Filepaths must either be absolute or relative to the location of the config file.");
 		
 		JButton btnChoose = new JButton("Choose");
@@ -93,10 +95,24 @@ public class Gui extends JFrame {
 					File f = chooser.getSelectedFile();
 					Gui.this.lastUsedDirectory = f.getParentFile();
 					loadConfigFile(f);
+					if (Gui.this.editor != null) {
+						Gui.this.editor.closeEditor();
+						Gui.this.editor = null;
+					}
 				}
 			}
 		});
-		
+
+		this.btnEdit = new JButton("Edit…");
+		this.btnEdit.setEnabled(false);
+		this.btnEdit.addActionListener(e -> {
+			if (Gui.this.editor == null) {
+				this.editor = new ConfigEditor(Gui.this.configFile, Gui.this::loadConfigFile);
+			}
+			Gui.this.editor.showEditor();
+			Gui.this.editor.toFront();
+		});
+
 		JLabel lblYouAreRunning = new JLabel("You are using MATSim version:");
 		
 		txtMatsimversion = new JTextField();
@@ -225,7 +241,10 @@ public class Gui extends JFrame {
 								.addGroup(groupLayout.createSequentialGroup()
 									.addComponent(txtConfigfilename, GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
 									.addPreferredGap(ComponentPlacement.RELATED)
-									.addComponent(btnChoose))
+									.addComponent(btnChoose)
+									.addPreferredGap(ComponentPlacement.RELATED)
+									.addComponent(btnEdit)
+								)
 								.addComponent(progressBar, GroupLayout.DEFAULT_SIZE, 285, Short.MAX_VALUE)
 								.addGroup(groupLayout.createSequentialGroup()
 									.addComponent(txtOutput, GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
@@ -254,7 +273,8 @@ public class Gui extends JFrame {
 					.addGroup(groupLayout.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblConfigurationFile)
 						.addComponent(txtConfigfilename, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addComponent(btnChoose))
+						.addComponent(btnChoose)
+						.addComponent(btnEdit))
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(lblWorkDirectory)
 					.addPreferredGap(ComponentPlacement.RELATED)
@@ -334,7 +354,6 @@ public class Gui extends JFrame {
 					Config config = ConfigUtils.createConfig();
 					new ConfigWriter(config).write(destFile.getAbsolutePath());
 				}
-
 			}
 		});
 
@@ -409,6 +428,7 @@ public class Gui extends JFrame {
 	}
 	
 	public void loadConfigFile(final File configFile) {
+		this.configFile = configFile;
 		String configFilename = configFile.getAbsolutePath();
 		
 		Config config = ConfigUtils.createConfig();
@@ -433,9 +453,10 @@ public class Gui extends JFrame {
 			txtOutput.setText(outputDir.getAbsolutePath());
 		}
 		
-		btnStartMatsim.setEnabled(true);		
+		btnStartMatsim.setEnabled(true);
+		btnEdit.setEnabled(true);
 	}
-	
+
 	public void stopMATSim() {
 		ExeRunner runner = this.exeRunner;
 		if (runner != null) {
