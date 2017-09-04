@@ -30,12 +30,12 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 	private DemandHandler demandHandler;
 	private Person person;
 	private CarsharingSupplyInterface carsharingSupplyContainer;
-	
+	/*
 	private static final  Set<String> walkingLegs = ImmutableSet.of("egress_walk_ow", "access_walk_ow",
 			"egress_walk_tw", "access_walk_tw", "egress_walk_ff", "access_walk_ff");
 	
 	private static final  Set<String> carsharingLegs = ImmutableSet.of("oneway_vehicle", "twoway_vehicle",
-			"freefloating_vehicle");
+			"freefloating_vehicle");*/
 	
 	public CarsharingLegScoringFunction(ScoringParameters params, 
 			Config config,  Network network, DemandHandler demandHandler,
@@ -76,7 +76,7 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 		
 		
 		double tmpScore = 0.0D;
-		double travelTime = arrivalTime - departureTime;
+		/*double travelTime = arrivalTime - departureTime;
 		String mode = leg.getMode();
 		if (carsharingLegs.contains(mode)) {
 					
@@ -102,16 +102,16 @@ public class CarsharingLegScoringFunction extends org.matsim.core.scoring.functi
 			
 			tmpScore += getWalkScore(leg.getRoute().getDistance(), travelTime);
 			
-		}			
+		}*/			
 		return tmpScore;
 	}
 
-	private double getWalkScore(double distance, double travelTime)
+	/*private double getWalkScore(double distance, double travelTime)
 	{
 		double score = 0.0D;
 
 		score += travelTime * this.params.modeParams.get(TransportMode.walk).marginalUtilityOfTraveling_s + this.params.modeParams.get(TransportMode.walk).marginalUtilityOfDistance_m * distance;
 
 		return score;
-	}
+	}*/
 }
