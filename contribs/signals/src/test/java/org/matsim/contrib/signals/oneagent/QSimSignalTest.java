@@ -166,7 +166,6 @@ public class QSimSignalTest implements
 		}), new SignalsModule()));
 	
 		EventsManager events = injector.getInstance(EventsManager.class);
-		events.initProcessing();
 		if (handleEvents){
 			events.addHandler(this);
 		}
