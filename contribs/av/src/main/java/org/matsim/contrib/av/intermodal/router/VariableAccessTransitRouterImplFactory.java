@@ -26,6 +26,7 @@ import org.matsim.contrib.av.intermodal.router.config.VariableAccessConfigGroup;
 import org.matsim.contrib.av.intermodal.router.config.VariableAccessModeConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
@@ -56,6 +57,7 @@ import javax.inject.Singleton;
 public class VariableAccessTransitRouterImplFactory implements Provider<TransitRouter> {
 
 	private final TransitRouterConfig transitRouterconfig;
+	private final PlanCalcScoreConfigGroup planCalcScoreConfig;
 	private final TransitRouterNetwork routerNetwork;
 	private final PreparedTransitSchedule preparedTransitSchedule;
 	private final Config config;
@@ -65,8 +67,9 @@ public class VariableAccessTransitRouterImplFactory implements Provider<TransitR
 	@Inject
 	VariableAccessTransitRouterImplFactory(final @Named("variableAccess") TransitSchedule schedule, final Config config, final Network network) {
 		this.config = config;
-		
 		this.transitRouterconfig = new TransitRouterConfig(config.planCalcScore(),config.plansCalcRoute(),config.transitRouter(),config.vspExperimental());
+		this.planCalcScoreConfig = config.planCalcScore();
+		planCalcScoreConfig.setLocked();
 		this.routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, this.transitRouterconfig.getBeelineWalkConnectionDistance());
 		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
 		this.network = network;
@@ -102,7 +105,7 @@ public class VariableAccessTransitRouterImplFactory implements Provider<TransitR
 			throw new RuntimeException("Unsupported Style");
 		}
 		TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.transitRouterconfig, this.preparedTransitSchedule);
-		return new VariableAccessTransitRouterImpl(this.transitRouterconfig, this.preparedTransitSchedule, this.routerNetwork, ttCalculator, ttCalculator, variableAccessEgressTravelDisutility, network);
+		return new VariableAccessTransitRouterImpl(this.planCalcScoreConfig, this.transitRouterconfig, this.preparedTransitSchedule, this.routerNetwork, ttCalculator, ttCalculator, variableAccessEgressTravelDisutility, network);
 	}
 	
 }

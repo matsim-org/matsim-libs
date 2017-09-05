@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
@@ -66,7 +67,8 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 
 	private final TransitRouterNetwork transitNetwork;
 	private final Network network;
-	private final TransitRouterConfig config;
+	private final PlanCalcScoreConfigGroup pcsConfig;
+	private final TransitRouterConfig trConfig;
 	private final TransitTravelDisutility travelDisutility;
 	private final TravelTime travelTime;
 	private final VariableAccessEgressTravelDisutility variableAccessEgressTravelDisutility;
@@ -77,13 +79,15 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 	
 
 	public VariableAccessTransitRouterImpl(
-			final TransitRouterConfig config,
+			final PlanCalcScoreConfigGroup planCalcScoreConfig,
+			final TransitRouterConfig transitRouterConfig,
 			final PreparedTransitSchedule preparedTransitSchedule,
 			final TransitRouterNetwork routerNetwork,
 			final TravelTime travelTime,
 			final TransitTravelDisutility travelDisutility, final VariableAccessEgressTravelDisutility variableAccessEgressTravelDisutility,
 			final Network network) {
-		this.config = config;
+		this.pcsConfig = planCalcScoreConfig;
+		this.trConfig = transitRouterConfig;
 		this.transitNetwork = routerNetwork;
 		this.travelTime = travelTime;
 		this.travelDisutility = travelDisutility;
@@ -93,20 +97,31 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 	}
 
 	private Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime) {
-		Collection<TransitRouterNetworkNode> nearestNodes = this.transitNetwork.getNearestNodes(coord, this.config.getSearchRadius());
+		Collection<TransitRouterNetworkNode> nearestNodes = this.transitNetwork.getNearestNodes(coord, this.trConfig.getSearchRadius());
 		if (nearestNodes.size() < 2) {
 			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
 			TransitRouterNetworkNode nearestNode = this.transitNetwork.getNearestNode(coord);
 			double distance = CoordUtils.calcEuclideanDistance(coord, nearestNode.stop.getStopFacility().getCoord());
-			nearestNodes = this.transitNetwork.getNearestNodes(coord, distance + this.config.getExtensionRadius());
+			nearestNodes = this.transitNetwork.getNearestNodes(coord, distance + this.trConfig.getExtensionRadius());
 		}
 		Map<Node, InitialNode> wrappedNearestNodes = new LinkedHashMap<>();
 		for (TransitRouterNetworkNode node : nearestNodes) {
 			Coord toCoord = node.stop.getStopFacility().getCoord();
 			Leg initialLeg = getAccessEgressLeg(person, coord, toCoord, departureTime);
 			double initialTime = initialLeg.getTravelTime();
-			//variable access: only use time as disutility for the time being
-			wrappedNearestNodes.put(node, new InitialNode(initialTime, initialTime + departureTime));
+			double marginalUtilityOfDistance_utl_m = 
+					pcsConfig.getModes().get(initialLeg.getMode()).getMonetaryDistanceRate() * pcsConfig.getMarginalUtilityOfMoney() +
+					pcsConfig.getModes().get(initialLeg.getMode()).getMarginalUtilityOfDistance();
+			double marginalUtilityOfTravelTime_utl_s = 
+					pcsConfig.getModes().get(initialLeg.getMode()).getMarginalUtilityOfTraveling()/3600.0 -
+					pcsConfig.getPerforming_utils_hr()/3600.;
+			//  getMarginalUtilityOfTravelTimeWalk includes the opportunity cost of time.
+			double timeCost = - initialLeg.getTravelTime() * marginalUtilityOfTravelTime_utl_s ;
+			// (sign: margUtl is negative; overall it should be positive because it is a cost.)
+			double distanceCost = - initialLeg.getRoute().getDistance() * marginalUtilityOfDistance_utl_m ;
+			// (sign: same as above)
+			double initialCost = timeCost + distanceCost;
+			wrappedNearestNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 		return wrappedNearestNodes;
 	}
@@ -117,11 +132,11 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 
 
 	private double getTransferTime(Person person, Coord coord, Coord toCoord) {
-		return travelDisutility.getTravelTime(person, coord, toCoord) + this.config.getAdditionalTransferTime();
+		return travelDisutility.getWalkTravelTime(person, coord, toCoord) + this.trConfig.getAdditionalTransferTime();
 	}
 
 	private double getAccessEgressDisutility(Person person, Coord coord, Coord toCoord) {
-		return travelDisutility.getTravelDisutility(person, coord, toCoord);
+		return travelDisutility.getWalkTravelDisutility(person, coord, toCoord);
 	}
 
 	@Override
@@ -144,7 +159,7 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 		double directWalkCost = getAccessEgressDisutility(person, fromFacility.getCoord(), toFacility.getCoord());
 		double pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
 
-		if (directWalkCost * config.getDirectWalkFactor() < pathCost) {
+		if (directWalkCost * trConfig.getDirectWalkFactor() < pathCost) {
 			return this.createDirectAccessEgressModeLegList(null, fromFacility.getCoord(), toFacility.getCoord(), departureTime);
 		}
 		return convertPathToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
@@ -220,7 +235,7 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 								walkRoute.setTravelTime(transferTime);
 								
 //								walkRoute.setDistance( currentDistance );
-								walkRoute.setDistance( config.getBeelineDistanceFactor() * 
+								walkRoute.setDistance( trConfig.getBeelineDistanceFactor() * 
 										NetworkUtils.getEuclideanDistance(accessStop.getCoord(), egressStop.getCoord()) );
 								// (see MATSIM-556)
 
@@ -248,7 +263,7 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 											leg.getRoute().getEndLinkId(), egressStop.getLinkId());
 									double walkTime = getTransferTime(person, network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord(), egressStop.getCoord());
 									walkRoute.setTravelTime(walkTime);
-									walkRoute.setDistance(config.getBeelineDistanceFactor() * 
+									walkRoute.setDistance(trConfig.getBeelineDistanceFactor() * 
 											NetworkUtils.getEuclideanDistance(network.getLinks().get(leg.getRoute().getEndLinkId()).getCoord(), egressStop.getCoord()) );
 								
 									Leg walkleg = PopulationUtils.createLeg(TransportMode.transit_walk);
@@ -279,7 +294,7 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 			TransitStopFacility egressStop = prevLink.toNode.stop.getStopFacility();
 			ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 //			ptRoute.setDistance( currentDistance );
-			ptRoute.setDistance( config.getBeelineDistanceFactor() * NetworkUtils.getEuclideanDistance(accessStop.getCoord(), egressStop.getCoord() ) );
+			ptRoute.setDistance( trConfig.getBeelineDistanceFactor() * NetworkUtils.getEuclideanDistance(accessStop.getCoord(), egressStop.getCoord() ) );
 			// (see MATSIM-556)
 			leg.setRoute(ptRoute);
 			double arrivalOffset = ((prevLink).toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ?
@@ -312,7 +327,7 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 					double walkTime = getTransferTime(person, accessStop.getCoord(), network.getLinks().get(eleg.getRoute().getStartLinkId()).getCoord());
 					leg.setTravelTime(walkTime);
 					Route walkRoute = RouteUtils.createGenericRouteImpl(accessStop.getLinkId(), eleg.getRoute().getStartLinkId());
-					walkRoute.setDistance(config.getBeelineDistanceFactor() * 
+					walkRoute.setDistance(trConfig.getBeelineDistanceFactor() * 
 											NetworkUtils.getEuclideanDistance(accessStop.getCoord(),network.getLinks().get(eleg.getRoute().getStartLinkId()).getCoord()));
 					leg.setRoute(walkRoute);
 					legs.add(leg);
@@ -343,7 +358,7 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 	}
 
 	protected TransitRouterConfig getConfig() {
-		return config;
+		return trConfig;
 	}
 
 }

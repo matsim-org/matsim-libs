@@ -476,12 +476,12 @@ public class MultiNodeDijkstraTest extends TestCase {
 		}
 
 		@Override
-		public double getTravelTime(Person person, Coord coord, Coord toCoord) {
+		public double getWalkTravelTime(Person person, Coord coord, Coord toCoord) {
 			return 0;
 		}
 
 		@Override
-		public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
+		public double getWalkTravelDisutility(Person person, Coord coord, Coord toCoord) {
 			return 0;
 		}
 		

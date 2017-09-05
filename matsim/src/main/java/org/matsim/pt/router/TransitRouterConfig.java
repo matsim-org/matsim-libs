@@ -112,12 +112,16 @@ public class TransitRouterConfig implements MatsimParameters {
 		
 		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 		
-		this.marginalUtilityOfTravelDistanceWalk_utl_m = pcsConfig.getMarginalUtilityOfMoney() * pcsConfig.getModes().get(TransportMode.walk).getMonetaryDistanceRate();
+		this.marginalUtilityOfTravelDistanceWalk_utl_m = pcsConfig.getMarginalUtilityOfMoney() *
+				pcsConfig.getModes().get(TransportMode.walk).getMonetaryDistanceRate() +
+				pcsConfig.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance();
 		
 		// pt:
 		this.marginalUtilityOfTravelTimeTransit_utl_s = pcsConfig.getModes().get(TransportMode.pt).getMarginalUtilityOfTraveling() /3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 
-		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getMarginalUtilityOfMoney() * pcsConfig.getModes().get(TransportMode.pt).getMonetaryDistanceRate();
+		this.marginalUtilityOfTravelDistanceTransit_utl_m = pcsConfig.getMarginalUtilityOfMoney() *
+				pcsConfig.getModes().get(TransportMode.pt).getMonetaryDistanceRate() +
+				pcsConfig.getModes().get(TransportMode.pt).getMarginalUtilityOfDistance();
 
 		this.marginalUtilityOfWaitingPt_utl_s = pcsConfig.getMarginalUtlOfWaitingPt_utils_hr() / 3600.0 - pcsConfig.getPerforming_utils_hr()/3600. ;
 

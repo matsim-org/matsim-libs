@@ -162,7 +162,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			// the fact that all the speed values are reset to some other value there.  No idea what happens there. kai, jul'16
 
 			this.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(6, "road",  1,  45.0/3.6, 1.0,  600); // Exists on OSM and is menta for roads not yet classified, dz, aug'18
 		}
 	}
 

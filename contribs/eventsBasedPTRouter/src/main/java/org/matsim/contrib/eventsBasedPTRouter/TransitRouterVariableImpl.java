@@ -90,11 +90,11 @@ public class TransitRouterVariableImpl implements TransitRouter {
 	}
 	
 	private double getWalkTime(Person person, Coord coord, Coord toCoord) {
-		return this.ttCalculator.getTravelTime(person, coord, toCoord);
+		return this.ttCalculator.getWalkTravelTime(person, coord, toCoord);
 	}
 	
 	private double getWalkDisutility(Person person, Coord coord, Coord toCoord) {
-		return this.ttCalculator.getTravelDisutility(person, coord, toCoord);
+		return this.ttCalculator.getWalkTravelDisutility(person, coord, toCoord);
 	}
 	
 	public Map<Id<Node>, Path> calcPathRoutes(final Id<Node> fromNodeId, final Set<Id<Node>> toNodeIds, final double startTime, final Person person) {

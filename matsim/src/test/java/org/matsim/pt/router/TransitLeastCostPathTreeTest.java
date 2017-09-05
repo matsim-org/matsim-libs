@@ -78,8 +78,8 @@ public class TransitLeastCostPathTreeTest {
         TransitRouterNetwork.TransitRouterNetworkNode nearestNode = network.getNearestNode(coord);
         Map<Node, InitialNode> wrappedNearestNodes = new LinkedHashMap<>();
         Coord toCoord = nearestNode.stop.getStopFacility().getCoord();
-        double initialTime = travelDisutility.getTravelTime(person, coord, toCoord);
-        double initialCost = travelDisutility.getTravelDisutility(person, coord, toCoord);
+        double initialTime = travelDisutility.getWalkTravelTime(person, coord, toCoord);
+        double initialCost = travelDisutility.getWalkTravelDisutility(person, coord, toCoord);
         wrappedNearestNodes.put(nearestNode, new InitialNode(initialCost, initialTime + departureTime));
         return wrappedNearestNodes;
     }
@@ -208,12 +208,12 @@ public class TransitLeastCostPathTreeTest {
         }
 
         @Override
-        public double getTravelTime(Person person, Coord coord, Coord toCoord) {
+        public double getWalkTravelTime(Person person, Coord coord, Coord toCoord) {
             return 0;
         }
 
         @Override
-        public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
+        public double getWalkTravelDisutility(Person person, Coord coord, Coord toCoord) {
             return 0;
         }
 

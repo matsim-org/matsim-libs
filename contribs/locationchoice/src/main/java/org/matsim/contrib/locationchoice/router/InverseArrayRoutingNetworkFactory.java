@@ -34,7 +34,6 @@ import org.matsim.core.router.util.ArrayRoutingNetwork;
 import org.matsim.core.router.util.ArrayRoutingNetworkFactory;
 import org.matsim.core.router.util.ArrayRoutingNetworkLink;
 import org.matsim.core.router.util.ArrayRoutingNetworkNode;
-import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.RoutingNetworkLink;
 import org.matsim.core.router.util.RoutingNetworkNode;
 
@@ -50,10 +49,6 @@ public class InverseArrayRoutingNetworkFactory extends AbstractRoutingNetworkFac
 	
 	private int nodeArrayIndexCounter;
 	private int linkArrayIndexCounter;
-	
-	public InverseArrayRoutingNetworkFactory(PreProcessDijkstra preProcessData) {
-		super(preProcessData);
-	}
 	
 	@Override
 	public ArrayRoutingNetwork createRoutingNetwork(Network network) {
@@ -92,14 +87,6 @@ public class InverseArrayRoutingNetworkFactory extends AbstractRoutingNetworkFac
 		
 		if (routingLinks.size() > 0) log.warn("Not all links have been use in the ArrayRoutingNetwork - " +
 				"check connectivity of input network!");
-		
-		if (preProcessData != null) {
-			if (preProcessData.containsData()) {
-				for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
-					node.setDeadEndData(preProcessData.getNodeData(node.getNode()));
-				}
-			}
-		}
 		
 		return routingNetwork;
 	}

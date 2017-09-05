@@ -198,19 +198,20 @@ public class TransitRouterNetworkTravelTimeAndDisutility implements TravelTime, 
 	}
 
 	@Override
-	public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
+	public double getWalkTravelDisutility(Person person, Coord coord, Coord toCoord) {
 		//  getMarginalUtilityOfTravelTimeWalk INCLUDES the opportunity cost of time.  kai, dec'12
-		double timeCost = - getTravelTime(person, coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s() ;
+		double timeCost = - getWalkTravelTime(person, coord, toCoord) * config.getMarginalUtilityOfTravelTimeWalk_utl_s() ;
 		// (sign: margUtl is negative; overall it should be positive because it is a cost.)
 		
-		double distanceCost = - CoordUtils.calcEuclideanDistance(coord,toCoord) * config.getMarginalUtilityOfTravelDistancePt_utl_m() ;
+		double distanceCost = - CoordUtils.calcEuclideanDistance(coord,toCoord) * 
+				config.getBeelineDistanceFactor() * config.getMarginalUtilityOfTravelDistanceWalk_utl_m();
 		// (sign: same as above)
 		
 		return timeCost + distanceCost ;
 	}
 
 	@Override
-	public double getTravelTime(Person person, Coord coord, Coord toCoord) {
+	public double getWalkTravelTime(Person person, Coord coord, Coord toCoord) {
 		double distance = CoordUtils.calcEuclideanDistance(coord, toCoord);
 		double initialTime = distance / config.getBeelineWalkSpeed();
 		return initialTime;

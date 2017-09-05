@@ -65,8 +65,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		preProcessEuclidean.run(network);
 
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessEuclidean)
-				.createRoutingNetwork(network);
+		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(network);
 
 		router = new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelDisutility, travelTime,
 				drtCfg.getAStarEuclideanOverdoFactor(), fastRouterFactory);

@@ -28,7 +28,7 @@ import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-public class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
+public final class ConfigWriter extends MatsimXmlWriter implements MatsimWriter {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

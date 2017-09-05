@@ -57,8 +57,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		preProcessEuclidean.run(network);
 
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessEuclidean)
-				.createRoutingNetwork(network);
+		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(network);
 
 		router = new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelDisutility, travelTime,
 				params.AStarEuclideanOverdoFactor, fastRouterFactory);

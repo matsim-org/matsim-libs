@@ -86,7 +86,7 @@ public class NoiseConfigGroupIT {
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		controler.run();
 		
-		Config outputConfig = ConfigUtils.loadConfig(controler.getConfig().controler().getOutputDirectory() + "/output_config.xml.gz", new NoiseConfigGroup());
+		Config outputConfig = ConfigUtils.loadConfig(controler.getConfig().controler().getOutputDirectory() + "/output_config.xml", new NoiseConfigGroup());
 		NoiseConfigGroup outputNoiseParameters = (NoiseConfigGroup) outputConfig.getModule("noise");
 		
 		Assert.assertEquals("input and output config parameters are not the same", noiseParameters.toString(), outputNoiseParameters.toString());

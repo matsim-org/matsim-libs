@@ -41,6 +41,7 @@ import org.matsim.core.utils.io.IOUtils;
  * @author balmermi
  */
 public class ConfigGroup implements MatsimExtensionPoint {
+	// this cannot be made final since many actual groups inherit from it
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables

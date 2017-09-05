@@ -61,7 +61,7 @@ public class AccessibilityComputationNairobiTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
 	@Test
-	public void runAccessibilityComputation() throws IOException {
+	public void runAccessibilityComputation() {
 		Double cellSize = 2000.;
 		boolean push2Geoserver = false; // set true for run on server
 		boolean createQGisOutput = true; // set false for run on server
@@ -102,13 +102,20 @@ public class AccessibilityComputationNairobiTest {
 		CoordinateTransformation transformation = TransformationFactory.getCoordinateTransformation(scenarioCRS, "EPSG:4326");
 		Coord southwest = transformation.transform(new Coord(envelope.getMinX(), envelope.getMinY()));
 		Coord northeast = transformation.transform(new Coord(envelope.getMaxX(), envelope.getMaxY()));
-//		URL osm = new URL("http://api.openstreetmap.org/api/0.6/map?bbox=" + southwest.getX() + "," + southwest.getY() + "," + northeast.getX() + "," + northeast.getY());
-		URL osm = new URL("http://overpass.osm.rambler.ru/cgi/xapi_meta?*[bbox=" + southwest.getX() + "," + southwest.getY() + "," + northeast.getX() + "," + northeast.getY() +"]");
-		HttpURLConnection connection = (HttpURLConnection) osm.openConnection();
-		HttpURLConnection connection2 = (HttpURLConnection) osm.openConnection(); // TODO There might be more elegant option without creating this twice
-	    Network network = AccessibilityNetworkUtils.createNetwork(connection.getInputStream(), scenarioCRS, true, true, false);
-	    double buildingTypeFromVicinityRange = 0.;
-		ActivityFacilities facilities = RunCombinedOsmReaderKibera.createFacilites(connection2.getInputStream(), scenarioCRS, buildingTypeFromVicinityRange);
+		Network network = null;
+		ActivityFacilities facilities = null;
+		try {
+//			URL osm = new URL("http://api.openstreetmap.org/api/0.6/map?bbox=" + southwest.getX() + "," + southwest.getY() + "," + northeast.getX() + "," + northeast.getY());
+			URL osm = new URL("http://overpass.osm.rambler.ru/cgi/xapi_meta?*[bbox=" + southwest.getX() + "," + southwest.getY() + "," + northeast.getX() + "," + northeast.getY() +"]");
+			HttpURLConnection connection = (HttpURLConnection) osm.openConnection();
+			HttpURLConnection connection2 = (HttpURLConnection) osm.openConnection(); // TODO There might be more elegant option without creating this twice
+		    network = AccessibilityNetworkUtils.createNetwork(connection.getInputStream(), scenarioCRS, true, true, false);
+		    double buildingTypeFromVicinityRange = 0.;
+			
+			facilities = RunCombinedOsmReaderKibera.createFacilites(connection2.getInputStream(), scenarioCRS, buildingTypeFromVicinityRange);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		// ---------- 
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -118,12 +125,6 @@ public class AccessibilityComputationNairobiTest {
 		
 		config.global().setCoordinateSystem(scenarioCRS);
 		
-		// ---------- Matrix-based pt
-//		String travelTimeMatrix = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/tt.csv";
-//		String travelDistanceMatrix = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/td.csv";
-//		String ptStops = "../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/IDs.csv";
-		// ----------
-		
 		AccessibilityConfigGroup acg = ConfigUtils.addOrGetModule(config, AccessibilityConfigGroup.class);
 		acg.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox);
 		acg.setEnvelope(envelope);
@@ -131,25 +132,8 @@ public class AccessibilityComputationNairobiTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, false);
-//		acg.setComputingAccessibilityForMode(Modes4Accessibility.matrixBasedPt, false);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false );
 		acg.setOutputCrs(scenarioCRS); // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		
-		// ---------- Matrix-based pt
-//		MatrixBasedPtRouterConfigGroup mbConfig = new MatrixBasedPtRouterConfigGroup();
-////		mbConfig.setPtStopsInputFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/IDs.csv");
-////		mbConfig.setPtTravelDistancesInputFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/td.csv");
-////		mbConfig.setPtTravelTimesInputFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/gtfs/matrix/temp/tt.csv");
-//		mbConfig.setPtStopsInputFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/otp_2015-06-16/fromIDs.csv");
-//		mbConfig.setPtTravelDistancesInputFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/otp_2015-06-16/td.csv");
-//		mbConfig.setPtTravelTimesInputFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/otp_2015-06-16/tt.csv");
-////		mbConfig.setPtStopsInputFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/example/ptStops.csv");
-////		mbConfig.setPtTravelDistancesInputFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/example/ptTravelInfo.csv");
-////		mbConfig.setPtTravelTimesInputFile("../../../shared-svn/projects/maxess/data/nairobi/digital_matatus/example/ptTravelInfo.csv");
-//		mbConfig.setUsingPtStops(true);
-//		mbConfig.setUsingTravelTimesAndDistances(true);
-//		config.addModule(mbConfig);
-		// ----------
 		
 		ConfigUtils.setVspDefaults(config);
 		
@@ -190,13 +174,6 @@ public class AccessibilityComputationNairobiTest {
 //		scenario.setTransitSchedule(schedule);
 //		scenario.setTransitVehicles(vehicles);
 		
-		// ---------- Matrix-based pt
-//		BoundingBox bb = new BoundingBox(envelope);
-////		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(scenario.getNetwork()), mbConfig);
-//		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), bb, mbConfig);
-//		scenario.addScenarioElement(PtMatrix.NAME, ptMatrix);
-		// ----------
-		
 		// Activity types
 //		final List<String> activityTypes = Arrays.asList(new String[]{"airport"});
 //		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING, FacilityTypes.EDUCATION});
@@ -222,15 +199,6 @@ public class AccessibilityComputationNairobiTest {
 			module.setPushing2Geoserver(push2Geoserver);
 			controler.addOverridingModule(module);
 		}
-
-		// ---------- Matrix-based pt
-//		controler.addOverridingModule(new AbstractModule() {
-//			@Override
-//			public void install() {
-//				bind(PtMatrix.class).toInstance(ptMatrix);
-//			}
-//		});
-		// ----------
 
 		controler.run();
 

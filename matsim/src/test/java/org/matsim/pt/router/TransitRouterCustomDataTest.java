@@ -106,13 +106,13 @@ public class TransitRouterCustomDataTest {
 		}
 		
 		@Override
-		public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
-			return routerDisutility.getTravelDisutility(person, coord, toCoord);
+		public double getWalkTravelDisutility(Person person, Coord coord, Coord toCoord) {
+			return routerDisutility.getWalkTravelDisutility(person, coord, toCoord);
 		}
 
 		@Override
-		public double getTravelTime(Person person, Coord coord, Coord toCoord) {
-			return routerDisutility.getTravelTime(person, coord, toCoord);
+		public double getWalkTravelTime(Person person, Coord coord, Coord toCoord) {
+			return routerDisutility.getWalkTravelTime(person, coord, toCoord);
 		}
 		
 	}
