@@ -127,13 +127,13 @@ final class WagonSimRouterNetworkTravelDistutilityAndTravelTime implements Trans
 	}
 
 	@Override
-	public double getTravelTime(Person person, Coord coord, Coord toCoord) {
-		return this.delegate.getTravelTime(person, coord, toCoord);
+	public double getWalkTravelTime(Person person, Coord coord, Coord toCoord) {
+		return this.delegate.getWalkTravelTime(person, coord, toCoord);
 	}
 
 	@Override
-	public double getTravelDisutility(Person person, Coord coord, Coord toCoord) {
-		return this.delegate.getTravelDisutility(person, coord, toCoord);
+	public double getWalkTravelDisutility(Person person, Coord coord, Coord toCoord) {
+		return this.delegate.getWalkTravelDisutility(person, coord, toCoord);
 	}
 	
 }
