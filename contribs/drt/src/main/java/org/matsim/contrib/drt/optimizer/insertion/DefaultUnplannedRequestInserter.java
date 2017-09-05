@@ -72,7 +72,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 
 		// TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
 		// PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
-		// preProcessDijkstra.run(network);
+		// preProcessDijkstra.run(routingNetwork);
 		PreProcessDijkstra preProcessDijkstra = null;
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(network);

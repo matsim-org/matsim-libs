@@ -38,9 +38,9 @@ import com.google.common.collect.Iterables;
  */
 public class AssignmentTaxiOptimizer extends AbstractTaxiOptimizer {
 	private final AssignmentTaxiOptimizerParams params;
-	private final FastMultiNodeDijkstra router;
-	private final BackwardFastMultiNodeDijkstra backwardRouter;
-	private final FastAStarEuclidean euclideanRouter;
+	private final FastMultiNodeDijkstra multiNodeRouter;
+	private final BackwardFastMultiNodeDijkstra backwardMultiNodeRouter;
+	private final LeastCostPathCalculator router;
 	private final VehicleAssignmentProblem<TaxiRequest> assignmentProblem;
 	private final TaxiToRequestAssignmentCostProvider assignmentCostProvider;
 
@@ -50,28 +50,24 @@ public class AssignmentTaxiOptimizer extends AbstractTaxiOptimizer {
 
 		// TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
 		// PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
-		// preProcessDijkstra.run(optimContext.network);
+		// preProcessDijkstra.run(routing network);
 		PreProcessDijkstra preProcessDijkstra = null;
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 
 		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(optimContext.network);
-		router = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility, optimContext.travelTime,
+		multiNodeRouter = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility, optimContext.travelTime,
 				preProcessDijkstra, fastRouterFactory, true);
 
-		RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory().createRoutingNetwork(optimContext.network);
-		backwardRouter = new BackwardFastMultiNodeDijkstra(inverseRoutingNetwork, optimContext.travelDisutility,
+		RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory()
+				.createRoutingNetwork(optimContext.network);
+		backwardMultiNodeRouter = new BackwardFastMultiNodeDijkstra(inverseRoutingNetwork, optimContext.travelDisutility,
 				optimContext.travelTime, preProcessDijkstra, fastRouterFactory, true);
 
-		PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(optimContext.travelDisutility);
-		preProcessEuclidean.run(optimContext.network);
-
-		RoutingNetwork euclideanRoutingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(optimContext.network);
-		euclideanRouter = new FastAStarEuclidean(euclideanRoutingNetwork, preProcessEuclidean,
-				optimContext.travelDisutility, optimContext.travelTime,
-				optimContext.scheduler.getParams().AStarEuclideanOverdoFactor, fastRouterFactory);
+		router = new FastAStarEuclideanFactory().createPathCalculator(optimContext.network,
+				optimContext.travelDisutility, optimContext.travelTime);
 
 		assignmentProblem = new VehicleAssignmentProblem<>(optimContext.travelTime, getRouter(), getBackwardRouter(),
-				euclideanRouter, params.nearestRequestsLimit, params.nearestVehiclesLimit);
+				router, params.nearestRequestsLimit, params.nearestVehiclesLimit);
 
 		assignmentCostProvider = new TaxiToRequestAssignmentCostProvider(params);
 	}
@@ -107,10 +103,10 @@ public class AssignmentTaxiOptimizer extends AbstractTaxiOptimizer {
 	}
 
 	protected MultiNodePathCalculator getRouter() {
-		return router;
+		return multiNodeRouter;
 	}
 
 	protected BackwardMultiNodePathCalculator getBackwardRouter() {
-		return backwardRouter;
+		return backwardMultiNodeRouter;
 	}
 }
