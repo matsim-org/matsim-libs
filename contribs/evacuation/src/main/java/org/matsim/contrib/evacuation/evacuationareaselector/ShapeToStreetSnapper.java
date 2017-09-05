@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.evacuation.control.helper.Algorithms;
 import org.matsim.contrib.evacuation.control.helper.shapetostreetsnapper.LinkSorter;
 import org.matsim.contrib.evacuation.control.helper.shapetostreetsnapper.TravelCost;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
@@ -96,7 +96,7 @@ public class ShapeToStreetSnapper {
 		List<Node> nodes  = getBoundaryNodes(p);
 		FreeSpeedTravelTime fs = new FreeSpeedTravelTime();
 		TravelDisutility cost = new TravelCost(p);
-		LeastCostPathCalculator dijkstra = new Dijkstra(this.sc.getNetwork(), cost, fs);
+		LeastCostPathCalculator dijkstra = new DijkstraFactory().createPathCalculator(this.sc.getNetwork(), cost, fs);
 		
 		List<Node> finalNodes = new ArrayList<Node>();
 		for (int i = 1; i < nodes.size(); i++) {

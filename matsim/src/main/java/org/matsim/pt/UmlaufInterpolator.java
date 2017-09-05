@@ -1,5 +1,7 @@
 package org.matsim.pt;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -7,14 +9,11 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-
-import java.util.List;
 
 public class UmlaufInterpolator {
 
@@ -25,7 +24,7 @@ public class UmlaufInterpolator {
 		super();
 		this.network = network;
         FreespeedTravelTimeAndDisutility travelTimes = new FreespeedTravelTimeAndDisutility(config);
-		this.routingAlgo = new Dijkstra(network, travelTimes, travelTimes);
+		this.routingAlgo = new DijkstraFactory().createPathCalculator(network, travelTimes, travelTimes);
 	}
 
 	public void addUmlaufStueckToUmlauf(UmlaufStueck umlaufStueck, Umlauf umlauf) {

@@ -21,18 +21,28 @@ package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.DriveTaskImpl;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.DijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import com.google.inject.Inject;
@@ -56,7 +66,7 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 	public OneTaxiOptimizer(@Named(DvrpModule.DVRP_ROUTING) Network network, Fleet fleet, QSim qSim) {
 		timer = qSim.getSimTimer();
 		travelTime = new FreeSpeedTravelTime();
-		router = new Dijkstra(network, new TimeAsTravelDisutility(travelTime), travelTime);
+		router = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime), travelTime);
 
 		vehicle = fleet.getVehicles().values().iterator().next();
 		vehicle.resetSchedule();

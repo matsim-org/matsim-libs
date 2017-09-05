@@ -140,6 +140,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @param timeFunction
 	 *            Determines the travel time on links.
 	 */
+	// please use DijkstraFactory when you want to create an instance of this
 	protected Dijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction) {
 		this(network, costFunction, timeFunction, null);
 	}
@@ -156,6 +157,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @param preProcessData
 	 *            The pre processing data used during the routing phase.
 	 */
+	// please use DijkstraFactory when you want to create an instance of this
 	protected Dijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
 			final PreProcessDijkstra preProcessData) {
 

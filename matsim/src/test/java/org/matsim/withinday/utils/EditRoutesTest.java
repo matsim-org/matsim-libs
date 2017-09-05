@@ -34,20 +34,18 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.population.routes.RouteFactories;
+import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterModule;
@@ -450,7 +448,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		
 		TravelTime timeFunction = new FreeSpeedTravelTime() ;
 		TravelDisutility costFunction = new OnlyTimeDependentTravelDisutility( timeFunction ) ;
-		this.pathCalculator = new Dijkstra(scenario.getNetwork(), costFunction, timeFunction) ;
+		this.pathCalculator = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), costFunction, timeFunction) ;
 		
 		this.routeFactory = ((PopulationFactory)scenario.getPopulation().getFactory()).getRouteFactories() ;
 	}
