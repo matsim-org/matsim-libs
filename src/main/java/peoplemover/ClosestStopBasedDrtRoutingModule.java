@@ -40,7 +40,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.GenericRouteImpl;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -108,7 +108,7 @@ public class ClosestStopBasedDrtRoutingModule implements RoutingModule {
 		drtInt1.setLinkId(accessFacility.getLinkId());
 		legList.add(drtInt1);
 
-		Route drtRoute = new GenericRouteImpl(accessFacility.getLinkId(), egressFacility.getLinkId());
+		Route drtRoute = RouteUtils.createGenericRouteImpl(accessFacility.getLinkId(), egressFacility.getLinkId());
 		drtRoute.setDistance(drtconfig.getEstimatedBeelineDistanceFactor()
 				* CoordUtils.calcEuclideanDistance(accessFacility.getCoord(), egressFacility.getCoord()));
 		drtRoute.setTravelTime(drtRoute.getDistance() / drtconfig.getEstimatedDrtSpeed());
