@@ -6,9 +6,10 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JToggleButton;
 
-import playground.clruch.net.ObjectClient;
+import playground.clib.util.net.ObjectClient;
+import playground.clib.util.net.ObjectHandler;
 import playground.clruch.net.SimulationObject;
-import playground.clruch.net.SimulationSubscriber;
+import playground.clruch.net.SimulationServer;
 
 /* package */ class MatsimToggleButton extends JToggleButton {
 
@@ -27,10 +28,10 @@ import playground.clruch.net.SimulationSubscriber;
                             client.close();
                             client = null;
                         }
-                        client = new ObjectClient("localhost", new SimulationSubscriber() {
+                        client = new ObjectClient("localhost", SimulationServer.OBJECT_SERVER_PORT, new ObjectHandler() {
                             @Override
-                            public void handle(SimulationObject simulationObject) {
-                                matsimJMapViewer.setSimulationObject(simulationObject);
+                            public void handle(Object simulationObject) {
+                                matsimJMapViewer.setSimulationObject((SimulationObject) simulationObject);
                             }
                         });
                     } catch (Exception exception) {
