@@ -55,8 +55,7 @@ public class EmptyVehicleRelocator {
 		preProcessEuclidean.run(network);
 
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessEuclidean)
-				.createRoutingNetwork(network);
+		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(network);
 
 		router = new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelDisutility, travelTime, 2.,
 				fastRouterFactory);

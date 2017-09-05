@@ -51,7 +51,7 @@ public class BackwardsFastMultiNodeDijkstraFactory implements LeastCostPathCalcu
 		this.searchAllEndNodes = searchAllEndNodes;
 		
 		this.routingNetworks = new HashMap<>();
-		this.routingNetworkFactory = new InverseArrayRoutingNetworkFactory(preProcessData);
+		this.routingNetworkFactory = new InverseArrayRoutingNetworkFactory();
 	}
 
 	@Override

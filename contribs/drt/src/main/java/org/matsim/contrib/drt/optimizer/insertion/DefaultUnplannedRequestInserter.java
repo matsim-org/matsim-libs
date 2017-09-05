@@ -75,10 +75,8 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		// preProcessDijkstra.run(network);
 		PreProcessDijkstra preProcessDijkstra = null;
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessDijkstra)
-				.createRoutingNetwork(network);
-		RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory(preProcessDijkstra)
-				.createRoutingNetwork(network);
+		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(network);
+		RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory().createRoutingNetwork(network);
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 
 		SingleVehicleInsertionProblem[] singleVehicleInsertionProblems = new SingleVehicleInsertionProblem[drtCfg

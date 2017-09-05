@@ -53,8 +53,7 @@ public class BestDispatchFinder {
 		PreProcessDijkstra preProcessDijkstra = null;
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 
-		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessDijkstra)
-				.createRoutingNetwork(optimContext.network);
+		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(optimContext.network);
 		router = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility, optimContext.travelTime,
 				preProcessDijkstra, fastRouterFactory, false);
 	}

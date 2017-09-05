@@ -54,21 +54,18 @@ public class AssignmentTaxiOptimizer extends AbstractTaxiOptimizer {
 		PreProcessDijkstra preProcessDijkstra = null;
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 
-		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory(preProcessDijkstra)
-				.createRoutingNetwork(optimContext.network);
+		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(optimContext.network);
 		router = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility, optimContext.travelTime,
 				preProcessDijkstra, fastRouterFactory, true);
 
-		RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory(preProcessDijkstra)
-				.createRoutingNetwork(optimContext.network);
+		RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory().createRoutingNetwork(optimContext.network);
 		backwardRouter = new BackwardFastMultiNodeDijkstra(inverseRoutingNetwork, optimContext.travelDisutility,
 				optimContext.travelTime, preProcessDijkstra, fastRouterFactory, true);
 
 		PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(optimContext.travelDisutility);
 		preProcessEuclidean.run(optimContext.network);
 
-		RoutingNetwork euclideanRoutingNetwork = new ArrayRoutingNetworkFactory(preProcessEuclidean)
-				.createRoutingNetwork(optimContext.network);
+		RoutingNetwork euclideanRoutingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(optimContext.network);
 		euclideanRouter = new FastAStarEuclidean(euclideanRoutingNetwork, preProcessEuclidean,
 				optimContext.travelDisutility, optimContext.travelTime,
 				optimContext.scheduler.getParams().AStarEuclideanOverdoFactor, fastRouterFactory);
