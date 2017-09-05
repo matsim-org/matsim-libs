@@ -38,7 +38,7 @@ import java.util.ArrayList;
  */
 public class BackwardFastMultiNodeDijkstra extends FastMultiNodeDijkstra implements BackwardMultiNodePathCalculator {
 	
-	public BackwardFastMultiNodeDijkstra(final RoutingNetwork routingNetwork, final TravelDisutility costFunction,
+	BackwardFastMultiNodeDijkstra(final RoutingNetwork routingNetwork, final TravelDisutility costFunction,
 			final TravelTime timeFunction, final PreProcessDijkstra preProcessData, 
 			final FastRouterDelegateFactory fastRouterFactory, boolean searchAllEndNodes) {
 		super(routingNetwork, costFunction, timeFunction, preProcessData, fastRouterFactory, searchAllEndNodes);
