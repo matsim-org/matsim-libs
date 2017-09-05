@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MultiNodeDijkstraFactory.java
+ * DijkstraFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,37 +18,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.util;
+package org.matsim.core.router;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.router.MultiNodeDijkstra;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PreProcessDijkstra;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
-public class MultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory {
+@Singleton
+public class DijkstraFactory implements LeastCostPathCalculatorFactory {
 
-	private final boolean searchAllEndNodes;
 	private final boolean usePreProcessData;
 	private final Map<Network, PreProcessDijkstra> preProcessData = new HashMap<>();
-	
-	public MultiNodeDijkstraFactory() {
-		this.searchAllEndNodes = false;
-		this.usePreProcessData = false;
-	}
-	
-	public MultiNodeDijkstraFactory(final boolean searchAllEndNodes) {
-		this.searchAllEndNodes = searchAllEndNodes;
+
+	@Inject
+	public DijkstraFactory() {
 		this.usePreProcessData = false;
 	}
 
-	public MultiNodeDijkstraFactory(final boolean usePreProcessData, final boolean searchAllEndNodes) {
+	public DijkstraFactory(final boolean usePreProcessData) {
 		this.usePreProcessData = usePreProcessData;
-		this.searchAllEndNodes = searchAllEndNodes;
 	}
 
+	// yy there is no guarantee that "createPathCalculator" is called with the same network as the one that was used for "preProcessData".
+	// This can happen for example when LinkToLink routing is switched on.  kai & theresa, feb'15
+	// To fix this, we create the PreProcessData when the first LeastCostPathCalculator object is created and store it in a map using
+	// the network as key. For the PreProcessDijkstra data this is fine, since it does not take travel times and disutilities into account.
+	// For the AStarLandmarks data, we would have to include the other two arguments into the lookup value as well... cdobler, sep'17 
 	@Override
-	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {		
+	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		if (this.usePreProcessData) {
 			PreProcessDijkstra preProcessDijkstra = this.preProcessData.get(network);
 			if (preProcessDijkstra == null) {
@@ -56,9 +62,8 @@ public class MultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory 
 				preProcessDijkstra.run(network);
 				this.preProcessData.put(network, preProcessDijkstra);
 			}
-			return new MultiNodeDijkstra(network, travelCosts, travelTimes, preProcessDijkstra, this.searchAllEndNodes);
+			return new Dijkstra(network, travelCosts, travelTimes, preProcessDijkstra);
 		}
-		
-		return new MultiNodeDijkstra(network, travelCosts, travelTimes, this.searchAllEndNodes);
+		return new Dijkstra(network, travelCosts, travelTimes);
 	}
 }

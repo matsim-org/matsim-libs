@@ -56,7 +56,7 @@ public class FastDijkstra extends Dijkstra {
 	 * Create the routing network here and clear the nodeData map 
 	 * which is not used by this implementation.
 	 */
-	public FastDijkstra(final RoutingNetwork routingNetwork, final TravelDisutility costFunction, final TravelTime timeFunction,
+	FastDijkstra(final RoutingNetwork routingNetwork, final TravelDisutility costFunction, final TravelTime timeFunction,
 			final PreProcessDijkstra preProcessData, final FastRouterDelegateFactory fastRouterFactory) {
 		super(routingNetwork, costFunction, timeFunction, preProcessData);
 		

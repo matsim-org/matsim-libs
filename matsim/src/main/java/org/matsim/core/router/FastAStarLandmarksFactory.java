@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.util;
+package org.matsim.core.router;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,10 +27,15 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.router.ArrayFastRouterDelegateFactory;
-import org.matsim.core.router.FastAStarLandmarks;
-import org.matsim.core.router.FastRouterDelegateFactory;
-import org.matsim.core.router.FastRouterType;
+import org.matsim.core.router.util.ArrayRoutingNetworkFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PreProcessLandmarks;
+import org.matsim.core.router.util.RoutingNetwork;
+import org.matsim.core.router.util.RoutingNetworkFactory;
+import org.matsim.core.router.util.RoutingNetworkNode;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author cdobler

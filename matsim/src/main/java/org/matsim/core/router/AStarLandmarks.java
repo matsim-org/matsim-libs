@@ -79,7 +79,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @param timeFunction Calculates the travel time on links.
 	 * @param costFunction Calculates the travel cost on links.
 	 */
-	public AStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
+	AStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
 			final TravelDisutility costFunction, final TravelTime timeFunction) {
 		this(network, preProcessData, costFunction, timeFunction, 1);
 	}
@@ -90,7 +90,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @param preProcessData The pre-process data (containing the landmarks etc.).
 	 * @param timeFunction Calculates the travel time on links.
 	 */
-	public AStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
+	AStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
 			final TravelTime timeFunction) {
 		this(network, preProcessData, preProcessData.getCostFunction(), timeFunction, 1);
 	}
@@ -107,7 +107,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * least-cost paths. Rather it tends to return distance-minimal paths.
 	 * @see #AStarLandmarks(Network, PreProcessLandmarks, TravelTime)
 	 */
-	public AStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
+	AStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
 			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor) {
 		super(network, preProcessData, costFunction, timeFunction, overdoFactor);
 

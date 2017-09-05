@@ -17,13 +17,17 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.router.util;
+package org.matsim.core.router;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.router.AStarEuclidean;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PreProcessEuclidean;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author dgrether

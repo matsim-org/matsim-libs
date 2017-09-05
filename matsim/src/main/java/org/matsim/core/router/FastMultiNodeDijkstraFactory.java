@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FastDijkstraFactory.java
+ * FastMultiNodeDijkstraFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,54 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.util;
-
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.router.ArrayFastRouterDelegateFactory;
-import org.matsim.core.router.FastDijkstra;
-import org.matsim.core.router.FastRouterDelegateFactory;
-import org.matsim.core.router.FastRouterType;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
+package org.matsim.core.router;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Singleton
-public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.router.util.ArrayRoutingNetworkFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PreProcessDijkstra;
+import org.matsim.core.router.util.RoutingNetwork;
+import org.matsim.core.router.util.RoutingNetworkFactory;
+import org.matsim.core.router.util.RoutingNetworkNode;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
+
+public class FastMultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory {
 	
+	private final boolean searchAllEndNodes;
 	private final boolean usePreProcessData;
 	private final RoutingNetworkFactory routingNetworkFactory;
 	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
 	private final Map<Network, PreProcessDijkstra> preProcessData = new HashMap<>();
-
-	@Inject
-	public FastDijkstraFactory() {
-		this(false, FastRouterType.ARRAY);
+	
+	public FastMultiNodeDijkstraFactory() {
+		this(false);
 	}
-
-    public FastDijkstraFactory(final boolean usePreProcessData) {
-		this(usePreProcessData, FastRouterType.ARRAY);
+	
+	public FastMultiNodeDijkstraFactory(boolean searchAllEndNodes) {
+		this(false, searchAllEndNodes);
 	}
-
-	private FastDijkstraFactory(final boolean usePreProcessData, final FastRouterType fastRouterType) {
+		
+	public FastMultiNodeDijkstraFactory(final boolean usePreProcessData, final boolean searchAllEndNodes) {
 		this.usePreProcessData = usePreProcessData;
-				
-		switch (fastRouterType) {
-		case ARRAY:
-			this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
-			break;
-		case POINTER:
-			throw new RuntimeException("PointerRoutingNetworks are no longer supported. "
-					+ "Use ArrayRoutingNetworks instead. Aborting!");
-		default:
-			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
-		}
+		this.searchAllEndNodes = searchAllEndNodes;
+		this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
 	}
 
 	@Override
 	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
+		
 		RoutingNetwork routingNetwork = this.routingNetworks.get(network);
 		PreProcessDijkstra preProcessDijkstra = this.preProcessData.get(network);
 
@@ -89,6 +82,6 @@ public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
 		}
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 		
-		return new FastDijkstra(routingNetwork, travelCosts, travelTimes, preProcessDijkstra, fastRouterFactory);
+		return new FastMultiNodeDijkstra(routingNetwork, travelCosts, travelTimes, preProcessDijkstra, fastRouterFactory, this.searchAllEndNodes);
 	}
 }
