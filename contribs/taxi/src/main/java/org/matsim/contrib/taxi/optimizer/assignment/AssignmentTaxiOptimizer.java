@@ -19,17 +19,25 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
-import java.util.*;
+import java.util.List;
+import java.util.TreeSet;
 
 import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiries;
-import org.matsim.contrib.locationchoice.router.*;
+import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
+import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
+import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizer;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
+import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
+import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.assignment.VehicleAssignmentProblem.AssignmentCost;
-import org.matsim.core.router.*;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.FastAStarEuclideanFactory;
+import org.matsim.core.router.FastMultiNodeDijkstra;
+import org.matsim.core.router.FastMultiNodeDijkstraFactory;
+import org.matsim.core.router.MultiNodePathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 
 import com.google.common.collect.Iterables;
 
@@ -51,7 +59,7 @@ public class AssignmentTaxiOptimizer extends AbstractTaxiOptimizer {
 		multiNodeRouter = (FastMultiNodeDijkstra)new FastMultiNodeDijkstraFactory(true)
 				.createPathCalculator(optimContext.network, optimContext.travelDisutility, optimContext.travelTime);
 
-		backwardMultiNodeRouter = (BackwardFastMultiNodeDijkstra)new BackwardsFastMultiNodeDijkstraFactory(true)
+		backwardMultiNodeRouter = (BackwardFastMultiNodeDijkstra)new BackwardFastMultiNodeDijkstraFactory(true)
 				.createPathCalculator(optimContext.network, optimContext.travelDisutility, optimContext.travelTime);
 
 		router = new FastAStarEuclideanFactory().createPathCalculator(optimContext.network,

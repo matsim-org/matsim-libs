@@ -39,6 +39,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.FastMultiNodeDijkstra;
+import org.matsim.core.router.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.misc.Time;
@@ -76,7 +77,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		for (int i = 0; i < singleVehicleInsertionProblems.length; i++) {
 			FastMultiNodeDijkstra router = (FastMultiNodeDijkstra)new FastMultiNodeDijkstraFactory(true)
 					.createPathCalculator(network, travelDisutility, travelTime);
-			BackwardFastMultiNodeDijkstra backwardRouter = (BackwardFastMultiNodeDijkstra)new BackwardsFastMultiNodeDijkstraFactory(
+			BackwardFastMultiNodeDijkstra backwardRouter = (BackwardFastMultiNodeDijkstra)new BackwardFastMultiNodeDijkstraFactory(
 					true).createPathCalculator(network, travelDisutility, travelTime);
 			singleVehicleInsertionProblems[i] = new SingleVehicleInsertionProblem(router, backwardRouter,
 					drtCfg.getStopDuration(), drtCfg.getMaxWaitTime(), mobsimTimer);
