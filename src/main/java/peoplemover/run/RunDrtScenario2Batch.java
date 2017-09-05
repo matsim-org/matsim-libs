@@ -22,12 +22,15 @@ package peoplemover.run;
 import java.util.Arrays;
 import java.util.List;
 
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalModule;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.optimizer.rebalancing.DemandBasedRebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 //import org.matsim.contrib.av.robotaxi.run.RunRobotaxiExample;
 import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -48,40 +51,60 @@ public class RunDrtScenario2Batch {
 
 	public static void main(String[] args) {
 		//Define Iteration list
-		List<String> strings = Arrays.asList("0.5");
+		List<String> strings = Arrays.asList("0.3");
 //		List<String> strings = Arrays.asList("0.1", "0.3","0.5");
 
 
 		for (String Element : strings){
 			//Define the path to the config file and enable / disable otfvis
 			//Basis configuration
-			final Config config = ConfigUtils.loadConfig("D:/runs-svn/vw_rufbus/data_from_Vw/package/config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+			final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 			boolean otfvis = false;
 			
 	
 			//Overwrite existing configuration parameters
-			config.controler().setLastIteration(10);
+			config.controler().setLastIteration(4);
 			config.controler().setWriteEventsInterval(1);
 			config.controler().setWritePlansInterval(1);
-			config.controler().setOutputDirectory("D:/runs-svn/vw_rufbus/data_from_Vw/package/"+Element.toString()+"_nextStation_default/output/");
-			config.plans().setInputFile("D:/runs-svn/vw_rufbus/data_from_Vw/package/population/run124.100.output_plans_DRT"+Element.toString()+".xml.gz");
+			config.controler().setOutputDirectory("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/"+Element.toString()+"/output/");
+			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/population/run124.100.output_plans_DRT0.3.xml.gz");
+//			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/drt_population_iteration/population/run124.100.output_plans.xml.gz");
 			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
-			drt.setkNearestVehicles(150);
+			drt.setkNearestVehicles(90);
+			//fuehrt ein re-balancing im 30 minuten takt durch. hoehere Taktung ist nicht sinnvoll, da die Nachfrage in Halbstundenscheiben gespeichert wird.
+			drt.setRebalancingInterval(1800);
+			
 			//Initialize the controller
 			Controler controler = createControler(config, otfvis);
 			
+			
+			//erstellt ein Grid mit einer Kantenlänge von 2000m über das gesamte Netz. Ggf. einen höheren Parameter wählen.
+			DrtZonalSystem zones = new DrtZonalSystem(controler.getScenario().getNetwork(), 2000);
+
 			controler.addOverridingModule(new AbstractModule() {
+		
 				@Override
 				public void install() {
-					addRoutingModuleBinding(DvrpConfigGroup.get(config).getMode())
-							.to(ClosestStopBasedDrtRoutingModule.class);
-					DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.3);
-					
+					bind(DrtZonalSystem.class).toInstance(zones);
+					bind(RebalancingStrategy.class).to(DemandBasedRebalancingStrategy.class).asEagerSingleton();
 				}
 			});
+			controler.addOverridingModule(new DrtZonalModule());
+			
+			
+//			controler.addOverridingModule(new AbstractModule() {
+//				@Override
+//				public void install() {
+//					addRoutingModuleBinding(DvrpConfigGroup.get(config).getMode())
+//							.to(ClosestStopBasedDrtRoutingModule.class);
+//					DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.3);
+//					
+//				}
+//			});
 	
 			controler.run();
 
 	}
 	}
 }
+

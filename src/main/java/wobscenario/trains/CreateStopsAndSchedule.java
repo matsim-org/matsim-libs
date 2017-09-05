@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
@@ -144,7 +144,7 @@ public class CreateStopsAndSchedule {
 			Id<Link> end = links.get(links.size() - 1);
 			links.remove(start);
 			links.remove(end);
-			NetworkRoute route = new LinkNetworkRouteImpl(start, links, end);
+			NetworkRoute route = RouteUtils.createLinkNetworkRouteImpl(start, links, end);
 			final TransitRoute troute = transitScheduleFactory
 					.createTransitRoute(Id.create(lineString, TransitRoute.class), route, stops, "pt");
 

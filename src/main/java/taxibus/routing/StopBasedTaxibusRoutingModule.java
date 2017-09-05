@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
@@ -106,7 +107,7 @@ public class StopBasedTaxibusRoutingModule implements RoutingModule {
 		drtInt1.setMaximumDuration(1);
 		drtInt1.setLinkId(accessFacility.getLinkId());
 		legList.add(drtInt1);
-
+		
 		Route drtRoute = RouteUtils.createGenericRouteImpl(accessFacility.getLinkId(), egressFacility.getLinkId());
 		drtRoute.setDistance(1.3* CoordUtils.calcEuclideanDistance(accessFacility.getCoord(), egressFacility.getCoord()));
 		drtRoute.setTravelTime(drtRoute.getDistance() / 11.1111);
