@@ -75,7 +75,7 @@ public final class Config implements MatsimExtensionPoint {
 	// ////////////////////////////////////////////////////////////////////
 
 	/** Map of all config-groups known to this instance. */
-	private final TreeMap<String, ConfigGroup> modules = new TreeMap<String, ConfigGroup>();
+	private final TreeMap<String, ConfigGroup> modules = new TreeMap<>();
 
 	/*
 	 * the following members are for the direct access to the core config
