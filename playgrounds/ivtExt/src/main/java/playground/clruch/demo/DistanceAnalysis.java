@@ -12,13 +12,13 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Range;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.Pretty;
-import playground.clib.util.NetworkLoader;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
 import playground.clruch.net.VehicleStatistic;
+import playground.clruch.utils.NetworkLoader;
 
 /**
  * THIS FILE IS A CONCISE DEMO OF FUNCTIONALITY

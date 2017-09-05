@@ -8,8 +8,8 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clib.util.VrpPathUtils;
 import playground.clruch.router.FuturePathContainer;
+import playground.clruch.utils.VrpPathUtils;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;

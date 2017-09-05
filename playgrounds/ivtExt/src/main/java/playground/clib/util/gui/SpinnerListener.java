@@ -1,5 +1,5 @@
 // code by jph
-package playground.clruch.utils.gui;
+package playground.clib.util.gui;
 
 public interface SpinnerListener<Type> {
   void actionPerformed(Type myType);

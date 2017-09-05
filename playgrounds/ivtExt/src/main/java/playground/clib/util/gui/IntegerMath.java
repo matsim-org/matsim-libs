@@ -1,6 +1,6 @@
 // code by jph
 // http://stackoverflow.com/questions/3305059/how-do-you-calculate-log-base-2-in-java-for-integers
-package playground.clruch.utils.gui;
+package playground.clib.util.gui;
 
 import java.util.Collection;
 

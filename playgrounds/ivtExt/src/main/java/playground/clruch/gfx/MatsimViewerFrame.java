@@ -24,6 +24,8 @@ import javax.swing.JToolBar;
 import org.matsim.api.core.v01.Coord;
 
 import ch.ethz.idsc.tensor.RealScalar;
+import playground.clib.util.gui.RowPanel;
+import playground.clib.util.gui.SpinnerLabel;
 import playground.clruch.jmapviewer.Coordinate;
 import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.jmapviewer.interfaces.ICoordinate;
@@ -31,8 +33,6 @@ import playground.clruch.net.DummyStorageSupplier;
 import playground.clruch.net.IterationFolder;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.StorageUtils;
-import playground.clruch.utils.gui.RowPanel;
-import playground.clruch.utils.gui.SpinnerLabel;
 
 /**
  * Demonstrates the usage of {@link JMapViewer}

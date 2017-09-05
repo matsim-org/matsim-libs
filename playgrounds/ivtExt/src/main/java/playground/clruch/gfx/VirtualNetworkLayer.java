@@ -17,14 +17,14 @@ import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.red.Max;
+import playground.clib.util.gui.RowPanel;
+import playground.clib.util.gui.SpinnerLabel;
 import playground.clruch.gheat.graphics.ColorSchemes;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
-import playground.clruch.utils.gui.RowPanel;
-import playground.clruch.utils.gui.SpinnerLabel;
 
 public class VirtualNetworkLayer extends ViewerLayer {
     public static final Color COLOR = new Color(128, 153 / 2, 0, 128);

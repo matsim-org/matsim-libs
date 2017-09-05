@@ -16,8 +16,8 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clib.util.SafeConfig;
 import playground.clruch.utils.AVTaskAdapter;
+import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;

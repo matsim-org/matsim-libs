@@ -23,7 +23,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clib.util.SafeConfig;
 import playground.clruch.net.SimulationDistribution;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationObjectCompiler;
@@ -31,6 +30,7 @@ import playground.clruch.net.SimulationObjects;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
 import playground.clruch.utils.AVTaskAdapter;
+import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.dispatcher.AbstractDispatcher;

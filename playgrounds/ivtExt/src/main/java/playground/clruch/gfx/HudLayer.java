@@ -7,10 +7,10 @@ import java.awt.Point;
 
 import javax.swing.JCheckBox;
 
+import playground.clib.util.gui.GraphicsUtil;
+import playground.clib.util.gui.RowPanel;
+import playground.clib.util.gui.SpinnerLabel;
 import playground.clruch.net.SimulationObject;
-import playground.clruch.utils.gui.GraphicsUtil;
-import playground.clruch.utils.gui.RowPanel;
-import playground.clruch.utils.gui.SpinnerLabel;
 
 /**
  * Head Up Display

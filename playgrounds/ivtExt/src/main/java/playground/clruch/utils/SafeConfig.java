@@ -1,5 +1,5 @@
 // code by jph
-package playground.clib.util;
+package playground.clruch.utils;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
 

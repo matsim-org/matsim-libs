@@ -1,5 +1,5 @@
 // code by jph
-package playground.clruch.utils.gui;
+package playground.clib.util.gui;
 
 import java.awt.Component;
 import java.awt.Point;

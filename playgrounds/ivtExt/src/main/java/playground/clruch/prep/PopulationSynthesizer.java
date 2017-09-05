@@ -16,7 +16,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.clib.util.GZHandler;
+import ch.ethz.idsc.queuey.util.GZHandler;
 
 /**
  * Created by Claudio on 1/4/2017.

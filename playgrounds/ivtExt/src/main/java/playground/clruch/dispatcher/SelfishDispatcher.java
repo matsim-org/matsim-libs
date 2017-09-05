@@ -20,11 +20,11 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clib.util.SafeConfig;
 import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
+import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;

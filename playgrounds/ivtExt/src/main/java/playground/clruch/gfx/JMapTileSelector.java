@@ -3,6 +3,7 @@ package playground.clruch.gfx;
 
 import java.awt.Dimension;
 
+import playground.clib.util.gui.SpinnerLabel;
 import playground.clruch.jmapviewer.JMapViewer;
 import playground.clruch.jmapviewer.interfaces.TileSource;
 import playground.clruch.jmapviewer.tilesources.BingAerialTileSource;
@@ -20,7 +21,6 @@ import playground.clruch.jmapviewer.tilesources.MapnikTileSource;
 import playground.clruch.jmapviewer.tilesources.OpenCycleTileSource;
 import playground.clruch.jmapviewer.tilesources.WatercolorTileSource;
 import playground.clruch.jmapviewer.tilesources.WikimediaTileSource;
-import playground.clruch.utils.gui.SpinnerLabel;
 
 /* package */ class JMapTileSelector {
     public static SpinnerLabel<TileSource> create(JMapViewer jMapViewer) {
