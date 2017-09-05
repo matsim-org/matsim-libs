@@ -42,7 +42,7 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 	}
 
 	@Override
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
+	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		PreProcessLandmarks preProcessLandmarks = this.preProcessData.get(network);
 		if (preProcessLandmarks == null) {
 			preProcessLandmarks = new PreProcessLandmarks(travelCosts);
@@ -54,5 +54,4 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 		final double overdoFactor = 1.0;
 		return new AStarLandmarks(network, preProcessLandmarks, travelCosts, travelTimes, overdoFactor);
 	}
-
 }

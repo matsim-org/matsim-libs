@@ -33,7 +33,7 @@ public class AStarEuclideanFactory implements LeastCostPathCalculatorFactory {
 	private final Map<Network, PreProcessEuclidean> preProcessData = new HashMap<>();
 
 	@Override
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
+	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		PreProcessEuclidean preProcessEuclidean = this.preProcessData.get(network);
 		if (preProcessEuclidean == null) {
 			preProcessEuclidean = new PreProcessEuclidean(travelCosts);
@@ -44,5 +44,4 @@ public class AStarEuclideanFactory implements LeastCostPathCalculatorFactory {
 		final double overdoFactor = 1.0;
 		return new AStarEuclidean(network, preProcessEuclidean, travelCosts, travelTimes, overdoFactor);
 	}
-
 }
