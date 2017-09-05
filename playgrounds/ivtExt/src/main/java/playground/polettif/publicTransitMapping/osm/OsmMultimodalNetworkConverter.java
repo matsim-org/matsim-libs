@@ -21,6 +21,12 @@
 
 package playground.polettif.publicTransitMapping.osm;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -34,15 +40,14 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
+
 import playground.polettif.publicTransitMapping.config.OsmConverterConfigGroup;
 import playground.polettif.publicTransitMapping.osm.lib.OsmParser;
 import playground.polettif.publicTransitMapping.osm.lib.OsmParserHandler;
-import playground.polettif.publicTransitMapping.osm.lib.TagFilter;
 import playground.polettif.publicTransitMapping.osm.lib.OsmTag;
 import playground.polettif.publicTransitMapping.osm.lib.OsmValue;
+import playground.polettif.publicTransitMapping.osm.lib.TagFilter;
 import playground.polettif.publicTransitMapping.tools.NetworkTools;
-
-import java.util.*;
 
 /**
  * Implemenation of a network converter. Modified version from {@link org.matsim.core.utils.io.OsmNetworkReader}

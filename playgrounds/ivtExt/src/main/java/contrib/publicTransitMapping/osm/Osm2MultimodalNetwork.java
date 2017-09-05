@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
+
 import contrib.publicTransitMapping.config.CreateDefaultOsmConfig;
 import contrib.publicTransitMapping.config.OsmConverterConfigGroup;
 import contrib.publicTransitMapping.tools.NetworkTools;

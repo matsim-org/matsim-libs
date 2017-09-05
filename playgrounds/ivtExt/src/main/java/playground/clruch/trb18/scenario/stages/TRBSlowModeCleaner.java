@@ -1,5 +1,7 @@
 package playground.clruch.trb18.scenario.stages;
 
+import java.util.Iterator;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -13,8 +15,6 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
-import java.util.Iterator;
 
 public class TRBSlowModeCleaner {
     final static private Logger logger = Logger.getLogger(TRBSlowModeCleaner.class);

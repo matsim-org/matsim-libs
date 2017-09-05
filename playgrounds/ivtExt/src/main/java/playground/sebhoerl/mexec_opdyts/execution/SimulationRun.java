@@ -1,12 +1,12 @@
 package playground.sebhoerl.mexec_opdyts.execution;
 
-import playground.sebhoerl.mexec.Simulation;
-import playground.sebhoerl.mexec_opdyts.optimization.IterationState;
-import playground.sebhoerl.mexec_opdyts.optimization.Proposal;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+
+import playground.sebhoerl.mexec.Simulation;
+import playground.sebhoerl.mexec_opdyts.optimization.IterationState;
+import playground.sebhoerl.mexec_opdyts.optimization.Proposal;
 
 public class SimulationRun {
     final private Simulation simulation;

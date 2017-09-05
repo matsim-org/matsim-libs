@@ -1,30 +1,30 @@
 package contrib.baseline.calibration.location_choice;
 
-import com.google.inject.name.Names;
-import contrib.baseline.IVTBaselineScoringFunctionFactory;
-import contrib.baseline.counts.*;
-import contrib.baseline.preparation.IVTConfigCreator;
+import java.io.File;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.controler.*;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.PtConstants;
-import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
-import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 
-import java.io.File;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import contrib.baseline.IVTBaselineScoringFunctionFactory;
+import contrib.baseline.preparation.IVTConfigCreator;
+import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 
 public class LCScenarioRunner {
     public static void main(String[] args) {}

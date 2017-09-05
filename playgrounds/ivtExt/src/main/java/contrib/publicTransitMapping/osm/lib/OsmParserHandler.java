@@ -18,13 +18,14 @@
 
 package contrib.publicTransitMapping.osm.lib;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+
 import contrib.publicTransitMapping.osm.lib.handler.OsmNodeHandler;
 import contrib.publicTransitMapping.osm.lib.handler.OsmRelationHandler;
 import contrib.publicTransitMapping.osm.lib.handler.OsmWayHandler;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Handler to read out osm data (nodes, ways and relations). Just stores the data.

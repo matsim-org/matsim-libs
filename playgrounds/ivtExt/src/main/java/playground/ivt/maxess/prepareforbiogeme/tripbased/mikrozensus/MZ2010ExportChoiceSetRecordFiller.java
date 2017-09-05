@@ -18,17 +18,18 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSet;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.RecordFillerUtils;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
-
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * @author thibautd

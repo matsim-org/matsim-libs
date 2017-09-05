@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.ivt.matsim2030.router;
 
+import java.util.Map;
+import java.util.Stack;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
@@ -27,11 +30,12 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.xml.sax.Attributes;
-
-import java.util.Map;
-import java.util.Stack;
 
 /**
  * This is copied from Christoph's playground, to avoid depending on it

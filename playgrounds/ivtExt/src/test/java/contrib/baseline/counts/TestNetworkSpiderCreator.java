@@ -21,9 +21,12 @@
 
 package contrib.baseline.counts;
 
-import com.vividsolutions.jts.util.Assert;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -34,12 +37,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
-import playground.sebhoerl.av.framework.InteractionConfig;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.vividsolutions.jts.util.Assert;
 
 /**
  * Testing network spider creator.

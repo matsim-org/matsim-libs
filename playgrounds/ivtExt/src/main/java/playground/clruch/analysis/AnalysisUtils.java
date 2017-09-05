@@ -1,14 +1,14 @@
 package playground.clruch.analysis;
 
-import ch.ethz.idsc.tensor.*;
+import java.util.Map;
+
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.red.Max;
 import ch.ethz.idsc.tensor.red.Tally;
 import ch.ethz.idsc.tensor.sca.Floor;
-
-
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
 
 /**
  * Created by Joel on 29.06.2017.

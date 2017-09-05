@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.zip.DataFormatException;
 
-import org.matsim.api.core.v01.network.Network;
-
 import ch.ethz.idsc.tensor.io.ObjectFormat;
 import playground.clruch.netdata.VirtualNetwork;
 

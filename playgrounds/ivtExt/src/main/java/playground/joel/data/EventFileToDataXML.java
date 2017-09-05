@@ -2,14 +2,7 @@ package playground.joel.data;
 
 
 import java.io.File;
-import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;

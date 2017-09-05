@@ -1,6 +1,8 @@
 package playground.clruch.analysis;
 
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
 import java.io.File;
 
 import org.jfree.chart.ChartFactory;
@@ -13,12 +15,12 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
+import org.jfree.ui.RectangleEdge;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Dimensions;
-import org.jfree.ui.RectangleEdge;
-import playground.clruch.utils.GlobalAssert;
 
 /**
  * Created by Joel on 04.03.2017.

@@ -1,6 +1,5 @@
 package playground.ivt.matsim2030.scoring;
 
-import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
@@ -11,11 +10,16 @@ import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.*;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
 import org.matsim.pt.PtConstants;
-import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import com.google.inject.Inject;
+
 import playground.ivt.kticompatibility.KtiActivityScoring;
-import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.scoring.LineChangeScoringFunction;
 
 /**

@@ -1,14 +1,14 @@
 package playground.balac.induceddemand.strategies;
 
+import java.util.List;
+import java.util.Random;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
-
-import java.util.List;
-import java.util.Random;
 
 public class ChooseRandomActivitiesToSwap implements PlanAlgorithm {
 

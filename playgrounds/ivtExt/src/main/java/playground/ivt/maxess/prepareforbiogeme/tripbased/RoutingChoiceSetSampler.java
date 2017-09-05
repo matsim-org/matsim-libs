@@ -18,19 +18,20 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.tripbased;
 
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.router.TripRouter;
-import org.matsim.facilities.ActivityFacility;
-import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSet;
-import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.router.TripRouter;
+import org.matsim.facilities.ActivityFacility;
+
+import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSet;
+import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
 
 /**
  * @author thibautd

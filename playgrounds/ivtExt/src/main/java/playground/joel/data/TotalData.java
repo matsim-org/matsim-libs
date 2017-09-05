@@ -3,10 +3,6 @@ package playground.joel.data;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Set;
 
 import org.jdom.Attribute;
 import org.jdom.Document;

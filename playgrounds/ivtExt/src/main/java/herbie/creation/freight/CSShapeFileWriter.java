@@ -19,7 +19,10 @@
 
 package herbie.creation.freight;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.core.utils.geometry.geotools.MGC;
@@ -28,9 +31,7 @@ import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.vividsolutions.jts.geom.Coordinate;
 
 public class CSShapeFileWriter {
 	private final static Logger log = Logger.getLogger(CSShapeFileWriter.class);	

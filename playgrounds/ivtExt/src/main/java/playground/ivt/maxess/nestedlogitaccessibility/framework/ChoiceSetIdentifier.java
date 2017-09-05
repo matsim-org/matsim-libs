@@ -18,9 +18,9 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.framework;
 
-import org.matsim.api.core.v01.population.Person;
-
 import java.util.Map;
+
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author thibautd

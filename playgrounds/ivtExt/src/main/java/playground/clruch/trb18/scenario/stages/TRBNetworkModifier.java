@@ -1,10 +1,10 @@
 package playground.clruch.trb18.scenario.stages;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 
 public class TRBNetworkModifier {
     /**

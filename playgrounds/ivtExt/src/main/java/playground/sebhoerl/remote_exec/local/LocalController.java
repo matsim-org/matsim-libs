@@ -1,11 +1,8 @@
 package playground.sebhoerl.remote_exec.local;
 
-import playground.sebhoerl.remote_exec.RemoteController;
-import playground.sebhoerl.remote_exec.euler.EulerInterface;
-import playground.sebhoerl.remote_exec.euler.EulerSimulation;
-import playground.sebhoerl.remote_exec.euler.InternalEulerController;
-
 import java.util.Collection;
+
+import playground.sebhoerl.remote_exec.RemoteController;
 
 /**
  * Created by sebastian on 11/10/16.

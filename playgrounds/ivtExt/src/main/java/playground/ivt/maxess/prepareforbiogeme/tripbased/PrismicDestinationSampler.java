@@ -18,6 +18,12 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.tripbased;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.socnetsim.utils.QuadTreeRebuilder;
@@ -26,13 +32,8 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
-import playground.ivt.maxess.prepareforbiogeme.tripbased.RoutingChoiceSetSampler.DestinationSampler;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import playground.ivt.maxess.prepareforbiogeme.tripbased.RoutingChoiceSetSampler.DestinationSampler;
 
 /**
  * @author thibautd

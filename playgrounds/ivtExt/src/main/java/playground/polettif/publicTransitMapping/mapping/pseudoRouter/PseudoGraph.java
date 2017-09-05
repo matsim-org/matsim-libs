@@ -18,11 +18,12 @@
 
 package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
-
 import java.util.Collection;
 import java.util.List;
+
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 
 /**
  * A pseudo graph with {@link PseudoRouteStop}s as nodes. Edges connect

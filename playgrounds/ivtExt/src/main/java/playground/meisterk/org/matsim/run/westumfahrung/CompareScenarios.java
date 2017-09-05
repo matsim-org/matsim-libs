@@ -19,38 +19,25 @@
 
 package playground.meisterk.org.matsim.run.westumfahrung;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.TreeMap;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.CalcAverageTripLength;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.analysis.filters.population.PersonFilter;
-import org.matsim.contrib.analysis.filters.population.RouteLinkFilter;
-import org.matsim.contrib.analysis.filters.population.SelectedPlanFilter;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
 import org.matsim.core.utils.misc.Time;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.regex.Pattern;
 
 
 /**

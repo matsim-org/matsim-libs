@@ -5,8 +5,8 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.io.ObjectFormat;
-import playground.clruch.utils.GlobalAssert;
 
 public class StorageSubscriber implements SimulationSubscriber {
     @Override

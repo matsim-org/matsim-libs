@@ -1,11 +1,12 @@
 package playground.sebhoerl.euler_opdyts;
 
-import floetteroed.utilities.math.Vector;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 
-import java.util.HashMap;
-import java.util.Map;
+import floetteroed.utilities.math.Vector;
 
 public class MyObjectiveHandler implements RemoteStateHandler, PersonDepartureEventHandler {
     private Map<String, Long> departures;

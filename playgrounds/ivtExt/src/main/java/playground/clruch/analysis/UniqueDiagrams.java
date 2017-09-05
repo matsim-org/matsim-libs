@@ -1,23 +1,28 @@
 package playground.clruch.analysis;
 
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.alg.Transpose;
-import ch.ethz.idsc.tensor.io.CsvFormat;
-import org.jfree.chart.*;
-import org.jfree.chart.axis.*;
-import org.jfree.chart.plot.*;
+import java.awt.Color;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.LegendItem;
+import org.jfree.chart.LegendItemCollection;
+import org.jfree.chart.axis.DateAxis;
+import org.jfree.chart.axis.DateTickUnit;
+import org.jfree.chart.axis.DateTickUnitType;
+import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.title.LegendTitle;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.TimeTableXYDataset;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.util.SortOrder;
 
-import playground.clruch.utils.GlobalAssert;
-
-import java.awt.*;
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.alg.Transpose;
+import ch.ethz.idsc.tensor.io.CsvFormat;
 
 /**
  * Created by Joel on 29.06.2017.

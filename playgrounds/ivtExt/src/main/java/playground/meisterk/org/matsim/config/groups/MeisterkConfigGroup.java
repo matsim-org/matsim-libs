@@ -20,11 +20,11 @@
 
 package playground.meisterk.org.matsim.config.groups;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.config.ConfigGroup;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.matsim.core.config.ConfigGroup;
 
 public class MeisterkConfigGroup extends ConfigGroup {
 

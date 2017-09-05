@@ -21,18 +21,19 @@
 
 package playground.polettif.publicTransitMapping.hafas;
 
+import java.io.IOException;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
+
 import playground.polettif.publicTransitMapping.hafas.lib.BitfeldAnalyzer;
 import playground.polettif.publicTransitMapping.hafas.lib.OperatorReader;
 import playground.polettif.publicTransitMapping.hafas.lib.StopReader;
 import playground.polettif.publicTransitMapping.hafas.v1.FPLANReaderV1;
 import playground.polettif.publicTransitMapping.tools.ScheduleCleaner;
-
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Implementation of Hafas2MATSimTransitSchedule.

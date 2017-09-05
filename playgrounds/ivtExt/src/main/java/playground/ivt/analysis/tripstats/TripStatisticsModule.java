@@ -18,14 +18,15 @@
  * *********************************************************************** */
 package playground.ivt.analysis.tripstats;
 
-import com.google.inject.Provider;
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scoring.EventsToActivities;
 import org.matsim.core.scoring.EventsToLegs;
 
-import javax.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author thibautd

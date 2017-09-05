@@ -18,6 +18,12 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.tripbased;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -30,13 +36,8 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
-import playground.ivt.maxess.prepareforbiogeme.framework.ChoicesIdentifier;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import playground.ivt.maxess.prepareforbiogeme.framework.ChoicesIdentifier;
 
 /**
  * @author thibautd

@@ -18,13 +18,14 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.tripbased;
 
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Time;
+
+import gnu.trove.map.TLongObjectMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSet;
 
 /**

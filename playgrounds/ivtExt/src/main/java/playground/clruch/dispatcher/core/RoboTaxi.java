@@ -7,7 +7,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
-import playground.clruch.utils.GlobalAssert;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 
 /** RoboTaxi is central classs to be used in all dispatchers.

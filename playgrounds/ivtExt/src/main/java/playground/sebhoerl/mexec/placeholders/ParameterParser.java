@@ -1,9 +1,5 @@
 package playground.sebhoerl.mexec.placeholders;
 
-import playground.sebhoerl.mexec.placeholders.ConstantElement;
-import playground.sebhoerl.mexec.placeholders.Parameter;
-import playground.sebhoerl.mexec.placeholders.PlaceholderElement;
-
 public class ParameterParser {
     private enum State {
         EXTERNAL, INTERNAL, PLACEHOLDER

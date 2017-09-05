@@ -21,6 +21,18 @@
 
 package contrib.baseline.counts;
 
+import static contrib.baseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -32,15 +44,8 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
+
 import contrib.baseline.lib.NetworkUtils;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.*;
-
-import static contrib.baseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
 
 /**
  * Identifies for a given count-station(coord) the according street-link in the network.

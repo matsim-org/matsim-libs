@@ -12,7 +12,6 @@ import com.google.inject.Inject;
 
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
-import playground.sebhoerl.avtaxi.generator.AVGenerator;
 
 /**
  * class generates {@link AVVehicle}s and places them randomly.

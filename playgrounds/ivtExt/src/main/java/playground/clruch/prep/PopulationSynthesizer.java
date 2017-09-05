@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
@@ -17,7 +16,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.clruch.utils.GZHandler;
+import playground.clib.util.GZHandler;
 
 /**
  * Created by Claudio on 1/4/2017.

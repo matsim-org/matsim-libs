@@ -18,20 +18,18 @@
 
 package contrib.crossings;
 
+import java.util.Map;
+import java.util.Stack;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
+
 import playground.polettif.crossings.lib.CrossingImpl;
 import playground.polettif.crossings.lib.PtLink;
 import playground.polettif.crossings.lib.PtLinkImpl;
-
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Stack;
 
 /**
  * Used to parse a crossings file.

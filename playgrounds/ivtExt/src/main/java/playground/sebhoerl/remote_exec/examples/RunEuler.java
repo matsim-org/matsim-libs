@@ -1,14 +1,18 @@
 package playground.sebhoerl.remote_exec.examples;
 
+import java.io.IOException;
+
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsManagerImpl;
+
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
-import playground.sebhoerl.remote_exec.RemoteSimulation;
-import playground.sebhoerl.remote_exec.euler.*;
 
-import java.io.*;
+import playground.sebhoerl.remote_exec.euler.EulerConfiguration;
+import playground.sebhoerl.remote_exec.euler.EulerEnvironment;
+import playground.sebhoerl.remote_exec.euler.EulerInterface;
+import playground.sebhoerl.remote_exec.euler.EulerSimulation;
 
 public class RunEuler {
     public static void main(String[] args) throws JSchException, IOException, InterruptedException {

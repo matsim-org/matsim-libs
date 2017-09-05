@@ -21,8 +21,6 @@
 
 package contrib.publicTransitMapping.hafas.lib;
 
-import org.apache.log4j.Logger;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -31,6 +29,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
 
 /**
  * Identifies the busiest day of the validity period of the schedule and returns all bitfeld-numbers for the

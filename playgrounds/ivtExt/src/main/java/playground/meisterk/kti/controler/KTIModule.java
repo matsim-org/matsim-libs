@@ -19,6 +19,9 @@
 
 package playground.meisterk.kti.controler;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
@@ -26,15 +29,13 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.Gbl;
+
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;
 import playground.meisterk.kti.controler.listeners.KtiPopulationPreparation;
 import playground.meisterk.kti.controler.listeners.LegDistanceDistributionWriter;
 import playground.meisterk.kti.controler.listeners.ScoreElements;
 import playground.meisterk.kti.router.PlansCalcRouteKtiInfo;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * A special controler for the KTI-Project.

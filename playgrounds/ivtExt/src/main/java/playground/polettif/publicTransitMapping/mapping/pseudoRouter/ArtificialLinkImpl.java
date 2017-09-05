@@ -18,13 +18,14 @@
 
 package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
+import java.util.Set;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
+
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingStrings;
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
-
-import java.util.Set;
 
 /**
  * Container class for artificial links

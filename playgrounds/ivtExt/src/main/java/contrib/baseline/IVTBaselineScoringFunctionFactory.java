@@ -21,6 +21,11 @@
 
 package contrib.baseline;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -36,14 +41,16 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.*;
+import org.matsim.core.scoring.functions.ActivityUtilityParameters;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.FacilityOpeningIntervalCalculator;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import playground.ivt.matsim2030.scoring.DestinationEspilonScoring;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import playground.ivt.matsim2030.scoring.DestinationEspilonScoring;
 
 /**
  * Based on playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory by thibautd

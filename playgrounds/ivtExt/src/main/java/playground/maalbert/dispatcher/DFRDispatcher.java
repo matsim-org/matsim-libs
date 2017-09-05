@@ -7,6 +7,21 @@
 
 package playground.maalbert.dispatcher;
 
+import java.io.File;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.router.util.TravelTime;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -17,32 +32,28 @@ import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Ceiling;
 import ch.ethz.idsc.tensor.sca.Floor;
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.router.util.TravelTime;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.clruch.dispatcher.utils.*;
-import playground.clruch.netdata.*;
+import playground.clruch.dispatcher.utils.AbstractRequestSelector;
+import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
+import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
+import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
+import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
+import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
+import playground.clruch.dispatcher.utils.OldestRequestSelector;
+import playground.clruch.netdata.VirtualLink;
+import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.netdata.VirtualNetworkIO;
+import playground.clruch.netdata.VirtualNode;
+import playground.clruch.netdata.vLinkDataReader;
 import playground.clruch.traveldata.TravelData;
-import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.generator.PopulationDensityGenerator;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * {@link PopulationDensityGenerator}

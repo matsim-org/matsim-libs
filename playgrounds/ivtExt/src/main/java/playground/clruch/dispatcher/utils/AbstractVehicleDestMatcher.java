@@ -3,7 +3,6 @@ package playground.clruch.dispatcher.utils;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;

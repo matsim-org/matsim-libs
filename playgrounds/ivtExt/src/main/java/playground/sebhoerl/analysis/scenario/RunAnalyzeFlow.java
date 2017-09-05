@@ -23,9 +23,7 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleReaderV1;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;

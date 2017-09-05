@@ -1,23 +1,29 @@
 package playground.sebhoerl.mexec.examples;
 
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
+import java.io.File;
+
 import org.apache.commons.lang3.SystemUtils;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
-import playground.sebhoerl.mexec.*;
+
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+
+import playground.sebhoerl.mexec.Config;
+import playground.sebhoerl.mexec.Controller;
+import playground.sebhoerl.mexec.Environment;
+import playground.sebhoerl.mexec.Scenario;
+import playground.sebhoerl.mexec.Simulation;
+import playground.sebhoerl.mexec.SimulationUtils;
 import playground.sebhoerl.mexec.local.LocalEnvironment;
 import playground.sebhoerl.mexec.local.os.LinuxDriver;
 import playground.sebhoerl.mexec.local.os.OSDriver;
 import playground.sebhoerl.mexec.local.os.WindowsDriver;
 import playground.sebhoerl.mexec.ssh.SSHEnvironment;
 import playground.sebhoerl.mexec.ssh.utils.SSHUtils;
-
-import java.io.File;
-import java.io.IOException;
 
 public class RunEquil {
     public static void main(String[] args) {

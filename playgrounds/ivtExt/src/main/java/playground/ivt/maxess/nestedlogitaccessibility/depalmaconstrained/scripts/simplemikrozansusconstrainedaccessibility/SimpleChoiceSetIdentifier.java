@@ -18,8 +18,12 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.scripts.simplemikrozansusconstrainedaccessibility;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -28,6 +32,10 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+
 import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.SingleNest;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
@@ -36,12 +44,6 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.PrismSampler;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.NestedAccessibilityConfigGroup;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author thibautd

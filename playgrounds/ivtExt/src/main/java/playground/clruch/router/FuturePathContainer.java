@@ -6,8 +6,8 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.clruch.utils.GlobalAssert;
-import playground.clruch.utils.VrpPathUtils;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
+import playground.clib.util.VrpPathUtils;
 import playground.sebhoerl.plcpc.LeastCostPathFuture;
 
 /**

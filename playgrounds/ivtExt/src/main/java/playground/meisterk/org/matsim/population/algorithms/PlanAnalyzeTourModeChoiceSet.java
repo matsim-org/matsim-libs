@@ -20,20 +20,23 @@
 
 package playground.meisterk.org.matsim.population.algorithms;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.facilities.ActivityFacilities;
 
 import playground.meisterk.org.matsim.config.PlanomatConfigGroup;
-
-import java.util.*;
 
 /**
  * Feasible mode chain analysis according to section 3.2 of

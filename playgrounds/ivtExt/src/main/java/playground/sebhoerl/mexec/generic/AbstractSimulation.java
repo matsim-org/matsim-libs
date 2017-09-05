@@ -1,10 +1,10 @@
 package playground.sebhoerl.mexec.generic;
 
-import playground.sebhoerl.mexec.Simulation;
-import playground.sebhoerl.mexec.data.SimulationData;
-
 import java.io.InputStream;
 import java.util.Map;
+
+import playground.sebhoerl.mexec.Simulation;
+import playground.sebhoerl.mexec.data.SimulationData;
 
 public abstract class AbstractSimulation<DataType extends SimulationData> implements Simulation {
     final protected DataType data;

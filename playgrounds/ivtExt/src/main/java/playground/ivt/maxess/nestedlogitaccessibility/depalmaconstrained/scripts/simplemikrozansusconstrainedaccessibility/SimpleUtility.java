@@ -18,16 +18,17 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.scripts.simplemikrozansusconstrainedaccessibility;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
 import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.SingleNest;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
-
-import java.util.List;
 
 /**
  * @author thibautd

@@ -1,9 +1,12 @@
 package playground.sebhoerl.euler_opdyts;
 
-import floetteroed.opdyts.DecisionVariable;
-import floetteroed.opdyts.DecisionVariableRandomizer;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Random;
 
-import java.util.*;
+import floetteroed.opdyts.DecisionVariableRandomizer;
 
 public class MyDecisionVariableRandomizer implements DecisionVariableRandomizer<RemoteDecisionVariable> {
     final Random random;

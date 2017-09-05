@@ -19,13 +19,15 @@
 package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.scripts.simplemikrozansusconstrainedaccessibility;
 
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.MainModeIdentifier;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.MainModeIdentifier;
+
 import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.ConstrainedAccessibilityConfigGroup;
 import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.CorrectedUtilityCreator;
 import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.SingleNest;

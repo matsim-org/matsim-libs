@@ -7,9 +7,9 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Network;
 
+import playground.clib.util.NetworkLoader;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
-import playground.clruch.utils.NetworkLoader;
 
 /** @author Claudio Ruch */
 enum StandaloneFleetConverter {

@@ -18,12 +18,13 @@
 
 package playground.polettif.publicTransitMapping.workbench;
 
+import java.util.Set;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.collections.CollectionUtils;
-import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
-import java.util.Set;
+import playground.polettif.publicTransitMapping.tools.NetworkTools;
 
 /**
  * Workbench. Runs the network cleaner on the "road" links of the given network.

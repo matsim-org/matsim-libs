@@ -1,6 +1,7 @@
 package playground.clruch.trb18.scenario.stages;
 
-import contrib.baseline.preparation.ZHCutter;
+import java.util.Collections;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -12,7 +13,7 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import java.util.Collections;
+import contrib.baseline.preparation.ZHCutter;
 
 public class TRBNetworkRadiusFilter {
     final private Logger logger = Logger.getLogger(TRBNetworkRadiusFilter.class);

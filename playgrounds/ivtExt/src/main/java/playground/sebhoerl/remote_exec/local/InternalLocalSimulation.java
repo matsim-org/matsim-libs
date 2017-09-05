@@ -1,16 +1,18 @@
 package playground.sebhoerl.remote_exec.local;
 
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.core.api.experimental.events.EventsManager;
+
 import com.fasterxml.jackson.annotation.JacksonInject;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.matsim.core.api.experimental.events.EventsManager;
+
 import playground.sebhoerl.remote_exec.RemoteSimulation;
 import playground.sebhoerl.remote_exec.RemoteUtils;
-
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 @JsonIgnoreProperties({"status"})
 public class InternalLocalSimulation {

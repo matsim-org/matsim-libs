@@ -1,12 +1,16 @@
 package playground.clruch.trb18.replanning;
 
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.replanning.selectors.PlanSelector;
-import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.replanning.selectors.PlanSelector;
+
+import playground.sebhoerl.avtaxi.framework.AVModule;
 
 /**
  * Makes sure that the number of available plans for an agent are balanced.

@@ -18,15 +18,17 @@
 
 package playground.polettif.publicTransitMapping.plausibility.log;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+
 import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
-
-import java.util.*;
 
 /**
  * Plausibility warning if the travel time given by the schedule

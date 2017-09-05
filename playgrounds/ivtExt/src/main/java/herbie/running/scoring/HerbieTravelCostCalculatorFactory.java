@@ -20,13 +20,13 @@
 
 package herbie.running.scoring;
 
-import herbie.running.config.HerbieConfigGroup;
-
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+
+import herbie.running.config.HerbieConfigGroup;
 
 public class HerbieTravelCostCalculatorFactory implements TravelDisutilityFactory {
 	

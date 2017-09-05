@@ -1,7 +1,8 @@
 package herbie.running.analysis;
 
-import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
-import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -12,8 +13,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
+import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
+import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
 
 public class AnalyseEventFile {
 	

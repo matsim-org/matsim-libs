@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public class SimulationObjectCompiler {

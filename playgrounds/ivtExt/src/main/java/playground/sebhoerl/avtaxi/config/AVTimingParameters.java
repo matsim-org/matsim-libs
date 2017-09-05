@@ -1,10 +1,6 @@
 package playground.sebhoerl.avtaxi.config;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.utils.io.MatsimXmlParser;
-import org.xml.sax.Attributes;
-
-import java.util.Stack;
 
 public class AVTimingParameters extends ReflectiveConfigGroup {
     final static String TIMING = "timing";

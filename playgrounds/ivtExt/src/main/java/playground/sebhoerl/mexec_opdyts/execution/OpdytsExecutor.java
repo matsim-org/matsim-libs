@@ -1,6 +1,13 @@
 package playground.sebhoerl.mexec_opdyts.execution;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
+
 import playground.sebhoerl.mexec.Controller;
 import playground.sebhoerl.mexec.Environment;
 import playground.sebhoerl.mexec.Scenario;
@@ -8,8 +15,6 @@ import playground.sebhoerl.mexec.Simulation;
 import playground.sebhoerl.mexec_opdyts.optimization.InitialState;
 import playground.sebhoerl.mexec_opdyts.optimization.IterationState;
 import playground.sebhoerl.mexec_opdyts.optimization.Proposal;
-
-import java.util.*;
 
 public class OpdytsExecutor {
     private Logger logger = Logger.getLogger(OpdytsExecutor.class);

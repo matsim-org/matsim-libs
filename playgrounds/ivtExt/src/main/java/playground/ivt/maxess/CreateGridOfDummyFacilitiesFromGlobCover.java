@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.ivt.maxess;
 
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -37,9 +39,8 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.FacilitiesUtils;
 import org.matsim.facilities.FacilitiesWriter;
-import playground.ivt.maxess.gisutils.GlobCoverTypeIdentifier;
 
-import java.util.Set;
+import playground.ivt.maxess.gisutils.GlobCoverTypeIdentifier;
 
 /**
  * Script to generate fake facilities around a population, based on land cover types from the ESA (http://due.esrin.esa.int/page_globcover.php)

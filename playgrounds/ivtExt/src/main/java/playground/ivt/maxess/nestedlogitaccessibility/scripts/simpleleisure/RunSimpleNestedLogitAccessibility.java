@@ -18,8 +18,10 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure;
 
-import com.google.inject.Module;
-import com.google.inject.TypeLiteral;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.concurrent.TimeUnit;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
@@ -29,6 +31,9 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.algorithms.XY2Links;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+
+import com.google.inject.Module;
+import com.google.inject.TypeLiteral;
 
 import playground.ivt.maxess.nestedlogitaccessibility.framework.AccessibilityComputationResult;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.BaseNestedAccessibilityComputationModule;
@@ -41,10 +46,6 @@ import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessi
 import playground.ivt.router.CachingFreespeedCarRouterModule;
 import playground.ivt.router.lazyschedulebasedmatrix.LazyScheduleBasedMatrixModule;
 import playground.ivt.utils.MoreIOUtils;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author thibautd

@@ -20,7 +20,15 @@
 
 package playground.ivt.analysis.activityhistogram;
 
-import com.google.inject.Singleton;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
+import javax.inject.Inject;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
@@ -31,13 +39,7 @@ import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.scoring.PersonExperiencedActivity;
 import org.matsim.core.utils.misc.Time;
 
-import javax.inject.Inject;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import com.google.inject.Singleton;
 
 /**
  * @author mrieser

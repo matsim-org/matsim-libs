@@ -6,11 +6,11 @@ import java.text.DecimalFormat;
 
 import org.matsim.core.utils.misc.Time;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.io.Export;
 import ch.ethz.idsc.tensor.io.Import;
 import ch.ethz.idsc.tensor.red.Mean;
 import playground.clruch.analysis.AnalyzeSummary;
-import playground.clruch.utils.GlobalAssert;
 
 /** @author Claudio Ruch based on initial version by gjoel */
 public class ReportGenerator {

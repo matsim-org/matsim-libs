@@ -1,5 +1,7 @@
 package playground.wrashid.ABMT.vehicleShare;
 
+import java.util.HashMap;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -15,8 +17,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.parking.parkingchoice.lib.GeneralLib;
 import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
 import org.matsim.core.controler.MatsimServices;
-
-import java.util.HashMap;
 
 public class TollsManager implements LinkEnterEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler {
 

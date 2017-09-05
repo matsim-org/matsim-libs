@@ -1,13 +1,14 @@
 package contrib.baseline.preparation.secondaryFacilityCreation;
 
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
-import contrib.baseline.lib.CSVReader;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
+
+import contrib.baseline.lib.CSVReader;
 
 /**
  * WHAT IS IT FOR?

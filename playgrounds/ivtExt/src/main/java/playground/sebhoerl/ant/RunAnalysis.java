@@ -1,20 +1,14 @@
 package playground.sebhoerl.ant;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioUtils;
-import playground.sebhoerl.av_paper.BinCalculator;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+
+import playground.sebhoerl.av_paper.BinCalculator;
 
 public class RunAnalysis {
     final static String NETWORK_PATH = "/home/sebastian/ant/assets/network.xml";

@@ -20,7 +20,11 @@
 
 package herbie.running.controler.listeners;
 
-import herbie.running.scoring.ActivityScoringFunction;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.corelisteners.PlansScoring;
@@ -31,13 +35,10 @@ import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.TreeMap;
+import herbie.running.scoring.ActivityScoringFunction;
 
 public class ScoreElements implements StartupListener, ScoringListener, ShutdownListener {
 

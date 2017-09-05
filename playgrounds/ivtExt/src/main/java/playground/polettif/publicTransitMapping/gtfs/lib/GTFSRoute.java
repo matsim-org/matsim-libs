@@ -20,11 +20,10 @@
 
 package playground.polettif.publicTransitMapping.gtfs.lib;
 
-import playground.polettif.publicTransitMapping.gtfs.lib.GTFSDefinitions.RouteTypes;
-
-
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import playground.polettif.publicTransitMapping.gtfs.lib.GTFSDefinitions.RouteTypes;
 
 
 public class GTFSRoute {

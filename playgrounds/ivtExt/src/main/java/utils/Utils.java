@@ -1,15 +1,13 @@
 package utils;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.population.PopulationUtils;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.population.PopulationUtils;
 
 public abstract class Utils {
 

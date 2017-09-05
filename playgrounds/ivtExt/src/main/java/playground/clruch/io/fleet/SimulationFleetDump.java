@@ -10,13 +10,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationObjects;
 import playground.clruch.net.StorageSubscriber;
 import playground.clruch.net.VehicleContainer;
-import playground.clruch.utils.GlobalAssert;
 
 enum SimulationFleetDump {
     ;

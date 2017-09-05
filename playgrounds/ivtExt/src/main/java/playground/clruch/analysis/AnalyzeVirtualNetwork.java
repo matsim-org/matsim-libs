@@ -1,6 +1,6 @@
 package playground.clruch.analysis;
 
-import static playground.clruch.utils.NetworkLoader.loadNetwork;
+import static playground.clib.util.NetworkLoader.loadNetwork;
 
 import java.io.File;
 

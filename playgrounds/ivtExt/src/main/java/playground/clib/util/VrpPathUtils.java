@@ -1,5 +1,5 @@
 // code by jph
-package playground.clruch.utils;
+package playground.clib.util;
 
 import java.util.Iterator;
 

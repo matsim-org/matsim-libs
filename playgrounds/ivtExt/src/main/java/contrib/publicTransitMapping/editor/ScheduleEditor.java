@@ -18,14 +18,14 @@
 
 package contrib.publicTransitMapping.editor;
 
+import java.io.IOException;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.io.IOException;
 
 /**
  * Interface that defines the possible commands to edit

@@ -4,6 +4,7 @@
 package playground.joel.analysis.utils;
 
 import ch.ethz.idsc.queuey.math.TensorOperations;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -15,7 +16,6 @@ import ch.ethz.idsc.tensor.mat.IdentityMatrix;
 import ch.ethz.idsc.tensor.mat.NullSpace;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
-import playground.clruch.utils.GlobalAssert;
 
 /** @author Claudio Ruch */
 public enum ThroughputCalculator {

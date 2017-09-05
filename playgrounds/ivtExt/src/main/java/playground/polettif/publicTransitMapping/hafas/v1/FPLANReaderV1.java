@@ -21,13 +21,6 @@
 
 package playground.polettif.publicTransitMapping.hafas.v1;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.misc.Counter;
-import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.*;
-import playground.polettif.publicTransitMapping.hafas.HafasDefinitions;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -35,6 +28,22 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.misc.Counter;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.Vehicles;
+import org.matsim.vehicles.VehiclesFactory;
+
+import playground.polettif.publicTransitMapping.hafas.HafasDefinitions;
 
 /**
  * Reads the transit lines from a given FPLAN file.

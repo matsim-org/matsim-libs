@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.io.ObjectFormat;
-import playground.clruch.utils.GlobalAssert;
 
 public class VirtualNetworkIO {
     

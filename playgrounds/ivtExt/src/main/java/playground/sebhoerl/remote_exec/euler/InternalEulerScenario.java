@@ -1,10 +1,13 @@
 package playground.sebhoerl.remote_exec.euler;
 
-import com.fasterxml.jackson.annotation.*;
-import playground.sebhoerl.remote_exec.RemoteScenario;
-import playground.sebhoerl.remote_exec.RemoteSimulation;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
-import java.util.*;
+import com.fasterxml.jackson.annotation.JacksonInject;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties({"simulationInstances"})
 public class InternalEulerScenario {

@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package playground.ivt.replanning;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.ConfigUtils;
@@ -30,6 +28,9 @@ import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author thibautd

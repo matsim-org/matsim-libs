@@ -21,7 +21,6 @@
 
 package contrib.baseline.counts;
 
-import com.google.inject.Inject;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -31,6 +30,8 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
+
+import com.google.inject.Inject;
 
 /**
  * Counts the daily passengers on a given link.

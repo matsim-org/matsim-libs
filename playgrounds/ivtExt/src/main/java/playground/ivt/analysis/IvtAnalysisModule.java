@@ -19,6 +19,7 @@
 package playground.ivt.analysis;
 
 import org.matsim.core.controler.AbstractModule;
+
 import playground.ivt.analysis.activityhistogram.ActivityHistogramModule;
 import playground.ivt.analysis.tripstats.TripStatisticsModule;
 

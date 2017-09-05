@@ -18,11 +18,11 @@
  * *********************************************************************** */
 package playground.ivt.utils;
 
-import org.apache.log4j.Logger;
-
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import org.apache.log4j.Logger;
 
 /**
  * Efficient stopwatch that is safe to use in a multithreaded environment.

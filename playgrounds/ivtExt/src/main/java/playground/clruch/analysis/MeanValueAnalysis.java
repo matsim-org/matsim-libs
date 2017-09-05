@@ -1,5 +1,6 @@
 package playground.clruch.analysis;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -8,7 +9,6 @@ import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.sca.Increment;
 import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
-import playground.clruch.utils.GlobalAssert;
 
 /** @author Claudio Ruch Performns mean value analysis for a system with i nodes, relative
  *         throughputs pii, arrival rates mui */

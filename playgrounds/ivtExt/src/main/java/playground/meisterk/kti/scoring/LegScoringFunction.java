@@ -20,13 +20,16 @@
 
 package playground.meisterk.kti.scoring;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -35,13 +38,10 @@ import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.KtiPtRoute;
 import playground.meisterk.kti.router.PlansCalcRouteKti;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeSet;
 
 
 /**

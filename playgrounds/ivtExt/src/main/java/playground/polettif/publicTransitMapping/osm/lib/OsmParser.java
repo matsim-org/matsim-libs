@@ -26,11 +26,11 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-
-import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.UncheckedIOException;
+
 import playground.polettif.publicTransitMapping.osm.lib.handler.OsmHandler;
 import playground.polettif.publicTransitMapping.osm.lib.handler.OsmNodeHandler;
 import playground.polettif.publicTransitMapping.osm.lib.handler.OsmRelationHandler;

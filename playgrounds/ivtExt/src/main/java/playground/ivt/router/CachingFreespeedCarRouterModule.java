@@ -18,8 +18,6 @@
  * *********************************************************************** */
 package playground.ivt.router;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
@@ -27,6 +25,9 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 /**
  * @author thibautd

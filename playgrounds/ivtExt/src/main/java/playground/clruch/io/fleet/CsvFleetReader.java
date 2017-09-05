@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import playground.clruch.utils.GlobalAssert;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 public class CsvFleetReader {
 

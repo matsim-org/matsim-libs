@@ -19,7 +19,14 @@
  * *********************************************************************** */
 package herbie.running.analysis;
 
-import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.apache.log4j.Logger;
@@ -41,9 +48,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
+import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
 
 /**
  * Collects and processes data on the mode shares, based on the travelled

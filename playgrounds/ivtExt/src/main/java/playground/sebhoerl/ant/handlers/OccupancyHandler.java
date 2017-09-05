@@ -1,23 +1,18 @@
 package playground.sebhoerl.ant.handlers;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.vehicles.Vehicle;
+
 import playground.sebhoerl.ant.DataFrame;
 import playground.sebhoerl.av_paper.BinCalculator;
-import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.aggregation.AggregationEvent;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-
-import java.util.*;
 
 public class OccupancyHandler extends AbstractHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
     final private Map<Id<Vehicle>, Integer> passengerCount = new HashMap();

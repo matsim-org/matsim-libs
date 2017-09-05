@@ -18,12 +18,12 @@
  * *********************************************************************** */
 package playground.ivt.analysis.activityhistogram;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scoring.EventsToActivities;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * @author thibautd

@@ -1,8 +1,6 @@
 package playground.sebhoerl.analysis.aggregate_events;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.zip.GZIPInputStream;
 

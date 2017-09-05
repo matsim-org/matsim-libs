@@ -1,7 +1,5 @@
 package playground.joel.data;
 
-import playground.clruch.dispatcher.core.AVStatus;
-
 /**
  * Created by Joel on 28.02.2017.
  */

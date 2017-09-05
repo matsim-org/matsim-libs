@@ -1,5 +1,17 @@
 package contrib.baseline.preparation;
 
+import static contrib.baseline.preparation.IVTConfigCreator.EDUCATION;
+import static contrib.baseline.preparation.IVTConfigCreator.ESCORT_KIDS;
+import static contrib.baseline.preparation.IVTConfigCreator.ESCORT_OTHER;
+import static contrib.baseline.preparation.IVTConfigCreator.HOME;
+import static contrib.baseline.preparation.IVTConfigCreator.LEISURE;
+import static contrib.baseline.preparation.IVTConfigCreator.REMOTE_HOME;
+import static contrib.baseline.preparation.IVTConfigCreator.REMOTE_WORK;
+import static contrib.baseline.preparation.IVTConfigCreator.SHOP;
+import static contrib.baseline.preparation.IVTConfigCreator.WORK;
+
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -13,11 +25,8 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+
 import contrib.baseline.lib.ActivityAnalyzer;
-
-import java.util.Random;
-
-import static contrib.baseline.preparation.IVTConfigCreator.*;
 
 /**
  * Creates preferences for a given population.

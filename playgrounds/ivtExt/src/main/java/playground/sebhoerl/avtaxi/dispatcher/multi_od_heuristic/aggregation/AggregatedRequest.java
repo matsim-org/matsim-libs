@@ -1,13 +1,11 @@
 package playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.aggregation;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.core.utils.geometry.CoordUtils;
+import java.util.Collection;
+import java.util.LinkedList;
+
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.TravelTimeEstimator;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
-
-import java.util.Collection;
-import java.util.LinkedList;
 
 public class AggregatedRequest {
     final private AVRequest master;

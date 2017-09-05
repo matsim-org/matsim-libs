@@ -1,9 +1,12 @@
 package playground.joel.helpers;
 
-import playground.clruch.utils.GlobalAssert;
-
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.NavigableMap;
+
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 
 /**

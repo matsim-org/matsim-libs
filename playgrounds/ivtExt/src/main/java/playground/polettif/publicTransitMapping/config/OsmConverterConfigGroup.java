@@ -19,6 +19,10 @@
 
 package playground.polettif.publicTransitMapping.config;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -26,13 +30,10 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+
 import playground.polettif.publicTransitMapping.osm.OsmMultimodalNetworkConverter;
 import playground.polettif.publicTransitMapping.osm.lib.OsmTag;
 import playground.polettif.publicTransitMapping.osm.lib.OsmValue;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
 
 
 /**

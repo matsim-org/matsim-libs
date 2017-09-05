@@ -22,6 +22,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+
 import playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus.SBBPricesUtils;
 
 /**

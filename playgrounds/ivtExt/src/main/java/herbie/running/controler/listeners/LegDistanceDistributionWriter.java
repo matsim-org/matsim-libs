@@ -20,9 +20,9 @@
 
 package herbie.running.controler.listeners;
 
-import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
-import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
-import herbie.running.population.algorithms.PopulationLegDistanceDistribution;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -30,8 +30,9 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
+import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
+import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
+import herbie.running.population.algorithms.PopulationLegDistanceDistribution;
 
 public class LegDistanceDistributionWriter implements IterationEndsListener {
 

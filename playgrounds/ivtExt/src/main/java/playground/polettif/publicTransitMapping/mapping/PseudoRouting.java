@@ -2,8 +2,12 @@ package playground.polettif.publicTransitMapping.mapping;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitLine;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.*;
-import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.*;
+
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.ArtificialLink;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoGraph;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoSchedule;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoTransitRoute;
 
 /**
  * Generates and calculates the {@link PseudoTransitRoute} for each queued

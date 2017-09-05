@@ -1,19 +1,5 @@
 package playground.clruch.trb18.analysis;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.pt.PtConstants;
-import playground.sebhoerl.av_paper.BinCalculator;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-
-import java.util.*;
-
 public class DelayHandler { //} implements PersonDepartureEventHandler, PersonArrivalEventHandler {
     /*final private BinCalculator binCalculator;
     final private DataFrame dataFrame;

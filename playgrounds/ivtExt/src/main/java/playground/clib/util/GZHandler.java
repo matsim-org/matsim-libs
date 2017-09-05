@@ -1,5 +1,5 @@
 // code by clruch
-package playground.clruch.utils;
+package playground.clib.util;
 
 import java.io.File;
 import java.io.FileInputStream;

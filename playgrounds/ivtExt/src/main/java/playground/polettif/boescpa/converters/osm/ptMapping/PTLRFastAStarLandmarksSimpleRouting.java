@@ -21,6 +21,9 @@
 
 package playground.polettif.boescpa.converters.osm.ptMapping;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -33,9 +36,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Based on the line, mode, and link type, the traveling on links is assigned different costs.

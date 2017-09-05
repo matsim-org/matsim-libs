@@ -1,9 +1,9 @@
 package playground.sebhoerl.avtaxi.config;
 
-import org.matsim.core.config.ReflectiveConfigGroup;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class AVConfig extends ReflectiveConfigGroup {
     final static String MARGINAL_UTILITY_OF_WAITING_TIME = "marginalUtilityOfWaitingTime";

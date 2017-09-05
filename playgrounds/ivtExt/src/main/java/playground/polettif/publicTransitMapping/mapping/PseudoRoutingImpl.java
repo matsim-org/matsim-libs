@@ -18,6 +18,13 @@
 
 package playground.polettif.publicTransitMapping.mapping;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -29,15 +36,18 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+
 import playground.polettif.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidateCreator;
+import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
 import playground.polettif.publicTransitMapping.mapping.pseudoRouter.ArtificialLink;
 import playground.polettif.publicTransitMapping.mapping.pseudoRouter.ArtificialLinkImpl;
-import playground.polettif.publicTransitMapping.mapping.pseudoRouter.*;
-import playground.polettif.publicTransitMapping.mapping.networkRouter.Router;
-
-import java.util.*;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoGraph;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoGraphImpl;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoRouteStop;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoSchedule;
+import playground.polettif.publicTransitMapping.mapping.pseudoRouter.PseudoScheduleImpl;
 
 /**
  * Generates and calculates the pseudoRoutes for all the queued

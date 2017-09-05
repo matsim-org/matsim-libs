@@ -18,6 +18,15 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.scripts.capetown;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,6 +44,7 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Nest;
@@ -42,8 +52,6 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.capetown.PersonEnums;
 import playground.ivt.utils.ConcurrentStopWatch;
-
-import java.util.*;
 
 /**
  * @author thibautd

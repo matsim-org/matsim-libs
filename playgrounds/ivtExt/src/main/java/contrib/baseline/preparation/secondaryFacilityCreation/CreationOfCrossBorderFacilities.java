@@ -6,9 +6,18 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.facilities.*;
-import contrib.baseline.preparation.IVTConfigCreator;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.MatsimFacilitiesReader;
+import org.matsim.facilities.OpeningTimeImpl;
+
 import contrib.baseline.lib.CSVReader;
+import contrib.baseline.preparation.IVTConfigCreator;
 
 /**
  * Creates facilities from BZ12.

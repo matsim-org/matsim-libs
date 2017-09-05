@@ -13,6 +13,7 @@ import org.gnu.glpk.SWIGTYPE_p_int;
 import org.gnu.glpk.glp_prob;
 import org.gnu.glpk.glp_smcp;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -22,7 +23,6 @@ import ch.ethz.idsc.tensor.red.Total;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
-import playground.clruch.utils.GlobalAssert;
 
 /**
  * Created by Claudio on 3/17/2017. Updated by Claudio on 5/7/2017.

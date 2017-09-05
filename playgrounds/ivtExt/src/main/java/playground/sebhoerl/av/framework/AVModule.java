@@ -12,7 +12,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import com.google.inject.Binder;
 import com.google.inject.Injector;
@@ -51,12 +50,12 @@ import playground.sebhoerl.av.router.AVFlowDensityRandomizedTravelTime;
 import playground.sebhoerl.av.router.AVFlowDensityTracker;
 import playground.sebhoerl.av.router.AVFlowDensityTravelTime;
 import playground.sebhoerl.av.router.AVFreespeedTravelTime;
+import playground.sebhoerl.av.router.AVLinkSpeedMutator;
 import playground.sebhoerl.av.router.AVRandomizedTravelTime;
 import playground.sebhoerl.av.router.AVRouterFactory;
 import playground.sebhoerl.av.router.AVSpeedTracker;
 import playground.sebhoerl.av.router.AVSpeedTravelTime;
 import playground.sebhoerl.av.router.AVTravelTime;
-import playground.sebhoerl.av.router.AVLinkSpeedMutator;
 import playground.sebhoerl.av.scoring.AVScoringFunctionFactory;
 import playground.sebhoerl.av.utils.AVTripCounter;
 

@@ -1,18 +1,22 @@
 package playground.clruch.trb18.analysis.detail;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import playground.clruch.trb18.analysis.detail.events.LegCollector;
-import playground.clruch.trb18.analysis.detail.events.PairCollector;
-import playground.clruch.trb18.analysis.detail.events.TripCollector;
-
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Network;
+
+import playground.clruch.trb18.analysis.detail.events.LegCollector;
+import playground.clruch.trb18.analysis.detail.events.PairCollector;
+import playground.clruch.trb18.analysis.detail.events.TripCollector;
 
 public class AnalysisWriter implements PairCollector.Handler {
     final private BufferedWriter writer;

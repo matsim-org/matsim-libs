@@ -21,13 +21,42 @@
 
 package contrib.baseline.preparation;
 
+import static contrib.baseline.preparation.IVTConfigCreator.FACILITIES;
+import static contrib.baseline.preparation.IVTConfigCreator.HOUSEHOLDS;
+import static contrib.baseline.preparation.IVTConfigCreator.HOUSEHOLD_ATTRIBUTES;
+import static contrib.baseline.preparation.IVTConfigCreator.NETWORK;
+import static contrib.baseline.preparation.IVTConfigCreator.POPULATION;
+import static contrib.baseline.preparation.IVTConfigCreator.POPULATION_ATTRIBUTES;
+import static contrib.baseline.preparation.IVTConfigCreator.SCHEDULE;
+import static contrib.baseline.preparation.IVTConfigCreator.VEHICLES;
+import static contrib.baseline.preparation.IVTConfigCreator.getStrategySetting;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -57,23 +86,33 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.facilities.*;
-import org.matsim.households.*;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.households.Household;
+import org.matsim.households.Households;
+import org.matsim.households.HouseholdsImpl;
+import org.matsim.households.HouseholdsReaderV10;
+import org.matsim.households.HouseholdsWriterV10;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import org.matsim.vehicles.*;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
 
 import contrib.baseline.lib.F2LConnector;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import static contrib.baseline.preparation.IVTConfigCreator.*;
 
 /**
  * Cuts an IVT baseline scenario to a predefined area.

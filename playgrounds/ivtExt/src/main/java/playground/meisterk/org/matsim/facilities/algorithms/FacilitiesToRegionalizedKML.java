@@ -20,7 +20,14 @@
 
 package playground.meisterk.org.matsim.facilities.algorithms;
 
-import net.opengis.kml._2.*;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.util.Set;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
@@ -29,12 +36,16 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.util.Set;
+import net.opengis.kml._2.BasicLinkType;
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.IconStyleType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.PointType;
+import net.opengis.kml._2.StyleType;
+import net.opengis.kml._2.TimeSpanType;
 
 //import com.google.earth.kml._2.BasicLinkType;
 //import com.google.earth.kml._2.DocumentType;

@@ -1,45 +1,20 @@
 package contrib.baseline.build;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.ProcessBuilder.Redirect;
 import java.util.LinkedList;
 import java.util.List;
 
-import contrib.baseline.modification.EndTimeDiluter;
-import contrib.baseline.modification.FreespeedAdjustment;
 import org.apache.commons.compress.utils.IOUtils;
 import org.apache.commons.io.FileUtils;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.ControlerDefaultsModule;
-import org.matsim.core.controler.Injector;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.StrategyManagerModule;
-import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.NetworkRoutingModule;
-import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterModule;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
-import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
-import com.google.inject.Key;
-import com.google.inject.name.Names;
-
-import contrib.baseline.RunIVTBaseline;
 import contrib.baseline.build.BuildConfig.Scaling;
 import contrib.baseline.build.BuildConfig.Scenario;
+import contrib.baseline.modification.EndTimeDiluter;
+import contrib.baseline.modification.FreespeedAdjustment;
 import contrib.baseline.preparation.FacilityUnifier;
 import contrib.baseline.preparation.PreparationScript;
 import contrib.baseline.preparation.ZHCutter;

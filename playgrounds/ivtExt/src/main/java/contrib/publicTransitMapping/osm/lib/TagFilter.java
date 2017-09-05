@@ -19,11 +19,11 @@
 
 package contrib.publicTransitMapping.osm.lib;
 
-import org.matsim.core.utils.collections.MapUtils;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.matsim.core.utils.collections.MapUtils;
 
 /**
  * A helper class to easily find out if some OSM entity contains

@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.population.routes.AbstractRoute;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.StringUtils;
 import org.matsim.matrices.Entry;
 
 public class KtiPtRoute extends AbstractRoute {
