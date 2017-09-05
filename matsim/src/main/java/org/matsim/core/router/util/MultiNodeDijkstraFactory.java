@@ -20,35 +20,45 @@
 
 package org.matsim.core.router.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.MultiNodeDijkstra;
 
 public class MultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory {
 
 	private final boolean searchAllEndNodes;
-	private final PreProcessDijkstra preProcessData;
+	private final boolean usePreProcessData;
+	private final Map<Network, PreProcessDijkstra> preProcessData = new HashMap<>();
 	
 	public MultiNodeDijkstraFactory() {
-		this.preProcessData = null;
 		this.searchAllEndNodes = false;
+		this.usePreProcessData = false;
 	}
 	
 	public MultiNodeDijkstraFactory(final boolean searchAllEndNodes) {
-		this.preProcessData = null;
 		this.searchAllEndNodes = searchAllEndNodes;
+		this.usePreProcessData = false;
 	}
 
-	public MultiNodeDijkstraFactory(final PreProcessDijkstra preProcessData, final boolean searchAllEndNodes) {
-		this.preProcessData = preProcessData;
+	public MultiNodeDijkstraFactory(final boolean usePreProcessData, final boolean searchAllEndNodes) {
+		this.usePreProcessData = usePreProcessData;
 		this.searchAllEndNodes = searchAllEndNodes;
 	}
 
 	@Override
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		if (this.preProcessData == null) {
-			return new MultiNodeDijkstra(network, travelCosts, travelTimes, searchAllEndNodes);
+	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {		
+		if (this.usePreProcessData) {
+			PreProcessDijkstra preProcessDijkstra = this.preProcessData.get(network);
+			if (preProcessDijkstra == null) {
+				preProcessDijkstra = new PreProcessDijkstra();
+				preProcessDijkstra.run(network);
+				this.preProcessData.put(network, preProcessDijkstra);
+			}
+			return new MultiNodeDijkstra(network, travelCosts, travelTimes, preProcessDijkstra, this.searchAllEndNodes);
 		}
-		return new MultiNodeDijkstra(network, travelCosts, travelTimes, preProcessData, searchAllEndNodes);
+		
+		return new MultiNodeDijkstra(network, travelCosts, travelTimes, this.searchAllEndNodes);
 	}
-
 }

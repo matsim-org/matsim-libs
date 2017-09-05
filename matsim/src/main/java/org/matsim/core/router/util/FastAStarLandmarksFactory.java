@@ -20,19 +20,17 @@
 
 package org.matsim.core.router.util;
 
-import org.matsim.api.core.v01.TransportMode;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.Config;
 import org.matsim.core.router.ArrayFastRouterDelegateFactory;
 import org.matsim.core.router.FastAStarLandmarks;
 import org.matsim.core.router.FastRouterDelegateFactory;
 import org.matsim.core.router.FastRouterType;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author cdobler
@@ -40,51 +38,52 @@ import java.util.Map;
 @Singleton
 public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 
-	private final PreProcessLandmarks preProcessData;
 	private final RoutingNetworkFactory routingNetworkFactory;
-	private final Map<Network, RoutingNetwork> routingNetworks;
+	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
+	private final Map<Network, PreProcessLandmarks> preProcessData = new HashMap<>();
 
 	@Inject
-	FastAStarLandmarksFactory(Network network, Config config, Map<String,TravelTime> travelTime, Map<String,TravelDisutilityFactory> fsttc) {
-		//TODO: No guarantee that these are the same travel times for which the router is later requested.
-		this(network, fsttc.get(TransportMode.car).createTravelDisutility(travelTime.get(TransportMode.car)), FastRouterType.ARRAY);
+	public FastAStarLandmarksFactory() {
+		this(FastRouterType.ARRAY);
 	}
 
-	public FastAStarLandmarksFactory(Network network, final TravelDisutility fsttc) {
-		this(network, fsttc, FastRouterType.ARRAY);
-	}
-
-	private FastAStarLandmarksFactory(Network network, final TravelDisutility fsttc,
-			FastRouterType fastRouterType) {
-		this.preProcessData = new PreProcessLandmarks(fsttc);
-		this.preProcessData.run(network);
-		
-		this.routingNetworks = new HashMap<>();
-		
+	private FastAStarLandmarksFactory(final FastRouterType fastRouterType) {
 		switch (fastRouterType) {
 		case ARRAY:
-			this.routingNetworkFactory = new ArrayRoutingNetworkFactory(preProcessData);
+			this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
 			break;
 		case POINTER:
-			throw new RuntimeException("PointerRoutingNetworks are no longer supported. "
-					+ "Use ArrayRoutingNetworks instead. Aborting!");
+			throw new RuntimeException("PointerRoutingNetworks are no longer supported. Use ArrayRoutingNetworks instead. Aborting!");
 		default:
 			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
 		}
 	}
 
 	@Override
-	public LeastCostPathCalculator createPathCalculator(Network network,
-			TravelDisutility travelCosts, TravelTime travelTimes) {
-		
+	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		RoutingNetwork routingNetwork = this.routingNetworks.get(network);
+		PreProcessLandmarks preProcessLandmarks = this.preProcessData.get(network);
+		
 		if (routingNetwork == null) {
 			routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
+			
+			if (preProcessLandmarks == null) {
+				preProcessLandmarks = new PreProcessLandmarks(travelCosts);
+				preProcessLandmarks.setNumberOfThreads(8);
+				preProcessLandmarks.run(network);
+				this.preProcessData.put(network, preProcessLandmarks);
+			}
+			if (preProcessLandmarks.containsData()) {
+				for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
+					node.setDeadEndData(preProcessLandmarks.getNodeData(node.getNode()));
+				}
+			}				
+			
 			this.routingNetworks.put(network, routingNetwork);
 		}
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-
-		return new FastAStarLandmarks(routingNetwork, this.preProcessData, travelCosts, travelTimes, 1,
-				fastRouterFactory);
+		
+		final double overdoFactor = 1.0;
+		return new FastAStarLandmarks(routingNetwork, preProcessLandmarks, travelCosts, travelTimes, overdoFactor, fastRouterFactory);
 	}
 }

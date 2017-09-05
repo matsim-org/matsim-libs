@@ -47,7 +47,6 @@ import org.matsim.core.router.util.FastAStarEuclideanFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
@@ -57,7 +56,7 @@ import org.matsim.testcases.MatsimTestUtils;
 public class RoutingIT {
 	/*package*/ static final Logger log = Logger.getLogger(RoutingIT.class);
 	
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private interface RouterProvider {
 		public String getName();
@@ -111,9 +110,7 @@ public class RoutingIT {
 			}
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				PreProcessDijkstra preProcessData = new PreProcessDijkstra();
-				preProcessData.run(network);
-				return new FastDijkstraFactory(preProcessData);
+				return new FastDijkstraFactory();
 			}
 		});
 	}
@@ -139,7 +136,7 @@ public class RoutingIT {
 			}
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastAStarEuclideanFactory(network, costCalc);
+				return new FastAStarEuclideanFactory();
 			}
 		});
 	}
@@ -165,7 +162,7 @@ public class RoutingIT {
 			}
 			@Override
 			public LeastCostPathCalculatorFactory getFactory(final Network network, final TravelDisutility costCalc, final TravelTime timeCalc) {
-				return new FastAStarLandmarksFactory(network, costCalc);
+				return new FastAStarLandmarksFactory();
 			}
 		});
 	}
@@ -187,8 +184,8 @@ public class RoutingIT {
 		
 		final boolean isEqual = PopulationUtils.equalPopulation(referenceScenario.getPopulation(), scenario.getPopulation());
 		if ( !isEqual ) {
-			new PopulationWriter(referenceScenario.getPopulation(), scenario.getNetwork()).write( utils.getOutputDirectory() + "/reference_population.xml.gz");
-			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write( utils.getOutputDirectory() + "/output_population.xml.gz");
+			new PopulationWriter(referenceScenario.getPopulation(), scenario.getNetwork()).write(this.utils.getOutputDirectory() + "/reference_population.xml.gz");
+			new PopulationWriter(scenario.getPopulation(), scenario.getNetwork()).write(this.utils.getOutputDirectory() + "/output_population.xml.gz");
 		}
 		Assert.assertTrue("different plans files.", isEqual);
 	}
@@ -227,7 +224,7 @@ public class RoutingIT {
 		});
 
 		final TripRouter tripRouter = injector.getInstance(TripRouter.class);
-		final PersonAlgorithm router = new PlanRouter( tripRouter );
+		final PersonAlgorithm router = new PlanRouter(tripRouter);
 		
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {
 			router.run(p);

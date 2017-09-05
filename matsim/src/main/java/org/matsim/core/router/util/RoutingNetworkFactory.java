@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.network.Node;
 
 public interface RoutingNetworkFactory extends NetworkFactory {
 	
-	public RoutingNetwork createRoutingNetwork(Network network);
+	public RoutingNetwork createRoutingNetwork(final Network network);
 	
-	public RoutingNetworkNode createRoutingNetworkNode(Node node, int numOutLinks);
+	public RoutingNetworkNode createRoutingNetworkNode(final Node node, final int numOutLinks);
 	
-	public RoutingNetworkLink createRoutingNetworkLink(Link link, RoutingNetworkNode fromNode, RoutingNetworkNode toNode);
+	public RoutingNetworkLink createRoutingNetworkLink(final Link link, final RoutingNetworkNode fromNode, final RoutingNetworkNode toNode);
 }

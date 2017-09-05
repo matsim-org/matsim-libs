@@ -34,45 +34,50 @@ import java.util.Map;
  */
 public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory {
 
-	private final PreProcessEuclidean preProcessData;
 	private final RoutingNetworkFactory routingNetworkFactory;
-	private final Map<Network, RoutingNetwork> routingNetworks;
+	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
+	private final Map<Network, PreProcessEuclidean> preProcessData = new HashMap<>();
 
-	public FastAStarEuclideanFactory(Network network, final TravelDisutility fsttc) {
-		this(network, fsttc, FastRouterType.ARRAY);		
+	public FastAStarEuclideanFactory() {
+		this(FastRouterType.ARRAY);		
 	}
 
-	private FastAStarEuclideanFactory(Network network, final TravelDisutility fsttc,
-			FastRouterType fastRouterType) {
-		this.preProcessData = new PreProcessEuclidean(fsttc);
-		this.preProcessData.run(network);
-
-		this.routingNetworks = new HashMap<Network, RoutingNetwork>();
-		
+	private FastAStarEuclideanFactory(final FastRouterType fastRouterType) {
 		switch (fastRouterType) {
 		case ARRAY:
-			this.routingNetworkFactory = new ArrayRoutingNetworkFactory(preProcessData);
+			this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
 			break;
 		case POINTER:
-			throw new RuntimeException("PointerRoutingNetworks are no longer supported. "
-					+ "Use ArrayRoutingNetworks instead. Aborting!");
+			throw new RuntimeException("PointerRoutingNetworks are no longer supported. Use ArrayRoutingNetworks instead. Aborting!");
 		default:
 			throw new RuntimeException("Undefined FastRouterType: " + fastRouterType);
 		}
 	}
 
 	@Override
-	public LeastCostPathCalculator createPathCalculator(Network network,
-			TravelDisutility travelCosts, TravelTime travelTimes) {
-	
+	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		RoutingNetwork routingNetwork = this.routingNetworks.get(network);
+		PreProcessEuclidean preProcessEuclidean = this.preProcessData.get(network);
+		
 		if (routingNetwork == null) {
 			routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
+			
+			if (preProcessEuclidean == null) {
+				preProcessEuclidean = new PreProcessEuclidean(travelCosts);
+				preProcessEuclidean.run(network);
+				this.preProcessData.put(network, preProcessEuclidean);
+			}
+			if (preProcessEuclidean.containsData()) {
+				for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
+					node.setDeadEndData(preProcessEuclidean.getNodeData(node.getNode()));
+				}
+			}				
+			
 			this.routingNetworks.put(network, routingNetwork);
 		}
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 		
-		return new FastAStarEuclidean(routingNetwork, this.preProcessData, travelCosts, travelTimes, 1,
-			fastRouterFactory);
+		final double overdoFactor = 1.0;
+		return new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelCosts, travelTimes, overdoFactor, fastRouterFactory);
 	}
 }

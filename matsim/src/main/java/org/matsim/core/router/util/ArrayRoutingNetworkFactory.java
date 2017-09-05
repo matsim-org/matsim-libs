@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.LinkFactory;
-import org.matsim.core.network.NetworkChangeEvent;
 
 public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 	
@@ -37,13 +36,9 @@ public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 	
 	private int nodeArrayIndexCounter;
 	private int linkArrayIndexCounter;
-	
-	public ArrayRoutingNetworkFactory(PreProcessDijkstra preProcessData) {
-		super(preProcessData);
-	}
-	
+
 	@Override
-	public ArrayRoutingNetwork createRoutingNetwork(Network network) {
+	public synchronized ArrayRoutingNetwork createRoutingNetwork(final Network network) {
 		this.nodeArrayIndexCounter = 0;
 		this.linkArrayIndexCounter = 0;
 		
@@ -77,31 +72,21 @@ public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 		if (routingLinks.size() > 0) log.warn("Not all links have been use in the ArrayRoutingNetwork - " +
 				"check connectivity of input network!");
 		
-		if (preProcessData != null) {
-			if (preProcessData.containsData()) {
-				for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
-					node.setDeadEndData(preProcessData.getNodeData(node.getNode()));
-				}
-			}
-		}
-		
 		return routingNetwork;
 	}
 
 	@Override
-	public ArrayRoutingNetworkNode createRoutingNetworkNode(Node node, int numOutLinks) {
-		return new ArrayRoutingNetworkNode(node, numOutLinks, nodeArrayIndexCounter++);
+	public ArrayRoutingNetworkNode createRoutingNetworkNode(final Node node, final int numOutLinks) {
+		return new ArrayRoutingNetworkNode(node, numOutLinks, this.nodeArrayIndexCounter++);
 	}
 
 	@Override
-	public ArrayRoutingNetworkLink createRoutingNetworkLink(Link link,
-			RoutingNetworkNode fromNode, RoutingNetworkNode toNode) {
-		return new ArrayRoutingNetworkLink(link, fromNode, toNode, linkArrayIndexCounter++);
+	public ArrayRoutingNetworkLink createRoutingNetworkLink(final Link link, final RoutingNetworkNode fromNode, final RoutingNetworkNode toNode) {
+		return new ArrayRoutingNetworkLink(link, fromNode, toNode, this.linkArrayIndexCounter++);
 	}
 
 	@Override
-	public void setLinkFactory(LinkFactory factory) {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented") ;
+	public void setLinkFactory(final LinkFactory factory) {
+		throw new RuntimeException("not implemented");
 	}
 }

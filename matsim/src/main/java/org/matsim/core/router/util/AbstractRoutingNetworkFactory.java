@@ -26,21 +26,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
 public abstract class AbstractRoutingNetworkFactory implements RoutingNetworkFactory {
-
-	protected final PreProcessDijkstra preProcessData;
-	
-	public AbstractRoutingNetworkFactory(PreProcessDijkstra preProcessData) {
-		this.preProcessData = preProcessData;
-	}
 	
 	@Override
-	public Link createLink(Id<Link> id, Node fromNode, Node toNode) {
+	public Link createLink(final Id<Link> id, final Node fromNode, final Node toNode) {
 		throw new RuntimeException("Not supported operation!");
 	}
 
 	@Override
-	public RoutingNetworkNode createNode(Id<Node> id, Coord coord) {
+	public RoutingNetworkNode createNode(final Id<Node> id, final Coord coord) {
 		throw new RuntimeException("Not supported operation!");
 	}
-
 }

@@ -28,33 +28,33 @@ import org.matsim.core.router.FastRouterType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
 import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
 public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
 	
-	private final PreProcessDijkstra preProcessData;
+	private final boolean usePreProcessData;
 	private final RoutingNetworkFactory routingNetworkFactory;
-	private final Map<Network, RoutingNetwork> routingNetworks;
+	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
+	private final Map<Network, PreProcessDijkstra> preProcessData = new HashMap<>();
 
 	@Inject
 	public FastDijkstraFactory() {
-		this(null, FastRouterType.ARRAY);
+		this(false, FastRouterType.ARRAY);
 	}
 
-    public FastDijkstraFactory(final PreProcessDijkstra preProcessData) {
-		this(preProcessData, FastRouterType.ARRAY);
+    public FastDijkstraFactory(final boolean usePreProcessData) {
+		this(usePreProcessData, FastRouterType.ARRAY);
 	}
 
-	private FastDijkstraFactory(final PreProcessDijkstra preProcessData, FastRouterType fastRouterType) {
-		this.preProcessData = preProcessData;
-		
-		this.routingNetworks = new HashMap<Network, RoutingNetwork>();
-		
+	private FastDijkstraFactory(final boolean usePreProcessData, final FastRouterType fastRouterType) {
+		this.usePreProcessData = usePreProcessData;
+				
 		switch (fastRouterType) {
 		case ARRAY:
-			this.routingNetworkFactory = new ArrayRoutingNetworkFactory(preProcessData);
+			this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
 			break;
 		case POINTER:
 			throw new RuntimeException("PointerRoutingNetworks are no longer supported. "
@@ -65,15 +65,30 @@ public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
 	}
 
 	@Override
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
-			
+	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		RoutingNetwork routingNetwork = this.routingNetworks.get(network);
+		PreProcessDijkstra preProcessDijkstra = this.preProcessData.get(network);
+
 		if (routingNetwork == null) {
 			routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
+			
+			if (this.usePreProcessData) {
+				if (preProcessDijkstra == null) {
+					preProcessDijkstra = new PreProcessDijkstra();
+					preProcessDijkstra.run(network);
+					this.preProcessData.put(network, preProcessDijkstra);
+				}
+				if (preProcessDijkstra.containsData()) {
+					for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
+						node.setDeadEndData(preProcessDijkstra.getNodeData(node.getNode()));
+					}
+				}
+			}
+			
 			this.routingNetworks.put(network, routingNetwork);
 		}
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 		
-		return new FastDijkstra(routingNetwork, travelCosts, travelTimes, preProcessData, fastRouterFactory);
+		return new FastDijkstra(routingNetwork, travelCosts, travelTimes, preProcessDijkstra, fastRouterFactory);
 	}
 }

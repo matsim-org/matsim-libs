@@ -31,37 +31,51 @@ import org.matsim.core.router.FastRouterDelegateFactory;
 public class FastMultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory {
 	
 	private final boolean searchAllEndNodes;
-	private final PreProcessDijkstra preProcessData;
+	private final boolean usePreProcessData;
 	private final RoutingNetworkFactory routingNetworkFactory;
-	private final Map<Network, RoutingNetwork> routingNetworks;
+	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
+	private final Map<Network, PreProcessDijkstra> preProcessData = new HashMap<>();
 	
 	public FastMultiNodeDijkstraFactory() {
 		this(false);
 	}
 	
 	public FastMultiNodeDijkstraFactory(boolean searchAllEndNodes) {
-		this(null, searchAllEndNodes);
+		this(false, searchAllEndNodes);
 	}
 		
-	public FastMultiNodeDijkstraFactory(final PreProcessDijkstra preProcessData, final boolean searchAllEndNodes) {
-		this.preProcessData = preProcessData;
+	public FastMultiNodeDijkstraFactory(final boolean usePreProcessData, final boolean searchAllEndNodes) {
+		this.usePreProcessData = usePreProcessData;
 		this.searchAllEndNodes = searchAllEndNodes;
-		
-		this.routingNetworks = new HashMap<Network, RoutingNetwork>();
-		this.routingNetworkFactory = new ArrayRoutingNetworkFactory(preProcessData);
+		this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
 	}
 
 	@Override
-	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
+	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		
-		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 		RoutingNetwork routingNetwork = this.routingNetworks.get(network);
+		PreProcessDijkstra preProcessDijkstra = this.preProcessData.get(network);
+
 		if (routingNetwork == null) {
 			routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
+			
+			if (this.usePreProcessData) {
+				if (preProcessDijkstra == null) {
+					preProcessDijkstra = new PreProcessDijkstra();
+					preProcessDijkstra.run(network);
+					this.preProcessData.put(network, preProcessDijkstra);
+				}
+				if (preProcessDijkstra.containsData()) {
+					for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
+						node.setDeadEndData(preProcessDijkstra.getNodeData(node.getNode()));
+					}
+				}
+			}
+			
 			this.routingNetworks.put(network, routingNetwork);
 		}
+		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 		
-		return new FastMultiNodeDijkstra(routingNetwork, travelCosts, travelTimes, 
-				this.preProcessData, fastRouterFactory, this.searchAllEndNodes);
+		return new FastMultiNodeDijkstra(routingNetwork, travelCosts, travelTimes, preProcessDijkstra, fastRouterFactory, this.searchAllEndNodes);
 	}
 }
