@@ -11,7 +11,7 @@ import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.contrib.util.LinkProvider;
 import org.matsim.core.router.*;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 
 /**
@@ -47,15 +47,8 @@ public class BestDispatchFinder {
 		this.scheduleInquiry = optimContext.scheduler;
 		this.expectedNeighbourhoodSize = expectedNeighbourhoodSize;
 
-		// TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
-		// PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
-		// preProcessDijkstra.run(routingNetwork);
-		PreProcessDijkstra preProcessDijkstra = null;
-		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-
-		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(optimContext.network);
-		router = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility, optimContext.travelTime,
-				preProcessDijkstra, fastRouterFactory, false);
+		router = (MultiNodeDijkstra)new FastMultiNodeDijkstraFactory(false).createPathCalculator(optimContext.network,
+				optimContext.travelDisutility, optimContext.travelTime);
 	}
 
 	// for immediate requests only
@@ -105,7 +98,7 @@ public class BestDispatchFinder {
 			return null;
 		}
 
-		ImaginaryNode fromNodes = MultiNodeDijkstra.createImaginaryNode(initialNodes.values());
+		RoutingNetworkImaginaryNode fromNodes = new RoutingNetworkImaginaryNode(initialNodes.values());
 
 		Path path = router.calcLeastCostPath(fromNodes, toNode, currTime, null, null);
 		// the calculated path contains real nodes (no imaginary/initial nodes),
@@ -153,7 +146,7 @@ public class BestDispatchFinder {
 			}
 		}
 
-		ImaginaryNode toNodes = MultiNodeDijkstra.createImaginaryNode(initialNodes.values());
+		RoutingNetworkImaginaryNode toNodes = new RoutingNetworkImaginaryNode(initialNodes.values());
 
 		// calc path for departure.time+1 (we need 1 second to move over the node)
 		Path path = router.calcLeastCostPath(fromNode, toNodes, departure.time + 1, null, null);

@@ -38,7 +38,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-import org.matsim.core.router.*;
+import org.matsim.core.router.FastMultiNodeDijkstra;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.misc.Time;
@@ -59,8 +59,8 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final ParallelMultiVehicleInsertionProblem insertionProblem;
 
 	@Inject
-	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network, Fleet fleet,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
+			Fleet fleet, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory,
 			MobsimTimer mobsimTimer, DrtVehicleFilter vehicleFilter, EventsManager eventsManager,
 			DrtScheduler scheduler) {
@@ -70,22 +70,14 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		this.eventsManager = eventsManager;
 		this.scheduler = scheduler;
 
-		// TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
-		// PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
-		// preProcessDijkstra.run(routingNetwork);
-		PreProcessDijkstra preProcessDijkstra = null;
-		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(network);
-		RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory().createRoutingNetwork(network);
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
-
 		SingleVehicleInsertionProblem[] singleVehicleInsertionProblems = new SingleVehicleInsertionProblem[drtCfg
 				.getNumberOfThreads()];
 		for (int i = 0; i < singleVehicleInsertionProblems.length; i++) {
-			FastMultiNodeDijkstra router = new FastMultiNodeDijkstra(routingNetwork, travelDisutility, travelTime,
-					preProcessDijkstra, fastRouterFactory, true);
-			BackwardFastMultiNodeDijkstra backwardRouter = new BackwardFastMultiNodeDijkstra(inverseRoutingNetwork,
-					travelDisutility, travelTime, preProcessDijkstra, fastRouterFactory, true);
+			FastMultiNodeDijkstra router = (FastMultiNodeDijkstra)new FastMultiNodeDijkstraFactory(true)
+					.createPathCalculator(network, travelDisutility, travelTime);
+			BackwardFastMultiNodeDijkstra backwardRouter = (BackwardFastMultiNodeDijkstra)new BackwardsFastMultiNodeDijkstraFactory(
+					true).createPathCalculator(network, travelDisutility, travelTime);
 			singleVehicleInsertionProblems[i] = new SingleVehicleInsertionProblem(router, backwardRouter,
 					drtCfg.getStopDuration(), drtCfg.getMaxWaitTime(), mobsimTimer);
 		}

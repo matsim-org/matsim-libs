@@ -88,7 +88,7 @@ public class OneToManyPathSearch {
 	}
 
 	private void calculatePaths(Node fromNode, Map<Id<Node>, ToNode> toNodes, double startTime) {
-		ImaginaryNode imaginaryNode = MultiNodeDijkstra.createImaginaryNode(toNodes.values());
+		RoutingNetworkImaginaryNode imaginaryNode = new RoutingNetworkImaginaryNode(toNodes.values());
 		multiNodeDijkstra.setSearchAllEndNodes(true);
 		multiNodeDijkstra.calcLeastCostPath(fromNode, imaginaryNode, startTime, null, null);
 

@@ -48,20 +48,11 @@ public class AssignmentTaxiOptimizer extends AbstractTaxiOptimizer {
 		super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true, true);
 		this.params = params;
 
-		// TODO bug: cannot cast ImaginaryNode to RoutingNetworkNode
-		// PreProcessDijkstra preProcessDijkstra = new PreProcessDijkstra();
-		// preProcessDijkstra.run(routing network);
-		PreProcessDijkstra preProcessDijkstra = null;
-		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
+		multiNodeRouter = (FastMultiNodeDijkstra)new FastMultiNodeDijkstraFactory(true)
+				.createPathCalculator(optimContext.network, optimContext.travelDisutility, optimContext.travelTime);
 
-		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(optimContext.network);
-		multiNodeRouter = new FastMultiNodeDijkstra(routingNetwork, optimContext.travelDisutility, optimContext.travelTime,
-				preProcessDijkstra, fastRouterFactory, true);
-
-		RoutingNetwork inverseRoutingNetwork = new InverseArrayRoutingNetworkFactory()
-				.createRoutingNetwork(optimContext.network);
-		backwardMultiNodeRouter = new BackwardFastMultiNodeDijkstra(inverseRoutingNetwork, optimContext.travelDisutility,
-				optimContext.travelTime, preProcessDijkstra, fastRouterFactory, true);
+		backwardMultiNodeRouter = (BackwardFastMultiNodeDijkstra)new BackwardsFastMultiNodeDijkstraFactory(true)
+				.createPathCalculator(optimContext.network, optimContext.travelDisutility, optimContext.travelTime);
 
 		router = new FastAStarEuclideanFactory().createPathCalculator(optimContext.network,
 				optimContext.travelDisutility, optimContext.travelTime);
