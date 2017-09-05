@@ -1,18 +1,10 @@
 // code by jph
 package playground.clruch.traveldata;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
-import java.util.Optional;
 
 import org.gnu.glpk.GLPKConstants;
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -22,21 +14,17 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 
+import ch.ethz.idsc.queuey.math.TensorOperations;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Transpose;
-import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.red.Total;
-import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
 import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
-import playground.clruch.tensorUtils.TensorOperations;
 import playground.clruch.utils.GlobalAssert;
 
 /**
