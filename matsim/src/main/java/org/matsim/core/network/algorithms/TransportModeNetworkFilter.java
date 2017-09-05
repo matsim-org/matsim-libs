@@ -52,12 +52,28 @@ public final class TransportModeNetworkFilter {
 
 	/**
 	 * Extracts a subnetwork containing only links with the specified modes.
+	 * 
+	 * I had to extend this method in order to keep the nodes in the same order as in
+	 * the input network. Otherwise, some router tests failed since for some from-to-pairs,
+	 * multiple routes with the same costs were found. In that case, the outcome depends
+	 * on the order of the nodes and links in the network. This problem might occur also
+	 * in other places, therefore, I fixed it here.
+	 * cdobler, sep'17
 	 *
 	 * @param subNetwork the network object where to store the extracted subnetwork
 	 * @param extractModes set of modes that should be contained in the subnetwork
 	 */
-	public void filter(final Network subNetwork, final Set<String> extractModes) {
+	public void filter(final Network subNetwork, final Set<String> extractModes) {	
 		NetworkFactory factory = subNetwork.getFactory();
+		
+		// first, clone all nodes to ensure their order is not changed
+		for (Node node : this.fullNetwork.getNodes().values()) {
+			Node newNode = factory.createNode(node.getId(), node.getCoord());
+			subNetwork.addNode(newNode);
+		}
+		
+		// second, create clones of the links allowing the extracted modes
+		Set<Id<Node>> nodesToInclude = new HashSet<>();
 		for (Link link : this.fullNetwork.getLinks().values()) {
 			Set<String> intersection = new HashSet<>(extractModes);
 			intersection.retainAll(link.getAllowedModes());
@@ -66,17 +82,8 @@ public final class TransportModeNetworkFilter {
 				Id<Node> toId = link.getToNode().getId();
 				Node fromNode2 = subNetwork.getNodes().get(fromId);
 				Node toNode2 = subNetwork.getNodes().get(toId);
-				if (fromNode2 == null) {
-					fromNode2 = factory.createNode(fromId, link.getFromNode().getCoord());
-					subNetwork.addNode(fromNode2);
-					if (fromId == toId) {
-						toNode2 = fromNode2;
-					}
-				}
-				if (toNode2 == null) {
-					toNode2 = factory.createNode(toId, link.getToNode().getCoord());
-					subNetwork.addNode(toNode2);
-				}
+				nodesToInclude.add(fromId);
+				nodesToInclude.add(toId);
 
 				Link link2 = factory.createLink(link.getId(), fromNode2, toNode2);
 				link2.setAllowedModes(intersection);
@@ -88,6 +95,12 @@ public final class TransportModeNetworkFilter {
 				subNetwork.addLink(link2);
 			}
 		}
+		
+		// third, remove all nodes that are not used by the valid links
+		Set<Id<Node>> nodesToRemove = new HashSet<>();
+		for (Node node : this.fullNetwork.getNodes().values()) {
+			if (!nodesToInclude.contains(node.getId())) nodesToRemove.add(node.getId());
+		}
+		for (Id<Node> nodeId : nodesToRemove) subNetwork.removeNode(nodeId);
 	}
-
 }
