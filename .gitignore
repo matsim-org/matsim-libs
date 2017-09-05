@@ -19,5 +19,4 @@ IDSCOptions.properties
 # jan added:
 tutorial/output/
 tutorial/pop.xml.gz
-
-.gitignore
+/playgrounds/ivtExt/src/main/java/playground/clruch/dispatcher/TestStrategiesDispatcher.java

@@ -18,6 +18,10 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure;
 
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -25,6 +29,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Nest;
@@ -33,10 +38,6 @@ import playground.ivt.maxess.nestedlogitaccessibility.framework.PrismSampler;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 import playground.ivt.utils.ConcurrentStopWatch;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author thibautd

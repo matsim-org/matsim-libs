@@ -18,11 +18,12 @@
  * *********************************************************************** */
 package playground.ivt.scripts;
 
-import org.matsim.core.utils.misc.Counter;
-import playground.ivt.utils.MonitoringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.matsim.core.utils.misc.Counter;
+
+import playground.ivt.utils.MonitoringUtils;
 
 /**
  * @author thibautd

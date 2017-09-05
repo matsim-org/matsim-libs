@@ -14,6 +14,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.AnalyzeSummary;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
@@ -33,7 +34,6 @@ import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
 import playground.clruch.trb18.traveltime.reloading.WriteTravelTimesModule;
-import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.PropertiesExt;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;

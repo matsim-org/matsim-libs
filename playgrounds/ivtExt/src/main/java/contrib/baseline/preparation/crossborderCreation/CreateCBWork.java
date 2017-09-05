@@ -21,6 +21,13 @@
 
 package contrib.baseline.preparation.crossborderCreation;
 
+import static contrib.baseline.preparation.IVTConfigCreator.WORK;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -33,15 +40,8 @@ import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.ActivityOptionImpl;
 import org.matsim.facilities.OpeningTimeImpl;
+
 import contrib.baseline.lib.CSVReader;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static contrib.baseline.preparation.IVTConfigCreator.*;
-import static contrib.baseline.preparation.IVTConfigCreator.WORK;
 
 /**
  * Implementation of the trunk class CreateCBsubpop for the creation of single-trip work cb-agents.

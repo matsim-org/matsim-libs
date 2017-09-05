@@ -1,23 +1,29 @@
 package playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.AbstractTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
+
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVTimingParameters;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.aggregation.AggregatedRequest;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.avtaxi.schedule.*;
-
-import java.util.*;
+import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
+import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
+import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
+import playground.sebhoerl.avtaxi.schedule.AVStayTask;
+import playground.sebhoerl.avtaxi.schedule.AVTask;
 
 public class AggregateRideAppender {
     final private LeastCostPathCalculator router;

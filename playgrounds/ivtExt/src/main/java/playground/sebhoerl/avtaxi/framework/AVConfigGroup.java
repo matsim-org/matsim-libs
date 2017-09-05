@@ -1,9 +1,6 @@
 package playground.sebhoerl.avtaxi.framework;
 
 import org.matsim.core.config.ReflectiveConfigGroup;
-import playground.sebhoerl.avtaxi.config.AVConfig;
-import playground.sebhoerl.avtaxi.config.AVConfigReader;
-import playground.sebhoerl.avtaxi.config.AVTimingParameters;
 
 public class AVConfigGroup extends ReflectiveConfigGroup {
 	final static String AV = "av";

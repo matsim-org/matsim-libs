@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;

@@ -3,7 +3,6 @@ package playground.sebhoerl.av.model.dispatcher;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.matsim.core.population.routes.NetworkRoute;
 

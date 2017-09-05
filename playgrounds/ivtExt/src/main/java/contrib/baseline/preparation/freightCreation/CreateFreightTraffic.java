@@ -21,24 +21,39 @@
 
 package contrib.baseline.preparation.freightCreation;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toCH1903LV03Plus;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.facilities.*;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.OpeningTime;
+import org.matsim.facilities.OpeningTimeImpl;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import contrib.baseline.preparation.IVTConfigCreator;
+
 import contrib.baseline.lib.FacilityUtils;
 import contrib.baseline.lib.PopulationUtils;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.*;
+import contrib.baseline.preparation.IVTConfigCreator;
 
 /**
  * Creates single-trip populations from OD-matrices.

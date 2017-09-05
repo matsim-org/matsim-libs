@@ -1,8 +1,8 @@
 package playground.sebhoerl.remote_exec.euler;
 
-import playground.sebhoerl.remote_exec.RemoteController;
-
 import java.util.Collection;
+
+import playground.sebhoerl.remote_exec.RemoteController;
 
 public class EulerController implements RemoteController {
     final EulerInterface euler;

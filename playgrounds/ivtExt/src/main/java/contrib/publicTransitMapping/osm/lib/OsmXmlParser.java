@@ -19,18 +19,23 @@
 
 package contrib.publicTransitMapping.osm.lib;
 
+import java.util.Locale;
+import java.util.Stack;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
-import contrib.publicTransitMapping.osm.lib.OsmParser.*;
+
+import contrib.publicTransitMapping.osm.lib.OsmParser.OsmNode;
+import contrib.publicTransitMapping.osm.lib.OsmParser.OsmRelation;
+import contrib.publicTransitMapping.osm.lib.OsmParser.OsmRelationMember;
+import contrib.publicTransitMapping.osm.lib.OsmParser.OsmRelationMemberType;
+import contrib.publicTransitMapping.osm.lib.OsmParser.OsmWay;
 import contrib.publicTransitMapping.osm.lib.handler.OsmHandler;
 import contrib.publicTransitMapping.osm.lib.handler.OsmNodeHandler;
 import contrib.publicTransitMapping.osm.lib.handler.OsmRelationHandler;
 import contrib.publicTransitMapping.osm.lib.handler.OsmWayHandler;
-
-import java.util.Locale;
-import java.util.Stack;
 
 /**
  * @author mrieser / Senozon AG

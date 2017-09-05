@@ -4,8 +4,6 @@ package playground.clruch.prep;
 import static org.matsim.pt.PtConstants.TRANSIT_ACTIVITY_TYPE;
 
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;

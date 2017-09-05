@@ -1,9 +1,9 @@
 // code by clruch
 package playground.clruch.prep;
 
-import org.matsim.api.core.v01.network.Network;
-
 import java.io.File;
+
+import org.matsim.api.core.v01.network.Network;
 
 /**
  * Created by Claudio on 2/8/2017.

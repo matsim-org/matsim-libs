@@ -6,8 +6,8 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.router.FuturePathContainer;
-import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 

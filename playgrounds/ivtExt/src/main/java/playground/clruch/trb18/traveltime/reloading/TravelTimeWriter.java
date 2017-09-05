@@ -1,16 +1,18 @@
 package playground.clruch.trb18.traveltime.reloading;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.zip.GZIPOutputStream;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.router.util.TravelTime;
-
-import java.io.*;
-import java.util.zip.GZIPOutputStream;
 
 public class TravelTimeWriter implements IterationEndsListener {
     final private Network network;

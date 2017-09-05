@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.ivt.maxess.gisutils;
 
+import java.io.File;
+
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.gce.geotiff.GeoTiffReader;
 import org.geotools.geometry.DirectPosition2D;
@@ -25,8 +27,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.geometry.DirectPosition;
-
-import java.io.File;
 
 /**
  * @author thibautd

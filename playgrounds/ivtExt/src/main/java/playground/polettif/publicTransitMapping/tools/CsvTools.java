@@ -19,9 +19,6 @@
 
 package playground.polettif.publicTransitMapping.tools;
 
-import org.matsim.core.utils.collections.MapUtils;
-import org.matsim.core.utils.collections.Tuple;
-
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -29,6 +26,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.collections.Tuple;
 
 /**
  * Methods to create and write csv data.

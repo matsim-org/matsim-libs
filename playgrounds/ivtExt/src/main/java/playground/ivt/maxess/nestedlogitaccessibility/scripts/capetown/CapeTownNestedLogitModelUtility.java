@@ -18,7 +18,10 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.scripts.capetown;
 
-import com.google.inject.Inject;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
@@ -26,12 +29,11 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
+
+import com.google.inject.Inject;
+
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author thibautd

@@ -1,10 +1,14 @@
 package playground.clruch.trb18.analysis.detail.events;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
-import playground.clruch.trb18.analysis.detail.events.TripCollector;
-
-import java.util.*;
 
 public class PairCollector {
     final public TripCollector.Handler referenceHandler;

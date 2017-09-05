@@ -2,7 +2,6 @@ package playground.sebhoerl.mexec_opdyts.optimization;
 
 import floetteroed.opdyts.SimulatorState;
 import floetteroed.utilities.math.Vector;
-import playground.sebhoerl.mexec.Simulation;
 import playground.sebhoerl.mexec_opdyts.execution.OpdytsExecutor;
 import playground.sebhoerl.mexec_opdyts.execution.SimulationRun;
 

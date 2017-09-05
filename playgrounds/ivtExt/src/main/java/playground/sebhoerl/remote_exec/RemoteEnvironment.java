@@ -1,8 +1,5 @@
 package playground.sebhoerl.remote_exec;
 
-import com.jcraft.jsch.JSchException;
-
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
 

@@ -20,10 +20,10 @@
 
 package contrib.publicTransitMapping.gtfs.lib;
 
-import contrib.publicTransitMapping.gtfs.lib.GTFSDefinitions.RouteTypes;
-
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import contrib.publicTransitMapping.gtfs.lib.GTFSDefinitions.RouteTypes;
 
 
 public class GTFSRoute {

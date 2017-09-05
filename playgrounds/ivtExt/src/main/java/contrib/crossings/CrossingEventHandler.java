@@ -18,6 +18,11 @@
 
 package contrib.crossings;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -28,15 +33,11 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.utils.misc.Time;
+
 import playground.polettif.crossings.lib.Crossing;
 import playground.polettif.crossings.lib.LinkChangeEvent;
 import playground.polettif.crossings.lib.LinkChangeEventImpl;
 import playground.polettif.crossings.lib.PtLink;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Handles when a train enters a rail link and stores the

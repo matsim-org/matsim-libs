@@ -4,7 +4,7 @@ package playground.clruch.gheat.graphics;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
-import playground.clruch.utils.GlobalAssert;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 public class ColorScheme {
     public final BufferedImage bufferedImage = new BufferedImage(1, 256, BufferedImage.TYPE_INT_ARGB);

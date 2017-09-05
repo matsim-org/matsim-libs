@@ -1,7 +1,6 @@
 package playground.sebhoerl.analysis.scenario;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;

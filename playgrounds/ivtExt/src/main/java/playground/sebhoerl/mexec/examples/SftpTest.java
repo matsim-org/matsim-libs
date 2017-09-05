@@ -1,16 +1,15 @@
 package playground.sebhoerl.mexec.examples;
 
-import com.jcraft.jsch.*;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsManagerImpl;
+import java.io.File;
+import java.io.IOException;
+
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
+import com.jcraft.jsch.SftpException;
+
 import playground.sebhoerl.mexec.ssh.utils.SSHFile;
 import playground.sebhoerl.mexec.ssh.utils.SSHUtils;
-import playground.sebhoerl.remote_exec.euler.EulerConfiguration;
-import playground.sebhoerl.remote_exec.euler.EulerEnvironment;
-import playground.sebhoerl.remote_exec.euler.EulerInterface;
-import playground.sebhoerl.remote_exec.euler.EulerSimulation;
-
-import java.io.*;
 
 public class SftpTest {
     static public void main(String[] args) throws JSchException, SftpException, IOException {

@@ -19,16 +19,17 @@
  * *********************************************************************** */
 package playground.ivt.replanning;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
+import javax.inject.Provider;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
-
-import javax.inject.Provider;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 
 /**
  * Randomly mutates mode of non-chain based trips.

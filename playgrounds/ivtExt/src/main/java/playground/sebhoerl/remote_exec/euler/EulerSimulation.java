@@ -1,13 +1,11 @@
 package playground.sebhoerl.remote_exec.euler;
 
-import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.EventHandler;
-import playground.sebhoerl.remote_exec.RemoteSimulation;
-
 import java.io.OutputStream;
 import java.util.Map;
+
+import org.matsim.core.api.experimental.events.EventsManager;
+
+import playground.sebhoerl.remote_exec.RemoteSimulation;
 
 public class EulerSimulation implements RemoteSimulation {
     final private String id;

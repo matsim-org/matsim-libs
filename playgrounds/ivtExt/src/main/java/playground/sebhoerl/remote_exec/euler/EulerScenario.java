@@ -1,9 +1,8 @@
 package playground.sebhoerl.remote_exec.euler;
 
-import playground.sebhoerl.remote_exec.RemoteScenario;
-import playground.sebhoerl.remote_exec.RemoteSimulation;
-
 import java.util.Collection;
+
+import playground.sebhoerl.remote_exec.RemoteScenario;
 
 public class EulerScenario implements RemoteScenario {
     final EulerInterface euler;

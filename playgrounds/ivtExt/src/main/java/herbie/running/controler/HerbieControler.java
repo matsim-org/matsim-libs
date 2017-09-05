@@ -20,10 +20,11 @@
 
 package herbie.running.controler;
 
-import herbie.running.config.HerbieConfigGroup;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+
+import herbie.running.config.HerbieConfigGroup;
 
 /**
  * Controler for the Herbie project.

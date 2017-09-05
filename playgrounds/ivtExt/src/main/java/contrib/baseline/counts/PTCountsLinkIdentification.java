@@ -21,24 +21,27 @@
 
 package contrib.baseline.counts;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Counter;
-import contrib.baseline.lib.NetworkUtils;
+import static contrib.baseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
-import static contrib.baseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
+
+import contrib.baseline.lib.NetworkUtils;
 
 /**
  * Identifies for a given from-to-relationship the according pt-link in the network.

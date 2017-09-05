@@ -19,6 +19,7 @@
 package playground.ivt.maxess.nestedlogitaccessibility.scripts;
 
 import org.apache.log4j.Logger;
+
 import playground.ivt.maxess.nestedlogitaccessibility.framework.AccessibilityComputationResult;
 import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessibilityWriter;
 

@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.SumScoringFunction;
+
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringFunctionFactory;
 
 /**

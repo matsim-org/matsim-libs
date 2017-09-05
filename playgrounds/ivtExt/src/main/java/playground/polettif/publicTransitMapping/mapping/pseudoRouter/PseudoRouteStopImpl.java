@@ -18,16 +18,17 @@
 
 package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidateImpl;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author polettif

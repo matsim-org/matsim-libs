@@ -18,20 +18,22 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.framework;
 
-import com.google.inject.Provider;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.core.utils.misc.Counter;
-import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter.ChoiceSetRecordFiller;
-
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.misc.Counter;
+
+import com.google.inject.Provider;
+
+import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter.ChoiceSetRecordFiller;
 
 /**
  * @author thibautd

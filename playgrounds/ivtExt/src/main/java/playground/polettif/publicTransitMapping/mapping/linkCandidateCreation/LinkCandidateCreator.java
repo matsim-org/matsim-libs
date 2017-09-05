@@ -18,10 +18,10 @@
 
 package playground.polettif.publicTransitMapping.mapping.linkCandidateCreation;
 
+import java.util.SortedSet;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import java.util.SortedSet;
 
 /**
  * Interface for a class to create and store {@link LinkCandidate}s

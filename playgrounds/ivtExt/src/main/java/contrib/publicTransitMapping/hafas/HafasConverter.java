@@ -21,27 +21,32 @@
 
 package contrib.publicTransitMapping.hafas;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.vehicles.VehicleCapacity;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehiclesFactory;
+
 import contrib.publicTransitMapping.hafas.lib.BitfeldAnalyzer;
 import contrib.publicTransitMapping.hafas.lib.OperatorReader;
 import contrib.publicTransitMapping.hafas.lib.StopReader;
 import contrib.publicTransitMapping.hafas.v2.FPLANReader;
 import contrib.publicTransitMapping.hafas.v2.FPLANRoute;
 import contrib.publicTransitMapping.tools.ScheduleCleaner;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Implementation of Hafas2MATSimTransitSchedule.

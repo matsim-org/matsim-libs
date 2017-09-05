@@ -1,5 +1,8 @@
 package playground.sebhoerl.mexec.ssh;
 
+import java.io.IOException;
+import java.util.Set;
+
 import playground.sebhoerl.mexec.ConfigUtils;
 import playground.sebhoerl.mexec.Scenario;
 import playground.sebhoerl.mexec.data.ScenarioData;
@@ -7,9 +10,6 @@ import playground.sebhoerl.mexec.generic.AbstractScenario;
 import playground.sebhoerl.mexec.placeholders.PlaceholderUtils;
 import playground.sebhoerl.mexec.ssh.utils.SSHFile;
 import playground.sebhoerl.mexec.ssh.utils.SSHUtils;
-
-import java.io.IOException;
-import java.util.Set;
 
 public class SSHScenario extends AbstractScenario implements Scenario {
     final private SSHEnvironment environment;

@@ -20,14 +20,15 @@
 
 package herbie.running.controler.listeners;
 
-import herbie.running.config.HerbieConfigGroup;
-import herbie.running.population.algorithms.PersonInvalidateScores;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmRunner;
+
+import herbie.running.config.HerbieConfigGroup;
+import herbie.running.population.algorithms.PersonInvalidateScores;
 
 public class KtiPopulationPreparation implements StartupListener {
 

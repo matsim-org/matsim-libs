@@ -20,6 +20,16 @@
 
 package herbie.running.scoring;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -32,8 +42,6 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.OpeningTime;
 import org.matsim.facilities.OpeningTimeImpl;
-
-import java.util.*;
 
 
 /**

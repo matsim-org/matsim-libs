@@ -2,17 +2,16 @@ package playground.clruch.trb18.scenario.stages;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-
-import java.util.HashSet;
-import java.util.Set;
 
 public class TRBReducedPopulationExtractor {
     final private static Logger logger = Logger.getLogger(TRBReducedPopulationExtractor.class);

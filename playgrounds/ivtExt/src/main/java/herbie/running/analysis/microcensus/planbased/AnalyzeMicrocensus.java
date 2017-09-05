@@ -23,10 +23,9 @@ package herbie.running.analysis.microcensus.planbased;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.analysis.filters.population.PersonIntersectAreaFilter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
@@ -37,6 +36,7 @@ import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+
 import utils.Bins;
 
 /**

@@ -1,9 +1,7 @@
 package playground.sebhoerl.mexec.generic;
 
 import playground.sebhoerl.mexec.Controller;
-import playground.sebhoerl.mexec.Environment;
 import playground.sebhoerl.mexec.data.ControllerData;
-import playground.sebhoerl.mexec.local.LocalEnvironment;
 
 public abstract class AbstractController<DataType extends ControllerData> implements Controller {
     final protected DataType data;

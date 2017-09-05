@@ -18,6 +18,9 @@
  * *********************************************************************** */
 package playground.ivt.analysis;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.socnetsim.jointtrips.JointMainModeIdentifier;
 import org.matsim.contrib.socnetsim.jointtrips.population.JointActingTypes;
@@ -28,10 +31,8 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
-import playground.ivt.utils.TripModeShares;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import playground.ivt.utils.TripModeShares;
 
 /**
  * @author thibautd

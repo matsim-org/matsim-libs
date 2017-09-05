@@ -1,5 +1,16 @@
 package playground.sebhoerl.mexec.ssh;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import playground.sebhoerl.mexec.Config;
 import playground.sebhoerl.mexec.ConfigUtils;
 import playground.sebhoerl.mexec.Simulation;
@@ -9,12 +20,6 @@ import playground.sebhoerl.mexec.placeholders.PlaceholderUtils;
 import playground.sebhoerl.mexec.ssh.data.SSHSimulationData;
 import playground.sebhoerl.mexec.ssh.utils.SSHFile;
 import playground.sebhoerl.mexec.ssh.utils.SSHUtils;
-
-import java.io.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 public class SSHSimulation extends AbstractSimulation<SSHSimulationData> implements Simulation {
     final private SSHEnvironment environment;

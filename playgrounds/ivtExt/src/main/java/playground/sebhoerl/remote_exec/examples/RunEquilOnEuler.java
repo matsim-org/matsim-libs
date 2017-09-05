@@ -1,22 +1,30 @@
 package playground.sebhoerl.remote_exec.examples;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsManagerImpl;
+
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.events.EventsManagerImpl;
-import playground.sebhoerl.remote_exec.*;
+
+import playground.sebhoerl.remote_exec.RemoteController;
+import playground.sebhoerl.remote_exec.RemoteEnvironment;
+import playground.sebhoerl.remote_exec.RemoteScenario;
+import playground.sebhoerl.remote_exec.RemoteSimulation;
+import playground.sebhoerl.remote_exec.RemoteUtils;
 import playground.sebhoerl.remote_exec.euler.EulerConfiguration;
 import playground.sebhoerl.remote_exec.euler.EulerEnvironment;
 import playground.sebhoerl.remote_exec.euler.EulerInterface;
 import playground.sebhoerl.remote_exec.local.LocalConfiguration;
 import playground.sebhoerl.remote_exec.local.LocalEnvironment;
 import playground.sebhoerl.remote_exec.local.LocalInterface;
-
-import java.io.*;
 
 public class RunEquilOnEuler {
     /**

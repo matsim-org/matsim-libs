@@ -20,10 +20,14 @@
 
 package playground.polettif.publicTransitMapping.gtfs.lib;
 
-import org.matsim.core.utils.collections.MapUtils;
-
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.matsim.core.utils.collections.MapUtils;
 
 public class Service {
 	

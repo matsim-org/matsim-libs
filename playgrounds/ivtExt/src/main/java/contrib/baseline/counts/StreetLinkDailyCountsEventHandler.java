@@ -21,13 +21,7 @@
 
 package contrib.baseline.counts;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.core.config.Config;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.IOUtils;
+import static contrib.baseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -37,7 +31,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static contrib.baseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.core.config.Config;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.IOUtils;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * Counts the daily vehicles on a given link.

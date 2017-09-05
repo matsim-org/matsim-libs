@@ -1,5 +1,8 @@
 package playground.ivt.maxess.tripbased;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -9,11 +12,9 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.testcases.MatsimTestUtils;
+
 import playground.ivt.maxess.prepareforbiogeme.tripbased.PrismicConversionConfigGroup;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.RunPrismicTripChoiceSetConversion;
-
-import java.io.BufferedReader;
-import java.io.IOException;
 
 /**
  * More a regression/integration test than a unit test

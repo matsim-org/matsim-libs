@@ -1,11 +1,14 @@
 package playground.sebhoerl.mexec_opdyts.examples;
 
-import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
-import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
+import java.io.File;
+
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+
+import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
+import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import playground.sebhoerl.mexec.Controller;
 import playground.sebhoerl.mexec.Environment;
 import playground.sebhoerl.mexec.Scenario;
@@ -14,11 +17,11 @@ import playground.sebhoerl.mexec.local.LocalEnvironment;
 import playground.sebhoerl.mexec.local.os.LinuxDriver;
 import playground.sebhoerl.mexec_opdyts.execution.OpdytsRunner;
 import playground.sebhoerl.mexec_opdyts.execution.OpdytsRunnerConfig;
-import playground.sebhoerl.mexec_opdyts.optimization.*;
-
-import java.io.File;
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import playground.sebhoerl.mexec_opdyts.optimization.EventsBasedObjectiveFunction;
+import playground.sebhoerl.mexec_opdyts.optimization.IterationEventHandler;
+import playground.sebhoerl.mexec_opdyts.optimization.IterationObjectiveFunction;
+import playground.sebhoerl.mexec_opdyts.optimization.Proposal;
+import playground.sebhoerl.mexec_opdyts.optimization.ProposalDistribution;
 
 public class RunEquiExample {
     static public class WalkShareObjectiveHandler implements PersonDepartureEventHandler, IterationEventHandler {

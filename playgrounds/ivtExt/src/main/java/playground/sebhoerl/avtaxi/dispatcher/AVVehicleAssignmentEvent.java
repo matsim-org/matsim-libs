@@ -1,9 +1,10 @@
 package playground.sebhoerl.avtaxi.dispatcher;
 
-import org.matsim.api.core.v01.events.Event;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
-
 import java.util.Map;
+
+import org.matsim.api.core.v01.events.Event;
+
+import playground.sebhoerl.avtaxi.data.AVVehicle;
 
 public class AVVehicleAssignmentEvent extends Event {
     final private AVVehicle vehicle;

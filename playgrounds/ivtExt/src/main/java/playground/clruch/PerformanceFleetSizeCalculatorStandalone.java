@@ -12,13 +12,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
-import playground.clruch.utils.GlobalAssert;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 

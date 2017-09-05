@@ -27,10 +27,10 @@ import org.matsim.contrib.locationchoice.BestReplyDestinationChoice;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.SumScoringFunction.ActivityScoring;
 import org.matsim.core.scoring.SumScoringFunction.LegScoring;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 
 /**
  * TODO: propose to put in location choice contrib

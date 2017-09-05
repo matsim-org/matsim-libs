@@ -15,9 +15,9 @@ import org.matsim.core.utils.collections.QuadTree;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
-import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;

@@ -6,13 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
-
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
-import org.matsim.contrib.dvrp.data.*;
-
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
@@ -21,6 +17,9 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;

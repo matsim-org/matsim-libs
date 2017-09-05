@@ -20,6 +20,8 @@
 
 package herbie.running.replanning;
 
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -33,8 +35,6 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
-
-import javax.inject.Provider;
 
 /**
  *	A subset of the switzerland population are transit agents. They can by identified by

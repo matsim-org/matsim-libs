@@ -18,15 +18,16 @@
 
 package contrib.publicTransitMapping.plausibility.log;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import contrib.publicTransitMapping.plausibility.PlausibilityCheck;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import contrib.publicTransitMapping.plausibility.PlausibilityCheck;
 
 /**
  * Plausibility warning if a link sequence has abrupt direction changes

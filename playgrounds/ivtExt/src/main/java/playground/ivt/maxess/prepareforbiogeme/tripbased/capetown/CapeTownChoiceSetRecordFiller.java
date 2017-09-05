@@ -18,21 +18,22 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.tripbased.capetown;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.Income;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceDataSetWriter;
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSet;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.RecordFillerUtils;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus.Codebook;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * @author thibautd

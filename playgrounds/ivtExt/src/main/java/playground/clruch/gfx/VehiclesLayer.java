@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 
 import javax.swing.JCheckBox;
 
+import playground.clib.util.gui.RowPanel;
+import playground.clib.util.gui.SpinnerLabel;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.net.AbstractContainer;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.VehicleContainer;
-import playground.clruch.utils.gui.RowPanel;
-import playground.clruch.utils.gui.SpinnerLabel;
 
 /* package */ class VehiclesLayer extends ViewerLayer {
     private static final AVStatus[] aVStatusArray = new AVStatus[] { //

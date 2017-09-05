@@ -1,12 +1,13 @@
 package playground.sebhoerl.euler_opdyts;
 
-import org.apache.log4j.Logger;
-import playground.sebhoerl.remote_exec.RemoteSimulation;
-import playground.sebhoerl.remote_exec.RemoteUtils;
-
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import playground.sebhoerl.remote_exec.RemoteSimulation;
+import playground.sebhoerl.remote_exec.RemoteUtils;
 
 public class WarmupFactory implements RemoteSimulationFactory {
     final private static Logger log = Logger.getLogger(WarmupFactory.class);

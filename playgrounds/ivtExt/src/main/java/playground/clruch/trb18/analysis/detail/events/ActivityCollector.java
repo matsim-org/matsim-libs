@@ -1,5 +1,10 @@
 package playground.clruch.trb18.analysis.detail.events;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -7,12 +12,8 @@ import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import playground.clruch.trb18.analysis.detail.Utils;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import playground.clruch.trb18.analysis.detail.Utils;
 
 public class ActivityCollector implements ActivityStartEventHandler, ActivityEndEventHandler {
     final private Map<Id<Person>, Activity> activities = new HashMap<>();

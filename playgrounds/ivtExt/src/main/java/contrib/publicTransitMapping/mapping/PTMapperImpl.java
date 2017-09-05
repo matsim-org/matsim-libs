@@ -21,6 +21,13 @@
 
 package contrib.publicTransitMapping.mapping;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -33,6 +40,7 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.TransitScheduleValidator;
+
 import contrib.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import contrib.publicTransitMapping.config.PublicTransitMappingStrings;
 import contrib.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidateCreator;
@@ -45,8 +53,6 @@ import contrib.publicTransitMapping.plausibility.StopFacilityHistogram;
 import contrib.publicTransitMapping.tools.NetworkTools;
 import contrib.publicTransitMapping.tools.ScheduleCleaner;
 import contrib.publicTransitMapping.tools.ScheduleTools;
-
-import java.util.*;
 
 /**
  * References an unmapped transit schedule to a network. Combines

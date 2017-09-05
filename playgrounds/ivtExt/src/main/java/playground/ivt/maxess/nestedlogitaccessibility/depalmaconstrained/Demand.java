@@ -18,24 +18,25 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained;
 
-import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
+
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Alternative;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.LogSumExpCalculator;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Nest;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedChoiceSet;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.NestedLogitModel;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ForkJoinPool;
 
 /**
  * @author thibautd

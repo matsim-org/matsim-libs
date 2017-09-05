@@ -21,16 +21,17 @@
 
 package contrib.baseline.preparation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+
 import contrib.baseline.preparation.crossborderCreation.CreateCBPop;
 import contrib.baseline.preparation.freightCreation.CreateFreightTraffic;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Creates an ivt config with location choice.

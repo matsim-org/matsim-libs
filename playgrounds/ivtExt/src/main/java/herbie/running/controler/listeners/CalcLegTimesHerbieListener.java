@@ -20,8 +20,10 @@
 
 package herbie.running.controler.listeners;
 
-import herbie.running.analysis.CalcLegTimesKTI;
-import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
@@ -36,9 +38,8 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.misc.Time;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
-import java.util.TreeMap;
+import herbie.running.analysis.CalcLegTimesKTI;
+import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
 
 
 public class CalcLegTimesHerbieListener implements StartupListener, AfterMobsimListener, ShutdownListener, IterationEndsListener {

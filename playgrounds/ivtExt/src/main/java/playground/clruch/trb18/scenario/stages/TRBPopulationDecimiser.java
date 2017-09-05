@@ -1,12 +1,12 @@
 package playground.clruch.trb18.scenario.stages;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 
 public class TRBPopulationDecimiser {
     final private Random random;

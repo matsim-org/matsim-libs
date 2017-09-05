@@ -19,17 +19,22 @@
 
 package contrib.publicTransitMapping.osm.lib;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.UncheckedIOException;
+
 import contrib.publicTransitMapping.osm.lib.handler.OsmHandler;
 import contrib.publicTransitMapping.osm.lib.handler.OsmNodeHandler;
 import contrib.publicTransitMapping.osm.lib.handler.OsmRelationHandler;
 import contrib.publicTransitMapping.osm.lib.handler.OsmWayHandler;
-
-import java.util.*;
 
 /**
  * @author mrieser / Senozon AG

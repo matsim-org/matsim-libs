@@ -18,9 +18,9 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.framework;
 
-import org.matsim.api.core.v01.population.Plan;
-
 import java.util.List;
+
+import org.matsim.api.core.v01.population.Plan;
 
 /**
  * @author thibautd

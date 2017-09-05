@@ -18,14 +18,27 @@ package playground.clruch.prep;
  *                                                                         *
  * *********************************************************************** */
 
-import herbie.creation.freight.CSShapeFileWriter;
-import herbie.creation.freight.ODRelation;
-import herbie.creation.freight.Statistics;
-import herbie.creation.freight.Zone;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.TreeMap;
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigReader;
@@ -38,12 +51,18 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.facilities.*;
-import utils.BuildTrees;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.FacilitiesReaderMatsimV1;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.OpeningTime;
+import org.matsim.facilities.OpeningTimeImpl;
 
-import java.io.*;
-import java.text.DecimalFormat;
-import java.util.*;
+import herbie.creation.freight.CSShapeFileWriter;
+import herbie.creation.freight.ODRelation;
+import herbie.creation.freight.Statistics;
+import herbie.creation.freight.Zone;
+import utils.BuildTrees;
 
 public class CreateTraffic {
 

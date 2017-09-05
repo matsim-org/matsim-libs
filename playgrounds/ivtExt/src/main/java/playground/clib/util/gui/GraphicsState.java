@@ -1,4 +1,5 @@
-package playground.clruch.utils.gui;
+// code by jph
+package playground.clib.util.gui;
 
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;

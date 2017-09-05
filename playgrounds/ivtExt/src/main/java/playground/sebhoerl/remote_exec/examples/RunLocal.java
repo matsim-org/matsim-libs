@@ -1,9 +1,15 @@
 package playground.sebhoerl.remote_exec.examples;
 
-import playground.sebhoerl.remote_exec.*;
-import playground.sebhoerl.remote_exec.local.*;
-
 import java.io.IOException;
+
+import playground.sebhoerl.remote_exec.RemoteController;
+import playground.sebhoerl.remote_exec.RemoteEnvironment;
+import playground.sebhoerl.remote_exec.RemoteScenario;
+import playground.sebhoerl.remote_exec.RemoteSimulation;
+import playground.sebhoerl.remote_exec.RemoteUtils;
+import playground.sebhoerl.remote_exec.local.LocalConfiguration;
+import playground.sebhoerl.remote_exec.local.LocalEnvironment;
+import playground.sebhoerl.remote_exec.local.LocalInterface;
 
 public class RunLocal {
     public static void main(String[] args) throws InterruptedException, IOException {

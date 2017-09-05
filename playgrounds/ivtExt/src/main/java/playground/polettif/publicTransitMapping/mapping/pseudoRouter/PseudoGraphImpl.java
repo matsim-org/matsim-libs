@@ -19,12 +19,20 @@
 
 package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableSet;
+import java.util.TreeSet;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
-import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 
-import java.util.*;
+import playground.polettif.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 
 /**
  * @author polettif

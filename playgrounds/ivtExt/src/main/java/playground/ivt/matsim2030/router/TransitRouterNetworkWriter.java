@@ -20,6 +20,9 @@
 
 package playground.ivt.matsim2030.router;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.collections.Tuple;
@@ -29,9 +32,6 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TransitRouterNetworkWriter extends MatsimXmlWriter implements MatsimWriter {
 	

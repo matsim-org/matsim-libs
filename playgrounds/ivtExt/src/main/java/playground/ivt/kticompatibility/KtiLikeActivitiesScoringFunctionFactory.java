@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.ivt.kticompatibility;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -30,10 +32,13 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
-import org.matsim.core.scoring.functions.*;
-import playground.ivt.scoring.LineChangeScoringFunction;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
 
-import java.util.Collection;
+import playground.ivt.scoring.LineChangeScoringFunction;
 
 /**
  * This factory creates "CharyparNagel" scoring functions, but with

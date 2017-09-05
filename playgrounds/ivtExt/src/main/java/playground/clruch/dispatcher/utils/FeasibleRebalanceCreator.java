@@ -4,6 +4,7 @@ package playground.clruch.dispatcher.utils;
 import java.util.List;
 import java.util.Map;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -12,7 +13,6 @@ import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.netdata.VirtualNode;
-import playground.clruch.utils.GlobalAssert;
 
 public enum FeasibleRebalanceCreator {
     ;

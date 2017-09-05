@@ -1,11 +1,20 @@
 package playground.clruch.trb18.scenario;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import java.io.File;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -20,20 +29,29 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.prep.PopulationRequestSchedule;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
-import playground.clruch.trb18.scenario.stages.*;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import playground.clruch.trb18.scenario.stages.TRBAVPlanSelector;
+import playground.clruch.trb18.scenario.stages.TRBBackgroundTrafficCleaner;
+import playground.clruch.trb18.scenario.stages.TRBConfigModifier;
+import playground.clruch.trb18.scenario.stages.TRBNetworkModifier;
+import playground.clruch.trb18.scenario.stages.TRBNetworkRadiusFilter;
+import playground.clruch.trb18.scenario.stages.TRBNetworkShapeFilter;
+import playground.clruch.trb18.scenario.stages.TRBPlanModifier;
+import playground.clruch.trb18.scenario.stages.TRBPopulationCleaner;
+import playground.clruch.trb18.scenario.stages.TRBPopulationDecimiser;
+import playground.clruch.trb18.scenario.stages.TRBPopulationPreparer;
+import playground.clruch.trb18.scenario.stages.TRBReducedPopulationExtractor;
+import playground.clruch.trb18.scenario.stages.TRBRouteAppender;
+import playground.clruch.trb18.scenario.stages.TRBSlowModeCleaner;
 
 public class RunTRBScenarioBuilder {
     public static void main(String args[]) throws Exception {

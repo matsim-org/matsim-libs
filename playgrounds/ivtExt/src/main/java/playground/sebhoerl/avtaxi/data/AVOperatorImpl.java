@@ -1,13 +1,8 @@
 package playground.sebhoerl.avtaxi.data;
 
 import org.matsim.api.core.v01.Id;
-import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
 
 public class AVOperatorImpl implements AVOperator {
     final private Id<AVOperator> id;

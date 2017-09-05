@@ -4,8 +4,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+
 import playground.sebhoerl.mexec.Simulation;
 import playground.sebhoerl.mexec.SimulationUtils;
 

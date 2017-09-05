@@ -9,11 +9,8 @@
 
 package playground.clruch.dispatcher;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.zip.DataFormatException;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -23,6 +20,7 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -42,12 +40,9 @@ import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.VirtualNode;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
-import playground.clruch.traveldata.TravelDataIO;
-import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;

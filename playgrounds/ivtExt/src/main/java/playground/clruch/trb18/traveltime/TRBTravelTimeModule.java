@@ -1,12 +1,14 @@
 package playground.clruch.trb18.traveltime;
 
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.TravelTime;
+
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
+
 import playground.sebhoerl.avtaxi.framework.AVModule;
 
 public class TRBTravelTimeModule extends AbstractModule {

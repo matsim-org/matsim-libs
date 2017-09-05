@@ -19,26 +19,48 @@
 
 package contrib.publicTransitMapping.gtfs;
 
-import com.opencsv.CSVReader;
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.collections.MapUtils;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.Vehicles;
-import contrib.publicTransitMapping.gtfs.lib.*;
-import contrib.publicTransitMapping.tools.ScheduleTools;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.geometry.CoordinateTransformation;
+import org.matsim.core.utils.misc.Time;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicles;
+
+import com.opencsv.CSVReader;
+
+import contrib.publicTransitMapping.gtfs.lib.Frequency;
+import contrib.publicTransitMapping.gtfs.lib.GTFSDefinitions;
+import contrib.publicTransitMapping.gtfs.lib.GTFSRoute;
+import contrib.publicTransitMapping.gtfs.lib.GTFSStop;
+import contrib.publicTransitMapping.gtfs.lib.Service;
+import contrib.publicTransitMapping.gtfs.lib.Shape;
+import contrib.publicTransitMapping.gtfs.lib.StopTime;
+import contrib.publicTransitMapping.gtfs.lib.Trip;
+import contrib.publicTransitMapping.tools.ScheduleTools;
 
 
 /**

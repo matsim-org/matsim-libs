@@ -18,8 +18,11 @@
  * *********************************************************************** */
 package playground.ivt.analysis.scoretracking;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -34,10 +37,8 @@ import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * @author thibautd

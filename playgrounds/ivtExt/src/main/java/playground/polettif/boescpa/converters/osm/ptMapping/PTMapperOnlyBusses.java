@@ -21,6 +21,14 @@
 
 package playground.polettif.boescpa.converters.osm.ptMapping;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -34,10 +42,11 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.pt.transitSchedule.api.*;
-import playground.polettif.boescpa.converters.osm.ptMapping.PTLRouter;
-
-import java.util.*;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Default implementation of PTLinesCreator.

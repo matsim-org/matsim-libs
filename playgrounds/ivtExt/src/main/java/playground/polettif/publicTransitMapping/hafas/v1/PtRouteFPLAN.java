@@ -21,18 +21,24 @@
 
 package playground.polettif.publicTransitMapping.hafas.v1;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vehicles.VehicleType;
-import playground.polettif.publicTransitMapping.hafas.HafasDefinitions;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+
+import playground.polettif.publicTransitMapping.hafas.HafasDefinitions;
 
 /**
  * A public transport route as read out from HAFAS FPLAN.

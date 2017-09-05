@@ -1,14 +1,20 @@
 package playground.sebhoerl.ant;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.File;
+import java.io.IOException;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.MatsimEventsReader;
-import playground.sebhoerl.ant.handlers.*;
-import playground.sebhoerl.av_paper.BinCalculator;
 
-import java.io.File;
-import java.io.IOException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import playground.sebhoerl.ant.handlers.CountsHandler;
+import playground.sebhoerl.ant.handlers.DistanceHandler;
+import playground.sebhoerl.ant.handlers.IdleHandler;
+import playground.sebhoerl.ant.handlers.OccupancyHandler;
+import playground.sebhoerl.ant.handlers.TimeHandler;
+import playground.sebhoerl.av_paper.BinCalculator;
 
 public class AnalysisRunner implements Runnable {
     final private BinCalculator binCalculator;

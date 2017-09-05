@@ -21,6 +21,15 @@
 
 package contrib.baseline.preparation.crossborderCreation;
 
+import static contrib.baseline.preparation.IVTConfigCreator.LEISURE;
+import static contrib.baseline.preparation.IVTConfigCreator.SHOP;
+import static contrib.baseline.preparation.secondaryFacilityCreation.CreationOfCrossBorderFacilities.BC_TAG;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
@@ -30,15 +39,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import static contrib.baseline.preparation.IVTConfigCreator.*;
-import static contrib.baseline.preparation.secondaryFacilityCreation.CreationOfCrossBorderFacilities.*;
-import static contrib.baseline.preparation.secondaryFacilityCreation.CreationOfCrossBorderFacilities.BC_TAG;
 
 /**
  * Implementation of the trunk class CreateCBsubpop for the creation of secondary activity single-trip cb-agents.

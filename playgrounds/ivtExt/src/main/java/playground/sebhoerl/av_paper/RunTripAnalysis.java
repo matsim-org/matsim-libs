@@ -10,10 +10,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -26,10 +23,6 @@ import org.matsim.core.scoring.EventsToLegs;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import playground.sebhoerl.analysis.aggregate_events.AggregateReader;
-import playground.sebhoerl.analysis.aggregate_events.Trip;
-import playground.sebhoerl.analysis.scenario.RunModeChoiceAnalysis.TripHandler;
 
 public class RunTripAnalysis {
     public static class TripPerPersonHandler implements EventsToTrips.TripHandler {

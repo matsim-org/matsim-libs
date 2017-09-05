@@ -18,7 +18,11 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.scripts.simplemikrozansusconstrainedaccessibility;
 
-import com.google.inject.TypeLiteral;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Optional;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -33,6 +37,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 
+import com.google.inject.TypeLiteral;
+
 import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.ConstrainedAccessibilityConfigGroup;
 import playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained.SingleNest;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.AccessibilityComputationResult;
@@ -44,11 +50,6 @@ import playground.ivt.maxess.nestedlogitaccessibility.writers.BasicPersonAccessi
 import playground.ivt.router.CachingFreespeedCarRouterModule;
 import playground.ivt.router.lazyschedulebasedmatrix.LazyScheduleBasedMatrixModule;
 import playground.ivt.utils.MoreIOUtils;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Optional;
 
 /**
  * @author thibautd

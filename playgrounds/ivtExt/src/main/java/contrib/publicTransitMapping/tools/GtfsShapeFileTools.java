@@ -18,7 +18,12 @@
 
 package contrib.publicTransitMapping.tools;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -26,12 +31,13 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PolylineFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.opengis.feature.simple.SimpleFeature;
+
+import com.vividsolutions.jts.geom.Coordinate;
+
 import contrib.publicTransitMapping.gtfs.GtfsConverter;
 import contrib.publicTransitMapping.gtfs.lib.GTFSRoute;
 import contrib.publicTransitMapping.gtfs.lib.Shape;
 import contrib.publicTransitMapping.gtfs.lib.Trip;
-
-import java.util.*;
 
 /**
  * Provides tools to convert GTFS data

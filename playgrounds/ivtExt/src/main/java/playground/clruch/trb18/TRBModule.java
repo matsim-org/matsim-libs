@@ -1,11 +1,11 @@
 package playground.clruch.trb18;
 
-import com.google.inject.Provides;
-import com.google.inject.name.Named;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.io.MatsimNetworkReader;
+
+import com.google.inject.Provides;
+import com.google.inject.name.Named;
+
 import playground.sebhoerl.avtaxi.framework.AVUtils;
 
 public class TRBModule extends AbstractModule {

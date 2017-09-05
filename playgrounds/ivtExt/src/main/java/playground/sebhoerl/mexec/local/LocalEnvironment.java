@@ -1,25 +1,25 @@
 package playground.sebhoerl.mexec.local;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.io.FileUtils;
-import playground.sebhoerl.mexec.Controller;
-import playground.sebhoerl.mexec.Environment;
-import playground.sebhoerl.mexec.Scenario;
-import playground.sebhoerl.mexec.Simulation;
-import playground.sebhoerl.mexec.data.ControllerData;
-import playground.sebhoerl.mexec.data.EnvironmentData;
-import playground.sebhoerl.mexec.data.ScenarioData;
-import playground.sebhoerl.mexec.data.SimulationData;
-import playground.sebhoerl.mexec.local.data.LocalEnvironmentData;
-import playground.sebhoerl.mexec.local.data.LocalSimulationData;
-import playground.sebhoerl.mexec.local.os.OSDriver;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+
+import org.apache.commons.io.FileUtils;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import playground.sebhoerl.mexec.Controller;
+import playground.sebhoerl.mexec.Environment;
+import playground.sebhoerl.mexec.Scenario;
+import playground.sebhoerl.mexec.Simulation;
+import playground.sebhoerl.mexec.data.ControllerData;
+import playground.sebhoerl.mexec.data.ScenarioData;
+import playground.sebhoerl.mexec.data.SimulationData;
+import playground.sebhoerl.mexec.local.data.LocalEnvironmentData;
+import playground.sebhoerl.mexec.local.data.LocalSimulationData;
+import playground.sebhoerl.mexec.local.os.OSDriver;
 
 public class LocalEnvironment implements Environment {
     final private File environmentPath;

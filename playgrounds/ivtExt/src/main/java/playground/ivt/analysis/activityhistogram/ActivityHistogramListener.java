@@ -20,7 +20,8 @@
 
 package playground.ivt.analysis.activityhistogram;
 
-import com.google.inject.Singleton;
+import javax.inject.Inject;
+
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.core.config.Config;
@@ -30,7 +31,7 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 
-import javax.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * Integrates the {@link LegHistogram} into the

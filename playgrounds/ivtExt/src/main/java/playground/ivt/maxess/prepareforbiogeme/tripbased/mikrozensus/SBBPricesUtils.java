@@ -19,6 +19,7 @@
 package playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus;
 
 import org.apache.log4j.Logger;
+
 import playground.ivt.maxess.prepareforbiogeme.tripbased.RecordFillerUtils;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 

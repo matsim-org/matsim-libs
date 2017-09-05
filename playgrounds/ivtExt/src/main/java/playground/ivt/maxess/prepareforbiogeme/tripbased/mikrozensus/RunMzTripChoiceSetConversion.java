@@ -18,7 +18,9 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus;
 
-import com.google.inject.Provider;
+import java.io.File;
+import java.util.Collections;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -39,6 +41,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.router.MultiNodeDijkstra;
+
+import com.google.inject.Provider;
+
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
 import playground.ivt.maxess.prepareforbiogeme.framework.Converter;
 import playground.ivt.maxess.prepareforbiogeme.tripbased.PrismicConversionConfigGroup;
@@ -50,9 +55,6 @@ import playground.ivt.maxess.prepareforbiogeme.tripbased.TripChoicesIdentifier;
 import playground.ivt.router.CachingRoutingModuleWrapper;
 import playground.ivt.router.TripSoftCache;
 import playground.ivt.utils.MoreIOUtils;
-
-import java.io.File;
-import java.util.Collections;
 
 /**
  * @author thibautd

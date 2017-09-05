@@ -21,16 +21,16 @@
 
 package contrib.baseline.preparation;
 
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.misc.Counter;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * Analysis of trip data base for speeds.

@@ -1,5 +1,8 @@
 package playground.clruch.trb18.analysis.detail;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -8,13 +11,11 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.pt.PtConstants;
+
 import playground.clruch.trb18.analysis.detail.events.ActivityCollector;
 import playground.clruch.trb18.analysis.detail.events.LegCollector;
 import playground.clruch.trb18.analysis.detail.events.PairCollector;
 import playground.clruch.trb18.analysis.detail.events.TripCollector;
-
-import java.io.File;
-import java.io.IOException;
 
 public class RunDetailAnalysis {
     static public void main(String[] args) throws IOException, InterruptedException {

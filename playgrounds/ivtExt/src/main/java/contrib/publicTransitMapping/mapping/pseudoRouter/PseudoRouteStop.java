@@ -18,15 +18,16 @@
 
 package contrib.publicTransitMapping.mapping.pseudoRouter;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import contrib.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 
-import java.util.Map;
+import contrib.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 
 /**
  * A PseudoRouteStop is used as node in the PseudoGraph. It is a container

@@ -18,15 +18,8 @@
  * *********************************************************************** */
 package playground.ivt.utils;
 
-import com.sun.management.GarbageCollectionNotificationInfo;
-import org.apache.log4j.Logger;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
+import static com.sun.management.GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION;
 
-import javax.management.NotificationBroadcaster;
-import javax.management.NotificationListener;
-import javax.management.openmbean.CompositeData;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.management.GarbageCollectorMXBean;
@@ -37,7 +30,16 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.DoubleConsumer;
 import java.util.function.LongConsumer;
 
-import static com.sun.management.GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION;
+import javax.management.NotificationBroadcaster;
+import javax.management.NotificationListener;
+import javax.management.openmbean.CompositeData;
+
+import org.apache.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
+
+import com.sun.management.GarbageCollectionNotificationInfo;
 
 /**
  * @author thibautd

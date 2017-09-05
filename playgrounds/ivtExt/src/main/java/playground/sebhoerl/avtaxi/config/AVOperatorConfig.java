@@ -2,6 +2,7 @@ package playground.sebhoerl.avtaxi.config;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ReflectiveConfigGroup;
+
 import playground.sebhoerl.avtaxi.data.AVOperator;
 
 public class AVOperatorConfig extends ReflectiveConfigGroup {

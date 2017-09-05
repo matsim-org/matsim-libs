@@ -7,9 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.population.Person;
 
 import com.fasterxml.jackson.core.JsonGenerationException;

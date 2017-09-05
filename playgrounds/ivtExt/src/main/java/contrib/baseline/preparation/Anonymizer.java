@@ -21,6 +21,16 @@
 
 package contrib.baseline.preparation;
 
+import static contrib.baseline.preparation.IVTConfigCreator.FACILITIES;
+import static contrib.baseline.preparation.IVTConfigCreator.HOUSEHOLDS;
+import static contrib.baseline.preparation.IVTConfigCreator.NETWORK;
+import static contrib.baseline.preparation.IVTConfigCreator.POPULATION;
+import static contrib.baseline.preparation.IVTConfigCreator.POPULATION_ATTRIBUTES;
+import static contrib.baseline.preparation.IVTConfigCreator.SCHEDULE;
+import static contrib.baseline.preparation.IVTConfigCreator.VEHICLES;
+
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
@@ -42,10 +52,6 @@ import org.matsim.households.Income;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import org.matsim.vehicles.VehicleWriterV1;
-
-import java.io.File;
-
-import static contrib.baseline.preparation.IVTConfigCreator.*;
 
 /**
  * Provides the functionality to anonymize a scenario before publication.

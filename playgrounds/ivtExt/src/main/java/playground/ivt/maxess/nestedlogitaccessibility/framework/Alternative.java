@@ -19,6 +19,7 @@
 package playground.ivt.maxess.nestedlogitaccessibility.framework;
 
 import org.matsim.api.core.v01.Id;
+
 import playground.ivt.maxess.prepareforbiogeme.tripbased.Trip;
 
 /**

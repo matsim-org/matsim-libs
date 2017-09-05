@@ -18,6 +18,8 @@
 
 package contrib.publicTransitMapping.mapping;
 
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,12 +29,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
 import contrib.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import contrib.publicTransitMapping.tools.NetworkTools;
 import contrib.publicTransitMapping.tools.ScheduleCleaner;
 import contrib.publicTransitMapping.tools.ScheduleTools;
-
-import java.util.List;
 
 /**
  * Takes the siouxfalls example schedule and network, removes the mapping and runs the PTMapper on the unmapped schedule.

@@ -12,12 +12,12 @@ import java.util.function.BiConsumer;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.QuadTree;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
-import playground.clruch.utils.GlobalAssert;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /** @author Claudio Ruch */

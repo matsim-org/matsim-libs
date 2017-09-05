@@ -1,22 +1,24 @@
 package playground.joel.data;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
+import java.io.File;
+import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.NavigableMap;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
-import playground.clruch.utils.GlobalAssert;
-import playground.clruch.utils.HelperPredicates;
-import playground.joel.helpers.*;
 
-import java.io.File;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.util.*;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
+import playground.clruch.utils.HelperPredicates;
+import playground.joel.helpers.CSVcreator;
+import playground.joel.helpers.KeyMap;
+import playground.joel.helpers.binnedHelper;
 
 /**
  * Created by Joel on 28.02.2017.

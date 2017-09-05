@@ -19,6 +19,10 @@
 
 package herbie.creation.ptAnalysis;
 
+import java.util.Map;
+import java.util.Stack;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -30,13 +34,19 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitRouteImpl;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
-import org.matsim.pt.transitSchedule.api.*;
-import org.matsim.vehicles.*;
-import utils.Bins;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleImpl;
+import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.Vehicles;
 
-import java.util.Map;
-import java.util.Stack;
-import java.util.TreeMap;
+import utils.Bins;
 
 public class PtScenarioAdaption {
 	

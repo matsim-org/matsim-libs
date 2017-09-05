@@ -145,7 +145,8 @@ public class AVModule extends AbstractModule {
 
         bind(MPCDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), MPCDispatcher.class.getSimpleName()).to(MPCDispatcher.Factory.class);
-
+        
+        
     }
 
     private void configureGeneratorStrategies() {

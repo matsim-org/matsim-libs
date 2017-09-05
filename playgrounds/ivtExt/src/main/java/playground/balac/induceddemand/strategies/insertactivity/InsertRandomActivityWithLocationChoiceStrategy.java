@@ -1,7 +1,9 @@
 package playground.balac.induceddemand.strategies.insertactivity;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.Map;
+
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -25,10 +27,11 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.utils.collections.QuadTree;
-import playground.balac.induceddemand.strategies.InsertRandomActivity;
 
-import javax.inject.Provider;
-import java.util.Map;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
+import playground.balac.induceddemand.strategies.InsertRandomActivity;
 
 public class InsertRandomActivityWithLocationChoiceStrategy implements PlanStrategy {
 	private PlanStrategyImpl planStrategyDelegate;

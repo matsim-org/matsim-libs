@@ -18,6 +18,13 @@
 
 package contrib.publicTransitMapping.mapping;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -29,13 +36,18 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+
 import contrib.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import contrib.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 import contrib.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidateCreator;
 import contrib.publicTransitMapping.mapping.networkRouter.Router;
-import contrib.publicTransitMapping.mapping.pseudoRouter.*;
-
-import java.util.*;
+import contrib.publicTransitMapping.mapping.pseudoRouter.ArtificialLink;
+import contrib.publicTransitMapping.mapping.pseudoRouter.ArtificialLinkImpl;
+import contrib.publicTransitMapping.mapping.pseudoRouter.PseudoGraph;
+import contrib.publicTransitMapping.mapping.pseudoRouter.PseudoGraphImpl;
+import contrib.publicTransitMapping.mapping.pseudoRouter.PseudoRouteStop;
+import contrib.publicTransitMapping.mapping.pseudoRouter.PseudoSchedule;
+import contrib.publicTransitMapping.mapping.pseudoRouter.PseudoScheduleImpl;
 
 /**
  * Generates and calculates the pseudoRoutes for all the queued

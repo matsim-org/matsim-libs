@@ -1,8 +1,8 @@
 package playground.sebhoerl.remote_exec.local;
 
-import playground.sebhoerl.remote_exec.RemoteScenario;
-
 import java.util.Collection;
+
+import playground.sebhoerl.remote_exec.RemoteScenario;
 
 /**
  * Created by sebastian on 11/10/16.

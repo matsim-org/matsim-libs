@@ -19,8 +19,16 @@
  * *********************************************************************** */
 package playground.ivt.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
@@ -32,10 +40,6 @@ import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * An events manager which (attempts to) transmit only events relevant for a given

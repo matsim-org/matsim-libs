@@ -2,6 +2,7 @@ package contrib.publicTransitMapping.mapping;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.transitSchedule.api.TransitLine;
+
 import contrib.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 import contrib.publicTransitMapping.mapping.pseudoRouter.ArtificialLink;
 import contrib.publicTransitMapping.mapping.pseudoRouter.PseudoGraph;

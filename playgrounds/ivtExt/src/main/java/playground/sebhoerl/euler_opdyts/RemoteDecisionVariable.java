@@ -1,9 +1,10 @@
 package playground.sebhoerl.euler_opdyts;
 
-import floetteroed.opdyts.DecisionVariable;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 
-import java.util.Map;
+import floetteroed.opdyts.DecisionVariable;
 
 public class RemoteDecisionVariable implements DecisionVariable {
     final private static Logger log = Logger.getLogger(RemoteDecisionVariable.class);

@@ -1,9 +1,8 @@
 package playground.clruch.analysis;
 
-import ch.ethz.idsc.tensor.Tensor;
-
 import java.io.Serializable;
-import java.util.List;
+
+import ch.ethz.idsc.tensor.Tensor;
 
 /**
  * Created by Joel on 28.06.2017.

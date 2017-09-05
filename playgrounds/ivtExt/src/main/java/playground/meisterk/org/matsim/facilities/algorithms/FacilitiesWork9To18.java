@@ -20,15 +20,20 @@
 
 package playground.meisterk.org.matsim.facilities.algorithms;
 
+import java.util.Iterator;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
-import org.matsim.facilities.*;
+import org.matsim.facilities.ActivityFacilitiesImpl;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityFacilityImpl;
+import org.matsim.facilities.ActivityOptionImpl;
+import org.matsim.facilities.OpeningTimeImpl;
+
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensus;
 import playground.meisterk.org.matsim.enterprisecensus.EnterpriseCensusParser;
-
-import java.util.Iterator;
-import java.util.TreeMap;
 
 public class FacilitiesWork9To18 {
 

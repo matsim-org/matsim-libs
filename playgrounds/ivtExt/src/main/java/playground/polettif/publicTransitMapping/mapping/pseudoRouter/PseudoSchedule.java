@@ -18,12 +18,12 @@
 
 package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
+import java.util.List;
+import java.util.Set;
+
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * Container to store multiple {@link PseudoTransitRoute}. Provides a

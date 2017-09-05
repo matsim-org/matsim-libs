@@ -21,23 +21,33 @@
 
 package contrib.baseline;
 
-import contrib.baseline.counts.*;
-import com.google.inject.name.Names;
+import java.io.File;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceInitializer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.*;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.MatsimServices;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.PtConstants;
+
+import com.google.inject.name.Names;
+
+import contrib.baseline.counts.CountsIVTBaseline;
+import contrib.baseline.counts.PTLinkCountsEventHandler;
+import contrib.baseline.counts.PTStationCountsEventHandler;
+import contrib.baseline.counts.StreetLinkDailyCountsEventHandler;
+import contrib.baseline.counts.StreetLinkHourlyCountsEventHandler;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
-
-import java.io.File;
 
 /**
  * Basic main for the calibration of the ivt baseline scenarios.

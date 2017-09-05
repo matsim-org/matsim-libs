@@ -18,11 +18,10 @@
 
 package playground.polettif.crossings.lib;
 
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import playground.polettif.crossings.lib.Crossing;
-
-import java.util.Set;
 
 /**
  * Public transport link with referenced Crossings on it

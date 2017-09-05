@@ -1,6 +1,15 @@
 package playground.clruch.trb18;
 
-import contrib.baseline.preparation.ZHCutter;
+import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -8,8 +17,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
-import org.matsim.contrib.accessibility.utils.NetworkUtil;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -21,14 +35,12 @@ import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+
+import ch.ethz.idsc.queuey.util.GlobalAssert;
+import contrib.baseline.preparation.ZHCutter;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
@@ -36,15 +48,8 @@ import playground.clruch.prep.NetworkCutClean;
 import playground.clruch.prep.PopulationRequestSchedule;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
-import playground.clruch.utils.GlobalAssert;
-import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
 @Deprecated
 public class PrepareScenarioForTRB {
     final String VIRTUALNETWORKFOLDERNAME = "virtualNetwork";

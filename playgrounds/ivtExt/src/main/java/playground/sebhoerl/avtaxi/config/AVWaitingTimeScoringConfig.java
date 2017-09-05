@@ -1,6 +1,7 @@
 package playground.sebhoerl.avtaxi.config;
 
-import org.matsim.core.config.ReflectiveConfigGroup.*;
+import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
+import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
 
 public class AVWaitingTimeScoringConfig {
     static final String PLANNED_WAITING = "marginalUtiltiyOfPlannedWaitingTime";

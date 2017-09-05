@@ -1,18 +1,19 @@
 package playground.joel.data;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.Color;
+import java.io.File;
 import java.util.NavigableMap;
 
 import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.general.SeriesException;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.chart.ChartUtilities;
-import playground.clruch.utils.GlobalAssert;
+
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.joel.helpers.KeyMap;
 
 /**

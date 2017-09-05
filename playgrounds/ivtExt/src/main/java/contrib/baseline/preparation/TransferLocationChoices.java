@@ -21,10 +21,15 @@
 
 package contrib.baseline.preparation;
 
-import org.matsim.api.core.v01.population.*;
-import contrib.baseline.lib.PopulationUtils;
-
 import java.util.List;
+
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
+
+import contrib.baseline.lib.PopulationUtils;
 
 /**
  * Transfers location choices from one population to another.

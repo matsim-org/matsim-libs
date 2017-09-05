@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -15,11 +16,9 @@ import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Quantile;
 import playground.clruch.dispatcher.core.AVStatus;
-import playground.clruch.html.DataCollector;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
-import playground.clruch.utils.GlobalAssert;
 
 /**
  * Created by Joel on 05.04.2017.

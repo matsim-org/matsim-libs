@@ -21,14 +21,15 @@
 
 package contrib.publicTransitMapping.hafas;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;
-import contrib.publicTransitMapping.tools.ScheduleTools;
 
-import java.io.IOException;
+import contrib.publicTransitMapping.tools.ScheduleTools;
 
 /**
  * Contract class to convert (Swiss) HAFAS data to
