@@ -49,23 +49,23 @@ public class RunDrtScenarioBatch {
 
 	public static void main(String[] args) {
 		//Define Iteration list
-		List<String> strings = Arrays.asList("0.3");
+		List<String> strings = Arrays.asList("0.5");
 //		List<String> strings = Arrays.asList("0.1", "0.3","0.5");
 
 
 		for (String Element : strings){
 			//Define the path to the config file and enable / disable otfvis
 			//Basis configuration
-			final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+			final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 			boolean otfvis = false;
 			
 	
 			//Overwrite existing configuration parameters
-			config.controler().setLastIteration(4);
+			config.controler().setLastIteration(6);
 			config.controler().setWriteEventsInterval(1);
 			config.controler().setWritePlansInterval(1);
 			config.controler().setOutputDirectory("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/"+Element.toString()+"/output/");
-			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/population/run124.100.output_plans_DRT0.3.xml.gz");
+			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/population/run124.100.output_plans_DRT0.5.xml.gz");
 //			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/drt_population_iteration/population/run124.100.output_plans.xml.gz");
 			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 			drt.setkNearestVehicles(90);
