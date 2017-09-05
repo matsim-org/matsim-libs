@@ -13,7 +13,7 @@ public class ObjectClient {
     ObjectInputStream objectInputStream;
     volatile boolean isLaunched = true;
 
-    public ObjectClient(final String IP, int port, ObjectHandler simulationSubscriber) throws Exception {
+    public ObjectClient(final String IP, int port, ObjectHandler objectHandler) throws Exception {
         this.IP = IP;
         new Thread(new Runnable() {
 
@@ -28,7 +28,7 @@ public class ObjectClient {
                         objectInputStream = new ObjectInputStream(socket.getInputStream());
                     while (isLaunched) {
                         Object object = objectInputStream.readObject(); // blocks until object is available
-                        simulationSubscriber.handle(object);
+                        objectHandler.handle(object);
                     }
                 } catch (Exception myException) {
                     if (isLaunched)

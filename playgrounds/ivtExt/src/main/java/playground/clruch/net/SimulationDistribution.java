@@ -24,8 +24,8 @@ public enum SimulationDistribution {
                 }
         }
 
-        for (ObjectHandler simulationSubscriber : SimulationClientSet.INSTANCE)
-            simulationSubscriber.handle(simulationObject);
+        for (ObjectHandler objectHandler : SimulationClientSet.INSTANCE)
+            objectHandler.handle(simulationObject);
     }
 
 }

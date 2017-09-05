@@ -15,7 +15,7 @@ class SimulationSubscriberDemo {
                     new ObjectClient("localhost", SimulationServer.OBJECT_SERVER_PORT, //
                             new ObjectHandler() {
                                 @Override
-                                public void handle(Object simulationObject) {
+                                public void handle(Object object) {
 //                                    System.out.println("object for simtime: " + simulationObject.now);
 
                                 }

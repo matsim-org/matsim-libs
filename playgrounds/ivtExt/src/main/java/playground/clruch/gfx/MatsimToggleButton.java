@@ -30,8 +30,8 @@ import playground.clruch.net.SimulationServer;
                         }
                         client = new ObjectClient("localhost", SimulationServer.OBJECT_SERVER_PORT, new ObjectHandler() {
                             @Override
-                            public void handle(Object simulationObject) {
-                                matsimJMapViewer.setSimulationObject((SimulationObject) simulationObject);
+                            public void handle(Object object) {
+                                matsimJMapViewer.setSimulationObject((SimulationObject) object);
                             }
                         });
                     } catch (Exception exception) {
