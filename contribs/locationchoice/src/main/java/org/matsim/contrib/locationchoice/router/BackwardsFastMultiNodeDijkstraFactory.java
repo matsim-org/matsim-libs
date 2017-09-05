@@ -38,33 +38,52 @@ import java.util.Map;
 public class BackwardsFastMultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory {
 	
 	private final boolean searchAllEndNodes;
-	private final PreProcessDijkstra preProcessData;
+	private final boolean usePreProcessData;
 	private final RoutingNetworkFactory routingNetworkFactory;
-	private final Map<Network, RoutingNetwork> routingNetworks;
+	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
+	private final Map<Network, PreProcessDijkstra> preProcessData = new HashMap<>();
 
+	public BackwardsFastMultiNodeDijkstraFactory(){
+		this(false);
+	}
+	
     public BackwardsFastMultiNodeDijkstraFactory(final boolean searchAllEndNodes) {
-		this(null, searchAllEndNodes);
+		this(false, searchAllEndNodes);
 	}
 		
-	public BackwardsFastMultiNodeDijkstraFactory(final PreProcessDijkstra preProcessData, final boolean searchAllEndNodes) {
-		this.preProcessData = preProcessData;
+	public BackwardsFastMultiNodeDijkstraFactory(final boolean usePreProcessData, final boolean searchAllEndNodes) {
+		this.usePreProcessData = usePreProcessData;
 		this.searchAllEndNodes = searchAllEndNodes;
-		
-		this.routingNetworks = new HashMap<>();
 		this.routingNetworkFactory = new InverseArrayRoutingNetworkFactory();
 	}
 
 	@Override
 	public LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		
-		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 		RoutingNetwork routingNetwork = this.routingNetworks.get(network);
+		PreProcessDijkstra preProcessDijkstra = this.preProcessData.get(network);
+	
 		if (routingNetwork == null) {
 			routingNetwork = this.routingNetworkFactory.createRoutingNetwork(network);
+			
+			if (this.usePreProcessData) {
+				if (preProcessDijkstra == null) {
+					preProcessDijkstra = new PreProcessDijkstra();
+					preProcessDijkstra.run(network);
+					this.preProcessData.put(network, preProcessDijkstra);
+				}
+				if (preProcessDijkstra.containsData()) {
+					for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
+						node.setDeadEndData(preProcessDijkstra.getNodeData(node.getNode()));
+					}
+				}
+			}
+			
 			this.routingNetworks.put(network, routingNetwork);
 		}
+		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 		
 		return new BackwardFastMultiNodeDijkstra(routingNetwork, travelCosts, travelTimes, 
-				this.preProcessData, fastRouterFactory, this.searchAllEndNodes);
+				preProcessDijkstra, fastRouterFactory, this.searchAllEndNodes);
 	}
 }
