@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-import org.matsim.contrib.locationchoice.router.BackwardsFastMultiNodeDijkstraFactory;
+import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
@@ -62,7 +62,7 @@ public class BackwardFastMultiNodeTest {
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime);
-		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardsFastMultiNodeDijkstraFactory(searchAllEndNodes).
+		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardFastMultiNodeDijkstraFactory(searchAllEndNodes).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
 		Node fromNode = scenario.getNetwork().getNodes().get(Id.create("n3", Node.class));
@@ -120,7 +120,7 @@ public class BackwardFastMultiNodeTest {
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime);
-		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardsFastMultiNodeDijkstraFactory(false).
+		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardFastMultiNodeDijkstraFactory(false).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
 		Node fromNode = scenario.getNetwork().getNodes().get(Id.create("n3", Node.class));
@@ -208,7 +208,7 @@ public class BackwardFastMultiNodeTest {
 
 		TravelTime travelTime = new FreeSpeedTravelTime();
 		TravelDisutility travelDisutility = new RandomizingTimeDistanceTravelDisutilityFactory( TransportMode.car, config.planCalcScore() ).createTravelDisutility(travelTime);
-		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardsFastMultiNodeDijkstraFactory(true).
+		BackwardFastMultiNodeDijkstra dijkstra = (BackwardFastMultiNodeDijkstra) new BackwardFastMultiNodeDijkstraFactory(true).
 				createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime);
 		
 		Node fromNode = scenario.getNetwork().getNodes().get(Id.create("n3", Node.class));

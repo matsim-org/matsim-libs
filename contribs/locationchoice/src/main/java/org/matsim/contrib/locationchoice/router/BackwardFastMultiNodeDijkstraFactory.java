@@ -35,7 +35,7 @@ import java.util.Map;
  * 
  * @author cdobler
  */
-public class BackwardsFastMultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory {
+public class BackwardFastMultiNodeDijkstraFactory implements LeastCostPathCalculatorFactory {
 	
 	private final boolean searchAllEndNodes;
 	private final boolean usePreProcessData;
@@ -43,15 +43,15 @@ public class BackwardsFastMultiNodeDijkstraFactory implements LeastCostPathCalcu
 	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
 	private final Map<Network, PreProcessDijkstra> preProcessData = new HashMap<>();
 
-	public BackwardsFastMultiNodeDijkstraFactory(){
+	public BackwardFastMultiNodeDijkstraFactory(){
 		this(false);
 	}
 	
-    public BackwardsFastMultiNodeDijkstraFactory(final boolean searchAllEndNodes) {
+    public BackwardFastMultiNodeDijkstraFactory(final boolean searchAllEndNodes) {
 		this(false, searchAllEndNodes);
 	}
 		
-	public BackwardsFastMultiNodeDijkstraFactory(final boolean usePreProcessData, final boolean searchAllEndNodes) {
+	public BackwardFastMultiNodeDijkstraFactory(final boolean usePreProcessData, final boolean searchAllEndNodes) {
 		this.usePreProcessData = usePreProcessData;
 		this.searchAllEndNodes = searchAllEndNodes;
 		this.routingNetworkFactory = new InverseArrayRoutingNetworkFactory();
