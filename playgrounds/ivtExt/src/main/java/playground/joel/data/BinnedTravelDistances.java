@@ -33,7 +33,7 @@ import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.utils.HelperPredicates;
 import playground.joel.helpers.CSVcreator;
 import playground.joel.helpers.KeyMap;
-import playground.joel.helpers.binnedHelper;
+import playground.joel.helpers.BinnedHelper;
 
 /**
  * Created by Joel on 28.02.2017.
@@ -143,25 +143,25 @@ class BinnedTravelDistances extends AbstractData {
             travelDistances.put(vehicle, new TreeMap<>());
 
         if(endTime <= keyMap.getBinStart(startTime) + binSize) {
-            binnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(startTime), getLinkLength(linkId));
-            binnedHelper.putAdd(traveledDistance, keyMap.getKey(startTime), getLinkLength(linkId));
-            if (vehicleStatus.get(vehicle) == 1) binnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(startTime), getLinkLength(linkId));
+            BinnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(startTime), getLinkLength(linkId));
+            BinnedHelper.putAdd(traveledDistance, keyMap.getKey(startTime), getLinkLength(linkId));
+            if (vehicleStatus.get(vehicle) == 1) BinnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(startTime), getLinkLength(linkId));
         } else {
             double nextBin = keyMap.getBinStart(startTime) + binSize;
-            binnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(startTime), interpolateLinkLength(startTime, endTime, nextBin - startTime, linkId));
-            binnedHelper.putAdd(traveledDistance, keyMap.getKey(startTime), interpolateLinkLength(startTime, endTime, nextBin - startTime, linkId));
-            if (vehicleStatus.get(vehicle) == 1) binnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(startTime), interpolateLinkLength(startTime, endTime, nextBin - startTime, linkId));
+            BinnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(startTime), interpolateLinkLength(startTime, endTime, nextBin - startTime, linkId));
+            BinnedHelper.putAdd(traveledDistance, keyMap.getKey(startTime), interpolateLinkLength(startTime, endTime, nextBin - startTime, linkId));
+            if (vehicleStatus.get(vehicle) == 1) BinnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(startTime), interpolateLinkLength(startTime, endTime, nextBin - startTime, linkId));
 
             while (endTime > nextBin + binSize) {
-                binnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, binSize, linkId));
-                binnedHelper.putAdd(traveledDistance, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, binSize, linkId));
-                if (vehicleStatus.get(vehicle) == 1) binnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, binSize, linkId));
+                BinnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, binSize, linkId));
+                BinnedHelper.putAdd(traveledDistance, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, binSize, linkId));
+                if (vehicleStatus.get(vehicle) == 1) BinnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, binSize, linkId));
                 nextBin += binSize;
             }
 
-            binnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, endTime - nextBin, linkId));
-            binnedHelper.putAdd(traveledDistance, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, endTime - nextBin, linkId));
-            if (vehicleStatus.get(vehicle) == 1) binnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, endTime - nextBin, linkId));
+            BinnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, endTime - nextBin, linkId));
+            BinnedHelper.putAdd(traveledDistance, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, endTime - nextBin, linkId));
+            if (vehicleStatus.get(vehicle) == 1) BinnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, endTime - nextBin, linkId));
         }
         //System.out.println("distance with customer: " + totalDistanceWithCust);
     }
@@ -289,7 +289,7 @@ class BinnedTravelDistances extends AbstractData {
 
         // export to node-based XML file
         NavigableMap<String, NavigableMap<String, Double>> binnedRatios = new TreeMap<>();
-        binnedHelper.checkFull(binnedData, binSize, keyMap);
+        BinnedHelper.checkFull(binnedData, binSize, keyMap);
         binnedRatios.put("bins", binnedData);
         new BinnedRatiosXML("binnedDistanceRatio").generate(binnedRatios, fileExport);
 

@@ -9,7 +9,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 
 /** Created by Joel on 26.06.2017. */
-public abstract class htmlUtils {
+public abstract class HtmlUtils {
     public static StringBuilder stringBuilder = new StringBuilder();
     public static boolean html = false;
     public static boolean head = false;
@@ -27,7 +27,7 @@ public abstract class htmlUtils {
         } else {
             stringBuilder.append("<html>");
             html = true;
-            htmlUtils.insertCSS("header, footer {font-family: arial;", //
+            HtmlUtils.insertCSS("header, footer {font-family: arial;", //
                     "background-color: #000099;", //
                     "color: white;", //
                     "padding: 20px;", //
@@ -158,7 +158,7 @@ public abstract class htmlUtils {
     }
 
     public static void insertLink(String url, String link) {
-        htmlUtils.insertCSS("a {font-family: arial;}");
+        HtmlUtils.insertCSS("a {font-family: arial;}");
         if (footer || header)
             stringBuilder.append("<a id=\"footer_link\" target=\"_blank\"" + " href=\"" + url + "\"> <b>" + link + "</b></a>");
         else
