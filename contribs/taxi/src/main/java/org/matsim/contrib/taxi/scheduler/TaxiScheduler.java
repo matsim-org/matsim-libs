@@ -34,22 +34,22 @@ import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.*;
+import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.util.*;
 import org.matsim.core.utils.misc.Time;
 
 public class TaxiScheduler implements TaxiScheduleInquiry {
 	private final Fleet fleet;
-	protected final TaxiSchedulerParams params;
+	protected final TaxiConfigGroup taxiCfg;
 	private final MobsimTimer timer;
 
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
 
 	public TaxiScheduler(TaxiConfigGroup taxiCfg, Network network, Fleet fleet, MobsimTimer timer,
-			TaxiSchedulerParams params, TravelTime travelTime, TravelDisutility travelDisutility) {
+			TravelTime travelTime, TravelDisutility travelDisutility) {
+		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
-		this.params = params;
 		this.timer = timer;
 		this.travelTime = travelTime;
 
@@ -71,10 +71,6 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		}
 	}
 
-	public TaxiSchedulerParams getParams() {
-		return params;
-	}
-
 	@Override
 	public boolean isIdle(Vehicle vehicle) {
 		Schedule schedule = vehicle.getSchedule();
@@ -92,7 +88,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	 */
 	@Override
 	public LinkTimePair getImmediateDiversionOrEarliestIdleness(Vehicle veh) {
-		if (params.vehicleDiversion) {
+		if (taxiCfg.isVehicleDiversion()) {
 			LinkTimePair diversion = getImmediateDiversion(veh);
 			if (diversion != null) {
 				return diversion;
@@ -127,7 +123,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 						return createValidLinkTimePair(link, time, veh);
 
 					case PICKUP:
-						if (!params.destinationKnown) {
+						if (!taxiCfg.isDestinationKnown()) {
 							return null;
 						}
 						// otherwise: IllegalStateException -- the schedule should end with STAY (or PICKUP if
@@ -152,7 +148,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	 */
 	@Override
 	public LinkTimePair getImmediateDiversion(Vehicle veh) {
-		if (!params.vehicleDiversion) {
+		if (!taxiCfg.isVehicleDiversion()) {
 			throw new RuntimeException("Diversion must be on");
 		}
 
@@ -191,10 +187,10 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		divertOrAppendDrive(schedule, vrpPath);
 
 		double pickupEndTime = Math.max(vrpPath.getArrivalTime(), request.getEarliestStartTime())
-				+ params.pickupDuration;
+				+ taxiCfg.getPickupDuration();
 		schedule.addTask(new TaxiPickupTask(vrpPath.getArrivalTime(), pickupEndTime, request));
 
-		if (params.destinationKnown) {
+		if (taxiCfg.isDestinationKnown()) {
 			appendOccupiedDriveAndDropoff(schedule);
 			appendTasksAfterDropoff(vehicle);
 		}
@@ -217,7 +213,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	}
 
 	protected void divertDrive(TaxiEmptyDriveTask lastTask, VrpPathWithTravelData vrpPath) {
-		if (!params.vehicleDiversion) {
+		if (!taxiCfg.isVehicleDiversion()) {
 			throw new IllegalStateException();
 		}
 
@@ -266,7 +262,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	}
 
 	public void stopVehicle(Vehicle vehicle) {
-		if (!params.vehicleDiversion) {
+		if (!taxiCfg.isVehicleDiversion()) {
 			throw new RuntimeException("Diversion must be on");
 		}
 
@@ -294,7 +290,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 
 		updateTimelineImpl(vehicle, timer.getTimeOfDay());
 
-		if (!params.destinationKnown) {
+		if (!taxiCfg.isDestinationKnown()) {
 			TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
 			if (currentTask.getTaxiTaskType() == TaxiTaskType.PICKUP) {
 				appendOccupiedDriveAndDropoff(schedule);
@@ -316,7 +312,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		schedule.addTask(new TaxiOccupiedDriveTask(path, req));
 
 		double t4 = path.getArrivalTime();
-		double t5 = t4 + params.dropoffDuration;
+		double t5 = t4 + taxiCfg.getDropoffDuration();
 		schedule.addTask(new TaxiDropoffTask(t4, t5, req));
 	}
 
@@ -405,11 +401,11 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 			case PICKUP: {
 				double t0 = ((TaxiPickupTask)task).getRequest().getEarliestStartTime();
 				// the actual pickup starts at max(t, t0)
-				return Math.max(newBeginTime, t0) + params.pickupDuration;
+				return Math.max(newBeginTime, t0) + taxiCfg.getPickupDuration();
 			}
 			case DROPOFF: {
 				// cannot be shortened/lengthen, therefore must be moved forward/backward
-				return newBeginTime + params.dropoffDuration;
+				return newBeginTime + taxiCfg.getDropoffDuration();
 			}
 
 			default:
@@ -470,19 +466,19 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		TaxiTask currentTask = (TaxiTask)schedule.getCurrentTask();
 		switch (currentTask.getTaxiTaskType()) {
 			case PICKUP:
-				return params.destinationKnown ? 2 : null;
+				return taxiCfg.isDestinationKnown() ? 2 : null;
 
 			case OCCUPIED_DRIVE:
 				return 1;
 
 			case EMPTY_DRIVE:
-				if (params.vehicleDiversion) {
+				if (taxiCfg.isVehicleDiversion()) {
 					return 0;
 				}
 
 				if (((TaxiTask)Schedules.getNextTask(schedule)).getTaxiTaskType() == TaxiTaskType.PICKUP) {
 					// if no diversion and driving to pick up sb then serve that request
-					return params.destinationKnown ? 3 : null;
+					return taxiCfg.isDestinationKnown() ? 3 : null;
 				}
 
 				// potentially: driving back to the rank (e.g. to charge batteries)
@@ -545,7 +541,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 				return;
 
 			case EMPTY_DRIVE:
-				if (!params.vehicleDiversion) {
+				if (!taxiCfg.isVehicleDiversion()) {
 					throw new RuntimeException("Currently won't happen");
 				}
 

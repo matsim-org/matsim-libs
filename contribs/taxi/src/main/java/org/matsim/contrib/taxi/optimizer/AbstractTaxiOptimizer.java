@@ -52,8 +52,8 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 		this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;
 		this.doUpdateTimelines = doUpdateTimelines;
 
-		destinationKnown = optimContext.scheduler.getParams().destinationKnown;
-		vehicleDiversion = optimContext.scheduler.getParams().vehicleDiversion;
+		destinationKnown = optimContext.taxiCfg.isDestinationKnown();
+		vehicleDiversion = optimContext.taxiCfg.isVehicleDiversion();
 		reoptimizationTimeStep = params.reoptimizationTimeStep;
 	}
 
