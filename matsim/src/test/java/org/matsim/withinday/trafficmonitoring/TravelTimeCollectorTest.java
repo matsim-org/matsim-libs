@@ -59,6 +59,8 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 	@Rule
 	public MatsimTestUtils helper = new MatsimTestUtils();
 	
+	private int run = 0;
+	
 	public TravelTimeCollectorTest(boolean isUsingFastCapacityUpdate) {
 		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
 	}
@@ -72,8 +74,8 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 	@Test
 	public void testGetLinkTravelTime() {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setOutputDirectory(helper.getOutputDirectory()+"fastCapacityUpdate_"+this.isUsingFastCapacityUpdate);
-
+		config.controler().setOutputDirectory(helper.getOutputDirectory()+"fastCapacityUpdate_"+run);
+		run++;
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
 		qSimConfig.setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
