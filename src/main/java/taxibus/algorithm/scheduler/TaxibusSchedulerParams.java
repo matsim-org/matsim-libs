@@ -19,18 +19,19 @@
 
 package taxibus.algorithm.scheduler;
 
-import org.matsim.contrib.taxi.scheduler.TaxiSchedulerParams;
-
 /**
  * @author jbischoff
  *
  */
-public class TaxibusSchedulerParams extends TaxiSchedulerParams {
-
+public class TaxibusSchedulerParams  {
+	public final boolean destinationKnown = true;
+	public final boolean vehicleDiversion = false;
+	public final double pickupDuration;
+	public final double dropoffDuration;
+	public final double AStarEuclideanOverdoFactor = 1.;
 	public TaxibusSchedulerParams(double pickupDuration, double dropoffDuration) {
-		super(true, false, pickupDuration, dropoffDuration, 1.0);
 		// We assume we a) know where we are heading to and b) do not allow diversions once a bus is running
-
+		this.pickupDuration = pickupDuration;
+		this.dropoffDuration = dropoffDuration;
 	}
-
 }
