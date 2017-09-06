@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Random;
 
+import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -62,7 +63,6 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 	@Rule
 	public MatsimTestUtils helper = new MatsimTestUtils();
 	
-	private int run = 0;
 	Random random = MatsimRandom.getRandom();
 	
 	public TravelTimeCollectorTest(boolean isUsingFastCapacityUpdate) {
@@ -78,8 +78,15 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 	@Test
 	public void testGetLinkTravelTime() {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
-		run++;
-		config.controler().setOutputDirectory(helper.getOutputDirectory()+"fastCapacityUpdate_"+run+random.nextInt(10));
+        try {
+			Thread.sleep(4000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		Logger.getLogger(getClass()).info("fastCapacity Update = "+this.isUsingFastCapacityUpdate);
+		config.controler().setOutputDirectory(helper.getOutputDirectory()+"fastCapacityUpdate_"+this.isUsingFastCapacityUpdate);
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
 		qSimConfig.setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
