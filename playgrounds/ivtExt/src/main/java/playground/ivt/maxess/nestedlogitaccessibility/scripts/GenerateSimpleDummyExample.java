@@ -18,6 +18,10 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.scripts;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -52,11 +56,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreatePseudoNetwork;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-import playground.ivt.utils.MoreIOUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import playground.ivt.utils.MoreIOUtils;
 
 /**
  * @author thibautd

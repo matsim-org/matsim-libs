@@ -19,7 +19,13 @@
 
 package playground.polettif.publicTransitMapping.config;
 
-import com.opencsv.CSVReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimParameters;
@@ -28,11 +34,10 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import playground.polettif.publicTransitMapping.mapping.RunPublicTransitMapper;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.*;
+import com.opencsv.CSVReader;
+
+import playground.polettif.publicTransitMapping.mapping.RunPublicTransitMapper;
 
 
 /**

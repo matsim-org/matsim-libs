@@ -18,18 +18,19 @@
 
 package playground.polettif.publicTransitMapping.plausibility.log;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+
 import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Plausibility warning if a link sequence passes a node twice

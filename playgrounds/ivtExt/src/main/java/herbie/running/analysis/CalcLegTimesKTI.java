@@ -20,7 +20,10 @@
 
 package herbie.running.analysis;
 
-import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.TreeMap;
+
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.ResizableDoubleArray;
@@ -36,9 +39,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.TreeMap;
+import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
 
 /**
  * Calculates average trip durations by mode.

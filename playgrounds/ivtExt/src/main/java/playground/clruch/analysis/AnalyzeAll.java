@@ -6,10 +6,10 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import ch.ethz.idsc.tensor.RealScalar;
-import ch.ethz.idsc.tensor.Scalar;
 import org.matsim.api.core.v01.network.Network;
 
+import ch.ethz.idsc.tensor.RealScalar;
+import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Join;
@@ -18,7 +18,6 @@ import ch.ethz.idsc.tensor.io.CsvFormat;
 import ch.ethz.idsc.tensor.io.MathematicaFormat;
 import ch.ethz.idsc.tensor.io.MatlabExport;
 import playground.clruch.data.ReferenceFrame;
-import playground.clruch.html.DataCollector;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
 import playground.joel.data.TotalData;

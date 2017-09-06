@@ -18,6 +18,15 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.framework;
 
+import java.lang.reflect.ParameterizedType;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import org.matsim.core.config.Config;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.router.RoutingModule;
+
 import com.google.inject.Binding;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -30,14 +39,6 @@ import com.google.inject.spi.Element;
 import com.google.inject.spi.Elements;
 import com.google.inject.util.Modules;
 import com.google.inject.util.Types;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.RoutingModule;
-
-import java.lang.reflect.ParameterizedType;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author thibautd

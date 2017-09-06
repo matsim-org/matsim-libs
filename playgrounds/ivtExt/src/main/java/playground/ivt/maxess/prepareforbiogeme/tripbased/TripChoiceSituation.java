@@ -18,10 +18,11 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.tripbased;
 
-import org.matsim.core.router.TripStructureUtils;
-import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSituation;
-
 import java.util.List;
+
+import org.matsim.core.router.TripStructureUtils;
+
+import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSituation;
 
 /**
  * @author thibautd

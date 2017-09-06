@@ -22,7 +22,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import contrib.publicTransitMapping.tools.ScheduleTools;
 
 /**
  * Extract one route from a schedule

@@ -1,10 +1,21 @@
 package contrib.baseline.preparation;
 
+import static contrib.baseline.preparation.IVTConfigCreator.EDUCATION;
+import static contrib.baseline.preparation.IVTConfigCreator.HOME;
+import static contrib.baseline.preparation.IVTConfigCreator.WORK;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -13,11 +24,6 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.FacilitiesReaderMatsimV1;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static contrib.baseline.preparation.IVTConfigCreator.*;
 
 /**
  * If an activity has no facility assigned, the closest facility offering this activity will be assigned.

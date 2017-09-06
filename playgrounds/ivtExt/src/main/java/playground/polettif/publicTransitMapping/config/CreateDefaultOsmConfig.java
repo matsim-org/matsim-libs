@@ -18,13 +18,12 @@
 
 package playground.polettif.publicTransitMapping.config;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-import playground.polettif.publicTransitMapping.config.OsmConverterConfigGroup;
-
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Creates a default osmConverter config file.

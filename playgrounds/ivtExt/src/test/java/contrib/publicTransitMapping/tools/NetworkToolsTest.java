@@ -1,5 +1,11 @@
 package contrib.publicTransitMapping.tools;
 
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static playground.polettif.publicTransitMapping.tools.NetworkTools.coordIsOnRightSideOfLink;
+import static playground.polettif.publicTransitMapping.tools.NetworkTools.findClosestLinks;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,11 +18,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.testcases.MatsimTestUtils;
-
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static playground.polettif.publicTransitMapping.tools.NetworkTools.*;
 
 public class NetworkToolsTest {
 

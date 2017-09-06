@@ -1,11 +1,14 @@
 package playground.sebhoerl.remote_exec.euler;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import playground.sebhoerl.remote_exec.RemoteController;
 import playground.sebhoerl.remote_exec.RemoteEnvironment;
 import playground.sebhoerl.remote_exec.RemoteScenario;
-import playground.sebhoerl.remote_exec.RemoteSimulation;
-
-import java.util.*;
 
 public class EulerEnvironment implements RemoteEnvironment {
     final private EulerInterface euler;

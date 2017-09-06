@@ -18,6 +18,20 @@
 
 package contrib.publicTransitMapping.plausibility;
 
+import static contrib.publicTransitMapping.tools.ScheduleTools.getTransitRouteLinkIds;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -39,15 +53,19 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import org.opengis.feature.simple.SimpleFeature;
-import contrib.publicTransitMapping.plausibility.log.*;
-import contrib.publicTransitMapping.tools.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
-import java.util.*;
-
-import static contrib.publicTransitMapping.tools.ScheduleTools.getTransitRouteLinkIds;
+import contrib.publicTransitMapping.plausibility.log.AbstractPlausibilityWarning;
+import contrib.publicTransitMapping.plausibility.log.DirectionChangeWarning;
+import contrib.publicTransitMapping.plausibility.log.LoopWarning;
+import contrib.publicTransitMapping.plausibility.log.PlausibilityWarning;
+import contrib.publicTransitMapping.plausibility.log.TravelTimeWarning;
+import contrib.publicTransitMapping.tools.CoordTools;
+import contrib.publicTransitMapping.tools.CsvTools;
+import contrib.publicTransitMapping.tools.GtfsShapeFileTools;
+import contrib.publicTransitMapping.tools.MiscUtils;
+import contrib.publicTransitMapping.tools.NetworkTools;
+import contrib.publicTransitMapping.tools.ScheduleShapeFileWriter;
+import contrib.publicTransitMapping.tools.ScheduleTools;
 
 /**
  * Performs a plausibility check on the given schedule

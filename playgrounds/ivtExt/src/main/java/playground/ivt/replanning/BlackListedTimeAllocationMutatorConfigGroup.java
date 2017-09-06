@@ -18,11 +18,11 @@
  * *********************************************************************** */
 package playground.ivt.replanning;
 
-import org.matsim.core.config.ReflectiveConfigGroup;
-import org.matsim.core.utils.collections.CollectionUtils;
-
 import java.util.Collections;
 import java.util.Set;
+
+import org.matsim.core.config.ReflectiveConfigGroup;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
  * @author thibautd

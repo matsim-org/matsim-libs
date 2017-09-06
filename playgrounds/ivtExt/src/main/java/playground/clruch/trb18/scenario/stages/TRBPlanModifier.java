@@ -1,5 +1,7 @@
 package playground.clruch.trb18.scenario.stages;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -7,8 +9,6 @@ import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.pt.PtConstants;
-
-import java.util.List;
 
 public class TRBPlanModifier {
     final private Network filteredNetwork;

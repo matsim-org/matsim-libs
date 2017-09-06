@@ -20,12 +20,13 @@
 
 package contrib.publicTransitMapping.gtfs.lib;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.geotools.MGC;
 
-import java.util.SortedMap;
-import java.util.TreeMap;
+import com.vividsolutions.jts.geom.Coordinate;
 
 public class Shape {
 	

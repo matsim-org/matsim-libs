@@ -12,13 +12,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.misc.Time;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.io.Export;
 import playground.clruch.analysis.AnalyzeSummary;
 import playground.clruch.analysis.TripDistances;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
-import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.traveldata.TravelData;
-import playground.clruch.utils.GlobalAssert;
 import playground.joel.helpers.EasyDijkstra;
 
 /** @author Claudio Ruch based on initial version by gjoel */

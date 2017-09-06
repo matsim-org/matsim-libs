@@ -10,7 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 
-import playground.clruch.utils.GlobalAssert;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 /**
  * example use:

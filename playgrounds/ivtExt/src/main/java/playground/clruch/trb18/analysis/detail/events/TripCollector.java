@@ -1,11 +1,17 @@
 package playground.clruch.trb18.analysis.detail.events;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.StageActivityTypes;
-import playground.clruch.trb18.analysis.detail.Utils;
 
-import java.util.*;
+import playground.clruch.trb18.analysis.detail.Utils;
 
 public class TripCollector implements LegCollector.Handler, ActivityCollector.Handler {
     final private StageActivityTypes stageActivityTypes;

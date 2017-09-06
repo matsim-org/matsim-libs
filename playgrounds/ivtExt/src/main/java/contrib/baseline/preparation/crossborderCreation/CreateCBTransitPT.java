@@ -21,16 +21,17 @@
 
 package contrib.baseline.preparation.crossborderCreation;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.facilities.ActivityFacility;
-import contrib.baseline.preparation.secondaryFacilityCreation.CreationOfCrossBorderFacilities;
 
-import java.io.BufferedReader;
-import java.io.IOException;
+import contrib.baseline.preparation.secondaryFacilityCreation.CreationOfCrossBorderFacilities;
 
 /**
  * Implementation of the trunk class CreateCBsubpop for the creation of public transport transit single-trip cb-agents.

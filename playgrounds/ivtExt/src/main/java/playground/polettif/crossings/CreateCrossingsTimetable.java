@@ -18,6 +18,10 @@
 
 package playground.polettif.crossings;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -26,11 +30,8 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.io.IOUtils;
-import playground.polettif.crossings.lib.LinkChangeEvent;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.List;
+import playground.polettif.crossings.lib.LinkChangeEvent;
 
 /**
  * Creates a timetable (network change events file) with a given

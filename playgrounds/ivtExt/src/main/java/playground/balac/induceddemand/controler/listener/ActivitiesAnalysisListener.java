@@ -1,5 +1,11 @@
 package playground.balac.induceddemand.controler.listener;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -16,10 +22,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
-
-import playground.balac.induceddemand.strategies.activitychainmodifier.NeighboursCreator;
-
-import java.util.*;
 
 public class ActivitiesAnalysisListener implements IterationEndsListener, IterationStartsListener, BeforeMobsimListener {
 	

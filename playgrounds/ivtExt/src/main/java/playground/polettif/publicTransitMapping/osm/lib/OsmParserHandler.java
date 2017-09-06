@@ -19,12 +19,14 @@
 
 package playground.polettif.publicTransitMapping.osm.lib;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
+
 import playground.polettif.publicTransitMapping.osm.lib.handler.OsmNodeHandler;
 import playground.polettif.publicTransitMapping.osm.lib.handler.OsmRelationHandler;
 import playground.polettif.publicTransitMapping.osm.lib.handler.OsmWayHandler;
-
-import java.util.*;
 
 /*
 	<relation> ...

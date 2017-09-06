@@ -13,6 +13,8 @@ import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import ch.ethz.idsc.queuey.util.GZHandler;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeIO;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
@@ -27,8 +29,6 @@ import playground.clruch.prep.PopulationTools;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
-import playground.clruch.utils.GZHandler;
-import playground.clruch.utils.GlobalAssert;
 import playground.clruch.utils.PropertiesExt;
 
 /** Class to prepare a given scenario for MATSim, includes preparation of netowrk, population, creation of virtualNetwork

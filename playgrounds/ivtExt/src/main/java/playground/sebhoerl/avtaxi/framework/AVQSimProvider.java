@@ -2,8 +2,6 @@ package playground.sebhoerl.avtaxi.framework;
 
 import java.util.Collection;
 
-import com.google.inject.Injector;
-import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
@@ -14,6 +12,8 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Provider;
 
 import playground.clruch.traveltimetracker.AVTravelTimeRecorder;
 import playground.sebhoerl.avtaxi.config.AVConfig;

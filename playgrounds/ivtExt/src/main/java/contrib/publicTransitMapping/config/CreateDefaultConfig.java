@@ -18,12 +18,12 @@
 
 package contrib.publicTransitMapping.config;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
-
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Creates a default publicTransitMapping config file.

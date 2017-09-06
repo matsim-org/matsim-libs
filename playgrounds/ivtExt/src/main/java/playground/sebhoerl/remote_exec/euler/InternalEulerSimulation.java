@@ -1,16 +1,18 @@
 package playground.sebhoerl.remote_exec.euler;
 
-import com.fasterxml.jackson.annotation.*;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.matsim.core.api.experimental.events.EventsManager;
-import playground.sebhoerl.remote_exec.RemoteSimulation;
-import playground.sebhoerl.remote_exec.RemoteUtils;
-
 import java.io.OutputStream;
-import java.rmi.Remote;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.matsim.core.api.experimental.events.EventsManager;
+
+import com.fasterxml.jackson.annotation.JacksonInject;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import playground.sebhoerl.remote_exec.RemoteSimulation;
+import playground.sebhoerl.remote_exec.RemoteUtils;
 
 @JsonIgnoreProperties({"status"})
 public class InternalEulerSimulation {

@@ -18,7 +18,9 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.tripbased;
 
-import com.google.inject.Provider;
+import java.io.File;
+import java.util.Collections;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
@@ -35,15 +37,15 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
+
+import com.google.inject.Provider;
+
 import playground.ivt.maxess.prepareforbiogeme.framework.ChoiceSetSampler;
 import playground.ivt.maxess.prepareforbiogeme.framework.Converter;
 import playground.ivt.router.CachingRoutingModuleWrapper;
 import playground.ivt.router.TripSoftCache;
 import playground.ivt.router.TripSoftCache.LocationType;
 import playground.ivt.utils.MoreIOUtils;
-
-import java.io.File;
-import java.util.Collections;
 
 /**
  * @author thibautd

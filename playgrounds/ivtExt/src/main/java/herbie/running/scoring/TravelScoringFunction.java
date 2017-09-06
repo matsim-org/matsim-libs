@@ -20,9 +20,10 @@
 
 package herbie.running.scoring;
 
-import herbie.running.config.HerbieConfigGroup;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+
+import herbie.running.config.HerbieConfigGroup;
 
 
 /**

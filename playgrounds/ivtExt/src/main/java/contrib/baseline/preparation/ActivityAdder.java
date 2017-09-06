@@ -1,12 +1,26 @@
 package contrib.baseline.preparation;
 
+import static contrib.baseline.preparation.IVTConfigCreator.EDUCATION;
+import static contrib.baseline.preparation.IVTConfigCreator.ESCORT_KIDS;
+import static contrib.baseline.preparation.IVTConfigCreator.ESCORT_OTHER;
+import static contrib.baseline.preparation.IVTConfigCreator.HOME;
+import static contrib.baseline.preparation.IVTConfigCreator.LEISURE;
+import static contrib.baseline.preparation.IVTConfigCreator.REMOTE_HOME;
+import static contrib.baseline.preparation.IVTConfigCreator.REMOTE_WORK;
+import static contrib.baseline.preparation.IVTConfigCreator.SHOP;
+import static contrib.baseline.preparation.IVTConfigCreator.WORK;
+import static contrib.baseline.preparation.secondaryFacilityCreation.FacilitiesFromBZ12.testFacilities;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.facilities.*;
-
-import static contrib.baseline.preparation.IVTConfigCreator.*;
-import static contrib.baseline.preparation.secondaryFacilityCreation.FacilitiesFromBZ12.testFacilities;
+import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacilitiesFactoryImpl;
+import org.matsim.facilities.ActivityFacility;
+import org.matsim.facilities.ActivityOption;
+import org.matsim.facilities.FacilitiesWriter;
+import org.matsim.facilities.MatsimFacilitiesReader;
+import org.matsim.facilities.OpeningTimeImpl;
 
 /**
  * Adds activities to existing facilities.

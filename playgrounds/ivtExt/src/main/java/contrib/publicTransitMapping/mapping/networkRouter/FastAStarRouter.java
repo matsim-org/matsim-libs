@@ -18,6 +18,10 @@
 
 package contrib.publicTransitMapping.mapping.networkRouter;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -30,13 +34,10 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.vehicles.Vehicle;
+
 import contrib.publicTransitMapping.config.PublicTransitMappingConfigGroup;
 import contrib.publicTransitMapping.mapping.linkCandidateCreation.LinkCandidate;
 import contrib.publicTransitMapping.tools.NetworkTools;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * A LeastCostPathCalculator using FastAStarLandmarks.

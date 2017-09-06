@@ -1,20 +1,17 @@
 package playground.sebhoerl.ant.handlers;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.vehicles.Vehicle;
+
 import playground.sebhoerl.ant.DataFrame;
 import playground.sebhoerl.av_paper.BinCalculator;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class IdleHandler extends AbstractHandler implements ActivityStartEventHandler, ActivityEndEventHandler {
     final private Map<Id<Person>, Double> startTimes = new HashMap<>();

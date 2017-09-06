@@ -9,7 +9,8 @@ import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.DynAgent;
 
 import com.google.inject.Inject;
 

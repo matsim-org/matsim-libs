@@ -1,9 +1,9 @@
 package playground.sebhoerl.remote_exec;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-
 import java.io.OutputStream;
 import java.util.Map;
+
+import org.matsim.core.api.experimental.events.EventsManager;
 
 public interface RemoteSimulation {
     enum Status {

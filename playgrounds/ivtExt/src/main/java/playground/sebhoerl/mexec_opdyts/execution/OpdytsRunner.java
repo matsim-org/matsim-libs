@@ -1,5 +1,7 @@
 package playground.sebhoerl.mexec_opdyts.execution;
 
+import java.util.Random;
+
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
@@ -8,8 +10,6 @@ import playground.sebhoerl.mexec.Environment;
 import playground.sebhoerl.mexec.Scenario;
 import playground.sebhoerl.mexec_opdyts.optimization.IterationObjectiveFunction;
 import playground.sebhoerl.mexec_opdyts.optimization.ProposalDistribution;
-
-import java.util.Random;
 
 public class OpdytsRunner {
     final private RandomSearch<ProposalDecisionVariable> searchAlgorithm;

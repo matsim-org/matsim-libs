@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.ivt.analysis.scripts;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.analysis.LegHistogramChart;
@@ -40,12 +43,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
 import playground.ivt.utils.SubpopulationFilteringEventsManager;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author thibautd

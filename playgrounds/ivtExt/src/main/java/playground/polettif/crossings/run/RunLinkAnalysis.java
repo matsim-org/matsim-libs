@@ -19,15 +19,15 @@
 
 package playground.polettif.crossings.run;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-
-import playground.polettif.crossings.analysis.LinkAnalysis;
-
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+
+import playground.polettif.crossings.analysis.LinkAnalysis;
 
 /**
  * Analyses link travel times and volumes.

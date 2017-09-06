@@ -4,18 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
-import org.matsim.vehicles.Vehicle;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -25,7 +20,6 @@ import playground.sebhoerl.analysis.aggregate_events.AggregateReader;
 import playground.sebhoerl.analysis.aggregate_events.DefaultAggregateHandler;
 import playground.sebhoerl.analysis.aggregate_events.Trip;
 import playground.sebhoerl.av.framework.AVConfigGroup;
-import playground.sebhoerl.av.framework.AVModule;
 
 public class RunSensitivityAnalysis {
     static class StatisticsHandler extends DefaultAggregateHandler {

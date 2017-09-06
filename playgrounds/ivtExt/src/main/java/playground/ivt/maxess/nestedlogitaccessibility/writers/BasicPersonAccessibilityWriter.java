@@ -18,6 +18,12 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.writers;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -29,13 +35,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.facilities.ActivityFacility;
-import playground.ivt.maxess.nestedlogitaccessibility.framework.AccessibilityComputationResult;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import playground.ivt.maxess.nestedlogitaccessibility.framework.AccessibilityComputationResult;
 
 /**
  * @author thibautd

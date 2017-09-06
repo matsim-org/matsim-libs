@@ -1,6 +1,7 @@
 package playground.balac.induceddemand.strategies;
 
-import com.google.inject.Inject;
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.HasPlansAndId;
 import org.matsim.api.core.v01.population.Person;
@@ -12,7 +13,7 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 import org.matsim.core.router.TripRouter;
 
-import javax.inject.Provider;
+import com.google.inject.Inject;
 
 public class RemoveRandomActivityStrategy implements PlanStrategy {
 	private final PlanStrategy planStrategyDelegate;

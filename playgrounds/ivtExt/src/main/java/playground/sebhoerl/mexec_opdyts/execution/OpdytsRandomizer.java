@@ -1,11 +1,11 @@
 package playground.sebhoerl.mexec_opdyts.execution;
 
-import floetteroed.opdyts.DecisionVariableRandomizer;
-import playground.sebhoerl.mexec_opdyts.optimization.ProposalDistribution;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import floetteroed.opdyts.DecisionVariableRandomizer;
+import playground.sebhoerl.mexec_opdyts.optimization.ProposalDistribution;
 
 public class OpdytsRandomizer implements DecisionVariableRandomizer<ProposalDecisionVariable> {
     final private OpdytsExecutor executor;

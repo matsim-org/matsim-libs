@@ -1,18 +1,24 @@
 package playground.sebhoerl.avtaxi.replanning;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.routing.AVRoute;
-
-import java.util.Iterator;
-import java.util.Map;
 
 @Singleton
 public class AVOperatorChoiceStrategy implements PlanStrategy {

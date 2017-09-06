@@ -21,11 +21,6 @@
 
 package playground.polettif.publicTransitMapping.hafas.v2;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.misc.Counter;
-import org.matsim.vehicles.VehicleType;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -34,6 +29,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.misc.Counter;
+import org.matsim.vehicles.VehicleType;
 
 /**
  * Reads the transit lines from a given FPLAN file.

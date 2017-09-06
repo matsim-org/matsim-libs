@@ -19,6 +19,10 @@
 package playground.polettif.publicTransitMapping.plausibility.log;
 
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -26,11 +30,8 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import playground.polettif.publicTransitMapping.plausibility.PlausibilityCheck;
 
 /**
  * Abstract class for plausibility warnings

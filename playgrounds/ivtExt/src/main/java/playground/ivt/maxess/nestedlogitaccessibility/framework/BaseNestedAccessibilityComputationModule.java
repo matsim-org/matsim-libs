@@ -18,10 +18,9 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.framework;
 
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.google.inject.TypeLiteral;
-import com.google.inject.util.Types;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
@@ -30,8 +29,10 @@ import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
+import com.google.inject.util.Types;
 
 /**
  * Sets the basic elements of the computation.

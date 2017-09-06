@@ -22,7 +22,12 @@
 
 package playground.ivt.analysis.activityhistogram;
 
-import com.google.inject.Singleton;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.io.File;
+import java.io.IOException;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -34,9 +39,7 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import com.google.inject.Singleton;
 
 @Singleton
 public class ActivityHistogramChart {

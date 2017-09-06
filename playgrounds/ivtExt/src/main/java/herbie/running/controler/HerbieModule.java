@@ -1,10 +1,8 @@
 package herbie.running.controler;
 
-import com.google.inject.Singleton;
-import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
-import herbie.running.controler.listeners.LegDistanceDistributionWriter;
-import herbie.running.controler.listeners.ScoreElements;
-import herbie.running.replanning.TransitStrategyManager;
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.AbstractModule;
@@ -12,8 +10,12 @@ import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.router.TripRouter;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
+import com.google.inject.Singleton;
+
+import herbie.running.controler.listeners.CalcLegTimesHerbieListener;
+import herbie.running.controler.listeners.LegDistanceDistributionWriter;
+import herbie.running.controler.listeners.ScoreElements;
+import herbie.running.replanning.TransitStrategyManager;
 
 
 public class HerbieModule extends AbstractModule {

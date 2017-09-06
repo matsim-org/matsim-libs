@@ -1,6 +1,5 @@
 package playground.clruch.trb18;
 
-import contrib.baseline.preparation.ZHCutter;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -9,6 +8,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import contrib.baseline.preparation.ZHCutter;
 
 public class CountAgents {
     static public void main(String[] args) {

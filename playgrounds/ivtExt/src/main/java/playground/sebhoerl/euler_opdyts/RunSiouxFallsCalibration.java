@@ -1,24 +1,28 @@
 package playground.sebhoerl.euler_opdyts;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+
+import org.apache.log4j.Logger;
+
 import com.jcraft.jsch.JSchException;
+
 import floetteroed.opdyts.DecisionVariableRandomizer;
 import floetteroed.opdyts.ObjectiveFunction;
 import floetteroed.opdyts.convergencecriteria.ConvergenceCriterion;
 import floetteroed.opdyts.convergencecriteria.FixedIterationNumberConvergenceCriterion;
 import floetteroed.opdyts.searchalgorithms.RandomSearch;
 import floetteroed.opdyts.searchalgorithms.SelfTuner;
-import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Logger;
-import playground.sebhoerl.remote_exec.*;
+import playground.sebhoerl.remote_exec.RemoteController;
+import playground.sebhoerl.remote_exec.RemoteEnvironment;
+import playground.sebhoerl.remote_exec.RemoteScenario;
+import playground.sebhoerl.remote_exec.RemoteSimulation;
+import playground.sebhoerl.remote_exec.RemoteUtils;
 import playground.sebhoerl.remote_exec.local.LocalConfiguration;
 import playground.sebhoerl.remote_exec.local.LocalEnvironment;
 import playground.sebhoerl.remote_exec.local.LocalInterface;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 public class RunSiouxFallsCalibration {
     final private static Logger log = Logger.getLogger(RunSiouxFallsCalibration.class);

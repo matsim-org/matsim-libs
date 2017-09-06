@@ -1,7 +1,7 @@
 package playground.sebhoerl.avtaxi.passenger;
 
-import com.google.inject.Inject;
-import com.google.inject.Singleton;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
@@ -10,12 +10,14 @@ import org.matsim.contrib.dvrp.passenger.PassengerRequest;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 import playground.sebhoerl.avtaxi.data.AVData;
 import playground.sebhoerl.avtaxi.data.AVOperator;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.routing.AVRoute;
-
-import java.util.Map;
 
 @Singleton
 public class AVRequestCreator implements PassengerRequestCreator {

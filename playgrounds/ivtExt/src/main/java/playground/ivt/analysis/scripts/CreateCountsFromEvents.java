@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.ivt.analysis.scripts;
 
+import java.util.Locale;
+
 import org.apache.log4j.Logger;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
@@ -44,10 +46,9 @@ import org.matsim.counts.algorithms.graphs.CountsErrorGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsLoadCurveGraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimReal24GraphCreator;
 import org.matsim.counts.algorithms.graphs.CountsSimRealPerHourGraphCreator;
+
 import playground.ivt.utils.ArgParser;
 import playground.ivt.utils.ArgParser.Args;
-
-import java.util.Locale;
 
 /**
  * @author thibautd

@@ -18,15 +18,15 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.framework;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.core.utils.misc.Counter;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * @author thibautd

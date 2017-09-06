@@ -21,6 +21,13 @@
 
 package contrib.publicTransitMapping.osm;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -35,12 +42,14 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.MapUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
-import contrib.publicTransitMapping.config.OsmConverterConfigGroup;
-import contrib.publicTransitMapping.osm.lib.*;
-import contrib.publicTransitMapping.tools.NetworkTools;
 
-import java.io.File;
-import java.util.*;
+import contrib.publicTransitMapping.config.OsmConverterConfigGroup;
+import contrib.publicTransitMapping.osm.lib.OsmParser;
+import contrib.publicTransitMapping.osm.lib.OsmParserHandler;
+import contrib.publicTransitMapping.osm.lib.OsmTag;
+import contrib.publicTransitMapping.osm.lib.OsmValue;
+import contrib.publicTransitMapping.osm.lib.TagFilter;
+import contrib.publicTransitMapping.tools.NetworkTools;
 
 /**
  * Implemenation of a network converter. Modified version from {@link org.matsim.core.utils.io.OsmNetworkReader}

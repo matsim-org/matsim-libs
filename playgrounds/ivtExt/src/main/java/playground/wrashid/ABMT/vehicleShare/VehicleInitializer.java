@@ -1,5 +1,9 @@
 package playground.wrashid.ABMT.vehicleShare;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -10,10 +14,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.gbl.MatsimRandom;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 
 
 

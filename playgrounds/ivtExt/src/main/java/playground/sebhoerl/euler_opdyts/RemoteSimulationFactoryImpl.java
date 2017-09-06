@@ -1,6 +1,5 @@
 package playground.sebhoerl.euler_opdyts;
 
-import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import playground.sebhoerl.remote_exec.RemoteController;
 import playground.sebhoerl.remote_exec.RemoteEnvironment;
 import playground.sebhoerl.remote_exec.RemoteScenario;

@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
+import ch.ethz.idsc.owly.data.LruCache;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -27,13 +28,12 @@ import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Subdivide;
 import ch.ethz.idsc.tensor.io.ObjectFormat;
 import ch.ethz.idsc.tensor.red.Total;
+import playground.clib.util.gui.GraphicsUtil;
+import playground.clib.util.gui.RowPanel;
+import playground.clib.util.gui.SpinnerLabel;
 import playground.clruch.gheat.graphics.Hue;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.SimulationObject;
-import playground.clruch.utils.LruCache;
-import playground.clruch.utils.gui.GraphicsUtil;
-import playground.clruch.utils.gui.RowPanel;
-import playground.clruch.utils.gui.SpinnerLabel;
 
 /* package */ class LinkLayer extends ViewerLayer {
 

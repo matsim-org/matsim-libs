@@ -18,10 +18,11 @@
  * *********************************************************************** */
 package playground.ivt.maxess.nestedlogitaccessibility.depalmaconstrained;
 
+import org.apache.log4j.Logger;
+
 import gnu.trove.iterator.TDoubleIterator;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.array.TDoubleArrayList;
-import org.apache.log4j.Logger;
 
 /**
  * @author thibautd

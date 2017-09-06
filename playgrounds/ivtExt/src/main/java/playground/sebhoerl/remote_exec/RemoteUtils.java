@@ -1,7 +1,5 @@
 package playground.sebhoerl.remote_exec;
 
-import java.rmi.Remote;
-
 public class RemoteUtils {
     public static void removeScenarioAndSimulations(RemoteScenario scenario) {
         for (RemoteSimulation simulation : scenario.getSimulations()) {

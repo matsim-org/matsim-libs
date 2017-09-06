@@ -18,10 +18,10 @@
 
 package contrib.crossings.lib;
 
+import java.util.Set;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-
-import java.util.Set;
 
 /**
  * Public transport link with referenced Crossings on it

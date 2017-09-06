@@ -1,13 +1,11 @@
 package playground.sebhoerl.avtaxi.framework;
 
 import com.google.inject.Binder;
-import com.google.inject.TypeLiteral;
 import com.google.inject.binder.LinkedBindingBuilder;
 import com.google.inject.multibindings.MapBinder;
+
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.generator.AVGenerator;
-
-import java.util.Map;
 
 public class AVUtils {
     static public LinkedBindingBuilder<AVDispatcher.AVDispatcherFactory> bindDispatcherFactory(Binder binder, String dispatcherName) {

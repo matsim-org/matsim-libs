@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyGeneratedInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -24,7 +25,6 @@ import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import playground.clruch.netdata.VirtualNode;
-import playground.clruch.utils.GlobalAssert;
 
 public class KMeansVirtualNodeDest extends AbstractVirtualNodeDest {
     Random random = new Random();

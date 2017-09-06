@@ -1,14 +1,22 @@
 package playground.maalbert.analysis;
 
+import static playground.clruch.utils.NetworkLoader.loadNetwork;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+
+import com.google.inject.Inject;
+
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Quantile;
-import com.google.inject.Inject;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
@@ -16,13 +24,6 @@ import playground.clruch.net.StorageSupplier;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.VirtualNode;
-import playground.clruch.utils.GlobalAssert;
-import playground.joel.analysis.*;
-
-import java.io.File;
-import java.util.*;
-
-import static playground.clruch.utils.NetworkLoader.loadNetwork;
 
 class ConsensusAnalysis {
     StorageSupplier storageSupplier;

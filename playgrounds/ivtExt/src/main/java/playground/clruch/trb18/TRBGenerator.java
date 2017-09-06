@@ -1,21 +1,20 @@
 package playground.clruch.trb18;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.gbl.MatsimRandom;
+
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
-import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.generator.AVGenerator;
-
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class TRBGenerator implements AVGenerator {
     final long numberOfVehicles;

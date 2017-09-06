@@ -1,12 +1,8 @@
 package playground.sebhoerl.analysis.aggregate_events;
 
-import java.io.BufferedWriter;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.zip.GZIPOutputStream;
 
 import org.matsim.api.core.v01.Scenario;

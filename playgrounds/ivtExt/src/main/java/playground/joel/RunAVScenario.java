@@ -16,11 +16,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 // TODO we don't use XML anymore, update or delete this file plz
 //import playground.clruch.export.EventFileToProcessingXML;
 import playground.clruch.prep.TheApocalypse;
+import playground.joel.data.EventFileToDataXML;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
-
-import playground.joel.data.EventFileToDataXML;
 
 /** main entry point */
 public class RunAVScenario {

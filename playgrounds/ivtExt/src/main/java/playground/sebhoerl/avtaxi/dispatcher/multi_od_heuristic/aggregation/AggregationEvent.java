@@ -1,9 +1,10 @@
 package playground.sebhoerl.avtaxi.dispatcher.multi_od_heuristic.aggregation;
 
-import org.matsim.api.core.v01.events.Event;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
-
 import java.util.Map;
+
+import org.matsim.api.core.v01.events.Event;
+
+import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public class AggregationEvent extends Event {
     final private AVRequest master;

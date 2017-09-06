@@ -1,6 +1,15 @@
 package contrib.baseline.calibration.location_choice;
 
-import org.apache.commons.lang.ArrayUtils;
+import java.io.BufferedWriter;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -21,9 +30,6 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.vehicles.Vehicle;
-
-import java.io.*;
-import java.util.*;
 
 public class DistanceAggregator implements ActivityStartEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, LinkLeaveEventHandler, TeleportationArrivalEventHandler {
     final private Map<Id<Person>, Double> personDistances = new HashMap<>();

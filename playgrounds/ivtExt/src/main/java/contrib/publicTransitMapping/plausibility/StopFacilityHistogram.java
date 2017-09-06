@@ -18,22 +18,23 @@
 
 package contrib.publicTransitMapping.plausibility;
 
-import org.matsim.core.utils.charts.BarChart;
-import org.matsim.core.utils.collections.MapUtils;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import contrib.publicTransitMapping.config.PublicTransitMappingStrings;
-import contrib.publicTransitMapping.tools.CsvTools;
-import contrib.publicTransitMapping.tools.MiscUtils;
-import contrib.publicTransitMapping.tools.ScheduleTools;
-
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.matsim.core.utils.charts.BarChart;
+import org.matsim.core.utils.collections.MapUtils;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
+import contrib.publicTransitMapping.config.PublicTransitMappingStrings;
+import contrib.publicTransitMapping.tools.CsvTools;
+import contrib.publicTransitMapping.tools.MiscUtils;
+import contrib.publicTransitMapping.tools.ScheduleTools;
 
 /**
  * Generates a histogram for number of child stop

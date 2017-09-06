@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.ivt.teaching;
 
+import java.io.File;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -36,11 +38,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.lib.tools.fileCreation.F2LConfigGroup;
 import playground.ivt.matsim2030.scoring.MATSim2010ScoringModule;
-
-import java.io.File;
 
 /**
  * @author thibautd

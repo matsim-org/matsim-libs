@@ -18,6 +18,17 @@
  * *********************************************************************** */
 package playground.ivt.analysis.tripstats;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -41,12 +52,6 @@ import org.matsim.core.scoring.PersonExperiencedLeg;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.facilities.ActivityFacility;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.*;
 
 /**
  * @author thibautd

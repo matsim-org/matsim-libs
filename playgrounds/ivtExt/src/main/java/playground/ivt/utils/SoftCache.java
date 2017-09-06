@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package playground.ivt.utils;
 
-import org.apache.log4j.Logger;
-
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
+
+import org.apache.log4j.Logger;
 
 /**
  * A cache that keeps entries as long as the Virtual Machine is happy

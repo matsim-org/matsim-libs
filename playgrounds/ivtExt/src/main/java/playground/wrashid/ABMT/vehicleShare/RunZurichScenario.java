@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.wrashid.ABMT.vehicleShare;
 
+import java.io.File;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -37,9 +39,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.pt.PtConstants;
-import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 
-import java.io.File;
+import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 
 /**
  * @author thibautd

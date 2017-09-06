@@ -1,6 +1,8 @@
 // code by jph
 package playground.clruch.net;
 
+import playground.clib.util.net.ObjectHandler;
+
 public enum SimulationDistribution {
     ;
     // ---
@@ -22,8 +24,8 @@ public enum SimulationDistribution {
                 }
         }
 
-        for (SimulationSubscriber simulationSubscriber : SimulationClientSet.INSTANCE)
-            simulationSubscriber.handle(simulationObject);
+        for (ObjectHandler objectHandler : SimulationClientSet.INSTANCE)
+            objectHandler.handle(simulationObject);
     }
 
 }

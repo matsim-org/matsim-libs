@@ -1,6 +1,5 @@
 package playground.sebhoerl.analysis.aggregate_events;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;

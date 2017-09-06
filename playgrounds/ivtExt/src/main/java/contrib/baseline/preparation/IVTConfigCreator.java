@@ -1,5 +1,10 @@
 package contrib.baseline.preparation;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.DestinationChoiceConfigGroup;
 import org.matsim.core.config.Config;
@@ -9,15 +14,10 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.facilities.algorithms.WorldConnectLocations;
+
 import contrib.baseline.preparation.crossborderCreation.CreateCBPop;
 import contrib.baseline.preparation.freightCreation.CreateFreightTraffic;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Creates a default config for the ivt baseline scenarios.

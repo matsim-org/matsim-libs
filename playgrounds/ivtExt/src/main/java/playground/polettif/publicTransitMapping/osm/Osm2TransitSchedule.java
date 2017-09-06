@@ -19,20 +19,33 @@
 
 package playground.polettif.publicTransitMapping.osm;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
 import playground.polettif.publicTransitMapping.osm.lib.OsmParser;
 import playground.polettif.publicTransitMapping.osm.lib.OsmParserHandler;
-import playground.polettif.publicTransitMapping.osm.lib.TagFilter;
 import playground.polettif.publicTransitMapping.osm.lib.OsmTag;
 import playground.polettif.publicTransitMapping.osm.lib.OsmValue;
+import playground.polettif.publicTransitMapping.osm.lib.TagFilter;
 import playground.polettif.publicTransitMapping.tools.ScheduleTools;
-
-import java.util.*;
 
 /**
  * Creates an unmapped MATSim transit schedule from OSM. Converts

@@ -9,7 +9,7 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
 
-import playground.clruch.utils.GlobalAssert;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 public class TaxiTrail {
 	@SuppressWarnings("unused")

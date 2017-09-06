@@ -1,5 +1,5 @@
 // code by jph
-package playground.clruch.utils.gui;
+package playground.clib.util.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -21,11 +21,9 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
-/**
- * selector in gui for easy scrolling through a list with mouse-wheel but no pull-down menu
+/** selector in gui for easy scrolling through a list with mouse-wheel but no pull-down menu
  * 
- * @param <Type>
- */
+ * @param <Type> */
 public class SpinnerLabel<Type> {
     public static final Color background1 = new Color(248, 248, 248, 128);
     public static final Color background0 = new Color(248, 248, 248, 64);
@@ -228,11 +226,9 @@ public class SpinnerLabel<Type> {
         mySpinnerListeners.forEach(mySpinnerListener -> mySpinnerListener.actionPerformed(myType));
     }
 
-    /**
-     * @param myList
+    /** @param myList
      *            is used by reference.
-     *            Any modification to myList is discouraged and (eventually) reflected in the {@link SpinnerLabel}.
-     */
+     *            Any modification to myList is discouraged and (eventually) reflected in the {@link SpinnerLabel}. */
     public void setList(List<Type> myList) {
         this.myList = myList;
     }
@@ -263,11 +259,9 @@ public class SpinnerLabel<Type> {
         return myList == null ? 0 : myList.size();
     }
 
-    /**
-     * does not invoke call backs
+    /** does not invoke call backs
      * 
-     * @param myType
-     */
+     * @param myType */
     public void setValue(Type myType) {
         index = myList.indexOf(myType);
         updateLabel();
@@ -301,7 +295,7 @@ public class SpinnerLabel<Type> {
         myJLabel.setText(stringFormat(getValue()));
         myJSpinner.setEnabled(1 < myList.size()); // added recently to indicate that there is nothing to scroll
     }
-    
+
     public JComponent getLabelComponent() {
         return myJLabel;
     }

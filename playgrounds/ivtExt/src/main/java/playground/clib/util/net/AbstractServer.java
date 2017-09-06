@@ -1,5 +1,5 @@
 // code by jph
-package playground.clruch.net;
+package playground.clib.util.net;
 
 import java.net.ServerSocket;
 import java.net.Socket;

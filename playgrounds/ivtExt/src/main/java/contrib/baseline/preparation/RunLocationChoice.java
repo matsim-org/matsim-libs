@@ -1,5 +1,7 @@
 package contrib.baseline.preparation;
 
+import java.io.File;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -16,11 +18,10 @@ import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.PtConstants;
+
 import contrib.baseline.IVTBaselineScoringFunctionFactory;
 import contrib.baseline.lib.F2LConfigGroup;
 import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
-
-import java.io.File;
 
 /**
  * Basic main for the ivt baseline scenarios.

@@ -1,12 +1,14 @@
 // code by jph
-package playground.clruch.net;
+package playground.clib.util.net;
 
 import java.io.EOFException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-public class ObjectSocket implements AutoCloseable, SimulationSubscriber {
+import playground.clruch.net.SimulationClientSet;
+
+public class ObjectSocket implements AutoCloseable, ObjectHandler {
     ObjectOutputStream objectOutputStream;
     ObjectInputStream objectInputStream = null;
     final Socket socket;
@@ -54,12 +56,12 @@ public class ObjectSocket implements AutoCloseable, SimulationSubscriber {
 
     @Override
     public void close() throws Exception {
-        SimulationClientSet.INSTANCE.remove(this);
+        SimulationClientSet.INSTANCE.remove(this); // TODO not the right location
         socket.close();
     }
 
     @Override
-    public void handle(SimulationObject simulationObject) {
+    public void handle(Object simulationObject) {
         try {
             objectOutputStream.writeObject(simulationObject);
         } catch (Exception exception) {

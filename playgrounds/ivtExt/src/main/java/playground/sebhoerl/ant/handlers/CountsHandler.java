@@ -1,5 +1,9 @@
 package playground.sebhoerl.ant.handlers;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
@@ -8,12 +12,9 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
+
 import playground.sebhoerl.ant.DataFrame;
 import playground.sebhoerl.av_paper.BinCalculator;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class CountsHandler extends AbstractHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityStartEventHandler {
     final private Map<Id<Person>, Double> departures = new HashMap();

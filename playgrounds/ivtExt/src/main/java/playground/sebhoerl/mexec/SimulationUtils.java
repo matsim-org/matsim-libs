@@ -1,10 +1,10 @@
 package playground.sebhoerl.mexec;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.EventsReaderXMLv1;
-
 import java.io.IOException;
 import java.util.zip.GZIPInputStream;
+
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsReaderXMLv1;
 
 public class SimulationUtils {
     static public void processEvents(EventsManager eventsManager, Simulation simulation, Long iteration ) {

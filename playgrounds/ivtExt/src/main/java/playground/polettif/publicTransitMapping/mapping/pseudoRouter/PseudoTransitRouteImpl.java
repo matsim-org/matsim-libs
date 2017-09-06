@@ -18,11 +18,11 @@
 
 package playground.polettif.publicTransitMapping.mapping.pseudoRouter;
 
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-
-import java.util.List;
 
 /**
  * @author polettif

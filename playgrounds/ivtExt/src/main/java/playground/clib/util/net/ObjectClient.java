@@ -1,5 +1,5 @@
 // code by jph
-package playground.clruch.net;
+package playground.clib.util.net;
 
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,13 +13,14 @@ public class ObjectClient {
     ObjectInputStream objectInputStream;
     volatile boolean isLaunched = true;
 
-    public ObjectClient(final String IP, SimulationSubscriber simulationSubscriber) throws Exception {
+    public ObjectClient(final String IP, int port, ObjectHandler objectHandler) throws Exception {
         this.IP = IP;
         new Thread(new Runnable() {
+
             @Override
             public void run() {
                 try {
-                    socket = new Socket(InetAddress.getByName(IP), SimulationServer.OBJECT_SERVER_PORT); // blocking if IP cannot be reached
+                    socket = new Socket(InetAddress.getByName(IP), port); // blocking if IP cannot be reached
                     objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
                     objectOutputStream.flush();
                     if (objectInputStream == null)
@@ -27,10 +28,7 @@ public class ObjectClient {
                         objectInputStream = new ObjectInputStream(socket.getInputStream());
                     while (isLaunched) {
                         Object object = objectInputStream.readObject(); // blocks until object is available
-                        if (object instanceof SimulationObject) {
-                            SimulationObject simulationObject = (SimulationObject) object;
-                            simulationSubscriber.handle(simulationObject);
-                        }
+                        objectHandler.handle(object);
                     }
                 } catch (Exception myException) {
                     if (isLaunched)

@@ -20,12 +20,12 @@
 
 package contrib.publicTransitMapping.gtfs.lib;
 
-import org.matsim.api.core.v01.network.Link;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * Container for a GTFS Trip

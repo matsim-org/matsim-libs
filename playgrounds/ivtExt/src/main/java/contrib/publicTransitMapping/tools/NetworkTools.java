@@ -19,6 +19,19 @@
 
 package contrib.publicTransitMapping.tools;
 
+import static contrib.publicTransitMapping.tools.ScheduleTools.getTransitRouteLinkIds;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -28,7 +41,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkTransform;
 import org.matsim.core.network.filter.NetworkFilterManager;
 import org.matsim.core.network.filter.NetworkLinkFilter;
@@ -41,14 +53,9 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+
 import contrib.publicTransitMapping.mapping.networkRouter.FastAStarRouter;
 import contrib.publicTransitMapping.mapping.networkRouter.Router;
-import contrib.publicTransitMapping.tools.CoordTools;
-import contrib.publicTransitMapping.tools.MiscUtils;
-
-import java.util.*;
-
-import static contrib.publicTransitMapping.tools.ScheduleTools.getTransitRouteLinkIds;
 
 /**
  * Provides Tools for analysing and manipulating networks.

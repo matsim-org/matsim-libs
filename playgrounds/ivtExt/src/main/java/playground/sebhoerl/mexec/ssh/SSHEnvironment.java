@@ -1,6 +1,15 @@
 package playground.sebhoerl.mexec.ssh;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import playground.sebhoerl.mexec.Controller;
 import playground.sebhoerl.mexec.Environment;
 import playground.sebhoerl.mexec.Scenario;
@@ -11,14 +20,6 @@ import playground.sebhoerl.mexec.ssh.data.SSHEnvironmentData;
 import playground.sebhoerl.mexec.ssh.data.SSHSimulationData;
 import playground.sebhoerl.mexec.ssh.utils.SSHFile;
 import playground.sebhoerl.mexec.ssh.utils.SSHUtils;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 public class SSHEnvironment implements Environment {
     private SSHFile environmentPath;

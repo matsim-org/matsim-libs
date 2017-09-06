@@ -19,10 +19,12 @@
 package playground.ivt.maxess.nestedlogitaccessibility.scripts.simpleleisure;
 
 
+import org.matsim.api.core.v01.Scenario;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
-import org.matsim.api.core.v01.Scenario;
+
 import playground.ivt.maxess.nestedlogitaccessibility.framework.ChoiceSetIdentifier;
 import playground.ivt.maxess.nestedlogitaccessibility.framework.Utility;
 import playground.ivt.maxess.nestedlogitaccessibility.scripts.ModeNests;

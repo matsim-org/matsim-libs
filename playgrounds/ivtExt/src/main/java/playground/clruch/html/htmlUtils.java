@@ -7,9 +7,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
-import java.util.Properties;
-
-import playground.clruch.ScenarioOptions;
 
 /** Created by Joel on 26.06.2017. */
 public abstract class htmlUtils {

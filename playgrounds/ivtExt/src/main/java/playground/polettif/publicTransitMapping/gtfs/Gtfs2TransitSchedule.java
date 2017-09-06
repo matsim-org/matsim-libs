@@ -27,8 +27,9 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
-import playground.polettif.publicTransitMapping.tools.ScheduleTools;
+
 import playground.polettif.publicTransitMapping.tools.GtfsShapeFileTools;
+import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 /**
  * Contract class to read GTFS files and convert them to an unmapped MATSim Transit Schedule

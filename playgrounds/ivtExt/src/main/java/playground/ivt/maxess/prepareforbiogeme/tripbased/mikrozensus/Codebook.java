@@ -18,12 +18,12 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.tripbased.mikrozensus;
 
-import org.matsim.core.utils.collections.MapUtils;
-
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.matsim.core.utils.collections.MapUtils;
 
 /**
  * @author thibautd

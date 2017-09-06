@@ -1,9 +1,9 @@
 package playground.sebhoerl.plcpc;
 
-import org.matsim.core.router.util.LeastCostPathCalculator;
-
 import java.util.LinkedList;
 import java.util.Queue;
+
+import org.matsim.core.router.util.LeastCostPathCalculator;
 
 public class SequentialLeastCostPathCalculatorWorker implements LeastCostPathCalculatorWorker {
     final private Queue<ParallelLeastCostPathCalculatorTask> pending = new LinkedList<>();

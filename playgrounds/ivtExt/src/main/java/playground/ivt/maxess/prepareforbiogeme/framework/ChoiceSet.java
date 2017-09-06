@@ -18,10 +18,10 @@
  * *********************************************************************** */
 package playground.ivt.maxess.prepareforbiogeme.framework;
 
-import org.matsim.api.core.v01.population.Person;
-
 import java.util.Map;
 import java.util.TreeMap;
+
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author thibautd

@@ -7,10 +7,10 @@ import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
 
+import playground.clib.util.gui.RowPanel;
+import playground.clib.util.gui.SpinnerLabel;
 import playground.clruch.jmapviewer.interfaces.TileSource;
 import playground.clruch.net.SimulationObject;
-import playground.clruch.utils.gui.RowPanel;
-import playground.clruch.utils.gui.SpinnerLabel;
 
 /* package */ class TilesLayer extends ViewerLayer {
 

@@ -21,8 +21,16 @@
 
 package contrib.baseline.counts;
 
-import com.google.inject.Inject;
-import com.google.inject.name.Named;
+import static contrib.baseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -39,15 +47,8 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.Vehicle;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
-import static contrib.baseline.counts.CountsIVTBaseline.COUNTS_DELIMITER;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
 /**
  * Counts the daily pt passengers on a given link.

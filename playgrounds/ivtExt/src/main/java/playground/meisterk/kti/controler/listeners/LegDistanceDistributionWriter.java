@@ -20,17 +20,18 @@
 
 package playground.meisterk.kti.controler.listeners;
 
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+
 import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis;
 import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis.CrosstabFormat;
 import playground.meisterk.org.matsim.population.algorithms.PopulationLegDistanceDistribution;
-
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 
 public class LegDistanceDistributionWriter implements IterationEndsListener {
 

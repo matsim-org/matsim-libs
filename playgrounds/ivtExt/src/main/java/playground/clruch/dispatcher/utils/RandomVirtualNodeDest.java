@@ -1,14 +1,15 @@
 package playground.clruch.dispatcher.utils;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.gbl.MatsimRandom;
-import playground.clruch.netdata.VirtualNode;
-import playground.clruch.utils.GlobalAssert;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.gbl.MatsimRandom;
+
+import ch.ethz.idsc.queuey.util.GlobalAssert;
+import playground.clruch.netdata.VirtualNode;
 
 /**
  * Created by Joel on 26.06.2017.

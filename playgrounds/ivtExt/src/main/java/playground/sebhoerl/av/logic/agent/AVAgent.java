@@ -7,8 +7,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vehicles.Vehicle;
 
-import playground.sebhoerl.agentfsm.agent.FSMAgentImpl;
 import playground.sebhoerl.agentfsm.StateMachine;
+import playground.sebhoerl.agentfsm.agent.FSMAgentImpl;
 import playground.sebhoerl.agentlock.LockEngine;
 import playground.sebhoerl.av.logic.service.Service;
 

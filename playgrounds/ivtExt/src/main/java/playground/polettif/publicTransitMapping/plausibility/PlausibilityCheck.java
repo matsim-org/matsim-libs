@@ -18,12 +18,25 @@
 
 package playground.polettif.publicTransitMapping.plausibility;
 
+import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getTransitRouteLinkIds;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -40,15 +53,19 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.utils.TransitScheduleValidator;
 import org.opengis.feature.simple.SimpleFeature;
-import playground.polettif.publicTransitMapping.plausibility.log.*;
-import playground.polettif.publicTransitMapping.tools.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
-import java.util.*;
-
-import static playground.polettif.publicTransitMapping.tools.ScheduleTools.getTransitRouteLinkIds;
+import playground.polettif.publicTransitMapping.plausibility.log.AbstractPlausibilityWarning;
+import playground.polettif.publicTransitMapping.plausibility.log.DirectionChangeWarning;
+import playground.polettif.publicTransitMapping.plausibility.log.LoopWarning;
+import playground.polettif.publicTransitMapping.plausibility.log.PlausibilityWarning;
+import playground.polettif.publicTransitMapping.plausibility.log.TravelTimeWarning;
+import playground.polettif.publicTransitMapping.tools.CoordTools;
+import playground.polettif.publicTransitMapping.tools.CsvTools;
+import playground.polettif.publicTransitMapping.tools.GtfsShapeFileTools;
+import playground.polettif.publicTransitMapping.tools.MiscUtils;
+import playground.polettif.publicTransitMapping.tools.NetworkTools;
+import playground.polettif.publicTransitMapping.tools.ScheduleShapeFileWriter;
+import playground.polettif.publicTransitMapping.tools.ScheduleTools;
 
 /**
  * Performs a plausibility check on the given schedule
