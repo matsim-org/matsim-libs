@@ -2,7 +2,6 @@
 package playground.clruch.dispatcher;
 
 import java.util.Collection;
-import java.util.Random;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -28,9 +27,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * 
  * @author Claudio Ruch */
 public class TestBedDispatcher extends RebalancingDispatcher {
-    private final Random randGen = new Random(1234);
     private final int rebalancingPeriod;
-    private int total_abortTrip = 0;
     private final Network network;
 
     private TestBedDispatcher(//
@@ -71,9 +68,7 @@ public class TestBedDispatcher extends RebalancingDispatcher {
     @Override
     protected String getInfoLine() {
         return String.format("%s AT=%5d", //
-                super.getInfoLine(), //
-                total_abortTrip //
-        );
+                super.getInfoLine());
     }
 
     public static class Factory implements AVDispatcherFactory {

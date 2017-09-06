@@ -1,5 +1,5 @@
 // code by clruch
-package playground.clruch.dispatcher.utils;
+package playground.clruch.dispatcher.utils.virtualnodedestselector;
 
 import java.util.ArrayList;
 import java.util.Collections;
