@@ -4,9 +4,11 @@ package playground.clruch;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Objects;
 
 import org.matsim.api.core.v01.network.Network;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
@@ -30,6 +32,8 @@ public class ScenarioViewer {
         PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
 
         ReferenceFrame referenceFrame = simOptions.getReferenceFrame();
+        GlobalAssert.that(Objects.nonNull(referenceFrame));
+        GlobalAssert.that(Objects.nonNull(simOptions.getLocationSpec()));
         Network network = NetworkLoader.loadNetwork(new File(workingDirectory, simOptions.getString("simuConfig")));
 
         // load viewer

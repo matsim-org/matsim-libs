@@ -6,18 +6,18 @@ import java.util.Properties;
 
 import org.matsim.api.core.v01.network.Network;
 
-import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.ScenarioOptions;
 
 public enum VirtualNetworkGet {
     ;
 
+    /** @param network
+     * @return null if file does not exist */
     public static VirtualNetwork readDefault(Network network) {
         Properties simOptions = ScenarioOptions.getDefault();
         final File virtualnetworkFile = new File(simOptions.getProperty("virtualNetworkDir"), //
                 simOptions.getProperty("virtualNetworkName"));
         System.out.println("reading network from" + virtualnetworkFile.getAbsoluteFile());
-        GlobalAssert.that(virtualnetworkFile.exists());
         try {
             return VirtualNetworkIO.fromByte(network, virtualnetworkFile);
         } catch (Exception e) {
