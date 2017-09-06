@@ -144,7 +144,7 @@ public class TrbScenarioServer {
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
-        DataCollector.store(new File(args[0]), controler, //
+        DataCollector datacollector = new DataCollector(new File(args[0]), controler, //
                 minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
 
         // generate report

@@ -109,7 +109,7 @@ public class ScenarioServer {
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
-        DataCollector.store(configFile, controler, //
+        DataCollector datacollector = new DataCollector(configFile, controler, //
                 minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
 
         // generate report
