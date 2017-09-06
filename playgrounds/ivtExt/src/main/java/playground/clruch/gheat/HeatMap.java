@@ -3,8 +3,8 @@ package playground.clruch.gheat;
 
 import java.awt.image.BufferedImage;
 
-import playground.clruch.gheat.graphics.ColorScheme;
-import playground.clruch.gheat.graphics.DotImages;
+import playground.clib.gheat.gui.ColorScheme;
+import playground.clib.gheat.gui.DotImages;
 
 public class HeatMap {
     public static boolean isInitialised = false;

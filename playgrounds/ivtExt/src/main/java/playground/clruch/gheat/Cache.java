@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-import playground.clruch.gheat.graphics.ColorScheme;
+import playground.clib.gheat.gui.ColorScheme;
 
 /* package */ enum Cache {
     ;

@@ -1,4 +1,4 @@
-package playground.clruch.gheat.graphics;
+package playground.clib.gheat.gui;
 
 import java.awt.Composite;
 import java.awt.CompositeContext;

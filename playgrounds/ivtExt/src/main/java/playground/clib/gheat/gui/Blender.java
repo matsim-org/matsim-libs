@@ -1,5 +1,5 @@
 // code by varunpant
-package playground.clruch.gheat.graphics;
+package playground.clib.gheat.gui;
 
 abstract class Blender {
     public abstract void blend(int[] src, int[] dst, int[] result);

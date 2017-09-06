@@ -1,32 +1,25 @@
 // code by jph
-package playground.clruch.gheat.graphics;
+package playground.clib.gheat.gui;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
-import ch.ethz.idsc.queuey.util.GlobalAssert;
-
 public class ColorScheme {
     public final BufferedImage bufferedImage = new BufferedImage(1, 256, BufferedImage.TYPE_INT_ARGB);
 
-    /**
-     * 
-     * @param i
+    /** @param i
      *            ranges from 0 to 255 inclusive
-     * @param color
-     */
+     * @param color */
     public void set(int i, Color color) {
         bufferedImage.setRGB(0, i, color.getRGB());
         int rgb = bufferedImage.getRGB(0, i);
-        GlobalAssert.that(rgb == color.getRGB());
+        if (rgb != color.getRGB())
+            throw new RuntimeException();
     }
 
-    /**
-     * 
-     * @param i
+    /** @param i
      *            ranges from 0 to 255 inclusive
-     * @return color corresponding to value i in range [0, 255]
-     */
+     * @return color corresponding to value i in range [0, 255] */
     public Color get(int i) {
         return new Color(bufferedImage.getRGB(0, i), true);
     }

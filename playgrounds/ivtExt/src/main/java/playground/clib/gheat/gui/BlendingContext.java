@@ -1,5 +1,5 @@
 // code by varunpant
-package playground.clruch.gheat.graphics;
+package playground.clib.gheat.gui;
 
 import java.awt.CompositeContext;
 import java.awt.image.Raster;

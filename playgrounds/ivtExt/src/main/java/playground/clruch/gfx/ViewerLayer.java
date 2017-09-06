@@ -11,9 +11,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import playground.clib.gheat.gui.ColorSchemes;
 import playground.clib.util.gui.RowPanel;
 import playground.clib.util.gui.SpinnerLabel;
-import playground.clruch.gheat.graphics.ColorSchemes;
 import playground.clruch.net.SimulationObject;
 
 /* package */ abstract class ViewerLayer {

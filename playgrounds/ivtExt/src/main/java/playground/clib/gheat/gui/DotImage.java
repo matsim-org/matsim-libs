@@ -1,5 +1,5 @@
 // code by jph
-package playground.clruch.gheat.graphics;
+package playground.clib.gheat.gui;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;

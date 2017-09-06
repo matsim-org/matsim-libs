@@ -15,8 +15,8 @@ import javax.swing.JCheckBox;
 
 import org.matsim.api.core.v01.Coord;
 
+import playground.clib.gheat.gui.ColorSchemes;
 import playground.clib.util.gui.RowPanel;
-import playground.clruch.gheat.graphics.ColorSchemes;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;

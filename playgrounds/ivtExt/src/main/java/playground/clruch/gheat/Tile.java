@@ -7,10 +7,10 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import playground.clruch.gheat.graphics.BlendComposite;
-import playground.clruch.gheat.graphics.ColorScheme;
-import playground.clruch.gheat.graphics.DotImage;
-import playground.clruch.gheat.graphics.GammaCorrection;
+import playground.clib.gheat.gui.BlendComposite;
+import playground.clib.gheat.gui.ColorScheme;
+import playground.clib.gheat.gui.DotImage;
+import playground.clib.gheat.gui.GammaCorrection;
 
 public class Tile {
     private Tile() {

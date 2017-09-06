@@ -1,4 +1,4 @@
-package playground.clruch.gheat.graphics;
+package playground.clib.gheat.gui;
 
 /*
   * $Id: ColorUtilities.java,v 1.1 2006/12/15 13:53:13 gfx Exp $
