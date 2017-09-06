@@ -22,6 +22,8 @@ package org.matsim.withinday.trafficmonitoring;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Random;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -37,6 +39,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -60,6 +63,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 	public MatsimTestUtils helper = new MatsimTestUtils();
 	
 	private int run = 0;
+	Random random = MatsimRandom.getRandom();
 	
 	public TravelTimeCollectorTest(boolean isUsingFastCapacityUpdate) {
 		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
@@ -74,8 +78,8 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 	@Test
 	public void testGetLinkTravelTime() {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setOutputDirectory(helper.getOutputDirectory()+"fastCapacityUpdate_"+run);
 		run++;
+		config.controler().setOutputDirectory(helper.getOutputDirectory()+"fastCapacityUpdate_"+run+random.nextInt(10));
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
 		qSimConfig.setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
