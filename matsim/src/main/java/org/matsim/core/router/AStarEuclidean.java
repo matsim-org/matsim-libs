@@ -34,7 +34,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-
 /**
  * Implements the <a href="http://en.wikipedia.org/wiki/A%2A">A* router algorithm</a>
  * for a given NetworkLayer by using the euclidean distance divided by the
@@ -156,23 +155,30 @@ public class AStarEuclidean extends Dijkstra {
 	}
 
 	@Override
-	protected
-	boolean addToPendingNodes(final Link l, final Node n, final RouterPriorityQueue<Node> pendingNodes,
+	protected boolean addToPendingNodes(final Link l, final Node n, final RouterPriorityQueue<Node> pendingNodes,
 			final double currTime, final double currCost, final Node toNode) {
 
-		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, getPerson(), getVehicle());
-		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.getPerson(), this.getVehicle());
-		AStarNodeData data = getData(n);
-		double nCost = data.getCost();
+		final double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, this.person, this.vehicle);
+		final double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.person, this.vehicle);		
+		final AStarNodeData data = getData(n);
 		if (!data.isVisited(getIterationId())) {
 			double remainingTravelCost = estimateRemainingTravelCost(n, toNode);
-			visitNode(n, data, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, remainingTravelCost, l);
+			visitNode(n, data, pendingNodes, currTime + travelTime, currCost + travelCost, remainingTravelCost, l);
 			return true;
-		} else if (currCost + travelCost < nCost) {
-			revisitNode(n, data, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, l);
+		}
+		
+		final double nCost = data.getCost();
+		final double totalCost = currCost + travelCost;
+		if (totalCost < nCost) {
+			revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
 			return true;
+		} else if (totalCost == nCost) {
+			// Special case: a node can be reached from two links with exactly the same costs.
+			// Decide based on the linkId which one to take... just have to common criteria to be deterministic.
+			if (data.getPrevLink().getId().compareTo(l.getId()) > 0) {
+				revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
+				return true;
+			}
 		}
 		return false;
 	}
@@ -193,7 +199,7 @@ public class AStarEuclidean extends Dijkstra {
 			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final double expectedRemainingCost, final Link outLink) {
 		data.setExpectedRemainingCost(expectedRemainingCost);
-		visitNode(n, data, pendingNodes, time, cost, outLink);
+		super.visitNode(n, data, pendingNodes, time, cost, outLink);
 	}
 
 	/**
@@ -211,8 +217,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * @return The travel cost when traveling between the two given nodes.
 	 */
 	protected double estimateRemainingTravelCost(final Node fromNode, final Node toNode) {
-		double dist = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord())
-				* getMinTravelCostPerLength();
+		double dist = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()) * getMinTravelCostPerLength();
 		return dist * this.overdoFactor;
 	}
 
@@ -248,7 +253,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * @return the minimal travel cost per length unit on a link in the
 	 * network.
 	 */
-	public double getMinTravelCostPerLength() {
+	public final double getMinTravelCostPerLength() {
 		return this.minTravelCostPerLength;
 	}
 
@@ -261,5 +266,4 @@ public class AStarEuclidean extends Dijkstra {
 	protected double getPriority(final DijkstraNodeData data) {
 		return ((AStarNodeData) data).getExpectedCost();
 	}
-
 }
