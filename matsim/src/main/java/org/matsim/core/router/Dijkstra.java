@@ -584,12 +584,16 @@ public class Dijkstra implements LeastCostPathCalculator {
 	protected DijkstraNodeData getData(final Node n) {
 		DijkstraNodeData r = this.nodeData.get(n.getId());
 		if (null == r) {
-			r = new DijkstraNodeData();
+			r = createNodeData();
 			this.nodeData.put(n.getId(), r);
 		}
 		return r;
 	}
 
+	protected DijkstraNodeData createNodeData() {
+		return new DijkstraNodeData();
+	}
+	
 	protected PreProcessDijkstra.DeadEndData getPreProcessData(final Node n) {
 		return this.preProcessData.getNodeData(n);
 	}

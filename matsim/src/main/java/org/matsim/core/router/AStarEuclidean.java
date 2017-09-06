@@ -20,9 +20,6 @@
 
 package org.matsim.core.router;
 
-import java.util.HashMap;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -82,7 +79,6 @@ public class AStarEuclidean extends Dijkstra {
 	protected final double overdoFactor;
 
 	private double minTravelCostPerLength;
-	/*package*/ final HashMap<Id<Node>, AStarNodeData> nodeData;
 
 	/**
 	 * Default constructor; sets the overdo factor to 1.
@@ -129,7 +125,6 @@ public class AStarEuclidean extends Dijkstra {
 
 		setMinTravelCostPerLength(preProcessData.getMinTravelCostPerLength());
 
-		this.nodeData = new HashMap<>((int)(network.getNodes().size() * 1.1), 0.95f);
 		this.overdoFactor = overdoFactor;
 	}
 
@@ -230,20 +225,20 @@ public class AStarEuclidean extends Dijkstra {
 	 */
 	@Override
 	protected AStarNodeData getData(final Node n) {
-		AStarNodeData r = this.nodeData.get(n.getId());
-		if (null == r) {
-			r = new AStarNodeData();
-			this.nodeData.put(n.getId(), r);
-		}
-		return r;
+		return (AStarNodeData) super.getData(n);
 	}
 
+	@Override
+	protected AStarNodeData createNodeData() {
+		return new AStarNodeData();
+	}
+	
 	/**
 	 * Sets minTravelCostPerLength to the given value.
 	 * @param minTravelCostPerLength
 	 *            the minTravelCostPerLength to set
 	 */
-	void setMinTravelCostPerLength(final double minTravelCostPerLength) {
+	/*package*/ void setMinTravelCostPerLength(final double minTravelCostPerLength) {
 		this.minTravelCostPerLength = minTravelCostPerLength;
 	}
 
