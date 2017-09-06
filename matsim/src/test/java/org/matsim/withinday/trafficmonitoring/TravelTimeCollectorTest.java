@@ -77,13 +77,13 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 	
 	@Test
 	public void testGetLinkTravelTime() {
-		Config config = loadConfig("test/scenarios/equil/config.xml");
         try {
 			Thread.sleep(4000);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        Config config = loadConfig("test/scenarios/equil/config.xml");
 
 		Logger.getLogger(getClass()).info("fastCapacity Update = "+this.isUsingFastCapacityUpdate);
 		config.controler().setOutputDirectory(helper.getOutputDirectory()+"fastCapacityUpdate_"+this.isUsingFastCapacityUpdate);
