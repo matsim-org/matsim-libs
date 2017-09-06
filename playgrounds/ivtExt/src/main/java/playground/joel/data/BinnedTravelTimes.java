@@ -18,7 +18,7 @@ import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.utils.HelperPredicates;
 import playground.joel.helpers.CSVcreator;
 import playground.joel.helpers.KeyMap;
-import playground.joel.helpers.binnedHelper;
+import playground.joel.helpers.BinnedHelper;
 
 /**
  * Created by Joel on 28.02.2017.
@@ -70,18 +70,18 @@ class BinnedTravelTimes extends AbstractData {
 
         if(endTime <= keyMap.getBinStart(startTime) + binSize) {
             travelTimes.get(vehicle).put(startTime, endTime);
-            binnedHelper.putAdd(traveledTime, keyMap.getKey(startTime), endTime - startTime);
+            BinnedHelper.putAdd(traveledTime, keyMap.getKey(startTime), endTime - startTime);
         } else {
             double nextBin = keyMap.getBinStart(startTime) + binSize;
             travelTimes.get(vehicle).put(startTime, nextBin);
-            binnedHelper.putAdd(traveledTime, keyMap.getKey(startTime), nextBin - startTime);
+            BinnedHelper.putAdd(traveledTime, keyMap.getKey(startTime), nextBin - startTime);
             while (endTime > nextBin + binSize) {
                 travelTimes.get(vehicle).put(nextBin, nextBin + binSize);
-                binnedHelper.putAdd(traveledTime, keyMap.getKey(nextBin), binSize);
+                BinnedHelper.putAdd(traveledTime, keyMap.getKey(nextBin), binSize);
                 nextBin += binSize;
             }
             travelTimes.get(vehicle).put(nextBin, endTime);
-            binnedHelper.putAdd(traveledTime, keyMap.getKey(nextBin), endTime - nextBin);
+            BinnedHelper.putAdd(traveledTime, keyMap.getKey(nextBin), endTime - nextBin);
         }
         if (endTime <= 108000) {
             totalTimeWithCust += endTime - startTime;
@@ -153,7 +153,7 @@ class BinnedTravelTimes extends AbstractData {
 
         // export to node-based XML file
         NavigableMap<String, NavigableMap<String, Double>> binnedRatios = new TreeMap<>();
-        binnedHelper.checkFull(binnedData, binSize, keyMap);
+        BinnedHelper.checkFull(binnedData, binSize, keyMap);
         binnedRatios.put("bins", binnedData);
         new BinnedRatiosXML("binnedTimeRatio").generate(binnedRatios, fileExport2);
 

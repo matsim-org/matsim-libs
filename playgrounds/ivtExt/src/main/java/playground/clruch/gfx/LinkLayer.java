@@ -26,12 +26,12 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Subdivide;
+import ch.ethz.idsc.tensor.img.Hue;
 import ch.ethz.idsc.tensor.io.ObjectFormat;
 import ch.ethz.idsc.tensor.red.Total;
 import playground.clib.util.gui.GraphicsUtil;
 import playground.clib.util.gui.RowPanel;
 import playground.clib.util.gui.SpinnerLabel;
-import playground.clruch.gheat.graphics.Hue;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.SimulationObject;
 
@@ -113,7 +113,7 @@ import playground.clruch.net.SimulationObject;
                     double ratio = carsEmpty / (double) total;
                     double h = (ratio + 0.8) / 3; // r=0->Green, r=1->Blue
                     double v = 0.84 + ratio * .15; // r=0->, r=1->Brighter
-                    graphics.setColor(new Hue(h, 1, v, .75).rgba);
+                    graphics.setColor(Hue.of(h, 1, v, .75));
                     Stroke stroke = new BasicStroke((float) Math.sqrt(scaling * total / factor));
                     graphics.setStroke(stroke);
                     Shape shape = new Line2D.Double(p1.x, p1.y, p2.x, p2.y);

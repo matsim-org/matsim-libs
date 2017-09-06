@@ -24,11 +24,12 @@ public class ZHFileReader {
      * @return all files in filesDirectory that have the sequence @param sharedFileName in their filename */
     private List<File> getFahrStreckenProtokolle(String sharedFileName) {
         List<File> relevantFiles = new ArrayList<>();
-        for (File file : filesDirectory.listFiles()) {
-            if (file.getName().contains(sharedFileName)) {
-                relevantFiles.add(file);
+        if (filesDirectory.isDirectory())
+            for (File file : filesDirectory.listFiles()) {
+                if (file.getName().contains(sharedFileName)) {
+                    relevantFiles.add(file);
+                }
             }
-        }
         return relevantFiles;
 
     }

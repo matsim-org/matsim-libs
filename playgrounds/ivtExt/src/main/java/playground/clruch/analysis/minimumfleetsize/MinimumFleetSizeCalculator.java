@@ -16,11 +16,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import ch.ethz.idsc.queuey.math.AnalysisUtils;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import playground.clruch.analysis.AnalysisUtils;
 import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.DiagramCreator;
 import playground.clruch.analysis.RequestAnalysis;
