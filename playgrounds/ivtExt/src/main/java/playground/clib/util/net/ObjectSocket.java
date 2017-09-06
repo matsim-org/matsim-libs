@@ -6,8 +6,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import playground.clruch.net.SimulationClientSet;
-
 public class ObjectSocket implements AutoCloseable, ObjectHandler {
     ObjectOutputStream objectOutputStream;
     ObjectInputStream objectInputStream = null;
@@ -20,11 +18,11 @@ public class ObjectSocket implements AutoCloseable, ObjectHandler {
             // flush the stream immediately to ensure that constructors for receiving ObjectInputStreams will not block when reading the header
             objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
             objectOutputStream.flush();
-            SimulationClientSet.INSTANCE.add(this); // TODO not the right location
-        } catch (Exception myException) {
-            myException.printStackTrace();
+
+        } catch (Exception exception) {
+            exception.printStackTrace();
         }
-        Thread myThread = new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -33,7 +31,8 @@ public class ObjectSocket implements AutoCloseable, ObjectHandler {
                         objectInputStream = new ObjectInputStream(socket.getInputStream());
 
                     while (launched) {
-                        Object myObject = objectInputStream.readObject(); // blocking, might give EOFException
+                        @SuppressWarnings("unused")
+                        Object object = objectInputStream.readObject(); // blocking, might give EOFException
                         System.out.println("object received");
                     }
                 } catch (EOFException eofException) {
@@ -45,18 +44,17 @@ public class ObjectSocket implements AutoCloseable, ObjectHandler {
                 launched = false;
                 try {
                     close();
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (Exception exception) {
+                    exception.printStackTrace();
                 }
             }
         });
 
-        myThread.start();
+        thread.start();
     }
 
     @Override
     public void close() throws Exception {
-        SimulationClientSet.INSTANCE.remove(this); // TODO not the right location
         socket.close();
     }
 
