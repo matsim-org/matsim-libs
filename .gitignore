@@ -20,3 +20,4 @@ IDSCOptions.properties
 tutorial/output/
 tutorial/pop.xml.gz
 /playgrounds/ivtExt/src/main/java/playground/clruch/dispatcher/TestStrategiesDispatcher.java
+/playgrounds/ivtExt/src/main/java/playground/clruch/ScenarioReporterMPC.java
