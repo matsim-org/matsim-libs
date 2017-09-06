@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import playground.clib.gheat.gui.ColorSchemes;
+import playground.clib.jmapviewer.MatsimHeatMap;
 import playground.clib.util.gui.RowPanel;
 import playground.clib.util.gui.SpinnerLabel;
 import playground.clruch.net.SimulationObject;
@@ -56,9 +57,9 @@ import playground.clruch.net.SimulationObject;
 
     protected final void createHeatmapPanel(RowPanel rowPanel, String string, MatsimHeatMap matsimHeatMap) {
         final JCheckBox jCheckBox = new JCheckBox(string);
-        jCheckBox.setSelected(matsimHeatMap.show);
+        jCheckBox.setSelected(matsimHeatMap.getShow());
         jCheckBox.addActionListener(event -> {
-            matsimHeatMap.show = jCheckBox.isSelected();
+            matsimHeatMap.setShow ( jCheckBox.isSelected());
             matsimMapComponent.repaint();
         });
         rowPanel.add(jCheckBox);
@@ -66,9 +67,9 @@ import playground.clruch.net.SimulationObject;
             SpinnerLabel<ColorSchemes> spinnerLabel = new SpinnerLabel<>();
             spinnerLabel.setToolTipText("color scheme of heatmap");
             spinnerLabel.setArray(ColorSchemes.values());            
-            spinnerLabel.setValue(matsimHeatMap.colorSchemes);
+            spinnerLabel.setValue(matsimHeatMap.getColorSchemes());
             spinnerLabel.addSpinnerListener(cs -> {
-                matsimHeatMap.colorSchemes = cs;
+                matsimHeatMap.setColorSchemes( cs);
                 matsimMapComponent.repaint();
             });
             spinnerLabel.getLabelComponent().setPreferredSize(new Dimension(100, DEFAULT_HEIGHT));

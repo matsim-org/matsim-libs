@@ -3,24 +3,24 @@ package playground.clruch.gfx;
 
 import java.awt.Dimension;
 
+import playground.clib.jmapviewer.JMapViewer;
+import playground.clib.jmapviewer.interfaces.TileSource;
+import playground.clib.jmapviewer.tilesources.BingAerialTileSource;
+import playground.clib.jmapviewer.tilesources.BlackWhiteTileSource;
+import playground.clib.jmapviewer.tilesources.CycleTileSource;
+import playground.clib.jmapviewer.tilesources.DarkCartoTileSource;
+import playground.clib.jmapviewer.tilesources.FrenchTileSource;
+import playground.clib.jmapviewer.tilesources.GrayMapnikTileSource;
+import playground.clib.jmapviewer.tilesources.HikebikeTileSource;
+import playground.clib.jmapviewer.tilesources.HillshadingTileSource;
+import playground.clib.jmapviewer.tilesources.HotTileSource;
+import playground.clib.jmapviewer.tilesources.LandscapeTileSource;
+import playground.clib.jmapviewer.tilesources.LightCartoTileSource;
+import playground.clib.jmapviewer.tilesources.MapnikTileSource;
+import playground.clib.jmapviewer.tilesources.OpenCycleTileSource;
+import playground.clib.jmapviewer.tilesources.WatercolorTileSource;
+import playground.clib.jmapviewer.tilesources.WikimediaTileSource;
 import playground.clib.util.gui.SpinnerLabel;
-import playground.clruch.jmapviewer.JMapViewer;
-import playground.clruch.jmapviewer.interfaces.TileSource;
-import playground.clruch.jmapviewer.tilesources.BingAerialTileSource;
-import playground.clruch.jmapviewer.tilesources.BlackWhiteTileSource;
-import playground.clruch.jmapviewer.tilesources.CycleTileSource;
-import playground.clruch.jmapviewer.tilesources.DarkCartoTileSource;
-import playground.clruch.jmapviewer.tilesources.FrenchTileSource;
-import playground.clruch.jmapviewer.tilesources.GrayMapnikTileSource;
-import playground.clruch.jmapviewer.tilesources.HikebikeTileSource;
-import playground.clruch.jmapviewer.tilesources.HillshadingTileSource;
-import playground.clruch.jmapviewer.tilesources.HotTileSource;
-import playground.clruch.jmapviewer.tilesources.LandscapeTileSource;
-import playground.clruch.jmapviewer.tilesources.LightCartoTileSource;
-import playground.clruch.jmapviewer.tilesources.MapnikTileSource;
-import playground.clruch.jmapviewer.tilesources.OpenCycleTileSource;
-import playground.clruch.jmapviewer.tilesources.WatercolorTileSource;
-import playground.clruch.jmapviewer.tilesources.WikimediaTileSource;
 
 /* package */ class JMapTileSelector {
     public static SpinnerLabel<TileSource> create(JMapViewer jMapViewer) {

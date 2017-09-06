@@ -4,10 +4,10 @@ package playground.clruch.gfx;
 import java.util.ArrayList;
 import java.util.List;
 
-import playground.clruch.gheat.DataPoint;
-import playground.clruch.gheat.HeatMapDataSource;
-import playground.clruch.gheat.PointLatLng;
-import playground.clruch.gheat.Projections;
+import playground.clib.gheat.DataPoint;
+import playground.clib.gheat.HeatMapDataSource;
+import playground.clib.gheat.PointLatLng;
+import playground.clib.gheat.Projections;
 
 /* package */ class MatsimDataSource implements HeatMapDataSource {
     private List<PointLatLng> _pointList = null;
