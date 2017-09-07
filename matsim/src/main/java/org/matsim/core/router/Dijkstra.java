@@ -337,6 +337,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 			}
 			links.add(0, tmpLink);
 			nodes.add(0, tmpLink.getFromNode());
+			
 		}
 
 		DijkstraNodeData toNodeData = getData(toNode);
@@ -395,9 +396,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * Logic that was previously located in the relaxNode(...) method. 
 	 * By doing so, the FastDijkstra can overwrite relaxNode without copying the logic. 
 	 */
-	/*package*/ void relaxNodeLogic(final Link l, final RouterPriorityQueue<Node> pendingNodes,
-			final double currTime, final double currCost, final Node toNode,
-			final PreProcessDijkstra.DeadEndData ddOutData) {
+	/*package*/ void relaxNodeLogic(final Link l, final RouterPriorityQueue<Node> pendingNodes, final double currTime, 
+			final double currCost, final Node toNode, final PreProcessDijkstra.DeadEndData ddOutData) {
 		if (this.pruneDeadEnds) {
 			if (canPassLink(l)) {
 				Node n = l.getToNode();
@@ -503,9 +503,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @param outLink
 	 *            The link from which we came visiting n.
 	 */
-	protected void revisitNode(final Node n, final DijkstraNodeData data,
-			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
-			final Link outLink) {
+	protected void revisitNode(final Node n, final DijkstraNodeData data, final RouterPriorityQueue<Node> pendingNodes, 
+			final double time, final double cost, final Link outLink) {
 		data.visit(outLink, cost, time, getIterationId());
 		pendingNodes.decreaseKey(n, getPriority(data));
 	}
@@ -527,9 +526,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @param outLink
 	 *            The node from which we came visiting n.
 	 */
-	protected void visitNode(final Node n, final DijkstraNodeData data,
-			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
-			final Link outLink) {
+	protected void visitNode(final Node n, final DijkstraNodeData data, final RouterPriorityQueue<Node> pendingNodes,
+			final double time, final double cost, final Link outLink) {
 		data.visit(outLink, cost, time, getIterationId());
 		pendingNodes.add(n, getPriority(data));
 	}

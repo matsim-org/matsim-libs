@@ -75,12 +75,6 @@ public class FastAStarLandmarks extends AStarLandmarks {
 		
 		RoutingNetworkNode routingNetworkFromNode = routingNetwork.getNodes().get(fromNode.getId());
 		RoutingNetworkNode routingNetworkToNode = routingNetwork.getNodes().get(toNode.getId());
-
-		if (this.landmarks.length >= 2) {
-			initializeActiveLandmarks(routingNetworkFromNode, routingNetworkToNode, 2);
-		} else {
-			initializeActiveLandmarks(routingNetworkFromNode, routingNetworkToNode, this.landmarks.length);
-		}
 		
 		return super.calcLeastCostPath(routingNetworkFromNode, routingNetworkToNode, startTime, person, vehicle);
 	}
@@ -101,8 +95,6 @@ public class FastAStarLandmarks extends AStarLandmarks {
 				this.heap.reset();
 				return this.heap;
 			}
-//			int maxSize = this.routingNetwork.getNodes().size();
-//			return new BinaryMinHeap<ArrayRoutingNetworkNode>(maxSize);
 		} else {
 			return super.createRouterPriorityQueue();
 		}
@@ -114,7 +106,7 @@ public class FastAStarLandmarks extends AStarLandmarks {
 	 */
 	@Override
 	protected Path constructPath(Node fromNode, Node toNode, double startTime, double arrivalTime) {
-		return fastRouter.constructPath(fromNode, toNode, startTime, arrivalTime);
+		return this.fastRouter.constructPath(fromNode, toNode, startTime, arrivalTime);
 	}
 	
 	/*
@@ -133,7 +125,7 @@ public class FastAStarLandmarks extends AStarLandmarks {
 			this.controlCounter = 0;
 		}
 		
-		fastRouter.relaxNode(outNode, toNode, pendingNodes);
+		this.fastRouter.relaxNode(outNode, toNode, pendingNodes);
 	}
 	
 	/*
@@ -141,7 +133,7 @@ public class FastAStarLandmarks extends AStarLandmarks {
 	 */
 	@Override
 	protected AStarNodeData getData(final Node n) {
-		return (AStarNodeData) fastRouter.getData(n);
+		return (AStarNodeData) this.fastRouter.getData(n);
 	}
 
 	/*
@@ -149,6 +141,6 @@ public class FastAStarLandmarks extends AStarLandmarks {
 	 */
 	@Override
 	protected PreProcessLandmarks.LandmarksData getPreProcessData(final Node n) {
-		return (PreProcessLandmarks.LandmarksData) fastRouter.getPreProcessData(n);
+		return (PreProcessLandmarks.LandmarksData) this.fastRouter.getPreProcessData(n);
 	}
 }

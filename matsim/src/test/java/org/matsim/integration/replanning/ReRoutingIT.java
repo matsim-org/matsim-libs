@@ -20,6 +20,10 @@
 
 package org.matsim.integration.replanning;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.util.EnumSet;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,10 +39,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.util.EnumSet;
-
 public class ReRoutingIT {
 
 	@Rule
@@ -53,6 +53,7 @@ public class ReRoutingIT {
 		config.qsim().setRemoveStuckVehicles(true);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 		config.controler().setLastIteration(1);
+		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
 
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
@@ -110,7 +111,7 @@ public class ReRoutingIT {
 		controler.run();
 		this.evaluate();
 	}
-
+	
 	private void evaluate() throws MalformedURLException {
 		Config config = utils.loadConfig(IOUtils.newUrl(utils.classInputResourcePath(), "config.xml"));
 		config.network().setInputFile(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
@@ -127,5 +128,4 @@ public class ReRoutingIT {
 		}
 		Assert.assertTrue("different plans files.", isEqual);
 	}
-
 }
