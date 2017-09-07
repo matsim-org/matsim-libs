@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -77,15 +78,8 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 	
 	@Test
 	public void testGetLinkTravelTime() {
-        try {
-			Thread.sleep(4000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        Config config = loadConfig("test/scenarios/equil/config.xml");
-
-		Logger.getLogger(getClass()).info("fastCapacity Update = "+this.isUsingFastCapacityUpdate);
+     
+        Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setOutputDirectory(helper.getOutputDirectory()+"fastCapacityUpdate_"+this.isUsingFastCapacityUpdate);
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
