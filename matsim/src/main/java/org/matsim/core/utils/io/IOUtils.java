@@ -307,7 +307,7 @@ public class IOUtils {
 				}
 			});
 		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+			throw new UncheckedIOException(e.getMessage(), e);
 		}
 	}
 
