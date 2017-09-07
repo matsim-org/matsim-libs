@@ -52,7 +52,7 @@ public class FastAStarLandmarks extends AStarLandmarks {
 	private BinaryMinHeap<ArrayRoutingNetworkNode> heap = null;
 	private int maxSize = -1;
 
-	public FastAStarLandmarks(final RoutingNetwork routingNetwork, final PreProcessLandmarks preProcessData,
+	FastAStarLandmarks(final RoutingNetwork routingNetwork, final PreProcessLandmarks preProcessData,
 			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor,
 			final FastRouterDelegateFactory fastRouterFactory) {
 		super(routingNetwork, preProcessData, costFunction, timeFunction, overdoFactor);

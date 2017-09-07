@@ -18,13 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.util;
+package org.matsim.core.router;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.router.ArrayFastRouterDelegateFactory;
-import org.matsim.core.router.FastAStarEuclidean;
-import org.matsim.core.router.FastRouterDelegateFactory;
-import org.matsim.core.router.FastRouterType;
+import org.matsim.core.router.util.ArrayRoutingNetworkFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.PreProcessEuclidean;
+import org.matsim.core.router.util.RoutingNetwork;
+import org.matsim.core.router.util.RoutingNetworkFactory;
+import org.matsim.core.router.util.RoutingNetworkNode;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 import java.util.HashMap;
 import java.util.Map;

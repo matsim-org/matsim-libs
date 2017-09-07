@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.scheduler;
+package org.matsim.core.router;
 
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import java.util.Collection;
 
-public class TaxiSchedulerParams {
-	public final boolean destinationKnown;
-	public final boolean vehicleDiversion;
-	public final double pickupDuration;
-	public final double dropoffDuration;
-	public final double AStarEuclideanOverdoFactor;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.PreProcessDijkstra.DeadEndData;
 
-	public TaxiSchedulerParams(TaxiConfigGroup taxiCfg) {
-		this.destinationKnown = taxiCfg.isDestinationKnown();
-		this.vehicleDiversion = taxiCfg.isVehicleDiversion();
-		this.pickupDuration = taxiCfg.getPickupDuration();
-		this.dropoffDuration = taxiCfg.getDropoffDuration();
-		this.AStarEuclideanOverdoFactor = taxiCfg.getAStarEuclideanOverdoFactor();
+/**
+ * A subclass of ImaginaryNode for fast routers (FastMultiNodeDijkstra and BackwardFastMultiNodeDijkstra).
+ * 
+ * @author michalm
+ */
+public class RoutingNetworkImaginaryNode extends ImaginaryNode implements RoutingNetworkNode {
+
+	public RoutingNetworkImaginaryNode(Collection<? extends InitialNode> initialNodes) {
+		super(initialNodes);
 	}
 
-	public TaxiSchedulerParams(boolean destinationKnown, boolean vehicleDiversion, double pickupDuration,
-			double dropoffDuration, double AStarEuclideanOverdoFactor) {
-		this.destinationKnown = destinationKnown;
-		this.vehicleDiversion = vehicleDiversion;
-		this.pickupDuration = pickupDuration;
-		this.dropoffDuration = dropoffDuration;
-		this.AStarEuclideanOverdoFactor = AStarEuclideanOverdoFactor;
+	@Override
+	public Node getNode() {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public void setOutLinksArray(RoutingNetworkLink[] outLinks) {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public RoutingNetworkLink[] getOutLinksArray() {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public void setDeadEndData(DeadEndData deadEndData) {
+		throw new RuntimeException("not implemented");
+	}
+
+	@Override
+	public DeadEndData getDeadEndData() {
+		return null;
 	}
 }

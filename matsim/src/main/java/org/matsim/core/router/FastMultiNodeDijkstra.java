@@ -58,7 +58,7 @@ public class FastMultiNodeDijkstra extends MultiNodeDijkstra {
 	 * Create the routing network here and clear the nodeData map 
 	 * which is not used by this implementation.
 	 */
-	public FastMultiNodeDijkstra(final RoutingNetwork routingNetwork, final TravelDisutility costFunction, 
+	protected FastMultiNodeDijkstra(final RoutingNetwork routingNetwork, final TravelDisutility costFunction, 
 			final TravelTime timeFunction, final PreProcessDijkstra preProcessData, 
 			final FastRouterDelegateFactory fastRouterFactory, boolean searchAllEndNodes) {
 		super(routingNetwork, costFunction, timeFunction, preProcessData, searchAllEndNodes);

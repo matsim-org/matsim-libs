@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.analysis;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Map;
+
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Coord;
@@ -32,17 +36,13 @@ import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 import org.matsim.contrib.socnetgen.sna.math.Distribution;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
-
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author illenberger
@@ -60,7 +60,7 @@ public class TravelTimeTask extends AnalyzerTask {
 		this.network = network;
 		
 		FreespeedTravelTimeAndDisutility freeSpeedTT = new FreespeedTravelTimeAndDisutility(-1, 0, 0);
-		router = new Dijkstra(network, freeSpeedTT, freeSpeedTT);
+		router = new DijkstraFactory().createPathCalculator(network, freeSpeedTT, freeSpeedTT);
 		
 		
 	}

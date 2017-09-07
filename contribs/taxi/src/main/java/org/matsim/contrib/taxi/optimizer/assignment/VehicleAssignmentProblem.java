@@ -31,7 +31,7 @@ import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
 import org.matsim.contrib.util.*;
 import org.matsim.core.router.*;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
 
 import com.google.common.collect.Lists;
 
@@ -44,7 +44,7 @@ public class VehicleAssignmentProblem<D> {
 	}
 
 	private final TravelTime travelTime;
-	private final FastAStarEuclidean euclideanRouter;
+	private final LeastCostPathCalculator router;
 
 	private final OneToManyPathSearch forwardPathSearch;
 	private final OneToManyPathSearch backwardPathSearch;
@@ -64,14 +64,14 @@ public class VehicleAssignmentProblem<D> {
 		this(travelTime, router, backwardRouter, null, -1, -1);
 	}
 
-	public VehicleAssignmentProblem(TravelTime travelTime, MultiNodePathCalculator router,
-			BackwardMultiNodePathCalculator backwardRouter, FastAStarEuclidean euclideanRouter,
+	public VehicleAssignmentProblem(TravelTime travelTime, MultiNodePathCalculator multiNodeRouter,
+			BackwardMultiNodePathCalculator backwardMultiNodeRouter, LeastCostPathCalculator router,
 			int nearestDestinationLimit, int nearestVehicleLimit) {
 		this.travelTime = travelTime;
-		this.euclideanRouter = euclideanRouter;
+		this.router = router;
 
-		forwardPathSearch = OneToManyPathSearch.createForwardSearch(router);
-		backwardPathSearch = OneToManyPathSearch.createBackwardSearch(backwardRouter);
+		forwardPathSearch = OneToManyPathSearch.createForwardSearch(multiNodeRouter);
+		backwardPathSearch = OneToManyPathSearch.createBackwardSearch(backwardMultiNodeRouter);
 
 		// TODO this kNN is slow
 		LinkProvider<DestEntry<D>> linkProvider = LinkProviders.createDestEntryToLink();
@@ -179,7 +179,7 @@ public class VehicleAssignmentProblem<D> {
 
 			// TODO if null is frequent we may be more efficient by increasing the neighbourhood
 			VrpPathWithTravelData vrpPath = pathData == null ? //
-					VrpPaths.calcAndCreatePath(departure.link, dest.link, departure.time, euclideanRouter, travelTime)
+					VrpPaths.calcAndCreatePath(departure.link, dest.link, departure.time, router, travelTime)
 					: VrpPaths.createPath(departure.link, dest.link, departure.time, pathData.path, travelTime);
 
 			dispatches.add(new Dispatch<>(departure.vehicle, dest.destination, vrpPath));

@@ -86,7 +86,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * @param preProcessData
 	 * @param timeFunction
 	 */
-	public AStarEuclidean(final Network network, final PreProcessEuclidean preProcessData,
+	AStarEuclidean(final Network network, final PreProcessEuclidean preProcessData,
 			final TravelTime timeFunction) {
 		this(network, preProcessData, timeFunction, 1);
 	}
@@ -100,7 +100,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * for an overdo factor > 1, it is not guaranteed that the router returns the least-cost paths. Rather it tends 
 	 * to return distance-minimal paths.
 	 */
-	public AStarEuclidean(final Network network, final PreProcessEuclidean preProcessData,
+	AStarEuclidean(final Network network, final PreProcessEuclidean preProcessData,
 			final TravelTime timeFunction, final double overdoFactor) {
 		this(network, preProcessData, preProcessData.getCostFunction(),
 				timeFunction, overdoFactor);
@@ -116,7 +116,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * for an overdo factor > 1, it is not guaranteed that the router returns the least-cost paths. Rather it tends 
 	 * to return distance-minimal paths.
 	 */
-	public AStarEuclidean(final Network network,
+	AStarEuclidean(final Network network,
 			final PreProcessEuclidean preProcessData,
 			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor) {
 		super(network, costFunction, timeFunction, preProcessData);

@@ -32,8 +32,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.router.FastDijkstraFactory;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 

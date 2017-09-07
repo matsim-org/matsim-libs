@@ -19,16 +19,20 @@
 
 package org.matsim.contrib.drt.scheduler;
 
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.core.router.*;
+import org.matsim.core.router.FastAStarEuclideanFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -40,7 +44,7 @@ import com.google.inject.name.Named;
 public class EmptyVehicleRelocator {
 	private final TravelTime travelTime;
 	private final DrtScheduler scheduler;
-	private final FastAStarEuclidean router;
+	private final LeastCostPathCalculator router;
 
 	@Inject
 	public EmptyVehicleRelocator(@Named(DvrpModule.DVRP_ROUTING) Network network,
@@ -49,16 +53,9 @@ public class EmptyVehicleRelocator {
 			DrtScheduler scheduler) {
 		this.travelTime = travelTime;
 		this.scheduler = scheduler;
+
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
-
-		PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(travelDisutility);
-		preProcessEuclidean.run(network);
-
-		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(network);
-
-		router = new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelDisutility, travelTime, 2.,
-				fastRouterFactory);
+		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 
 	public void relocateVehicle(Vehicle vehicle, Link link, double time) {

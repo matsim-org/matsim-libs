@@ -102,7 +102,8 @@ class PrepareForSimImpl implements PrepareForSim {
 							if (route != null) {
 								vehicleId = route.getVehicleId(); // may be null!
 							} else {
-								throw new RuntimeException("Route not found.");
+								throw new RuntimeException("Route not found.  Possible reason: leg did not have "
+										+ "activites with locations at both ends (e.g. plan ends with leg).");
 							}
 
 							if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location

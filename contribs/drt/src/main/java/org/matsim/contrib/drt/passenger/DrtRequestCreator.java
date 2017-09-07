@@ -60,15 +60,7 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		this.timer = qSim.getSimTimer();
 
 		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
-
-		PreProcessEuclidean preProcessEuclidean = new PreProcessEuclidean(travelDisutility);
-		preProcessEuclidean.run(network);
-
-		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
-		RoutingNetwork routingNetwork = new ArrayRoutingNetworkFactory().createRoutingNetwork(network);
-
-		router = new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelDisutility, travelTime,
-				drtCfg.getAStarEuclideanOverdoFactor(), fastRouterFactory);
+		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 
 	@Override

@@ -53,7 +53,7 @@ public class FastAStarEuclidean extends AStarEuclidean {
 	private BinaryMinHeap<ArrayRoutingNetworkNode> heap = null;
 	private int maxSize = -1;
 	
-	public FastAStarEuclidean(final RoutingNetwork routingNetwork, final PreProcessEuclidean preProcessData,
+	FastAStarEuclidean(final RoutingNetwork routingNetwork, final PreProcessEuclidean preProcessData,
 			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor,
 			final FastRouterDelegateFactory fastRouterFactory) {
 		super(routingNetwork, preProcessData, costFunction, timeFunction, overdoFactor);

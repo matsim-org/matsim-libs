@@ -33,16 +33,16 @@ import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestRespo
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-import org.matsim.contrib.locationchoice.router.BackwardsFastMultiNodeDijkstraFactory;
+import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.MultiNodeDijkstra;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -93,7 +93,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		this.scenario = lcContext.getScenario();
 		this.personsMaxEpsUnscaled = personsMaxDCScoreUnscaled;
 		this.forwardMultiNodeDijsktaFactory = new FastMultiNodeDijkstraFactory(true);
-		this.backwardMultiNodeDijsktaFactory = new BackwardsFastMultiNodeDijkstraFactory(true);
+		this.backwardMultiNodeDijsktaFactory = new BackwardFastMultiNodeDijkstraFactory(true);
 		
 		// create cache which is used in ChoiceSet
 		// instead of just the nearest link we probably should check whether the facility is attached to a link? cdobler, oct'14

@@ -28,9 +28,8 @@ import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
@@ -55,7 +54,7 @@ public class WithinDayParkingRouter implements ParkingRouter {
 		this.travelTime = travelTime;
 		travelDisutility = new TimeAsTravelDisutility(this.travelTime);
 		this.network = network;
-		pathCalculator = new Dijkstra(network, travelDisutility, this.travelTime);
+		pathCalculator = new DijkstraFactory().createPathCalculator(network, travelDisutility, this.travelTime);
 	}
 
 	@Override

@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AStarLandmarksFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +16,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.router.util;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.router.AStarEuclidean;
 
 /**
- * @author dgrether
+ * 
  */
-public class AStarEuclideanFactory implements LeastCostPathCalculatorFactory {
+package tutorial.network.modifyNetworkExample;
 
-	private final Map<Network, PreProcessEuclidean> preProcessData = new HashMap<>();
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 
-	@Override
-	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
-		PreProcessEuclidean preProcessEuclidean = this.preProcessData.get(network);
-		if (preProcessEuclidean == null) {
-			preProcessEuclidean = new PreProcessEuclidean(travelCosts);
-			preProcessEuclidean.run(network);
-			this.preProcessData.put(network, preProcessEuclidean);
-		}
+/**
+ * @author  jbischoff
+ * This provides an example script how to read a MATSim network and modify some values for each link.
+ * In this case, we are reducing the capacity of each link by 50%.
+ */
+
+public class RunModifyNetworkExample {
+
+	public static void main(String[] args) {
 		
-		final double overdoFactor = 1.0;
-		return new AStarEuclidean(network, preProcessEuclidean, travelCosts, travelTimes, overdoFactor);
+		// read in the network
+		Network network = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(network).readFile("path-to-network.xml");
+		
+		// iterate through all links
+		for (Link l : network.getLinks().values()){
+			//get current capacity
+			double oldCapacity = l.getCapacity();
+			double newCapacity = oldCapacity / 2.0  ;
+			
+			//set new capacity
+			l.setCapacity(newCapacity);
+		}
+		new NetworkWriter(network).write("path-to-modified-network.xml");
 	}
 }

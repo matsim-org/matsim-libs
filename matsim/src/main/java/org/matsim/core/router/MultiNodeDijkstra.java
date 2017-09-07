@@ -74,12 +74,12 @@ public class MultiNodeDijkstra extends Dijkstra implements MultiNodePathCalculat
 	 */
 	private boolean searchAllEndNodes;
 	
-	public MultiNodeDijkstra(Network network, TravelDisutility costFunction, TravelTime timeFunction, boolean searchAllEndNodes) {
+	MultiNodeDijkstra(Network network, TravelDisutility costFunction, TravelTime timeFunction, boolean searchAllEndNodes) {
 		super(network, costFunction, timeFunction);
 		this.searchAllEndNodes = searchAllEndNodes;
 	}
 	
-	public MultiNodeDijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
+	MultiNodeDijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
 			final PreProcessDijkstra preProcessData, boolean searchAllEndNodes) {
 		super(network, costFunction, timeFunction, preProcessData);
 		this.searchAllEndNodes = searchAllEndNodes;
