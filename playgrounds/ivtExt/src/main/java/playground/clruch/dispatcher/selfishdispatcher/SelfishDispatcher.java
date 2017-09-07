@@ -1,10 +1,8 @@
-package playground.clruch.dispatcher;
+package playground.clruch.dispatcher.selfishdispatcher;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -14,11 +12,9 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
-import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.robotaxirequestmatcher.AbstractRoboTaxiRequestMatcher;
 import playground.clruch.dispatcher.utils.robotaxirequestmatcher.RoboTaxiCloseRequestMatcher;
@@ -76,22 +72,32 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
     /** @return VirtualNode selected by a selfish agent. */
     private VirtualNode selectRebalanceNode() {
-        Map<VirtualNode, Double> scores =  new HashMap<>();
-        virtualNetwork.getVirtualNodes().stream().forEach(vn->);
-        
-        
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()){
+        Map<VirtualNode, Double> scores = new HashMap<>();
+
+        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
             double averageFare = calcAverageFare(virtualNode, //
                     getVirtualNodeRequests().get(virtualNode));
-            double openRequests =  getVirtualNodeRequests().get(virtualNode).size();            
+            double openRequests = getVirtualNodeRequests().get(virtualNode).size();
             double waitingTaxis = getVirtualNodeStayVehicles().get(virtualNode).size();
-            
-            scores.append(tensor)
+            //
+            double score = waitingTaxis/(averageFare * openRequests);
+            scores.put(virtualNode, score);
         }
 
+        VirtualNode vnOpt = scores.entrySet().stream().sorted(new ScoreComparator()).findFirst().get().getKey();
+        virtualNetwork.getVirtualNodes().forEach(vn -> GlobalAssert.that(scores.get(vn) <= scores.get(vnOpt)));
+        return vnOpt;
 
-            return null;
     }
+    
+    
+    
+    private double calcAverageFare(VirtualNode virtualNode, List<AVRequest> requests){
+        //TODO implement this. 
+        return 1.0;
+    }
+    
+    
 
     @Override
     protected String getInfoLine() {
