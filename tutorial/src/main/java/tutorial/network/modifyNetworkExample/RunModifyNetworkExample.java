@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.scheduler;
+/**
+ * 
+ */
+package tutorial.network.modifyNetworkExample;
 
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
 
-public class TaxiSchedulerParams {
-	public final boolean destinationKnown;
-	public final boolean vehicleDiversion;
-	public final double pickupDuration;
-	public final double dropoffDuration;
-	public final double AStarEuclideanOverdoFactor;
+/**
+ * @author  jbischoff
+ * This provides an example script how to read a MATSim network and modify some values for each link.
+ * In this case, we are reducing the capacity of each link by 50%.
+ */
 
-	public TaxiSchedulerParams(TaxiConfigGroup taxiCfg) {
-		this.destinationKnown = taxiCfg.isDestinationKnown();
-		this.vehicleDiversion = taxiCfg.isVehicleDiversion();
-		this.pickupDuration = taxiCfg.getPickupDuration();
-		this.dropoffDuration = taxiCfg.getDropoffDuration();
-		this.AStarEuclideanOverdoFactor = taxiCfg.getAStarEuclideanOverdoFactor();
-	}
+public class RunModifyNetworkExample {
 
-	public TaxiSchedulerParams(boolean destinationKnown, boolean vehicleDiversion, double pickupDuration,
-			double dropoffDuration, double AStarEuclideanOverdoFactor) {
-		this.destinationKnown = destinationKnown;
-		this.vehicleDiversion = vehicleDiversion;
-		this.pickupDuration = pickupDuration;
-		this.dropoffDuration = dropoffDuration;
-		this.AStarEuclideanOverdoFactor = AStarEuclideanOverdoFactor;
+	public static void main(String[] args) {
+		
+		// read in the network
+		Network network = NetworkUtils.createNetwork();
+		new MatsimNetworkReader(network).readFile("path-to-network.xml");
+		
+		// iterate through all links
+		for (Link l : network.getLinks().values()){
+			//get current capacity
+			double oldCapacity = l.getCapacity();
+			double newCapacity = oldCapacity / 2.0  ;
+			
+			//set new capacity
+			l.setCapacity(newCapacity);
+		}
+		new NetworkWriter(network).write("path-to-modified-network.xml");
 	}
 }

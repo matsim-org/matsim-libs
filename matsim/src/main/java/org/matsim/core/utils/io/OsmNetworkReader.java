@@ -544,8 +544,11 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		String maxspeedTag = way.tags.get(TAG_MAXSPEED);
 		if (maxspeedTag != null) {
 			try {
-				freespeed = Double.parseDouble(maxspeedTag) / 3.6; // convert km/h to m/s
-				// TODO In some places where mph is common, speeds are tagged as "xx mph" (note the space!); consider this here, dz, aug'17
+				if(maxspeedTag.endsWith("mph")) {
+					freespeed = Double.parseDouble(maxspeedTag.replace("mph", "").trim()) * 1.609344 / 3.6; // convert mph to m/s
+				} else {
+					freespeed = Double.parseDouble(maxspeedTag) / 3.6; // convert km/h to m/s
+				}
 			} catch (NumberFormatException e) {
 				if (!this.unknownMaxspeedTags.contains(maxspeedTag)) {
 					this.unknownMaxspeedTags.add(maxspeedTag);

@@ -66,15 +66,13 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 
 	@Override
 	public TaxiOptimizer get() {
-		TaxiSchedulerParams schedulerParams = new TaxiSchedulerParams(taxiCfg);
-
 		TravelDisutility travelDisutility = travelDisutilityFactory == null ? new TimeAsTravelDisutility(travelTime)
 				: travelDisutilityFactory.createTravelDisutility(travelTime);
 
-		TaxiScheduler scheduler = new TaxiScheduler(taxiCfg, network, fleet, qSim.getSimTimer(), schedulerParams,
+		TaxiScheduler scheduler = new TaxiScheduler(taxiCfg, network, fleet, qSim.getSimTimer(),
 				travelTime, travelDisutility);
 
-		TaxiOptimizerContext optimContext = new TaxiOptimizerContext(fleet, network, qSim.getSimTimer(), travelTime,
+		TaxiOptimizerContext optimContext = new TaxiOptimizerContext(taxiCfg, fleet, network, qSim.getSimTimer(), travelTime,
 				travelDisutility, scheduler);
 
 		Configuration optimizerConfig = new MapConfiguration(taxiCfg.getOptimizerConfigGroup().getParams());

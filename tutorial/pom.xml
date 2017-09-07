@@ -52,6 +52,8 @@
 					<quiet>true</quiet>
 					<header>MATSim Tutorial</header>
 					<detectLinks>true</detectLinks>
+					<linksource>true</linksource>
+					<additionalparam>-Xdoclint:none</additionalparam>
 				</configuration>
 				<executions>
 					<execution>
