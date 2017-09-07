@@ -52,6 +52,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
+import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 
 /**
