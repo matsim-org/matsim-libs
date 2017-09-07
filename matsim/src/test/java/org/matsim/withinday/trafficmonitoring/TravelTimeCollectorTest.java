@@ -80,7 +80,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 	public void testGetLinkTravelTime() {
      
         Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setOutputDirectory(helper.getOutputDirectory()+"fastCapacityUpdate_"+this.isUsingFastCapacityUpdate);
+		config.controler().setOutputDirectory(helper.getOutputDirectory());
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
 		qSimConfig.setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
