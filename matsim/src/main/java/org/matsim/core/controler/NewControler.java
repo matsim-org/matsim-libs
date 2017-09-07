@@ -73,6 +73,7 @@ class NewControler extends AbstractController implements ControlerI {
 	public final void run() {
 		super.setupOutputDirectory(outputDirectoryHierarchy);
 		super.run(this.config);
+		OutputDirectoryLogging.closeOutputDirLogging();
 	}
 
 	@Override
