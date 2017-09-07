@@ -21,7 +21,6 @@ package org.matsim.core.router;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -66,13 +65,9 @@ public final class NetworkRoutingModule implements RoutingModule {
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(
-			final Facility<?> fromFacility,
-			final Facility<?> toFacility,
-			final double departureTime,
-			final Person person) {
+	public List<? extends PlanElement> calcRoute(final Facility<?> fromFacility, final Facility<?> toFacility, final double departureTime,
+			final Person person) {		
 		Leg newLeg = this.populationFactory.createLeg( this.mode );
-		newLeg.setDepartureTime( departureTime );
 		
 		Gbl.assertNotNull(fromFacility);
 		Gbl.assertNotNull(toFacility);
@@ -80,22 +75,30 @@ public final class NetworkRoutingModule implements RoutingModule {
 		Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
 		Link toLink = this.network.getLinks().get(toFacility.getLinkId());
 
-		/* Remove this and next three lines once debugged. */
-		if(fromLink == null || toLink == null){
-			Logger.getLogger(NetworkRoutingModule.class).error("  ==>  null from/to link for person " + person.getId().toString());
+		if (toLink != fromLink) {
+			// (a "true" route)
+			Node startNode = fromLink.getToNode(); // start at the end of the "current" link
+			Node endNode = toLink.getFromNode(); // the target is the start of the link
+			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, departureTime, person, null);
+			if (path == null)
+				throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
+			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
+			route.setTravelTime(path.travelTime);
+			route.setTravelCost(path.travelCost);
+			route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.network));
+			newLeg.setRoute(route);
+			newLeg.setTravelTime(path.travelTime);
+		} else {
+			// create an empty route == staying on place if toLink == endLink
+			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
+			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
+			route.setTravelTime(0);
+			route.setDistance(0.0);
+			newLeg.setRoute(route);
+			newLeg.setTravelTime(0);
 		}
-		if (fromLink == null) throw new RuntimeException("fromLink "+fromFacility.getLinkId()+" missing.");
-		if (toLink == null) throw new RuntimeException("toLink "+toFacility.getLinkId()+" missing.");
-
-		double travTime = routeLeg(
-				person,
-				newLeg,
-				fromLink,
-				toLink,
-				departureTime);
-
-		// otherwise, information may be lost
-		newLeg.setTravelTime( travTime );
+		newLeg.setDepartureTime(departureTime);
 
 		return Arrays.asList( newLeg );
 	}
@@ -108,40 +111,6 @@ public final class NetworkRoutingModule implements RoutingModule {
 	@Override
 	public String toString() {
 		return "[NetworkRoutingModule: mode="+this.mode+"]";
-	}
-
-	private double routeLeg(Person person, Leg leg, Link fromLink, Link toLink, double depTime) {
-		double travTime = 0;
-
-//		CarRoute route = null;
-//		Path path = null;
-		if (toLink != fromLink) {
-            // (a "true" route)
-	        Node startNode = fromLink.getToNode();  // start at the end of the "current" link
-	        Node endNode = toLink.getFromNode(); // the target is the start of the link
-			Path path = this.routeAlgo.calcLeastCostPath(startNode, endNode, depTime, person, null);
-			if (path == null) throw new RuntimeException("No route found from node " + startNode.getId() + " to node " + endNode.getId() + ".");
-			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
-			route.setLinkIds(fromLink.getId(), NetworkUtils.getLinkIds(path.links), toLink.getId());
-			route.setTravelTime((int) path.travelTime); // yyyy why int?  kai, dec'15
-			route.setTravelCost(path.travelCost);
-			route.setDistance(RouteUtils.calcDistance(route, 1.0, 1.0, this.network));
-			leg.setRoute(route);
-			travTime = (int) path.travelTime; // yyyy why int?  kai, dec'15
-		} else {
-			// create an empty route == staying on place if toLink == endLink
-			// note that we still do a route: someone may drive from one location to another on the link. kai, dec'15
-			NetworkRoute route = this.populationFactory.getRouteFactories().createRoute(NetworkRoute.class, fromLink.getId(), toLink.getId());
-			route.setTravelTime(0);
-			route.setDistance(0.0);
-			leg.setRoute(route);
-			travTime = 0;
-		}
-
-		leg.setDepartureTime(depTime);
-		leg.setTravelTime(travTime);
-
-		return travTime;
 	}
 
 }

@@ -106,223 +106,223 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	private static final String MAX_MEMORY_PER_TRAJECTORY =  "maxMemoryPerTrajectory";
 	private int maxMemoryPerTrajectory = Integer.MAX_VALUE;
 
-	//@StringGetter(MAX_TOTAL_MEMORY)
+	@StringGetter(MAX_TOTAL_MEMORY)
 	public int getMaxTotalMemory() {
 		return maxTotalMemory;
 	}
 
-	//@StringSetter(MAX_TOTAL_MEMORY)
+	@StringSetter(MAX_TOTAL_MEMORY)
 	public void setMaxTotalMemory(int maxTotalMemory) {
 		this.maxTotalMemory = maxTotalMemory;
 	}
 
-	////@StringGetter(MAX_MEMORY_PER_TRAJECTORY)
+	@StringGetter(MAX_MEMORY_PER_TRAJECTORY)
 	public int getMaxMemoryPerTrajectory() {
 		return maxMemoryPerTrajectory;
 	}
 
-	//@StringSetter(MAX_MEMORY_PER_TRAJECTORY)
+	@StringSetter(MAX_MEMORY_PER_TRAJECTORY)
 	public void setMaxMemoryPerTrajectory(int maxMemoryPerTrajectory) {
 		this.maxMemoryPerTrajectory = maxMemoryPerTrajectory;
 	}
 	// NEW, amit July17
 
-	//@StringGetter(WARM_UP_ITERATIONS)
+	@StringGetter(WARM_UP_ITERATIONS)
 	public int getWarmUpIterations() {
 		return warmUpIterations;
 	}
 
-	//@StringSetter(WARM_UP_ITERATIONS)
+	@StringSetter(WARM_UP_ITERATIONS)
 	public void setWarmUpIterations(int warmUpIterations) {
 		this.warmUpIterations = warmUpIterations;
 	}
 
-	//@StringGetter(USE_ALL_WARM_UP_ITERATIONS)
+	@StringGetter(USE_ALL_WARM_UP_ITERATIONS)
 	public boolean getUseAllWarmUpIterations() {
 		return useAllWarmUpIterations;
 	}
 
-	//@StringSetter(USE_ALL_WARM_UP_ITERATIONS)
+	@StringSetter(USE_ALL_WARM_UP_ITERATIONS)
 	public void setUseAllWarmUpIterations(boolean useAllWarmUpIterations) {
 		this.useAllWarmUpIterations = useAllWarmUpIterations;
 	}
 
-	//@StringGetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
+	@StringGetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
 	public double getVariationSizeOfRandomizeDecisionVariable() {
 		return variationSizeOfRandomizeDecisionVariable;
 	}
 
-	//@StringSetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
+	@StringSetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
 	public void setVariationSizeOfRandomizeDecisionVariable(double variationSizeOfRandomizeDecisionVariable) {
 		this.variationSizeOfRandomizeDecisionVariable = variationSizeOfRandomizeDecisionVariable;
 	}
 
-	//@StringGetter(RANDOM_SEED_TO_RANDOMIZE_DECISION_VARIABLE)
+	@StringGetter(RANDOM_SEED_TO_RANDOMIZE_DECISION_VARIABLE)
 	public int getRandomSeedToRandomizeDecisionVariable() {
 		return this.randomSeedToRandomizeDecisionVariable;
 	}
 
-	//@StringSetter(RANDOM_SEED_TO_RANDOMIZE_DECISION_VARIABLE)
+	@StringSetter(RANDOM_SEED_TO_RANDOMIZE_DECISION_VARIABLE)
 	public void setRandomSeedToRandomizeDecisionVariable(int randomSeedToRandomizeDecisionVariable) {
 		this.randomSeedToRandomizeDecisionVariable = randomSeedToRandomizeDecisionVariable;
 	}
 
-	//@StringGetter(OUTPUT_DIRECTORY)
+	@StringGetter(OUTPUT_DIRECTORY)
 	public String getOutputDirectory() {
 		return this.outputDirectory;
 	}
 
-	//@StringSetter(OUTPUT_DIRECTORY)
+	@StringSetter(OUTPUT_DIRECTORY)
 	public void setOutputDirectory(String outputDirectory) {
 		this.outputDirectory = outputDirectory;
 	}
 
-	//@StringGetter(MAX_ITERATION)
+	@StringGetter(MAX_ITERATION)
 	public int getMaxIteration() {
 		return this.maxIteration;
 	}
 
-	//@StringSetter(MAX_ITERATION)
+	@StringSetter(MAX_ITERATION)
 	public void setMaxIteration(int maxIteration) {
 		this.maxIteration = maxIteration;
 	}
 
-	//@StringGetter(MAX_TRANSITION)
+	@StringGetter(MAX_TRANSITION)
 	public int getMaxTransition() {
 		return this.maxTransition;
 	}
 
-	//@StringSetter(MAX_TRANSITION)
+	@StringSetter(MAX_TRANSITION)
 	public void setMaxTransition(int maxTransition) {
 		this.maxTransition = maxTransition;
 	}
 
-	//@StringGetter(POPULATION_SIZE)
+	@StringGetter(POPULATION_SIZE)
 	public int getPopulationSize() {
 		return this.populationSize;
 	}
 
-	//@StringSetter(POPULATION_SIZE)
+	@StringSetter(POPULATION_SIZE)
 	public void setPopulationSize(int populationSize) {
 		this.populationSize = populationSize;
 	}
 
-	//@StringGetter(IS_INTERPOLATE)
+	@StringGetter(IS_INTERPOLATE)
 	public boolean isInterpolate() {
 		return interpolate;
 	}
 
-	//@StringSetter(IS_INTERPOLATE)
+	@StringSetter(IS_INTERPOLATE)
 	public void setInterpolate(boolean interpolate) {
 		this.interpolate = interpolate;
 	}
 
-	//@StringGetter(INCLUDE_CURRENT_BEST)
+	@StringGetter(INCLUDE_CURRENT_BEST)
 	public boolean isIncludeCurrentBest() {
 		return includeCurrentBest;
 	}
 
-	//@StringSetter(INCLUDE_CURRENT_BEST)
+	@StringSetter(INCLUDE_CURRENT_BEST)
 	public void setIncludeCurrentBest(boolean includeCurrentBest) {
 		this.includeCurrentBest = includeCurrentBest;
 	}
 
-	//@StringGetter(START_TIME)
+	@StringGetter(START_TIME)
 	public int getStartTime() {
 		return this.startTime;
 	}
 
-	//@StringSetter(START_TIME)
+	@StringSetter(START_TIME)
 	public void setStartTime(int startTime) {
 		this.startTime = startTime;
 	}
 
-	//@StringGetter(BIN_SIZE)
+	@StringGetter(BIN_SIZE)
 	public int getBinSize() {
 		return this.binSize;
 	}
 
-	//@StringSetter(BIN_SIZE)
+	@StringSetter(BIN_SIZE)
 	public void setBinSize(int binSize) {
 		this.binSize = binSize;
 	}
 
-	//@StringGetter(BIN_COUNT)
+	@StringGetter(BIN_COUNT)
 	public int getBinCount() {
 		return this.binCount;
 	}
 
-	//@StringSetter(BIN_COUNT)
+	@StringSetter(BIN_COUNT)
 	public void setBinCount(int binCount) {
 		this.binCount = binCount;
 	}
 
-	//@StringGetter(NUMBER_OF_ITERATION_TO_AVERAGE)
+	@StringGetter(NUMBER_OF_ITERATION_TO_AVERAGE)
 	public int getNumberOfIterationsForAveraging() {
 		return numberOfIterationsForAveraging;
 	}
 
-	//@StringSetter(NUMBER_OF_ITERATION_TO_AVERAGE)
+	@StringSetter(NUMBER_OF_ITERATION_TO_AVERAGE)
 	public void setNumberOfIterationsForAveraging(int numberOfIterationsForAveraging) {
 		this.numberOfIterationsForAveraging = numberOfIterationsForAveraging;
 	}
 
-	//@StringGetter(NUMER_OF_ITERATION_FOR_CONVERGENCE)
+	@StringGetter(NUMER_OF_ITERATION_FOR_CONVERGENCE)
 	public int getNumberOfIterationsForConvergence() {
 		return numberOfIterationsForConvergence;
 	}
 
-	//@StringSetter(NUMER_OF_ITERATION_FOR_CONVERGENCE)
+	@StringSetter(NUMER_OF_ITERATION_FOR_CONVERGENCE)
 	public void setNumberOfIterationsForConvergence(int numberOfIterationsForConvergence) {
 		this.numberOfIterationsForConvergence = numberOfIterationsForConvergence;
 	}
 
-	//@StringGetter(INERTIA)
+	@StringGetter(INERTIA)
 	public double getInertia() {
 		return inertia;
 	}
 
-	//@StringSetter(INERTIA)
+	@StringSetter(INERTIA)
 	public void setInertia(double inertia) {
 		this.inertia = inertia;
 	}
 
-	//@StringGetter(NOISY_SYSTEM)
+	@StringGetter(NOISY_SYSTEM)
 	public boolean isNoisySystem() {
 		return noisySystem;
 	}
 
-	//@StringSetter(NOISY_SYSTEM)
+	@StringSetter(NOISY_SYSTEM)
 	public void setNoisySystem(boolean noisySystem) {
 		this.noisySystem = noisySystem;
 	}
 
-	//@StringGetter(SELF_TUNING_WEIGHT)
+	@StringGetter(SELF_TUNING_WEIGHT)
 	public double getSelfTuningWeight() {
 		return this.selfTuningWeight;
 	}
 
-	//@StringSetter(SELF_TUNING_WEIGHT)
+	@StringSetter(SELF_TUNING_WEIGHT)
 	public void setSelfTuningWeight(double selfTuningWeight) {
 		this.selfTuningWeight = selfTuningWeight;
 	}
 
-	//@StringGetter(EQUILIBRIUM_GAP_WEIGHT)
+	@StringGetter(EQUILIBRIUM_GAP_WEIGHT)
 	public double getEquilibriumGapWeight() {
 		return equilibriumGapWeight;
 	}
 
-	//@StringSetter(EQUILIBRIUM_GAP_WEIGHT)
+	@StringSetter(EQUILIBRIUM_GAP_WEIGHT)
 	public void setEquilibriumGapWeight(double equilibriumGapWeight) {
 		this.equilibriumGapWeight = equilibriumGapWeight;
 	}
 
-	//@StringGetter(UNIFORMITY_GAP_WEIGHT)
+	@StringGetter(UNIFORMITY_GAP_WEIGHT)
 	public double getUniformityGapWeight() {
 		return uniformityGapWeight;
 	}
 
-	//@StringSetter(UNIFORMITY_GAP_WEIGHT)
+	@StringSetter(UNIFORMITY_GAP_WEIGHT)
 	public void setUniformityGapWeight(double uniformityGapWeight) {
 		this.uniformityGapWeight = uniformityGapWeight;
 	}
