@@ -83,10 +83,8 @@ public class FastDijkstraFactory implements LeastCostPathCalculatorFactory {
 					preProcessDijkstra.run(network);
 					this.preProcessData.put(network, preProcessDijkstra);
 					
-					if (preProcessDijkstra.containsData()) {
-						for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
-							node.setDeadEndData(preProcessDijkstra.getNodeData(node.getNode()));
-						}
+					for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
+						node.setDeadEndData(preProcessDijkstra.getNodeData(node.getNode()));
 					}
 				}
 			}
