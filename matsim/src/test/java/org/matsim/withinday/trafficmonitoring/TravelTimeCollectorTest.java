@@ -28,8 +28,6 @@ import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -54,10 +52,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
+import junitparams.Parameters;
+
 /**
  * @author cdobler
  */
-@RunWith(Parameterized.class)
+@RunWith(JUnitParamsRunner.class)
 public class TravelTimeCollectorTest extends MatsimTestCase {
 
 	private final boolean isUsingFastCapacityUpdate ;
@@ -70,17 +70,15 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
 	}
 	
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
-	public static Collection<Object> parameterObjects () {
-		Object [] capacityUpdates = new Object [] { false, true };
-		return Arrays.asList(capacityUpdates);
-	}
 	
+	 
 	@Test
-	public void testGetLinkTravelTime() {
-     
+	@Parameters({"false", "true"})
+	public void testGetLinkTravelTime(boolean isUsingFastCapacityUpdate) {
+     	
         Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setOutputDirectory(helper.getOutputDirectory());
+		
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
 		qSimConfig.setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
