@@ -20,11 +20,8 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -61,24 +58,17 @@ import junitparams.Parameters;
 @RunWith(JUnitParamsRunner.class)
 public class TravelTimeCollectorTest extends MatsimTestCase {
 
-	private final boolean isUsingFastCapacityUpdate ;
 	@Rule
 	public MatsimTestUtils helper = new MatsimTestUtils();
 	
 	Random random = MatsimRandom.getRandom();
-	
-	public TravelTimeCollectorTest(boolean isUsingFastCapacityUpdate) {
-		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
-	}
-	
-	
-	 
+		 
 	@Test
 	@Parameters({"false", "true"})
 	public void testGetLinkTravelTime(boolean isUsingFastCapacityUpdate) {
      	
         Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setOutputDirectory(helper.getOutputDirectory());
+		config.controler().setOutputDirectory(helper.getOutputDirectory()+"_"+isUsingFastCapacityUpdate);
 		
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
