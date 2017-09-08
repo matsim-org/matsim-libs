@@ -24,6 +24,7 @@ import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.netdata.VirtualNetworkUtils;
 import playground.clruch.netdata.VirtualNode;
 
 public class VirtualNetworkLayer extends ViewerLayer {
@@ -158,8 +159,8 @@ public class VirtualNetworkLayer extends ViewerLayer {
             for (VirtualLink vl : virtualNetwork.getVirtualLinks()) {
                 VirtualNode n1 = vl.getFrom();
                 VirtualNode n2 = vl.getTo();
-                Coord c1 = db.referenceFrame.coords_toWGS84.transform(n1.getCoord());
-                Coord c2 = db.referenceFrame.coords_toWGS84.transform(n2.getCoord());
+                Coord c1 = db.referenceFrame.coords_toWGS84.transform(VirtualNetworkUtils.fromTensor(n1.getCoord()));
+                Coord c2 = db.referenceFrame.coords_toWGS84.transform(VirtualNetworkUtils.fromTensor(n2.getCoord()));
                 Point p1 = matsimMapComponent.getMapPositionAlways(c1);
                 Point p2 = matsimMapComponent.getMapPositionAlways(c2);
                 graphics.drawLine(p1.x, p1.y, p2.x, p2.y);

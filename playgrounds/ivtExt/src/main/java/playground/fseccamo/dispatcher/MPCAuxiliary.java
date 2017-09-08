@@ -83,7 +83,8 @@ public class MPCAuxiliary {
             final QuadTree<Link> quadTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
             for (Link link : virtualNode.getLinks())
                 quadTree.put(link.getCoord().getX(), link.getCoord().getY(), link);
-            Link center = quadTree.getClosest(virtualNode.getCoord().getX(), virtualNode.getCoord().getY());
+            Link center = quadTree.getClosest(virtualNode.getCoord().Get(0).number().doubleValue(), //
+                    virtualNode.getCoord().Get(1).number().doubleValue());
             centerLink.put(virtualNode, center);
         }
         return centerLink;

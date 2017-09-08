@@ -8,12 +8,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.idsc.tensor.Tensor;
 
 /** Created by Claudio on 2/8/2017. */
 public class VirtualNode implements Serializable {
@@ -24,9 +24,9 @@ public class VirtualNode implements Serializable {
     private transient Set<Link> links;
     private final Set<String> linkIDsforSerialization;
     private final int neighCount;
-    private final Coord coord;
+    private final Tensor coord;
 
-    VirtualNode(int index, String id, Set<Link> links, int neighCount, Coord coord) {
+    VirtualNode(int index, String id, Set<Link> links, int neighCount, Tensor coord) {
         this.index = index;
         this.id = id;
         this.links = links;
@@ -36,7 +36,7 @@ public class VirtualNode implements Serializable {
                 .collect(Collectors.toCollection(HashSet::new));
     }
 
-    VirtualNode(int index, String id, int neighCount, Coord coord) {
+    VirtualNode(int index, String id, int neighCount, Tensor coord) {
         this(index, id, new LinkedHashSet<>(), neighCount, coord);
     }
 
@@ -71,7 +71,7 @@ public class VirtualNode implements Serializable {
         return id;
     }
 
-    public Coord getCoord() {
+    public Tensor getCoord() {
         return coord;
     }
 

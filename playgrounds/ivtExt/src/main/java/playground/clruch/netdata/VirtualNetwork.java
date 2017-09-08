@@ -84,7 +84,7 @@ public class VirtualNetwork implements Serializable {
     }
 
     /* package */ VirtualNode addVirtualNode(String idIn, Set<Link> linksIn, int neighCount, Coord coord) {
-        VirtualNode virtualNode = new VirtualNode(virtualNodes.size(), idIn, linksIn, neighCount, coord);
+        VirtualNode virtualNode = new VirtualNode(virtualNodes.size(), idIn, linksIn, neighCount, VirtualNetworkUtils.fromCoord(coord));
         return addVirtualNode(virtualNode);
     }
 

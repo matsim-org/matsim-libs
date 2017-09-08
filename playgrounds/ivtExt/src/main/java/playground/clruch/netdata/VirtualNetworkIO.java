@@ -100,8 +100,8 @@ public class VirtualNetworkIO {
             Element virtualNodeelem = new Element(VIRTUALNODENAME);
             // set attributes
             virtualNodeelem.setAttribute(new Attribute(IDNAME, virtualNode.getId()));
-            virtualNodeelem.setAttribute(new Attribute(XNAME, Double.toString(virtualNode.getCoord().getX())));
-            virtualNodeelem.setAttribute(new Attribute(YNAME, Double.toString(virtualNode.getCoord().getY())));
+            virtualNodeelem.setAttribute(new Attribute(XNAME, Double.toString(virtualNode.getCoord().Get(0).number().doubleValue())));
+            virtualNodeelem.setAttribute(new Attribute(YNAME, Double.toString(virtualNode.getCoord().Get(1).number().doubleValue())));
             virtualNodeelem.setAttribute(new Attribute(NUMBERNEIGHBORNAME, Integer.toString(virtualNode.getNeighCount())));
             // add links
             Element linksElement = new Element(LINKNAME+"s");

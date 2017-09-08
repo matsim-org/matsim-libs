@@ -103,7 +103,7 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
             for (Cluster<KMeansModel> clu : c.getAllClusters()) {
                 Coord coord = new Coord(clu.getModel().getPrototype().get(0), clu.getModel().getPrototype().get(1));
                 String indexStr = "vNode_" + Integer.toString(index + 1);
-                vNMap.put(new VirtualNode(index, indexStr, neighCount, coord), new LinkedHashSet<Link>());
+                vNMap.put(new VirtualNode(index, indexStr, neighCount, VirtualNetworkUtils.fromCoord(coord)), new LinkedHashSet<Link>());
                 index++;
             }
 
@@ -114,7 +114,8 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
         final double[] networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         vnQuadtree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
         for (VirtualNode virtualNode : vNMap.keySet()) {
-            boolean successAdd = vnQuadtree.put(virtualNode.getCoord().getX(), virtualNode.getCoord().getY(), virtualNode);
+            boolean successAdd = vnQuadtree.put(virtualNode.getCoord().Get(0).number().doubleValue(), //
+                    virtualNode.getCoord().Get(0).number().doubleValue(), virtualNode);
             GlobalAssert.that(successAdd);
         }
 
@@ -137,7 +138,7 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
                 for (VirtualNode vNto : virtualNetwork.getVirtualNodes()) {
                     if (!vNfrom.equals(vNto)) {
                         String indexStr = "vLink_" + Integer.toString(index + 1);
-                        virtualNetwork.addVirtualLink(indexStr, vNfrom, vNto, CoordUtils.calcEuclideanDistance(vNfrom.getCoord(), vNto.getCoord()));
+                        virtualNetwork.addVirtualLink(indexStr, vNfrom, vNto, VirtualNetworkUtils.distance(vNfrom.getCoord(),vNto.getCoord()));
                         index++;
                     }
                 }
@@ -159,7 +160,7 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
                 VirtualNode vNfrom = virtualNetwork.getVirtualNode(point.x);
                 VirtualNode vNto = virtualNetwork.getVirtualNode(point.y);
                 String indexStr = "vLink_" + Integer.toString(index + 1);
-                virtualNetwork.addVirtualLink(indexStr, vNfrom, vNto, CoordUtils.calcEuclideanDistance(vNfrom.getCoord(), vNto.getCoord()));
+                virtualNetwork.addVirtualLink(indexStr, vNfrom, vNto, VirtualNetworkUtils.distance(vNfrom.getCoord(), vNto.getCoord()));
                 index++;
 
             }

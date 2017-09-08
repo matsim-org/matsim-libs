@@ -38,8 +38,8 @@ enum MpcUtils {
         }
         {
             Tensor matrix = Tensors.vector(i -> Tensors.vector( //
-                    virtualNetwork.getVirtualNode(i).getCoord().getX(), //
-                    virtualNetwork.getVirtualNode(i).getCoord().getY() //
+                    virtualNetwork.getVirtualNode(i).getCoord().Get(0).number().doubleValue(), //
+                    virtualNetwork.getVirtualNode(i).getCoord().Get(1).number().doubleValue() //
             ), n);
             // System.out.println(Pretty.of(matrix));
             double[] array = Primitives.toArrayDouble(Transpose.of(matrix));
