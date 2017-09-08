@@ -88,28 +88,21 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
 
 		double distance = link.getLength();
-		double gradient = 0.;
-		Double fromNodeZ = link.getFromNode().getCoord().getZ();
-		Double toNodeZ = link.getToNode().getCoord().getZ();
-		if ((fromNodeZ != null) && (toNodeZ != null)) {
-			gradient = (toNodeZ - fromNodeZ) / link.getLength();
-		}
-//		Object gradientValue = link.getAttributes().getAttribute(BicycleLabels.GRADIENT);
-//		double gradient = 0.;
-//		if (gradientValue != null) {
-//			gradient = Double.parseDouble((String) gradientValue);
-//		}
 		
 		double travelTimeDisutility = marginalCostOfTime_s * travelTime;
 		double distanceDisutility = marginalCostOfDistance_m * distance;
+		
 		double comfortFactor = getComfortFactor(surface, type);
 		double comfortDisutility = marginalCostOfComfort_m * (1. - comfortFactor) * distance;
+		
 		double infrastructureFactor = getInfrastructureFactor(type, cyclewaytype);
 		double infrastructureDisutility = marginalCostOfInfrastructure_m * (1. - infrastructureFactor) * distance;
-		double gradientDisutility = marginalCostOfGradient_m_100m * gradient * distance;
+		
+		double gradientFactor = getGradientFactor(link);
+		double gradientDisutility = marginalCostOfGradient_m_100m * gradientFactor * distance;
 		
 		LOG.info("link = " + link.getId() + "-- travelTime = " + travelTime + " -- distance = " + distance + " -- comfortFactor = "
-				+ comfortFactor	+ " -- infraFactor = "+ infrastructureFactor + " -- gradient = " + gradient);
+				+ comfortFactor	+ " -- infraFactor = "+ infrastructureFactor + " -- gradient = " + gradientFactor);
 		 
 		// TODO Gender
 		// TODO Activity
@@ -131,6 +124,18 @@ public class BicycleTravelDisutility implements TravelDisutility {
 				+ " -- infrastructureDisutility = " + infrastructureDisutility + " -- comfortDisutility = "
 				+ comfortDisutility + " -- gradientDisutility = " + gradientDisutility + " -- randomfactor = " + logNormalRnd);
 		return (travelTimeDisutility + logNormalRnd * (distanceDisutility + infrastructureDisutility + comfortDisutility + gradientDisutility));
+	}
+
+	private double getGradientFactor(Link link) {
+		double gradient = 0.;
+		Double fromNodeZ = link.getFromNode().getCoord().getZ();
+		Double toNodeZ = link.getToNode().getCoord().getZ();
+		if ((fromNodeZ != null) && (toNodeZ != null)) {
+			if (toNodeZ > fromNodeZ) { // No positive utility for downhill, only negative for uphill
+				gradient = (toNodeZ - fromNodeZ) / link.getLength();
+			}
+		}
+		return gradient;
 	}
 
 	private double getComfortFactor(String surface, String type) {
