@@ -269,7 +269,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		// generate some events that suggest a really long travel time
 		double linkTravelTime1 = 50.0 * 60; // 50minutes in first time bin
-		double linkTravelTime2 = 10.0 * 60; // 10minutes in third time bin
+		double linkTravelTime2 = 10.0 * 60; // 10minutes in forth time bin
 		ttcalc.handleEvent(new LinkEnterEvent(firstTimeBinStart, vehId, link1.getId()));
 		ttcalc.handleEvent(new LinkLeaveEvent(firstTimeBinStart + linkTravelTime1, vehId, link1.getId()));
 		ttcalc.handleEvent(new LinkEnterEvent(firstTimeBinStart + 3*timeBinSize, vehId, link1.getId()));
@@ -282,6 +282,49 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		assertEquals(linkTravelTime2, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 3*timeBinSize + offset, null, null), EPSILON);
 		assertEquals(freeSpeedTT, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 4*timeBinSize + offset, null, null), EPSILON);
 		assertEquals(freeSpeedTT, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 5*timeBinSize + offset, null, null), EPSILON);
+	}
+	
+	/**
+	 * Test linear interpolation of aggregated travel times at different positions of a time bin. (Previous tests only test the midpoint of each time bin.)
+	 * 
+	 * @author tthunig
+	 */
+	public void testInterpolatedTravelTimes() {
+		Config config = ConfigUtils.createConfig();
+		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
+		int timeBinSize = 15*60;
+		config.travelTimeCalculator().setTraveltimeBinSize(timeBinSize);
+		config.travelTimeCalculator().setMaxTime(12*3600);
+		
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		Network network = scenario.getNetwork();
+		network.setCapacityPeriod(3600.0);
+		final Node fromNode = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord(0, 0));
+		final Node toNode = NetworkUtils.createAndAddNode(network, Id.create("2", Node.class), new Coord(1000, 0));
+		Link link1 = NetworkUtils.createAndAddLink(network,Id.create("1", Link.class), fromNode, toNode, 1000.0, 100.0, 3600.0, 1.0 );
+		Id<Vehicle> vehId = Id.create("1", Vehicle.class);
+		
+		TravelTimeCalculator ttcalc = TravelTimeCalculator.create(network, config.travelTimeCalculator());
+		double firstTimeBinStart = 7.0 * 3600;
+
+		// generate some events that create different travel times in different time bins
+		double linkTravelTime1 = 50.0 * 60; // 50minutes in first time bin
+		double linkTravelTime2 = 40.0 * 60; // 40minutes in third time bin
+		ttcalc.handleEvent(new LinkEnterEvent(firstTimeBinStart, vehId, link1.getId()));
+		ttcalc.handleEvent(new LinkLeaveEvent(firstTimeBinStart + linkTravelTime1, vehId, link1.getId()));
+		ttcalc.handleEvent(new LinkEnterEvent(firstTimeBinStart + 2*timeBinSize, vehId, link1.getId()));
+		ttcalc.handleEvent(new LinkLeaveEvent(firstTimeBinStart + 2*timeBinSize + linkTravelTime2, vehId, link1.getId()));
+
+		// travel time should be the measured aggregated travel time at the midpoint of each interval
+		assertEquals(linkTravelTime1, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 0.5*timeBinSize, null, null), EPSILON);
+		// travel time should decrease 1 second per time step between first and second time bin
+		assertEquals(linkTravelTime1 - 1, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 0.5*timeBinSize + 1, null, null), EPSILON);
+		assertEquals(linkTravelTime1 - 1*timeBinSize + 1, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 1.5*timeBinSize - 1, null, null), EPSILON);
+		assertEquals(linkTravelTime1 - 1*timeBinSize, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 1.5*timeBinSize, null, null), EPSILON);
+		// travel time should increase again by 1/3 seconds per time step between second and third time bin
+		assertEquals(linkTravelTime1 - 1*timeBinSize + 1, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 1.5*timeBinSize + 3, null, null), EPSILON);
+		assertEquals(linkTravelTime2 - 1, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 2.5*timeBinSize - 3, null, null), EPSILON);
+		assertEquals(linkTravelTime2, ttcalc.getLinkTravelTimes().getLinkTravelTime(link1, firstTimeBinStart + 2.5*timeBinSize, null, null), EPSILON);
 	}
 
 	/**
