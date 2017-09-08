@@ -4,8 +4,9 @@
 package playground.clruch.dispatcher.utils.robotaxirequestmatcher;
 
 import java.util.Collection;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 
 import ch.ethz.idsc.owly.data.GlobalAssert;
@@ -22,13 +23,13 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
  * 
  * @author Claudio Ruch */
 public class RoboTaxiCloseRequestMatcher implements AbstractRoboTaxiRequestMatcher {
-    private Collection<AVRequest> requestsMatched;
+    private Set<AVRequest> requestsMatched;
 
     @Override
     public final void match(List<RoboTaxi> robotaxis, Collection<AVRequest> requests, //
             BiConsumer<RoboTaxi, AVRequest> matchingFunction) {
 
-        requestsMatched = Collections.emptyList();
+        requestsMatched = new HashSet<>();
 
         for (RoboTaxi robotaxi : robotaxis) {
             if (requests.size() > 0 && requestsMatched.size() < requests.size()) {
@@ -42,6 +43,7 @@ public class RoboTaxiCloseRequestMatcher implements AbstractRoboTaxiRequestMatch
         }
     }
 
+    // TODO implement efficiently using some tree structure. 
     private AVRequest findClosest(RoboTaxi robotaxi, Collection<AVRequest> requests) {
         double distCloest = Double.MAX_VALUE;
         AVRequest closest = null;

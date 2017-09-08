@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.SynchronousQueue;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
@@ -108,7 +107,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
         }
 
         Entry<VirtualNode, Double> maxEntry = Collections.max(scores.entrySet(), new ScoreComparator());
-        virtualNetwork.getVirtualNodes().forEach(vn -> GlobalAssert.that(scores.get(vn) >= scores.get(maxEntry.getKey())));
+        virtualNetwork.getVirtualNodes().forEach(vn -> GlobalAssert.that(scores.get(vn) <= scores.get(maxEntry.getKey())));
 
         Set<VirtualNode> maxNodes = scores.entrySet().stream().filter(e -> e.getValue().equals(maxEntry.getValue())).map(e -> e.getKey())
                 .collect(Collectors.toSet());
