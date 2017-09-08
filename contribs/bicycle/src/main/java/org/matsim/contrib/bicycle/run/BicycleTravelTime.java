@@ -45,11 +45,17 @@ public class BicycleTravelTime implements TravelTime {
 		double vehicleLinkSpeed = Math.min(infrastructureSpeed, BicycleUtils.getSpeed("bicycle"));
 		//double vehicleLinkSpeed = Math.min(infrastructureSpeed, vehicle.getType().getMaximumVelocity());
 		
-		Object gradientValue = link.getAttributes().getAttribute(BicycleLabels.GRADIENT);
 		double gradient = 0.;
-		if (gradientValue != null) {
-			gradient = Double.parseDouble((String) gradientValue);
+		Double fromNodeZ = link.getFromNode().getCoord().getZ();
+		Double toNodeZ = link.getToNode().getCoord().getZ();
+		if ((fromNodeZ != null) && (toNodeZ != null)) {
+			gradient = (toNodeZ - fromNodeZ) / link.getLength();
 		}
+//		Object gradientValue = link.getAttributes().getAttribute(BicycleLabels.GRADIENT);
+//		double gradient = 0.;
+//		if (gradientValue != null) {
+//			gradient = Double.parseDouble((String) gradientValue);
+//		}
 		double gradientSpeed = computeGradientSpeed(vehicleLinkSpeed, gradient);
 
 		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
@@ -95,6 +101,7 @@ public class BicycleTravelTime implements TravelTime {
 		if (gradient > 0.) {
 			gradientSpeedFactor = 1 - 5. * gradient; // 50% reducation at 10% up-slope
 		}
+		System.err.println("gradientSpeedFactor = " + gradientSpeedFactor);
 		return vehicleLinkSpeed * gradientSpeedFactor;
 	}
 	

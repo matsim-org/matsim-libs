@@ -77,25 +77,28 @@ public class BicycleTravelDisutility implements TravelDisutility {
 
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-		Link link2 = network.getLinks().get(link.getId());
-		System.err.println(link.toString());
-		double travelTime = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
-		return getTravelDisutilityBasedOnTTime(link2, time, person, vehicle, travelTime);
+		Link linkWithAttributes = network.getLinks().get(link.getId());
+		double travelTime = timeCalculator.getLinkTravelTime(linkWithAttributes, time, person, vehicle);
+		return getTravelDisutilityBasedOnTTime(linkWithAttributes, time, person, vehicle, travelTime);
 	}
 
 	public double getTravelDisutilityBasedOnTTime(Link link, double enterTime, Person person, Vehicle vehicle, double travelTime) {
-		System.err.println(link.toString());
 		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
-		LOG.warn("surface = " + surface);
 		String type = (String) link.getAttributes().getAttribute("type");
 		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
 
 		double distance = link.getLength();
-		Object gradientValue = link.getAttributes().getAttribute(BicycleLabels.GRADIENT);
 		double gradient = 0.;
-		if (gradientValue != null) {
-			gradient = Double.parseDouble((String) gradientValue);
+		Double fromNodeZ = link.getFromNode().getCoord().getZ();
+		Double toNodeZ = link.getToNode().getCoord().getZ();
+		if ((fromNodeZ != null) && (toNodeZ != null)) {
+			gradient = (toNodeZ - fromNodeZ) / link.getLength();
 		}
+//		Object gradientValue = link.getAttributes().getAttribute(BicycleLabels.GRADIENT);
+//		double gradient = 0.;
+//		if (gradientValue != null) {
+//			gradient = Double.parseDouble((String) gradientValue);
+//		}
 		
 		double travelTimeDisutility = marginalCostOfTime_s * travelTime;
 		double distanceDisutility = marginalCostOfDistance_m * distance;
@@ -105,8 +108,8 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		double infrastructureDisutility = marginalCostOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 		double gradientDisutility = marginalCostOfGradient_m_100m * gradient * distance;
 		
-		LOG.info("travelTime = " + travelTime + " -- distance = " + distance + " -- comfortFactor = " + comfortFactor
-		+ " -- infraFactor = "+ infrastructureFactor + " -- gradient = " + gradient);
+		LOG.info("link = " + link.getId() + "-- travelTime = " + travelTime + " -- distance = " + distance + " -- comfortFactor = "
+				+ comfortFactor	+ " -- infraFactor = "+ infrastructureFactor + " -- gradient = " + gradient);
 		 
 		// TODO Gender
 		// TODO Activity
@@ -125,7 +128,7 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		logNormalRnd *= normalization;
 
 		LOG.info("link = " + link.getId() + " -- travelTimeDisutility = " + travelTimeDisutility + " -- distanceDisutility = "+ distanceDisutility
-				+ " -- streettypeDisutility = " + infrastructureDisutility + " -- surfaceDisutility = "
+				+ " -- infrastructureDisutility = " + infrastructureDisutility + " -- comfortDisutility = "
 				+ comfortDisutility + " -- gradientDisutility = " + gradientDisutility + " -- randomfactor = " + logNormalRnd);
 		return (travelTimeDisutility + logNormalRnd * (distanceDisutility + infrastructureDisutility + comfortDisutility + gradientDisutility));
 	}
@@ -179,9 +182,6 @@ public class BicycleTravelDisutility implements TravelDisutility {
 	}
 
 	private double getInfrastructureFactor(String type, String cyclewaytype) {
-		// How safe and comfortable does one feel on this kind of street?
-		// Big roads without cycleways are bad, residential roads and footways are okay.
-		// Cycle lanes and tracks are good Cycleways are good
 		double infrastructureFactor = 1.0;
 		if (type != null) {
 			if (type.equals("trunk")) {
