@@ -22,6 +22,7 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.bicycle.BicycleLabels;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -44,11 +45,12 @@ public class BicycleTravelDisutility implements TravelDisutility {
 	private final double marginalCostOfGradient_m_100m;
 	private final double sigma;
 	private final TravelTime timeCalculator;
+	private final Network network;
 
 	private static int normalisationWrnCnt = 0;
 
 	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup,
-			PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, TravelTime timeCalculator) {
+			PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, TravelTime timeCalculator, Network network) {
 		final PlanCalcScoreConfigGroup.ModeParams bicycleParams = cnScoringGroup.getModes().get("bicycle");
 		if (bicycleParams == null) {
 			throw new NullPointerException("Bicycle is not part of the valid mode parameters " + cnScoringGroup.getModes().keySet());
@@ -68,15 +70,21 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		this.sigma = 0.0;
 
 		this.timeCalculator = timeCalculator;
+		
+		// TODO only needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
+		this.network = network;
 	}
 
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
+		Link link2 = network.getLinks().get(link.getId());
+		System.err.println(link.toString());
 		double travelTime = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
-		return getTravelDisutilityBasedOnTTime(link, time, person, vehicle, travelTime);
+		return getTravelDisutilityBasedOnTTime(link2, time, person, vehicle, travelTime);
 	}
 
 	public double getTravelDisutilityBasedOnTTime(Link link, double enterTime, Person person, Vehicle vehicle, double travelTime) {
+		System.err.println(link.toString());
 		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
 		LOG.warn("surface = " + surface);
 		String type = (String) link.getAttributes().getAttribute("type");
