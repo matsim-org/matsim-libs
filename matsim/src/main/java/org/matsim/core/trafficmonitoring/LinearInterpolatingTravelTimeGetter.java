@@ -23,8 +23,8 @@ package org.matsim.core.trafficmonitoring;
 public class LinearInterpolatingTravelTimeGetter implements TravelTimeGetter {
 
 	private AbstractTravelTimeAggregator travelTimeAggregator = null;
-	private int numSlots;
-	private int travelTimeBinSize;
+	private final int numSlots;
+	private final int travelTimeBinSize;
 	private final double halfBinSize;
 	
 	public LinearInterpolatingTravelTimeGetter(int numSlots, int travelTimeBinSize) {
@@ -68,7 +68,15 @@ public class LinearInterpolatingTravelTimeGetter implements TravelTimeGetter {
 		
 		// interpolate travel time
 		double dx = time - (firstSlot * travelTimeBinSize + halfBinSize); 
-		double dy = (secondTravelTime - firstTravelTime) * (travelTimeBinSize - dx) / travelTimeBinSize;
+//		double dy = (secondTravelTime - firstTravelTime) * (travelTimeBinSize - dx) / travelTimeBinSize;
+		/*
+		 * The line above was a bug: we need to divide the change in travel time (i.e. second minus first travel time) by the change in time (i.e. the time bin size) 
+		 * to get the gradient of the line between the midpoint of the first interval and the midpoint of the second interval. 
+		 * Then we have to multiply it by dx to get dy. The last part was wrong (it was multiplied by time bin size minus dx).
+		 * The test (TravelTimeCalculatorTest) only tests one value in each time bin -- namely the starting time of each time bin, which is unfortunately 
+		 * always the midpoint on the interpolated lines, i.e. the only time per time bin where the bug has no influence... theresa, sep'17
+		 */
+		double dy = (secondTravelTime - firstTravelTime) * dx / travelTimeBinSize;
 		
 		return firstTravelTime + dy;
 	}

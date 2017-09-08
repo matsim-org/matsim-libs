@@ -77,8 +77,7 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 				preProcessLandmarks.setNumberOfThreads(8);
 				preProcessLandmarks.run(network);
 				this.preProcessData.put(network, preProcessLandmarks);
-			}
-			if (preProcessLandmarks.containsData()) {
+				
 				for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
 					node.setDeadEndData(preProcessLandmarks.getNodeData(node.getNode()));
 				}

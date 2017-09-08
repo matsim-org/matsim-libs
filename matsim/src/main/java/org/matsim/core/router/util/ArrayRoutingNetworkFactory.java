@@ -69,8 +69,7 @@ public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 			dijkstraNode.setOutLinksArray(outLinks);
 		}
 		
-		if (routingLinks.size() > 0) log.warn("Not all links have been use in the ArrayRoutingNetwork - " +
-				"check connectivity of input network!");
+		if (routingLinks.size() > 0) log.warn("Not all links have been use in the ArrayRoutingNetwork - check connectivity of input network!");
 		
 		return routingNetwork;
 	}
