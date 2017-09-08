@@ -83,7 +83,7 @@ public enum VehicleOnVirtualLinkCalculator {
                     if (fromIn != candidate) {
                         toIn = candidate;
                         VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
-                        return virtualLink.index;
+                        return virtualLink.getIndex();
                     }
                 }
             }
