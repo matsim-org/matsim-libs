@@ -174,8 +174,8 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		l.setAllowedModes(modes);
 		
 		// Gradient
-		double gradient = (l.getToNode().getCoord().getZ() - l.getFromNode().getCoord().getZ()) / l.getLength();
-		l.getAttributes().putAttribute(BicycleLabels.GRADIENT, gradient);
+//		double gradient = (l.getToNode().getCoord().getZ() - l.getFromNode().getCoord().getZ()) / l.getLength();
+//		l.getAttributes().putAttribute(BicycleLabels.GRADIENT, gradient);
 		
 		// Elevation
 		double averageElevation = (l.getToNode().getCoord().getZ() + l.getFromNode().getCoord().getZ()) / 2;
