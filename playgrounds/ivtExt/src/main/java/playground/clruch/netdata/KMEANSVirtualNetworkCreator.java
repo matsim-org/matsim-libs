@@ -115,7 +115,7 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
         vnQuadtree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
         for (VirtualNode virtualNode : vNMap.keySet()) {
             boolean successAdd = vnQuadtree.put(virtualNode.getCoord().Get(0).number().doubleValue(), //
-                    virtualNode.getCoord().Get(0).number().doubleValue(), virtualNode);
+                    virtualNode.getCoord().Get(1).number().doubleValue(), virtualNode);
             GlobalAssert.that(successAdd);
         }
 
