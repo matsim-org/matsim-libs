@@ -130,6 +130,8 @@ public class VirtualNetwork implements Serializable {
      * @param network */
     public void fillSerializationInfo(Network network) {
         fillLinkVNodeMap(network);
+        NetworkLinkMapUtil nwlmp = new NetworkLinkMapUtil(network);
+        // virtualNodes.stream().forEach(v -> v.setLinksAfterSerialization(nwlmp::linkToStringID));
         virtualNodes.stream().forEach(v -> v.setLinksAfterSerialization(network));
     }
 

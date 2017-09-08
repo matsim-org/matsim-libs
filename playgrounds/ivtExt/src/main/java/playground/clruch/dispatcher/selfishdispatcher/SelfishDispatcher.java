@@ -149,6 +149,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             virtualNetwork = VirtualNetworkGet.readDefault(network);
+            GlobalAssert.that(virtualNetwork!=null);
             return new SelfishDispatcher(config, travelTime, router, eventsManager, network, virtualNetwork);
         }
     }

@@ -45,19 +45,49 @@ public class VirtualNode implements Serializable {
         GlobalAssert.that(links.size() == linkIDsforSerialization.size());
     }
 
+    // /** Function initializes the Set<Link> links with references to the simulation network after it was loaded from a serialized bitmap
+    // *
+    // * @param network */
+    // /* package */ void setLinksAfterSerialization(Function<String, Link> mapFunction) {
+    // this.links = new HashSet<>();
+    // for (String linkIDString : linkIDsforSerialization) {
+    // System.out.println("linkIDString = " + linkIDString);
+    // // Id<Link> linkID = Id.createLinkId(linkIDString);
+    // System.out.println("just before map function:");
+    // Link link = mapFunction.apply(linkIDString);// network.getLinks().get(linkID);
+    // System.out.println("just after map function.");
+    // System.out.println("found link, the id is: " + link.getId().toString());
+    // GlobalAssert.that(link != null);
+    // links.add(link);
+    // }
+    //
+    // }
+
     /** Function initializes the Set<Link> links with references to the simulation network after it was loaded from a serialized bitmap
-     * 
+     *
      * @param network */
     /* package */ void setLinksAfterSerialization(Network network) {
         this.links = new HashSet<>();
         for (String linkIDString : linkIDsforSerialization) {
+            System.out.println("linkIDString = " + linkIDString);
             Id<Link> linkID = Id.createLinkId(linkIDString);
             Link link = network.getLinks().get(linkID);
             GlobalAssert.that(link != null);
             links.add(link);
         }
-
     }
+    
+    /*package*/ void fillSerializationInfo(Set<Link> links){
+        GlobalAssert.that(links.size() == linkIDsforSerialization.size());
+        
+        
+        
+    }
+    
+    /*package*/ Set<String> getSerializationIDs(){
+        return linkIDsforSerialization;
+    }
+    
 
     public Set<Link> getLinks() {
         return Collections.unmodifiableSet(links);

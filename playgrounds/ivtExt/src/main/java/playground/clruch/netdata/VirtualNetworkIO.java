@@ -71,6 +71,7 @@ public class VirtualNetworkIO {
      */
     /*package*/ static VirtualNetwork fromByte(Network network, File file) throws ClassNotFoundException, DataFormatException, IOException{
         VirtualNetwork virtualNetwork = ObjectFormat.parse(Files.readAllBytes(file.toPath())); 
+        GlobalAssert.that(virtualNetwork!=null);
         virtualNetwork.fillSerializationInfo(network);
         GlobalAssert.that(virtualNetwork.linkVNodeMap!=null);
         return virtualNetwork;
