@@ -20,7 +20,7 @@
 
 package org.matsim.core.router.util;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -32,7 +32,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 
 public abstract class AbstractRoutingNetwork implements RoutingNetwork {
 	
-	/*package*/ final Map<Id<Node>, RoutingNetworkNode> nodes = new HashMap<Id<Node>, RoutingNetworkNode>();
+	/*package*/ final Map<Id<Node>, RoutingNetworkNode> nodes = new LinkedHashMap<>();	// needs to be a LinkedHashMap since the order is relevant for the router-preprocessing!
 	/*package*/ final Network network;
 	/*package*/ PreProcessDijkstra preProcessData;
 	

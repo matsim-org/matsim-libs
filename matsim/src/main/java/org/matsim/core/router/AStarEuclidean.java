@@ -20,9 +20,6 @@
 
 package org.matsim.core.router;
 
-import java.util.HashMap;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -33,7 +30,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.core.utils.geometry.CoordUtils;
-
 
 /**
  * Implements the <a href="http://en.wikipedia.org/wiki/A%2A">A* router algorithm</a>
@@ -83,7 +79,6 @@ public class AStarEuclidean extends Dijkstra {
 	protected final double overdoFactor;
 
 	private double minTravelCostPerLength;
-	/*package*/ final HashMap<Id<Node>, AStarNodeData> nodeData;
 
 	/**
 	 * Default constructor; sets the overdo factor to 1.
@@ -100,11 +95,10 @@ public class AStarEuclidean extends Dijkstra {
 	 * @param network Where we do the routing.
 	 * @param preProcessData The pre-process data (containing the landmarks etc.).
 	 * @param timeFunction Determines the travel time on each link.
-	 * @param overdoFactor The factor which is multiplied with the output of the
-	 * A* heuristic function. The higher the overdo factor the greedier the router,
-	 * i.e. it visits less nodes during routing and is thus faster, but for an
-	 * overdo factor > 1, it is not guaranteed that the router returns the
-	 * least-cost paths. Rather it tends to return distance-minimal paths.
+	 * @param overdoFactor The factor which is multiplied with the output of the A* heuristic function. The higher 
+	 * the overdo factor the greedier the router, i.e. it visits less nodes during routing and is thus faster, but 
+	 * for an overdo factor > 1, it is not guaranteed that the router returns the least-cost paths. Rather it tends 
+	 * to return distance-minimal paths.
 	 */
 	AStarEuclidean(final Network network, final PreProcessEuclidean preProcessData,
 			final TravelTime timeFunction, final double overdoFactor) {
@@ -117,11 +111,10 @@ public class AStarEuclidean extends Dijkstra {
 	 * @param preProcessData The pre-process data (containing the landmarks etc.).
 	 * @param timeFunction Determines the travel time on each link.
 	 * @param costFunction Calculates the travel cost on links.
-	 * @param overdoFactor The factor which is multiplied with the output of the
-	 * A* heuristic function. The higher the overdo factor the greedier the router,
-	 * i.e. it visits less nodes during routing and is thus faster, but for an
-	 * overdo factor > 1, it is not guaranteed that the router returns the
-	 * least-cost paths. Rather it tends to return distance-minimal paths.
+	 * @param overdoFactor The factor which is multiplied with the output of the A* heuristic function. The higher 
+	 * the overdo factor the greedier the router, i.e. it visits less nodes during routing and is thus faster, but 
+	 * for an overdo factor > 1, it is not guaranteed that the router returns the least-cost paths. Rather it tends 
+	 * to return distance-minimal paths.
 	 */
 	AStarEuclidean(final Network network,
 			final PreProcessEuclidean preProcessData,
@@ -130,7 +123,6 @@ public class AStarEuclidean extends Dijkstra {
 
 		setMinTravelCostPerLength(preProcessData.getMinTravelCostPerLength());
 
-		this.nodeData = new HashMap<>((int)(network.getNodes().size() * 1.1), 0.95f);
 		this.overdoFactor = overdoFactor;
 	}
 
@@ -156,30 +148,37 @@ public class AStarEuclidean extends Dijkstra {
 	}
 
 	@Override
-	protected
-	boolean addToPendingNodes(final Link l, final Node n, final RouterPriorityQueue<Node> pendingNodes,
+	protected boolean addToPendingNodes(final Link l, final Node n, final RouterPriorityQueue<Node> pendingNodes,
 			final double currTime, final double currCost, final Node toNode) {
 
-		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, getPerson(), getVehicle());
-		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.getPerson(), this.getVehicle());
-		AStarNodeData data = getData(n);
-		double nCost = data.getCost();
+		final double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, this.person, this.vehicle);
+		final double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.person, this.vehicle);		
+		final AStarNodeData data = getData(n);
 		if (!data.isVisited(getIterationId())) {
 			double remainingTravelCost = estimateRemainingTravelCost(n, toNode);
-			visitNode(n, data, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, remainingTravelCost, l);
+			visitNode(n, data, pendingNodes, currTime + travelTime, currCost + travelCost, remainingTravelCost, l);
 			return true;
-		} else if (currCost + travelCost < nCost) {
-			revisitNode(n, data, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, l);
+		}
+		
+		final double nCost = data.getCost();
+		final double totalCost = currCost + travelCost;
+		if (totalCost < nCost) {
+			revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
 			return true;
+		} else if (totalCost == nCost) {
+			// Special case: a node can be reached from two links with exactly the same costs.
+			// Decide based on the linkId which one to take... just have to common criteria to be deterministic.
+			if (data.getPrevLink().getId().compareTo(l.getId()) > 0) {
+				revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
+				return true;
+			}
 		}
 		return false;
 	}
 
 	/**
-	 * Inserts the given Node n into the pendingNodes queue
-	 * and updates its time and cost information.
+	 * Inserts the given Node n into the pendingNodes queue and updates its time and cost information.
+	 * 
 	 * @param n The Node that is revisited.
 	 * @param data The data for node.
 	 * @param pendingNodes The nodes visited and not processed yet.
@@ -189,13 +188,12 @@ public class AStarEuclidean extends Dijkstra {
 	 * traveling from n to the target node of the route.
 	 * @param outLink The link from which we came visiting n.
 	 */
-	private void visitNode(final Node n, final AStarNodeData data,
-			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
-			final double expectedRemainingCost, final Link outLink) {
+	private void visitNode(final Node n, final AStarNodeData data, final RouterPriorityQueue<Node> pendingNodes, 
+			final double time, final double cost, final double expectedRemainingCost, final Link outLink) {
 		data.setExpectedRemainingCost(expectedRemainingCost);
-		visitNode(n, data, pendingNodes, time, cost, outLink);
+		super.visitNode(n, data, pendingNodes, time, cost, outLink);
 	}
-
+	
 	/**
 	 * @return The overdo factor used.
 	 */
@@ -204,62 +202,58 @@ public class AStarEuclidean extends Dijkstra {
 	}
 
 	/**
-	 * Estimates the remaining travel cost from fromNode to toNode
-	 * using the euclidean distance between them.
+	 * Estimates the remaining travel cost from fromNode to toNode using the euclidean distance between them.
+	 * 
 	 * @param fromNode The first node.
 	 * @param toNode The second node.
 	 * @return The travel cost when traveling between the two given nodes.
 	 */
 	protected double estimateRemainingTravelCost(final Node fromNode, final Node toNode) {
-		double dist = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord())
-				* getMinTravelCostPerLength();
+		double dist = CoordUtils.calcEuclideanDistance(fromNode.getCoord(), toNode.getCoord()) * getMinTravelCostPerLength();
 		return dist * this.overdoFactor;
 	}
 
 	/**
-	 * Returns the data for the given Node. Creates a new AStarNodeData if none
-	 * exists yet.
+	 * Returns the data for the given Node. Creates a new AStarNodeData if none exists yet.
 	 *
 	 * @param n The node for which to return the data for..
 	 * @return The data to the given Node
 	 */
 	@Override
 	protected AStarNodeData getData(final Node n) {
-		AStarNodeData r = this.nodeData.get(n.getId());
-		if (null == r) {
-			r = new AStarNodeData();
-			this.nodeData.put(n.getId(), r);
-		}
-		return r;
+		return (AStarNodeData) super.getData(n);
 	}
 
+	@Override
+	protected AStarNodeData createNodeData() {
+		return new AStarNodeData();
+	}
+	
 	/**
 	 * Sets minTravelCostPerLength to the given value.
+	 * 
 	 * @param minTravelCostPerLength
 	 *            the minTravelCostPerLength to set
 	 */
-	void setMinTravelCostPerLength(final double minTravelCostPerLength) {
+	/*package*/ void setMinTravelCostPerLength(final double minTravelCostPerLength) {
 		this.minTravelCostPerLength = minTravelCostPerLength;
 	}
 
 	/**
-	 * Returns the minimal travel cost per length unit on a link in the
-	 * network.
-	 * @return the minimal travel cost per length unit on a link in the
-	 * network.
+	 * Returns the minimal travel cost per length unit on a link in the network.
+	 * 
+	 * @return the minimal travel cost per length unit on a link in the network.
 	 */
-	public double getMinTravelCostPerLength() {
+	public final double getMinTravelCostPerLength() {
 		return this.minTravelCostPerLength;
 	}
 
 	/**
-	 * The value used to sort the pending nodes during routing.
-	 * This implementation compares the total estimated remaining travel cost
-	 * to sort the nodes in the pending nodes queue during routing.
+	 * The value used to sort the pending nodes during routing. This implementation compares the total 
+	 * estimated remaining travel cost to sort the nodes in the pending nodes queue during routing.
 	 */
 	@Override
 	protected double getPriority(final DijkstraNodeData data) {
 		return ((AStarNodeData) data).getExpectedCost();
 	}
-
 }

@@ -71,8 +71,7 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 				preProcessEuclidean = new PreProcessEuclidean(travelCosts);
 				preProcessEuclidean.run(network);
 				this.preProcessData.put(network, preProcessEuclidean);
-			}
-			if (preProcessEuclidean.containsData()) {
+
 				for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
 					node.setDeadEndData(preProcessEuclidean.getNodeData(node.getNode()));
 				}

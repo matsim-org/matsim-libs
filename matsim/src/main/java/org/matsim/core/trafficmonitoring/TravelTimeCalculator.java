@@ -299,11 +299,40 @@ public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEve
 	 */
 	public double getLinkTravelTime(final Link link, final double time) {
 		if (this.calculateLinkTravelTimes) {
+			
 			DataContainer data = this.dataContainerProvider.getTravelTimeData(link, true);
 			if (data.needsConsolidation) {
 				consolidateData(data);
 			}
 			return this.aggregator.getTravelTime(data.ttData, time);
+
+			/*
+			 * Workaround for jumps in returned travel times due to time bin approach?
+			 * Should not be necessary when using linear interpolated travel times.
+			 */
+//			DataContainer data = this.dataContainerProvider.getTravelTimeData(link, true);
+//			if (data.needsConsolidation) {
+//				consolidateData(data);
+//			}
+//			double travelTime = this.aggregator.getTravelTime(data.ttData, time);
+//
+//			// in case there is no previous time bin
+//			if (time <= this.timeSlice) return travelTime;
+//			
+//			int index = this.aggregator.getTimeSlotIndex(time);
+//			double previousBinEndTime = index * this.timeSlice;
+//			
+//			// calculate travel time when starting at the last second of the previous time slot
+//			double previousTravelTime = this.aggregator.getTravelTime(data.ttData, time - this.timeSlice);
+//			
+//			double prev = previousBinEndTime + previousTravelTime;
+//			double now = time + travelTime;
+//			if (now >= prev) {
+//				return travelTime;
+//			}
+//			else {
+//				return prev - time;	// ensure travel time not shorter than travel time from the previous bin
+//			}
 		}
 		throw new IllegalStateException("No link travel time is available " +
 				"if calculation is switched off by config option!");
