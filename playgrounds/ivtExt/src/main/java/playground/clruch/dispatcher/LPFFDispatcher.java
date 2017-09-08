@@ -119,7 +119,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
                 VirtualLink virtualLink = this.virtualNetwork.getVirtualLink(i);
                 VirtualNode toNode = virtualLink.getTo();
                 VirtualNode fromNode = virtualLink.getFrom();
-                int numreb = (Integer) (feasibleRebalanceCount.Get(fromNode.index, toNode.index)).number();
+                int numreb = (Integer) (feasibleRebalanceCount.Get(fromNode.getIndex(), toNode.getIndex())).number();
                 List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(toNode, numreb);
                 destinationLinks.get(fromNode).addAll(rebalanceTargets);
             }

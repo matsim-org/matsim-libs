@@ -79,7 +79,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 Tensor count = new VehicleCountVirtualNodeFunction(matsimMapComponent.db, virtualNetwork).evaluate(ref);
                 Tensor prob = normalize1Norm(count);
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
-                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    final int i = 255 - prob.Get(entry.getKey().getIndex()).number().intValue();
                     graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
@@ -90,7 +90,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 Tensor prob = normalize1Norm(count);
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    final int i = 255 - prob.Get(entry.getKey().getIndex()).number().intValue();
                     graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
@@ -101,7 +101,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 Tensor prob = normalize1Norm(count);
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    final int i = 255 - prob.Get(entry.getKey().getIndex()).number().intValue();
                     graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
@@ -114,7 +114,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 Tensor prob = normalize1Norm(count);
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    final int i = 255 - prob.Get(entry.getKey().getIndex()).number().intValue();
                     graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
@@ -127,7 +127,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 Tensor prob = normalize1Norm(count);
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    final int i = 255 - prob.Get(entry.getKey().getIndex()).number().intValue();
                     graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
@@ -141,7 +141,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 Tensor prob = normalize1Norm(count);
                 for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    final int i = 255 - prob.Get(entry.getKey().getIndex()).number().intValue();
                     graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }

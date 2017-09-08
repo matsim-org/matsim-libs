@@ -40,7 +40,7 @@ public class RequestWaitingVirtualNodeFunction extends AbstractVirtualNodeFuncti
             Link linkAnte = db.getOsmLink(rc.fromLinkIndex).link;
             // Link linkPost = db.getOsmLink(rc.toLinkIndex).link;
             VirtualNode vn = virtualNetwork.getVirtualNode(linkAnte);
-            collect.set(s -> s.append(DoubleScalar.of(duration)), vn.index);
+            collect.set(s -> s.append(DoubleScalar.of(duration)), vn.getIndex());
         }
         return Tensors.vector(i -> function.apply(collect.get(i)), virtualNetwork.getvNodesCount());
     }

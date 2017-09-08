@@ -27,7 +27,7 @@ import playground.clruch.netdata.VirtualNode;
             int linkIndex = rc.fromLinkIndex;
             Link link = db.getOsmLink(linkIndex).link;
             VirtualNode vn = virtualNetwork.getVirtualNode(link);
-            count.set(Increment.ONE, vn.index);
+            count.set(Increment.ONE, vn.getIndex());
         }
         return count;
     }

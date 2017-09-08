@@ -212,10 +212,10 @@ public class MPCDispatcher extends BaseMpcDispatcher {
 
             if (Scalars.nonZero(d1.multiply(d2))) {
                 System.out.println("double rebalance");
-                System.out.print("" + virtualNetwork.getVirtualLink(vl + 0).getFrom().index);
-                System.out.println(" -> " + virtualNetwork.getVirtualLink(vl + 0).getTo().index);
-                System.out.print("" + virtualNetwork.getVirtualLink(vl + 1).getFrom().index);
-                System.out.println("-> " + virtualNetwork.getVirtualLink(vl + 1).getTo().index);
+                System.out.print("" + virtualNetwork.getVirtualLink(vl + 0).getFrom().getIndex());
+                System.out.println(" -> " + virtualNetwork.getVirtualLink(vl + 0).getTo().getIndex());
+                System.out.print("" + virtualNetwork.getVirtualLink(vl + 1).getFrom().getIndex());
+                System.out.println("-> " + virtualNetwork.getVirtualLink(vl + 1).getTo().getIndex());
                 System.out.println(d1 + " " + d2);
                 Scalar surplus = Min.of(d1, d2);
                 rebalanceVector.set(s -> s.subtract(surplus), vl + 0);

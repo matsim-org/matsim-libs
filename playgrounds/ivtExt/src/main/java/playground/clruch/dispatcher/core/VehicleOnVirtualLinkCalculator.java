@@ -46,7 +46,7 @@ public enum VehicleOnVirtualLinkCalculator {
                     // then the vehicle is considered to remain within current
                     // virtual node
                     VirtualNode vnode = virtualNetwork.getVirtualNode(current);
-                    vector.set(Increment.ONE, m + vnode.index); // self loop
+                    vector.set(Increment.ONE, m + vnode.getIndex()); // self loop
                 } else {
                     vector.set(Increment.ONE, vli);
                 }
@@ -54,7 +54,7 @@ public enum VehicleOnVirtualLinkCalculator {
             if (task instanceof AVDropoffTask) {
                 // consider the vehicle on the self loop of current virtual node
                 VirtualNode vnode = virtualNetwork.getVirtualNode(current);
-                vector.set(Increment.ONE, m + vnode.index); // self loop
+                vector.set(Increment.ONE, m + vnode.getIndex()); // self loop
             }
         }
         return vector;

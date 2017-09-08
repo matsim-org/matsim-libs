@@ -114,7 +114,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
             availableVehicles.values().stream().flatMap(List::stream).forEach(accountedVehicles::add);
             double[] array = new double[n];
             for (Entry<VirtualNode, List<RoboTaxi>> entry : availableVehicles.entrySet())
-                array[entry.getKey().index] = entry.getValue().size(); // could use tensor notation
+                array[entry.getKey().getIndex()] = entry.getValue().size(); // could use tensor notation
             DoubleArray doubleArray = new DoubleArray("availableVehiclesPerVNode", new int[] { array.length }, array);
             container.add(doubleArray);
             vehicleTotal = vehicleTotal.add(Total.of(Tensors.vectorDouble(array)));
@@ -149,7 +149,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
                         if (mpcDispatcher.requestVectorIndexMap.containsKey(avRequest))
                             index = mpcDispatcher.requestVectorIndexMap.get(avRequest);
                         else {
-                            index = m + virtualNetwork.getVirtualNode(avRequest.getFromLink()).index;
+                            index = m + virtualNetwork.getVirtualNode(avRequest.getFromLink()).getIndex();
                             new RuntimeException("map should provide request info").printStackTrace();
                         }
                         vector.set(Increment.ONE, index);

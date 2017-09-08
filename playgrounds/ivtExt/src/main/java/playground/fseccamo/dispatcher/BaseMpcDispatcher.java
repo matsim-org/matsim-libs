@@ -67,10 +67,10 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
                 // check if origin and dest are from same virtualNode
                 final VirtualNode vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
                 final VirtualNode vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
-                GlobalAssert.that(vnFrom.equals(vnTo) == (vnFrom.index == vnTo.index));
+                GlobalAssert.that(vnFrom.equals(vnTo) == (vnFrom.getIndex() == vnTo.getIndex()));
                 if (vnFrom.equals(vnTo)) {
                     // self loop
-                    requestVectorIndexMap.put(avRequest, m + vnFrom.index);
+                    requestVectorIndexMap.put(avRequest, m + vnFrom.getIndex());
                 } else {
                     // non-self loop
                     boolean success = false;

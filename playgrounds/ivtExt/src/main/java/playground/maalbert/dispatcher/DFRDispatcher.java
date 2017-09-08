@@ -161,9 +161,9 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 Tensor feedback_Rebalancing_DFR = Array.zeros(N_vStations, N_vStations);
                 Tensor feedfwrd_Rebalancing_LPR = Array.zeros(N_vStations, N_vStations);
                 // Initialize System State Matrices
-                available_Vehicles.entrySet().stream().forEach(e -> availableVehicles.set(RealScalar.of(e.getValue().size()), e.getKey().index));
-                v_ij_reb.entrySet().stream().forEach(e -> rebalancingTovStation.set(RealScalar.of(e.getValue().size()), e.getKey().index));
-                requests.entrySet().stream().forEach(e -> openRequests.set(RealScalar.of(e.getValue().size()), e.getKey().index));
+                available_Vehicles.entrySet().stream().forEach(e -> availableVehicles.set(RealScalar.of(e.getValue().size()), e.getKey().getIndex()));
+                v_ij_reb.entrySet().stream().forEach(e -> rebalancingTovStation.set(RealScalar.of(e.getValue().size()), e.getKey().getIndex()));
+                requests.entrySet().stream().forEach(e -> openRequests.set(RealScalar.of(e.getValue().size()), e.getKey().getIndex()));
                 // ------------------------------------------------------------------------------------------------------
                 // System Imbalance
                 // ------------------------------------------------------------------------------------------------------

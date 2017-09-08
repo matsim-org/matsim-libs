@@ -118,7 +118,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                 for (VirtualNode virtualNode : availableVehicles.keySet()) {
                     int viExcessVal = availableVehicles.get(virtualNode).size() + v_ij_reb.get(virtualNode).size() + v_ij_cust.get(virtualNode).size()
                             - requests.get(virtualNode).size();
-                    vi_excessT.set(RealScalar.of(viExcessVal), virtualNode.index);
+                    vi_excessT.set(RealScalar.of(viExcessVal), virtualNode.getIndex());
                 }
 
                 // solve the linear program with updated right-hand side
@@ -145,7 +145,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                     VirtualLink virtualLink = this.virtualNetwork.getVirtualLink(i);
                     VirtualNode toNode = virtualLink.getTo();
                     VirtualNode fromNode = virtualLink.getFrom();
-                    int numreb = (Integer) (feasibleRebalanceCount.Get(fromNode.index, toNode.index)).number();
+                    int numreb = (Integer) (feasibleRebalanceCount.Get(fromNode.getIndex(), toNode.getIndex())).number();
                     List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(toNode, numreb);
                     rebalanceDestinations.get(fromNode).addAll(rebalanceTargets);
                 }

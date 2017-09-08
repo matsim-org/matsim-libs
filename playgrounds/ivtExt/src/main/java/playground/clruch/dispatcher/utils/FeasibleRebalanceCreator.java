@@ -38,7 +38,7 @@ public enum FeasibleRebalanceCreator {
             int outgoingVeh = (int) outgoingNmrvNode;
             int finalI = i;
             int availableVehvNode = availableVehicles //
-                    .get(availableVehicles.keySet().stream().filter(v -> v.index == finalI).findAny().get()).size();
+                    .get(availableVehicles.keySet().stream().filter(v -> v.getIndex() == finalI).findAny().get()).size();
             // if number of outoing vehicles too small, reduce proportionally
             if (availableVehvNode < outgoingVeh) {
                 long shrinkingFactor = ((long) availableVehvNode / ((long) outgoingVeh));

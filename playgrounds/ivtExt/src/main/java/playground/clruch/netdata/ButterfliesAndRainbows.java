@@ -41,8 +41,8 @@ class ButterfliesAndRainbows {
                 List<VirtualNode> some = new ArrayList<>(set);
                 for (int i = 0; i < some.size() - 1; ++i)
                     for (int j = i + 1; j < some.size(); ++j) {
-                        list.add(new Point(some.get(i).index, some.get(j).index));
-                        list.add(new Point(some.get(j).index, some.get(i).index));
+                        list.add(new Point(some.get(i).getIndex(), some.get(j).getIndex()));
+                        list.add(new Point(some.get(j).getIndex(), some.get(i).getIndex()));
                     }
             }
         }

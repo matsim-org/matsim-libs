@@ -34,7 +34,7 @@ import playground.clruch.netdata.VirtualNode;
                     linkAnte.getCoord().getX() - linkPost.getCoord().getX(), //
                     linkAnte.getCoord().getY() - linkPost.getCoord().getY());
             VirtualNode vn = virtualNetwork.getVirtualNode(linkAnte);
-            collect.set(s -> s.append(DoubleScalar.of(distance)), vn.index);
+            collect.set(s -> s.append(DoubleScalar.of(distance)), vn.getIndex());
         }
         return Tensors.vector(i -> meanOrZero(collect.get(i)), virtualNetwork.getvNodesCount());
     }

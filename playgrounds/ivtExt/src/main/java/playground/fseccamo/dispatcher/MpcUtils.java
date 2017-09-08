@@ -20,13 +20,13 @@ enum MpcUtils {
 
         Container container = new Container("init");
         { // directed graph incidence matrix
-            Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getTo().index, i), n, m);
+            Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getTo().getIndex(), i), n, m);
             double[] array = Primitives.toArrayDouble(Transpose.of(matrix));
             DoubleArray doubleArray = new DoubleArray("E_in", new int[] { n, m }, array);
             container.add(doubleArray);
         }
         {
-            Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getFrom().index, i), n, m);
+            Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getFrom().getIndex(), i), n, m);
             double[] array = Primitives.toArrayDouble(Transpose.of(matrix));
             DoubleArray doubleArray = new DoubleArray("E_out", new int[] { n, m }, array);
             container.add(doubleArray);

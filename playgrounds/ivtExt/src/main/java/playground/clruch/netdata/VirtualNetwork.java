@@ -89,7 +89,7 @@ public class VirtualNetwork implements Serializable {
     }
 
     /* package */ VirtualNode addVirtualNode(VirtualNode virtualNode) {
-        GlobalAssert.that(virtualNodes.size() == virtualNode.index); // <- NEVER remove this check
+        GlobalAssert.that(virtualNodes.size() == virtualNode.getIndex()); // <- NEVER remove this check
         virtualNodes.add(virtualNode);
         for (Link link : virtualNode.getLinks())
             linkVNodeMap.put(link, virtualNode);
@@ -106,8 +106,8 @@ public class VirtualNetwork implements Serializable {
 
     private static final Point nodePair_key(VirtualNode fromIn, VirtualNode toIn) {
         // it does not make sense to query links with source == dest:
-        GlobalAssert.that(fromIn.index != toIn.index);
-        return new Point(fromIn.index, toIn.index);
+        GlobalAssert.that(fromIn.getIndex() != toIn.getIndex());
+        return new Point(fromIn.getIndex(), toIn.getIndex());
     }
 
     /** @param fromIn

@@ -23,7 +23,7 @@ public class VirtualNode implements Serializable, Comparable<VirtualNode> {
     /**
      * index is counting from 0,1,... index is used to assign entries in vectors and matrices
      */
-    public final int index;
+    private final int index;
     /** id is only used for debugging */
     private final String id;
     // TODO how to make links final again?
