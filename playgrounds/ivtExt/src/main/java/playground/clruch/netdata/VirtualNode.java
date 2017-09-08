@@ -4,7 +4,6 @@ package playground.clruch.netdata;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,11 +35,8 @@ public class VirtualNode implements Serializable {
                 .collect(Collectors.toCollection(HashSet::new));
     }
 
-    VirtualNode(int index, String id, int neighCount, Tensor coord) {
-        this(index, id, new LinkedHashSet<>(), neighCount, coord);
-    }
-
     /* package */ void setLinks(Set<Link> links) {
+        GlobalAssert.that(this.links != null);
         GlobalAssert.that(this.links.size() == 0);
         for (Link link : links) {
             this.links.add(link);

@@ -2,6 +2,7 @@
 package playground.clruch.netdata;
 
 import java.awt.Point;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -61,8 +62,8 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
             for (Plan plan : person.getPlans()) {
                 for (PlanElement planElem : plan.getPlanElements()) {
                     if (planElem instanceof Activity) {
-                        double x = network.getLinks().get(((Activity)planElem).getLinkId()).getCoord().getX();
-                        double y = network.getLinks().get(((Activity)planElem).getLinkId()).getCoord().getY();
+                        double x = network.getLinks().get(((Activity) planElem).getLinkId()).getCoord().getX();
+                        double y = network.getLinks().get(((Activity) planElem).getLinkId()).getCoord().getY();
                         dataList.add(new double[] { x, y });
                     }
                 }
@@ -103,7 +104,7 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
             for (Cluster<KMeansModel> clu : c.getAllClusters()) {
                 Coord coord = new Coord(clu.getModel().getPrototype().get(0), clu.getModel().getPrototype().get(1));
                 String indexStr = "vNode_" + Integer.toString(index + 1);
-                vNMap.put(new VirtualNode(index, indexStr, neighCount, VirtualNetworkUtils.fromCoord(coord)), new LinkedHashSet<Link>());
+                vNMap.put(new VirtualNode(index, indexStr, new LinkedHashSet<>(), neighCount, VirtualNetworkUtils.fromCoord(coord)), new LinkedHashSet<Link>());
                 index++;
             }
 
@@ -138,7 +139,7 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
                 for (VirtualNode vNto : virtualNetwork.getVirtualNodes()) {
                     if (!vNfrom.equals(vNto)) {
                         String indexStr = "vLink_" + Integer.toString(index + 1);
-                        virtualNetwork.addVirtualLink(indexStr, vNfrom, vNto, VirtualNetworkUtils.distance(vNfrom.getCoord(),vNto.getCoord()));
+                        virtualNetwork.addVirtualLink(indexStr, vNfrom, vNto, VirtualNetworkUtils.distance(vNfrom.getCoord(), vNto.getCoord()));
                         index++;
                     }
                 }
@@ -169,8 +170,8 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
 
         // FILL information for serialization
         virtualNetwork.fillVNodeMapRAWVERYPRIVATE();
-        
-        System.out.println("VNODES="+virtualNetwork.getvNodesCount());
+
+        System.out.println("VNODES=" + virtualNetwork.getvNodesCount());
 
         return virtualNetwork;
 
