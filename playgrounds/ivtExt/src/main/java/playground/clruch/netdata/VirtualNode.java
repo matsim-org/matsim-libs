@@ -15,61 +15,49 @@ import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 
-/**
- * Created by Claudio on 2/8/2017.
- */
-// TODO VirtualNode implements Comparable<VirtualNode> based on index
-public class VirtualNode implements Serializable, Comparable<VirtualNode> {
-    /**
-     * index is counting from 0,1,... index is used to assign entries in vectors and matrices
-     */
+/** Created by Claudio on 2/8/2017. */
+public class VirtualNode implements Serializable {
+    /** index is counting from 0,1,... index is used to assign entries in vectors and matrices */
     private final int index;
     /** id is only used for debugging */
     private final String id;
-    // TODO how to make links final again?
     private transient Set<Link> links;
     private final Set<String> linkIDsforSerialization;
     private final int neighCount;
     private final Coord coord;
 
-    VirtualNode(int index, String idIn, Set<Link> linksIn, int neighCount, Coord coordIn) {
+    VirtualNode(int index, String id, Set<Link> links, int neighCount, Coord coord) {
         this.index = index;
-        this.id = idIn;
-        this.links = linksIn;
+        this.id = id;
+        this.links = links;
         this.neighCount = neighCount;
-        this.coord = coordIn;
-        this.linkIDsforSerialization = linksIn.stream().map(v -> v.getId().toString()).collect(Collectors.toCollection(HashSet::new));
-
-        // TODO remove check
-        // EVTL GET RID OF THIS -> LEFTOVER NODE or deal differently with it or test if last idx is
-        // not leftOver-> problem & fill last one in!!sth like this... TODO
-        if (!idIn.contains("" + (index + 1)))
-            throw new RuntimeException("node index mismatch:" + idIn + " != " + (index + 1));
+        this.coord = coord;
+        this.linkIDsforSerialization = links.stream().map(v -> v.getId().toString())//
+                .collect(Collectors.toCollection(HashSet::new));
     }
 
-    VirtualNode(int index, String idIn, int neighCount, Coord coordIn) {
-        this(index, idIn, new LinkedHashSet<>(), neighCount, coordIn);
+    VirtualNode(int index, String id, int neighCount, Coord coord) {
+        this(index, id, new LinkedHashSet<>(), neighCount, coord);
     }
 
-    public void setLinks(Set<Link> linksIn) {
+    /* package */ void setLinks(Set<Link> links) {
         GlobalAssert.that(this.links.size() == 0);
-        for (Link link : linksIn) {
+        for (Link link : links) {
             this.links.add(link);
             this.linkIDsforSerialization.add(link.getId().toString());
         }
         GlobalAssert.that(links.size() == linkIDsforSerialization.size());
     }
 
-    /**
-     * Function initializes the Set<Link> links with references to the simulation network after it was loaded from a serialized bitmap
-     * @param network
-     */
-    public void setLinksAfterSerialization(Network network) {
+    /** Function initializes the Set<Link> links with references to the simulation network after it was loaded from a serialized bitmap
+     * 
+     * @param network */
+    /* package */ void setLinksAfterSerialization(Network network) {
         this.links = new HashSet<>();
-        for (String linkIDString : linkIDsforSerialization) {            
+        for (String linkIDString : linkIDsforSerialization) {
             Id<Link> linkID = Id.createLinkId(linkIDString);
             Link link = network.getLinks().get(linkID);
-            GlobalAssert.that(link!=null);
+            GlobalAssert.that(link != null);
             links.add(link);
         }
 
@@ -95,8 +83,4 @@ public class VirtualNode implements Serializable, Comparable<VirtualNode> {
         return neighCount;
     }
 
-    @Override
-    public int compareTo(VirtualNode virtualNode) {
-        return Integer.compare(index, virtualNode.index);
-    }
 }
