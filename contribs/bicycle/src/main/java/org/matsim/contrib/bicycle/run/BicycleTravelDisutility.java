@@ -108,17 +108,10 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		LOG.info("travelTime = " + travelTime + " -- distance = " + distance + " -- comfortFactor = " + comfortFactor
 		+ " -- infraFactor = "+ infrastructureFactor + " -- gradient = " + gradient);
 		 
-
 		// TODO Gender
-
 		// TODO Activity
-
 		// TODO Other influence factors
 
-		// New randomization
-		// yyyyyy in the randomized toll disutility this is LOGnormal. Should be made consistent, or an argument provided why in the different cases
-		// different mathematical forms make sense. kai, feb'17
-		// This following should address this comment, dz, aug'17
 		 double normalization = 1;
 		 if (sigma != 0.) {
 			 normalization = 1. / Math.exp(this.sigma * this.sigma / 2);
@@ -130,34 +123,11 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		Random random2 = MatsimRandom.getLocalInstance(); // Make sure that stream of random variables is reproducible. dz, aug'17
 		double logNormalRnd = Math.exp(sigma * random2.nextGaussian());
 		logNormalRnd *= normalization;
-		//
 
-		// Old randomization from Simon
-//		Random random = MatsimRandom.getLocalInstance(); // Make sure that stream of random variables is reproducible. dz, aug'17
-//		double standardDeviation = 0.2;
-//		int mean = 1;
-//		double randomfactor = random.nextGaussian() * standardDeviation + mean;
-		//
-
-		// Old disutility
-//		LOG.info("travelTimeDisutility = " + travelTimeDisutility + " -- distanceDisutility = " + distanceDisutility
-//				+ " -- streettypeDisutility = " + infrastructureDisutility + " -- surfaceDisutility = "
-//				+ comfortDisutility + " -- randomfactor = " + randomfactor);
-//		return (travelTimeDisutility + distanceDisutility + infrastructureDisutility + comfortDisutility)
-//				* randomfactor;
-		// Example from RandomizingTimeDistanceTravelDisutility: return
-		// this.marginalCostOfTime * travelTime + logNormalRnd *
-		// this.marginalCostOfDistance * link.getLength();
-
-		// Intermediate solution
-		// return travelTimeDisutility + randomfactor * (distanceDisutility +
-		// infrastructureDisutility + comfortDisutility);
-
-		// New disutility
-		 LOG.info("link = " + link.getId() + " -- travelTimeDisutility = " + travelTimeDisutility + " -- distanceDisutility = "+ distanceDisutility
-				 + " -- streettypeDisutility = " + infrastructureDisutility + " -- surfaceDisutility = "
-				 + comfortDisutility + " -- gradientDisutility = " + gradientDisutility + " -- randomfactor = " + logNormalRnd);
-		 return (travelTimeDisutility + logNormalRnd * (distanceDisutility + infrastructureDisutility + comfortDisutility + gradientDisutility));
+		LOG.info("link = " + link.getId() + " -- travelTimeDisutility = " + travelTimeDisutility + " -- distanceDisutility = "+ distanceDisutility
+				+ " -- streettypeDisutility = " + infrastructureDisutility + " -- surfaceDisutility = "
+				+ comfortDisutility + " -- gradientDisutility = " + gradientDisutility + " -- randomfactor = " + logNormalRnd);
+		return (travelTimeDisutility + logNormalRnd * (distanceDisutility + infrastructureDisutility + comfortDisutility + gradientDisutility));
 	}
 
 	private double getComfortFactor(String surface, String type) {
