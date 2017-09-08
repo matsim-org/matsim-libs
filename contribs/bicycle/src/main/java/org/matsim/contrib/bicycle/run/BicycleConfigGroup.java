@@ -23,21 +23,22 @@ import java.util.TreeMap;
 
 import org.matsim.core.config.ConfigGroup;
 
+/**
+ * @author smetzler, dziemke
+ */
 public class BicycleConfigGroup extends ConfigGroup {
 
 	public static final String GROUP_NAME = "bicycle";
 
 	private static final String INPUT_NETWORK_ATTRIBUTE_FILE = "inputNetworkObjectattributeFile";
-//	private static final String INPUT_REFERENCE_BIKE_SPEED = "referenceBikeSpeed";
-//	private static final String INPUT_COMFORT = "marginalUtilityOfComfort";
-	private static final String INPUT_SURFACETYPE = "marginalUtilityOfSurfacetype";
-	private static final String INPUT_STREETTYPE = "marginalUtilityOfStreettype";
+	private static final String INPUT_COMFORT = "marginalUtilityOfComfort_m";
+	private static final String INPUT_INFRASTRUCTURE = "marginalUtilityOfInfrastructure_m";
+	private static final String INPUT_GRADIENT = "marginalUtilityOfGradient_m_100m";
 
 	private String networkAttFile = null;
-//	private double referenceBikeSpeed;
-//	private double marginalUtilityOfComfort;
-	private double marginalUtilityOfSurfacetype;
-	private double marginalUtilityOfStreettype;
+	private double marginalUtilityOfComfort;
+	private double marginalUtilityOfInfrastructure;
+	private double marginalUtilityOfGradient;
 	
 	public BicycleConfigGroup() {
 		super(GROUP_NAME);
@@ -50,14 +51,12 @@ public class BicycleConfigGroup extends ConfigGroup {
 
 		if (INPUT_NETWORK_ATTRIBUTE_FILE.equals(key)) {
 			setNetworkAttFile(value);
-//		} else if (INPUT_REFERENCE_BIKE_SPEED.equals(key)) {
-//			setReferenceBikeSpeed(Double.parseDouble(value));
-//		} else if (INPUT_COMFORT.equals(key)) {
-//			setMarginalUtilityOfComfort(Double.parseDouble(value));
-		} else if (INPUT_SURFACETYPE.equals(key)) {
-			setMarginalUtilityOfSurfacetype(Double.parseDouble(value));
-		} else if (INPUT_STREETTYPE.equals(key)) {
-			setMarginalUtilityOfStreettype(Double.parseDouble(value));
+		} else if (INPUT_COMFORT.equals(key)) {
+			setMarginalUtilityOfComfort_m(Double.parseDouble(value));
+		} else if (INPUT_INFRASTRUCTURE.equals(key)) {
+			setMarginalUtilityOfInfrastructure_m(Double.parseDouble(value));
+		} else if (INPUT_GRADIENT.equals(key)) {
+			setMarginalUtilityOfGradient_m_100m(Double.parseDouble(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -67,14 +66,12 @@ public class BicycleConfigGroup extends ConfigGroup {
 	public final String getValue(final String key) {
 		if (INPUT_NETWORK_ATTRIBUTE_FILE.equals(key)) {
 			return getNetworkAttFile();
-//		} else if (INPUT_REFERENCE_BIKE_SPEED.equals(key)) {
-//			return Double.toString(getReferenceBikeSpeed());
-//		} else if (INPUT_COMFORT.equals(key)) {
-//			return Double.toString(getMarginalUtilityOfComfort());
-		} else if (INPUT_SURFACETYPE.equals(key)) {
-			return Double.toString(getMarginalUtilityOfSurfacetype());
-		} else if (INPUT_STREETTYPE.equals(key)) {
-			return Double.toString(getMarginalUtilityOfStreettype());
+		} else if (INPUT_COMFORT.equals(key)) {
+			return Double.toString(getMarginalUtilityOfComfort_m());
+		} else if (INPUT_INFRASTRUCTURE.equals(key)) {
+			return Double.toString(getMarginalUtilityOfInfrastructure_m());
+		} else if (INPUT_GRADIENT.equals(key)) {
+			return Double.toString(getMarginalUtilityOfGradient_m_100m());
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -84,22 +81,19 @@ public class BicycleConfigGroup extends ConfigGroup {
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<>();
 		map.put(INPUT_NETWORK_ATTRIBUTE_FILE, getValue(INPUT_NETWORK_ATTRIBUTE_FILE));
-//		map.put(INPUT_REFERENCE_BIKE_SPEED, getValue(INPUT_REFERENCE_BIKE_SPEED));
-	//	map.put(INPUT_COMFORT, getValue(INPUT_COMFORT));
-		map.put(INPUT_SURFACETYPE, getValue(INPUT_SURFACETYPE));
-		map.put(INPUT_STREETTYPE, getValue(INPUT_STREETTYPE));
+		map.put(INPUT_COMFORT, getValue(INPUT_COMFORT));
+		map.put(INPUT_INFRASTRUCTURE, getValue(INPUT_INFRASTRUCTURE));
+		map.put(INPUT_GRADIENT, getValue(INPUT_GRADIENT));
 		return map;
 	}
-
 
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(INPUT_NETWORK_ATTRIBUTE_FILE, "Path to a file containing information for the network's links (required file format: ObjectAttributes).");
-	//	map.put(INPUT_REFERENCE_BIKE_SPEED, "ReferenceBikeSpeed // 6.01 according to Prakin and Rotheram");
-	//	map.put(INPUT_COMFORT, "MarginalUtilityOfComfort");
-		map.put(INPUT_SURFACETYPE, "marginalUtilityOfSurfacetype");
-		map.put(INPUT_STREETTYPE, "marginalUtilityOfStreettype");
+		map.put(INPUT_COMFORT, "marginalUtilityOfSurfacetype");
+		map.put(INPUT_INFRASTRUCTURE, "marginalUtilityOfStreettype");
+		map.put(INPUT_GRADIENT, "marginalUtilityOfGradient");
 		return map;
 	}
 	void setNetworkAttFile(String file) {
@@ -109,36 +103,28 @@ public class BicycleConfigGroup extends ConfigGroup {
 	public String getNetworkAttFile() {
 		return this.networkAttFile;
 	}
-
-//	public void setReferenceBikeSpeed(final double value) {
-//		this.referenceBikeSpeed = value;
-//	}
-//
-//	public double getReferenceBikeSpeed() {
-//		return this.referenceBikeSpeed;
-//	}
-//	
-//	public void setMarginalUtilityOfComfort(final double value) {
-//		this.marginalUtilityOfComfort = value;
-//	}
-//
-//	public double getMarginalUtilityOfComfort() {
-//		return this.marginalUtilityOfComfort;
-//	}
 	
-	public void setMarginalUtilityOfSurfacetype(final double value) {
-		this.marginalUtilityOfSurfacetype = value;
+	public void setMarginalUtilityOfComfort_m(final double value) {
+		this.marginalUtilityOfComfort = value;
 	}
 
-	public double getMarginalUtilityOfSurfacetype() {
-		return this.marginalUtilityOfSurfacetype;
+	public double getMarginalUtilityOfComfort_m() {
+		return this.marginalUtilityOfComfort;
 	}
 	
-	public void setMarginalUtilityOfStreettype(final double value) {
-		this.marginalUtilityOfStreettype = value;
+	public void setMarginalUtilityOfInfrastructure_m(final double value) {
+		this.marginalUtilityOfInfrastructure = value;
 	}
 
-	public double getMarginalUtilityOfStreettype() {
-		return this.marginalUtilityOfStreettype;
+	public double getMarginalUtilityOfInfrastructure_m() {
+		return this.marginalUtilityOfInfrastructure;
+	}
+	
+	public void setMarginalUtilityOfGradient_m_100m(final double value) {
+		this.marginalUtilityOfGradient = value;
+	}
+
+	public double getMarginalUtilityOfGradient_m_100m() {
+		return this.marginalUtilityOfGradient;
 	}
 }
