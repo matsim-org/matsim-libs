@@ -37,7 +37,7 @@ public class BicycleEquil {
 
 	public static void main(String[] args) {
 		// This works when the data is stored under "/matsim/contribs/bicycle/src/main/resurces/bicycle_example"
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin-bike/equil/config-e.xml", new BicycleConfigGroup());
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin-bike/equil/config-f.xml", new BicycleConfigGroup());
 		new BicycleEquil().run(config);
 	}
 

@@ -43,20 +43,8 @@ public class BicycleTravelTime implements TravelTime {
 		double infrastructureSpeed = Math.max(link.getFreespeed(), cyclingInfrastructureSpeed);
 
 		double vehicleLinkSpeed = Math.min(infrastructureSpeed, BicycleUtils.getSpeed("bicycle"));
-		//double vehicleLinkSpeed = Math.min(infrastructureSpeed, vehicle.getType().getMaximumVelocity());
-		
-		double gradient = 0.;
-		Double fromNodeZ = link.getFromNode().getCoord().getZ();
-		Double toNodeZ = link.getToNode().getCoord().getZ();
-		if ((fromNodeZ != null) && (toNodeZ != null)) {
-			gradient = (toNodeZ - fromNodeZ) / link.getLength();
-		}
-//		Object gradientValue = link.getAttributes().getAttribute(BicycleLabels.GRADIENT);
-//		double gradient = 0.;
-//		if (gradientValue != null) {
-//			gradient = Double.parseDouble((String) gradientValue);
-//		}
-		double gradientSpeed = computeGradientSpeed(vehicleLinkSpeed, gradient);
+
+		double gradientSpeed = computeGradientSpeed(link, vehicleLinkSpeed);
 
 		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
 		double surfaceSpeed = vehicleLinkSpeed;
@@ -96,12 +84,15 @@ public class BicycleTravelTime implements TravelTime {
 	 * Negative gradients (downhill):
 	 * Not linear; highest speeds at 5% or 6% gradient; at gradients higher than 6% braking
 	 */
-	private double computeGradientSpeed(double vehicleLinkSpeed, double gradient) {
+	private double computeGradientSpeed(Link link, double vehicleLinkSpeed) {
 		double gradientSpeedFactor = 1.;
-		if (gradient > 0.) {
-			gradientSpeedFactor = 1 - 5. * gradient; // 50% reducation at 10% up-slope
+		Double fromNodeZ = link.getFromNode().getCoord().getZ();
+		Double toNodeZ = link.getToNode().getCoord().getZ();
+		if ((fromNodeZ != null) && (toNodeZ != null)) {
+			if (toNodeZ > fromNodeZ) { // No positive speed increase for downhill, only decrease for uphill
+				gradientSpeedFactor = 1 - 5. * ((toNodeZ - fromNodeZ) / link.getLength()); // 50% reducation at 10% up-slope
+			}
 		}
-		System.err.println("gradientSpeedFactor = " + gradientSpeedFactor);
 		return vehicleLinkSpeed * gradientSpeedFactor;
 	}
 	
