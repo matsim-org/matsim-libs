@@ -65,13 +65,11 @@ public class LanesIT {
 		config.network().setLaneDefinitionsFile("testLaneDefinitions_v2.0.xml");
 		config.plans().setInputFile("population.xml");
 		config.controler().setOutputDirectory(testUtils.getOutputDirectory() + "output");
-//		final int lastIteration = 50;
-//		config.controler().setWriteEventsInterval(lastIteration);
-//		config.controler().setWritePlansInterval(lastIteration);
-//		config.controler().setLastIteration(lastIteration);
-		// ---
+		final int lastIteration = 50;
+		config.controler().setLastIteration(lastIteration);
+		config.controler().setCreateGraphs(false);
+		config.vspExperimental().setWritingOutputEvents(false);
 		Controler controler = new Controler(config);
-		controler.getConfig().controler().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -130,31 +128,15 @@ public class LanesIT {
 		}
 
 		@Override
-		public void notifyShutdown(ShutdownEvent event) {
-			/**
-			 * The lanes attached to link 23 should distribute the 3600 veh/h capacity
-			 * to link 34 with 600 veh/h (approx. 16.6 %)
-			 * to link 35 with 1200 veh/h (approx. 33.3 %)
-			 * to link 36 with 1800 veh/h to link 36 (approx. 50 %).
-			 */
-			
+		public void notifyShutdown(ShutdownEvent event) {			
 			log.info( "link34:" + percent34 );
 			log.info( "link35:" + percent35 );
 			log.info( "link36:" + percent36 );
 			
-//			Assert.assertTrue("", (15.5 < percent34 && percent34 < 17.5));
-//			Assert.assertTrue("", (32.5 < percent35 && percent35 < 34.5));
-//			Assert.assertTrue("", (49.0 < percent36 && percent36 < 51.0));
-			
-			// shifting the error margins so that 50 iterations are enough. kai, feb'16
-//			Assert.assertTrue("", (17.4 < percent34 && percent34 < 17.5));
-//			Assert.assertTrue("", (34.5 < percent35 && percent35 < 34.6));
-//			Assert.assertTrue("", (47.9 < percent36 && percent36 < 48.0));
-
-			//back to 100 iterations. michalm, jan'17
-            Assert.assertTrue("", (17.2 < percent34 && percent34 < 17.3));
-            Assert.assertTrue("", (33.6 < percent35 && percent35 < 33.7));
-            Assert.assertTrue("", (49.1 < percent36 && percent36 < 49.2));
+			// The lanes attached to link 23 should distribute the 3600 veh/h capacity as follows:
+			Assert.assertEquals("lane to link 34 should have approx. 600 veh/h, i.e. 16.6% of the total flow", 16.6, percent34, 1);
+			Assert.assertEquals("lane to link 35 should have approx. 1200 veh/h, i.e. 33.3% of the total flow", 33.3, percent35, 1);
+			Assert.assertEquals("lane to link 36 should have approx. 1800 veh/h, i.e. 50.0% of the total flow", 50.0, percent36, 1);
 		}
 	}
 
