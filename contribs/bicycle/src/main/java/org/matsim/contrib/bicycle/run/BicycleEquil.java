@@ -37,7 +37,7 @@ public class BicycleEquil {
 
 	public static void main(String[] args) {
 		// This works when the data is stored under "/matsim/contribs/bicycle/src/main/resurces/bicycle_example"
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin-bike/equil/config-f.xml", new BicycleConfigGroup());
+		Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin-bike/equil/config-a-motor.xml", new BicycleConfigGroup());
 		new BicycleEquil().run(config);
 	}
 
@@ -45,7 +45,7 @@ public class BicycleEquil {
 //		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 		config.global().setNumberOfThreads(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(10);
 		
 		// New, yet to be applied
 		config.plansCalcRoute().setRoutingRandomness(0.2);
@@ -60,13 +60,16 @@ public class BicycleEquil {
 
 		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
 		bicycle.setMaximumVelocity(30.0/3.6);
-		bicycle.setPcuEquivalents(0.0);
+		bicycle.setPcuEquivalents(0.25);
 		scenario.getVehicles().addVehicleType(bicycle);
 
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new BicycleModule());
+		
+		BicycleModule bicycleModule = new BicycleModule();
+		bicycleModule.setConsiderMotorizedInteraction(true);
+		controler.addOverridingModule(bicycleModule);
 		
 		controler.run();
 	}

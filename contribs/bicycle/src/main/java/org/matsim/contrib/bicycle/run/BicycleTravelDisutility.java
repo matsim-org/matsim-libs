@@ -66,8 +66,8 @@ public class BicycleTravelDisutility implements TravelDisutility {
 
 		// Does not seem to be implemented yet
 		// this.sigma = plansCalcRouteConfigGroup.getRoutingRandomness();
-		// this.sigma = 0.2;
-		this.sigma = 0.0;
+		this.sigma = 0.2;
+		//this.sigma = 0.0;
 
 		this.timeCalculator = timeCalculator;
 		
@@ -101,7 +101,7 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		double gradientFactor = getGradientFactor(link);
 		double gradientDisutility = marginalCostOfGradient_m_100m * gradientFactor * distance;
 		
-		LOG.info("link = " + link.getId() + "-- travelTime = " + travelTime + " -- distance = " + distance + " -- comfortFactor = "
+		LOG.warn("link = " + link.getId() + "-- travelTime = " + travelTime + " -- distance = " + distance + " -- comfortFactor = "
 				+ comfortFactor	+ " -- infraFactor = "+ infrastructureFactor + " -- gradient = " + gradientFactor);
 		 
 		// TODO Gender
@@ -120,7 +120,7 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		double logNormalRnd = Math.exp(sigma * random2.nextGaussian());
 		logNormalRnd *= normalization;
 
-		LOG.info("link = " + link.getId() + " -- travelTimeDisutility = " + travelTimeDisutility + " -- distanceDisutility = "+ distanceDisutility
+		LOG.warn("link = " + link.getId() + " -- travelTimeDisutility = " + travelTimeDisutility + " -- distanceDisutility = "+ distanceDisutility
 				+ " -- infrastructureDisutility = " + infrastructureDisutility + " -- comfortDisutility = "
 				+ comfortDisutility + " -- gradientDisutility = " + gradientDisutility + " -- randomfactor = " + logNormalRnd);
 		return (travelTimeDisutility + logNormalRnd * (distanceDisutility + infrastructureDisutility + comfortDisutility + gradientDisutility));
