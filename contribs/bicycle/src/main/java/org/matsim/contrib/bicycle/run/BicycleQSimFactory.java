@@ -37,6 +37,7 @@ import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Provider;
 
+@Deprecated
 public class BicycleQSimFactory implements Provider<Mobsim> {
 	
 	@Inject Map<String, TravelTime> multiModalTravelTimes;

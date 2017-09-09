@@ -22,6 +22,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.bicycle.BicycleUtils;
+import org.matsim.contrib.bicycle.MotorizedInteractionEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
@@ -38,6 +39,7 @@ import com.google.inject.Singleton;
  * @author smetzler, dziemke
  */
 public class BicycleModule extends AbstractModule {
+	private boolean considerMotorizedInteraction;
 	
 	@Override
 	public void install() {
@@ -46,6 +48,10 @@ public class BicycleModule extends AbstractModule {
 		bind(BicycleTravelDisutilityFactory.class).asEagerSingleton();
 		addTravelDisutilityFactoryBinding("bicycle").to(BicycleTravelDisutilityFactory.class);		
 		this.bindScoringFunctionFactory().toInstance(new BicycleScoringFunctionFactory());
+		
+		if (considerMotorizedInteraction) {
+			addMobsimListenerBinding().to(MotorizedInteractionEngine.class);
+		}
 	}
 	
 	@Singleton @Provides
@@ -55,12 +61,18 @@ public class BicycleModule extends AbstractModule {
 			LinkSpeedCalculator delegate = new DefaultLinkSpeedCalculator() ;
 			@Override public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
 				if ( vehicle.getVehicle().getType().getId().equals( Id.create("bicycle", VehicleType.class) ) ) {
-					return BicycleUtils.getSpeed("bicycle"); // compute bicycle speed instead
+//					return vehicle.getMaximumVelocity(); // return the same as vehicleType.getMaximumVelocity()
+//					return vehicle.getVehicle().getType().getMaximumVelocity();
+					return BicycleUtils.getSpeed("bicycle");
 				} else {
 					return delegate.getMaximumVelocity(vehicle, link, time) ;
 				}
 			}
 		});
 		return qNetworkFactory;
+	}
+
+	public void setConsiderMotorizedInteraction(boolean considerMotorizedInteraction) {
+		this.considerMotorizedInteraction = considerMotorizedInteraction;
 	}
 }
