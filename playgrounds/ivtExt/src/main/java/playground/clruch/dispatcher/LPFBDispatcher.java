@@ -95,10 +95,10 @@ public class LPFBDispatcher extends PartitionedDispatcher {
         if (round_now % rebalancingPeriod == 0 && round_now > 10) { // needed because of problems with robotaxi
                                                                     // inititalization.
 
-            Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
+            Map<VirtualNode<Link>, List<AVRequest>> requests = getVirtualNodeRequests();
             // II.i compute rebalancing vehicles and send to virtualNodes
             {
-                Map<VirtualNode, List<RoboTaxi>> availableVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
+                Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
                 int totalAvailable = 0;
                 for (List<RoboTaxi> robotaxiList : availableVehicles.values()) {
                     totalAvailable += robotaxiList.size();
@@ -112,8 +112,8 @@ public class LPFBDispatcher extends PartitionedDispatcher {
 
                 // calculate excess vehicles per virtual Node i, where v_i excess = vi_own - c_i =
                 // v_i + sum_j (v_ji) - c_i
-                Map<VirtualNode, List<RoboTaxi>> v_ij_reb = getVirtualNodeRebalancingToRoboTaxis();
-                Map<VirtualNode, List<RoboTaxi>> v_ij_cust = getVirtualNodeArrivingWithCustomerRoboTaxis();
+                Map<VirtualNode<Link>, List<RoboTaxi>> v_ij_reb = getVirtualNodeRebalancingToRoboTaxis();
+                Map<VirtualNode<Link>, List<RoboTaxi>> v_ij_cust = getVirtualNodeArrivingWithCustomerRoboTaxis();
                 Tensor vi_excessT = Array.zeros(virtualNetwork.getvNodesCount());
                 for (VirtualNode virtualNode : availableVehicles.keySet()) {
                     int viExcessVal = availableVehicles.get(virtualNode).size() + v_ij_reb.get(virtualNode).size() + v_ij_cust.get(virtualNode).size()
@@ -138,13 +138,13 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                 total_rebalanceCount += (Integer) ((Scalar) Total.of(Tensor.of(feasibleRebalanceCount.flatten(-1)))).number();
 
                 // generate routing instructions for rebalancing vehicles
-                Map<VirtualNode, List<Link>> rebalanceDestinations = virtualNetwork.createVNodeTypeMap();
+                Map<VirtualNode<Link>, List<Link>> rebalanceDestinations = virtualNetwork.createVNodeTypeMap();
 
                 // fill rebalancing destinations
                 for (int i = 0; i < virtualNetwork.getvLinksCount(); ++i) {
                     VirtualLink virtualLink = this.virtualNetwork.getVirtualLink(i);
-                    VirtualNode toNode = virtualLink.getTo();
-                    VirtualNode fromNode = virtualLink.getFrom();
+                    VirtualNode<Link> toNode = virtualLink.getTo();
+                    VirtualNode<Link> fromNode = virtualLink.getFrom();
                     int numreb = (Integer) (feasibleRebalanceCount.Get(fromNode.getIndex(), toNode.getIndex())).number();
                     List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(toNode, numreb);
                     rebalanceDestinations.get(fromNode).addAll(rebalanceTargets);
@@ -152,7 +152,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
 
                 // consistency check: rebalancing destination links must not exceed available
                 // vehicles in virtual node
-                Map<VirtualNode, List<RoboTaxi>> finalAvailableVehicles = availableVehicles;
+                Map<VirtualNode<Link>, List<RoboTaxi>> finalAvailableVehicles = availableVehicles;
                 GlobalAssert.that(
                         virtualNetwork.getVirtualNodes().stream().allMatch(v -> finalAvailableVehicles.get(v).size() >= rebalanceDestinations.get(v).size()));
 

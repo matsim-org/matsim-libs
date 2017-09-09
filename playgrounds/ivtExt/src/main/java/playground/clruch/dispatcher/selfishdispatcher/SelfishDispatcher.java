@@ -83,11 +83,11 @@ public class SelfishDispatcher extends PartitionedDispatcher {
     }
 
     /** @return VirtualNode selected by a selfish agent. */
-    private VirtualNode selectRebalanceNode() {
+    private VirtualNode<Link> selectRebalanceNode() {
 
-        Map<VirtualNode, Double> scores = new HashMap<>();
+        Map<VirtualNode<Link>, Double> scores = new HashMap<>();
 
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+        for (VirtualNode<Link> virtualNode : virtualNetwork.getVirtualNodes()) {
             double averageFare = calcAverageFare(virtualNode, //
                     getVirtualNodeRequests().get(virtualNode));
             GlobalAssert.that(averageFare >= 0.0);
@@ -106,7 +106,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
             scores.put(virtualNode, score);
         }
 
-        Entry<VirtualNode, Double> maxEntry = Collections.max(scores.entrySet(), new ScoreComparator());
+        Entry<VirtualNode<Link>, Double> maxEntry = Collections.max(scores.entrySet(), new ScoreComparator());
         virtualNetwork.getVirtualNodes().forEach(vn -> GlobalAssert.that(scores.get(vn) <= scores.get(maxEntry.getKey())));
 
         Set<VirtualNode> maxNodes = scores.entrySet().stream().filter(e -> e.getValue().equals(maxEntry.getValue())).map(e -> e.getKey())

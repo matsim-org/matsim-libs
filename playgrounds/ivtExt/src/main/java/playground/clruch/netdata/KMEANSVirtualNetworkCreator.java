@@ -52,9 +52,9 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
     Relation<NumberVector> rel;
 
     @Override
-    public VirtualNetwork createVirtualNetwork(Population population, Network network, int numVNodes, boolean completeGraph) {
+    public VirtualNetwork<Link> createVirtualNetwork(Population population, Network network, int numVNodes, boolean completeGraph) {
         // initialize new virtual network
-        VirtualNetwork virtualNetwork = new VirtualNetwork();
+        VirtualNetwork<Link> virtualNetwork = new VirtualNetwork();
 
         // FOR ALL activities find positions, record in list and store in array
         List<double[]> dataList = new ArrayList<>();
@@ -174,7 +174,10 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
         }
 
         // FILL information for serialization
-        virtualNetwork.fillVNodeMapRAWVERYPRIVATE();
+        Map<Link,String> map = new HashMap<>();
+        network.getLinks().values().forEach(l->map.put(l, l.getId().toString()));
+        
+        virtualNetwork.fillVNodeMapRAWVERYPRIVATE(map);
 
         System.out.println("VNODES=" + virtualNetwork.getvNodesCount());
 

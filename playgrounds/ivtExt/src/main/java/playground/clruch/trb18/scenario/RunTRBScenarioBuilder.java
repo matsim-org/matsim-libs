@@ -158,7 +158,7 @@ public class RunTRBScenarioBuilder {
         virtualNetworkOutputDirectory.mkdir();
 
         VirtualNetworkIO.toByte(new File(virtualNetworkOutputDirectory, scenarioConfig.virtualNetworkFileName), virtualNetwork);
-        VirtualNetworkIO.toXML(new File(virtualNetworkOutputDirectory, scenarioConfig.virtualNetworkFileName + ".xml").toString(), virtualNetwork);
+        //VirtualNetworkIO.toXML(new File(virtualNetworkOutputDirectory, scenarioConfig.virtualNetworkFileName + ".xml").toString(), virtualNetwork);
 
         Population requestSchedulePopulation = createRequestSchedulePopulation(reducedPopulation);
         PopulationRequestSchedule prs = new PopulationRequestSchedule(filteredNetwork, requestSchedulePopulation, virtualNetwork);

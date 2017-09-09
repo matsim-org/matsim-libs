@@ -4,6 +4,8 @@ package playground.clruch.dispatcher.utils;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.network.Link;
+
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -20,7 +22,7 @@ public enum FeasibleRebalanceCreator {
      * @param availableVehicles
      * @return returns a scaled rebalanceInput which is feasible considering the available number of
      *         vehicles */
-    public static Tensor returnFeasibleRebalance(Tensor rebalanceInput, Map<VirtualNode, //
+    public static Tensor returnFeasibleRebalance(Tensor rebalanceInput, Map<VirtualNode<Link>, //
             List<RoboTaxi>> availableVehicles) {
 
         GlobalAssert.that(Dimensions.of(rebalanceInput).get(0) == Dimensions.of(rebalanceInput).get(1));

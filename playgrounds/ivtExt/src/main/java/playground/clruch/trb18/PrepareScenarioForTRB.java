@@ -339,7 +339,7 @@ public class PrepareScenarioForTRB {
         virtualNetworkOutputDirectory.mkdir();
 
         VirtualNetworkIO.toByte(new File(virtualNetworkOutputDirectory, VIRTUALNETWORKFILENAME), virtualNetwork);
-        VirtualNetworkIO.toXML(new File(virtualNetworkOutputDirectory, VIRTUALNETWORKFILENAME + ".xml").toString(), virtualNetwork);
+        //VirtualNetworkIO.toXML(new File(virtualNetworkOutputDirectory, VIRTUALNETWORKFILENAME + ".xml").toString(), virtualNetwork);
 
         PopulationRequestSchedule prs = new PopulationRequestSchedule(reducedNetwork, reducedPopulation, virtualNetwork);
         prs.exportCsv();

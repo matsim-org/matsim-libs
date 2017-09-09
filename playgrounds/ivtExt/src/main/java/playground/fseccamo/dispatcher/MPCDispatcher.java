@@ -146,9 +146,9 @@ public class MPCDispatcher extends BaseMpcDispatcher {
 
         for (int vectorIndex = 0; vectorIndex < m + n; ++vectorIndex) {
             // ---
-            final VirtualNode vnFrom = vectorIndex < m ? //
+            final VirtualNode<Link> vnFrom = vectorIndex < m ? //
                     virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
-            final Map<VirtualNode, List<RoboTaxi>> availableVehicles = //
+            final Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles = //
                     getVirtualNodeStayVehicles();
 
             final List<RoboTaxi> cars = availableVehicles.get(vnFrom); // find cars
@@ -230,7 +230,7 @@ public class MPCDispatcher extends BaseMpcDispatcher {
                     virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
             final VirtualNode vnTo = vectorIndex < m ? //
                     virtualNetwork.getVirtualLink(vectorIndex).getTo() : virtualNetwork.getVirtualNode(vectorIndex - m);
-            final Map<VirtualNode, List<RoboTaxi>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
+            final Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
 
             List<Link> candidateLinks = new ArrayList<>();
             for (AVRequest avRequest : getUnassignedAVRequests()) {

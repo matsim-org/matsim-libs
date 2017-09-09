@@ -28,16 +28,14 @@ import playground.clruch.netdata.VirtualNode;
 class ConsensusAnalysis {
     StorageSupplier storageSupplier;
     int size;
-  //  String dataPath;
+    // String dataPath;
     String[] args;
 
-
-
-   // ConsensusAnalysis(String[] argmnts, StorageSupplier storageSupplierIn, String datapath){
-    ConsensusAnalysis(String[] argmnts, StorageSupplier storageSupplierIn){
+    // ConsensusAnalysis(String[] argmnts, StorageSupplier storageSupplierIn, String datapath){
+    ConsensusAnalysis(String[] argmnts, StorageSupplier storageSupplierIn) {
         storageSupplier = storageSupplierIn;
         size = storageSupplier.size();
-       // dataPath = datapath;
+        // dataPath = datapath;
         args = argmnts;
     }
 
@@ -47,32 +45,35 @@ class ConsensusAnalysis {
     public void analyze() throws Exception {
         System.out.print("Saving Wait Times...");
 
-        //==============================================================================================================
+        // ==============================================================================================================
         // INIT
-        //==============================================================================================================
+        // ==============================================================================================================
 
         Tensor MeanWaitTimes = Tensors.empty();
-        Tensor Q10waitTimes  = Tensors.empty();
-        Tensor Q50waitTimes  = Tensors.empty();
-        Tensor Q95waitTimes  = Tensors.empty();
-        Tensor NoRequests    = Tensors.empty();
+        Tensor Q10waitTimes = Tensors.empty();
+        Tensor Q50waitTimes = Tensors.empty();
+        Tensor Q95waitTimes = Tensors.empty();
+        Tensor NoRequests = Tensors.empty();
 
-        //DEBUG START
+        // DEBUG START
 
         Network network = loadNetwork(new File(args[0]));
         final File virtualnetworkFile = new File("vN_40vS_L1_v2\\virtualNetwork.xml");
         GlobalAssert.that(virtualnetworkFile.isFile());
-        VirtualNetwork virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);
+        // VirtualNetwork virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);
 
+        VirtualNetwork virtualNetwork = null;
+        GlobalAssert.that(virtualNetwork != null);
+        // TODO fromXML is deprecated, load differently.
 
-       MatsimStaticDatabase.initializeSingletonInstance( //
+        MatsimStaticDatabase.initializeSingletonInstance( //
                 network, ReferenceFrame.IDENTITY);
 
         Map<Link, Integer> linkIntegerMap = MatsimStaticDatabase.INSTANCE.getLinkInteger();
 
-        //TODO remove loop and do more elegantly
+        // TODO remove loop and do more elegantly
         Map<Integer, Link> rev_linkIntegerMap = new HashMap<>();
-        for(Map.Entry<Link, Integer> entry : linkIntegerMap.entrySet()){
+        for (Map.Entry<Link, Integer> entry : linkIntegerMap.entrySet()) {
             rev_linkIntegerMap.put(entry.getValue(), entry.getKey());
         }
 
@@ -83,23 +84,25 @@ class ConsensusAnalysis {
             SimulationObject s = storageSupplier.getSimulationObject(index);
             final long now = s.now;
 
-            //==========================================================================================================
+            // ==========================================================================================================
             // Compute Wait Times and System Imbalance
-            //==========================================================================================================
+            // ==========================================================================================================
             // Wait Times Per Virtual Station
             {
                 Tensor MeanWaitTimes_tmp = Tensors.empty();
-                Tensor Q10waitTimes_tmp  = Tensors.empty();
-                Tensor Q50waitTimes_tmp  = Tensors.empty();
-                Tensor Q95waitTimes_tmp  = Tensors.empty();
-                Tensor NoRequests_tmp    = Tensors.empty();
+                Tensor Q10waitTimes_tmp = Tensors.empty();
+                Tensor Q50waitTimes_tmp = Tensors.empty();
+                Tensor Q95waitTimes_tmp = Tensors.empty();
+                Tensor NoRequests_tmp = Tensors.empty();
 
                 for (int i = 0; i < N_vStations; i++) {
-                    //Get wait times per vNode
+                    // Get wait times per vNode
                     VirtualNode vStation = virtualNetwork.getVirtualNode(i);
-                    Tensor waitTimes_i = Tensor.of(s.requests.stream().filter(r -> virtualNetwork.getVirtualNode(rev_linkIntegerMap.get(r.fromLinkIndex)) == vStation).map(rc -> RealScalar.of(now - rc.submissionTime)));
+                    Tensor waitTimes_i = Tensor
+                            .of(s.requests.stream().filter(r -> virtualNetwork.getVirtualNode(rev_linkIntegerMap.get(r.fromLinkIndex)) == vStation)
+                                    .map(rc -> RealScalar.of(now - rc.submissionTime)));
 
-                    //Compute Statistics
+                    // Compute Statistics
                     NoRequests_tmp.append(RealScalar.of(waitTimes_i.length()));
 
                     if (waitTimes_i.length() < 1) {
@@ -120,24 +123,21 @@ class ConsensusAnalysis {
                 Q95waitTimes.append(Q95waitTimes_tmp);
                 NoRequests.append(NoRequests_tmp);
             }
-            //System Imbalance Per Virtual Station
-            //TODO
-            
-            //==========================================================================================================
+            // System Imbalance Per Virtual Station
+            // TODO
+
+            // ==========================================================================================================
             // END
-            //==========================================================================================================
+            // ==========================================================================================================
         }
 
         {
-            AnalyzeMarc.saveFile(MeanWaitTimes,"MeanWaitTimes");
-            AnalyzeMarc.saveFile(Q10waitTimes,"Q10WaitTimes");
-            AnalyzeMarc.saveFile(Q50waitTimes,"Q50WaitTimes");
-            AnalyzeMarc.saveFile(Q95waitTimes,"Q95WaitTimes");
-            AnalyzeMarc.saveFile(NoRequests,"NoRequests");
+            AnalyzeMarc.saveFile(MeanWaitTimes, "MeanWaitTimes");
+            AnalyzeMarc.saveFile(Q10waitTimes, "Q10WaitTimes");
+            AnalyzeMarc.saveFile(Q50waitTimes, "Q50WaitTimes");
+            AnalyzeMarc.saveFile(Q95waitTimes, "Q95WaitTimes");
+            AnalyzeMarc.saveFile(NoRequests, "NoRequests");
         }
         System.out.print("Done.\n");
     }
 }
-
-
-

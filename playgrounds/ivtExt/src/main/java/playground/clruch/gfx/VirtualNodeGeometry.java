@@ -20,9 +20,9 @@ import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNode;
 
 class VirtualNodeGeometry {
-    Map<VirtualNode, Tensor> convexHulls = new LinkedHashMap<>(); // ordering matters
+    Map<VirtualNode<Link>, Tensor> convexHulls = new LinkedHashMap<>(); // ordering matters
 
-    VirtualNodeGeometry(MatsimStaticDatabase db, VirtualNetwork virtualNetwork) {
+    VirtualNodeGeometry(MatsimStaticDatabase db, VirtualNetwork<Link> virtualNetwork) {
         if (virtualNetwork == null)
             return;
         for (VirtualNode<Link> virtualNode : virtualNetwork.getVirtualNodes()) {
@@ -37,9 +37,9 @@ class VirtualNodeGeometry {
         }
     }
 
-    Map<VirtualNode, Shape> getShapes(MatsimMapComponent matsimMapComponent) {
-        Map<VirtualNode, Shape> map = new LinkedHashMap<>(); // ordering matters
-        for (Entry<VirtualNode, Tensor> entry : convexHulls.entrySet()) {
+    Map<VirtualNode<Link>, Shape> getShapes(MatsimMapComponent matsimMapComponent) {
+        Map<VirtualNode<Link>, Shape> map = new LinkedHashMap<>(); // ordering matters
+        for (Entry<VirtualNode<Link>, Tensor> entry : convexHulls.entrySet()) {
             Tensor hull = entry.getValue();
             Path2D path2d = new Path2D.Double();
             boolean init = false;

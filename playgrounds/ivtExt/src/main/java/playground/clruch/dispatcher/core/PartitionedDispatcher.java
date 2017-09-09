@@ -21,45 +21,45 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * @author Claudio Ruch
  * @param <T> */
 public abstract class PartitionedDispatcher extends RebalancingDispatcher {
-    protected final VirtualNetwork virtualNetwork; //
+    protected final VirtualNetwork<Link> virtualNetwork; //
 
     protected PartitionedDispatcher( //
             AVDispatcherConfig config, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
-            VirtualNetwork virtualNetwork) {
+            VirtualNetwork<Link> virtualNetwork) {
         super(config, travelTime, router, eventsManager);
         this.virtualNetwork = virtualNetwork;
         GlobalAssert.that(virtualNetwork != null);
     }
 
     /** @return {@link java.util.Map} where all {@link AVRequest} are listed at the {@link VirtualNode} where their {@link AVRequest.fromLink} is. */
-    protected Map<VirtualNode, List<AVRequest>> getVirtualNodeRequests() {
+    protected Map<VirtualNode<Link>, List<AVRequest>> getVirtualNodeRequests() {
         return virtualNetwork.binToVirtualNode(getAVRequests(), AVRequest::getFromLink);
     }
 
     /** @return {@link java.util.Map} where all divertable not rebalancing {@link RoboTaxi} are listed at the {@link VirtualNode} where their {@link Link}
      *         divertableLocation is. */
-    protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeDivertableNotRebalancingRoboTaxis() {
+    protected Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeDivertableNotRebalancingRoboTaxis() {
         return virtualNetwork.binToVirtualNode(getDivertableNotRebalancingRoboTaxis(), RoboTaxi::getDivertableLocation);
     }
 
     /** @return {@link java.util.Map} where all rebalancing {@link RoboTaxi} are listed at the {@link VirtualNode} where their {@link Link} current
      *         driveDestination is. */
-    protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeRebalancingToRoboTaxis() {
+    protected Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeRebalancingToRoboTaxis() {
         return virtualNetwork.binToVirtualNode(getRebalancingRoboTaxis(), RoboTaxi::getCurrentDriveDestination);
     }
 
     /** @return {@link java.util.Map} where all roboTaxis with customer {@link RoboTaxi} are listed at the {@link VirtualNode} where their {@link Link} current
      *         driveDestination is. */
-    protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeArrivingWithCustomerRoboTaxis() {
+    protected Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeArrivingWithCustomerRoboTaxis() {
         return virtualNetwork.binToVirtualNode(getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER), RoboTaxi::getCurrentDriveDestination);
     }
 
     /** @return {@link java.util.Map} where all stay roboTaxis with customer {@link RoboTaxi} are listed at the {@link VirtualNode} where their {@link Link} current
      *         divertableLocation is. */
-    protected Map<VirtualNode, List<RoboTaxi>> getVirtualNodeStayVehicles() {
+    protected Map<VirtualNode<Link>, List<RoboTaxi>> getVirtualNodeStayVehicles() {
         return virtualNetwork.binToVirtualNode(getRoboTaxiSubset(AVStatus.STAY), RoboTaxi::getDivertableLocation);
     }
 

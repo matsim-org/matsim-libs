@@ -107,12 +107,12 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             
 
             // ensure that not more vehicles are sent away than available
-            Map<VirtualNode, List<RoboTaxi>> availableVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
+            Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
             Tensor feasibleRebalanceCount = FeasibleRebalanceCreator.returnFeasibleRebalance(rebalanceCountInteger.unmodifiable(), availableVehicles);
             total_rebalanceCount += (Integer) ((Scalar) Total.of(Tensor.of(feasibleRebalanceCount.flatten(-1)))).number();
 
             // generate routing instructions for rebalancing vehicles
-            Map<VirtualNode, List<Link>> destinationLinks = virtualNetwork.createVNodeTypeMap();
+            Map<VirtualNode<Link>, List<Link>> destinationLinks = virtualNetwork.createVNodeTypeMap();
 
             // fill rebalancing destinations
             for (int i = 0; i < nVLinks; ++i) {

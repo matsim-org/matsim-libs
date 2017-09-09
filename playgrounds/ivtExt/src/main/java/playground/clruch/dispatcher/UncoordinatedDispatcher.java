@@ -118,7 +118,7 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
      * @param virtualNetwork
      * @return HashMap<VirtualNode, Link> with one wait location per VirtualNode
      */
-    private static Map<VirtualNode<Link>, Link> fillWaitLocations(Network network, VirtualNetwork virtualNetwork, int numberofRoboTaxis) {
+    private static Map<VirtualNode<Link>, Link> fillWaitLocations(Network network, VirtualNetwork<Link> virtualNetwork, int numberofRoboTaxis) {
         double carsPerVNode = ((double) numberofRoboTaxis) / virtualNetwork.getvNodesCount();
 
         Map<VirtualNode<Link>, Link> waitLocations = new HashMap<>();

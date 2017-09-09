@@ -45,7 +45,7 @@ import playground.clruch.netdata.VirtualLink;
 import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.netdata.VirtualNode;
-import playground.clruch.netdata.vLinkDataReader;
+//import playground.clruch.netdata.vLinkDataReader; // this was deleted // TODO think if need something else for replacement. 
 import playground.clruch.traveldata.TravelData;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -141,7 +141,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
         // --------------------------------------------------------------------------------------------------------------
         // Get Open Requests
         // --------------------------------------------------------------------------------------------------------------
-        Map<VirtualNode, List<AVRequest>> requests = getVirtualNodeRequests();
+        Map<VirtualNode<Link>, List<AVRequest>> requests = getVirtualNodeRequests();
         // ==============================================================================================================
         // DFR Algorithm
         // ==============================================================================================================
@@ -152,8 +152,8 @@ public class DFRDispatcher extends PartitionedDispatcher {
               // Initialize
               // ------------------------------------------------------------------------------------------------------
               // Get System State
-                Map<VirtualNode, List<RoboTaxi>> available_Vehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
-                Map<VirtualNode, List<RoboTaxi>> v_ij_reb = getVirtualNodeRebalancingToRoboTaxis();
+                Map<VirtualNode<Link>, List<RoboTaxi>> available_Vehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
+                Map<VirtualNode<Link>, List<RoboTaxi>> v_ij_reb = getVirtualNodeRebalancingToRoboTaxis();
                 // Declare System State Matrices
                 Tensor rebalancingTovStation = Array.zeros(N_vStations);
                 Tensor openRequests = Array.zeros(N_vStations);
@@ -358,7 +358,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 // ======================================================================================================
                 // Execute Rebalancing Order
                 // ======================================================================================================
-                Map<VirtualNode, List<Link>> destinationLinks = virtualNetwork.createVNodeTypeMap();
+                Map<VirtualNode<Link>, List<Link>> destinationLinks = virtualNetwork.createVNodeTypeMap();
 
                 // Fill destinationLinks Map
                 for (int rebalanceFromidx = 0; rebalanceFromidx < N_vStations; rebalanceFromidx++) {
@@ -397,15 +397,15 @@ public class DFRDispatcher extends PartitionedDispatcher {
             // II.ii if vehilces remain in vNode, send to customers
             {
                 // collect destinations per vNode
-                Map<VirtualNode, List<Link>> destinationLinks = virtualNetwork.createVNodeTypeMap();
+                Map<VirtualNode<Link>, List<Link>> destinationLinks = virtualNetwork.createVNodeTypeMap();
 
-                for (VirtualNode vNode : virtualNetwork.getVirtualNodes()) {
+                for (VirtualNode<Link> vNode : virtualNetwork.getVirtualNodes()) {
                     destinationLinks.get(vNode).addAll( // stores from links
                             requests.get(vNode).stream().map(AVRequest::getFromLink).collect(Collectors.toList()));
                 }
 
                 // collect available vehicles per vNode
-                Map<VirtualNode, List<RoboTaxi>> available_Vehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
+                Map<VirtualNode<Link>, List<RoboTaxi>> available_Vehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
 
                 // assign destinations to the available vehicles
                 {
@@ -434,7 +434,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
         return lambda.multiply(factor);
     }
 
-    private Tensor avg_WaitTimePerVirtualNode(Map<VirtualNode, List<AVRequest>> requests, long timenow) {
+    private Tensor avg_WaitTimePerVirtualNode(Map<VirtualNode<Link>, List<AVRequest>> requests, long timenow) {
         // TODO remove for-loop for more elgancy
         Tensor meanWaitTimepervNode = Tensors.empty();
         for (List<AVRequest> avRequests : requests.values()) {
@@ -497,14 +497,20 @@ public class DFRDispatcher extends PartitionedDispatcher {
             {
                 final File virtualnetworkFile = new File(virtualnetworkDir, "virtualNetwork.xml");
                 GlobalAssert.that(virtualnetworkFile.isFile());
-                virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);
+                // TODO  XML networks are deprecated
+                GlobalAssert.that(false);
+                virtualNetwork = null;
+//                virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);
             }
             // ---
             {
                 final String string = "consensusWeights_" + config.getParams().get(KEY_WEIGHTSEXTENSION) + ".xml";
                 final File linkWeightsXML = new File(virtualnetworkDir, string);
                 GlobalAssert.that(linkWeightsXML.isFile());
-                linkWeights = vLinkDataReader.fillvLinkData(linkWeightsXML, virtualNetwork, "weight");
+                //linkWeights = vLinkDataReader.fillvLinkData(linkWeightsXML, virtualNetwork, "weight");
+                linkWeights = null;
+                GlobalAssert.that(linkWeights!=null);
+                //TODO datareader above was deleted, read your data directly from virtualNetwork. 
             }
 
             TravelData arrivalInformation = null;

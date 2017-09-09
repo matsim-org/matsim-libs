@@ -39,9 +39,9 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
         samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod"));
     }
 
-    Map<VirtualNode, List<RoboTaxi>> getDivertableNotRebalancingNotPickupVehicles() {
-        Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
-        Map<VirtualNode, List<RoboTaxi>> allVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
+    Map<VirtualNode<Link>, List<RoboTaxi>> getDivertableNotRebalancingNotPickupVehicles() {
+        Map<VirtualNode<Link>, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
+        Map<VirtualNode<Link>, List<RoboTaxi>> allVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
         for (VirtualNode vn : allVehicles.keySet()) {
             for (RoboTaxi robotaxi : allVehicles.get(vn)) {
                 if (!robotaxi.getAVStatus().equals(AVStatus.DRIVETOCUSTMER)) {
