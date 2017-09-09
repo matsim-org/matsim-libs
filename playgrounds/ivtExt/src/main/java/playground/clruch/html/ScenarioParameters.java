@@ -15,6 +15,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
 import playground.clruch.ScenarioOptions;
@@ -22,7 +23,6 @@ import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeGet;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeGet;
-import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVConfig;

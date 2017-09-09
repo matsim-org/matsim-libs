@@ -13,6 +13,8 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.network.Node;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
+
 /**
  * class helps to detect adjacency between VirtualNodes based on shared Nodes in the network
  * 

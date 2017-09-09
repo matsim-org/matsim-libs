@@ -39,10 +39,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import contrib.baseline.preparation.ZHCutter;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
-import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.prep.NetworkCutClean;
 import playground.clruch.prep.PopulationRequestSchedule;

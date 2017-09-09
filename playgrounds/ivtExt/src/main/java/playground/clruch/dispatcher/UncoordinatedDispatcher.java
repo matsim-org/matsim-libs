@@ -14,13 +14,13 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import playground.clruch.dispatcher.core.DispatcherUtils;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
-import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;

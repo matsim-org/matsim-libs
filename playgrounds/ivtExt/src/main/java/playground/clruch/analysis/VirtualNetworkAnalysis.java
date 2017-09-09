@@ -2,6 +2,7 @@ package playground.clruch.analysis;
 
 import java.io.File;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
@@ -14,7 +15,6 @@ import playground.clruch.gfx.VirtualNodeFunction;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
-import playground.clruch.netdata.VirtualNetwork;
 
 /**
  * Created by Joel on 05.04.2017.

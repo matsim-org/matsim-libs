@@ -14,6 +14,7 @@ import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.util.GZHandler;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
@@ -22,7 +23,6 @@ import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalcu
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeIO;
 import playground.clruch.data.LocationSpec;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
-import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.prep.NetworkCutClean;
 import playground.clruch.prep.PopulationRequestSchedule;

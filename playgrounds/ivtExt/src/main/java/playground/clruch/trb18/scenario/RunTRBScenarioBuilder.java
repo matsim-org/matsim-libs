@@ -33,8 +33,8 @@ import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
-import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkIO;
 import playground.clruch.prep.PopulationRequestSchedule;
 import playground.clruch.traveldata.TravelData;

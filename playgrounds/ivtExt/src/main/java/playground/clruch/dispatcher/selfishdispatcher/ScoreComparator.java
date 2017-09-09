@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.network.Link;
 
-import playground.clruch.netdata.VirtualNode;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 
 /** @author Claudio Ruch */
 public class ScoreComparator implements Comparator<Entry<VirtualNode<Link>, Double>> {

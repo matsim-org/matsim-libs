@@ -11,6 +11,7 @@ import java.util.zip.DataFormatException;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.io.ObjectFormat;
 
@@ -44,7 +45,7 @@ public class VirtualNetworkIO {
         // virtualNodes.stream().forEach(v -> v.setLinksAfterSerialization2(map));
 
         virtualNetwork.fillSerializationInfo(map);
-        GlobalAssert.that(virtualNetwork.linkVNodeMap != null);
+        virtualNetwork.checkConsistency();
         return virtualNetwork;
     }
 

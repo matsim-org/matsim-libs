@@ -16,6 +16,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -25,7 +26,6 @@ import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.DiagramCreator;
 import playground.clruch.analysis.RequestAnalysis;
 import playground.clruch.analysis.RequestObj;
-import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;

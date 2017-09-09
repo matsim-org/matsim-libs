@@ -10,8 +10,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.matsim.api.core.v01.network.Link;
+
 import ch.ethz.idsc.jmex.Container;
 import ch.ethz.idsc.jmex.DoubleArray;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.DoubleScalar;
 import ch.ethz.idsc.tensor.RealScalar;
@@ -26,8 +30,6 @@ import ch.ethz.idsc.tensor.sca.Chop;
 import ch.ethz.idsc.tensor.sca.Increment;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.core.VehicleOnVirtualLinkCalculator;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /** @author Claudio Ruch */
@@ -35,7 +37,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
     private final int m;
     private final int n;
-    private final VirtualNetwork virtualNetwork;
+    private final VirtualNetwork<Link> virtualNetwork;
     private final Collection<AVRequest> unassignedRequests;
     private final List<RoboTaxi> styRoboTaxis;
     private final List<RoboTaxi> d2cRoboTaxis;
@@ -45,7 +47,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
     /**
      * 
      */
-    public MPCDataCollection(VirtualNetwork virtualNetwork, Collection<AVRequest> unassignedRequests, //
+    public MPCDataCollection(VirtualNetwork<Link> virtualNetwork, Collection<AVRequest> unassignedRequests, //
             List<RoboTaxi> styRoboTaxis, List<RoboTaxi> d2cRoboTaxis, List<RoboTaxi> dwcRoboTaxis, List<RoboTaxi> rebRoboTaxis) {
 
         m = virtualNetwork.getvLinksCount();
@@ -105,7 +107,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
             // all vehicles except the ones with a customer on board and the ones which
             // are rebalancing
             // Map<VirtualNode, List<RoboTaxi>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
-            Map<VirtualNode, List<RoboTaxi>> availableVehicles = virtualNetwork.createVNodeTypeMap();
+            Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles = virtualNetwork.createVNodeTypeMap();
             for (RoboTaxi robotaxi : styRoboTaxis) {
                 VirtualNode vnode = virtualNetwork.getVirtualNode(robotaxi.getDivertableLocation());
                 availableVehicles.get(vnode).add(robotaxi);
@@ -113,7 +115,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
             availableVehicles.values().stream().flatMap(List::stream).forEach(accountedVehicles::add);
             double[] array = new double[n];
-            for (Entry<VirtualNode, List<RoboTaxi>> entry : availableVehicles.entrySet())
+            for (Entry<VirtualNode<Link>, List<RoboTaxi>> entry : availableVehicles.entrySet())
                 array[entry.getKey().getIndex()] = entry.getValue().size(); // could use tensor notation
             DoubleArray doubleArray = new DoubleArray("availableVehiclesPerVNode", new int[] { array.length }, array);
             container.add(doubleArray);

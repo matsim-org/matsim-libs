@@ -2,7 +2,6 @@
 package playground.clruch.netdata;
 
 import java.awt.Point;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -22,8 +21,9 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.geometry.CoordUtils;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyGeneratedInitialMeans;

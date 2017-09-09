@@ -9,12 +9,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.schedule.Task;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualLink;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.sca.Increment;
-import playground.clruch.netdata.VirtualLink;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;

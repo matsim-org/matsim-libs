@@ -21,6 +21,9 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualLink;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -41,10 +44,6 @@ import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
 import playground.clruch.dispatcher.utils.OldestRequestSelector;
 import playground.clruch.dispatcher.utils.virtualnodedestselector.AbstractVirtualNodeDest;
 import playground.clruch.dispatcher.utils.virtualnodedestselector.KMeansVirtualNodeDest;
-import playground.clruch.netdata.VirtualLink;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNetworkIO;
-import playground.clruch.netdata.VirtualNode;
 //import playground.clruch.netdata.vLinkDataReader; // this was deleted // TODO think if need something else for replacement. 
 import playground.clruch.traveldata.TravelData;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
@@ -77,7 +76,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
     private final int N_vStations;
     private final long popSize;
     private final FeedbackTerm feebackTerm;
-    private final Map<VirtualLink, Double> vLinkWeights;
+    private final Map<VirtualLink<Link>, Double> vLinkWeights;
     private Tensor rebalancingOrderRest;
     private Tensor inConsensus;
     private Tensor consensusVal;
@@ -96,11 +95,11 @@ public class DFRDispatcher extends PartitionedDispatcher {
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
-            VirtualNetwork virtualNetwork, //
+            VirtualNetwork<Link> virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractRequestSelector abstractRequestSelector, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
-            Map<VirtualLink, Double> linkWeightsIn, //
+            Map<VirtualLink<Link>, Double> linkWeightsIn, //
             TravelData arrivalInformation) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
 
@@ -239,7 +238,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                     // ==================================================================================================
                     // Compute Feedback Rebalancing
                     // ==================================================================================================
-                    for (Map.Entry<VirtualLink, Double> entry : vLinkWeights.entrySet()) {
+                    for (Map.Entry<VirtualLink<Link>, Double> entry : vLinkWeights.entrySet()) {
                         // ----------------------------------------------------------------------------------------------
                         // Get Link Imbalance
                         // ----------------------------------------------------------------------------------------------
@@ -478,8 +477,8 @@ public class DFRDispatcher extends PartitionedDispatcher {
         @Inject
         private Population population;
 
-        public static VirtualNetwork virtualNetwork;
-        public static Map<VirtualLink, Double> linkWeights;
+        public static VirtualNetwork<Link> virtualNetwork;
+        public static Map<VirtualLink<Link>, Double> linkWeights;
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {

@@ -15,13 +15,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Sort;
 import ch.ethz.idsc.tensor.io.Export;
 import ch.ethz.idsc.tensor.io.Import;
-import playground.clruch.netdata.VirtualNetwork;
 
 public class PopulationRequestSchedule {
     static final String VIRTUALNETWORK_DIRECTORYNAME = "virtualNetwork";

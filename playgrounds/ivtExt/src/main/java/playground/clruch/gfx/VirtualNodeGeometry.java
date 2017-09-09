@@ -11,13 +11,13 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.opt.ConvexHull;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.OsmLink;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
 
 class VirtualNodeGeometry {
     Map<VirtualNode<Link>, Tensor> convexHulls = new LinkedHashMap<>(); // ordering matters

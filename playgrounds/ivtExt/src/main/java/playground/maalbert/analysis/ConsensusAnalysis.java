@@ -11,6 +11,8 @@ import org.matsim.api.core.v01.network.Network;
 
 import com.google.inject.Inject;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -21,9 +23,6 @@ import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNetworkIO;
-import playground.clruch.netdata.VirtualNode;
 
 class ConsensusAnalysis {
     StorageSupplier storageSupplier;

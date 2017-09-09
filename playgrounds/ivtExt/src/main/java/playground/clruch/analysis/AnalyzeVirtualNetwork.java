@@ -6,10 +6,10 @@ import java.io.File;
 
 import org.matsim.api.core.v01.network.Network;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
-import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 
 /**

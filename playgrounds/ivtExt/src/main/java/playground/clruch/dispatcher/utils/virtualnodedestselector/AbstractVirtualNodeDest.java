@@ -6,7 +6,7 @@ import java.util.List;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 
-import playground.clruch.netdata.VirtualNode;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 
 public abstract class AbstractVirtualNodeDest {
     public abstract List<Link> selectLinkSet(VirtualNode<Link> virtualNode, int size);

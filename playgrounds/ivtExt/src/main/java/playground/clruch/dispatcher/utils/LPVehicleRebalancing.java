@@ -14,6 +14,9 @@ import org.gnu.glpk.glp_prob;
 import org.gnu.glpk.glp_smcp;
 import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualLink;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -21,9 +24,6 @@ import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.red.Total;
-import playground.clruch.netdata.VirtualLink;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
 
 /**
  * Created by Claudio on 3/17/2017. Updated by Claudio on 5/7/2017.

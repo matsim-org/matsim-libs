@@ -9,13 +9,13 @@ import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualLink;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.clruch.netdata.VirtualLink;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
 import playground.clruch.router.InstantPathFactory;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;

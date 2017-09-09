@@ -2,13 +2,13 @@ package playground.fseccamo.dispatcher;
 
 import ch.ethz.idsc.jmex.Container;
 import ch.ethz.idsc.jmex.DoubleArray;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.Primitives;
 import ch.ethz.idsc.tensor.red.KroneckerDelta;
-import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.prep.PopulationRequestSchedule;
 
 enum MpcUtils {

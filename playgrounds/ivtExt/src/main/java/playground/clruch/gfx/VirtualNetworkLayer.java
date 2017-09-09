@@ -13,6 +13,9 @@ import javax.swing.JCheckBox;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualLink;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -23,10 +26,7 @@ import playground.clib.util.gui.SpinnerLabel;
 import playground.clruch.gheat.graphics.ColorSchemes;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
-import playground.clruch.netdata.VirtualLink;
-import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkUtils;
-import playground.clruch.netdata.VirtualNode;
 
 public class VirtualNetworkLayer extends ViewerLayer {
     public static final Color COLOR = new Color(128, 153 / 2, 0, 128);

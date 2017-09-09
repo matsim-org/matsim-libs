@@ -6,6 +6,7 @@ import java.util.Properties;
 
 import org.matsim.api.core.v01.network.Network;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.ScenarioOptions;
 

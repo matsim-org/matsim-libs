@@ -8,8 +8,8 @@ import java.util.stream.Collectors;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.MatsimRandom;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.netdata.VirtualNode;
 
 /**
  * Created by Joel on 26.06.2017.
