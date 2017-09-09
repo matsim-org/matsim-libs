@@ -97,7 +97,7 @@ public class VirtualNetworkIO {
         List<VirtualNode> virtualNodesSorted = virtualNetwork.getVirtualNodes().stream().sorted(byIntID).collect(Collectors.toList());
         
         Element virtualNodeselem = new Element(VIRTUALNODENAME+"s");
-        for (VirtualNode virtualNode : virtualNodesSorted) {
+        for (VirtualNode<Link> virtualNode : virtualNodesSorted) {
             Element virtualNodeelem = new Element(VIRTUALNODENAME);
             // set attributes
             virtualNodeelem.setAttribute(new Attribute(IDNAME, virtualNode.getId()));

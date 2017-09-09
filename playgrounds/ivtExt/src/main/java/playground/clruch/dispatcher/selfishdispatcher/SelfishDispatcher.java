@@ -73,7 +73,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
             /** for remaining stay vehicles, chose a location in A,B to rebalance to */
             for (RoboTaxi robotaxi : getRoboTaxiSubset(AVStatus.STAY)) {
                 if (!waitingTaxis.contains(robotaxi)) {
-                    VirtualNode vn = selectRebalanceNode();
+                    VirtualNode<Link> vn = selectRebalanceNode();
                     Link link = (new RandomVirtualNodeDest()).selectLinkSet(vn, 1).get(0);
                     setRoboTaxiRebalance(robotaxi, link);
                     waitingTaxis.add(robotaxi);

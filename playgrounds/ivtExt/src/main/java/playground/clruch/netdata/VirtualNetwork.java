@@ -84,11 +84,13 @@ public class VirtualNetwork implements Serializable {
     }
 
     /* package */ VirtualNode addVirtualNode(String idIn, Set<Link> linksIn, int neighCount, Coord coord) {
-        VirtualNode virtualNode = new VirtualNode(virtualNodes.size(), idIn, linksIn, neighCount, VirtualNetworkUtils.fromCoord(coord));
+        Map<String,Link> map = new HashMap<>();
+        linksIn.stream().forEach(l->   map.put(l.getId().toString(), l));
+        VirtualNode<Link> virtualNode = new VirtualNode(virtualNodes.size(), idIn, map, neighCount, VirtualNetworkUtils.fromCoord(coord));
         return addVirtualNode(virtualNode);
     }
 
-    /* package */ VirtualNode addVirtualNode(VirtualNode virtualNode) {
+    /* package */ VirtualNode addVirtualNode(VirtualNode<Link> virtualNode) {
         GlobalAssert.that(virtualNodes.size() == virtualNode.getIndex()); // <- NEVER remove this check
         virtualNodes.add(virtualNode);
         for (Link link : virtualNode.getLinks())
@@ -191,7 +193,7 @@ public class VirtualNetwork implements Serializable {
         if (!linkVNodeMap.keySet().containsAll(network.getLinks().values()))
             throw new RuntimeException("not all Links are assigned a VirtualNode");
 
-        for (VirtualNode virtualNode : getVirtualNodes()) {
+        for (VirtualNode<Link> virtualNode : getVirtualNodes()) {
             System.out.println("vNode " + virtualNode.getId() + " contains " + virtualNode.getLinks().size() + " links:");
             for (Link link : virtualNode.getLinks())
                 System.out.println(" " + link.getId());

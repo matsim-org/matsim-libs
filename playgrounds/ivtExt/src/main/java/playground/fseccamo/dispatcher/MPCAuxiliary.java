@@ -77,9 +77,9 @@ public class MPCAuxiliary {
         return totalPickupEffectiveAdd;
     }
 
-    /* package */ static Map<VirtualNode, Link> computeCenterLinks(VirtualNetwork virtualNetwork, double[] networkBounds) {
-        Map<VirtualNode, Link> centerLink = new HashMap<>();
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+    /* package */ static Map<VirtualNode<Link>, Link> computeCenterLinks(VirtualNetwork virtualNetwork, double[] networkBounds) {
+        Map<VirtualNode<Link>, Link> centerLink = new HashMap<>();
+        for (VirtualNode<Link> virtualNode : virtualNetwork.getVirtualNodes()) {
             final QuadTree<Link> quadTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
             for (Link link : virtualNode.getLinks())
                 quadTree.put(link.getCoord().getX(), link.getCoord().getY(), link);

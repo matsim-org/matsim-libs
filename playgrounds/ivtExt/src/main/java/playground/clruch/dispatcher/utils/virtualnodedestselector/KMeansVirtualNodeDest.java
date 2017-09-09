@@ -37,7 +37,7 @@ public class KMeansVirtualNodeDest extends AbstractVirtualNodeDest {
     Relation<NumberVector> rel;
 
     @Override
-    public List<Link> selectLinkSet(VirtualNode virtualNode, int size) {
+    public List<Link> selectLinkSet(VirtualNode<Link> virtualNode, int size) {
 
         // if no vehicles to be send to node, return empty list
         if (size < 1)

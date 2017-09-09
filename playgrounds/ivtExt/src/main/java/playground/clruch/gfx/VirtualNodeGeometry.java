@@ -25,7 +25,7 @@ class VirtualNodeGeometry {
     VirtualNodeGeometry(MatsimStaticDatabase db, VirtualNetwork virtualNetwork) {
         if (virtualNetwork == null)
             return;
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+        for (VirtualNode<Link> virtualNode : virtualNetwork.getVirtualNodes()) {
             Tensor coords = Tensors.empty();
             for (Link link : virtualNode.getLinks()) {
                 int index = db.getLinkIndex(link);

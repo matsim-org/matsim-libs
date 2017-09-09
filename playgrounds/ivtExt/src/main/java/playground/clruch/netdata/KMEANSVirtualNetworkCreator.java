@@ -4,6 +4,7 @@ package playground.clruch.netdata;
 import java.awt.Point;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -96,7 +97,7 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
         // CREATE MAP with all VirtualNodes
         // the datastructure HAS TO BE a linked hash map ! do not change to hash map
         // the map has to be ordered to preserve the indexing of the vnodes 0,1,2,...
-        Map<VirtualNode, Set<Link>> vNMap = new LinkedHashMap<>();
+        Map<VirtualNode<Link>, Set<Link>> vNMap = new LinkedHashMap<>();
 
         {
             int index = 0;
@@ -104,7 +105,7 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
             for (Cluster<KMeansModel> clu : c.getAllClusters()) {
                 Coord coord = new Coord(clu.getModel().getPrototype().get(0), clu.getModel().getPrototype().get(1));
                 String indexStr = "vNode_" + Integer.toString(index + 1);
-                vNMap.put(new VirtualNode(index, indexStr, new LinkedHashSet<>(), neighCount, VirtualNetworkUtils.fromCoord(coord)), new LinkedHashSet<Link>());
+                vNMap.put(new VirtualNode(index, indexStr, new HashMap<>(), neighCount, VirtualNetworkUtils.fromCoord(coord)), new LinkedHashSet<Link>());
                 index++;
             }
 
@@ -126,8 +127,12 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
             vNMap.get(closestVNode).add(link);
         }
 
-        for (VirtualNode virtualNode : vNMap.keySet()) {
-            virtualNode.setLinks(vNMap.get(virtualNode));
+        for (VirtualNode<Link> virtualNode : vNMap.keySet()) {
+            HashMap<String,Link> map = new HashMap<>();
+            
+            vNMap.get(virtualNode).stream().forEach(l->map.put(l.getId().toString(), l));
+            
+            virtualNode.setLinks(map);
             virtualNetwork.addVirtualNode(virtualNode); // <- function requires the final set of links belonging to virtual node
         }
 
@@ -148,7 +153,7 @@ public class KMEANSVirtualNetworkCreator implements AbstractVirtualNetworkCreato
         } else { // build proximity
 
             ButterfliesAndRainbows butterflyAndRainbows = new ButterfliesAndRainbows();
-            for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+            for (VirtualNode<Link> virtualNode : virtualNetwork.getVirtualNodes()) {
                 virtualNode.getLinks().stream() //
                         .map(link -> link.getFromNode()) //
                         .forEach(node -> butterflyAndRainbows.add(node, virtualNode));
