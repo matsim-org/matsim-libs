@@ -101,8 +101,8 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		double gradientFactor = getGradientFactor(link);
 		double gradientDisutility = marginalCostOfGradient_m_100m * gradientFactor * distance;
 		
-		LOG.warn("link = " + link.getId() + "-- travelTime = " + travelTime + " -- distance = " + distance + " -- comfortFactor = "
-				+ comfortFactor	+ " -- infraFactor = "+ infrastructureFactor + " -- gradient = " + gradientFactor);
+//		LOG.warn("link = " + link.getId() + "-- travelTime = " + travelTime + " -- distance = " + distance + " -- comfortFactor = "
+//				+ comfortFactor	+ " -- infraFactor = "+ infrastructureFactor + " -- gradient = " + gradientFactor);
 		 
 		// TODO Gender
 		// TODO Activity
@@ -120,9 +120,9 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		double logNormalRnd = Math.exp(sigma * random2.nextGaussian());
 		logNormalRnd *= normalization;
 
-		LOG.warn("link = " + link.getId() + " -- travelTimeDisutility = " + travelTimeDisutility + " -- distanceDisutility = "+ distanceDisutility
-				+ " -- infrastructureDisutility = " + infrastructureDisutility + " -- comfortDisutility = "
-				+ comfortDisutility + " -- gradientDisutility = " + gradientDisutility + " -- randomfactor = " + logNormalRnd);
+//		LOG.warn("link = " + link.getId() + " -- travelTimeDisutility = " + travelTimeDisutility + " -- distanceDisutility = "+ distanceDisutility
+//				+ " -- infrastructureDisutility = " + infrastructureDisutility + " -- comfortDisutility = "
+//				+ comfortDisutility + " -- gradientDisutility = " + gradientDisutility + " -- randomfactor = " + logNormalRnd);
 		return (travelTimeDisutility + logNormalRnd * (distanceDisutility + infrastructureDisutility + comfortDisutility + gradientDisutility));
 	}
 
@@ -138,6 +138,7 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		return gradient;
 	}
 
+	// TODO combine this with speeds
 	private double getComfortFactor(String surface, String type) {
 		double comfortFactor = 1.0;
 		if (surface != null) {
