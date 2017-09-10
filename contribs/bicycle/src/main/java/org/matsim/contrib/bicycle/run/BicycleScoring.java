@@ -113,12 +113,12 @@ public class BicycleScoring implements SumScoringFunction.ArbitraryEventScoring,
 			Person person = scenario.getPopulation().getPersons().get(delegate.getDriverOfVehicle(vehId));
 			Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehId);
 			
-			double carScoreOffset = this.carCountOnLink * 0.004;
+			double carScoreOffset = -(this.carCountOnLink * 0.04);
 			this.score += carScoreOffset;
 			LOG.warn("----- link = " + linkId + " -- car score offset = " + carScoreOffset);
 			
 			this.score += bicycleTravelDisutility.getTravelDisutilityBasedOnTTime(link, enterTime, person, vehicle, travelTime);
-			LOG.warn("score = " + score + " -- linkId = " + link.getId() + " -- enterTime = " + enterTime + " -- personId = " + person.getId() + " -- travelTime = " + travelTime);
+//			LOG.warn("score = " + score + " -- linkId = " + link.getId() + " -- enterTime = " + enterTime + " -- personId = " + person.getId() + " -- travelTime = " + travelTime);
 		}
 		else {
 			// If agent was already at the end of the link and thus did not travel on it, do nothing
