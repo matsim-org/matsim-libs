@@ -57,8 +57,8 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 
 		final ScoringParameters params = parameters.getScoringParameters(person);
-		// TODO Do I need leg scoring here or is this only double-counted?
-		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
+		// No leg scoring here as it would only double-count
+		// sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
