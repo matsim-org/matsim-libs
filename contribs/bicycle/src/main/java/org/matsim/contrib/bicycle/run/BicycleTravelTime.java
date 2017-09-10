@@ -37,8 +37,8 @@ public class BicycleTravelTime implements TravelTime {
 		
 		String type = (String) link.getAttributes().getAttribute("type");
 		String cycleway = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
-		double cyclingInfrastructureSpeed = computeMinimumCyclingInfrastructureSpeed(linkFreespeed,
-				type, cycleway, minimumSpeedForDedicatedCyclingInfrastructure);
+		double cyclingInfrastructureSpeed = computeMinimumCyclingInfrastructureSpeed(type,
+				cycleway, minimumSpeedForDedicatedCyclingInfrastructure);
 		
 		double infrastructureSpeed = Math.max(link.getFreespeed(), cyclingInfrastructureSpeed);
 
@@ -62,16 +62,15 @@ public class BicycleTravelTime implements TravelTime {
 	 * of slopes) falls under a certain minimum
 	 * @return
 	 */
-	private double computeMinimumCyclingInfrastructureSpeed(double vehicleLinkSpeed, String type, String cycleway,
-			double minimumSpeedForDedicatedCyclingInfrastructure) {
+	private double computeMinimumCyclingInfrastructureSpeed(String type, String cycleway, double minimumSpeedForDedicatedCyclingInfrastructure) {
 		double cyclingInfrastructureSpeed = 0.;
 		if (type.equals("cycleway")) {
-			cyclingInfrastructureSpeed = 15.0/3.6; // Assume that this speed is always feasible on a dedicated cycleway
+			cyclingInfrastructureSpeed = minimumSpeedForDedicatedCyclingInfrastructure; // Assume that this speed is always feasible on a dedicated cycleway
 		}
 		
 		if (cycleway != null) {
 			if (cycleway.equals("track") || cycleway.equals("track")) {
-				cyclingInfrastructureSpeed = 15.0/3.6; // Assume that this speed is always feasible on a dedicated cycleway
+				cyclingInfrastructureSpeed = minimumSpeedForDedicatedCyclingInfrastructure; // Assume that this speed is always feasible on a dedicated cycleway
 			}
 		}
 		return cyclingInfrastructureSpeed;
