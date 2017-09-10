@@ -32,14 +32,13 @@ public class BicycleTravelTime implements TravelTime {
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		double linkFreespeed = link.getFreespeed();
+		// TODO make this speed adjustable
 		double minimumSpeedForDedicatedCyclingInfrastructure = 15.0/3.6;
 		
 		String type = (String) link.getAttributes().getAttribute("type");
 		String cycleway = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
 		double cyclingInfrastructureSpeed = computeMinimumCyclingInfrastructureSpeed(type,
 				cycleway, minimumSpeedForDedicatedCyclingInfrastructure);
-		
 		double infrastructureSpeed = Math.max(link.getFreespeed(), cyclingInfrastructureSpeed);
 
 		double vehicleLinkSpeed = Math.min(infrastructureSpeed, BicycleUtils.getSpeed("bicycle"));
@@ -92,9 +91,13 @@ public class BicycleTravelTime implements TravelTime {
 				gradientSpeedFactor = 1 - 5. * ((toNodeZ - fromNodeZ) / link.getLength()); // 50% reducation at 10% up-slope
 			}
 		}
+		if (gradientSpeedFactor < 0.1) {
+			gradientSpeedFactor = 0.1;
+		}
 		return vehicleLinkSpeed * gradientSpeedFactor;
 	}
 	
+	// TODO combine this with comfort
 	private double computeSurfaceSpeed(double vehicleLinkSpeed, String surface, String type) {
 		if (type.equals("cycleway")) {
 			return vehicleLinkSpeed; // Assuming that dedicated cycleways are on good surface like ashalt
