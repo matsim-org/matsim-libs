@@ -11,7 +11,7 @@ import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /** @author Claudio Ruch */
-public enum EuclideanLocation {
+public enum PlaneLocation {
     ;
 
     public static Tensor of(AVRequest avRequest) {
@@ -21,6 +21,10 @@ public enum EuclideanLocation {
     public static Tensor of(RoboTaxi robotaxi) {
         return tensorOf(robotaxi.getDivertableLocation());
     }
+    
+    public static Tensor of(Link link){
+        return tensorOf(link);
+    }
 
     private static Tensor tensorOf(Link link) {
         double dx = link.getCoord().getX();
@@ -28,5 +32,7 @@ public enum EuclideanLocation {
         return Tensors.vectorDouble(dx, dy);
 
     }
+    
+    
 
 }

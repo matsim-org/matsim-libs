@@ -30,12 +30,14 @@ import com.google.inject.name.Names;
 
 import playground.clruch.dispatcher.DriveByDispatcher;
 import playground.clruch.dispatcher.EdgyDispatcher;
+import playground.clruch.dispatcher.GBMDEuclideanRealistic;
 import playground.clruch.dispatcher.GlobalBipartiteMatchingDispatcher;
 import playground.clruch.dispatcher.LPFBDispatcher;
 import playground.clruch.dispatcher.LPFFDispatcher;
 import playground.clruch.dispatcher.NewSingleHeuristicDispatcher;
 import playground.clruch.dispatcher.TestBedDispatcher;
 import playground.clruch.dispatcher.UncoordinatedDispatcher;
+import playground.clruch.dispatcher.selfishdispatcher.SelfishDispatcher;
 import playground.fseccamo.dispatcher.MPCDispatcher;
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVConfigReader;
@@ -118,14 +120,17 @@ public class AVModule extends AbstractModule {
         bind(GlobalBipartiteMatchingDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), GlobalBipartiteMatchingDispatcher.class.getSimpleName()).to(GlobalBipartiteMatchingDispatcher.Factory.class);
 
-        // bind(SelfishDispatcher.Factory.class);
-        // AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);
+        bind(SelfishDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), SelfishDispatcher.class.getSimpleName()).to(SelfishDispatcher.Factory.class);
 
         bind(NewSingleHeuristicDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), NewSingleHeuristicDispatcher.class.getSimpleName()).to(NewSingleHeuristicDispatcher.Factory.class);
 
         bind(TestBedDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), TestBedDispatcher.class.getSimpleName()).to(TestBedDispatcher.Factory.class);
+
+        bind(GBMDEuclideanRealistic.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), GBMDEuclideanRealistic.class.getSimpleName()).to(GBMDEuclideanRealistic.Factory.class);
 
         // bind(PolyMultiGBMDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), PolyMultiGBMDispatcher.class.getSimpleName()).to(PolyMultiGBMDispatcher.Factory.class);
@@ -145,8 +150,7 @@ public class AVModule extends AbstractModule {
 
         bind(MPCDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), MPCDispatcher.class.getSimpleName()).to(MPCDispatcher.Factory.class);
-        
-        
+
     }
 
     private void configureGeneratorStrategies() {

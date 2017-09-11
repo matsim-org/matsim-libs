@@ -14,13 +14,13 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import playground.clruch.dispatcher.core.DispatcherUtils;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
-import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.clruch.netdata.VirtualNode;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -38,7 +38,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 public class UncoordinatedDispatcher extends PartitionedDispatcher {
     private final int dispatchPeriod;
     private final double maxWaitTime = 5 * 60.0;;
-    private final Map<VirtualNode, Link> waitLocations;
+    private final Map<VirtualNode<Link>, Link> waitLocations;
 
     private UncoordinatedDispatcher( //
             AVDispatcherConfig config, //
@@ -118,11 +118,11 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
      * @param virtualNetwork
      * @return HashMap<VirtualNode, Link> with one wait location per VirtualNode
      */
-    private static Map<VirtualNode, Link> fillWaitLocations(Network network, VirtualNetwork virtualNetwork, int numberofRoboTaxis) {
+    private static Map<VirtualNode<Link>, Link> fillWaitLocations(Network network, VirtualNetwork<Link> virtualNetwork, int numberofRoboTaxis) {
         double carsPerVNode = ((double) numberofRoboTaxis) / virtualNetwork.getvNodesCount();
 
-        Map<VirtualNode, Link> waitLocations = new HashMap<>();
-        for (VirtualNode vn : virtualNetwork.getVirtualNodes()) {
+        Map<VirtualNode<Link>, Link> waitLocations = new HashMap<>();
+        for (VirtualNode<Link> vn : virtualNetwork.getVirtualNodes()) {
             // select some link in virtualNode, if possible with high enough capacity
             Link link = null;
             Optional<Link> optLink = vn.getLinks().stream().filter(v -> v.getCapacity() > carsPerVNode)

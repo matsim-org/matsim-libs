@@ -23,6 +23,9 @@ import ch.ethz.idsc.jmex.Container;
 import ch.ethz.idsc.jmex.DoubleArray;
 import ch.ethz.idsc.jmex.java.JavaContainerSocket;
 import ch.ethz.idsc.jmex.matlab.MfileContainerServer;
+import ch.ethz.idsc.queuey.core.networks.VirtualLink;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -34,10 +37,7 @@ import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.clruch.netdata.VirtualLink;
-import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.clruch.netdata.VirtualNode;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -146,9 +146,9 @@ public class MPCDispatcher extends BaseMpcDispatcher {
 
         for (int vectorIndex = 0; vectorIndex < m + n; ++vectorIndex) {
             // ---
-            final VirtualNode vnFrom = vectorIndex < m ? //
+            final VirtualNode<Link> vnFrom = vectorIndex < m ? //
                     virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
-            final Map<VirtualNode, List<RoboTaxi>> availableVehicles = //
+            final Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles = //
                     getVirtualNodeStayVehicles();
 
             final List<RoboTaxi> cars = availableVehicles.get(vnFrom); // find cars
@@ -212,10 +212,10 @@ public class MPCDispatcher extends BaseMpcDispatcher {
 
             if (Scalars.nonZero(d1.multiply(d2))) {
                 System.out.println("double rebalance");
-                System.out.print("" + virtualNetwork.getVirtualLink(vl + 0).getFrom().index);
-                System.out.println(" -> " + virtualNetwork.getVirtualLink(vl + 0).getTo().index);
-                System.out.print("" + virtualNetwork.getVirtualLink(vl + 1).getFrom().index);
-                System.out.println("-> " + virtualNetwork.getVirtualLink(vl + 1).getTo().index);
+                System.out.print("" + virtualNetwork.getVirtualLink(vl + 0).getFrom().getIndex());
+                System.out.println(" -> " + virtualNetwork.getVirtualLink(vl + 0).getTo().getIndex());
+                System.out.print("" + virtualNetwork.getVirtualLink(vl + 1).getFrom().getIndex());
+                System.out.println("-> " + virtualNetwork.getVirtualLink(vl + 1).getTo().getIndex());
                 System.out.println(d1 + " " + d2);
                 Scalar surplus = Min.of(d1, d2);
                 rebalanceVector.set(s -> s.subtract(surplus), vl + 0);
@@ -230,7 +230,7 @@ public class MPCDispatcher extends BaseMpcDispatcher {
                     virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
             final VirtualNode vnTo = vectorIndex < m ? //
                     virtualNetwork.getVirtualLink(vectorIndex).getTo() : virtualNetwork.getVirtualNode(vectorIndex - m);
-            final Map<VirtualNode, List<RoboTaxi>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
+            final Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
 
             List<Link> candidateLinks = new ArrayList<>();
             for (AVRequest avRequest : getUnassignedAVRequests()) {

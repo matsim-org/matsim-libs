@@ -9,13 +9,13 @@ import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.router.util.TravelTime;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualLink;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.clruch.netdata.VirtualLink;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
 import playground.clruch.router.InstantPathFactory;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
@@ -39,9 +39,9 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
         samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod"));
     }
 
-    Map<VirtualNode, List<RoboTaxi>> getDivertableNotRebalancingNotPickupVehicles() {
-        Map<VirtualNode, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
-        Map<VirtualNode, List<RoboTaxi>> allVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
+    Map<VirtualNode<Link>, List<RoboTaxi>> getDivertableNotRebalancingNotPickupVehicles() {
+        Map<VirtualNode<Link>, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
+        Map<VirtualNode<Link>, List<RoboTaxi>> allVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
         for (VirtualNode vn : allVehicles.keySet()) {
             for (RoboTaxi robotaxi : allVehicles.get(vn)) {
                 if (!robotaxi.getAVStatus().equals(AVStatus.DRIVETOCUSTMER)) {
@@ -67,10 +67,10 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
                 // check if origin and dest are from same virtualNode
                 final VirtualNode vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
                 final VirtualNode vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
-                GlobalAssert.that(vnFrom.equals(vnTo) == (vnFrom.index == vnTo.index));
+                GlobalAssert.that(vnFrom.equals(vnTo) == (vnFrom.getIndex() == vnTo.getIndex()));
                 if (vnFrom.equals(vnTo)) {
                     // self loop
-                    requestVectorIndexMap.put(avRequest, m + vnFrom.index);
+                    requestVectorIndexMap.put(avRequest, m + vnFrom.getIndex());
                 } else {
                     // non-self loop
                     boolean success = false;

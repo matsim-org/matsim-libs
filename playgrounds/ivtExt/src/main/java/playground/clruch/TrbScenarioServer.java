@@ -17,6 +17,7 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.AnalyzeSummary;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
@@ -30,7 +31,6 @@ import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.net.StorageUtils;
-import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
@@ -144,7 +144,7 @@ public class TrbScenarioServer {
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
-        DataCollector.store(new File(args[0]), controler, //
+        DataCollector datacollector = new DataCollector(new File(args[0]), controler, //
                 minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
 
         // generate report

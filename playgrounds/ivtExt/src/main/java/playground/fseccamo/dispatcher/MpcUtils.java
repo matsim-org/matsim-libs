@@ -2,13 +2,13 @@ package playground.fseccamo.dispatcher;
 
 import ch.ethz.idsc.jmex.Container;
 import ch.ethz.idsc.jmex.DoubleArray;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.Primitives;
 import ch.ethz.idsc.tensor.red.KroneckerDelta;
-import playground.clruch.netdata.VirtualNetwork;
 import playground.clruch.prep.PopulationRequestSchedule;
 
 enum MpcUtils {
@@ -20,13 +20,13 @@ enum MpcUtils {
 
         Container container = new Container("init");
         { // directed graph incidence matrix
-            Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getTo().index, i), n, m);
+            Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getTo().getIndex(), i), n, m);
             double[] array = Primitives.toArrayDouble(Transpose.of(matrix));
             DoubleArray doubleArray = new DoubleArray("E_in", new int[] { n, m }, array);
             container.add(doubleArray);
         }
         {
-            Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getFrom().index, i), n, m);
+            Tensor matrix = Tensors.matrix((i, j) -> KroneckerDelta.of(virtualNetwork.getVirtualLink(j).getFrom().getIndex(), i), n, m);
             double[] array = Primitives.toArrayDouble(Transpose.of(matrix));
             DoubleArray doubleArray = new DoubleArray("E_out", new int[] { n, m }, array);
             container.add(doubleArray);
@@ -38,8 +38,8 @@ enum MpcUtils {
         }
         {
             Tensor matrix = Tensors.vector(i -> Tensors.vector( //
-                    virtualNetwork.getVirtualNode(i).getCoord().getX(), //
-                    virtualNetwork.getVirtualNode(i).getCoord().getY() //
+                    virtualNetwork.getVirtualNode(i).getCoord().Get(0).number().doubleValue(), //
+                    virtualNetwork.getVirtualNode(i).getCoord().Get(1).number().doubleValue() //
             ), n);
             // System.out.println(Pretty.of(matrix));
             double[] array = Primitives.toArrayDouble(Transpose.of(matrix));

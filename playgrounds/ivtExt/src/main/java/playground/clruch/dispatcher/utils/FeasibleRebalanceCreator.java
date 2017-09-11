@@ -4,6 +4,9 @@ package playground.clruch.dispatcher.utils;
 import java.util.List;
 import java.util.Map;
 
+import org.matsim.api.core.v01.network.Link;
+
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -12,7 +15,6 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.clruch.netdata.VirtualNode;
 
 public enum FeasibleRebalanceCreator {
     ;
@@ -20,7 +22,7 @@ public enum FeasibleRebalanceCreator {
      * @param availableVehicles
      * @return returns a scaled rebalanceInput which is feasible considering the available number of
      *         vehicles */
-    public static Tensor returnFeasibleRebalance(Tensor rebalanceInput, Map<VirtualNode, //
+    public static Tensor returnFeasibleRebalance(Tensor rebalanceInput, Map<VirtualNode<Link>, //
             List<RoboTaxi>> availableVehicles) {
 
         GlobalAssert.that(Dimensions.of(rebalanceInput).get(0) == Dimensions.of(rebalanceInput).get(1));
@@ -38,7 +40,7 @@ public enum FeasibleRebalanceCreator {
             int outgoingVeh = (int) outgoingNmrvNode;
             int finalI = i;
             int availableVehvNode = availableVehicles //
-                    .get(availableVehicles.keySet().stream().filter(v -> v.index == finalI).findAny().get()).size();
+                    .get(availableVehicles.keySet().stream().filter(v -> v.getIndex() == finalI).findAny().get()).size();
             // if number of outoing vehicles too small, reduce proportionally
             if (availableVehvNode < outgoingVeh) {
                 long shrinkingFactor = ((long) availableVehvNode / ((long) outgoingVeh));

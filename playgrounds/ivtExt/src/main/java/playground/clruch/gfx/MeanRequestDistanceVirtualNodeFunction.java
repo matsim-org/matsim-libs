@@ -3,6 +3,8 @@ package playground.clruch.gfx;
 
 import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.tensor.DoubleScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -12,8 +14,6 @@ import ch.ethz.idsc.tensor.red.Mean;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
 
 /**
  * mean request distance
@@ -34,7 +34,7 @@ import playground.clruch.netdata.VirtualNode;
                     linkAnte.getCoord().getX() - linkPost.getCoord().getX(), //
                     linkAnte.getCoord().getY() - linkPost.getCoord().getY());
             VirtualNode vn = virtualNetwork.getVirtualNode(linkAnte);
-            collect.set(s -> s.append(DoubleScalar.of(distance)), vn.index);
+            collect.set(s -> s.append(DoubleScalar.of(distance)), vn.getIndex());
         }
         return Tensors.vector(i -> meanOrZero(collect.get(i)), virtualNetwork.getvNodesCount());
     }

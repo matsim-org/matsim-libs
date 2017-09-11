@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.math.TensorOperations;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
@@ -25,7 +26,6 @@ import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.red.Total;
 import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
-import playground.clruch.netdata.VirtualNetwork;
 
 /**
  * Created by Claudio on 5/6/2017.

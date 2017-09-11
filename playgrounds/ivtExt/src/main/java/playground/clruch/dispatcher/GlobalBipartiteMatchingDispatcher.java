@@ -43,12 +43,12 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
     @Override
     public void redispatch(double now) {
         final long round_now = Math.round(now);
-        
+
         if (round_now % dispatchPeriod == 0) {
             printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, //
                     getDivertableRoboTaxis(), getAVRequests(), //
-                    new EuclideanDistanceFunction(), network, false);
-            // ndf, network,false);
+                    // new EuclideanDistanceFunction(), network, false);
+                    ndf, network, false);
 
         }
     }

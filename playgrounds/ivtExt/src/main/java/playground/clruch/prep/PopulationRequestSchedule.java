@@ -15,13 +15,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Sort;
 import ch.ethz.idsc.tensor.io.Export;
 import ch.ethz.idsc.tensor.io.Import;
-import playground.clruch.netdata.VirtualNetwork;
 
 public class PopulationRequestSchedule {
     static final String VIRTUALNETWORK_DIRECTORYNAME = "virtualNetwork";
@@ -95,8 +95,8 @@ public class PopulationRequestSchedule {
 
     private Tensor requestRow(StdRequest std) {
         long time = Math.round(std.departureTime);
-        int vnAnte = virtualNetwork.getVirtualNode(std.ante).index + 1; // +1 for indexing in matlab
-        int vnPost = virtualNetwork.getVirtualNode(std.post).index + 1;
+        int vnAnte = virtualNetwork.getVirtualNode(std.ante).getIndex() + 1; // +1 for indexing in matlab
+        int vnPost = virtualNetwork.getVirtualNode(std.post).getIndex() + 1;
         return Tensors.vector(time, vnAnte, vnPost);
     }
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
@@ -13,6 +14,8 @@ import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetworkIO;
 import ch.ethz.idsc.queuey.util.GZHandler;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
@@ -20,9 +23,8 @@ import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeIO;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeIO;
 import playground.clruch.data.LocationSpec;
-import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNetworkIO;
+import playground.clruch.netdata.MatsimCenterVirtualNetworkCreator;
+import playground.clruch.netdata.MatsimKMEANSVirtualNetworkCreator;
 import playground.clruch.prep.NetworkCutClean;
 import playground.clruch.prep.PopulationRequestSchedule;
 import playground.clruch.prep.PopulationTools;
@@ -35,6 +37,7 @@ import playground.clruch.utils.PropertiesExt;
  * and travelData objects.
  * 
  * @author clruch */
+// TODO clean up thoroughly this file
 public class ScenarioPreparer {
 
     private final static String NETWORKUPDATEDNAME = "networkConverted";
@@ -63,6 +66,7 @@ public class ScenarioPreparer {
         int maxPopulationSize = simOptions.getInt("maxPopulationSize");
         int dtTravelData = simOptions.getInt("dtTravelData");
         boolean calculatePerformanceFleetSize = simOptions.getBoolean("calculatePerformanceFleetSize");
+        boolean centerNetwork = simOptions.getBoolean("centerNetwork");
         String VIRTUALNETWORKFOLDERNAME = simOptions.getString("virtualNetworkDir");
         String VIRTUALNETWORKFILENAME = simOptions.getString("virtualNetworkName");
         String TRAVELDATAFILENAME = simOptions.getString("travelDataName");
@@ -131,12 +135,19 @@ public class ScenarioPreparer {
         }
 
         // 3) create virtual Network
-        KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
-        VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
+        // TODO make this generic for any VirtualNetwork creators. 
+        VirtualNetwork<Link> virtualNetwork;
+        if(centerNetwork){
+            MatsimCenterVirtualNetworkCreator centercreator = new MatsimCenterVirtualNetworkCreator();
+            virtualNetwork = centercreator.creatVirtualNetwork(network);            
+        }else{
+            MatsimKMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new MatsimKMEANSVirtualNetworkCreator();
+            virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);            
+        }
+
         final File vnDir = new File(workingDirectory, VIRTUALNETWORKFOLDERNAME);
         vnDir.mkdir(); // create folder if necessary
-        VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
-        VirtualNetworkIO.toXML(new File(vnDir, VIRTUALNETWORKFILENAME + ".xml").toString(), virtualNetwork);
+        (new VirtualNetworkIO<Link>()).toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
         System.out.println("saved virtual network byte format to : " + new File(vnDir, VIRTUALNETWORKFILENAME));
         PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);
         prs.exportCsv();

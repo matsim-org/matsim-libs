@@ -9,12 +9,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.contrib.dvrp.schedule.Task;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualLink;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.sca.Increment;
-import playground.clruch.netdata.VirtualLink;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
 import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
@@ -46,7 +46,7 @@ public enum VehicleOnVirtualLinkCalculator {
                     // then the vehicle is considered to remain within current
                     // virtual node
                     VirtualNode vnode = virtualNetwork.getVirtualNode(current);
-                    vector.set(Increment.ONE, m + vnode.index); // self loop
+                    vector.set(Increment.ONE, m + vnode.getIndex()); // self loop
                 } else {
                     vector.set(Increment.ONE, vli);
                 }
@@ -54,7 +54,7 @@ public enum VehicleOnVirtualLinkCalculator {
             if (task instanceof AVDropoffTask) {
                 // consider the vehicle on the self loop of current virtual node
                 VirtualNode vnode = virtualNetwork.getVirtualNode(current);
-                vector.set(Increment.ONE, m + vnode.index); // self loop
+                vector.set(Increment.ONE, m + vnode.getIndex()); // self loop
             }
         }
         return vector;
@@ -83,7 +83,7 @@ public enum VehicleOnVirtualLinkCalculator {
                     if (fromIn != candidate) {
                         toIn = candidate;
                         VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
-                        return virtualLink.index;
+                        return virtualLink.getIndex();
                     }
                 }
             }

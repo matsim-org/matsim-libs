@@ -22,15 +22,14 @@ import playground.joel.helpers.EasyDijkstra;
 
 /** @author Claudio Ruch based on initial version by gjoel */
 public class DataCollector {
+    private final AnalyzeSummary analyzeSummary;
 
-    public static AnalyzeSummary analyzeSummary;
-
-    public static void store(File configFile, Controler controler, //
+    public DataCollector(File configFile, Controler controler, //
             MinimumFleetSizeCalculator minimumFleetSizeCalculator, //
-            AnalyzeSummary analyzeSummaryIn, //
+            AnalyzeSummary analyzeSummary, //
             Network network, Population population, TravelData travelData) throws Exception {
-
-        analyzeSummary = analyzeSummaryIn;
+        GlobalAssert.that(analyzeSummary != null);
+        this.analyzeSummary = analyzeSummary;
 
         // collect the data
         readStopwatch(configFile);
@@ -42,9 +41,7 @@ public class DataCollector {
 
     }
 
-
-
-    private static void readStopwatch(File configFile) {
+    private void readStopwatch(File configFile) {
         File stopwatch = new File(configFile.getParent(), "output/stopwatch.txt");
         try {
             BufferedReader reader = new BufferedReader(new FileReader(stopwatch));

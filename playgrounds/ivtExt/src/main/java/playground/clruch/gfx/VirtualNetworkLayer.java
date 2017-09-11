@@ -11,7 +11,11 @@ import java.util.Map.Entry;
 import javax.swing.JCheckBox;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualLink;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -22,13 +26,11 @@ import playground.clib.util.gui.RowPanel;
 import playground.clib.util.gui.SpinnerLabel;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
-import playground.clruch.netdata.VirtualLink;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
+import playground.clruch.netdata.NetworkCreatorUtils;
 
 public class VirtualNetworkLayer extends ViewerLayer {
     public static final Color COLOR = new Color(128, 153 / 2, 0, 128);
-    private VirtualNetwork virtualNetwork = null;
+    private VirtualNetwork<Link> virtualNetwork = null;
     private boolean drawVNodes = true;
     private boolean drawVLinks = false;
     VirtualNodeGeometry virtualNodeGeometry = null;
@@ -65,21 +67,21 @@ public class VirtualNetworkLayer extends ViewerLayer {
             {
                 if (virtualNodeShader.renderBoundary()) {
                     graphics.setColor(new Color(128, 128, 128, 128 + 16));
-                    for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet())
+                    for (Entry<VirtualNode<Link>, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet())
                         graphics.draw(entry.getValue());
                 }
             }
             switch (virtualNodeShader) {
             case None:
                 graphics.setColor(new Color(128, 128, 128, 64));
-                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet())
+                for (Entry<VirtualNode<Link>, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet())
                     graphics.fill(entry.getValue());
                 break;
             case VehicleCount: {
                 Tensor count = new VehicleCountVirtualNodeFunction(matsimMapComponent.db, virtualNetwork).evaluate(ref);
                 Tensor prob = normalize1Norm(count);
-                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
-                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                for (Entry<VirtualNode<Link>, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
+                    final int i = 255 - prob.Get(entry.getKey().getIndex()).number().intValue();
                     graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
@@ -88,9 +90,9 @@ public class VirtualNetworkLayer extends ViewerLayer {
             case RequestCount: {
                 Tensor count = new RequestCountVirtualNodeFunction(matsimMapComponent.db, virtualNetwork).evaluate(ref);
                 Tensor prob = normalize1Norm(count);
-                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
+                for (Entry<VirtualNode<Link>, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    final int i = 255 - prob.Get(entry.getKey().getIndex()).number().intValue();
                     graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
@@ -99,9 +101,9 @@ public class VirtualNetworkLayer extends ViewerLayer {
             case MeanRequestDistance: {
                 Tensor count = new MeanRequestDistanceVirtualNodeFunction(matsimMapComponent.db, virtualNetwork).evaluate(ref);
                 Tensor prob = normalize1Norm(count);
-                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
+                for (Entry<VirtualNode<Link>, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    final int i = 255 - prob.Get(entry.getKey().getIndex()).number().intValue();
                     graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
@@ -112,9 +114,9 @@ public class VirtualNetworkLayer extends ViewerLayer {
                         matsimMapComponent.db, virtualNetwork, //
                         RequestWaitingVirtualNodeFunction::meanOrZero).evaluate(ref);
                 Tensor prob = normalize1Norm(count);
-                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
+                for (Entry<VirtualNode<Link>, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    final int i = 255 - prob.Get(entry.getKey().getIndex()).number().intValue();
                     graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
@@ -125,9 +127,9 @@ public class VirtualNetworkLayer extends ViewerLayer {
                         matsimMapComponent.db, virtualNetwork, //
                         RequestWaitingVirtualNodeFunction::medianOrZero).evaluate(ref);
                 Tensor prob = normalize1Norm(count);
-                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
+                for (Entry<VirtualNode<Link>, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    final int i = 255 - prob.Get(entry.getKey().getIndex()).number().intValue();
                     graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
@@ -139,9 +141,9 @@ public class VirtualNetworkLayer extends ViewerLayer {
                         matsimMapComponent.db, virtualNetwork, //
                         RequestWaitingVirtualNodeFunction::maxOrZero).evaluate(ref);
                 Tensor prob = normalize1Norm(count);
-                for (Entry<VirtualNode, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
+                for (Entry<VirtualNode<Link>, Shape> entry : virtualNodeGeometry.getShapes(matsimMapComponent).entrySet()) {
                     // graphics.setColor(new Color(128, 128, 128, prob.Get(entry.getKey().index).number().intValue()));
-                    final int i = 255 - prob.Get(entry.getKey().index).number().intValue();
+                    final int i = 255 - prob.Get(entry.getKey().getIndex()).number().intValue();
                     graphics.setColor(halfAlpha(colorSchemes.colorScheme.get(i)));
                     graphics.fill(entry.getValue());
                 }
@@ -155,11 +157,11 @@ public class VirtualNetworkLayer extends ViewerLayer {
             final MatsimStaticDatabase db = matsimMapComponent.db;
 
             graphics.setColor(new Color(255, 0, 0, 64));
-            for (VirtualLink vl : virtualNetwork.getVirtualLinks()) {
-                VirtualNode n1 = vl.getFrom();
-                VirtualNode n2 = vl.getTo();
-                Coord c1 = db.referenceFrame.coords_toWGS84.transform(n1.getCoord());
-                Coord c2 = db.referenceFrame.coords_toWGS84.transform(n2.getCoord());
+            for (VirtualLink<Link> vl : virtualNetwork.getVirtualLinks()) {
+                VirtualNode<Link> n1 = vl.getFrom();
+                VirtualNode<Link> n2 = vl.getTo();
+                Coord c1 = db.referenceFrame.coords_toWGS84.transform(NetworkCreatorUtils.fromTensor(n1.getCoord()));
+                Coord c2 = db.referenceFrame.coords_toWGS84.transform(NetworkCreatorUtils.fromTensor(n2.getCoord()));
                 Point p1 = matsimMapComponent.getMapPositionAlways(c1);
                 Point p2 = matsimMapComponent.getMapPositionAlways(c2);
                 graphics.drawLine(p1.x, p1.y, p2.x, p2.y);
@@ -222,7 +224,7 @@ public class VirtualNetworkLayer extends ViewerLayer {
         }
     }
 
-    public void setVirtualNetwork(VirtualNetwork virtualNetwork) {
+    public void setVirtualNetwork(VirtualNetwork<Link> virtualNetwork) {
         this.virtualNetwork = virtualNetwork;
         virtualNodeGeometry = new VirtualNodeGeometry(matsimMapComponent.db, virtualNetwork);
     }

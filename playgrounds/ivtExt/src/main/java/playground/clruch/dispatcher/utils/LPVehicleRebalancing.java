@@ -12,7 +12,11 @@ import org.gnu.glpk.SWIGTYPE_p_double;
 import org.gnu.glpk.SWIGTYPE_p_int;
 import org.gnu.glpk.glp_prob;
 import org.gnu.glpk.glp_smcp;
+import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualLink;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -20,15 +24,12 @@ import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.red.Total;
-import playground.clruch.netdata.VirtualLink;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
 
 /**
  * Created by Claudio on 3/17/2017. Updated by Claudio on 5/7/2017.
  */
 public class LPVehicleRebalancing {
-    VirtualNetwork virtualNetwork;
+    VirtualNetwork<Link> virtualNetwork;
     glp_prob lp;
     glp_smcp parm = new glp_smcp();
     final int n;
@@ -75,9 +76,9 @@ public class LPVehicleRebalancing {
                         GLPK.glp_set_col_kind(lp, variableId, GLPKConstants.GLP_CV);
 
                         // for every variable find virtualLink
-                        VirtualNode vNodeFrom = virtualNetwork.getVirtualNode(i);
-                        VirtualNode vNodeTo = virtualNetwork.getVirtualNode(j);
-                        Optional<VirtualLink> optVLink = virtualNetwork.getVirtualLinks().stream()
+                        VirtualNode<Link> vNodeFrom = virtualNetwork.getVirtualNode(i);
+                        VirtualNode<Link> vNodeTo = virtualNetwork.getVirtualNode(j);
+                        Optional<VirtualLink<Link>> optVLink = virtualNetwork.getVirtualLinks().stream()
                                 .filter(v -> (v.getFrom().equals(vNodeFrom) && v.getTo().equals(vNodeTo))).findFirst();
                         if(optVLink.isPresent()){ // if virtualLink is present it is a lower bounded optimization variable
                             GLPK.glp_set_col_bnds(lp, variableId, GLPKConstants.GLP_LO, 0.0, 0.0); // Lower bound: second number irrelevant

@@ -36,7 +36,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 @Deprecated
 //ATTENTION: THIS DISPATCHER HAS NOT BEEN TESTED WITH THE NEW INTERFACE, LIKELY NOT TO 
 // FUNCTION CORRECTLY.
-public class SelfishDispatcher extends RebalancingDispatcher {
+public class SpencerSelfishOldNotWorking extends RebalancingDispatcher {
 
     private final int dispatchPeriod;
 
@@ -62,7 +62,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
     private final HashSet<AVRequest> openRequests = new HashSet<>();
     private final double[] networkBounds;
 
-    private SelfishDispatcher( //
+    private SpencerSelfishOldNotWorking( //
             AVDispatcherConfig avDispatcherConfig, //
             AVGeneratorConfig generatorConfig, //
             TravelTime travelTime, //
@@ -448,7 +448,7 @@ public class SelfishDispatcher extends RebalancingDispatcher {
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
-            return new SelfishDispatcher( //
+            return new SpencerSelfishOldNotWorking( //
                     config, generatorConfig, travelTime, router, eventsManager, network, abstractRequestSelector);
         }
     }

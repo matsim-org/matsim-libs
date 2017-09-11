@@ -19,16 +19,16 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.utils.geometry.CoordUtils;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Total;
-import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
-import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
+import playground.clruch.dispatcher.utils.virtualnodedestselector.AbstractVirtualNodeDest;
+import playground.clruch.dispatcher.utils.virtualnodedestselector.KMeansVirtualNodeDest;
 import playground.clruch.traveldata.TravelData;
 import playground.joel.helpers.EasyDijkstra;
 

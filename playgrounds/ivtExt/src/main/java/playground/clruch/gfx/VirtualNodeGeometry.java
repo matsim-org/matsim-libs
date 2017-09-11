@@ -11,21 +11,21 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.opt.ConvexHull;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.OsmLink;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
 
 class VirtualNodeGeometry {
-    Map<VirtualNode, Tensor> convexHulls = new LinkedHashMap<>(); // ordering matters
+    Map<VirtualNode<Link>, Tensor> convexHulls = new LinkedHashMap<>(); // ordering matters
 
-    VirtualNodeGeometry(MatsimStaticDatabase db, VirtualNetwork virtualNetwork) {
+    VirtualNodeGeometry(MatsimStaticDatabase db, VirtualNetwork<Link> virtualNetwork) {
         if (virtualNetwork == null)
             return;
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+        for (VirtualNode<Link> virtualNode : virtualNetwork.getVirtualNodes()) {
             Tensor coords = Tensors.empty();
             for (Link link : virtualNode.getLinks()) {
                 int index = db.getLinkIndex(link);
@@ -37,9 +37,9 @@ class VirtualNodeGeometry {
         }
     }
 
-    Map<VirtualNode, Shape> getShapes(MatsimMapComponent matsimMapComponent) {
-        Map<VirtualNode, Shape> map = new LinkedHashMap<>(); // ordering matters
-        for (Entry<VirtualNode, Tensor> entry : convexHulls.entrySet()) {
+    Map<VirtualNode<Link>, Shape> getShapes(MatsimMapComponent matsimMapComponent) {
+        Map<VirtualNode<Link>, Shape> map = new LinkedHashMap<>(); // ordering matters
+        for (Entry<VirtualNode<Link>, Tensor> entry : convexHulls.entrySet()) {
             Tensor hull = entry.getValue();
             Path2D path2d = new Path2D.Double();
             boolean init = false;

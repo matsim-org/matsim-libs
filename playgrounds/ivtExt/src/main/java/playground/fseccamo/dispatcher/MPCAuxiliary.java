@@ -12,12 +12,12 @@ import java.util.function.BiConsumer;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.QuadTree;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /** @author Claudio Ruch */
@@ -77,13 +77,14 @@ public class MPCAuxiliary {
         return totalPickupEffectiveAdd;
     }
 
-    /* package */ static Map<VirtualNode, Link> computeCenterLinks(VirtualNetwork virtualNetwork, double[] networkBounds) {
-        Map<VirtualNode, Link> centerLink = new HashMap<>();
-        for (VirtualNode virtualNode : virtualNetwork.getVirtualNodes()) {
+    /* package */ static Map<VirtualNode<Link>, Link> computeCenterLinks(VirtualNetwork<Link> virtualNetwork, double[] networkBounds) {
+        Map<VirtualNode<Link>, Link> centerLink = new HashMap<>();
+        for (VirtualNode<Link> virtualNode : virtualNetwork.getVirtualNodes()) {
             final QuadTree<Link> quadTree = new QuadTree<>(networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
             for (Link link : virtualNode.getLinks())
                 quadTree.put(link.getCoord().getX(), link.getCoord().getY(), link);
-            Link center = quadTree.getClosest(virtualNode.getCoord().getX(), virtualNode.getCoord().getY());
+            Link center = quadTree.getClosest(virtualNode.getCoord().Get(0).number().doubleValue(), //
+                    virtualNode.getCoord().Get(1).number().doubleValue());
             centerLink.put(virtualNode, center);
         }
         return centerLink;

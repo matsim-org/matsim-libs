@@ -5,6 +5,8 @@ import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.tensor.DoubleScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -16,8 +18,6 @@ import ch.ethz.idsc.tensor.red.Median;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
-import playground.clruch.netdata.VirtualNetwork;
-import playground.clruch.netdata.VirtualNode;
 
 /**
  * mean request waiting time
@@ -40,7 +40,7 @@ public class RequestWaitingVirtualNodeFunction extends AbstractVirtualNodeFuncti
             Link linkAnte = db.getOsmLink(rc.fromLinkIndex).link;
             // Link linkPost = db.getOsmLink(rc.toLinkIndex).link;
             VirtualNode vn = virtualNetwork.getVirtualNode(linkAnte);
-            collect.set(s -> s.append(DoubleScalar.of(duration)), vn.index);
+            collect.set(s -> s.append(DoubleScalar.of(duration)), vn.getIndex());
         }
         return Tensors.vector(i -> function.apply(collect.get(i)), virtualNetwork.getvNodesCount());
     }

@@ -1,5 +1,5 @@
 // code by clruch
-package playground.clruch.dispatcher.utils;
+package playground.clruch.dispatcher.utils.virtualnodedestselector;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyGeneratedInitialMeans;
@@ -24,7 +25,6 @@ import de.lmu.ifi.dbs.elki.datasource.ArrayAdapterDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import playground.clruch.netdata.VirtualNode;
 
 public class KMeansVirtualNodeDest extends AbstractVirtualNodeDest {
     Random random = new Random();
@@ -37,7 +37,7 @@ public class KMeansVirtualNodeDest extends AbstractVirtualNodeDest {
     Relation<NumberVector> rel;
 
     @Override
-    public List<Link> selectLinkSet(VirtualNode virtualNode, int size) {
+    public List<Link> selectLinkSet(VirtualNode<Link> virtualNode, int size) {
 
         // if no vehicles to be send to node, return empty list
         if (size < 1)

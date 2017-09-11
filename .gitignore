@@ -16,7 +16,9 @@ playgrounds/jjoubert/data
 /playgrounds/ivtExt/src/main/java/playground/clruch/TestBed.java
 IDSCOptions.properties
 
-# jan added:
+# jan and claudio  added:
 tutorial/output/
 tutorial/pop.xml.gz
 /playgrounds/ivtExt/src/main/java/playground/clruch/dispatcher/TestStrategiesDispatcher.java
+/playgrounds/ivtExt/src/main/java/playground/clruch/ScenarioReporterMPC.java
+/playgrounds/ivtExt/src/main/java/playground/clruch/dispatcher/GBMDEuclideanRealistic.java

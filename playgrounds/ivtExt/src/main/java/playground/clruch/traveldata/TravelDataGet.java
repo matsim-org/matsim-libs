@@ -10,8 +10,8 @@ package playground.clruch.traveldata;
 import java.io.File;
 import java.util.Properties;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import playground.clruch.ScenarioOptions;
-import playground.clruch.netdata.VirtualNetwork;
 
 public enum TravelDataGet {
     ;

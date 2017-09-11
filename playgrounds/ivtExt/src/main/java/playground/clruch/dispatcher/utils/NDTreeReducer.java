@@ -36,7 +36,7 @@ public enum NDTreeReducer {
 
         // add uniquely identifiable requests to KD tree
         for (AVRequest avRequest : requests) {
-            ndTree.add(EuclideanLocation.of(avRequest), avRequest);
+            ndTree.add(PlaneLocation.of(avRequest), avRequest);
         }
 
         // for all roboTaxis vehicles, start nearestNeighborSearch until union is as large as the
@@ -46,7 +46,7 @@ public enum NDTreeReducer {
         do {
             requestsChosen.clear();
             for (RoboTaxi roboTaxi : roboTaxis) {
-                Tensor center = EuclideanLocation.of(roboTaxi);
+                Tensor center = PlaneLocation.of(roboTaxi);
                 NdCluster<AVRequest> nearestCluster = ndTree.buildCluster(center, iter, NdDistanceInterface.EUCLIDEAN);
                 nearestCluster.stream().forEach(ndentry -> requestsChosen.add(ndentry.value));
             }
@@ -71,7 +71,7 @@ public enum NDTreeReducer {
 
         // add roboTaxis to ND Tree
         for (RoboTaxi robotaxi : roboTaxis) {
-            ndTree.add(EuclideanLocation.of(robotaxi), robotaxi);
+            ndTree.add(PlaneLocation.of(robotaxi), robotaxi);
         }
 
         // for all robotaxis, start nearestNeighborSearch until union is as large as the number of requests
@@ -81,7 +81,7 @@ public enum NDTreeReducer {
         do {
             vehiclesChosen.clear();
             for (AVRequest avRequest : requests) {
-                Tensor center = EuclideanLocation.of(avRequest);
+                Tensor center = PlaneLocation.of(avRequest);
                 NdCluster<RoboTaxi> nearestCluster = ndTree.buildCluster(center, roboTaxiPerRequest, NdDistanceInterface.EUCLIDEAN);
                 nearestCluster.stream().forEach(ndentry -> vehiclesChosen.add(ndentry.value));
             }
@@ -91,12 +91,12 @@ public enum NDTreeReducer {
         return vehiclesChosen;
     }
 
-    private static Tensor lowerBoudnsOf(Network network) {
+    public static Tensor lowerBoudnsOf(Network network) {
         double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         return Tensors.vectorDouble(bounds[0], bounds[1]);
     }
 
-    private static Tensor upperBoudnsOf(Network network) {
+    public static Tensor upperBoudnsOf(Network network) {
 
         double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         Tensor lbounds = Tensors.vectorDouble(bounds[0], bounds[1]);

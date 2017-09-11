@@ -20,6 +20,9 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import ch.ethz.idsc.queuey.core.networks.VirtualLink;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -31,16 +34,13 @@ import ch.ethz.idsc.tensor.sca.Floor;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
-import playground.clruch.dispatcher.utils.AbstractVirtualNodeDest;
 import playground.clruch.dispatcher.utils.BipartiteMatchingUtils;
 import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
 import playground.clruch.dispatcher.utils.FeasibleRebalanceCreator;
 import playground.clruch.dispatcher.utils.HungarBiPartVehicleDestMatcher;
-import playground.clruch.dispatcher.utils.KMeansVirtualNodeDest;
-import playground.clruch.netdata.VirtualLink;
-import playground.clruch.netdata.VirtualNetwork;
+import playground.clruch.dispatcher.utils.virtualnodedestselector.AbstractVirtualNodeDest;
+import playground.clruch.dispatcher.utils.virtualnodedestselector.KMeansVirtualNodeDest;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.clruch.netdata.VirtualNode;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.utils.SafeConfig;
@@ -107,19 +107,19 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             
 
             // ensure that not more vehicles are sent away than available
-            Map<VirtualNode, List<RoboTaxi>> availableVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
+            Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
             Tensor feasibleRebalanceCount = FeasibleRebalanceCreator.returnFeasibleRebalance(rebalanceCountInteger.unmodifiable(), availableVehicles);
             total_rebalanceCount += (Integer) ((Scalar) Total.of(Tensor.of(feasibleRebalanceCount.flatten(-1)))).number();
 
             // generate routing instructions for rebalancing vehicles
-            Map<VirtualNode, List<Link>> destinationLinks = virtualNetwork.createVNodeTypeMap();
+            Map<VirtualNode<Link>, List<Link>> destinationLinks = virtualNetwork.createVNodeTypeMap();
 
             // fill rebalancing destinations
             for (int i = 0; i < nVLinks; ++i) {
                 VirtualLink virtualLink = this.virtualNetwork.getVirtualLink(i);
                 VirtualNode toNode = virtualLink.getTo();
                 VirtualNode fromNode = virtualLink.getFrom();
-                int numreb = (Integer) (feasibleRebalanceCount.Get(fromNode.index, toNode.index)).number();
+                int numreb = (Integer) (feasibleRebalanceCount.Get(fromNode.getIndex(), toNode.getIndex())).number();
                 List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(toNode, numreb);
                 destinationLinks.get(fromNode).addAll(rebalanceTargets);
             }
