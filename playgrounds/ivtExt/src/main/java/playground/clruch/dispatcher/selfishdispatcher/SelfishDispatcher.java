@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.measure.unit.SystemOfUnits;
+
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -105,6 +107,8 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
             scores.put(virtualNode, score);
         }
+        
+        scores.values().stream().forEach(v->System.out.println("score = " + v));
 
         Entry<VirtualNode<Link>, Double> maxEntry = Collections.max(scores.entrySet(), new ScoreComparator());
         virtualNetwork.getVirtualNodes().forEach(vn -> GlobalAssert.that(scores.get(vn) <= scores.get(maxEntry.getKey())));
@@ -118,8 +122,10 @@ public class SelfishDispatcher extends PartitionedDispatcher {
     }
 
     private double calcAverageFare(VirtualNode virtualNode, List<AVRequest> requests) {
-        // TODO implement this.
-        return 1.0;
+        if(virtualNode.getIndex() == 0)
+            return 1000.0;
+        else
+            return 0.0;
     }
 
     @Override
