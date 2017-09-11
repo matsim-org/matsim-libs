@@ -92,7 +92,7 @@ public interface Scenario {
 	 * <li> This is currently set to deprecated, since the guice injection approach achieves something similar.  However, 
 	 * at this point injection is only possible after {@link Controler} was started, which stands in the way of <i>first</i> constructing
 	 * the scenario and only <i>then</i> starting {@link Controler}.  So maybe we should un-deprecate this method.  Kai/Theresa, sep'16
-	 * Done for the time being.   Kai, dec'16
+	 * Un-deprecated for the time being.   Kai, dec'16
 	 * </ul>
 	 *
 	 * @param name the name to which the object should be associated
@@ -111,7 +111,7 @@ public interface Scenario {
 	 * @param name the name of the element to get
 	 * @return the object associated with that name, or null if none is associated
 	 */
-	@Deprecated // see javadoc
+//	@Deprecated // see javadoc
 	Object getScenarioElement(String name);
 
 	ActivityFacilities getActivityFacilities();
