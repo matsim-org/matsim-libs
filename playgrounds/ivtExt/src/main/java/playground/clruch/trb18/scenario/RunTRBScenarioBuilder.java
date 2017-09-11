@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -34,8 +35,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
-import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
-import playground.clruch.netdata.VirtualNetworkIO;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetworkIO;
+import playground.clruch.netdata.MatsimKMEANSVirtualNetworkCreator;
 import playground.clruch.prep.PopulationRequestSchedule;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
@@ -150,14 +151,14 @@ public class RunTRBScenarioBuilder {
         //
         // Eventually, the IDSC scripts should be adapted (TripStructureUtils etc.)
 
-        KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
+        MatsimKMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new MatsimKMEANSVirtualNetworkCreator();
         Population virtualNetworkPopulation = createVirtualNetworkPopulation(reducedPopulation);
-        VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(virtualNetworkPopulation, filteredNetwork, scenarioConfig.numberOfVirtualNodes, true);
+        VirtualNetwork<Link> virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(virtualNetworkPopulation, filteredNetwork, scenarioConfig.numberOfVirtualNodes, true);
 
         final File virtualNetworkOutputDirectory = new File(scenarioConfig.virtualNetworkOutputDirectory);
         virtualNetworkOutputDirectory.mkdir();
 
-        VirtualNetworkIO.toByte(new File(virtualNetworkOutputDirectory, scenarioConfig.virtualNetworkFileName), virtualNetwork);
+        (new VirtualNetworkIO<Link>()).toByte(new File(virtualNetworkOutputDirectory, scenarioConfig.virtualNetworkFileName), virtualNetwork);
         //VirtualNetworkIO.toXML(new File(virtualNetworkOutputDirectory, scenarioConfig.virtualNetworkFileName + ".xml").toString(), virtualNetwork);
 
         Population requestSchedulePopulation = createRequestSchedulePopulation(reducedPopulation);

@@ -91,12 +91,12 @@ public enum NDTreeReducer {
         return vehiclesChosen;
     }
 
-    private static Tensor lowerBoudnsOf(Network network) {
+    public static Tensor lowerBoudnsOf(Network network) {
         double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         return Tensors.vectorDouble(bounds[0], bounds[1]);
     }
 
-    private static Tensor upperBoudnsOf(Network network) {
+    public static Tensor upperBoudnsOf(Network network) {
 
         double[] bounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         Tensor lbounds = Tensors.vectorDouble(bounds[0], bounds[1]);

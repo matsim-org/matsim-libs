@@ -26,7 +26,7 @@ import playground.clib.util.gui.SpinnerLabel;
 import playground.clruch.gheat.graphics.ColorSchemes;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
-import playground.clruch.netdata.VirtualNetworkUtils;
+import playground.clruch.netdata.NetworkCreatorUtils;
 
 public class VirtualNetworkLayer extends ViewerLayer {
     public static final Color COLOR = new Color(128, 153 / 2, 0, 128);
@@ -160,8 +160,8 @@ public class VirtualNetworkLayer extends ViewerLayer {
             for (VirtualLink<Link> vl : virtualNetwork.getVirtualLinks()) {
                 VirtualNode<Link> n1 = vl.getFrom();
                 VirtualNode<Link> n2 = vl.getTo();
-                Coord c1 = db.referenceFrame.coords_toWGS84.transform(VirtualNetworkUtils.fromTensor(n1.getCoord()));
-                Coord c2 = db.referenceFrame.coords_toWGS84.transform(VirtualNetworkUtils.fromTensor(n2.getCoord()));
+                Coord c1 = db.referenceFrame.coords_toWGS84.transform(NetworkCreatorUtils.fromTensor(n1.getCoord()));
+                Coord c2 = db.referenceFrame.coords_toWGS84.transform(NetworkCreatorUtils.fromTensor(n2.getCoord()));
                 Point p1 = matsimMapComponent.getMapPositionAlways(c1);
                 Point p2 = matsimMapComponent.getMapPositionAlways(c2);
                 graphics.drawLine(p1.x, p1.y, p2.x, p2.y);

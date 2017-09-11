@@ -15,6 +15,7 @@ import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetworkIO;
 import ch.ethz.idsc.queuey.util.GZHandler;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
@@ -22,8 +23,7 @@ import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeIO;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeIO;
 import playground.clruch.data.LocationSpec;
-import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
-import playground.clruch.netdata.VirtualNetworkIO;
+import playground.clruch.netdata.MatsimKMEANSVirtualNetworkCreator;
 import playground.clruch.prep.NetworkCutClean;
 import playground.clruch.prep.PopulationRequestSchedule;
 import playground.clruch.prep.PopulationTools;
@@ -132,11 +132,11 @@ public class ScenarioPreparer {
         }
 
         // 3) create virtual Network
-        KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
+        MatsimKMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new MatsimKMEANSVirtualNetworkCreator();
         VirtualNetwork<Link> virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
         final File vnDir = new File(workingDirectory, VIRTUALNETWORKFOLDERNAME);
         vnDir.mkdir(); // create folder if necessary
-        VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
+        (new VirtualNetworkIO<Link>()).toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
         System.out.println("saved virtual network byte format to : " + new File(vnDir, VIRTUALNETWORKFILENAME));
         PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);
         prs.exportCsv();

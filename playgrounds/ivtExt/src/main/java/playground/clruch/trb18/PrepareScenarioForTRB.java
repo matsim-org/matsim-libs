@@ -40,10 +40,11 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.core.networks.VirtualNetworkIO;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import contrib.baseline.preparation.ZHCutter;
-import playground.clruch.netdata.KMEANSVirtualNetworkCreator;
-import playground.clruch.netdata.VirtualNetworkIO;
+import playground.clruch.netdata.MatsimKMEANSVirtualNetworkCreator;
+
 import playground.clruch.prep.NetworkCutClean;
 import playground.clruch.prep.PopulationRequestSchedule;
 import playground.clruch.traveldata.TravelData;
@@ -332,13 +333,13 @@ public class PrepareScenarioForTRB {
         Network reducedNetwork = buildReducedNetwork(config);
         Population reducedPopulation = buildReducedPopulation(population, reducedNetwork, config);
 
-        KMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new KMEANSVirtualNetworkCreator();
-        VirtualNetwork virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(reducedPopulation, reducedNetwork, numberOfVirtualNodes, true);
+        MatsimKMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new MatsimKMEANSVirtualNetworkCreator();
+        VirtualNetwork<Link> virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(reducedPopulation, reducedNetwork, numberOfVirtualNodes, true);
 
         final File virtualNetworkOutputDirectory = new File(outputDirectory, VIRTUALNETWORKFOLDERNAME);
         virtualNetworkOutputDirectory.mkdir();
 
-        VirtualNetworkIO.toByte(new File(virtualNetworkOutputDirectory, VIRTUALNETWORKFILENAME), virtualNetwork);
+        (new VirtualNetworkIO<Link>()).toByte(new File(virtualNetworkOutputDirectory, VIRTUALNETWORKFILENAME), virtualNetwork);
         //VirtualNetworkIO.toXML(new File(virtualNetworkOutputDirectory, VIRTUALNETWORKFILENAME + ".xml").toString(), virtualNetwork);
 
         PopulationRequestSchedule prs = new PopulationRequestSchedule(reducedNetwork, reducedPopulation, virtualNetwork);
