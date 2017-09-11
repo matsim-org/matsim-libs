@@ -20,14 +20,13 @@
 package org.matsim.contrib.taxi.optimizer.assignment;
 
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.optimizer.TaxiOptimizerContext;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 class AssignmentRequestData extends AssignmentDestinationData<TaxiRequest> {
 	private int urgentReqCount = 0;
 
-	AssignmentRequestData(TaxiOptimizerContext optimContext, double planningHorizon,
-			Iterable<TaxiRequest> unplannedRequests) {
-		double currTime = optimContext.timer.getTimeOfDay();
+	AssignmentRequestData(MobsimTimer timer, double planningHorizon, Iterable<TaxiRequest> unplannedRequests) {
+		double currTime = timer.getTimeOfDay();
 		double maxT0 = currTime + planningHorizon;
 
 		int idx = 0;
