@@ -19,17 +19,31 @@
 
 package org.matsim.contrib.taxi.optimizer.zonal;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
-import org.matsim.contrib.zone.*;
-import org.matsim.contrib.zone.util.*;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
+import org.matsim.contrib.zone.Zone;
+import org.matsim.contrib.zone.Zones;
+import org.matsim.contrib.zone.util.NetworkWithZonesUtils;
+import org.matsim.contrib.zone.util.ZoneFinderImpl;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 public class ZonalTaxiOptimizer extends RuleBasedTaxiOptimizer {
 	private static final Comparator<Vehicle> LONGEST_WAITING_FIRST = new Comparator<Vehicle>() {
@@ -44,13 +58,15 @@ public class ZonalTaxiOptimizer extends RuleBasedTaxiOptimizer {
 	private Map<Id<Zone>, PriorityQueue<Vehicle>> zoneToIdleVehicleQueue;
 	private final Map<Id<Link>, Zone> linkToZone;
 
-	public ZonalTaxiOptimizer(TaxiOptimizerContext optimContext, ZonalTaxiOptimizerParams params) {
-		super(optimContext, params);
+	public ZonalTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, Network network,
+			MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler,
+			ZonalTaxiOptimizerParams params) {
+		super(taxiCfg, fleet, network, timer, travelTime, travelDisutility, scheduler, params);
 
 		zones = Zones.readZones(params.zonesXmlFile, params.zonesShpFile);
 		System.err.println("No conversion of SRS is done");
 
-		this.linkToZone = NetworkWithZonesUtils.createLinkToZoneMap(optimContext.network,
+		this.linkToZone = NetworkWithZonesUtils.createLinkToZoneMap(network,
 				new ZoneFinderImpl(zones, params.expansionDistance));
 
 		// FIXME zonal system used in RuleBasedTaxiOptim (for registers) should be equivalent to
@@ -75,8 +91,8 @@ public class ZonalTaxiOptimizer extends RuleBasedTaxiOptimizer {
 			zoneToIdleVehicleQueue.put(zoneId, new PriorityQueue<Vehicle>(10, LONGEST_WAITING_FIRST));
 		}
 
-		for (Vehicle veh : getOptimContext().fleet.getVehicles().values()) {
-			if (getOptimContext().scheduler.isIdle(veh)) {
+		for (Vehicle veh : getFleet().getVehicles().values()) {
+			if (getScheduler().isIdle(veh)) {
 				Link link = ((StayTask)veh.getSchedule().getCurrentTask()).getLink();
 				Zone zone = linkToZone.get(link.getId());
 				if (zone != null) {
@@ -107,7 +123,7 @@ public class ZonalTaxiOptimizer extends RuleBasedTaxiOptimizer {
 					filteredVehs);
 
 			if (best != null) {
-				getOptimContext().scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+				getScheduler().scheduleRequest(best.vehicle, best.destination, best.path);
 				reqIter.remove();
 				idleVehsInZone.remove(best.vehicle);
 			}

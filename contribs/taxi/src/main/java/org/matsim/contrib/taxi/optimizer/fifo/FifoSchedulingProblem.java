@@ -21,15 +21,19 @@ package org.matsim.contrib.taxi.optimizer.fifo;
 
 import java.util.Queue;
 
+import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 
 public class FifoSchedulingProblem {
-	private final TaxiOptimizerContext optimContext;
+	private final Fleet fleet;
+	private final TaxiScheduler scheduler;
 	private final BestDispatchFinder dispatchFinder;
 
-	public FifoSchedulingProblem(TaxiOptimizerContext optimContext, BestDispatchFinder vrpFinder) {
-		this.optimContext = optimContext;
+	public FifoSchedulingProblem(Fleet fleet, TaxiScheduler scheduler, BestDispatchFinder vrpFinder) {
+		this.fleet = fleet;
+		this.scheduler = scheduler;
 		this.dispatchFinder = vrpFinder;
 	}
 
@@ -38,7 +42,7 @@ public class FifoSchedulingProblem {
 			TaxiRequest req = unplannedRequests.peek();
 
 			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestVehicleForRequest(req,
-					optimContext.fleet.getVehicles().values());
+					fleet.getVehicles().values());
 
 			// TODO search only through available vehicles
 			// TODO what about k-nearstvehicle filtering?
@@ -47,7 +51,7 @@ public class FifoSchedulingProblem {
 				return;
 			}
 
-			optimContext.scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+			scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
 			unplannedRequests.poll();
 		}
 	}
