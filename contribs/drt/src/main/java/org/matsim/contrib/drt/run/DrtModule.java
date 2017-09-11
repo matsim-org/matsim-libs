@@ -3,14 +3,17 @@ package org.matsim.contrib.drt.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.validator.*;
+import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.depot.*;
 import org.matsim.contrib.drt.optimizer.rebalancing.*;
 import org.matsim.contrib.drt.routing.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.*;
 
@@ -27,6 +30,8 @@ public final class DrtModule extends AbstractModule {
 		bind(DrtRequestValidator.class).to(DefaultDrtRequestValidator.class);
 		bind(DepotFinder.class).to(NearestStartLinkAsDepot.class);
 		bind(RebalancingStrategy.class).to(SendToStartLinkStrategy.class);
+		bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultDrtOptimizer.DRT_OPTIMIZER))
+				.toInstance(timeCalculator -> new TimeAsTravelDisutility(timeCalculator));
 
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:

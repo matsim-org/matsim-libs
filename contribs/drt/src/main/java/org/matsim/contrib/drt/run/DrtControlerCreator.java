@@ -25,17 +25,23 @@ package org.matsim.contrib.drt.run;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
-import org.matsim.contrib.drt.optimizer.*;
-import org.matsim.contrib.drt.optimizer.insertion.*;
-import org.matsim.contrib.drt.optimizer.insertion.filter.*;
+import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
+import org.matsim.contrib.drt.optimizer.DrtOptimizer;
+import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
+import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
+import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
+import org.matsim.contrib.drt.optimizer.insertion.filter.KNearestVehicleFilter;
+import org.matsim.contrib.drt.optimizer.insertion.filter.NoFilter;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
-import org.matsim.contrib.drt.scheduler.*;
+import org.matsim.contrib.drt.scheduler.DrtScheduler;
+import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
@@ -44,10 +50,13 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import com.google.inject.*;
-import com.google.inject.name.Names;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+import com.google.inject.name.Named;
 
 /**
  * @author jbischoff
@@ -92,8 +101,6 @@ public final class DrtControlerCreator {
 				bind(DefaultUnplannedRequestInserter.class).asEagerSingleton();
 				bind(UnplannedRequestInserter.class).to(DefaultUnplannedRequestInserter.class);
 				bind(EmptyVehicleRelocator.class).asEagerSingleton();
-				bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultDrtOptimizer.DRT_OPTIMIZER))
-						.toInstance(timeCalculator -> new TimeAsTravelDisutility(timeCalculator));
 				bind(DrtScheduler.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(DrtActionCreator.class).asEagerSingleton();
 				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
@@ -101,15 +108,23 @@ public final class DrtControlerCreator {
 
 			@Provides
 			@Singleton
-			private DrtVehicleFilter getFilter(DrtConfigGroup drtCfg) {
+			private DrtVehicleFilter provideFilter(DrtConfigGroup drtCfg) {
 				return drtCfg.getKNearestVehicles() > 0 ? new KNearestVehicleFilter(drtCfg.getKNearestVehicles())
 						: new NoFilter();
 			}
 
 			@Provides
 			@Singleton
-			private MobsimTimer getTimer(QSim qSim) {
+			private MobsimTimer provideTimer(QSim qSim) {
 				return qSim.getSimTimer();
+			}
+
+			@Provides
+			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER)
+			private TravelDisutility provideTravelDisutility(
+					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+					@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory) {
+				return travelDisutilityFactory.createTravelDisutility(travelTime);
 			}
 		};
 	}
