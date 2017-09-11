@@ -27,6 +27,7 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
@@ -38,6 +39,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -76,8 +79,16 @@ public final class TaxiModule extends AbstractModule {
 
 			@Provides
 			@Singleton
-			private MobsimTimer getTimer(QSim qSim) {
+			private MobsimTimer provideTimer(QSim qSim) {
 				return qSim.getSimTimer();
+			}
+
+			@Provides
+			@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER)
+			private TravelDisutility provideTravelDisutility(
+					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+					@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory) {
+				return travelDisutilityFactory.createTravelDisutility(travelTime);
 			}
 		};
 	}
@@ -86,7 +97,7 @@ public final class TaxiModule extends AbstractModule {
 	public void install() {
 		bind(Fleet.class).toProvider(DefaultTaxiFleetProvider.class).asEagerSingleton();
 		bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER))
-				.toInstance(timeCalculator -> new TimeAsTravelDisutility(timeCalculator));
+				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
 
 		install(dvrpModule);
 	}
