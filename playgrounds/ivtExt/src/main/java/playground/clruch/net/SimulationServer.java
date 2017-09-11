@@ -19,7 +19,14 @@ public class SimulationServer extends AbstractServer {
 
     @Override
     protected void handleConnection(Socket socket, Timer timer) {
-        new ObjectSocket(socket);
+        ObjectSocket os = new ObjectSocket(socket) {
+            @Override
+            public void close() throws Exception {
+                super.close();
+                SimulationClientSet.INSTANCE.remove(this);
+            }
+        };
+        SimulationClientSet.INSTANCE.add(os);
     }
 
 }

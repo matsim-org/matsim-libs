@@ -15,8 +15,9 @@ import javax.swing.JCheckBox;
 
 import org.matsim.api.core.v01.Coord;
 
+import playground.clib.gheat.gui.ColorSchemes;
+import playground.clib.jmapviewer.MatsimHeatMap;
 import playground.clib.util.gui.RowPanel;
-import playground.clruch.gheat.graphics.ColorSchemes;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
@@ -29,13 +30,13 @@ import playground.clruch.net.SimulationObject;
     private volatile boolean drawNumber = true;
     private volatile boolean drawRequestDestinations = false;
 
-    MatsimHeatMap requestHeatMap = new MatsimHeatMap(ColorSchemes.OrangeContour);
-    MatsimHeatMap requestDestMap = new MatsimHeatMap(ColorSchemes.GreenContour);
+    MatsimHeatMap requestHeatMap = new MatsimHeatMapImpl(ColorSchemes.OrangeContour);
+    MatsimHeatMap requestDestMap = new MatsimHeatMapImpl(ColorSchemes.GreenContour);
     double maxWaitTime;
 
     public RequestsLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
-        requestDestMap.show = false; // default: don't show distrib of request dest
+        requestDestMap.setShow(false); // default: don't show distrib of request dest
     }
 
     @Override
@@ -49,7 +50,7 @@ import playground.clruch.net.SimulationObject;
                 final int size = entry.getValue().size();
                 for (int count = 0; count < size; ++count) {
                     Coord coord = osmLink.getAt(count / (double) size);
-                    requestHeatMap.addCoord(coord);
+                    requestHeatMap.addPoint(coord.getX(), coord.getY());
                 }
             }
         }

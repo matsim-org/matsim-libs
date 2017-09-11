@@ -22,7 +22,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import playground.clruch.utils.HelperPredicates;
 import playground.joel.helpers.CSVcreator;
 import playground.joel.helpers.KeyMap;
-import playground.joel.helpers.binnedHelper;
+import playground.joel.helpers.BinnedHelper;
 
 
 /**
@@ -167,9 +167,9 @@ class BinnedWaitingTimes extends AbstractData {
         NavigableMap<String, NavigableMap<String, Double>> quantiles50 = new TreeMap<>();
         NavigableMap<String, NavigableMap<String, Double>> quantiles95 = new TreeMap<>();
         NavigableMap<String, NavigableMap<String, Double>> means = new TreeMap<>();
-        binnedHelper.checkFull(quantile50, binSize, keyMap);
-        binnedHelper.checkFull(quantile95, binSize, keyMap);
-        binnedHelper.checkFull(mean, binSize, keyMap);
+        BinnedHelper.checkFull(quantile50, binSize, keyMap);
+        BinnedHelper.checkFull(quantile95, binSize, keyMap);
+        BinnedHelper.checkFull(mean, binSize, keyMap);
         quantiles50.put("bins", quantile50);
         quantiles95.put("bins", quantile95);
         means.put("bins", mean);

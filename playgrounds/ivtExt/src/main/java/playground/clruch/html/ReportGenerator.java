@@ -46,8 +46,8 @@ public class ReportGenerator {
 
         // write report
         // -------------------------------------------------------------------------------------------------------------
-        htmlUtils.html();
-        htmlUtils.insertCSS(//
+        HtmlUtils.html();
+        HtmlUtils.insertCSS(//
                 "h2 {float: left; width: 100%; padding: 10px}", //
                 "pre {font-family: verdana; float: left; width: 100%; padding-left: 20px;}", //
                 "p {float: left; width: 80%; padding-left: 20px;}", //
@@ -56,45 +56,45 @@ public class ReportGenerator {
                 "img {display: block; margin-left: auto; margin-right: auto;}" //
 
         );
-        htmlUtils.body();
+        HtmlUtils.body();
         // ----------------------------------------------
-        htmlUtils.title(TITLE);
+        HtmlUtils.title(TITLE);
 
-        htmlUtils.insertSubTitle("General/Aggregate Information");
-        htmlUtils.insertTextLeft("User:" + //
+        HtmlUtils.insertSubTitle("General/Aggregate Information");
+        HtmlUtils.insertTextLeft("User:" + //
                 "\nTimestamp:");
-        htmlUtils.insertTextLeft(scenarioParametersingleton.user + //
+        HtmlUtils.insertTextLeft(scenarioParametersingleton.user + //
                 "\n" + scenarioParametersingleton.date);
-        htmlUtils.newLine();
-        htmlUtils.insertTextLeft("Iterations:");
-        htmlUtils.insertTextLeft(String.valueOf(scenarioParametersingleton.iterations));
-        htmlUtils.newLine();
-        htmlUtils.insertLink("av.xml", "AV File");
-        htmlUtils.insertLink("av_config.xml", "AV_Config File");
-        htmlUtils.newLine();
-        htmlUtils.insertTextLeft("Dispatcher:" + //
+        HtmlUtils.newLine();
+        HtmlUtils.insertTextLeft("Iterations:");
+        HtmlUtils.insertTextLeft(String.valueOf(scenarioParametersingleton.iterations));
+        HtmlUtils.newLine();
+        HtmlUtils.insertLink("av.xml", "AV File");
+        HtmlUtils.insertLink("av_config.xml", "AV_Config File");
+        HtmlUtils.newLine();
+        HtmlUtils.insertTextLeft("Dispatcher:" + //
                 "\nVehicles:" + //
                 "\nRebalancing Period:" + //
                 "\nRedispatching Period:");
-        htmlUtils.insertTextLeft(scenarioParametersingleton.dispatcher + //
+        HtmlUtils.insertTextLeft(scenarioParametersingleton.dispatcher + //
                 "\n" + analyzeSummary.numVehicles + //
                 "\n" + Time.writeTime(scenarioParametersingleton.rebalancingPeriod) + //
                 "\n" + Time.writeTime(scenarioParametersingleton.redispatchPeriod));
-        htmlUtils.newLine();
-        htmlUtils.insertTextLeft("Network:" + //
+        HtmlUtils.newLine();
+        HtmlUtils.insertTextLeft("Network:" + //
                 "\nVirtual Nodes:" + //
                 "\nPopulation:" + //
                 "\nRequests:");
-        htmlUtils.insertTextLeft(scenarioParametersingleton.networkName + //
+        HtmlUtils.insertTextLeft(scenarioParametersingleton.networkName + //
                 "\n" + scenarioParametersingleton.virtualNodes + //
                 "\n" + scenarioParametersingleton.populationSize + //
                 "\n" + analyzeSummary.numRequests);
 
-        htmlUtils.insertSubTitle("Aggregate Results");
-        htmlUtils.insertTextLeft("Computation Time:");
-        htmlUtils.insertTextLeft(analyzeSummary.computationTime);
-        htmlUtils.newLine();
-        htmlUtils.insertTextLeft(htmlUtils.bold("Waiting Times") + //
+        HtmlUtils.insertSubTitle("Aggregate Results");
+        HtmlUtils.insertTextLeft("Computation Time:");
+        HtmlUtils.insertTextLeft(analyzeSummary.computationTime);
+        HtmlUtils.newLine();
+        HtmlUtils.insertTextLeft(HtmlUtils.bold("Waiting Times") + //
                 "\n\tMean:" + //
                 "\n\t50% quantile:" + //
                 "\n\t95% quantile:" + //
@@ -103,7 +103,7 @@ public class ReportGenerator {
                 "\nOccupancy Ratio:" + //
                 "\nDistance Ratio:" + //
                 "\n" + //
-                "\n" + htmlUtils.bold("Distances") + //
+                "\n" + HtmlUtils.bold("Distances") + //
                 "\n\tTotal:" + //
                 "\n\tRebalancing:" + //
                 "\n\tPickup:" + //
@@ -111,7 +111,7 @@ public class ReportGenerator {
                 "\n" + //
                 "\nAverage Trip Distance:" //
         );
-        htmlUtils.insertTextLeft(" " + //
+        HtmlUtils.insertTextLeft(" " + //
                 "\n" + Time.writeTime(analyzeSummary.totalWaitTimeMean.Get().number().doubleValue()) + //
                 "\n" + Time.writeTime(analyzeSummary.totalWaitTimeQuantile.Get(1).number().doubleValue()) + //
                 "\n" + Time.writeTime(analyzeSummary.totalWaitTimeQuantile.Get(2).number().doubleValue()) + //
@@ -129,82 +129,82 @@ public class ReportGenerator {
                 d.format(100 * analyzeSummary.distanceWithCust / analyzeSummary.distance) + "%)" + //
                 "\n" + //
                 "\n" + d.format(link2km * analyzeSummary.distanceWithCust / analyzeSummary.numRequests) + " km");
-        htmlUtils.insertImgRight(IMAGE_FOLDER + "/stackedDistance.png", 250, 400);
+        HtmlUtils.insertImgRight(IMAGE_FOLDER + "/stackedDistance.png", 250, 400);
         if (scenarioParametersingleton.EMDks != null) {
-            htmlUtils.newLine();
-            htmlUtils.insertTextLeft("Minimum Fleet Size:" + //
+            HtmlUtils.newLine();
+            HtmlUtils.insertTextLeft("Minimum Fleet Size:" + //
                     "\nAverage Earth Movers Distance:");
-            htmlUtils.insertTextLeft((int) Math.ceil(scenarioParametersingleton.minimumFleet) + //
+            HtmlUtils.insertTextLeft((int) Math.ceil(scenarioParametersingleton.minimumFleet) + //
                     "\n" + d.format(Mean.of(scenarioParametersingleton.EMDks).Get().number().doubleValue() * link2km) + " km");
         }
 
-        htmlUtils.insertSubTitle("Wait Times");
-        htmlUtils.insertTextLeft("Requests:");
-        htmlUtils.insertTextLeft(String.valueOf(analyzeSummary.numRequests));
-        htmlUtils.newLine();
-        htmlUtils.insertTextLeft(htmlUtils.bold("Waiting Times") + //
+        HtmlUtils.insertSubTitle("Wait Times");
+        HtmlUtils.insertTextLeft("Requests:");
+        HtmlUtils.insertTextLeft(String.valueOf(analyzeSummary.numRequests));
+        HtmlUtils.newLine();
+        HtmlUtils.insertTextLeft(HtmlUtils.bold("Waiting Times") + //
                 "\n\tMean:" + //
                 "\n\t50% quantile:" + //
                 "\n\t95% quantile:" + //
                 "\n\tMaximum:");
-        htmlUtils.insertTextLeft(" " + //
+        HtmlUtils.insertTextLeft(" " + //
                 "\n" + Time.writeTime(analyzeSummary.totalWaitTimeMean.Get().number().doubleValue()) + //
                 "\n" + Time.writeTime(analyzeSummary.totalWaitTimeQuantile.Get(1).number().doubleValue()) + //
                 "\n" + Time.writeTime(analyzeSummary.totalWaitTimeQuantile.Get(2).number().doubleValue()) + //
                 "\n" + Time.writeTime(analyzeSummary.maximumWaitTime));
-        htmlUtils.newLine();
-        htmlUtils.insertImg(IMAGE_FOLDER + "/binnedWaitingTimes.png", 800, 600);
-        htmlUtils.insertImg(IMAGE_FOLDER + "/waitBinCounter.png", 800, 600);
+        HtmlUtils.newLine();
+        HtmlUtils.insertImg(IMAGE_FOLDER + "/binnedWaitingTimes.png", 800, 600);
+        HtmlUtils.insertImg(IMAGE_FOLDER + "/waitBinCounter.png", 800, 600);
 
-        htmlUtils.insertSubTitle("Fleet Performance");
-        htmlUtils.insertTextLeft( //
+        HtmlUtils.insertSubTitle("Fleet Performance");
+        HtmlUtils.insertTextLeft( //
                 "Occupancy Ratio:" + //
                         "\nDistance Ratio:" //
         );
-        htmlUtils.insertTextLeft( //
+        HtmlUtils.insertTextLeft( //
                 d.format(analyzeSummary.occupancyRatio * 100) + "%" + //
                         "\n" + d.format(analyzeSummary.distanceRatio * 100) + "%" //
         );
-        htmlUtils.newLine();
-        htmlUtils.insertImg(IMAGE_FOLDER + "/binnedTimeRatios.png", 800, 600);
-        htmlUtils.insertImg(IMAGE_FOLDER + "/binnedDistanceRatios.png", 800, 600);
+        HtmlUtils.newLine();
+        HtmlUtils.insertImg(IMAGE_FOLDER + "/binnedTimeRatios.png", 800, 600);
+        HtmlUtils.insertImg(IMAGE_FOLDER + "/binnedDistanceRatios.png", 800, 600);
         if (scenarioParametersingleton.EMDks != null) {
-            htmlUtils.insertTextLeft("Average Trip Distance:");
-            htmlUtils.insertTextLeft(d.format( //
+            HtmlUtils.insertTextLeft("Average Trip Distance:");
+            HtmlUtils.insertTextLeft(d.format( //
                     link2km * analyzeSummary.distanceWithCust / analyzeSummary.numRequests) + " km");
-            htmlUtils.newLine();
+            HtmlUtils.newLine();
         }
-        htmlUtils.insertImg(IMAGE_FOLDER + "/tripDistances.png", 800, 600);
-        htmlUtils.insertImg(IMAGE_FOLDER + "/distanceDistribution.png", 800, 600);
-        htmlUtils.insertImg(IMAGE_FOLDER + "/totalDistanceVehicle.png", 800, 600);
-        htmlUtils.insertImg(IMAGE_FOLDER + "/dwcVehicle.png", 800, 600);
-        htmlUtils.insertImg(IMAGE_FOLDER + "/statusDistribution.png", 800, 600);
+        HtmlUtils.insertImg(IMAGE_FOLDER + "/tripDistances.png", 800, 600);
+        HtmlUtils.insertImg(IMAGE_FOLDER + "/distanceDistribution.png", 800, 600);
+        HtmlUtils.insertImg(IMAGE_FOLDER + "/totalDistanceVehicle.png", 800, 600);
+        HtmlUtils.insertImg(IMAGE_FOLDER + "/dwcVehicle.png", 800, 600);
+        HtmlUtils.insertImg(IMAGE_FOLDER + "/statusDistribution.png", 800, 600);
         if (scenarioParametersingleton.EMDks != null) {
-            htmlUtils.newLine();
-            htmlUtils.insertTextLeft("Minimum Fleet Size:" + //
+            HtmlUtils.newLine();
+            HtmlUtils.insertTextLeft("Minimum Fleet Size:" + //
                     "\nAverage Earth Movers Distance:");
-            htmlUtils.insertTextLeft((int) Math.ceil(scenarioParametersingleton.minimumFleet) + //
+            HtmlUtils.insertTextLeft((int) Math.ceil(scenarioParametersingleton.minimumFleet) + //
                     "\n" + d.format(Mean.of(scenarioParametersingleton.EMDks).Get().number().doubleValue() * link2km) + " km");
-            htmlUtils.newLine();
-            htmlUtils.insertImg(IMAGE_FOLDER + "/minFleet.png", 800, 600);
-            htmlUtils.insertImg(IMAGE_FOLDER + "/EMD.png", 800, 600);
+            HtmlUtils.newLine();
+            HtmlUtils.insertImg(IMAGE_FOLDER + "/minFleet.png", 800, 600);
+            HtmlUtils.insertImg(IMAGE_FOLDER + "/EMD.png", 800, 600);
         }
 
         
-        htmlUtils.insertImgIfExists(IMAGE_FOLDER + "/availbilitiesByNumberVehicles.png",reportFolder.getAbsolutePath(), 800, 600);
+        HtmlUtils.insertImgIfExists(IMAGE_FOLDER + "/availbilitiesByNumberVehicles.png",reportFolder.getAbsolutePath(), 800, 600);
 
         // ----------------------------------------------
-        htmlUtils.footer();
-        htmlUtils.insertLink("http://www.idsc.ethz.ch/", "www.idsc.ethz.ch");
-        htmlUtils.footer();
+        HtmlUtils.footer();
+        HtmlUtils.insertLink("http://www.idsc.ethz.ch/", "www.idsc.ethz.ch");
+        HtmlUtils.footer();
         // ----------------------------------------------
-        htmlUtils.body();
-        htmlUtils.html();
+        HtmlUtils.body();
+        HtmlUtils.html();
 
         // save document
         // -------------------------------------------------------------------------------------------------------------
         try {
-            htmlUtils.saveFile(REPORT_NAME);
+            HtmlUtils.saveFile(REPORT_NAME);
         } catch (Exception e) {
             System.err.println("Not able to save report. ");
             e.printStackTrace();
