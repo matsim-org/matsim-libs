@@ -19,13 +19,13 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
@@ -63,15 +63,14 @@ public class VehicleData {
 		idleCount = idleCounter;
 	}
 
-	public VehicleData(MobsimTimer timer, TaxiScheduleInquiry scheduleInquiry, Iterable<? extends Vehicle> vehicles) {
-		this(timer, scheduleInquiry, vehicles, NO_PLANNING_HORIZON);
+	public VehicleData(double currentTime, TaxiScheduleInquiry scheduleInquiry, Iterable<? extends Vehicle> vehicles) {
+		this(currentTime, scheduleInquiry, vehicles, NO_PLANNING_HORIZON);
 	}
 
 	// skipping vehicles with departure.time > curr_time + maxDepartureDelay
-	public VehicleData(MobsimTimer timer, TaxiScheduleInquiry scheduleInquiry, Iterable<? extends Vehicle> vehicles,
+	public VehicleData(double currentTime, TaxiScheduleInquiry scheduleInquiry, Iterable<? extends Vehicle> vehicles,
 			double planningHorizon) {
-		double currTime = timer.getTimeOfDay();
-		double maxDepartureTime = currTime + planningHorizon;
+		double maxDepartureTime = currentTime + planningHorizon;
 
 		int idx = 0;
 		int idleCounter = 0;
@@ -79,7 +78,7 @@ public class VehicleData {
 			LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(v);
 
 			if (departure != null && departure.time <= maxDepartureTime) {
-				boolean idle = departure.time == currTime // to avoid unnecessary calls to Scheduler.isIdle()
+				boolean idle = departure.time == currentTime // to avoid unnecessary calls to Scheduler.isIdle()
 						&& scheduleInquiry.isIdle(v);
 				entries.add(new Entry(idx++, v, departure.link, departure.time, idle));
 				if (idle) {

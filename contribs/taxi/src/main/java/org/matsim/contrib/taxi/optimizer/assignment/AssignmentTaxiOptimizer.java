@@ -83,7 +83,7 @@ public class AssignmentTaxiOptimizer extends AbstractTaxiOptimizer {
 	@Override
 	protected void scheduleUnplannedRequests() {
 		// advance request not considered => horizon==0
-		AssignmentRequestData rData = new AssignmentRequestData(timer, 0, getUnplannedRequests());
+		AssignmentRequestData rData = new AssignmentRequestData(timer.getTimeOfDay(), 0, getUnplannedRequests());
 		if (rData.getSize() == 0) {
 			return;
 		}
@@ -107,7 +107,8 @@ public class AssignmentTaxiOptimizer extends AbstractTaxiOptimizer {
 				Iterables.filter(getFleet().getVehicles().values(), ScheduleInquiries.createIsIdle(getScheduler())));
 		double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ? //
 				params.vehPlanningHorizonUndersupply : params.vehPlanningHorizonOversupply;
-		return new VehicleData(timer, getScheduler(), getFleet().getVehicles().values(), vehPlanningHorizon);
+		return new VehicleData(timer.getTimeOfDay(), getScheduler(), getFleet().getVehicles().values(),
+				vehPlanningHorizon);
 	}
 
 	protected MultiNodePathCalculator getRouter() {
