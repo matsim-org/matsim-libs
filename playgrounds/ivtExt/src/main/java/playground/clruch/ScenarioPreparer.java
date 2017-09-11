@@ -23,6 +23,7 @@ import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeIO;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeIO;
 import playground.clruch.data.LocationSpec;
+import playground.clruch.netdata.MatsimCenterVirtualNetworkCreator;
 import playground.clruch.netdata.MatsimKMEANSVirtualNetworkCreator;
 import playground.clruch.prep.NetworkCutClean;
 import playground.clruch.prep.PopulationRequestSchedule;
@@ -36,6 +37,7 @@ import playground.clruch.utils.PropertiesExt;
  * and travelData objects.
  * 
  * @author clruch */
+// TODO clean up thoroughly this file
 public class ScenarioPreparer {
 
     private final static String NETWORKUPDATEDNAME = "networkConverted";
@@ -64,6 +66,7 @@ public class ScenarioPreparer {
         int maxPopulationSize = simOptions.getInt("maxPopulationSize");
         int dtTravelData = simOptions.getInt("dtTravelData");
         boolean calculatePerformanceFleetSize = simOptions.getBoolean("calculatePerformanceFleetSize");
+        boolean centerNetwork = simOptions.getBoolean("centerNetwork");
         String VIRTUALNETWORKFOLDERNAME = simOptions.getString("virtualNetworkDir");
         String VIRTUALNETWORKFILENAME = simOptions.getString("virtualNetworkName");
         String TRAVELDATAFILENAME = simOptions.getString("travelDataName");
@@ -132,8 +135,16 @@ public class ScenarioPreparer {
         }
 
         // 3) create virtual Network
-        MatsimKMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new MatsimKMEANSVirtualNetworkCreator();
-        VirtualNetwork<Link> virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
+        // TODO make this generic for any VirtualNetwork creators. 
+        VirtualNetwork<Link> virtualNetwork;
+        if(centerNetwork){
+            MatsimCenterVirtualNetworkCreator centercreator = new MatsimCenterVirtualNetworkCreator();
+            virtualNetwork = centercreator.creatVirtualNetwork(network);            
+        }else{
+            MatsimKMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new MatsimKMEANSVirtualNetworkCreator();
+            virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);            
+        }
+
         final File vnDir = new File(workingDirectory, VIRTUALNETWORKFOLDERNAME);
         vnDir.mkdir(); // create folder if necessary
         (new VirtualNetworkIO<Link>()).toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);

@@ -34,6 +34,7 @@ public enum ScenarioOptions {
         returnP.setProperty("calculatePerformanceFleetSize", "false");
         returnP.setProperty("minimumFleetSizeFileName", "minimumFleetSizeCalculator");
         returnP.setProperty("performanceFleetSizeFileName", "performanceFleetSizeCalculator");
+        returnP.setProperty("centerNetwork","false");
         return returnP;
     }
 
