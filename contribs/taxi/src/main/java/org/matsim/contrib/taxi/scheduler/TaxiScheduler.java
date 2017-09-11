@@ -55,8 +55,8 @@ import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.taxi.schedule.TaxiTaskWithRequest;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.FastAStarEuclideanFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
@@ -73,14 +73,13 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	@Inject
 	public TaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, @Named(DvrpModule.DVRP_ROUTING) Network network,
 			MobsimTimer timer, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory) {
+			@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER) TravelDisutility travelDisutility) {
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.timer = timer;
 		this.travelTime = travelTime;
 
-		router = new FastAStarEuclideanFactory().createPathCalculator(network,
-				travelDisutilityFactory.createTravelDisutility(travelTime), travelTime);
+		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
 		initFleet(taxiCfg);
 	}
 
