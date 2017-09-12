@@ -21,7 +21,7 @@ package org.matsim.contrib.taxi.optimizer.rules;
 
 import org.apache.commons.configuration.Configuration;
 import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
-import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer.Goal;
+import org.matsim.contrib.taxi.optimizer.rules.RuleBasedRequestInserter.Goal;
 
 public class RuleBasedTaxiOptimizerParams extends AbstractTaxiOptimizerParams {
 	public static final String GOAL = "goal";

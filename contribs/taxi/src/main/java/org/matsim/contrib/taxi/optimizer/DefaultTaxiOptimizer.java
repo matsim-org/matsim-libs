@@ -37,11 +37,12 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 /**
  * @author michalm
  */
-public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
-	private final Collection<TaxiRequest> unplannedRequests;
-
+public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
+
+	private final Collection<TaxiRequest> unplannedRequests;
+	private final UnplannedRequestInserter requestInserter;
 
 	private final boolean doUnscheduleAwaitingRequests;// PLANNED
 	private final boolean doUpdateTimelines;// PLANNED
@@ -51,13 +52,15 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 
 	private boolean requiresReoptimization = false;
 
-	public AbstractTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
-			AbstractTaxiOptimizerParams params, Collection<TaxiRequest> unplannedRequests,
-			boolean doUnscheduleAwaitingRequests, boolean doUpdateTimelines) {
-		this.unplannedRequests = unplannedRequests;
-
+	public DefaultTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
+			AbstractTaxiOptimizerParams params, UnplannedRequestInserter requestInserter,
+			Collection<TaxiRequest> unplannedRequests, boolean doUnscheduleAwaitingRequests,
+			boolean doUpdateTimelines) {
 		this.fleet = fleet;
 		this.scheduler = scheduler;
+
+		this.unplannedRequests = unplannedRequests;
+		this.requestInserter = requestInserter;
 
 		this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;
 		this.doUpdateTimelines = doUpdateTimelines;
@@ -92,7 +95,8 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 		}
 	}
 
-	protected boolean isNewDecisionEpoch(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e, int epochLength) {
+	public static boolean isNewDecisionEpoch(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e,
+			int epochLength) {
 		return e.getSimulationTime() % epochLength == 0;
 	}
 
@@ -101,7 +105,9 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 		unplannedRequests.addAll(removedRequests);
 	}
 
-	protected abstract void scheduleUnplannedRequests();
+	protected void scheduleUnplannedRequests() {
+		requestInserter.scheduleUnplannedRequests(unplannedRequests);
+	}
 
 	protected void handleAimlessDriveTasks() {
 		scheduler.stopAllAimlessDriveTasks();
@@ -137,23 +143,7 @@ public abstract class AbstractTaxiOptimizer implements TaxiOptimizer {
 		// if (delays/speedups encountered) {requiresReoptimization = true;}
 	}
 
-	protected Collection<TaxiRequest> getUnplannedRequests() {
-		return unplannedRequests;
-	}
-
-	protected boolean isRequiresReoptimization() {
-		return requiresReoptimization;
-	}
-
 	protected void setRequiresReoptimization(boolean requiresReoptimization) {
 		this.requiresReoptimization = requiresReoptimization;
-	}
-
-	protected Fleet getFleet() {
-		return fleet;
-	}
-
-	protected TaxiScheduler getScheduler() {
-		return scheduler;
 	}
 }
