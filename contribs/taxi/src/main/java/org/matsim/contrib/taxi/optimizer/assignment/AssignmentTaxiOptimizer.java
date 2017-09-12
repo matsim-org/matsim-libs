@@ -41,6 +41,6 @@ public class AssignmentTaxiOptimizer extends DefaultTaxiOptimizer {
 
 	public AssignmentTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
 			AssignmentTaxiOptimizerParams params, AssignmentRequestInserter requestInserter) {
-		super(taxiCfg, fleet, scheduler, params, requestInserter, true, true);
+		super(taxiCfg, fleet, scheduler, params, requestInserter);
 	}
 }

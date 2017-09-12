@@ -27,10 +27,17 @@ import org.apache.commons.configuration.Configuration;
 public class DefaultTaxiOptimizerParams {
 	public static final String REOPTIMIZATION_TIME_STEP = "reoptimizationTimeStep";
 
+	public final boolean doUnscheduleAwaitingRequests;// PLANNED requests
+	public final boolean doUpdateTimelines;// STARTED+PLANNED requests
+
 	// usually 1 s; however, the assignment strategy for TaxiBerlin used 10 s (IEEE IS paper)
 	public final int reoptimizationTimeStep;
 
-	protected DefaultTaxiOptimizerParams(Configuration optimizerConfig) {
+	public DefaultTaxiOptimizerParams(Configuration optimizerConfig, boolean doUnscheduleAwaitingRequests,
+			boolean doUpdateTimelines) {
+		this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;
+		this.doUpdateTimelines = doUnscheduleAwaitingRequests;
+
 		reoptimizationTimeStep = optimizerConfig.getInt(REOPTIMIZATION_TIME_STEP, 1);
 	}
 }

@@ -37,6 +37,6 @@ public class FifoTaxiOptimizer extends DefaultTaxiOptimizer {
 			TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler,
 			FifoTaxiOptimizerParams params) {
 		super(taxiCfg, fleet, scheduler, params,
-				new FifoRequestInserter(network, fleet, timer, travelTime, travelDisutility, scheduler), true, true);
+				new FifoRequestInserter(network, fleet, timer, travelTime, travelDisutility, scheduler));
 	}
 }

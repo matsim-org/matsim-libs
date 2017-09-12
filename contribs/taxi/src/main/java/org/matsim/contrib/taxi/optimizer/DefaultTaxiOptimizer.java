@@ -46,41 +46,33 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final Collection<TaxiRequest> unplannedRequests = new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR);
 	private final UnplannedRequestInserter requestInserter;
 
-	private final boolean doUnscheduleAwaitingRequests;// PLANNED
-	private final boolean doUpdateTimelines;// PLANNED
 	private final boolean destinationKnown;
 	private final boolean vehicleDiversion;
-	private final int reoptimizationTimeStep;
+	private final DefaultTaxiOptimizerParams params;
 
 	private boolean requiresReoptimization = false;
 
 	public DefaultTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
-			DefaultTaxiOptimizerParams params, UnplannedRequestInserter requestInserter,
-			boolean doUnscheduleAwaitingRequests,
-			boolean doUpdateTimelines) {
+			DefaultTaxiOptimizerParams params, UnplannedRequestInserter requestInserter) {
 		this.fleet = fleet;
 		this.scheduler = scheduler;
-
 		this.requestInserter = requestInserter;
-
-		this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;
-		this.doUpdateTimelines = doUpdateTimelines;
+		this.params = params;
 
 		destinationKnown = taxiCfg.isDestinationKnown();
 		vehicleDiversion = taxiCfg.isVehicleDiversion();
-		reoptimizationTimeStep = params.reoptimizationTimeStep;
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
-		if (requiresReoptimization && isNewDecisionEpoch(e, reoptimizationTimeStep)) {
-			if (doUnscheduleAwaitingRequests) {
+		if (requiresReoptimization && isNewDecisionEpoch(e, params.reoptimizationTimeStep)) {
+			if (params.doUnscheduleAwaitingRequests) {
 				unscheduleAwaitingRequests();
 			}
 
 			// TODO update timeline only if the algo really wants to reschedule in this time step,
 			// perhaps by checking if there are any unplanned requests??
-			if (doUpdateTimelines) {
+			if (params.doUpdateTimelines) {
 				for (Vehicle v : fleet.getVehicles().values()) {
 					scheduler.updateTimeline(v);
 				}
@@ -88,7 +80,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 
 			scheduleUnplannedRequests();
 
-			if (doUnscheduleAwaitingRequests && vehicleDiversion) {
+			if (params.doUnscheduleAwaitingRequests && vehicleDiversion) {
 				handleAimlessDriveTasks();
 			}
 
