@@ -39,7 +39,7 @@ public class RuleBasedTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public final double cellSize;
 
 	public RuleBasedTaxiOptimizerParams(Configuration optimizerConfig) {
-		super(optimizerConfig);
+		super(optimizerConfig, false, false);
 
 		goal = Goal.valueOf(optimizerConfig.getString(GOAL));
 

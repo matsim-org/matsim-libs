@@ -69,7 +69,7 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 	public RuleBasedTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
 			RuleBasedTaxiOptimizerParams params, IdleTaxiZonalRegistry idleTaxiRegistry,
 			UnplannedRequestZonalRegistry unplannedRequestRegistry, UnplannedRequestInserter requestInserter) {
-		super(taxiCfg, fleet, scheduler, params, requestInserter, false, false);
+		super(taxiCfg, fleet, scheduler, params, requestInserter);
 
 		this.scheduler = scheduler;
 		this.idleTaxiRegistry = idleTaxiRegistry;
