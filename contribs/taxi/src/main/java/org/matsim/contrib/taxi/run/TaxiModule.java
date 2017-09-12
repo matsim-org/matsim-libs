@@ -43,6 +43,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
+import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
@@ -62,19 +63,27 @@ public final class TaxiModule extends AbstractModule {
 	}
 
 	public TaxiModule(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		dvrpModule = new DvrpModule(createModuleForQSimPlugin(providerClass), TaxiOptimizer.class);
-	}
-
-	private static com.google.inject.AbstractModule createModuleForQSimPlugin(
-			final Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		return new com.google.inject.AbstractModule() {
+		this(new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
 				bind(TaxiOptimizer.class).toProvider(providerClass).asEagerSingleton();
+			}
+		});
+	}
+
+	public TaxiModule(Module taxiOptimizerModule) {
+		dvrpModule = new DvrpModule(createModuleForQSimPlugin(taxiOptimizerModule), TaxiOptimizer.class);
+	}
+
+	public static Module createModuleForQSimPlugin(Module taxiOptimizerModule) {
+		return new com.google.inject.AbstractModule() {
+			@Override
+			protected void configure() {
 				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
 				bind(TaxiScheduler.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
 				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
+				install(taxiOptimizerModule);
 			}
 
 			@Provides
