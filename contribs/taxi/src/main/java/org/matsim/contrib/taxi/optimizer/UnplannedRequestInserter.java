@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +16,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.schedule;
+package org.matsim.contrib.taxi.optimizer;
 
-import org.matsim.contrib.dvrp.data.Vehicle;
+import java.util.Collection;
 
-import com.google.common.base.Predicate;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 
 /**
  * @author michalm
  */
-public class ScheduleInquiries {
-	public static Predicate<Vehicle> createIsIdle(final ScheduleInquiry scheduleInquiry) {
-		return new Predicate<Vehicle>() {
-			public boolean apply(Vehicle vehicle) {
-				return scheduleInquiry.isIdle(vehicle);
-			}
-		};
-	}
+public interface UnplannedRequestInserter {
+	void scheduleUnplannedRequests(Collection<TaxiRequest> unplannedRequests);
 }
