@@ -19,12 +19,9 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
-import java.util.TreeSet;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
@@ -72,8 +69,7 @@ public class RuleBasedTaxiOptimizer extends DefaultTaxiOptimizer {
 	public RuleBasedTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
 			RuleBasedTaxiOptimizerParams params, IdleTaxiZonalRegistry idleTaxiRegistry,
 			UnplannedRequestZonalRegistry unplannedRequestRegistry, UnplannedRequestInserter requestInserter) {
-		super(taxiCfg, fleet, scheduler, params, requestInserter,
-				new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false, false);
+		super(taxiCfg, fleet, scheduler, params, requestInserter, false, false);
 
 		this.scheduler = scheduler;
 		this.idleTaxiRegistry = idleTaxiRegistry;

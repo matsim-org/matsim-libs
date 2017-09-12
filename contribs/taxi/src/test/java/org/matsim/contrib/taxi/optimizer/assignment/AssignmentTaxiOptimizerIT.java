@@ -25,7 +25,7 @@ import java.util.*;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider.OptimizerType;
 import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
 import org.matsim.testcases.MatsimTestUtils;
@@ -53,7 +53,7 @@ public class AssignmentTaxiOptimizerIT {
 		params.put(AssignmentTaxiOptimizerParams.VEH_PLANNING_HORIZON_UNDERSUPPLY, 30 + "");
 		params.put(AssignmentTaxiOptimizerParams.NEAREST_REQUESTS_LIMIT, 10 + "");
 		params.put(AssignmentTaxiOptimizerParams.NEAREST_VEHICLES_LIMIT, 10 + "");
-		params.put(AbstractTaxiOptimizerParams.REOPTIMIZATION_TIME_STEP, 10 + "");
+		params.put(DefaultTaxiOptimizerParams.REOPTIMIZATION_TIME_STEP, 10 + "");
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_B");
 	}
 }

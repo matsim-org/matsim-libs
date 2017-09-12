@@ -74,7 +74,7 @@ public class TaxiOptimizerTestIT {
 		params.put(AssignmentTaxiOptimizerParams.VEH_PLANNING_HORIZON_UNDERSUPPLY, 30 + "");
 		params.put(AssignmentTaxiOptimizerParams.NEAREST_REQUESTS_LIMIT, 10 + "");
 		params.put(AssignmentTaxiOptimizerParams.NEAREST_VEHICLES_LIMIT, 10 + "");
-		params.put(AbstractTaxiOptimizerParams.REOPTIMIZATION_TIME_STEP, 10 + "");
+		params.put(DefaultTaxiOptimizerParams.REOPTIMIZATION_TIME_STEP, 10 + "");
 		runBenchmark(variants, params, benchmark, utils.getOutputDirectory() + "_B");
 
 		params.put(AssignmentTaxiOptimizerParams.MODE, Mode.TOTAL_WAIT_TIME.name());

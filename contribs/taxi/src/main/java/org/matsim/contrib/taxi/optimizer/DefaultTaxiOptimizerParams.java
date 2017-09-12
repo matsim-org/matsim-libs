@@ -24,13 +24,13 @@ import org.apache.commons.configuration.Configuration;
 /**
  * @author michalm
  */
-public class AbstractTaxiOptimizerParams {
+public class DefaultTaxiOptimizerParams {
 	public static final String REOPTIMIZATION_TIME_STEP = "reoptimizationTimeStep";
 
 	// usually 1 s; however, the assignment strategy for TaxiBerlin used 10 s (IEEE IS paper)
 	public final int reoptimizationTimeStep;
 
-	protected AbstractTaxiOptimizerParams(Configuration optimizerConfig) {
+	protected DefaultTaxiOptimizerParams(Configuration optimizerConfig) {
 		reoptimizationTimeStep = optimizerConfig.getInt(REOPTIMIZATION_TIME_STEP, 1);
 	}
 }

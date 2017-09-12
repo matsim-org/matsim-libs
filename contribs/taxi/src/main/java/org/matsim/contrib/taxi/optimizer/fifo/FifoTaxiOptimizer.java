@@ -19,12 +19,8 @@
 
 package org.matsim.contrib.taxi.optimizer.fifo;
 
-import java.util.PriorityQueue;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Requests;
-import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
@@ -41,7 +37,6 @@ public class FifoTaxiOptimizer extends DefaultTaxiOptimizer {
 			TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler,
 			FifoTaxiOptimizerParams params) {
 		super(taxiCfg, fleet, scheduler, params,
-				new FifoRequestInserter(network, fleet, timer, travelTime, travelDisutility, scheduler),
-				new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), true, true);
+				new FifoRequestInserter(network, fleet, timer, travelTime, travelDisutility, scheduler), true, true);
 	}
 }

@@ -19,12 +19,8 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
-import java.util.TreeSet;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.Requests;
-import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
@@ -45,7 +41,6 @@ public class AssignmentTaxiOptimizer extends DefaultTaxiOptimizer {
 
 	public AssignmentTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
 			AssignmentTaxiOptimizerParams params, AssignmentRequestInserter requestInserter) {
-		super(taxiCfg, fleet, scheduler, params, requestInserter,
-				new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), true, true);
+		super(taxiCfg, fleet, scheduler, params, requestInserter, true, true);
 	}
 }
