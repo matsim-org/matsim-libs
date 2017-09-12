@@ -21,10 +21,12 @@ package org.matsim.contrib.taxi.optimizer;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.TreeSet;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.data.TaxiRequest;
@@ -41,7 +43,7 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
 
-	private final Collection<TaxiRequest> unplannedRequests;
+	private final Collection<TaxiRequest> unplannedRequests = new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR);
 	private final UnplannedRequestInserter requestInserter;
 
 	private final boolean doUnscheduleAwaitingRequests;// PLANNED
@@ -53,13 +55,12 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private boolean requiresReoptimization = false;
 
 	public DefaultTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
-			AbstractTaxiOptimizerParams params, UnplannedRequestInserter requestInserter,
-			Collection<TaxiRequest> unplannedRequests, boolean doUnscheduleAwaitingRequests,
+			DefaultTaxiOptimizerParams params, UnplannedRequestInserter requestInserter,
+			boolean doUnscheduleAwaitingRequests,
 			boolean doUpdateTimelines) {
 		this.fleet = fleet;
 		this.scheduler = scheduler;
 
-		this.unplannedRequests = unplannedRequests;
 		this.requestInserter = requestInserter;
 
 		this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;

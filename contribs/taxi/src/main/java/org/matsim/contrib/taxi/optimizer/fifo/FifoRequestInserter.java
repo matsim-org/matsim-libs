@@ -19,7 +19,6 @@
 package org.matsim.contrib.taxi.optimizer.fifo;
 
 import java.util.Collection;
-import java.util.Queue;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
@@ -48,7 +47,6 @@ public class FifoRequestInserter implements UnplannedRequestInserter {
 
 	@Override
 	public void scheduleUnplannedRequests(Collection<TaxiRequest> unplannedRequests) {
-		new FifoSchedulingProblem(fleet, scheduler, dispatchFinder)
-				.scheduleUnplannedRequests((Queue<TaxiRequest>)unplannedRequests);
+		new FifoSchedulingProblem(fleet, scheduler, dispatchFinder).scheduleUnplannedRequests(unplannedRequests);
 	}
 }

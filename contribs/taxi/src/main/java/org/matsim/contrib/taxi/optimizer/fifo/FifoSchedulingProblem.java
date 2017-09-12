@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.taxi.optimizer.fifo;
 
-import java.util.Queue;
+import java.util.Collection;
+import java.util.Iterator;
 
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.data.TaxiRequest;
@@ -37,9 +38,10 @@ public class FifoSchedulingProblem {
 		this.dispatchFinder = vrpFinder;
 	}
 
-	public void scheduleUnplannedRequests(Queue<TaxiRequest> unplannedRequests) {
-		while (!unplannedRequests.isEmpty()) {
-			TaxiRequest req = unplannedRequests.peek();
+	public void scheduleUnplannedRequests(Collection<TaxiRequest> unplannedRequests) {
+		Iterator<TaxiRequest> reqIter = unplannedRequests.iterator();
+		while (reqIter.hasNext()) {
+			TaxiRequest req = reqIter.next();
 
 			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestVehicleForRequest(req,
 					fleet.getVehicles().values());
@@ -52,7 +54,7 @@ public class FifoSchedulingProblem {
 			}
 
 			scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
-			unplannedRequests.poll();
+			reqIter.remove();
 		}
 	}
 }
