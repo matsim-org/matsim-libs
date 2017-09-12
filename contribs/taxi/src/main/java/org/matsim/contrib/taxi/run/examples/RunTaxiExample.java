@@ -52,13 +52,13 @@ public class RunTaxiExample {
 		// setup controler
 		Controler controler = new Controler(scenario);
 
-		final boolean ownTaxiOptimizer = false ;
-		if ( !ownTaxiOptimizer) {
-			controler.addOverridingModule(new TaxiModule()); 
+		final boolean ownTaxiOptimizer = false;
+		if (!ownTaxiOptimizer) {
+			controler.addOverridingModule(new TaxiModule());
 			// (default taxi optimizer)
 		} else {
-			controler.addOverridingModule(new TaxiModule( MyTaxiOptimizerProvider.class ) );
-//			(implement your own taxi optimizer)
+			controler.addOverridingModule(new TaxiModule(MyTaxiOptimizerProvider.class));
+			// (implement your own taxi optimizer)
 		}
 
 		controler.addOverridingModule(new TaxiOutputModule()); // taxi output (can be commented out)
@@ -74,29 +74,34 @@ public class RunTaxiExample {
 	public static void main(String[] args) {
 		RunTaxiExample.run(false, 0); // switch to 'false' to turn off visualisation
 	}
-	
+
 	/**
 	 * See {@link DefaultTaxiOptimizerProvider} for examples.
 	 */
-	@SuppressWarnings("unused")
 	private static class MyTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
-		@Override public TaxiOptimizer get() {
-			return new TaxiOptimizer(){
-				@Override public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
+		@Override
+		public TaxiOptimizer get() {
+			return new TaxiOptimizer() {
+				@Override
+				public void vehicleEnteredNextLink(Vehicle vehicle, Link nextLink) {
 					// TODO Auto-generated method stub
 				}
-				@Override public void requestSubmitted(Request request) {
+
+				@Override
+				public void requestSubmitted(Request request) {
 					// TODO Auto-generated method stub
 				}
-				@Override public void nextTask(Vehicle vehicle) {
+
+				@Override
+				public void nextTask(Vehicle vehicle) {
 					// TODO Auto-generated method stub
 				}
-				@Override public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+
+				@Override
+				public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 					// TODO Auto-generated method stub
 				}
-			} ;
+			};
 		}
 	}
-
-
 }

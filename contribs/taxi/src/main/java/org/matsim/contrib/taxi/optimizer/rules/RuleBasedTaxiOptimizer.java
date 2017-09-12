@@ -21,44 +21,54 @@ package org.matsim.contrib.taxi.optimizer.rules;
 
 import java.util.*;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.zone.*;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.router.util.*;
 
 /**
  * @author michalm
  */
 public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 	private final BestDispatchFinder dispatchFinder;
+	private final MobsimTimer timer;
 
 	private final IdleTaxiZonalRegistry idleTaxiRegistry;
 	private final UnplannedRequestZonalRegistry unplannedRequestRegistry;
 
 	private final RuleBasedTaxiOptimizerParams params;
 
-	public RuleBasedTaxiOptimizer(TaxiOptimizerContext optimContext, RuleBasedTaxiOptimizerParams params) {
-		this(optimContext, params, new SquareGridSystem(optimContext.network, params.cellSize));
+	public RuleBasedTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, Network network, MobsimTimer timer,
+			TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler,
+			RuleBasedTaxiOptimizerParams params) {
+		this(taxiCfg, fleet, scheduler, network, timer, travelTime, travelDisutility, params,
+				new SquareGridSystem(network, params.cellSize));
 	}
 
-	public RuleBasedTaxiOptimizer(TaxiOptimizerContext optimContext, RuleBasedTaxiOptimizerParams params,
-			ZonalSystem zonalSystem) {
-		super(optimContext, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false, false);
+	public RuleBasedTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler, Network network,
+			MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
+			RuleBasedTaxiOptimizerParams params, ZonalSystem zonalSystem) {
+		super(taxiCfg, fleet, scheduler, params, new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR), false, false);
 
 		this.params = params;
+		this.timer = timer;
 
-		if (optimContext.taxiCfg.isVehicleDiversion()) {
+		if (taxiCfg.isVehicleDiversion()) {
 			// hmmmm, change into warning?? or even allow it (e.g. for empty taxi relocaton)??
 			throw new RuntimeException("Diversion is not supported by RuleBasedTaxiOptimizer");
 		}
 
-		dispatchFinder = new BestDispatchFinder(optimContext);
-		idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, optimContext.scheduler);
+		dispatchFinder = new BestDispatchFinder(scheduler, network, timer, travelTime, travelDisutility);
+		idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler);
 		unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
 	}
 
@@ -85,7 +95,7 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 
 			case DEMAND_SUPPLY_EQUIL:
 				int awaitingReqCount = Requests.countRequests(getUnplannedRequests(),
-						new Requests.IsUrgentPredicate(getOptimContext().timer.getTimeOfDay()));
+						new Requests.IsUrgentPredicate(timer.getTimeOfDay()));
 
 				return awaitingReqCount > idleTaxiRegistry.getVehicleCount();
 
@@ -120,7 +130,7 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 
 			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestVehicleForRequest(req, selectedVehs);
 
-			getOptimContext().scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+			getScheduler().scheduleRequest(best.vehicle, best.destination, best.path);
 
 			reqIter.remove();
 			unplannedRequestRegistry.removeRequest(req);
@@ -141,7 +151,7 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 
 			BestDispatchFinder.Dispatch<TaxiRequest> best = dispatchFinder.findBestRequestForVehicle(veh, selectedReqs);
 
-			getOptimContext().scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
+			getScheduler().scheduleRequest(best.vehicle, best.destination, best.path);
 
 			getUnplannedRequests().remove(best.destination);
 			unplannedRequestRegistry.removeRequest(best.destination);
@@ -164,10 +174,10 @@ public class RuleBasedTaxiOptimizer extends AbstractTaxiOptimizer {
 			if (lastTask.getBeginTime() < vehicle.getServiceEndTime()) {
 				idleTaxiRegistry.removeVehicle(vehicle);
 			}
-		} else if (getOptimContext().scheduler.isIdle(vehicle)) {
+		} else if (getScheduler().isIdle(vehicle)) {
 			idleTaxiRegistry.addVehicle(vehicle);
 		} else {
-			if (schedule.getCurrentTask().getTaskIdx() != 0) {//not first task
+			if (schedule.getCurrentTask().getTaskIdx() != 0) {// not first task
 				TaxiTask previousTask = (TaxiTask)Schedules.getPreviousTask(schedule);
 				if (isWaitStay(previousTask)) {
 					idleTaxiRegistry.removeVehicle(vehicle);
