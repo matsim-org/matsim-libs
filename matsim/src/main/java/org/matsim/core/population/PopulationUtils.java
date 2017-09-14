@@ -481,104 +481,109 @@ public final class PopulationUtils {
 		return TripStructureUtils.getLegs( plan ) ;
 	}
 
-	/**
-	 * Notes:<ul>
-	 * <li>not normalized (for the time being?)
-	 * <li>does not look at times (for the time being?)
-	 * </ul>
-	 *
-	 */
-	public static double calculateSimilarity(List<Leg> legs1, List<Leg> legs2, Network network, 
-			double sameModeReward, double sameRouteReward ) {
-		// yyyy should be made configurable somehow (i.e. possibly not a static method any more).  kai, apr'15
-
-		// yy kwa points to: 
-		// Schüssler, N. and K.W. Axhausen (2009b) Accounting for similarities in destination choice modelling: A concept, paper presented at the 9th Swiss Transport Research Conference, Ascona, October 2009.
-		//		und 
-		//  Joh, Chang-Hyeon, Theo A. Arentze and Harry J. P. Timmermans (2001). 
-		// A Position-Sensitive Sequence Alignment Method Illustrated for Space-Time Activity-Diary Data¹, Environment and Planning A 33(2): 313­338.
-
-		// Mahdieh Allahviranloo has some work on activity pattern similarity (iatbr'15)
-
-		double simil = 0. ;
-		Iterator<Leg> it1 = legs1.iterator();
-		Iterator<Leg> it2 = legs2.iterator();
-		for ( ; it1.hasNext() && it2.hasNext(); ) {
-			Leg leg1 = it1.next() ;
-			Leg leg2 = it2.next() ;
-			if ( leg1.getMode().equals( leg2.getMode() ) ) {
-				simil += sameModeReward ;
-			}
-			// the easy way for the route is to not go along the links but just check for overlap.
-			Route route1 = leg1.getRoute() ;
-			Route route2 = leg2.getRoute() ;
-			// currently only for network routes:
-			NetworkRoute nr1, nr2 ;
-			if ( route1 instanceof NetworkRoute ) {
-				nr1 = (NetworkRoute) route1 ;
-			} else {
-				continue ; // next leg
-			}
-			if ( route2 instanceof NetworkRoute ) {
-				nr2 = (NetworkRoute) route2 ;
-			} else {
-				continue ; // next leg
-			}
-			simil += sameRouteReward * RouteUtils.calculateCoverage(nr1, nr2, network) ;
-		}
-		return simil ;
-	}
-
-	/**
-	 * Notes:<ul>
-	 * <li> not normalized (for the time being?)
-	 * </ul>
-	 */
-	public static double calculateSimilarity(List<Activity> activities1, List<Activity> activities2, double sameActivityTypePenalty, 
-			double sameActivityLocationPenalty, double actTimeParameter ) {
-		// yyyy should be made configurable somehow (i.e. possibly not a static method any more).  kai, apr'15
-
-		// yy kwa points to: 
-		// Schüssler, N. and K.W. Axhausen (2009b) Accounting for similarities in destination choice modelling: A concept, paper presented at the 9th Swiss Transport Research Conference, Ascona, October 2009.
-		//		und 
-		//  Joh, Chang-Hyeon, Theo A. Arentze and Harry J. P. Timmermans (2001). 
-		// A Position-Sensitive Sequence Alignment Method Illustrated for Space-Time Activity-Diary Data¹, Environment and Planning A 33(2): 313­338.
-		
-		// Mahdieh Allahviranloo has some work on activity pattern similarity (iatbr'15)
-
-		double simil = 0. ;
-		Iterator<Activity> it1 = activities1.iterator() ;
-		Iterator<Activity> it2 = activities2.iterator() ;
-		for ( ; it1.hasNext() && it2.hasNext() ; ) {
-			Activity act1 = it1.next() ;
-			Activity act2 = it2.next() ;
-			
-			// activity type
-			if ( act1.getType().equals(act2.getType() ) ) {
-				simil += sameActivityTypePenalty ;
-			}
-			
-			// activity location
-			if ( act1.getCoord().equals( act2.getCoord() ) ){ 
-				simil += sameActivityLocationPenalty ;
-			}
-			
-			// activity end times
-			if ( Double.isInfinite( act1.getEndTime() ) && Double.isInfinite( act2.getEndTime() ) ){
-				// both activities have no end time, no need to compute a similarity penalty
-			} else {
-				// both activities have an end time, comparing the end times
-				
-				// 300/ln(2) means a penalty of 0.5 for 300 sec difference
-				double delta = Math.abs(act1.getEndTime() - act2.getEndTime()) ;
-				simil += actTimeParameter * Math.exp( - delta/(300/Math.log(2)) ) ;
-			}
-			
-		}
-		
-		// a positive value is interpreted as a penalty
-		return simil ;
-	}
+//	/**
+//	 * Notes:<ul>
+//	 * <li>not normalized (for the time being?)
+//	 * <li>does not look at times (for the time being?)
+//	 * </ul>
+//	 *
+//	 */
+//	public static double calculateSimilarity(List<Leg> legs1, List<Leg> legs2, Network network, 
+//			double sameModeReward, double sameRouteReward ) {
+//		
+//		return new LegsSimilarityCalculator1( network, sameModeReward, sameRouteReward ).
+//		
+//		// yyyy should be made configurable somehow (i.e. possibly not a static method any more).  kai, apr'15
+//
+//		// yy kwa points to: 
+//		// Schüssler, N. and K.W. Axhausen (2009b) Accounting for similarities in destination choice modelling: A concept, paper presented at the 9th Swiss Transport Research Conference, Ascona, October 2009.
+//		//		und 
+//		//  Joh, Chang-Hyeon, Theo A. Arentze and Harry J. P. Timmermans (2001). 
+//		// A Position-Sensitive Sequence Alignment Method Illustrated for Space-Time Activity-Diary Data¹, Environment and Planning A 33(2): 313­338.
+//
+//		// Mahdieh Allahviranloo has some work on activity pattern similarity (iatbr'15)
+//		
+//		
+//
+//		double simil = 0. ;
+//		Iterator<Leg> it1 = legs1.iterator();
+//		Iterator<Leg> it2 = legs2.iterator();
+//		for ( ; it1.hasNext() && it2.hasNext(); ) {
+//			Leg leg1 = it1.next() ;
+//			Leg leg2 = it2.next() ;
+//			if ( leg1.getMode().equals( leg2.getMode() ) ) {
+//				simil += sameModeReward ;
+//			}
+//			// the easy way for the route is to not go along the links but just check for overlap.
+//			Route route1 = leg1.getRoute() ;
+//			Route route2 = leg2.getRoute() ;
+//			// currently only for network routes:
+//			NetworkRoute nr1, nr2 ;
+//			if ( route1 instanceof NetworkRoute ) {
+//				nr1 = (NetworkRoute) route1 ;
+//			} else {
+//				continue ; // next leg
+//			}
+//			if ( route2 instanceof NetworkRoute ) {
+//				nr2 = (NetworkRoute) route2 ;
+//			} else {
+//				continue ; // next leg
+//			}
+//			simil += sameRouteReward * RouteUtils.calculateCoverage(nr1, nr2, network) ;
+//		}
+//		return simil ;
+//	}
+//
+//	/**
+//	 * Notes:<ul>
+//	 * <li> not normalized (for the time being?)
+//	 * </ul>
+//	 */
+//	public static double calculateSimilarity(List<Activity> activities1, List<Activity> activities2, double sameActivityTypePenalty, 
+//			double sameActivityLocationPenalty, double actTimeParameter ) {
+//		// yyyy should be made configurable somehow (i.e. possibly not a static method any more).  kai, apr'15
+//
+//		// yy kwa points to: 
+//		// Schüssler, N. and K.W. Axhausen (2009b) Accounting for similarities in destination choice modelling: A concept, paper presented at the 9th Swiss Transport Research Conference, Ascona, October 2009.
+//		//		und 
+//		//  Joh, Chang-Hyeon, Theo A. Arentze and Harry J. P. Timmermans (2001). 
+//		// A Position-Sensitive Sequence Alignment Method Illustrated for Space-Time Activity-Diary Data¹, Environment and Planning A 33(2): 313­338.
+//		
+//		// Mahdieh Allahviranloo has some work on activity pattern similarity (iatbr'15)
+//
+//		double simil = 0. ;
+//		Iterator<Activity> it1 = activities1.iterator() ;
+//		Iterator<Activity> it2 = activities2.iterator() ;
+//		for ( ; it1.hasNext() && it2.hasNext() ; ) {
+//			Activity act1 = it1.next() ;
+//			Activity act2 = it2.next() ;
+//			
+//			// activity type
+//			if ( act1.getType().equals(act2.getType() ) ) {
+//				simil += sameActivityTypePenalty ;
+//			}
+//			
+//			// activity location
+//			if ( act1.getCoord().equals( act2.getCoord() ) ){ 
+//				simil += sameActivityLocationPenalty ;
+//			}
+//			
+//			// activity end times
+//			if ( Double.isInfinite( act1.getEndTime() ) && Double.isInfinite( act2.getEndTime() ) ){
+//				// both activities have no end time, no need to compute a similarity penalty
+//			} else {
+//				// both activities have an end time, comparing the end times
+//				
+//				// 300/ln(2) means a penalty of 0.5 for 300 sec difference
+//				double delta = Math.abs(act1.getEndTime() - act2.getEndTime()) ;
+//				simil += actTimeParameter * Math.exp( - delta/(300/Math.log(2)) ) ;
+//			}
+//			
+//		}
+//		
+//		// a positive value is interpreted as a penalty
+//		return simil ;
+//	}
 	
 	/**
 	 * Compares two Populations by serializing them to XML with the current writer

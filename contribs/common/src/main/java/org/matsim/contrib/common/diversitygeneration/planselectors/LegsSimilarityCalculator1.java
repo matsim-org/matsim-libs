@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 
-class LegsSimilarityCalculator1 implements LegsSimilarityCalculator {
+/* package */ class LegsSimilarityCalculator1 implements LegsSimilarityCalculator {
 	static class Builder {
 		private final Network network ;
 		private double sameModeReward = 1. ;

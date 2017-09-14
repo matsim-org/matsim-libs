@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.population.Activity;
 
-class ActivitiesSimilarityCalculator1 implements ActivitiesSimilarityCalculator {
+/* package */ class ActivitiesSimilarityCalculator1 implements ActivitiesSimilarityCalculator {
 	static class Builder {
 		private double actTypeWeight = 1. ;
 		private double locationWeight = 1. ;
