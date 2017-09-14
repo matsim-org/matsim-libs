@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.gbl.Gbl;
 
 import javax.inject.Inject;
 import java.util.HashMap;
@@ -31,9 +32,12 @@ class NewScoreAssignerImpl implements NewScoreAssigner {
 		}
 		learningRate = planCalcScoreConfigGroup.getLearningRate();
 	}
+	
 
+	@Override
 	public void assignNewScores(int iteration, ScoringFunctionsForPopulation scoringFunctionsForPopulation, Population population) {
 		log.info("it: " + iteration + " msaStart: " + this.scoreMSAstartsAtIteration );
+		int wrnCnt = 0 ;
 
 		for (Person person : population.getPersons().values()) {
 			ScoringFunction sf = scoringFunctionsForPopulation.getScoringFunctionForAgent(person.getId());
@@ -52,8 +56,12 @@ class NewScoreAssignerImpl implements NewScoreAssigner {
 						log.trace( " lrn: " + this.learningRate + " oldScore: " + oldScore + " simScore: " + score + " newScore: " + newScore );
 					}
 					plan.setScore(newScore);
-					if ( plan.getScore().isNaN() ) {
+					if ( plan.getScore().isNaN() & wrnCnt<10 ) {
+						wrnCnt++ ;
 						log.warn("score is NaN; plan:" + plan.toString()+" with lrn: " + this.learningRate + " oldScore: " + oldScore + " simScore: " + score + " newScore: " + newScore );
+						if ( wrnCnt==10 ) {
+							log.warn( Gbl.FUTURE_SUPPRESSED + " (In this iteration.)" );
+						}
 					}
 				} else {
 //					double alpha = 1./(this.iteration - this.scoreMSAstartsAtIteration + 1) ;
