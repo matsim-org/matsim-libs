@@ -22,31 +22,45 @@
  */
 package taxibus.algorithm.optimizer.prebooked.jsprit;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.DijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
 import com.graphhopper.jsprit.core.algorithm.box.SchrimpfFactory;
-import com.graphhopper.jsprit.core.problem.*;
+import com.graphhopper.jsprit.core.problem.Location;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem.FleetSize;
-import com.graphhopper.jsprit.core.problem.job.*;
+import com.graphhopper.jsprit.core.problem.job.Job;
+import com.graphhopper.jsprit.core.problem.job.Shipment;
 import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
-import com.graphhopper.jsprit.core.problem.solution.route.activity.*;
-import com.graphhopper.jsprit.core.problem.vehicle.*;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow;
+import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl.Builder;
-import com.graphhopper.jsprit.core.util.*;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
+import com.graphhopper.jsprit.core.util.Coordinate;
+import com.graphhopper.jsprit.core.util.Solutions;
 
 import taxibus.TaxibusRequest;
 import taxibus.algorithm.optimizer.TaxibusOptimizer;
@@ -66,7 +80,7 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 	final PrebookedTaxibusOptimizerContext context;
 	final Collection<TaxibusRequest> unplannedRequests;
 	final Random r = MatsimRandom.getLocalInstance();
-	private final Dijkstra router;
+	private final LeastCostPathCalculator router;
 
 	/**
 	 * 
@@ -74,7 +88,8 @@ public class JspritTaxibusOptimizer implements TaxibusOptimizer {
 	public JspritTaxibusOptimizer(PrebookedTaxibusOptimizerContext context) {
 		this.context = context;
 		this.unplannedRequests = new HashSet<>();
-		this.router = new Dijkstra(context.scenario.getNetwork(), context.travelDisutility, context.travelTime);
+		this.router = new DijkstraFactory().createPathCalculator(context.scenario.getNetwork(),
+				context.travelDisutility, context.travelTime);
 
 	}
 
