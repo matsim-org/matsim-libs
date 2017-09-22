@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Node;
  * @see org.matsim.core.router.MultiNodeDijkstra
  * @author cdobler
  */
-public class InitialNode {
+public final class InitialNode {
 	
 	public Node node;
 	public final double initialCost;
@@ -39,11 +39,23 @@ public class InitialNode {
 		this.initialCost = initialCost;
 		this.initialTime = initialTime;
 	}
+
+	// setting node as null because, many duplicates of InitialNode does not need node. Thus, duplicate classes can be removed. Amit Sep'17
+	public InitialNode(final double initialCost, final double initialTime) {
+		this(null, initialCost, initialTime);
+	}
 	
 	@Override
 	public String toString() {
-		return "[id=" + this.node.getId() + "]" +
-				"[initialCost=" + this.initialCost + "]" +
-				"[initialTime=" + this.initialTime + "]";
+		if (node == null) {
+			return "[id=" + " null " + "]" +
+					"[initialCost=" + this.initialCost + "]" +
+					"[initialTime=" + this.initialTime + "]";
+		} else {
+			return "[id=" + this.node.getId() + "]" +
+					"[initialCost=" + this.initialCost + "]" +
+					"[initialTime=" + this.initialTime + "]";
+		}
+
 	}
 }

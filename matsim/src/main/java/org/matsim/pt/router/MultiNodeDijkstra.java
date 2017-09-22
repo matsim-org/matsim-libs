@@ -20,14 +20,14 @@
 
 package org.matsim.pt.router;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class MultiNodeDijkstra /*extends Dijkstra*/ {
 
@@ -54,26 +54,17 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 
 	@SuppressWarnings("unchecked")
 	public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes, final Person person) {
-		Map<Node, TransitLeastCostPathTree.InitialNode> swapedToNodes = swapNodes(toNodes);
+		Map<Node, InitialNode> swapedToNodes = swapNodes(toNodes);
 		TransitLeastCostPathTree tree = new TransitLeastCostPathTree(network, costFunction, timeFunction, swapNodes(fromNodes), swapedToNodes, person);
 		return tree.getPath(swapedToNodes);
 	}
 
-	private Map<Node, TransitLeastCostPathTree.InitialNode> swapNodes(final Map<Node, InitialNode> original) {
-		Map<Node, TransitLeastCostPathTree.InitialNode> result = new HashMap<>();
+	private Map<Node, InitialNode> swapNodes(final Map<Node, InitialNode> original) {
+		Map<Node, InitialNode> result = new HashMap<>();
 		for (Map.Entry<Node, InitialNode> entry : original.entrySet()) {
-			result.put(entry.getKey(), new TransitLeastCostPathTree.InitialNode(entry.getValue().initialCost, entry.getValue().initialTime));
+			result.put(entry.getKey(), new InitialNode(entry.getValue().initialCost, entry.getValue().initialTime));
 		}
 		return result;
-	}
-
-	public static class InitialNode {
-		public final double initialCost;
-		public final double initialTime;
-		public InitialNode(final double initialCost, final double initialTime) {
-			this.initialCost = initialCost;
-			this.initialTime = initialTime;
-		}
 	}
 
 }

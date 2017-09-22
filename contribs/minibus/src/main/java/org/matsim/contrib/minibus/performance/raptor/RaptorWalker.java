@@ -23,9 +23,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
-import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
+import org.matsim.core.router.InitialNode;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 

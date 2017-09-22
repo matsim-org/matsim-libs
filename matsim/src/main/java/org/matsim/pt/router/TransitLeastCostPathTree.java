@@ -20,19 +20,19 @@
 
 package org.matsim.pt.router;
 
+import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.*;
 
 /**
  * This class is based on and similar to org.matsim.pt.router.MultiNodeDijkstra
@@ -370,15 +370,6 @@ public class TransitLeastCostPathTree {
 	 */
 	private double getPriority(final DijkstraNodeData data) {
 		return data.getCost();
-	}
-
-	public static class InitialNode {
-		public final double initialCost;
-		public final double initialTime;
-		public InitialNode(final double initialCost, final double initialTime) {
-			this.initialCost = initialCost;
-			this.initialTime = initialTime;
-		}
 	}
 
 	/**

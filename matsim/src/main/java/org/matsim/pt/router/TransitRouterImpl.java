@@ -27,10 +27,10 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.router.TransitLeastCostPathTree.InitialNode;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
