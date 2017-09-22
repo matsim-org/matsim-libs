@@ -28,7 +28,9 @@ import org.matsim.api.core.v01.network.Node;
  * @see org.matsim.core.router.MultiNodeDijkstra
  * @author cdobler
  */
-public final class InitialNode {
+public class InitialNode {
+	//cant make final, extended by OneToManyPathSearch.ToNode
+	//need a decision. Amit Sep'17
 	
 	public Node node;
 	public final double initialCost;
