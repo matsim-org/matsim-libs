@@ -26,6 +26,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.core.router.InitialNode;
 import org.matsim.pt.router.PreparedTransitSchedule;
+import org.matsim.pt.router.TransitPassengerRoute;
+import org.matsim.pt.router.RouteSegment;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -111,9 +113,9 @@ public class RaptorWalker {
 		this.transferTransitStopsToCheck = new boolean[this.raptorSearchData.stops.length];
 	}
 
-	public RaptorRoute calcLeastCostPath(Map<TransitStopFacility, InitialNode> fromTransitStops, Map<TransitStopFacility, InitialNode> toTransitStops) {
+	public TransitPassengerRoute calcLeastCostPath(Map<TransitStopFacility, InitialNode> fromTransitStops, Map<TransitStopFacility, InitialNode> toTransitStops) {
 		
-		RaptorRoute bestRoute = null;
+		TransitPassengerRoute bestRoute = null;
 
 		// init
 		Arrays.fill(this.earliestArrivalTimeAtRouteStop, Double.POSITIVE_INFINITY);
@@ -159,7 +161,7 @@ public class RaptorWalker {
 
 			this.checkRouteStops();
 
-			RaptorRoute bestRouteOfThisRound = this.getBestRouteFoundSoFar(fromTransitStops, toTransitStops, sourcePointerTransitStops);
+			TransitPassengerRoute bestRouteOfThisRound = this.getBestRouteFoundSoFar(fromTransitStops, toTransitStops, sourcePointerTransitStops);
 			if (bestRouteOfThisRound != null) {
 				if (bestRoute == null) {
 					// this is the first route found
@@ -332,7 +334,7 @@ public class RaptorWalker {
 		}
 	}
 	
-	private RaptorRoute getBestRouteFoundSoFar(Map<TransitStopFacility, InitialNode> fromTransitStops, Map<TransitStopFacility, InitialNode> toTransitStops, SourcePointer[] sourcePointerTransitStops) {
+	private TransitPassengerRoute getBestRouteFoundSoFar(Map<TransitStopFacility, InitialNode> fromTransitStops, Map<TransitStopFacility, InitialNode> toTransitStops, SourcePointer[] sourcePointerTransitStops) {
 		// get routes for all n of transfers and return them
 		List<List<RouteSegment>> routesFound = new LinkedList<List<RouteSegment>>();
 		for (TransitStopFacility toTransitStop : toTransitStops.keySet()) {
@@ -428,10 +430,10 @@ public class RaptorWalker {
 			RouteSegment routeSegment;
 			if (currentSourcePointer.transfer) {
 				if (lastRouteSegment != null) {
-					if (lastRouteSegment.routeTaken == null) {
+					if (lastRouteSegment.getRouteTaken() == null) {
 						// had been a transfer, too - merge both
-						toTransitStop = lastRouteSegment.toStop;
-						travelTime += lastRouteSegment.travelTime;
+						toTransitStop = lastRouteSegment.getToStop();
+						travelTime += lastRouteSegment.getTravelTime();
 						route.remove(0);
 					}
 				}
@@ -451,16 +453,16 @@ public class RaptorWalker {
 		return route;
 	}
 
-	private RaptorRoute scoreRoutesAndReturnBest(List<List<RouteSegment>> routesFound, Map<TransitStopFacility, InitialNode> fromTransitStops, Map<TransitStopFacility, InitialNode> toTransitStops) {
+	private TransitPassengerRoute scoreRoutesAndReturnBest(List<List<RouteSegment>> routesFound, Map<TransitStopFacility, InitialNode> fromTransitStops, Map<TransitStopFacility, InitialNode> toTransitStops) {
 		
-		RaptorRoute bestRouteSoFar = null;
+		TransitPassengerRoute bestRouteSoFar = null;
 		
 		for (List<RouteSegment> route : routesFound) {
 			double cost = this.scoreRoute(route, fromTransitStops, toTransitStops);
 			if (bestRouteSoFar == null) {
-				bestRouteSoFar = new RaptorRoute(cost, route);
+				bestRouteSoFar = new TransitPassengerRoute(cost, route);
 			} else if (cost < bestRouteSoFar.getTravelCost()) {
-				bestRouteSoFar = new RaptorRoute(cost, route);
+				bestRouteSoFar = new TransitPassengerRoute(cost, route);
 			}
 		}
 		
@@ -472,9 +474,9 @@ public class RaptorWalker {
 		double cost = 0.0;
 		
 		for (RouteSegment routeSegment : route) {
-			if (routeSegment.routeTaken == null) {
+			if (routeSegment.getRouteTaken() == null) {
 				// handle transfer
-				cost += this.raptorDisutility.getTransferCost(routeSegment.fromStop.getCoord(), routeSegment.toStop.getCoord());
+				cost += this.raptorDisutility.getTransferCost(routeSegment.getFromStop().getCoord(), routeSegment.getToStop().getCoord());
 			} else {
 				// pt trip
 				cost += this.raptorDisutility.getInVehicleTravelDisutility(routeSegment);
@@ -482,8 +484,8 @@ public class RaptorWalker {
 		}
 		
 		// add cost for getting to the first and last stop
-		cost += fromStops.get(route.get(0).fromStop).initialCost;
-		cost += toStops.get(route.get(route.size() - 1).toStop).initialCost;
+		cost += fromStops.get(route.get(0).getFromStop()).initialCost;
+		cost += toStops.get(route.get(route.size() - 1).getToStop()).initialCost;
 		
 		return cost;
 	}

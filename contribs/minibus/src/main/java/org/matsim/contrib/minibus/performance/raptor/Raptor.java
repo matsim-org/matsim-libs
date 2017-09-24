@@ -36,6 +36,8 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.InitialNode;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
+import org.matsim.pt.router.TransitPassengerRoute;
+import org.matsim.pt.router.RouteSegment;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -101,7 +103,7 @@ public class Raptor implements TransitRouter {
 		Map<TransitStopFacility, InitialNode> toStops = this.locateWrappedNearestTransitStops(person, toFacility.getCoord(), departureTime);
 
 		// find routes between start and end stops
-		RaptorRoute p = this.raptorWalker.calcLeastCostPath(fromStops, toStops);
+		TransitPassengerRoute p = this.raptorWalker.calcLeastCostPath(fromStops, toStops);
 
 		if (p == null) {
 			// return null;
@@ -130,34 +132,34 @@ public class Raptor implements TransitRouter {
 		return legs;
 	}
 
-	protected List<Leg> convertPathToLegList(double departureTime, RaptorRoute p, Coord fromCoord, Coord toCoord, Person person) {
+	protected List<Leg> convertPathToLegList(double departureTime, TransitPassengerRoute p, Coord fromCoord, Coord toCoord, Person person) {
 		// convert the route into a sequence of legs
 		List<Leg> legs = new ArrayList<>();
 
 		// access leg
 		Leg accessLeg;
 		// check if first leg extends walking distance
-		if (p.getRoute().get(0).routeTaken == null) {
+		if (p.getRoute().get(0).getRouteTaken() == null) {
 			// route starts with transfer - extend initial walk to that stop
-			accessLeg = createTransitWalkLeg(fromCoord, p.getRoute().get(0).toStop.getCoord());
+			accessLeg = createTransitWalkLeg(fromCoord, p.getRoute().get(0).getToStop().getCoord());
 			p.getRoute().remove(0);
 		} else {
 			// do not extend it - add a regular walk leg
 			// 
-			accessLeg = createTransitWalkLeg(fromCoord, p.getRoute().get(0).fromStop.getCoord());
+			accessLeg = createTransitWalkLeg(fromCoord, p.getRoute().get(0).getFromStop().getCoord());
 		}
 
 		// egress leg
 		Leg egressLeg;
 		// check if first leg extends walking distance
-		if (p.getRoute().get(p.getRoute().size() - 1).routeTaken == null) {
+		if (p.getRoute().get(p.getRoute().size() - 1).getRouteTaken() == null) {
 			// route starts with transfer - extend initial walk to that stop
-			egressLeg = createTransitWalkLeg(p.getRoute().get(p.getRoute().size() - 1).fromStop.getCoord(), toCoord);
+			egressLeg = createTransitWalkLeg(p.getRoute().get(p.getRoute().size() - 1).getFromStop().getCoord(), toCoord);
 			p.getRoute().remove(p.getRoute().size() - 1);
 		} else {
 			// do not extend it - add a regular walk leg
 			// access leg
-			egressLeg = createTransitWalkLeg(p.getRoute().get(p.getRoute().size() - 1).toStop.getCoord(), toCoord);
+			egressLeg = createTransitWalkLeg(p.getRoute().get(p.getRoute().size() - 1).getToStop().getCoord(), toCoord);
 		}
 
 
@@ -166,7 +168,7 @@ public class Raptor implements TransitRouter {
 
 		// route segments are now in pt-walk-pt sequence
 		for (RouteSegment routeSegement : p.getRoute()) {
-			if (routeSegement.routeTaken == null) {
+			if (routeSegement.getRouteTaken() == null) {
 				// transfer
 				legs.add(createTransferTransitWalkLeg(routeSegement));
 			} else {
@@ -184,23 +186,23 @@ public class Raptor implements TransitRouter {
 	private Leg createTransitLeg(RouteSegment routeSegment) {
 		Leg leg = PopulationUtils.createLeg(TransportMode.pt);
 
-		TransitStopFacility accessStop = routeSegment.fromStop;
-		TransitStopFacility egressStop = routeSegment.toStop;
+		TransitStopFacility accessStop = routeSegment.getFromStop();
+		TransitStopFacility egressStop = routeSegment.getToStop();
 
-		ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, egressStop, routeSegment.lineTaken, routeSegment.routeTaken);
+		ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, egressStop, routeSegment.getLineTaken(), routeSegment.getRouteTaken());
 		leg.setRoute(ptRoute);
 
-		leg.setTravelTime(routeSegment.travelTime);
+		leg.setTravelTime(routeSegment.getTravelTime());
 		return leg;
 	}
 
 	private Leg createTransferTransitWalkLeg(RouteSegment routeSegement) {
-		Leg leg = this.createTransitWalkLeg(routeSegement.fromStop.getCoord(), routeSegement.toStop.getCoord());
-		Route walkRoute = RouteUtils.createGenericRouteImpl(routeSegement.fromStop.getLinkId(), routeSegement.toStop.getLinkId());
+		Leg leg = this.createTransitWalkLeg(routeSegement.getFromStop().getCoord(), routeSegement.getToStop().getCoord());
+		Route walkRoute = RouteUtils.createGenericRouteImpl(routeSegement.getFromStop().getLinkId(), routeSegement.getToStop().getLinkId());
 //		walkRoute.setTravelTime(leg.getTravelTime() );
 		// transit walk leg should include additional transfer time; Amit, Aug'17
-		leg.setTravelTime( this.raptorDisutility.getTransferTime(routeSegement.fromStop.getCoord(), routeSegement.toStop.getCoord()) );
-		walkRoute.setTravelTime(this.raptorDisutility.getTransferTime(routeSegement.fromStop.getCoord(), routeSegement.toStop.getCoord()) );
+		leg.setTravelTime( this.raptorDisutility.getTransferTime(routeSegement.getFromStop().getCoord(), routeSegement.getToStop().getCoord()) );
+		walkRoute.setTravelTime(this.raptorDisutility.getTransferTime(routeSegement.getFromStop().getCoord(), routeSegement.getToStop().getCoord()) );
 		leg.setRoute(walkRoute);
 
 		return leg;

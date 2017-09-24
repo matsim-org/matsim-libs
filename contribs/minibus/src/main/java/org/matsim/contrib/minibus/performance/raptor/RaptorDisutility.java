@@ -21,6 +21,7 @@ package org.matsim.contrib.minibus.performance.raptor;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.pt.router.RouteSegment;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 
@@ -50,8 +51,8 @@ public class RaptorDisutility {
 		double cost = 0.0;
 		
 		// this assumes dwell time as in-vehicle time
-		double inVehicleTravelTime = routeSegment.travelTime;
-		double inVehicleBeelineDistance = CoordUtils.calcEuclideanDistance(routeSegment.fromStop.getCoord(), routeSegment.toStop.getCoord());
+		double inVehicleTravelTime = routeSegment.getTravelTime();
+		double inVehicleBeelineDistance = CoordUtils.calcEuclideanDistance(routeSegment.getFromStop().getCoord(), routeSegment.getToStop().getCoord());
 		
 		cost += - inVehicleTravelTime * this.config.getMarginalUtilityOfTravelTimePt_utl_s();
 		cost += - inVehicleBeelineDistance * this.config.getMarginalUtilityOfTravelDistancePt_utl_m();
