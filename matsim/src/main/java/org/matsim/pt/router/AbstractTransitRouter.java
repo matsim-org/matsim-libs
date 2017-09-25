@@ -56,6 +56,7 @@ public class AbstractTransitRouter {
 		return getTravelDisutility().getWalkTravelTime(person, coord, toCoord) + this.getConfig().getAdditionalTransferTime();
 	}
 
+	//same is used in raptor router
 	protected final List<Leg> createDirectWalkLegList(Person person, Coord fromCoord, Coord toCoord) {
 		List<Leg> legs = new ArrayList<>();
 		Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
@@ -68,6 +69,7 @@ public class AbstractTransitRouter {
 		return legs;
 	}
 
+	// it would be better to have TransitPassengerRoute as an argument rather than path (see Raptor...). Amit Sep'17
 	protected final List<Leg> convertPathToLegList(double departureTime, Path path, Coord fromCoord, Coord toCoord, Person person) {
 			// yy would be nice if the following could be documented a bit better.  kai, jul'16
 			
@@ -222,6 +224,7 @@ public class AbstractTransitRouter {
 		return getTravelDisutility().getWalkTravelDisutility(person, coord, toCoord);
 	}
 
+	// "default" PT router uses TransitRouterNetworkNode (an implementation of Node) whereas "raptor" uses TransitStopFacility. Amit' Sep 17
 	protected final Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime) {
 		Collection<TransitRouterNetworkNode> nearestNodes = this.getTransitRouterNetwork().getNearestNodes(coord, this.getConfig().getSearchRadius());
 		if (nearestNodes.size() < 2) {
