@@ -49,7 +49,7 @@ public class RunDrtScenarioBatch {
 
 	public static void main(String[] args) {
 		//Define Iteration list
-		List<String> strings = Arrays.asList("0.5");
+		List<String> strings = Arrays.asList("0.1_0.5");
 //		List<String> strings = Arrays.asList("0.1", "0.3","0.5");
 
 
@@ -64,8 +64,8 @@ public class RunDrtScenarioBatch {
 			config.controler().setLastIteration(6);
 			config.controler().setWriteEventsInterval(1);
 			config.controler().setWritePlansInterval(1);
-			config.controler().setOutputDirectory("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/"+Element.toString()+"/output/");
-			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/population/run124.100.output_plans_DRT0.5.xml.gz");
+			config.controler().setOutputDirectory("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/results/"+Element.toString()+"/");
+			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/population/run124.10.output_plans_DRT0.5.xml.gz");
 //			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/drt_population_iteration/population/run124.100.output_plans.xml.gz");
 			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 			drt.setkNearestVehicles(90);
@@ -77,7 +77,7 @@ public class RunDrtScenarioBatch {
 			
 			
 			//erstellt ein Grid mit einer Kantenlänge von 2000m über das gesamte Netz. Ggf. einen höheren Parameter wählen.
-			DrtZonalSystem zones = new DrtZonalSystem(controler.getScenario().getNetwork(), 2000);
+			DrtZonalSystem zones = new DrtZonalSystem(controler.getScenario().getNetwork(), 1000);
 
 			controler.addOverridingModule(new AbstractModule() {
 		
@@ -90,15 +90,15 @@ public class RunDrtScenarioBatch {
 			controler.addOverridingModule(new DrtZonalModule());
 			
 			
-//			controler.addOverridingModule(new AbstractModule() {
-//				@Override
-//				public void install() {
-//					addRoutingModuleBinding(DvrpConfigGroup.get(config).getMode())
-//							.to(ClosestStopBasedDrtRoutingModule.class);
-//					DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.3);
-//					
-//				}
-//			});
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					addRoutingModuleBinding(DvrpConfigGroup.get(config).getMode())
+							.to(ClosestStopBasedDrtRoutingModule.class);
+					DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.3);
+					
+				}
+			});
 	
 			controler.run();
 
