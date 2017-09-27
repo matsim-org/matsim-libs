@@ -55,14 +55,19 @@ import java.util.Set;
 
 	@Inject
     LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+	
+	private
+	Network filteredNetwork;
 
 	@Override
 	public RoutingModule get() {
+		if (filteredNetwork == null){
 		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
 		Set<String> modes = new HashSet<>();
 		modes.add(TransportMode.car);
-		Network filteredNetwork = NetworkUtils.createNetwork();
+		filteredNetwork = NetworkUtils.createNetwork();
 		filter.filter(filteredNetwork, modes);
+		}
 		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactory.get(PlansCalcRouteWithTollOrNot.CAR_WITH_PAYED_AREA_TOLL);
 		TravelTime travelTime = travelTimes.get(TransportMode.car);
 		LeastCostPathCalculator routeAlgo =
