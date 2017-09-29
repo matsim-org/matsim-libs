@@ -32,6 +32,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -223,58 +224,67 @@ public class TransitLeastCostPathTree {
 		// now construct route segements, which are required for TransitPassengerRoute
 		List<RouteSegment> routeSegments = new ArrayList<>();
 
-		TransitRouterNetworkLink nextLink = (TransitRouterNetworkLink) getData(minCostNode).getPrevLink();
-		TransitRouterNetworkLink previousLink = null;
+		TransitRouterNetworkLink link = (TransitRouterNetworkLink) getData(minCostNode).getPrevLink();
+		TransitRouterNetworkLink downstreamLink = null;
 		Node previousFromNode = minCostNode;
+		double transferCost = 0.;
 
-		while (nextLink != null) {
-			TransitRouterNetworkNode fromNode = nextLink.fromNode;
-			TransitRouterNetworkNode toNode = nextLink.toNode;
+		while (link != null) {
+			TransitRouterNetworkNode fromNode = link.fromNode;
+			TransitRouterNetworkNode toNode = link.toNode;
 
 			double travelTime = getData(toNode).getTime() - getData(fromNode).getTime();
+			Id<TransitLine> transitLineId = null;
+			Id<TransitRoute> routeId = null;
 
-			Id<TransitLine> lineId = null ;
-			Id<TransitRoute> routeId = null ;
-			boolean isTransferLeg = true;
-
-			if (nextLink.line !=null ) { // transfer leg
-				lineId = nextLink.line.getId();
-				routeId = nextLink.route.getId();
-				isTransferLeg = false;
+			boolean isTransferLeg = false;
+			if (link.line==null) isTransferLeg = true;
+			else {
+				transitLineId = link.line.getId();
+				routeId = link.route.getId();
 			}
 
-			if (previousLink == null || isTransferLeg ) { // first pt leg or a transfer leg
-				routeSegments.add(new RouteSegment( fromNode.stop.getStopFacility(),
+			if (downstreamLink == null // very first pt leg or first pt leg after transfer
+					|| isTransferLeg ) {
+				routeSegments.add(0, new RouteSegment( fromNode.stop.getStopFacility(),
 						toNode.stop.getStopFacility(),
 						travelTime,
-						lineId,
+						transitLineId,
 						routeId
 				));
-			} else if (previousLink.line.getId() == nextLink.line.getId() && previousLink.route.getId() == nextLink.route.getId() ){
-				//same route --> update the last routeSegment
-				int lastIndex = routeSegments.size()-1;
-				RouteSegment routeSegment = routeSegments.remove(lastIndex);
+
+				if (isTransferLeg) {
+					// transfer cost
+					//TODO : following will not work if travelDisutility is other than Default. Amit Sep'17
+					transferCost += ((TransitRouterNetworkTravelTimeAndDisutility) this.costFunction).defaultTransferCost(link,
+							Time.UNDEFINED_TIME,null,null);
+				}
+
+			} else if (downstreamLink.line.getId() == link.line.getId() && downstreamLink.route.getId() == link.route.getId() ){
+				//same route --> update the top routeSegment
+				RouteSegment routeSegment = routeSegments.remove(0);
 				routeSegment = new RouteSegment(fromNode.stop.getStopFacility(),
 						routeSegment.toStop,
 						routeSegment.travelTime+travelTime,
-						lineId,
+						transitLineId,
 						routeId);
-				routeSegments.add(lastIndex,routeSegment);
+				routeSegments.add(0,routeSegment);
 			}
 
 			previousFromNode = fromNode;
-			if (! isTransferLeg) previousLink = nextLink;
+			if (isTransferLeg ) downstreamLink = null;
+			else downstreamLink = link;
 
-			nextLink = (TransitRouterNetworkLink) getData(fromNode).getPrevLink();
+			link = (TransitRouterNetworkLink) getData(fromNode).getPrevLink();
 		}
-
-		// merge the route segments which are on same route of a line
-		// else, it's a transfer.
 
 		DijkstraNodeData startNodeData = getData(previousFromNode);
 		DijkstraNodeData toNodeData = getData(minCostNode);
 
-		double cost = toNodeData.getCost() - startNodeData.getCost() + this.fromNodes.get(previousFromNode).initialCost + toNodes.get(minCostNode).initialCost;
+		double cost = toNodeData.getCost() - startNodeData.getCost()
+				+ this.fromNodes.get(previousFromNode).initialCost
+				+ toNodes.get(minCostNode).initialCost
+				+ transferCost;
 
 		return new TransitPassengerRoute(cost, routeSegments);
 	}
