@@ -289,12 +289,13 @@ public class TransitLeastCostPathTree {
 				//TODO : following will not work if travelDisutility is other than Default. Amit Sep'17
 				transferCost += ((TransitRouterNetworkTravelTimeAndDisutility) this.costFunction).defaultTransferCost(link,
 						Time.UNDEFINED_TIME,null,null);
+
+				downstreamLink = null;
+			} else {
+				downstreamLink = link;
 			}
 
 			previousFromNode = fromNode;
-			if (isTransferLeg ) downstreamLink = null;
-			else downstreamLink = link;
-
 			link = (TransitRouterNetworkLink) getData(fromNode).getPrevLink();
 		}
 
@@ -306,7 +307,9 @@ public class TransitLeastCostPathTree {
 				+ toNodes.get(minCostNode).initialCost
 				+ transferCost;
 
-		return new TransitPassengerRoute(cost, routeSegments);
+		// if there is no connection found, getPath(...) return a path with nothing in it, however, I (and AN) think that it should throw null. Amit Sep'17
+		if (routeSegments.size()==0) return null;
+		else return new TransitPassengerRoute(cost, routeSegments);
 	}
 
 	/**
