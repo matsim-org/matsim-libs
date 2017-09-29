@@ -69,6 +69,89 @@ public class AbstractTransitRouter {
 		return legs;
 	}
 
+	private Leg createTransferTransitWalkLeg(RouteSegment routeSegement) {
+		Leg leg = this.createTransitWalkLeg(routeSegement.getFromStop().getCoord(), routeSegement.getToStop().getCoord());
+		Route walkRoute = RouteUtils.createGenericRouteImpl(routeSegement.getFromStop().getLinkId(), routeSegement.getToStop().getLinkId());
+//		walkRoute.setTravelTime(leg.getTravelTime() );
+		// transit walk leg should include additional transfer time; Amit, Aug'17
+		leg.setTravelTime( getTransferTime(null, routeSegement.getFromStop().getCoord(), routeSegement.getToStop().getCoord()) );
+		walkRoute.setTravelTime(getTransferTime(null, routeSegement.getFromStop().getCoord(), routeSegement.getToStop().getCoord()) );
+		leg.setRoute(walkRoute);
+
+		return leg;
+	}
+
+	protected List<Leg> convertPathToLegList(double departureTime, TransitPassengerRoute p, Coord fromCoord, Coord toCoord, Person person) {
+		// convert the route into a sequence of legs
+		List<Leg> legs = new ArrayList<>();
+
+		// access leg
+		Leg accessLeg;
+		// check if first leg extends walking distance
+		if (p.getRoute().get(0).getRouteTaken() == null) {
+			// route starts with transfer - extend initial walk to that stop
+			accessLeg = createTransitWalkLeg(fromCoord, p.getRoute().get(0).getToStop().getCoord());
+			p.getRoute().remove(0);
+		} else {
+			// do not extend it - add a regular walk leg
+			//
+			accessLeg = createTransitWalkLeg(fromCoord, p.getRoute().get(0).getFromStop().getCoord());
+		}
+
+		// egress leg
+		Leg egressLeg;
+		// check if first leg extends walking distance
+		if (p.getRoute().get(p.getRoute().size() - 1).getRouteTaken() == null) {
+			// route starts with transfer - extend initial walk to that stop
+			egressLeg = createTransitWalkLeg(p.getRoute().get(p.getRoute().size() - 1).getFromStop().getCoord(), toCoord);
+			p.getRoute().remove(p.getRoute().size() - 1);
+		} else {
+			// do not extend it - add a regular walk leg
+			// access leg
+			egressLeg = createTransitWalkLeg(p.getRoute().get(p.getRoute().size() - 1).getToStop().getCoord(), toCoord);
+		}
+
+
+		// add very first leg
+		legs.add(accessLeg);
+
+		// route segments are now in pt-walk-pt sequence
+		for (RouteSegment routeSegement : p.getRoute()) {
+			if (routeSegement.getRouteTaken() == null) {
+				// transfer
+				legs.add(createTransferTransitWalkLeg(routeSegement));
+			} else {
+				// pt leg
+				legs.add(createTransitLeg(routeSegement));
+			}
+		}
+
+		// add last leg
+		legs.add(egressLeg);
+
+		return legs;
+	}
+
+	private Leg createTransitLeg(RouteSegment routeSegment) {
+		Leg leg = PopulationUtils.createLeg(TransportMode.pt);
+
+		TransitStopFacility accessStop = routeSegment.getFromStop();
+		TransitStopFacility egressStop = routeSegment.getToStop();
+
+		ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, egressStop, routeSegment.getLineTaken(), routeSegment.getRouteTaken());
+		leg.setRoute(ptRoute);
+
+		leg.setTravelTime(routeSegment.getTravelTime());
+		return leg;
+	}
+
+	private Leg createTransitWalkLeg(Coord fromCoord, Coord toCoord) {
+		Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
+		double walkTime = getWalkTime(null, fromCoord, toCoord);
+		leg.setTravelTime(walkTime);
+		return leg;
+	}
+
 	// it would be better to have TransitPassengerRoute as an argument rather than path (see Raptor...). Amit Sep'17
 	protected final List<Leg> convertPathToLegList(double departureTime, Path path, Coord fromCoord, Coord toCoord, Person person) {
 			// yy would be nice if the following could be documented a bit better.  kai, jul'16

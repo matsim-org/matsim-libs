@@ -22,13 +22,10 @@ package org.matsim.pt.router;
 
 import java.util.List;
 import java.util.Map;
-
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.InitialNode;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -61,7 +58,7 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
 		Map<Node, InitialNode> wrappedToNodes = this.locateWrappedNearestTransitNodes(person, toFacility.getCoord(), departureTime);
 		
 		double pathCost = Double.POSITIVE_INFINITY ;
-		Path p = null ;
+		TransitPassengerRoute transitPassengerRoute = null;
 
 		if ( wrappedFromNodes != null && wrappedToNodes != null ) {
 
@@ -70,12 +67,12 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
 			// yyyyyy This sounds like it is doing the full tree.  But I think it is not. Kai, nov'16
 
 			// find routes between start and end stop
-			p = tree.getPath(wrappedToNodes);
+			transitPassengerRoute = tree.getTransitPassengerRoute(wrappedToNodes);
 
-			if (p == null) {
+			if (transitPassengerRoute == null) {
 				return null; // yyyyyy why not return the direct walk leg?? kai/dz, mar'17
 			}
-			pathCost = p.travelCost + wrappedFromNodes.get(p.nodes.get(0)).initialCost + wrappedToNodes.get(p.nodes.get(p.nodes.size() - 1)).initialCost;
+			pathCost = transitPassengerRoute.getTravelCost();
 		}
 
 		double directWalkCost = getWalkDisutility(person, fromFacility.getCoord(), toFacility.getCoord());
@@ -83,8 +80,7 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
 		if (directWalkCost * getConfig().getDirectWalkFactor() < pathCost ) {
 			return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
 		}
-		Gbl.assertNotNull(p); // this is now a bit confused since I do not understand the logic, see above.  kai, mar'17
-		return convertPathToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
+		return convertPathToLegList(departureTime, transitPassengerRoute, fromFacility.getCoord(), toFacility.getCoord(), person);
 	}
 
 }

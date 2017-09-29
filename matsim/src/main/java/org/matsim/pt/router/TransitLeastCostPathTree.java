@@ -32,6 +32,10 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
+import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
+import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -178,6 +182,99 @@ public class TransitLeastCostPathTree {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Method to request the path from the (cached) fromNodes to the passed toNodes.
+	 * Should only be requested after calling createTransitLeastCostPathTree().
+	 *
+	 * @param toNodes
+	 *          The nodes that are the next stops to the toCoord and you like to route to.
+	 *
+	 * @return
+	 *          the transitPassengerRoute between the fromNode and the toNode.
+	 *          Will be null if the route could not be found.
+	 */
+	@SuppressWarnings("unchecked")
+	public TransitPassengerRoute getTransitPassengerRoute(final Map<Node, InitialNode> toNodes) {
+		//find the best node
+		double minCost = Double.POSITIVE_INFINITY;
+		Node minCostNode = null;
+		for (Node currentNode: toNodes.keySet()) {
+			DijkstraNodeData r = this.nodeData.get(currentNode.getId());
+			if (r == null) {
+				expandNodeData(toNodes);
+			}
+			DijkstraNodeData data = getData(currentNode);
+			InitialNode initData = toNodes.get(currentNode);
+			double cost = data.getCost() + initData.initialCost;
+			if (data.getCost() != 0.0 || fromNodes.containsKey(currentNode)) {
+				if (cost < minCost) {
+					minCost = cost;
+					minCostNode = currentNode;
+				}
+			}
+		}
+
+		if (minCostNode == null) {
+			return null;
+		}
+
+		// now construct route segements, which are required for TransitPassengerRoute
+		List<RouteSegment> routeSegments = new ArrayList<>();
+
+		TransitRouterNetworkLink nextLink = (TransitRouterNetworkLink) getData(minCostNode).getPrevLink();
+		TransitRouterNetworkLink previousLink = null;
+		Node previousFromNode = minCostNode;
+
+		while (nextLink != null) {
+			TransitRouterNetworkNode fromNode = nextLink.fromNode;
+			TransitRouterNetworkNode toNode = nextLink.toNode;
+
+			double travelTime = getData(toNode).getTime() - getData(fromNode).getTime();
+
+			Id<TransitLine> lineId = null ;
+			Id<TransitRoute> routeId = null ;
+			boolean isTransferLeg = true;
+
+			if (nextLink.line !=null ) { // transfer leg
+				lineId = nextLink.line.getId();
+				routeId = nextLink.route.getId();
+				isTransferLeg = false;
+			}
+
+			if (previousLink == null || isTransferLeg ) { // first pt leg or a transfer leg
+				routeSegments.add(new RouteSegment( fromNode.stop.getStopFacility(),
+						toNode.stop.getStopFacility(),
+						travelTime,
+						lineId,
+						routeId
+				));
+			} else if (previousLink.line.getId() == nextLink.line.getId() && previousLink.route.getId() == nextLink.route.getId() ){
+				//same route --> update the last routeSegment
+				int lastIndex = routeSegments.size()-1;
+				RouteSegment routeSegment = routeSegments.remove(lastIndex);
+				routeSegment = new RouteSegment(fromNode.stop.getStopFacility(),
+						routeSegment.toStop,
+						routeSegment.travelTime+travelTime,
+						lineId,
+						routeId);
+				routeSegments.add(lastIndex,routeSegment);
+			}
+
+			previousFromNode = fromNode;
+			if (! isTransferLeg) previousLink = nextLink;
+
+			nextLink = (TransitRouterNetworkLink) getData(fromNode).getPrevLink();
+		}
+
+		// merge the route segments which are on same route of a line
+		// else, it's a transfer.
+
+		DijkstraNodeData startNodeData = getData(previousFromNode);
+		DijkstraNodeData toNodeData = getData(minCostNode);
+
+		return new TransitPassengerRoute(toNodeData.getCost() - startNodeData.getCost(), routeSegments);
 	}
 
 	/**
