@@ -274,7 +274,9 @@ public class TransitLeastCostPathTree {
 		DijkstraNodeData startNodeData = getData(previousFromNode);
 		DijkstraNodeData toNodeData = getData(minCostNode);
 
-		return new TransitPassengerRoute(toNodeData.getCost() - startNodeData.getCost(), routeSegments);
+		double cost = toNodeData.getCost() - startNodeData.getCost() + this.fromNodes.get(previousFromNode).initialCost + toNodes.get(minCostNode).initialCost;
+
+		return new TransitPassengerRoute(cost, routeSegments);
 	}
 
 	/**
