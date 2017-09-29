@@ -70,7 +70,8 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
 			transitPassengerRoute = tree.getTransitPassengerRoute(wrappedToNodes);
 
 			if (transitPassengerRoute == null) {
-				return null; // yyyyyy why not return the direct walk leg?? kai/dz, mar'17
+//				return null; // yyyyyy why not return the direct walk leg?? kai/dz, mar'17
+				return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
 			}
 			pathCost = transitPassengerRoute.getTravelCost();
 		}
