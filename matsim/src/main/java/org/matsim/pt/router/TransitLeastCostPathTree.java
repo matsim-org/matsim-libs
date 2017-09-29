@@ -37,6 +37,7 @@ import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -244,7 +245,28 @@ public class TransitLeastCostPathTree {
 				routeId = link.route.getId();
 			}
 
-			if (downstreamLink == null // very first pt leg or first pt leg after transfer
+			if (downstreamLink==null && isTransferLeg) {
+				// continuous transfers: see TransitRouterImplTest.testDoubleWalk.
+				// Another possibility is that trip start with transfer itself, see TransitRouterImplTest.testDoubleWalkOnly.
+				double tempTravelTime = 0.;
+				TransitStopFacility toStop = null;
+
+				if (routeSegments.size()==0) { // very first leg starts with transfer
+					toStop = toNode.stop.getStopFacility();
+				} else {
+					RouteSegment routeSegment = routeSegments.remove(0);
+					travelTime = routeSegment.travelTime;
+					toStop = routeSegment.toStop;
+				}
+
+				routeSegments.add(0,
+						new RouteSegment(fromNode.stop.getStopFacility(),
+						toStop,
+						tempTravelTime+travelTime,
+						transitLineId,
+						routeId));
+				//not sure, if transferCost will be included for every transfer or not. Currently, transfer cost will be accumulated for every transfer. Amit Sep'17
+			} else if (downstreamLink == null // very first pt leg or first pt leg after transfer
 					|| isTransferLeg ) {
 				routeSegments.add(0, new RouteSegment( fromNode.stop.getStopFacility(),
 						toNode.stop.getStopFacility(),
@@ -252,23 +274,21 @@ public class TransitLeastCostPathTree {
 						transitLineId,
 						routeId
 				));
-
-				if (isTransferLeg) {
-					// transfer cost
-					//TODO : following will not work if travelDisutility is other than Default. Amit Sep'17
-					transferCost += ((TransitRouterNetworkTravelTimeAndDisutility) this.costFunction).defaultTransferCost(link,
-							Time.UNDEFINED_TIME,null,null);
-				}
-
 			} else if (downstreamLink.line.getId() == link.line.getId() && downstreamLink.route.getId() == link.route.getId() ){
 				//same route --> update the top routeSegment
 				RouteSegment routeSegment = routeSegments.remove(0);
-				routeSegment = new RouteSegment(fromNode.stop.getStopFacility(),
+				routeSegments.add(0, new RouteSegment(fromNode.stop.getStopFacility(),
 						routeSegment.toStop,
 						routeSegment.travelTime+travelTime,
 						transitLineId,
-						routeId);
-				routeSegments.add(0,routeSegment);
+						routeId));
+			}
+
+			if (isTransferLeg) {
+				// transfer cost
+				//TODO : following will not work if travelDisutility is other than Default. Amit Sep'17
+				transferCost += ((TransitRouterNetworkTravelTimeAndDisutility) this.costFunction).defaultTransferCost(link,
+						Time.UNDEFINED_TIME,null,null);
 			}
 
 			previousFromNode = fromNode;
