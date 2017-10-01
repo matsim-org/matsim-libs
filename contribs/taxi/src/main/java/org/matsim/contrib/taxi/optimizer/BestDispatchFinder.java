@@ -3,17 +3,24 @@ package org.matsim.contrib.taxi.optimizer;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduleInquiry;
 import org.matsim.contrib.util.LinkProvider;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.*;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.FastMultiNodeDijkstraFactory;
+import org.matsim.core.router.InitialNode;
+import org.matsim.core.router.MultiNodeDijkstra;
+import org.matsim.core.router.RoutingNetworkImaginaryNode;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.collect.Maps;
 

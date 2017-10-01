@@ -20,18 +20,24 @@
 package org.matsim.contrib.taxi.optimizer.assignment;
 
 import java.lang.reflect.Array;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.path.*;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
-import org.matsim.contrib.taxi.optimizer.*;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
+import org.matsim.contrib.taxi.optimizer.LinkProviders;
+import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
-import org.matsim.contrib.util.*;
-import org.matsim.core.router.*;
-import org.matsim.core.router.util.*;
+import org.matsim.contrib.util.LinkProvider;
+import org.matsim.contrib.util.StraightLineKnnFinder;
+import org.matsim.core.router.MultiNodePathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.collect.Lists;
 

@@ -20,12 +20,17 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.file.VehicleReader;
-import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.core.config.*;
-import org.matsim.core.controler.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -52,11 +57,11 @@ class RunOneTaxiExample {
 
 		// setup controler
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule( //
+		controler.addOverridingModule(DvrpModule.create( //
 				OneTaxiOptimizer.class, // optimizer that dispatches taxis
 				OneTaxiRequestCreator.class, // converts departures of the "taxi" mode into taxi requests
 				OneTaxiActionCreator.class)); // converts scheduled tasks into simulated actions (legs and activities)
-		
+
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

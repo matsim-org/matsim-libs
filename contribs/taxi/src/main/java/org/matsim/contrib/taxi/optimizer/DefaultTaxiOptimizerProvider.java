@@ -88,12 +88,12 @@ public class DefaultTaxiOptimizerProvider implements Provider<TaxiOptimizer> {
 						new FifoTaxiOptimizerParams(optimizerConfig));
 
 			case RULE_BASED:
-				return new RuleBasedTaxiOptimizer(taxiCfg, fleet, network, timer, travelTime, travelDisutility,
-						scheduler, new RuleBasedTaxiOptimizerParams(optimizerConfig));
+				return RuleBasedTaxiOptimizer.create(taxiCfg, fleet, scheduler, network, timer, travelTime,
+						travelDisutility, new RuleBasedTaxiOptimizerParams(optimizerConfig));
 
 			case ZONAL:
-				return new ZonalTaxiOptimizer(taxiCfg, fleet, network, timer, travelTime, travelDisutility, scheduler,
-						new ZonalTaxiOptimizerParams(optimizerConfig));
+				return ZonalTaxiOptimizer.create(taxiCfg, fleet, scheduler, network, timer, travelTime,
+						travelDisutility, new ZonalTaxiOptimizerParams(optimizerConfig));
 
 			default:
 				throw new IllegalStateException();

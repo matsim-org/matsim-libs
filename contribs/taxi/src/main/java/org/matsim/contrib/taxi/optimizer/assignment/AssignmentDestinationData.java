@@ -19,7 +19,8 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
