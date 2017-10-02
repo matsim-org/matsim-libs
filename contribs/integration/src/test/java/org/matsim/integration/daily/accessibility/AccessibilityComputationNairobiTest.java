@@ -63,16 +63,13 @@ public class AccessibilityComputationNairobiTest {
 	@Test
 	public void runAccessibilityComputation() {
 		Double cellSize = 2000.;
-		boolean push2Geoserver = false; // set true for run on server
-		boolean createQGisOutput = true; // set false for run on server
+		boolean push2Geoserver = false; // Set true for run on server
+		boolean createQGisOutput = true; // Set false for run on server
 
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
 		// Notation: minX, maxX, minY, maxY
 		Envelope envelope = new  Envelope(240000, 280000, 9844000, 9874000); // whole Nairobi
 //		Envelope envelope = new  Envelope(246000, 271000, 9853000, 9863000); // whole Nairobi // central part
-//		final Envelope envelope = new Envelope(249000, 255000, 9854000, 9858000); // western Nairobi with Kibera
-//		final Envelope envelope = new Envelope(-70000, 800000, 9450000, 10500000); // whole Kenya
-//		final Envelope envelope = new Envelope(-70000, 420000, 9750000, 10100000); // Southwestern half of Kenya
 //		Envelope envelope = new Envelope(251800.0, 258300.0, 9854300.0, 9858700.0); // City center and Kibera for minibus caluclation
 		String scenarioCRS = "EPSG:21037"; // EPSG:21037 = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		
@@ -87,10 +84,8 @@ public class AccessibilityComputationNairobiTest {
 //		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 //		config.network().setInputFile(folderStructure + networkFile);
 //		
-//		config.facilities().setInputFile(folderStructure + "matsimExamples/countries/ke/nairobi/2016-07-09_facilities_airports.xml"); //airports
 //		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2015-10-15_facilities.xml";
 //		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilities.xml";
-//		config.facilities().setInputFile("../../../shared-svn/projects/maxess/data/nairobi/kodi/schools/primary_public/facilities.xml");
 //		config.facilities().setInputFile("../../../shared-svn/projects/maxess/data/nairobi/facilities/2017-04-25_nairobi_central_and_kibera/2017-04-25_facilities_landuse_buildings.xml");
 //		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/health/hospitals/facilities.xml";
 //		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/facilities/04/facilities.xml"; //airports
@@ -133,7 +128,7 @@ public class AccessibilityComputationNairobiTest {
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, false);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false );
-		acg.setOutputCrs(scenarioCRS); // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
+		acg.setOutputCrs(scenarioCRS);
 		
 		ConfigUtils.setVspDefaults(config);
 		
@@ -175,7 +170,6 @@ public class AccessibilityComputationNairobiTest {
 //		scenario.setTransitVehicles(vehicles);
 		
 		// Activity types
-//		final List<String> activityTypes = Arrays.asList(new String[]{"airport"});
 //		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING, FacilityTypes.EDUCATION});
 //		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING});
 		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.WORK});
@@ -183,7 +177,6 @@ public class AccessibilityComputationNairobiTest {
 //		activityTypes.add("Industrial"); // land-use file version
 //		activityTypes.add("Public Purpose"); // land-use file version
 //		activityTypes.add("Recreational"); // land-use file version
-//		activityTypes.add("Hospital"); // kodi file version
 		log.info("Using activity types: " + activityTypes);
 
 		// Network density points (as proxy for population density)
@@ -215,7 +208,7 @@ public class AccessibilityComputationNairobiTest {
 			for (String actType : activityTypes) {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
-					VisualizationUtils.createQGisOutputGraduated(actType, mode.toString(), envelope, workingDirectory,
+					VisualizationUtils.createQGisOutputGraduatedStandardColorRange(actType, mode.toString(), envelope, workingDirectory,
 							scenarioCRS, includeDensityLayer, lowerBound, upperBound, range, cellSize.intValue(),
 							populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
