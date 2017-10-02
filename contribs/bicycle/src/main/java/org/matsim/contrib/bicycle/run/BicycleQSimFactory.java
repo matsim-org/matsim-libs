@@ -19,8 +19,9 @@
 package org.matsim.contrib.bicycle.run;
 
 import java.util.Map;
+
 import javax.inject.Inject;
-import com.google.inject.Provider;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -34,6 +35,9 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.inject.Provider;
+
+@Deprecated
 public class BicycleQSimFactory implements Provider<Mobsim> {
 	
 	@Inject Map<String, TravelTime> multiModalTravelTimes;
@@ -62,8 +66,8 @@ public class BicycleQSimFactory implements Provider<Mobsim> {
 //		qNetworkFactory.setLinkSpeedCalculator(new LinkSpeedCalculator(){
 //			LinkSpeedCalculator delegate = new DefaultLinkSpeedCalculator() ;
 //			@Override public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {
-//				if ( vehicle.getVehicle().getType().equals( "bike" ) ) {
-//					return 0.1 ; // compute bicycle speed instead
+//				if ( vehicle.getVehicle().getType().equals( "bicycle" ) ) {
+//					return MixedTrafficVehiclesUtils.getSpeed("bike"); // compute bicycle speed instead
 //				} else {
 //					return delegate.getMaximumVelocity(vehicle, link, time) ;
 //				}
