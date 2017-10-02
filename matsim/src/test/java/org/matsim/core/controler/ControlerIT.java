@@ -52,13 +52,15 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -139,22 +141,21 @@ public class ControlerIT {
 	}
 
 	/**
-	 * Tests that the travel times are correctly calculated during the simulation.
+	 * Tests that the travel times are correctly calculated during the simulation
+	 * and the same for fast and slow capacity update.
 	 *
 	 * @author mrieser
 	 */
 	@Test
 	public void testTravelTimeCalculation() {
-		Config config = this.utils.loadConfig((String) null);
-		Fixture f = new Fixture(config);
-
-		/* Create 2 persons driving from link 1 to link 3, both starting at the
-		 * same time at 7am.  */
+		Fixture f = new Fixture(ConfigUtils.createConfig());
+		Config config = f.scenario.getConfig();
+		
+		/* Create 2 persons driving from link 1 to link 3, both starting at the same time at 7am.  */
 		Population population = f.scenario.getPopulation();
 		PopulationFactory factory = population.getFactory();
-		Person person1 = null;
-
-		person1 = factory.createPerson(Id.create("1", Person.class));
+		
+		Person person1 = factory.createPerson(Id.create("1", Person.class));
 		Plan plan1 = factory.createPlan();
 		person1.addPlan(plan1);
 		Activity a1 = factory.createActivityFromLinkId("h", f.link1.getId());
@@ -183,8 +184,16 @@ public class ControlerIT {
 		route2.setLinkIds(f.link1.getId(), linkIds, f.link3.getId());
 		plan2.addActivity(factory.createActivityFromLinkId("h", f.link3.getId()));
 		population.addPerson(person2);
+		
+		/* the first agent needs 101 seconds (100 seconds free speed + 1s buffer) for link2; 
+		 * the second agent needs 200 seconds (has to wait for 100 seconds because of flow capacity) */
+		double avgTravelTimeLink2 = 150.5;
 
 		// Complete the configuration for our test case
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+		config.controler().setCreateGraphs(false);
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setDumpDataAtEnd(false);		
 		// - set scoring parameters
 		ActivityParams actParams = new ActivityParams("h");
 		actParams.setTypicalDuration(8*3600);
@@ -199,42 +208,29 @@ public class ControlerIT {
 		
 		// Now run the simulation
 		Controler controler = new Controler(f.scenario);
-        controler.getConfig().controler().setCreateGraphs(false);
-        controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
-		// test if we got the right result
-//		if ( this.isUsingFastCapacityUpdate ) {
-			// the actual result is 151sec, not 150, as each vehicle "loses" 1sec in the buffer
-			assertEquals("TravelTimeCalculator has wrong result",
-					150.5, controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7*3600, null, null), 0.0);
-//		} else {
-//			assertEquals("TravelTimeCalculator has wrong result",
-//					151.0, controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7*3600, null, null), 0.0);
-//		}
+		// test if the travel time calculator got the right result
+		// the actual result is 151sec, not 150, as each vehicle "loses" 1sec in the buffer
+		assertEquals("TravelTimeCalculator has wrong result", avgTravelTimeLink2,
+				controler.getLinkTravelTimes().getLinkTravelTime(f.link2, 7 * 3600, null, null), MatsimTestUtils.EPSILON);
 
 		// now test that the ReRoute-Strategy also knows about these travel times...
 		config.controler().setLastIteration(1);
-		ConfigGroup strategyParams = config.getModule("strategy");
-		strategyParams.addParam("maxAgentPlanMemorySize", "4");
-		strategyParams.addParam("ModuleProbability_1", "1.0");
-		strategyParams.addParam("Module_1", "ReRoute");
+		config.strategy().setMaxAgentPlanMemorySize(4);
+		// add ReRoute strategy
+		StrategySettings strat = new StrategySettings();
+		strat.setStrategyName(DefaultStrategy.ReRoute.toString());
+		strat.setWeight(1.);
+		config.strategy().addStrategySettings(strat);
 		// Run the simulation again
 		controler = new Controler(f.scenario);
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
 
-		// test that the plans have the correct times
-//		if ( this.isUsingFastCapacityUpdate ) {
-			assertEquals("ReRoute seems to have wrong travel times.",
-					150.0, ((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), 0.0);
-//		} else {
-//			assertEquals("ReRoute seems to have wrong travel times.",
-//					151.0, ((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), 0.0);
-//		}
+		// test that the plans have the correct travel times 
+		// (travel time of the plan does not contain first and last link)
+		assertEquals("ReRoute seems to have wrong travel times.", avgTravelTimeLink2,
+				((Leg) (person1.getPlans().get(1).getPlanElements().get(1))).getTravelTime(), MatsimTestUtils.EPSILON);
 	}
 
 	/**
@@ -992,7 +988,7 @@ public class ControlerIT {
 	 * @author mrieser
 	 */
 	private static class Fixture {
-		final MutableScenario scenario;
+		final Scenario scenario;
 		final Network network;
 		Node node1 = null;
 		Node node2 = null;
@@ -1003,7 +999,7 @@ public class ControlerIT {
 		Link link3 = null;
 
 		protected Fixture(final Config config) {
-			this.scenario = (MutableScenario) ScenarioUtils.createScenario(config);
+			this.scenario = ScenarioUtils.createScenario(config);
 			this.network = this.scenario.getNetwork();
 
 			/* Create a simple network with 4 nodes and 3 links:

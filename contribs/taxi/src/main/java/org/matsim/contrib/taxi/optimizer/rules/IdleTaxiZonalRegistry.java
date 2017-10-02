@@ -19,32 +19,41 @@
 
 package org.matsim.contrib.taxi.optimizer.rules;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
+import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.taxi.schedule.TaxiStayTask;
-import org.matsim.contrib.zone.*;
+import org.matsim.contrib.zone.ZonalSystem;
+import org.matsim.contrib.zone.ZonalSystems;
+import org.matsim.contrib.zone.Zone;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.*;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
 
 public class IdleTaxiZonalRegistry {
+	private final ScheduleInquiry scheduleInquiry;
+
 	private final ZonalSystem zonalSystem;
 	private final Map<Id<Zone>, List<Zone>> zonesSortedByDistance;
 
 	private final Map<Id<Zone>, Map<Id<Vehicle>, Vehicle>> vehiclesInZones;
 	private final Map<Id<Vehicle>, Vehicle> vehicles = new LinkedHashMap<>();
 
-	private final Predicate<Vehicle> isIdle;
-
 	public IdleTaxiZonalRegistry(ZonalSystem zonalSystem, ScheduleInquiry scheduleInquiry) {
+		this.scheduleInquiry = scheduleInquiry;
+
 		this.zonalSystem = zonalSystem;
 		zonesSortedByDistance = ZonalSystems.initZonesByDistance(zonalSystem.getZones());
-
-		isIdle = ScheduleInquiries.createIsIdle(scheduleInquiry);
 
 		vehiclesInZones = Maps.newHashMapWithExpectedSize(zonalSystem.getZones().size());
 		for (Id<Zone> id : zonalSystem.getZones().keySet()) {
@@ -79,16 +88,23 @@ public class IdleTaxiZonalRegistry {
 	}
 
 	public List<Vehicle> findNearestVehicles(Node node, int minCount) {
+		return findNearestVehicles(node, minCount, null);
+	}
+
+	public List<Vehicle> findNearestVehicles(Node node, int minCount, Predicate<Vehicle> vehicleFilter) {
 		if (minCount >= vehicles.size()) {
 			return getVehicles();
 		}
+
+		Predicate<Vehicle> idleVehicleFilter = vehicleFilter == null ? scheduleInquiry::isIdle
+				: Predicates.and(vehicleFilter, scheduleInquiry::isIdle);
 
 		Zone zone = zonalSystem.getZone(node);
 		Iterable<? extends Zone> zonesByDistance = zonesSortedByDistance.get(zone.getId());
 		List<Vehicle> nearestVehs = new ArrayList<>();
 
 		for (Zone z : zonesByDistance) {
-			Iterables.addAll(nearestVehs, Iterables.filter(vehiclesInZones.get(z.getId()).values(), isIdle));
+			Iterables.addAll(nearestVehs, Iterables.filter(vehiclesInZones.get(z.getId()).values(), idleVehicleFilter));
 
 			if (nearestVehs.size() >= minCount) {
 				return nearestVehs;
@@ -104,7 +120,7 @@ public class IdleTaxiZonalRegistry {
 
 	public List<Vehicle> getVehicles() {
 		List<Vehicle> vehs = new ArrayList<>();
-		Iterables.addAll(vehs, Iterables.filter(vehicles.values(), isIdle));
+		Iterables.addAll(vehs, Iterables.filter(vehicles.values(), scheduleInquiry::isIdle));
 		return vehs;
 	}
 

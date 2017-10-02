@@ -20,6 +20,11 @@
 
 package org.matsim.core.router;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -27,15 +32,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.priorityqueue.WrappedBinaryMinHeap;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.DijkstraNodeData;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.PreProcessDijkstra;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-
 
 /**
  * Implementation of <a
@@ -117,18 +121,15 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 */
 	/*package*/ final boolean pruneDeadEnds;
 
-	/**
-	 * Comparator that defines how to order the nodes in the pending nodes queue
-	 * during routing.
-	 */
 
 	private final PreProcessDijkstra preProcessData;
 
+	private RouterPriorityQueue<Node> heap = null;
 
 	private String[] modeRestriction = null;
 	
-	private Person person = null;
-	private Vehicle vehicle = null;
+	/*package*/ Person person = null;
+	/*package*/ Vehicle vehicle = null;
 
 	/**
 	 * Default constructor.
@@ -248,7 +249,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * cdobler, jun'14
 	 */
 	/*package*/ void checkNodeBelongToNetwork(Node node) {
-		if (network.getNodes().get(node.getId()) != node) {
+		if (this.network.getNodes().get(node.getId()) != node) {
 			throw new IllegalArgumentException("The nodes passed as parameters are not part of the network stored by "+
 					getClass().getSimpleName() + ": the validity of the results cannot be guaranteed. Aborting!");
 		}
@@ -267,7 +268,24 @@ public class Dijkstra implements LeastCostPathCalculator {
 		 * the getArrayIndex() method of the ArrayRoutingNetworkNodes which further reduces
 		 * the memory consumption and increases the performance by another ~10%.
 		 */
-		return new WrappedBinaryMinHeap<>(this.network.getNodes().size());
+		/*
+		 * Create a WrappedBinaryMinHeap and add all nodes initially once in the same order as
+		 * they are in the network. Internally, the heap assigns all elements an index. By adding
+		 * all elements initially, we ensure that the indices are in the same order as the nodes
+		 * are in the network. In case the router finds two connections with the same costs,
+		 * the selected connection depends on the indices.
+		 * Moreover, re-use the heap instead of creating it from scratch for each calculated route.
+		 * According to findings from the FastDijkstra, this should be faster.
+		 * cdobler, sep'17
+		 */
+		if (this.heap == null) {
+			this.heap = new WrappedBinaryMinHeap<>(this.network.getNodes().size());
+			for (Node node : this.network.getNodes().values()) this.heap.add(node, 0.);
+		}
+		this.heap.reset();			
+		return this.heap;
+//		return new WrappedBinaryMinHeap<>(this.network.getNodes().size());
+//		return new PseudoRemovePriorityQueue<>(this.network.getNodes().size());
 	}
 	
 	/**
@@ -308,8 +326,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *            The time when the trip starts.
 	 */
 	protected Path constructPath(Node fromNode, Node toNode, double startTime, double arrivalTime) {
-		ArrayList<Node> nodes = new ArrayList<>();
-		ArrayList<Link> links = new ArrayList<>();
+		List<Node> nodes = new ArrayList<>();
+		List<Link> links = new ArrayList<>();
 
 		nodes.add(0, toNode);
 		Link tmpLink = getData(toNode).getPrevLink();
@@ -321,11 +339,11 @@ public class Dijkstra implements LeastCostPathCalculator {
 			}
 			links.add(0, tmpLink);
 			nodes.add(0, tmpLink.getFromNode());
+			
 		}
 
 		DijkstraNodeData toNodeData = getData(toNode);
 		Path path = new Path(nodes, links, arrivalTime - startTime, toNodeData.getCost());
-
 		return path;
 	}
 	
@@ -380,9 +398,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * Logic that was previously located in the relaxNode(...) method. 
 	 * By doing so, the FastDijkstra can overwrite relaxNode without copying the logic. 
 	 */
-	/*package*/ void relaxNodeLogic(final Link l, final RouterPriorityQueue<Node> pendingNodes,
-			final double currTime, final double currCost, final Node toNode,
-			final PreProcessDijkstra.DeadEndData ddOutData) {
+	/*package*/ void relaxNodeLogic(final Link l, final RouterPriorityQueue<Node> pendingNodes, final double currTime, 
+			final double currCost, final Node toNode, final PreProcessDijkstra.DeadEndData ddOutData) {
 		if (this.pruneDeadEnds) {
 			if (canPassLink(l)) {
 				Node n = l.getToNode();
@@ -429,22 +446,29 @@ public class Dijkstra implements LeastCostPathCalculator {
 	protected boolean addToPendingNodes(final Link l, final Node n,
 			final RouterPriorityQueue<Node> pendingNodes, final double currTime,
 			final double currCost, final Node toNode) {
-
-		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, person, vehicle);
-		double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.person, this.vehicle);
-		DijkstraNodeData data = getData(n);
-		double nCost = data.getCost();
+		
+		final double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, this.person, this.vehicle);
+		final double travelCost = this.costFunction.getLinkTravelDisutility(l, currTime, this.person, this.vehicle);
+		final DijkstraNodeData data = getData(n);
 		if (!data.isVisited(getIterationId())) {
-			visitNode(n, data, pendingNodes, currTime + travelTime, currCost
-					+ travelCost, l);
+			visitNode(n, data, pendingNodes, currTime + travelTime, currCost + travelCost, l);
 			return true;
 		}
-		double totalCost = currCost + travelCost;
+				
+		final double nCost = data.getCost();
+		final double totalCost = currCost + travelCost;
 		if (totalCost < nCost) {
 			revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
 			return true;
+		} else if (totalCost == nCost) {
+			// Special case: a node can be reached from two links with exactly the same costs.
+			// Decide based on the linkId which one to take... just have to common criteria to be deterministic.
+			Link prevLink = data.getPrevLink();
+			if (prevLink != null && prevLink.getId().compareTo(l.getId()) > 0) {
+				revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
+				return true;
+			}
 		}
-
 		return false;
 	}
 
@@ -482,9 +506,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @param outLink
 	 *            The link from which we came visiting n.
 	 */
-	protected void revisitNode(final Node n, final DijkstraNodeData data,
-			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
-			final Link outLink) {
+	protected void revisitNode(final Node n, final DijkstraNodeData data, final RouterPriorityQueue<Node> pendingNodes, 
+			final double time, final double cost, final Link outLink) {
 		data.visit(outLink, cost, time, getIterationId());
 		pendingNodes.decreaseKey(n, getPriority(data));
 	}
@@ -506,9 +529,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 * @param outLink
 	 *            The node from which we came visiting n.
 	 */
-	protected void visitNode(final Node n, final DijkstraNodeData data,
-			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
-			final Link outLink) {
+	protected void visitNode(final Node n, final DijkstraNodeData data, final RouterPriorityQueue<Node> pendingNodes,
+			final double time, final double cost, final Link outLink) {
 		data.visit(outLink, cost, time, getIterationId());
 		pendingNodes.add(n, getPriority(data));
 	}
@@ -563,12 +585,16 @@ public class Dijkstra implements LeastCostPathCalculator {
 	protected DijkstraNodeData getData(final Node n) {
 		DijkstraNodeData r = this.nodeData.get(n.getId());
 		if (null == r) {
-			r = new DijkstraNodeData();
+			r = createNodeData();
 			this.nodeData.put(n.getId(), r);
 		}
 		return r;
 	}
 
+	protected DijkstraNodeData createNodeData() {
+		return new DijkstraNodeData();
+	}
+	
 	protected PreProcessDijkstra.DeadEndData getPreProcessData(final Node n) {
 		return this.preProcessData.getNodeData(n);
 	}
@@ -576,13 +602,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 	protected final Person getPerson() {
 		return this.person;
 	}
-
-	protected final void setPerson(final Person person) {
-		this.person = person;
-	}
 	
 	protected final Vehicle getVehicle() {
 		return this.vehicle;
 	}
-	
 }

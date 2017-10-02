@@ -19,98 +19,41 @@
 
 package org.matsim.contrib.taxi.optimizer.zonal;
 
-import java.util.*;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.taxi.optimizer.rules.IdleTaxiZonalRegistry;
 import org.matsim.contrib.taxi.optimizer.rules.RuleBasedTaxiOptimizer;
-import org.matsim.contrib.zone.*;
-import org.matsim.contrib.zone.util.*;
+import org.matsim.contrib.taxi.optimizer.rules.UnplannedRequestZonalRegistry;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
+import org.matsim.contrib.zone.SquareGridSystem;
+import org.matsim.contrib.zone.ZonalSystem;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 public class ZonalTaxiOptimizer extends RuleBasedTaxiOptimizer {
-	private static final Comparator<Vehicle> LONGEST_WAITING_FIRST = new Comparator<Vehicle>() {
-		public int compare(Vehicle v1, Vehicle v2) {
-			double beginTime1 = v1.getSchedule().getCurrentTask().getBeginTime();
-			double beginTime2 = v2.getSchedule().getCurrentTask().getBeginTime();
-			return Double.compare(beginTime1, beginTime2);
-		}
-	};
-
-	private final Map<Id<Zone>, Zone> zones;
-	private Map<Id<Zone>, PriorityQueue<Vehicle>> zoneToIdleVehicleQueue;
-	private final Map<Id<Link>, Zone> linkToZone;
-
-	public ZonalTaxiOptimizer(TaxiOptimizerContext optimContext, ZonalTaxiOptimizerParams params) {
-		super(optimContext, params);
-
-		zones = Zones.readZones(params.zonesXmlFile, params.zonesShpFile);
-		System.err.println("No conversion of SRS is done");
-
-		this.linkToZone = NetworkWithZonesUtils.createLinkToZoneMap(optimContext.network,
-				new ZoneFinderImpl(zones, params.expansionDistance));
-
-		// FIXME zonal system used in RuleBasedTaxiOptim (for registers) should be equivalent to
-		// the zones used in ZonalTaxiOptim (for dispatching)
+	public static ZonalTaxiOptimizer create(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
+			Network network, MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
+			ZonalTaxiOptimizerParams params) {
+		return create(taxiCfg, fleet, scheduler, network, timer, travelTime, travelDisutility, params,
+				new SquareGridSystem(network, params.cellSize));
 	}
 
-	@Override
-	protected void scheduleUnplannedRequests() {
-		initIdleVehiclesInZones();
-		scheduleUnplannedRequestsWithinZones();
-
-		if (!getUnplannedRequests().isEmpty()) {
-			super.scheduleUnplannedRequests();
-		}
+	public static ZonalTaxiOptimizer create(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler,
+			Network network, MobsimTimer timer, TravelTime travelTime, TravelDisutility travelDisutility,
+			ZonalTaxiOptimizerParams params, ZonalSystem zonalSystem) {
+		IdleTaxiZonalRegistry idleTaxiRegistry = new IdleTaxiZonalRegistry(zonalSystem, scheduler);
+		UnplannedRequestZonalRegistry unplannedRequestRegistry = new UnplannedRequestZonalRegistry(zonalSystem);
+		ZonalRequestInserter requestInserter = new ZonalRequestInserter(fleet, scheduler, timer, network, travelTime,
+				travelDisutility, params, idleTaxiRegistry, unplannedRequestRegistry);
+		return new ZonalTaxiOptimizer(taxiCfg, fleet, scheduler, network, params, idleTaxiRegistry,
+				unplannedRequestRegistry, requestInserter);
 	}
 
-	private void initIdleVehiclesInZones() {
-		// TODO use idle vehicle register instead...
-
-		zoneToIdleVehicleQueue = new HashMap<>();
-		for (Id<Zone> zoneId : zones.keySet()) {
-			zoneToIdleVehicleQueue.put(zoneId, new PriorityQueue<Vehicle>(10, LONGEST_WAITING_FIRST));
-		}
-
-		for (Vehicle veh : getOptimContext().fleet.getVehicles().values()) {
-			if (getOptimContext().scheduler.isIdle(veh)) {
-				Link link = ((StayTask)veh.getSchedule().getCurrentTask()).getLink();
-				Zone zone = linkToZone.get(link.getId());
-				if (zone != null) {
-					PriorityQueue<Vehicle> queue = zoneToIdleVehicleQueue.get(zone.getId());
-					queue.add(veh);
-				}
-			}
-		}
-	}
-
-	private void scheduleUnplannedRequestsWithinZones() {
-		Iterator<TaxiRequest> reqIter = getUnplannedRequests().iterator();
-		while (reqIter.hasNext()) {
-			TaxiRequest req = reqIter.next();
-
-			Zone zone = linkToZone.get(req.getFromLink().getId());
-			if (zone == null) {
-				continue;
-			}
-
-			PriorityQueue<Vehicle> idleVehsInZone = zoneToIdleVehicleQueue.get(zone.getId());
-			if (idleVehsInZone.isEmpty()) {
-				continue;
-			}
-
-			Iterable<Vehicle> filteredVehs = Collections.singleton(idleVehsInZone.peek());
-			BestDispatchFinder.Dispatch<TaxiRequest> best = getDispatchFinder().findBestVehicleForRequest(req,
-					filteredVehs);
-
-			if (best != null) {
-				getOptimContext().scheduler.scheduleRequest(best.vehicle, best.destination, best.path);
-				reqIter.remove();
-				idleVehsInZone.remove(best.vehicle);
-			}
-		}
+	public ZonalTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, TaxiScheduler scheduler, Network network,
+			ZonalTaxiOptimizerParams params, IdleTaxiZonalRegistry idleTaxiRegistry,
+			UnplannedRequestZonalRegistry unplannedRequestRegistry, ZonalRequestInserter requestInserter) {
+		super(taxiCfg, fleet, scheduler, params, idleTaxiRegistry, unplannedRequestRegistry, requestInserter);
 	}
 }

@@ -95,7 +95,7 @@ public class TaxiBenchmarkPostProcessor {
 	private void readFile(String file, Experiment experiment) {
 		try (Scanner sc = new Scanner(new File(file))) {
 			String header = sc.nextLine();
-			if (!header.equals(this.header)) {
+			if (!header.split("\t").equals(this.header)) {
 				throw new RuntimeException("Incompatibile header");
 			}
 

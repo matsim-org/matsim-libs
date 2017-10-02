@@ -19,35 +19,61 @@
 
 package org.matsim.contrib.taxi.scheduler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.matsim.api.core.v01.network.*;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.path.*;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.Vehicles;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelDataImpl;
+import org.matsim.contrib.dvrp.path.VrpPaths;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.tracker.*;
+import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
+import org.matsim.contrib.dvrp.tracker.TaskTrackers;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
+import org.matsim.contrib.taxi.schedule.TaxiEmptyDriveTask;
+import org.matsim.contrib.taxi.schedule.TaxiOccupiedDriveTask;
+import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
+import org.matsim.contrib.taxi.schedule.TaxiStayTask;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
+import org.matsim.contrib.taxi.schedule.TaxiTaskWithRequest;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.FastAStarEuclideanFactory;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
 
-public class TaxiScheduler implements TaxiScheduleInquiry {
-	private final Fleet fleet;
-	protected final TaxiConfigGroup taxiCfg;
-	private final MobsimTimer timer;
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
 
+public class TaxiScheduler implements TaxiScheduleInquiry {
+	protected final TaxiConfigGroup taxiCfg;
+	private final Fleet fleet;
+	private final MobsimTimer timer;
 	private final TravelTime travelTime;
 	private final LeastCostPathCalculator router;
 
-	public TaxiScheduler(TaxiConfigGroup taxiCfg, Network network, Fleet fleet, MobsimTimer timer,
-			TravelTime travelTime, TravelDisutility travelDisutility) {
+	@Inject
+	public TaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, @Named(DvrpModule.DVRP_ROUTING) Network network,
+			MobsimTimer timer, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER) TravelDisutility travelDisutility) {
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
 		this.timer = timer;

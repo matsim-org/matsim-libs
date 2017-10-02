@@ -19,18 +19,16 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 public class Schedules {
-	public static final Predicate<Task> STAY_TASK_PREDICATE = t -> t instanceof StayTask;
-	public static final Predicate<Task> DRIVE_TASK_PREDICATE = t -> t instanceof DriveTask;
 	public static final Comparator<Task> TASK_SCHEDULE_IDX_COMPARATOR = (t1, t2) -> t1.getTaskIdx() - t2.getTaskIdx();
 
 	public static Task getFirstTask(Schedule schedule) {
@@ -74,16 +72,11 @@ public class Schedules {
 
 	@SuppressWarnings("unchecked")
 	public static Iterable<StayTask> createStayTaskIter(Schedule schedule) {
-		return (Iterable<StayTask>)createTaskFilterIter(schedule, STAY_TASK_PREDICATE);
+		return (Iterable<StayTask>)Iterables.filter(schedule.getTasks(), t -> t instanceof StayTask);
 	}
 
 	@SuppressWarnings("unchecked")
 	public static Iterable<DriveTask> createDriveTaskIter(Schedule schedule) {
-		return (Iterable<DriveTask>)createTaskFilterIter(schedule, DRIVE_TASK_PREDICATE);
-	}
-
-	public static Iterable<? extends Task> createTaskFilterIter(Schedule schedule,
-			Predicate<? super Task> taskPredicate) {
-		return Iterables.filter(schedule.getTasks(), taskPredicate);
+		return (Iterable<DriveTask>)Iterables.filter(schedule.getTasks(), t -> t instanceof DriveTask);
 	}
 }

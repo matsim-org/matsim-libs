@@ -20,10 +20,10 @@
 package org.matsim.contrib.taxi.optimizer.fifo;
 
 import org.apache.commons.configuration.Configuration;
-import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 
-public class FifoTaxiOptimizerParams extends AbstractTaxiOptimizerParams {
+public class FifoTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public FifoTaxiOptimizerParams(Configuration optimizerConfig) {
-		super(optimizerConfig);
+		super(optimizerConfig, true, true);
 	}
 }
