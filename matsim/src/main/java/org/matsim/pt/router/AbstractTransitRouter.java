@@ -29,6 +29,7 @@ public class AbstractTransitRouter {
 	private final TravelTime travelTime;
 	private final PreparedTransitSchedule preparedTransitSchedule;
 
+	//used mainly as MATSim default PT router
 	protected AbstractTransitRouter(TransitRouterConfig trConfig, TransitSchedule schedule) {
 		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
 		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(trConfig, getPreparedTransitSchedule());
@@ -46,6 +47,17 @@ public class AbstractTransitRouter {
 		this.travelTime = travelTime;
 		this.travelDisutility = travelDisutility;
 		this.preparedTransitSchedule = preparedTransitSchedule;
+	}
+
+	// for other routers which does not use TransitRouterNetwork e.g. raptor. Amit Oct'17
+	protected AbstractTransitRouter(TransitRouterConfig config,
+									TransitTravelDisutility travelDisutility) {
+		this.trConfig = config;
+		this.travelDisutility = travelDisutility;
+		// not necessary for raptor
+		this.travelTime = null;
+		this.preparedTransitSchedule = null;
+		this.transitNetwork = null;
 	}
 
 	protected final double getWalkTime(Person person, Coord coord, Coord toCoord) {

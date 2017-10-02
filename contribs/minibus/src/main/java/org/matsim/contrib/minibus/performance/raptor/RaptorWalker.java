@@ -28,6 +28,7 @@ import org.matsim.core.router.InitialNode;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitPassengerRoute;
 import org.matsim.pt.router.RouteSegment;
+import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -95,8 +96,8 @@ public class RaptorWalker {
 	private final boolean[] routeStopsToCheck;
 	private final boolean[] transferTransitStopsToCheck;
 
-	public RaptorWalker(RaptorSearchData raptorSearchData, RaptorDisutility raptorDisutility, int maxTransfers, int graceTransfers) {
-		this.raptorDisutility = raptorDisutility;
+	public RaptorWalker(RaptorSearchData raptorSearchData, TransitTravelDisutility transitTravelDisutility, int maxTransfers, int graceTransfers) {
+		this.raptorDisutility = (RaptorDisutility) transitTravelDisutility;
 		this.raptorSearchData = raptorSearchData;
 		this.maxTransfers = maxTransfers;
 		this.graceTransfers = graceTransfers;

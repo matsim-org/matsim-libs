@@ -20,27 +20,18 @@
 
 package org.matsim.contrib.minibus.performance.raptor;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.InitialNode;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
-import org.matsim.pt.router.TransitPassengerRoute;
-import org.matsim.pt.router.RouteSegment;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.routes.ExperimentalTransitRoute;
+import org.matsim.pt.router.*;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
@@ -48,27 +39,35 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  *
  * @author aneumann
  */
-public class Raptor implements TransitRouter {
+public class Raptor extends AbstractTransitRouter implements TransitRouter {
 
 	private final TransitRouterQuadTree transitRouterQuadTree;
 
 	private final RaptorWalker raptorWalker;
 	private final TransitRouterConfig config;
-	private final RaptorDisutility raptorDisutility;
+	private RaptorDisutility raptorDisutility ;
 
 	// MAGIC NUMBERS BELOW THIS LINE
 	int maxTransfers = 10;
 	int graceRuns = 1;
 	// END MAGIC NUMBERS
 
-	public Raptor(TransitRouterQuadTree transitRouterQuadTree, RaptorDisutility raptorDisutility, TransitRouterConfig transitRouterConfig) {
-		this.transitRouterQuadTree = transitRouterQuadTree;
-		this.raptorDisutility = raptorDisutility;
+	public Raptor(TransitRouterConfig transitRouterConfig, TransitSchedule transitSchedule, TransitTravelDisutility raptorDisutility) {
+		super (transitRouterConfig, raptorDisutility);
 		this.config = transitRouterConfig;
-
-		this.raptorWalker = new RaptorWalker(this.transitRouterQuadTree.getSearchData(), this.raptorDisutility, this.maxTransfers, this.graceRuns);
+		// casting to raptorDisutility is necessary here. At the moment, I dont know if there is a better way. Amit Oct'17
+		this.transitRouterQuadTree = new TransitRouterQuadTree( (RaptorDisutility) raptorDisutility);
+		this.transitRouterQuadTree.initializeFromSchedule(transitSchedule, config.getBeelineWalkConnectionDistance());
+		this.raptorDisutility = (RaptorDisutility) raptorDisutility;
+		this.raptorWalker = new RaptorWalker(this.transitRouterQuadTree.getSearchData(), raptorDisutility, this.maxTransfers, this.graceRuns);
 	}
 
+	public Raptor(TransitRouterConfig transitRouterConfig, TransitSchedule transitSchedule) {
+		// do something about these two magic numbers for raptor disutility. Amit Oct'17
+		this(transitRouterConfig, transitSchedule, new RaptorDisutility(transitRouterConfig, 0., 0.));
+	}
+
+	// "default" PT router uses TransitRouterNetworkNode (an implementation of Node) whereas "raptor" uses TransitStopFacility. Amit' Sep 17
 	private Map<TransitStopFacility, InitialNode> locateWrappedNearestTransitStops(Person person, Coord coord, double departureTime) {
 		Collection<TransitStopFacility> nearestTransitStops = this.transitRouterQuadTree.getNearestTransitStopFacilities(coord, this.config.getSearchRadius());
 		if (nearestTransitStops.size() < 2) {
@@ -80,19 +79,15 @@ public class Raptor implements TransitRouter {
 		Map<TransitStopFacility, InitialNode> wrappedNearestTransitStops2AccessCost = new LinkedHashMap<>();
 		for (TransitStopFacility node : nearestTransitStops) {
 			Coord toCoord = node.getCoord();
-			double initialTime = getWalkTime( coord, toCoord);
+			double initialTime = getWalkTime(null, coord, toCoord);
 			double initialCost = getWalkDisutility(coord, toCoord);
 			wrappedNearestTransitStops2AccessCost.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 		return wrappedNearestTransitStops2AccessCost;
 	}
 
-	private double getWalkTime(Coord coord, Coord toCoord) {
-		return this.raptorDisutility.getTravelTime(coord, toCoord);
-	}
-
 	private double getWalkDisutility(Coord coord, Coord toCoord) {
-		return this.raptorDisutility.getTravelDisutility(coord, toCoord);
+		return this.raptorDisutility.getWalkTravelDisutility(null, coord, toCoord);
 	}
 
 	@Override
@@ -120,111 +115,8 @@ public class Raptor implements TransitRouter {
 		return convertPathToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
 	}
 
-	private List<Leg> createDirectWalkLegList(Person person, Coord fromCoord, Coord toCoord) {
-		List<Leg> legs = new ArrayList<>();
-		Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
-		double walkTime = getWalkTime(fromCoord, toCoord);
-		leg.setTravelTime(walkTime);
-		Route walkRoute = RouteUtils.createGenericRouteImpl(null, null);
-		walkRoute.setTravelTime(walkTime);
-		leg.setRoute(walkRoute);
-		legs.add(leg);
-		return legs;
-	}
-
-	protected List<Leg> convertPathToLegList(double departureTime, TransitPassengerRoute p, Coord fromCoord, Coord toCoord, Person person) {
-		// convert the route into a sequence of legs
-		List<Leg> legs = new ArrayList<>();
-
-		// access leg
-		Leg accessLeg;
-		// check if first leg extends walking distance
-		if (p.getRoute().get(0).getRouteTaken() == null) {
-			// route starts with transfer - extend initial walk to that stop
-			accessLeg = createTransitWalkLeg(fromCoord, p.getRoute().get(0).getToStop().getCoord());
-			p.getRoute().remove(0);
-		} else {
-			// do not extend it - add a regular walk leg
-			// 
-			accessLeg = createTransitWalkLeg(fromCoord, p.getRoute().get(0).getFromStop().getCoord());
-		}
-
-		// egress leg
-		Leg egressLeg;
-		// check if first leg extends walking distance
-		if (p.getRoute().get(p.getRoute().size() - 1).getRouteTaken() == null) {
-			// route starts with transfer - extend initial walk to that stop
-			egressLeg = createTransitWalkLeg(p.getRoute().get(p.getRoute().size() - 1).getFromStop().getCoord(), toCoord);
-			p.getRoute().remove(p.getRoute().size() - 1);
-		} else {
-			// do not extend it - add a regular walk leg
-			// access leg
-			egressLeg = createTransitWalkLeg(p.getRoute().get(p.getRoute().size() - 1).getToStop().getCoord(), toCoord);
-		}
-
-
-		// add very first leg
-		legs.add(accessLeg);
-
-		// route segments are now in pt-walk-pt sequence
-		for (RouteSegment routeSegement : p.getRoute()) {
-			if (routeSegement.getRouteTaken() == null) {
-				// transfer
-				legs.add(createTransferTransitWalkLeg(routeSegement));
-			} else {
-				// pt leg
-				legs.add(createTransitLeg(routeSegement));
-			}
-		}
-
-		// add last leg
-		legs.add(egressLeg);
-
-		return legs;
-	}
-
-	private Leg createTransitLeg(RouteSegment routeSegment) {
-		Leg leg = PopulationUtils.createLeg(TransportMode.pt);
-
-		TransitStopFacility accessStop = routeSegment.getFromStop();
-		TransitStopFacility egressStop = routeSegment.getToStop();
-
-		ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, egressStop, routeSegment.getLineTaken(), routeSegment.getRouteTaken());
-		leg.setRoute(ptRoute);
-
-		leg.setTravelTime(routeSegment.getTravelTime());
-		return leg;
-	}
-
-	private Leg createTransferTransitWalkLeg(RouteSegment routeSegement) {
-		Leg leg = this.createTransitWalkLeg(routeSegement.getFromStop().getCoord(), routeSegement.getToStop().getCoord());
-		Route walkRoute = RouteUtils.createGenericRouteImpl(routeSegement.getFromStop().getLinkId(), routeSegement.getToStop().getLinkId());
-//		walkRoute.setTravelTime(leg.getTravelTime() );
-		// transit walk leg should include additional transfer time; Amit, Aug'17
-		leg.setTravelTime( this.raptorDisutility.getTransferTime(routeSegement.getFromStop().getCoord(), routeSegement.getToStop().getCoord()) );
-		walkRoute.setTravelTime(this.raptorDisutility.getTransferTime(routeSegement.getFromStop().getCoord(), routeSegement.getToStop().getCoord()) );
-		leg.setRoute(walkRoute);
-
-		return leg;
-	}
-
-	private Leg createTransitWalkLeg(Coord fromCoord, Coord toCoord) {
-		Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
-		double walkTime = getWalkTime(fromCoord, toCoord);
-		leg.setTravelTime(walkTime);
-		return leg;
-	}
-
-	public TransitRouterQuadTree getTransitRouterNetwork() {
-		return this.transitRouterQuadTree;
-	}
-
 	protected TransitRouterQuadTree getTransitNetwork() {
 		return this.transitRouterQuadTree;
-	}
-
-	protected TransitRouterConfig getConfig() {
-		return config;
 	}
 
 }
