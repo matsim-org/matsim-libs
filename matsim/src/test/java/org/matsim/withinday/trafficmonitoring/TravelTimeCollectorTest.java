@@ -20,23 +20,23 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.Random;
+
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-import org.junit.runners.Parameterized.Parameters;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -49,31 +49,27 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
+import junitparams.JUnitParamsRunner;
+import junitparams.Parameters;
+
 /**
  * @author cdobler
  */
-@RunWith(Parameterized.class)
+@RunWith(JUnitParamsRunner.class)
 public class TravelTimeCollectorTest extends MatsimTestCase {
 
-	private final boolean isUsingFastCapacityUpdate ;
 	@Rule
 	public MatsimTestUtils helper = new MatsimTestUtils();
 	
-	public TravelTimeCollectorTest(boolean isUsingFastCapacityUpdate) {
-		this.isUsingFastCapacityUpdate = isUsingFastCapacityUpdate;
-	}
-	
-	@Parameters(name = "{index}: isUsingfastCapacityUpdate == {0}")
-	public static Collection<Object> parameterObjects () {
-		Object [] capacityUpdates = new Object [] { false, true };
-		return Arrays.asList(capacityUpdates);
-	}
-	
+	Random random = MatsimRandom.getRandom();
+		 
 	@Test
-	public void testGetLinkTravelTime() {
-		Config config = loadConfig("test/scenarios/equil/config.xml");
-		config.controler().setOutputDirectory(helper.getOutputDirectory()+"/fastCapacityUpdate_"+this.isUsingFastCapacityUpdate);
-
+	@Parameters({"false", "true"})
+	public void testGetLinkTravelTime(boolean isUsingFastCapacityUpdate) {
+     	
+        Config config = ConfigUtils.loadConfig("test/scenarios/equil/config.xml");
+		config.controler().setOutputDirectory(helper.getOutputDirectory()+"fastCapacityUpdate_"+isUsingFastCapacityUpdate);
+		
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
 		qSimConfig.setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);

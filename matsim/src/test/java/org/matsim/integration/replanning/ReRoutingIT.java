@@ -20,6 +20,10 @@
 
 package org.matsim.integration.replanning;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.util.EnumSet;
+
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,10 +39,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.util.EnumSet;
-
 public class ReRoutingIT {
 
 	@Rule
@@ -53,6 +53,15 @@ public class ReRoutingIT {
 		config.qsim().setRemoveStuckVehicles(true);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 		config.controler().setLastIteration(1);
+		/* linear interpolate the into time bins aggregated travel time data to avoid artifacts at the boundaries of time bins: 
+		 * e.g. a first time bin with aggregated travel time of 90 seconds and a second time bin with 45 seconds; time bin size 60;
+		 * i.e. consolidateData-method in TravelTimeCalculator will accept this difference; imagine an requested route starting 2 
+		 * seconds before the end of the first time bin, another route starts 2 seconds after the start of the second time bin; then
+		 * the second one will arrive 41 seconds earlier than the first. Depending on the algorithm, some routers will detect this, 
+		 * some not (see MATSim-730), which is why we decided to test the linear interpolated travel time data here (which does not 
+		 * contain this artifacts). theresa, sep'17
+		 * */
+		config.travelTimeCalculator().setTravelTimeGetterType("linearinterpolation");
 
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
@@ -86,9 +95,6 @@ public class ReRoutingIT {
 		this.evaluate();
 	}
 
-	/**
-	 * This test seems to have race conditions somewhere (i.e. it fails intermittently without code changes). kai, aug'13
-	 */
 	@Test
 	public void testReRoutingAStarLandmarks() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
@@ -110,11 +116,11 @@ public class ReRoutingIT {
 		controler.run();
 		this.evaluate();
 	}
-
+	
 	private void evaluate() throws MalformedURLException {
 		Config config = utils.loadConfig(IOUtils.newUrl(utils.classInputResourcePath(), "config.xml"));
 		config.network().setInputFile(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("berlin"), "network.xml.gz").toString());
-		config.plans().setInputFile(IOUtils.newUrl(utils.inputResourcePath(), "1.plans.xml.gz").toString());
+		config.plans().setInputFile(IOUtils.newUrl(utils.classInputResourcePath(), "plans.xml.gz").toString());
 		Scenario referenceScenario = ScenarioUtils.loadScenario(config);
 
 		config.plans().setInputFile(new File(utils.getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz").toURI().toURL().toString());
@@ -127,5 +133,5 @@ public class ReRoutingIT {
 		}
 		Assert.assertTrue("different plans files.", isEqual);
 	}
-
+	
 }

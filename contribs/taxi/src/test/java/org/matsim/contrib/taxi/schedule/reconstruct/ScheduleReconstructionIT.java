@@ -35,9 +35,13 @@ import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.TaxiTask;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.*;
+import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 public class ScheduleReconstructionIT {
+	@Rule
+	public final MatsimTestUtils utils = new MatsimTestUtils();
+
 	@Test
 	public void testOneTaxiReconstruction() {
 		runReconstruction("one_taxi/one_taxi_config.xml");
@@ -52,6 +56,7 @@ public class ScheduleReconstructionIT {
 	private void runReconstruction(String configFile) {
 		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
 		Controler controler = RunTaxiBenchmark.createControler(config, 1);
 		controler.addOverridingModule(new AbstractModule() {

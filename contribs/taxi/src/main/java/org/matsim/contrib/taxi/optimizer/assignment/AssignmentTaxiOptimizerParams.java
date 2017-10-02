@@ -20,10 +20,10 @@
 package org.matsim.contrib.taxi.optimizer.assignment;
 
 import org.apache.commons.configuration.Configuration;
-import org.matsim.contrib.taxi.optimizer.AbstractTaxiOptimizerParams;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerParams;
 import org.matsim.contrib.taxi.optimizer.assignment.TaxiToRequestAssignmentCostProvider.Mode;
 
-public class AssignmentTaxiOptimizerParams extends AbstractTaxiOptimizerParams {
+public class AssignmentTaxiOptimizerParams extends DefaultTaxiOptimizerParams {
 	public static final String MODE = "mode";
 	public static final String NULL_PATH_COST = "nullPathCost";
 
@@ -44,7 +44,7 @@ public class AssignmentTaxiOptimizerParams extends AbstractTaxiOptimizerParams {
 	public final int nearestVehiclesLimit;
 
 	public AssignmentTaxiOptimizerParams(Configuration optimizerConfig) {
-		super(optimizerConfig);
+		super(optimizerConfig, true, true);
 
 		mode = Mode.valueOf(optimizerConfig.getString(MODE));
 

@@ -38,13 +38,13 @@ public class WrappedBinaryMinHeap<E> implements MinHeap<E> {
 	private final Map<E, WrappedEntry> map;
 	
 	public WrappedBinaryMinHeap(int maxSize) {
-		this.delegate = new BinaryMinHeap<WrappedEntry>(maxSize);
-		this.map = new IdentityHashMap<E, WrappedEntry>(maxSize);
+		this.delegate = new BinaryMinHeap<>(maxSize);
+		this.map = new IdentityHashMap<>(maxSize);
 	}
 	
 	public WrappedBinaryMinHeap(int maxSize, int fanout, boolean classicalRemove) {
-		this.delegate = new BinaryMinHeap<WrappedEntry>(maxSize, fanout, classicalRemove);
-		this.map = new IdentityHashMap<E, WrappedEntry>(maxSize);
+		this.delegate = new BinaryMinHeap<>(maxSize, fanout, classicalRemove);
+		this.map = new IdentityHashMap<>(maxSize);
 	}
 	
 	@Override
@@ -72,7 +72,11 @@ public class WrappedBinaryMinHeap<E> implements MinHeap<E> {
 	
 	@Override
 	public void reset() {
-		this.map.clear();
+		// I don't see why we need this? Might make sense if after a reset are added new elements -
+		// but in that case create a new heap.
+		// cdobler, sep'17
+//		this.map.clear();
+		
 		this.delegate.reset();
 	}
 	
