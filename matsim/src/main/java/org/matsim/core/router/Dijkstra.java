@@ -463,7 +463,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 		} else if (totalCost == nCost) {
 			// Special case: a node can be reached from two links with exactly the same costs.
 			// Decide based on the linkId which one to take... just have to common criteria to be deterministic.
-			if (data.getPrevLink().getId().compareTo(l.getId()) > 0) {
+			Link prevLink = data.getPrevLink();
+			if (prevLink != null && prevLink.getId().compareTo(l.getId()) > 0) {
 				revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
 				return true;
 			}
