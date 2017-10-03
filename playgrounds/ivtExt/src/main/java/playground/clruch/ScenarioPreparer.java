@@ -167,6 +167,7 @@ public class ScenarioPreparer {
                 PerformanceFleetSizeIO.toByte(new File(vnDir, PERFORMANCEFLEETSIZEFILENAME), performanceFleetSizeCalculator);
             }
         }
+        virtualNetwork.printVirtualNetworkInfo();
         System.out.println("successfully converted simulation data files from in " + workingDirectory);
     }
 }
