@@ -20,6 +20,7 @@ import com.google.inject.name.Named;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.idsc.tensor.Tensor;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
@@ -27,6 +28,8 @@ import playground.clruch.dispatcher.utils.robotaxirequestmatcher.AbstractRoboTax
 import playground.clruch.dispatcher.utils.robotaxirequestmatcher.RoboTaxiCloseRequestMatcher;
 import playground.clruch.dispatcher.utils.virtualnodedestselector.RandomVirtualNodeDest;
 import playground.clruch.netdata.VirtualNetworkGet;
+import playground.clruch.traveldata.TravelData;
+import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -43,18 +46,21 @@ public class SelfishDispatcher extends PartitionedDispatcher {
     private final Network network;
     private final AbstractRoboTaxiRequestMatcher roboTaxiRequestMatcher;
     private Set<RoboTaxi> waitingTaxis = new HashSet<>();
+    private final TravelData travelData;
 
     private SelfishDispatcher(//
             AVDispatcherConfig config, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
-            Network network, VirtualNetwork virtualNetwork) {
+            Network network, VirtualNetwork<Link> virtualNetwork,//
+            TravelData travelData) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(config);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         this.network = network;
         roboTaxiRequestMatcher = new RoboTaxiCloseRequestMatcher();
+        this.travelData = travelData;
     }
 
     @Override
@@ -73,7 +79,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
             /** for remaining stay vehicles, chose a location in A,B to rebalance to */
             for (RoboTaxi robotaxi : getRoboTaxiSubset(AVStatus.STAY)) {
                 if (!waitingTaxis.contains(robotaxi)) {
-                    VirtualNode<Link> vn = selectRebalanceNode();
+                    VirtualNode<Link> vn = selectRebalanceNode((int)round_now);
                     Link link = (new RandomVirtualNodeDest()).selectLinkSet(vn, 1).get(0);
                     setRoboTaxiRebalance(robotaxi, link);
                     waitingTaxis.add(robotaxi);
@@ -83,13 +89,13 @@ public class SelfishDispatcher extends PartitionedDispatcher {
     }
 
     /** @return VirtualNode selected by a selfish agent. */
-    private VirtualNode<Link> selectRebalanceNode() {
+    private VirtualNode<Link> selectRebalanceNode(int time) {
 
         Map<VirtualNode<Link>, Double> scores = new HashMap<>();
 
         for (VirtualNode<Link> virtualNode : virtualNetwork.getVirtualNodes()) {
             double averageFare = calcAverageFare(virtualNode, //
-                    getVirtualNodeRequests().get(virtualNode));
+                    getVirtualNodeRequests().get(virtualNode),time);
             GlobalAssert.that(averageFare >= 0.0);
             int openRequests = getVirtualNodeRequests().get(virtualNode).size();
             GlobalAssert.that(openRequests >= 0);
@@ -105,8 +111,8 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
             scores.put(virtualNode, score);
         }
-        
-        scores.values().stream().forEach(v->System.out.println("score = " + v));
+
+        scores.values().stream().forEach(v -> System.out.println("score = " + v));
 
         Entry<VirtualNode<Link>, Double> maxEntry = Collections.max(scores.entrySet(), new ScoreComparator());
         virtualNetwork.getVirtualNodes().forEach(vn -> GlobalAssert.that(scores.get(vn) <= scores.get(maxEntry.getKey())));
@@ -119,11 +125,21 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
     }
 
-    private double calcAverageFare(VirtualNode virtualNode, List<AVRequest> requests) {
-        if(virtualNode.getIndex() == 0)
+    private double calcAverageFare(VirtualNode virtualNode, List<AVRequest> requests, int time) {
+        double fareRatio = calcFareRatio(travelData, time);
+        
+        
+        if (virtualNode.getIndex() == 0)
             return 1000.0;
         else
             return 0.0;
+    }
+    
+    private double calcFareRatio(TravelData travelData, int time){
+        Tensor lambda = travelData.getLambdaforTime(time);
+        // TODO implement formlula form paper
+
+        return 1.0;
     }
 
     @Override
@@ -149,12 +165,13 @@ public class SelfishDispatcher extends PartitionedDispatcher {
         private Network network;
 
         public static VirtualNetwork virtualNetwork;
+        TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             virtualNetwork = VirtualNetworkGet.readDefault(network);
-            GlobalAssert.that(virtualNetwork!=null);
-            return new SelfishDispatcher(config, travelTime, router, eventsManager, network, virtualNetwork);
+            GlobalAssert.that(virtualNetwork != null);
+            return new SelfishDispatcher(config, travelTime, router, eventsManager, network, virtualNetwork, travelData);
         }
     }
 
