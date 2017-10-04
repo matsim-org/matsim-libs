@@ -21,6 +21,7 @@ import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.alg.Dimensions;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
@@ -53,13 +54,14 @@ public class SelfishDispatcher extends PartitionedDispatcher {
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
-            Network network, VirtualNetwork<Link> virtualNetwork,//
+            Network network, VirtualNetwork<Link> virtualNetwork, //
             TravelData travelData) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(config);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         this.network = network;
         roboTaxiRequestMatcher = new RoboTaxiCloseRequestMatcher();
+        GlobalAssert.that(travelData != null);
         this.travelData = travelData;
     }
 
@@ -79,7 +81,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
             /** for remaining stay vehicles, chose a location in A,B to rebalance to */
             for (RoboTaxi robotaxi : getRoboTaxiSubset(AVStatus.STAY)) {
                 if (!waitingTaxis.contains(robotaxi)) {
-                    VirtualNode<Link> vn = selectRebalanceNode((int)round_now);
+                    VirtualNode<Link> vn = selectRebalanceNode((int) round_now);
                     Link link = (new RandomVirtualNodeDest()).selectLinkSet(vn, 1).get(0);
                     setRoboTaxiRebalance(robotaxi, link);
                     waitingTaxis.add(robotaxi);
@@ -95,7 +97,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
         for (VirtualNode<Link> virtualNode : virtualNetwork.getVirtualNodes()) {
             double averageFare = calcAverageFare(virtualNode, //
-                    getVirtualNodeRequests().get(virtualNode),time);
+                    getVirtualNodeRequests().get(virtualNode), time);
             GlobalAssert.that(averageFare >= 0.0);
             int openRequests = getVirtualNodeRequests().get(virtualNode).size();
             GlobalAssert.that(openRequests >= 0);
@@ -117,7 +119,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
         Entry<VirtualNode<Link>, Double> maxEntry = Collections.max(scores.entrySet(), new ScoreComparator());
         virtualNetwork.getVirtualNodes().forEach(vn -> GlobalAssert.that(scores.get(vn) <= scores.get(maxEntry.getKey())));
 
-        Set<VirtualNode> maxNodes = scores.entrySet().stream().filter(e -> e.getValue().equals(maxEntry.getValue())).map(e -> e.getKey())
+        Set<VirtualNode<Link>> maxNodes = scores.entrySet().stream().filter(e -> e.getValue().equals(maxEntry.getValue())).map(e -> e.getKey())
                 .collect(Collectors.toSet());
 
         GlobalAssert.that(maxNodes.size() > 0);
@@ -126,20 +128,15 @@ public class SelfishDispatcher extends PartitionedDispatcher {
     }
 
     private double calcAverageFare(VirtualNode virtualNode, List<AVRequest> requests, int time) {
-        double fareRatio = calcFareRatio(travelData, time);
-        
-        
-        if (virtualNode.getIndex() == 0)
-            return 1000.0;
-        else
-            return 0.0;
-    }
-    
-    private double calcFareRatio(TravelData travelData, int time){
-        Tensor lambda = travelData.getLambdaforTime(time);
-        // TODO implement formlula form paper
+        double fareRatio = FareRatioCalculator.calcOptLightLoadFareRatio(travelData, time, getRoboTaxis().size());
+        fareRatio *= 10;
+        System.out.println("fare ratio is: " + fareRatio);
+        double basicFare = 1;
 
-        return 1.0;
+        if (virtualNode.getIndex() == 0)
+            return basicFare * fareRatio;
+        else
+            return fareRatio;
     }
 
     @Override
@@ -164,13 +161,15 @@ public class SelfishDispatcher extends PartitionedDispatcher {
         @Inject
         private Network network;
 
-        public static VirtualNetwork virtualNetwork;
-        TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
+        public static VirtualNetwork<Link> virtualNetwork;
+        public static TravelData travelData;
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
             virtualNetwork = VirtualNetworkGet.readDefault(network);
+            travelData = TravelDataGet.readDefault(virtualNetwork);
             GlobalAssert.that(virtualNetwork != null);
+            GlobalAssert.that(travelData != null);
             return new SelfishDispatcher(config, travelTime, router, eventsManager, network, virtualNetwork, travelData);
         }
     }
