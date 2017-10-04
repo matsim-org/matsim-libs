@@ -19,6 +19,9 @@ import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
 import ch.ethz.idsc.owly.data.LruCache;
+import ch.ethz.idsc.queuey.view.util.gui.GraphicsUtil;
+import ch.ethz.idsc.queuey.view.util.gui.RowPanel;
+import ch.ethz.idsc.queuey.view.util.gui.SpinnerLabel;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -29,9 +32,6 @@ import ch.ethz.idsc.tensor.alg.Subdivide;
 import ch.ethz.idsc.tensor.img.Hue;
 import ch.ethz.idsc.tensor.io.ObjectFormat;
 import ch.ethz.idsc.tensor.red.Total;
-import playground.clib.util.gui.GraphicsUtil;
-import playground.clib.util.gui.RowPanel;
-import playground.clib.util.gui.SpinnerLabel;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.SimulationObject;
 

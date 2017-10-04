@@ -23,12 +23,12 @@ import javax.swing.JToolBar;
 
 import org.matsim.api.core.v01.Coord;
 
+import ch.ethz.idsc.queuey.view.jmapviewer.Coordinate;
+import ch.ethz.idsc.queuey.view.jmapviewer.JMapViewer;
+import ch.ethz.idsc.queuey.view.jmapviewer.interfaces.ICoordinate;
+import ch.ethz.idsc.queuey.view.util.gui.RowPanel;
+import ch.ethz.idsc.queuey.view.util.gui.SpinnerLabel;
 import ch.ethz.idsc.tensor.RealScalar;
-import playground.clib.jmapviewer.Coordinate;
-import playground.clib.jmapviewer.JMapViewer;
-import playground.clib.jmapviewer.interfaces.ICoordinate;
-import playground.clib.util.gui.RowPanel;
-import playground.clib.util.gui.SpinnerLabel;
 import playground.clruch.net.DummyStorageSupplier;
 import playground.clruch.net.IterationFolder;
 import playground.clruch.net.StorageSupplier;

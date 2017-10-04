@@ -7,12 +7,12 @@ import java.awt.image.ImageObserver;
 
 import javax.swing.JLabel;
 
-import playground.clib.gheat.DataManager;
-import playground.clib.gheat.HeatMap;
-import playground.clib.gheat.PointLatLng;
-import playground.clib.gheat.gui.ColorSchemes;
-import playground.clib.jmapviewer.MatsimHeatMap;
-import playground.clib.jmapviewer.Tile;
+import ch.ethz.idsc.queuey.view.gheat.DataManager;
+import ch.ethz.idsc.queuey.view.gheat.HeatMap;
+import ch.ethz.idsc.queuey.view.gheat.PointLatLng;
+import ch.ethz.idsc.queuey.view.gheat.gui.ColorSchemes;
+import ch.ethz.idsc.queuey.view.jmapviewer.MatsimHeatMap;
+import ch.ethz.idsc.queuey.view.jmapviewer.Tile;
 
 public class MatsimHeatMapImpl implements MatsimHeatMap {
     final MatsimDataSource matsimDataSource = new MatsimDataSource();
