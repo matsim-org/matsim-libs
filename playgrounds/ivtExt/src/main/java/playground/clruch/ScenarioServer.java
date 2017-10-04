@@ -45,13 +45,11 @@ import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
  * simulation status */
 public class ScenarioServer {
 
-    
-    public static void main(String[] args) throws MalformedURLException, Exception{
-        simulate(args);
+    public static void main(String[] args) throws MalformedURLException, Exception {
+        simulate();
     }
 
-    
-    public static void simulate(String[] args) throws MalformedURLException, Exception {
+    /* package */ static void simulate() throws MalformedURLException, Exception {
         // load options
         File workingDirectory = new File("").getCanonicalFile();
         PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));

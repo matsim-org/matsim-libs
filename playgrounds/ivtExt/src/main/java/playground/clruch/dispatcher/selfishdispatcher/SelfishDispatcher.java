@@ -48,6 +48,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
     private final AbstractRoboTaxiRequestMatcher roboTaxiRequestMatcher;
     private Set<RoboTaxi> waitingTaxis = new HashSet<>();
     private final TravelData travelData;
+    private final double fareRatioMultiply;
 
     private SelfishDispatcher(//
             AVDispatcherConfig config, //
@@ -63,6 +64,8 @@ public class SelfishDispatcher extends PartitionedDispatcher {
         roboTaxiRequestMatcher = new RoboTaxiCloseRequestMatcher();
         GlobalAssert.that(travelData != null);
         this.travelData = travelData;
+        this.fareRatioMultiply = safeConfig.getDouble("fareRatioMultiply",1.0);
+        System.out.println("fare ratio multiply = " +  fareRatioMultiply);
     }
 
     @Override
@@ -129,7 +132,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
     private double calcAverageFare(VirtualNode virtualNode, List<AVRequest> requests, int time) {
         double fareRatio = FareRatioCalculator.calcOptLightLoadFareRatio(travelData, time, getRoboTaxis().size());
-        fareRatio *= 10;
+        fareRatio *= fareRatioMultiply;
         System.out.println("fare ratio is: " + fareRatio);
         double basicFare = 1;
 
