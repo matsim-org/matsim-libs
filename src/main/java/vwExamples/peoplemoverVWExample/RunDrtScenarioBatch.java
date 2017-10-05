@@ -25,7 +25,7 @@ import java.util.List;
 
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalModule;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.optimizer.rebalancing.DemandBasedRebalancingStrategy;
+//import org.matsim.contrib.drt.optimizer.rebalancing.DemandBasedRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -36,6 +36,8 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import peoplemover.ClosestStopBasedDrtRoutingModule;
+import vwExamples.peoplemoverVWExample.CustomRebalancing.DemandBasedRebalancingStrategyMy;
+import vwExamples.peoplemoverVWExample.CustomRebalancing.ZonalDemandAggregatorMy;
 
 /** * @author axer */
 public class RunDrtScenarioBatch {
@@ -70,7 +72,7 @@ public class RunDrtScenarioBatch {
 			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 			drt.setkNearestVehicles(90);
 			//fuehrt ein re-balancing im 30 minuten takt durch. hoehere Taktung ist nicht sinnvoll, da die Nachfrage in Halbstundenscheiben gespeichert wird.
-			drt.setRebalancingInterval(1800);
+			drt.setRebalancingInterval(300);
 			
 			//Initialize the controller
 			Controler controler = createControler(config, otfvis);
@@ -84,7 +86,8 @@ public class RunDrtScenarioBatch {
 				@Override
 				public void install() {
 					bind(DrtZonalSystem.class).toInstance(zones);
-					bind(RebalancingStrategy.class).to(DemandBasedRebalancingStrategy.class).asEagerSingleton();
+					bind(RebalancingStrategy.class).to(DemandBasedRebalancingStrategyMy.class).asEagerSingleton();
+					bind(ZonalDemandAggregatorMy.class).asEagerSingleton();
 				}
 			});
 			controler.addOverridingModule(new DrtZonalModule());
