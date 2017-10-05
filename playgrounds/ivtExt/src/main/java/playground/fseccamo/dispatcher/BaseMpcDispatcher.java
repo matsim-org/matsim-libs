@@ -31,7 +31,7 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager, //
-            VirtualNetwork virtualNetwork) {
+            VirtualNetwork<Link> virtualNetwork) {
         super(config, travelTime, parallelLeastCostPathCalculator, eventsManager, virtualNetwork);
         this.instantPathFactory = new InstantPathFactory(parallelLeastCostPathCalculator, travelTime);
 
@@ -42,7 +42,7 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
     Map<VirtualNode<Link>, List<RoboTaxi>> getDivertableNotRebalancingNotPickupVehicles() {
         Map<VirtualNode<Link>, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
         Map<VirtualNode<Link>, List<RoboTaxi>> allVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
-        for (VirtualNode vn : allVehicles.keySet()) {
+        for (VirtualNode<Link> vn : allVehicles.keySet()) {
             for (RoboTaxi robotaxi : allVehicles.get(vn)) {
                 if (!robotaxi.getAVStatus().equals(AVStatus.DRIVETOCUSTMER)) {
                     returnMap.get(vn).add(robotaxi);
@@ -65,8 +65,8 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
             if (!requestVectorIndexMap.containsKey(avRequest)) {
 
                 // check if origin and dest are from same virtualNode
-                final VirtualNode vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
-                final VirtualNode vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
+                final VirtualNode<Link> vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
+                final VirtualNode<Link> vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
                 GlobalAssert.that(vnFrom.equals(vnTo) == (vnFrom.getIndex() == vnTo.getIndex()));
                 if (vnFrom.equals(vnTo)) {
                     // self loop
@@ -77,14 +77,14 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
                     VrpPath vrpPath = instantPathFactory.getVrpPathWithTravelData( //
                             avRequest.getFromLink(), avRequest.getToLink(), now);
                     // TODO perhaps add expected waitTime
-                    VirtualNode fromIn = null;
+                    VirtualNode<Link> fromIn = null;
                     for (Link link : vrpPath) {
-                        final VirtualNode toIn = virtualNetwork.getVirtualNode(link);
+                        final VirtualNode<Link> toIn = virtualNetwork.getVirtualNode(link);
                         if (fromIn == null)
                             fromIn = toIn;
                         else //
                         if (fromIn != toIn) { // found adjacent node
-                            VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
+                            VirtualLink<Link> virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
                             requestVectorIndexMap.put(avRequest, virtualLink.getIndex());
                             success = true;
                             break;

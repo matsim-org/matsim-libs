@@ -46,7 +46,7 @@ public class AnalyzeAll {
     public static double distanceRatio;
 
     public static void main(String[] args) throws Exception {
-        analyze(new File(args[0]));
+        analyze(new File(args[0]), args[1]);
     }
 
     public static void saveFile(Tensor table, String name) throws Exception {
@@ -151,9 +151,10 @@ public class AnalyzeAll {
         return analyzeSummary;
     }
 
-    public static AnalyzeSummary analyze(File config) throws Exception {
+    public static AnalyzeSummary analyze(File config, String outputdirectory) throws Exception {
 
-        File data = new File(config.getParent(), "output/data");
+        String dataFolderName = outputdirectory + "/data";
+        File data = new File(config.getParent(), dataFolderName);
         data.mkdir();
 
         // load system network

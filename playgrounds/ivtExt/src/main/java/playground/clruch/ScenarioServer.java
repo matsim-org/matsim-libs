@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -69,7 +70,10 @@ public class ScenarioServer {
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, //
-                new BlackListedTimeAllocationMutatorConfigGroup());
+                new BlackListedTimeAllocationMutatorConfigGroup());       
+        String outputdirectory = config.controler().getOutputDirectory();
+        System.out.println("outputdirectory = " + outputdirectory);
+
 
         // load scenario for simulation
         Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -99,8 +103,8 @@ public class ScenarioServer {
         SimulationServer.INSTANCE.stopAccepting();
 
         // perform analysis of results
-        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(configFile);
-        VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
+        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(configFile,outputdirectory);
+        VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
@@ -113,11 +117,11 @@ public class ScenarioServer {
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
-        DataCollector datacollector = new DataCollector(configFile, controler, //
+        DataCollector datacollector = new DataCollector(configFile, outputdirectory, controler, //
                 minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
 
         // generate report
-        ReportGenerator.from(configFile);
+        ReportGenerator.from(configFile,outputdirectory);
 
     }
 }

@@ -4,6 +4,7 @@ import static playground.clruch.utils.NetworkLoader.loadNetwork;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
@@ -32,7 +33,7 @@ public class AnalyzeVirtualNetwork {
 
         MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SIOUXFALLS);
 
-        VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(network);
+        VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(network);
 
         // load simulation data
         StorageSupplier storageSupplier = StorageSupplier.getDefault();

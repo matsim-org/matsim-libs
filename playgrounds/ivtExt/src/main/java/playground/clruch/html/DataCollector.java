@@ -22,9 +22,10 @@ import playground.joel.helpers.EasyDijkstra;
 
 /** @author Claudio Ruch based on initial version by gjoel */
 public class DataCollector {
+    private final String STOPWATCH_FILENAME = "stopwatch.txt";
     private final AnalyzeSummary analyzeSummary;
 
-    public DataCollector(File configFile, Controler controler, //
+    public DataCollector(File configFile, String outputdirectory, Controler controler, //
             MinimumFleetSizeCalculator minimumFleetSizeCalculator, //
             AnalyzeSummary analyzeSummary, //
             Network network, Population population, TravelData travelData) throws Exception {
@@ -32,7 +33,7 @@ public class DataCollector {
         this.analyzeSummary = analyzeSummary;
 
         // collect the data
-        readStopwatch(configFile);
+        readStopwatch(configFile,outputdirectory);
 
         minimumFleetSizeCalculator.plot();
 
@@ -41,8 +42,10 @@ public class DataCollector {
 
     }
 
-    private void readStopwatch(File configFile) {
-        File stopwatch = new File(configFile.getParent(), "output/stopwatch.txt");
+    private void readStopwatch(File configFile,String outputdirectory) {
+        String stopwatchfileName = (outputdirectory + STOPWATCH_FILENAME);
+        File stopwatch = new File(configFile.getParent(), stopwatchfileName);
+        GlobalAssert.that(stopwatch.exists());
         try {
             BufferedReader reader = new BufferedReader(new FileReader(stopwatch));
             String startTime = "00:00:00";

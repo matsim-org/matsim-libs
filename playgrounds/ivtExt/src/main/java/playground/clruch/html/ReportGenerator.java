@@ -27,21 +27,24 @@ public class ReportGenerator {
     private static File reportFolder;
 
     public static void main(String[] args) throws Exception {
-        from(new File(args[0]));
+        String outputdirectory = args[1];
+        from(new File(args[0]),outputdirectory);
     }
 
-    public static void from(File configFile) throws Exception {
-
-        Thread.sleep(5000);
+    public static void from(File configFile, String outputdirectory) throws Exception {
 
         // create folder
-        reportFolder = new File(configFile.getParent(), "output/report");
+        String reportLocation = (outputdirectory + "/" + REPORT_NAME);
+        reportFolder = new File(configFile.getParent(), reportLocation);
         reportFolder.mkdir();
+        System.out.println("the report is located at " + reportFolder.getAbsolutePath());
 
         // extract necessary data
         ScenarioParameters scenarioParametersingleton = ScenarioParameters.INSTANCE;
-        Export.object(new File("output/data/scenarioParameters.obj"), scenarioParametersingleton);
-        AnalyzeSummary analyzeSummary = Import.object(new File("output/data/analyzeSummary.obj"));
+        String scenarioParametersFilename = outputdirectory +"/data/scenarioParameters.obj";
+        Export.object(new File(scenarioParametersFilename), scenarioParametersingleton);
+        String analyzeSummaryFileName = outputdirectory + "/data/analyzeSummary.obj";
+        AnalyzeSummary analyzeSummary = Import.object(new File(analyzeSummaryFileName));  
         saveConfigs(configFile);
 
         // write report
@@ -190,8 +193,7 @@ public class ReportGenerator {
             HtmlUtils.insertImg(IMAGE_FOLDER + "/EMD.png", 800, 600);
         }
 
-        
-        HtmlUtils.insertImgIfExists(IMAGE_FOLDER + "/availbilitiesByNumberVehicles.png",reportFolder.getAbsolutePath(), 800, 600);
+        HtmlUtils.insertImgIfExists(IMAGE_FOLDER + "/availbilitiesByNumberVehicles.png", reportFolder.getAbsolutePath(), 800, 600);
 
         // ----------------------------------------------
         HtmlUtils.footer();
