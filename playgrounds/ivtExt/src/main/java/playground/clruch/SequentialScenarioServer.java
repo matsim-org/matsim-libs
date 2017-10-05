@@ -26,7 +26,10 @@ public class SequentialScenarioServer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
 
-        final int iterations = 20;
+        int iterations = 20;
+        if (iterations % 2 == 0) {
+            iterations = iterations - 1;
+        }
         File rawFolder = new File("").getCanonicalFile();
         // double[] fareRatios = { 0.1, 0.5, 1.0, 2.0, 10.0 };
 
@@ -34,7 +37,7 @@ public class SequentialScenarioServer {
         double[] fareRatios = fareRatioCreator(iterations, factorPlus);
 
         // copy the raw folder name including changed settings
-        for (int i = 0; i < 2; ++i) {
+        for (int i = 0; i < iterations; ++i) {
             System.out.println("working in the directory " + rawFolder.getAbsolutePath());
 
             // modify the av.xml file
@@ -51,9 +54,7 @@ public class SequentialScenarioServer {
     }
 
     private static double[] fareRatioCreator(int iterations, double factorPlus) throws InterruptedException {
-        if (iterations % 2 == 0) {
-            iterations = iterations - 1;
-        }
+        GlobalAssert.that(iterations % 2 != 0);
 
         double[] fareRatios = new double[iterations];
 

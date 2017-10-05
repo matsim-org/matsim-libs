@@ -64,8 +64,8 @@ public class SelfishDispatcher extends PartitionedDispatcher {
         roboTaxiRequestMatcher = new RoboTaxiCloseRequestMatcher();
         GlobalAssert.that(travelData != null);
         this.travelData = travelData;
-        this.fareRatioMultiply = safeConfig.getDouble("fareRatioMultiply",1.0);
-        System.out.println("fare ratio multiply = " +  fareRatioMultiply);
+        this.fareRatioMultiply = safeConfig.getDouble("fareRatioMultiply", 1.0);
+        System.out.println("fare ratio multiply = " + fareRatioMultiply);
     }
 
     @Override
@@ -117,8 +117,6 @@ public class SelfishDispatcher extends PartitionedDispatcher {
             scores.put(virtualNode, score);
         }
 
-        scores.values().stream().forEach(v -> System.out.println("score = " + v));
-
         Entry<VirtualNode<Link>, Double> maxEntry = Collections.max(scores.entrySet(), new ScoreComparator());
         virtualNetwork.getVirtualNodes().forEach(vn -> GlobalAssert.that(scores.get(vn) <= scores.get(maxEntry.getKey())));
 
@@ -133,7 +131,6 @@ public class SelfishDispatcher extends PartitionedDispatcher {
     private double calcAverageFare(VirtualNode virtualNode, List<AVRequest> requests, int time) {
         double fareRatio = FareRatioCalculator.calcOptLightLoadFareRatio(travelData, time, getRoboTaxis().size());
         fareRatio *= fareRatioMultiply;
-        System.out.println("fare ratio is: " + fareRatio);
         double basicFare = 1;
 
         if (virtualNode.getIndex() == 0)
