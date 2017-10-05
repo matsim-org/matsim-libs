@@ -189,12 +189,12 @@ public final class AccessibilityCalculator {
 			double walkBetaTT_utils_h = this.cnScoringGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfTraveling()
 					- this.cnScoringGroup.getPerforming_utils_hr(); // default values: -12 = (-6.) - (6.)
 			double VjkWalkTravelTime = walkBetaTT_utils_h * (distance_m / this.walkSpeed_m_h);
-			System.out.println("VjkWalkTravelTime = " + VjkWalkTravelTime);
+			// System.out.println("VjkWalkTravelTime = " + VjkWalkTravelTime);
 			
 			// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist:
 			double walkBetaTD_utils_m = cnScoringGroup.getModes().get(TransportMode.walk).getMarginalUtilityOfDistance(); // default value: 0.
 			double VjkWalkDistance = walkBetaTD_utils_m * distance_m;
-			System.out.println("VjkWalkDistance = " + VjkWalkDistance);
+			// System.out.println("VjkWalkDistance = " + VjkWalkDistance);
 			
 			double expVjk = Math.exp(this.cnScoringGroup.getBrainExpBeta() * (VjkWalkTravelTime + VjkWalkDistance));
 
