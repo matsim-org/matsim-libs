@@ -207,7 +207,7 @@ public class ReportGenerator {
         // save document
         // -------------------------------------------------------------------------------------------------------------
         try {
-            HtmlUtils.saveFile(REPORT_NAME);
+            HtmlUtils.saveFile(REPORT_NAME, outputdirectory);
         } catch (Exception e) {
             System.err.println("Not able to save report. ");
             e.printStackTrace();
