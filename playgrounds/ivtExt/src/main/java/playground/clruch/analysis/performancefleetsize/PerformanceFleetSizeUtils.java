@@ -5,6 +5,7 @@ package playground.clruch.analysis.performancefleetsize;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualLink;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
@@ -28,7 +30,6 @@ import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.red.Norm;
 import ch.ethz.idsc.tensor.red.Total;
-import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.DiagramCreator;
 import playground.clruch.traveldata.TravelData;
 
@@ -36,7 +37,7 @@ import playground.clruch.traveldata.TravelData;
 public enum PerformanceFleetSizeUtils {
     ;
 
-    /* package */ static Set<Integer> calcPeakSteps(VirtualNetwork virtualNetwork, TravelData tData, double PEAKPERCENTAGE) {
+    /* package */ static Set<Integer> calcPeakSteps(VirtualNetwork<Link> virtualNetwork, TravelData tData, double PEAKPERCENTAGE) {
         int numberTimeSteps = tData.getNumbertimeSteps();
         int dt = tData.getdt();
 
@@ -103,16 +104,16 @@ public enum PerformanceFleetSizeUtils {
 
     }
 
-    /* package */static Tensor calcSRRoad(VirtualNetwork virtualNetwork, int avSpeed) {
+    /* package */static Tensor calcSRRoad(VirtualNetwork<Link> virtualNetwork, int avSpeed) {
         int numVNode = virtualNetwork.getvNodesCount();
         Tensor serviceRateRoads = Array.zeros(numVNode, numVNode);
         for (int i = 0; i < numVNode; ++i) {
             for (int j = 0; j < numVNode; ++j) {
-                VirtualNode from = virtualNetwork.getVirtualNode(i);
-                VirtualNode to = virtualNetwork.getVirtualNode(j);
+                VirtualNode<Link> from = virtualNetwork.getVirtualNode(i);
+                VirtualNode<Link> to = virtualNetwork.getVirtualNode(j);
                 Scalar serviceRate = RealScalar.ZERO;
                 if (i != j) {
-                    VirtualLink vLink = virtualNetwork.getVirtualLink(from, to);
+                    VirtualLink<Link> vLink = virtualNetwork.getVirtualLink(from, to);
                     Scalar distance = (Scalar) RealScalar.of(vLink.getDistance());   
                     serviceRate = RealScalar.of(avSpeed).divide(distance);
                 }
@@ -156,7 +157,7 @@ public enum PerformanceFleetSizeUtils {
 
     }
 
-    /* package */ static void plot(Tensor values, Tensor valuesPeak) throws Exception {
+    /* package */ static void plot(Tensor values, Tensor valuesPeak, File relativeDirectory) throws Exception {
         XYSeries series = new XYSeries("Availability");
         for (int i = 0; i < Dimensions.of(values).get(0); ++i) {
             series.add(i, values.Get(i).number().doubleValue());
@@ -193,7 +194,7 @@ public enum PerformanceFleetSizeUtils {
         // save plot as png
         int width = 1000; // Width of the image
         int height = 750; // Height of the image
-        DiagramCreator.savePlot(AnalyzeAll.RELATIVE_DIRECTORY, "availbilitiesByNumberVehicles", timechart, width, height);
+        DiagramCreator.savePlot(relativeDirectory, "availbilitiesByNumberVehicles", timechart, width, height);
     }
 
 }

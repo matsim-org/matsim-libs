@@ -70,10 +70,9 @@ public class ScenarioServer {
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, //
-                new BlackListedTimeAllocationMutatorConfigGroup());       
+                new BlackListedTimeAllocationMutatorConfigGroup());
         String outputdirectory = config.controler().getOutputDirectory();
         System.out.println("outputdirectory = " + outputdirectory);
-
 
         // load scenario for simulation
         Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -103,7 +102,7 @@ public class ScenarioServer {
         SimulationServer.INSTANCE.stopAccepting();
 
         // perform analysis of results
-        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(configFile,outputdirectory);
+        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(configFile, outputdirectory);
         VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
@@ -112,8 +111,12 @@ public class ScenarioServer {
         if (virtualNetwork != null) {
             minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
             performanceFleetSizeCalculator = PerformanceFleetSizeGet.readDefault();
-            if (performanceFleetSizeCalculator != null)
-                performanceFleetSizeCalculator.saveAndPlot();
+            if (performanceFleetSizeCalculator != null) {
+                String dataFolderName = outputdirectory + "/data";
+                File relativeDirectory = new File(dataFolderName);
+                performanceFleetSizeCalculator.saveAndPlot(dataFolderName, relativeDirectory);
+            }
+
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
@@ -121,7 +124,7 @@ public class ScenarioServer {
                 minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
 
         // generate report
-        ReportGenerator.from(configFile,outputdirectory);
+        ReportGenerator.from(configFile, outputdirectory);
 
     }
 }

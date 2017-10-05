@@ -27,6 +27,8 @@ public class AnalyzeVirtualNetwork {
         File config = new File(args[0]);
         File data = new File(config.getParent(), "output/data");
         data.mkdir();
+        
+
 
         // load system network
         Network network = loadNetwork(new File(args[0]));
@@ -40,7 +42,7 @@ public class AnalyzeVirtualNetwork {
         final int size = storageSupplier.size();
         System.out.println("found files: " + size);
         VirtualNetworkAnalysis vna = new VirtualNetworkAnalysis(storageSupplier, virtualNetwork);
-        vna.analyze();
+        vna.analyze(data);
 
     }
 }

@@ -2,6 +2,8 @@ package playground.clruch.analysis;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.network.Link;
+
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
@@ -22,12 +24,12 @@ import playground.clruch.net.StorageSupplier;
 class VirtualNetworkAnalysis {
     final StorageSupplier storageSupplier;
     final int size;
-    final VirtualNetwork virtualNetwork;
+    final VirtualNetwork<Link> virtualNetwork;
     Tensor summary = Tensors.empty();
     Tensor totalWaitTimeQuantile = Tensors.empty();
     Tensor totalWaitTimeMean = Tensors.empty();
 
-    VirtualNetworkAnalysis(StorageSupplier storageSupplier, VirtualNetwork virtualNetwork) {
+    VirtualNetworkAnalysis(StorageSupplier storageSupplier, VirtualNetwork<Link> virtualNetwork) {
         this.storageSupplier = storageSupplier;
         size = storageSupplier.size();
         this.virtualNetwork = virtualNetwork;
@@ -49,7 +51,7 @@ class VirtualNetworkAnalysis {
         }
     }
 
-    public void analyze() throws Exception {
+    public void analyze(File relativeDirectory) throws Exception {
         final MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
         // ---
         final Tensor tableMean = Tensors.empty();
@@ -72,8 +74,8 @@ class VirtualNetworkAnalysis {
             if (ref.now % 10000 == 0)
                 System.out.println(ref.now);
         }
-        Export.of(new File(AnalyzeAll.RELATIVE_DIRECTORY, "RequestWaitingVirtualNode_Mean.csv"), tableMean);
-        Export.of(new File(AnalyzeAll.RELATIVE_DIRECTORY, "RequestWaitingVirtualNode_Median.csv"), tableMedian);
-        Export.of(new File(AnalyzeAll.RELATIVE_DIRECTORY, "RequestWaitingVirtualNode_Max.csv"), tableMax);
+        Export.of(new File(relativeDirectory, "RequestWaitingVirtualNode_Mean.csv"), tableMean);
+        Export.of(new File(relativeDirectory, "RequestWaitingVirtualNode_Median.csv"), tableMedian);
+        Export.of(new File(relativeDirectory, "RequestWaitingVirtualNode_Max.csv"), tableMax);
     }
 }

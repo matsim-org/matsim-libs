@@ -35,9 +35,7 @@ import playground.joel.helpers.CSVcreator;
 import playground.joel.helpers.KeyMap;
 import playground.joel.helpers.BinnedHelper;
 
-/**
- * Created by Joel on 28.02.2017.
- */
+/** Created by Joel on 28.02.2017. */
 class BinnedTravelDistances extends AbstractData {
 
     NavigableMap<String, NavigableMap<String, Double>> travelDistances = new TreeMap<>();
@@ -57,7 +55,6 @@ class BinnedTravelDistances extends AbstractData {
     // cut the total distance ratio
     DecimalFormat valueForm = new DecimalFormat("#.####");
 
-
     double getLinkLength(Id<Link> linkId) {
         return linkLengths.get(linkId.toString());
     }
@@ -76,9 +73,9 @@ class BinnedTravelDistances extends AbstractData {
                 Double length = Double.parseDouble(linkelem.getAttributeValue("length"));
 
                 // find the link with the corresponding ID and assign the length to it.
-                //linkLengths.put(linkXML.stream().filter(vl -> vl.getAttributeValue("id").equals(linkID)).findFirst().get().toString(), length);
+                // linkLengths.put(linkXML.stream().filter(vl -> vl.getAttributeValue("id").equals(linkID)).findFirst().get().toString(), length);
                 linkLengths.put(linkID, length);
-                //System.out.println("added " + linkID + ", " + length + " to linkLengths");
+                // System.out.println("added " + linkID + ", " + length + " to linkLengths");
             }
         } catch (JDOMException e) {
             e.printStackTrace();
@@ -89,31 +86,32 @@ class BinnedTravelDistances extends AbstractData {
 
     double interpolateLinkLength(double start, double end, double deltaT, Id<Link> linkId) {
         // interpolates the remaining link length before or after the next bin start
-            return getLinkLength(linkId)*deltaT/(end - start);
+        return getLinkLength(linkId) * deltaT / (end - start);
     }
 
     void calculateDistanceRatio() {
         if (!(totalDistance == 0)) {
             totalDistanceRatio = Double.parseDouble(valueForm.format(totalDistanceWithCust / totalDistance));
-        } else System.out.println("total distance equals zero!");
+        } else
+            System.out.println("total distance equals zero!");
     }
 
     double calculateDistanceRatio(String key) {
         double ratio = 0.0;
-        if(traveledDistance.containsKey(key) && traveledDistanceWithCust.containsKey(key)) {
-            ratio = traveledDistanceWithCust.get(key)/traveledDistance.get(key);
+        if (traveledDistance.containsKey(key) && traveledDistanceWithCust.containsKey(key)) {
+            ratio = traveledDistanceWithCust.get(key) / traveledDistance.get(key);
         } // else System.out.println("entry/entries not found while calculating the time ratio");
         return ratio;
     }
 
     private void setStartTime(LinkEnterEvent event) {
         avLinkStart.put(event.getVehicleId().toString(), event.getTime());
-        //System.out.println("added " + event.getVehicleId().toString() + ", " + event.getTime() + " to avLinkStart");
+        // System.out.println("added " + event.getVehicleId().toString() + ", " + event.getTime() + " to avLinkStart");
     }
 
     private void setStartTime(VehicleEntersTrafficEvent event) {
         avLinkStart.put(event.getVehicleId().toString(), event.getTime());
-        //System.out.println("added " + event.getVehicleId().toString() + ", " + event.getTime() + " to avLinkStart");
+        // System.out.println("added " + event.getVehicleId().toString() + ", " + event.getTime() + " to avLinkStart");
     }
 
     private double getStartTime(LinkLeaveEvent event) {
@@ -134,36 +132,42 @@ class BinnedTravelDistances extends AbstractData {
         }
     }
 
-    private void put(Id linkId, String vehicle, double startTime, double endTime) {
+    private void put(Id<Link> linkId, String vehicle, double startTime, double endTime) {
         totalDistance += getLinkLength(linkId);
-        if (!vehicleStatus.containsKey(vehicle)) vehicleStatus.put(vehicle, 0); // replaces activitystart
-        if (vehicleStatus.get(vehicle) == 1) totalDistanceWithCust += getLinkLength(linkId);
+        if (!vehicleStatus.containsKey(vehicle))
+            vehicleStatus.put(vehicle, 0); // replaces activitystart
+        if (vehicleStatus.get(vehicle) == 1)
+            totalDistanceWithCust += getLinkLength(linkId);
 
         if (!travelDistances.containsKey(vehicle))
             travelDistances.put(vehicle, new TreeMap<>());
 
-        if(endTime <= keyMap.getBinStart(startTime) + binSize) {
+        if (endTime <= keyMap.getBinStart(startTime) + binSize) {
             BinnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(startTime), getLinkLength(linkId));
             BinnedHelper.putAdd(traveledDistance, keyMap.getKey(startTime), getLinkLength(linkId));
-            if (vehicleStatus.get(vehicle) == 1) BinnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(startTime), getLinkLength(linkId));
+            if (vehicleStatus.get(vehicle) == 1)
+                BinnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(startTime), getLinkLength(linkId));
         } else {
             double nextBin = keyMap.getBinStart(startTime) + binSize;
             BinnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(startTime), interpolateLinkLength(startTime, endTime, nextBin - startTime, linkId));
             BinnedHelper.putAdd(traveledDistance, keyMap.getKey(startTime), interpolateLinkLength(startTime, endTime, nextBin - startTime, linkId));
-            if (vehicleStatus.get(vehicle) == 1) BinnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(startTime), interpolateLinkLength(startTime, endTime, nextBin - startTime, linkId));
+            if (vehicleStatus.get(vehicle) == 1)
+                BinnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(startTime), interpolateLinkLength(startTime, endTime, nextBin - startTime, linkId));
 
             while (endTime > nextBin + binSize) {
                 BinnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, binSize, linkId));
                 BinnedHelper.putAdd(traveledDistance, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, binSize, linkId));
-                if (vehicleStatus.get(vehicle) == 1) BinnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, binSize, linkId));
+                if (vehicleStatus.get(vehicle) == 1)
+                    BinnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, binSize, linkId));
                 nextBin += binSize;
             }
 
             BinnedHelper.putAdd(travelDistances.get(vehicle), keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, endTime - nextBin, linkId));
             BinnedHelper.putAdd(traveledDistance, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, endTime - nextBin, linkId));
-            if (vehicleStatus.get(vehicle) == 1) BinnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, endTime - nextBin, linkId));
+            if (vehicleStatus.get(vehicle) == 1)
+                BinnedHelper.putAdd(traveledDistanceWithCust, keyMap.getKey(nextBin), interpolateLinkLength(startTime, endTime, endTime - nextBin, linkId));
         }
-        //System.out.println("distance with customer: " + totalDistanceWithCust);
+        // System.out.println("distance with customer: " + totalDistanceWithCust);
     }
 
     private void putDriveWithCustomer(PersonEntersVehicleEvent event) {
@@ -174,7 +178,6 @@ class BinnedTravelDistances extends AbstractData {
     private void putDriveToCustomer(PersonLeavesVehicleEvent event) {
         vehicleStatus.put(event.getVehicleId().toString(), 0);
     } // switch vehicle status to 0
-
 
     @Override
     void initialize(EventsManager events) {
@@ -220,6 +223,7 @@ class BinnedTravelDistances extends AbstractData {
             // trafficenter
             events.addHandler(new VehicleEntersTrafficEventHandler() {
 
+                @Override
                 public void handleEvent(VehicleEntersTrafficEvent event) {
                     setStartTime(event);
                 }
@@ -233,6 +237,7 @@ class BinnedTravelDistances extends AbstractData {
             // trafficleave
             events.addHandler(new VehicleLeavesTrafficEventHandler() {
 
+                @Override
                 public void handleEvent(VehicleLeavesTrafficEvent event) {
                     final String vehicle = event.getVehicleId().toString();
                     put(event.getLinkId(), vehicle, getStartTime(event), event.getTime());
@@ -247,6 +252,7 @@ class BinnedTravelDistances extends AbstractData {
             // linkenter
             events.addHandler(new LinkEnterEventHandler() {
 
+                @Override
                 public void handleEvent(LinkEnterEvent event) {
                     setStartTime(event);
                 }
@@ -260,6 +266,7 @@ class BinnedTravelDistances extends AbstractData {
             // linkleave
             events.addHandler(new LinkLeaveEventHandler() {
 
+                @Override
                 public void handleEvent(LinkLeaveEvent event) {
                     final String vehicle = event.getVehicleId().toString();
                     put(event.getLinkId(), vehicle, getStartTime(event), event.getTime());
@@ -282,7 +289,7 @@ class BinnedTravelDistances extends AbstractData {
 
         calculateDistanceRatio();
 
-        for(String key: traveledDistance.keySet()) {
+        for (String key : traveledDistance.keySet()) {
             GlobalAssert.that(traveledDistance.get(key) != 0);
             binnedData.put(key, calculateDistanceRatio(key));
         }
@@ -294,18 +301,18 @@ class BinnedTravelDistances extends AbstractData {
         new BinnedRatiosXML("binnedDistanceRatio").generate(binnedRatios, fileExport);
 
         // export to time series diagram PNG
-        TimeDiagramCreator diagram = new TimeDiagramCreator();
-        try{
-            diagram.createDiagram(directory, "binnedDistanceRatios", "distance ratio", binnedData);
-        }catch (Exception e){
+
+        try {
+            TimeDiagramCreator.createDiagram(directory, "binnedDistanceRatios", "distance ratio", binnedData);
+        } catch (Exception e) {
             System.out.println("Error creating the diagram");
         }
 
         // export to CSV
         CSVcreator csv = new CSVcreator();
-        try{
+        try {
             csv.createCSV(binnedData, directory, "binnedDistanceRatios");
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("Error creating the csv file");
         }
 

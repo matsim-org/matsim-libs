@@ -44,6 +44,7 @@ public class ReportGenerator {
         String scenarioParametersFilename = outputdirectory +"/data/scenarioParameters.obj";
         Export.object(new File(scenarioParametersFilename), scenarioParametersingleton);
         String analyzeSummaryFileName = outputdirectory + "/data/analyzeSummary.obj";
+        System.out.println("loading analyze summary from " +  analyzeSummaryFileName);
         AnalyzeSummary analyzeSummary = Import.object(new File(analyzeSummaryFileName));  
         saveConfigs(configFile);
 

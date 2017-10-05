@@ -158,9 +158,8 @@ class BinnedTravelTimes extends AbstractData {
         new BinnedRatiosXML("binnedTimeRatio").generate(binnedRatios, fileExport2);
 
         // export to time series diagram PNG
-        TimeDiagramCreator diagram = new TimeDiagramCreator();
         try{
-            diagram.createDiagram(directory, "binnedTimeRatios", "occupancy ratio", binnedData);
+            TimeDiagramCreator.createDiagram(directory, "binnedTimeRatios", "occupancy ratio", binnedData);
         }catch (Exception e){
             System.out.println("Error creating the diagram");
         }
