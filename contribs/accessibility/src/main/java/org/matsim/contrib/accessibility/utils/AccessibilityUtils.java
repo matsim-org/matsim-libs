@@ -1,11 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*												   *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 package org.matsim.contrib.accessibility.utils;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -63,7 +75,6 @@ public class AccessibilityUtils {
 		return activityFacilities;
 	}
 
-	
 	/**
 	 * Collects the types of all facilities that have been loaded to the scenario.
 	 */
@@ -80,7 +91,6 @@ public class AccessibilityUtils {
 		LOG.warn("The following activity option types where found within the activity facilities: " + activityOptionTypes);
 		return activityOptionTypes;
 	}
-	
 	
 	public static void combineDifferentActivityOptionTypes(final Scenario scenario, String combinedType, final List<String> activityOptionsToBeIncluded) {
 		ActivityOption markerOption = new ActivityOptionImpl(combinedType); 
@@ -104,7 +114,6 @@ public class AccessibilityUtils {
 		}
 	}
 	
-	
 	public static final ActivityFacilities createFacilityForEachLink( Network network ) {
 		ActivityFacilities facilities = FacilitiesUtils.createActivityFacilities("LinkFacilities") ;
 		ActivityFacilitiesFactory ff = facilities.getFactory() ;
@@ -114,7 +123,6 @@ public class AccessibilityUtils {
 		}
 		return facilities ;
 	}
-	
 	
 	public static final ActivityFacilities createFacilityFromBuildingShapefile(String shapeFileName, String identifierCaption, String numberOfHouseholdsCaption) {
 		ShapeFileReader shapeFileReader = new ShapeFileReader();
@@ -136,7 +144,6 @@ public class AccessibilityUtils {
 		}
 		return facilities ;
 	}
-	
 	
 	/**
 	 * Goes through a given set of measuring points and creates a facility on the measuring point if the
@@ -168,7 +175,6 @@ public class AccessibilityUtils {
 		return networkDensityFacilities;
 	}
 
-
 	/**
 	 * Creates measuring points based on the scenario's network and a specified cell size.
 	 */
@@ -184,7 +190,6 @@ public class AccessibilityUtils {
 		return measuringPoints;
 	}
 	
-	
 	/**
 	 * Calculates the sum of the values of a given list.
 	 * 
@@ -198,7 +203,6 @@ public class AccessibilityUtils {
 		}
 		return sum;
 	}
-	
 	
 	/**
 	 * Calculates Gini coefficient of the values of a given values. The Gini Coefficient is equals to the half of
@@ -224,7 +228,6 @@ public class AccessibilityUtils {
 		double giniCoefficient = sumOfAbsoluteDifferences / (2 * Math.pow(numberOfValues, 2) * arithmeticMean);
 		return giniCoefficient;
 	}
-	
 	
 	/**
 	 * Creates facilities from plans. Note that a new additional facility is created for each activity.
@@ -272,7 +275,6 @@ public class AccessibilityUtils {
 		return facilities;
 	}
 
-
 	public static String getDate() {
 		Calendar cal = Calendar.getInstance ();
 		int month = cal.get(Calendar.MONTH) + 1;
@@ -283,15 +285,4 @@ public class AccessibilityUtils {
 				+ monthStr + "-" + cal.get(Calendar.DAY_OF_MONTH);
 		return date;
 	}
-	
-	
-//	public static File createOSMDownloadScript(String regionName, String minLon, String minLat, String maxLon, String maxLat) throws IOException {
-//	    File osmDownloadScript = new File("script");
-//	    Writer streamWriter = new OutputStreamWriter(new FileOutputStream(osmDownloadScript));
-//	    PrintWriter printWriter = new PrintWriter(streamWriter);
-//	    String command = "/usr/local/bin/wget -O " + regionName + " \"http://api.openstreetmap.org/api/0.6/map?bbox=" + minLon + "," + minLat + "," + maxLon + "," + maxLat + "\"";
-//	    printWriter.println(command);
-//	    printWriter.close();
-//	    return osmDownloadScript;
-//	}
 }
