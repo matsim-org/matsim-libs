@@ -24,15 +24,25 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsData;
+import org.matsim.contrib.signals.model.Signal;
+import org.matsim.contrib.signals.model.SignalGroup;
+import org.matsim.contrib.signals.model.SignalSystem;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.data.Lanes;
 import org.matsim.lanes.data.LanesToLinkAssignment;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 
 /**
- * @author dgrether
- *
+ * @author dgrether, tthunig
  */
 public class SignalSystemsDataConsistencyChecker {
 
@@ -44,6 +54,12 @@ public class SignalSystemsDataConsistencyChecker {
 	private Lanes lanes;
 
 	private Network network;
+
+	private List<Tuple<Id<Signal>, Id<SignalSystem>>> malformedSignals = new LinkedList<>();
+
+	private List<Tuple<Id<SignalGroup>, Id<SignalSystem>>> emptyGroups = new LinkedList<>();
+
+	private List<Id<SignalSystem>> emptySystems = new LinkedList<>();
 
 	public SignalSystemsDataConsistencyChecker(Network network, Lanes lanes, SignalsData signalsData) {
 		this.network = network;
@@ -59,7 +75,64 @@ public class SignalSystemsDataConsistencyChecker {
 		}
 		this.checkSignalToLinkMatching();
 		this.checkSignalToLaneMatching();
+		this.removeMalformedSignalSystems();
 	}
+
+	private void removeMalformedSignalSystems() {
+
+		for (Tuple<Id<Signal>, Id<SignalSystem>> tuple : malformedSignals){
+			signalsData.getSignalSystemsData().getSignalSystemData().get(tuple.getSecond()).getSignalData().remove(tuple.getFirst());
+			for(SignalGroupData sigGroup : this.signalsData.getSignalGroupsData().getSignalGroupDataBySignalSystemId().get(tuple.getSecond()).values()){
+				if(sigGroup.getSignalIds().contains(tuple.getFirst())){
+					sigGroup.getSignalIds().remove(tuple.getFirst());
+				}
+			}
+		}
+
+//		SignalControlData control = this.signalsData.getSignalControlData();
+//		for (SignalSystemControllerData  controller : control.getSignalSystemControllerDataBySystemId().values()) {
+//			Map<Id<SignalGroup>, SignalGroupData> signalGroups = this.signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(controller.getSignalSystemId());
+//			for (SignalPlanData plan : controller.getSignalPlanData().values()) {
+//				for (SignalGroupSettingsData settings : plan.getSignalGroupSettingsDataByGroupId().values()) {
+//					if (! signalGroups.containsKey(settings.getSignalGroupId())){
+//
+//					}
+//				}
+//			}
+//		}
+
+
+		for (Map<Id<SignalGroup>, SignalGroupData> sigGroups : this.signalsData.getSignalGroupsData().getSignalGroupDataBySignalSystemId().values()) {
+			for(SignalGroupData sigGroup : sigGroups.values()){
+				if(sigGroup.getSignalIds().isEmpty()){
+					emptyGroups.add(new Tuple<> (sigGroup.getId(), sigGroup.getSignalSystemId()));
+				}
+			}
+		}
+
+		for (Tuple<Id<SignalGroup>, Id<SignalSystem>> tuple : emptyGroups){
+			signalsData.getSignalGroupsData().getSignalGroupDataBySignalSystemId().get(tuple.getSecond()).remove(tuple.getFirst());
+			for(SignalPlanData sigPlanData : signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(tuple.getSecond()).getSignalPlanData().values()){
+				sigPlanData.getSignalGroupSettingsDataByGroupId().remove(tuple.getFirst());
+			}
+		}
+
+		for(SignalSystemData system : signalsData.getSignalSystemsData().getSignalSystemData().values()){
+			if (system.getSignalData().isEmpty()) {
+				emptySystems.add(system.getId());
+				if (!signalsData.getSignalGroupsData().getSignalGroupDataBySystemId(system.getId()).isEmpty()){
+					log.warn("a system contains no signals but groups");
+				}
+			}
+		}
+
+		for(Id<SignalSystem> systemId : emptySystems){
+			signalsData.getSignalSystemsData().getSignalSystemData().remove(systemId);
+			signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().remove(systemId);
+			signalsData.getSignalGroupsData().getSignalGroupDataBySignalSystemId().remove(systemId);
+		}
+	}
+
 
 	private void checkSignalToLinkMatching() {
 		SignalSystemsData signalSystems = this.signalsData.getSignalSystemsData();
@@ -69,6 +142,7 @@ public class SignalSystemsDataConsistencyChecker {
 					log.error("Error: No Link for Signal: "); 
 					log.error("\t\tSignalData Id: "  + signal.getId() + " of SignalSystemData Id: " + system.getId() 
 							+ " is located at Link Id: " + signal.getLinkId() + " but this link is not existing in the network!");
+					this.malformedSignals.add(new Tuple<>(signal.getId(), system.getId()));
 				}
 			}
 		}
@@ -85,15 +159,21 @@ public class SignalSystemsDataConsistencyChecker {
 						log.error("Error: No LanesToLinkAssignment for Signals:");
 						log.error("\t\tSignalData Id: "  + signal.getId() + " of SignalSystemData Id: " + system.getId() 
 							+ " is located at some lanes of Link Id: " + signal.getLinkId() + " but there is no LanesToLinkAssignemt existing in the LaneDefinitions.");
+						malformedSignals.add(new Tuple<>(signal.getId(), system.getId()));
 					}
 					else {
+						List<Id<Lane>> lanesToRemove = new LinkedList<>();
 						LanesToLinkAssignment l2l = this.lanes.getLanesToLinkAssignments().get(signal.getLinkId());
-						for (Id laneId : signal.getLaneIds()) {
+						for (Id<Lane> laneId : signal.getLaneIds()) {
 							if (! l2l.getLanes().containsKey(laneId)) {
 								log.error("Error: No Lane for Signal: "); 
 								log.error("\t\tSignalData Id: "  + signal.getId() + " of SignalSystemData Id: " + system.getId() 
 										+ " is located at Link Id: " + signal.getLinkId() + " at Lane Id: " + laneId + " but this link is not existing in the network!");
+								lanesToRemove.add(laneId);
 							}
+						}
+						for (Id<Lane> laneId : lanesToRemove){
+							signal.getLaneIds().remove(laneId);
 						}
 					}
 				}
