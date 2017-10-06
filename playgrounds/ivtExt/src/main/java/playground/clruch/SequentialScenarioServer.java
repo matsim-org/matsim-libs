@@ -44,7 +44,7 @@ public class SequentialScenarioServer {
             changeFareRatioTo(fareRatios[i], rawFolder);
 
             // set the output-directory correctly
-            changeOutputDirectoryTo("output" + i, rawFolder);
+            changeOutputDirectoryTo("output" + String.format("%04d", i), rawFolder);
 
             // simulate
             ScenarioServer.simulate();

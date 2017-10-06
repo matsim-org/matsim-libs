@@ -152,8 +152,6 @@ public class AnalyzeAll {
 
     public static AnalyzeSummary analyze(File config, String outputdirectory) throws Exception {
 
-        // public static final File RELATIVE_DIRECTORY = new File("output", "data");
-
         String dataFolderName = outputdirectory + "/data";
         File relativeDirectory = new File(dataFolderName);
         File data = new File(config.getParent(), dataFolderName);

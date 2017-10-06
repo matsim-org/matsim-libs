@@ -16,7 +16,7 @@ public class StorageSupplier {
      * @return file index that contain simulation objects of last iteration
      */
     public static StorageSupplier getDefault() {
-        return new StorageSupplier(StorageUtils.getAvailable());
+        return new StorageSupplier(StorageUtils.getFirstAvailableIteration());
     }
     
     private final NavigableMap<Integer, File> navigableMap;

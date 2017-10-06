@@ -128,7 +128,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
     }
 
-    private double calcAverageFare(VirtualNode virtualNode, List<AVRequest> requests, int time) {
+    private double calcAverageFare(VirtualNode<Link> virtualNode, List<AVRequest> requests, int time) {
         double fareRatio = FareRatioCalculator.calcOptLightLoadFareRatio(travelData, time, getRoboTaxis().size());
         fareRatio *= fareRatioMultiply;
         double basicFare = 1;
