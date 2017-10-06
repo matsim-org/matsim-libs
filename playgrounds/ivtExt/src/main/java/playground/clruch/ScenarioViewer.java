@@ -13,7 +13,6 @@ import playground.clruch.data.ReferenceFrame;
 import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.net.MatsimStaticDatabase;
-import playground.clruch.net.StorageUtils;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.NetworkLoader;
 import playground.clruch.utils.PropertiesExt;
@@ -48,8 +47,8 @@ public class ScenarioViewer {
         /** this is optional and should not cause problems if file does not exist. temporary solution */
         matsimJMapViewer.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
-        StorageUtils storageUtils = new StorageUtils(outputDirectory);
-        MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer, storageUtils);
+
+        MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer, outputDirectory);
         matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
         matsimViewer.jFrame.setSize(900, 900);
         matsimViewer.jFrame.setVisible(true);

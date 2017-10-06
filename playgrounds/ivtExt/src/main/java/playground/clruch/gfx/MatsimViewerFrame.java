@@ -11,7 +11,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -23,6 +26,7 @@ import javax.swing.JToolBar;
 
 import org.matsim.api.core.v01.Coord;
 
+import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.view.jmapviewer.Coordinate;
 import ch.ethz.idsc.queuey.view.jmapviewer.JMapViewer;
 import ch.ethz.idsc.queuey.view.jmapviewer.interfaces.ICoordinate;
@@ -34,11 +38,9 @@ import playground.clruch.net.IterationFolder;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.StorageUtils;
 
-/**
- * Demonstrates the usage of {@link JMapViewer}
+/** Demonstrates the usage of {@link JMapViewer}
  *
- * adapted from code by Jan Peter Stotz
- */
+ * adapted from code by Jan Peter Stotz */
 public class MatsimViewerFrame implements Runnable {
     public static int STEPSIZE_SECONDS = 10; // TODO this should be derived from storage files
     // ---
@@ -47,18 +49,33 @@ public class MatsimViewerFrame implements Runnable {
     private final JToggleButton jToggleButtonAuto = new JToggleButton("auto");
     private int playbackSpeed = 50;
     private final Thread thread;
+    private StorageUtils storageUtils;
+    private final File[] outputFolders;
+    private final String[] outputFolderNames;
 
     public final JFrame jFrame = new JFrame();
     StorageSupplier storageSupplier = new DummyStorageSupplier();
 
     SpinnerLabel<IterationFolder> spinnerLabelIter = new SpinnerLabel<>();
+    SpinnerLabel<String> spinnerLabelOutputFolder = new SpinnerLabel<>();
     JButton jButtonDecr = new JButton("<");
     JButton jButtonIncr = new JButton(">");
     SpinnerLabel<Integer> spinnerLabelSpeed = new SpinnerLabel<>();
     private final JSlider jSlider = new JSlider(0, 1, 0);
 
     /** Constructs the {@code Demo}. */
-    public MatsimViewerFrame(MatsimMapComponent matsimMapComponent, StorageUtils storageUtils) {
+    public MatsimViewerFrame(MatsimMapComponent matsimMapComponent, File outputDirectory) {
+
+        {// get list of all outputfolders in the outputDirectory
+            outputFolders = MultiFileTools.getAllDirectoriesSorted(outputDirectory);
+            outputFolderNames = new String[outputFolders.length];
+            for (int i = 0; i < outputFolders.length; ++i) {
+                outputFolderNames[i] = outputFolders[i].getName();
+            }
+        }
+
+        this.storageUtils = new StorageUtils(new File(outputDirectory,outputFolderNames[0]));
+        ;
         this.matsimMapComponent = matsimMapComponent;
         // ---
         jFrame.setTitle("ETH Z\u00fcrich MATSim Viewer");
@@ -109,6 +126,21 @@ public class MatsimViewerFrame implements Runnable {
             jButton.setToolTipText("reindex available simulation objects");
             jButton.addActionListener(event -> reindex(storageUtils));
             panelControls.add(jButton);
+        }
+        panelControls.addSeparator();
+        {
+            // spinnerLabelOutputFolder.setArray(new String[] { "abc", "def", "ghi" });
+            spinnerLabelOutputFolder.setArray(outputFolderNames);
+            spinnerLabelOutputFolder.addSpinnerListener(s -> {
+                
+                File currentOutputFolder = new File(outputDirectory,s);
+                System.out.println("now displaying output from folder: ");
+                System.out.println(currentOutputFolder.getAbsolutePath());
+                this.storageUtils = new StorageUtils(outputDirectory);
+
+
+            });
+            spinnerLabelOutputFolder.addToComponentReduced(panelControls, new Dimension(60, 26), "outputFolder");
         }
         panelControls.addSeparator();
         {
