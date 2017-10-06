@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.lanes;
+package org.matsim.lanes.data;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.data.*;
 
 import java.util.*;
 
@@ -36,6 +35,10 @@ import java.util.*;
  * 
  */
 public final class LanesUtils {
+
+	public static Lanes createLanesContainer(){
+		return new LanesImpl();
+	}
 
 	/**
 	 * Convenience method to create a lane with the given Id, the given length,
@@ -78,6 +81,30 @@ public final class LanesUtils {
 		lane.setAlignment(alignment); 
 		l2l.addLane(lane);
 	}
+
+	/**
+	 * Replaces the method that converted a lane from format 11 to format 20.
+	 * Use this when you have not defined an original lane of the link and when you have not set lane capacities yet.
+	 *
+	 * @param scenario
+	 */
+	public static void createOriginalLanesAndSetLaneCapacities(Scenario scenario){
+		LanesFactory factory = scenario.getLanes().getFactory();
+		for (LanesToLinkAssignment l2l : scenario.getLanes().getLanesToLinkAssignments().values()){
+			Link link = scenario.getNetwork().getLinks().get(l2l.getLinkId());
+
+			Lane olLane = factory.createLane(Id.create(l2l.getLinkId().toString() + ".ol", Lane.class));
+			l2l.addLane(olLane);
+			for (Lane lane : l2l.getLanes().values()) {
+				olLane.addToLaneId(lane.getId());
+
+				//set capacity of the lane depending on link capacity and number of representative lanes
+				LanesUtils.calculateAndSetCapacity(lane, true, link, scenario.getNetwork());
+			}
+			olLane.setNumberOfRepresentedLanes(link.getNumberOfLanes());
+			olLane.setStartsAtMeterFromLinkEnd(link.getLength());
+		}
+	}
 	
 	/**
 	 * Creates a sorted list of lanes for a link. 
@@ -86,8 +113,8 @@ public final class LanesUtils {
 	 * @return sorted list with the most upstream lane at the first position. 
 	 */
 	public static List<ModelLane> createLanes(Link link, LanesToLinkAssignment lanesToLinkAssignment) {
-		List<ModelLane> queueLanes = new ArrayList<ModelLane>();
-		List<Lane> sortedLanes =  new ArrayList<Lane>(lanesToLinkAssignment.getLanes().values());
+		List<ModelLane> queueLanes = new ArrayList<>();
+		List<Lane> sortedLanes =  new ArrayList<>(lanesToLinkAssignment.getLanes().values());
 		Collections.sort(sortedLanes, new Comparator<Lane>() {
 			@Override
 			public int compare(Lane o1, Lane o2) {
@@ -102,7 +129,7 @@ public final class LanesUtils {
 		});
 		Collections.reverse(sortedLanes);
 
-		List<ModelLane> laneList = new LinkedList<ModelLane>();
+		List<ModelLane> laneList = new LinkedList<>();
 		Lane firstLane = sortedLanes.remove(0);
 		if (firstLane.getStartsAtMeterFromLinkEnd() != link.getLength()) {
 			throw new IllegalStateException("First Lane Id " + firstLane.getId() + " on Link Id " + link.getId() +
@@ -110,7 +137,7 @@ public final class LanesUtils {
 		}
 		ModelLane firstQLane = new ModelLane(firstLane);
 		laneList.add(firstQLane);
-		Stack<ModelLane> laneStack = new Stack<ModelLane>();
+		Stack<ModelLane> laneStack = new Stack<>();
 
 		while (!laneList.isEmpty()){
 			ModelLane lastQLane = laneList.remove(0);

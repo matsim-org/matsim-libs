@@ -25,10 +25,10 @@ import java.util.List;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.utils.misc.ByteBufferUtils;
-import org.matsim.lanes.ModelLane;
+import org.matsim.lanes.data.ModelLane;
 import org.matsim.lanes.data.Lanes;
 import org.matsim.lanes.data.LanesToLinkAssignment;
-import org.matsim.lanes.LanesUtils;
+import org.matsim.lanes.data.LanesUtils;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;
 import org.matsim.vis.otfvis.data.OTFDataWriter;
