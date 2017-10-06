@@ -484,6 +484,8 @@ public class M4UConfigUtils {
 		log.info(newline + "Complete config dump:" + newline + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
 		log.info("Checking consistency of config...");
+		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
+		// (this used to be abort, but I can't see what that should be useful just for backwards consistency. kai, oct'17)
 		config.checkConsistency();
 		log.info("Checking consistency of config done.");
 		log.info("("+message+")" + newline + newline ) ;
