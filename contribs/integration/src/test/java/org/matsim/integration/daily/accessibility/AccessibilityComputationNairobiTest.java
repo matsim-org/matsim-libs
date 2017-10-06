@@ -106,8 +106,6 @@ public class AccessibilityComputationNairobiTest {
 			HttpURLConnection connection2 = (HttpURLConnection) osm.openConnection(); // TODO There might be more elegant option without creating this twice
 //		    network = AccessibilityNetworkUtils.createNetwork(connection.getInputStream(), scenarioCRS, true, true, false);
 			AccessibilityOsmNetworkReader networkReader = new AccessibilityOsmNetworkReader(connection.getInputStream(), scenarioCRS);
-			networkReader.setKeepPaths(true);
-			networkReader.setIincludeLowHierarchyWays(true);
 			networkReader.createNetwork();
 			network = networkReader.getNetwork();
 			

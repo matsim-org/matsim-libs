@@ -90,8 +90,6 @@ public class AccessibilityComputationSantaBarbaraTest {
 		
 //	    Network network = AccessibilityNetworkUtils.createNetwork(connection.getInputStream(), scenarioCRS, false, false, false);
 		AccessibilityOsmNetworkReader networkReader = new AccessibilityOsmNetworkReader(connection.getInputStream(), scenarioCRS);
-		networkReader.setKeepPaths(true);
-		networkReader.setIincludeLowHierarchyWays(true);
 		networkReader.createNetwork();
 		Network network = networkReader.getNetwork();
 	    
