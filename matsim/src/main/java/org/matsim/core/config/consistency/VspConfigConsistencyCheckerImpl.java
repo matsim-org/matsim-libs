@@ -173,6 +173,17 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 			System.out.flush() ;
 			log.error("found marginal utility of waiting != 0.  vsp default is setting this to 0. " ) ;
 		}
+		
+		// added oct'17:
+		if ( config.planCalcScore().getFractionOfIterationsToStartScoreMSA() == null ) {
+			problem = true ;
+			System.out.flush() ;
+			log.log( lvl, "You are not setting fractionOfIterationsToStartScoreMSA; vsp default is to set this to something like 0.8.  " +
+					"This means you have to add the following lines to your config file: ") ;
+			log.log( lvl, "<module name=\"planCalcScore\">");
+			log.log( lvl, "	<param name=\"fractionOfIterationsToStartScoreMSA\" value=\"0.8\" />");
+			log.log( lvl, "</module>");
+		}
 
 		// === plans:
 		
@@ -239,7 +250,7 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		case queue:
 		default:
 			log.log( lvl,  " found 'qsim.trafficDynamics==" + config.qsim().getTrafficDynamics() + "'; vsp standard is`" 
-					+ TrafficDynamics.withHoles + "'." ) ;
+					+ TrafficDynamics.kinematicWaves + "'." ) ;
 			break;
 		}
 		
