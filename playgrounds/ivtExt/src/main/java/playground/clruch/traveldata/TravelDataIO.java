@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.zip.DataFormatException;
 
+import org.matsim.api.core.v01.network.Link;
+
+import ch.ethz.idsc.owly.data.GlobalAssert;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.tensor.io.ObjectFormat;
 
@@ -29,8 +32,9 @@ public class TravelDataIO {
      * @throws ClassNotFoundException
      * @throws DataFormatException
      * @throws IOException */
-    /* package */ static TravelData fromByte(VirtualNetwork virtualNetwork, File file)//
+    /* package */ static TravelData fromByte(VirtualNetwork<Link> virtualNetwork, File file)//
             throws ClassNotFoundException, DataFormatException, IOException {
+        GlobalAssert.that(virtualNetwork != null);
         TravelData travelData = ObjectFormat.parse(Files.readAllBytes(file.toPath()));
         travelData.fillSerializationInfo(virtualNetwork);
         travelData.checkConsistency();

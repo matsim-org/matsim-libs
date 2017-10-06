@@ -22,9 +22,10 @@ import playground.joel.helpers.EasyDijkstra;
 
 /** @author Claudio Ruch based on initial version by gjoel */
 public class DataCollector {
+    private final String STOPWATCH_FILENAME = "/stopwatch.txt";
     private final AnalyzeSummary analyzeSummary;
 
-    public DataCollector(File configFile, Controler controler, //
+    public DataCollector(File configFile, String outputdirectory, Controler controler, //
             MinimumFleetSizeCalculator minimumFleetSizeCalculator, //
             AnalyzeSummary analyzeSummary, //
             Network network, Population population, TravelData travelData) throws Exception {
@@ -32,17 +33,23 @@ public class DataCollector {
         this.analyzeSummary = analyzeSummary;
 
         // collect the data
-        readStopwatch(configFile);
+        readStopwatch(configFile, outputdirectory);
 
-        minimumFleetSizeCalculator.plot();
+        String dataFolderName = outputdirectory + "/data";
+        File relativeDirectory = new File(dataFolderName);
+
+        minimumFleetSizeCalculator.plot(relativeDirectory);
 
         LeastCostPathCalculator dijkstra = EasyDijkstra.prepDijkstra(network);
-        new TripDistances(dijkstra, travelData, population, network);
+        new TripDistances(dijkstra, travelData, population, network, relativeDirectory);
 
     }
 
-    private void readStopwatch(File configFile) {
-        File stopwatch = new File(configFile.getParent(), "output/stopwatch.txt");
+    private void readStopwatch(File configFile, String outputdirectory) {
+        String stopwatchfileName = (outputdirectory + STOPWATCH_FILENAME);
+        File stopwatch = new File(configFile.getParent(), stopwatchfileName);
+        System.out.println("stopwatch file is at " + stopwatch.getAbsolutePath());
+        GlobalAssert.that(stopwatch.exists());
         try {
             BufferedReader reader = new BufferedReader(new FileReader(stopwatch));
             String startTime = "00:00:00";
@@ -66,7 +73,9 @@ public class DataCollector {
                 lineInt++;
             }
             analyzeSummary.computationTime = Time.writeTime(Time.parseTime(endTime) - Time.parseTime(startTime));
-            Export.object(new File("output/data/analyzeSummary.obj"), analyzeSummary);
+            File analyzeSummaryFile = new File(outputdirectory + "/data/analyzeSummary.obj");
+            System.out.println("saving analyzeSummary to " + analyzeSummaryFile.getAbsolutePath());
+            Export.object(analyzeSummaryFile, analyzeSummary);
         } catch (IOException e) {
             e.printStackTrace();
         }

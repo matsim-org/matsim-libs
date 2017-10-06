@@ -65,30 +65,30 @@ public class UniqueDiagrams {
     }
 
     public static void distanceDistribution(File directory, String fileTitle, String diagramTitle, //
-                                            boolean filter) throws Exception {
+                                            boolean filter, String dataDirectory) throws Exception {
         String[] labels = {"With Customer", "Pickup", "Rebalancing"};
         Double[] scale = {-0.001, 0.001, 0.001};
         stackedTimeChart(directory, fileTitle, diagramTitle, filter, DiagramCreator.filterSize, 12,15, scale, //
-                labels, "Distance [km]");
+                labels, "Distance [km]", dataDirectory);
     }
 
     public static void statusDistribution(File directory, String fileTitle, String diagramTitle, //
-                                            boolean filter) throws Exception {
+                                            boolean filter, String dataDirectory) throws Exception {
         String[] labels = {"With Customer", "Pickup", "Rebalancing", "Stay"};
         Double[] scale = {1.0, 1.0, 1.0, 1.0};
         stackedTimeChart(directory, fileTitle, diagramTitle, filter, 60,6 ,10, scale, //
-                labels, "Vehicles");
+                labels, "Vehicles", dataDirectory);
     }
 
     public static void stackedTimeChart(File directory, String fileTitle, String diagramTitle, //
                                             boolean filter, int filterSize, int from, int to, Double[] scale, //
-                                        String[] labels, String yAxisLabel) throws Exception {
+                                        String[] labels, String yAxisLabel, String dataDirectory) throws Exception {
         int width = 1000; /* Width of the image */
         int height = 750; /* Height of the image */
 
         GlobalAssert.that(labels.length >= from - to && scale.length >= from - to);
 
-        Tensor table = CsvFormat.parse(Files.lines(Paths.get("output/data/summary.csv")));
+        Tensor table = CsvFormat.parse(Files.lines(Paths.get(dataDirectory + "/summary.csv")));
         table = Transpose.of(table);
 
         Tensor values = DiagramCreator.filter(table.extract(from, to), table.get(0), filterSize, filter);

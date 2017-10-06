@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 
 import javax.swing.JCheckBox;
 
-import playground.clib.util.gui.RowPanel;
-import playground.clib.util.gui.SpinnerLabel;
+import ch.ethz.idsc.queuey.view.util.gui.RowPanel;
+import ch.ethz.idsc.queuey.view.util.gui.SpinnerLabel;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.net.AbstractContainer;
 import playground.clruch.net.OsmLink;

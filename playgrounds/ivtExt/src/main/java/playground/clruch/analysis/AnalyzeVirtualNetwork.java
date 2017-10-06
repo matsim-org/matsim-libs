@@ -4,6 +4,7 @@ import static playground.clruch.utils.NetworkLoader.loadNetwork;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
@@ -26,20 +27,22 @@ public class AnalyzeVirtualNetwork {
         File config = new File(args[0]);
         File data = new File(config.getParent(), "output/data");
         data.mkdir();
+        
+
 
         // load system network
         Network network = loadNetwork(new File(args[0]));
 
         MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SIOUXFALLS);
 
-        VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(network);
+        VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(network);
 
         // load simulation data
         StorageSupplier storageSupplier = StorageSupplier.getDefault();
         final int size = storageSupplier.size();
         System.out.println("found files: " + size);
         VirtualNetworkAnalysis vna = new VirtualNetworkAnalysis(storageSupplier, virtualNetwork);
-        vna.analyze();
+        vna.analyze(data);
 
     }
 }

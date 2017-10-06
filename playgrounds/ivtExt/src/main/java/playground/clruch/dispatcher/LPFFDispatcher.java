@@ -73,7 +73,7 @@ public class LPFFDispatcher extends PartitionedDispatcher {
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
             Network network,//
-            VirtualNetwork virtualNetwork, //
+            VirtualNetwork<Link> virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
             TravelData travelData) {

@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Properties;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -83,7 +84,7 @@ public enum ScenarioParameters {
         Network network = scenario.getNetwork();
         networkName = network.getName();
 
-        VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(network);
+        VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(network);
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
         PerformanceFleetSizeCalculator performanceFleetSizeCalculator = PerformanceFleetSizeGet.readDefault();
         GlobalAssert.that(virtualNetwork != null);

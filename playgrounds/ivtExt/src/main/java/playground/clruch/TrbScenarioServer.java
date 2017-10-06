@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -69,6 +70,8 @@ public class TrbScenarioServer {
 
         File configFile = new File(args[0]);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, new BlackListedTimeAllocationMutatorConfigGroup());
+        String outputdirectory = config.controler().getOutputDirectory();
+        System.out.println("outputdirectory = " + outputdirectory);
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         final Population population = scenario.getPopulation();
@@ -128,8 +131,8 @@ public class TrbScenarioServer {
 
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
-        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(new File(args[0]));
-        VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
+        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(new File(args[0]), outputdirectory);
+        VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
         int vehicleSteps = Math.max(10, maxNumberVehiclesPerformanceCalculator / 400);
 
@@ -139,16 +142,19 @@ public class TrbScenarioServer {
         if (virtualNetwork != null) {
             minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
             performanceFleetSizeCalculator = PerformanceFleetSizeGet.readDefault();
-            if (performanceFleetSizeCalculator != null)
-                performanceFleetSizeCalculator.saveAndPlot();
+            if (performanceFleetSizeCalculator != null) {
+                String dataFolderName = outputdirectory + "/data";
+                File relativeDirectory = new File(dataFolderName);
+                performanceFleetSizeCalculator.saveAndPlot(dataFolderName, relativeDirectory);
+            }
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
-        DataCollector datacollector = new DataCollector(new File(args[0]), controler, //
+        DataCollector datacollector = new DataCollector(new File(args[0]), outputdirectory, controler, //
                 minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
 
         // generate report
-        ReportGenerator.from(new File(args[0]));
+        ReportGenerator.from(new File(args[0]), outputdirectory);
 
     }
 }

@@ -7,6 +7,7 @@ import java.io.File;
  */
 public class HtmlDemo {
     public static void main(String[] args) {
+        String outputdirectory = "output";
         String fileName = "htmlDemo";
 
         File config = new File(args[0]);
@@ -57,7 +58,7 @@ public class HtmlDemo {
         // save document
         // -------------------------------------------------------------------------------------------------------------
         try {
-            HtmlUtils.saveFile(fileName);
+            HtmlUtils.saveFile(fileName, outputdirectory);
         } catch (Exception e) {
             e.printStackTrace();
         }

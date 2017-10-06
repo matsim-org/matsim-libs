@@ -20,8 +20,9 @@ import playground.clruch.net.VehicleContainer;
 
 enum SimulationFleetDump {
     ;
+    
     public static void of(DayTaxiRecord dayTaxiRecord, Network network, MatsimStaticDatabase db) {
-
+        
         final int MAXTIME = 216000; // TODO magic const
         final int TIMESTEP = 10;
 

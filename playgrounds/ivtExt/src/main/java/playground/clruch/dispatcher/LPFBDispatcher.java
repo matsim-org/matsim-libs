@@ -69,7 +69,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
             Network network, //
-            VirtualNetwork virtualNetwork, //
+            VirtualNetwork<Link> virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher) {
         super(config, travelTime, router, eventsManager, virtualNetwork);
@@ -115,7 +115,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                 Map<VirtualNode<Link>, List<RoboTaxi>> v_ij_reb = getVirtualNodeRebalancingToRoboTaxis();
                 Map<VirtualNode<Link>, List<RoboTaxi>> v_ij_cust = getVirtualNodeArrivingWithCustomerRoboTaxis();
                 Tensor vi_excessT = Array.zeros(virtualNetwork.getvNodesCount());
-                for (VirtualNode virtualNode : availableVehicles.keySet()) {
+                for (VirtualNode<Link> virtualNode : availableVehicles.keySet()) {
                     int viExcessVal = availableVehicles.get(virtualNode).size() + v_ij_reb.get(virtualNode).size() + v_ij_cust.get(virtualNode).size()
                             - requests.get(virtualNode).size();
                     vi_excessT.set(RealScalar.of(viExcessVal), virtualNode.getIndex());
@@ -142,7 +142,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
 
                 // fill rebalancing destinations
                 for (int i = 0; i < virtualNetwork.getvLinksCount(); ++i) {
-                    VirtualLink virtualLink = this.virtualNetwork.getVirtualLink(i);
+                    VirtualLink<Link> virtualLink = this.virtualNetwork.getVirtualLink(i);
                     VirtualNode<Link> toNode = virtualLink.getTo();
                     VirtualNode<Link> fromNode = virtualLink.getFrom();
                     int numreb = (Integer) (feasibleRebalanceCount.Get(fromNode.getIndex(), toNode.getIndex())).number();
@@ -157,7 +157,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                         virtualNetwork.getVirtualNodes().stream().allMatch(v -> finalAvailableVehicles.get(v).size() >= rebalanceDestinations.get(v).size()));
 
                 // send rebalancing vehicles using the setVehicleRebalance command
-                for (VirtualNode virtualNode : rebalanceDestinations.keySet()) {
+                for (VirtualNode<Link> virtualNode : rebalanceDestinations.keySet()) {
                     Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode),
                             rebalanceDestinations.get(virtualNode));
                     rebalanceMatching.keySet().forEach(v -> setRoboTaxiRebalance(v, rebalanceMatching.get(v)));

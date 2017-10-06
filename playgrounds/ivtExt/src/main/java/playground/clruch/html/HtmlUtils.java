@@ -239,8 +239,8 @@ public abstract class HtmlUtils {
         return "<b>" + text + "</b>";
     }
 
-    public static void saveFile(String fileName) throws IOException {
-        File file = new File("output/report", fileName + ".html");
+    public static void saveFile(String fileName, String outputdirectory) throws IOException {
+        File file = new File(outputdirectory + "/report", fileName + ".html");
         // if file does exists, then delete and create a new file
         Files.deleteIfExists(file.toPath());
 
