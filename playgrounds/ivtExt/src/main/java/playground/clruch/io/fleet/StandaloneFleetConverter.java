@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Network;
 import ch.ethz.idsc.queuey.datalys.MultiFileReader;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
+import playground.clruch.net.StorageUtils;
 import playground.clruch.utils.NetworkLoader;
 
 /** @author Claudio Ruch */
@@ -20,8 +21,10 @@ enum StandaloneFleetConverter {
         // selection of reference frame, file
         File directory = //
                 new File("/home/clruch/Downloads/2017-06-29 - ETH GPS Protokolle & Auftragslisten");
+        File outputDirectory = new File(args[0], "output");
+        StorageUtils storageUtils = new StorageUtils(outputDirectory);
         ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
-        //File file = new File("/media/datahaki/media/ethz/taxi", "2017-06-27 - GPS Fahrtstrecken-Protokoll.csv");
+        // File file = new File("/media/datahaki/media/ethz/taxi", "2017-06-27 - GPS Fahrtstrecken-Protokoll.csv");
         List<File> trailFiles = (new MultiFileReader(directory, "Fahrtstrecken")).getFolderFiles();
         DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
         // extract data from file and put into dayTaxiRecord
@@ -32,8 +35,8 @@ enum StandaloneFleetConverter {
         // STEP 2: DayTaxiRecord to MATSimStaticDatabase
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         // generate sim objects and store
-        SimulationFleetDump.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE);
-        
+        SimulationFleetDump.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE, storageUtils);
+
     }
 
 }

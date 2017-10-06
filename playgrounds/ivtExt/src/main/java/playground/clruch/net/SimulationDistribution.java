@@ -7,10 +7,10 @@ public enum SimulationDistribution {
     ;
     // ---
 
-    public static void of(SimulationObject simulationObject) {
+    public static void of(SimulationObject simulationObject, StorageUtils storageUtils) {
         SimulationObjects.sortVehiclesAccordingToIndex(simulationObject);
 
-        new StorageSubscriber().handle(simulationObject);
+        new StorageSubscriber(storageUtils).handle(simulationObject);
 
         if (SimulationServer.INSTANCE.getWaitForClients()) { // <- server is running && wait for clients is set
             if (SimulationClientSet.INSTANCE.isEmpty())

@@ -7,7 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 
+import ch.ethz.idsc.owly.data.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -17,10 +20,15 @@ import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.CsvFormat;
 import ch.ethz.idsc.tensor.io.MathematicaFormat;
 import ch.ethz.idsc.tensor.io.MatlabExport;
+import playground.clruch.ScenarioOptions;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
+import playground.clruch.net.StorageUtils;
+import playground.clruch.utils.PropertiesExt;
+import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.joel.data.TotalData;
+import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
 /** Created by Joel on 05.04.2017.
  * updated by clruch, aug sept 2017. */
@@ -43,8 +51,17 @@ public class AnalyzeAll {
     public static Tensor totalWaitTimeMean;
     public static double distanceRatio;
 
+    /** to be executed in simulation directory to perform analysis
+     * 
+     * @throws Exception */
     public static void main(String[] args) throws Exception {
-        analyze(new File(args[0]), args[1]);
+        File workingDirectory = new File("").getCanonicalFile();
+        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
+        Config config = ConfigUtils.loadConfig(configFile.toString());
+        String outputdirectory = config.controler().getOutputDirectory();
+        StorageUtils storageUtils = new StorageUtils(new File(outputdirectory));
+        analyze(configFile, outputdirectory, storageUtils);
     }
 
     public static void saveFile(Tensor table, String name, String dataFolderName) throws Exception {
@@ -150,11 +167,14 @@ public class AnalyzeAll {
         return analyzeSummary;
     }
 
-    public static AnalyzeSummary analyze(File config, String outputdirectory) throws Exception {
+    public static AnalyzeSummary analyze(File config, String outputdirectory, StorageUtils storageUtils) throws Exception {
+
+        storageUtils.printStorageProperties();
 
         String dataFolderName = outputdirectory + "/data";
         File relativeDirectory = new File(dataFolderName);
         File data = new File(config.getParent(), dataFolderName);
+        System.out.println("searching data in directory: " + dataFolderName);
         data.mkdir();
 
         // load system network
@@ -165,7 +185,7 @@ public class AnalyzeAll {
         MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SIOUXFALLS);
 
         // load simulation data
-        StorageSupplier storageSupplier = StorageSupplier.getDefault();
+        StorageSupplier storageSupplier = new StorageSupplier(storageUtils.getFirstAvailableIteration());
         final int size = storageSupplier.size();
         System.out.println("Found files: " + size);
 

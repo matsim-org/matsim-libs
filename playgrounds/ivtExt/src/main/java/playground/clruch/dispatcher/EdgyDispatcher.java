@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Optional;
 
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -34,11 +35,12 @@ public class EdgyDispatcher extends RebalancingDispatcher {
     private final double DISTCLOSE = 1000.0;
 
     private EdgyDispatcher( //
+            Config config,//
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager) {
-        super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
+        super(config,avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         // this.network = network;
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
@@ -54,30 +56,28 @@ public class EdgyDispatcher extends RebalancingDispatcher {
         total_abortTrip += DrivebyRequestStopper //
                 .stopDrivingBy(DispatcherUtils.getAVRequestsAtLinks(getAVRequests()), getDivertableRoboTaxis(), this::setRoboTaxiPickup);
 
-
         final long round_now = Math.round(now);
         if (round_now % dispatchPeriod == 0) {
 
             Collection<AVRequest> requests = getAVRequests();
-            
+
             // 1) send stay vehicles to some closeby request closer than DISTCLOSE
             for (RoboTaxi robotaxi : getDivertableRoboTaxis()) {
                 if (robotaxi.isInStayTask()) {
                     Optional<AVRequest> someCloseRequest = requests.stream()
                             .filter(v -> CoordUtils.calcEuclideanDistance(v.getFromLink().getCoord(), robotaxi.getDivertableLocation().getCoord()) < DISTCLOSE)
                             .findAny();
-                    if (someCloseRequest.isPresent()){
-                        setRoboTaxiRebalance(robotaxi, someCloseRequest.get().getFromLink()); 
+                    if (someCloseRequest.isPresent()) {
+                        setRoboTaxiRebalance(robotaxi, someCloseRequest.get().getFromLink());
                     }
                 }
             }
-            
-            
+
             // 2) send some vehicle to requests waiting longer than MAXWAIT
-            for( AVRequest avRequest : requests){
-                if(now-avRequest.getSubmissionTime() > MAXWAIT){
-                    Optional<RoboTaxi> robotaxi =  getDivertableRoboTaxis().stream().findAny();
-                    if(robotaxi.isPresent()){
+            for (AVRequest avRequest : requests) {
+                if (now - avRequest.getSubmissionTime() > MAXWAIT) {
+                    Optional<RoboTaxi> robotaxi = getDivertableRoboTaxis().stream().findAny();
+                    if (robotaxi.isPresent()) {
                         setRoboTaxiRebalance(robotaxi.get(), avRequest.getFromLink());
                     }
                 }
@@ -107,9 +107,9 @@ public class EdgyDispatcher extends RebalancingDispatcher {
         private EventsManager eventsManager;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
             return new EdgyDispatcher( //
-                    config, travelTime, router, eventsManager);
+                    config, avconfig, travelTime, router, eventsManager);
         }
     }
 }

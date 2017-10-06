@@ -2,6 +2,7 @@ package playground.clruch.dispatcher;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
@@ -29,11 +30,12 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
 
     private GlobalBipartiteMatchingDispatcher( //
             Network network, //
+            Config config,//
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager) {
-        super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
+        super(config, avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         this.ndf = new NetworkDistanceFunction(network);
@@ -77,9 +79,9 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
         private Network network;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
             return new GlobalBipartiteMatchingDispatcher( //
-                    network, config, travelTime, router, eventsManager);
+                    network,config, avconfig, travelTime, router, eventsManager);
         }
     }
 }

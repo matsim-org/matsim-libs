@@ -58,7 +58,7 @@ public class MatsimViewerFrame implements Runnable {
     private final JSlider jSlider = new JSlider(0, 1, 0);
 
     /** Constructs the {@code Demo}. */
-    public MatsimViewerFrame(MatsimMapComponent matsimMapComponent) {
+    public MatsimViewerFrame(MatsimMapComponent matsimMapComponent, StorageUtils storageUtils) {
         this.matsimMapComponent = matsimMapComponent;
         // ---
         jFrame.setTitle("ETH Z\u00fcrich MATSim Viewer");
@@ -107,7 +107,7 @@ public class MatsimViewerFrame implements Runnable {
         {
             JButton jButton = new JButton("reindex");
             jButton.setToolTipText("reindex available simulation objects");
-            jButton.addActionListener(event -> reindex());
+            jButton.addActionListener(event -> reindex(storageUtils));
             panelControls.add(jButton);
         }
         panelControls.addSeparator();
@@ -189,14 +189,14 @@ public class MatsimViewerFrame implements Runnable {
                 // getJMapViewer().setToolTipText(getJMapViewer().getPosition(p).toString());
             }
         });
-        reindex();
+        reindex(storageUtils);
         thread = new Thread(this);
         thread.start();
     }
 
-    void reindex() {
+    void reindex(StorageUtils storageUtils) {
         // System.out.println("reindex");
-        List<IterationFolder> list = StorageUtils.getAvailableIterations();
+        List<IterationFolder> list = storageUtils.getAvailableIterations();
         boolean nonEmpty = !list.isEmpty();
         spinnerLabelIter.setEnabled(nonEmpty);
         jButtonDecr.setEnabled(nonEmpty);

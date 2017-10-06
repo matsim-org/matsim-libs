@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
@@ -20,8 +21,6 @@ import com.google.inject.name.Named;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.alg.Dimensions;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
@@ -51,14 +50,15 @@ public class SelfishDispatcher extends PartitionedDispatcher {
     private final double fareRatioMultiply;
 
     private SelfishDispatcher(//
-            AVDispatcherConfig config, //
+            Config config, //
+            AVDispatcherConfig avconfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
             Network network, VirtualNetwork<Link> virtualNetwork, //
             TravelData travelData) {
-        super(config, travelTime, router, eventsManager, virtualNetwork);
-        SafeConfig safeConfig = SafeConfig.wrap(config);
+        super(config, avconfig, travelTime, router, eventsManager, virtualNetwork);
+        SafeConfig safeConfig = SafeConfig.wrap(avconfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         this.network = network;
         roboTaxiRequestMatcher = new RoboTaxiCloseRequestMatcher();
@@ -165,12 +165,12 @@ public class SelfishDispatcher extends PartitionedDispatcher {
         public static TravelData travelData;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
             virtualNetwork = VirtualNetworkGet.readDefault(network);
             travelData = TravelDataGet.readDefault(virtualNetwork);
             GlobalAssert.that(virtualNetwork != null);
             GlobalAssert.that(travelData != null);
-            return new SelfishDispatcher(config, travelTime, router, eventsManager, network, virtualNetwork, travelData);
+            return new SelfishDispatcher(config, avconfig, travelTime, router, eventsManager, network, virtualNetwork, travelData);
         }
     }
 

@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
@@ -29,27 +30,26 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
-/**
- * This dispatcher tries to simulate the behavior of an UncoordinatedFleet as for instance todays 
+/** This dispatcher tries to simulate the behavior of an UncoordinatedFleet as for instance todays
  * taxi operations. Not verified with real-world data. Initial working version.
- * @author Claudio Ruch
- *
- */
+ * 
+ * @author Claudio Ruch */
 public class UncoordinatedDispatcher extends PartitionedDispatcher {
     private final int dispatchPeriod;
     private final double maxWaitTime = 5 * 60.0;;
     private final Map<VirtualNode<Link>, Link> waitLocations;
 
     private UncoordinatedDispatcher( //
-            AVDispatcherConfig config, //
+            Config config, //
+            AVDispatcherConfig avconfig, //
             AVGeneratorConfig generatorConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
             Network network, //
             VirtualNetwork virtualNetwork) {
-        super(config, travelTime, router, eventsManager, virtualNetwork);
-        SafeConfig safeConfig = SafeConfig.wrap(config);
+        super(config, avconfig, travelTime, router, eventsManager, virtualNetwork);
+        SafeConfig safeConfig = SafeConfig.wrap(avconfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
         waitLocations = fillWaitLocations(network, virtualNetwork, (int) generatorConfig.getNumberOfVehicles());
     }
@@ -67,8 +67,6 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
             total_abortTrip += DrivebyRequestStopper //
                     .stopDrivingBy(DispatcherUtils.getAVRequestsAtLinks(getAVRequests()), getDivertableRoboTaxis(), this::setRoboTaxiPickup);
 
-
-            
             { // TODO implement some logic here that matches the behavior of a currently operating taxi company.
               // currently not tested, not verified simplistic implementation.
 
@@ -78,8 +76,7 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
 
                 for (AVRequest avr : unassignedRequests) {
                     VirtualNode vn = virtualNetwork.getVirtualNode(avr.getFromLink());
-                    Optional<RoboTaxi> optVh = vehicles.stream()
-                            .filter(v -> virtualNetwork.getVirtualNode(v.getDivertableLocation()).equals(vn)).findAny();
+                    Optional<RoboTaxi> optVh = vehicles.stream().filter(v -> virtualNetwork.getVirtualNode(v.getDivertableLocation()).equals(vn)).findAny();
                     if (optVh.isPresent()) {
                         RoboTaxi vehicleToSend = optVh.get();
                         setRoboTaxiPickup(vehicleToSend, avr);
@@ -104,20 +101,17 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
                 vehicles = getDivertableUnassignedRoboTaxis();
                 for (RoboTaxi roboTaxi : vehicles) {
                     VirtualNode vn = virtualNetwork.getVirtualNode(roboTaxi.getDivertableLocation());
-                    if(!roboTaxi.getDivertableLocation().equals(waitLocations.get(vn))){
-                        setRoboTaxiRebalance(roboTaxi, waitLocations.get(vn));                        
+                    if (!roboTaxi.getDivertableLocation().equals(waitLocations.get(vn))) {
+                        setRoboTaxiRebalance(roboTaxi, waitLocations.get(vn));
                     }
                 }
             }
         }
     }
 
-    /**
-     * 
-     * @param network
+    /** @param network
      * @param virtualNetwork
-     * @return HashMap<VirtualNode, Link> with one wait location per VirtualNode
-     */
+     * @return HashMap<VirtualNode, Link> with one wait location per VirtualNode */
     private static Map<VirtualNode<Link>, Link> fillWaitLocations(Network network, VirtualNetwork<Link> virtualNetwork, int numberofRoboTaxis) {
         double carsPerVNode = ((double) numberofRoboTaxis) / virtualNetwork.getvNodesCount();
 
@@ -125,8 +119,8 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
         for (VirtualNode<Link> vn : virtualNetwork.getVirtualNodes()) {
             // select some link in virtualNode, if possible with high enough capacity
             Link link = null;
-            Optional<Link> optLink = vn.getLinks().stream().filter(v -> v.getCapacity() > carsPerVNode)
-                    .filter(v -> v.getAllowedModes().contains("car")).findAny();
+            Optional<Link> optLink = vn.getLinks().stream().filter(v -> v.getCapacity() > carsPerVNode).filter(v -> v.getAllowedModes().contains("car"))
+                    .findAny();
             link = optLink.isPresent() ? optLink.get() : vn.getLinks().stream().findAny().get();
             waitLocations.put(vn, vn.getLinks().stream().findAny().get());
         }
@@ -160,11 +154,11 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
         public static VirtualNetwork virtualNetwork;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
 
             virtualNetwork = VirtualNetworkGet.readDefault(network);
             return new UncoordinatedDispatcher( //
-                    config, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork);
+                    config, avconfig, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork);
         }
     }
 }
