@@ -34,7 +34,7 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssib
 import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.utils.AccessibilityNetworkUtils;
+import org.matsim.contrib.accessibility.utils.AccessibilityOsmNetworkReader;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.core.config.Config;
@@ -88,10 +88,15 @@ public class AccessibilityComputationSantaBarbaraTest {
 		HttpURLConnection connection = (HttpURLConnection) osm.openConnection();
 		HttpURLConnection connection2 = (HttpURLConnection) osm.openConnection(); // TODO There might be more elegant option without creating this twice
 		
-	    Network network = AccessibilityNetworkUtils.createNetwork(connection.getInputStream(), scenarioCRS, false, false, false);
+//	    Network network = AccessibilityNetworkUtils.createNetwork(connection.getInputStream(), scenarioCRS, false, false, false);
+		AccessibilityOsmNetworkReader networkReader = new AccessibilityOsmNetworkReader(connection.getInputStream(), scenarioCRS);
+		networkReader.setKeepPaths(true);
+		networkReader.setIincludeLowHierarchyWays(true);
+		networkReader.createNetwork();
+		Network network = networkReader.getNetwork();
 	    
 	    double buildingTypeFromVicinityRange = 0.;
-		ActivityFacilities facilities = RunCombinedOsmReaderKibera.createFacilites(connection2.getInputStream(), scenarioCRS, buildingTypeFromVicinityRange);
+		ActivityFacilities facilities = CombinedOsmFacilityReaderKenya.createFacilites(connection2.getInputStream(), scenarioCRS, buildingTypeFromVicinityRange);
 		
 		config.global().setCoordinateSystem(scenarioCRS);
 		
