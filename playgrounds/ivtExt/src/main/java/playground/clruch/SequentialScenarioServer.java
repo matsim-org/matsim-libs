@@ -26,7 +26,7 @@ public class SequentialScenarioServer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
 
-        int iterations = 20;
+        int iterations = 3;
         if (iterations % 2 == 0) {
             iterations = iterations - 1;
         }
@@ -35,16 +35,18 @@ public class SequentialScenarioServer {
 
         double factorPlus = 1.5;
         double[] fareRatios = fareRatioCreator(iterations, factorPlus);
+        int[] vehicleNumbers = new int[] { 10, 500, 2000 };
 
         // copy the raw folder name including changed settings
         for (int i = 0; i < iterations; ++i) {
             System.out.println("working in the directory " + rawFolder.getAbsolutePath());
 
             // modify the av.xml file
-            changeFareRatioTo(fareRatios[i], rawFolder);
+            // changeFareRatioTo(fareRatios[i], rawFolder);
+            changeVehicleNumberTo(vehicleNumbers[i], rawFolder);
 
             // set the output-directory correctly
-            changeOutputDirectoryTo("output" + String.format("%04d", i), rawFolder);
+            changeOutputDirectoryTo("output/output" + String.format("%04d", i), rawFolder);
 
             // simulate
             ScenarioServer.simulate();
@@ -76,6 +78,44 @@ public class SequentialScenarioServer {
         Thread.sleep(5000);
 
         return fareRatios;
+
+    }
+
+    private static void changeVehicleNumberTo(int vehicleNumber, File simFolder) //
+            throws ParserConfigurationException, JDOMException, IOException {
+        System.out.println("changing vehicle number to " + vehicleNumber);
+
+        File xmlFile = new File(simFolder, "av.xml");
+
+        System.out.println("looking for av.xml file at " + xmlFile.getAbsolutePath());
+
+        GlobalAssert.that(xmlFile.exists());
+
+        SAXBuilder builder = new SAXBuilder();
+        builder.setValidation(false);
+        builder.setFeature("http://xml.org/sax/features/validation", false);
+        builder.setFeature("http://apache.org/xml/features/nonvalidating/load-dtd-grammar", false);
+        builder.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+        Document doc = (Document) builder.build(xmlFile);
+        Element rootNode = doc.getRootElement();
+        Element operator = rootNode.getChild("operator");
+        Element dispatcher = operator.getChild("generator");
+        List<Element> children = dispatcher.getChildren();
+
+        for (Element element : children) {
+            List<Attribute> theAttributes = element.getAttributes();
+
+            if (theAttributes.get(0).getValue().equals("numberOfVehicles")) {
+                theAttributes.get(1).setValue(Integer.toString(vehicleNumber));
+
+            }
+
+        }
+
+        XMLOutputter xmlOutput = new XMLOutputter();
+        xmlOutput.setFormat(Format.getPrettyFormat());
+        xmlOutput.output(doc, new FileWriter(xmlFile));
 
     }
 

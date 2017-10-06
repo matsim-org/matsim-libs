@@ -15,6 +15,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.SynchronousQueue;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -67,6 +68,7 @@ public class MatsimViewerFrame implements Runnable {
     public MatsimViewerFrame(MatsimMapComponent matsimMapComponent, File outputDirectory) {
 
         {// get list of all outputfolders in the outputDirectory
+            System.out.println("getting all output folders from: " + outputDirectory.getAbsolutePath());
             outputFolders = MultiFileTools.getAllDirectoriesSorted(outputDirectory);
             outputFolderNames = new String[outputFolders.length];
             for (int i = 0; i < outputFolders.length; ++i) {
@@ -74,7 +76,7 @@ public class MatsimViewerFrame implements Runnable {
             }
         }
 
-        this.storageUtils = new StorageUtils(new File(outputDirectory,outputFolderNames[0]));
+        this.storageUtils = new StorageUtils(new File(outputDirectory, outputFolderNames[0]));
         ;
         this.matsimMapComponent = matsimMapComponent;
         // ---
@@ -132,12 +134,12 @@ public class MatsimViewerFrame implements Runnable {
             // spinnerLabelOutputFolder.setArray(new String[] { "abc", "def", "ghi" });
             spinnerLabelOutputFolder.setArray(outputFolderNames);
             spinnerLabelOutputFolder.addSpinnerListener(s -> {
-                
-                File currentOutputFolder = new File(outputDirectory,s);
+
+                File currentOutputFolder = new File(outputDirectory, s);
                 System.out.println("now displaying output from folder: ");
                 System.out.println(currentOutputFolder.getAbsolutePath());
                 this.storageUtils = new StorageUtils(outputDirectory);
-
+                // TODO the viewer does not update if spinner is used... why??
 
             });
             spinnerLabelOutputFolder.addToComponentReduced(panelControls, new Dimension(60, 26), "outputFolder");

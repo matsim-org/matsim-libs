@@ -91,9 +91,6 @@ public class ScenarioServer {
         controler.addOverridingModule(new AVTravelTimeModule());
         controler.addOverridingModule(new WriteTravelTimesModule());
 
-        // directories for saving results
-        StorageUtils storageUtils = new StorageUtils(new File(outputdirectory));
-
         // run simulation
         controler.run();
 
@@ -101,7 +98,8 @@ public class ScenarioServer {
         SimulationServer.INSTANCE.stopAccepting();
 
         // perform analysis of results
-        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(configFile, outputdirectory, storageUtils);
+        AnalyzeAll analyzeAll = new AnalyzeAll();
+        AnalyzeSummary analyzeSummary = analyzeAll.analyze(configFile, outputdirectory);
         VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
@@ -123,7 +121,8 @@ public class ScenarioServer {
                 minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
 
         // generate report
-        ReportGenerator.from(configFile, outputdirectory);
+        ReportGenerator reportGenerator = new ReportGenerator();
+        reportGenerator.from(configFile, outputdirectory);
 
     }
 }

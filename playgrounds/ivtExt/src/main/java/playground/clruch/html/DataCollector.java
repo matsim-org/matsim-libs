@@ -73,6 +73,10 @@ public class DataCollector {
                 lineInt++;
             }
             analyzeSummary.computationTime = Time.writeTime(Time.parseTime(endTime) - Time.parseTime(startTime));
+            File dataFolder = new File(outputdirectory + "/data");
+            if(!dataFolder.exists()){
+                dataFolder.mkdirs();
+            }
             File analyzeSummaryFile = new File(outputdirectory + "/data/analyzeSummary.obj");
             System.out.println("saving analyzeSummary to " + analyzeSummaryFile.getAbsolutePath());
             Export.object(analyzeSummaryFile, analyzeSummary);
