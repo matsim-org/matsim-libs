@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*                                                   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,29 +16,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.bicycle.run;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Inject;
+package org.matsim.contrib.bicycle;
 
 /**
- * @author smetzler, dziemke
+ * Enumeration of frequently used labels related to bicycles.
+ *
+ * @author dziemke
  */
-public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
+public final class BicycleLabels {
 
-	@Inject	BicycleConfigGroup bicycleConfigGroup;
-	@Inject	PlanCalcScoreConfigGroup cnScoringGroup;
-	@Inject	PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
-	@Inject Network network; // TODO only needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
-	
-	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		return new BicycleTravelDisutility(bicycleConfigGroup, cnScoringGroup, plansCalcRouteConfigGroup, timeCalculator, network);
+	public static final String GRADIENT = "gradient";
+	public static final String AVERAGE_ELEVATION = "average_elevation";
+	public static final String SURFACE = "surface";
+	public static final String SMOOTHNESS = "smoothness";
+	public static final String CYCLEWAY = "cycleway";
+
+	private BicycleLabels() {
+		// Don't allow to create instances of this class
 	}
+
 }

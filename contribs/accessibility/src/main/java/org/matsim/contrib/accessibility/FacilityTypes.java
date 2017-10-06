@@ -23,4 +23,7 @@ public final class FacilityTypes {
 	public static final String CLINIC = "clinic";
 	
 	public static final String AIRPORT = "airport";
+	
+	// for Cape Town
+	public static final String SCHOOL = "school";
 }

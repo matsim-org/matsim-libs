@@ -55,8 +55,8 @@ import com.vividsolutions.jts.geom.Envelope;
 /**
  * @author dziemke
  */
-public class AccessibilityComputationNairobiTest {
-	public static final Logger log = Logger.getLogger(AccessibilityComputationNairobiTest.class);
+public class AccessibilityComputationNairobiMatatuTest {
+	public static final Logger log = Logger.getLogger(AccessibilityComputationNairobiMatatuTest.class);
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 	
@@ -68,27 +68,20 @@ public class AccessibilityComputationNairobiTest {
 
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
 		// Notation: minX, maxX, minY, maxY
-		Envelope envelope = new  Envelope(240000, 280000, 9844000, 9874000); // whole Nairobi
-//		Envelope envelope = new  Envelope(246000, 271000, 9853000, 9863000); // whole Nairobi // central part
-//		Envelope envelope = new Envelope(251800.0, 258300.0, 9854300.0, 9858700.0); // City center and Kibera for minibus caluclation
+		Envelope envelope = new Envelope(251800.0, 258300.0, 9854300.0, 9858700.0); // City center and Kibera for minibus caluclation
 		String scenarioCRS = "EPSG:21037"; // EPSG:21037 = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		
 		// ---------- Input (if pre-downloaded)
 //		String folderStructure = "../../";
 //		String networkFile = "matsimExamples/countries/ke/nairobi/2015-10-15_network.xml";
 //		String networkFile = "../shared-svn/projects/maxess/data/nairobi/network/2015-10-15_network.xml";
-//		String networkFile = "../shared-svn/projects/maxess/data/nairobi/minibus/07/grid10min_0.output_network.xml.gz";
-//		String networkFile = "../shared-svn/projects/maxess/data/nairobi/network/2015-10-15_network_modified_policy.xml";
-//		String networkFile = "../shared-svn/projects/maxess/data/kenya/network/2016-10-19_network_detailed.xml";
+		String networkFile = "../shared-svn/projects/maxess/data/nairobi/minibus/07/grid10min_0.output_network.xml.gz";
 //		// Adapt folder structure that may be different on different machines, in particular on server
 //		folderStructure = PathUtils.tryANumberOfFolderStructures(folderStructure, networkFile);
 //		config.network().setInputFile(folderStructure + networkFile);
 //		
 //		final String facilitiesFile = folderStructure + "matsimExamples/countries/ke/nairobi/2015-10-15_facilities.xml";
-//		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/land_use/nairobi_LU_2010/facilities.xml";
-//		config.facilities().setInputFile("../../../shared-svn/projects/maxess/data/nairobi/facilities/2017-04-25_nairobi_central_and_kibera/2017-04-25_facilities_landuse_buildings.xml");
-//		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/kodi/health/hospitals/facilities.xml";
-//		final String facilitiesFile = "../../../shared-svn/projects/maxess/data/nairobi/facilities/04/facilities.xml"; //airports
+		config.facilities().setInputFile("../../../shared-svn/projects/maxess/data/nairobi/facilities/2017-04-25_nairobi_central_and_kibera/2017-04-25_facilities_landuse_buildings.xml");
 //
 //		final String outputDirectory = "../../../shared-svn/projects/maxess/data/nairobi/output/27/";
 		// ---------- 
