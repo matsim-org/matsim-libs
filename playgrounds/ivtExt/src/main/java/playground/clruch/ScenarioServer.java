@@ -16,6 +16,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.AnalyzeSummary;
@@ -52,7 +53,7 @@ public class ScenarioServer {
 
     /* package */ static void simulate() throws MalformedURLException, Exception {
         // load options
-        File workingDirectory = new File("").getCanonicalFile();
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
         PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
 
         /** set to true in order to make server wait for at least 1 client, for instance viewer client */

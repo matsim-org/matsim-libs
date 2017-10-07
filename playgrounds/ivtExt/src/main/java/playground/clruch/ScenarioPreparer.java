@@ -16,6 +16,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetworkIO;
+import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
@@ -50,7 +51,7 @@ public class ScenarioPreparer {
     public static void run(String[] args) throws MalformedURLException, Exception {
 
         // load options
-        File workingDirectory = new File("").getCanonicalFile();
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
         PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
 
         File configFile = new File(workingDirectory, simOptions.getString("fullConfig"));
@@ -135,14 +136,14 @@ public class ScenarioPreparer {
         }
 
         // 3) create virtual Network
-        // TODO make this generic for any VirtualNetwork creators. 
+        // TODO make this generic for any VirtualNetwork creators.
         VirtualNetwork<Link> virtualNetwork;
-        if(centerNetwork){
+        if (centerNetwork) {
             MatsimCenterVirtualNetworkCreator centercreator = new MatsimCenterVirtualNetworkCreator();
-            virtualNetwork = centercreator.creatVirtualNetwork(network);            
-        }else{
+            virtualNetwork = centercreator.creatVirtualNetwork(network);
+        } else {
             MatsimKMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new MatsimKMEANSVirtualNetworkCreator();
-            virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);            
+            virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
         }
 
         final File vnDir = new File(workingDirectory, VIRTUALNETWORKFOLDERNAME);

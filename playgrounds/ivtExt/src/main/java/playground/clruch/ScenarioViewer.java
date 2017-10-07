@@ -8,6 +8,7 @@ import java.util.Objects;
 
 import org.matsim.api.core.v01.network.Network;
 
+import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.gfx.MatsimMapComponent;
@@ -29,7 +30,7 @@ public class ScenarioViewer {
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
         // load options
-        File workingDirectory = new File("").getCanonicalFile();
+        File workingDirectory = MultiFileTools.getWorkingDirectory();;
         PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
         File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
         System.out.println("showing simulation results stored in folder: " + outputDirectory.getName());
