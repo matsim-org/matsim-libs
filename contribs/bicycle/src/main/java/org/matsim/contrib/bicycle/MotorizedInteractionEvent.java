@@ -16,29 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.bicycle.run;
+package org.matsim.contrib.bicycle;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Inject;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
 
 /**
- * @author smetzler, dziemke
+ * @author dziemke
  */
-public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
+public class MotorizedInteractionEvent extends Event {
 
-	@Inject	BicycleConfigGroup bicycleConfigGroup;
-	@Inject	PlanCalcScoreConfigGroup cnScoringGroup;
-	@Inject	PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
-	@Inject Network network; // TODO only needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
-	
+	private Id<Link> linkId;
+	private Id<Vehicle> vehId;
+
+	public MotorizedInteractionEvent(double time, Id<Link> linkId, Id<Vehicle> vehId) {
+		super(time);
+		this.linkId = linkId;
+		this.vehId = vehId;
+	}
+
+	public Id<Link> getLinkId() {
+		return linkId;
+	}
+
+	public Id<Vehicle> getVehId() {
+		return vehId;
+	}
+
 	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		return new BicycleTravelDisutility(bicycleConfigGroup, cnScoringGroup, plansCalcRouteConfigGroup, timeCalculator, network);
+	public String getEventType() {
+		return "motorizedInteraction";
 	}
 }

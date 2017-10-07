@@ -171,7 +171,8 @@ public final class AccessibilityModule extends AbstractModule {
 				}
 				
 				if (pushing2Geoserver == true) {
-					accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs, config.controler().getRunId() + "_" + activityType));
+					accessibilityCalculator.addFacilityDataExchangeListener(new GeoserverUpdater(crs,
+							config.controler().getRunId() + "_" + activityType, acg.getCellSizeCellBasedAccessibility()));
 				}
 
 				GridBasedAccessibilityShutdownListenerV3 gbasl = new GridBasedAccessibilityShutdownListenerV3(accessibilityCalculator, 

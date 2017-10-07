@@ -40,7 +40,7 @@ public final class CSVWriter {
 	public final void writeField( double val ) {
 		try {
 			if ( first ) {
-				writer.write( val + SEPARATOR ) ;
+				writer.write( val + "" ) ;
 				first = false ;
 			} else {
 				writer.write( SEPARATOR + val ) ;
@@ -54,7 +54,7 @@ public final class CSVWriter {
 	public final void writeField( String val ) {
 		try {
 			if ( first ) {
-				writer.write( val + SEPARATOR ) ;
+				writer.write( val ) ;
 				first = false ;
 			} else {
 				writer.write( SEPARATOR + val ) ;

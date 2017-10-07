@@ -16,29 +16,13 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.bicycle.run;
+package org.matsim.contrib.bicycle;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Inject;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
- * @author smetzler, dziemke
+ * @author dziemke
  */
-public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
-
-	@Inject	BicycleConfigGroup bicycleConfigGroup;
-	@Inject	PlanCalcScoreConfigGroup cnScoringGroup;
-	@Inject	PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
-	@Inject Network network; // TODO only needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
-	
-	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		return new BicycleTravelDisutility(bicycleConfigGroup, cnScoringGroup, plansCalcRouteConfigGroup, timeCalculator, network);
-	}
+public interface MotorizedInteractionEventHandler extends EventHandler{
+	public void handleEvent (MotorizedInteractionEvent event);
 }

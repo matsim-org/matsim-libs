@@ -55,11 +55,12 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 
 	private String crs;
 	private String name;
+	private long cellSize;
 
-
-	public GeoserverUpdater (String crs, String name) {
+	public GeoserverUpdater (String crs, String name, long cellSize) {
 		this.crs = crs;
 		this.name = name;
+		this.cellSize = cellSize;
 	}
 
 	
@@ -114,10 +115,10 @@ public class GeoserverUpdater implements FacilityDataExchangeInterface {
 //			featureBuilder.add(geometryFactory.createPoint(MGC.coord2Coordinate(transformation.transform(coord))));
 //			featureBuilder.add(coord.getX());
 //			featureBuilder.add(coord.getY());
-			Coordinate coord1 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() - 50, coord.getY() - 50)));
-			Coordinate coord2 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() + 50, coord.getY() - 50)));
-			Coordinate coord3 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() + 50, coord.getY() + 50)));
-			Coordinate coord4 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() - 50, coord.getY() + 50)));
+			Coordinate coord1 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() - (cellSize / 2), coord.getY() - (cellSize / 2))));
+			Coordinate coord2 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() + (cellSize / 2), coord.getY() - (cellSize / 2))));
+			Coordinate coord3 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() + (cellSize / 2), coord.getY() + (cellSize / 2))));
+			Coordinate coord4 = MGC.coord2Coordinate(transformation.transform(CoordUtils.createCoord(coord.getX() - (cellSize / 2), coord.getY() + (cellSize / 2))));
 			featureBuilder.add(geometryFactory.createPolygon(new Coordinate[]{coord1, coord2, coord3, coord4, coord1}));
 //			featureBuilder.add(timeOfDay);
 

@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,29 +16,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.bicycle.run;
-
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
-
-import com.google.inject.Inject;
+package org.matsim.contrib.bicycle;
 
 /**
- * @author smetzler, dziemke
+ * @author amit, dziemke
  */
-public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
+public class BicycleUtils {
 
-	@Inject	BicycleConfigGroup bicycleConfigGroup;
-	@Inject	PlanCalcScoreConfigGroup cnScoringGroup;
-	@Inject	PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
-	@Inject Network network; // TODO only needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
-	
-	@Override
-	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
-		return new BicycleTravelDisutility(bicycleConfigGroup, cnScoringGroup, plansCalcRouteConfigGroup, timeCalculator, network);
+	public static double getSpeed(final String travelMode){
+		double speed;
+		switch (travelMode) {
+		case "bicycle": speed = 4.17; break;
+		default: throw new RuntimeException("No speed is set for travel mode "+travelMode+ ".");
+		}
+		return speed;
 	}
 }
