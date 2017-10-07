@@ -46,7 +46,7 @@ public class SequentialScenarioServer {
             changeVehicleNumberTo(vehicleNumbers[i], rawFolder);
 
             // set the output-directory correctly
-            changeOutputDirectoryTo("output/output" + String.format("%04d", i), rawFolder);
+            changeOutputDirectoryTo("output/" + String.format("%04d", i), rawFolder);
 
             // simulate
             ScenarioServer.simulate();
