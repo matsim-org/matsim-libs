@@ -35,6 +35,8 @@ public class LanesImpl implements Lanes {
 
 	private LanesFactory builder = new LanesFactoryImpl();
 
+	LanesImpl(){}
+
 	@Override
 	public SortedMap<Id<Link>, LanesToLinkAssignment> getLanesToLinkAssignments() {
 		return this.lanesToLinkAssignments;
