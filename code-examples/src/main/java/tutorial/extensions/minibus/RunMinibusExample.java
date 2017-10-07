@@ -16,44 +16,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.withinDayReplanningFromPlans;
+package tutorial.extensions.minibus;
 
-import java.io.File;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.testcases.MatsimTestUtils;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.minibus.PConfigGroup;
+import org.matsim.contrib.minibus.RunMinibus;
+import org.matsim.contrib.minibus.hook.PModule;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author nagel
  *
  */
-public class IT {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+public class RunMinibusExample {
+	private final static Logger log = Logger.getLogger(RunMinibus.class);
 
-	/**
-	 * Test method for {@link RunWithinDayReplanningFromPlansExample}
-	 */
-	@SuppressWarnings("static-method")
-	@Test
-	public final void testMain() {
-		final String pathname = "./output/within-day";
-		try {
-			IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
-		} catch ( IllegalArgumentException ee ) {
-			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
-			// and did not remove the directory afterwards.)
-		} catch ( UncheckedIOException ee ) {
-			
+	public static void main(final String[] args) {
+
+		if(args.length == 0){
+			log.info("Arg 1: config.xml is missing.");
+			log.info("Check http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/atlantis/minibus/ for an example.");
+			System.exit(1);
 		}
-		RunWithinDayReplanningFromPlansExample.main(null);
 
-		IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
-		// (here, the directory should have been there)
-	}
+		Config config = ConfigUtils.loadConfig( args[0], new PConfigGroup() ) ;
+		
+//		PConfigGroup pConfig = ConfigUtils.addOrGetModule(config, PConfigGroup.GROUP_NAME, PConfigGroup.class ) ;
+//		
+//		pConfig.getCostPerKilometer() ;
 
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+
+
+		Controler controler = new Controler(scenario);
+		controler.getConfig().controler().setCreateGraphs(false);
+		
+		controler.addOverridingModule(new PModule()) ;
+
+		controler.run();
+	}		
 }
-
-

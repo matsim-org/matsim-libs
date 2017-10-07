@@ -2,6 +2,7 @@ package tutorial.programming.individualizedScoringParameters;
 
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 import tutorial.scoring.individualizedScoringParameters.RunExampleIndividualizedScoring;
 
@@ -19,6 +20,7 @@ public class IT {
 		} catch ( IllegalArgumentException ee ) {
 			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
 			// and did not remove the directory afterwards.)
+		} catch ( UncheckedIOException ee ) {
 		}
 		RunExampleIndividualizedScoring.main();
 
