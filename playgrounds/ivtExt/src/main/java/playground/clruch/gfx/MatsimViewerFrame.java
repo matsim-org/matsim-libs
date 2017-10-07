@@ -12,10 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.SynchronousQueue;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -134,12 +131,15 @@ public class MatsimViewerFrame implements Runnable {
             // spinnerLabelOutputFolder.setArray(new String[] { "abc", "def", "ghi" });
             spinnerLabelOutputFolder.setArray(outputFolderNames);
             spinnerLabelOutputFolder.addSpinnerListener(s -> {
-
                 File currentOutputFolder = new File(outputDirectory, s);
                 System.out.println("now displaying output from folder: ");
                 System.out.println(currentOutputFolder.getAbsolutePath());
-                this.storageUtils = new StorageUtils(outputDirectory);
+                this.storageUtils = new StorageUtils(currentOutputFolder);
                 // TODO the viewer does not update if spinner is used... why??
+                // reindex and ensure that new data displayed at sime time as before action.
+                reindex(storageUtils);
+                jSlider.setValue(jSlider.getValue() - 1);
+                jSlider.setValue(jSlider.getValue() + 1);
 
             });
             spinnerLabelOutputFolder.addToComponentReduced(panelControls, new Dimension(60, 26), "outputFolder");
@@ -230,6 +230,7 @@ public class MatsimViewerFrame implements Runnable {
 
     void reindex(StorageUtils storageUtils) {
         // System.out.println("reindex");
+        // storageUtils.printStorageProperties();
         List<IterationFolder> list = storageUtils.getAvailableIterations();
         boolean nonEmpty = !list.isEmpty();
         spinnerLabelIter.setEnabled(nonEmpty);
