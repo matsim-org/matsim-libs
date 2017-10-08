@@ -68,7 +68,6 @@ public class AbstractTransitRouter {
 		return getTravelDisutility().getWalkTravelTime(person, coord, toCoord) + this.getConfig().getAdditionalTransferTime();
 	}
 
-	//same is used in raptor router
 	protected final List<Leg> createDirectWalkLegList(Person person, Coord fromCoord, Coord toCoord) {
 		List<Leg> legs = new ArrayList<>();
 		Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
@@ -164,7 +163,11 @@ public class AbstractTransitRouter {
 		return leg;
 	}
 
-	// it would be better to have TransitPassengerRoute as an argument rather than path (see Raptor...). Amit Sep'17
+	@Deprecated
+	/**
+	 * Use convertPathToLegList(double departureTime, TransitPassengerRoute p, Coord fromCoord, Coord toCoord, Person person) instead.
+	 * This will probably be removed. Amit Oct'17
+	 */
 	protected final List<Leg> convertPathToLegList(double departureTime, Path path, Coord fromCoord, Coord toCoord, Person person) {
 			// yy would be nice if the following could be documented a bit better.  kai, jul'16
 			
