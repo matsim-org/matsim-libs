@@ -35,7 +35,7 @@ import org.matsim.contrib.accessibility.AccessibilityConfigGroup.AreaOfAccesssib
 import org.matsim.contrib.accessibility.AccessibilityModule;
 import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.Modes4Accessibility;
-import org.matsim.contrib.accessibility.utils.AccessibilityNetworkUtils;
+import org.matsim.contrib.accessibility.utils.AccessibilityOsmNetworkReader;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.core.config.Config;
@@ -97,10 +97,13 @@ public class AccessibilityComputationNairobiMatatuTest {
 			URL osm = new URL("http://overpass.osm.rambler.ru/cgi/xapi_meta?*[bbox=" + southwest.getX() + "," + southwest.getY() + "," + northeast.getX() + "," + northeast.getY() +"]");
 			HttpURLConnection connection = (HttpURLConnection) osm.openConnection();
 			HttpURLConnection connection2 = (HttpURLConnection) osm.openConnection(); // TODO There might be more elegant option without creating this twice
-		    network = AccessibilityNetworkUtils.createNetwork(connection.getInputStream(), scenarioCRS, true, true, false);
+//		    network = AccessibilityNetworkUtils.createNetwork(connection.getInputStream(), scenarioCRS, true, true, false);
+			AccessibilityOsmNetworkReader networkReader = new AccessibilityOsmNetworkReader(connection.getInputStream(), scenarioCRS);
+			network = networkReader.getNetwork();
+		    
 		    double buildingTypeFromVicinityRange = 0.;
 			
-			facilities = RunCombinedOsmReaderKibera.createFacilites(connection2.getInputStream(), scenarioCRS, buildingTypeFromVicinityRange);
+			facilities = CombinedOsmFacilityReaderKenya.createFacilites(connection2.getInputStream(), scenarioCRS, buildingTypeFromVicinityRange);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

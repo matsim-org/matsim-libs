@@ -1,7 +1,0 @@
-Variables used in our example:
-------------------------------
-PERSON_ID	person id		
-ALTJ	age
-AGDE	working municipality
-XH	x hectare coordinate of residence location
-YH	y hectare coordinate of residence location
