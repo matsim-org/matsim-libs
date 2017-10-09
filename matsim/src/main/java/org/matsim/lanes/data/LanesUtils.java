@@ -85,13 +85,11 @@ public final class LanesUtils {
 	/**
 	 * Replaces the method that converted a lane from format 11 to format 20.
 	 * Use this when you have not defined an original lane of the link and when you have not set lane capacities yet.
-	 *
-	 * @param scenario
 	 */
-	public static void createOriginalLanesAndSetLaneCapacities(Scenario scenario){
-		LanesFactory factory = scenario.getLanes().getFactory();
-		for (LanesToLinkAssignment l2l : scenario.getLanes().getLanesToLinkAssignments().values()){
-			Link link = scenario.getNetwork().getLinks().get(l2l.getLinkId());
+	public static void createOriginalLanesAndSetLaneCapacities(Network network, Lanes lanes){
+		LanesFactory factory = lanes.getFactory();
+		for (LanesToLinkAssignment l2l : lanes.getLanesToLinkAssignments().values()){
+			Link link = network.getLinks().get(l2l.getLinkId());
 
 			Lane olLane = factory.createLane(Id.create(l2l.getLinkId().toString() + ".ol", Lane.class));
 			l2l.addLane(olLane);
@@ -99,7 +97,7 @@ public final class LanesUtils {
 				olLane.addToLaneId(lane.getId());
 
 				//set capacity of the lane depending on link capacity and number of representative lanes
-				LanesUtils.calculateAndSetCapacity(lane, true, link, scenario.getNetwork());
+				LanesUtils.calculateAndSetCapacity(lane, true, link, network);
 			}
 			olLane.setNumberOfRepresentedLanes(link.getNumberOfLanes());
 			olLane.setStartsAtMeterFromLinkEnd(link.getLength());
