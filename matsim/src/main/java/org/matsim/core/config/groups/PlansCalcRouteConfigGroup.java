@@ -311,6 +311,17 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		testForLocked() ;
 		addParameterSet( pars );
 	}
+	
+	public void removeModeRoutingParams( String key ) {
+		testForLocked() ;
+		for ( ConfigGroup pars : getParameterSets( ModeRoutingParams.SET_TYPE ) ) {
+			final String mode = ((ModeRoutingParams) pars).getMode();
+			if ( key.equals(mode) ) {
+				this.removeParameterSet(pars) ;
+				break ;
+			}
+		}
+	}
 
 	public Map<String, ModeRoutingParams> getModeRoutingParams() {
 		final Map<String, ModeRoutingParams> map = new LinkedHashMap< >();
