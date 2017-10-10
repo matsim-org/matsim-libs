@@ -67,7 +67,6 @@ public class Raptor extends AbstractTransitRouter implements TransitRouter {
 		this(transitRouterConfig, transitSchedule, new RaptorDisutility(transitRouterConfig, 0., 0.));
 	}
 
-	// "default" PT router uses TransitRouterNetworkNode (an implementation of Node) whereas "raptor" uses TransitStopFacility. Amit' Sep 17
 	private Map<TransitStopFacility, InitialNode> locateWrappedNearestTransitStops(Person person, Coord coord, double departureTime) {
 		Collection<TransitStopFacility> nearestTransitStops = this.transitRouterQuadTree.getNearestTransitStopFacilities(coord, this.config.getSearchRadius());
 		if (nearestTransitStops.size() < 2) {

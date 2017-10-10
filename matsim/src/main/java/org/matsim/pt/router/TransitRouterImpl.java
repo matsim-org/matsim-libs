@@ -20,13 +20,17 @@
 
 package org.matsim.pt.router;
 
+import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -43,11 +47,33 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
 
 	public TransitRouterImpl(
 			final TransitRouterConfig config,
+			// even though it is not used now. This constructor is used at many places, so keeping it here.
+			//However, replacing it with transitSchedule will help to get rid of TransitRouterNetwork from AbstractTransitRouter. Amit Oct'17
 			final PreparedTransitSchedule preparedTransitSchedule,
 			final TransitRouterNetwork routerNetwork,
 			final TravelTime travelTime,
 			final TransitTravelDisutility travelDisutility) {
-		super( config, preparedTransitSchedule, routerNetwork, travelTime, travelDisutility) ;
+		super( config, routerNetwork, travelTime, travelDisutility) ;
+	}
+
+	private final Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime) {
+		Collection<TransitRouterNetwork.TransitRouterNetworkNode> nearestNodes = this.getTransitRouterNetwork().getNearestNodes(coord, this.getConfig().getSearchRadius());
+		if (nearestNodes.size() < 2) {
+			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
+			TransitRouterNetwork.TransitRouterNetworkNode nearestNode = this.getTransitRouterNetwork().getNearestNode(coord);
+			if ( nearestNode != null ) { // transit schedule might be completely empty!
+				double distance = CoordUtils.calcEuclideanDistance(coord, nearestNode.stop.getStopFacility().getCoord());
+				nearestNodes = this.getTransitRouterNetwork().getNearestNodes(coord, distance + this.getConfig().getExtensionRadius());
+			}
+		}
+		Map<Node, InitialNode> wrappedNearestNodes = new LinkedHashMap<>();
+		for (TransitRouterNetwork.TransitRouterNetworkNode node : nearestNodes) {
+			Coord toCoord = node.stop.getStopFacility().getCoord();
+			double initialTime = getWalkTime(person, coord, toCoord);
+			double initialCost = getWalkDisutility(person, coord, toCoord);
+			wrappedNearestNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
+		}
+		return wrappedNearestNodes;
 	}
 
 	@Override

@@ -1,22 +1,15 @@
 package org.matsim.pt.router;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
-import org.matsim.core.router.InitialNode;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -31,16 +24,23 @@ public class AbstractTransitRouter {
 
 
 	//used mainly as MATSim default PT router
-	protected AbstractTransitRouter(TransitRouterConfig trConfig, TransitSchedule schedule) {
+	protected AbstractTransitRouter(
+			TransitRouterConfig trConfig,
+			TransitSchedule schedule) {
+
 		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(trConfig, new PreparedTransitSchedule(schedule));
-		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
+
 		this.trConfig = trConfig;
 		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
+
 		this.transitNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.getBeelineWalkConnectionDistance());
+		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
 	}
 
-	protected AbstractTransitRouter(TransitRouterConfig config, PreparedTransitSchedule preparedTransitSchedule,
-			TransitRouterNetwork routerNetwork, TravelTime travelTime,
+	protected AbstractTransitRouter(
+			TransitRouterConfig config,
+			TransitRouterNetwork routerNetwork,
+			TravelTime travelTime,
 			TransitTravelDisutility travelDisutility) {
 		this.trConfig = config;
 		this.transitNetwork = routerNetwork;
@@ -173,27 +173,6 @@ public class AbstractTransitRouter {
 
 	protected final double getWalkDisutility(Person person, Coord coord, Coord toCoord) {
 		return getTravelDisutility().getWalkTravelDisutility(person, coord, toCoord);
-	}
-
-	// "default" PT router uses TransitRouterNetworkNode (an implementation of Node) whereas "raptor" uses TransitStopFacility. Amit' Sep 17
-	protected final Map<Node, InitialNode> locateWrappedNearestTransitNodes(Person person, Coord coord, double departureTime) {
-		Collection<TransitRouterNetworkNode> nearestNodes = this.getTransitRouterNetwork().getNearestNodes(coord, this.getConfig().getSearchRadius());
-		if (nearestNodes.size() < 2) {
-			// also enlarge search area if only one stop found, maybe a second one is near the border of the search area
-			TransitRouterNetworkNode nearestNode = this.getTransitRouterNetwork().getNearestNode(coord);
-			if ( nearestNode != null ) { // transit schedule might be completely empty!
-				double distance = CoordUtils.calcEuclideanDistance(coord, nearestNode.stop.getStopFacility().getCoord());
-				nearestNodes = this.getTransitRouterNetwork().getNearestNodes(coord, distance + this.getConfig().getExtensionRadius());
-			}
-		}
-		Map<Node, InitialNode> wrappedNearestNodes = new LinkedHashMap<>();
-		for (TransitRouterNetworkNode node : nearestNodes) {
-			Coord toCoord = node.stop.getStopFacility().getCoord();
-			double initialTime = getWalkTime(person, coord, toCoord);
-			double initialCost = getWalkDisutility(person, coord, toCoord);
-			wrappedNearestNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
-		}
-		return wrappedNearestNodes;
 	}
 
 	protected final TransitTravelDisutility getTravelDisutility() {
