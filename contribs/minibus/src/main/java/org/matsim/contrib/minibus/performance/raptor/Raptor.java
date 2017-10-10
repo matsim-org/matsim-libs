@@ -111,7 +111,7 @@ public class Raptor extends AbstractTransitRouter implements TransitRouter {
 		if (directWalkCost * getConfig().getDirectWalkFactor() < pathCost) {
 			return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
 		}
-		return convertPathToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
+		return convertPassengerRouteToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
 	}
 
 }

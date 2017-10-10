@@ -107,7 +107,7 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
 		if (directWalkCost * getConfig().getDirectWalkFactor() < pathCost ) {
 			return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
 		}
-		return convertPathToLegList(departureTime, transitPassengerRoute, fromFacility.getCoord(), toFacility.getCoord(), person);
+		return convertPassengerRouteToLegList(departureTime, transitPassengerRoute, fromFacility.getCoord(), toFacility.getCoord(), person);
 	}
 
 }

@@ -91,7 +91,7 @@ public class AbstractTransitRouter {
 		return leg;
 	}
 
-	protected List<Leg> convertPathToLegList(double departureTime, TransitPassengerRoute p, Coord fromCoord, Coord toCoord, Person person) {
+	protected List<Leg> convertPassengerRouteToLegList(double departureTime, TransitPassengerRoute p, Coord fromCoord, Coord toCoord, Person person) {
 		// convert the route into a sequence of legs
 		List<Leg> legs = new ArrayList<>();
 
