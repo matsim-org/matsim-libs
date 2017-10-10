@@ -115,8 +115,4 @@ public class Raptor extends AbstractTransitRouter implements TransitRouter {
 		return convertPathToLegList(departureTime, p, fromFacility.getCoord(), toFacility.getCoord(), person);
 	}
 
-	protected TransitRouterQuadTree getTransitNetwork() {
-		return this.transitRouterQuadTree;
-	}
-
 }

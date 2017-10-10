@@ -187,7 +187,7 @@ public class TransitLeastCostPathTree {
 	}
 
 	/**
-	 * Method to request the path from the (cached) fromNodes to the passed toNodes.
+	 * Method to request the passenger route from the (cached) fromNodes to the passed toNodes.
 	 * Should only be requested after calling createTransitLeastCostPathTree().
 	 *
 	 * @param toNodes
@@ -197,7 +197,6 @@ public class TransitLeastCostPathTree {
 	 *          the transitPassengerRoute between the fromNode and the toNode.
 	 *          Will be null if the route could not be found.
 	 */
-	@SuppressWarnings("unchecked")
 	public TransitPassengerRoute getTransitPassengerRoute(final Map<Node, InitialNode> toNodes) {
 		//find the best node
 		double minCost = Double.POSITIVE_INFINITY;
@@ -222,7 +221,7 @@ public class TransitLeastCostPathTree {
 			return null;
 		}
 
-		// now construct route segements, which are required for TransitPassengerRoute
+		// now construct route segments, which are required for TransitPassengerRoute
 		List<RouteSegment> routeSegments = new ArrayList<>();
 
 		TransitRouterNetworkLink link = (TransitRouterNetworkLink) getData(minCostNode).getPrevLink();

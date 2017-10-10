@@ -42,7 +42,7 @@ public class InitialNode {
 		this.initialTime = initialTime;
 	}
 
-	// setting node as null because, many duplicates of InitialNode does not need node. Thus, duplicate classes can be removed. Amit Sep'17
+	// allowing node as null; many duplicates of InitialNode does not require node thus removing such duplicate classes by setting node as null. Amit Sep'17
 	public InitialNode(final double initialCost, final double initialTime) {
 		this(null, initialCost, initialTime);
 	}

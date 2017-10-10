@@ -1,6 +1,10 @@
 package org.matsim.pt.router;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -19,20 +23,26 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 public class AbstractTransitRouter {
 
-	private final TransitRouterNetwork transitNetwork;
+	private final TransitRouterNetwork transitNetwork; // specific to default pt router
+	private final TravelTime travelTime ; // specific to default pt router
+	private final PreparedTransitSchedule preparedTransitSchedule; // specific to default pt router
+
 	private final TransitRouterConfig trConfig;
 	private final TransitTravelDisutility travelDisutility;
-	private final TravelTime travelTime;
-	private final PreparedTransitSchedule preparedTransitSchedule;
+
 
 	//used mainly as MATSim default PT router
 	protected AbstractTransitRouter(TransitRouterConfig trConfig, TransitSchedule schedule) {
 		this.preparedTransitSchedule = new PreparedTransitSchedule(schedule);
-		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(trConfig, getPreparedTransitSchedule());
+		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(trConfig, this.preparedTransitSchedule);
 		this.travelTime = transitRouterNetworkTravelTimeAndDisutility;
 		this.trConfig = trConfig;
 		this.travelDisutility = transitRouterNetworkTravelTimeAndDisutility;
@@ -50,8 +60,9 @@ public class AbstractTransitRouter {
 	}
 
 	// for other routers which does not use TransitRouterNetwork e.g. raptor. Amit Oct'17
-	protected AbstractTransitRouter(TransitRouterConfig config,
-									TransitTravelDisutility travelDisutility) {
+	protected AbstractTransitRouter(
+			TransitRouterConfig config,
+			TransitTravelDisutility travelDisutility) {
 		this.trConfig = config;
 		this.travelDisutility = travelDisutility;
 		// not necessary for raptor
@@ -191,7 +202,7 @@ public class AbstractTransitRouter {
 						leg = PopulationUtils.createLeg(TransportMode.pt);
 						ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, line, route, egressStop);
 						double arrivalOffset = (link.getFromNode().stop.getArrivalOffset() != Time.UNDEFINED_TIME) ? link.fromNode.stop.getArrivalOffset() : link.fromNode.stop.getDepartureOffset();
-						double arrivalTime = this.getPreparedTransitSchedule().getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+						double arrivalTime = this.preparedTransitSchedule.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 						ptRoute.setTravelTime(arrivalTime - time);
 	
 	//					ptRoute.setDistance( currentDistance );
@@ -280,7 +291,7 @@ public class AbstractTransitRouter {
 				double arrivalOffset = ((prevLink).toNode.stop.getArrivalOffset() != Time.UNDEFINED_TIME) ?
 						(prevLink).toNode.stop.getArrivalOffset()
 						: (prevLink).toNode.stop.getDepartureOffset();
-						double arrivalTime = this.getPreparedTransitSchedule().getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
+						double arrivalTime = this.preparedTransitSchedule.getNextDepartureTime(route, transitRouteStart, time) + (arrivalOffset - transitRouteStart.getDepartureOffset());
 						leg.setTravelTime(arrivalTime - time);
 						ptRoute.setTravelTime( arrivalTime - time );
 						legs.add(leg);
@@ -347,12 +358,9 @@ public class AbstractTransitRouter {
 		return travelDisutility;
 	}
 
+	// specific to default pt router. Amit Oct'17
 	protected final TravelTime getTravelTime() {
 		return travelTime;
-	}
-
-	protected final PreparedTransitSchedule getPreparedTransitSchedule() {
-		return preparedTransitSchedule;
 	}
 
 }
