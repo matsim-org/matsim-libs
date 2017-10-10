@@ -19,11 +19,7 @@
 
 package org.matsim.integration.daily.accessibility;
 
-import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -32,78 +28,12 @@ import org.matsim.contrib.accessibility.FacilityTypes;
 import org.matsim.contrib.accessibility.osm.CombinedOsmReader;
 import org.matsim.contrib.accessibility.utils.AccessibilityFacilityUtils;
 import org.matsim.facilities.ActivityFacilities;
-import org.matsim.facilities.Facility;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * @author dziemke
  */
-public class RunCombinedOsmReaderKibera {
-	final private static Logger LOG = Logger.getLogger(RunCombinedOsmReaderKibera.class);
-
-	/**
-	 * Implementing the {@link CombinedOsmReader} class. 
-	 * @param args The main method requires three arguments:
-	 * <ol>
-	 * 	<li> the OpenStreetMap file, *.osm;
-	 * 	<li> the output MATSim {@link Facility} file;
-	 * 	<li> the output {@link ObjectAttributes} file containing the facility 
-	 * 		 attributes.
-	 * </ol>
-	 * 
-	 * An optional argument can be provided if you want the WGS84 coordinates
-	 * converted into another (projected) coordinate reference system (CRS). 
-	 * It is recommended that you <i>do</i> provide a projected CRS as MATSim
-	 * works in metres.
-	 */
-	public static void main(String[] args) {
-//		String osmFile = "../../../shared-svn/projects/maxess/data/nairobi/osm/2017-04-25_nairobi_central_and_kibera";
-//		String outputBase = "../../../shared-svn/projects/maxess/data/nairobi/facilities/2017-04-25_nairobi_central_and_kibera/";
-//		String facilityFile = outputBase + "2017-04-25_facilities.xml";
-//		String attributeFile = outputBase + "2017-04-25_facilitiy_attributes.xml";
-//		
-////		String outputCRS = "EPSG:31468"; // = DHDN GK4, for Berlin
-//		String outputCRS = "EPSG:21037"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		
-		String osmFile = "/Users/dominik/Downloads/patna/2017-09-26_patna";
-		String outputBase = "/Users/dominik/Downloads/patna/";
-		String facilityFile = outputBase + "2017-09-26_facilities.xml";
-		String attributeFile = outputBase + "2017-09-26_facilitiy_attributes.xml";
-		
-//		String outputCRS = "EPSG:31468"; // = DHDN GK4, for Berlin
-		String outputCRS = "EPSG:24345"; // = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
-		
-		// building types are either taken from the building itself and, if building does not have a type, taken from
-		// the type of land use of the area which the build belongs to.
-		double buildingTypeFromVicinityRange = 0.;
-		
-		createFacilitesAndWriteToFile(osmFile, facilityFile, attributeFile, outputCRS, buildingTypeFromVicinityRange);
-	}
-	
-		
-	public static void createFacilitesAndWriteToFile(String osmFile, String facilityFile, String attributeFile,
-			String outputCRS, double buildingTypeFromVicinityRange) {
-		LOG.info("Parsing facility information from OpenStreetMap input file.");
-
-		CombinedOsmReader combinedOsmReader = new CombinedOsmReader(
-				outputCRS,
-				AccessibilityFacilityUtils.buildOsmLandUseToMatsimTypeMap(),
-				AccessibilityFacilityUtils.buildOsmBuildingToMatsimTypeMap(),
-				buildOsmAmenityToMatsimTypeMap(), // local
-				AccessibilityFacilityUtils.buildOsmLeisureToMatsimTypeMap(),
-				AccessibilityFacilityUtils.buildOsmTourismToMatsimTypeMap(),
-				AccessibilityFacilityUtils.buildUnmannedEntitiesList(),
-				buildingTypeFromVicinityRange);
-		try {
-			combinedOsmReader.parseFile(osmFile);
-			combinedOsmReader.writeFacilities(facilityFile);
-			combinedOsmReader.writeFacilityAttributes(attributeFile);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		LOG.info("Output will be wirtten to " + facilityFile);
-	}
-	
+public class CombinedOsmFacilityReaderKenya {
+	final private static Logger LOG = Logger.getLogger(CombinedOsmFacilityReaderKenya.class);	
 	
 	public static ActivityFacilities createFacilites(InputStream osmInputStream, String outputCRS, double buildingTypeFromVicinityRange) {
 		LOG.info("Parsing facility information from OpenStreetMap input stream.");
@@ -122,7 +52,6 @@ public class RunCombinedOsmReaderKibera {
 
 			return facilities;
 	}
-
 	
 	private static Map<String, String> buildOsmAmenityToMatsimTypeMap(){
 		Map<String, String> map = new TreeMap<String, String>();
@@ -135,9 +64,7 @@ public class RunCombinedOsmReaderKibera {
 
 		map.put("cafe", FacilityTypes.LEISURE); // used to be "l"
 		
-		// -------------------------------------------------
 		map.put("drinking_water", FacilityTypes.DRINKING_WATER); // activated for Kibera
-		// -------------------------------------------------
 
 		map.put("fast_food", FacilityTypes.LEISURE); // used to be "l"
 		map.put("food_court", FacilityTypes.LEISURE); // used to be "l"
@@ -190,18 +117,12 @@ public class RunCombinedOsmReaderKibera {
 		// "healthcare" section in osm wiki
 		map.put("baby_hatch", FacilityTypes.IGNORE);
 
-		// -------------------------------------------------
 		map.put("clinic", FacilityTypes.CLINIC); // used to be "m" // activated for Kibera
-		// -------------------------------------------------
 		map.put("dentist", FacilityTypes.MEDICAL); // used to be "m"
 		map.put("doctors", FacilityTypes.MEDICAL); // used to be "m"
-		// -------------------------------------------------
 		map.put("hospital", FacilityTypes.HOSPITAL); // used to be "m" // activated for Kibera
-		// -------------------------------------------------
 		map.put("nursing_home", FacilityTypes.MEDICAL); // used to be "m"
-		// -------------------------------------------------
 		map.put("pharmacy", FacilityTypes.PHARMACY); // used to be "m" // activated for Kibera
-		// -------------------------------------------------
 
 		map.put("social_facility", FacilityTypes.IGNORE);
 		map.put("veterinary", FacilityTypes.IGNORE);
@@ -278,9 +199,7 @@ public class RunCombinedOsmReaderKibera {
 		map.put("shelter", FacilityTypes.IGNORE);
 		map.put("shower", FacilityTypes.IGNORE);
 		map.put("telephone", FacilityTypes.IGNORE);
-		// -------------------------------------------------
 		map.put("toilets", FacilityTypes.TOILETS);
-		// -------------------------------------------------
 
 		map.put("townhall", FacilityTypes.OTHER); // used to be "t"
 
