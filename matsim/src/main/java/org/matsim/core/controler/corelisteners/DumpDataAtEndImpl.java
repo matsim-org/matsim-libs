@@ -61,6 +61,7 @@ import org.matsim.vehicles.Vehicles;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.Map;
 
@@ -139,10 +140,10 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			File toFile = new File(	controlerIO.getOutputFilename("output_events.xml.gz"));
 			File fromFile = new File(controlerIO.getIterationFilename(controlerConfigGroup.getLastIteration(), "events.xml.gz"));
 			try {
-                Files.copy(fromFile.toPath(), toFile.toPath());
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
-            }
+				Files.copy(fromFile.toPath(), toFile.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
 		} catch ( Exception ee ) {
 			Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
 					+ "generated in the final iteration") ;
