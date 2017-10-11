@@ -30,7 +30,6 @@ import com.google.inject.name.Names;
 
 import playground.clruch.dispatcher.DriveByDispatcher;
 import playground.clruch.dispatcher.EdgyDispatcher;
-import playground.clruch.dispatcher.GBMDEuclideanRealistic;
 import playground.clruch.dispatcher.GlobalBipartiteMatchingDispatcher;
 import playground.clruch.dispatcher.LPFBDispatcher;
 import playground.clruch.dispatcher.LPFFDispatcher;
@@ -129,8 +128,6 @@ public class AVModule extends AbstractModule {
         bind(TestBedDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), TestBedDispatcher.class.getSimpleName()).to(TestBedDispatcher.Factory.class);
 
-        bind(GBMDEuclideanRealistic.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), GBMDEuclideanRealistic.class.getSimpleName()).to(GBMDEuclideanRealistic.Factory.class);
 
         // bind(PolyMultiGBMDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), PolyMultiGBMDispatcher.class.getSimpleName()).to(PolyMultiGBMDispatcher.Factory.class);
