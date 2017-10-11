@@ -33,7 +33,8 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import com.google.inject.Inject;
 
 /**
- * this class adds the turn acceptance logic for signals
+ * this class adds the turn acceptance logic for signals. 
+ * it checks whether the signal for the specific turn shows green.
  * 
  * @author tthunig
  */
@@ -41,8 +42,8 @@ public class QSignalsNetworkFactory extends QNetworkFactory{
 
 	private final QNetworkFactory delegate;
 	
-	private Scenario scenario;
-	private EventsManager events;
+	private final Scenario scenario;
+	private final EventsManager events;
 	private NetsimEngineContext context;
 	private NetsimInternalInterface netsimEngine ;
 	
