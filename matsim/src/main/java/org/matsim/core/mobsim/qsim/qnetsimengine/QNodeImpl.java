@@ -255,14 +255,7 @@ final class QNodeImpl implements QNodeI {
 		Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = veh.getCurrentLink();
 		
-		if (nextLinkId == null) {
-			log.error( "Agent has no or wrong route! agentId=" + veh.getDriver().getId()
-					+ " currentLink=" + currentLink.getId().toString()
-					+ ". The agent is removed from the simulation.");
-			return true;
-		}
-		QLinkI nextQueueLink = this.netsimEngine.getNetsimNetwork().getNetsimLinks().get(nextLinkId);
-		AcceptTurn turn = turnAcceptanceLogic.isAcceptingTurn(currentLink, fromLaneBuffer, nextLinkId, nextQueueLink, veh);
+		AcceptTurn turn = turnAcceptanceLogic.isAcceptingTurn(currentLink, fromLaneBuffer, nextLinkId, veh, this.netsimEngine.getNetsimNetwork());
 		if ( turn.equals(AcceptTurn.ABORT) ) {
 			moveVehicleFromInlinkToAbort( veh, fromLaneBuffer, now, currentLink.getId() ) ;
 			return true ;
@@ -270,6 +263,7 @@ final class QNodeImpl implements QNodeI {
 			return false;
 		}
 		
+		QLinkI nextQueueLink = this.netsimEngine.getNetsimNetwork().getNetsimLinks().get(nextLinkId);
 		QLaneI nextQueueLane = nextQueueLink.getAcceptingQLane() ;
 		if (nextQueueLane.isAcceptingFromUpstream()) {
 			moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLaneBuffer, nextLinkId, nextQueueLane);

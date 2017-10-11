@@ -14,6 +14,6 @@ interface TurnAcceptanceLogic {
 	
 	enum AcceptTurn { GO, WAIT, ABORT }
 
-	AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QLinkI nextQLink, QVehicle veh);
+	AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork);
 
 }

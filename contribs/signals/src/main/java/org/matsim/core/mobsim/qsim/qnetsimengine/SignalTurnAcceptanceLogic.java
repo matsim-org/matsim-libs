@@ -21,30 +21,24 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultTurnAcceptanceLogic;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLaneI;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkI;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.TurnAcceptanceLogic;
 
 /**
  * @author tthunig
  */
 final class SignalTurnAcceptanceLogic implements TurnAcceptanceLogic {
 
-	TurnAcceptanceLogic delegate = new DefaultTurnAcceptanceLogic();
+	private final TurnAcceptanceLogic delegate = new DefaultTurnAcceptanceLogic();
 	
 	@Override
-	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QLinkI nextQLink, QVehicle veh) {
-		AcceptTurn defaultTurn = delegate.isAcceptingTurn(currentLink, currentLane, nextLinkId, nextQLink, veh);
+	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork) {
+		AcceptTurn defaultTurn = delegate.isAcceptingTurn(currentLink, currentLane, nextLinkId, veh, qNetwork);
 		if ( defaultTurn.equals(AcceptTurn.ABORT) ) {
 			return defaultTurn;
 		}
 		// else: check whether signals show green
-		if ( ! currentLane.hasGreenForToLink(nextLinkId) ) {
-			//there is no longer a stuck check for red links. This means that
-			//in case of an infinite red time the simulation will not stop automatically because
-			//vehicles waiting in front of the red signal will never reach their destination. dg, mar'14
+		if (!currentLane.hasGreenForToLink(nextLinkId)) {
+			/* because turn acceptance is checked before stuck time, an infinite red time
+			 * does not lead to stuck event of waiting vehicles. dg, mar'14 */
 			return AcceptTurn.WAIT;
 		}
 		return AcceptTurn.GO;
