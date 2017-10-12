@@ -21,6 +21,7 @@ import com.google.inject.name.Named;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.idsc.tensor.Tensor;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
@@ -65,7 +66,9 @@ public class SelfishDispatcher extends PartitionedDispatcher {
         GlobalAssert.that(travelData != null);
         this.travelData = travelData;
         this.fareRatioMultiply = safeConfig.getDouble("fareRatioMultiply", 1.0);
+        System.out.println("==========================================");
         System.out.println("fare ratio multiply = " + fareRatioMultiply);
+        System.out.println("==========================================");
     }
 
     @Override
@@ -98,20 +101,30 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
         Map<VirtualNode<Link>, Double> scores = new HashMap<>();
 
+        Tensor lambda = travelData.getLambdaforTime(time);
+
+        // double lambda0 = lambda.Get(0).number().doubleValue();
+        // double lambda1 = lambda.Get(1).number().doubleValue();
+
         for (VirtualNode<Link> virtualNode : virtualNetwork.getVirtualNodes()) {
+
             double averageFare = calcAverageFare(virtualNode, //
                     getVirtualNodeRequests().get(virtualNode), time);
             GlobalAssert.that(averageFare >= 0.0);
-            int openRequests = getVirtualNodeRequests().get(virtualNode).size();
-            GlobalAssert.that(openRequests >= 0);
+            // int openRequests = getVirtualNodeRequests().get(virtualNode).size();
+
+            double arrivalFreq = lambda.Get(virtualNode.getIndex()).number().doubleValue();
+
+            // GlobalAssert.that(openRequests >= 0);
+            GlobalAssert.that(arrivalFreq >= 0);
             double waitingTaxis = getVirtualNodeStayVehicles().get(virtualNode).size();
             GlobalAssert.that(waitingTaxis >= 0);
             //
             double score;
             if (waitingTaxis > 0) {
-                score = (averageFare * openRequests) / ((double) waitingTaxis);
+                score = (averageFare * arrivalFreq) / ((double) waitingTaxis);
             } else {
-                score = (averageFare * openRequests);
+                score = (averageFare * arrivalFreq);
             }
 
             scores.put(virtualNode, score);
