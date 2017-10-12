@@ -1,8 +1,0 @@
-/**
- * 
- */
-/**
- * @author beckerh
- *
- */
-package sharedmobility;
