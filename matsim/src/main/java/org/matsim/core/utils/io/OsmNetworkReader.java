@@ -715,7 +715,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		return !isOnewayReverse(way);
 	}
 
-	private static interface OsmFilter {
+	public static interface OsmFilter {
 		boolean coordInFilter( final Coord coord, final int hierarchyLevel ) ;
 	}
 	private static class OsmFilterImpl implements OsmFilter {
