@@ -7,6 +7,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualLink;
@@ -27,16 +28,17 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
     final Map<AVRequest, Integer> requestVectorIndexMap = new HashMap<>();
 
     BaseMpcDispatcher( //
-            AVDispatcherConfig config, //
+            Config config, //
+            AVDispatcherConfig avconfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager, //
             VirtualNetwork<Link> virtualNetwork) {
-        super(config, travelTime, parallelLeastCostPathCalculator, eventsManager, virtualNetwork);
+        super(config, avconfig, travelTime, parallelLeastCostPathCalculator, eventsManager, virtualNetwork);
         this.instantPathFactory = new InstantPathFactory(parallelLeastCostPathCalculator, travelTime);
 
         // period between calls to MPC
-        samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod"));
+        samplingPeriod = Integer.parseInt(avconfig.getParams().get("samplingPeriod"));
     }
 
     Map<VirtualNode<Link>, List<RoboTaxi>> getDivertableNotRebalancingNotPickupVehicles() {
@@ -97,7 +99,5 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
                 }
             }
     }
-
-
 
 }

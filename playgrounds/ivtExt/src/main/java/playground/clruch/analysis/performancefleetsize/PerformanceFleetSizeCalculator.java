@@ -32,7 +32,7 @@ import ch.ethz.idsc.tensor.sca.N;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.ScenarioOptions;
 import playground.clruch.analysis.AnalyzeAll;
-
+import playground.clruch.analysis.SaveUtils;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
@@ -137,8 +137,8 @@ public class PerformanceFleetSizeCalculator implements Serializable {
 
     public void saveAndPlot(String dataFolderName, File relativeDirectory) {
         try {
-            AnalyzeAll.saveFile(meanByVehiclesOffPeak, "availabilitiesOffPeak", dataFolderName);
-            AnalyzeAll.saveFile(meanByVehiclesPeak, "availabilitiesPeak", dataFolderName);
+            SaveUtils.saveFile(meanByVehiclesOffPeak, "availabilitiesOffPeak", dataFolderName);
+            SaveUtils.saveFile(meanByVehiclesPeak, "availabilitiesPeak", dataFolderName);
             PerformanceFleetSizeUtils.plot(meanByVehiclesOffPeak, meanByVehiclesPeak, relativeDirectory);
         } catch (Exception e) {
             System.out.println("Error saving the availabilities");

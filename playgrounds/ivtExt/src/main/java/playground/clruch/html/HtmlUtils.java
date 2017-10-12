@@ -8,26 +8,32 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Files;
 
-/** Created by Joel on 26.06.2017. */
-public abstract class HtmlUtils {
-    public static StringBuilder stringBuilder = new StringBuilder();
-    public static boolean html = false;
-    public static boolean head = false;
-    public static boolean header = false;
-    public static boolean body = false;
-    public static boolean paragraph = false;
-    public static boolean footer = false;
-    public static boolean style = false;
+/** Created by Joel on 26.06.2017.
+ * reworked by clruch */
+
+public class HtmlUtils {
+    public StringBuilder stringBuilder = new StringBuilder();
+    public boolean html = false;
+    public boolean head = false;
+    public boolean header = false;
+    public boolean body = false;
+    public boolean paragraph = false;
+    public boolean footer = false;
+    public boolean style = false;
+    
+    /*package*/ HtmlUtils(){
+        
+    }
 
     /** called at the begin and end of document */
-    public static void html() {
+    public void html() {
         if (html) {
             stringBuilder.append("</html>");
             html = false;
         } else {
             stringBuilder.append("<html>");
             html = true;
-            HtmlUtils.insertCSS("header, footer {font-family: arial;", //
+            this.insertCSS("header, footer {font-family: arial;", //
                     "background-color: #000099;", //
                     "color: white;", //
                     "padding: 20px;", //
@@ -42,7 +48,7 @@ public abstract class HtmlUtils {
     }
 
     /** called at the begin and end of head */
-    public static void head() {
+    public void head() {
         if (head) {
             stringBuilder.append("</head>");
             head = false;
@@ -53,7 +59,7 @@ public abstract class HtmlUtils {
     }
 
     /** called at the begin and end of header */
-    public static void header() {
+    public void header() {
         if (header) {
             stringBuilder.append("</header>");
             header = false;
@@ -64,7 +70,7 @@ public abstract class HtmlUtils {
     }
 
     /** called at the begin and end of document */
-    public static void body() {
+    public void body() {
         if (body) {
             stringBuilder.append("</body>");
             body = false;
@@ -75,7 +81,7 @@ public abstract class HtmlUtils {
     }
 
     /** called at the begin and end of paragraph */
-    public static void paragraph() {
+    public void paragraph() {
         if (paragraph) {
             stringBuilder.append("</p>");
             paragraph = false;
@@ -85,12 +91,12 @@ public abstract class HtmlUtils {
         }
     }
 
-    public static void newLine() {
+    public void newLine() {
         stringBuilder.append("<br style=\"clear:both\">");
     }
 
     /** called at the begin and end of footer */
-    public static void footer() {
+    public void footer() {
         if (footer) {
             stringBuilder.append("</footer>");
             header = false;
@@ -101,7 +107,7 @@ public abstract class HtmlUtils {
     }
 
     /** called at the begin and end of CSS */
-    public static void style() {
+    public void style() {
         if (style) {
             stringBuilder.append("</style>");
             style = false;
@@ -114,7 +120,7 @@ public abstract class HtmlUtils {
     /** tab title
      *
      * @param title */
-    public static void setTitle(String title) {
+    public void setTitle(String title) {
         head();
         stringBuilder.append("<title>" + title + "</title>");
         head();
@@ -123,49 +129,49 @@ public abstract class HtmlUtils {
     /** page title
      *
      * @param title */
-    public static void insertTitle(String title) {
+    public void insertTitle(String title) {
         header();
         stringBuilder.append("<h1>" + title + "</h1>");
         header();
     }
 
-    public static void insertSubTitle(String title) {
+    public void insertSubTitle(String title) {
         stringBuilder.append("<h2>" + title + "</h2>");
     }
 
-    public static void title(String title) {
+    public void title(String title) {
         insertTitle(title);
         setTitle(title);
     }
 
-    public static void insertText(String... lines) {
+    public void insertText(String... lines) {
         paragraph();
         for (int i = 0; i < lines.length; i++)
             stringBuilder.append(lines[i] + "<br>");
         paragraph();
     }
 
-    public static void insertText(String text) {
+    public void insertText(String text) {
         stringBuilder.append("<pre>" + text + "</pre>");
     }
 
-    public static void insertTextLeft(String text) {
+    public void insertTextLeft(String text) {
         stringBuilder.append("<pre id=\"pre_left\">" + text + "</pre>");
     }
 
-    public static void insertTextRight(String text) {
+    public void insertTextRight(String text) {
         stringBuilder.append("<pre id=\"pre_right\">" + text + "</pre>");
     }
 
-    public static void insertLink(String url, String link) {
-        HtmlUtils.insertCSS("a {font-family: arial;}");
+    public void insertLink(String url, String link) {
+        this.insertCSS("a {font-family: arial;}");
         if (footer || header)
             stringBuilder.append("<a id=\"footer_link\" target=\"_blank\"" + " href=\"" + url + "\"> <b>" + link + "</b></a>");
         else
             stringBuilder.append("<a target=\"_blank\" href=\"" + url + "\"> <b>" + link + "</b></a>");
     }
 
-    public static void insertCSS(String... line) {
+    public void insertCSS(String... line) {
         head();
         style();
         for (int i = 0; i < line.length; i++)
@@ -174,28 +180,28 @@ public abstract class HtmlUtils {
         head();
     }
 
-    public static void insertImg(String relPath) {
+    public void insertImg(String relPath) {
         insertImg(relPath, 800, 600);
     }
 
-    public static void insertImg(String relPath, int width, int heigth) {
+    public void insertImg(String relPath, int width, int heigth) {
         stringBuilder.append("<img src=" + relPath + " alt=\"Image not found\" style=\"width:" + //
                 width + "px;height:" + heigth + "px;\">");
     }
 
-    public static void insertImgIfExists(String relPath, String reportLoc, int width, int heigth) {
+    public void insertImgIfExists(String relPath, String reportLoc, int width, int heigth) {
 
-        File imgFile = new File(reportLoc,relPath);
-        System.out.println("relative Path = "  + relPath);
+        File imgFile = new File(reportLoc, relPath);
+        System.out.println("relative Path = " + relPath);
         System.out.println("searching for file " + imgFile.getAbsolutePath());
         if (imgFile.exists()) {
             stringBuilder.append("<img src=" + relPath + " alt=\"Image not found\" style=\"width:" + //
                     width + "px;height:" + heigth + "px;\">");
-        }
-        else System.out.println("file "+ imgFile.getAbsolutePath() + " not found.");
+        } else
+            System.out.println("file " + imgFile.getAbsolutePath() + " not found.");
     }
 
-    public static void insertImgRight(String relPath, int width, int heigth) {
+    public void insertImgRight(String relPath, int width, int heigth) {
         stringBuilder.append("<img id=\"img_right\" float=\"right\" src=" + relPath + " " + //
                 "alt=\"Image not found\" style=\"width:" + width + "px;height:" + heigth + "px;\">");
     }
@@ -206,7 +212,7 @@ public abstract class HtmlUtils {
      * @param rows
      * @param borders
      * @param content */
-    public static void insertTable(int columns, int rows, boolean borders, String... content) {
+    public void insertTable(int columns, int rows, boolean borders, String... content) {
         if (content.length != columns * rows)
             stringBuilder.append("unable to create table");
         else {
@@ -228,18 +234,18 @@ public abstract class HtmlUtils {
         }
     }
 
-    public static void insertList(String... lines) {
+    public void insertList(String... lines) {
         stringBuilder.append("<ul style=\"list-style-type:disc\">");
         for (int i = 0; i < lines.length; i++)
             stringBuilder.append("<li>" + lines[i] + "</li>");
         stringBuilder.append("</ul>");
     }
 
-    public static String bold(String text) {
+    public String bold(String text) {
         return "<b>" + text + "</b>";
     }
 
-    public static void saveFile(String fileName, String outputdirectory) throws IOException {
+    public void saveFile(String fileName, String outputdirectory) throws IOException {
         File file = new File(outputdirectory + "/report", fileName + ".html");
         // if file does exists, then delete and create a new file
         Files.deleteIfExists(file.toPath());

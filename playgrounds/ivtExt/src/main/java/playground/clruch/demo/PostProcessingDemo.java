@@ -1,5 +1,6 @@
 package playground.clruch.demo;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -19,6 +20,7 @@ import ch.ethz.idsc.tensor.red.Quantile;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
+import playground.clruch.net.StorageUtils;
 import playground.clruch.net.VehicleContainer;
 
 /**
@@ -40,7 +42,10 @@ class PostProcessingDemo {
      */
     // TODO can this be removed?
     public static void main(String[] args) throws Exception {
-        StorageSupplier storageSupplier = StorageSupplier.getDefault();
+        
+        StorageUtils storageUtils = new StorageUtils(new File(args[0] + "output"));
+        
+        StorageSupplier storageSupplier = new StorageSupplier(storageUtils.getFirstAvailableIteration());
 
         int size = storageSupplier.size();
         System.out.println("found files: " + size);

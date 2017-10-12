@@ -124,14 +124,15 @@ public class TrbScenarioServer {
         // }
         // });
 
-        StorageUtils.OUTPUT = new File(config.controler().getOutputDirectory());
-        StorageUtils.DIRECTORY = new File(StorageUtils.OUTPUT, "simobj");
+        StorageUtils storageUtils = new StorageUtils(new File(outputdirectory));
+        // StorageUtils.OUTPUT = new File(config.controler().getOutputDirectory());
+        // StorageUtils.DIRECTORY = new File(StorageUtils.OUTPUT, "simobj");
 
         controler.run();
 
         SimulationServer.INSTANCE.stopAccepting(); // close port
 
-        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(new File(args[0]), outputdirectory);
+        AnalyzeSummary analyzeSummary = (new AnalyzeAll()).analyze(new File(args[0]), outputdirectory);
         VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
         int vehicleSteps = Math.max(10, maxNumberVehiclesPerformanceCalculator / 400);
@@ -154,7 +155,8 @@ public class TrbScenarioServer {
                 minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
 
         // generate report
-        ReportGenerator.from(new File(args[0]), outputdirectory);
+        ReportGenerator reportGenerator = new ReportGenerator();
+        reportGenerator.from(new File(args[0]), outputdirectory);
 
     }
 }

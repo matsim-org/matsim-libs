@@ -9,6 +9,7 @@ import java.util.stream.IntStream;
 
 import org.matsim.api.core.v01.network.Network;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Transpose;
@@ -22,18 +23,17 @@ import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
+import playground.clruch.net.StorageUtils;
 import playground.clruch.net.VehicleContainer;
 import playground.clruch.utils.NetworkLoader;
 
-/**
- * THIS FILE IS A CONCISE DEMO OF FUNCTIONALITY
+/** THIS FILE IS A CONCISE DEMO OF FUNCTIONALITY
  * 
  * DO NOT MODIFY THIS FILE (unless you are the primary author),
  * BUT DO NOT RELY ON THIS FILE NOT BEING CHANGED
  * 
  * IF YOU WANT TO MAKE A SIMILAR CLASS OR REPLY ON THIS IMPLEMENTATION
- * THEN DUPLICATE THIS FILE AND MAKE THE CHANGES IN THE NEW FILE
- */
+ * THEN DUPLICATE THIS FILE AND MAKE THE CHANGES IN THE NEW FILE */
 class CongestionAnalysis {
     final StorageSupplier storageSupplier;
     final int size;
@@ -68,7 +68,7 @@ class CongestionAnalysis {
 
         Tensor matrix = Transpose.of(Tensors.of(vector1, vector2, vector3));
         System.out.println(Pretty.of(matrix));
-        
+
         Files.write(Paths.get("output/linkstats.obj"), ObjectFormat.of(matrix));
 
         Files.write(Paths.get("output/linkstats.csv"), (Iterable<String>) CsvFormat.of(matrix)::iterator);
@@ -80,7 +80,10 @@ class CongestionAnalysis {
         // load coordinate system
         MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SIOUXFALLS);
 
-        CongestionAnalysis ca = new CongestionAnalysis(StorageSupplier.getDefault());
+        GlobalAssert.that(false); // TODO next lines disfunctional, check before continuing
+        StorageUtils storageUtils = null;
+
+        CongestionAnalysis ca = new CongestionAnalysis(new StorageSupplier(storageUtils.getFirstAvailableIteration()));
         try {
             ca.analzye();
         } catch (Exception exception) {

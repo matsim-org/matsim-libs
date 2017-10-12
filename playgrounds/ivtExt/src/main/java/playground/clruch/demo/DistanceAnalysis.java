@@ -16,19 +16,18 @@ import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
+import playground.clruch.net.StorageUtils;
 import playground.clruch.net.VehicleContainer;
 import playground.clruch.net.VehicleStatistic;
 import playground.clruch.utils.NetworkLoader;
 
-/**
- * THIS FILE IS A CONCISE DEMO OF FUNCTIONALITY
+/** THIS FILE IS A CONCISE DEMO OF FUNCTIONALITY
  * 
  * DO NOT MODIFY THIS FILE (unless you are the primary author),
  * BUT DO NOT RELY ON THIS FILE NOT BEING CHANGED
  * 
  * IF YOU WANT TO MAKE A SIMILAR CLASS OR REPLY ON THIS IMPLEMENTATION
- * THEN DUPLICATE THIS FILE AND MAKE THE CHANGES IN THE NEW FILE
- */
+ * THEN DUPLICATE THIS FILE AND MAKE THE CHANGES IN THE NEW FILE */
 class DistanceAnalysis {
     StorageSupplier storageSupplier;
     int size;
@@ -78,7 +77,9 @@ class DistanceAnalysis {
         // load coordinate system
         MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SIOUXFALLS);
 
-        DistanceAnalysis da = new DistanceAnalysis(StorageSupplier.getDefault(), args[0]);
+        StorageUtils storageUtils = new StorageUtils(new File(args[0], "output"));
+
+        DistanceAnalysis da = new DistanceAnalysis(new StorageSupplier(storageUtils.getFirstAvailableIteration()), args[0]);
         try {
             da.analzye();
         } catch (Exception exception) {

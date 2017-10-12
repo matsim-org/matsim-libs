@@ -11,9 +11,9 @@ public class IterationFolder {
     public final File itDir;
     public final StorageSupplier storageSupplier;
 
-    public IterationFolder(File itDir) {
+    public IterationFolder(File itDir, StorageUtils storageUtils) {
         this.itDir = itDir;
-        storageSupplier = new StorageSupplier(StorageUtils.getFrom(itDir));
+        storageSupplier = new StorageSupplier(storageUtils.getFrom(itDir));
     }
 
     @Override

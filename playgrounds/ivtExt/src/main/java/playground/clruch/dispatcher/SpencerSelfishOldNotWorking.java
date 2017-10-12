@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
@@ -63,6 +64,7 @@ public class SpencerSelfishOldNotWorking extends RebalancingDispatcher {
     private final double[] networkBounds;
 
     private SpencerSelfishOldNotWorking( //
+            Config config,
             AVDispatcherConfig avDispatcherConfig, //
             AVGeneratorConfig generatorConfig, //
             TravelTime travelTime, //
@@ -70,7 +72,7 @@ public class SpencerSelfishOldNotWorking extends RebalancingDispatcher {
             EventsManager eventsManager, //
             Network networkIn, AbstractRequestSelector abstractRequestSelector) {
 
-        super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
+        super(config,avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
 
         // Load parameters from av.xml
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
@@ -446,10 +448,10 @@ public class SpencerSelfishOldNotWorking extends RebalancingDispatcher {
         private Network network;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             return new SpencerSelfishOldNotWorking( //
-                    config, generatorConfig, travelTime, router, eventsManager, network, abstractRequestSelector);
+                    config,avconfig, generatorConfig, travelTime, router, eventsManager, network, abstractRequestSelector);
         }
     }
 }

@@ -8,6 +8,7 @@ import java.util.Objects;
 
 import org.matsim.api.core.v01.network.Network;
 
+import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.gfx.MatsimMapComponent;
@@ -21,18 +22,22 @@ import playground.clruch.utils.PropertiesExt;
  * simulation results. */
 public class ScenarioViewer {
 
-    /** @param args a java Properties type file with the options for the viewer, an example file
-     *            can be created with DefaultOptions.saveViewerDefault();
+    /** Execute in simulation folder to view past results or connect to simulation s
+     * 
+     * @param args not used
      * @throws FileNotFoundException
      * @throws IOException */
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
         // load options
-        File workingDirectory = new File("").getCanonicalFile();
+        File workingDirectory = MultiFileTools.getWorkingDirectory();;
         PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
-
+        File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
+        System.out.println("showing simulation results stored in folder: " + outputDirectory.getName());
+        
         ReferenceFrame referenceFrame = simOptions.getReferenceFrame();
-        GlobalAssert.that(Objects.nonNull(referenceFrame));
+        /** reference frame needs to be set manually in IDSCOptions.properties file */
+        GlobalAssert.that(Objects.nonNull(referenceFrame)); 
         GlobalAssert.that(Objects.nonNull(simOptions.getLocationSpec()));
         Network network = NetworkLoader.loadNetwork(new File(workingDirectory, simOptions.getString("simuConfig")));
 
@@ -43,7 +48,8 @@ public class ScenarioViewer {
         /** this is optional and should not cause problems if file does not exist. temporary solution */
         matsimJMapViewer.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
-        MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer);
+
+        MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer, outputDirectory);
         matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
         matsimViewer.jFrame.setSize(900, 900);
         matsimViewer.jFrame.setVisible(true);

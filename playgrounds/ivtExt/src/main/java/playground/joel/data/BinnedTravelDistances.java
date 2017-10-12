@@ -36,6 +36,7 @@ import playground.joel.helpers.KeyMap;
 import playground.joel.helpers.BinnedHelper;
 
 /** Created by Joel on 28.02.2017. */
+@Deprecated // TODO can this be removed?
 class BinnedTravelDistances extends AbstractData {
 
     NavigableMap<String, NavigableMap<String, Double>> travelDistances = new TreeMap<>();
@@ -62,7 +63,10 @@ class BinnedTravelDistances extends AbstractData {
     void readLinkLengths() {
         // open the network file and parse the parameter values
         SAXBuilder builder = new SAXBuilder();
-        File file = new File(EventFileToDataXML.path, "network.xml");
+        GlobalAssert.that(false); // TODO next line was commented out, take care of this before continuing.
+        // File file = new File(EventFileToDataXML.path, "network.xml");
+        File file = null;
+
         try {
             Document document = (Document) builder.build(file);
             Element rootNode = document.getRootElement();

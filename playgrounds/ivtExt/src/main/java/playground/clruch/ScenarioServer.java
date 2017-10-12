@@ -16,6 +16,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.AnalyzeSummary;
@@ -52,7 +53,7 @@ public class ScenarioServer {
 
     /* package */ static void simulate() throws MalformedURLException, Exception {
         // load options
-        File workingDirectory = new File("").getCanonicalFile();
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
         PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
 
         /** set to true in order to make server wait for at least 1 client, for instance viewer client */
@@ -91,10 +92,6 @@ public class ScenarioServer {
         controler.addOverridingModule(new AVTravelTimeModule());
         controler.addOverridingModule(new WriteTravelTimesModule());
 
-        // directories for saving results
-        StorageUtils.OUTPUT = new File(config.controler().getOutputDirectory());
-        StorageUtils.DIRECTORY = new File(StorageUtils.OUTPUT, "simobj");
-
         // run simulation
         controler.run();
 
@@ -102,7 +99,8 @@ public class ScenarioServer {
         SimulationServer.INSTANCE.stopAccepting();
 
         // perform analysis of results
-        AnalyzeSummary analyzeSummary = AnalyzeAll.analyze(configFile, outputdirectory);
+        AnalyzeAll analyzeAll = new AnalyzeAll();
+        AnalyzeSummary analyzeSummary = analyzeAll.analyze(configFile, outputdirectory);
         VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
@@ -120,11 +118,12 @@ public class ScenarioServer {
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
-        DataCollector datacollector = new DataCollector(configFile, outputdirectory, controler, //
+        new DataCollector(configFile, outputdirectory, controler, //
                 minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
 
         // generate report
-        ReportGenerator.from(configFile, outputdirectory);
+        ReportGenerator reportGenerator = new ReportGenerator();
+        reportGenerator.from(configFile, outputdirectory);
 
     }
 }

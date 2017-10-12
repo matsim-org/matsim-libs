@@ -9,13 +9,16 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import ch.ethz.idsc.queuey.datalys.csv.CSVUtils;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 public class CsvFleetReader {
 
-    public static List<String> csvLineToList(String line) {
-        return Stream.of(line.split(";")).collect(Collectors.toList());
-    }
+    
+    // TODO moved to queuey
+//    public static List<String> csvLineToList(String line) {
+//        return Stream.of(line.split(";")).collect(Collectors.toList());
+//    }
 
     private final DayTaxiRecord dayTaxiRecord;
 
@@ -31,7 +34,7 @@ public class CsvFleetReader {
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 {
                     String line = br.readLine();
-                    List<String> list = csvLineToList(line);
+                    List<String> list = CSVUtils.csvLineToList(line);
                     int count = 0;
                     System.out.println("CSV HEADER");
                     for (String token : list) {
@@ -43,7 +46,7 @@ public class CsvFleetReader {
                     String line = br.readLine();
                     if (Objects.isNull(line))
                         break;
-                    List<String> list = csvLineToList(line);
+                    List<String> list = CSVUtils.csvLineToList(line);
 
                     dayTaxiRecord.insert(list);
                     ++dataline;
