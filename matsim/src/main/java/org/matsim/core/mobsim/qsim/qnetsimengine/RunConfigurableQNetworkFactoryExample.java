@@ -24,7 +24,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -33,10 +32,6 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class RunConfigurableQNetworkFactoryExample {
 
-
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 
 		Config config = ConfigUtils.createConfig(args[0]) ;

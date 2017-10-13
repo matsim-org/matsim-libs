@@ -9,10 +9,10 @@ import org.matsim.core.mobsim.qsim.interfaces.NetsimNode;
  * @author kainagel
  *
  */
-abstract class QNodeI implements NetsimNode {
+interface QNodeI extends NetsimNode {
 
-	abstract boolean doSimStep(double now) ;
+	boolean doSimStep(double now) ;
 
-	abstract void init() ;
+	void init() ;
 
 }

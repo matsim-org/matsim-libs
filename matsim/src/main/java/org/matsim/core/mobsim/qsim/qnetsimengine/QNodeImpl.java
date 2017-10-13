@@ -38,13 +38,13 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
-import org.matsim.core.mobsim.qsim.interfaces.NetsimNode;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.TurnAcceptanceLogic.AcceptTurn;
 
 /**
  * Represents a node in the QSimulation.
  */
-public class QNodeImpl extends QNodeI {
+final class QNodeImpl implements QNodeI {
 	private static final Logger log = Logger.getLogger(QNodeImpl.class);
 	public static class Builder {
 		private final NetsimInternalInterface netsimEngine;
@@ -112,7 +112,7 @@ public class QNodeImpl extends QNodeI {
 	 * QueueNodes and QueueLinks.
 	 */
 	@Override
-	/*package*/ void init() {
+	public void init() {
 		int i = 0;
 		for (Link l : this.node.getInLinks().values()) {
 			QNetwork network = netsimEngine.getNetsimNetwork() ;
@@ -192,7 +192,7 @@ public class QNodeImpl extends QNodeI {
 	 * 		Whether the QNode stays active or not.
 	 */
 	@Override
-	/*package*/ boolean doSimStep(final double now) {
+	public boolean doSimStep(final double now) {
 		
 		int inLinksCounter = 0;
 		double inLinksCapSum = 0.0;
@@ -253,30 +253,18 @@ public class QNodeImpl extends QNodeI {
 	 */
 	private boolean moveVehicleOverNode(final QVehicle veh, final QLaneI fromLaneBuffer, final double now) {
 		Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
-		if ((! fromLaneBuffer.hasGreenForToLink(nextLinkId))) {
-			//there is no longer a stuck check for red links. This means that
-			//in case of an infinite red time the simulation will not stop automatically because
-			//vehicles waiting in front of the red signal will never reach their destination. dg, mar'14
-				return false;
-		}
-
 		Link currentLink = veh.getCurrentLink();
-		if (nextLinkId == null) {
-			log.error( "Agent has no or wrong route! agentId=" + veh.getDriver().getId()
-					+ " currentLink=" + currentLink.getId().toString()
-					+ ". The agent is removed from the simulation.");
-			moveVehicleFromInlinkToAbort(veh, fromLaneBuffer, now, currentLink.getId());
-			return true;
+		
+		AcceptTurn turn = turnAcceptanceLogic.isAcceptingTurn(currentLink, fromLaneBuffer, nextLinkId, veh, this.netsimEngine.getNetsimNetwork());
+		if ( turn.equals(AcceptTurn.ABORT) ) {
+			moveVehicleFromInlinkToAbort( veh, fromLaneBuffer, now, currentLink.getId() ) ;
+			return true ;
+		} else if ( turn.equals(AcceptTurn.WAIT) ) {
+			return false;
 		}
 		
 		QLinkI nextQueueLink = this.netsimEngine.getNetsimNetwork().getNetsimLinks().get(nextLinkId);
-		if ( !turnAcceptanceLogic.isAcceptingTurn(currentLink, nextLinkId, nextQueueLink, veh) ) {
-			moveVehicleFromInlinkToAbort( veh, fromLaneBuffer, now, currentLink.getId() ) ;
-			return true ;
-		}
-		
 		QLaneI nextQueueLane = nextQueueLink.getAcceptingQLane() ;
-
 		if (nextQueueLane.isAcceptingFromUpstream()) {
 			moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLaneBuffer, nextLinkId, nextQueueLane);
 			return true;

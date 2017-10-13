@@ -53,7 +53,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
  *
  * @author nagel
  */
-final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
+final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private static final Logger log = Logger.getLogger( QueueWithBuffer.class ) ;
 
 	static final class Builder implements LaneFactory {
@@ -201,7 +201,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	final void addFromWait(final QVehicle veh) {
+	public final void addFromWait(final QVehicle veh) {
 		//To protect against calling addToBuffer() without calling hasFlowCapacityLeft() first.
 		//This only could happen for addFromWait(), because it can be called from outside QueueWithBuffer
 		if (flowcap_accumulate.getValue() <= 0.0 && veh.getVehicle().getType().getPcuEquivalents() > context.qsimConfig
@@ -235,7 +235,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	final boolean isAcceptingFromWait(QVehicle veh) {
+	public final boolean isAcceptingFromWait(QVehicle veh) {
 		return this.hasFlowCapacityLeft(veh) ;
 	}
 
@@ -278,7 +278,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	final void initBeforeSimStep() {
+	public final void initBeforeSimStep() {
 		if(!context.qsimConfig.isUsingFastCapacityUpdate() ){
 			updateSlowFlowAccumulation();
 		}
@@ -386,7 +386,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	final boolean doSimStep( ) {
+	public final boolean doSimStep( ) {
 		switch (context.qsimConfig.getTrafficDynamics()) {
 			case queue:
 				break;
@@ -523,7 +523,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	final boolean isActive() {
+	public final boolean isActive() {
 		if( context.qsimConfig.isUsingFastCapacityUpdate() ){
 			return (!this.vehQueue.isEmpty())
 					|| (!this.isNotOfferingVehicle() && context.qsimConfig.isUseLanes()) // if lanes, the buffer needs to be active in order to move vehicles over an internal node
@@ -540,17 +540,17 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	public final void setSignalStateAllTurningMoves( final SignalGroupState state) {
 		qSignalizedItem.setSignalStateAllTurningMoves(state);
 
-		thisTimeStepGreen  = qSignalizedItem.isLinkGreen();
+		thisTimeStepGreen  = qSignalizedItem.hasGreenForAllToLinks();
 		// (this is only for capacity accumulation)
 	}
 
 	@Override
-	final double getSimulatedFlowCapacityPerTimeStep() {
+	public final double getSimulatedFlowCapacityPerTimeStep() {
 		return this.flowCapacityPerTimeStep;
 	}
 
 	@Override
-	final boolean isAcceptingFromUpstream() {
+	public final boolean isAcceptingFromUpstream() {
 		boolean storageOk = usedStorageCapacity < storageCapacity ;
 
 		if ( context.qsimConfig.getTrafficDynamics()==TrafficDynamics.queue )  {
@@ -583,7 +583,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	final void changeSpeedMetersPerSecond( final double val ) {
+	public final void changeSpeedMetersPerSecond( final double val ) {
 		this.freespeedTravelTime = this.length / val ;
 		if (Double.isNaN(freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
@@ -591,7 +591,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	final QVehicle getVehicle(final Id<Vehicle> vehicleId) {
+	public final QVehicle getVehicle(final Id<Vehicle> vehicleId) {
 		for (QVehicle veh : this.vehQueue) {
 			if (veh.getId().equals(vehicleId))
 				return veh;
@@ -604,7 +604,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	final Collection<MobsimVehicle> getAllVehicles() {
+	public final Collection<MobsimVehicle> getAllVehicles() {
 		/* since it is an instance of arrayList, insertion order is maintained. Thus, correcting the order or insertion.
 		 * It will be more complicated for passingQueue. amit feb'16
 		 */
@@ -615,7 +615,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	final QVehicle popFirstVehicle() {
+	public final QVehicle popFirstVehicle() {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		QVehicle veh = removeFirstVehicle();
 		if (this.context.qsimConfig.isUseLanes() ) {
@@ -643,31 +643,39 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 		}
 		qSignalizedItem.setSignalStateForTurningMove(state, toLinkId);
 
-		thisTimeStepGreen = qSignalizedItem.isLinkGreen();
+		thisTimeStepGreen = qSignalizedItem.hasGreenForAllToLinks();
 		// (this is only for capacity accumulation.  As soon as at least one turning relation is green, the "link" is considered
 		// green).
 	}
 
 	@Override
-	final boolean hasGreenForToLink(final Id<Link> toLinkId) {
+	public final boolean hasGreenForToLink(final Id<Link> toLinkId) {
 		if (qSignalizedItem != null){
-			return qSignalizedItem.isLinkGreenForToLink(toLinkId);
+			return qSignalizedItem.hasGreenForToLink(toLinkId);
 		}
 		return true; //the lane is not signalized and thus always green
 	}
 
 	@Override
-	final double getStorageCapacity() {
+	public boolean hasGreenForAllToLinks() {
+		if (qSignalizedItem != null) {
+			return qSignalizedItem.hasGreenForAllToLinks();
+		}
+		return true; //the lane is not signalized and thus always green
+	}
+
+	@Override
+	public final double getStorageCapacity() {
 		return storageCapacity;
 	}
 
 	@Override
-	final boolean isNotOfferingVehicle() {
+	public final boolean isNotOfferingVehicle() {
 		return buffer.isEmpty();
 	}
 
 	@Override
-	final void clearVehicles() {
+	public final void clearVehicles() {
 		// yyyyyy right now it seems to me that one should rather just abort the agents and have the framework take care of the rest. kai, mar'16
 
 		double now = context.getSimTimer().getTimeOfDay() ;
@@ -695,7 +703,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	final void addFromUpstream(final QVehicle veh) {
+	public final void addFromUpstream(final QVehicle veh) {
 		double now = context.getSimTimer().getTimeOfDay() ;
 
 		if (this.context.qsimConfig.isUseLanes() ) {
@@ -754,17 +762,17 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	final QLaneI.VisData getVisData() {
+	public final QLaneI.VisData getVisData() {
 		return this.visData  ;
 	}
 
 	@Override
-	final QVehicle getFirstVehicle() {
+	public final QVehicle getFirstVehicle() {
 		return this.buffer.peek() ;
 	}
 
 	@Override
-	final double getLastMovementTimeOfFirstVehicle() {
+	public final double getLastMovementTimeOfFirstVehicle() {
 		return this.bufferLastMovedTime ;
 	}
 
@@ -772,7 +780,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	 * Needs to be added _upstream_ of the regular stop location so that a possible second stop on the link can also be served.
 	 */
 	@Override
-	final void addTransitSlightlyUpstreamOfStop( final QVehicle veh) {
+	public final void addTransitSlightlyUpstreamOfStop( final QVehicle veh) {
 		this.vehQueue.addFirst(veh) ;
 	}
 
@@ -782,14 +790,14 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	final void changeUnscaledFlowCapacityPerSecond( final double val ) {
+	public final void changeUnscaledFlowCapacityPerSecond( final double val ) {
 		this.unscaledFlowCapacity_s = val ;
 		// be defensive (might now be called twice):
 		this.recalcTimeVariantAttributes();
 	}
 
 	@Override
-	final void changeEffectiveNumberOfLanes( final double val ) {
+	public final void changeEffectiveNumberOfLanes( final double val ) {
 		this.effectiveNumberOfLanes = val ;
 		// be defensive (might now be called twice):
 		this.recalcTimeVariantAttributes();
@@ -917,7 +925,7 @@ final class QueueWithBuffer extends QLaneI implements SignalizeableItem {
 	}
 
 	@Override
-	double getLoadIndicator() {
+	public double getLoadIndicator() {
 		return usedStorageCapacity;
 	}
 

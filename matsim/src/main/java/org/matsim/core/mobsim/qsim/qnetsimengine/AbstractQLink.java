@@ -57,7 +57,7 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-abstract class AbstractQLink extends QLinkI {
+abstract class AbstractQLink implements QLinkI {
 	// yy The way forward might be to separate the "service link/network" from the "movement link/network".  The 
 	// service link would do things like park agents, accept additional agents on link, accept passengers or drivers waiting for
 	// cars, etc.  Both the thread-based parallelization and the visualization then would have to treat those service links
@@ -114,7 +114,8 @@ abstract class AbstractQLink extends QLinkI {
 		this.netsimEngine = netsimEngine2;
 	}
 
-	@Override QNodeI getToNode() {
+	@Override
+	public QNodeI getToNode() {
 		return toQNode ;
 	}
 
@@ -134,7 +135,7 @@ abstract class AbstractQLink extends QLinkI {
 	}
 	private static int wrnCnt = 0 ;
 	@Override
-	/*package*/ final void addParkedVehicle(MobsimVehicle vehicle) {
+	public final void addParkedVehicle(MobsimVehicle vehicle) {
 		QVehicle qveh = (QVehicle) vehicle; // cast ok: when it gets here, it needs to be a qvehicle to work.
 		
 		if ( this.parkedVehicles.put(qveh.getId(), qveh) != null ) {
@@ -156,12 +157,12 @@ abstract class AbstractQLink extends QLinkI {
 	}
 
 	@Override
-	/*package*/ final QVehicle removeParkedVehicle(Id<Vehicle> vehicleId) {
+	public final QVehicle removeParkedVehicle(Id<Vehicle> vehicleId) {
 		return this.parkedVehicles.remove(vehicleId);
 	}
 
 	@Override
-	/*package*/ QVehicle getParkedVehicle(Id<Vehicle> vehicleId) {
+	public QVehicle getParkedVehicle(Id<Vehicle> vehicleId) {
 		return this.parkedVehicles.get(vehicleId);
 	}
 
@@ -173,22 +174,22 @@ abstract class AbstractQLink extends QLinkI {
 	}
 
 	@Override
-	/*package*/ void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
+	public void registerAdditionalAgentOnLink(MobsimAgent planAgent) {
 		this.additionalAgentsOnLink.put(planAgent.getId(), planAgent);
 	}
 
 	@Override
-	/*package*/ MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> mobsimAgentId) {
+	public MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> mobsimAgentId) {
 		return this.additionalAgentsOnLink.remove(mobsimAgentId);
 	}
 
 	@Override
-	/*package*/ Collection<MobsimAgent> getAdditionalAgentsOnLink() {
+	public Collection<MobsimAgent> getAdditionalAgentsOnLink() {
 		return Collections.unmodifiableCollection( this.additionalAgentsOnLink.values());
 	}
 
 	@Override
-	void clearVehicles() {
+	public void clearVehicles() {
 		double now = context.getSimTimer().getTimeOfDay();
 
 		/*
@@ -326,7 +327,7 @@ abstract class AbstractQLink extends QLinkI {
 	}
 
 	@Override
-	final void letVehicleDepart(QVehicle vehicle) {
+	public final void letVehicleDepart(QVehicle vehicle) {
 		double now = context.getSimTimer().getTimeOfDay();
 		
 		MobsimDriverAgent driver = vehicle.getDriver();
@@ -343,7 +344,7 @@ abstract class AbstractQLink extends QLinkI {
 	 * the waiting list and return false.
 	 */
 	@Override
-	final boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id<Vehicle> vehicleId) {
+	public final boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id<Vehicle> vehicleId) {
 		double now = context.getSimTimer().getTimeOfDay();
 		
 		QVehicle vehicle = this.getParkedVehicle(vehicleId);
@@ -371,7 +372,7 @@ abstract class AbstractQLink extends QLinkI {
 	}
 
 	@Override
-	/*package*/ QVehicle getVehicle(Id<Vehicle> vehicleId) {
+	public QVehicle getVehicle(Id<Vehicle> vehicleId) {
 		// yyyy ?? does same as getParkedVehicle(...) ??  kai, mar'16
 		
 		QVehicle ret = this.parkedVehicles.get(vehicleId);
@@ -395,7 +396,7 @@ abstract class AbstractQLink extends QLinkI {
 	}
 
 	@Override
-	/*package*/ void registerDriverAgentWaitingForCar(final MobsimDriverAgent agent) {
+	public void registerDriverAgentWaitingForCar(final MobsimDriverAgent agent) {
 		final Id<Vehicle> vehicleId = agent.getPlannedVehicleId() ;
 		Queue<MobsimDriverAgent> queue = driversWaitingForCars.get( vehicleId );
 
@@ -408,17 +409,17 @@ abstract class AbstractQLink extends QLinkI {
 	}
 
 	@Override
-	/*package*/ void registerDriverAgentWaitingForPassengers(MobsimDriverAgent agent) {
+	public void registerDriverAgentWaitingForPassengers(MobsimDriverAgent agent) {
 		driversWaitingForPassengers.put(agent.getId(), agent);
 	}
 
 	@Override
-	/*package*/ MobsimAgent unregisterDriverAgentWaitingForPassengers(Id<Person> agentId) {
+	public MobsimAgent unregisterDriverAgentWaitingForPassengers(Id<Person> agentId) {
 		return driversWaitingForPassengers.remove(agentId);
 	}
 
 	@Override
-	/*package*/ void registerPassengerAgentWaitingForCar(MobsimAgent agent, Id<Vehicle> vehicleId) {
+	public void registerPassengerAgentWaitingForCar(MobsimAgent agent, Id<Vehicle> vehicleId) {
 		Set<MobsimAgent> passengers = passengersWaitingForCars.get(vehicleId);
 		if (passengers == null) {
 			passengers = new LinkedHashSet<>();
@@ -428,14 +429,14 @@ abstract class AbstractQLink extends QLinkI {
 	}
 
 	@Override
-	/*package*/ MobsimAgent unregisterPassengerAgentWaitingForCar(MobsimAgent agent, Id<Vehicle> vehicleId) {
+	public MobsimAgent unregisterPassengerAgentWaitingForCar(MobsimAgent agent, Id<Vehicle> vehicleId) {
 		Set<MobsimAgent> passengers = passengersWaitingForCars.get(vehicleId);
 		if (passengers != null && passengers.remove(agent)) return agent;
 		else return null;
 	}
 
 	@Override
-	/*package*/ Set<MobsimAgent> getAgentsWaitingForCar(Id<Vehicle> vehicleId) {
+	public Set<MobsimAgent> getAgentsWaitingForCar(Id<Vehicle> vehicleId) {
 		Set<MobsimAgent> set = passengersWaitingForCars.get(vehicleId);
 		if (set != null) return Collections.unmodifiableSet(set);
 		else return null;

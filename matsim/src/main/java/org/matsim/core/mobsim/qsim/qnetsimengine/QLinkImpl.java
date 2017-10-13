@@ -100,13 +100,13 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	}
 
 	@Override
-	void clearVehicles() {
+	public void clearVehicles() {
 		super.clearVehicles();
 		qlane.clearVehicles();
 	}
 
 	@Override
-	boolean doSimStep() {
+	public boolean doSimStep() {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		qlane.initBeforeSimStep();
 		
@@ -158,7 +158,8 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		}
 	}
 
-	@Override boolean isNotOfferingVehicle() {
+	@Override
+	public boolean isNotOfferingVehicle() {
 		return qlane.isNotOfferingVehicle();
 	}
 
@@ -169,7 +170,8 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		qlane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ;
 	}
 
-	@Override QVehicle getVehicle(Id<Vehicle> vehicleId) {
+	@Override
+	public QVehicle getVehicle(Id<Vehicle> vehicleId) {
 		QVehicle ret = super.getVehicle(vehicleId);
 		if (ret != null) {
 			return ret;
@@ -234,6 +236,16 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		((SignalizeableItem) qlane).setSignalized(isSignalized);
 	}
 
+	@Override
+	public boolean hasGreenForToLink(Id<Link> toLinkId) {
+		return ((SignalizeableItem) qlane).hasGreenForToLink(toLinkId);
+	}
+
+	@Override
+	public boolean hasGreenForAllToLinks() {
+		return ((SignalizeableItem) qlane).hasGreenForAllToLinks();
+	}
+
 	/**
 	 * Inner class to encapsulate visualization methods
 	 *
@@ -286,12 +298,14 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	}
 
-	@Override List<QLaneI> getOfferingQLanes() {
+	@Override
+	public List<QLaneI> getOfferingQLanes() {
 		List<QLaneI> list = new ArrayList<>() ;
 		list.add( this.qlane ) ;
 		return list ;
 	}
-	@Override QLaneI getAcceptingQLane() {
+	@Override
+	public QLaneI getAcceptingQLane() {
 		return qlane ;
 	}
 

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalizedItem
+ * SignalTurnAcceptanceLogic
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,30 +17,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.core.mobsim.qsim.interfaces;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-
+import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 
 /**
- * A simulation element that leads to something with an Id. In usual traffic/network applications
- * this would be a link or lane that is leading to one to several links.
- * 
- * The SignalizeableItem must be notified by its property to be signalized by calling the setSignalized(..) method.
- * 
- * @author dgrether
- *
+ * @author tthunig
  */
-public interface SignalizeableItem {
+final class SignalTurnAcceptanceLogic implements TurnAcceptanceLogic {
+
+	private final TurnAcceptanceLogic delegate = new DefaultTurnAcceptanceLogic();
 	
-	void setSignalized(final boolean isSignalized);
-	
-	void setSignalStateAllTurningMoves(final SignalGroupState state);
-	
-	void setSignalStateForTurningMove(final SignalGroupState state, final Id<Link> toLinkId);
-	
-	boolean hasGreenForAllToLinks();
-	
-	boolean hasGreenForToLink(final Id<Link> toLinkId);
+	@Override
+	public AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork) {
+		AcceptTurn defaultTurn = delegate.isAcceptingTurn(currentLink, currentLane, nextLinkId, veh, qNetwork);
+		if ( defaultTurn.equals(AcceptTurn.ABORT) ) {
+			return defaultTurn;
+		}
+		// else: check whether there are signals at the lane/link and whether they show green/red
+		if ( (currentLane instanceof SignalizeableItem) && 
+				(! ((SignalizeableItem)currentLane).hasGreenForToLink(nextLinkId)) ) {
+			/* because turn acceptance is checked before stuck time, an infinite red time
+			 * does not lead to stuck event of waiting vehicles. dg, mar'14 */
+			return AcceptTurn.WAIT;
+		}
+		return AcceptTurn.GO;
+	}
+
 }
