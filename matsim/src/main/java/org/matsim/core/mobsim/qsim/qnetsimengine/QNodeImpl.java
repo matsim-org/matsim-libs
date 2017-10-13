@@ -326,10 +326,10 @@ final class QNodeImpl implements QNodeI {
 
 		veh.getDriver().notifyMoveOverNode( nextLinkId );
 
-		nextQueueLane.addFromUpstream(veh);
 		// -->
 		this.context.getEventsManager().processEvent(new LinkEnterEvent(now, veh.getId(), nextLinkId ));
 		// <--
+		nextQueueLane.addFromUpstream(veh);
 	}
 
 	private boolean vehicleIsStuck(final QLaneI fromLaneBuffer, final double now) {
