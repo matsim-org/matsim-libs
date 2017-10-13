@@ -79,9 +79,12 @@ public final class DefaultSignalizeableItem implements SignalizeableItem {
 	}
 
 	private static boolean checkGreen(SignalGroupState state) {
-		return (state.equals(SignalGroupState.GREEN) || state.equals(SignalGroupState.REDYELLOW) || state.equals(SignalGroupState.OFF));
+		return (state.equals(SignalGroupState.GREEN) || state.equals(SignalGroupState.YELLOW) || state.equals(SignalGroupState.OFF));
 	}
 
+	/**
+	 * returns true, if at least on signal at the link/lane shows green
+	 */
 	public boolean hasGreenForAllToLinks() {
 		return linkGreen;
 	}
