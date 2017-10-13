@@ -34,7 +34,7 @@ public class CsvFleetReader {
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 {
                     String line = br.readLine();
-                    List<String> list = CSVUtils.csvLineToList(line);
+                    List<String> list =    CSVUtils.csvLineToList(line,";");
                     int count = 0;
                     System.out.println("CSV HEADER");
                     for (String token : list) {
@@ -46,7 +46,7 @@ public class CsvFleetReader {
                     String line = br.readLine();
                     if (Objects.isNull(line))
                         break;
-                    List<String> list = CSVUtils.csvLineToList(line);
+                    List<String> list = CSVUtils.csvLineToList(line,";");
 
                     dayTaxiRecord.insert(list);
                     ++dataline;
