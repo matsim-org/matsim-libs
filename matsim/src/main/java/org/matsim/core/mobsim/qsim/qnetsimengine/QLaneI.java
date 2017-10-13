@@ -85,8 +85,6 @@ interface QLaneI extends Identifiable<Lane> {
 
 	double getLastMovementTimeOfFirstVehicle();
 
-	boolean hasGreenForToLink(final Id<Link> toLinkId);
-
 	boolean isAcceptingFromUpstream();
 
 	void changeSpeedMetersPerSecond(double val) ;

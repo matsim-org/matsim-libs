@@ -213,12 +213,6 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		}
 
 		@Override
-		public boolean hasGreenForToLink(Id<Link> arg0) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
 		public boolean isAcceptingFromUpstream() {
 			return e.hasSpace(getLink().getFromNode().getId());
 		}

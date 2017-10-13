@@ -47,7 +47,7 @@ public final class DefaultSignalizeableItem implements SignalizeableItem {
 	@Override
 	public void setSignalStateAllTurningMoves(SignalGroupState state) {
 		this.allToLinksState = state;
-		this.linkGreen = this.checkGreen(state);
+		this.linkGreen = checkGreen(state);
 	}
 
 	private void initToLinkIdSignalStates(){
@@ -82,11 +82,11 @@ public final class DefaultSignalizeableItem implements SignalizeableItem {
 		return (state.equals(SignalGroupState.GREEN) || state.equals(SignalGroupState.REDYELLOW) || state.equals(SignalGroupState.OFF));
 	}
 
-	public boolean isLinkGreen() {
+	public boolean hasGreenForAllToLinks() {
 		return linkGreen;
 	}
 	
-	public boolean isLinkGreenForToLink(Id<Link> toLinkId){
+	public boolean hasGreenForToLink(Id<Link> toLinkId){
 		if (this.allToLinksState != null) {
 			return checkGreen(this.allToLinksState);
 		}

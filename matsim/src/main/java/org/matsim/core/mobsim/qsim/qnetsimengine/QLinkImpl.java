@@ -236,6 +236,16 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		((SignalizeableItem) qlane).setSignalized(isSignalized);
 	}
 
+	@Override
+	public boolean hasGreenForToLink(Id<Link> toLinkId) {
+		return ((SignalizeableItem) qlane).hasGreenForToLink(toLinkId);
+	}
+
+	@Override
+	public boolean hasGreenForAllToLinks() {
+		return ((SignalizeableItem) qlane).hasGreenForAllToLinks();
+	}
+
 	/**
 	 * Inner class to encapsulate visualization methods
 	 *

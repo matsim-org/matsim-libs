@@ -540,7 +540,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	public final void setSignalStateAllTurningMoves( final SignalGroupState state) {
 		qSignalizedItem.setSignalStateAllTurningMoves(state);
 
-		thisTimeStepGreen  = qSignalizedItem.isLinkGreen();
+		thisTimeStepGreen  = qSignalizedItem.hasGreenForAllToLinks();
 		// (this is only for capacity accumulation)
 	}
 
@@ -643,7 +643,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		}
 		qSignalizedItem.setSignalStateForTurningMove(state, toLinkId);
 
-		thisTimeStepGreen = qSignalizedItem.isLinkGreen();
+		thisTimeStepGreen = qSignalizedItem.hasGreenForAllToLinks();
 		// (this is only for capacity accumulation.  As soon as at least one turning relation is green, the "link" is considered
 		// green).
 	}
@@ -651,7 +651,15 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	@Override
 	public final boolean hasGreenForToLink(final Id<Link> toLinkId) {
 		if (qSignalizedItem != null){
-			return qSignalizedItem.isLinkGreenForToLink(toLinkId);
+			return qSignalizedItem.hasGreenForToLink(toLinkId);
+		}
+		return true; //the lane is not signalized and thus always green
+	}
+
+	@Override
+	public boolean hasGreenForAllToLinks() {
+		if (qSignalizedItem != null) {
+			return qSignalizedItem.hasGreenForAllToLinks();
 		}
 		return true; //the lane is not signalized and thus always green
 	}

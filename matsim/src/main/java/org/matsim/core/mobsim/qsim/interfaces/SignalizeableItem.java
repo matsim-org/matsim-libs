@@ -39,5 +39,8 @@ public interface SignalizeableItem {
 	void setSignalStateAllTurningMoves(final SignalGroupState state);
 	
 	void setSignalStateForTurningMove(final SignalGroupState state, final Id<Link> toLinkId);
-
+	
+	boolean hasGreenForAllToLinks();
+	
+	boolean hasGreenForToLink(final Id<Link> toLinkId);
 }

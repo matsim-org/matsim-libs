@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 
 /**
  * @author tthunig
@@ -35,8 +36,9 @@ final class SignalTurnAcceptanceLogic implements TurnAcceptanceLogic {
 		if ( defaultTurn.equals(AcceptTurn.ABORT) ) {
 			return defaultTurn;
 		}
-		// else: check whether signals show green
-		if (!currentLane.hasGreenForToLink(nextLinkId)) {
+		// else: check whether there are signals at the lane/link and whether they show green/red
+		if ( (currentLane instanceof SignalizeableItem) && 
+				(! ((SignalizeableItem)currentLane).hasGreenForToLink(nextLinkId)) ) {
 			/* because turn acceptance is checked before stuck time, an infinite red time
 			 * does not lead to stuck event of waiting vehicles. dg, mar'14 */
 			return AcceptTurn.WAIT;
