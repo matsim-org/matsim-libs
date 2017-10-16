@@ -24,7 +24,11 @@ public enum StorageUtils {
      * @return file to store given simulationObject
      */
     public static File getFileForStorageOf(SimulationObject simulationObject) {
-        GlobalAssert.that(OUTPUT.exists());
+    	if(!OUTPUT.exists()) {
+        	System.out.println("OUTPUT = " + OUTPUT.getAbsolutePath());
+            GlobalAssert.that(false	);    		
+    	}
+
         DIRECTORY.mkdir();
         File iter = new File(DIRECTORY, String.format("it.%02d", simulationObject.iteration));
         iter.mkdir();
