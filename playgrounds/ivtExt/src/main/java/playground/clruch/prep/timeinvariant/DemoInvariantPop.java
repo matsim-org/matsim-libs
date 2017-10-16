@@ -40,7 +40,6 @@ public class DemoInvariantPop {
         PopulationTools.changeModesOfTransportToAV(population);
         Population populationInvariant = TimeInvariantPopulation.at(interval, population);
         int numPeopleUpd = population.getPersons().size();
-        GlobalAssert.that(numPeople == numPeopleUpd);
         
         TheApocalypse.decimatesThe(population).toNoMoreThan(3000);
 
