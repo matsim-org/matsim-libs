@@ -9,11 +9,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 /** @author Claudio Ruch */
 public enum TimeInvariantPopulation {
@@ -25,40 +28,49 @@ public enum TimeInvariantPopulation {
         // 1) get all trips that occur during timeslice
         Map<Id<Person>, Person> people = (Map<Id<Person>, Person>) population.getPersons();
 
-        HashMap<Person, HashSet<Plan>> toRemove = new HashMap<>();
-        for(Person person : population.getPersons().values()){
-            toRemove.put(person, new HashSet<>());
+        HashMap<Person, HashSet<FramedActivity>> toAdd = new HashMap<>();
+        for (Person person : population.getPersons().values()) {
+            toAdd.put(person, new HashSet<>());
         }
-        
-        
+
+        PlanElement planE1 = null;
+        PlanElement planE2 = null;
+        PlanElement planE3 = null;
 
         for (Person person : people.values()) {
 
             List<Plan> plans = (List<Plan>) person.getPlans();
 
             for (Plan plan : plans) {
-                for (PlanElement planElement : plan.getPlanElements()) {
-                    if (planElement instanceof Leg) {
-                        Leg leg = (Leg) planElement;
+                for (PlanElement planENew : plan.getPlanElements()) {
+                    planE3 = planE2;
+                    planE2 = planE1;
+                    planE1 = planENew;
+
+                    if (planE2 instanceof Leg) {
+                        Leg leg = (Leg) planE2;
+                        GlobalAssert.that(planE3 instanceof Activity);
+                        GlobalAssert.that(planE1 instanceof Activity);
+                        Activity abefor = (Activity) planE3;
+                        Activity aafter = (Activity) planE1;
                         double depTime = leg.getDepartureTime();
-                        System.out.println("depTime: " +  depTime);
+                        System.out.println("depTime: " + depTime);
                         boolean inWindow = depTime >= time && depTime <= time + duration;
-                        if (!inWindow) {
-                            toRemove.get(person).add(plan);
-                        }else{
-                            System.out.println("the plan can stay, it is in the window");
+                        if (inWindow) {
+                            FramedActivity fac = new FramedActivity(abefor, leg, aafter);
+                            toAdd.get(person).add(fac);
+                            System.out.println("the plan is in the morning window");
                         }
                     }
                 }
             }
         }
 
-        for(Person person : people.values()){
-            for(Plan plan : toRemove.get(person)){
-                person.removePlan(plan);
+        for (Person person : people.values()) {
+            for (FramedActivity fa : toAdd.get(person)) {
+                Utils.removeAllButFramedA(person, fa);
             }
         }
-        
 
         return population;
     }

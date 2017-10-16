@@ -16,6 +16,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
 import playground.clruch.ScenarioOptions;
+import playground.clruch.prep.PopulationTools;
 import playground.clruch.utils.PropertiesExt;
 
 /** @author Claudio Ruch */
@@ -33,7 +34,8 @@ public class DemoInvariantPop {
         Config config = ConfigUtils.loadConfig(configFile.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Population population = scenario.getPopulation();
-
+        
+        PopulationTools.changeModesOfTransportToAV(population);
         Population populationInvariant = TimeInvariantPopulation.at(sTime, duration, population);
 
         // write the modified population to file

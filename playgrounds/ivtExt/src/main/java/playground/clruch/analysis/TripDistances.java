@@ -49,7 +49,7 @@ public class TripDistances {
     }
 
     private void analyze(File relativeDirectory) throws Exception {
-        tripDistances = tripDistances.multiply(RealScalar.of(0.001));
+        tripDistances = tripDistances.multiply(RealScalar.of(0.001)); // TODO magic constant for m -> km 
 
         tripDistanceBinSize = AnalysisUtils.adaptBinSize(tripDistances, tripDistanceBinSize, RealScalar.of(0.5));
         tripDistanceBinCounter = AnalysisUtils.binCount(tripDistances, tripDistanceBinSize);
