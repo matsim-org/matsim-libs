@@ -152,8 +152,13 @@ public class DemandBasedRebalancingStrategy implements RebalancingStrategy {
 		Map<String,Integer> requiredAdditionalVehiclesPerZone = new HashMap<>();
 		for (Entry<String, MutableInt> entry : expectedDemand.entrySet()){
 			double demand = entry.getValue().doubleValue();
-			int vehPerZone = (int) Math.floor((demand / totalDemand.doubleValue()) * rebalancableVehicles.size());
+			int vehPerZone = (int) Math.ceil((demand / totalDemand.doubleValue()) * rebalancableVehicles.size());
 			int idleVehiclesInZone = 0;
+			if (vehPerZone>demand){
+                vehPerZone=(int) demand;
+			}
+
+			
 			LinkedList<Id<Vehicle>> idleVehicleIds = idleVehicles.getIdleVehiclesPerZone(entry.getKey());
 			if (idleVehicleIds!=null & (!idleVehicleIds.isEmpty())){
 				idleVehiclesInZone = idleVehicleIds.size();
