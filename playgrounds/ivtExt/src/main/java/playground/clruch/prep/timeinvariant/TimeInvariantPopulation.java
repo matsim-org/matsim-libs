@@ -15,6 +15,9 @@ import ch.ethz.idsc.queuey.util.GlobalAssert;
 public enum TimeInvariantPopulation {
     ;
 
+    /** @param interval
+     * @param population
+     * @return {@link Population} consisting only of legs with a departure time in the @param interval */
     public static Population at(double[] interval, Population population) {
 
         GlobalAssert.that(interval.length == 2);
@@ -23,17 +26,37 @@ public enum TimeInvariantPopulation {
         System.out.println("total legs: " + CountLegs.of(population));
         System.out.println("total interval legs: " + CountLegs.of(population, interval));
 
-        Map<Id<Person>, Person> people = (Map<Id<Person>, Person>) population.getPersons();
-        for (Person person : people.values()) {
-            RemoveNonIntervalPlans.of(person, interval);
-        }
-
-        GlobalAssert.that(CountLegs.of(population, interval) == CountLegs.of(population));
+        filterTo(interval, population);
 
         System.out.println("total legs: " + CountLegs.of(population));
         System.out.println("total interval legs: " + CountLegs.of(population, interval));
 
         return population;
+    }
+
+    /** @param interval
+     * @param population
+     * @return {@link Population} with legs from the @param interval resample over the entire day */
+    public static Population from(double[] interval, Population population) {
+        filterTo(interval, population);
+        resampleDuringDay(population);
+
+        return population;
+    }
+
+    private static void filterTo(double[] interval, Population population) {
+        GlobalAssert.that(interval.length == 2);
+        Map<Id<Person>, Person> people = (Map<Id<Person>, Person>) population.getPersons();
+        for (Person person : people.values()) {
+            RemoveNonIntervalPlans.of(person, interval);
+        }
+        GlobalAssert.that(CountLegs.of(population, interval) == CountLegs.of(population));
+    }
+
+    private static void resampleDuringDay(Population population) {
+        // 
+        
+
     }
 
 }
