@@ -3,9 +3,6 @@
  */
 package playground.clruch.prep.timeinvariant;
 
-import java.util.HashSet;
-import java.util.List;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -14,27 +11,31 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 
 import ch.ethz.idsc.owly.data.GlobalAssert;
+import playground.clruch.prep.timeinvariant.poptools.Interval;
 
 /** @author Claudio Ruch */
 public enum RemoveNonIntervalPlans {
     ;
 
-    public static void of(Person person, double[] interval) {
-        GlobalAssert.that(interval.length == 2);
-        List<Plan> plans = (List<Plan>) person.getPlans();
-        for (Plan plan : plans) {
+    /** removes all plans of person which are not in the interval
+     * 
+     * @param person
+     * @param interval */
+    public static void of(Person person, Interval interval) {
+        GlobalAssert.that(interval.getDim() == 1);
 
+        for (Plan plan : person.getPlans()) {
+
+            // create new plan
             Plan newPlan = PopulationUtils.createPlan();
             newPlan.setType(plan.getType());
             newPlan.setPerson(plan.getPerson());
             newPlan.setScore(plan.getScore());
 
-            HashSet<Activity> activities = new HashSet<>();
-
+            // iterate plans saving three plans
             PlanElement planE1 = null;
             PlanElement planE2 = null;
             PlanElement planE3 = null;
-
             for (PlanElement planENew : plan.getPlanElements()) {
 
                 planE3 = planE2;
@@ -44,7 +45,7 @@ public enum RemoveNonIntervalPlans {
                 if (planE2 instanceof Leg) {
                     Leg leg = (Leg) planE2;
                     double depTime = leg.getDepartureTime();
-                    if (depTime >= interval[0] && depTime <= interval[1]) {
+                    if (interval.contains(new double[] { depTime })) {
                         GlobalAssert.that(planE3 instanceof Activity);
                         newPlan.addActivity((Activity) planE3);
 
@@ -57,8 +58,7 @@ public enum RemoveNonIntervalPlans {
 
                 }
             }
-            
-            
+
             person.removePlan(plan);
             person.addPlan(newPlan);
         }

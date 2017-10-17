@@ -17,29 +17,29 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import playground.clruch.prep.timeinvariant.poptools.Constants;
+import playground.clruch.prep.timeinvariant.poptools.CountLegs;
+import playground.clruch.prep.timeinvariant.poptools.Interval;
+import playground.clruch.prep.timeinvariant.poptools.PopulationUtils;
 
 /** @author Claudio Ruch */
 public enum TimeInvariantPopulation {
     ;
 
-    private static double dayLength = 108000.0; // TODO magic const.
-    private static int randomSeed = 12345;
-    private static Random rand = new Random(randomSeed);
-
     /** @param interval
      * @param population
      * @return {@link Population} consisting only of legs with a departure time in the @param interval */
-    public static Population at(double[] interval, Population population) {
+    public static Population at(Interval interval, Population population) {
+        GlobalAssert.that(interval.getDim() == 1);
+        System.out.println("calc. time-invariant pop. in time interval ");
+        System.out.println(interval.print());
 
-        GlobalAssert.that(interval.length == 2);
-        System.out.println("calc. time-invariant pop. from " + interval[0] + " to " + interval[1]);
-
-        System.out.println("total legs: " + CountLegs.of(population));
+        System.out.println("total legs: " + CountLegs.countLegsOf(population));
         System.out.println("total interval legs: " + CountLegs.of(population, interval));
 
-        filterTo(interval, population);
+        PopulationUtils.filterTo(interval, population);
 
-        System.out.println("total legs: " + CountLegs.of(population));
+        System.out.println("total legs: " + CountLegs.countLegsOf(population));
         System.out.println("total interval legs: " + CountLegs.of(population, interval));
 
         return population;
@@ -48,25 +48,14 @@ public enum TimeInvariantPopulation {
     /** @param interval
      * @param population
      * @return {@link Population} with legs from the @param interval resample over the entire day */
-    public static Population from(double[] interval, Population population) {
-        filterTo(interval, population);
+    public static Population from(Interval interval, Population population) {
+        PopulationUtils.filterTo(interval, population);
         return resampleDuringDay(interval, population);
     }
 
-    private static void filterTo(double[] interval, Population population) {
-        GlobalAssert.that(interval.length == 2);
-        Map<Id<Person>, Person> people = (Map<Id<Person>, Person>) population.getPersons();
-        for (Person person : people.values()) {
-            RemoveNonIntervalPlans.of(person, interval);
-        }
 
-        removePeopleWithoutPlans(population);
 
-        GlobalAssert.that(CountLegs.of(population, interval) == CountLegs.of(population));
-    }
-
-    private static Population resampleDuringDay(double[] interval, Population population) {
-        GlobalAssert.that(interval[1] >= interval[0]);
+    private static Population resampleDuringDay(Interval interval, Population population) {
 
         // get unique IDs of all agents
         HashSet<Id<Person>> usedIDs = new HashSet<>();
@@ -81,18 +70,20 @@ public enum TimeInvariantPopulation {
         people.keySet().stream().forEach(i -> population.removePerson(i));
 
         // calculate total for entire day
-        double timeSpan = interval[1] - interval[0];
-        int totalP = (int) ((dayLength / timeSpan) * ((double) people.size()));
-        System.out.println(people.size() + " in interval " + interval[0] + " - " + interval[1]);
+
+        int totalP = (int) ((Constants.getDayLength() / interval.getLength()[0]) * ((double) people.size()));
+        System.out.println(people.size() + " in interval " + interval.print());
         System.out.println(totalP + " in interval " + 0 + " - " + 108000);
 
         for (int i = 0; i < totalP; ++i) {
-            System.out.println("creating person " + i +  " of " + totalP);
+            if (i % 500 == 0)
+                System.out.println("creating person " + i + " of " + totalP);
+
             // take random person from "people"
             Person randomP = getRandomPerson(people);
 
             // select random time in day
-            double time = getRandomDayTime();
+            double time = PopulationUtils.getRandomDayTime();
 
             // adapt person to choice
             Person newPerson = createNewPerson(randomP, time, usedIDs);
@@ -106,40 +97,20 @@ public enum TimeInvariantPopulation {
 
     }
 
-    /** removes all {@link Person} that do not have any {@link planElement} left int their single {@link Plan}
-     * 
-     * @param population */
-    private static void removePeopleWithoutPlans(Population population) {
-        HashSet<Id<Person>> unneededPeople = new HashSet<>();
-        for (Entry<Id<Person>, ? extends Person> entry : population.getPersons().entrySet()) {
-            List<Plan> plans = (List<Plan>) entry.getValue().getPlans();
 
-            if (plans.size() == 1) {
-                if (plans.get(0).getPlanElements().size() == 0) {
-                    unneededPeople.add(entry.getKey());
-                }
-            }
-        }
-        unneededPeople.stream().forEach(id -> population.removePerson(id));
-    }
 
     /** @param people
      * @return random {@link Person} from the map */
     private static Person getRandomPerson(HashMap<Id<Person>, ? extends Person> people) {
-        int el = rand.nextInt(people.size());
+        int el = Constants.nextInt(people.size());
         return people.values().stream().collect(Collectors.toList()).get(el);
-    }
-
-    /** @return random time during daylength */
-    private static double getRandomDayTime() {
-        return rand.nextDouble() * dayLength;
     }
 
     /** @param randomP a {@link Person}
      * @param time {@link double} when the person should start its travel
      * @return new {@link Person} identical to @param randomP starting its first travel at @param time */
     private static Person createNewPerson(Person randomP, double time, HashSet<Id<Person>> usedIDs) {
-        Id<Person> newID = getUnusedID(usedIDs);
+        Id<Person> newID = generateUnusedID(usedIDs);
         usedIDs.add(newID);
         Person newPerson = new PersonImplAdd(newID);
 
@@ -172,7 +143,9 @@ public enum TimeInvariantPopulation {
         return newPerson;
     }
 
-    private static Id<Person> getUnusedID(HashSet<Id<Person>> usedIDs) {
+    /** @param usedIDs
+     * @return new ID which is not yet in set usedIDs */
+    private static Id<Person> generateUnusedID(HashSet<Id<Person>> usedIDs) {
         Integer i = 0;
         Id<Person> newId;
         do {

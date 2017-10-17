@@ -13,19 +13,24 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.io.PopulationWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import ch.ethz.idsc.owly.data.GlobalAssert;
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
 import playground.clruch.ScenarioOptions;
 import playground.clruch.prep.PopulationTools;
 import playground.clruch.prep.TheApocalypse;
+import playground.clruch.prep.timeinvariant.poptools.Interval;
 import playground.clruch.utils.PropertiesExt;
 
 /** @author Claudio Ruch */
 public class DemoInvariantPop {
 
+    /** Takes the full config population in the working directory and creates a population only in the interval
+     * or the interval population resampled during the entire day.
+     * 
+     * @param args
+     * @throws IOException */
     public static void main(String[] args) throws IOException {
-        final double[] interval = new double[] { 27900.0, 27900.0 + 3600.0 };
+        final Interval interval = new Interval(new double[] { 27900.0, 27900.0 + 3600.0 });
         final String POPULATIONUPDATEDNAME = "populationMorning";
 
         // demo
@@ -37,6 +42,7 @@ public class DemoInvariantPop {
         Population population = scenario.getPopulation();
 
         int numPeople = population.getPersons().size();
+        TheApocalypse.decimatesThe(population).toNoMoreThan(500);
         PopulationTools.changeModesOfTransportToAV(population);
         // Population populationInvariant = TimeInvariantPopulation.at(interval, population);
         Population populationInvariant = TimeInvariantPopulation.from(interval, population);
