@@ -12,7 +12,7 @@ public class ColorRangeUtils {
 
     public enum ColorRange {
         DEFAULT_RED_TO_BLUE, RED_TO_GREEN, GREEN_TO_RED, GREEN_TO_BLUE, BLUE_TO_GREEN, BLUE_TO_RED, RED_TO_BLUE,
-        BLACK_TO_WHITE, WHITE_TO_BLACK, DENSITY_RANGE
+        BLACK_TO_WHITE, WHITE_TO_BLACK, DENSITY
     }
 
     public static Color getColor(ColorRange colorRange, double power) {
@@ -44,8 +44,8 @@ public class ColorRangeUtils {
             case WHITE_TO_BLACK:
                 return getColorFromBlackToWhite(invert(power));
 
-            case DENSITY_RANGE:
-                return getColorInDensityRange(power);
+            case DENSITY:
+                return getColorInDensityRange();
 
             default:
                 log.error("No such color range");
@@ -89,11 +89,8 @@ public class ColorRangeUtils {
         return new Color(rgbValue);
     }
 
-    private static Color getColorInDensityRange(double power) {
-        if (power < 0.5)
-            return new Color(255, 255, 255, 255);
-        else
-            return new Color(0, 0, 0, 0);
+    private static Color getColorInDensityRange() {
+        return new Color(255, 255, 255, 255);
     }
 
     private static double invert(double power) {

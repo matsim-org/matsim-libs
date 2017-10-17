@@ -12,7 +12,7 @@ public class RendererFactory {
     }
 
     public static GraduatedSymbolRenderer createDensitiesRenderer(VectorLayer layer, int populationThreshold, int symbolSize) {
-        return new GraduatedSymbolRenderer(layer, (double)populationThreshold, (double)populationThreshold, 2,
-                symbolSize, ColorRangeUtils.ColorRange.DENSITY_RANGE);
+        return new GraduatedSymbolRenderer(layer, (double)populationThreshold, (double)populationThreshold, 1,
+                symbolSize, ColorRangeUtils.ColorRange.DENSITY);
     }
 }
