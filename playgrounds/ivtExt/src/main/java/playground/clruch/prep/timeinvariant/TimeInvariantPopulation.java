@@ -73,7 +73,7 @@ public enum TimeInvariantPopulation {
 
         int totalP = (int) ((Constants.getDayLength() / interval.getLength()[0]) * ((double) people.size()));
         System.out.println(people.size() + " in interval " + interval.print());
-        System.out.println(totalP + " in interval " + 0 + " - " + 108000);
+        System.out.println(totalP + " in interval " + 0 + "-->" + 108000);
 
         for (int i = 0; i < totalP; ++i) {
             if (i % 500 == 0)
