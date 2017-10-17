@@ -82,11 +82,12 @@ public enum TimeInvariantPopulation {
 
         // calculate total for entire day
         double timeSpan = interval[1] - interval[0];
-        int totalP = (int) ( (dayLength/timeSpan ) * ((double) people.size()));
+        int totalP = (int) ((dayLength / timeSpan) * ((double) people.size()));
         System.out.println(people.size() + " in interval " + interval[0] + " - " + interval[1]);
         System.out.println(totalP + " in interval " + 0 + " - " + 108000);
 
         for (int i = 0; i < totalP; ++i) {
+            System.out.println("creating person " + i +  " of " + totalP);
             // take random person from "people"
             Person randomP = getRandomPerson(people);
 
@@ -138,16 +139,9 @@ public enum TimeInvariantPopulation {
      * @param time {@link double} when the person should start its travel
      * @return new {@link Person} identical to @param randomP starting its first travel at @param time */
     private static Person createNewPerson(Person randomP, double time, HashSet<Id<Person>> usedIDs) {
-        Integer i = 0;
-        Id<Person> newId;
-
-        do {
-            ++i;
-            String newIDs = Integer.toString(i);
-            newId = Id.create(newIDs, Person.class);
-        } while (usedIDs.contains(newId));
-
-        Person newPerson = new PersonImplAdd(newId);
+        Id<Person> newID = getUnusedID(usedIDs);
+        usedIDs.add(newID);
+        Person newPerson = new PersonImplAdd(newID);
 
         PlanElement pEFirst = randomP.getPlans().get(0).getPlanElements().get(0);
         GlobalAssert.that(pEFirst instanceof Activity);
@@ -177,4 +171,17 @@ public enum TimeInvariantPopulation {
         }
         return newPerson;
     }
+
+    private static Id<Person> getUnusedID(HashSet<Id<Person>> usedIDs) {
+        Integer i = 0;
+        Id<Person> newId;
+        do {
+            ++i;
+            String newIDs = Integer.toString(i);
+            newId = Id.create(newIDs, Person.class);
+        } while (usedIDs.contains(newId));
+
+        return newId;
+    }
+
 }

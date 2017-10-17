@@ -25,7 +25,7 @@ import playground.clruch.utils.PropertiesExt;
 public class DemoInvariantPop {
 
     public static void main(String[] args) throws IOException {
-        final double[] interval = new double[]{27900.0,27900.0+3600.0};
+        final double[] interval = new double[] { 27900.0, 27900.0 + 3600.0 };
         final String POPULATIONUPDATEDNAME = "populationMorning";
 
         // demo
@@ -35,15 +35,13 @@ public class DemoInvariantPop {
         Config config = ConfigUtils.loadConfig(configFile.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Population population = scenario.getPopulation();
-        
-        int numPeople = population.getPersons().size();
-        TheApocalypse.decimatesThe(population).toNoMoreThan(5000);
-        PopulationTools.changeModesOfTransportToAV(population);
-//        Population populationInvariant = TimeInvariantPopulation.at(interval, population);
-        Population populationInvariant = TimeInvariantPopulation.from(interval, population);
-        int numPeopleUpd = population.getPersons().size();
-        
 
+        int numPeople = population.getPersons().size();
+        PopulationTools.changeModesOfTransportToAV(population);
+        // Population populationInvariant = TimeInvariantPopulation.at(interval, population);
+        Population populationInvariant = TimeInvariantPopulation.from(interval, population);
+        // TheApocalypse.decimatesThe(population).toNoMoreThan(2000);
+        int numPeopleUpd = population.getPersons().size();
 
         // write the modified population to file
         final File fileExportGz = new File(workingDirectory, POPULATIONUPDATEDNAME + ".xml.gz");
