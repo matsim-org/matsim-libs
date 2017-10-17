@@ -18,7 +18,6 @@ import ch.ethz.idsc.queuey.util.GZHandler;
 import playground.clruch.ScenarioOptions;
 import playground.clruch.prep.PopulationTools;
 import playground.clruch.prep.TheApocalypse;
-import playground.clruch.prep.timeinvariant.poptools.Interval;
 import playground.clruch.utils.PropertiesExt;
 
 /** @author Claudio Ruch */
@@ -42,7 +41,7 @@ public class DemoInvariantPop {
         Population population = scenario.getPopulation();
 
         int numPeople = population.getPersons().size();
-        TheApocalypse.decimatesThe(population).toNoMoreThan(5000);
+        TheApocalypse.decimatesThe(population).toNoMoreThan(3000);
         PopulationTools.changeModesOfTransportToAV(population);
         // Population populationInvariant = TimeInvariantPopulation.at(interval, population);
         Population populationInvariant = TimeInvariantPopulation.from(interval, population);

@@ -17,10 +17,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.prep.timeinvariant.poptools.Constants;
-import playground.clruch.prep.timeinvariant.poptools.CountLegs;
-import playground.clruch.prep.timeinvariant.poptools.Interval;
-import playground.clruch.prep.timeinvariant.poptools.PopulationUtils;
 
 /** @author Claudio Ruch */
 public enum TimeInvariantPopulation {
@@ -29,7 +25,7 @@ public enum TimeInvariantPopulation {
     /** @param interval
      * @param population
      * @return {@link Population} consisting only of legs with a departure time in the @param interval */
-    public static Population at(Interval interval, Population population) {
+    /* package */ static Population at(Interval interval, Population population) {
         GlobalAssert.that(interval.getDim() == 1);
         System.out.println("calc. time-invariant pop. in time interval ");
         System.out.println(interval.print());
@@ -48,12 +44,10 @@ public enum TimeInvariantPopulation {
     /** @param interval
      * @param population
      * @return {@link Population} with legs from the @param interval resample over the entire day */
-    public static Population from(Interval interval, Population population) {
+    /* package */ static Population from(Interval interval, Population population) {
         PopulationUtils.filterTo(interval, population);
         return resampleDuringDay(interval, population);
     }
-
-
 
     private static Population resampleDuringDay(Interval interval, Population population) {
 
@@ -79,14 +73,9 @@ public enum TimeInvariantPopulation {
             if (i % 500 == 0)
                 System.out.println("creating person " + i + " of " + totalP);
 
-            // take random person from "people"
-            Person randomP = getRandomPerson(people);
-
-            // select random time in day
-            double time = PopulationUtils.getRandomDayTime();
-
-            // adapt person to choice
-            Person newPerson = createNewPerson(randomP, time, usedIDs);
+            // adapt a random person to choice random time in the day
+            Person newPerson = createNewPerson(PopulationUtils.getRandomPerson(people), //
+                    PopulationUtils.getRandomDayTime(), usedIDs);
 
             // add to new population
             population.addPerson(newPerson);
@@ -95,15 +84,6 @@ public enum TimeInvariantPopulation {
 
         return population;
 
-    }
-
-
-
-    /** @param people
-     * @return random {@link Person} from the map */
-    private static Person getRandomPerson(HashMap<Id<Person>, ? extends Person> people) {
-        int el = Constants.nextInt(people.size());
-        return people.values().stream().collect(Collectors.toList()).get(el);
     }
 
     /** @param randomP a {@link Person}

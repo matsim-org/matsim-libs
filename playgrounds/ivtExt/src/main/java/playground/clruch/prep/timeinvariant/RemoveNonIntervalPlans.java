@@ -11,7 +11,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 
 import ch.ethz.idsc.owly.data.GlobalAssert;
-import playground.clruch.prep.timeinvariant.poptools.Interval;
 
 /** @author Claudio Ruch */
 public enum RemoveNonIntervalPlans {
@@ -21,7 +20,7 @@ public enum RemoveNonIntervalPlans {
      * 
      * @param person
      * @param interval */
-    public static void of(Person person, Interval interval) {
+    /* package */ static void of(Person person, Interval interval) {
         GlobalAssert.that(interval.getDim() == 1);
 
         for (Plan plan : person.getPlans()) {
