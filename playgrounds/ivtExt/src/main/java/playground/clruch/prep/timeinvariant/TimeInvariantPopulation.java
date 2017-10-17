@@ -2,11 +2,6 @@ package playground.clruch.prep.timeinvariant;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -74,8 +69,9 @@ public enum TimeInvariantPopulation {
                 System.out.println("creating person " + i + " of " + totalP);
 
             // adapt a random person to choice random time in the day
+            IDGenerator generator = new IDGenerator(usedIDs);
             Person newPerson = createNewPerson(PopulationUtils.getRandomPerson(people), //
-                    PopulationUtils.getRandomDayTime(), usedIDs);
+                    PopulationUtils.getRandomDayTime(), generator);
 
             // add to new population
             population.addPerson(newPerson);
@@ -89,9 +85,10 @@ public enum TimeInvariantPopulation {
     /** @param randomP a {@link Person}
      * @param time {@link double} when the person should start its travel
      * @return new {@link Person} identical to @param randomP starting its first travel at @param time */
-    private static Person createNewPerson(Person randomP, double time, HashSet<Id<Person>> usedIDs) {
-        Id<Person> newID = generateUnusedID(usedIDs);
-        usedIDs.add(newID);
+    private static Person createNewPerson(Person randomP, double time, IDGenerator generator) {
+        
+        
+        Id<Person> newID = generator.generateUnusedID();
         Person newPerson = new PersonImplAdd(newID);
 
         PlanElement pEFirst = randomP.getPlans().get(0).getPlanElements().get(0);
@@ -123,18 +120,6 @@ public enum TimeInvariantPopulation {
         return newPerson;
     }
 
-    /** @param usedIDs
-     * @return new ID which is not yet in set usedIDs */
-    private static Id<Person> generateUnusedID(HashSet<Id<Person>> usedIDs) {
-        Integer i = 0;
-        Id<Person> newId;
-        do {
-            ++i;
-            String newIDs = Integer.toString(i);
-            newId = Id.create(newIDs, Person.class);
-        } while (usedIDs.contains(newId));
 
-        return newId;
-    }
 
 }

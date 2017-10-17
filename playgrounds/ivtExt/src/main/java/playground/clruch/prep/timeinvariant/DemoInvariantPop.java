@@ -41,7 +41,7 @@ public class DemoInvariantPop {
         Population population = scenario.getPopulation();
 
         int numPeople = population.getPersons().size();
-        TheApocalypse.decimatesThe(population).toNoMoreThan(3000);
+        // TheApocalypse.decimatesThe(population).toNoMoreThan(3000);
         PopulationTools.changeModesOfTransportToAV(population);
         // Population populationInvariant = TimeInvariantPopulation.at(interval, population);
         Population populationInvariant = TimeInvariantPopulation.from(interval, population);
