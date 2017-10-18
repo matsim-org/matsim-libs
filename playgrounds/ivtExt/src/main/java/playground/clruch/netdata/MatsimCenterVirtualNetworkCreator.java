@@ -11,6 +11,8 @@ import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.core.networks.CenterVirtualNetworkCreator;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyGeneratedInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -38,8 +40,9 @@ public class MatsimCenterVirtualNetworkCreator {
     public VirtualNetwork<Link> creatVirtualNetwork(Network network) {
         // TODO magic consts.
         double centerRadius = 1500;
+        Tensor emptyTensor = Tensors.empty();
         Collection<Link> elements = (Collection<Link>) network.getLinks().values();
-        CenterVirtualNetworkCreator<Link> cvn = new CenterVirtualNetworkCreator<>(centerRadius, elements, PlaneLocation::of, NetworkCreatorUtils::linkToID);
+        CenterVirtualNetworkCreator<Link> cvn = new CenterVirtualNetworkCreator<>(centerRadius, emptyTensor, elements, PlaneLocation::of, NetworkCreatorUtils::linkToID);
         return cvn.getVirtualNetwork();
     }
 
