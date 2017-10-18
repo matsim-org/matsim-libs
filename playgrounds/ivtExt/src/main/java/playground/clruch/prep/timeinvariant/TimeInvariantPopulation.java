@@ -64,12 +64,12 @@ public enum TimeInvariantPopulation {
         System.out.println(people.size() + " in interval " + interval.print());
         System.out.println(totalP + " in interval " + 0 + "-->" + 108000);
 
+        IDGenerator generator = new IDGenerator(usedIDs);
         for (int i = 0; i < totalP; ++i) {
             if (i % 500 == 0)
                 System.out.println("creating person " + i + " of " + totalP);
 
-            // adapt a random person to choice random time in the day
-            IDGenerator generator = new IDGenerator(usedIDs);
+            // adapt a random person to choice random time in the day            
             Person newPerson = createNewPerson(PopulationUtils.getRandomPerson(people), //
                     PopulationUtils.getRandomDayTime(), generator);
 
