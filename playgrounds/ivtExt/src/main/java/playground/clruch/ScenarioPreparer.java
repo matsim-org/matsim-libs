@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -139,8 +140,9 @@ public class ScenarioPreparer {
         // TODO make this generic for any VirtualNetwork creators.
         VirtualNetwork<Link> virtualNetwork;
         if (centerNetwork) {
-            MatsimCenterVirtualNetworkCreator centercreator = new MatsimCenterVirtualNetworkCreator();
-            virtualNetwork = centercreator.creatVirtualNetwork(network);
+            Coord centerShift = new Coord(0,0);
+            double radius = 1500;
+            virtualNetwork = (new MatsimCenterVirtualNetworkCreator(centerShift, radius, network)).getVirtualNetwork();
         } else {
             MatsimKMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new MatsimKMEANSVirtualNetworkCreator();
             virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
