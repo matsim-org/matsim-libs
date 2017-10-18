@@ -30,10 +30,11 @@ import org.matsim.contrib.signals.builder.SignalModelFactory;
 import org.matsim.contrib.signals.builder.SignalSystemsModelBuilder;
 import org.matsim.contrib.signals.mobsim.QSimSignalEngine;
 import org.matsim.contrib.signals.model.SignalSystemsManager;
-import org.matsim.contrib.signals.router.*;
+import org.matsim.contrib.signals.router.NetworkWithSignalsTurnInfoBuilder;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.network.algorithms.NetworkTurnInfoBuilder;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QSignalsNetworkFactory;
 import org.matsim.core.network.algorithms.NetworkTurnInfoBuilderI;
 import org.matsim.core.replanning.ReplanningContext;
 
@@ -55,6 +56,7 @@ public class SignalsModule extends AbstractModule {
 			// general signal bindings
 			bind(SignalSystemsModelBuilder.class).to(FromDataBuilder.class);
 			addMobsimListenerBinding().to(QSimSignalEngine.class);
+			bind(QNetworkFactory.class).to(QSignalsNetworkFactory.class);
 
 			// bind tool to write information about signal states for via
 			bind(SignalEvents2ViaCSVWriter.class).asEagerSingleton();

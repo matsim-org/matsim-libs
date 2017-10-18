@@ -60,12 +60,12 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 	private NetsimInternalInterface netsimEngine;
 	
 	@Inject 
-	public QLanesNetworkFactory( QSimConfigGroup qsimConfig, EventsManager events, Network network, Scenario scenario, Lanes lanesDefinitions ) {
-		this.qsimConfig = qsimConfig ;
+	public QLanesNetworkFactory( EventsManager events, Scenario scenario ) {
+		this.qsimConfig = scenario.getConfig().qsim();
 		this.events = events ;
-		this.network = network ;
+		this.network = scenario.getNetwork() ;
 		this.scenario = scenario ;
-		this.laneDefinitions = lanesDefinitions;
+		this.laneDefinitions = scenario.getLanes();
 		delegate = new DefaultQNetworkFactory( events, scenario ) ;
 	}
 

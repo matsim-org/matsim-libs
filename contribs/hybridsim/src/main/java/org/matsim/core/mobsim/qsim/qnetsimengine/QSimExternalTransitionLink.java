@@ -52,7 +52,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	}
 
 	@Override
-	boolean doSimStep() {
+	public boolean doSimStep() {
 		return false;
 	}
 
@@ -69,7 +69,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	// now in QLaneI, see below. kai, mar'16
 
 	@Override
-	boolean isNotOfferingVehicle() {
+	public boolean isNotOfferingVehicle() {
 		return true;
 	}
 
@@ -89,12 +89,12 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	}
 
 	@Override
-	QNodeI getToNode() {
+	public QNodeI getToNode() {
 		throw new RuntimeException("not yet implemented");
 	}
 
 	@Override
-	List<QLaneI> getOfferingQLanes() {
+	public List<QLaneI> getOfferingQLanes() {
 		List<QLaneI> list = new ArrayList<>() ;
 		list.add( fakeLane ) ;
 		return list ;
@@ -105,13 +105,13 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 	}
 	
 	@Override
-	QLaneI getAcceptingQLane() {
+	public QLaneI getAcceptingQLane() {
 		return this.fakeLane ;
 	}
 	
-	private final class FakeLane extends QLaneI {
+	private final class FakeLane implements QLaneI {
 		@Override
-		void addFromUpstream(QVehicle veh) {
+		public void addFromUpstream(QVehicle veh) {
 			double now = context.getSimTimer().getTimeOfDay() ;
 			
 			Id<Link> nextL = veh.getDriver().chooseNextLinkId();
@@ -122,59 +122,59 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		}
 		
 		@Override
-		double getLoadIndicator() {
+		public double getLoadIndicator() {
 			return 0. ;
 		}
 		@Override
-		void changeSpeedMetersPerSecond( double spd ) {
+		public void changeSpeedMetersPerSecond( double spd ) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		void addFromWait(QVehicle arg0) {
+		public void addFromWait(QVehicle arg0) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		void addTransitSlightlyUpstreamOfStop(QVehicle arg0) {
+		public void addTransitSlightlyUpstreamOfStop(QVehicle arg0) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		void changeEffectiveNumberOfLanes(double arg0) {
+		public void changeEffectiveNumberOfLanes(double arg0) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		void changeUnscaledFlowCapacityPerSecond(double arg0) {
+		public void changeUnscaledFlowCapacityPerSecond(double arg0) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		void clearVehicles() {
+		public void clearVehicles() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		boolean doSimStep() {
+		public boolean doSimStep() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		Collection<MobsimVehicle> getAllVehicles() {
+		public Collection<MobsimVehicle> getAllVehicles() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		QVehicle getFirstVehicle() {
+		public QVehicle getFirstVehicle() {
 			// something like
 //			QSimExternalTransitionLink.this.e.getFirstFehicle() ;
 			
@@ -183,66 +183,60 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		}
 
 		@Override
-		double getLastMovementTimeOfFirstVehicle() {
+		public double getLastMovementTimeOfFirstVehicle() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		double getSimulatedFlowCapacityPerTimeStep() {
+		public double getSimulatedFlowCapacityPerTimeStep() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		double getStorageCapacity() {
+		public double getStorageCapacity() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		QVehicle getVehicle(Id<Vehicle> arg0) {
+		public QVehicle getVehicle(Id<Vehicle> arg0) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		VisData getVisData() {
+		public VisData getVisData() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		boolean hasGreenForToLink(Id<Link> arg0) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		boolean isAcceptingFromUpstream() {
+		public boolean isAcceptingFromUpstream() {
 			return e.hasSpace(getLink().getFromNode().getId());
 		}
 
 		@Override
-		boolean isAcceptingFromWait(QVehicle veh) {
+		public boolean isAcceptingFromWait(QVehicle veh) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		boolean isActive() {
+		public boolean isActive() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		boolean isNotOfferingVehicle() {
+		public boolean isNotOfferingVehicle() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
 
 		@Override
-		QVehicle popFirstVehicle() {
+		public QVehicle popFirstVehicle() {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
@@ -254,7 +248,7 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		}
 		
 		@Override
-		void initBeforeSimStep() {
+		public void initBeforeSimStep() {
 		    // TODO Auto-generated method stub
 		}
 	}

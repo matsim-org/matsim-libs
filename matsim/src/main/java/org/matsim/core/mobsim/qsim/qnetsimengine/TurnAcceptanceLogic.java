@@ -11,7 +11,9 @@ import org.matsim.api.core.v01.network.Link;
  *
  */
 interface TurnAcceptanceLogic {
+	
+	enum AcceptTurn { GO, WAIT, ABORT }
 
-	boolean isAcceptingTurn(Link currentLink, Id<Link> nextLinkId, QLinkI nextQLink, QVehicle veh);
+	AcceptTurn isAcceptingTurn(Link currentLink, QLaneI currentLane, Id<Link> nextLinkId, QVehicle veh, QNetwork qNetwork);
 
 }
