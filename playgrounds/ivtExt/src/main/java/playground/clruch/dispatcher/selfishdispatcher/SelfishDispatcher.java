@@ -44,7 +44,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
     private final AbstractRoboTaxiRequestMatcher roboTaxiRequestMatcher;
     private Set<RoboTaxi> waitingTaxis = new HashSet<>();
     private final TravelData travelData;
-    private final double fareRatioMultiply;
+    private final double fareRatio;
 
     private SelfishDispatcher(//
             Config config, //
@@ -61,9 +61,9 @@ public class SelfishDispatcher extends PartitionedDispatcher {
         roboTaxiRequestMatcher = new RoboTaxiCloseRequestMatcher();
         GlobalAssert.that(travelData != null);
         this.travelData = travelData;
-        this.fareRatioMultiply = safeConfig.getDouble("fareRatioMultiply", 1.0);
+        this.fareRatio = safeConfig.getDouble("fareRatio", 1.0);
         System.out.println("==========================================");
-        System.out.println("fare ratio multiply = " + fareRatioMultiply);
+        System.out.println("fare ratio  = " + fareRatio);
         System.out.println("==========================================");
     }
 
@@ -71,6 +71,11 @@ public class SelfishDispatcher extends PartitionedDispatcher {
     public void redispatch(double now) {
         // TestBedDispatcher implemenatation
         final long round_now = Math.round(now);
+
+        if (getRoboTaxis().size() > 0 && round_now < 10.0) { // TODO magic const
+            getRoboTaxis().stream().forEach(rt -> waitingTaxis.add(rt));
+        }
+
         if (round_now % dispatchPeriod == 0) {
 
             /** assign all stay vehicles to an unassigned request */
@@ -96,29 +101,42 @@ public class SelfishDispatcher extends PartitionedDispatcher {
     private VirtualNode<Link> selectRebalanceNode(int time) {
 
         Map<VirtualNode<Link>, Double> scores = new HashMap<>();
-        Tensor lambda = travelData.getLambdaforTime(time);
+        Tensor lambdaT = travelData.getLambdaforTime(time);
 
         for (VirtualNode<Link> virtualNode : virtualNetwork.getVirtualNodes()) {
-
-            double averageFare = calcAverageFare(virtualNode, time);
-            double arrivalFreq = lambda.Get(virtualNode.getIndex()).number().doubleValue();
-            double waitingTaxis = getVirtualNodeStayVehicles().get(virtualNode).size();
-            scores.put(virtualNode, getScore(averageFare, arrivalFreq));
+            double lambda = lambdaT.Get(virtualNode.getIndex()).number().doubleValue();
+            
+            double optFR = FareRatioCalculator.calcOptLightLoadFareRatio(lambdaT, getRoboTaxis().size());
+            
+            double averageFare = calcAverageFare(virtualNode, fareRatio,optFR, time);
+            double idleVeh = getVirtualNodeStayVehicles().get(virtualNode).size();
+            scores.put(virtualNode, getScore(averageFare, lambda, idleVeh));
         }
 
         return Max.getMaxScoreElement(scores, new ScoreComparator());
 
     }
 
-    private double getScore(double averageFare, double arrivalFreq) {
-        double score = (averageFare * arrivalFreq);
+    private double getScore(double averageFare, double lambda, double idleVeh) {
+        double score = (averageFare * lambda) / (idleVeh);
         return score;
 
     }
 
-    private double calcAverageFare(VirtualNode<Link> virtualNode, int time) {
+    private double calcAverageFare(VirtualNode<Link> virtualNode,double fareRatioOpt,double fareRatio, int time) {
+        
 
-        return 1.0;
+        
+        double basicFare = 1.0; 
+        
+        double fA = basicFare;
+        double fB = basicFare * fareRatio;
+
+        if (virtualNode.getIndex() == 0)
+            return fA;
+        else
+            return fB;
+
         // // TODO add global asserts, document, update.
         // double fareRatio = FareRatioCalculator.calcOptLightLoadFareRatio(travelData, time, getRoboTaxis().size());
         // fareRatio *= fareRatioMultiply;
