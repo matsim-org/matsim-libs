@@ -17,6 +17,7 @@ import playground.clruch.dispatcher.utils.PlaneLocation;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /** @author Claudio Ruch */
+// TODO doc
 public class RequestCloseRoboTaxiMatcher implements AbstractRoboTaxiRequestMatcher {
     private Set<RoboTaxi> roboTaxisMatched;
 
@@ -42,16 +43,16 @@ public class RequestCloseRoboTaxiMatcher implements AbstractRoboTaxiRequestMatch
 
     // TODO implement efficiently using some tree structure.
     private RoboTaxi findClosest(AVRequest avr, List<RoboTaxi> robotaxis) {
-        double distCloest = Double.MAX_VALUE;
+        double distClosest = Double.MAX_VALUE;
         RoboTaxi closest = null;
 
         Tensor locAVR = PlaneLocation.of(avr);
         for (RoboTaxi robotaxi : robotaxis) {
             if (!roboTaxisMatched.contains(robotaxi)) {
                 Tensor locRT = PlaneLocation.of(robotaxi);
-                double dist = PlaneEuclideanDistance.of(locAVR, locAVR);
-                if (dist < distCloest) {
-                    distCloest = dist;
+                double dist = PlaneEuclideanDistance.of(locRT, locAVR);
+                if (dist < distClosest) {
+                    distClosest = dist;
                     closest = robotaxi;
                 }
 

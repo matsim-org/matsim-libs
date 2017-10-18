@@ -23,7 +23,7 @@ import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.robotaxirequestmatcher.AbstractRoboTaxiRequestMatcher;
-import playground.clruch.dispatcher.utils.robotaxirequestmatcher.RoboTaxiCloseRequestMatcher;
+import playground.clruch.dispatcher.utils.robotaxirequestmatcher.RequestCloseRoboTaxiMatcher;
 import playground.clruch.dispatcher.utils.virtualnodedestselector.RandomVirtualNodeDest;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
@@ -58,7 +58,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
         SafeConfig safeConfig = SafeConfig.wrap(avconfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         this.network = network;
-        roboTaxiRequestMatcher = new RoboTaxiCloseRequestMatcher();
+        roboTaxiRequestMatcher = new RequestCloseRoboTaxiMatcher();
         GlobalAssert.that(travelData != null);
         this.travelData = travelData;
         this.fareRatioMultiply = safeConfig.getDouble("fareRatio", 1.0);
