@@ -1,13 +1,9 @@
 package playground.clruch.dispatcher.selfishdispatcher;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -20,6 +16,7 @@ import com.google.inject.name.Named;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNode;
+import ch.ethz.idsc.queuey.math.utils.Max;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
 import playground.clruch.dispatcher.core.AVStatus;
@@ -36,7 +33,6 @@ import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /** Dispatcher used to create datasets to verify the theory of selfish fleet performance.
@@ -105,15 +101,12 @@ public class SelfishDispatcher extends PartitionedDispatcher {
         for (VirtualNode<Link> virtualNode : virtualNetwork.getVirtualNodes()) {
 
             double averageFare = calcAverageFare(virtualNode, time);
-
             double arrivalFreq = lambda.Get(virtualNode.getIndex()).number().doubleValue();
-
             double waitingTaxis = getVirtualNodeStayVehicles().get(virtualNode).size();
-
             scores.put(virtualNode, getScore(averageFare, arrivalFreq));
         }
 
-        return getMaxVirtualNode(scores);
+        return Max.getMaxScoreElement(scores, new ScoreComparator());
 
     }
 
@@ -123,27 +116,18 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
     }
 
-    private VirtualNode<Link> getMaxVirtualNode(Map<VirtualNode<Link>, Double> scores) {
-        Entry<VirtualNode<Link>, Double> maxEntry = Collections.max(scores.entrySet(), new ScoreComparator());
-        virtualNetwork.getVirtualNodes().forEach(vn -> GlobalAssert.that(scores.get(vn) <= scores.get(maxEntry.getKey())));
-
-        Set<VirtualNode<Link>> maxNodes = scores.entrySet().stream().filter(e -> e.getValue().equals(maxEntry.getValue())).map(e -> e.getKey())
-                .collect(Collectors.toSet());
-
-        GlobalAssert.that(maxNodes.size() > 0);
-        return maxNodes.stream().skip((int) (maxNodes.size() * Math.random())).findFirst().get();
-    }
-
     private double calcAverageFare(VirtualNode<Link> virtualNode, int time) {
-        // TODO add global asserts, document, update.
-        double fareRatio = FareRatioCalculator.calcOptLightLoadFareRatio(travelData, time, getRoboTaxis().size());
-        fareRatio *= fareRatioMultiply;
-        double basicFare = 1;
 
-        if (virtualNode.getIndex() == 0)
-            return basicFare * fareRatio;
-        else
-            return fareRatio;
+        return 1.0;
+        // // TODO add global asserts, document, update.
+        // double fareRatio = FareRatioCalculator.calcOptLightLoadFareRatio(travelData, time, getRoboTaxis().size());
+        // fareRatio *= fareRatioMultiply;
+        // double basicFare = 1;
+        //
+        // if (virtualNode.getIndex() == 0)
+        // return basicFare * fareRatio;
+        // else
+        // return fareRatio;
     }
 
     @Override
