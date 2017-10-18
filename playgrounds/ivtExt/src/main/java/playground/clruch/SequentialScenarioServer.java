@@ -27,7 +27,7 @@ public class SequentialScenarioServer {
         
         
         
-        double[] fareRatios = new double[]{0.01, 1.0, 1000.0};
+        double[] fareRatios = new double[]{0.0001, 1.0, 10000.0};
         
 
         // copy the raw folder name including changed settings

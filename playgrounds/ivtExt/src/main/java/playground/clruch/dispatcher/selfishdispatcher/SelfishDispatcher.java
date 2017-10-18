@@ -44,7 +44,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
     private final AbstractRoboTaxiRequestMatcher roboTaxiRequestMatcher;
     private Set<RoboTaxi> waitingTaxis = new HashSet<>();
     private final TravelData travelData;
-    private final double fareRatio;
+    private final double fareRatioMultiply;
 
     private SelfishDispatcher(//
             Config config, //
@@ -61,9 +61,9 @@ public class SelfishDispatcher extends PartitionedDispatcher {
         roboTaxiRequestMatcher = new RoboTaxiCloseRequestMatcher();
         GlobalAssert.that(travelData != null);
         this.travelData = travelData;
-        this.fareRatio = safeConfig.getDouble("fareRatio", 1.0);
+        this.fareRatioMultiply = safeConfig.getDouble("fareRatio", 1.0);
         System.out.println("==========================================");
-        System.out.println("fare ratio  = " + fareRatio);
+        System.out.println("fare ratio  = " + fareRatioMultiply);
         System.out.println("==========================================");
     }
 
@@ -105,10 +105,10 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
         for (VirtualNode<Link> virtualNode : virtualNetwork.getVirtualNodes()) {
             double lambda = lambdaT.Get(virtualNode.getIndex()).number().doubleValue();
-            
+
             double optFR = FareRatioCalculator.calcOptLightLoadFareRatio(lambdaT, getRoboTaxis().size());
-            
-            double averageFare = calcAverageFare(virtualNode, fareRatio,optFR, time);
+
+            double averageFare = calcAverageFare(virtualNode, fareRatioMultiply, optFR, time);
             double idleVeh = getVirtualNodeStayVehicles().get(virtualNode).size();
             scores.put(virtualNode, getScore(averageFare, lambda, idleVeh));
         }
@@ -123,14 +123,10 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
     }
 
-    private double calcAverageFare(VirtualNode<Link> virtualNode,double fareRatioOpt,double fareRatio, int time) {
-        
+    private double calcAverageFare(VirtualNode<Link> virtualNode, double fareRatioMultiPly, double fareRatioOpt, int time) {
 
-        
-        double basicFare = 1.0; 
-        
-        double fA = basicFare;
-        double fB = basicFare * fareRatio;
+        double fA = fareRatioOpt * fareRatioMultiPly;
+        double fB = fareRatioOpt;
 
         if (virtualNode.getIndex() == 0)
             return fA;
