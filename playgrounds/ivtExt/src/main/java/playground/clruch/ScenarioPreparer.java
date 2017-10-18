@@ -58,7 +58,7 @@ public class ScenarioPreparer {
         File configFile = new File(workingDirectory, simOptions.getString("fullConfig"));
         System.out.println("loading config file to get data " + configFile.getAbsoluteFile());
 
-        // TODO wrap properties with new class, class contains function getBoolean...
+        // TODO can some of these be directly read from another source? Do all have to be user settings?
         boolean populationeliminateFreight = simOptions.getBoolean("populationeliminateFreight");
         boolean populationeliminateWalking = simOptions.getBoolean("populationeliminateWalking");
         boolean populationchangeModeToAV = simOptions.getBoolean("populationchangeModeToAV");
@@ -140,8 +140,8 @@ public class ScenarioPreparer {
         // TODO make this generic for any VirtualNetwork creators.
         VirtualNetwork<Link> virtualNetwork;
         if (centerNetwork) {
-            Coord centerShift = new Coord(0,0);
-            double radius = 1500;
+            Coord centerShift = new Coord(800, -2200);
+            double radius = 2500;
             virtualNetwork = (new MatsimCenterVirtualNetworkCreator(centerShift, radius, network)).getVirtualNetwork();
         } else {
             MatsimKMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new MatsimKMEANSVirtualNetworkCreator();

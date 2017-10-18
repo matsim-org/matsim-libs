@@ -100,36 +100,30 @@ public class SelfishDispatcher extends PartitionedDispatcher {
     private VirtualNode<Link> selectRebalanceNode(int time) {
 
         Map<VirtualNode<Link>, Double> scores = new HashMap<>();
-
         Tensor lambda = travelData.getLambdaforTime(time);
-
-        // double lambda0 = lambda.Get(0).number().doubleValue();
-        // double lambda1 = lambda.Get(1).number().doubleValue();
 
         for (VirtualNode<Link> virtualNode : virtualNetwork.getVirtualNodes()) {
 
-            double averageFare = calcAverageFare(virtualNode, //
-                    getVirtualNodeRequests().get(virtualNode), time);
-            GlobalAssert.that(averageFare >= 0.0);
-            // int openRequests = getVirtualNodeRequests().get(virtualNode).size();
+            double averageFare = calcAverageFare(virtualNode, time);
 
             double arrivalFreq = lambda.Get(virtualNode.getIndex()).number().doubleValue();
 
-            // GlobalAssert.that(openRequests >= 0);
-            GlobalAssert.that(arrivalFreq >= 0);
             double waitingTaxis = getVirtualNodeStayVehicles().get(virtualNode).size();
-            GlobalAssert.that(waitingTaxis >= 0);
-            //
-            double score;
-            if (waitingTaxis > 0) {
-                score = (averageFare * arrivalFreq) / ((double) waitingTaxis);
-            } else {
-                score = (averageFare * arrivalFreq);
-            }
 
-            scores.put(virtualNode, score);
+            scores.put(virtualNode, getScore(averageFare, arrivalFreq));
         }
 
+        return getMaxVirtualNode(scores);
+
+    }
+
+    private double getScore(double averageFare, double arrivalFreq) {
+        double score = (averageFare * arrivalFreq);
+        return score;
+
+    }
+
+    private VirtualNode<Link> getMaxVirtualNode(Map<VirtualNode<Link>, Double> scores) {
         Entry<VirtualNode<Link>, Double> maxEntry = Collections.max(scores.entrySet(), new ScoreComparator());
         virtualNetwork.getVirtualNodes().forEach(vn -> GlobalAssert.that(scores.get(vn) <= scores.get(maxEntry.getKey())));
 
@@ -138,10 +132,10 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
         GlobalAssert.that(maxNodes.size() > 0);
         return maxNodes.stream().skip((int) (maxNodes.size() * Math.random())).findFirst().get();
-
     }
 
-    private double calcAverageFare(VirtualNode<Link> virtualNode, List<AVRequest> requests, int time) {
+    private double calcAverageFare(VirtualNode<Link> virtualNode, int time) {
+        // TODO add global asserts, document, update.
         double fareRatio = FareRatioCalculator.calcOptLightLoadFareRatio(travelData, time, getRoboTaxis().size());
         fareRatio *= fareRatioMultiply;
         double basicFare = 1;
