@@ -318,6 +318,14 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	}
 
 	/**
+	 * Adds a new filter to hierarchy layer.
+	 * @param osmFilter
+	 */
+	public void addOsmFilter(final OsmFilter osmFilter) {
+		this.hierarchyLayers.add(osmFilter);
+	}
+
+	/**
 	 * By default, this converter caches a lot of data internally to speed up the network generation.
 	 * This can lead to OutOfMemoryExceptions when converting huge osm files. By enabling this
 	 * memory optimization, the converter tries to reduce its memory usage, but will run slower.
