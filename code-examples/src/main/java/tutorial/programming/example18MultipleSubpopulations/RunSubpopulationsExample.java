@@ -38,9 +38,12 @@ import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
 
 import java.io.File;
+import java.net.URL;
 
 /**
  * This example illustrates how to go about modelling subpopulations, 
@@ -79,16 +82,18 @@ public class RunSubpopulationsExample {
 	public static void main(String[] args) {
 		// preparation of an example scenario:
 		{
-			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			URL url = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL("equil-extended") , "config.xml" ) ;
+			
+			Scenario sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(url));
 
 			/* Set up network and plans. */
-			MatsimNetworkReader mnr = new MatsimNetworkReader(sc.getNetwork());
-			mnr.readFile(EQUIL_NETWORK);
 			createPopulation(sc, SUBPOP1_NAME, 100);
 			createPopulation(sc, SUBPOP2_NAME, 100);
 			new PopulationWriter(sc.getPopulation(), sc.getNetwork()).write(PLANS);
 			new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(OBJECT_ATTRIBUTES);
 		}
+		
+		System.exit(-1); 
 		
 		// building and running the simulation based on the example scenario:
 		Config config = ConfigUtils.createConfig(); 
