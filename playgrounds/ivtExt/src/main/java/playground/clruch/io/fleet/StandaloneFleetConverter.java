@@ -8,6 +8,7 @@ import java.util.List;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileReader;
+
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageUtils;
@@ -20,7 +21,7 @@ enum StandaloneFleetConverter {
         // STEP 1: File to DayTaxiRecord
         // selection of reference frame, file
         File directory = //
-                new File("/home/clruch/Downloads/2017-06-29 - ETH GPS Protokolle & Auftragslisten");
+                new File("/home/anape/Downloads/SanFranciscoTaxi/data");
         File outputDirectory = new File(args[0], "output");
         StorageUtils storageUtils = new StorageUtils(outputDirectory);
         ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
