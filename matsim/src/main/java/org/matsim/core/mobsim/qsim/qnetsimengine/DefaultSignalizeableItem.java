@@ -47,7 +47,7 @@ public final class DefaultSignalizeableItem implements SignalizeableItem {
 	@Override
 	public void setSignalStateAllTurningMoves(SignalGroupState state) {
 		this.allToLinksState = state;
-		this.linkGreen = this.checkGreen(state);
+		this.linkGreen = checkGreen(state);
 	}
 
 	private void initToLinkIdSignalStates(){
@@ -79,14 +79,17 @@ public final class DefaultSignalizeableItem implements SignalizeableItem {
 	}
 
 	private static boolean checkGreen(SignalGroupState state) {
-		return (state.equals(SignalGroupState.GREEN) || state.equals(SignalGroupState.REDYELLOW) || state.equals(SignalGroupState.OFF));
+		return (state.equals(SignalGroupState.GREEN) || state.equals(SignalGroupState.YELLOW) || state.equals(SignalGroupState.OFF));
 	}
 
-	public boolean isLinkGreen() {
+	/**
+	 * returns true, if at least on signal at the link/lane shows green
+	 */
+	public boolean hasGreenForAllToLinks() {
 		return linkGreen;
 	}
 	
-	public boolean isLinkGreenForToLink(Id<Link> toLinkId){
+	public boolean hasGreenForToLink(Id<Link> toLinkId){
 		if (this.allToLinksState != null) {
 			return checkGreen(this.allToLinksState);
 		}

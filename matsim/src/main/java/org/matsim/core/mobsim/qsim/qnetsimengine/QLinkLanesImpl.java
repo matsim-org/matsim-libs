@@ -226,12 +226,12 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	List<QLaneI> getOfferingQLanes() {
+	public List<QLaneI> getOfferingQLanes() {
 		return this.toNodeLaneQueues;
 	}
 
 	@Override
-	void clearVehicles() {
+	public void clearVehicles() {
 		super.clearVehicles();
 		for (QLaneI lane : this.laneQueues.values()) {
 			lane.clearVehicles();
@@ -239,7 +239,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	boolean doSimStep() {
+	public boolean doSimStep() {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		
 		boolean lanesActive = false;
@@ -405,7 +405,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	boolean isNotOfferingVehicle() {
+	public boolean isNotOfferingVehicle() {
 		// otherwise we have to do a bit more work
 		for (QLaneI lane : this.toNodeLaneQueues) {
 			if (!lane.isNotOfferingVehicle()) {
@@ -427,7 +427,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	QVehicle getVehicle(Id<Vehicle> vehicleId) {
+	public QVehicle getVehicle(Id<Vehicle> vehicleId) {
 		QVehicle ret = super.getVehicle(vehicleId);
 		if (ret != null) {
 			return ret;
@@ -559,7 +559,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 	
 	@Override
-	QLaneI getAcceptingQLane() {
+	public QLaneI getAcceptingQLane() {
 		return this.firstLaneQueue ;
 	}
 
