@@ -78,6 +78,8 @@ public final class MutableScenario implements Scenario, Lockable {
 		this.vehicles = VehicleUtils.createVehiclesContainer();
 		this.transitVehicles = VehicleUtils.createVehiclesContainer();
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
+		
+		this.config.network().setLocked();
 	}
 
 	@Override
