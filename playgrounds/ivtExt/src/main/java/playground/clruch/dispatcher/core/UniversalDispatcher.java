@@ -20,6 +20,7 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
@@ -27,6 +28,7 @@ import playground.clruch.net.SimulationDistribution;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationObjectCompiler;
 import playground.clruch.net.SimulationObjects;
+import playground.clruch.net.StorageUtils;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
 import playground.clruch.utils.AVTaskAdapter;
@@ -53,12 +55,13 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
     private int total_matchedRequests = 0;
 
     protected UniversalDispatcher( //
+            Config config,//
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager //
     ) {
-        super(eventsManager, avDispatcherConfig);
+        super(eventsManager, config, avDispatcherConfig);
         futurePathFactory = new FuturePathFactory(parallelLeastCostPathCalculator, travelTime);
         pickupDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getPickupDurationPerStop();
         dropoffDurationPerStop = avDispatcherConfig.getParent().getTimingParameters().getDropoffDurationPerStop();
@@ -85,9 +88,9 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
      * 
      * @param status {@AVStatus} of desired robotaxis, e.g., STAY,DRIVETOCUSTOMER,...
      * @return list of robotaxis which are in {@AVStatus} status */
-    public final List<RoboTaxi> getRoboTaxiSubset(AVStatus... status) {   
+    public final List<RoboTaxi> getRoboTaxiSubset(AVStatus... status) {
         return getRoboTaxiSubset(EnumSet.copyOf(Arrays.asList(status)));
-    }    
+    }
 
     private List<RoboTaxi> getRoboTaxiSubset(Set<AVStatus> status) {
         return getRoboTaxis().stream().filter(rt -> status.contains(rt.getAVStatus())).collect(Collectors.toList());
@@ -283,7 +286,7 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
 
     /** save simulation data into {@link SimulationObject} for later analysis and visualization. */
     @Override
-    protected final void notifySimulationSubscribers(long round_now) {
+    protected final void notifySimulationSubscribers(long round_now, StorageUtils storageUtils) {
         if (publishPeriod > 0 && round_now % publishPeriod == 0) {
             SimulationObjectCompiler simulationObjectCompiler = SimulationObjectCompiler.create( //
                     round_now, getInfoLine(), total_matchedRequests);
@@ -300,7 +303,7 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
             // in that case, the simObj will not be stored or communicated
             if (SimulationObjects.hasVehicles(simulationObject)) {
                 // store simObj and distribute to clients
-                SimulationDistribution.of(simulationObject);
+                SimulationDistribution.of(simulationObject, storageUtils);
             }
             publishPeriodMatchedRequests.clear();
         }

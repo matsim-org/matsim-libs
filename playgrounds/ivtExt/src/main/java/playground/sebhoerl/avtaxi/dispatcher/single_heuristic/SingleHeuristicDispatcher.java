@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
@@ -163,12 +164,12 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
         private ParallelLeastCostPathCalculator router;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
             return new SingleHeuristicDispatcher(
-                    config.getParent().getId(),
+                    avconfig.getParent().getId(),
                     eventsManager,
                     network,
-                    new SingleRideAppender(config, router, travelTime)
+                    new SingleRideAppender(avconfig, router, travelTime)
             );
         }
     }

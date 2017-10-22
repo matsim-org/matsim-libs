@@ -10,10 +10,8 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-/**
- * Created by Joel on 01.03.2017.
- */
-public class TotalData <Type> {
+/** Created by Joel on 01.03.2017. */
+public class TotalData {
     String xmlTitle = "SimulationResult";
     String L1ElName = "TotalTimeRatio";
     String L1AttrName = "TimeRatio";
@@ -24,7 +22,8 @@ public class TotalData <Type> {
     String L3Attr2Name = "WaitingTime50Quantile";
     String L3Attr3Name = "WaitingTime95Quantile";
 
-    public TotalData() {}
+    public TotalData() {
+    }
 
     // Take the Map timeStepData which for some IDs contains series of changes for times Double
     // in the data format Type. Save them in an XML with the structure:
@@ -49,7 +48,6 @@ public class TotalData <Type> {
             Element element2 = new Element(L2ElName);
             element2.setAttribute(new Attribute(L2AttrName, value2));
             doc.getRootElement().addContent(element2);
-
 
             // waiting times
             Element element3 = new Element(L3ElName);

@@ -25,35 +25,22 @@ import playground.clruch.net.VehicleContainer;
  * Created by Joel on 05.04.2017.
  */
 public class CoreAnalysis {
-    final StorageSupplier storageSupplier;
-    final int size;
-    public Tensor summary = Tensors.empty();
-    public Tensor waitBinCounter = Tensors.empty();
-    public Tensor totalWaitTimeQuantile = Tensors.empty();
-    public Tensor totalWaitTimeMean = Tensors.empty();
-    public double maximumWaitTime;
-    public int numRequests;
+    private final StorageSupplier storageSupplier;
+    private final int size;
+    private Tensor summary = Tensors.empty();
+    public Tensor waitBinCounter = Tensors.empty(); //TODO access, TODO can this be deleted?
+    public Tensor totalWaitTimeQuantile = Tensors.empty(); // TODO access
+    public Tensor totalWaitTimeMean = Tensors.empty(); // TODO access
+    public double maximumWaitTime; // TODO access
+    public int numRequests; // TODO access
+    private AnalyzeAll analyzeAll;
 
-    CoreAnalysis(StorageSupplier storageSupplierIn) {
+    public CoreAnalysis(StorageSupplier storageSupplierIn, AnalyzeAll analyzeAll) {
         storageSupplier = storageSupplierIn;
         size = storageSupplier.size();
+        this.analyzeAll = analyzeAll;
     }
 
-    static Tensor quantiles(Tensor submission) {
-        if (3 < submission.length()) {
-            return Quantile.of(submission, Tensors.vectorDouble(.1, .5, .95));
-        } else {
-            return Array.zeros(3);
-        }
-    }
-
-    static Tensor means(Tensor submission) {
-        if (3 < submission.length()) {
-            return Mean.of(submission);
-        } else {
-            return Mean.of(Array.zeros(1));
-        }
-    }
 
     public void analyze() throws Exception {
 
@@ -77,8 +64,8 @@ public class CoreAnalysis {
             Tensor waitTimeMean;
             {
                 Tensor submission = Tensor.of(s.requests.stream().map(rc -> RealScalar.of(now - rc.submissionTime)));
-                waitTimeQuantile = quantiles(submission);
-                waitTimeMean = means(submission);
+                waitTimeQuantile = TensorUtils.quantiles(submission);
+                waitTimeMean = TensorUtils.means(submission);
                 allSubmissions.append(submission);
             }
 
@@ -122,17 +109,21 @@ public class CoreAnalysis {
         Tensor uniqueSubmissions = Tensor.of(requestWaitTimes.values().stream().map(RealScalar::of));
         numRequests = uniqueSubmissions.length();
         maximumWaitTime = AnalysisUtils.maximum(uniqueSubmissions).number().doubleValue();
-        AnalyzeAll.waitBinSize = AnalysisUtils.adaptBinSize(uniqueSubmissions, AnalyzeAll.waitBinSize, RealScalar.of(5.0));
-        waitBinCounter = AnalysisUtils.binCount(uniqueSubmissions, AnalyzeAll.waitBinSize);
+        analyzeAll.setwaitBinSize(AnalysisUtils.adaptBinSize(uniqueSubmissions, analyzeAll.getwaitbinSize(), RealScalar.of(5.0)));
+        waitBinCounter = AnalysisUtils.binCount(uniqueSubmissions, analyzeAll.getwaitbinSize());
 
         System.out.println("Found requests: " + numRequests);
 
-        totalWaitTimeQuantile = quantiles(uniqueSubmissions);
+        totalWaitTimeQuantile = TensorUtils.quantiles(uniqueSubmissions);
         System.out.println("Q = " + totalWaitTimeQuantile);
-        totalWaitTimeMean = means(uniqueSubmissions);
+        totalWaitTimeMean = TensorUtils.means(uniqueSubmissions);
         System.out.println("mean = " + totalWaitTimeMean);
 
         summary = table;
 
+    }
+    
+    public Tensor getSummary(){
+        return summary.copy();
     }
 }

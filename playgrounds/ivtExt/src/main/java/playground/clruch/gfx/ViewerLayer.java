@@ -11,10 +11,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import playground.clib.gheat.gui.ColorSchemes;
-import playground.clib.jmapviewer.MatsimHeatMap;
-import playground.clib.util.gui.RowPanel;
-import playground.clib.util.gui.SpinnerLabel;
+import ch.ethz.idsc.queuey.view.gheat.gui.ColorSchemes;
+import ch.ethz.idsc.queuey.view.jmapviewer.MatsimHeatMap;
+import ch.ethz.idsc.queuey.view.util.gui.RowPanel;
+import ch.ethz.idsc.queuey.view.util.gui.SpinnerLabel;
 import playground.clruch.net.SimulationObject;
 
 /* package */ abstract class ViewerLayer {

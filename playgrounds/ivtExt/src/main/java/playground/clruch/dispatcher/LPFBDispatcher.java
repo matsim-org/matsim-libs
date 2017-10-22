@@ -13,6 +13,7 @@ import org.gnu.glpk.GLPKConstants;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
@@ -63,21 +64,21 @@ public class LPFBDispatcher extends PartitionedDispatcher {
     private final Network network;
 
     public LPFBDispatcher( //
-            AVDispatcherConfig config, //
+            Config config, AVDispatcherConfig avconfig, //
             AVGeneratorConfig generatorConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
             Network network, //
-            VirtualNetwork virtualNetwork, //
+            VirtualNetwork<Link> virtualNetwork, //
             AbstractVirtualNodeDest abstractVirtualNodeDest, //
             AbstractVehicleDestMatcher abstractVehicleDestMatcher) {
-        super(config, travelTime, router, eventsManager, virtualNetwork);
+        super(config, avconfig, travelTime, router, eventsManager, virtualNetwork);
         virtualNodeDest = abstractVirtualNodeDest;
         vehicleDestMatcher = abstractVehicleDestMatcher;
         numRobotaxi = (int) generatorConfig.getNumberOfVehicles();
         lpVehicleRebalancing = new LPVehicleRebalancing(virtualNetwork);
-        SafeConfig safeConfig = SafeConfig.wrap(config);
+        SafeConfig safeConfig = SafeConfig.wrap(avconfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
         rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 300);
         this.network = network;
@@ -115,7 +116,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                 Map<VirtualNode<Link>, List<RoboTaxi>> v_ij_reb = getVirtualNodeRebalancingToRoboTaxis();
                 Map<VirtualNode<Link>, List<RoboTaxi>> v_ij_cust = getVirtualNodeArrivingWithCustomerRoboTaxis();
                 Tensor vi_excessT = Array.zeros(virtualNetwork.getvNodesCount());
-                for (VirtualNode virtualNode : availableVehicles.keySet()) {
+                for (VirtualNode<Link> virtualNode : availableVehicles.keySet()) {
                     int viExcessVal = availableVehicles.get(virtualNode).size() + v_ij_reb.get(virtualNode).size() + v_ij_cust.get(virtualNode).size()
                             - requests.get(virtualNode).size();
                     vi_excessT.set(RealScalar.of(viExcessVal), virtualNode.getIndex());
@@ -142,7 +143,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
 
                 // fill rebalancing destinations
                 for (int i = 0; i < virtualNetwork.getvLinksCount(); ++i) {
-                    VirtualLink virtualLink = this.virtualNetwork.getVirtualLink(i);
+                    VirtualLink<Link> virtualLink = this.virtualNetwork.getVirtualLink(i);
                     VirtualNode<Link> toNode = virtualLink.getTo();
                     VirtualNode<Link> fromNode = virtualLink.getFrom();
                     int numreb = (Integer) (feasibleRebalanceCount.Get(fromNode.getIndex(), toNode.getIndex())).number();
@@ -157,7 +158,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
                         virtualNetwork.getVirtualNodes().stream().allMatch(v -> finalAvailableVehicles.get(v).size() >= rebalanceDestinations.get(v).size()));
 
                 // send rebalancing vehicles using the setVehicleRebalance command
-                for (VirtualNode virtualNode : rebalanceDestinations.keySet()) {
+                for (VirtualNode<Link> virtualNode : rebalanceDestinations.keySet()) {
                     Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(availableVehicles.get(virtualNode),
                             rebalanceDestinations.get(virtualNode));
                     rebalanceMatching.keySet().forEach(v -> setRoboTaxiRebalance(v, rebalanceMatching.get(v)));
@@ -169,8 +170,8 @@ public class LPFBDispatcher extends PartitionedDispatcher {
         // Part II: outside rebalancing periods, permanently assign destinations to vehicles using
         // bipartite matching
         if (round_now % dispatchPeriod == 0) {
-            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(), 
-                    new EuclideanDistanceFunction(), network,false);
+            printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, getDivertableRoboTaxis(), getAVRequests(),
+                    new EuclideanDistanceFunction(), network, false);
         }
     }
 
@@ -198,16 +199,16 @@ public class LPFBDispatcher extends PartitionedDispatcher {
         @Inject
         private Network network;
 
-        public static VirtualNetwork virtualNetwork;
+        public static VirtualNetwork<Link> virtualNetwork;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new RandomVirtualNodeDest();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
             virtualNetwork = VirtualNetworkGet.readDefault(network);
 
-            return new LPFBDispatcher(config, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork, abstractVirtualNodeDest,
+            return new LPFBDispatcher(config, avconfig, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork, abstractVirtualNodeDest,
                     abstractVehicleDestMatcher);
         }
     }

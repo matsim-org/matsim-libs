@@ -8,6 +8,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.QuadTree;
@@ -39,12 +40,13 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
                                                                       // "contains" searching
 
     private NewSingleHeuristicDispatcher( //
+            Config config,//
             AVDispatcherConfig avDispatcherConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager, //
             Network network) {
-        super(avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
+        super(config,avDispatcherConfig, travelTime, parallelLeastCostPathCalculator, eventsManager);
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
         networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
@@ -178,9 +180,9 @@ public class NewSingleHeuristicDispatcher extends UniversalDispatcher {
         private Network network;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
-            return new NewSingleHeuristicDispatcher( //
-                    config, travelTime, router, eventsManager, network);
+        public AVDispatcher createDispatcher(Config config,AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
+            return new NewSingleHeuristicDispatcher(config, //
+                    avconfig, travelTime, router, eventsManager, network);
         }
     }
 }

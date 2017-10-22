@@ -8,6 +8,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
@@ -36,15 +37,16 @@ public class DriveByDispatcher extends RebalancingDispatcher {
     private int total_abortTrip = 0;
 
     private DriveByDispatcher(//
-            AVDispatcherConfig config, //
+            Config config, //
+            AVDispatcherConfig avconfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
             Network network) {
-        super(config, travelTime, router, eventsManager);
+        super(config,avconfig, travelTime, router, eventsManager);
         links = new ArrayList<>(network.getLinks().values());
         Collections.shuffle(links, randGen);
-        SafeConfig safeConfig = SafeConfig.wrap(config);
+        SafeConfig safeConfig = SafeConfig.wrap(avconfig);
         rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 120);
     }
 
@@ -96,8 +98,8 @@ public class DriveByDispatcher extends RebalancingDispatcher {
         private Network network;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
-            return new DriveByDispatcher(config, travelTime, router, eventsManager, network);
+        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
+            return new DriveByDispatcher(config,avconfig, travelTime, router, eventsManager, network);
         }
     }
 

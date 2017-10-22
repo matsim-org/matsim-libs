@@ -7,9 +7,9 @@ import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
 
-import playground.clib.jmapviewer.interfaces.TileSource;
-import playground.clib.util.gui.RowPanel;
-import playground.clib.util.gui.SpinnerLabel;
+import ch.ethz.idsc.queuey.view.jmapviewer.interfaces.TileSource;
+import ch.ethz.idsc.queuey.view.util.gui.RowPanel;
+import ch.ethz.idsc.queuey.view.util.gui.SpinnerLabel;
 import playground.clruch.net.SimulationObject;
 
 /* package */ class TilesLayer extends ViewerLayer {

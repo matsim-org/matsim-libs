@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
@@ -24,12 +25,13 @@ public abstract class PartitionedDispatcher extends RebalancingDispatcher {
     protected final VirtualNetwork<Link> virtualNetwork; //
 
     protected PartitionedDispatcher( //
-            AVDispatcherConfig config, //
+            Config config,//
+            AVDispatcherConfig avconfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
             VirtualNetwork<Link> virtualNetwork) {
-        super(config, travelTime, router, eventsManager);
+        super(config, avconfig, travelTime, router, eventsManager);
         this.virtualNetwork = virtualNetwork;
         GlobalAssert.that(virtualNetwork != null);
     }

@@ -13,6 +13,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 
@@ -50,7 +51,7 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * 
  * MPC dispatcher requires yalmip running in matlab */
 public class MPCDispatcher extends BaseMpcDispatcher {
-    final Map<VirtualLink, Double> travelTimes;
+    final Map<VirtualLink<Link>, Double> travelTimes;
     final int numberOfVehicles;
     private String infoLineExtension = "";
 
@@ -58,15 +59,16 @@ public class MPCDispatcher extends BaseMpcDispatcher {
     final double[] networkBounds;
 
     public MPCDispatcher( //
-            AVDispatcherConfig config, //
+            Config config, //
+            AVDispatcherConfig avconfig, //
             AVGeneratorConfig generatorConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager, //
-            VirtualNetwork virtualNetwork, //
+            VirtualNetwork<Link> virtualNetwork, //
             Network network, //
-            Map<VirtualLink, Double> travelTimesIn) {
-        super(config, travelTime, parallelLeastCostPathCalculator, eventsManager, virtualNetwork);
+            Map<VirtualLink<Link>, Double> travelTimesIn) {
+        super(config, avconfig, travelTime, parallelLeastCostPathCalculator, eventsManager, virtualNetwork);
         travelTimes = travelTimesIn;
         numberOfVehicles = (int) generatorConfig.getNumberOfVehicles();
         try {
@@ -296,15 +298,15 @@ public class MPCDispatcher extends BaseMpcDispatcher {
         @Inject
         private Network network;
 
-        public static VirtualNetwork virtualNetwork;
-        public static Map<VirtualLink, Double> travelTimes;
+        public static VirtualNetwork<Link> virtualNetwork;
+        public static Map<VirtualLink<Link>, Double> travelTimes;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
 
             virtualNetwork = VirtualNetworkGet.readDefault(network);
 
-            return new MPCDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, network, travelTimes);
+            return new MPCDispatcher(config, avconfig, generatorConfig, travelTime, router, eventsManager, virtualNetwork, network, travelTimes);
         }
     }
 }
