@@ -44,11 +44,8 @@ import org.matsim.core.utils.io.UncheckedIOException;
  */
 public abstract class ConfigUtils implements MatsimExtensionPoint {
 
-	public static Config createConfig(final String filename) {
-		// are there systematic arguments against such a method?  otherwise, users will return to new Controler( filename ), since that
-		// is easier to memorize. kai, jul'16
-		
-		URL url = IOUtils.getUrlFromFileOrResource(filename) ;
+	public static Config createConfig(final String context) {
+		URL url = IOUtils.getUrlFromFileOrResource(context) ;
 		return createConfig( url ) ;
 	}
 

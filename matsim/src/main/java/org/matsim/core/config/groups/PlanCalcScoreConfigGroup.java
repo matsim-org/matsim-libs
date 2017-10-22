@@ -465,6 +465,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 				throw new IllegalArgumentException( module.getName() );
 		}
 	}
+	
+	@Override
+	protected final void checkConsistency( final Config config ) {
+		super.checkConsistency(config);
+		
+	}
 
 
 	public boolean isMemorizingExperiencedPlans() {
@@ -1019,11 +1025,6 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		@StringSetter( WAITING )
 		public void setMarginalUtlOfWaiting_utils_hr(final double waiting) {
 			testForLocked() ;
-			if ( (waiting != 0.) && (setWaitingCnt<1) ) {
-				setWaitingCnt++ ;
-				log.warn("Setting betaWaiting different from zero is discouraged.  It is probably implemented correctly, " +
-						"but there is as of now no indication that it makes the results more realistic." + Gbl.ONLYONCE );
-			}
 			this.waiting = waiting;
 		}
 
@@ -1230,7 +1231,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			}
 			if ( this.getMarginalUtlOfWaiting_utils_hr() != 0.0 ) {
 				log.warn( "marginal utl of wait set to: " + this.getMarginalUtlOfWaiting_utils_hr() + ". Setting this different from zero is " +
-						"discouraged. The parameter was also abused for pt routing; if you did that, consider setting the new " +
+						"discouraged since there is already the marginal utility of time as a resource. The parameter was also used "
+						+ "in the past for pt routing; if you did that, consider setting the new " +
 						"parameter waitingPt instead.");
 			}
 		}
