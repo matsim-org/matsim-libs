@@ -44,6 +44,9 @@ public class GeometryUtils {
 	 * @return
 	 */
 	public static List<Link> findIntersectingLinks(LineString lineString, final Network network) {
+		// One could probably improve this method by using the (already existing) link quadtree to look only at
+		// those links that are in the bounding box.  kai, oct'17
+		
 		// convert matsim links into geotools line strings:
 		Map<Link,LineString> segments = new LinkedHashMap<>() ;
 		for ( Link link : network.getLinks().values() ) {
