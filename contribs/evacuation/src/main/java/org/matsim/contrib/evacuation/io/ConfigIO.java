@@ -49,18 +49,21 @@ public class ConfigIO
 	{
 		
 		Scenario scenario = controller.getScenario();
-		String scenarioPath = controller.getScenarioPath();
-		String configFile = controller.getConfigFilePath();
 
 		if (roadClosures.size() > 0)
 		{
 
-			scenario.getConfig().network().setTimeVariantNetwork(true);
+			//			scenario.getConfig().network().setTimeVariantNetwork(true);
 			scenario.getConfig().network().setChangeEventsInputFile("changeEvents.xml");
-			new ConfigWriter(scenario.getConfig()).write(configFile);
+			new ConfigWriter(scenario.getConfig()).write(controller.getConfigFilePath());
+
+			// Since this caused too many problems, I am now disallowing to change the time variant network 
+			// after the scenario has been loaded.  I tried to set this to true now just before the scenario
+			// is loaded into Controller.  Might be better to have a deep copy method for config, but we don't 
+			// have that. kai, oct'17
 			
 			// create change event
-			Collection<NetworkChangeEvent> evs = new ArrayList<NetworkChangeEvent>();
+			Collection<NetworkChangeEvent> evs = new ArrayList<>();
 
 			Iterator<Entry<Id<Link>, String>> it = roadClosures.entrySet().iterator();
 			while (it.hasNext())
