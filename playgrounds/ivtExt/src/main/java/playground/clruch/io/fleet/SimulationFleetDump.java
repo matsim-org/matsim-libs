@@ -46,29 +46,36 @@ enum SimulationFleetDump {
 
             for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
             	
-            	/***
-            	 * Get the whole entry with timestamp instead only the value
-            	 */
-            	Entry<Integer, TaxiStamp> entry = dayTaxiRecord.get(vehicleIndex).interp(now);
-            	TaxiStamp taxiStamp = entry.getValue();
+            	// Get corresponding dayTaxiRecord entry according to time now
+            	Entry<Integer, TaxiStamp> dayTaxiRecordEntry = dayTaxiRecord.get(vehicleIndex).interp(now);
+            	TaxiStamp taxiStamp = dayTaxiRecordEntry.getValue();
+            	int timeStamp = dayTaxiRecordEntry.getKey();
                 try {
                     Coord xy = db.referenceFrame.coords_fromWGS84.transform(taxiStamp.gps);
                     // getClosest(...) may fail if xy is outside boundingbox
                     Link center = quadTree.getClosest(xy.getX(), xy.getY());
+                    
+                    /***
+                	 * - Get the whole entry with timestamp instead only the value
+                	 * Initialize all REBALANCE & STAY cars as OFFSERVICE 
+                	 * - Check if difference between now and the interp.now
+                     * is greater than specific limit and specify either
+                     * STAY or OFFSERVICE AVStatus
+                	 */
+                    AVStatus avStatus = taxiStamp.avStatus;
+                	if (now == 0) {
+                		if (taxiStamp.avStatus == AVStatus.STAY || taxiStamp.avStatus == AVStatus.REBALANCEDRIVE)
+                			avStatus = AVStatus.OFFSERVICE;
+                	}
+                	else if (Math.abs(now - timeStamp) >= 3600) // TODO magic const.
+                    	avStatus = AVStatus.OFFSERVICE;
+                	
                     // ---
                     VehicleContainer vc = new VehicleContainer();
                     vc.vehicleIndex = vehicleIndex;
                     vc.linkIndex = db.getLinkIndex(center);
+                    vc.avStatus = avStatus;
                     
-                    /***
-                     * Check if difference between now and the interp.now
-                     * is greater than specific limit and specify either
-                     * STAY or OFFSERVICE AVStatus
-                     */
-                    //if (now - entry.getKey() >= 3600) // TODO magic const.
-                    //	vc.avStatus = AVStatus.OFFSERVICE;
-                    //else
-                    	vc.avStatus = taxiStamp.avStatus;
                     GlobalAssert.that(Objects.nonNull(vc.avStatus));
                     simulationObject.vehicles.add(vc);
                 } catch (Exception exception) {

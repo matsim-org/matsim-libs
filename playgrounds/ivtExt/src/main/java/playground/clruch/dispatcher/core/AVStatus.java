@@ -27,8 +27,7 @@ public enum AVStatus {
     
     // New method checking for real stay or rebalance drive
     public static AVStatus check_stay(double dist, double time) {
-    	double wait_factor = time / dist;
-    	if (wait_factor >= 2.0 && time >= 200 && dist <= 100) // TODO magic const, check with AVSTATUS graph.
+    	if (time >= 150 && dist <= 150) // TODO magic const, check with AVSTATUS graph.
     		return AVStatus.STAY;
     	else
     		return AVStatus.REBALANCEDRIVE;

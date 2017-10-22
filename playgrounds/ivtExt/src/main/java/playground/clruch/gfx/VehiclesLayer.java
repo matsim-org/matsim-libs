@@ -23,11 +23,12 @@ import playground.clruch.net.VehicleContainer;
 
 /* package */ class VehiclesLayer extends ViewerLayer {
     private static final AVStatus[] aVStatusArray = new AVStatus[] { //
-            AVStatus.DRIVETOCUSTMER, AVStatus.DRIVEWITHCUSTOMER, AVStatus.REBALANCEDRIVE };
+            AVStatus.DRIVETOCUSTMER, AVStatus.DRIVEWITHCUSTOMER, //
+            AVStatus.REBALANCEDRIVE, AVStatus.STAY, AVStatus.OFFSERVICE };
     private BitSet bits = new BitSet();
 
     // during development standard colors are a better default
-    AvStatusColor avStatusColors = AvStatusColor.Standard;
+    AvStatusColor avStatusColors = AvStatusColor.Pop;
     boolean showLocation = true;
 
     public VehiclesLayer(MatsimMapComponent matsimMapComponent) {
