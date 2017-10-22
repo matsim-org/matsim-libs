@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
+import org.opengis.referencing.SpatialReferenceSystemUsingGeographicIdentifier;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 
@@ -18,7 +19,6 @@ public class TaxiTrail {
 
 	public void insert(int now, List<String> list) {
 		TaxiStamp taxiStamp = new TaxiStamp();
-		System.out.println("Getting AVStatus for vehicle ID " + list.get(1)) + ": ";
 		taxiStamp.avStatus = StringStatusMapper.apply(list.get(3),list.get(4),list.get(5));
 
 		taxiStamp.gps = new Coord( //
@@ -33,13 +33,19 @@ public class TaxiTrail {
 		sortedMap.put(now, taxiStamp);
 	}
 
-	public TaxiStamp interp(int now) {
+	/***
+	 * Changed method to return the whole entry instead only the getvalue() part
+	 * so we also know the timestamp it "interpolated" to.
+	 * @param now
+	 * @return
+	 */
+	public Entry<Integer, TaxiStamp> interp(int now) {
 		// less than or equal to the given key
 		Entry<Integer, TaxiStamp> entry = sortedMap.floorEntry(now);
 		if (Objects.nonNull(entry))
-			return entry.getValue();
+			return entry;
 		entry = sortedMap.higherEntry(now); // strictly greater
 		GlobalAssert.that(Objects.nonNull(entry));
-		return entry.getValue();
+		return entry;
 	}
 }

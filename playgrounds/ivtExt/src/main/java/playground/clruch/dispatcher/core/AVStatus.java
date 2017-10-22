@@ -9,6 +9,7 @@ public enum AVStatus {
     DRIVETOCUSTMER("d2c", "pickup"), //
     REBALANCEDRIVE("reb", "rebalance"), //
     STAY("stay", "stay"), //
+    OFFSERVICE("off", "off service"), // TODO check if useful.
     ;
 
     public final String xmlTag;
@@ -22,5 +23,14 @@ public enum AVStatus {
     @Override
     public String toString() {
         return this.xmlTag;
+    }
+    
+    // New method checking for real stay or rebalance drive
+    public static AVStatus check_stay(double dist, double time) {
+    	double wait_factor = time / dist;
+    	if (wait_factor >= 2.0 && time >= 200 && dist <= 100) // TODO magic const, check with AVSTATUS graph.
+    		return AVStatus.STAY;
+    	else
+    		return AVStatus.REBALANCEDRIVE;
     }
 }

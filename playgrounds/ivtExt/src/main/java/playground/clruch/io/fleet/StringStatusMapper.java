@@ -6,14 +6,9 @@ public enum StringStatusMapper {
     ;
     // TODO check assignments
     public static AVStatus apply(String string, String distance, String time) {
-    	double wait_factor = Double.parseDouble(time) / Double.parseDouble(distance);
-    	System.out.println("Wait factor " + wait_factor);
         switch (string) {
         case "Am Standplatz":
-        	if (wait_factor >= 2.0)
-        		return AVStatus.STAY;
-        	else
-        		return AVStatus.REBALANCEDRIVE;
+        	return AVStatus.check_stay(Double.parseDouble(distance), Double.parseDouble(time));        	
         case "In Anfahrt":
         	return AVStatus.DRIVETOCUSTMER;
         case "Angemeldet":

@@ -3,6 +3,7 @@ package playground.clruch.io.fleet;
 
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -12,6 +13,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensors;
+import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationObjects;
@@ -43,7 +45,12 @@ enum SimulationFleetDump {
             simulationObject.vehicles = new ArrayList<>();
 
             for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
-                TaxiStamp taxiStamp = dayTaxiRecord.get(vehicleIndex).interp(now);
+            	
+            	/***
+            	 * Get the whole entry with timestamp instead only the value
+            	 */
+            	Entry<Integer, TaxiStamp> entry = dayTaxiRecord.get(vehicleIndex).interp(now);
+            	TaxiStamp taxiStamp = entry.getValue();
                 try {
                     Coord xy = db.referenceFrame.coords_fromWGS84.transform(taxiStamp.gps);
                     // getClosest(...) may fail if xy is outside boundingbox
@@ -52,7 +59,16 @@ enum SimulationFleetDump {
                     VehicleContainer vc = new VehicleContainer();
                     vc.vehicleIndex = vehicleIndex;
                     vc.linkIndex = db.getLinkIndex(center);
-                    vc.avStatus = taxiStamp.avStatus;
+                    
+                    /***
+                     * Check if difference between now and the interp.now
+                     * is greater than specific limit and specify either
+                     * STAY or OFFSERVICE AVStatus
+                     */
+                    //if (now - entry.getKey() >= 3600) // TODO magic const.
+                    //	vc.avStatus = AVStatus.OFFSERVICE;
+                    //else
+                    	vc.avStatus = taxiStamp.avStatus;
                     GlobalAssert.that(Objects.nonNull(vc.avStatus));
                     simulationObject.vehicles.add(vc);
                 } catch (Exception exception) {
