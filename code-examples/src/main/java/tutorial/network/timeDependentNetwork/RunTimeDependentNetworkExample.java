@@ -48,11 +48,16 @@ public class RunTimeDependentNetworkExample {
 		URL configurl = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL("equil") , "config.xml" ) ;
 		
 		Config config = ConfigUtils.loadConfig( configurl ) ;
+		
+		// configure the time variant network here:
 		config.network().setTimeVariantNetwork(true);
+
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
 		// ---
 		
+		// create/load the scenario here.  The time variant network does already have to be set at this point
+		// in the config, otherwise it will not work.
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		
 		// ---
