@@ -39,8 +39,9 @@ public class MatsimCenterVirtualNetworkCreator {
         // TODO magic consts.
         double centerRadius = 1500;
         Collection<Link> elements = (Collection<Link>) network.getLinks().values();
-        CenterVirtualNetworkCreator<Link> cvn = new CenterVirtualNetworkCreator<>(centerRadius, elements, PlaneLocation::of, NetworkCreatorUtils::linkToID);
-        return cvn.getVirtualNetwork();
+        // CenterVirtualNetworkCreator<Link> cvn = new CenterVirtualNetworkCreator<>(centerRadius, elements, PlaneLocation::of, NetworkCreatorUtils::linkToID);
+        // return cvn.getVirtualNetwork();
+        return null;
     }
 
 }
