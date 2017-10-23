@@ -18,7 +18,7 @@ enum StandaloneFleetConverter {
         // STEP 1: File to DayTaxiRecord
         // selection of reference frame, file
         File directory = //
-                new File("/home/andya/Desktop/idsc_st/10_Daten/2017-10-11 ZurichNew");
+                new File("/home/andya/Desktop/idsc_st/10_Daten/2017-10-11_ZurichNew");
         ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
         //File file = new File("/media/datahaki/media/ethz/taxi", "2017-06-27 - GPS Fahrtstrecken-Protokoll.csv");
         List<File> trailFiles = (new ZHFileReader(directory, "Fahrtstrecken")).getTrailFiles();
