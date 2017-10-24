@@ -27,16 +27,16 @@
 			<artifactId>locationchoice</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>socnetsim</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>parking</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.matsim.contrib</groupId> -->
+<!-- 			<artifactId>socnetsim</artifactId> -->
+<!-- 			<version>0.9.0-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.matsim.contrib</groupId> -->
+<!-- 			<artifactId>parking</artifactId> -->
+<!-- 			<version>0.9.0-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-geotiff</artifactId>
@@ -47,16 +47,16 @@
 			<artifactId>opencsv</artifactId>
 			<version>3.7</version>
 		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>analysis</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>accessibility</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.matsim.contrib</groupId> -->
+<!-- 			<artifactId>analysis</artifactId> -->
+<!-- 			<version>0.9.0-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.matsim.contrib</groupId> -->
+<!-- 			<artifactId>accessibility</artifactId> -->
+<!-- 			<version>0.9.0-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
@@ -72,21 +72,21 @@
 			<artifactId>jsch</artifactId>
 			<version>0.1.54</version>
 		</dependency>
-		<dependency>
-			<groupId>com.github.gunnarfloetteroed</groupId>
-			<artifactId>java</artifactId>
-			<version>master</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.github.gunnarfloetteroed</groupId> -->
+<!-- 			<artifactId>java</artifactId> -->
+<!-- 			<version>master</version> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>org.matsim.contrib</groupId>
-			<artifactId>taxi</artifactId>
-			<version>0.9.0-SNAPSHOT</version>
-		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.matsim.contrib</groupId> -->
+<!-- 			<artifactId>taxi</artifactId> -->
+<!-- 			<version>0.9.0-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.jdom</groupId>
 			<artifactId>jdom2</artifactId>

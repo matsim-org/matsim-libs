@@ -29,7 +29,6 @@ import playground.clruch.analysis.RequestObj;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
-import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.joel.helpers.EasyDijkstra;
 
 /** @author Claudio Ruch */
@@ -122,8 +121,7 @@ public class MinimumFleetSizeCalculator implements Serializable {
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 
         File configFile = new File(args[0]);
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup,
-                new BlackListedTimeAllocationMutatorConfigGroup());
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup);
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();

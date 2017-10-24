@@ -19,7 +19,6 @@ import playground.clruch.net.SimulationServer;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
-import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
 enum PerformanceFleetSizeCalculatorStandalone {
@@ -43,8 +42,7 @@ enum PerformanceFleetSizeCalculatorStandalone {
         GlobalAssert.that(configFile.exists());
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, //
-                new BlackListedTimeAllocationMutatorConfigGroup());
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
 
         // load scenario for simulation
         Scenario scenario = ScenarioUtils.loadScenario(config);
