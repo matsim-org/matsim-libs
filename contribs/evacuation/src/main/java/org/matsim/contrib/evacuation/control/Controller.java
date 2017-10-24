@@ -484,6 +484,10 @@ public class Controller {
 
 				this.matsimConfig.global().setCoordinateSystem(this.targetCoordinateSystem);
 
+				this.matsimConfig.network().setTimeVariantNetwork(true);
+				// setting this globally to true since there is at least one case where it was set to 
+				// true after the scenario was loaded, and this is no longer allowed.  kai, oct'17
+				
 				this.scenario = ScenarioUtils.createScenario(this.matsimConfig);
 
 			}
@@ -956,6 +960,11 @@ public class Controller {
 			} catch (org.matsim.core.utils.io.UncheckedIOException e) {
 				e.printStackTrace();
 			}
+
+			this.matsimConfig.network().setTimeVariantNetwork(true);
+			// setting this globally to true since there is at least one case where it was set to 
+			// true after the scenario was loaded, and this is no longer allowed.  kai, oct'17
+
 			this.scenario = ScenarioUtils.loadScenario(this.matsimConfig);
 
 			// check if geo tranformation tools are available
