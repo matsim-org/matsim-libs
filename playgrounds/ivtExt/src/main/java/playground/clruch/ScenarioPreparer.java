@@ -83,6 +83,8 @@ public class ScenarioPreparer {
         Population population = scenario.getPopulation();
 
         {// 1) cut network (and reduce population to new network)
+            if(network == null) System.out.println("its the network");
+            if(ls == null) System.out.println("its the ls");
             NetworkCutClean.elminateOutsideRadius(network, ls.center, ls.radius);
             final File fileExportGz = new File(workingDirectory, NETWORKUPDATEDNAME + ".xml.gz");
             final File fileExport = new File(workingDirectory, NETWORKUPDATEDNAME + ".xml");

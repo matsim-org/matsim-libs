@@ -17,17 +17,14 @@ public class SequentialScenarioServer {
         /** Delete current content in outputfolder, DO NOT MODIFY THIS, POTENTIALLY VERY DANGEROUS. */
         SequentialScenarioTools.emptyOutputFolder(workingDirectory);
 
-        int iterations = 3;
+        int iterations = 31;
         if (iterations % 2 == 0) {
             iterations = iterations - 1;
         }
 
-        double factorPlus = 1.6;
-        //double[] fareRatios = SequentialScenarioTools.fareRatioCreator(iterations, factorPlus);
-        
-        
-        
-        double[] fareRatios = new double[]{0.0001, 1.0, 10000.0};
+        double factorPlus = 1.9;
+        double[] fareRatios = SequentialScenarioTools.fareRatioCreator(iterations, factorPlus);
+        //double[] fareRatios = new double[]{0.0001, 1.0, 10000.0};
         
 
         // copy the raw folder name including changed settings
