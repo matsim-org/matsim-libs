@@ -88,7 +88,7 @@ public class EditRoutes {
 	public EditRoutes( Network network, LeastCostPathCalculator pathCalculator, PopulationFactory popFactory ) {
 		this.network = network ;
 		this.pathCalculator = pathCalculator ;
-		this.routeFactories = ((PopulationFactory) popFactory).getRouteFactories() ;
+		this.routeFactories = popFactory.getRouteFactories() ;
 	}
 
 	/**
@@ -177,43 +177,29 @@ public class EditRoutes {
 	}
 
 	
-	/** Convenience method, to be consistent with earlier syntax.  kai, may'16
-	 * @param trip
-	 * @param plan
-	 * @param mainMode
-	 * @param departureTime
-	 * @param network
-	 * @param tripRouter
-	 */
-	public static boolean relocateFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter) {
-		return replanFutureTrip( trip,  plan,  mainMode,  departureTime,  network,  tripRouter) ;
-	}
-
 	/**
 	 * In contrast to the other replanFutureLegRoute(...) method, the leg at the given index is replaced
 	 * by a new one. This is e.g. necessary when replacing a pt trip which might consists of multiple legs
 	 * and pt_interaction activities.  
 	 * This might become the future default approach.
+	 * @deprecated Use {@link EditTrips#replanFutureTrip(Trip,Plan,String,double)} instead
 	 */
 		public static boolean replanFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter) {
+			return new EditTrips(tripRouter).replanFutureTrip(trip, plan, mainMode, departureTime);
+		}
 
-		Person person = plan.getPerson();
-
-		Activity fromActivity = trip.getOriginActivity();
-		Activity toActivity = trip.getDestinationActivity();
-
-		Link fromLink = network.getLinks().get(fromActivity.getLinkId());
-		Link toLink = network.getLinks().get(toActivity.getLinkId());
-
-		Facility<ActivityFacility> fromFacility = new LinkWrapperFacility(fromLink);
-		Facility<ActivityFacility> toFacility = new LinkWrapperFacility(toLink);
-
-		final List<? extends PlanElement> newTrip = tripRouter.calcRoute(mainMode, fromFacility, toFacility, departureTime, person);
-
-		TripRouter.insertTrip(plan, trip.getOriginActivity(), newTrip, trip.getDestinationActivity());
-
-		return true;
-	}
+		/** Convenience method, to be consistent with earlier syntax.  kai, may'16
+		 * @param trip
+		 * @param plan
+		 * @param mainMode
+		 * @param departureTime
+		 * @param network
+		 * @param tripRouter
+		 * @deprecated Use {@link EditTrips#relocateFutureTrip(Trip,Plan,String,double)} instead
+		 */
+		public static boolean relocateFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter) {
+			return new EditTrips(tripRouter).relocateFutureTrip(trip, plan, mainMode, departureTime );
+		}
 
 //	/**
 //	 * @deprecated switch this to (a new) relocateCurrentTrip, since with egress legs relocating the destination of a single leg leads to disconnected trips. kai, dec'15
@@ -235,7 +221,7 @@ public class EditRoutes {
 ////		return replanCurrentLegRoute( leg, person, currentLinkIndex, now, network, tripRouter ) ;
 //		throw new RuntimeException("currently not implemented") ;
 //	}
-
+		
 	/**
 	 * Re-locates a current route. The route is given by its leg.  Does not look after plans consistency!
 	 * 
@@ -267,7 +253,7 @@ public class EditRoutes {
 		Vehicle vehicle = null ;
 		Path path = this.pathCalculator.calcLeastCostPath(startLink.getToNode(), endLink.getFromNode(), time, person, vehicle) ;
 
-		List<Id<Link>> newLinkIds = new ArrayList<Id<Link>>();
+		List<Id<Link>> newLinkIds = new ArrayList<>();
 
 		/*
 		 * Get those Links which have already been passed.
@@ -289,7 +275,8 @@ public class EditRoutes {
 		 * remove that linkId from the linkIds List - it is stored
 		 * in the endLinkId field of the route.
 		 */
-		if (newLinkIds.size() > 0 && path.links.size()>0 && newLinkIds.get(newLinkIds.size() - 1).equals( path.links.get( path.links.size()-1 ) ) ) {
+//		if (newLinkIds.size() > 0 && path.links.size()>0 && newLinkIds.get(newLinkIds.size() - 1).equals( path.links.get( path.links.size()-1 ) ) ) {
+		if (newLinkIds.size() > 0 && path.links.size()>0 && newLinkIds.get(newLinkIds.size() - 1).equals( path.links.get( path.links.size()-1 ).getId() ) ) {
 			newLinkIds.remove( newLinkIds.size()-1 );
 		}
 
@@ -372,16 +359,16 @@ public class EditRoutes {
 
 	/**
 	 * @param trip
-	 * @return the depature time of the first leg of the trip
+	 * @return the departure time of the first leg of the trip
 	 */
-	public static double getDepatureTime(Trip trip) {
+	public static double getDepartureTime(Trip trip) {
 		// does this always make sense?
 		Leg leg = (Leg) trip.getTripElements().get(0);
 		return leg.getDepartureTime();
 	}
 
 	private static List<Id<Link>> getRouteLinkIds(Route route) {
-		List<Id<Link>> linkIds = new ArrayList<Id<Link>>();
+		List<Id<Link>> linkIds = new ArrayList<>();
 
 		if (route instanceof NetworkRoute) {
 			NetworkRoute networkRoute = (NetworkRoute) route;

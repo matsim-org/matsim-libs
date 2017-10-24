@@ -32,6 +32,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
 import org.matsim.withinday.utils.EditRoutes;
+import org.matsim.withinday.utils.EditTrips;
 
 /**
  * The NextLegReplanner can be used while an agent is performing an activity. The
@@ -65,8 +66,8 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		if (trip == null) return false;
 		
 		String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
-		double departureTime = EditRoutes.getDepatureTime(trip);
-		EditRoutes.replanFutureTrip(trip, executedPlan, mainMode, departureTime, scenario.getNetwork(), this.tripRouter);
+		double departureTime = EditRoutes.getDepartureTime(trip);
+		new EditTrips(this.tripRouter).replanFutureTrip(trip, executedPlan, mainMode, departureTime);
 		
 		/*
 		 * Updated code to use the TripRouter approach. This might result in problems at a few

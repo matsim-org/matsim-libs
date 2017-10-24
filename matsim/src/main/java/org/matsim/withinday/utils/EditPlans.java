@@ -31,9 +31,9 @@ import org.matsim.api.core.v01.population.Plan;
  * 
  * @author cdobler
  */
-public class ReplacePlanElements {
+public class EditPlans {
 
-	public boolean replaceActivity(Plan plan, Activity oldActivity, Activity newActivity) {
+	public static boolean replaceActivity(Plan plan, Activity oldActivity, Activity newActivity) {
 		
 		if (plan == null) return false;
 		if (oldActivity == null) return false;
@@ -61,7 +61,7 @@ public class ReplacePlanElements {
 		return true;
 	}
 	
-	public boolean replaceLeg(Plan plan, Leg oldLeg, Leg newLeg) {
+	public static boolean replaceLeg(Plan plan, Leg oldLeg, Leg newLeg) {
 		
 		if (plan == null) return false;
 		if (oldLeg == null) return false;
