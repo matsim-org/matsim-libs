@@ -10,6 +10,7 @@ import ch.ethz.idsc.queuey.math.AnalysisUtils;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.ScalarQ;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
@@ -88,8 +89,9 @@ public class CoreAnalysis {
             }
 
             // Distance ratio
-            GlobalAssert.that(!waitTimeQuantile.isScalar());
-            GlobalAssert.that(!numStatus.isScalar());
+            
+            GlobalAssert.that(!ScalarQ.of(waitTimeQuantile));
+            GlobalAssert.that(!ScalarQ.of(numStatus));
             Tensor row = Join.of( //
                     Tensors.of(time, requestsSize), // 0,1
                     waitTimeQuantile, // 2,3,4 (.1, .5, .95)
