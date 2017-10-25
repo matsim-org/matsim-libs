@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -58,7 +59,7 @@ public class MultiODHeuristic implements AVDispatcher {
 
     private double now;
 
-    public MultiODHeuristic(Id<AVOperator> operatorId, EventsManager eventsManager, Network network, AggregateRideAppender appender, TravelTimeEstimator estimator) {
+    public MultiODHeuristic(Config config, Id<AVOperator> operatorId, EventsManager eventsManager, Network network, AggregateRideAppender appender, TravelTimeEstimator estimator) {
         this.operatorId = operatorId;
         this.eventsManager = eventsManager;
         this.appender = appender;
@@ -226,11 +227,12 @@ public class MultiODHeuristic implements AVDispatcher {
         private TravelTime travelTime;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
-            double threshold = Double.parseDouble(config.getParams().getOrDefault("aggregationThreshold", "600.0"));
+        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
+            double threshold = Double.parseDouble(avconfig.getParams().getOrDefault("aggregationThreshold", "600.0"));
             TravelTimeEstimator estimator = new TravelTimeEstimator(router, threshold);
 
-            return new MultiODHeuristic(config.getParent().getId(), eventsManager, network, new AggregateRideAppender(config, router, travelTime, estimator), estimator);
+            return new MultiODHeuristic(config,avconfig.getParent().getId(), eventsManager, network, //
+                    new AggregateRideAppender(avconfig, router, travelTime, estimator), estimator);
         }
     }
 }

@@ -3,7 +3,7 @@ package playground.clruch.net;
 
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import playground.clib.util.net.ObjectHandler;
+import ch.ethz.idsc.queuey.view.util.net.ObjectHandler;
 
 public class SimulationClientSet extends CopyOnWriteArraySet<ObjectHandler> {
     public static final SimulationClientSet INSTANCE = new SimulationClientSet();

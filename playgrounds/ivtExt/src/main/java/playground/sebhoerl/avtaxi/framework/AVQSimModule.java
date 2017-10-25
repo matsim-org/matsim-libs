@@ -12,6 +12,7 @@ import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vehicles.VehicleType;
 
@@ -34,17 +35,19 @@ import playground.sebhoerl.avtaxi.schedule.AVOptimizer;
 import playground.sebhoerl.avtaxi.vrpagent.AVActionCreator;
 
 public class AVQSimModule extends com.google.inject.AbstractModule {
-    final private AVConfig config;
+    final private AVConfig avconfig;
     final private QSim qsim;
+    final private Config config;
 
-    public AVQSimModule(AVConfig config, QSim qsim) {
-        this.config = config;
+    public AVQSimModule(Config config, AVConfig avconfig, QSim qsim) {
+        this.avconfig = avconfig;
         this.qsim = qsim;
+        this.config = config;
     }
 
     @Override
     protected void configure() {
-        bind(Double.class).annotatedWith(Names.named("pickupDuration")).toInstance(config.getTimingParameters().getPickupDurationPerStop());
+        bind(Double.class).annotatedWith(Names.named("pickupDuration")).toInstance(avconfig.getTimingParameters().getPickupDurationPerStop());
         bind(AVOptimizer.class);
         bind(AVActionCreator.class);
         bind(AVRequestCreator.class);
@@ -79,7 +82,7 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
      * TODO presumably called only once during initialization
      * 
      * @param factories
-     * @param config
+     * @param avconfig
      * @param vehicles
      * @return
      */
@@ -87,10 +90,10 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
     @Singleton
     Map<Id<AVOperator>, AVDispatcher> provideDispatchers( //
             Map<String, AVDispatcher.AVDispatcherFactory> factories, //
-            AVConfig config, Map<Id<AVOperator>, List<AVVehicle>> vehicles) {
+            Config config, AVConfig avconfig, Map<Id<AVOperator>, List<AVVehicle>> vehicles) {
         Map<Id<AVOperator>, AVDispatcher> dispatchers = new HashMap<>();
 
-        for (AVOperatorConfig oc : config.getOperatorConfigs()) {
+        for (AVOperatorConfig oc : avconfig.getOperatorConfigs()) {
             AVDispatcherConfig dc = oc.getDispatcherConfig();
             AVGeneratorConfig gc = oc.getGeneratorConfig();
             String strategy = dc.getStrategyName();
@@ -100,7 +103,7 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
             }
 
             AVDispatcher.AVDispatcherFactory factory = factories.get(strategy);
-            AVDispatcher dispatcher = factory.createDispatcher(dc,gc);
+            AVDispatcher dispatcher = factory.createDispatcher(config,dc,gc);
 
             for (AVVehicle vehicle : vehicles.get(oc.getId())) {
                 dispatcher.registerVehicle(vehicle);

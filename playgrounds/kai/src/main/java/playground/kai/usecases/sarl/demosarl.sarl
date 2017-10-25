@@ -1,5 +1,0 @@
-package myapp.demo
-
-agent MyAgent{}
-
-agent mySecondAgent{}

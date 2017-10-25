@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
@@ -15,95 +17,90 @@ import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.CsvFormat;
-import ch.ethz.idsc.tensor.io.MathematicaFormat;
-import ch.ethz.idsc.tensor.io.MatlabExport;
+import playground.clruch.ScenarioOptions;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
+import playground.clruch.net.StorageUtils;
+import playground.clruch.utils.PropertiesExt;
 import playground.joel.data.TotalData;
 
-/**
- * Created by Joel on 05.04.2017.
- */
+/** Created by Joel on 05.04.2017.
+ * updated by clruch, aug sept 2017. */
 public class AnalyzeAll {
-    public static final File RELATIVE_DIRECTORY = new File("output", "data");
-    public static final boolean filter = true;  // filter size can be adapted in the diagram creator
-    public static final double maxWaitingTime = -1.0; // maximally displayed waiting time in minutes,
-                                                        // -1.0 sets it automatically
+    private final boolean filter = true; // filter size can be adapted in the diagram creator
+    private final double maxWaitingTime = -1.0; // maximally displayed waiting time in minutes,
+                                                // -1.0 sets it automatically
 
-    public static Scalar waitBinSize = RealScalar.of(5.0); // minimally, in minutes
-    public static Scalar totalDistanceBinSize = RealScalar.of(10.0); // minimally, in km
-    public static Scalar distanceWCBinSize = RealScalar.of(10.0); // minimally, in km
+    private Scalar waitBinSize = RealScalar.of(5.0); // minimally, in minutes
+    private Scalar totalDistanceBinSize = RealScalar.of(10.0); // minimally, in km
+    private Scalar distanceWCBinSize = RealScalar.of(10.0); // minimally, in km
     // will be stepwise increased if too small
 
-    public static double timeRatio ;
-    public static double distance ;
-    public static double distanceWithCust;
-    public static double distancePickup;
-    public static double distanceRebalance;
-    public static Tensor totalWaitTimeQuantile;
-    public static Tensor totalWaitTimeMean;
-    public static double distanceRatio;
+    private double timeRatio;
+    private double distance;
+    private double distanceWithCust;
+    private double distancePickup;
+    private double distanceRebalance;
+    private Tensor totalWaitTimeQuantile;
+    private Tensor totalWaitTimeMean;
+    private double distanceRatio;
 
-    public static void main(String[] args) throws Exception {
-        analyze(new File(args[0]));
+    public AnalyzeAll() {
+
     }
 
-    public static void saveFile(Tensor table, String name) throws Exception {
-        Files.write(Paths.get("output/data/" + name + ".csv"), (Iterable<String>) CsvFormat.of(table)::iterator);
-        Files.write(Paths.get("output/data/" + name + ".mathematica"), (Iterable<String>) MathematicaFormat.of(table)::iterator);
-        Files.write(Paths.get("output/data/" + name + ".m"), (Iterable<String>) MatlabExport.of(table)::iterator);
-    }
-
-    static void plot(String csv, String name, String title, int from, int to, Double maxRange) throws Exception {
-        Tensor table = CsvFormat.parse(Files.lines(Paths.get("output/data/" + csv + ".csv")));
+    /* package */ void plot(String csv, String name, String title, int from, int to, Double maxRange, File relativeDirectory) //
+            throws Exception {
+        Tensor table = CsvFormat.parse(Files.lines(Paths.get(relativeDirectory.getPath() + "/" + csv + ".csv")));
         table = Transpose.of(table);
         try {
-            DiagramCreator.createDiagram(RELATIVE_DIRECTORY, name, title, table.get(0), table.extract(from, to), //
+            DiagramCreator.createDiagram(relativeDirectory, name, title, table.get(0), table.extract(from, to), //
                     maxRange, filter);
         } catch (Exception e) {
             System.out.println("Error creating the diagrams");
         }
     }
 
-    static void plot(String csv, String name, String title, int from, int to) throws Exception {
-        plot(csv, name, title, from, to, 1.05);
+    /* package */ void plot(String csv, String name, String title, int from, int to, File relativeDirectory) throws Exception {
+        plot(csv, name, title, from, to, 1.05, relativeDirectory);
     }
 
-    static void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis) throws Exception {
-        Tensor summary = Join.of(1, coreAnalysis.summary, distanceAnalysis.summary);
-        saveFile(summary, "summary");
+    /* package */ void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis, File relativeDirectory) //
+            throws Exception {
+        Tensor summary = Join.of(1, coreAnalysis.getSummary(), distanceAnalysis.summary);
+        SaveUtils.saveFile(summary, "summary", relativeDirectory.getPath());
         System.out.println("Size of data summary: " + Dimensions.of(summary));
 
-        getTotals(summary, coreAnalysis);
+        getTotals(summary, coreAnalysis, relativeDirectory);
 
-        AnalyzeAll.plot("summary", "binnedWaitingTimes", "Waiting Times", 3, 6, maxWaitingTime);
+        plot("summary", "binnedWaitingTimes", "Waiting Times", 3, 6, maxWaitingTime, relativeDirectory);
         // maximum waiting time in the plot to have this uniform for all simulations
-        AnalyzeAll.plot("summary", "binnedTimeRatios", "Occupancy Ratio", 10, 11);
-        AnalyzeAll.plot("summary", "binnedDistanceRatios", "Distance Ratio", 15, 16);
-        DiagramCreator.binCountGraph(RELATIVE_DIRECTORY, "waitBinCounter", //
+        plot("summary", "binnedTimeRatios", "Occupancy Ratio", 10, 11, relativeDirectory);
+        plot("summary", "binnedDistanceRatios", "Distance Ratio", 15, 16, relativeDirectory);
+        DiagramCreator.binCountGraph(relativeDirectory, "waitBinCounter", //
                 "Requests per Waiting Time", coreAnalysis.waitBinCounter, waitBinSize.number().doubleValue(), //
-                100.0/coreAnalysis.numRequests, "% of requests", //
+                100.0 / coreAnalysis.numRequests, "% of requests", //
                 "Waiting Times", " sec", 1000, 750);
-        DiagramCreator.binCountGraph(RELATIVE_DIRECTORY, "totalDistanceVehicle", //
+        DiagramCreator.binCountGraph(relativeDirectory, "totalDistanceVehicle", //
                 "Vehicles per Total Distance", distanceAnalysis.tdBinCounter, //
-                totalDistanceBinSize.number().doubleValue(), 100.0/distanceAnalysis.numVehicles, //
+                totalDistanceBinSize.number().doubleValue(), 100.0 / distanceAnalysis.numVehicles, //
                 "% of fleet", "Total Distances", " km", //
                 1000, 750);
-        DiagramCreator.binCountGraph(RELATIVE_DIRECTORY, "dwcVehicle", //
+        DiagramCreator.binCountGraph(relativeDirectory, "dwcVehicle", //
                 "Vehicles per Distance with Customer", distanceAnalysis.dwcBinCounter, //
-                distanceWCBinSize.number().doubleValue(), 100.0/distanceAnalysis.numVehicles, //
+                distanceWCBinSize.number().doubleValue(), 100.0 / distanceAnalysis.numVehicles, //
                 "% of fleet", "Distances with Customer", " km", //
                 1000, 750);
-        UniqueDiagrams.distanceStack(RELATIVE_DIRECTORY, "stackedDistance", "Distance Partition", //
-                distanceRebalance/distance, distancePickup/distance, distanceWithCust/distance);
-        UniqueDiagrams.distanceDistribution(RELATIVE_DIRECTORY, "distanceDistribution", //
-                "Distance Distribution", true);
-        UniqueDiagrams.statusDistribution(RELATIVE_DIRECTORY, "statusDistribution", //
-                "Status Distribution", true);
+        UniqueDiagrams.distanceStack(relativeDirectory, "stackedDistance", "Distance Partition", //
+                distanceRebalance / distance, distancePickup / distance, distanceWithCust / distance);
+        UniqueDiagrams.distanceDistribution(relativeDirectory, "distanceDistribution", //
+                "Distance Distribution", true, relativeDirectory.getPath());
+        UniqueDiagrams.statusDistribution(relativeDirectory, "statusDistribution", //
+                "Status Distribution", true, relativeDirectory.getPath());
     }
 
-    static void getTotals(Tensor summary, CoreAnalysis coreAnalysis) {
+    /* package */ void getTotals(Tensor summary, CoreAnalysis coreAnalysis, File relativeDirectory) {
         int size = summary.length();
         timeRatio = 0;
         distance = 0;
@@ -116,12 +113,11 @@ public class AnalyzeAll {
             timeRatio += summary.Get(j, 10).number().doubleValue();
             distance += summary.Get(j, 11).number().doubleValue();
             distanceWithCust += summary.Get(j, 12).number().doubleValue();
-            distancePickup+= summary.Get(j, 13).number().doubleValue();
+            distancePickup += summary.Get(j, 13).number().doubleValue();
             distanceRebalance += summary.Get(j, 14).number().doubleValue();
         }
         timeRatio = timeRatio / size;
         distanceRatio = distanceWithCust / distance;
-
 
         System.out.println("===================================");
         System.out.println("totalWaitTimeMean: " + totalWaitTimeMean);
@@ -130,10 +126,10 @@ public class AnalyzeAll {
                 String.valueOf(totalWaitTimeMean.Get().number().doubleValue()), //
                 String.valueOf(totalWaitTimeQuantile.Get(1).number().doubleValue()), //
                 String.valueOf(totalWaitTimeQuantile.Get(2).number().doubleValue()), //
-                new File(RELATIVE_DIRECTORY, "totalData.xml"));
+                new File(relativeDirectory, "totalData.xml"));
     }
 
-    public static AnalyzeSummary summarize(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis) {
+    private AnalyzeSummary summarize(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis) {
         AnalyzeSummary analyzeSummary = new AnalyzeSummary();
         analyzeSummary.numVehicles = distanceAnalysis.numVehicles;
         analyzeSummary.numRequests = coreAnalysis.numRequests;
@@ -151,10 +147,18 @@ public class AnalyzeAll {
         return analyzeSummary;
     }
 
-    public static AnalyzeSummary analyze(File config) throws Exception {
+    public AnalyzeSummary analyze(File config, String outputdirectory) throws Exception {
 
-        File data = new File(config.getParent(), "output/data");
+        String dataFolderName = outputdirectory;
+        File relativeDirectory = new File(dataFolderName, "data");
+        if (!relativeDirectory.exists()) {
+            relativeDirectory.mkdir();
+        }
+        File data = new File(config.getParent(), dataFolderName);
+        System.out.println("searching data in directory: " + dataFolderName);
         data.mkdir();
+        StorageUtils storageUtils = new StorageUtils(data);
+        storageUtils.printStorageProperties();
 
         // load system network
         Network network = loadNetwork(config);
@@ -164,12 +168,12 @@ public class AnalyzeAll {
         MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SIOUXFALLS);
 
         // load simulation data
-        StorageSupplier storageSupplier = StorageSupplier.getDefault();
+        StorageSupplier storageSupplier = new StorageSupplier(storageUtils.getFirstAvailableIteration());
         final int size = storageSupplier.size();
         System.out.println("Found files: " + size);
 
         // analyze and print files
-        CoreAnalysis coreAnalysis = new CoreAnalysis(storageSupplier);
+        CoreAnalysis coreAnalysis = new CoreAnalysis(storageSupplier, this);
         DistanceAnalysis distanceAnalysis = new DistanceAnalysis(storageSupplier);
         try {
             coreAnalysis.analyze();
@@ -178,9 +182,48 @@ public class AnalyzeAll {
             e.printStackTrace();
         }
 
-        collectAndPlot(coreAnalysis, distanceAnalysis);
+        collectAndPlot(coreAnalysis, distanceAnalysis, relativeDirectory);
 
         return summarize(coreAnalysis, distanceAnalysis);
 
+    }
+
+    public void setwaitBinSize(Scalar waitBinSize) {
+        // TODO test input
+        this.waitBinSize = waitBinSize;
+    }
+
+    public Scalar getwaitbinSize() {
+        return waitBinSize;
+    }
+
+    public void settotalDistanceBinSize(Scalar totalDistanceBinSize) {
+        // TODO test input
+        this.totalDistanceBinSize = totalDistanceBinSize;
+    }
+
+    public Scalar gettotalDistanceBinSize() {
+        return totalDistanceBinSize;
+    }
+
+    public void setdistanceWCBinSize(Scalar distanceWCBinSize) {
+        this.distanceWCBinSize = distanceWCBinSize;
+    }
+
+    public Scalar getdistanceWCBinSize() {
+        return distanceWCBinSize;
+    }
+
+    /** to be executed in simulation directory to perform analysis
+     * 
+     * @throws Exception */
+    public void main(String[] args) throws Exception {
+        File workingDirectory = new File("").getCanonicalFile();
+        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
+        Config config = ConfigUtils.loadConfig(configFile.toString());
+        String outputdirectory = config.controler().getOutputDirectory();
+        // StorageUtils storageUtils = new StorageUtils(new File(outputdirectory));
+        analyze(configFile, outputdirectory);
     }
 }

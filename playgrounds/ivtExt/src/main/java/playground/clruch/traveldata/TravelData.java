@@ -293,10 +293,12 @@ public class TravelData implements Serializable {
         return alphaijPSF.get(timestep).copy();
     }
 
-    protected void fillSerializationInfo(VirtualNetwork virtalNetworkIn) {
+    protected void fillSerializationInfo(VirtualNetwork<Link> virtualNetwork) {
         // check if TravelData object was created with the supplied virtualNetwork
-        GlobalAssert.that(virtalNetworkIn.getvNetworkID() == virtualNetworkID);
-        this.virtualNetwork = virtalNetworkIn;
+        System.out.println("in network ID: " + virtualNetwork.getvNetworkID());
+        System.out.println("inside network ID: " + virtualNetworkID);        
+        GlobalAssert.that(virtualNetwork.getvNetworkID() == virtualNetworkID);
+        this.virtualNetwork = virtualNetwork;
     }
 
     public long getVirtualNetworkID() {

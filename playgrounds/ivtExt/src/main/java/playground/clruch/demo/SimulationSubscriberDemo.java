@@ -1,7 +1,7 @@
 package playground.clruch.demo;
 
-import playground.clib.util.net.ObjectClient;
-import playground.clib.util.net.ObjectHandler;
+import ch.ethz.idsc.queuey.view.util.net.ObjectClient;
+import ch.ethz.idsc.queuey.view.util.net.ObjectHandler;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationServer;
 

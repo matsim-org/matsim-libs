@@ -178,9 +178,8 @@ class BinnedWaitingTimes extends AbstractData {
         new BinnedRatiosXML("binnedMeans", "means").generate(means, fileExport3);
 
         // export to time series diagram PNG
-        TimeDiagramCreator diagram = new TimeDiagramCreator();
         try{
-            diagram.createDiagram(directory, "binnedWaitingTimes", "waiting time", quantile50, quantile95, mean, maxWait);
+            TimeDiagramCreator.createDiagram(directory, "binnedWaitingTimes", "waiting time", quantile50, quantile95, mean, maxWait);
         }catch (Exception e){
             System.out.println("Error creating the diagram");
         }

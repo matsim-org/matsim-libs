@@ -2,6 +2,7 @@
 // API change by clruch
 package playground.clruch.dispatcher.core;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,8 +15,10 @@ import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTrackerImpl;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import playground.clruch.net.StorageUtils;
 import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
@@ -40,11 +43,14 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
     private final List<RoboTaxi> roboTaxis = new ArrayList<>();
     private Double private_now = null;
     public InfoLine infoLine = null;
+    private final StorageUtils storageUtils;
 
-    RoboTaxiMaintainer(EventsManager eventsManager, AVDispatcherConfig avDispatcherConfig) {
+    RoboTaxiMaintainer(EventsManager eventsManager, Config config, AVDispatcherConfig avDispatcherConfig) {
         SafeConfig safeConfig = SafeConfig.wrap(avDispatcherConfig);
         this.eventsManager = eventsManager;
         this.infoLine = new InfoLine(safeConfig.getInteger("infoLinePeriod", 10));
+        String outputdirectory = config.controler().getOutputDirectory();
+        this.storageUtils = new StorageUtils(new File(outputdirectory));
 
     }
 
@@ -118,8 +124,8 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
     public final void onNextTimestep(double now) {
         private_now = now; // <- time available to derived class via getTimeNow()
         updateInfoLine();
-        notifySimulationSubscribers(Math.round(now));
-        
+        notifySimulationSubscribers(Math.round(now), storageUtils);
+
         consistencyCheck();
         beforeStepTasks();
         executePickups();
@@ -194,7 +200,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
 
     /* package */ abstract void consistencySubCheck();
 
-    /* package */ abstract void notifySimulationSubscribers(long round_now);
+    /* package */ abstract void notifySimulationSubscribers(long round_now, StorageUtils storageUtils);
 
     /* package */ abstract boolean isInPickupRegister(RoboTaxi robotaxi);
 

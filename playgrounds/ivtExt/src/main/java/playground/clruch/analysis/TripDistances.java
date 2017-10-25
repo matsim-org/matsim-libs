@@ -3,6 +3,7 @@
  */
 package playground.clruch.analysis;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.network.Network;
@@ -26,11 +27,11 @@ public class TripDistances {
     // will be stepwise increased if too small
 
     public TripDistances(LeastCostPathCalculator dijkstra, TravelData travelData, //
-            Population population, Network network) throws Exception {
+            Population population, Network network, File relativeDirectory) throws Exception {
         numberTimeSteps = travelData.getNumbertimeSteps();
         dt = travelData.getdt();
         fill(dijkstra, population, network);
-        analyze();
+        analyze(relativeDirectory);
     }
 
     private void fill(LeastCostPathCalculator dijkstra, Population population, Network network) {
@@ -47,13 +48,13 @@ public class TripDistances {
 
     }
 
-    private void analyze() throws Exception {
+    private void analyze(File relativeDirectory) throws Exception {
         tripDistances = tripDistances.multiply(RealScalar.of(0.001));
 
         tripDistanceBinSize = AnalysisUtils.adaptBinSize(tripDistances, tripDistanceBinSize, RealScalar.of(0.5));
         tripDistanceBinCounter = AnalysisUtils.binCount(tripDistances, tripDistanceBinSize);
 
-        DiagramCreator.binCountGraph(AnalyzeAll.RELATIVE_DIRECTORY, "tripDistances", //
+        DiagramCreator.binCountGraph(relativeDirectory, "tripDistances", //
                 "Trips per Distance", tripDistanceBinCounter, //
                 tripDistanceBinSize.number().doubleValue(), 100.0 / tripDistances.length(), //
                 "% of requests", "Distances according to Dijkstra", " km", //

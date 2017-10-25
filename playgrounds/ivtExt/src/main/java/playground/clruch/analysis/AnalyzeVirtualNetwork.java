@@ -4,18 +4,21 @@ import static playground.clruch.utils.NetworkLoader.loadNetwork;
 
 import java.io.File;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
+import playground.clruch.net.StorageUtils;
 import playground.clruch.netdata.VirtualNetworkGet;
 
 /**
  * Created by Joel on 05.04.2017.
  */
-@Deprecated
+@Deprecated // TODO can this be deleted? 
 public class AnalyzeVirtualNetwork {
     public static void main(String[] args) throws Exception {
         analyze(args);
@@ -26,20 +29,24 @@ public class AnalyzeVirtualNetwork {
         File config = new File(args[0]);
         File data = new File(config.getParent(), "output/data");
         data.mkdir();
+        
+
 
         // load system network
         Network network = loadNetwork(new File(args[0]));
 
         MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SIOUXFALLS);
 
-        VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(network);
+        VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(network);
 
         // load simulation data
-        StorageSupplier storageSupplier = StorageSupplier.getDefault();
+        GlobalAssert.that(false); // TODO next two lines disfunctional, check before continuing
+        StorageUtils storageUtils = null;
+        StorageSupplier storageSupplier = new StorageSupplier(storageUtils.getFirstAvailableIteration());
         final int size = storageSupplier.size();
         System.out.println("found files: " + size);
         VirtualNetworkAnalysis vna = new VirtualNetworkAnalysis(storageSupplier, virtualNetwork);
-        vna.analyze();
+        vna.analyze(data);
 
     }
 }

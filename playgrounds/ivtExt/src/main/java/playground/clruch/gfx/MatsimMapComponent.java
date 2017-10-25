@@ -15,10 +15,10 @@ import javax.swing.JLabel;
 
 import org.matsim.api.core.v01.Coord;
 
-import playground.clib.jmapviewer.JMapViewer;
-import playground.clib.jmapviewer.MatsimHeatMap;
-import playground.clib.jmapviewer.interfaces.ICoordinate;
-import playground.clib.util.gui.GraphicsUtil;
+import ch.ethz.idsc.queuey.view.jmapviewer.JMapViewer;
+import ch.ethz.idsc.queuey.view.jmapviewer.MatsimHeatMap;
+import ch.ethz.idsc.queuey.view.jmapviewer.interfaces.ICoordinate;
+import ch.ethz.idsc.queuey.view.util.gui.GraphicsUtil;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 

@@ -17,9 +17,7 @@ import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.VehicleContainer;
 import playground.clruch.net.VehicleStatistic;
 
-/**
- * Created by Joel on 05.04.2017.
- */
+/** Created by Joel on 05.04.2017. */
 public class DistanceAnalysis {
     StorageSupplier storageSupplier;
     int size;
@@ -55,16 +53,15 @@ public class DistanceAnalysis {
 
         }
 
+        totalDistancesPerVehicle = Tensor.of(list.stream().map(vs -> Total.of(vs.distanceTotal))).multiply(RealScalar.of(0.001));
+        distancesWCPerVehicle = Tensor.of(list.stream().map(vs -> Total.of(vs.distanceWithCustomer))).multiply(RealScalar.of(0.001));
 
-        totalDistancesPerVehicle = Tensor.of(list.stream().map(vs ->
-                        Total.of(vs.distanceTotal))).multiply(RealScalar.of(0.001));
-        distancesWCPerVehicle = Tensor.of(list.stream().map(vs ->
-                Total.of(vs.distanceWithCustomer))).multiply(RealScalar.of(0.001));
+        AnalyzeAll analyzeAll = new AnalyzeAll();
 
-        AnalyzeAll.totalDistanceBinSize = AnalysisUtils.adaptBinSize(totalDistancesPerVehicle, AnalyzeAll.totalDistanceBinSize, RealScalar.of(5.0));
-        tdBinCounter = AnalysisUtils.binCount(totalDistancesPerVehicle, AnalyzeAll.totalDistanceBinSize);
-        AnalyzeAll.distanceWCBinSize = AnalysisUtils.adaptBinSize(distancesWCPerVehicle, AnalyzeAll.distanceWCBinSize, RealScalar.of(5.0));
-        dwcBinCounter = AnalysisUtils.binCount(distancesWCPerVehicle, AnalyzeAll.distanceWCBinSize);
+        analyzeAll.settotalDistanceBinSize(AnalysisUtils.adaptBinSize(totalDistancesPerVehicle, analyzeAll.gettotalDistanceBinSize(), RealScalar.of(5.0)));
+        tdBinCounter = AnalysisUtils.binCount(totalDistancesPerVehicle, analyzeAll.gettotalDistanceBinSize());
+        analyzeAll.setdistanceWCBinSize(AnalysisUtils.adaptBinSize(distancesWCPerVehicle, analyzeAll.getdistanceWCBinSize(), RealScalar.of(5.0)));
+        dwcBinCounter = AnalysisUtils.binCount(distancesWCPerVehicle, analyzeAll.getdistanceWCBinSize());
 
         list.forEach(VehicleStatistic::consolidate);
 
@@ -73,23 +70,23 @@ public class DistanceAnalysis {
         Tensor table3 = list.stream().map(vs -> vs.distancePickup).reduce(Tensor::add).get(); // summary 2 (13)
         Tensor table4 = list.stream().map(vs -> vs.distanceRebalance).reduce(Tensor::add).get(); // summary 3 (14)
         Tensor table5 = table1.map(InvertUnlessZero.FUNCTION).pmul(table2); // summary 4 (15)
-        System.out.println("1:"+Dimensions.of(table1));
-        System.out.println("2:"+Dimensions.of(table2));
-        System.out.println("3:"+Dimensions.of(table3));
-        System.out.println("4:"+Dimensions.of(table4));
-        System.out.println("5:"+Dimensions.of(table5));
-        
-        summary = Transpose.of(Tensors.of(table1, table2, table3, table4, table5)); 
-//                Join.of(1, table1, table2, table3, table4, table5);
+        System.out.println("1:" + Dimensions.of(table1));
+        System.out.println("2:" + Dimensions.of(table2));
+        System.out.println("3:" + Dimensions.of(table3));
+        System.out.println("4:" + Dimensions.of(table4));
+        System.out.println("5:" + Dimensions.of(table5));
+
+        summary = Transpose.of(Tensors.of(table1, table2, table3, table4, table5));
+        // Join.of(1, table1, table2, table3, table4, table5);
         System.out.println(Dimensions.of(summary));
         /*
-        {
-            AnalyzeAll.saveFile(table1, "distanceTotal");
-            AnalyzeAll.saveFile(table2, "distanceWithCustomer");
-            AnalyzeAll.saveFile(table3, "distancePickup");
-            AnalyzeAll.saveFile(table4, "distanceRebalance");
-            AnalyzeAll.saveFile(table5, "distanceRatio");
-        }
-        */
+         * {
+         * AnalyzeAll.saveFile(table1, "distanceTotal");
+         * AnalyzeAll.saveFile(table2, "distanceWithCustomer");
+         * AnalyzeAll.saveFile(table3, "distancePickup");
+         * AnalyzeAll.saveFile(table4, "distanceRebalance");
+         * AnalyzeAll.saveFile(table5, "distanceRatio");
+         * }
+         */
     }
 }

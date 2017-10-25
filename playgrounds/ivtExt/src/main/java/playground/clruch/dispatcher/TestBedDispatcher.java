@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
@@ -31,13 +32,14 @@ public class TestBedDispatcher extends RebalancingDispatcher {
     private final Network network;
 
     private TestBedDispatcher(//
-            AVDispatcherConfig config, //
+            Config config,
+            AVDispatcherConfig avconfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
             Network network) {
-        super(config, travelTime, router, eventsManager);
-        SafeConfig safeConfig = SafeConfig.wrap(config);
+        super(config, avconfig, travelTime, router, eventsManager);
+        SafeConfig safeConfig = SafeConfig.wrap(avconfig);
         rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 120);
         this.network = network;
     }
@@ -87,8 +89,8 @@ public class TestBedDispatcher extends RebalancingDispatcher {
         private Network network;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
-            return new TestBedDispatcher(config, travelTime, router, eventsManager, network);
+        public AVDispatcher createDispatcher(Config config,AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
+            return new TestBedDispatcher(config, avconfig, travelTime, router, eventsManager, network);
         }
     }
 
