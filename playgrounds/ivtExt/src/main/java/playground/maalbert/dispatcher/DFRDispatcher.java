@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
@@ -90,7 +91,8 @@ public class DFRDispatcher extends PartitionedDispatcher {
     // Class Constructor
     // ==================================================================================================================
     public DFRDispatcher( //
-            AVDispatcherConfig config, //
+            Config config,//
+            AVDispatcherConfig avconfig, //
             AVGeneratorConfig generatorConfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
@@ -101,21 +103,21 @@ public class DFRDispatcher extends PartitionedDispatcher {
             AbstractVehicleDestMatcher abstractVehicleDestMatcher, //
             Map<VirtualLink<Link>, Double> linkWeightsIn, //
             TravelData arrivalInformation) {
-        super(config, travelTime, router, eventsManager, virtualNetwork);
+        super(config, avconfig, travelTime, router, eventsManager, virtualNetwork);
 
         this.virtualNodeDest = abstractVirtualNodeDest;
         this.requestSelector = abstractRequestSelector;
         this.vehicleDestMatcher = abstractVehicleDestMatcher;
         this.arrivalInformation = arrivalInformation;
         vLinkWeights = linkWeightsIn;
-        rebalancingPeriod = Integer.parseInt(config.getParams().get(KEY_REBALANCINGPERIOD));
-        redispatchPeriod = Integer.parseInt(config.getParams().get(KEY_REDISPATCHPERIOD));
+        rebalancingPeriod = Integer.parseInt(avconfig.getParams().get(KEY_REBALANCINGPERIOD));
+        redispatchPeriod = Integer.parseInt(avconfig.getParams().get(KEY_REDISPATCHPERIOD));
         N_vStations = virtualNetwork.getvNodesCount(); // Consider here nodecount -1 as no vLink to leftover region!!
         popSize = arrivalInformation.populationSize;
         rebalancingOrderRest = Array.zeros(N_vStations, N_vStations);
         inConsensus = Array.zeros(N_vStations);
         consensusVal = Array.zeros(N_vStations);
-        feebackTerm = FeedbackTerm.valueOf(config.getParams().get(KEY_FEEDBACKTERM));
+        feebackTerm = FeedbackTerm.valueOf(avconfig.getParams().get(KEY_FEEDBACKTERM));
         // TODO: Get rid of Loop
         neighCount = Array.zeros(N_vStations);
         for (int i = 0; i < N_vStations; i++) {
@@ -481,16 +483,16 @@ public class DFRDispatcher extends PartitionedDispatcher {
         public static Map<VirtualLink<Link>, Double> linkWeights;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(Config config,AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
             // ---
-            GlobalAssert.that(config.getParams().containsKey(KEY_VIRTUALNETWORKDIRECTORY));
-            GlobalAssert.that(config.getParams().containsKey(KEY_DTEXTENSION));
+            GlobalAssert.that(avconfig.getParams().containsKey(KEY_VIRTUALNETWORKDIRECTORY));
+            GlobalAssert.that(avconfig.getParams().containsKey(KEY_DTEXTENSION));
             // ---
-            final File virtualnetworkDir = new File(config.getParams().get(KEY_VIRTUALNETWORKDIRECTORY));
+            final File virtualnetworkDir = new File(avconfig.getParams().get(KEY_VIRTUALNETWORKDIRECTORY));
             GlobalAssert.that(virtualnetworkDir.isDirectory());
             // ---
             {
@@ -503,7 +505,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
             }
             // ---
             {
-                final String string = "consensusWeights_" + config.getParams().get(KEY_WEIGHTSEXTENSION) + ".xml";
+                final String string = "consensusWeights_" + avconfig.getParams().get(KEY_WEIGHTSEXTENSION) + ".xml";
                 final File linkWeightsXML = new File(virtualnetworkDir, string);
                 GlobalAssert.that(linkWeightsXML.isFile());
                 //linkWeights = vLinkDataReader.fillvLinkData(linkWeightsXML, virtualNetwork, "weight");
@@ -514,7 +516,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
 
             TravelData arrivalInformation = null;
             {
-                final String ext = config.getParams().get(KEY_DTEXTENSION);
+                final String ext = avconfig.getParams().get(KEY_DTEXTENSION);
                 final File lambdaXML = new File(virtualnetworkDir, "poissonParameters_" + ext + ".xml");
                 GlobalAssert.that(lambdaXML.isFile());
                 final File pijFile = new File(virtualnetworkDir, "transitionProbabilities_" + ext + ".xml");
@@ -524,7 +526,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
 
                 try {
                     long populationSize = population.getPersons().size();
-                    int rebalancingPeriod = Integer.parseInt(config.getParams().get("rebalancingPeriod"));
+                    int rebalancingPeriod = Integer.parseInt(avconfig.getParams().get("rebalancingPeriod"));
                     GlobalAssert.that(false);
                     arrivalInformation = null;
                     // TODO load from serialized data not XML, XML load function deleted. 
@@ -538,7 +540,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 }
             }
 
-            return new DFRDispatcher(config, generatorConfig, travelTime, router, eventsManager, virtualNetwork, //
+            return new DFRDispatcher(config,avconfig, generatorConfig, travelTime, router, eventsManager, virtualNetwork, //
                     abstractVirtualNodeDest, //
                     abstractRequestSelector, //
                     abstractVehicleDestMatcher, //

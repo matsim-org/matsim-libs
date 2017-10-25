@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
@@ -80,8 +81,8 @@ public class SingleFIFODispatcher extends AbstractDispatcher {
         private EventsManager eventsManager;
 
         @Override
-        public AVDispatcher createDispatcher(AVDispatcherConfig config, AVGeneratorConfig generatorConfig) {
-            return new SingleFIFODispatcher(eventsManager, new SingleRideAppender(config, router, travelTime));
+        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
+            return new SingleFIFODispatcher(eventsManager, new SingleRideAppender(avconfig, router, travelTime));
         }
     }
 }

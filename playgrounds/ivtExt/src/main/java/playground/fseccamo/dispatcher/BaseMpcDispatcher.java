@@ -7,6 +7,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.VrpPath;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualLink;
@@ -27,22 +28,23 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
     final Map<AVRequest, Integer> requestVectorIndexMap = new HashMap<>();
 
     BaseMpcDispatcher( //
-            AVDispatcherConfig config, //
+            Config config, //
+            AVDispatcherConfig avconfig, //
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator parallelLeastCostPathCalculator, //
             EventsManager eventsManager, //
-            VirtualNetwork virtualNetwork) {
-        super(config, travelTime, parallelLeastCostPathCalculator, eventsManager, virtualNetwork);
+            VirtualNetwork<Link> virtualNetwork) {
+        super(config, avconfig, travelTime, parallelLeastCostPathCalculator, eventsManager, virtualNetwork);
         this.instantPathFactory = new InstantPathFactory(parallelLeastCostPathCalculator, travelTime);
 
         // period between calls to MPC
-        samplingPeriod = Integer.parseInt(config.getParams().get("samplingPeriod"));
+        samplingPeriod = Integer.parseInt(avconfig.getParams().get("samplingPeriod"));
     }
 
     Map<VirtualNode<Link>, List<RoboTaxi>> getDivertableNotRebalancingNotPickupVehicles() {
         Map<VirtualNode<Link>, List<RoboTaxi>> returnMap = virtualNetwork.createVNodeTypeMap();
         Map<VirtualNode<Link>, List<RoboTaxi>> allVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
-        for (VirtualNode vn : allVehicles.keySet()) {
+        for (VirtualNode<Link> vn : allVehicles.keySet()) {
             for (RoboTaxi robotaxi : allVehicles.get(vn)) {
                 if (!robotaxi.getAVStatus().equals(AVStatus.DRIVETOCUSTMER)) {
                     returnMap.get(vn).add(robotaxi);
@@ -65,8 +67,8 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
             if (!requestVectorIndexMap.containsKey(avRequest)) {
 
                 // check if origin and dest are from same virtualNode
-                final VirtualNode vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
-                final VirtualNode vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
+                final VirtualNode<Link> vnFrom = virtualNetwork.getVirtualNode(avRequest.getFromLink());
+                final VirtualNode<Link> vnTo = virtualNetwork.getVirtualNode(avRequest.getToLink());
                 GlobalAssert.that(vnFrom.equals(vnTo) == (vnFrom.getIndex() == vnTo.getIndex()));
                 if (vnFrom.equals(vnTo)) {
                     // self loop
@@ -77,14 +79,14 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
                     VrpPath vrpPath = instantPathFactory.getVrpPathWithTravelData( //
                             avRequest.getFromLink(), avRequest.getToLink(), now);
                     // TODO perhaps add expected waitTime
-                    VirtualNode fromIn = null;
+                    VirtualNode<Link> fromIn = null;
                     for (Link link : vrpPath) {
-                        final VirtualNode toIn = virtualNetwork.getVirtualNode(link);
+                        final VirtualNode<Link> toIn = virtualNetwork.getVirtualNode(link);
                         if (fromIn == null)
                             fromIn = toIn;
                         else //
                         if (fromIn != toIn) { // found adjacent node
-                            VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
+                            VirtualLink<Link> virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
                             requestVectorIndexMap.put(avRequest, virtualLink.getIndex());
                             success = true;
                             break;
@@ -97,7 +99,5 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
                 }
             }
     }
-
-
 
 }

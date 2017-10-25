@@ -13,7 +13,7 @@ import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-class BinnedRatiosXML<Type> {
+class BinnedRatiosXML {
     String xmlTitle = "SimulationResult";
     String L1ElName;
     //String L1AttrName = "attribute";

@@ -23,14 +23,12 @@ import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.DiagramCreator;
 import playground.clruch.analysis.RequestAnalysis;
 import playground.clruch.analysis.RequestObj;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
-import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
 import playground.joel.helpers.EasyDijkstra;
 
 /** @author Claudio Ruch */
@@ -41,7 +39,7 @@ public class MinimumFleetSizeCalculator implements Serializable {
     private Tensor EMDks;
     public double minimumFleet;
 
-    public MinimumFleetSizeCalculator(Network network, Population population, VirtualNetwork virtualNetwork, TravelData travelData) {
+    public MinimumFleetSizeCalculator(Network network, Population population, VirtualNetwork<Link> virtualNetwork, TravelData travelData) {
         // data preparation
         numberTimeSteps = travelData.getNumbertimeSteps();
         GlobalAssert.that(108000 % numberTimeSteps == 0);
@@ -52,7 +50,7 @@ public class MinimumFleetSizeCalculator implements Serializable {
         calculateMinFleet(network, population, virtualNetwork, travelData);
     }
 
-    private Tensor calculateMinFleet(Network network, Population population, VirtualNetwork virtualNetwork, TravelData travelData) {
+    private Tensor calculateMinFleet(Network network, Population population, VirtualNetwork<Link> virtualNetwork, TravelData travelData) {
 
         LeastCostPathCalculator dijkstra = EasyDijkstra.prepDijkstra(network);
 
@@ -92,10 +90,10 @@ public class MinimumFleetSizeCalculator implements Serializable {
         return minFleet;
     }
 
-    public void plot() throws Exception {
-        DiagramCreator.createDiagram(AnalyzeAll.RELATIVE_DIRECTORY, "EMD", "Earth Movers Distance", //
+    public void plot(File relativeDirectory) throws Exception {
+        DiagramCreator.createDiagram(relativeDirectory, "EMD", "Earth Movers Distance", //
                 EMDks.multiply(RealScalar.of(0.001)), "km");
-        DiagramCreator.createDiagram(AnalyzeAll.RELATIVE_DIRECTORY, "minFleet", "Minimum Fleet Size", //
+        DiagramCreator.createDiagram(relativeDirectory, "minFleet", "Minimum Fleet Size", //
                 minFleet, "vehicles");
         // DataCollector.loadScenarioData(args).minFleet, "vehicles");
     }
@@ -123,8 +121,7 @@ public class MinimumFleetSizeCalculator implements Serializable {
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 
         File configFile = new File(args[0]);
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup,
-                new BlackListedTimeAllocationMutatorConfigGroup());
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup);
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();

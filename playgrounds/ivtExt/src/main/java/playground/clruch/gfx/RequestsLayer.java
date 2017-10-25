@@ -15,9 +15,9 @@ import javax.swing.JCheckBox;
 
 import org.matsim.api.core.v01.Coord;
 
-import playground.clib.gheat.gui.ColorSchemes;
-import playground.clib.jmapviewer.MatsimHeatMap;
-import playground.clib.util.gui.RowPanel;
+import ch.ethz.idsc.queuey.view.gheat.gui.ColorSchemes;
+import ch.ethz.idsc.queuey.view.jmapviewer.MatsimHeatMap;
+import ch.ethz.idsc.queuey.view.util.gui.RowPanel;
 import playground.clruch.net.OsmLink;
 import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;

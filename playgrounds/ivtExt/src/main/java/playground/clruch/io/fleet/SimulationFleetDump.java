@@ -17,11 +17,14 @@ import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationObjects;
 import playground.clruch.net.StorageSubscriber;
+import playground.clruch.net.StorageUtils;
 import playground.clruch.net.VehicleContainer;
 
 enum SimulationFleetDump {
     ;
-    public static void of(DayTaxiRecord dayTaxiRecord, Network network, MatsimStaticDatabase db) {
+
+    public static void of(DayTaxiRecord dayTaxiRecord, Network network, MatsimStaticDatabase db,//
+            StorageUtils storageUtils) {
 
         final int MAXTIME = 216000; // TODO magic const
         final int TIMESTEP = 10;
@@ -68,7 +71,7 @@ enum SimulationFleetDump {
             }
             // sorting should be obsolete, since already sorted
             SimulationObjects.sortVehiclesAccordingToIndex(simulationObject);
-            new StorageSubscriber().handle(simulationObject);
+            new StorageSubscriber(storageUtils).handle(simulationObject);
         }
         System.out.println("dropped total " + dropped);
 

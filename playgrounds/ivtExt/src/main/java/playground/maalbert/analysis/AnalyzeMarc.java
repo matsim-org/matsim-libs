@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 
 import org.matsim.api.core.v01.network.Network;
 
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Join;
@@ -110,7 +111,9 @@ public class AnalyzeMarc {
         MatsimStaticDatabase.initializeSingletonInstance(network, ReferenceFrame.SIOUXFALLS);
 
         // load simulation data
-        StorageSupplier storageSupplier = StorageSupplier.getDefault();
+        GlobalAssert.that(false); // TODO next line was commented, adapt to make code usable again.
+        //StorageSupplier storageSupplier = StorageSupplier.getDefault();
+        StorageSupplier storageSupplier = null;
         final int size = storageSupplier.size();
         System.out.println("found files: " + size);
 

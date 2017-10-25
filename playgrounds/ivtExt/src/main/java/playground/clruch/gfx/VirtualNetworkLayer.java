@@ -1,11 +1,13 @@
 // code by jph
 package playground.clruch.gfx;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Shape;
+import java.awt.geom.Line2D;
 import java.util.Map.Entry;
 
 import javax.swing.JCheckBox;
@@ -16,14 +18,14 @@ import org.matsim.api.core.v01.network.Link;
 import ch.ethz.idsc.queuey.core.networks.VirtualLink;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNode;
+import ch.ethz.idsc.queuey.view.gheat.gui.ColorSchemes;
+import ch.ethz.idsc.queuey.view.util.gui.RowPanel;
+import ch.ethz.idsc.queuey.view.util.gui.SpinnerLabel;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.red.Max;
-import playground.clib.gheat.gui.ColorSchemes;
-import playground.clib.util.gui.RowPanel;
-import playground.clib.util.gui.SpinnerLabel;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.netdata.NetworkCreatorUtils;
@@ -156,7 +158,8 @@ public class VirtualNetworkLayer extends ViewerLayer {
         if (drawVLinks && virtualNetwork != null) {
             final MatsimStaticDatabase db = matsimMapComponent.db;
 
-            graphics.setColor(new Color(255, 0, 0, 64));
+            graphics.setColor(new Color(255, 0, 0, 128));
+            graphics.setStroke(new BasicStroke(3));
             for (VirtualLink<Link> vl : virtualNetwork.getVirtualLinks()) {
                 VirtualNode<Link> n1 = vl.getFrom();
                 VirtualNode<Link> n2 = vl.getTo();
@@ -164,8 +167,11 @@ public class VirtualNetworkLayer extends ViewerLayer {
                 Coord c2 = db.referenceFrame.coords_toWGS84.transform(NetworkCreatorUtils.fromTensor(n2.getCoord()));
                 Point p1 = matsimMapComponent.getMapPositionAlways(c1);
                 Point p2 = matsimMapComponent.getMapPositionAlways(c2);
-                graphics.drawLine(p1.x, p1.y, p2.x, p2.y);
+                Shape shape =  new Line2D.Double(p1.x, p1.y, p2.x, p2.y);
+                graphics.draw(shape);
+                //graphics.drawLine(p1.x, p1.y, p2.x, p2.y);
             }
+            graphics.setStroke(new BasicStroke(1));
         }
     }
 

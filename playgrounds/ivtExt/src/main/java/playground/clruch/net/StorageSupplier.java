@@ -12,17 +12,18 @@ import ch.ethz.idsc.tensor.io.ObjectFormat;
 
 public class StorageSupplier {
 
-    /**
-     * @return file index that contain simulation objects of last iteration
-     */
-    public static StorageSupplier getDefault() {
-        return new StorageSupplier(StorageUtils.getAvailable());
-    }
+    // /**
+    // * @return file index that contain simulation objects of last iteration
+    // */
+    // // TODO rename this more appropriately
+    // public static StorageSupplier getDefault(StorageUtils storageUtils) {
+    // return new StorageSupplier(storageUtils.getFirstAvailableIteration());
+    // }
     
     private final NavigableMap<Integer, File> navigableMap;
     private final List<File> ordered;
 
-    StorageSupplier(NavigableMap<Integer, File> map) {
+    public StorageSupplier(NavigableMap<Integer, File> map) {
         this.navigableMap = map;
         ordered = new ArrayList<>(map.values());
     }

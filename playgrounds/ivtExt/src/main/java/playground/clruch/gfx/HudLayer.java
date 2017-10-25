@@ -7,9 +7,9 @@ import java.awt.Point;
 
 import javax.swing.JCheckBox;
 
-import playground.clib.util.gui.GraphicsUtil;
-import playground.clib.util.gui.RowPanel;
-import playground.clib.util.gui.SpinnerLabel;
+import ch.ethz.idsc.queuey.view.util.gui.GraphicsUtil;
+import ch.ethz.idsc.queuey.view.util.gui.RowPanel;
+import ch.ethz.idsc.queuey.view.util.gui.SpinnerLabel;
 import playground.clruch.net.SimulationObject;
 
 /**

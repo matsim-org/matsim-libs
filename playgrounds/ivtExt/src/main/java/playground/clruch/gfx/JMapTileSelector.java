@@ -3,24 +3,24 @@ package playground.clruch.gfx;
 
 import java.awt.Dimension;
 
-import playground.clib.jmapviewer.JMapViewer;
-import playground.clib.jmapviewer.interfaces.TileSource;
-import playground.clib.jmapviewer.tilesources.BingAerialTileSource;
-import playground.clib.jmapviewer.tilesources.BlackWhiteTileSource;
-import playground.clib.jmapviewer.tilesources.CycleTileSource;
-import playground.clib.jmapviewer.tilesources.DarkCartoTileSource;
-import playground.clib.jmapviewer.tilesources.FrenchTileSource;
-import playground.clib.jmapviewer.tilesources.GrayMapnikTileSource;
-import playground.clib.jmapviewer.tilesources.HikebikeTileSource;
-import playground.clib.jmapviewer.tilesources.HillshadingTileSource;
-import playground.clib.jmapviewer.tilesources.HotTileSource;
-import playground.clib.jmapviewer.tilesources.LandscapeTileSource;
-import playground.clib.jmapviewer.tilesources.LightCartoTileSource;
-import playground.clib.jmapviewer.tilesources.MapnikTileSource;
-import playground.clib.jmapviewer.tilesources.OpenCycleTileSource;
-import playground.clib.jmapviewer.tilesources.WatercolorTileSource;
-import playground.clib.jmapviewer.tilesources.WikimediaTileSource;
-import playground.clib.util.gui.SpinnerLabel;
+import ch.ethz.idsc.queuey.view.jmapviewer.JMapViewer;
+import ch.ethz.idsc.queuey.view.jmapviewer.interfaces.TileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.BingAerialTileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.BlackWhiteTileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.CycleTileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.DarkCartoTileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.FrenchTileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.GrayMapnikTileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.HikebikeTileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.HillshadingTileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.HotTileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.LandscapeTileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.LightCartoTileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.MapnikTileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.OpenCycleTileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.WatercolorTileSource;
+import ch.ethz.idsc.queuey.view.jmapviewer.tilesources.WikimediaTileSource;
+import ch.ethz.idsc.queuey.view.util.gui.SpinnerLabel;
 
 /* package */ class JMapTileSelector {
     public static SpinnerLabel<TileSource> create(JMapViewer jMapViewer) {
