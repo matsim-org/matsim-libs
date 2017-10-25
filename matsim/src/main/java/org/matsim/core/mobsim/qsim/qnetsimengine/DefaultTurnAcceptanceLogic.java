@@ -46,6 +46,10 @@ final class DefaultTurnAcceptanceLogic implements TurnAcceptanceLogic {
 //		}
 		// currently does not work, see MATSIM-533 
 		
+		/* note: it cannot happen, that currentLane does not lead to nextLink (e.g. due to turn restrictions) because this is checked before: 
+		 * a vehicle only enters a lane when that lane leads to the next link. see QLinkLanesImpl.moveBufferToNextLane() and .chooseNextLane()
+		 * tthunig, oct'17 */
+		
 		return AcceptTurn.GO ;
 	}
 
