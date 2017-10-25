@@ -18,7 +18,6 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.FileDelete;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 

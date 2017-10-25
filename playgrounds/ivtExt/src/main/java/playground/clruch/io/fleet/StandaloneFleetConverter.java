@@ -21,7 +21,7 @@ enum StandaloneFleetConverter {
         // selection of reference frame, file
         // TODO change this to generic input... rename in a way to show what it is. 
         File directory = //
-                new File("/home/andya/Desktop/idsc_st/10_Daten/2017-10-11_ZurichNew");
+                new File("/home/clruch/Downloads/2017-06-29 - ETH GPS Protokolle & Auftragslisten");
         ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
         // File file = new File("/media/datahaki/media/ethz/taxi", "2017-06-27 - GPS Fahrtstrecken-Protokoll.csv");
         List<File> trailFiles = (new MultiFileReader(directory, "Fahrtstrecken")).getFolderFiles();
@@ -39,7 +39,9 @@ enum StandaloneFleetConverter {
         // STEP 2: DayTaxiRecord to MATSimStaticDatabase
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         // generate sim objects and store
-        StorageUtils storageUtils = new StorageUtils(new File(simulationDirectory, "output"));
+        File storageSupplierFile = new File(simulationDirectory.getParent(), "output");
+        System.out.println("supplierFile: " +  storageSupplierFile.getAbsolutePath());
+        StorageUtils storageUtils = new StorageUtils(storageSupplierFile);
         SimulationFleetDump.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE, storageUtils);
 
     }
