@@ -27,7 +27,7 @@ public class RequestWaitingVirtualNodeFunction extends AbstractVirtualNodeFuncti
     private final Function<Tensor, Scalar> function;
 
     public RequestWaitingVirtualNodeFunction( //
-            MatsimStaticDatabase db, VirtualNetwork virtualNetwork, Function<Tensor, Scalar> function) {
+            MatsimStaticDatabase db, VirtualNetwork<Link> virtualNetwork, Function<Tensor, Scalar> function) {
         super(db, virtualNetwork);
         this.function = function;
     }
@@ -39,7 +39,7 @@ public class RequestWaitingVirtualNodeFunction extends AbstractVirtualNodeFuncti
             double duration = ref.now - rc.submissionTime;
             Link linkAnte = db.getOsmLink(rc.fromLinkIndex).link;
             // Link linkPost = db.getOsmLink(rc.toLinkIndex).link;
-            VirtualNode vn = virtualNetwork.getVirtualNode(linkAnte);
+            VirtualNode<Link> vn = virtualNetwork.getVirtualNode(linkAnte);
             collect.set(s -> s.append(DoubleScalar.of(duration)), vn.getIndex());
         }
         return Tensors.vector(i -> function.apply(collect.get(i)), virtualNetwork.getvNodesCount());
