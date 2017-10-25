@@ -26,7 +26,7 @@ enum SimulationFleetDump {
     public static void of(DayTaxiRecord dayTaxiRecord, Network network, MatsimStaticDatabase db,//
             StorageUtils storageUtils) {
 
-        final int MAXTIME = 216000; // TODO magic const
+        final int MAXTIME = 216000; // TODO magic const take this end time from the last info in the file... 
         final int TIMESTEP = 10;
 
         final double[] networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());

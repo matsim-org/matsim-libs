@@ -23,6 +23,7 @@ public enum AVStatus {
         return this.xmlTag;
     }
 
+    // TODO move this to another file
     // New method checking for real stay, rebalance drive or offservice
     public static AVStatus check_stay(int now, int lastTimeStamp, double distanceMoved, double timePassed) {
         if (Math.abs(now - lastTimeStamp) >= 2700) // TODO magic const.
