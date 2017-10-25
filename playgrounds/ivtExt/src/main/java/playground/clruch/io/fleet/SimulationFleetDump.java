@@ -2,8 +2,8 @@
 package playground.clruch.io.fleet;
 
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -13,7 +13,6 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensors;
-import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationObjects;
@@ -27,7 +26,7 @@ enum SimulationFleetDump {
     public static void of(DayTaxiRecord dayTaxiRecord, Network network, MatsimStaticDatabase db,//
             StorageUtils storageUtils) {
 
-        final int MAXTIME = 216000; // TODO magic const
+        final int MAXTIME = 216000; // TODO magic const take this end time from the last info in the file... 
         final int TIMESTEP = 10;
 
         final double[] networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
@@ -52,32 +51,16 @@ enum SimulationFleetDump {
             	// Get corresponding dayTaxiRecord entry according to time now
             	Entry<Integer, TaxiStamp> dayTaxiRecordEntry = dayTaxiRecord.get(vehicleIndex).interp(now);
             	TaxiStamp taxiStamp = dayTaxiRecordEntry.getValue();
-            	int timeStamp = dayTaxiRecordEntry.getKey();
                 try {
                     Coord xy = db.referenceFrame.coords_fromWGS84.transform(taxiStamp.gps);
                     // getClosest(...) may fail if xy is outside boundingbox
                     Link center = quadTree.getClosest(xy.getX(), xy.getY());
-                    
-                    /***
-                	 * - Get the whole entry with timestamp instead only the value
-                	 * Initialize all REBALANCE & STAY cars as OFFSERVICE 
-                	 * - Check if difference between now and the interp.now
-                     * is greater than specific limit and specify either
-                     * STAY or OFFSERVICE AVStatus
-                	 */
-                    AVStatus avStatus = taxiStamp.avStatus;
-                	if (now == 0) {
-                		if (taxiStamp.avStatus == AVStatus.STAY || taxiStamp.avStatus == AVStatus.REBALANCEDRIVE)
-                			avStatus = AVStatus.OFFSERVICE;
-                	}
-                	else if (Math.abs(now - timeStamp) >= 3600) // TODO magic const.
-                    	avStatus = AVStatus.OFFSERVICE;
-                	
+
                     // ---
                     VehicleContainer vc = new VehicleContainer();
                     vc.vehicleIndex = vehicleIndex;
                     vc.linkIndex = db.getLinkIndex(center);
-                    vc.avStatus = avStatus;
+                    vc.avStatus = taxiStamp.avStatus;
                     
                     GlobalAssert.that(Objects.nonNull(vc.avStatus));
                     simulationObject.vehicles.add(vc);
