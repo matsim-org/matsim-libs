@@ -14,7 +14,7 @@ public enum StringStatusMapper {
         case "Angemeldet":
             return AVStatus.check_stay(now, lastTimeStamp, Double.parseDouble(distanceMoved), Double.parseDouble(timePassed));
         case "In Umgebung":
-            return AVStatus.REBALANCEDRIVE;
+            return AVStatus.check_stay(now, lastTimeStamp, Double.parseDouble(distanceMoved), Double.parseDouble(timePassed));
         case "Beim Kunden":
             return AVStatus.DRIVETOCUSTMER;
         case "Besetzt mit Kunden":
