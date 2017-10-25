@@ -93,20 +93,11 @@ public class StorageUtils {
     /** function only called from {@link StorageSubscriber} when data is recorded during simulation
      * 
      * @param simulationObject
-<<<<<<< HEAD
-     * @return file to store given simulationObject
-     */
-    public static File getFileForStorageOf(SimulationObject simulationObject) {
-    	if(!OUTPUT.exists()) {
-        	System.out.println("OUTPUT = " + OUTPUT.getAbsolutePath());
-            GlobalAssert.that(false	);    		
-    	}
 
-=======
      * @return file to store given simulationObject */
     /* package */ File getFileForStorageOf(SimulationObject simulationObject) {
         GlobalAssert.that(OUTPUT.exists());
->>>>>>> master
+
         DIRECTORY.mkdir();
         File iter = new File(DIRECTORY, String.format("it.%02d", simulationObject.iteration));
         iter.mkdir();
