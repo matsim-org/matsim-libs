@@ -8,6 +8,8 @@ import java.util.List;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileReader;
+import ch.ethz.idsc.queuey.util.FileDelete;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageUtils;
@@ -19,7 +21,7 @@ enum StandaloneFleetConverter {
     public static void main(String[] args) throws Exception {
         // STEP 1: File to DayTaxiRecord
         // selection of reference frame, file
-        // TODO change this to generic input... rename in a way to show what it is. 
+        // TODO change this to generic input... rename in a way to show what it is.
         File directory = //
                 new File("/home/clruch/Downloads/2017-06-29 - ETH GPS Protokolle & Auftragslisten");
         ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
@@ -40,10 +42,14 @@ enum StandaloneFleetConverter {
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         // generate sim objects and store
         File storageSupplierFile = new File(simulationDirectory.getParent(), "output");
-        System.out.println("supplierFile: " +  storageSupplierFile.getAbsolutePath());
+        if (storageSupplierFile.exists()) {
+            FileDelete.of(storageSupplierFile, 5, 100000);
+        }
+        GlobalAssert.that(!storageSupplierFile.exists());
+        storageSupplierFile.mkdir();
+        System.out.println("supplierFile: " + storageSupplierFile.getAbsolutePath());
         StorageUtils storageUtils = new StorageUtils(storageSupplierFile);
         SimulationFleetDump.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE, storageUtils);
-
     }
 
 }
