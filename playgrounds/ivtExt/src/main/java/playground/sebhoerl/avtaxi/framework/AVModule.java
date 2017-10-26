@@ -34,6 +34,7 @@ import playground.clruch.dispatcher.GlobalBipartiteMatchingDispatcher;
 import playground.clruch.dispatcher.LPFBDispatcher;
 import playground.clruch.dispatcher.LPFFDispatcher;
 import playground.clruch.dispatcher.NewSingleHeuristicDispatcher;
+import playground.clruch.dispatcher.SPLICEDispatcher;
 import playground.clruch.dispatcher.TestBedDispatcher;
 import playground.clruch.dispatcher.UncoordinatedDispatcher;
 import playground.clruch.dispatcher.selfishdispatcher.SelfishDispatcher;
@@ -128,7 +129,17 @@ public class AVModule extends AbstractModule {
         bind(TestBedDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), TestBedDispatcher.class.getSimpleName()).to(TestBedDispatcher.Factory.class);
 
+        bind(SPLICEDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), SPLICEDispatcher.class.getSimpleName()).to(SPLICEDispatcher.Factory.class);
 
+        
+        
+        
+        
+
+        
+        
+        
         // bind(PolyMultiGBMDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), PolyMultiGBMDispatcher.class.getSimpleName()).to(PolyMultiGBMDispatcher.Factory.class);
 
