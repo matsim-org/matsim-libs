@@ -26,7 +26,8 @@ enum SimulationFleetDump {
     public static void of(DayTaxiRecord dayTaxiRecord, Network network, MatsimStaticDatabase db,//
             StorageUtils storageUtils) {
 
-        final int MAXTIME = 216000; // TODO magic const take this end time from the last info in the file... 
+        // final int MAXTIME = 180000; // TODO magic const take this end time from the last info in the file... 
+        final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
         final int TIMESTEP = 10;
 
         final double[] networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
@@ -48,6 +49,9 @@ enum SimulationFleetDump {
 
             for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
             	
+                // Check and propagate offservice status
+                dayTaxiRecord.get(vehicleIndex).check_offservice(now);
+                
             	// Get corresponding dayTaxiRecord entry according to time now
             	Entry<Integer, TaxiStamp> dayTaxiRecordEntry = dayTaxiRecord.get(vehicleIndex).interp(now);
             	TaxiStamp taxiStamp = dayTaxiRecordEntry.getValue();

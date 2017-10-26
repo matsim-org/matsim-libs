@@ -19,22 +19,21 @@ public class TaxiTrail {
 
     public void insert(int now, List<String> list) {
         TaxiStamp taxiStamp = new TaxiStamp();
-        int timeStamp = 0;
-
-        Entry<Integer, TaxiStamp> lastEntry = sortedMap.floorEntry(now);
-        if (Objects.nonNull(lastEntry)) {
-            timeStamp = lastEntry.getKey();
-        }
-
-        taxiStamp.avStatus = StringStatusMapper.apply(now, timeStamp, list.get(3), list.get(4), list.get(5));
-
-        // Propagate offservice status to last entry aswell
-        if (taxiStamp.avStatus == AVStatus.OFFSERVICE && Objects.nonNull(lastEntry)) {
-            TaxiStamp lastTaxiStamp = lastEntry.getValue();
-            lastTaxiStamp.avStatus = AVStatus.OFFSERVICE;
-            TaxiStamp retSt = sortedMap.put(timeStamp, lastTaxiStamp);
-            GlobalAssert.that(retSt != null);
-        }
+        // int lastTimeStamp = now;
+        //
+        // Entry<Integer, TaxiStamp> lastEntry = sortedMap.lowerEntry(now);
+        // if (Objects.nonNull(lastEntry)) {
+        // lastTimeStamp = lastEntry.getKey();
+        // }
+        //
+        taxiStamp.avStatus = StringStatusMapper.apply(now, list.get(3), list.get(4), list.get(5));
+        //
+        // // Propagate offservice status to last entry aswell
+        // if (taxiStamp.avStatus == AVStatus.OFFSERVICE) {
+        // TaxiStamp lastTaxiStamp = lastEntry.getValue();
+        // lastTaxiStamp.avStatus = AVStatus.OFFSERVICE;
+        // sortedMap.put(lastTimeStamp, lastTaxiStamp);
+        // }
 
         taxiStamp.gps = new Coord( //
                 Double.parseDouble(list.get(10)), //
@@ -45,11 +44,7 @@ public class TaxiTrail {
             ++override;
         }
 
-        TaxiStamp retSt = sortedMap.put(now, taxiStamp);
-        GlobalAssert.that(retSt == null);
-
-        checkConsistency();
-
+        sortedMap.put(now, taxiStamp);
     }
 
     /*** Changed method to return the whole entry instead only the getvalue() part
@@ -67,38 +62,34 @@ public class TaxiTrail {
         return entry;
     }
 
-    // TODO remove this
-    private void checkConsistency() {
-        int cd = 10; // checkdepth
-
-        AVStatus lastStatus = null;
-        Coord lastCoord = null;
-
-        int countWrong = 0;
-
-        for (Entry<Integer, TaxiStamp> entry : sortedMap.entrySet()) {
-
-            AVStatus nowStatus = entry.getValue().avStatus;
-            Coord nowCoord = entry.getValue().gps;
-
-            if (nowStatus.equals(AVStatus.DRIVEWITHCUSTOMER)) {
-                if (nowStatus.equals(lastStatus) && nowCoord.equals(lastCoord)) {
-                    countWrong++;
-                } else {
-                    countWrong = 0;
-                }
-
-            } else {
-                countWrong = 0;
+    /*** Off sourced check offservice avstatus to its own method which can be called
+     * either from taxitrail or simulationfleetdump */
+    public void check_offservice(int now) {
+        
+        // Get last two values
+        Entry<Integer, TaxiStamp> nowEntry = sortedMap.floorEntry(now);
+        
+        if (Objects.nonNull(nowEntry)) {
+            int nowTimeStamp = nowEntry.getKey();
+                        
+            // Check validity & time difference between last two timestamps
+            if (Math.abs(now - nowTimeStamp) >= 2700) { // TODO magic const.
+            
+                    // Change avstatus to offservice 
+                    TaxiStamp nowTaxiStamp = nowEntry.getValue();
+                    nowTaxiStamp.avStatus = AVStatus.OFFSERVICE;
+                    sortedMap.put(nowTimeStamp, nowTaxiStamp);
+                    
+                    // Check if entry before that also exist and propagate offservice status
+                    Entry<Integer, TaxiStamp> lastEntry = sortedMap.lowerEntry(nowTimeStamp);
+                    if (Objects.nonNull(lastEntry)) {
+                        TaxiStamp lastTaxiStamp = lastEntry.getValue();
+                        int lastTimeStamp = lastEntry.getKey();
+                        lastTaxiStamp.avStatus = AVStatus.OFFSERVICE;
+                        sortedMap.put(lastTimeStamp, lastTaxiStamp);
+                    }
             }
-
-            lastStatus = nowStatus;
-            lastCoord = nowCoord;
-
         }
-
-        GlobalAssert.that(countWrong < cd);
-
     }
 
 }
