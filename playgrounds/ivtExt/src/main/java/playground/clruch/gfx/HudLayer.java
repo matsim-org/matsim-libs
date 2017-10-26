@@ -25,6 +25,7 @@ import playground.clruch.net.SimulationObject;
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
+        if (ref != null) 
         if (show) {
             final Dimension dimension = matsimMapComponent.getSize();
             GraphicsUtil.setQualityHigh(graphics);

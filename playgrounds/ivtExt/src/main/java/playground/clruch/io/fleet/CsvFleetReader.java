@@ -45,7 +45,6 @@ public class CsvFleetReader {
                     if (Objects.isNull(line))
                         break;
                     List<String> list = CSVUtils.csvLineToList(line,";");
-
                     dayTaxiRecord.insert(list);
                     dayTaxiRecord.lastTimeStamp = list.get(0);
                     System.out.println("Last timestamp from csv file: " + dayTaxiRecord.lastTimeStamp);
