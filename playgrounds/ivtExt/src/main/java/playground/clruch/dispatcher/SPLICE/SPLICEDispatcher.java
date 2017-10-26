@@ -1,4 +1,4 @@
-package playground.clruch.dispatcher;
+package playground.clruch.dispatcher.SPLICE;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -56,6 +56,44 @@ public class SPLICEDispatcher extends RebalancingDispatcher {
         // TestBedDispatcher implemenatation
         final long round_now = Math.round(now);
         if (round_now % rebalancingPeriod == 0 && 0 < getAVRequests().size()) {
+            
+            // TASK 1: Compute a stacker crane tour from requests. 
+            
+            StackerCraneTour sct = new StackerCraneTour();
+            
+            
+            
+            // TASK 2: have only one vehicle and continuously let it run on the stacker crane tour 
+            // updated every 60 mins. 
+            
+            // Input: GlobalAssert.that(getRoboTaxis().size() == 1);
+            
+            
+            
+            
+            
+            
+            // 1 compute the Stacker Crane Tour
+            
+            // Euclidean Bipartite matching
+            // --> Look at the GlobalBipartiteMatchingDispatcher
+            
+            // connect
+            
+            // REWIRE to get away the subtours
+            
+            
+            // 2 Break up tour for number of cars
+            
+            // 3 assing each car a request on his tour chunk
+            
+            // 4 do the actual pickup
+            
+            
+            
+            
+            
+            
 
             // chose a link dpending on theNicoloFactor and then send all taxis to that link
             // every rebalcingPeriod
