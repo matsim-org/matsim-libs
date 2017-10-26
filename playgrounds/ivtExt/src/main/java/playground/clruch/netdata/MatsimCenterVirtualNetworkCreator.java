@@ -40,10 +40,13 @@ public class MatsimCenterVirtualNetworkCreator {
     public VirtualNetwork<Link> creatVirtualNetwork(Network network) {
         // TODO magic consts.
         double centerRadius = 1500;
-        Tensor emptyTensor = Tensors.empty();
+        Tensor emptyTensor = Tensors.vector(0, 0);
         Collection<Link> elements = (Collection<Link>) network.getLinks().values();
-        CenterVirtualNetworkCreator<Link> cvn = new CenterVirtualNetworkCreator<>(centerRadius, emptyTensor, elements, PlaneLocation::of, NetworkCreatorUtils::linkToID);
+
+        CenterVirtualNetworkCreator<Link> cvn = new CenterVirtualNetworkCreator<>(centerRadius, emptyTensor, elements, PlaneLocation::of,
+                NetworkCreatorUtils::linkToID);
         return cvn.getVirtualNetwork();
+
     }
 
 }

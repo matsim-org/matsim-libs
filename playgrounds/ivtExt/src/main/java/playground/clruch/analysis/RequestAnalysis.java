@@ -80,7 +80,7 @@ public enum RequestAnalysis {
      * @param time
      * @return earth mover's distance (EMD) for this set of requests
      */
-    public static double calcEMD(TravelData tData, VirtualNetwork virtualNetwork, LeastCostPathCalculator dijkstra, //
+    public static double calcEMD(TravelData tData, VirtualNetwork<Link> virtualNetwork, LeastCostPathCalculator dijkstra, //
                                  int dt, int time) {
         Tensor alphaij = tData.getAlphaijPSFforTime(time);
         AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
@@ -118,11 +118,11 @@ public enum RequestAnalysis {
         return network.getLinks().values().stream().mapToDouble(Link::getFreespeed).min().getAsDouble(); // smallest freespeed in network
     }
     
-    private static Scalar vLinkDistance(int i, int j, VirtualNetwork virtualNetwork, //
+    private static Scalar vLinkDistance(int i, int j, VirtualNetwork<Link> virtualNetwork, //
                                            LeastCostPathCalculator dijkstra, //
                                            AbstractVirtualNodeDest abstractVirtualNodeDest) {
-        VirtualNode vi = virtualNetwork.getVirtualNode(i);
-        VirtualNode vj = virtualNetwork.getVirtualNode(j);
+        VirtualNode<Link> vi = virtualNetwork.getVirtualNode(i);
+        VirtualNode<Link> vj = virtualNetwork.getVirtualNode(j);
 
         // return RealScalar.of(actualDistance(vi.getCoord(), vj.getCoord())); // euclidean approach
 

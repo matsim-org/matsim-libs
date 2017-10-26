@@ -5,7 +5,8 @@ import org.matsim.api.core.v01.Coord;
 
 import playground.clruch.dispatcher.core.AVStatus;
 
-class TaxiStamp {
+// TODO remove Coord, do with Tensor
+public class TaxiStamp {
 	public AVStatus avStatus;
 	public Coord gps;
 }

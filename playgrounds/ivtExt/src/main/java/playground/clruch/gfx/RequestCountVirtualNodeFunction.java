@@ -16,7 +16,7 @@ import playground.clruch.net.SimulationObject;
  * count requests
  */
 /* package */ class RequestCountVirtualNodeFunction extends AbstractVirtualNodeFunction {
-    public RequestCountVirtualNodeFunction(MatsimStaticDatabase db, VirtualNetwork virtualNetwork) {
+    public RequestCountVirtualNodeFunction(MatsimStaticDatabase db, VirtualNetwork<Link> virtualNetwork) {
         super(db, virtualNetwork);
     }
 
@@ -26,7 +26,7 @@ import playground.clruch.net.SimulationObject;
         for (RequestContainer rc : ref.requests) {
             int linkIndex = rc.fromLinkIndex;
             Link link = db.getOsmLink(linkIndex).link;
-            VirtualNode vn = virtualNetwork.getVirtualNode(link);
+            VirtualNode<Link> vn = virtualNetwork.getVirtualNode(link);
             count.set(Increment.ONE, vn.getIndex());
         }
         return count;

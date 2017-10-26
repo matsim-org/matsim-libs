@@ -1,14 +1,13 @@
 // code by clruch
 package playground.clruch.dispatcher.core;
 
-/**
- * Created by Claudio on 2/3/2017.
- */
+/** Created by Claudio on 2/3/2017. */
 public enum AVStatus {
     DRIVEWITHCUSTOMER("del", "with customer"), //
     DRIVETOCUSTMER("d2c", "pickup"), //
     REBALANCEDRIVE("reb", "rebalance"), //
     STAY("stay", "stay"), //
+    OFFSERVICE("off", "off service"), // TODO check if useful.
     ;
 
     public final String xmlTag;

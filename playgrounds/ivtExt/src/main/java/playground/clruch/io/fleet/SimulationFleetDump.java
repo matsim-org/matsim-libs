@@ -2,6 +2,7 @@
 package playground.clruch.io.fleet;
 
 import java.util.ArrayList;
+import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.matsim.api.core.v01.Coord;
@@ -25,7 +26,8 @@ enum SimulationFleetDump {
     public static void of(DayTaxiRecord dayTaxiRecord, Network network, MatsimStaticDatabase db,//
             StorageUtils storageUtils) {
 
-        final int MAXTIME = 216000; // TODO magic const
+        // final int MAXTIME = 180000; // TODO magic const take this end time from the last info in the file... 
+        final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
         final int TIMESTEP = 10;
 
         final double[] networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
@@ -46,16 +48,24 @@ enum SimulationFleetDump {
             simulationObject.vehicles = new ArrayList<>();
 
             for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
-                TaxiStamp taxiStamp = dayTaxiRecord.get(vehicleIndex).interp(now);
+            	
+                // Check and propagate offservice status
+                dayTaxiRecord.get(vehicleIndex).check_offservice(now);
+                
+            	// Get corresponding dayTaxiRecord entry according to time now
+            	Entry<Integer, TaxiStamp> dayTaxiRecordEntry = dayTaxiRecord.get(vehicleIndex).interp(now);
+            	TaxiStamp taxiStamp = dayTaxiRecordEntry.getValue();
                 try {
                     Coord xy = db.referenceFrame.coords_fromWGS84.transform(taxiStamp.gps);
                     // getClosest(...) may fail if xy is outside boundingbox
                     Link center = quadTree.getClosest(xy.getX(), xy.getY());
+
                     // ---
                     VehicleContainer vc = new VehicleContainer();
                     vc.vehicleIndex = vehicleIndex;
                     vc.linkIndex = db.getLinkIndex(center);
                     vc.avStatus = taxiStamp.avStatus;
+                    
                     GlobalAssert.that(Objects.nonNull(vc.avStatus));
                     simulationObject.vehicles.add(vc);
                 } catch (Exception exception) {

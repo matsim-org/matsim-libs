@@ -15,8 +15,8 @@ import playground.clruch.data.ReferenceFrame;
 import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.net.MatsimStaticDatabase;
-import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.NetworkLoader;
+import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.PropertiesExt;
 
 /** the viewer allows to connect to the scenario server or to view saved
