@@ -56,11 +56,8 @@ public class MatsimMapComponent extends JMapViewer {
             matsimHeatmaps.add(m);
     }
 
-    /**
-     * 
-     * @param coord
-     * @return null of coord is not within view
-     */
+    /** @param coord
+     * @return null of coord is not within view */
     final Point getMapPosition(Coord coord) {
         return getMapPosition(coord.getY(), coord.getX());
     }
@@ -91,19 +88,36 @@ public class MatsimMapComponent extends JMapViewer {
         final Graphics2D graphics = (Graphics2D) g;
         // final Dimension dimension = getSize();
 
-        if (ref != null) {
+//        if (ref != null) 
+        {
 
             infoStrings.clear();
+            if (ref != null) 
             append("i=%-3s %s", "" + ref.iteration, new SecondsToHMS(ref.now).toDigitalWatch());
             appendSeparator();
 
-            viewerLayers.forEach(viewerLayer -> viewerLayer.paint(graphics, ref));
-            viewerLayers.forEach(viewerLayer -> viewerLayer.hud(graphics, ref));
+            viewerLayers.forEach(viewerLayer -> {
+                try {
+                    viewerLayer.paint(graphics, ref);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            });
+            viewerLayers.forEach(viewerLayer -> {
+                try {
+                    viewerLayer.hud(graphics, ref);
+                } catch (Exception e2) {
+                    e2.printStackTrace();
+                }
+
+            });
 
             append("%5d zoom", getZoom());
             append("%5d m/pixel", (int) Math.ceil(getMeterPerPixel()));
             appendSeparator();
 
+            if (ref != null) 
             jLabel.setText(ref.infoLine);
 
             if (0 < infoFontSize)

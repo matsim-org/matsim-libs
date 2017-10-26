@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import ch.ethz.idsc.queuey.datalys.csv.CSVUtils;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
@@ -47,7 +45,6 @@ public class CsvFleetReader {
                     if (Objects.isNull(line))
                         break;
                     List<String> list = CSVUtils.csvLineToList(line,";");
-
                     dayTaxiRecord.insert(list);
                     ++dataline;
                 }

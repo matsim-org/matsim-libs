@@ -67,6 +67,7 @@ import playground.clruch.net.SimulationObject;
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
+        if (ref != null) 
         lruCache.put(ref.now, ref);
 
         if (drawLinks) {
@@ -80,6 +81,7 @@ import playground.clruch.net.SimulationObject;
             }
         }
 
+        if (ref != null) 
         if (drawLoad) {
             final int width = historyLength;
             LinkStats linkStats = new LinkStats(width);
