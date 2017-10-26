@@ -73,59 +73,60 @@ import playground.clruch.net.SimulationObject;
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
-        maxWaitTime = 0;
-        // draw requests
-        graphics.setFont(requestsFont);
-        final boolean showNumbers = drawNumber && 13 < matsimMapComponent.getZoom();
-        Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
-                .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
-        for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
-            Point p1;
-            {
-                int linkId = entry.getKey();
-                OsmLink osmLink = matsimMapComponent.db.getOsmLink(linkId);
-                p1 = matsimMapComponent.getMapPosition(osmLink.getAt(0.5));
-            }
-            if (p1 != null) {
-                final int numRequests = entry.getValue().size();
-
-                final int x = p1.x;
-                final int y = p1.y;
-
+        if (ref != null) {
+            maxWaitTime = 0;
+            // draw requests
+            graphics.setFont(requestsFont);
+            final boolean showNumbers = drawNumber && 13 < matsimMapComponent.getZoom();
+            Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
+                    .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
+            for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
+                Point p1;
                 {
-                    graphics.setColor(new Color(32, 128, 32, 128));
-                    int index = numRequests;
-                    for (RequestContainer rc : entry.getValue()) {
-                        double waitTime = ref.now - rc.submissionTime;
-                        maxWaitTime = Math.max(waitTime, maxWaitTime);
-                        int piy = y - index;
-                        int wid = (int) waitTime / 10;
-                        int left = x - wid / 2;
-                        // graphics.drawLine(left, piy, left + wid, piy);
-                        --index;
-                    }
+                    int linkId = entry.getKey();
+                    OsmLink osmLink = matsimMapComponent.db.getOsmLink(linkId);
+                    p1 = matsimMapComponent.getMapPosition(osmLink.getAt(0.5));
                 }
-                if (drawRequestDestinations) {
-                    graphics.setColor(new Color(128, 128, 128, 64));
-                    for (RequestContainer rc : entry.getValue()) {
-                        int linkId = rc.toLinkIndex;
-                        OsmLink osmLink = matsimMapComponent.db.getOsmLink(linkId);
-                        Point p2 = matsimMapComponent.getMapPositionAlways(osmLink.getAt(0.5));
-                        graphics.drawLine(x, y, p2.x, p2.y);
+                if (p1 != null) {
+                    final int numRequests = entry.getValue().size();
+
+                    final int x = p1.x;
+                    final int y = p1.y;
+
+                    {
+                        graphics.setColor(new Color(32, 128, 32, 128));
+                        int index = numRequests;
+                        for (RequestContainer rc : entry.getValue()) {
+                            double waitTime = ref.now - rc.submissionTime;
+                            maxWaitTime = Math.max(waitTime, maxWaitTime);
+                            int piy = y - index;
+                            int wid = (int) waitTime / 10;
+                            int left = x - wid / 2;
+                            // graphics.drawLine(left, piy, left + wid, piy);
+                            --index;
+                        }
                     }
-                }
-                if (showNumbers) {
-                    graphics.setColor(Color.GRAY);
-                    graphics.drawString("" + numRequests, x, y); // - numRequests
+                    if (drawRequestDestinations) {
+                        graphics.setColor(new Color(128, 128, 128, 64));
+                        for (RequestContainer rc : entry.getValue()) {
+                            int linkId = rc.toLinkIndex;
+                            OsmLink osmLink = matsimMapComponent.db.getOsmLink(linkId);
+                            Point p2 = matsimMapComponent.getMapPositionAlways(osmLink.getAt(0.5));
+                            graphics.drawLine(x, y, p2.x, p2.y);
+                        }
+                    }
+                    if (showNumbers) {
+                        graphics.setColor(Color.GRAY);
+                        graphics.drawString("" + numRequests, x, y); // - numRequests
+                    }
                 }
             }
         }
-
     }
 
     @Override
     void hud(Graphics2D graphics, SimulationObject ref) {
-        {
+        if (ref != null) {
             InfoString infoString = new InfoString(String.format("%5d %s", ref.requests.size(), "open requests"));
             infoString.color = Color.BLACK; // new Color(204, 122, 0);
             matsimMapComponent.append(infoString);
@@ -135,7 +136,8 @@ import playground.clruch.net.SimulationObject;
             infoString.color = Color.BLACK; // new Color(255, 102, 0);
             matsimMapComponent.append(infoString);
         }
-        matsimMapComponent.append("%5d %s", ref.total_matchedRequests, "matched req.");
+        if (ref != null)
+            matsimMapComponent.append("%5d %s", ref.total_matchedRequests, "matched req.");
         matsimMapComponent.appendSeparator();
     }
 

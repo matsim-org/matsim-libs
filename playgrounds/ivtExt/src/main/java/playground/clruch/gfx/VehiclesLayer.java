@@ -42,6 +42,8 @@ import playground.clruch.net.VehicleContainer;
 
     @Override
     void paint(Graphics2D graphics, SimulationObject ref) {
+        if (ref == null)
+            return;
         if (!showLocation && bits.isEmpty())
             return; // nothing to draw
 
@@ -83,17 +85,19 @@ import playground.clruch.net.VehicleContainer;
     @Override
     void hud(Graphics2D graphics, SimulationObject ref) {
         int[] count = new int[AVStatus.values().length];
-        ref.vehicles.forEach(v -> ++count[v.avStatus.ordinal()]);
+        if (ref != null) {
+            ref.vehicles.forEach(v -> ++count[v.avStatus.ordinal()]);
 
-        for (AVStatus avStatus : AVStatus.values()) {
-            InfoString infoString = new InfoString(String.format("%5d %s", count[avStatus.ordinal()], avStatus.description));
-            infoString.color = avStatusColors.of(avStatus);
+            for (AVStatus avStatus : AVStatus.values()) {
+                InfoString infoString = new InfoString(String.format("%5d %s", count[avStatus.ordinal()], avStatus.description));
+                infoString.color = avStatusColors.of(avStatus);
+                matsimMapComponent.append(infoString);
+            }
+            InfoString infoString = new InfoString(String.format("%5d %s", ref.vehicles.size(), "total"));
+            infoString.color = Color.BLACK;
             matsimMapComponent.append(infoString);
+            matsimMapComponent.appendSeparator();
         }
-        InfoString infoString = new InfoString(String.format("%5d %s", ref.vehicles.size(), "total"));
-        infoString.color = Color.BLACK;
-        matsimMapComponent.append(infoString);
-        matsimMapComponent.appendSeparator();
     }
 
     void setDrawDestinations(AVStatus status, boolean selected) {
