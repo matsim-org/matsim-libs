@@ -19,6 +19,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
+import ch.ethz.idsc.queuey.util.FileDelete;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 /** @author Claudio Ruch */
@@ -168,15 +169,16 @@ public enum SequentialScenarioTools {
     /** THIS DELETES ALL FILES IN THe OUTPUTFOLDER OF THE WORKINGDIRECTORY,
      * USE VERY CAREFULLY AND DNO NOT MODIFY WITHOUT KNOWING WHAT YOU ARE DOING
      * 
-     * @param workingDirectory */
-    /* package */ static void emptyOutputFolder(File workingDirectory) {
+     * @param workingDirectory 
+     * @throws IOException */
+    /* package */ static void emptyOutputFolder(File workingDirectory) throws IOException {
         GlobalAssert.that(workingDirectory.isDirectory());
         File outputFolder = new File(workingDirectory, "output");
         if (outputFolder.exists()) {
             GlobalAssert.that(outputFolder.isDirectory());
             System.out.println("Now deleting all files in outputFolder = ");
             System.out.println(outputFolder.getAbsolutePath());
-            MultiFileTools.recursiveDelete(outputFolder);
+            FileDelete.of(outputFolder,5,1000000);
         }
     }
 
