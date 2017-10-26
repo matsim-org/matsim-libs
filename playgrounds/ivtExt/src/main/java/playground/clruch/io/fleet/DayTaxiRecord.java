@@ -16,7 +16,9 @@ public class DayTaxiRecord {
 
 	public void insert(List<String> list) {
 		final String timeStamp = list.get(0);
+		System.out.println("1 " +timeStamp);
 		final long taxiStamp_millis = DateParser.from(timeStamp);
+		System.out.println("2" +taxiStamp_millis);
 		long cmp = DateParser.from(timeStamp.substring(0, 11) + "00:00:00");
 		if (midnight == null) {
 			midnight = cmp;

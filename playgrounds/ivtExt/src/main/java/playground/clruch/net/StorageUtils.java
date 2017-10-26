@@ -30,7 +30,6 @@ public class StorageUtils {
         }
 
         DIRECTORY = new File(OUTPUT, "simobj");
-
     }
 
     public void printStorageProperties() {

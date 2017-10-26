@@ -23,31 +23,45 @@ enum StandaloneFleetConverter {
         // STEP 1: File to DayTaxiRecord
         // selection of reference frame, file
         File directory = //
-                new File("/home/anape/Downloads/SanFranciscoTaxi/data");
+                new File("/home/anape/Downloads/SanFranciscoTaxi/prueba");
         GlobalAssert.that(directory.exists());
         GlobalAssert.that(directory.isDirectory());
-
+      
         List<File> trailFiles = new MultiFileReader(directory).getFolderFiles();
 
         for (File file : trailFiles) {
-            System.out.println("loaded file: " + file.getAbsolutePath());
+            System.out.println("loaded file: " + file.getPath());
         }
-
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
-        File outputDirectory = new File(workingDirectory, "output");
-
-        StorageUtils storageUtils = new StorageUtils(outputDirectory);
-        ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
-
-        DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
         
-        // File file = new File("/media/datahaki/media/ethz/taxi", "2017-06-27 - GPS
-        //List<File> trailFiles = (new MultiFileReader(directory, "Fahrtstrecken")).getFolderFiles();
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
+        File outputDirectory = new File(workingDirectory, "output");   
+        
+        System.out.println("The working directory: " + workingDirectory);
+        System.out.println("The output directory: " + outputDirectory);
+        
+        //comprueba que haya output directory
+        StorageUtils storageUtils = new StorageUtils(outputDirectory);
+       
+
+        
+        ReferenceFrame referenceFrame = ReferenceFrame.SIOUXFALLS;
+       
+        
+        
+        
+        //la creamos pero aun no hacemos nada con ella
+        DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();   
+//        dayTaxiRecord.insert(directory);
+        
         
         // extract data from file and put into dayTaxiRecord
         CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);
+        
         reader.populateFrom(trailFiles);
         
+        
+        
+    
         // =================================================
         // TODO from here onwards you will need a San Francisco network... 
         Network network = NetworkLoader.loadNetwork(new File(args[0]));
@@ -60,3 +74,24 @@ enum StandaloneFleetConverter {
     }
 
 }
+
+
+
+
+        // File file = new File("/media/datahaki/media/ethz/taxi", "2017-06-27 - GPS
+        //List<File> trailFiles = (new MultiFileReader(directory, "Fahrtstrecken")).getFolderFiles();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
