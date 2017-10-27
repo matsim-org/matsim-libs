@@ -19,22 +19,7 @@ public class TaxiTrail {
 
     public void insert(int now, List<String> list) {
         TaxiStamp taxiStamp = new TaxiStamp();
-        // int lastTimeStamp = now;
-        //
-        // Entry<Integer, TaxiStamp> lastEntry = sortedMap.lowerEntry(now);
-        // if (Objects.nonNull(lastEntry)) {
-        // lastTimeStamp = lastEntry.getKey();
-        // }
-        //
         taxiStamp.avStatus = StringStatusMapper.apply(now, list.get(3), list.get(4), list.get(5));
-        //
-        // // Propagate offservice status to last entry aswell
-        // if (taxiStamp.avStatus == AVStatus.OFFSERVICE) {
-        // TaxiStamp lastTaxiStamp = lastEntry.getValue();
-        // lastTaxiStamp.avStatus = AVStatus.OFFSERVICE;
-        // sortedMap.put(lastTimeStamp, lastTaxiStamp);
-        // }
-
         taxiStamp.gps = new Coord( //
                 Double.parseDouble(list.get(10)), //
                 Double.parseDouble(list.get(11)));
@@ -65,30 +50,36 @@ public class TaxiTrail {
     /*** Off sourced check offservice avstatus to its own method which can be called
      * either from taxitrail or simulationfleetdump */
     public void check_offservice(int now) {
-        
         // Get last two values
-        Entry<Integer, TaxiStamp> nowEntry = sortedMap.floorEntry(now);
-        
+        Entry<Integer, TaxiStamp> nowEntry = null;
+        if (now == 0) {
+            nowEntry = sortedMap.ceilingEntry(now);
+            if (nowEntry.getValue().avStatus == AVStatus.STAY || nowEntry.getValue().avStatus == AVStatus.REBALANCEDRIVE)
+                setOffService(nowEntry);
+        } else
+            nowEntry = sortedMap.floorEntry(now);
+
         if (Objects.nonNull(nowEntry)) {
             int nowTimeStamp = nowEntry.getKey();
-                        
             // Check validity & time difference between last two timestamps
             if (Math.abs(now - nowTimeStamp) >= 2700) { // TODO magic const.
-            
-                    // Change avstatus to offservice 
-                    TaxiStamp nowTaxiStamp = nowEntry.getValue();
-                    nowTaxiStamp.avStatus = AVStatus.OFFSERVICE;
-                    sortedMap.put(nowTimeStamp, nowTaxiStamp);
-                    
-                    // Check if entry before that also exist and propagate offservice status
-                    Entry<Integer, TaxiStamp> lastEntry = sortedMap.lowerEntry(nowTimeStamp);
-                    if (Objects.nonNull(lastEntry)) {
-                        TaxiStamp lastTaxiStamp = lastEntry.getValue();
-                        int lastTimeStamp = lastEntry.getKey();
-                        lastTaxiStamp.avStatus = AVStatus.OFFSERVICE;
-                        sortedMap.put(lastTimeStamp, lastTaxiStamp);
-                    }
+                // Change avstatus to offservice
+                setOffService(nowEntry);
+
+                // Check if entry before that also exist and propagate offservice status
+                Entry<Integer, TaxiStamp> lastEntry = sortedMap.lowerEntry(nowTimeStamp);
+                setOffService(lastEntry);
             }
+        }
+    }
+
+    private void setOffService(Entry<Integer, TaxiStamp> entry) {
+        // less than or equal to the given key
+        if (Objects.nonNull(entry)) {
+            TaxiStamp taxiStamp = entry.getValue();
+            int timeStamp = entry.getKey();
+            taxiStamp.avStatus = AVStatus.OFFSERVICE;
+            sortedMap.replace(timeStamp, taxiStamp);
         }
     }
 
