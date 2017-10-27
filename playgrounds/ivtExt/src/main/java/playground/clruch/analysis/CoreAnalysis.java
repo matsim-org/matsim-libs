@@ -15,6 +15,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Join;
+import ch.ethz.idsc.tensor.pdf.BinCounts;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
@@ -110,7 +111,7 @@ public class CoreAnalysis {
         numRequests = uniqueSubmissions.length();
         maximumWaitTime = AnalysisUtils.maximum(uniqueSubmissions).number().doubleValue();
         analyzeAll.setwaitBinSize(AnalysisUtils.adaptBinSize(uniqueSubmissions, analyzeAll.getwaitbinSize(), RealScalar.of(5.0)));
-        waitBinCounter = AnalysisUtils.binCount(uniqueSubmissions, analyzeAll.getwaitbinSize());
+        waitBinCounter = BinCounts.of(uniqueSubmissions, analyzeAll.getwaitbinSize());
 
         System.out.println("Found requests: " + numRequests);
 
