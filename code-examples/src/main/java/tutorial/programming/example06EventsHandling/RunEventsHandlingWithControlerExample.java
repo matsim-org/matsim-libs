@@ -43,7 +43,7 @@ public class RunEventsHandlingWithControlerExample {
 
 		Config config ;
 		if ( args==null || args.length==0 ) {
-			config = ConfigUtils.loadConfig( "examples/tutorial/programming/example7-config.xml" ) ;
+			config = ConfigUtils.loadConfig( "scenarios/equil/example7-config.xml" ) ;
 		} else {
 			config = ConfigUtils.loadConfig( args[0] ) ;
 		}
