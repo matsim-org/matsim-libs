@@ -398,15 +398,13 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 		if (!this.keepPaths) {
 
-			log.info("Mark nodes as unused where only one way leads through ...") ;
+			log.info("Mark nodes as unused that can be simplified ...") ;
 			for (OsmNode node : this.nodes.values()) {
-				if (node.ways.size()== 1 && !node.endPoint) {
-					node.used = false;
-				}
+				node.used = isNodeNecessary(node);
 			}
-			log.info("... done marking nodes as unused where only one way leads through.") ;
+			log.info("... done marking nodes as unused that can be simplified.") ;
 
-			log.info("Verify we did not mark nodes as unused that build a loop ...") ;
+			log.info("Verify we did not mark nodes that build a loop ...") ;
 			for (OsmWay way : this.ways.values()) {
 				String highway = way.tags.get(TAG_HIGHWAY);
 				if ((highway != null) && (this.highwayDefaults.containsKey(highway))) {
@@ -436,7 +434,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 					}
 				}
 			}
-			log.info("... done verifying that we did not mark nodes as unused that build a loop.") ;
+			log.info("... done verifying that we did not mark nodes that build a loop.") ;
 
 		}
 
@@ -513,6 +511,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		// free up memory
 		this.nodes.clear();
 		this.ways.clear();
+	}
+	
+	protected boolean isNodeNecessary(OsmNode node) {
+		return (node.ways.size() != 1) || node.endPoint;
 	}
 
 	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, 
