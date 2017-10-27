@@ -24,6 +24,20 @@ import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import net.opengis.kml._2.DocumentType;
+import net.opengis.kml._2.FolderType;
+import net.opengis.kml._2.IconStyleType;
+import net.opengis.kml._2.KmlType;
+import net.opengis.kml._2.LinkType;
+import net.opengis.kml._2.MultiGeometryType;
+import net.opengis.kml._2.NetworkLinkType;
+import net.opengis.kml._2.ObjectFactory;
+import net.opengis.kml._2.PlacemarkType;
+import net.opengis.kml._2.PointType;
+import net.opengis.kml._2.StyleType;
+import net.opengis.kml._2.TimeSpanType;
+import net.opengis.kml._2.TimeStampType;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.gbl.MatsimResource;
@@ -32,20 +46,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
-
-import net.opengis.kml.v_2_2_0.DocumentType;
-import net.opengis.kml.v_2_2_0.FolderType;
-import net.opengis.kml.v_2_2_0.IconStyleType;
-import net.opengis.kml.v_2_2_0.KmlType;
-import net.opengis.kml.v_2_2_0.LinkType;
-import net.opengis.kml.v_2_2_0.MultiGeometryType;
-import net.opengis.kml.v_2_2_0.NetworkLinkType;
-import net.opengis.kml.v_2_2_0.ObjectFactory;
-import net.opengis.kml.v_2_2_0.PlacemarkType;
-import net.opengis.kml.v_2_2_0.PointType;
-import net.opengis.kml.v_2_2_0.StyleType;
-import net.opengis.kml.v_2_2_0.TimeSpanType;
-import net.opengis.kml.v_2_2_0.TimeStampType;
 
 public class KmlSnapshotWriter implements SnapshotWriter {
 
@@ -66,7 +66,7 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 
 	private final CoordinateTransformation coordTransform;
 
-	private final TreeMap<Double, NetworkLinkType> timeLinks = new TreeMap<>();
+	private final TreeMap<Double, NetworkLinkType> timeLinks = new TreeMap<Double, NetworkLinkType>();
 
 	private double time = Time.UNDEFINED_TIME;
 	
@@ -94,13 +94,11 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 		}
 		this.carStyle = kmlObjectFactory.createStyleType();
 		this.carStyle.setId("redCarStyle");
-		{
-			IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
-			carIconStyle.setIcon(iconLink);
-			carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMRED);
-			carIconStyle.setScale(Double.valueOf(0.5));
-			this.carStyle.setIconStyle(carIconStyle);
-		}
+		IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
+		carIconStyle.setIcon(iconLink);
+		carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMRED);
+		carIconStyle.setScale(Double.valueOf(0.5));
+		this.carStyle.setIconStyle(carIconStyle);
 		this.mainDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(this.carStyle));
 
 		this.mainFolder = kmlObjectFactory.createFolderType();

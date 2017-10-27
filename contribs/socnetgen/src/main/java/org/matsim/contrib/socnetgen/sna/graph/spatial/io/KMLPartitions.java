@@ -19,13 +19,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.io;
 
-import java.util.List;
-import java.util.Set;
-
+import net.opengis.kml._2.FolderType;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 
-import net.opengis.kml.v_2_2_0.FolderType;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A KMLPartition implementation allows to organize partitions of vertices into

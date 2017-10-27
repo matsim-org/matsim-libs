@@ -20,8 +20,7 @@
 
 package org.matsim.core.network.io;
 
-import java.io.IOException;
-
+import net.opengis.kml._2.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -33,12 +32,7 @@ import org.matsim.vis.kml.MatsimKmlStyleFactory;
 import org.matsim.vis.kml.NetworkFeatureFactory;
 import org.matsim.vis.kml.NetworkKmlStyleFactory;
 
-import net.opengis.kml.v_2_2_0.AbstractFeatureType;
-import net.opengis.kml.v_2_2_0.DocumentType;
-import net.opengis.kml.v_2_2_0.FolderType;
-import net.opengis.kml.v_2_2_0.ObjectFactory;
-import net.opengis.kml.v_2_2_0.PlacemarkType;
-import net.opengis.kml.v_2_2_0.StyleType;
+import java.io.IOException;
 
 /**
  * @author dgrether
