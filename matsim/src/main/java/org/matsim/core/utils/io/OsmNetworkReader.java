@@ -373,20 +373,20 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				// check to which level a way belongs
 				way.hierarchy = this.highwayDefaults.get(highway).hierarchy;
 
-				// first and last are counted twice, so they are kept in all cases
-				this.nodes.get(way.nodes.get(0)).ways++;
-				this.nodes.get(way.nodes.get(way.nodes.size()-1)).ways++;
+				// first and last node are saved as endpoints, so they are kept in all cases
+				this.nodes.get(way.nodes.get(0)).endPoint = true;
+				this.nodes.get(way.nodes.get(way.nodes.size() - 1)).endPoint = true;
 
 				for (Long nodeId : way.nodes) {
 					OsmNode node = this.nodes.get(nodeId);
 					if (this.hierarchyLayers.isEmpty()) {
 						node.used = true;
-						node.ways++;
+						node.ways.put(way.id, way);
 					} else {
 						for (OsmFilter osmFilter : this.hierarchyLayers) {
 							if(osmFilter.coordInFilter(node.coord, way.hierarchy)){
 								node.used = true;
-								node.ways++;
+								node.ways.put(way.id, way);
 								break;
 							}
 						}
@@ -400,7 +400,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 			log.info("Mark nodes as unused where only one way leads through ...") ;
 			for (OsmNode node : this.nodes.values()) {
-				if (node.ways == 1) {
+				if (node.ways.size()== 1 && !node.endPoint) {
 					node.used = false;
 				}
 			}
@@ -776,8 +776,9 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	protected static class OsmNode {
 		public final long id;
 		public boolean used = false;
-		public int ways = 0;
+		public Map<Long, OsmWay> ways = new HashMap<>();
 		public Coord coord;
+		public boolean endPoint = false;
 
 		public OsmNode(final long id, final Coord coord) {
 			this.id = id;
