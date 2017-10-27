@@ -303,9 +303,9 @@ public class Dijkstra implements LeastCostPathCalculator {
 
 			if (outNode == null) {
 				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId() + ". Some possible reasons:");
-				log.warn("  * Network is not connected.  Run NetworkCleaner()") ;
+				log.warn("  * Network is not connected.  Run NetworkCleaner().") ;
 				log.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
-				log.warn("  * Network for considered mode is not connected to starting or ending point.  Setting insertingAccessEgressWalk to true may help.");
+				log.warn("  * Network for considered mode is not connected to starting or ending point of route.  Setting insertingAccessEgressWalk to true may help.");
 				log.warn("This will now return null, but it may fail later with a null pointer exception.");
 				return null;
 			}
