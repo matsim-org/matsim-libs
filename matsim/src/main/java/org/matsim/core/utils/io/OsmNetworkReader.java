@@ -366,7 +366,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		}
 		log.info("... done removing " + counter + "ways that have at least one node that was not read previously.");
 
-		log.info("Mark OSM nodes that shoud be kept ...");
+		log.info("Filter OSM nodes and collect all ways per node...");
 		for (OsmWay way : this.ways.values()) {
 			String highway = way.tags.get(TAG_HIGHWAY);
 			if ((highway != null) && (this.highwayDefaults.containsKey(highway))) {
@@ -437,25 +437,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			log.info("... done verifying that we did not mark nodes that build a loop.") ;
 
 		}
-
-		//check here whether node is needed for counts
-		//tschlenther jun'17
-		if(nodeIDsToKeep != null){
-			int cnt = 0;
-			log.info("...assure that all nodes that are definitely to be kept are marked as used");
-			for(Long nodeToBeKept : this.nodeIDsToKeep){
-				OsmNode node = this.nodes.get(nodeToBeKept);
-				if(node==null){
-					log.warn("cannot find node " + nodeToBeKept + ". maybe it was not read in or got deleted..");
-				}
-				else{
-					node.used = true;
-					cnt ++;
-				}
-			}
-			log.info("..found " + cnt + " out of " + nodeIDsToKeep.size() + " nodes to keep and marked them as used..");
-		}
-		
 		
 		log.info("Create the required nodes ...") ;
 		for (OsmNode node : this.nodes.values()) {
@@ -513,8 +494,22 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		this.ways.clear();
 	}
 	
+	/**
+	 * Override this when you want to change the definition of 'unused' nodes, e.g. to add a check for signals.
+	 * 
+	 * @return whether the node can be simplified (false) or not (true)
+	 */
 	protected boolean isNodeNecessary(OsmNode node) {
-		return (node.ways.size() != 1) || node.endPoint;
+		return (node.ways.size() != 1) || node.endPoint 
+				// or (i.e. when it's still 'false'): check if node has to be kept e.g. because of counts data
+				|| ((nodeIDsToKeep != null) && nodeIDsToKeep.contains(node.id));
+		/* note: checking here for counting stations changes the priority of filters and
+		 * counting stations: before, nodes with counting stations were kept also when
+		 * they are e.g. outside a bounding box (or not belonging to other filters). now
+		 * they are only kept inside the filtered nodes, i.e. only relevant when
+		 * 'keepPaths' is set to true.
+		 * tthunig, oct'17
+		 */
 	}
 
 	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, 
