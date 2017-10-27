@@ -567,49 +567,60 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 		// check tag "lanes"
 		String lanesTag = way.tags.get(TAG_LANES);
-		if (lanesTag != null) {
-			try {
-				double totalNofLanes = Double.parseDouble(lanesTag);
-				if (totalNofLanes > 0) {
-					// If the tag "lanes:forward" or "lanes:backward" is set, use them.
-					// If not, give either direction half of the total number of lanes.
-					//fzwick,nkuehnel, apr'17
-					String lanesForwardTag = way.tags.get(TAG_LANES_FORWARD);
-					if (lanesForwardTag != null) {
-						double parsedForwardLanes = Double.parseDouble(lanesForwardTag);
-						if(parsedForwardLanes > 0) {
-							nofLanesForward = parsedForwardLanes;
-						}
-					} else {
-						//By default, the OSM lanes tag specifies the total number of lanes in both directions.
-						//So if the road is not oneway (onewayReverse), let's distribute them between both directions
-						//michalm, jan'16
-						if(oneway) {
-							nofLanesForward = totalNofLanes;
-						} else {
-							nofLanesForward = totalNofLanes / 2.;
-						}
-					}
-
-					String lanesBackwardTag = way.tags.get(TAG_LANES_BACKWARD);
-					if (lanesBackwardTag != null) {
-						double parsedBackwardLanes = Double.parseDouble(lanesBackwardTag);
-						if(parsedBackwardLanes > 0) {
-							nofLanesBackward = parsedBackwardLanes;
-						}
-					} else {
-						if(onewayReverse) {
-							nofLanesBackward = totalNofLanes;
-						} else {
-							nofLanesBackward = totalNofLanes / 2.;
-						}
-					}
+		String lanesForwardTag = way.tags.get(TAG_LANES_FORWARD);
+		String lanesBackwardTag = way.tags.get(TAG_LANES_BACKWARD);
+		try {
+			/* If the tag "lanes:forward" or "lanes:backward" is set, use them.
+		 	 * If not, give each direction half of the total number of lanes (except it is a oneway street)
+		 	 * fzwick,nkuehnel, apr'17
+			 * If only one of them is set and total number of lanes is known (as it is often the case),
+			 * calculate missing value as the difference... tthunig, oct'17
+			 */
+			if (lanesForwardTag != null && lanesBackwardTag != null){
+				nofLanesForward = Double.parseDouble(lanesForwardTag);
+				nofLanesBackward = Double.parseDouble(lanesBackwardTag);
+				// done
+			} else if (oneway) {
+				nofLanesBackward = 0;
+				if (lanesForwardTag != null)
+					nofLanesForward = Double.parseDouble(lanesForwardTag);
+				else if (lanesTag != null)
+					nofLanesForward = Double.parseDouble(lanesTag);
+				// else keep default
+			} else if (onewayReverse) {
+				nofLanesForward = 0;
+				if (lanesBackwardTag != null)
+					nofLanesBackward = Double.parseDouble(lanesBackwardTag);
+				else if (lanesTag != null)
+					nofLanesBackward = Double.parseDouble(lanesTag);
+				// else keep default
+			} else if (lanesForwardTag != null) {
+				// i.e. lanesBackwardTag is null
+				nofLanesForward = Double.parseDouble(lanesForwardTag);
+				if (lanesTag != null)
+					nofLanesBackward = Double.parseDouble(lanesTag) - nofLanesForward;
+				// else keep default
+			}
+			else if (lanesBackwardTag != null) {
+				// i.e. lanesForwardTag is null
+				nofLanesBackward = Double.parseDouble(lanesBackwardTag);
+				if (lanesTag != null)
+					nofLanesForward = Double.parseDouble(lanesTag) - nofLanesBackward;
+				// else keep default
+			} else { // i.e. lanesForwardTag and lanesBackwardTag are null. no oneway
+				if (lanesTag != null) {
+					/* By default, the OSM lanes tag specifies the total number of lanes in both direction.
+					 * So, let's distribute them between both directions. michalm, jan'16
+					 */
+					nofLanesForward = Double.parseDouble(lanesTag) / 2;
+					nofLanesBackward = nofLanesForward;
 				}
-			} catch (Exception e) {
-				if (!this.unknownLanesTags.contains(lanesTag)) {
-					this.unknownLanesTags.add(lanesTag);
-					log.warn("Could not parse lanes tag:" + e.getMessage() + ". Ignoring it.");
-				}
+				// else keep default
+			}
+		} catch (Exception e) {
+			if (!this.unknownLanesTags.contains(lanesTag)) {
+				this.unknownLanesTags.add(lanesTag);
+				log.warn("Could not parse lanes tag:" + e.getMessage() + ". Ignoring it.");
 			}
 		}
 
