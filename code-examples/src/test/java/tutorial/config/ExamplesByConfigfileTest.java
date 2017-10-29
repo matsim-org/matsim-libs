@@ -43,20 +43,20 @@ public class ExamplesByConfigfileTest {
 	
 	@Parameters(name = "{index}: configFilename == {0};")
 	public static Collection<Object[]> createTests() {
-		Collection<Object[]> filesToRun = new ArrayList<Object[]>();
+		Collection<Object[]> filesToRun = new ArrayList<>();
 
-//		filesToRun.add(new Object [] {"../examples/scenarios/equil/config.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil/config.xml"});
 		// yy commented out because output ends up in "./output" instead of "./output/examples", and thus the input dir is not cleaned by the
 		// command below.  Should be changed, but are we destroying something if we do? kai, mar'17
 		
-		filesToRun.add(new Object [] {"examples/tutorial/config/example1-config.xml"});
-		filesToRun.add(new Object [] {"examples/tutorial/config/example5-config.xml"});
-		filesToRun.add(new Object [] {"examples/tutorial/config/example5trips-config.xml"});
-		filesToRun.add(new Object [] {"../examples/scenarios//equil-mixedTraffic/config-with-mode-vehicles.xml"});
-		filesToRun.add(new Object [] {"../examples/scenarios//equil-mixedTraffic/config-with-all-vehicles-from-file.xml"});
-		filesToRun.add(new Object [] {"examples/tutorial/config/example2-config.xml"});
-		filesToRun.add(new Object [] {"../examples/scenarios//equil-extended/config-with-network-change-events.xml"});
-		filesToRun.add(new Object [] {"../examples/scenarios/equil-extended/config-with-subpopulation.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil/example1-config.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil/example5-config.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil-extended/example5trips-config.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil-mixedTraffic/config-with-mode-vehicles.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil-mixedTraffic/config-with-all-vehicles-from-file.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil/example2-config.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-network-change-events.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-subpopulation.xml"});
 		
 		return filesToRun;
 		

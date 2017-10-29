@@ -65,7 +65,7 @@ public class RunCustomScoringExample {
 	}
 
 	public static void main(String[] args) {
-		String configFile = "examples/tutorial/config/example5-config.xml" ;
+		String configFile = "scenarios/equil/example5-config.xml" ;
 		final Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(configFile));
 
 		// Every second person gets a special property which influences their score.

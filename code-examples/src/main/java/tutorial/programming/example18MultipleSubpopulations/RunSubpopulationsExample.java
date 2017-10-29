@@ -67,11 +67,11 @@ import java.net.URL;
  *  @author nagel, jwjoubert
  */
 public class RunSubpopulationsExample {
-	final static String EQUIL_NETWORK = new File("../examples/scenarios/equil/network.xml").getAbsolutePath();
-	final static String PLANS = new File("./examples/tutorial/programming/multipleSubpopulations/plans.xml").getAbsolutePath();
-	final static String OBJECT_ATTRIBUTES = new File("./examples/tutorial/programming/multipleSubpopulations/personAtrributes.xml").getAbsolutePath();
-	final static String CONFIG = "./examples/tutorial/programming/multipleSubpopulations/config.xml";
-	final static String OUTPUT = "./output/";
+	final static String EQUIL_NETWORK = new File("scenarios/equil-extended/network.xml").getAbsolutePath();
+	final static String PLANS = new File("scenarios/equil-extended/plans-with-subpopulation.xml").getAbsolutePath();
+	final static String OBJECT_ATTRIBUTES = new File("scenarios/equil-extended/personAtrributes-with-subpopulation.xml").getAbsolutePath();
+	final static String CONFIG = "scenarios/equil-extended/config-with-subpopulation.xml";
+	final static String OUTPUT = "./output/example";
 
 	private static final String SUBPOP_ATTRIB_NAME = "subpopulation";
 	private static final String SUBPOP1_NAME = "time";
@@ -80,21 +80,9 @@ public class RunSubpopulationsExample {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// preparation of an example scenario:
-		{
-			URL url = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL("equil-extended") , "config.xml" ) ;
-			
-			Scenario sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(url));
-
-			/* Set up network and plans. */
-			createPopulation(sc, SUBPOP1_NAME, 100);
-			createPopulation(sc, SUBPOP2_NAME, 100);
-			new PopulationWriter(sc.getPopulation(), sc.getNetwork()).write(PLANS);
-			new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(OBJECT_ATTRIBUTES);
-		}
-		
-		System.exit(-1); 
-		
+		// There is a "prepareExampleScenario()" method below.  For what follows, it is assumed that the correct input files 
+		// already exist.  
+				
 		// building and running the simulation based on the example scenario:
 		Config config = ConfigUtils.createConfig(); 
 		ConfigUtils.loadConfig(config, CONFIG);
@@ -148,6 +136,20 @@ public class RunSubpopulationsExample {
 		Controler controler = new Controler(config);
 		
 		controler.run();
+	}
+
+	private static void prepareExampleScenario() {
+		{
+			URL url = IOUtils.newUrl( ExamplesUtils.getTestScenarioURL("equil-extended") , "config.xml" ) ;
+			
+			Scenario sc = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(url));
+
+			/* Set up network and plans. */
+			createPopulation(sc, SUBPOP1_NAME, 100);
+			createPopulation(sc, SUBPOP2_NAME, 100);
+			new PopulationWriter(sc.getPopulation(), sc.getNetwork()).write(PLANS);
+			new ObjectAttributesXmlWriter(sc.getPopulation().getPersonAttributes()).writeFile(OBJECT_ATTRIBUTES);
+		}
 	}
 
 	/**

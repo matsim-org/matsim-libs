@@ -17,7 +17,7 @@ public class RunControlerListenerExample {
 	 */
 	public static void main(String[] args) {
 		//set a default config for convenience...
-		String filename = "examples/tutorial/programming/example7-config.xml" ;
+		String filename = "scenarios/equil/example7-config.xml" ;
 		
 		ControlerUtils.initializeOutputLogging();
 		

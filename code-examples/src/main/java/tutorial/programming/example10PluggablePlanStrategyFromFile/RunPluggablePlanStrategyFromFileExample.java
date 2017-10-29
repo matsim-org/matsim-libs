@@ -32,7 +32,7 @@ public class RunPluggablePlanStrategyFromFileExample {
 
 		Config config;
 		if ( args.length==0 ) {
-			config = ConfigUtils.loadConfig( "examples/tutorial/programming/pluggablePlanStrategy-config.xml" ) ;
+			config = ConfigUtils.loadConfig( "scenarios/equil/pluggablePlanStrategy-config.xml" ) ;
 		} else {
 			config = ConfigUtils.loadConfig(args[0]);
 		}

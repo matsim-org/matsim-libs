@@ -24,6 +24,7 @@ import java.io.File;
 
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 public class ControlerListenerExampleTest {
 	
@@ -37,7 +38,7 @@ public class ControlerListenerExampleTest {
 		final String pathname = "./output/example7/";
 		try {
 			IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
-		} catch ( IllegalArgumentException ee ) {
+		} catch ( UncheckedIOException ee ) {
 			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
 			// and did not remove the directory afterwards.)
 		}
@@ -48,5 +49,7 @@ public class ControlerListenerExampleTest {
 			ee.printStackTrace();
 			fail( "Got an exception while running subpopulation example: "+ee ) ;
 		}
+
+		IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
 	}
 }
