@@ -177,6 +177,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			final double now,
 			final PlanElement pe) {
 		if (pe instanceof Activity) {
+			// yyyyyy this should use PopulationUtils.getActivityEndTime(...) to be consistent with other code.  kai, oct'17
 			Activity act = (Activity) pe;
 			double endTime = act.getEndTime();
 			double startTime = act.getStartTime();
