@@ -33,7 +33,7 @@ import tutorial.mobsim.simpleAdaptiveSignalEngine.RunSimpleAdaptiveSignalExample
  * @author tthunig
  *
  */
-public class RunSimpleAdaptiveSignalExampleIT {
+public class RunSimpleAdaptiveSignalExampleTest {
 	
 	@Rule public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
