@@ -31,7 +31,7 @@ import tutorial.mobsim.example22MobsimListener.RunMobsimListenerExample;
  * @author tthunig
  *
  */
-public class MobsimListenerExampleIT {
+public class MobsimListenerExampleTest {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 

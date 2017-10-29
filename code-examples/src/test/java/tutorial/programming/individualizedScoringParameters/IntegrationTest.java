@@ -11,7 +11,7 @@ import java.io.File;
 /**
  * @author thibautd
  */
-public class IT {
+public class IntegrationTest {
 	@Test
 	public void testMain() {
 		final String pathname = "output/exampleIndividualScores/";

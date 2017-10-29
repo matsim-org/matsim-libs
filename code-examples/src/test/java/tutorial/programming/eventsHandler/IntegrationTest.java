@@ -9,7 +9,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 import tutorial.programming.example06EventsHandling.RunEventsHandlingWithControlerExample;
 
-public class IT {
+public class IntegrationTest {
     
     @Test
 	public final void testMain() {

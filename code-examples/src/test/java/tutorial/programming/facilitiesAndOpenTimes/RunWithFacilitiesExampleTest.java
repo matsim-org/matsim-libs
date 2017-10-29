@@ -16,44 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.withinDayReplanningFromPlans;
+package tutorial.programming.facilitiesAndOpenTimes;
 
-import java.io.File;
+import java.util.Map;
 
-import org.junit.Rule;
+import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 
 /**
  * @author nagel
  *
  */
-public class IT {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+public class RunWithFacilitiesExampleTest {
+	private static final double EPS=0.001 ;
 
 	/**
-	 * Test method for {@link RunWithinDayReplanningFromPlansExample}
+	 * Test method for {@link tutorial.programming.facilitiesAndOpenTimes.RunWithFacilitiesExample#run()}.
 	 */
-	@SuppressWarnings("static-method")
+	@SuppressWarnings({ "static-method", "javadoc" })
 	@Test
-	public final void testMain() {
-		final String pathname = "./output/within-day";
-		try {
-			IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
-		} catch ( IllegalArgumentException ee ) {
-			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
-			// and did not remove the directory afterwards.)
-		} catch ( UncheckedIOException ee ) {
-			
-		}
-		RunWithinDayReplanningFromPlansExample.main(null);
-
-		IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
-		// (here, the directory should have been there)
+	public final void testRun() {
+		RunWithFacilitiesExample example = new RunWithFacilitiesExample() ;
+		example.run();
+		Scenario scenario = example.getScenario() ;
+		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons() ;
+		Assert.assertEquals( 124.84230476216275, persons.get(Id.createPersonId(1)).getSelectedPlan().getScore() , EPS ) ;
+		Assert.assertEquals( 112.84230476216275, persons.get(Id.createPersonId(2)).getSelectedPlan().getScore() , EPS ) ;
 	}
-
 }
-
-

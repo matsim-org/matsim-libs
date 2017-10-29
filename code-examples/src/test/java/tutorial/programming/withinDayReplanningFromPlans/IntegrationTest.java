@@ -16,53 +16,44 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.demandGenerationWithFacilities;
+package tutorial.programming.withinDayReplanningFromPlans;
 
-import org.junit.Assert;
+import java.io.File;
+
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.testcases.MatsimTestUtils;
-
-import tutorial.population.demandGenerationWithFacilities.RunCreateFacilities;
-import tutorial.population.demandGenerationWithFacilities.RunCreatePopulationAndDemand;
 
 /**
  * @author nagel
  *
  */
-public class IT {
-	
+public class IntegrationTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
+	/**
+	 * Test method for {@link RunWithinDayReplanningFromPlansExample}
+	 */
 	@SuppressWarnings("static-method")
 	@Test
-	public final void test() {
-		
+	public final void testMain() {
+		final String pathname = "./output/within-day";
 		try {
-			RunCreateFacilities.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
+			IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
+		} catch ( IllegalArgumentException ee ) {
+			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
+			// and did not remove the directory afterwards.)
+		} catch ( UncheckedIOException ee ) {
+			
 		}
-		
+		RunWithinDayReplanningFromPlansExample.main(null);
 
-		try {
-			RunCreatePopulationAndDemand.main(null);
-		} catch ( Exception eee ) {
-			eee.printStackTrace(); 
-			Assert.fail();
-		}
-
-		// We don't want to check in the input network.
-//		try {
-//			RunCreateNetwork.main(null);
-//		} catch ( Exception eee ) {
-//			eee.printStackTrace();
-//			Assert.fail();
-//		}
-
-		// The above test only tests if it runs, not if the output is reasonable.  Please go ahead and improve this. kai, jul'15
-		
+		IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
+		// (here, the directory should have been there)
 	}
 
 }
+
+

@@ -14,7 +14,7 @@ import java.io.File;
  *
  * Test class for CustomScoringExample
  */
-public class CustomScoringExampleIT {
+public class CustomScoringExampleTest {
 
     @Rule
     public MatsimTestUtils utils = new MatsimTestUtils() ;

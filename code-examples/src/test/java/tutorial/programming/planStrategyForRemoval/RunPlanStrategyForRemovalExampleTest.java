@@ -28,7 +28,7 @@ import org.matsim.testcases.MatsimTestUtils;
 * @author ikaddoura
 */
 
-public class RunPlanStrategyForRemovalExampleIT {
+public class RunPlanStrategyForRemovalExampleTest {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 

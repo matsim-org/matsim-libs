@@ -2,7 +2,7 @@ package tutorial.programming.example11PluggablePlanStrategyInCode;
 
 import org.junit.Test;
 
-public class RunPluggablePlanStrategyInCodeExampleIT {
+public class RunPluggablePlanStrategyInCodeExampleTest {
 
 	@Test
 	public final void testMain()

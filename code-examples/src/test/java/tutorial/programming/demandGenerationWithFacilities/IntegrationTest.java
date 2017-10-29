@@ -16,34 +16,53 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.facilitiesAndOpenTimes;
-
-import java.util.Map;
+package tutorial.programming.demandGenerationWithFacilities;
 
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.testcases.MatsimTestUtils;
+
+import tutorial.population.demandGenerationWithFacilities.RunCreateFacilities;
+import tutorial.population.demandGenerationWithFacilities.RunCreatePopulationAndDemand;
 
 /**
  * @author nagel
  *
  */
-public class RunWithFacilitiesExampleIT {
-	private static final double EPS=0.001 ;
+public class IntegrationTest {
+	
+	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
 
-	/**
-	 * Test method for {@link tutorial.programming.facilitiesAndOpenTimes.RunWithFacilitiesExample#run()}.
-	 */
-	@SuppressWarnings({ "static-method", "javadoc" })
+	@SuppressWarnings("static-method")
 	@Test
-	public final void testRun() {
-		RunWithFacilitiesExample example = new RunWithFacilitiesExample() ;
-		example.run();
-		Scenario scenario = example.getScenario() ;
-		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons() ;
-		Assert.assertEquals( 124.84230476216275, persons.get(Id.createPersonId(1)).getSelectedPlan().getScore() , EPS ) ;
-		Assert.assertEquals( 112.84230476216275, persons.get(Id.createPersonId(2)).getSelectedPlan().getScore() , EPS ) ;
+	public final void test() {
+		
+		try {
+			RunCreateFacilities.main(null);
+		} catch ( Exception eee ) {
+			eee.printStackTrace(); 
+			Assert.fail();
+		}
+		
+
+		try {
+			RunCreatePopulationAndDemand.main(null);
+		} catch ( Exception eee ) {
+			eee.printStackTrace(); 
+			Assert.fail();
+		}
+
+		// We don't want to check in the input network.
+//		try {
+//			RunCreateNetwork.main(null);
+//		} catch ( Exception eee ) {
+//			eee.printStackTrace();
+//			Assert.fail();
+//		}
+
+		// The above test only tests if it runs, not if the output is reasonable.  Please go ahead and improve this. kai, jul'15
+		
 	}
+
 }

@@ -16,36 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package tutorial.programming.example07ControlerListener;
 
-package tutorial.programming.example21TUBclass;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 
-import tutorial.programming.example21tutorialTUBclass.leastCostPath.RunLeastCostPathCalculatorExample;
-
-/**
- * @author  jbischoff
- *
- */
-public class IT {
-
+public class ControlerListenerExampleTest {
+	
+	/**
+	 * Test method for {@link tutorial.programming.example07ControlerListener.RunControlerListenerExample#main(java.lang.String[])}.
+	 */
+	@SuppressWarnings("static-method")
 	@Test
-	@Ignore
-	public void test() {
-		final String pathname = "./output/example";
-		try{
+	public final void testMain() {
+		
+		final String pathname = "./output/example7/";
+		try {
 			IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
+		} catch ( IllegalArgumentException ee ) {
+			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
+			// and did not remove the directory afterwards.)
 		}
-		catch (IllegalArgumentException e){
-			
+		
+		try {
+			RunControlerListenerExample.main(null);
+		} catch ( Exception ee ) {
+			ee.printStackTrace();
+			fail( "Got an exception while running subpopulation example: "+ee ) ;
 		}
-		RunLeastCostPathCalculatorExample.main(null);
-		IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
-
 	}
-
 }

@@ -33,11 +33,11 @@ import org.matsim.core.utils.io.UncheckedIOException;
  *
  */
 @RunWith(Parameterized.class)
-public class ExamplesByConfigfileIT {
+public class ExamplesByConfigfileTest {
 	
 	private String configFile;
 
-	public ExamplesByConfigfileIT(String configFile ) {
+	public ExamplesByConfigfileTest(String configFile ) {
 		this.configFile = configFile ;
 	}
 	
