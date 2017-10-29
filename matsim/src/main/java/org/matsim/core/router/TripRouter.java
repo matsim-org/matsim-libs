@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 
@@ -241,34 +242,39 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * (it is also used internally).
 	 * It is provided here, because such an operation is mainly useful for routing,
 	 * but it may be externalized in a "util" class...
+	 * @param config TODO
 	 */
 	public static double calcEndOfPlanElement(
 			final double now,
-			final PlanElement pe) {
+			final PlanElement pe, Config config) {
+		// yyyy see similar method in PlanRouter. kai, oct'17
+		
 		if (now == Time.UNDEFINED_TIME) {
 			throw new RuntimeException("got undefined now to update with plan element" + pe);
 		}
 
 		if (pe instanceof Activity) {
 			Activity act = (Activity) pe;
-			double endTime = act.getEndTime();
-			double startTime = act.getStartTime();
-			double dur = act.getMaximumDuration();
-			if (endTime != Time.UNDEFINED_TIME) {
-				// use fromAct.endTime as time for routing
-				return endTime;
-			}
-			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
-				// use fromAct.startTime + fromAct.duration as time for routing
-				return startTime + dur;
-			}
-			else if (dur != Time.UNDEFINED_TIME) {
-				// use last used time + fromAct.duration as time for routing
-				return now + dur;
-			}
-			else {
-				return Time.UNDEFINED_TIME;
-			}
+			return PopulationUtils.getActivityEndTime(act, now, config) ;
+			
+//			double endTime = act.getEndTime();
+//			double startTime = act.getStartTime();
+//			double dur = act.getMaximumDuration();
+//			if (endTime != Time.UNDEFINED_TIME) {
+//				// use fromAct.endTime as time for routing
+//				return endTime;
+//			}
+//			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
+//				// use fromAct.startTime + fromAct.duration as time for routing
+//				return startTime + dur;
+//			}
+//			else if (dur != Time.UNDEFINED_TIME) {
+//				// use last used time + fromAct.duration as time for routing
+//				return now + dur;
+//			}
+//			else {
+//				return Time.UNDEFINED_TIME;
+//			}
 		}
 		else {
 			Route route = ((Leg) pe).getRoute();

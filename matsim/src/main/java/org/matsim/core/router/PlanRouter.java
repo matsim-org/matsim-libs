@@ -21,6 +21,7 @@ package org.matsim.core.router;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.config.Config;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
@@ -87,7 +88,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 							routingHandler.getMainModeIdentifier().identifyMainMode( oldTrip.getTripElements() ),
 							toFacility( oldTrip.getOriginActivity() ),
 							toFacility( oldTrip.getDestinationActivity() ),
-							calcEndOfActivity( oldTrip.getOriginActivity() , plan ),
+							calcEndOfActivity( oldTrip.getOriginActivity() , plan, routingHandler.getConfig() ),
 							plan.getPerson() );
 			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
 			TripRouter.insertTrip(
@@ -154,9 +155,12 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		return new ActivityWrapperFacility( act );
 	}
 
-	private double calcEndOfActivity(
+	private static double calcEndOfActivity(
 			final Activity activity,
-			final Plan plan) {
+			final Plan plan,
+			final Config config ) {
+		// yyyy see similar method in TripRouter. kai, oct'17
+		
 		if (activity.getEndTime() != Time.UNDEFINED_TIME) return activity.getEndTime();
 
 		// no sufficient information in the activity...
@@ -167,20 +171,21 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		double now = 0;
 
 		for (PlanElement pe : plan.getPlanElements()) {
-			now = updateNow( now , pe );
+			now = updateNow( now , pe, config );
 			if (pe == activity) return now;
 		}
 
 		throw new RuntimeException( "activity "+activity+" not found in "+plan.getPlanElements() );
 	}
 
-	private double updateNow(
+	private static double updateNow(
 			final double now,
-			final PlanElement pe) {
+			final PlanElement pe,
+			final Config config ) {
 		if (pe instanceof Activity) {
 			// yyyyyy this should use PopulationUtils.getActivityEndTime(...) to be consistent with other code.  kai, oct'17
 			Activity act = (Activity) pe;
-			return PopulationUtils.getActivityEndTime(act, now, routingHandler.getConfig() ) ;
+			return PopulationUtils.getActivityEndTime(act, now, config ) ;
 			
 //			double endTime = act.getEndTime();
 //			double startTime = act.getStartTime();
