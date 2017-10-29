@@ -48,7 +48,7 @@ public class SimulationObject implements Serializable {
     /**
      * list of request
      */
-    public List<RequestContainer> requests = new ArrayList<>();
+    public List<RequestContainer> requests;
 
     /**
      * vehicles shall not be an empty list

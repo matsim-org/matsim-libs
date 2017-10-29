@@ -20,7 +20,7 @@ import playground.clruch.net.VehicleContainer;
 /* package */ class LinkStats {
 
     static AVStatus[] INTERP = new AVStatus[] { //
-            AVStatus.DRIVEWITHCUSTOMER, AVStatus.DRIVETOCUSTMER, AVStatus.REBALANCEDRIVE };
+            AVStatus.DRIVEWITHCUSTOMER, AVStatus.DRIVETOCUSTOMER, AVStatus.REBALANCEDRIVE };
 
     final MatsimStaticDatabase db;
     final int width;

@@ -23,7 +23,7 @@ import playground.clruch.net.VehicleContainer;
 
 /* package */ class VehiclesLayer extends ViewerLayer {
     private static final AVStatus[] aVStatusArray = new AVStatus[] { //
-            AVStatus.DRIVETOCUSTMER, AVStatus.DRIVEWITHCUSTOMER, //
+            AVStatus.DRIVETOCUSTOMER, AVStatus.DRIVEWITHCUSTOMER, //
             AVStatus.REBALANCEDRIVE, AVStatus.STAY, AVStatus.OFFSERVICE };
     private BitSet bits = new BitSet();
 
@@ -33,7 +33,7 @@ import playground.clruch.net.VehicleContainer;
 
     public VehiclesLayer(MatsimMapComponent matsimMapComponent) {
         super(matsimMapComponent);
-        bits.set(AVStatus.DRIVETOCUSTMER.ordinal());
+        bits.set(AVStatus.DRIVETOCUSTOMER.ordinal());
         bits.set(AVStatus.REBALANCEDRIVE.ordinal());
     }
 

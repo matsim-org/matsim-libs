@@ -3,6 +3,8 @@ package playground.clruch.net;
 
 import java.io.Serializable;
 
+import playground.clruch.dispatcher.core.RequestStatus;
+
 /**
  * the suffix "index" is chosen since the value is not identical to the "ID" of matsim
  * 
@@ -24,4 +26,11 @@ public class RequestContainer implements Serializable {
     public int fromLinkIndex = -1; // where the person is now
     public double submissionTime = -1;
     public int toLinkIndex = -1; // where the person wants to go
+    public RequestStatus requestStatus = RequestStatus.FREE; // TODO check if useful
+    
+    /***
+     *  TODO Check if also introduce *time to fulfill* request to see
+     *  if autonomous fleet can incorporate information to get vehicles
+     *  faster through traffic by distributing routes to take
+     */
 }
