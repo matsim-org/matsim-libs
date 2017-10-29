@@ -47,15 +47,14 @@ public class TaxiTrail {
         return entry;
     }
 
-    
     public Entry<Integer, TaxiStamp> getLastEntry(int now) {
         Entry<Integer, TaxiStamp> lastEntry = sortedMap.lowerEntry(interp(now).getKey());
         if (Objects.nonNull(lastEntry))
             return lastEntry;
+        // GlobalAssert.that(Objects.nonNull(lastEntry));
         return null;
     }
 
-    
     /*** Off sourced check offservice avstatus to its own method which can be called
      * either from taxitrail or simulationfleetdump */
     public void check_offservice(int now) {
@@ -78,7 +77,8 @@ public class TaxiTrail {
 
                 // Check if entry before that also exist and propagate offservice status
                 Entry<Integer, TaxiStamp> lastEntry = getLastEntry(now);
-                setOffService(lastEntry);
+                if (Objects.nonNull(lastEntry))
+                    setOffService(lastEntry);
             }
         }
     }

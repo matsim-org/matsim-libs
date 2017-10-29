@@ -7,7 +7,7 @@ public enum RequestStatus {
     PICKUP("pu", "pickup"), //
     DROPOFF("do", "dropoff"), //
     CANCELED("can", "request canceled"), //
-    FREE("noc", "no customer"), //
+    EMPTY("noc", "no customer"), //
     ;
 
     public final String xmlTag;
