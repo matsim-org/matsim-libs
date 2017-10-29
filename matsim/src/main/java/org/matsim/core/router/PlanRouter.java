@@ -155,11 +155,10 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		return new ActivityWrapperFacility( act );
 	}
 
-	private static double calcEndOfActivity(
+	public static double calcEndOfActivity(
 			final Activity activity,
 			final Plan plan,
 			final Config config ) {
-		// yyyy see similar method in TripRouter. kai, oct'17
 		
 		if (activity.getEndTime() != Time.UNDEFINED_TIME) return activity.getEndTime();
 
@@ -182,6 +181,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 			final double now,
 			final PlanElement pe,
 			final Config config ) {
+		// yyyy see similar method in TripRouter. kai, oct'17
 		if (pe instanceof Activity) {
 			// yyyyyy this should use PopulationUtils.getActivityEndTime(...) to be consistent with other code.  kai, oct'17
 			Activity act = (Activity) pe;
