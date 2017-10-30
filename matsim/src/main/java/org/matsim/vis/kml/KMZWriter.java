@@ -68,7 +68,7 @@ public class KMZWriter implements MatsimSomeWriter {
 
 	static {
 		try {
-			JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.kml._2");
+			JAXBContext jaxbContext = JAXBContext.newInstance("net.opengis.kml.v_2_2_0");
 			marshaller = jaxbContext.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		} catch (JAXBException e) {

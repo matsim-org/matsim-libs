@@ -96,16 +96,34 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 			iconLink.setHref("http://maps.google.com/mapfiles/kml/pal4/icon15.png");
 			e1.printStackTrace();
 		}
-		this.carStyle = kmlObjectFactory.createStyleType();
-		this.carStyle.setId("redCarStyle");
 		{
+			StyleType carStyle = kmlObjectFactory.createStyleType();
+			carStyle.setId("redCarStyle");
 			IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
 			carIconStyle.setIcon(iconLink);
 			carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMRED);
 			carIconStyle.setScale(Double.valueOf(0.5));
-			this.carStyle.setIconStyle(carIconStyle);
+			carStyle.setIconStyle(carIconStyle);
+			
+			carStyles.put( carStyle.getId(), carStyle ) ;
 		}
-		this.mainDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(this.carStyle));
+		{
+			StyleType carStyle = kmlObjectFactory.createStyleType();
+			carStyle.setId("greenCarStyle");
+			IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
+			carIconStyle.setIcon(iconLink);
+			carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMGREEN);
+			carIconStyle.setScale(Double.valueOf(0.5));
+			carStyle.setIconStyle(carIconStyle);
+			
+			carStyles.put( carStyle.getId(), carStyle ) ;
+		}
+		
+		for ( StyleType carStyle : carStyles.values() ) {
+			this.mainDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(carStyle));
+			// is this ever used anywhere?  I think that there would have to be a "setStyleUrl" somehow connected to
+			// mainDoc in order to be used.  ??  kai, oct'17
+		}
 
 		this.mainFolder = kmlObjectFactory.createFolderType();
 		this.mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(this.mainFolder));
