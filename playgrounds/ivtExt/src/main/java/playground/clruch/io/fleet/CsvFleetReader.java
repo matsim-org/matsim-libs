@@ -12,11 +12,6 @@ import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 public class CsvFleetReader {
 
-    // TODO moved to queuey
-    // public static List<String> csvLineToList(String line) {
-    // return Stream.of(line.split(";")).collect(Collectors.toList());
-    // }
-
     private final DayTaxiRecord dayTaxiRecord;
 
     public CsvFleetReader(DayTaxiRecord dayTaxiRecord) {
@@ -45,7 +40,6 @@ public class CsvFleetReader {
                     if (Objects.isNull(line))
                         break;
                     List<String> list = CSVUtils.csvLineToList(line, ";");
-
                     dayTaxiRecord.insert(list);
                     dayTaxiRecord.lastTimeStamp = list.get(0);
                     ++dataline;

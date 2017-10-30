@@ -3,7 +3,7 @@ package playground.clruch.data;
 
 import org.matsim.api.core.v01.Coord;
 
-public enum LocationSpec {
+public enum LocationSpec {    
     SIOUXFALLS_CITY( //
             ReferenceFrame.SIOUXFALLS, //
             new Coord(678365.311581, 4827050.237694), //
@@ -23,6 +23,10 @@ public enum LocationSpec {
     BASEL_REGION( //
             ReferenceFrame.SWITZERLAND, //
             new Coord(2612859.0, 1266343.0), //
+            null), // <- no cutting
+    SAN_FRANCISCO( //
+            ReferenceFrame.IDENTITY, //
+            new Coord(-122.4363005, 37.7511686), //
             null), // <- no cutting
     ;
 

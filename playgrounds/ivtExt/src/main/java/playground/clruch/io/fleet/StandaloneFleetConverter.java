@@ -22,6 +22,7 @@ enum StandaloneFleetConverter {
         // TODO change this to generic input... rename in a way to show what it is.
 
         File directory = //
+
                 new File("/home/andya/Desktop/idsc_st/10_Daten/2017-10-11_ZurichNew");
         ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
         // File file = new File("/media/datahaki/media/ethz/taxi", "2017-06-27 - GPS Fahrtstrecken-Protokoll.csv");
@@ -33,7 +34,9 @@ enum StandaloneFleetConverter {
         DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
         // extract data from file and put into dayTaxiRecord
         CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);
+        
         reader.populateFrom(trailFiles);
+
         File simulationDirectory = new File(args[0]);
         Network network = NetworkLoader.loadNetwork(simulationDirectory);
 
@@ -55,3 +58,24 @@ enum StandaloneFleetConverter {
     }
 
 }
+
+
+
+
+        // File file = new File("/media/datahaki/media/ethz/taxi", "2017-06-27 - GPS
+        //List<File> trailFiles = (new MultiFileReader(directory, "Fahrtstrecken")).getFolderFiles();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
