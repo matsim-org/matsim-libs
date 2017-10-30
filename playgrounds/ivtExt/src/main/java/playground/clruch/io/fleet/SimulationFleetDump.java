@@ -89,9 +89,10 @@ enum SimulationFleetDump {
                             requestIndex++;
                         } else {
                             System.out.println("Trying to find submission time for vehicle: " + vehicleIndex);
-                            // submissionTime = rcParser.findSubmissionTime(now);
+                            submissionTime = rcParser.findSubmissionTime(now);
                         }
 
+                        // TODO Add Counter for cancelled Requests
                         RequestContainer rc = new RequestContainer();
 
                         // Populate RequestContainer

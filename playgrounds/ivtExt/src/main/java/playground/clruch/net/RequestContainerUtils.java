@@ -47,7 +47,7 @@ public class RequestContainerUtils {
         RequestStatus requestStatus = taxiTrail.interp(now).getValue().requestStatus;
 
         // Check requestStatus and propagate to TaxiStamp with desired values
-        if (requestStatus != RequestStatus.EMPTY || requestStatus != RequestStatus.CANCELLED) {
+        if (requestStatus != RequestStatus.EMPTY && requestStatus != RequestStatus.CANCELLED) {
             now = propagateTo(now, requestedStatus);
             if (now >= 0)
                 return taxiTrail.interp(now).getValue().gps;
@@ -60,11 +60,10 @@ public class RequestContainerUtils {
         RequestStatus requestStatus = taxiTrail.interp(now).getValue().requestStatus;
         System.out.println("Trying to find: " + requestedStatus.toString() + " from " + requestStatus.toString());
         
-        if (requestStatus != RequestStatus.EMPTY || requestStatus != RequestStatus.CANCELLED) {
+        if (requestStatus != RequestStatus.EMPTY && requestStatus != RequestStatus.CANCELLED) {
             if (requestedStatus.compareTo(requestStatus) > 0) {
                 if (Objects.nonNull(requestStatus = taxiTrail.getNextEntry(now).getValue().requestStatus)) {
                     int nextTimeStep = taxiTrail.getNextEntry(now).getKey();
-                    System.out.println("Propagating forward...");
                     return propagateTo(nextTimeStep, requestedStatus);
                 }
                 else
@@ -72,11 +71,10 @@ public class RequestContainerUtils {
             } else if (requestedStatus.compareTo(requestStatus) < 0) {
                 if (Objects.nonNull(requestStatus = taxiTrail.getLastEntry(now).getValue().requestStatus)) {
                     int nextTimeStep = taxiTrail.getLastEntry(now).getKey();
-                    System.out.println("Propagating backward...");
                     return propagateTo(nextTimeStep, requestedStatus);
                 }
                 else
-                    System.err.println("getNextEntry is null");
+                    System.err.println("getLastEntry is null");
             } else if (requestedStatus == requestStatus)
                 return now;
         }
