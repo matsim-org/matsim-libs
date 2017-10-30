@@ -9,6 +9,8 @@ import java.util.Objects;
 
 import ch.ethz.idsc.queuey.datalys.csv.CSVUtils;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import playground.clruch.dispatcher.core.RequestStatus;
+import playground.clruch.net.RequestContainerUtils;
 
 public class CsvFleetReader {
 
@@ -54,21 +56,24 @@ public class CsvFleetReader {
                 // ...
             }
         }
-        
-        // Going through all timestamps and check for offservice vehicles
-        final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
-        final int TIMESTEP = 10;
 
-        System.out.println("Checking for OFFSERVICE for " + dayTaxiRecord.size() + " vehicles...");
-        for (int now = 0; now < MAXTIME; now += TIMESTEP) {
-            if (now % 10000 == 0)
-                System.out.println("now=" + now);
-            for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
-                // Check and propagate offservice status
-                dayTaxiRecord.get(vehicleIndex).check_offservice(now);
-            }
-        }
-        
+        // TODO Deprecated
+        // // Going through all timestamps and check for offservice vehicles && parse requests
+        // final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
+        // final int TIMESTEP = 10;
+        //
+        // System.out.println("Checking for OFFSERVICE & RequestStatus for " + dayTaxiRecord.size() + " vehicles...");
+        // for (int now = 0; now < MAXTIME; now += TIMESTEP) {
+        // if (now % 10000 == 0)
+        // System.out.println("now=" + now);
+        // for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
+        // TaxiTrail taxiTrail = dayTaxiRecord.get(vehicleIndex);
+        //
+        // // Check and propagate offservice status
+        // taxiTrail.checkOffService(now);
+        // }
+        // }
+
         System.out.println("lines      " + dataline);
         System.out.println("vehicles   " + dayTaxiRecord.size());
         // System.out.println("timestamps " + dayTaxiRecord.keySet().size());

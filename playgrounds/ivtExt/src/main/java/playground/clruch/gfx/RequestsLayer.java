@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import javax.swing.JCheckBox;
@@ -46,11 +47,13 @@ import playground.clruch.net.SimulationObject;
             Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
                     .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
             for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
-                OsmLink osmLink = matsimMapComponent.db.getOsmLink(entry.getKey());
-                final int size = entry.getValue().size();
-                for (int count = 0; count < size; ++count) {
-                    Coord coord = osmLink.getAt(count / (double) size);
-                    requestHeatMap.addPoint(coord.getX(), coord.getY());
+                if (entry.getKey() > 0) {
+                    OsmLink osmLink = matsimMapComponent.db.getOsmLink(entry.getKey());
+                    final int size = entry.getValue().size();
+                    for (int count = 0; count < size; ++count) {
+                        Coord coord = osmLink.getAt(count / (double) size);
+                        requestHeatMap.addPoint(coord.getX(), coord.getY());
+                    }
                 }
             }
         }
@@ -60,11 +63,13 @@ import playground.clruch.net.SimulationObject;
             Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
                     .collect(Collectors.groupingBy(requestContainer -> requestContainer.toLinkIndex));
             for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
-                OsmLink osmLink = matsimMapComponent.db.getOsmLink(entry.getKey());
-                final int size = entry.getValue().size();
-                for (int count = 0; count < size; ++count) {
-                    Coord coord = osmLink.getAt(count / (double) size);
-                    requestDestMap.addPoint(coord.getX(), coord.getY());
+                if (entry.getKey() > 0) {
+                    OsmLink osmLink = matsimMapComponent.db.getOsmLink(entry.getKey());
+                    final int size = entry.getValue().size();
+                    for (int count = 0; count < size; ++count) {
+                        Coord coord = osmLink.getAt(count / (double) size);
+                        requestDestMap.addPoint(coord.getX(), coord.getY());
+                    }
                 }
             }
         }
@@ -80,13 +85,15 @@ import playground.clruch.net.SimulationObject;
         Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
                 .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
         for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
-            Point p1;
+            Point p1 = null;
             {
                 int linkId = entry.getKey();
-                OsmLink osmLink = matsimMapComponent.db.getOsmLink(linkId);
-                p1 = matsimMapComponent.getMapPosition(osmLink.getAt(0.5));
+                if (linkId > 0) {
+                    OsmLink osmLink = matsimMapComponent.db.getOsmLink(linkId);
+                    p1 = matsimMapComponent.getMapPosition(osmLink.getAt(0.5));
+                }
             }
-            if (p1 != null) {
+            if (Objects.nonNull(p1)) {
                 final int numRequests = entry.getValue().size();
 
                 final int x = p1.x;

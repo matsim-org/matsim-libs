@@ -26,10 +26,10 @@ import playground.clruch.net.VehicleContainer;
 enum SimulationFleetDump {
     ;
 
-    public static void of(DayTaxiRecord dayTaxiRecord, Network network, MatsimStaticDatabase db,//
+    public static void of(DayTaxiRecord dayTaxiRecord, Network network, MatsimStaticDatabase db, //
             StorageUtils storageUtils) {
 
-        // final int MAXTIME = 180000; // TODO magic const take this end time from the last info in the file... 
+        // final int MAXTIME = 180000; // TODO magic const take this end time from the last info in the file...
         final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
         final int TIMESTEP = 10;
 
@@ -44,24 +44,25 @@ enum SimulationFleetDump {
 
         int dropped = 0;
         int canceledRequests = 0;
+        int requestIndex = 0;
+        // NavigableMap<Integer, Integer> requestMap = new TreeMap<>();
         for (int now = 0; now < MAXTIME; now += TIMESTEP) {
             if (now % 10000 == 0)
                 System.out.println("now=" + now);
-            int requestIndex = 0;
             SimulationObject simulationObject = new SimulationObject();
             simulationObject.now = now;
             simulationObject.vehicles = new ArrayList<>();
             simulationObject.requests = new ArrayList<>();
 
             for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
-            	
+
                 // Check and propagate offservice status
                 // dayTaxiRecord.get(vehicleIndex).check_offservice(now);
-                
-            	// Get corresponding dayTaxiRecord entry according to time now
+
+                // Get corresponding dayTaxiRecord entry according to time now
                 TaxiTrail taxiTrail = dayTaxiRecord.get(vehicleIndex);
-            	Entry<Integer, TaxiStamp> dayTaxiRecordEntry = taxiTrail.interp(now);
-            	TaxiStamp taxiStamp = dayTaxiRecordEntry.getValue();
+                Entry<Integer, TaxiStamp> dayTaxiRecordEntry = taxiTrail.interp(now);
+                TaxiStamp taxiStamp = dayTaxiRecordEntry.getValue();
                 try {
                     Coord xy = db.referenceFrame.coords_fromWGS84.transform(taxiStamp.gps);
                     // getClosest(...) may fail if xy is outside boundingbox
@@ -73,20 +74,46 @@ enum SimulationFleetDump {
                     vc.vehicleIndex = vehicleIndex;
                     vc.linkIndex = linkIndex;
                     vc.avStatus = taxiStamp.avStatus;
-                    
-                    RequestContainer rc = new RequestContainer();
-                    RequestContainerUtils rcMapper = new RequestContainerUtils(now, linkIndex, taxiTrail);
-                    rcMapper.populate(rc);
-                    if (rc.requestStatus == RequestStatus.REQUEST) {
-                        requestIndex++;
-                        rc.requestIndex = requestIndex;
+
+                    // Parse requests
+                    RequestContainerUtils rcParser = new RequestContainerUtils(taxiTrail);
+                    RequestStatus requestStatus = rcParser.parseRequestStatus(now);
+                    System.out.println("Parsing RequestStatus for vehicle " + vehicleIndex + ": " + requestStatus.toString());
+                    taxiTrail.setRequestStatus(now, requestStatus);
+
+                    // Create requestContainer if there is any requests
+                    if (requestStatus != RequestStatus.EMPTY) {
+                        int submissionTime = -1;
+                        if (rcParser.isNewRequest(now, requestIndex, taxiTrail)) {
+                            submissionTime = now;
+                            requestIndex++;
+                        } else {
+                            System.out.println("Trying to find submission time for vehicle: " + vehicleIndex);
+                            // submissionTime = rcParser.findSubmissionTime(now);
+                        }
+
+                        RequestContainer rc = new RequestContainer();
+
+                        // Populate RequestContainer
+                        System.out.println("Trying to find from/to Coords of vehicle: " + vehicleIndex);
+                        Coord from = rcParser.getCoordAt(now, RequestStatus.PICKUP);
+                        if (Objects.nonNull(from)) {
+                            from = db.referenceFrame.coords_fromWGS84.transform(from);
+                            rc.fromLinkIndex = db.getLinkIndex(quadTree.getClosest(from.getX(), from.getY()));
+                        }
+                        Coord to = rcParser.getCoordAt(now, RequestStatus.DROPOFF);
+                        if (Objects.nonNull(to)) {
+                            to = db.referenceFrame.coords_fromWGS84.transform(to);
+                            rc.fromLinkIndex = db.getLinkIndex(quadTree.getClosest(to.getX(), to.getY()));
+                        }
+                        rc.requestIndex = taxiTrail.interp(now).getValue().requestIndex;
+                        rc.requestStatus = taxiTrail.interp(now).getValue().requestStatus;
+                        rc.submissionTime = submissionTime;
+                        simulationObject.requests.add(rc);
                     }
-                    else if (rc.requestStatus == RequestStatus.CANCELED)
-                        canceledRequests++;
-                    
+
                     GlobalAssert.that(Objects.nonNull(vc.avStatus));
                     simulationObject.vehicles.add(vc);
-                    simulationObject.requests.add(rc);
                 } catch (Exception exception) {
                     System.err.println("failed to convert vehicle " + vehicleIndex + " at time: " + now);
                     ++dropped;
@@ -97,6 +124,7 @@ enum SimulationFleetDump {
             new StorageSubscriber(storageUtils).handle(simulationObject);
         }
         System.out.println("dropped total: " + dropped);
+        System.out.println("total requests: " + requestIndex);
         System.out.println("canceled requests: " + canceledRequests);
 
     }
