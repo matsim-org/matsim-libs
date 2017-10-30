@@ -12,11 +12,6 @@ import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 public class CsvFleetReader {
 
-    // TODO moved to queuey
-    // public static List<String> csvLineToList(String line) {
-    // return Stream.of(line.split(";")).collect(Collectors.toList());
-    // }
-
     private final DayTaxiRecord dayTaxiRecord;
 
     public CsvFleetReader(DayTaxiRecord dayTaxiRecord) {
@@ -32,7 +27,7 @@ public class CsvFleetReader {
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 {
                     String line = br.readLine();
-                    List<String> list =    CSVUtils.csvLineToList(line,";");
+                    List<String> list = CSVUtils.csvLineToList(line, ";");
                     int count = 0;
                     System.out.println("CSV HEADER");
                     for (String token : list) {
@@ -44,28 +39,30 @@ public class CsvFleetReader {
                     String line = br.readLine();
                     if (Objects.isNull(line))
                         break;
-                    List<String> list = CSVUtils.csvLineToList(line,";");
+                    List<String> list = CSVUtils.csvLineToList(line, ";");
                     dayTaxiRecord.insert(list);
                     dayTaxiRecord.lastTimeStamp = list.get(0);
-                    System.out.println("Last timestamp from csv file: " + dayTaxiRecord.lastTimeStamp);
                     ++dataline;
                 }
             } finally {
-                // Going through all timestamps and check for offservice vehicles
-                final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
-                final int TIMESTEP = 10;
-                
-                System.out.println("Checking for OFFSERVICE vehicles...");
-                for (int now = 0; now < MAXTIME; now += TIMESTEP) {
-                    if (now % 10000 == 0)
-                        System.out.println("now=" + now);
-                    for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
-                        // Check and propagate offservice status
-                        dayTaxiRecord.get(vehicleIndex).check_offservice(now);
-                    }
-                }
+                // ...
             }
         }
+        
+        // Going through all timestamps and check for offservice vehicles
+        final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
+        final int TIMESTEP = 10;
+
+        System.out.println("Checking for OFFSERVICE for " + dayTaxiRecord.size() + " vehicles...");
+        for (int now = 0; now < MAXTIME; now += TIMESTEP) {
+            if (now % 10000 == 0)
+                System.out.println("now=" + now);
+            for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
+                // Check and propagate offservice status
+                dayTaxiRecord.get(vehicleIndex).check_offservice(now);
+            }
+        }
+        
         System.out.println("lines      " + dataline);
         System.out.println("vehicles   " + dayTaxiRecord.size());
         // System.out.println("timestamps " + dayTaxiRecord.keySet().size());

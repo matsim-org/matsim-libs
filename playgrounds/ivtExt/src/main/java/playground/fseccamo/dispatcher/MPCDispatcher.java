@@ -91,12 +91,12 @@ public class MPCDispatcher extends BaseMpcDispatcher {
         if (0 < round_now && round_now % samplingPeriod == 0) {
             final StringBuilder stringBuilder = new StringBuilder();
             manageIncomingRequests(now);
-            GlobalAssert.that(getAVRequests().size() >= getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER).size());
-            System.out.println("open requests: " + getAVRequests().size() + "  in the process of pickup: " + getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER).size());
+            GlobalAssert.that(getAVRequests().size() >= getRoboTaxiSubset(AVStatus.DRIVETOCUSTOMER).size());
+            System.out.println("open requests: " + getAVRequests().size() + "  in the process of pickup: " + getRoboTaxiSubset(AVStatus.DRIVETOCUSTOMER).size());
 
             // A) BUILD AND SEND PROBLEM DESCRIPTION TO MATLAB AS INPUT TO MPC
             MPCDataCollection mpcDataCollection = new MPCDataCollection(virtualNetwork, getUnassignedAVRequests(), //
-                    getRoboTaxiSubset(AVStatus.STAY), getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER), //
+                    getRoboTaxiSubset(AVStatus.STAY), getRoboTaxiSubset(AVStatus.DRIVETOCUSTOMER), //
                     getRoboTaxiSubset(AVStatus.DRIVEWITHCUSTOMER), getRoboTaxiSubset(AVStatus.REBALANCEDRIVE));
             Container containerSend = mpcDataCollection.collectData(now, getPickupRoboTaxis(), this);
             javaContainerSocket.writeContainer(containerSend);

@@ -55,7 +55,7 @@ public class VehicleStatistic {
 
             AVStatus[] driven = new AVStatus[] { //
                     AVStatus.DRIVEWITHCUSTOMER, //
-                    AVStatus.DRIVETOCUSTMER, //
+                    AVStatus.DRIVETOCUSTOMER, //
                     AVStatus.REBALANCEDRIVE //
             };
             int part = 0;
@@ -72,7 +72,7 @@ public class VehicleStatistic {
                     distanceWithCustomer.set(contrib, index);
                     distanceTotal.set(contrib, index); // applies to all three
                     break;
-                case DRIVETOCUSTMER:
+                case DRIVETOCUSTOMER:
                     distancePickup.set(contrib, index);
                     distanceTotal.set(contrib, index); // applies to all three
                     break;
