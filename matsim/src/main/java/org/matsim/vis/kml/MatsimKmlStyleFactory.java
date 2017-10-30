@@ -49,6 +49,8 @@ public class MatsimKmlStyleFactory implements NetworkKmlStyleFactory {
 //	public static final Color MATSIMBLUE = new Color(190, 190, 80, 90);
 	private static final byte[] MATSIMGREY = new byte[]{(byte) 210, (byte) 70, (byte) 50, (byte) 50};
 	protected static final byte[] MATSIMWHITE = new byte[]{(byte) 230, (byte) 230, (byte) 230, (byte) 230};
+
+	public static final byte[] MATSIMGREEN = new byte[]{(byte) 15, (byte) 255, (byte) 15, (byte) 190};
 	/**
 	 * the kmz writer
 	 */
