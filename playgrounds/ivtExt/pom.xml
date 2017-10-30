@@ -105,7 +105,7 @@
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>owly</artifactId>
-			<version>0.0.4</version>
+			<version>0.0.7</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
