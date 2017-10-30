@@ -35,19 +35,19 @@ import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
 
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.FolderType;
-import net.opengis.kml._2.IconStyleType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.LinkType;
-import net.opengis.kml._2.MultiGeometryType;
-import net.opengis.kml._2.NetworkLinkType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.PlacemarkType;
-import net.opengis.kml._2.PointType;
-import net.opengis.kml._2.StyleType;
-import net.opengis.kml._2.TimeSpanType;
-import net.opengis.kml._2.TimeStampType;
+import net.opengis.kml.v_2_2_0.DocumentType;
+import net.opengis.kml.v_2_2_0.FolderType;
+import net.opengis.kml.v_2_2_0.IconStyleType;
+import net.opengis.kml.v_2_2_0.KmlType;
+import net.opengis.kml.v_2_2_0.LinkType;
+import net.opengis.kml.v_2_2_0.MultiGeometryType;
+import net.opengis.kml.v_2_2_0.NetworkLinkType;
+import net.opengis.kml.v_2_2_0.ObjectFactory;
+import net.opengis.kml.v_2_2_0.PlacemarkType;
+import net.opengis.kml.v_2_2_0.PointType;
+import net.opengis.kml.v_2_2_0.StyleType;
+import net.opengis.kml.v_2_2_0.TimeSpanType;
+import net.opengis.kml.v_2_2_0.TimeStampType;
 
 public class KmlSnapshotWriter implements SnapshotWriter {
 
@@ -96,34 +96,16 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 			iconLink.setHref("http://maps.google.com/mapfiles/kml/pal4/icon15.png");
 			e1.printStackTrace();
 		}
+		this.carStyle = kmlObjectFactory.createStyleType();
+		this.carStyle.setId("redCarStyle");
 		{
-			StyleType carStyle = kmlObjectFactory.createStyleType();
-			carStyle.setId("redCarStyle");
 			IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
 			carIconStyle.setIcon(iconLink);
 			carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMRED);
 			carIconStyle.setScale(Double.valueOf(0.5));
-			carStyle.setIconStyle(carIconStyle);
-			
-			carStyles.put( carStyle.getId(), carStyle ) ;
+			this.carStyle.setIconStyle(carIconStyle);
 		}
-		{
-			StyleType carStyle = kmlObjectFactory.createStyleType();
-			carStyle.setId("greenCarStyle");
-			IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
-			carIconStyle.setIcon(iconLink);
-			carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMGREEN);
-			carIconStyle.setScale(Double.valueOf(0.5));
-			carStyle.setIconStyle(carIconStyle);
-			
-			carStyles.put( carStyle.getId(), carStyle ) ;
-		}
-		
-		for ( StyleType carStyle : carStyles.values() ) {
-			this.mainDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(carStyle));
-			// is this ever used anywhere?  I think that there would have to be a "setStyleUrl" somehow connected to
-			// mainDoc in order to be used.  ??  kai, oct'17
-		}
+		this.mainDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(this.carStyle));
 
 		this.mainFolder = kmlObjectFactory.createFolderType();
 		this.mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(this.mainFolder));

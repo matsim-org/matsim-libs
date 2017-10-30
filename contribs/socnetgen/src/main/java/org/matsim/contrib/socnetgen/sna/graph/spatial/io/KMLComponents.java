@@ -19,14 +19,18 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.io;
 
-import net.opengis.kml._2.FolderType;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.matsim.contrib.socnetgen.sna.graph.analysis.Components;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialGraph;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialVertex;
 
-import java.awt.*;
-import java.util.*;
-import java.util.List;
+import net.opengis.kml.v_2_2_0.FolderType;
 
 
 /**
