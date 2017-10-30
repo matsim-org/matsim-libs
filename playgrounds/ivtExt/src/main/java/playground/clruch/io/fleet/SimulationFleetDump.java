@@ -51,7 +51,7 @@ enum SimulationFleetDump {
             SimulationObject simulationObject = new SimulationObject();
             simulationObject.now = now;
             simulationObject.vehicles = new ArrayList<>();
-            simulationObject.requests = new ArrayList<>();
+            // simulationObject.requests are already initialize in SimulationObject
 
             for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
             	

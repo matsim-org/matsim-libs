@@ -48,7 +48,9 @@ public class SimulationObject implements Serializable {
     /**
      * list of request
      */
-    public List<RequestContainer> requests;
+    // DO NOT MODIFY
+    public List<RequestContainer> requests = new ArrayList<>(); // <- DO NOT MODIFY !!!
+    // DO NOT MODIFY
 
     /**
      * vehicles shall not be an empty list
