@@ -15,6 +15,7 @@ import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.pdf.BinCounts;
 import playground.clruch.traveldata.TravelData;
 
 /** @author Claudio Ruch */
@@ -52,7 +53,7 @@ public class TripDistances {
         tripDistances = tripDistances.multiply(RealScalar.of(0.001));
 
         tripDistanceBinSize = AnalysisUtils.adaptBinSize(tripDistances, tripDistanceBinSize, RealScalar.of(0.5));
-        tripDistanceBinCounter = AnalysisUtils.binCount(tripDistances, tripDistanceBinSize);
+        tripDistanceBinCounter = BinCounts.of(tripDistances, tripDistanceBinSize);
 
         DiagramCreator.binCountGraph(relativeDirectory, "tripDistances", //
                 "Trips per Distance", tripDistanceBinCounter, //
