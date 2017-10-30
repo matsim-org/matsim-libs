@@ -27,11 +27,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.controler.corelisteners.DumpDataAtEnd;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
 
@@ -332,11 +331,6 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 
 	@StringSetter( OVERWRITE_FILE )
 	public void setOverwriteFileSetting(final OverwriteFileSetting overwriteFileSetting) {
-		if ( overwriteFileSetting == OverwriteFileSetting.overwriteExistingFiles ) {
-			log.warn( "setting overwriting behavior to "+overwriteFileSetting );
-			log.warn( "this is not recommended, as it might result in a directory containing output from several model runs" );
-			log.warn( "prefer the options "+OverwriteFileSetting.deleteDirectoryIfExists+" or "+OverwriteFileSetting.failIfDirectoryExists );
-		}
 		this.overwriteFileSetting = overwriteFileSetting;
 	}
 
@@ -365,5 +359,12 @@ public final class ControlerConfigGroup extends ReflectiveConfigGroup {
 	public void setWriteEventsUntilIteration(int val) {
 		this.writeEventsUntilIteration = val ;
 	}
-
+	@Override 
+	protected void checkConsistency(Config config) {
+		if ( config.controler().getOverwriteFileSetting() == OverwriteFileSetting.overwriteExistingFiles ) {
+			log.warn( "setting overwriting behavior to "+overwriteFileSetting );
+			log.warn( "this is not recommended, as it might result in a directory containing output from several model runs" );
+			log.warn( "prefer the options "+OverwriteFileSetting.deleteDirectoryIfExists+" or "+OverwriteFileSetting.failIfDirectoryExists );
+		}
+	}
 }

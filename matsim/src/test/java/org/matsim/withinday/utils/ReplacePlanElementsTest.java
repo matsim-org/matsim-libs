@@ -40,7 +40,7 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 		Plan plan = createSamplePlan();
 		Activity oldActivity = (Activity)plan.getPlanElements().get(0);
 		Activity newActivity = PopulationUtils.createActivityFromCoord("s", new Coord((double) 200, (double) 200));
-		ReplacePlanElements rpe = new ReplacePlanElements();
+		EditPlans rpe = new EditPlans();
 		
 		// expect rpe to return false if the plan or one of the activities is null
 		assertEquals(rpe.replaceActivity(null, oldActivity, newActivity), false);
@@ -64,7 +64,7 @@ public class ReplacePlanElementsTest extends MatsimTestCase {
 		Plan plan = createSamplePlan();
 		Leg oldLeg = (Leg)plan.getPlanElements().get(1);
 		Leg newLeg = PopulationUtils.createLeg(TransportMode.walk);
-		ReplacePlanElements rpe = new ReplacePlanElements();
+		EditPlans rpe = new EditPlans();
 		
 		// expect rpe to return false if the plan or one of the legs is null
 		assertEquals(rpe.replaceLeg(null, oldLeg, newLeg), false);
