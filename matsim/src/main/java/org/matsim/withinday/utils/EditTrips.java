@@ -37,22 +37,37 @@ public class EditTrips {
 	public EditTrips( TripRouter tripRouter ) {
 		this.tripRouter = tripRouter;
 	}
+	private Trip findCurrentTrip( MobsimAgent agent ) {
+		// this is where we are:
+		PlanElement pe = WithinDayAgentUtils.getCurrentPlanElement(agent) ;
+		// these are the trips we have:
+		List<Trip> trips = TripStructureUtils.getTrips( WithinDayAgentUtils.getModifiablePlan(agent), tripRouter.getStageActivityTypes() ) ;
+		for ( Trip trip : trips ) {
+			if ( trip.getTripElements().contains(pe) ) {
+				return trip ;
+			}
+		}
+		throw new ReplanningException("trip not found") ;
+	}
 	// current trip:
-	public final void replanCurrentTrip(Activity newAct, MobsimAgent agent, Trip trip, double now, 
-			Scenario scenario ) {
-		// this assumes, but does not make explicit, that the new activity will be at a different location
+	public final void replanCurrentTrip(MobsimAgent agent, double now, Scenario scenario ) {
+		// I will treat that in the way that it will make the trip consistent with the activities.  So if the activity in the
+		// plan has changed, the trip will go to a new location.
+		
+		// what matters is the external interface, which is above.  Everything below is internal so it does not matter so much.
 
-		final PlanElement currentPlanElement = ((PlanAgent)agent).getCurrentPlanElement();
-		final List<PlanElement> currentTripElements = trip.getTripElements();
-		int tripElementsIndex = currentTripElements.indexOf( currentPlanElement ) ;
-		final String currentMode = tripRouter.getMainModeIdentifier().identifyMainMode( currentTripElements ) ;
+		Trip trip = findCurrentTrip( agent ) ;
+		final PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(agent) ;
+		final List<PlanElement> tripElements = trip.getTripElements();
+		int tripElementsIndex = tripElements.indexOf( currentPlanElement ) ;
+		final String currentMode = tripRouter.getMainModeIdentifier().identifyMainMode( tripElements ) ;
 
 		if ( currentPlanElement instanceof Activity ) {
 			// we are on a stage activity.  Take it from there:
-			replanCurrentTripFromStageActivity(currentTripElements, tripElementsIndex, agent);
+			replanCurrentTripFromStageActivity(tripElements, tripElementsIndex, agent);
 		} else {
 			// we are on a leg
-			replanCurrentTripFromLeg(newAct, currentPlanElement, currentMode, now, agent, scenario);
+			replanCurrentTripFromLeg(trip.getDestinationActivity(), currentPlanElement, currentMode, now, agent, scenario);
 		}
 	}
 	private void replanCurrentTripFromLeg(Activity newAct, final PlanElement currentPlanElement, final String currentMode, 
