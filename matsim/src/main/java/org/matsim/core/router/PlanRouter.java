@@ -21,6 +21,8 @@ package org.matsim.core.router;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -86,7 +88,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 							routingHandler.getMainModeIdentifier().identifyMainMode( oldTrip.getTripElements() ),
 							toFacility( oldTrip.getOriginActivity() ),
 							toFacility( oldTrip.getDestinationActivity() ),
-							calcEndOfActivity( oldTrip.getOriginActivity() , plan ),
+							calcEndOfActivity( oldTrip.getOriginActivity() , plan, routingHandler.getConfig() ),
 							plan.getPerson() );
 			putVehicleFromOldTripIntoNewTripIfMeaningful(oldTrip, newTrip);
 			TripRouter.insertTrip(
@@ -153,9 +155,11 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		return new ActivityWrapperFacility( act );
 	}
 
-	private static double calcEndOfActivity(
+	public static double calcEndOfActivity(
 			final Activity activity,
-			final Plan plan) {
+			final Plan plan,
+			final Config config ) {
+		
 		if (activity.getEndTime() != Time.UNDEFINED_TIME) return activity.getEndTime();
 
 		// no sufficient information in the activity...
@@ -166,7 +170,7 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		double now = 0;
 
 		for (PlanElement pe : plan.getPlanElements()) {
-			now = updateNow( now , pe );
+			now = updateNow( now , pe, config );
 			if (pe == activity) return now;
 		}
 
@@ -175,28 +179,32 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 
 	private static double updateNow(
 			final double now,
-			final PlanElement pe) {
+			final PlanElement pe,
+			final Config config ) {
+		// yyyy see similar method in TripRouter. kai, oct'17
 		if (pe instanceof Activity) {
 			// yyyyyy this should use PopulationUtils.getActivityEndTime(...) to be consistent with other code.  kai, oct'17
 			Activity act = (Activity) pe;
-			double endTime = act.getEndTime();
-			double startTime = act.getStartTime();
-			double dur = (act instanceof Activity ? act.getMaximumDuration() : Time.UNDEFINED_TIME);
-			if (endTime != Time.UNDEFINED_TIME) {
-				// use fromAct.endTime as time for routing
-				return endTime;
-			}
-			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
-				// use fromAct.startTime + fromAct.duration as time for routing
-				return startTime + dur;
-			}
-			else if (dur != Time.UNDEFINED_TIME) {
-				// use last used time + fromAct.duration as time for routing
-				return now + dur;
-			}
-			else {
-				throw new RuntimeException("activity has neither end-time nor duration." + act);
-			}
+			return PopulationUtils.getActivityEndTime(act, now, config ) ;
+			
+//			double endTime = act.getEndTime();
+//			double startTime = act.getStartTime();
+//			double dur = (act instanceof Activity ? act.getMaximumDuration() : Time.UNDEFINED_TIME);
+//			if (endTime != Time.UNDEFINED_TIME) {
+//				// use fromAct.endTime as time for routing
+//				return endTime;
+//			}
+//			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
+//				// use fromAct.startTime + fromAct.duration as time for routing
+//				return startTime + dur;
+//			}
+//			else if (dur != Time.UNDEFINED_TIME) {
+//				// use last used time + fromAct.duration as time for routing
+//				return now + dur;
+//			}
+//			else {
+//				throw new RuntimeException("activity has neither end-time nor duration." + act);
+//			}
 		}
 		double tt = ((Leg) pe).getTravelTime();
 		return now + (tt != Time.UNDEFINED_TIME ? tt : 0);

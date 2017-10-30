@@ -22,14 +22,14 @@ package org.matsim.vis.kml;
 
 import java.io.IOException;
 
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.IconStyleType;
-import net.opengis.kml._2.LineStyleType;
-import net.opengis.kml._2.LinkType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.StyleType;
-
 import org.matsim.core.gbl.MatsimResource;
+
+import net.opengis.kml.v_2_2_0.DocumentType;
+import net.opengis.kml.v_2_2_0.IconStyleType;
+import net.opengis.kml.v_2_2_0.LineStyleType;
+import net.opengis.kml.v_2_2_0.LinkType;
+import net.opengis.kml.v_2_2_0.ObjectFactory;
+import net.opengis.kml.v_2_2_0.StyleType;
 
 /**
  * @author dgrether
@@ -49,6 +49,8 @@ public class MatsimKmlStyleFactory implements NetworkKmlStyleFactory {
 //	public static final Color MATSIMBLUE = new Color(190, 190, 80, 90);
 	private static final byte[] MATSIMGREY = new byte[]{(byte) 210, (byte) 70, (byte) 50, (byte) 50};
 	protected static final byte[] MATSIMWHITE = new byte[]{(byte) 230, (byte) 230, (byte) 230, (byte) 230};
+
+	public static final byte[] MATSIMGREEN = new byte[]{(byte) 15, (byte) 255, (byte) 15, (byte) 190};
 	/**
 	 * the kmz writer
 	 */

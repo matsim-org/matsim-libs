@@ -21,22 +21,10 @@
 package org.matsim.vis.snapshotwriters;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
-
-import net.opengis.kml._2.DocumentType;
-import net.opengis.kml._2.FolderType;
-import net.opengis.kml._2.IconStyleType;
-import net.opengis.kml._2.KmlType;
-import net.opengis.kml._2.LinkType;
-import net.opengis.kml._2.MultiGeometryType;
-import net.opengis.kml._2.NetworkLinkType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.PlacemarkType;
-import net.opengis.kml._2.PointType;
-import net.opengis.kml._2.StyleType;
-import net.opengis.kml._2.TimeSpanType;
-import net.opengis.kml._2.TimeStampType;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -47,6 +35,20 @@ import org.matsim.vis.kml.KMZWriter;
 import org.matsim.vis.kml.MatsimKMLLogo;
 import org.matsim.vis.kml.MatsimKmlStyleFactory;
 
+import net.opengis.kml.v_2_2_0.DocumentType;
+import net.opengis.kml.v_2_2_0.FolderType;
+import net.opengis.kml.v_2_2_0.IconStyleType;
+import net.opengis.kml.v_2_2_0.KmlType;
+import net.opengis.kml.v_2_2_0.LinkType;
+import net.opengis.kml.v_2_2_0.MultiGeometryType;
+import net.opengis.kml.v_2_2_0.NetworkLinkType;
+import net.opengis.kml.v_2_2_0.ObjectFactory;
+import net.opengis.kml.v_2_2_0.PlacemarkType;
+import net.opengis.kml.v_2_2_0.PointType;
+import net.opengis.kml.v_2_2_0.StyleType;
+import net.opengis.kml.v_2_2_0.TimeSpanType;
+import net.opengis.kml.v_2_2_0.TimeStampType;
+
 public class KmlSnapshotWriter implements SnapshotWriter {
 
 	private final ObjectFactory kmlObjectFactory = new ObjectFactory();
@@ -55,7 +57,7 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 	private final DocumentType mainDoc;
 	private FolderType mainFolder = null;
 	
-	private final StyleType carStyle;
+	private final Map<String,StyleType> carStyles = new LinkedHashMap<>() ;
 	
 	private KmlType timeKml = null;
 	private DocumentType timeDoc = null;
@@ -66,11 +68,13 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 
 	private final CoordinateTransformation coordTransform;
 
-	private final TreeMap<Double, NetworkLinkType> timeLinks = new TreeMap<Double, NetworkLinkType>();
+	private final TreeMap<Double, NetworkLinkType> timeLinks = new TreeMap<>();
 
 	private double time = Time.UNDEFINED_TIME;
 	
 	private final static Logger log = Logger.getLogger(KmlSnapshotWriter.class);
+	
+	private boolean writeThisSnapshot ;
 
 	public KmlSnapshotWriter(final String filename, final CoordinateTransformation coordTransform) {
 		this.coordTransform = coordTransform;
@@ -92,14 +96,34 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 			iconLink.setHref("http://maps.google.com/mapfiles/kml/pal4/icon15.png");
 			e1.printStackTrace();
 		}
-		this.carStyle = kmlObjectFactory.createStyleType();
-		this.carStyle.setId("redCarStyle");
-		IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
-		carIconStyle.setIcon(iconLink);
-		carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMRED);
-		carIconStyle.setScale(Double.valueOf(0.5));
-		this.carStyle.setIconStyle(carIconStyle);
-		this.mainDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(this.carStyle));
+		{
+			StyleType carStyle = kmlObjectFactory.createStyleType();
+			carStyle.setId("redCarStyle");
+			IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
+			carIconStyle.setIcon(iconLink);
+			carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMRED);
+			carIconStyle.setScale(Double.valueOf(0.5));
+			carStyle.setIconStyle(carIconStyle);
+			
+			carStyles.put( carStyle.getId(), carStyle ) ;
+		}
+		{
+			StyleType carStyle = kmlObjectFactory.createStyleType();
+			carStyle.setId("greenCarStyle");
+			IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
+			carIconStyle.setIcon(iconLink);
+			carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMGREEN);
+			carIconStyle.setScale(Double.valueOf(0.5));
+			carStyle.setIconStyle(carIconStyle);
+			
+			carStyles.put( carStyle.getId(), carStyle ) ;
+		}
+		
+		for ( StyleType carStyle : carStyles.values() ) {
+			this.mainDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(carStyle));
+			// is this ever used anywhere?  I think that there would have to be a "setStyleUrl" somehow connected to
+			// mainDoc in order to be used.  ??  kai, oct'17
+		}
 
 		this.mainFolder = kmlObjectFactory.createFolderType();
 		this.mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(this.mainFolder));
@@ -112,6 +136,7 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 			e.printStackTrace();
 		}
 
+		this.writeThisSnapshot = false ;
 	}
 
 	@Override
@@ -124,10 +149,11 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 		
 		this.timePlacemark = kmlObjectFactory.createPlacemarkType();
 		this.timePlacemark.setAbstractGeometryGroup(kmlObjectFactory.createMultiGeometry(this.timeGeometry));
-		this.timePlacemark.setStyleUrl(this.carStyle.getId());
 		
 		this.timeDoc = kmlObjectFactory.createDocumentType();
-		this.timeDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(this.carStyle));
+		for ( StyleType carStyle : carStyles.values() ) {
+			this.timeDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(carStyle));
+		}
 		this.timeDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(this.timePlacemark));
 		
 		this.timeKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(this.timeDoc));
@@ -135,26 +161,30 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 
 	@Override
 	public void endSnapshot() {
-		String filename = "data/time_" + this.time + ".kml";
-		this.writer.writeLinkedKml(filename, this.timeKml);
+		if ( this.writeThisSnapshot ) {
+			String filename = "data/time_" + this.time + ".kml";
+			this.writer.writeLinkedKml(filename, this.timeKml);
 
-		NetworkLinkType nl = kmlObjectFactory.createNetworkLinkType();
+			NetworkLinkType nl = kmlObjectFactory.createNetworkLinkType();
 		
-		LinkType link = kmlObjectFactory.createLinkType();
-		link.setHref(filename);
+			LinkType link = kmlObjectFactory.createLinkType();
+			link.setHref(filename);
 		
-		nl.setLink(link);
+			nl.setLink(link);
 	
-		TimeStampType timeStamp = kmlObjectFactory.createTimeStampType();
-		timeStamp.setWhen("1970-01-01T" + Time.writeTime(this.time));
+			TimeStampType timeStamp = kmlObjectFactory.createTimeStampType();
+			timeStamp.setWhen("1970-01-01T" + Time.writeTime(this.time));
 		
-		nl.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeStamp(timeStamp));
+			nl.setAbstractTimePrimitiveGroup(kmlObjectFactory.createTimeStamp(timeStamp));
 		
-		this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createNetworkLink(nl));
-		this.timeLinks.put(Double.valueOf(this.time), nl);
+			this.mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createNetworkLink(nl));
+			this.timeLinks.put(Double.valueOf(this.time), nl);
+		}
 
 		this.timeKml = null;
 		this.timeDoc = null;
+		
+		this.writeThisSnapshot = false ;
 	}
 
 	@Override
@@ -164,6 +194,10 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 		if (position.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY) {
 			return;
 		}
+		
+		this.writeThisSnapshot = true ;
+		
+		this.timePlacemark.setStyleUrl("greenCarStyle");
 
 		Coord coord = this.coordTransform.transform(new Coord(position.getEasting(), position.getNorthing()));
 		PointType point = kmlObjectFactory.createPointType();

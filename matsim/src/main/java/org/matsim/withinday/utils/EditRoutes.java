@@ -177,29 +177,9 @@ public class EditRoutes {
 	}
 
 	
-	/**
-	 * In contrast to the other replanFutureLegRoute(...) method, the leg at the given index is replaced
-	 * by a new one. This is e.g. necessary when replacing a pt trip which might consists of multiple legs
-	 * and pt_interaction activities.  
-	 * This might become the future default approach.
-	 * @deprecated Use {@link EditTrips#replanFutureTrip(Trip,Plan,String,double)} instead
-	 */
-		public static boolean replanFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter) {
-			return new EditTrips(tripRouter).replanFutureTrip(trip, plan, mainMode, departureTime);
-		}
+	
 
-		/** Convenience method, to be consistent with earlier syntax.  kai, may'16
-		 * @param trip
-		 * @param plan
-		 * @param mainMode
-		 * @param departureTime
-		 * @param network
-		 * @param tripRouter
-		 * @deprecated Use {@link EditTrips#relocateFutureTrip(Trip,Plan,String,double)} instead
-		 */
-		public static boolean relocateFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter) {
-			return new EditTrips(tripRouter).relocateFutureTrip(trip, plan, mainMode, departureTime );
-		}
+		
 
 //	/**
 //	 * @deprecated switch this to (a new) relocateCurrentTrip, since with egress legs relocating the destination of a single leg leads to disconnected trips. kai, dec'15
