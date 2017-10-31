@@ -44,7 +44,7 @@ public class MPCAuxiliary {
                     avRequest.getFromLink().getCoord().getX(), //
                     avRequest.getFromLink().getCoord().getY());
 
-            GlobalAssert.that(!mpcDispatcher.getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER).contains(robotaxi));
+            GlobalAssert.that(!mpcDispatcher.getRoboTaxiSubset(AVStatus.DRIVETOCUSTOMER).contains(robotaxi));
             {
                 boolean removed = cars.remove(robotaxi);
                 GlobalAssert.that(removed);

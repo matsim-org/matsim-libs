@@ -10,8 +10,8 @@ import java.util.Set;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkUtils;
 
+import ch.ethz.idsc.owly.data.nd.NdCenterInterface;
 import ch.ethz.idsc.owly.data.nd.NdCluster;
-import ch.ethz.idsc.owly.data.nd.NdDistanceInterface;
 import ch.ethz.idsc.owly.data.nd.NdTreeMap;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
@@ -47,8 +47,8 @@ public enum NDTreeReducer {
             requestsChosen.clear();
             for (RoboTaxi roboTaxi : roboTaxis) {
                 Tensor center = PlaneLocation.of(roboTaxi);
-                NdCluster<AVRequest> nearestCluster = ndTree.buildCluster(center, iter, NdDistanceInterface.EUCLIDEAN);
-                nearestCluster.stream().forEach(ndentry -> requestsChosen.add(ndentry.value));
+                NdCluster<AVRequest> nearestCluster = ndTree.buildCluster(NdCenterInterface.euclidean(center), iter);
+                nearestCluster.stream().forEach(ndentry -> requestsChosen.add(ndentry.value()));
             }
             ++iter;
         } while (requestsChosen.size() < roboTaxis.size() && iter <= roboTaxis.size());
@@ -82,8 +82,8 @@ public enum NDTreeReducer {
             vehiclesChosen.clear();
             for (AVRequest avRequest : requests) {
                 Tensor center = PlaneLocation.of(avRequest);
-                NdCluster<RoboTaxi> nearestCluster = ndTree.buildCluster(center, roboTaxiPerRequest, NdDistanceInterface.EUCLIDEAN);
-                nearestCluster.stream().forEach(ndentry -> vehiclesChosen.add(ndentry.value));
+                NdCluster<RoboTaxi> nearestCluster = ndTree.buildCluster(NdCenterInterface.euclidean(center), roboTaxiPerRequest);
+                nearestCluster.stream().forEach(ndentry -> vehiclesChosen.add(ndentry.value()));
             }
             ++roboTaxiPerRequest;
         } while (vehiclesChosen.size() < requests.size() && roboTaxiPerRequest <= requests.size());
