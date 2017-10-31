@@ -1,63 +1,26 @@
 package playground.lsieber.networkshapecutter;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Objects;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.io.NetworkWriter;
-
-import ch.ethz.idsc.queuey.datalys.MultiFileTools;
-import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.ScenarioOptions;
-import playground.clruch.data.ReferenceFrame;
-import playground.clruch.gfx.MatsimMapComponent;
-import playground.clruch.gfx.MatsimViewerFrame;
-import playground.clruch.net.MatsimStaticDatabase;
-import playground.clruch.netdata.VirtualNetworkGet;
-import playground.clruch.utils.NetworkLoader;
-import playground.clruch.utils.PropertiesExt;
 
 public class NetworkCutter {
 
-	public static void main(String[] args) throws FileNotFoundException, IOException {
-		 // load options
-        File workingDirectory = MultiFileTools.getWorkingDirectory();;
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
-        File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
-        System.out.println("showing simulation results stored in folder: " + outputDirectory.getName());
-        
-        ReferenceFrame referenceFrame = simOptions.getReferenceFrame();
-        /** reference frame needs to be set manually in IDSCOptions.properties file */
-        GlobalAssert.that(Objects.nonNull(referenceFrame)); 
-        GlobalAssert.that(Objects.nonNull(simOptions.getLocationSpec()));
-        Network network = NetworkLoader.loadNetwork(new File(workingDirectory, simOptions.getString("simuConfig")));
-
-        
-        // cut the network
-        Network network2 = new NetworkShapeFilter().filter(network, "shapefiles/Export_Output_2.shp");
-        new NetworkWriter(network2).write("network_test_reduced.xml");
-        new NetworkWriter(network).write("network_test_compleate.xml");
-
-        
-     // load viewer
-        MatsimStaticDatabase.initializeSingletonInstance(network2, referenceFrame);
-        MatsimMapComponent matsimJMapViewer = new MatsimMapComponent(MatsimStaticDatabase.INSTANCE);
-
-        /** this is optional and should not cause problems if file does not exist. temporary solution */
-        matsimJMapViewer.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network2));
-
-
-        MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer, outputDirectory);
-        matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
-        matsimViewer.jFrame.setSize(900, 900);
-        matsimViewer.jFrame.setVisible(true);
-        
-        
-        
-        
-
+	/** 
+	 * Cutts a network based on the other inputs. 
+	 * 1. Polygon cutting: 
+	 * A string with the path to the Shapefil (.shp) (and as well to the .shx file) needds to be given.
+	 * 
+	 * 2. Radius cutting:
+	 * The cutter reduces the network to the circle around the coordinates of the center with a radius. 
+	 */
+	public Network filter(Network network, String shapefilePath ) throws IOException {
+		return new NetworkShapeFilter().filter(network, shapefilePath + ".shp"); 
+	}
+	
+	public Network filter(Network network, Coord coord, double radius ) throws IOException {
+		return new NetworkRadiusFilter().filter(network, coord, radius); 
 	}
 
 }

@@ -24,10 +24,15 @@ public enum LocationSpec {
             ReferenceFrame.SWITZERLAND, //
             new Coord(2612859.0, 1266343.0), //
             null), // <- no cutting
+    HOMBURGERTAL( //
+            ReferenceFrame.SWITZERLAND, //
+            new Coord(2630647.0, 1251120.0), //
+            10000.0), // <- no cutting   
     SAN_FRANCISCO( //
             ReferenceFrame.IDENTITY, //
             new Coord(-122.4363005, 37.7511686), //
             null), // <- no cutting
+
     ;
 
     public final ReferenceFrame referenceFrame;
