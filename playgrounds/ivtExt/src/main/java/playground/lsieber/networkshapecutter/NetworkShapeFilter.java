@@ -28,16 +28,14 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 public class NetworkShapeFilter {
     final private Logger logger = Logger.getLogger(NetworkShapeFilter.class);
 
-    /**
-     * Filters the network for TRB:
+    /** Filters the network for TRB:
      * - Removes all non-car links
      * - Removes all nodes which are outside of the specified area
      * - Removes all corresponding links
      *
      * The original network is left unchanged!
      *
-     * Based on a shape file.
-     */
+     * Based on a shape file. */
     public Network filter(Network originalNetwork, String shapeFileInputPath) throws IOException {
         logger.info("Creating filtered network ...");
 
@@ -98,22 +96,20 @@ public class NetworkShapeFilter {
         long numberOfLinksFiltered = filteredNetwork.getLinks().size();
         long numberOfNodesFiltered = filteredNetwork.getNodes().size();
 
-        logger.info(String.format("  Number of nodes in filtered network: %d (%.2f%%)", numberOfNodesFiltered, 100.0 * numberOfNodesFiltered / numberOfNodesOriginal));
-        logger.info(String.format("  Number of links in filtered network: %d (%.2f%%)", numberOfLinksFiltered, 100.0 * numberOfLinksFiltered / numberOfLinksOriginal));
+        logger.info(String.format("  Number of nodes in filtered network: %d (%.2f%%)", numberOfNodesFiltered,
+                100.0 * numberOfNodesFiltered / numberOfNodesOriginal));
+        logger.info(String.format("  Number of links in filtered network: %d (%.2f%%)", numberOfLinksFiltered,
+                100.0 * numberOfLinksFiltered / numberOfLinksOriginal));
 
         return filteredNetwork;
     }
 
-    /**
-     * For testing purposes
-     */
+    /** For testing purposes */
     static public void main(String[] args) throws IOException {
         Network network = NetworkUtils.createNetwork();
         new MatsimNetworkReader(network).readFile(args[0]);
         new NetworkShapeFilter().filter(network, "homburgertal/homburgertal.shp");
         new NetworkWriter(network).write(args[1]);
     }
-    
-    
-}
 
+}

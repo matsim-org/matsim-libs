@@ -18,15 +18,12 @@ import org.matsim.core.utils.geometry.CoordUtils;
 public class NetworkRadiusFilter {
     final private Logger logger = Logger.getLogger(NetworkRadiusFilter.class);
 
-    /**
-     * Filters the network for TRB:
+    /** Filters the network for TRB:
      * - Removes all non-car links
      * - Removes all nodes which are outside of the specified area
      * - Removes all corresponding links
      *
-     * The original network is left unchanged!
-     * 
-     */
+     * The original network is left unchanged! */
     public Network filter(Network originalNetwork, Coord scenarioCenterCoord, double scenarioRadius) {
         logger.info("Creating filtered network ...");
 
@@ -70,20 +67,20 @@ public class NetworkRadiusFilter {
         long numberOfLinksFiltered = filteredNetwork.getLinks().size();
         long numberOfNodesFiltered = filteredNetwork.getNodes().size();
 
-        logger.info(String.format("  Number of nodes in filtered network: %d (%.2f%%)", numberOfNodesFiltered, 100.0 * numberOfNodesFiltered / numberOfNodesOriginal));
-        logger.info(String.format("  Number of links in filtered network: %d (%.2f%%)", numberOfLinksFiltered, 100.0 * numberOfLinksFiltered / numberOfLinksOriginal));
+        logger.info(String.format("  Number of nodes in filtered network: %d (%.2f%%)", numberOfNodesFiltered,
+                100.0 * numberOfNodesFiltered / numberOfNodesOriginal));
+        logger.info(String.format("  Number of links in filtered network: %d (%.2f%%)", numberOfLinksFiltered,
+                100.0 * numberOfLinksFiltered / numberOfLinksOriginal));
 
         return filteredNetwork;
     }
 
-    /**
-     * For testing purposes
-     */
-//    static public void main(String[] args) {
-//        Network network = NetworkUtils.createNetwork();
-//        new MatsimNetworkReader(network).readFile(args[0]);
-//        ZHCutter.ZHCutterConfigGroup zhCutterConfigGroup = new ZHCutter.ZHCutterConfigGroup("");
-//        new TRBNetworkRadiusFilter().filter(network, new Coord(zhCutterConfigGroup.getxCoordCenter(), zhCutterConfigGroup.getyCoordCenter()), 15000.0);
-//        new NetworkWriter(network).write(args[1]);
-//    }
+    /** For testing purposes */
+    // static public void main(String[] args) {
+    // Network network = NetworkUtils.createNetwork();
+    // new MatsimNetworkReader(network).readFile(args[0]);
+    // ZHCutter.ZHCutterConfigGroup zhCutterConfigGroup = new ZHCutter.ZHCutterConfigGroup("");
+    // new TRBNetworkRadiusFilter().filter(network, new Coord(zhCutterConfigGroup.getxCoordCenter(), zhCutterConfigGroup.getyCoordCenter()), 15000.0);
+    // new NetworkWriter(network).write(args[1]);
+    // }
 }

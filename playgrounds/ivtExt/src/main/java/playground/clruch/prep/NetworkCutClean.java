@@ -7,9 +7,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.algorithms.NetworkScenarioCut;
 
-/**
- * @author clruch
- */
+/** @author clruch */
 public class NetworkCutClean {
 
     private static final Logger log = Logger.getLogger(NetworkCutClean.class);
