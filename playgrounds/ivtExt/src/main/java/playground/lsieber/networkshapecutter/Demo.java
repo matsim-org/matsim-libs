@@ -25,7 +25,7 @@ public class Demo {
     public static void main(String[] args) throws FileNotFoundException, IOException {
         // load options
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        ;
+        
         PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
         File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
         System.out.println("showing simulation results stored in folder: " + outputDirectory.getName());
@@ -37,8 +37,14 @@ public class Demo {
         Network network = NetworkLoader.loadNetwork(new File(workingDirectory, simOptions.getString("simuConfig")));
 
         // cut the network
-        Network networkPolyCutted = new NetworkCutter().filter(network, "shapefiles/Export_Output_2");
-        Network networkRadiusCutted = new NetworkCutter().filter(network, LocationSpec.HOMBURGERTAL.center, LocationSpec.HOMBURGERTAL.radius);
+        NetworkCutter networkcutter = null;
+        
+        networkcutter = new NetworkShapeFilter2("shapefiles/Export_Output_2");
+        
+        Network cutN = networkcutter.filter(network);
+        
+        Network networkPolyCutted = new NetworkCutterOld().filter(network, "shapefiles/Export_Output_2");
+        Network networkRadiusCutted = new NetworkCutterOld().filter(network, LocationSpec.HOMBURGERTAL.center, LocationSpec.HOMBURGERTAL.radius);
 
         new NetworkWriter(networkPolyCutted).write("network_reduced_poly.xml");
         new NetworkWriter(networkRadiusCutted).write("network_reduced_radius.xml");
@@ -46,6 +52,7 @@ public class Demo {
 
         /*
          * TODO Write function to visualize a network and a population individually
+         * TODO: make a new network loader that can do this
          * @clruch: do we already have such a function???
          */
 
