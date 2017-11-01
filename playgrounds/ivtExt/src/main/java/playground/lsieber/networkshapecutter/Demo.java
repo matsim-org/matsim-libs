@@ -20,7 +20,8 @@ import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.NetworkLoader;
 import playground.clruch.utils.PropertiesExt;
 
-public class Demo {
+enum Demo { // TODO rename to more specific name
+    ;
 
     public static void main(String[] args) throws FileNotFoundException, IOException {
         // load options

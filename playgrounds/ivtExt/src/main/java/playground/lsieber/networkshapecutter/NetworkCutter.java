@@ -11,6 +11,8 @@ public interface NetworkCutter {
     // TODO can we do it as an abstract function? 
     Network filter(Network network);
     void printCutSummary();
-    void checkNetworkConsistency();
+    default void checkNetworkConsistency() {
+        // TODO jan added implementation to precent compile error
+    }
 
 }
