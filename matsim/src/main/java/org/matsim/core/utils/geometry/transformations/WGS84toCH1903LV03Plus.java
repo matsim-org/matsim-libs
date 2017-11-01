@@ -48,7 +48,7 @@ public class WGS84toCH1903LV03Plus implements CoordinateTransformation {
 			76.63 * Math.pow(latNorm, 2) -
 			194.56 * Math.pow(lonNorm, 2) * latNorm +
 			119.79 * Math.pow(latNorm, 3);
-		
+
 		double CH1903Y = 
 			2600072.37 +
 			211455.93 * lonNorm -

@@ -2,23 +2,15 @@
 package playground.clruch.io.fleet;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import ch.ethz.idsc.queuey.datalys.csv.CSVUtils;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 public class CsvFleetReader {
-
-    // TODO moved to queuey
-    // public static List<String> csvLineToList(String line) {
-    // return Stream.of(line.split(";")).collect(Collectors.toList());
-    // }
 
     private final DayTaxiRecord dayTaxiRecord;
 
@@ -48,7 +40,6 @@ public class CsvFleetReader {
                     if (Objects.isNull(line))
                         break;
                     List<String> list = CSVUtils.csvLineToList(line, ";");
-
                     dayTaxiRecord.insert(list);
                     dayTaxiRecord.lastTimeStamp = list.get(0);
                     ++dataline;
@@ -58,39 +49,40 @@ public class CsvFleetReader {
             }
         }
 
-        // Writing each TaxiTrail to a file to check output
-        for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
-            System.out.println("Writing taxiTrail data to file of vehicle: " + vehicleIndex);
-            String logTrailFile = "console_logs/TaxiTrail_" + vehicleIndex + String.valueOf(".txt");
-            FileWriter fstream = new FileWriter(logTrailFile);
-            BufferedWriter out = new BufferedWriter(fstream);
-            for (Map.Entry<Integer, TaxiStamp> entry : dayTaxiRecord.get(vehicleIndex).sortedMap.entrySet()) {
-                dayTaxiRecord.get(vehicleIndex).setRequestStatus(entry.getKey(), RequestStatusParser.parseRequestStatus(entry.getKey(), dayTaxiRecord.get(vehicleIndex)));
-                out.write(entry.getKey() + "\t" + entry.getValue().requestStatus + "\n");
-                out.flush(); // Flush the buffer and write all changes to the disk
+        // // Writing each TaxiTrail to a file to check output
+        // for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
+        // System.out.println("Writing taxiTrail data to file of vehicle: " + vehicleIndex);
+        // String logTrailFile = "logs/TaxiTrail_" + vehicleIndex + String.valueOf(".txt");
+        // FileWriter fstream = new FileWriter(logTrailFile);
+        // BufferedWriter out = new BufferedWriter(fstream);
+        // for (Map.Entry<Integer, TaxiStamp> entry : dayTaxiRecord.get(vehicleIndex).sortedMap.entrySet()) {
+        // // dayTaxiRecord.get(vehicleIndex).setRequestStatus(entry.getKey(), RequestStatusParser.parseRequestStatus(entry.getKey(),
+        // dayTaxiRecord.get(vehicleIndex)));
+        // out.write(entry.getKey() + "\t" + entry.getValue().requestStatus + "\n");
+        // out.flush(); // Flush the buffer and write all changes to the disk
+        // }
+        // out.close(); // Close the file
+        // }
+
+        // Going through all timestamps and check for offservice vehicles && parse requests
+        final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
+        final int TIMESTEP = 10;
+
+        System.out.println("INFO Checking for OFFSERVICE & RequestStatus for " + dayTaxiRecord.size() + " vehicles...");
+        for (int now = 0; now < MAXTIME; now += TIMESTEP) {
+            if (now % 10000 == 0)
+                System.out.println("now=" + now);
+            for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
+                TaxiTrail taxiTrail = dayTaxiRecord.get(vehicleIndex);
+                
+                // Check and propagate offservice status
+                taxiTrail.checkOffService(now);
+                taxiTrail.setRequestStatus(now, RequestStatusParser.parseRequestStatus(now, taxiTrail));
             }
-            out.close(); // Close the file
         }
 
-        // TODO Deprecated
-        // // Going through all timestamps and check for offservice vehicles && parse requests
-        // final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
-        // final int TIMESTEP = 10;
-        //
-        // System.out.println("Checking for OFFSERVICE & RequestStatus for " + dayTaxiRecord.size() + " vehicles...");
-        // for (int now = 0; now < MAXTIME; now += TIMESTEP) {
-        // if (now % 10000 == 0)
-        // System.out.println("now=" + now);
-        // for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
-        // TaxiTrail taxiTrail = dayTaxiRecord.get(vehicleIndex);
-        //
-        // // Check and propagate offservice status
-        // taxiTrail.checkOffService(now);
-        // }
-        // }
-
-        System.out.println("lines      " + dataline);
-        System.out.println("vehicles   " + dayTaxiRecord.size());
+        System.out.println("INFO lines      " + dataline);
+        System.out.println("INFO vehicles   " + dayTaxiRecord.size());
         // System.out.println("timestamps " + dayTaxiRecord.keySet().size());
         System.out.println(dayTaxiRecord.status);
         return dayTaxiRecord;

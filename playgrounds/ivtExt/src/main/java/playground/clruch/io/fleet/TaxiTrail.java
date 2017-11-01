@@ -16,7 +16,7 @@ import playground.clruch.dispatcher.core.RequestStatus;
 public class TaxiTrail {
     @SuppressWarnings("unused")
     private int override = 0;
-    public final NavigableMap<Integer, TaxiStamp> sortedMap = new TreeMap<>();
+    private final NavigableMap<Integer, TaxiStamp> sortedMap = new TreeMap<>();
 
     public void insert(int now, List<String> list) {
         TaxiStamp taxiStamp = new TaxiStamp();
@@ -29,7 +29,6 @@ public class TaxiTrail {
             System.err.println("override");
             ++override;
         }
-            // checkOffService(now);
         sortedMap.put(now, taxiStamp);
     }
 

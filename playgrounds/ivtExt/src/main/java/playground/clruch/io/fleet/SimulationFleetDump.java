@@ -52,7 +52,7 @@ enum SimulationFleetDump {
             SimulationObject simulationObject = new SimulationObject();
             simulationObject.now = now;
             simulationObject.vehicles = new ArrayList<>();
-            simulationObject.requests = new ArrayList<>();
+            // simulationObject.requests are already initialize in SimulationObject
 
             for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
 
@@ -78,25 +78,23 @@ enum SimulationFleetDump {
                     // Parse requests
                     RequestContainerUtils rcParser = new RequestContainerUtils(taxiTrail);
                     RequestStatus requestStatus = RequestStatusParser.parseRequestStatus(now, taxiTrail);
-//                    System.out.println("Parsing RequestStatus for vehicle " + vehicleIndex + ": " + requestStatus.toString());
+                    // System.out.println("Parsing RequestStatus for vehicle " + vehicleIndex + ": " + requestStatus.toString());
                     taxiTrail.setRequestStatus(now, requestStatus);
 
                     // Create requestContainer if there is any requests
                     if (requestStatus != RequestStatus.EMPTY && requestStatus != RequestStatus.CANCELLED) {
-                        
-                        System.out.println("Trying to populate RequestContainer of vehicle: " + vehicleIndex + " at time: " + now);
+                        // System.out.println("Trying to populate RequestContainer of vehicle: " + vehicleIndex + " at time: " + now);
                         RequestContainer rc = rcParser.populate(now, requestIndex, quadTree, db);
                         GlobalAssert.that(Objects.nonNull(rc.submissionTime));
                         simulationObject.requests.add(rc);
-                    }
-                    else if (requestStatus == RequestStatus.CANCELLED) {
-//                        System.out.println("Abort populating requestContainer.");
+                    } else if (requestStatus == RequestStatus.CANCELLED) {
+                        // System.out.println("Abort populating requestContainer.");
                         cancelledRequests++;
                     }
                     GlobalAssert.that(Objects.nonNull(vc.avStatus));
                     simulationObject.vehicles.add(vc);
                 } catch (Exception exception) {
-                    System.err.println("failed to convert vehicle " + vehicleIndex + " at time: " + now);
+                    System.err.println("WARN failed to convert vehicle " + vehicleIndex + " at time: " + now);
                     ++dropped;
                 }
             }
@@ -104,9 +102,9 @@ enum SimulationFleetDump {
             SimulationObjects.sortVehiclesAccordingToIndex(simulationObject);
             new StorageSubscriber(storageUtils).handle(simulationObject);
         }
-        System.out.println("dropped total: " + dropped);
-        System.out.println("total requests: " + requestIndex);
-        System.out.println("canceled requests: " + cancelledRequests);
+        System.out.println("INFO dropped total: " + dropped);
+        System.out.println("INFO total requests: " + requestIndex);
+        System.out.println("INFO canceled requests: " + cancelledRequests);
 
     }
 

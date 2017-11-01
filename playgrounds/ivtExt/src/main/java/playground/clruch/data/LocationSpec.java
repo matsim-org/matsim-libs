@@ -14,16 +14,23 @@ public enum LocationSpec {
             10000.0), //
     ZURICH_NOCUT(ReferenceFrame.SWITZERLAND, //
             new Coord(2683600.0, 1251400.0), //
-            null
-            ),
-    BASEL_CITY( //
-            ReferenceFrame.SWITZERLAND, //
-            new Coord(2612859.0, 1266343.0), //
-            12000.0), //
+            null), BASEL_CITY( //
+                    ReferenceFrame.SWITZERLAND, //
+                    new Coord(2612859.0, 1266343.0), //
+                    12000.0), //
     BASEL_REGION( //
             ReferenceFrame.SWITZERLAND, //
             new Coord(2612859.0, 1266343.0), //
             null), // <- no cutting
+    HOMBURGERTAL( //
+            ReferenceFrame.SWITZERLAND, //
+            new Coord(2630647.0, 1251120.0), //
+            10000.0), // radius of 10000
+    SAN_FRANCISCO( //
+            ReferenceFrame.IDENTITY, //
+            new Coord(-122.4363005, 37.7511686), //
+            null), // <- no cutting
+
     ;
 
     public final ReferenceFrame referenceFrame;
@@ -40,11 +47,11 @@ public enum LocationSpec {
         this.center = center;
         this.radius = radius;
     }
-    
-    
-    public static LocationSpec fromString(String stringRef){
-        for(LocationSpec locSpec : LocationSpec.values()){
-            if(locSpec.toString().equals(stringRef)) return locSpec;
+
+    public static LocationSpec fromString(String stringRef) {
+        for (LocationSpec locSpec : LocationSpec.values()) {
+            if (locSpec.toString().equals(stringRef))
+                return locSpec;
         }
         return null;
     }

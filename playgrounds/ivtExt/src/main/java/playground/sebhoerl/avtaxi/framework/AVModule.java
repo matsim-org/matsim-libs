@@ -128,7 +128,17 @@ public class AVModule extends AbstractModule {
         bind(TestBedDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), TestBedDispatcher.class.getSimpleName()).to(TestBedDispatcher.Factory.class);
 
+        // bind(SPLICEDispatcher.Factory.class);
+        //        AVUtils.bindDispatcherFactory(binder(), SPLICEDispatcher.class.getSimpleName()).to(SPLICEDispatcher.Factory.class);
 
+        
+        
+        
+        
+
+        
+        
+        
         // bind(PolyMultiGBMDispatcher.Factory.class);
         // AVUtils.bindDispatcherFactory(binder(), PolyMultiGBMDispatcher.class.getSimpleName()).to(PolyMultiGBMDispatcher.Factory.class);
 

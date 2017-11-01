@@ -28,7 +28,7 @@ public class RequestContainerUtils {
             if (submissionTime >= 0)
                 return submissionTime;
             else
-                System.err.println("Could not find submissionTime.");
+                System.err.println("WARN Could not find submissionTime.");
         }
         return -1;
     }
@@ -40,7 +40,7 @@ public class RequestContainerUtils {
         if (requestStatus != RequestStatus.EMPTY && requestStatus != RequestStatus.CANCELLED) {
             now = propagateTo(now, requestedStatus);
             if (now >= 0) {
-                System.out.println("Found gps data for requested Status: " + requestedStatus.toString());
+                // System.out.println("INFO Found gps data for requested Status: " + requestedStatus.toString());
                 return taxiTrail.interp(now).getValue().gps;
             }
         }
@@ -50,7 +50,7 @@ public class RequestContainerUtils {
     private int propagateTo(int now, RequestStatus requestedStatus) {
         // Check requestStatus and propagate to TaxiStamp with desired values
         RequestStatus requestStatus = taxiTrail.interp(now).getValue().requestStatus;
-//        System.out.println("Trying to find: " + requestedStatus.toString() + " from " + requestStatus.toString());
+        // System.out.println("Trying to find: " + requestedStatus.toString() + " from " + requestStatus.toString());
 
         if (requestStatus != RequestStatus.EMPTY && requestStatus != RequestStatus.CANCELLED) {
             if (requestedStatus.compareTo(requestStatus) > 0) {
@@ -58,37 +58,35 @@ public class RequestContainerUtils {
                     int nextTimeStep = taxiTrail.getNextEntry(now).getKey();
                     return propagateTo(nextTimeStep, requestedStatus);
                 } else
-                    System.err.println("getNextEntry is null");
+                    System.err.println("WARN getNextEntry is null");
             } else if (requestedStatus.compareTo(requestStatus) < 0) {
                 if (Objects.nonNull(requestStatus = taxiTrail.getLastEntry(now).getValue().requestStatus)) {
                     int nextTimeStep = taxiTrail.getLastEntry(now).getKey();
                     return propagateTo(nextTimeStep, requestedStatus);
                 } else
-                    System.err.println("getLastEntry is null");
+                    System.err.println("WARN getLastEntry is null");
             } else if (requestedStatus == requestStatus)
-                System.out.println("Found requestStatus: " + requestedStatus.toString());
+                System.out.println("INFO Found requestStatus: " + requestedStatus.toString());
             return now;
         }
-        System.err.println("Couldn't find requested Status, returning -1");
+        System.err.println("WARN Couldn't find requested Status, returning -1");
         return -1;
     }
 
     public RequestContainer populate(int now, int requestIndex, QuadTree<Link> qt, MatsimStaticDatabase db) {
         // Handle requestIndex & submissionTime
         int submissionTime = -1;
-        RequestStatus requestStatus = taxiTrail.interp(now).getValue().requestStatus;
+
         RequestStatus lastRequest = taxiTrail.getLastEntry(now).getValue().requestStatus;
-        if (requestStatus != RequestStatus.EMPTY) {
-            if (lastRequest == RequestStatus.EMPTY) {
-                requestIndex++;
-                taxiTrail.setRequestIndex(now, requestIndex);
-                submissionTime = now;
-            } else {
-                taxiTrail.setRequestIndex(now, taxiTrail.getLastEntry(now).getValue().requestIndex);
-                submissionTime = findSubmissionTime(now);
-            }
-            System.out.println("SubmissionTime set to: " + submissionTime);
+        if (lastRequest == RequestStatus.EMPTY) {
+            requestIndex++;
+            taxiTrail.setRequestIndex(now, requestIndex);
+            submissionTime = now;
+        } else {
+            taxiTrail.setRequestIndex(now, taxiTrail.getLastEntry(now).getValue().requestIndex);
+            submissionTime = findSubmissionTime(now);
         }
+        // System.out.println("INFO SubmissionTime set to: " + submissionTime);
 
         // Populate RequestContainer
         RequestContainer rc = new RequestContainer();
@@ -104,65 +102,11 @@ public class RequestContainerUtils {
                 rc.fromLinkIndex = db.getLinkIndex(qt.getClosest(to.getX(), to.getY()));
             }
         } catch (Exception exception) {
-            System.err.println("failed to get from/to Coords at time: " + now);
+            System.err.println("WARN failed to get from/to Coords at time: " + now);
         }
         rc.requestIndex = taxiTrail.interp(now).getValue().requestIndex;
         rc.requestStatus = taxiTrail.interp(now).getValue().requestStatus;
         rc.submissionTime = submissionTime;
         return rc;
     }
-
-    // Moved to seperate File
-    // public RequestStatus parseRequestStatus(int now) {
-    // if (now != 0) {
-    // Entry<Integer, TaxiStamp> nowEntry = taxiTrail.interp(now);
-    // Entry<Integer, TaxiStamp> lastEntry = taxiTrail.getLastEntry(now);
-    // // GlobalAssert.that(Objects.nonNull(lastEntry));
-    //
-    // if (Objects.nonNull(lastEntry)) {
-    // AVStatus nowState = nowEntry.getValue().avStatus;
-    // AVStatus lastState = lastEntry.getValue().avStatus;
-    //
-    // // Check change of AVStatus from the vehicle and map corresponding requestStatus
-    // switch (nowState) {
-    // case DRIVETOCUSTOMER:
-    // switch (lastState) {
-    // case STAY:
-    // case REBALANCEDRIVE:
-    // return RequestStatus.REQUESTED;
-    // case DRIVETOCUSTOMER:
-    // return RequestStatus.ONTHEWAY;
-    // default:
-    // break;
-    // }
-    // case DRIVEWITHCUSTOMER:
-    // switch (lastState) {
-    // case STAY:
-    // case REBALANCEDRIVE:
-    // case DRIVETOCUSTOMER:
-    // return RequestStatus.PICKUP;
-    // case DRIVEWITHCUSTOMER:
-    // return RequestStatus.DRIVING;
-    // default:
-    // break;
-    // }
-    // case STAY:
-    // case REBALANCEDRIVE:
-    // switch (lastState) {
-    // case DRIVETOCUSTOMER:
-    // return RequestStatus.CANCELLED;
-    // case DRIVEWITHCUSTOMER:
-    // return RequestStatus.DROPOFF;
-    // default:
-    // break;
-    // }
-    // default:
-    // break;
-    // }
-    // return RequestStatus.EMPTY;
-    // }
-    // return RequestStatus.EMPTY;
-    // }
-    // return RequestStatus.EMPTY;
-    // }
 }
