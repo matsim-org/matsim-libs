@@ -22,7 +22,10 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import com.google.inject.*;
+import java.util.Collection;
+
+import javax.inject.Inject;
+
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
@@ -30,8 +33,9 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
-import javax.inject.Inject;
-import java.util.Collection;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.Provider;
 
 public class QSimProvider implements Provider<QSim> {
 
@@ -46,7 +50,7 @@ public class QSimProvider implements Provider<QSim> {
 
     @Override
     public QSim get() {
-        AbstractModule module = new AbstractModule() {
+	    com.google.inject.AbstractModule module = new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
 				for (AbstractQSimPlugin plugin : plugins) {
