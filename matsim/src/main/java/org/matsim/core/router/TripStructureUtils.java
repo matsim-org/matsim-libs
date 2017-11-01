@@ -116,6 +116,9 @@ public class TripStructureUtils {
 
 			if (stageActivities.isStageActivity( act.getType() )) continue;
 			if ( currentIndex - originActivityIndex > 1 ) {
+				// which means, if I am understanding this right, that two activities without a leg in between will not be considered
+				// a trip.  
+				
 				trips.add( new Trip(
 						(Activity) planElements.get( originActivityIndex ),
 						// do not back the list by the list in the plan:
