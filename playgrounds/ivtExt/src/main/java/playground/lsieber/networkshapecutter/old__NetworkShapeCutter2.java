@@ -1,12 +1,15 @@
+/**
+ * 
+ */
 package playground.lsieber.networkshapecutter;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataUtilities;
@@ -18,41 +21,68 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.network.io.NetworkWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
-public class NetworkShapeFilter {
-    final private Logger logger = Logger.getLogger(NetworkShapeFilter.class);
+/** @author Claudio Ruch */
+public class old__NetworkShapeCutter2 extends old__ANetworkCutter {
 
-    /** Filters the network for TRB:
-     * - Removes all non-car links
-     * - Removes all nodes which are outside of the specified area
-     * - Removes all corresponding links
-     *
-     * The original network is left unchanged!
-     *
-     * Based on a shape file. */
-    public Network filter(Network originalNetwork, String shapeFileInputPath) throws IOException {
-        logger.info("Creating filtered network ...");
+    private String shapefilePath;
+
+    public old__NetworkShapeCutter2(Network network, String shapefilePath) {
+        super(network);
+        this.shapefilePath = shapefilePath;
+        filter();
+    }
+
+    @Override
+    protected final void filter() {
+        networkModif = filterInternal(networkOrig);
+
+    }
+
+    private Network filterInternal(Network originalNetwork) {
+        // logger.info("Creating filtered network ...");
 
         long numberOfLinksOriginal = originalNetwork.getLinks().size();
         long numberOfNodesOriginal = originalNetwork.getNodes().size();
 
-        logger.info("  Number of nodes in original network: " + numberOfNodesOriginal);
-        logger.info("  Number of links in original network: " + numberOfLinksOriginal);
+        // logger.info(" Number of nodes in original network: " + numberOfNodesOriginal);
+        // logger.info(" Number of links in original network: " + numberOfLinksOriginal);
 
         Network filteredNetwork = NetworkUtils.createNetwork();
 
         Map inputMap = new HashMap<>();
-        inputMap.put("url", new File(shapeFileInputPath).toURI().toURL());
-        DataStore dataStore = DataStoreFinder.getDataStore(inputMap);
+        try {
+            inputMap.put("url", new File(shapefilePath).toURI().toURL());
+        } catch (MalformedURLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        DataStore dataStore = null;
+        try {
+            dataStore = DataStoreFinder.getDataStore(inputMap);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-        SimpleFeatureSource featureSource = dataStore.getFeatureSource(dataStore.getTypeNames()[0]);
-        SimpleFeatureCollection collection = DataUtilities.collection(featureSource.getFeatures());
+        SimpleFeatureSource featureSource = null;
+        try {
+            featureSource = dataStore.getFeatureSource(dataStore.getTypeNames()[0]);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        SimpleFeatureCollection collection = null;
+        try {
+            collection = DataUtilities.collection(featureSource.getFeatures());
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         dataStore.dispose();
 
         GeometryFactory factory = new GeometryFactory();
@@ -91,25 +121,17 @@ public class NetworkShapeFilter {
 
         new NetworkCleaner().run(filteredNetwork);
 
-        logger.info("Finished creating filtered network!");
+        // logger.info("Finished creating filtered network!");
 
         long numberOfLinksFiltered = filteredNetwork.getLinks().size();
         long numberOfNodesFiltered = filteredNetwork.getNodes().size();
 
-        logger.info(String.format("  Number of nodes in filtered network: %d (%.2f%%)", numberOfNodesFiltered,
-                100.0 * numberOfNodesFiltered / numberOfNodesOriginal));
-        logger.info(String.format("  Number of links in filtered network: %d (%.2f%%)", numberOfLinksFiltered,
-                100.0 * numberOfLinksFiltered / numberOfLinksOriginal));
+        // logger.info(String.format(" Number of nodes in filtered network: %d (%.2f%%)", numberOfNodesFiltered,
+        // 100.0 * numberOfNodesFiltered / numberOfNodesOriginal));
+        // logger.info(String.format(" Number of links in filtered network: %d (%.2f%%)", numberOfLinksFiltered,
+        // 100.0 * numberOfLinksFiltered / numberOfLinksOriginal));
 
         return filteredNetwork;
-    }
-
-    /** For testing purposes */
-    static public void main(String[] args) throws IOException {
-        Network network = NetworkUtils.createNetwork();
-        new MatsimNetworkReader(network).readFile(args[0]);
-        new NetworkShapeFilter().filter(network, "homburgertal/homburgertal.shp");
-        new NetworkWriter(network).write(args[1]);
     }
 
 }

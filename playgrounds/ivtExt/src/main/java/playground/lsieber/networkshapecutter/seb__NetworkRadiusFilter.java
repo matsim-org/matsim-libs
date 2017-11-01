@@ -15,8 +15,8 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 //import contrib.baseline.preparation.ZHCutter;
 
-public class NetworkRadiusFilter {
-    final private Logger logger = Logger.getLogger(NetworkRadiusFilter.class);
+public class seb__NetworkRadiusFilter {
+    final private Logger logger = Logger.getLogger(seb__NetworkRadiusFilter.class);
 
     /** Filters the network for TRB:
      * - Removes all non-car links

@@ -5,7 +5,7 @@ import java.io.IOException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 
-public class NetworkCutterOld {
+public class old__NetworkCutterOld {
 
     /** Cutts a network based on the other inputs.
      * 1. Polygon cutting:
@@ -14,11 +14,11 @@ public class NetworkCutterOld {
      * 2. Radius cutting:
      * The cutter reduces the network to the circle around the coordinates of the center with a radius. */
     public Network filter(Network network, String shapefilePath) throws IOException {
-        return new NetworkShapeFilter().filter(network, shapefilePath + ".shp");
+        return new seb__NetworkShapeFilter().filter(network, shapefilePath + ".shp");
     }
 
     public Network filter(Network network, Coord coord, double radius) throws IOException {
-        return new NetworkRadiusFilter().filter(network, coord, radius);
+        return new seb__NetworkRadiusFilter().filter(network, coord, radius);
     }
     
     // TODO you did not avoid this... 
