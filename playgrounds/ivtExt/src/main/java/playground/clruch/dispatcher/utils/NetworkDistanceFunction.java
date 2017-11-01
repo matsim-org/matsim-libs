@@ -41,6 +41,20 @@ public class NetworkDistanceFunction implements DistanceFunction {
         return distNetwork(from, to);
 
     }
+    
+    
+    // Added Nicolo 29-10-17
+    @Override
+    public double getDistance(Link link1, Link link2) {
+
+        Node from = link1.getFromNode();
+        Node to = link2.getFromNode();
+
+        return distNetwork(from, to);
+
+    }
+    
+    
 
     private double distNetwork(Node from, Node to) {
         GlobalAssert.that(from!=null);

@@ -16,6 +16,7 @@ import com.google.inject.name.Named;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
+import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -23,6 +24,7 @@ import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
+
 
 /** Empty Test Dispatcher, rebalances a vehicle every 30 mins and
  * performs a pickup every 30 mins if open reqeutss are present.
@@ -34,7 +36,10 @@ public class SPLICEDispatcher extends RebalancingDispatcher {
     private final int nicoloFactor;
     private final Network network;
     private final Random random = new Random(1334);
+    private final NetworkDistanceFunction ndf;
 
+    
+    // constructor
     private SPLICEDispatcher(//
             Config config, AVDispatcherConfig avconfig, //
             TravelTime travelTime, //
@@ -46,23 +51,28 @@ public class SPLICEDispatcher extends RebalancingDispatcher {
         rebalancingPeriod = safeConfig.getInteger("rebalancingPeriod", 120);
         nicoloFactor = safeConfig.getInteger("theNicoloFactor", -1);
         this.network = network;
+        this.ndf= new NetworkDistanceFunction(network);
+        
     }
 
     @Override
     public void redispatch(double now) {
 
-        System.out.println("nicoloFactor =" + nicoloFactor);
+        //System.out.println("nicoloFactor =" + nicoloFactor);
 
-        // TestBedDispatcher implemenatation
-        final long round_now = Math.round(now);
-        if (round_now % rebalancingPeriod == 0 && 0 < getAVRequests().size()) {
+        // TestBedDispatcher implementation
+        final long round_now = Math.round(now);        
+        // if current time / divided by rebal period ==0 & there are requests
+        if (round_now % rebalancingPeriod == 0 && 6 < getAVRequests().size()) {
             
+        	System.out.println("Current time is "+ round_now +". It is multiple of rebalancing period of " + rebalancingPeriod + " !!!" );
             // TASK 1: Compute a stacker crane tour from requests. 
             
-            StackerCraneTour sct = new StackerCraneTour();
+            StackerCraneTour sct = new StackerCraneTour(ndf);
             
+            sct.calculate(getAVRequests());
             
-            
+                      
             // TASK 2: have only one vehicle and continuously let it run on the stacker crane tour 
             // updated every 60 mins. 
             
@@ -104,8 +114,12 @@ public class SPLICEDispatcher extends RebalancingDispatcher {
                 rebalanceTo = iterator.next();
                 ++i;
             }
+            // make sure that rebalanceTo is not empty
             GlobalAssert.that(rebalanceTo != null);
+        	System.out.println("Current Rebalancing link is: no " + rebalanceTo +" !!!" );
+
             
+            // for every robot taxi send each one to the rebalance to.
             for(RoboTaxi robotaxi : getDivertableRoboTaxis()){
                 setRoboTaxiRebalance(robotaxi, rebalanceTo);
                 

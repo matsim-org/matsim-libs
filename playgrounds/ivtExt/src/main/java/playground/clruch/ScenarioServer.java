@@ -54,6 +54,8 @@ public class ScenarioServer {
 		File workingDirectory = MultiFileTools.getWorkingDirectory();
 		PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
 
+		System.out.println("Start--------------------"); // added no
+		
 		/**
 		 * set to true in order to make server wait for at least 1 client, for
 		 * instance viewer client
@@ -66,9 +68,11 @@ public class ScenarioServer {
 		SimulationServer.INSTANCE.startAcceptingNonBlocking();
 		SimulationServer.INSTANCE.setWaitForClients(waitForClients);
 
-		// load MATSim configs
+
+		// load MATSim configs - includign av.xml where dispatcher is selected. 
 		System.out.println("loading config file " + configFile.getAbsoluteFile());
-		GlobalAssert.that(configFile.exists());
+		
+		GlobalAssert.that(configFile.exists()); // Test wheather the config file directory exists
 		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
 		dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 		Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
