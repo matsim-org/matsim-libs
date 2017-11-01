@@ -54,7 +54,7 @@ public class TaxiTrail {
         Entry<Integer, TaxiStamp> lastEntry = sortedMap.lowerEntry(interp(now).getKey());
         if (Objects.nonNull(lastEntry))
             return lastEntry;
-        GlobalAssert.that(Objects.nonNull(lastEntry));
+        // GlobalAssert.that(Objects.nonNull(lastEntry));
         return null;
     }
 
@@ -62,7 +62,7 @@ public class TaxiTrail {
         Entry<Integer, TaxiStamp> nextEntry = sortedMap.higherEntry(interp(now).getKey());
         if (Objects.nonNull(nextEntry))
             return nextEntry;
-        GlobalAssert.that(Objects.nonNull(nextEntry));
+        // GlobalAssert.that(Objects.nonNull(nextEntry));
         return null;
     }
 

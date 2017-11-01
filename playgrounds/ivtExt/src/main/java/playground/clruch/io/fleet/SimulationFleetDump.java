@@ -43,7 +43,7 @@ enum SimulationFleetDump {
             quadTree.put(link.getCoord().getX(), link.getCoord().getY(), link);
 
         int dropped = 0;
-        int canceledRequests = 0;
+        int cancelledRequests = 0;
         int requestIndex = 0;
         // NavigableMap<Integer, Integer> requestMap = new TreeMap<>();
         for (int now = 0; now < MAXTIME; now += TIMESTEP) {
@@ -82,37 +82,17 @@ enum SimulationFleetDump {
                     taxiTrail.setRequestStatus(now, requestStatus);
 
                     // Create requestContainer if there is any requests
-                    if (requestStatus != RequestStatus.EMPTY) {
-                        int submissionTime = -1;
-                        if (rcParser.isNewRequest(now, requestIndex, taxiTrail)) {
-                            submissionTime = now;
-                            requestIndex++;
-                        } else {
-                            System.out.println("Trying to find submission time for vehicle: " + vehicleIndex);
-                            submissionTime = rcParser.findSubmissionTime(now);
-                        }
-
-                        // TODO Add Counter for cancelled Requests
-                        RequestContainer rc = new RequestContainer();
-
-                        // Populate RequestContainer
-                        System.out.println("Trying to find from/to Coords of vehicle: " + vehicleIndex);
-                        Coord from = rcParser.getCoordAt(now, RequestStatus.PICKUP);
-                        if (Objects.nonNull(from)) {
-                            from = db.referenceFrame.coords_fromWGS84.transform(from);
-                            rc.fromLinkIndex = db.getLinkIndex(quadTree.getClosest(from.getX(), from.getY()));
-                        }
-                        Coord to = rcParser.getCoordAt(now, RequestStatus.DROPOFF);
-                        if (Objects.nonNull(to)) {
-                            to = db.referenceFrame.coords_fromWGS84.transform(to);
-                            rc.fromLinkIndex = db.getLinkIndex(quadTree.getClosest(to.getX(), to.getY()));
-                        }
-                        rc.requestIndex = taxiTrail.interp(now).getValue().requestIndex;
-                        rc.requestStatus = taxiTrail.interp(now).getValue().requestStatus;
-                        rc.submissionTime = submissionTime;
+                    if (requestStatus != RequestStatus.EMPTY && requestStatus != RequestStatus.CANCELLED) {
+                        
+                        System.out.println("Trying to populate RequestContainer of vehicle: " + vehicleIndex + " at time: " + now);
+                        RequestContainer rc = rcParser.populate(now, requestIndex, quadTree, db);
+                        GlobalAssert.that(Objects.nonNull(rc.submissionTime));
                         simulationObject.requests.add(rc);
                     }
-
+                    else if (requestStatus == RequestStatus.CANCELLED) {
+                        System.out.println("Abort populating requestContainer.");
+                        cancelledRequests++;
+                    }
                     GlobalAssert.that(Objects.nonNull(vc.avStatus));
                     simulationObject.vehicles.add(vc);
                 } catch (Exception exception) {
@@ -126,7 +106,7 @@ enum SimulationFleetDump {
         }
         System.out.println("dropped total: " + dropped);
         System.out.println("total requests: " + requestIndex);
-        System.out.println("canceled requests: " + canceledRequests);
+        System.out.println("canceled requests: " + cancelledRequests);
 
     }
 
