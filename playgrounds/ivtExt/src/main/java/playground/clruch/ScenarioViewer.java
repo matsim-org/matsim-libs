@@ -41,6 +41,9 @@ public class ScenarioViewer {
         GlobalAssert.that(Objects.nonNull(referenceFrame)); 
         GlobalAssert.that(Objects.nonNull(simOptions.getLocationSpec()));
         Network network = NetworkLoader.loadNetwork(new File(workingDirectory, simOptions.getString("simuConfig")));
+        System.out.println("loaded the network!");
+        System.out.println("links" +  network.getLinks().size());
+        System.out.println("nodes" +  network.getNodes().size());
 
         // load viewer
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
