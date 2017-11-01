@@ -77,8 +77,8 @@ enum SimulationFleetDump {
 
                     // Parse requests
                     RequestContainerUtils rcParser = new RequestContainerUtils(taxiTrail);
-                    RequestStatus requestStatus = rcParser.parseRequestStatus(now);
-                    System.out.println("Parsing RequestStatus for vehicle " + vehicleIndex + ": " + requestStatus.toString());
+                    RequestStatus requestStatus = RequestStatusParser.parseRequestStatus(now, taxiTrail);
+//                    System.out.println("Parsing RequestStatus for vehicle " + vehicleIndex + ": " + requestStatus.toString());
                     taxiTrail.setRequestStatus(now, requestStatus);
 
                     // Create requestContainer if there is any requests
@@ -90,7 +90,7 @@ enum SimulationFleetDump {
                         simulationObject.requests.add(rc);
                     }
                     else if (requestStatus == RequestStatus.CANCELLED) {
-                        System.out.println("Abort populating requestContainer.");
+//                        System.out.println("Abort populating requestContainer.");
                         cancelledRequests++;
                     }
                     GlobalAssert.that(Objects.nonNull(vc.avStatus));

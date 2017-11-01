@@ -2,15 +2,16 @@
 package playground.clruch.io.fleet;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import ch.ethz.idsc.queuey.datalys.csv.CSVUtils;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.dispatcher.core.RequestStatus;
-import playground.clruch.net.RequestContainerUtils;
 
 public class CsvFleetReader {
 
@@ -55,6 +56,20 @@ public class CsvFleetReader {
             } finally {
                 // ...
             }
+        }
+
+        // Writing each TaxiTrail to a file to check output
+        for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
+            System.out.println("Writing taxiTrail data to file of vehicle: " + vehicleIndex);
+            String logTrailFile = "console_logs/TaxiTrail_" + vehicleIndex + String.valueOf(".txt");
+            FileWriter fstream = new FileWriter(logTrailFile);
+            BufferedWriter out = new BufferedWriter(fstream);
+            for (Map.Entry<Integer, TaxiStamp> entry : dayTaxiRecord.get(vehicleIndex).sortedMap.entrySet()) {
+                dayTaxiRecord.get(vehicleIndex).setRequestStatus(entry.getKey(), RequestStatusParser.parseRequestStatus(entry.getKey(), dayTaxiRecord.get(vehicleIndex)));
+                out.write(entry.getKey() + "\t" + entry.getValue().requestStatus + "\n");
+                out.flush(); // Flush the buffer and write all changes to the disk
+            }
+            out.close(); // Close the file
         }
 
         // TODO Deprecated

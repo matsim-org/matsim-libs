@@ -16,7 +16,7 @@ import playground.clruch.dispatcher.core.RequestStatus;
 public class TaxiTrail {
     @SuppressWarnings("unused")
     private int override = 0;
-    private final NavigableMap<Integer, TaxiStamp> sortedMap = new TreeMap<>();
+    public final NavigableMap<Integer, TaxiStamp> sortedMap = new TreeMap<>();
 
     public void insert(int now, List<String> list) {
         TaxiStamp taxiStamp = new TaxiStamp();
