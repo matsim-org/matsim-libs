@@ -3,8 +3,8 @@ package playground.clruch.dispatcher.core;
 /** @author Andreas Aumiller */
 // TODO check if useful.
 public enum RequestStatus {
-    REQUESTED("req", "taxi requested"), //
-    ONTHEWAY("otw", "taxi on the way"), //
+    REQUESTED("req", "taxi requested"), // TODO add descriptions
+    PICKUPDRIVE("otw", "taxi on the way"), //
     PICKUP("pu", "pickup"), //
     DRIVING("drv", "driving with customer"), //
     DROPOFF("do", "dropoff"), //

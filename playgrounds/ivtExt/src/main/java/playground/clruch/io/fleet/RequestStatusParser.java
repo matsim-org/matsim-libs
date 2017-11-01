@@ -27,7 +27,7 @@ public enum RequestStatusParser {
                     case REBALANCEDRIVE:
                         return RequestStatus.REQUESTED;
                     case DRIVETOCUSTOMER:
-                        return RequestStatus.ONTHEWAY;
+                        return RequestStatus.PICKUPDRIVE;
                     default:
                         break;
                     }
