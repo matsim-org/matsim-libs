@@ -54,6 +54,7 @@ public class QSimProvider implements Provider<QSim> {
 			@Override
 			protected void configure() {
 				for (AbstractQSimPlugin plugin : plugins) {
+					// install each plugin's modules:
 					for (Module module1 : plugin.modules()) {
 						install(module1);
 					}
@@ -65,18 +66,23 @@ public class QSimProvider implements Provider<QSim> {
         Injector qSimLocalInjector = injector.createChildInjector(module);
         QSim qSim = qSimLocalInjector.getInstance(QSim.class);
         for (AbstractQSimPlugin plugin : plugins) {
+	  		// add each plugin's mobsim engines:
 			for (Class<? extends MobsimEngine> mobsimEngine : plugin.engines()) {
 				qSim.addMobsimEngine(qSimLocalInjector.getInstance(mobsimEngine));
 			}
+	  		// add each plugin's activity handlers:
 			for (Class<? extends ActivityHandler> activityHandler : plugin.activityHandlers()) {
 				qSim.addActivityHandler(qSimLocalInjector.getInstance(activityHandler));
 			}
+	  		// add each plugin's departure handlers:
 			for (Class<? extends DepartureHandler> mobsimEngine : plugin.departureHandlers()) {
 				qSim.addDepartureHandler(qSimLocalInjector.getInstance(mobsimEngine));
 			}
+	  		// add each plugin's mobsim listeners:
 			for (Class<? extends MobsimListener> mobsimListener : plugin.listeners()) {
 				qSim.addQueueSimulationListeners(qSimLocalInjector.getInstance(mobsimListener));
 			}
+	  		// add each plugin's agent sources:
 			for (Class<? extends AgentSource> agentSource : plugin.agentSources()) {
 				qSim.addAgentSource(qSimLocalInjector.getInstance(agentSource));
 			}
