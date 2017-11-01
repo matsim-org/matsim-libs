@@ -282,6 +282,8 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 
 	/* for the backward compatibility nonsense */
 	private final Map<String, ActivityParams> activityTypesByNumber = new HashMap< >();
+
+	private boolean usingTravelDisutilityForScoring = false ;
 	private ActivityParams getActivityTypeByNumber(final String number) {
 		ActivityParams actType = this.activityTypesByNumber.get(number);
 		if ( (actType == null) ) {
@@ -1323,6 +1325,19 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 			this.writeExperiencedPlans = writeExperiencedPlans;
 		}
 
+	}
+
+	/**
+	 * currently not accessible from xml
+	 */
+	public boolean isUsingTravelDisutilityForScoring() {
+		return this.usingTravelDisutilityForScoring ;
+	}
+	/**
+	 * currently not accessible from xml
+	 */
+	public void setUsingTravelDisutilityForScoring( boolean value) {
+		this.usingTravelDisutilityForScoring  = value ;
 	}
 
 }

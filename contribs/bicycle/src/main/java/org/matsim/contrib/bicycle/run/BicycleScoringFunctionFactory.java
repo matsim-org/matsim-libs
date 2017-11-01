@@ -50,27 +50,29 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 	@Inject BicycleTravelDisutilityFactory bicycleTravelDisutilityFactory;
 	
 	@Inject EventsManager eventsManager;
+	
+	SumScoringFunction delegate ;
 
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {		
-		SumScoringFunction sumScoringFunction = new SumScoringFunction();
-
-		final ScoringParameters params = parameters.getScoringParameters(person);
-		// No leg scoring here as it would only double-count
-		// sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
-		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
-		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-
-		scoringFunctionsForPopulation.setPassLinkEventsToPerson(true);
-		// yyyyyy this is the ONLY place where we need to make ScoringFunctionsForPopulation public.  Somehow,
-		// this would imply to me that we should attach this switch to something else. kai, sep'17
-		
-		BicycleScoring bicycleScoring = new BicycleScoring(scenario, bicycleTravelTime, bicycleTravelDisutilityFactory);
-		sumScoringFunction.addScoringFunction(bicycleScoring);
-		
-		CarCounter carCounter = new CarCounter(bicycleScoring);
-		eventsManager.addHandler(carCounter);
+//		SumScoringFunction sumScoringFunction = new SumScoringFunction();
+//
+//		final ScoringParameters params = parameters.getScoringParameters(person);
+//		// No leg scoring here as it would only double-count
+//		// sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
+//		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+//		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+//
+//		scoringFunctionsForPopulation.setPassLinkEventsToPerson(true);
+//		// yyyyyy this is the ONLY place where we need to make ScoringFunctionsForPopulation public.  Somehow,
+//		// this would imply to me that we should attach this switch to something else. kai, sep'17
+//		
+//		BicycleScoring bicycleScoring = new BicycleScoring(scenario, bicycleTravelTime, bicycleTravelDisutilityFactory);
+//		sumScoringFunction.addScoringFunction(bicycleScoring);
+//		
+//		CarCounter carCounter = new CarCounter(bicycleScoring);
+//		eventsManager.addHandler(carCounter);
 
 		return sumScoringFunction;
 	}
