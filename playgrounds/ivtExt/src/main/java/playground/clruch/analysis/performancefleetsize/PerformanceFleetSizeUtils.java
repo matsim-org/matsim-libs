@@ -21,6 +21,8 @@ import org.matsim.api.core.v01.network.Link;
 import ch.ethz.idsc.queuey.core.networks.VirtualLink;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNode;
+import ch.ethz.idsc.queuey.plot.DiagramCreator;
+import ch.ethz.idsc.queuey.plot.DiagramSettings;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -30,7 +32,6 @@ import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.red.Norm;
 import ch.ethz.idsc.tensor.red.Total;
-import playground.clruch.analysis.DiagramCreator;
 import playground.clruch.traveldata.TravelData;
 
 /** @author Claudio Ruch */
@@ -185,11 +186,11 @@ public enum PerformanceFleetSizeUtils {
         }
 
         // set text fonts
-        timechart.getTitle().setFont(DiagramCreator.titleFont);
-        timechart.getXYPlot().getDomainAxis().setLabelFont(DiagramCreator.axisFont);
-        timechart.getXYPlot().getRangeAxis().setLabelFont(DiagramCreator.axisFont);
-        timechart.getXYPlot().getDomainAxis().setTickLabelFont(DiagramCreator.tickFont);
-        timechart.getXYPlot().getRangeAxis().setTickLabelFont(DiagramCreator.tickFont);
+        timechart.getTitle().setFont(DiagramSettings.titleFont);
+        timechart.getXYPlot().getDomainAxis().setLabelFont(DiagramSettings.axisFont);
+        timechart.getXYPlot().getRangeAxis().setLabelFont(DiagramSettings.axisFont);
+        timechart.getXYPlot().getDomainAxis().setTickLabelFont(DiagramSettings.tickFont);
+        timechart.getXYPlot().getRangeAxis().setTickLabelFont(DiagramSettings.tickFont);
 
         // save plot as png
         int width = 1000; // Width of the image
