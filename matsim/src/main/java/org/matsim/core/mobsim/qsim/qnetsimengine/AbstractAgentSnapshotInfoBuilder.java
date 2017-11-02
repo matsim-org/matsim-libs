@@ -45,6 +45,7 @@ import org.matsim.vis.snapshotwriters.VisVehicle;
  *
  */
 abstract class AbstractAgentSnapshotInfoBuilder {
+	private static final Logger log = Logger.getLogger(AbstractAgentSnapshotInfoBuilder.class);
 
 	private final AgentSnapshotInfoFactory snapshotInfoFactory;
 	private Scenario scenario;
@@ -154,6 +155,8 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 
 		positions.add(pos);
 	}
+	
+	private static int wrnCnt = 0 ;
 
 	public final Collection<AgentSnapshotInfo> positionVehiclesAlongLine(Collection<AgentSnapshotInfo> positions,
 			double now, Collection<MobsimVehicle> vehs, double curvedLength, double storageCapacity, 
@@ -200,11 +203,16 @@ abstract class AbstractAgentSnapshotInfoBuilder {
 					}
 					final double spaceConsumptionOfHoles = sum*spacingOfOnePCE;
 					final double spaceAvailableForHoles = distanceOfHoleFromFromNode - firstHolePosition;
-					if ( spaceConsumptionOfHoles >= spaceAvailableForHoles ) {
-						Logger.getLogger(getClass()).warn("we have a problem: holes consume too much space:" ) ;
-						Logger.getLogger(getClass()).warn( "summed up space consumption of holes: " + spaceConsumptionOfHoles );
-						Logger.getLogger(getClass()).warn("distance bw first and last hole: " + spaceAvailableForHoles ) ;
-
+					if ( wrnCnt < 10 ) {
+						wrnCnt++ ;
+						if ( spaceConsumptionOfHoles >= spaceAvailableForHoles ) {
+							log.warn("we have a problem: holes consume too much space:" ) ;
+							log.warn( "summed up space consumption of holes: " + spaceConsumptionOfHoles );
+							log.warn("distance bw first and last hole: " + spaceAvailableForHoles ) ;
+						}
+						if ( wrnCnt==10 ) {
+							log.warn( Gbl.FUTURE_SUPPRESSED ) ; 
+						}
 					}
 				}
 				break;
