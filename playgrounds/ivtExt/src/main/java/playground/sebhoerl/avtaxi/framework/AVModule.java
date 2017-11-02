@@ -31,6 +31,7 @@ import com.google.inject.name.Names;
 import playground.clruch.dispatcher.DriveByDispatcher;
 import playground.clruch.dispatcher.EdgyDispatcher;
 import playground.clruch.dispatcher.GlobalBipartiteMatchingDispatcher;
+import playground.clruch.dispatcher.KMedianDispatcher;
 import playground.clruch.dispatcher.LPFBDispatcher;
 import playground.clruch.dispatcher.LPFFDispatcher;
 import playground.clruch.dispatcher.NewSingleHeuristicDispatcher;
@@ -131,6 +132,9 @@ public class AVModule extends AbstractModule {
 
         bind(SPLICEDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), SPLICEDispatcher.class.getSimpleName()).to(SPLICEDispatcher.Factory.class);
+
+        bind(KMedianDispatcher.Factory.class);
+        AVUtils.bindDispatcherFactory(binder(), KMedianDispatcher.class.getSimpleName()).to(KMedianDispatcher.Factory.class);
 
         
         
