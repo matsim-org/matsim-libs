@@ -32,4 +32,12 @@ public class EuclideanDistanceFunction implements DistanceFunction {
         
     }
 
+
+	@Override
+	public double getDistance(Link from, Link to) {
+		// TODO Nicolo Added -- needs to be checked
+		  return CoordUtils.calcEuclideanDistance(from.getCoord(), 
+				  to.getCoord());
+	}
+
 }

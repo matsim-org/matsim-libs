@@ -25,6 +25,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.dispatcher.utils.BipartiteMatchingUtils;
 import playground.clruch.dispatcher.utils.DistanceFunction;
 import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
+import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 
@@ -34,28 +35,18 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
  */
 public class StackerCraneTour {
 	// Fields
-	private final DistanceFunction distancer;
-
-	// Constructor
-	public StackerCraneTour(DistanceFunction distancer) {
+	private List<AVRequest> scTAVrequests = new ArrayList<AVRequest>();
+	private final NetworkDistanceFunction distancer;
+	
+	public StackerCraneTour(List<AVRequest> scTAVrequests, NetworkDistanceFunction distancer) {
+		super();
+		this.scTAVrequests = scTAVrequests;
 		this.distancer = distancer;
-
 	}
-
-	// METHODS ------- CALLABLE
-
-	public double calculate(Collection<AVRequest> requests) {
-		// double length = BPM(requests);
-		BPM(requests);
-
-		double length = 5;
-		System.out.println("Length of SCT = " + length);
-		return length;
-	}
-
-	// INTERNAL
-
-	private void BPM(Collection<AVRequest> requests) {
+	
+	// External
+	// Calculate Stacker crane tour
+	public List<AVRequest> calculate(Collection<AVRequest> requests) {
 
 		// since Collection::iterator does not make guarantees about the order we store
 		// the pairs in a list
@@ -67,8 +58,7 @@ public class StackerCraneTour {
 		final int m = ordered_requests.size(); // jobs
 
 		final double[][] requestsDistMatrix = new double[n][m];
-		double lengthAvReq = 0.0; // Added N
-
+		double lengthAvReq = 0.0; // 
 		int i = -1;
 		for (AVRequest avRequest : ordered_requests) {
 			++i;
@@ -80,13 +70,11 @@ public class StackerCraneTour {
 				// Calculate distance between Dropoff and pickup also including same request -
 				// i.e. sometimes might have only one request or create single subtours?
 				if (avRequest.getId() == avRequest2.getId()) {
-					// for (int k = 0; k <= m-1; k++){
 					// Set distance from i to j (if equal i.e. same dropoff and pickup of same
 					// request) to inf,
 					// not to create single subtours.
-					requestsDistMatrix[i][++j] = 99999999; // distancer.getDistance(DropOff, PickUp);
-					// }
-					lengthAvReq += distancer.getDistance(DropOff, PickUp);
+					requestsDistMatrix[i][++j] = 99999999; 
+					lengthAvReq += distancer.getDistance(DropOff, PickUp); // unused for now
 				} else {
 					requestsDistMatrix[i][++j] = distancer.getDistance(DropOff, PickUp);
 				}
@@ -105,7 +93,9 @@ public class StackerCraneTour {
 
 		HashMap<Integer, ArrayList<Integer>> subtMap = checkForSubtours(requestsDistMatrix, matchinghungarianAlgorithm,
 				ordered_requests);
+		
 		ArrayList<Integer> scTour = new ArrayList<Integer>();
+		// if many subt ---> rewire, else convert hashmap to array
 		if (subtMap.size() > 1) {
 
 			scTour = rewire(subtMap, requestsDistMatrix);
@@ -113,87 +103,81 @@ public class StackerCraneTour {
 			scTour = fromHashtoIntArray(subtMap);
 
 		}
-	
+		
+		scTAVrequests = fromIntSctToAVsct (scTour, ordered_requests);
+		return scTAVrequests;
 
-	//
-	// do the assignment according to the Hungarian algorithm (only for the
-	// matched elements, otherwise keep current drive destination)
-	// final Map<RoboTaxi, AVRequest> map = new HashMap<>();
-	// i = -1;
-	// for (RoboTaxi vehicleLinkPair : ordered_vehicleLinkPairs) {
-	// ++i;
-	// if (0 <= matchinghungarianAlgorithm[i]) {
-	// map.put(vehicleLinkPair,
-	// ordered_requests.get(matchinghungarianAlgorithm[i]));
-	// }
-	// }
-	//
-	// GlobalAssert.that(map.size() == Math.min(n, m));
-	// return map;
+	}
+	
+	
+	//--------------------------- Internal
+	// Get indexes of requests every 2 as scTour (arraylist) is in the format 0,2,2,3,3,6,6,...
+	private List<AVRequest> fromIntSctToAVsct (ArrayList<Integer> scTour, List<AVRequest> ordered_requests) {
+		ArrayList<AVRequest> scTAVrequests = new ArrayList<AVRequest>();
+			for(int i = 0; i< scTour.size(); i = i+2) {
+				scTAVrequests.add(ordered_requests.get(scTour.get(i)));
+			}
+		return scTAVrequests;	
 	}
 
+	
 	private HashMap<Integer, ArrayList<Integer>> checkForSubtours(double[][] requestsDistMatrix,
 			int[] matchinghungarianAlgorithm, Collection<AVRequest> requests) {
 
-		// Create HasMap<KEY,VALUE> to store key and value pairs. Doesn't hold order.
+		// Create HasMap<KEY,VALUE> to store key and value pairs. 
 		HashMap<Integer, ArrayList<Integer>> subtourMap = new HashMap<Integer, ArrayList<Integer>>();
-		HashMap<Integer, ArrayList<AVRequest>> subtourMap2 = new HashMap<Integer, ArrayList<AVRequest>>();
 
 		ArrayList<Integer> bpMatchingOut = new ArrayList<Integer>();
 		ArrayList<Integer> expandedRequests = new ArrayList<Integer>();
-
-		ArrayList<AVRequest> ordered_requests = new ArrayList<>(requests);
-		// Array to hold requests forming up a subtour
-		ArrayList<AVRequest> requestsSubT = new ArrayList<AVRequest>();
-		// Create array list with Av request indeces
-		for (int m = 0; m < matchinghungarianAlgorithm.length; m++) {
-			// array to hold hungarian algorithm output intact
+		
+		// --------Could also create arrays of requests directly instead of integers
+//		ArrayList<AVRequest> ordered_requests = new ArrayList<>(requests);
+//		// Array to hold requests forming up a subtour
+//		ArrayList<AVRequest> requestsSubT = new ArrayList<AVRequest>();
+		// --------
+		
+		// Fill in array lists with Av request indexes
+for (int m = 0; m < matchinghungarianAlgorithm.length; m++) {
+			// one to hold hungarian algorithm output intact
 			bpMatchingOut.add(matchinghungarianAlgorithm[m]);
-			// array to keep track of requests already expanded
+			// one to keep track of requests already expanded
 			expandedRequests.add(matchinghungarianAlgorithm[m]);
 
 		}
-		System.out.println("Currently the indecesArray list has following elements:" + bpMatchingOut);
+//		System.out.println("Currently the indecesArray list has following elements:" + bpMatchingOut);
+
 		boolean subtourend = false;
 		int k = 0;
 		int j = 0;
-		// Add new arraylist in map numbered with key
-		// i.e. subtour 1 (=key) and arraylist (= av requests dropff, pickup)
-		subtourMap.put(j, new ArrayList<Integer>());
-		// Maybe should first write array lists and then add them to the hashmap
+				
+		// First write array lists and then add them to the hashmap
+		// i.e. subtour 1 (=key) and arraylist (= av requests dropoff, pickup)
 		ArrayList<Integer> intSTour = new ArrayList<Integer>();
 
 		while (subtourend == false) {
 
-			// set index to -1 to accessed requests in 2nd array of indeces.
+			// set index to -1 to accessed requests in 2nd array of indexes.
 			expandedRequests.set(k, -1);
-			System.out.println("Removed " + k + " from indecesArray2 which has now" + "the following elements:"
-					+ expandedRequests);
+//			System.out.println("Removed " + k + " from indecesArray2 which has now" + "the following elements:"
+//					+ expandedRequests);
 
-			// Add requests as AV requests and as integeres-- still have to decide which
-			// format to use for later.
-			// i.e. These arrays hold the subtours in different format
-			requestsSubT.add(ordered_requests.get(k));
-			requestsSubT.add(ordered_requests.get(matchinghungarianAlgorithm[k]));
-
+			// Add requests as integers 
 			intSTour.add(k);
 			intSTour.add(bpMatchingOut.get(k));
 			// System.out.println("HashMap Elements: " + subtourMap);
 
-			System.out.println("Firs index of array " + bpMatchingOut.get(0));
-			System.out.println("New one:  " + intSTour);
+//			System.out.println("First index of array " + bpMatchingOut.get(0));
+//			System.out.println("New one:  " + intSTour);
 
 			// If arraylist has equal first and last value --> Subtour
 			if (intSTour.get(0) == intSTour.get(intSTour.size() - 1)) {
-				// Add Subtour to integer and AVrequest maps.
+				// Add Subtour to integer map.
 				subtourMap.put(j, intSTour);
-				subtourMap2.put(j, requestsSubT);
-				// Clear subt and requestsSubT
+				// Clear subt 
 				intSTour = new ArrayList<Integer>();
-				requestsSubT = new ArrayList<AVRequest>();
 
 				boolean found = false;
-				// Loop through indeces and find first one that is not -1.
+				// Loop through indexes and find first one that is not -1.
 				for (Integer a : expandedRequests) {
 					if (a > 0 && found == false) {
 						// Set k equal to the index of the first value not equal to -1 in expanded req.
@@ -205,15 +189,15 @@ public class StackerCraneTour {
 
 			} else {
 				// If subtour extraction is still ongoing then get next value.
-				// Indeces and values are related. i.e. at index 0 you could have value 2;
+				// Indexes and values are related. i.e. at index 0 you could have value 2;
 				// meaning the subtour consists of starting from the 0th request dropoff and
-				// moving to the second one. Hence at index = 2 there will be eiher a 0 i.e.
+				// moving to the second one for pickup. Hence at index = 2 there will be eiher a 0 i.e.
 				// the subtour is finished, or another number, meaning it continues to another
 				// request.
 				k = bpMatchingOut.get(k);
 			}
 
-			// Check if all indecesArray2 are = to -1 i.e. all nodes have been checked.
+			// Check if all expandedRequests are = to -1 i.e. all nodes have been checked.
 			if (expandedRequests.stream().distinct().limit(2).count() <= 1) {
 				subtourend = true;
 
@@ -222,54 +206,53 @@ public class StackerCraneTour {
 		}
 
 		System.out.println("Subtour Map with subtours of requests as integers: " + subtourMap);
-		// System.out.println("Subtour Map 2 with subtours of requests as AV requests: "
-		// + subtourMap2);
-		System.out.println("Found " + subtourMap2.size() + " Subtours!!!");
+		System.out.println("Found " + subtourMap.size() + " Subtours!!!");
 
 		return subtourMap;
 	}
 
-	// Need this method for rewiring after creating subtours
+	// Need this method for rewiring after creating subtours ie. stitching subtours together
 	private ArrayList<Integer> rewire(HashMap<Integer, ArrayList<Integer>> subtourMap, double[][] requestsDistMatrix) {
 
 		// ArrayList<AVRequest> totalSubt = new ArrayList<AVRequest>();
 		// Initialize set S that will hold all the subtours one after the other.
 		ArrayList<Integer> setS = new ArrayList<Integer>();
 		// Get random number to choose randomly link to be opened to connect subtours.
-		final Random randomGenerator;
-		randomGenerator = new Random();
-		// int k = subtourMap.size(); // no of subtours
+		//final Random randomGenerator;
+		//randomGenerator = new Random();
+		
+		//Not used, using arbitrary index choice
 
 		int i = 0;
 		int sizeStours[] = new int[subtourMap.size()]; // To hold sizes of subtours
+		
 		for (Entry<Integer, ArrayList<Integer>> entry : subtourMap.entrySet()) {
 			ArrayList<Integer> v = entry.getValue();
 			GlobalAssert.that(v.size() >= 4); // Check that subtours have at least 2 requests
 			sizeStours[i] = v.size();
-			setS.addAll(v); // Add them all up to for the set S
+			setS.addAll(v); // Add them all up to in the set S
 			i++;
 		}
 
-		// index oof arbitraty (random) delivery site in S1
-		int index = randomGenerator.nextInt(sizeStours[1] / 2) * 2;
+		// index of initial arbitrary delivery site in S1
+		int index = 2;//randomGenerator.nextInt(sizeStours[1] / 2) * 2;
 		// Base is the request index from which the 1st subtour (S1) is opened
 		int base = setS.get(index);
-		System.out.println("Subtour set S : " + setS);// + " , opened the link " + base);
+		System.out.println("Subtour set S : " + setS);
 		int prev = base; //
 		// Start subtour index
 		int startSInd = sizeStours[0];
-		// Array with distance to pickup from chosen delivery point
+		// Array with distance to pickup from chosen delivery point & temp lists
 		ArrayList<Integer> dtoNext = new ArrayList<Integer>();
 		ArrayList<Integer> tmpSTList = new ArrayList<Integer>();
 		ArrayList<Integer> tmpSTListOrder = new ArrayList<Integer>();
-		ArrayList<Integer> scTour = new ArrayList<Integer>(); // Stacker crane tour stored here
+		ArrayList<Integer> scTour = new ArrayList<Integer>(); // Final Stacker crane tour stored here
 		scTour.addAll(setS.subList(0, sizeStours[0])); // Add S1 in scTour
 
-		int next = 0; // TO be use
 		// Do for all subtours
 		for (int k = 0; k < subtourMap.size() - 1; k++) {
 
-			// Loop through the S (k+1) subtour within the setS array.. have to start from 1
+			// Loop through the S (k+1) subtour within the setS array.. need to start from [1]
 			// rather than [0]
 			// as subtours are always labelled D,P,D,P,D,P,D,P... where D = dropoff integer
 			// and P = pickup.
@@ -280,11 +263,12 @@ public class StackerCraneTour {
 				// System.out.println("Chosen " + dtoNext);
 			}
 			// System.out.println("Min v: " + Collections.min(dtoNext));
-			// Find index of pickup site closest to to y_prev by looping through the
+			
+			// Find index of pickup site closest to y prev (dropoff site) by looping through the
 			// distances to y_prev i.e.
-			// prev variable. add the +1)*2-1 to correct for the different indexing as in
+			// prev variable. Add the +1)*2-1 to correct for the different indexing as in
 			// for loop -->i = i+2.
-			// reorder_index --> next in paper.
+			// reorder_index --> next in paper doi. 10.1109/CDC.2011.6161406
 			int reorder_index = (dtoNext.indexOf(Collections.min(dtoNext)) + 1) * 2 - 1;
 
 			// create a temporary subtour list to have that can be reordered depending on
@@ -294,7 +278,8 @@ public class StackerCraneTour {
 			// Merge to current arraylist
 			scTour.addAll(index + 1, tmpSTListOrder);
 			// System.out.println("Current SCT: " + scTour);
-			// set prev -- i.e. b getting x_next i.e. where the next branch is added.
+			
+			// set prev -- i.e. by getting x_next i.e. where the next branch is added.
 			// This is found by getting the last value on the ordered subtour list i.e.
 			// it corresponds to the request dropoff before x_next
 			prev = tmpSTListOrder.get(tmpSTListOrder.size() - 1);
