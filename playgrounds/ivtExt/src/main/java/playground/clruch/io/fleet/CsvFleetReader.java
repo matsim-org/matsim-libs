@@ -26,8 +26,10 @@ public class CsvFleetReader {
 
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 {
-                    String line = br.readLine();
-                    List<String> list = CSVUtils.csvLineToList(line, ";");
+//                    String line = br.readLine();
+                    String realHeader = "LATITUDE LONGITUDE OCCUPANCY TIME"; // TODO remove magic const.
+                    String line = realHeader;
+                    List<String> list = CSVUtils.csvLineToList(line, " ");
                     int count = 0;
                     System.out.println("CSV HEADER");
                     for (String token : list) {
@@ -39,9 +41,9 @@ public class CsvFleetReader {
                     String line = br.readLine();
                     if (Objects.isNull(line))
                         break;
-                    List<String> list = CSVUtils.csvLineToList(line, ";");
+                    List<String> list = CSVUtils.csvLineToList(line, " ");
                     dayTaxiRecord.insert(list);
-                    dayTaxiRecord.lastTimeStamp = list.get(0);
+                    dayTaxiRecord.lastTimeStamp = list.get(3);
                     ++dataline;
                 }
             } finally {
@@ -65,7 +67,16 @@ public class CsvFleetReader {
         // }
 
         // Going through all timestamps and check for offservice vehicles && parse requests
-        final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
+        
+        
+        // TODO put both time we did this in one function, no double code
+        final int MAXTIME = (int) Long.parseLong(dayTaxiRecord.lastTimeStamp)/1000;
+
+                
+                
+        //        dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
+        
+        // OLD final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
         final int TIMESTEP = 10;
 
         System.out.println("INFO Checking for OFFSERVICE & RequestStatus for " + dayTaxiRecord.size() + " vehicles...");

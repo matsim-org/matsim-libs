@@ -16,28 +16,30 @@ public class DayTaxiRecord {
     public final Set<String> status = new HashSet<>();
 
     public void insert(List<String> list) {
-        final String timeStamp = list.get(0);
+        final String timeStamp = list.get(3);
 
         System.out.println("INFO reading " + timeStamp);
         // final long taxiStamp_millis = DateParser.from(timeStamp);
         // System.out.println("2 " + taxiStamp_millis);
 
-        long cmp = DateParser.from(timeStamp.substring(0, 11) + "00:00:00");
+        long cmp = Long.parseLong(timeStamp) * 1000;
+        // DateParser.from(timeStamp.substring(0, 11) + "00:00:00");
         if (midnight == null) {
             midnight = cmp;
             System.out.println("midnight=" + midnight);
         } else {
             if (midnight != cmp) {
-                System.out.println("drop " + timeStamp);
+
                 // throw new RuntimeException();
             }
         }
 
-        final int taxiStamp_id = vehicleIdIntegerDatabase.getId(list.get(1));
+        final int taxiStamp_id =  0; // TODO add ids from the _cabs.txt file
+        // vehicleIdIntegerDatabase.getId(list.get(1));
         if (taxiStamp_id == trails.size())
             trails.add(new TaxiTrail());
 
-        trails.get(taxiStamp_id).insert(getNow(timeStamp), list);
+        trails.get(taxiStamp_id).insert((int)cmp, list);
         status.add(list.get(3));
     }
 
@@ -48,6 +50,7 @@ public class DayTaxiRecord {
         return now;
     }
 
+    
     public int size() {
         return trails.size();
     }

@@ -20,10 +20,11 @@ public class TaxiTrail {
 
     public void insert(int now, List<String> list) {
         TaxiStamp taxiStamp = new TaxiStamp();
-        taxiStamp.avStatus = StringStatusMapper.apply(now, list.get(3), list.get(4), list.get(5));
+        taxiStamp.avStatus = AVStatus.DRIVEWITHCUSTOMER; // TODO make the real status here. 
+        //StringStatusMapper.apply(now, list.get(3), list.get(4), list.get(5));
         taxiStamp.gps = new Coord( //
-                Double.parseDouble(list.get(10)), //
-                Double.parseDouble(list.get(11)));
+                Double.parseDouble(list.get(0)), //
+                Double.parseDouble(list.get(1)));
 
         if (sortedMap.containsKey(now)) {
             System.err.println("override");

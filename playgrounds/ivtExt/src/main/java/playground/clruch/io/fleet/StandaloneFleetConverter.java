@@ -8,8 +8,9 @@ import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-
+import playground.clruch.ScenarioOptions;
 import playground.clruch.utils.NetworkLoader;
+import playground.clruch.utils.PropertiesExt;
 
 /** @author Claudio Ruch */
 enum StandaloneFleetConverter {
@@ -22,15 +23,22 @@ enum StandaloneFleetConverter {
         // File directory = //
         // new File("/home/andya/Desktop/idsc_st/10_Daten/2017-10-11_ZurichNew");
 
-        File simulationDirectory = MultiFileTools.getWorkingDirectory();
-        
-        File outputDirectory = new File(simulationDirectory, "output");
-        File configFile = new File(outputDirectory, "av_config.xml");        
-        System.out.println("INFO working folder: " + outputDirectory.getAbsolutePath());
-        System.out.println("INFO network file: " + configFile.getAbsolutePath());
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
+        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
+        GlobalAssert.that(configFile.exists());
         Network network = NetworkLoader.loadNetwork(configFile);
         GlobalAssert.that(network!=null);
-        System.out.println("networ has " + network.getNodes().size() + " nodes");
+        System.out.println("network has " + network.getNodes().size() + " nodes");        
+
+        
+//        File outputDirectory = new File(simulationDirectory, "output");
+//
+//        System.out.println("INFO working folder: " + outputDirectory.getAbsolutePath());
+//        System.out.println("INFO network file: " + configFile.getAbsolutePath());
+//        
+//        GlobalAssert.that(network!=null);
+
         
         
 //        ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;

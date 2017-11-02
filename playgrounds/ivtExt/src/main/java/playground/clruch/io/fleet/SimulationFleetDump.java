@@ -13,6 +13,7 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensors;
+import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RequestStatus;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.RequestContainer;
@@ -30,7 +31,7 @@ enum SimulationFleetDump {
             StorageUtils storageUtils) {
 
         // final int MAXTIME = 180000; // TODO magic const take this end time from the last info in the file...
-        final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
+        final int MAXTIME = (int) Long.parseLong(dayTaxiRecord.lastTimeStamp)/1000;
         final int TIMESTEP = 10;
 
         final double[] networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
@@ -73,7 +74,7 @@ enum SimulationFleetDump {
                     VehicleContainer vc = new VehicleContainer();
                     vc.vehicleIndex = vehicleIndex;
                     vc.linkIndex = linkIndex;
-                    vc.avStatus = taxiStamp.avStatus;
+                    vc.avStatus = AVStatus.DRIVETOCUSTOMER; // TODO change this hack later...  = taxiStamp.avStatus;
 
                     // Parse requests
                     RequestContainerUtils rcParser = new RequestContainerUtils(taxiTrail);
