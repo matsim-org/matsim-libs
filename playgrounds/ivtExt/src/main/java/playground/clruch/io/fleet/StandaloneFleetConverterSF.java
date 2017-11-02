@@ -23,6 +23,7 @@ import ch.ethz.idsc.queuey.datalys.csv.CSVUtils;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.ScenarioOptions;
 import playground.clruch.data.ReferenceFrame;
+import playground.clruch.net.IdIntegerDatabase;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageUtils;
 import playground.clruch.utils.NetworkLoader;
@@ -62,7 +63,7 @@ enum StandaloneFleetConverterSF {
         }
         
         List<File> trailFiles = new ArrayList<>();
-        for(int i = 0; i < 5; ++i){
+        for(int i = 0; i < 30; ++i){
             trailFiles.add(trailFilesComplete.get(i*5));
         }
         trailFiles.add(trailFilesComplete.get(1));
@@ -72,6 +73,8 @@ enum StandaloneFleetConverterSF {
         // TODO preprocess the taxi files and add one line with headers to each file
 
         ReferenceFrame referenceFrame = ReferenceFrame.IDENTITY;
+        
+        IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();        
         DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
         // extract data from file and put into dayTaxiRecord
         CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);

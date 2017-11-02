@@ -22,11 +22,12 @@ public class CsvFleetReader {
         files.stream().forEach(f -> GlobalAssert.that(f.isFile()));
         int dataline = 0;
         dayTaxiRecord.lastTimeStamp = null;
+        int idcounter = 0; // TODO do more elegant with the database!
         for (File file : files) {
 
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 {
-//                    String line = br.readLine();
+                    // String line = br.readLine();
                     String realHeader = "LATITUDE LONGITUDE OCCUPANCY TIME"; // TODO remove magic const.
                     String line = realHeader;
                     List<String> list = CSVUtils.csvLineToList(line, " ");
@@ -42,13 +43,14 @@ public class CsvFleetReader {
                     if (Objects.isNull(line))
                         break;
                     List<String> list = CSVUtils.csvLineToList(line, " ");
-                    dayTaxiRecord.insert(list);
+                    dayTaxiRecord.insert(list, idcounter);
                     dayTaxiRecord.lastTimeStamp = list.get(3);
                     ++dataline;
                 }
             } finally {
                 // ...
             }
+            ++idcounter;
         }
 
         // // Writing each TaxiTrail to a file to check output
@@ -67,15 +69,12 @@ public class CsvFleetReader {
         // }
 
         // Going through all timestamps and check for offservice vehicles && parse requests
-        
-        
-        // TODO put both time we did this in one function, no double code
-        final int MAXTIME = (int) Long.parseLong(dayTaxiRecord.lastTimeStamp)/1000;
 
-                
-                
-        //        dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
-        
+        // TODO put both time we did this in one function, no double code
+        final int MAXTIME = (int) Long.parseLong(dayTaxiRecord.lastTimeStamp) / 1000;
+
+        // dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
+
         // OLD final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
         final int TIMESTEP = 10;
 
@@ -85,7 +84,7 @@ public class CsvFleetReader {
                 System.out.println("now=" + now);
             for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
                 TaxiTrail taxiTrail = dayTaxiRecord.get(vehicleIndex);
-                
+
                 // Check and propagate offservice status
                 taxiTrail.checkOffService(now);
                 taxiTrail.setRequestStatus(now, RequestStatusParser.parseRequestStatus(now, taxiTrail));

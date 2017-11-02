@@ -23,8 +23,8 @@ public class TaxiTrail {
         taxiStamp.avStatus = AVStatus.DRIVEWITHCUSTOMER; // TODO make the real status here. 
         //StringStatusMapper.apply(now, list.get(3), list.get(4), list.get(5));
         taxiStamp.gps = new Coord( //
-                Double.parseDouble(list.get(0)), //
-                Double.parseDouble(list.get(1)));
+                Double.parseDouble(list.get(1)), //
+                Double.parseDouble(list.get(0)));
 
         if (sortedMap.containsKey(now)) {
             System.err.println("override");
