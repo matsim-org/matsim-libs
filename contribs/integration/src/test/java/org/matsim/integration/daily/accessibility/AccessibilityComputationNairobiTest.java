@@ -67,9 +67,8 @@ public class AccessibilityComputationNairobiTest {
 		boolean createQGisOutput = true; // Set false for run on server
 
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
-		// Notation: minX, maxX, minY, maxY
-		Envelope envelope = new  Envelope(240000, 280000, 9844000, 9874000); // whole Nairobi
-//		Envelope envelope = new  Envelope(246000, 271000, 9853000, 9863000); // whole Nairobi // central part
+		Envelope envelope = new Envelope(240000, 280000, 9844000, 9874000); // whole Nairobi
+//		Envelope envelope = new Envelope(246000, 271000, 9853000, 9863000); // whole Nairobi // central part
 //		Envelope envelope = new Envelope(251800.0, 258300.0, 9854300.0, 9858700.0); // City center and Kibera for minibus caluclation
 		String scenarioCRS = "EPSG:21037"; // EPSG:21037 = Arc 1960 / UTM zone 37S, for Nairobi, Kenya
 		
@@ -171,19 +170,11 @@ public class AccessibilityComputationNairobiTest {
 //		scenario.setTransitSchedule(schedule);
 //		scenario.setTransitVehicles(vehicles);
 		
-		// Activity types
 //		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING, FacilityTypes.EDUCATION});
 //		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING});
 		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.WORK});
-//		activityTypes.add("Commercial"); // land-use file version
-//		activityTypes.add("Industrial"); // land-use file version
-//		activityTypes.add("Public Purpose"); // land-use file version
-//		activityTypes.add("Recreational"); // land-use file version
-		log.info("Using activity types: " + activityTypes);
 
-		// Network density points (as proxy for population density)
-		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(scenario.getNetwork());
-		// will be aggregated in downstream code!
+		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(scenario.getNetwork()); // Will be aggregated in downstream code!
 
 		final Controler controler = new Controler(scenario);
 
@@ -197,7 +188,6 @@ public class AccessibilityComputationNairobiTest {
 
 		controler.run();
 
-		// QGis
 		if (createQGisOutput) {
 			final boolean includeDensityLayer = true;
 			final Integer range = 9; // In the current implementation, this must always be 9
@@ -211,8 +201,7 @@ public class AccessibilityComputationNairobiTest {
 				String actSpecificWorkingDirectory = workingDirectory + actType + "/";
 				for (Modes4Accessibility mode : acg.getIsComputingMode()) {
 					VisualizationUtils.createQGisOutputGraduatedStandardColorRange(actType, mode.toString(), envelope, workingDirectory,
-							scenarioCRS, includeDensityLayer, lowerBound, upperBound, range, cellSize.intValue(),
-							populationThreshold);
+							scenarioCRS, includeDensityLayer, lowerBound, upperBound, range, cellSize.intValue(), populationThreshold);
 					VisualizationUtils.createSnapshot(actSpecificWorkingDirectory, mode.toString(), osName);
 				}
 			}
