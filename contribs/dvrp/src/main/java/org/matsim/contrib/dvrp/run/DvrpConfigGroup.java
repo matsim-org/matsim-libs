@@ -21,6 +21,7 @@ package org.matsim.contrib.dvrp.run;
 
 import java.util.Map;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.*;
 
 public class DvrpConfigGroup extends ReflectiveConfigGroup {
@@ -36,7 +37,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	public static final String TRAVEL_TIME_ESTIMATION_ALPHA = "travelTimeEstimationAlpha";
 
 	private String mode = null; // travel mode (passengers'/customers' perspective)
-	private String networkMode = null; // used for building routes, calculating travel times, etc.
+	private String networkMode = TransportMode.car; // used for building routes, calculating travel times, etc.
 										// (dispatcher's perspective)
 	private double travelTimeEstimationAlpha = 0.05; // between 0 and 1; 0=> no averaging, only the initial time is used
 
@@ -52,7 +53,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 		map.put(NETWORK_MODE,
 				"Mode of which the network will be used for routing vehicles, calculating trave times, "
 						+ "etc. (fleet operator's perspective). "
-						+ "If null, no mode filtering is done; the standard network (Scenario.getNetwork()) is used");
+						+ "Default is car.");
 		map.put(TRAVEL_TIME_ESTIMATION_ALPHA,
 				"Used for estimation of travel times for VrpOptimizer by means of the exponential moving average."
 						+ " The weighting decrease, alpha, must be in (0,1]."

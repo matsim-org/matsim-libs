@@ -20,6 +20,7 @@
 package org.matsim.contrib.taxi.benchmark;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
 import org.matsim.core.config.Config;
@@ -44,7 +45,7 @@ public class TaxiBenchmarkConfigConsistencyChecker implements ConfigConsistencyC
 			log.warn("FlowCapFactor should be large enough (e.g. 100) to obtain deterministic travel times");
 		}
 
-		if (config.network().isTimeVariantNetwork() && DvrpConfigGroup.get(config).getNetworkMode() != null) {
+		if (config.network().isTimeVariantNetwork() && DvrpConfigGroup.get(config).getNetworkMode() != TransportMode.car) {
 			throw new RuntimeException("The current version of RunTaxiBenchmark does not support this case: "
 					+ "@Named(DvrpModule.DVRP_ROUTING) Network would consists of links having "
 					+ "VariableIntervalTimeVariantAttributes instead of FixedIntervalTimeVariantAttributes.");
