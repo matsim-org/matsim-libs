@@ -23,8 +23,8 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 
 /** main entry point */
-@Deprecated
-public class RunAVScenario {
+@Deprecated 
+public class RunAVScenario { // TODO JOEL is the class still needed? if not, please delete
     public static void main(String[] args) throws MalformedURLException {
         File configFile = new File("C:/Users/Joel/Documents/Studium/ETH/Bachelorarbeit/Simulation_Data/2017_03_22_Sioux_Hungarian_check1av/av_config.xml");
         final File dir = configFile.getParentFile();

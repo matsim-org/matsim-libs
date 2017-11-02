@@ -25,7 +25,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /** Empty Test Dispatcher, rebalances a vehicle every 30 mins and
- * performs a pickup every 30 mins if open reqeutss are present.
+ * performs a pickup every 30 mins if open requests are present.
  * Not functional, use as startpoint to build your own dispatcher.
  * 
  * @author Claudio Ruch */
@@ -53,7 +53,7 @@ public class SPLICEDispatcher extends RebalancingDispatcher {
 
         System.out.println("nicoloFactor =" + nicoloFactor);
 
-        // TestBedDispatcher implemenatation
+        // TestBedDispatcher implementation
         final long round_now = Math.round(now);
         if (round_now % rebalancingPeriod == 0 && 0 < getAVRequests().size()) {
             
