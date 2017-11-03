@@ -75,9 +75,9 @@ public class CsvFleetReader {
                 taxiTrail.checkOffService(now);
             }
 
-            System.out.println("Found keyset for vehicle " + vehicleIndex + ": " + dayTaxiRecord.get(vehicleIndex).getKeySet().toString());
+            // System.out.println("Found keyset for vehicle " + vehicleIndex + ": " + dayTaxiRecord.get(vehicleIndex).getKeySet().toString());
             for (Integer now : dayTaxiRecord.get(vehicleIndex).getKeySet()) {
-                System.out.println("Parsing requestStatus for vehicle " + vehicleIndex + " at time " + now);
+                // System.out.println("Parsing requestStatus for vehicle " + vehicleIndex + " at time " + now);
                 taxiTrail.setRequestStatus(now, RequestStatusParser.parseRequestStatus(now, taxiTrail));
 
                 // Writing each TaxiTrail to a file to check output

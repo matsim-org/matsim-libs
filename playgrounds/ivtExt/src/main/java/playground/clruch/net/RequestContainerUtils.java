@@ -19,7 +19,7 @@ public class RequestContainerUtils {
     }
 
     public boolean isValidRequest(int now) {
-        System.out.println("Checking if request is valid at time: " + now);
+        // System.out.println("Checking if request is valid at time: " + now);
         RequestStatus requestStatus = taxiTrail.interp(now).getValue().requestStatus;
         if (requestStatus != RequestStatus.EMPTY) {
             if (findSubmissionTime(now) >= 0 && (propagateTo(now, RequestStatus.DROPOFF) >= 0 || propagateTo(now, RequestStatus.CANCELLED) >= 0))
@@ -61,18 +61,22 @@ public class RequestContainerUtils {
         RequestStatus requestStatus = taxiTrail.interp(now).getValue().requestStatus;
         // System.out.println("Trying to find: " + requestedStatus.toString() + " from " + requestStatus.toString());
 
-        if (requestStatus != RequestStatus.EMPTY && requestStatus != RequestStatus.CANCELLED) {
+        if (requestStatus != RequestStatus.EMPTY) {
             if (requestedStatus.compareTo(requestStatus) > 0) {
                 if (Objects.nonNull(requestStatus = taxiTrail.getNextEntry(now).getValue().requestStatus)) {
                     int nextTimeStep = taxiTrail.getNextEntry(now).getKey();
                     return propagateTo(nextTimeStep, requestedStatus);
                 }
+                else 
+                    return -1;
                 // System.err.println("WARN getNextEntry is null");
             } else if (requestedStatus.compareTo(requestStatus) < 0) {
                 if (Objects.nonNull(requestStatus = taxiTrail.getLastEntry(now).getValue().requestStatus)) {
                     int nextTimeStep = taxiTrail.getLastEntry(now).getKey();
                     return propagateTo(nextTimeStep, requestedStatus);
                 }
+                else
+                    return -1;
                 // System.err.println("WARN getLastEntry is null");
             } else if (requestedStatus == requestStatus)
                 // System.out.println("INFO Found requestStatus: " + requestedStatus.toString());
