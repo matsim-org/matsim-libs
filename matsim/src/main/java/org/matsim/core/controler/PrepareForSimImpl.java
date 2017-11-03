@@ -61,8 +61,6 @@ class PrepareForSimImpl implements PrepareForSim {
 		this.tripRouterProvider = tripRouterProvider;
 		this.qSimConfigGroup = qSimConfigGroup;
 		this.facilitiesConfigGroup = facilitiesConfigGroup;
-
-
 	}
 
 
@@ -88,8 +86,6 @@ class PrepareForSimImpl implements PrepareForSim {
 		//matsim-724
 		if ( activityFacilities.getFacilities().isEmpty() && // skip if facilities already exists
 				facilitiesConfigGroup.isCreatingFacilities()) {
-			// I think, following may fail if multiple user groups are used and one of the user group does not have coordinates for the activities.
-			// For this, these options could be user group specific. Amit Nov'17
 			FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(activityFacilities);
 			facilitiesFromPopulation.setIdPrefix(facilitiesConfigGroup.getIdPrefix());
 			facilitiesFromPopulation.setOneFacilityPerLink(facilitiesConfigGroup.isOneFacilityPerLink());
@@ -125,7 +121,7 @@ class PrepareForSimImpl implements PrepareForSim {
 								vehicleId = route.getVehicleId(); // may be null!
 							} else {
 								throw new RuntimeException("Route not found.  Possible reason: leg did not have "
-										+ "activites with locations at both ends (e.g. plan ends with leg).");
+										+ "activities with locations at both ends (e.g. plan ends with leg).");
 							}
 
 							if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
