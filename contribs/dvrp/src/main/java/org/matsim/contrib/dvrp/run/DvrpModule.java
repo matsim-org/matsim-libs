@@ -122,18 +122,12 @@ public final class DvrpModule extends AbstractModule {
 
 		@Override
 		public Collection<? extends Module> modules() {
-			Collection<Module> result = new ArrayList<>();
-			result.add(module);
-			return result;
+			return Collections.singletonList(module);
 		}
 
 		@Override
 		public Collection<Class<? extends MobsimListener>> listeners() {
-			Collection<Class<? extends MobsimListener>> result = new ArrayList<>();
-			for (Class<? extends MobsimListener> l : listeners) {
-				result.add(l);
-			}
-			return result;
+			return new ArrayList<>(listeners);
 		}
 	}
 }
