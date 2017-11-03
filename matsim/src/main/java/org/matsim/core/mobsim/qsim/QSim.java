@@ -39,6 +39,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.utils.misc.Time;
@@ -94,7 +95,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	private final EventsManager events;
 
-	private QNetsimEngine netEngine;
+	private NetsimEngine netEngine;
 
 	private final Collection<MobsimEngine> mobsimEngines = new ArrayList<>();
 
@@ -104,7 +105,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	private WithinDayEngine withindayEngine = null;
 
-	private ActivityEngine activityEngine;
+	private ActivityHandler activityEngine;
 
 	private final Date realWorldStarttime = new Date();
 	private double stopTime = 100 * 3600;
@@ -115,7 +116,6 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private final org.matsim.core.mobsim.qsim.AgentCounter agentCounter;
 	private final Map<Id<Person>, MobsimAgent> agents = new LinkedHashMap<>();
 	private final List<AgentSource> agentSources = new ArrayList<>();
-	private TransitQSimEngine transitEngine;
 
 	// for detailed run time analysis
 	public static boolean analyzeRunTimes = false;
@@ -168,6 +168,8 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			QSim.this.activityEngine.rescheduleActivityEnd(agent);
 		}
 	};
+
+	private Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
 
 	@Override
 	public final void rescheduleActivityEnd(MobsimAgent agent) {
@@ -310,7 +312,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 				log.info(entry.getKey().getClass().toString() + " cpu time (nanos): " + entry.getValue().get());				
 			}
 			log.info("");
-			this.netEngine.printEngineRunTimes();
+			if ( this.netEngine instanceof QNetsimEngine ) {
+				((QNetsimEngine)this.netEngine).printEngineRunTimes();
+				// (yy should somehow be in afterSim()).
+			}
 		}
 	}
 
@@ -524,18 +529,24 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	}
 
 	public void addMobsimEngine(MobsimEngine mobsimEngine) {
-		if (mobsimEngine instanceof TransitQSimEngine) {
-			if (this.transitEngine != null) {
-				log.warn("pre-existing transitEngine != null; will be overwritten; with the current design, " +
-						"there can only be one TransitQSimEngine") ;
-			}
-			this.transitEngine = (TransitQSimEngine) mobsimEngine;
+		// yy in all of the instanceof expressions below, the implementation class needs to be replaced
+		// by a meaningful interface.  kai, oct'17
+		
+//		if (mobsimEngine instanceof TransitQSimEngine) {
+//			if (this.transitEngine != null) {
+//				log.warn("pre-existing transitEngine != null; will be overwritten; with the current design, " +
+//						"there can only be one TransitQSimEngine") ;
+//			}
+//			this.transitEngine = (TransitQSimEngine) mobsimEngine;
+//		}
+		if ( mobsimEngine instanceof AgentTracker ) {
+			agentTrackers.add((AgentTracker) mobsimEngine);
 		}
-		if (mobsimEngine instanceof ActivityEngine) {
-			this.activityEngine = (ActivityEngine) mobsimEngine;
+		if (mobsimEngine instanceof ActivityHandler) {
+			this.activityEngine = (ActivityHandler) mobsimEngine;
 		}
-		if (mobsimEngine instanceof QNetsimEngine) {
-			this.netEngine = (QNetsimEngine) mobsimEngine;
+		if (mobsimEngine instanceof NetsimEngine) {
+			this.netEngine = (NetsimEngine) mobsimEngine;
 		}
 		if (mobsimEngine instanceof TeleportationEngine) {
 			this.teleportationEngine = (TeleportationEngine) mobsimEngine;
@@ -578,15 +589,16 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 	}
 
-	/**
-	 * Only OTFVis is allowed to use this. If you want access to the TransitQSimEngine,
-	 * just "inline" the factory method of this class to plug together your own QSim, and you've got it!
-	 * This getter will disappear very soon. michaz 11/11
-	 */
-	@Deprecated
-	public TransitQSimEngine getTransitEngine() {
-		return this.transitEngine;
-	}
+//	/**
+//	 * Only OTFVis is allowed to use this. If you want access to the TransitQSimEngine,
+//	 * just "inline" the factory method of this class to plug together your own QSim, and you've got it!
+//	 * This getter will disappear very soon. michaz 11/11
+//	 */
+//	@Deprecated
+//	public TransitQSimEngine getTransitEngine() {
+//		return this.transitEngine;
+//	}
+	// see new getAgentTrackers method.  kai, nov'17
 
 	@Override
 	public Map<Id<Person>, MobsimAgent> getAgents() {
@@ -612,5 +624,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 				return positions;
 			}
 		};
+	}
+
+	public Collection<AgentTracker> getAgentTrackers() {
+		return Collections.unmodifiableCollection(agentTrackers) ;
 	}
 }

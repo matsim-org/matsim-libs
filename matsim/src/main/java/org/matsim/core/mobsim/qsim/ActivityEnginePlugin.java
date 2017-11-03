@@ -9,7 +9,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class ActivityEnginePlugin extends AbstractQSimPlugin {
+public final class ActivityEnginePlugin extends AbstractQSimPlugin {
 
 	public ActivityEnginePlugin(Config config) {
 		super(config);

@@ -49,6 +49,16 @@ import java.util.List;
 public class TripStructureUtils {
 
     private TripStructureUtils() {}
+    
+    public static Trip getTripStartingFromActivity( final Activity act, final Plan plan, StageActivityTypes stageActivities ) {
+	    List<Trip> trips = getTrips( plan, stageActivities ) ;
+	    for ( Trip trip : trips ) {
+		    if ( trip.getOriginActivity().equals( act ) ) {
+			    return trip ;
+		    }
+	    }
+	    return null ;
+    }
 
 	// also need this for plain old fashioned legs.  kai
     public static List<Leg> getLegs(final Plan plan) {

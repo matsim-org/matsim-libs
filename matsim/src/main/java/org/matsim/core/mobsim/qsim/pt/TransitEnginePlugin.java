@@ -23,7 +23,7 @@ public class TransitEnginePlugin extends AbstractQSimPlugin {
 			@Override
 			protected void configure() {
 				bind(TransitQSimEngine.class).asEagerSingleton();
-				bind(TransitStopHandlerFactory.class).to(ComplexTransitStopHandlerFactory.class).asEagerSingleton();
+//				bind(TransitStopHandlerFactory.class).to(ComplexTransitStopHandlerFactory.class).asEagerSingleton();
 			}
 		});
 		return result;

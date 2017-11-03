@@ -10,7 +10,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsPlugin;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
+import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitEnginePlugin;
+import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLanesNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
@@ -29,6 +31,10 @@ public class QSimModule extends com.google.inject.AbstractModule {
 		} else {
 			bind(QNetworkFactory.class).to( DefaultQNetworkFactory.class ) ;
 		}
+		if ( config.transit().isUseTransit() ) {
+			bind( TransitStopHandlerFactory.class ).to( ComplexTransitStopHandlerFactory.class ) ;
+		}
+		// yy see MATSIM-756
 	}
 
 	@SuppressWarnings("static-method")

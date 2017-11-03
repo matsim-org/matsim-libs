@@ -187,7 +187,8 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	 *
 	 * @param agent The agent.
 	 */
-	void rescheduleActivityEnd(final MobsimAgent agent) {
+	@Override
+	public void rescheduleActivityEnd(final MobsimAgent agent) {
 		double newActivityEndTime = agent.getActivityEndTime();
 		AgentEntry oldEntry = removeAgentFromQueue(agent);
 
