@@ -37,7 +37,7 @@ import org.matsim.facilities.ActivityOption;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 
-public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, Identifiable<Person>, HasPerson, VehicleUsingAgent {
+public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPerson, VehicleUsingAgent {
 	
 	private static final Logger log = Logger.getLogger(BasicPlanAgentImpl.class);
 	private static int finalActHasDpTimeWrnCnt = 0;

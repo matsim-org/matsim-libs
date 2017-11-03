@@ -23,6 +23,7 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.collections.QuadTree;
 
 /**
  * @author nagel
@@ -35,5 +36,9 @@ public interface SearchableNetwork {
 	Node getNearestNode(Coord coord);
 
 	Collection<Node> getNearestNodes(Coord coord, double distance);
+
+	QuadTree<Node> getNodeQuadTree();
+
+	LinkQuadTree getLinkQuadTree();
 
 }

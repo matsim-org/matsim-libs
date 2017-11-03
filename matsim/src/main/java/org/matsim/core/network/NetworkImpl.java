@@ -303,7 +303,13 @@ import java.util.Map;
 			if (link instanceof TimeVariantLinkImpl) {
 				((TimeVariantLinkImpl)link).applyEvent(event);
 			} else {
-				throw new IllegalArgumentException("Link " + link.getId().toString() + " is not TimeVariant.");
+				throw new IllegalArgumentException("Link " + link.getId().toString() + " is not timeVariant. "
+						+ "Did you make the network factory time variant?  The easiest way to achieve this is "
+						+ "either in the config file, or syntax of the type\n"
+						+ "config.network().setTimeVariantNetwork(true);\n"
+						+ "Scenario scenario = ScenarioUtils.load/createScenario(config);\n"
+						+ "Note that the scenario needs to be created _after_ the config option is set, otherwise"
+						+ "the factory will already be there.");
 			}
 		}
 	}
@@ -486,9 +492,13 @@ import java.util.Map;
 			throw new RuntimeException( "Network is locked; too late to do this.  See comments in code.") ;
 		}
 	}
-
-	@Override
-	public Attributes getAttributes() {
+	@Override public Attributes getAttributes() {
 		return attributes;
+	}
+	@Override public final LinkQuadTree getLinkQuadTree() {
+		return this.linkQuadTree ;
+	}
+	@Override public final QuadTree<Node> getNodeQuadTree() {
+		return this.nodeQuadTree ;
 	}
 }

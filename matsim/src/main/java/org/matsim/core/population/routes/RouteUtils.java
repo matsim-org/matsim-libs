@@ -131,7 +131,6 @@ public class RouteUtils {
 		return route.getSubRoute(fromLinkId, toLinkId);
 	}
 
-
 	/**
 	 * Calculates the distance of the complete route, <b>excluding</b> the distance traveled
 	 * on the start- and end-link of the route.

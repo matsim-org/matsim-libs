@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.io;
 
-import net.opengis.kml._2.StyleType;
+import net.opengis.kml.v_2_2_0.StyleType;
 
 /**
  * A KMLObjectStyle is used to define the style type of an object (e.g., a
