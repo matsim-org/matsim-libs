@@ -12,7 +12,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
@@ -28,6 +33,7 @@ import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.FacilitiesFromPopulation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -43,9 +49,10 @@ class PrepareForSimImpl implements PrepareForSim {
 	private final ActivityFacilities activityFacilities;
 	private final Provider<TripRouter> tripRouterProvider;
 	private final QSimConfigGroup qSimConfigGroup;
+	private final FacilitiesConfigGroup facilitiesConfigGroup;
 
 	@Inject
-	PrepareForSimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network, Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider, QSimConfigGroup qSimConfigGroup) {
+	PrepareForSimImpl(GlobalConfigGroup globalConfigGroup, Scenario scenario, Network network, Population population, ActivityFacilities activityFacilities, Provider<TripRouter> tripRouterProvider, QSimConfigGroup qSimConfigGroup, FacilitiesConfigGroup facilitiesConfigGroup) {
 		this.globalConfigGroup = globalConfigGroup;
 		this.scenario = scenario;
 		this.network = network;
@@ -53,6 +60,7 @@ class PrepareForSimImpl implements PrepareForSim {
 		this.activityFacilities = activityFacilities;
 		this.tripRouterProvider = tripRouterProvider;
 		this.qSimConfigGroup = qSimConfigGroup;
+		this.facilitiesConfigGroup = facilitiesConfigGroup;
 
 
 	}
@@ -75,6 +83,19 @@ class PrepareForSimImpl implements PrepareForSim {
 			filter.filter(net, modes);
 		} else {
 			net = network;
+		}
+
+		//matsim-724
+		if (facilitiesConfigGroup.isCreatingFacilities()) {
+			// I think, following may fail if multiple user groups are used and one of the user group does not have coordinates for the activities.
+			// For this, these options could be user group specific. Amit Nov'17
+			FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(activityFacilities);
+			facilitiesFromPopulation.setIdPrefix(facilitiesConfigGroup.getIdPrefix());
+			facilitiesFromPopulation.setOneFacilityPerLink(facilitiesConfigGroup.isOneFacilityPerLink());
+			facilitiesFromPopulation.setRemoveLinksAndCoordinates(facilitiesConfigGroup.isRemovingLinksAndCoordinates());
+			facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(facilitiesConfigGroup.isAssigningLinksToFacilitiesIfMissing(), network);
+			facilitiesFromPopulation.assignOpeningTimes(facilitiesConfigGroup.isAssigningOpeningTime(),scenario.getConfig().planCalcScore());
+			facilitiesFromPopulation.run(population);
 		}
 
 		// make sure all routes are calculated.
@@ -143,9 +164,12 @@ class PrepareForSimImpl implements PrepareForSim {
 		if ( network instanceof Lockable ) {
 			((Lockable) network).setLocked();
 		}
-		
-		// (yyyy means that if someone replaces prepareForSim and does not add the above lines, the containers are not locked.  kai, nov'16)
 
+		if (activityFacilities instanceof  Lockable) {
+			((Lockable) activityFacilities).setLocked();
+		}
+
+		// (yyyy means that if someone replaces prepareForSim and does not add the above lines, the containers are not locked.  kai, nov'16)
 	}
 
 	private void createVehiclesInAdvance(final Map<String, VehicleType> modeVehicleTypes) {
