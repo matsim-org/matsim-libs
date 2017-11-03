@@ -1,6 +1,4 @@
-/**
- * 
- */
+// code by francesco, jph, clruch
 package playground.fseccamo.dispatcher;
 
 import java.util.Collection;
@@ -32,7 +30,6 @@ import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.core.VehicleOnVirtualLinkCalculator;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
-/** @author Claudio Ruch */
 /* package */ class MPCDataCollection {
 
     private final int m;
