@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileReader;
 import ch.ethz.idsc.queuey.util.FileDelete;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.utils.NetworkLoader;
@@ -31,8 +32,8 @@ enum StandaloneFleetConverter {
         System.out.println("INFO network file: " + networkFile.getAbsolutePath());
         ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
         List<File> trailFiles = (new MultiFileReader(simulationDirectory, "Fahrtstrecken")).getFolderFiles();
-        List<DayTaxiRecord> dayTaxiRecords = new ArrayList<DayTaxiRecord>();
-        List<File> outputFolders = new ArrayList<File>();
+        List<DayTaxiRecord> dayTaxiRecords = new ArrayList<>();
+        List<File> outputFolders = new ArrayList<>();
         File outputFolder = new File(simulationDirectory, "output/");
         
         System.err.println("WARN All files in the following folder will be deleted. Hit ENTER key to continue:");
@@ -63,6 +64,7 @@ enum StandaloneFleetConverter {
             outputFolder = new File(simulationDirectory, "output/" + file.getName().substring(0, 10));
             if (outputFolder.exists() == false)
                 outputFolder.mkdir();
+            GlobalAssert.that(outputFolder.isDirectory());
             outputFolders.add(outputFolder);
             System.out.println("INFO output Folder: " + outputFolder.getAbsolutePath());
         }

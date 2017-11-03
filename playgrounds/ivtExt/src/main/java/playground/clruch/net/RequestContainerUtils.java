@@ -39,7 +39,7 @@ public class RequestContainerUtils {
                 return submissionTime;
             // System.err.println("WARN Could not find submissionTime.");
         }
-        return -1;
+        return -1; // TODO -1 seems to be a reoccurring magic const in this file
     }
 
     private Coord getCoordAt(int now, RequestStatus requestedStatus) {
@@ -53,6 +53,8 @@ public class RequestContainerUtils {
                 return taxiTrail.interp(now).getValue().gps;
             }
         }
+        // TODO look into returning type Optional<Coord>, and instead of null simply "return Optional.empty();"
+        // this can prevent certain mistakes in the application layer
         return null;
     }
 
@@ -68,7 +70,7 @@ public class RequestContainerUtils {
                     return propagateTo(nextTimeStep, requestedStatus);
                 }
                 else 
-                    return -1;
+                    return -1; 
                 // System.err.println("WARN getNextEntry is null");
             } else if (requestedStatus.compareTo(requestStatus) < 0) {
                 if (Objects.nonNull(requestStatus = taxiTrail.getLastEntry(now).getValue().requestStatus)) {
