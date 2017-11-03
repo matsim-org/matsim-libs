@@ -3,10 +3,10 @@ package playground.clruch.dispatcher.core;
 
 /** Created by Claudio on 2/3/2017. */
 public enum AVStatus {
-    DRIVEWITHCUSTOMER("del", "with customer"), //
+    DRIVEWITHCUSTOMER("dwc", "with customer"), //
     DRIVETOCUSTOMER("d2c", "pickup"), //
     REBALANCEDRIVE("reb", "rebalance"), //
-    STAY("stay", "stay"), //
+    STAY("sty", "stay"), //
     OFFSERVICE("off", "off service"), // TODO check if useful.
     ;
 

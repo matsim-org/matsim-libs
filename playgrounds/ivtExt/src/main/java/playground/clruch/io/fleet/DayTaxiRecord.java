@@ -18,19 +18,21 @@ public class DayTaxiRecord {
     public void insert(List<String> list) {
         final String timeStamp = list.get(0);
 
-        System.out.println("INFO reading " + timeStamp);
         // final long taxiStamp_millis = DateParser.from(timeStamp);
         // System.out.println("2 " + taxiStamp_millis);
 
         long cmp = DateParser.from(timeStamp.substring(0, 11) + "00:00:00");
         if (midnight == null) {
             midnight = cmp;
-            System.out.println("midnight=" + midnight);
+            System.out.println("INFO midnight = " + midnight);
         } else {
             if (midnight != cmp) {
-                System.out.println("drop " + timeStamp);
+                // System.out.println("INFO drop " + timeStamp);
                 // throw new RuntimeException();
             }
+            cmp = DateParser.from(timeStamp);
+            if (cmp % 600000 == 0)
+                System.out.println("INFO reading " + timeStamp);
         }
 
         final int taxiStamp_id = vehicleIdIntegerDatabase.getId(list.get(1));

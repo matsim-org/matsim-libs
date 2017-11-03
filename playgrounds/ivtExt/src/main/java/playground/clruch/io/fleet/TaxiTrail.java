@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
@@ -114,7 +115,7 @@ public class TaxiTrail {
             sortedMap.replace(timeStamp, taxiStamp);
         }
     }
-
+  
     private void setOffService(int now) {
         // less than or equal to the given key
         Entry<Integer, TaxiStamp> entry = interp(now);
@@ -124,6 +125,10 @@ public class TaxiTrail {
             taxiStamp.avStatus = AVStatus.OFFSERVICE;
             sortedMap.replace(timeStamp, taxiStamp);
         }
+    }
+    
+    public Set<Integer> getKeySet() {
+        return sortedMap.keySet();
     }
 
 }

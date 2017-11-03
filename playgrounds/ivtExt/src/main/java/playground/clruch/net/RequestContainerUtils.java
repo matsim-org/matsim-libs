@@ -27,8 +27,7 @@ public class RequestContainerUtils {
             submissionTime = propagateTo(now, RequestStatus.PICKUP);
             if (submissionTime >= 0)
                 return submissionTime;
-            else
-                System.err.println("WARN Could not find submissionTime.");
+            // System.err.println("WARN Could not find submissionTime.");
         }
         return -1;
     }
@@ -57,19 +56,19 @@ public class RequestContainerUtils {
                 if (Objects.nonNull(requestStatus = taxiTrail.getNextEntry(now).getValue().requestStatus)) {
                     int nextTimeStep = taxiTrail.getNextEntry(now).getKey();
                     return propagateTo(nextTimeStep, requestedStatus);
-                } else
-                    System.err.println("WARN getNextEntry is null");
+                }
+                // System.err.println("WARN getNextEntry is null");
             } else if (requestedStatus.compareTo(requestStatus) < 0) {
                 if (Objects.nonNull(requestStatus = taxiTrail.getLastEntry(now).getValue().requestStatus)) {
                     int nextTimeStep = taxiTrail.getLastEntry(now).getKey();
                     return propagateTo(nextTimeStep, requestedStatus);
-                } else
-                    System.err.println("WARN getLastEntry is null");
+                }
+                // System.err.println("WARN getLastEntry is null");
             } else if (requestedStatus == requestStatus)
-                System.out.println("INFO Found requestStatus: " + requestedStatus.toString());
-            return now;
+                // System.out.println("INFO Found requestStatus: " + requestedStatus.toString());
+                return now;
         }
-        System.err.println("WARN Couldn't find requested Status, returning -1");
+        // System.err.println("WARN Couldn't find requested Status, returning -1");
         return -1;
     }
 
@@ -99,7 +98,7 @@ public class RequestContainerUtils {
             Coord to = getCoordAt(now, RequestStatus.DROPOFF);
             if (Objects.nonNull(to)) {
                 to = db.referenceFrame.coords_fromWGS84.transform(to);
-                rc.fromLinkIndex = db.getLinkIndex(qt.getClosest(to.getX(), to.getY()));
+                rc.toLinkIndex = db.getLinkIndex(qt.getClosest(to.getX(), to.getY()));
             }
         } catch (Exception exception) {
             System.err.println("WARN failed to get from/to Coords at time: " + now);
