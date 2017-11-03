@@ -84,22 +84,18 @@ enum SimulationFleetDump {
                         vc.linkIndex = linkIndex;
                         vc.avStatus = taxiStamp.avStatus;
 
-                        // Parse requests
+                        // Check if there is valid requests and populate requestContainer
                         RequestContainerUtils rcParser = new RequestContainerUtils(taxiTrail);
-                        RequestStatus requestStatus = taxiStamp.requestStatus;
-                        // System.out.println("Parsing RequestStatus for vehicle " + vehicleIndex + ": " + requestStatus.toString());
-                        // taxiTrail.setRequestStatus(now, requestStatus);
+                        if (rcParser.isValidRequest(now)) {
+                            RequestStatus requestStatus = taxiStamp.requestStatus;
+                            // System.out.println("Parsing RequestStatus for vehicle " + vehicleIndex + ": " + requestStatus.toString());
 
-                        // Create requestContainer if there is any requests
-                        if (requestStatus != RequestStatus.EMPTY && requestStatus != RequestStatus.CANCELLED) {
-//                            System.out.println("Trying to populate RequestContainer of vehicle: " + vehicleIndex + " at time: " + now);
-                            RequestContainer rc = rcParser.populate(now, requestIndex, quadTree, db);
-                            GlobalAssert.that(Objects.nonNull(rc.submissionTime));
-                            if (rc.submissionTime != -1)
+                            if (requestStatus != RequestStatus.CANCELLED) {
+                                RequestContainer rc = rcParser.populate(now, requestIndex, quadTree, db);
                                 simulationObject.requests.add(rc);
-                        } else if (requestStatus == RequestStatus.CANCELLED) {
-                            // System.out.println("Abort populating requestContainer.");
-                            cancelledRequests++;
+                            } else if (requestStatus == RequestStatus.CANCELLED) {
+                                cancelledRequests++;
+                            }
                         }
                         GlobalAssert.that(Objects.nonNull(vc.avStatus));
                         simulationObject.vehicles.add(vc);

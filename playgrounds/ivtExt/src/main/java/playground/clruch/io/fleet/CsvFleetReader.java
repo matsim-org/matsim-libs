@@ -56,33 +56,35 @@ public class CsvFleetReader {
         // Going through all timestamps and check for offservice vehicles && parse requests
         final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
         final int TIMESTEP = 10;
-        
+
         System.out.println("INFO Checking for OFFSERVICE & RequestStatus for " + dayTaxiRecord.size() + " vehicles");
         File logFolder = new File("logs/" + file.getName().substring(0, 10));
         if (logFolder.exists())
             FileDelete.of(logFolder, 2, 10000);
         logFolder.mkdirs();
         for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
-            String logTrailFile = (logFolder + "/Trail_" + vehicleIndex + "_RequestStatus" + ".txt");
+            String logTrailFile = (logFolder + "/Trail_" + vehicleIndex + "_Status" + ".txt");
             FileWriter fstream = new FileWriter(logTrailFile);
             BufferedWriter out = new BufferedWriter(fstream);
-            out.write("Time \t AVStatus \t RequestStatus \n"); 
+            out.write("Time \t AVStatus \t RequestStatus \n");
             TaxiTrail taxiTrail = dayTaxiRecord.get(vehicleIndex);
             if (vehicleIndex % 10 == 0)
                 System.out.println("INFO Checking vehicle: " + vehicleIndex);
-            
+
             for (int now = 0; now < MAXTIME; now += TIMESTEP) {
                 taxiTrail.checkOffService(now);
-                
+            }
+
+            System.out.println("Found keyset for vehicle " + vehicleIndex + ": " + dayTaxiRecord.get(vehicleIndex).getKeySet().toString());
+            for (Integer now : dayTaxiRecord.get(vehicleIndex).getKeySet()) {
+                System.out.println("Parsing requestStatus for vehicle " + vehicleIndex + " at time " + now);
+                taxiTrail.setRequestStatus(now, RequestStatusParser.parseRequestStatus(now, taxiTrail));
+
                 // Writing each TaxiTrail to a file to check output
                 out.write(now + " \t " + taxiTrail.interp(now).getValue().avStatus + " \t " + taxiTrail.interp(now).getValue().requestStatus + "\n");
                 out.flush(); // Flush the buffer and write all changes to the disk
             }
             out.close(); // Close the file
-            
-            for (Integer now : dayTaxiRecord.get(vehicleIndex).getKeySet()) {
-                taxiTrail.setRequestStatus(now, RequestStatusParser.parseRequestStatus(now, taxiTrail));
-            }
         }
 
         System.out.println("INFO lines      " + dataline);

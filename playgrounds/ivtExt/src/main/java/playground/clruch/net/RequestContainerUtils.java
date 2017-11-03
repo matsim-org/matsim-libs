@@ -18,6 +18,16 @@ public class RequestContainerUtils {
         this.taxiTrail = taxiTrail;
     }
 
+    public boolean isValidRequest(int now) {
+        System.out.println("Checking if request is valid at time: " + now);
+        RequestStatus requestStatus = taxiTrail.interp(now).getValue().requestStatus;
+        if (requestStatus != RequestStatus.EMPTY) {
+            if (findSubmissionTime(now) >= 0 && (propagateTo(now, RequestStatus.DROPOFF) >= 0 || propagateTo(now, RequestStatus.CANCELLED) >= 0))
+                return true;
+        }
+        return false;
+    }
+
     private int findSubmissionTime(int now) {
         // System.out.println("Trying to find submissionTime from Time: " + now);
         int submissionTime = propagateTo(now, RequestStatus.REQUESTED);
@@ -32,7 +42,7 @@ public class RequestContainerUtils {
         return -1;
     }
 
-    public Coord getCoordAt(int now, RequestStatus requestedStatus) {
+    private Coord getCoordAt(int now, RequestStatus requestedStatus) {
         RequestStatus requestStatus = taxiTrail.interp(now).getValue().requestStatus;
 
         // Check requestStatus and propagate to TaxiStamp with desired values
