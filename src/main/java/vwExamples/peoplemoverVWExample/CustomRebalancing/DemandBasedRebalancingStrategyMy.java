@@ -97,7 +97,7 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 		
 		//Wir pruefen welche der rebalancableVehicles fuer die naechsten 600 Sekunden noch im Einsatz sind. 
 		for (Vehicle v : rebalancableVehicles){
-			if (v.getServiceEndTime()>time+600){
+			if (v.getServiceEndTime()>time+300){
 				idleVehiclesMap.put(v.getId(),v);
 			}
 		}

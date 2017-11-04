@@ -45,7 +45,7 @@ public class ZonalDemandAggregatorMy implements PersonDepartureEventHandler {
 
 	private final DrtZonalSystem zonalSystem;
 	private final String mode;
-	private final int binsize = 600; 
+	private final int binsize = 300; 
 	private Map<Double,Map<String,MutableInt>> departures = new HashMap<>();
 	private Map<Double,Map<String,MutableInt>> previousIterationDepartures = new HashMap<>();
 	/**

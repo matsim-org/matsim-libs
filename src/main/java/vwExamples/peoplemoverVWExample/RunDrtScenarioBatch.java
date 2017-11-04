@@ -40,6 +40,7 @@ import vwExamples.peoplemoverVWExample.CustomRebalancing.DemandBasedRebalancingS
 import vwExamples.peoplemoverVWExample.CustomRebalancing.ZonalDemandAggregatorMy;
 
 /** * @author axer */
+
 public class RunDrtScenarioBatch {
 	
 	//Class to create the controller
@@ -50,39 +51,90 @@ public class RunDrtScenarioBatch {
 	}
 
 	public static void main(String[] args) {
-		//Define Iteration list
-		List<String> strings = Arrays.asList("0.1_0.5");
-//		List<String> strings = Arrays.asList("0.1", "0.3","0.5");
+		//Defines a list of potential demandScenarios which will be iterated.
+		//The demandScenarios need to be already prepared and stored.
+		//This script generates automatically pathnames with the help of demandScenarios
+		List<Double> demandScenarios = Arrays.asList(0.02,0.05,0.1);
+//		List<Double> demandScenarios = Arrays.asList(0.02);
 
+		Integer stoptime;
 
-		for (String Element : strings){
+		for (Double demandScenario : demandScenarios){
+			//For each demandScenario we are generating a new config file
+			//Some config parameters will be taken from the provided config file
+			//Other config parameters will be generated or modified dynamically within this loop
 			//Define the path to the config file and enable / disable otfvis
-			//Basis configuration
 			final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+			
+
+			//OTFVis is an open source, OpenGL-based visualizer for looking at MATSim scenarios and output.
+			//With this switch we could disable/enable the visualization.
 			boolean otfvis = false;
 			
-	
 			//Overwrite existing configuration parameters
-			config.controler().setLastIteration(6);
-			config.controler().setWriteEventsInterval(1);
-			config.controler().setWritePlansInterval(1);
-			config.controler().setOutputDirectory("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/results/"+Element.toString()+"/");
-			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/population/run124.10.output_plans_DRT0.5.xml.gz");
-//			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/drt_population_iteration/population/run124.100.output_plans.xml.gz");
+			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/population/SmallSplits/run124.100.output_plans_DRT"+demandScenario.toString()+".xml.gz");
+			config.controler().setLastIteration(10); //Number of simulation iterations
+			config.controler().setWriteEventsInterval(5); //Write Events file every x-Iterations 
+			config.controler().setWritePlansInterval(5); //Write Plan file every x-Iterations
+
+			//This part allows to change dynamically DRT config parameters
 			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
+			//DRT optimizer searches only the x-most closed vehicles. 
+			//Handling more vehicles cost more time and will induce more empty trip mileage, because faraway vehicles are also considered to service the customer request 	
 			drt.setkNearestVehicles(90);
-			//fuehrt ein re-balancing im 30 minuten takt durch. hoehere Taktung ist nicht sinnvoll, da die Nachfrage in Halbstundenscheiben gespeichert wird.
-			drt.setRebalancingInterval(300);
 			
-			//Initialize the controller
+			//Use custom stop duration
+			drt.setStopDuration(15);
+			drt.setMaxTravelTimeBeta(900);
+			drt.setMaxTravelTimeAlpha(1.3);
+			drt.setMaxWaitTime(900);
+			stoptime=(int) drt.getStopDuration();
+			
+			config.controler().setOutputDirectory("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/results/"+demandScenario.toString()+"_stopDur"+stoptime.toString()+"/"); //Define dynamically the the output path
+			
+			//Every x-seconds the simulation calls a re-balancing process.
+			//Re-balancing has the task to move vehicles into cells or zones that fits typically with the demand situation
+			//The technically used re-balancing strategy is then installed/binded within the initialized controler  
+			drt.setRebalancingInterval(600);
+			
+			//For each demand scenario we are using a predefined drt vehicle fleet size 
+			
+			if ( (double) demandScenario == 0.02)
+			{
+				drt.setVehiclesFile("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/taxifleets/fleet_100.xml");	
+			}
+			
+			else if ( (double) demandScenario == 0.05)
+			{
+				drt.setVehiclesFile("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/taxifleets/fleet_200.xml");	
+			}
+			
+			else if ( (double) demandScenario == 0.1)
+			{
+				drt.setVehiclesFile("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/taxifleets/fleet_300.xml");	
+			}
+			
+			else 
+			{
+				System.out.println("Demand scenario not explicitly defined");
+				System.exit(0);
+			}
+			
+			
+			
+			
+			//Define the MATSim Controler
+			//Based on the prepared configuration this part creates a controller that runs
 			Controler controler = createControler(config, otfvis);
 			
-			
-			//erstellt ein Grid mit einer Kantenlänge von 2000m über das gesamte Netz. Ggf. einen höheren Parameter wählen.
+			//Our re-balancing requires a DrtZonalSystem
+			//DrtZonalSystem splits the network into squares with x=1000m 
 			DrtZonalSystem zones = new DrtZonalSystem(controler.getScenario().getNetwork(), 1000);
 
+			//In this stages we are adding new modules to the MATSim controler
+			controler.addOverridingModule(new DrtZonalModule());
 			controler.addOverridingModule(new AbstractModule() {
-		
+
 				@Override
 				public void install() {
 					bind(DrtZonalSystem.class).toInstance(zones);
@@ -90,19 +142,24 @@ public class RunDrtScenarioBatch {
 					bind(ZonalDemandAggregatorMy.class).asEagerSingleton();
 				}
 			});
-			controler.addOverridingModule(new DrtZonalModule());
 			
 			
+			//Change the routing module in this way, that agents are forced to go to their closest bus stop.
+			//If we would remove this part, agents are searching a bus stop which lies in the direction of their destination but is maybe far away.
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
 					addRoutingModuleBinding(DvrpConfigGroup.get(config).getMode())
-							.to(ClosestStopBasedDrtRoutingModule.class);
-					DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.3);
-					
+					        .to(ClosestStopBasedDrtRoutingModule.class);
+					// Link travel times are iterativly updated between iteration
+					// tt[i] = alpha * experiencedTT + (1 - alpha) * oldEstimatedTT;
+					// Remark: Small alpha leads to more smoothing and longer lags in reaction. Default alpha is 0.05. Which means i.e. 0.3 is not smooth in comparison to 0.05
+					DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.15); 
 				}
 			});
-	
+			
+			
+			//We finally run the controller to start MATSim
 			controler.run();
 
 	}
