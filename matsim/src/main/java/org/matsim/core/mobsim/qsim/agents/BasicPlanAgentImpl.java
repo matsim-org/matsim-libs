@@ -365,8 +365,10 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 	final Leg getCurrentLeg() {
 		return (Leg) this.getCurrentPlanElement() ;
 	}
-
-	final int getCurrentLinkIndex() {
+	@Override
+	public final int getCurrentLinkIndex() {
+		// Other then getPlanElementIndex, it seems that this one here has to be accessible, since routes may contain loops, in which
+		// case an indexOf search fails.  kai, nov'17
 		return currentLinkIndex;
 	}
 	

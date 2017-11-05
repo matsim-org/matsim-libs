@@ -29,7 +29,6 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.ActivityEndRescheduler;
-import org.matsim.core.population.routes.NetworkRoute;
 
 /**
  * <p>
@@ -77,23 +76,41 @@ public class WithinDayAgentUtils {
 	}
 
 	public static final Integer getCurrentRouteLinkIdIndex(MobsimAgent agent) {
-		//		if (agent instanceof PersonDriverAgentImpl) {
-		//			return ((PersonDriverAgentImpl) agent).getCurrentLinkIndex();			
-		//		} else 
+		/* NOTES:
+		 * () The current link index does not point to where the agent is, but one ahead.
+		 * () It does that even if there is nothing there in the underlying list.  I keep forgetting the convention, but I think that the
+		 *     arrival link is not in the list, and so for the arrival link special treatment is necessary.
+		 * () Routes may have loops, in which case the "indexOf" approach does not work.
+		 */
 
-		// commenting out the above so the new code runs through the existing tests.  kai, nov'17
+		if (agent instanceof PersonDriverAgentImpl) {
 
-		if ( agent instanceof PlanAgent ) {
-			Leg currentLeg = (Leg) ((PlanAgent)agent).getCurrentPlanElement() ;
-			if ( ! (currentLeg.getRoute() instanceof NetworkRoute ) ) {
-				throw new RuntimeException("agent currently not on network route; asking for link id index does not make sense") ;
+			return ((PersonDriverAgentImpl) agent).getCurrentLinkIndex();			
+
+//		} else if ( agent instanceof PlanAgent ) {
+//			
+//			// the following does not work because of loop routes, see above
+//				Leg currentLeg = (Leg) ((PlanAgent)agent).getCurrentPlanElement() ;
+//				if ( ! (currentLeg.getRoute() instanceof NetworkRoute ) ) {
+//					throw new RuntimeException("agent currently not on network route; asking for link id index does not make sense") ;
+//				}
+//				NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
+//				int index = route.getLinkIds().indexOf( agent.getCurrentLinkId() );
+//
+//				// if agent is on arrival link, we need special treatment:
+//				if ( index==-1 && agent.getCurrentLinkId().equals( route.getEndLinkId() ) ) {
+//					index = route.getLinkIds().size() ;
+//				}
+//
+//				// and in the end it points even one further (always points to the _next_ entry, if there is any)
+//				index++ ;
+//
+//				return index ;
+
+			} else {
+				throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+						" which does not support getCurrentRouteLinkIdIndex(...). Aborting!");
 			}
-			NetworkRoute route = (NetworkRoute) currentLeg.getRoute();
-			return route.getLinkIds().indexOf( agent.getCurrentLinkId() ) ;
-		} else {
-			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
-					" which does not support getCurrentRouteLinkIdIndex(...). Aborting!");
-		}
 	}
 
 	//	public static final void calculateAndSetDepartureTime(MobsimAgent agent, Activity act) {

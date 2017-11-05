@@ -15,4 +15,8 @@ public interface HasModifiablePlan {
 	
 	void resetCaches() ;
 
+	int getCurrentLinkIndex();
+	// not totally obvious that this should be _here_, but it really only makes sense together with the modifiable plan/within-da replanning
+	// capability.  Maybe should find a different name for the interface. kai, nov'17
+
 }

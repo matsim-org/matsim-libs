@@ -176,7 +176,8 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	final Leg getCurrentLeg() {
 		return basicAgentDelegate.getCurrentLeg() ;
 	}
-	final int getCurrentLinkIndex() {
+	@Override
+	public final int getCurrentLinkIndex() {
 		return basicAgentDelegate.getCurrentLinkIndex() ;
 	}
 	final int getCurrentPlanElementIndex() {

@@ -101,7 +101,8 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 		if (this.basicPlanAgentDelegate.getCurrentLinkIndex() >= routeLinkIds.size() ) {
 
 			// special case:
-			if (this.getCurrentLinkId().equals( this.getDestinationLinkId() )  && this.basicPlanAgentDelegate.getCurrentLinkIndex() > routeLinkIds.size()) {
+			if (this.getCurrentLinkId().equals( this.getDestinationLinkId() )  
+					&& this.basicPlanAgentDelegate.getCurrentLinkIndex() > routeLinkIds.size()) {
 				// this can happen if the last link in a route is a loop link. Don't ask, it can happen in special transit simulation cases... mrieser/jan2014
 
 				// the condition for arrival used to be "route has run dry AND destination link not attached to current link".  now with loop links,

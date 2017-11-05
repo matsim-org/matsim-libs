@@ -69,6 +69,12 @@ public final class EditPlans {
 		this.mobsim.rescheduleActivityEnd(agent);
 		return pe ;
 	}
+	public final void rescheduleActivityEndtime( MobsimAgent agent, int index, double newEndTime ) {
+		Activity activity = (Activity) WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements().get(index) ;
+		activity.setEndTime(newEndTime);
+		WithinDayAgentUtils.resetCaches(agent);
+		WithinDayAgentUtils.rescheduleActivityEnd(agent, mobsim);
+	}
 	public final Activity replaceActivity(MobsimAgent agent, int index, Activity newAct, String upstreamMode, String downstreamMode ) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;

@@ -88,7 +88,6 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 
 		editRoutes.replanCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, this.time ) ;
 		
-
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
 		WithinDayAgentUtils.resetCaches(withinDayAgent);
 

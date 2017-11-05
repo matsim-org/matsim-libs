@@ -80,21 +80,23 @@ public final class EditTrips {
 			// we are on a leg
 			replanCurrentTripFromLeg(trip.getDestinationActivity(), currentPlanElement, currentMode, now, agent, scenario);
 		}
+		WithinDayAgentUtils.resetCaches(agent);
 	}
 	private void replanCurrentTripFromLeg(Activity newAct, final PlanElement currentPlanElement, final String currentMode, 
 			double now, MobsimAgent agent, Scenario scenario) {
 		Leg currentLeg = (Leg) currentPlanElement ;
 		if ( currentLeg.getRoute() instanceof NetworkRoute ) {
-			replanCurrentLegWithNetworkRoute(newAct, currentMode, currentLeg, now, agent, scenario);
+			replanCurrentLegWithNetworkRoute(newAct, currentMode, currentLeg, now, agent);
 		} else {
 			throw new ReplanningException("not implemented") ;
 			// Does not feel so hard: 
 			// * with teleported legs, push forward to next facility
 			// * with passenger legs, push forward to next possibility of exit
 		}
+		WithinDayAgentUtils.resetCaches(agent);
 	}
 	private void replanCurrentLegWithNetworkRoute(Activity newAct, String mainMode, Leg currentLeg, double now, 
-			MobsimAgent agent, Scenario scenario) {
+			MobsimAgent agent) {
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
@@ -120,6 +122,7 @@ public final class EditTrips {
 		for ( int ijk = 1 ; ijk < newTripElements.size() ; ijk++ ) {
 			planElements.add( pos, newTripElements.get(ijk) ) ;
 		}
+		WithinDayAgentUtils.resetCaches(agent);
 	}
 	private List<? extends PlanElement> newTripToNewActivity(Activity newAct, String mainMode, double now, 
 			MobsimAgent agent, Person person, Scenario scenario) {
@@ -188,6 +191,7 @@ public final class EditTrips {
 
 		// also change the arrival link id:
 		currentNWRoute.setEndLinkId( newNWRoute.getEndLinkId() ) ;
+		WithinDayAgentUtils.resetCaches(agent);
 	}
 	private static void pruneUpToCurrentLeg(Leg currentLeg, List<? extends PlanElement> newTrip) {
 		while ( newTrip.get(0) instanceof Leg && !((Leg)newTrip.get(0)).getMode().equals( currentLeg.getMode()) ) {
