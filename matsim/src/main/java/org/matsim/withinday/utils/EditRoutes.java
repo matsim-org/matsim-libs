@@ -78,12 +78,13 @@ public class EditRoutes {
 
 	public EditRoutes(){} // for backwards compatibility
 
-	@Deprecated // use ctor with population factory (no need to pass non-API route factory as argument). kai, may'16
-	public EditRoutes( Network network, LeastCostPathCalculator pathCalculator, RouteFactories routeFactory ) {
-		this.network = network ;
-		this.pathCalculator = pathCalculator ;
-		this.routeFactories = routeFactory ;
-	}
+//	@Deprecated // use ctor with population factory (no need to pass non-API route factory as argument). kai, may'16
+//	public EditRoutes( Network network, LeastCostPathCalculator pathCalculator, RouteFactories routeFactory ) {
+//		this.network = network ;
+//		this.pathCalculator = pathCalculator ;
+//		this.routeFactories = routeFactory ;
+//	}
+	// it is more than a year later; commenting this out.  kai, nov'17
 
 	public EditRoutes( Network network, LeastCostPathCalculator pathCalculator, PopulationFactory popFactory ) {
 		this.network = network ;
@@ -326,15 +327,17 @@ public class EditRoutes {
 	 * @param tripRouter
 	 * @return the Trip that starts at the given activity or null, if no trip was found
 	 */
-	public static Trip getTrip(Plan plan, Activity fromActivity, TripRouter tripRouter) {
-		List<Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes());
-
-		for (Trip trip : trips) {
-			if (trip.getOriginActivity() == fromActivity) return trip;
-		}
-
-		// no matching trip was found
-		return null;
+	@Deprecated // use TripStructureUtils method directly.  kai, nov'17
+	public static Trip findTripAfterActivity(Plan plan, Activity activity, TripRouter tripRouter) {
+		return TripStructureUtils.findTripStartingAtActivity(activity, plan, tripRouter.getStageActivityTypes() ) ;
+//		List<Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes());
+//
+//		for (Trip trip : trips) {
+//			if (trip.getOriginActivity() == fromActivity) return trip;
+//		}
+//
+//		// no matching trip was found
+//		return null;
 	}
 
 	/**

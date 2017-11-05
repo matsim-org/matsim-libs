@@ -197,12 +197,14 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * @throws UnknownModeException if no RoutingModule is registered for the
 	 * given mode.
 	 */
-	public List<? extends PlanElement> calcRoute(
+	public synchronized List<? extends PlanElement> calcRoute(
 			final String mainMode,
 			final Facility fromFacility,
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
+		// I need this "synchronized" since I want mobsim agents to be able to call this during the mobsim.  So when the
+		// mobsim is multi-threaded, multiple agents might call this here at the same time.  kai, nov'17
 		
 		Gbl.assertNotNull( fromFacility );
 		Gbl.assertNotNull( toFacility );

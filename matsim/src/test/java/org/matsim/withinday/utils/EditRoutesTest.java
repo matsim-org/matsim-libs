@@ -72,7 +72,6 @@ public class EditRoutesTest extends MatsimTestCase {
 	private Plan plan;
 	private TripRouter tripRouter;
 	private LeastCostPathCalculator pathCalculator ;
-	private RouteFactories routeFactory ;
 	
 	/**
 	 * @author cdobler
@@ -91,7 +90,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		}
 
 
-		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, routeFactory);
+		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory() );
 		
 		Leg legHW = (Leg) plan.getPlanElements().get(firstCarLeg);
 		Leg legWH = (Leg) plan.getPlanElements().get(scndCarLeg);
@@ -152,7 +151,7 @@ public class EditRoutesTest extends MatsimTestCase {
 			thrdAct = 12 ;
 		}
 
-		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, routeFactory);
+		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory() );
 		
 		Activity activityH1 = (Activity) plan.getPlanElements().get(0);
 		Leg legHW = (Leg) plan.getPlanElements().get(firstCarLeg);
@@ -230,7 +229,7 @@ public class EditRoutesTest extends MatsimTestCase {
 
 
 		
-		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, routeFactory);
+		EditRoutes ed = new EditRoutes(scenario.getNetwork(), pathCalculator, scenario.getPopulation().getFactory());
 		
 		Activity activityW1 = null;
 		Activity activityH2 = null;
@@ -450,7 +449,6 @@ public class EditRoutesTest extends MatsimTestCase {
 		TravelDisutility costFunction = new OnlyTimeDependentTravelDisutility( timeFunction ) ;
 		this.pathCalculator = new DijkstraFactory().createPathCalculator(scenario.getNetwork(), costFunction, timeFunction) ;
 		
-		this.routeFactory = ((PopulationFactory)scenario.getPopulation().getFactory()).getRouteFactories() ;
 	}
 	
 	/**
