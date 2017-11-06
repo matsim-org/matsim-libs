@@ -64,7 +64,7 @@ import java.net.URL;
  *  In the input folder, two files are added for you with the {@link Id}s:
  *  <code>time.txt</code> for those agents adapting their activity timing, and
  *  <code>route.txt</code> for those agents adapting their routes. 
- *  @author nagel, jwjoubert
+ *  @author (of documentation) nagel, jwjoubert
  */
 public class RunSubpopulationsExample {
 	final static String EQUIL_NETWORK = new File("scenarios/equil-extended/network.xml").getAbsolutePath();

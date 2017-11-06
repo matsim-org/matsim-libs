@@ -76,6 +76,10 @@ public class RunAgentSourceExample {
 								final Vehicle vehicle = VehicleUtils.getFactory().createVehicle(Id.create(ag.getId(), Vehicle.class), VehicleUtils.getDefaultVehicleType());
 								final Id<Link> linkId4VehicleInsertion = Id.createLinkId(1);
 								qsim.createAndParkVehicleOnLink(vehicle, linkId4VehicleInsertion);
+								
+								// Note: I think that you can actually insert the agents directly into the qsim, i.e. no need to use the
+								// agent source for this.  However, this probably does not work with vehicles ... since the links for
+								// the vehicle placements are not yet there.  ???? kai, oct'17
 							}
 						});
 						return qsim;
