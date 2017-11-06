@@ -97,25 +97,15 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 			e1.printStackTrace();
 		}
 		{
-			StyleType carStyle = kmlObjectFactory.createStyleType();
-			carStyle.setId("redCarStyle");
-			IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
-			carIconStyle.setIcon(iconLink);
-			carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMRED);
-			carIconStyle.setScale(Double.valueOf(0.5));
-			carStyle.setIconStyle(carIconStyle);
-			
+			StyleType carStyle = createColoredCarStyle(iconLink, MatsimKmlStyleFactory.MATSIMRED, "redCarStyle");
 			carStyles.put( carStyle.getId(), carStyle ) ;
 		}
 		{
-			StyleType carStyle = kmlObjectFactory.createStyleType();
-			carStyle.setId("greenCarStyle");
-			IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
-			carIconStyle.setIcon(iconLink);
-			carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMGREEN);
-			carIconStyle.setScale(Double.valueOf(0.5));
-			carStyle.setIconStyle(carIconStyle);
-			
+			StyleType carStyle = createColoredCarStyle(iconLink, MatsimKmlStyleFactory.MATSIMYELLOW, "yellowCarStyle");
+			carStyles.put( carStyle.getId(), carStyle ) ;
+		}
+		{
+			StyleType carStyle = createColoredCarStyle(iconLink, MatsimKmlStyleFactory.MATSIMGREEN, "greenCarStyle");
 			carStyles.put( carStyle.getId(), carStyle ) ;
 		}
 		
@@ -137,6 +127,17 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 		}
 
 		this.writeThisSnapshot = false ;
+	}
+
+	private StyleType createColoredCarStyle(LinkType iconLink, final byte[] color, final String idString) {
+		StyleType carStyle = kmlObjectFactory.createStyleType();
+		carStyle.setId(idString);
+		IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
+		carIconStyle.setIcon(iconLink);
+		carIconStyle.setColor(color);
+		carIconStyle.setScale(Double.valueOf(0.5));
+		carStyle.setIconStyle(carIconStyle);
+		return carStyle;
 	}
 
 	@Override
@@ -188,18 +189,24 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 	}
 
 	@Override
-	public void addAgent(final AgentSnapshotInfo position) {
+	public void addAgent(final AgentSnapshotInfo info) {
 
 		//drop all parking vehicles
-		if (position.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY) {
+		if (info.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY) {
 			return;
 		}
 		
 		this.writeThisSnapshot = true ;
 		
-		this.timePlacemark.setStyleUrl("greenCarStyle");
+		if ( info.getColorValueBetweenZeroAndOne() < 0.33 ) {
+			this.timePlacemark.setStyleUrl("redCarStyle");
+		} else if ( info.getColorValueBetweenZeroAndOne() < 0.66 ) {
+			this.timePlacemark.setStyleUrl("yellowCarStyle");
+		} else {
+			this.timePlacemark.setStyleUrl("greenCarStyle");
+		}
 
-		Coord coord = this.coordTransform.transform(new Coord(position.getEasting(), position.getNorthing()));
+		Coord coord = this.coordTransform.transform(new Coord(info.getEasting(), info.getNorthing()));
 		PointType point = kmlObjectFactory.createPointType();
 		point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
 		this.timeGeometry.getAbstractGeometryGroup().add(kmlObjectFactory.createPoint(point));

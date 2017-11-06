@@ -1081,7 +1081,7 @@ public class TransitQueueNetworkTest extends TestCase {
 		  qSim.addMobsimEngine(netsimEngine);
 		  qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 		  this.simEngine = netsimEngine ;
-			TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
+			DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager);
 			qSim.addMobsimEngine(teleportationEngine);
 
             // setup: simulation
