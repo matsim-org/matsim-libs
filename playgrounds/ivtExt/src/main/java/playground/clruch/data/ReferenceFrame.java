@@ -20,11 +20,10 @@ public enum ReferenceFrame {
     // ---
     public final CoordinateTransformation coords_toWGS84;
     public final CoordinateTransformation coords_fromWGS84;
-
+   
     private ReferenceFrame(CoordinateTransformation c1, CoordinateTransformation c2) {
         this.coords_toWGS84 = c1;
         this.coords_fromWGS84 = c2;
-
     }    
     
     public static ReferenceFrame fromString(String stringRef){

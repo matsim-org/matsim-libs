@@ -108,8 +108,8 @@ public class PerformanceFleetSizeCalculator implements Serializable {
             }
 
             // 3) perform mean value analysis and print
-            Tensor srTotVehiclesNum = N.of(srTotVehicles);
-            Tensor tpNum = N.of(tp);
+            Tensor srTotVehiclesNum = N.DOUBLE.of(srTotVehicles);
+            Tensor tpNum = N.DOUBLE.of(tp);
 
             int numdisjointSol = Dimensions.of(tpNum).get(0);
             Tensor AvehRef = Array.zeros(maxVehicles + 1, numVNode);

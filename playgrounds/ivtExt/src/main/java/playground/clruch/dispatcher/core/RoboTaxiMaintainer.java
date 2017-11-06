@@ -149,7 +149,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
                 string.substring(0, 6), //
                 (long) getTimeNow(), //
                 roboTaxis.stream().filter(rt -> rt.isInStayTask()).count(), //
-                roboTaxis.stream().filter(rt -> (rt.getAVStatus().equals(AVStatus.DRIVETOCUSTMER) || rt.getAVStatus().equals(AVStatus.DRIVETOCUSTMER)))
+                roboTaxis.stream().filter(rt -> (rt.getAVStatus().equals(AVStatus.DRIVETOCUSTOMER) || rt.getAVStatus().equals(AVStatus.DRIVETOCUSTOMER)))
                         .count());
 
     }

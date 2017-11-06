@@ -289,7 +289,8 @@ public class SpencerSelfishOldNotWorking extends RebalancingDispatcher {
             Coord requestCoord = avRequest.getFromLink().getFromNode().getCoord();
             AVVehicle closestVehicle = null;
             double closestDistance = Double.POSITIVE_INFINITY;
-            for (RoboTaxi vehicleLinkPair : getDivertableRoboTaxis()) {
+            for (RoboTaxi robotaxi : getDivertableRoboTaxis()) {
+                System.out.println(robotaxi.getAVStatus());
                 
                 // Coord avCoord = vehicleLinkPair.getDivertableLocation().getFromNode().getCoord();
                 GlobalAssert.that(false);

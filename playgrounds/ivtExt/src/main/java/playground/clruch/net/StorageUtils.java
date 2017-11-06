@@ -30,7 +30,6 @@ public class StorageUtils {
         }
 
         DIRECTORY = new File(OUTPUT, "simobj");
-
     }
 
     public void printStorageProperties() {
@@ -93,9 +92,11 @@ public class StorageUtils {
     /** function only called from {@link StorageSubscriber} when data is recorded during simulation
      * 
      * @param simulationObject
+
      * @return file to store given simulationObject */
     /* package */ File getFileForStorageOf(SimulationObject simulationObject) {
         GlobalAssert.that(OUTPUT.exists());
+
         DIRECTORY.mkdir();
         File iter = new File(DIRECTORY, String.format("it.%02d", simulationObject.iteration));
         iter.mkdir();

@@ -10,12 +10,12 @@ import ch.ethz.idsc.queuey.math.AnalysisUtils;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
+import ch.ethz.idsc.tensor.ScalarQ;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Join;
-import ch.ethz.idsc.tensor.red.Mean;
-import ch.ethz.idsc.tensor.red.Quantile;
+import ch.ethz.idsc.tensor.pdf.BinCounts;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
@@ -88,8 +88,9 @@ public class CoreAnalysis {
             }
 
             // Distance ratio
-            GlobalAssert.that(!waitTimeQuantile.isScalar());
-            GlobalAssert.that(!numStatus.isScalar());
+            
+            GlobalAssert.that(!ScalarQ.of(waitTimeQuantile));
+            GlobalAssert.that(!ScalarQ.of(numStatus));
             Tensor row = Join.of( //
                     Tensors.of(time, requestsSize), // 0,1
                     waitTimeQuantile, // 2,3,4 (.1, .5, .95)
@@ -110,7 +111,7 @@ public class CoreAnalysis {
         numRequests = uniqueSubmissions.length();
         maximumWaitTime = AnalysisUtils.maximum(uniqueSubmissions).number().doubleValue();
         analyzeAll.setwaitBinSize(AnalysisUtils.adaptBinSize(uniqueSubmissions, analyzeAll.getwaitbinSize(), RealScalar.of(5.0)));
-        waitBinCounter = AnalysisUtils.binCount(uniqueSubmissions, analyzeAll.getwaitbinSize());
+        waitBinCounter = BinCounts.of(uniqueSubmissions, analyzeAll.getwaitbinSize());
 
         System.out.println("Found requests: " + numRequests);
 

@@ -118,7 +118,7 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
     protected final Map<RoboTaxi, AVRequest> getPickupRoboTaxis() {
         Map<RoboTaxi, AVRequest> pickupPairs = pickupRegister.entrySet().stream()//
                 .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
-        pickupPairs.keySet().stream().forEach(rt -> GlobalAssert.that(rt.getAVStatus().equals(AVStatus.DRIVETOCUSTMER)));
+        pickupPairs.keySet().stream().forEach(rt -> GlobalAssert.that(rt.getAVStatus().equals(AVStatus.DRIVETOCUSTOMER)));
         return pickupPairs;
     }
 
@@ -144,7 +144,7 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
         GlobalAssert.that(pickupRegister.size() == pickupRegister.values().stream().distinct().count());
 
         // 2) set vehicle diversion
-        setRoboTaxiDiversion(roboTaxi, avRequest.getFromLink(), AVStatus.DRIVETOCUSTMER);
+        setRoboTaxiDiversion(roboTaxi, avRequest.getFromLink(), AVStatus.DRIVETOCUSTOMER);
     }
 
     // ===================================================================================
@@ -262,7 +262,7 @@ public abstract class UniversalDispatcher extends RoboTaxiMaintainer {
 
         // stop vehicles still driving to a request but other taxi serving that request already
         getRoboTaxis().stream()//
-                .filter(rt -> rt.getAVStatus().equals(AVStatus.DRIVETOCUSTMER))//
+                .filter(rt -> rt.getAVStatus().equals(AVStatus.DRIVETOCUSTOMER))//
                 .filter(rt -> !pickupRegister.containsValue(rt))//
                 .filter(RoboTaxi::isWithoutCustomer)//
                 .filter(RoboTaxi::isWithoutDirective)//

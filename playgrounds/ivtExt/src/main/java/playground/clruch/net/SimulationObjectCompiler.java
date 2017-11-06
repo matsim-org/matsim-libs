@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
@@ -15,7 +16,7 @@ import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public class SimulationObjectCompiler {
-    
+
     public static SimulationObjectCompiler create( //
             long now, String infoLine, int total_matchedRequests) {
         final MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
@@ -26,15 +27,13 @@ public class SimulationObjectCompiler {
         simulationObject.total_matchedRequests = total_matchedRequests;
         return new SimulationObjectCompiler(simulationObject);
     }
-    
 
     private final SimulationObject simulationObject;
     private final Map<String, VehicleContainer> vehicleMap = new HashMap<>();
     private final MatsimStaticDatabase db = MatsimStaticDatabase.INSTANCE;
 
-
-
     private SimulationObjectCompiler(SimulationObject simulationObject) {
+        GlobalAssert.that(Objects.nonNull(simulationObject));
         this.simulationObject = simulationObject;
     }
 
@@ -52,6 +51,7 @@ public class SimulationObjectCompiler {
     }
 
     private void insertRequest(AVRequest avRequest) {
+        GlobalAssert.that(Objects.nonNull(avRequest));
         RequestContainer requestContainer = new RequestContainer();
         requestContainer.requestIndex = db.getRequestIndex(avRequest);
         requestContainer.fromLinkIndex = db.getLinkIndex(avRequest.getFromLink());

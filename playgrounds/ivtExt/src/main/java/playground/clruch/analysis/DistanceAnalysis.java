@@ -10,6 +10,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Transpose;
+import ch.ethz.idsc.tensor.pdf.BinCounts;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.InvertUnlessZero;
 import playground.clruch.net.SimulationObject;
@@ -59,9 +60,9 @@ public class DistanceAnalysis {
         AnalyzeAll analyzeAll = new AnalyzeAll();
 
         analyzeAll.settotalDistanceBinSize(AnalysisUtils.adaptBinSize(totalDistancesPerVehicle, analyzeAll.gettotalDistanceBinSize(), RealScalar.of(5.0)));
-        tdBinCounter = AnalysisUtils.binCount(totalDistancesPerVehicle, analyzeAll.gettotalDistanceBinSize());
+        tdBinCounter = BinCounts.of(totalDistancesPerVehicle, analyzeAll.gettotalDistanceBinSize());
         analyzeAll.setdistanceWCBinSize(AnalysisUtils.adaptBinSize(distancesWCPerVehicle, analyzeAll.getdistanceWCBinSize(), RealScalar.of(5.0)));
-        dwcBinCounter = AnalysisUtils.binCount(distancesWCPerVehicle, analyzeAll.getdistanceWCBinSize());
+        dwcBinCounter = BinCounts.of(distancesWCPerVehicle, analyzeAll.getdistanceWCBinSize());
 
         list.forEach(VehicleStatistic::consolidate);
 

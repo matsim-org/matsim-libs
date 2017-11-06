@@ -10,12 +10,13 @@ import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.net.MatsimStaticDatabase;
-import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.NetworkLoader;
+import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.PropertiesExt;
 
 /** the viewer allows to connect to the scenario server or to view saved
@@ -40,6 +41,9 @@ public class ScenarioViewer {
         GlobalAssert.that(Objects.nonNull(referenceFrame)); 
         GlobalAssert.that(Objects.nonNull(simOptions.getLocationSpec()));
         Network network = NetworkLoader.loadNetwork(new File(workingDirectory, simOptions.getString("simuConfig")));
+        System.out.println("loaded the network!");
+        System.out.println("links" +  network.getLinks().size());
+        System.out.println("nodes" +  network.getNodes().size());
 
         // load viewer
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
