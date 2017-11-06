@@ -1,3 +1,4 @@
+// code by francesco, jph, clruch
 package playground.fseccamo.dispatcher;
 
 import ch.ethz.idsc.jmex.Container;
