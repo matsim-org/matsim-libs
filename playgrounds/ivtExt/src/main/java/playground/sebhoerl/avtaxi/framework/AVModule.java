@@ -37,7 +37,6 @@ import playground.clruch.dispatcher.LPFFDispatcher;
 import playground.clruch.dispatcher.NewSingleHeuristicDispatcher;
 import playground.clruch.dispatcher.TestBedDispatcher;
 import playground.clruch.dispatcher.UncoordinatedDispatcher;
-import playground.clruch.dispatcher.SPLICE.SPLICEDispatcher;
 import playground.clruch.dispatcher.selfishdispatcher.SelfishDispatcher;
 import playground.fseccamo.dispatcher.MPCDispatcher;
 import playground.sebhoerl.avtaxi.config.AVConfig;
@@ -130,8 +129,8 @@ public class AVModule extends AbstractModule {
         bind(TestBedDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), TestBedDispatcher.class.getSimpleName()).to(TestBedDispatcher.Factory.class);
 
-        bind(SPLICEDispatcher.Factory.class);
-        AVUtils.bindDispatcherFactory(binder(), SPLICEDispatcher.class.getSimpleName()).to(SPLICEDispatcher.Factory.class);
+        // bind(SPLICEDispatcher.Factory.class);
+        //        AVUtils.bindDispatcherFactory(binder(), SPLICEDispatcher.class.getSimpleName()).to(SPLICEDispatcher.Factory.class);
 
         bind(KMedianDispatcher.Factory.class);
         AVUtils.bindDispatcherFactory(binder(), KMedianDispatcher.class.getSimpleName()).to(KMedianDispatcher.Factory.class);
