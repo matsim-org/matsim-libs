@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
@@ -316,7 +317,16 @@ public class EditRoutes {
 	public  boolean replanCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, double time ) {
 		// just a pointer to that other method, but this one (which does not change the destination) is still ok also with access/egress
 		// routing
-		return relocateCurrentLegRoute(leg, person, currentLinkIndex, leg.getRoute().getEndLinkId(), time );
+
+		Route route = leg.getRoute();
+		// if the route type is not supported:
+		if (!(route instanceof NetworkRoute)) {
+			log.warn( "route not instance of NetworkRoute");
+			return false;
+		}
+		// (cannot move the above test down into relocateCurrentLegRoute, since it also hedges against route==null.  kai, nov'17)
+		
+		return relocateCurrentLegRoute(leg, person, currentLinkIndex, route.getEndLinkId(), time );
 	}
 
 	// #########################################################################################
