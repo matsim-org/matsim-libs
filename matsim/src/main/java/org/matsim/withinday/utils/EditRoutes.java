@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
@@ -77,13 +78,15 @@ public class EditRoutes {
 	private  RouteFactories routeFactories ;
 
 	public EditRoutes(){} // for backwards compatibility
+	// yyyyyy ??????
 
-	@Deprecated // use ctor with population factory (no need to pass non-API route factory as argument). kai, may'16
-	public EditRoutes( Network network, LeastCostPathCalculator pathCalculator, RouteFactories routeFactory ) {
-		this.network = network ;
-		this.pathCalculator = pathCalculator ;
-		this.routeFactories = routeFactory ;
-	}
+//	@Deprecated // use ctor with population factory (no need to pass non-API route factory as argument). kai, may'16
+//	public EditRoutes( Network network, LeastCostPathCalculator pathCalculator, RouteFactories routeFactory ) {
+//		this.network = network ;
+//		this.pathCalculator = pathCalculator ;
+//		this.routeFactories = routeFactory ;
+//	}
+	// it is more than a year later; commenting this out.  kai, nov'17
 
 	public EditRoutes( Network network, LeastCostPathCalculator pathCalculator, PopulationFactory popFactory ) {
 		this.network = network ;
@@ -98,6 +101,8 @@ public class EditRoutes {
 	 * @return true when replacing the route worked, false when something went wrong
 	 * 
 	 */
+	@Deprecated // not consistent with access/egress approach; can only be used if you know exactly what you are doing.  
+	// Maybe replanXxx is already sufficient?  Otherwise use EditTrips or EditPlans.  kai, nov'17
 	public boolean relocateFutureLegRoute(Leg leg, Id<Link> fromLinkId, Id<Link> toLinkId, Person person ) {
 
 		Link fromLink = network.getLinks().get(fromLinkId);
@@ -116,7 +121,7 @@ public class EditRoutes {
 		route.setTravelCost(path.travelCost);
 		route.setDistance(RouteUtils.calcDistance(route,1.,1., this.network));
 		leg.setRoute(route);
-
+		
 		return true;
 	}
 
@@ -127,7 +132,8 @@ public class EditRoutes {
 	 * 
 	 * @deprecated switch this to relocateFutureTrip, since with egress legs relocating the destination of a single leg leads to disconnected trips. kai, dec'15
 	 */
-	@Deprecated // switch this to relocateFutureTrip, since with egress legs relocating the destination of a single leg leads to disconnected trips. kai, dec'15
+	@Deprecated // not consistent with access/egress approach; can only be used if you know exactly what you are doing.  
+	// Maybe replanXxx is already sufficient?  Otherwise use EditTrips or EditPlans.  kai, nov'17
 	public static boolean relocateFutureLegRoute(Leg leg, Id<Link> fromLinkId, Id<Link> toLinkId, Person person, Network network, TripRouter tripRouter) {
 
 		Link fromLink = network.getLinks().get(fromLinkId);
@@ -173,6 +179,9 @@ public class EditRoutes {
 	 * @return true when replacing the route worked, false when something went wrong
 	 */
 	public boolean replanFutureLegRoute(Leg leg, Person person ) {
+		// just a pointer to that other method, but this one (which does not change the destination) is still ok also with access/egress
+		// routing
+		
 		return relocateFutureLegRoute( leg, leg.getRoute().getStartLinkId(), leg.getRoute().getEndLinkId(), person ) ;
 	}
 
@@ -208,6 +217,8 @@ public class EditRoutes {
 	 * @return true when replacing the route worked, false when something went wrong
 	 * 
 	 */
+	@Deprecated // not consistent with access/egress approach; can only be used if you know exactly what you are doing.  
+	// Maybe replanXxx is already sufficient?  Otherwise use EditTrips or EditPlans.  kai, nov'17
 	public boolean relocateCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, Id<Link> toLinkId, double time ) {
 
 		Route route = leg.getRoute();
@@ -269,17 +280,17 @@ public class EditRoutes {
 	}
 
 
-	/**
-	 * We create a new Plan which contains only the Leg that should be replanned and its previous and next
-	 * Activities. By doing so the PlanAlgorithm will only change the Route of that Leg.
-	 *
-	 * Use currentNodeIndex from a DriverAgent if possible!
-	 *
-	 * Otherwise code it as following:
-	 * startLink - Node1 - routeLink1 - Node2 - routeLink2 - Node3 - endLink
-	 * The currentNodeIndex has to Point to the next Node
-	 * (which is the endNode of the current Link)
-	 */
+//	/**
+//	 * We create a new Plan which contains only the Leg that should be replanned and its previous and next
+//	 * Activities. By doing so the PlanAlgorithm will only change the Route of that Leg.
+//	 *
+//	 * Use currentNodeIndex from a DriverAgent if possible!
+//	 *
+//	 * Otherwise code it as following:
+//	 * startLink - Node1 - routeLink1 - Node2 - routeLink2 - Node3 - endLink
+//	 * The currentNodeIndex has to Point to the next Node
+//	 * (which is the endNode of the current Link)
+//	 */
 //	public static boolean replanCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, double time, Network network, TripRouter tripRouter) {
 //
 //		Route route = leg.getRoute();
@@ -304,16 +315,17 @@ public class EditRoutes {
 	 * (which is the endNode of the current Link)
 	 */
 	public  boolean replanCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, double time ) {
+		// just a pointer to that other method, but this one (which does not change the destination) is still ok also with access/egress
+		// routing
 
 		Route route = leg.getRoute();
-
-		// if the route type is not supported (e.g. because it is a walking agent)
+		// if the route type is not supported:
 		if (!(route instanceof NetworkRoute)) {
-			log.warn("route not instance of network route");
+			log.warn( "route not instance of NetworkRoute");
 			return false;
 		}
-
-		// This is just a special case of relocateCurrentLegRoute where the end link of the route is not changed.
+		// (cannot move the above test down into relocateCurrentLegRoute, since it also hedges against route==null.  kai, nov'17)
+		
 		return relocateCurrentLegRoute(leg, person, currentLinkIndex, route.getEndLinkId(), time );
 	}
 
@@ -326,15 +338,16 @@ public class EditRoutes {
 	 * @param tripRouter
 	 * @return the Trip that starts at the given activity or null, if no trip was found
 	 */
-	public static Trip getTrip(Plan plan, Activity fromActivity, TripRouter tripRouter) {
-		List<Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes());
-
-		for (Trip trip : trips) {
-			if (trip.getOriginActivity() == fromActivity) return trip;
-		}
-
-		// no matching trip was found
-		return null;
+	public static Trip findTripAfterActivity(Plan plan, Activity activity, TripRouter tripRouter) {
+		return TripStructureUtils.findTripStartingAtActivity(activity, plan, tripRouter.getStageActivityTypes() ) ;
+//		List<Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes());
+//
+//		for (Trip trip : trips) {
+//			if (trip.getOriginActivity() == fromActivity) return trip;
+//		}
+//
+//		// no matching trip was found
+//		return null;
 	}
 
 	/**
