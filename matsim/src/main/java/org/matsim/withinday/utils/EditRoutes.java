@@ -37,6 +37,9 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.HasPerson;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
@@ -123,6 +126,17 @@ public class EditRoutes {
 		leg.setRoute(route);
 		
 		return true;
+	}
+
+	public final void rePlanCurrentLeg( MobsimAgent agent, double now ) {
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
+		PlanElement pe = plan.getPlanElements().get( WithinDayAgentUtils.getCurrentPlanElementIndex(agent)) ;
+		if ( !(pe instanceof Leg) ) {
+			return ;
+		}
+		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent) ;
+		this.replanCurrentLegRoute((Leg)pe, ((HasPerson)agent).getPerson(), currentLinkIndex, now ) ;
+		WithinDayAgentUtils.resetCaches(agent);
 	}
 
 	/**

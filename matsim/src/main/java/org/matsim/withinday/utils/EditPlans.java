@@ -334,5 +334,9 @@ public final class EditPlans {
 
 		return true;
 	}
+	public void rescheduleActivityEnd(MobsimAgent agent) {
+		// this is mostly for retrofitting existing code.  but maybe also useful by itself
+		this.mobsim.rescheduleActivityEnd(agent);
+	}
 
 }
