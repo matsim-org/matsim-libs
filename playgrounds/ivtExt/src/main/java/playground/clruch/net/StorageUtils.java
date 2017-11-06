@@ -24,7 +24,7 @@ public class StorageUtils {
             OUTPUT = outputdirectory;
 
         } else {
-            System.out.println("supplied outputdiretory does not exist, using default");
+            System.out.println("supplied outputdircetory does not exist, using default");
             System.out.println("outputdirectory = " + defaultOutputDir.getAbsolutePath());
             OUTPUT = defaultOutputDir;
         }
