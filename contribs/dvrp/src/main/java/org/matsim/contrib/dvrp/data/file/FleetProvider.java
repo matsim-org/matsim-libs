@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
  * copyright       : (C) 2017 by the members listed in the COPYING,        *
@@ -17,42 +16,47 @@
  *                                                                         *
  * *********************************************************************** */
 
+package org.matsim.contrib.dvrp.data.file;
+
+import java.net.URL;
+
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.data.FleetImpl;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.core.controler.AbstractModule;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.name.Named;
+
 /**
- * 
+ * @author michalm
  */
-package org.matsim.contrib.parking.parkingsearch.sim;
+public class FleetProvider implements Provider<Fleet> {
+	@Inject
+	@Named(DvrpModule.DVRP_ROUTING)
+	Network network;
 
-import java.util.Collection;
-import java.util.Collections;
+	private final URL url;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.mobsim.framework.AgentSource;
-import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-
-import com.google.inject.Module;
-
-/**
- * @author  jbischoff
- *
- */
-public class ParkingSearchPopulationPlugin extends AbstractQSimPlugin {
-	public ParkingSearchPopulationPlugin(Config config) { super(config); }
-	@Override 
-	public Collection<? extends Module> modules() {
-		return Collections.singletonList(new com.google.inject.AbstractModule() {
-			@Override
-			protected void configure() {
-				if (getConfig().transit().isUseTransit()) {
-					throw new RuntimeException("parking search together with transit is not implemented (should not be difficult)") ;
-				} 
-				bind(AgentFactory.class).to(ParkingAgentFactory.class).asEagerSingleton(); // (**)
-				bind(ParkingPopulationAgentSource.class).asEagerSingleton();
-			}
-		});
+	public FleetProvider(URL url) {
+		this.url = url;
 	}
-	@Override 
-	public Collection<Class<? extends AgentSource>> agentSources() {
-		return Collections.singletonList(ParkingPopulationAgentSource.class);
+
+	@Override
+	public Fleet get() {
+		FleetImpl fleet = new FleetImpl();
+		new VehicleReader(network, fleet).parse(url);
+		return fleet;
+	}
+
+	public static AbstractModule createModule(URL url) {
+		return new AbstractModule() {
+			@Override
+			public void install() {
+				bind(Fleet.class).toProvider(new FleetProvider(url)).asEagerSingleton();
+			}
+		};
 	}
 }

@@ -5,8 +5,8 @@ import com.google.inject.Module;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public class TeleportationPlugin extends AbstractQSimPlugin {
 	public TeleportationPlugin(Config config) {
@@ -15,14 +15,12 @@ public class TeleportationPlugin extends AbstractQSimPlugin {
 
 	@Override
 	public Collection<? extends Module> modules() {
-		Collection<Module> result = new ArrayList<>();
-		result.add(new AbstractModule() {
+		return Collections.singletonList(new AbstractModule() {
 			@Override
 			protected void configure() {
 				bind(DefaultTeleportationEngine.class).asEagerSingleton();
 			}
 		});
-		return result;
 	}
 
 	@Override

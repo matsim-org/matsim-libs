@@ -1,32 +1,34 @@
 package org.matsim.contrib.drt.run;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.drt.data.validator.*;
+import org.matsim.contrib.drt.data.validator.DefaultDrtRequestValidator;
+import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
-import org.matsim.contrib.drt.optimizer.depot.*;
-import org.matsim.contrib.drt.optimizer.rebalancing.*;
-import org.matsim.contrib.drt.routing.*;
-import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
+import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.SendToStartLinkStrategy;
+import org.matsim.contrib.drt.routing.DrtRoutingModule;
+import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
-import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.core.config.*;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
-import com.google.inject.*;
-import com.google.inject.name.*;
+import com.google.inject.name.Names;
 
 public final class DrtModule extends AbstractModule {
 
 	@Override
 	public void install() {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(getConfig());
-
-		bind(Fleet.class).toProvider(DefaultDrtFleetProvider.class).asEagerSingleton();
+		bind(Fleet.class).toProvider(new FleetProvider(drtCfg.getVehiclesFileUrl(getConfig().getContext())))
+				.asEagerSingleton();
 		bind(DrtRequestValidator.class).to(DefaultDrtRequestValidator.class);
 		bind(DepotFinder.class).to(NearestStartLinkAsDepot.class);
 		bind(RebalancingStrategy.class).to(SendToStartLinkStrategy.class);
@@ -49,23 +51,6 @@ public final class DrtModule extends AbstractModule {
 
 			default:
 				throw new IllegalStateException();
-		}
-	}
-
-	public static final class DefaultDrtFleetProvider implements Provider<Fleet> {
-		@Inject
-		@Named(DvrpModule.DVRP_ROUTING)
-		Network network;
-		@Inject
-		Config config;
-		@Inject
-		DrtConfigGroup drtCfg;
-
-		@Override
-		public Fleet get() {
-			FleetImpl fleet = new FleetImpl();
-			new VehicleReader(network, fleet).parse(drtCfg.getVehiclesFileUrl(config.getContext()));
-			return fleet;
 		}
 	}
 }
