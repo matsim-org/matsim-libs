@@ -25,8 +25,6 @@ public class TeleportationPlugin extends AbstractQSimPlugin {
 
 	@Override
 	public Collection<Class<? extends MobsimEngine>> engines() {
-		Collection<Class<? extends MobsimEngine>> result = new ArrayList<>();
-		result.add(DefaultTeleportationEngine.class);
-		return result;
+		return Collections.singletonList( DefaultTeleportationEngine.class );
 	}
 }
