@@ -25,6 +25,7 @@ public enum RequestStatusParser {
                     switch (lastState) {
                     case STAY:
                     case REBALANCEDRIVE:
+                    case OFFSERVICE:
                         return RequestStatus.REQUESTED;
                     case DRIVETOCUSTOMER:
                         return RequestStatus.PICKUPDRIVE;
@@ -36,6 +37,7 @@ public enum RequestStatusParser {
                     case STAY:
                     case REBALANCEDRIVE:
                     case DRIVETOCUSTOMER:
+                    case OFFSERVICE:
                         return RequestStatus.PICKUP;
                     case DRIVEWITHCUSTOMER:
                         return RequestStatus.DRIVING;
@@ -44,6 +46,7 @@ public enum RequestStatusParser {
                     }
                 case STAY:
                 case REBALANCEDRIVE:
+                case OFFSERVICE:
                     switch (lastState) {
                     case DRIVETOCUSTOMER:
                         return RequestStatus.CANCELLED;

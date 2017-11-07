@@ -53,6 +53,7 @@ enum SimulationFleetDump {
             int dropped = 0;
             int cancelledRequests = 0;
             int requestIndex = 0;
+            int totalMatchedRequests = 0;
             // NavigableMap<Integer, Integer> requestMap = new TreeMap<>();
             for (int now = 0; now < MAXTIME; now += TIMESTEP) {
                 if (now % 10000 == 0)
@@ -60,10 +61,9 @@ enum SimulationFleetDump {
                 SimulationObject simulationObject = new SimulationObject();
                 simulationObject.now = now;
                 simulationObject.vehicles = new ArrayList<>();
-                simulationObject.requests = new ArrayList<>();
-                // simulationObject.requests are already initialize in SimulationObject
 
                 for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
+                    // for (int vehicleIndex = 100; vehicleIndex < 120; ++vehicleIndex) {
 
                     // Check and propagate offservice status
                     // dayTaxiRecord.get(vehicleIndex).check_offservice(now);
@@ -88,14 +88,19 @@ enum SimulationFleetDump {
                         RequestContainerUtils rcParser = new RequestContainerUtils(taxiTrail);
                         if (rcParser.isValidRequest(now)) {
                             RequestStatus requestStatus = taxiStamp.requestStatus;
-                            // System.out.println("Parsing RequestStatus for vehicle " + vehicleIndex + ": " + requestStatus.toString());
-
+                            System.out.println("Parsing RequestStatus " + requestStatus.toString() + " for vehicle " + vehicleIndex + " at time " + now);
                             if (requestStatus != RequestStatus.CANCELLED) {
                                 RequestContainer rc = rcParser.populate(now, requestIndex, quadTree, db);
                                 simulationObject.requests.add(rc);
-                            } else if (requestStatus == RequestStatus.CANCELLED) {
+                                // Check if a request has been completed
+                                if (requestStatus == RequestStatus.DROPOFF) {
+                                    totalMatchedRequests++;
+                                    simulationObject.total_matchedRequests = totalMatchedRequests;
+                                }
+                                if (rc.submissionTime == taxiTrail.interp(now).getKey())
+                                    requestIndex++;
+                            } else if (requestStatus == RequestStatus.CANCELLED)
                                 cancelledRequests++;
-                            }
                         }
                         GlobalAssert.that(Objects.nonNull(vc.avStatus));
                         simulationObject.vehicles.add(vc);
@@ -111,7 +116,8 @@ enum SimulationFleetDump {
             ++iteration;
             System.out.println("INFO dropped total: " + dropped);
             System.out.println("INFO total requests: " + requestIndex);
-            System.out.println("INFO canceled requests: " + cancelledRequests);
+            System.out.println("INFO total matched requests: " + totalMatchedRequests);
+            System.out.println("INFO cancelled requests: " + cancelledRequests);
         }
     }
 }

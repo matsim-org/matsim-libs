@@ -81,7 +81,7 @@ public class CsvFleetReader {
                 taxiTrail.setRequestStatus(now, RequestStatusParser.parseRequestStatus(now, taxiTrail));
 
                 // Writing each TaxiTrail to a file to check output
-                out.write(now + " \t " + taxiTrail.interp(now).getValue().avStatus + " \t " + taxiTrail.interp(now).getValue().requestStatus + "\n");
+                out.write(now + " \t " + taxiTrail.interp(now).getValue().avStatus + " \t\t " + taxiTrail.interp(now).getValue().requestStatus + "\n");
                 out.flush(); // Flush the buffer and write all changes to the disk
             }
             out.close(); // Close the file

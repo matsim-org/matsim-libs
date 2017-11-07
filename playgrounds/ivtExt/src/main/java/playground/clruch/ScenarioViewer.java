@@ -34,16 +34,16 @@ public class ScenarioViewer {
         File workingDirectory = MultiFileTools.getWorkingDirectory();;
         PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
         File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
-        System.out.println("showing simulation results stored in folder: " + outputDirectory.getName());
+        System.out.println("INFO Showing simulation results stored in folder: " + outputDirectory.getName());
         
         ReferenceFrame referenceFrame = simOptions.getReferenceFrame();
         /** reference frame needs to be set manually in IDSCOptions.properties file */
         GlobalAssert.that(Objects.nonNull(referenceFrame)); 
         GlobalAssert.that(Objects.nonNull(simOptions.getLocationSpec()));
         Network network = NetworkLoader.loadNetwork(new File(workingDirectory, simOptions.getString("simuConfig")));
-        System.out.println("INFO network loaded");
-        System.out.println("INFO total links " +  network.getLinks().size());
-        System.out.println("INFO total nodes " +  network.getNodes().size());
+        System.out.println("INFO Network loaded");
+        System.out.println("INFO Total links " +  network.getLinks().size());
+        System.out.println("INFO Total nodes " +  network.getNodes().size());
 
         // load viewer
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);

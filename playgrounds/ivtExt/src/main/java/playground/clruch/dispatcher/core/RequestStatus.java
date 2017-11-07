@@ -7,8 +7,8 @@ public enum RequestStatus {
     PICKUPDRIVE("otw", "taxi on the way"), //
     PICKUP("pup", "pickup"), //
     DRIVING("drv", "driving with customer"), //
-    DROPOFF("dof", "dropoff"), //
     CANCELLED("can", "request cancelled"), //
+    DROPOFF("dof", "dropoff"), //
     EMPTY("noc", "no customer"), //
     ;
 
