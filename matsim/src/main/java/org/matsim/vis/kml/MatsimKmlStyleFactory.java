@@ -50,7 +50,13 @@ public class MatsimKmlStyleFactory implements NetworkKmlStyleFactory {
 	private static final byte[] MATSIMGREY = new byte[]{(byte) 210, (byte) 70, (byte) 50, (byte) 50};
 	protected static final byte[] MATSIMWHITE = new byte[]{(byte) 230, (byte) 230, (byte) 230, (byte) 230};
 
-	public static final byte[] MATSIMGREEN = new byte[]{(byte) 15, (byte) 255, (byte) 15, (byte) 190};
+	
+	// these come from CountsSimComparisonKMLWriter:
+//	byte[] red = new byte[]{(byte) 0xFF, (byte) 0x0F, (byte) 0x0F, (byte) 0xBE};
+	public static final byte[] MATSIMGREEN = new byte[]{(byte) 0xFF, (byte) 0x14, (byte) 0xDC, (byte) 0x0A};
+	public static final byte[] MATSIMYELLOW = new byte[]{(byte) 0xFF, (byte) 0x14, (byte) 0xE6, (byte) 0xE6};
+//	byte[] grey = new byte[]{(byte) 0xFF, (byte) 0x42, (byte) 0x42, (byte) 0x42};
+
 	/**
 	 * the kmz writer
 	 */

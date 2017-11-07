@@ -19,10 +19,8 @@
 
 package org.matsim.contrib.taxi.run;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
@@ -34,7 +32,6 @@ import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -42,7 +39,6 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.inject.Inject;
 import com.google.inject.Module;
 import com.google.inject.Provider;
 import com.google.inject.Provides;
@@ -104,28 +100,12 @@ public final class TaxiModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		bind(Fleet.class).toProvider(DefaultTaxiFleetProvider.class).asEagerSingleton();
+		TaxiConfigGroup taxiCfg = TaxiConfigGroup.get(getConfig());
+		bind(Fleet.class).toProvider(new FleetProvider(taxiCfg.getTaxisFileUrl(getConfig().getContext())))
+				.asEagerSingleton();
 		bind(TravelDisutilityFactory.class).annotatedWith(Names.named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER))
 				.toInstance(travelTime -> new TimeAsTravelDisutility(travelTime));
 
 		install(dvrpModule);
-	}
-
-	@Singleton
-	public static final class DefaultTaxiFleetProvider implements Provider<Fleet> {
-		@Inject
-		@Named(DvrpModule.DVRP_ROUTING)
-		Network network;
-		@Inject
-		Config config;
-		@Inject
-		TaxiConfigGroup taxiCfg;
-
-		@Override
-		public Fleet get() {
-			FleetImpl fleet = new FleetImpl();
-			new VehicleReader(network, fleet).parse(taxiCfg.getTaxisFileUrl(config.getContext()));
-			return fleet;
-		}
 	}
 }

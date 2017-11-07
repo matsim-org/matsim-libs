@@ -42,9 +42,11 @@ public class GeometryUtils {
 	 * @param lineString
 	 * @param network
 	 * @return
+	 * 
+	 * @see {@link GeometryUtilsTest#testIntersectingLinks()}
 	 */
 	public static List<Link> findIntersectingLinks(LineString lineString, final Network network) {
-		// One could probably improve this method by using the (already existing) link quadtree to look only at
+		// yy One could probably improve this method by using the (already existing) link quadtree to look only at
 		// those links that are in the bounding box.  kai, oct'17
 		
 		// convert matsim links into geotools line strings:

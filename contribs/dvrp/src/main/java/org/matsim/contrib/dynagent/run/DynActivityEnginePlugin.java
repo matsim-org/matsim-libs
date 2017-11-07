@@ -1,12 +1,15 @@
 package org.matsim.contrib.dynagent.run;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
-import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import com.google.inject.*;
+import com.google.inject.AbstractModule;
+import com.google.inject.Module;
 
 public class DynActivityEnginePlugin extends AbstractQSimPlugin {
 	public DynActivityEnginePlugin(Config config) {
@@ -15,27 +18,21 @@ public class DynActivityEnginePlugin extends AbstractQSimPlugin {
 
 	@Override
 	public Collection<? extends Module> modules() {
-		Collection<Module> result = new ArrayList<>();
-		result.add(new AbstractModule() {
+		return Collections.singletonList(new AbstractModule() {
 			@Override
 			public void configure() {
 				bind(DynActivityEngine.class).asEagerSingleton();
 			}
 		});
-		return result;
 	}
 
 	@Override
 	public Collection<Class<? extends ActivityHandler>> activityHandlers() {
-		Collection<Class<? extends ActivityHandler>> result = new ArrayList<>();
-		result.add(DynActivityEngine.class);
-		return result;
+		return Collections.singletonList(DynActivityEngine.class);
 	}
 
 	@Override
 	public Collection<Class<? extends MobsimEngine>> engines() {
-		Collection<Class<? extends MobsimEngine>> result = new ArrayList<>();
-		result.add(DynActivityEngine.class);
-		return result;
+		return Collections.singletonList(DynActivityEngine.class);
 	}
 }

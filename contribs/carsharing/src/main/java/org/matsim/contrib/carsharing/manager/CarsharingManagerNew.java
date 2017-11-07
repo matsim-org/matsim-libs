@@ -56,7 +56,7 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 	
 	
 	@Override
-	public List<PlanElement> reserveAndrouteCarsharingTrip(Plan plan, String carsharingType, Leg legToBeRouted, Double time) {
+	public List<PlanElement> reserveAndrouteCarsharingTrip(final Plan plan, String carsharingType, Leg legToBeRouted, Double time) {
 		Network network = scenario.getNetwork();
 		Person person = plan.getPerson();
 		Link startLink = network.getLinks().get(legToBeRouted.getRoute().getStartLinkId());
@@ -126,7 +126,11 @@ public class CarsharingManagerNew implements CarsharingManagerInterface, Iterati
 			
 			
 			//TODO: offer the possible cars to the agent, from which the agent can choose
-			CSVehicle chosenVehicle = vehicleChoiceAgent.chooseVehicle(offeredVehicles, startLink);
+			//CSVehicle chosenVehicle = vehicleChoiceAgent.chooseVehicle(offeredVehicles, startLink, legToBeRouted, time, plan.getPerson());
+			
+			CSVehicle chosenVehicle = vehicleChoiceAgent.chooseVehicleActivityTimeIncluded(offeredVehicles, 
+					startLink, legToBeRouted, time, plan.getPerson(), durationOfNextActivity, keepTheCar);
+			
 			
 			if (chosenVehicle == null) {
 				eventsManager.processEvent(new NoVehicleCarSharingEvent(time, carsharingType, "", startLink, destinationLink));
