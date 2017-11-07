@@ -139,6 +139,7 @@ public final class BasicPlanAgentImpl implements MobsimAgent, PlanAgent, HasPers
 				noRouteWrnCnt++ ;
 			}
 			this.setState(MobsimAgent.State.ABORT) ;
+//			throw new RuntimeException("no route in leg") ;
 		} 
 	}
 

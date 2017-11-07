@@ -23,6 +23,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -229,6 +230,9 @@ public final class EditTrips {
 	 */
 	public static boolean relocateFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter) {
 		return replanFutureTrip(trip, plan, mainMode, departureTime, tripRouter );
+	}
+	public StageActivityTypes getStageActivities() {
+		return tripRouter.getStageActivityTypes() ;
 	}
 
 }
