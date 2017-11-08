@@ -32,7 +32,6 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplanner;
-import org.matsim.withinday.utils.EditRoutes;
 import org.matsim.withinday.utils.EditTrips;
 
 /**
@@ -67,7 +66,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		if (trip == null) return false;
 		
 		String mainMode = this.tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements());
-		double departureTime = EditRoutes.getDepartureTime(trip);
+		double departureTime = EditTrips.getDepartureTime(trip);
 		new EditTrips(this.tripRouter, scenario).replanFutureTrip(trip, executedPlan, mainMode, departureTime);
 		
 		return true;
