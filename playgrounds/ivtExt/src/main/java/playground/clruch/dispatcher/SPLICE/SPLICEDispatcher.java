@@ -1,14 +1,11 @@
 package playground.clruch.dispatcher.SPLICE;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -31,18 +28,21 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /**
+ * Empty Test Dispatcher, rebalances a vehicle every 30 mins and performs a
+ * pickup every 30 mins if open requests are present. Not functional, use as
+ * startpoint to build your own dispatcher. Splice Dispatcher based on Pavone
+ * and Frazzoli papers doi: 10.1109/TAC.2013.2259993, 10.1109/CDC.2011.6161406
  * Splice Dispatcher based on Pavone and Frazzoli papers doi:
- * 10.1109/TAC.2013.2259993, 10.1109/CDC.2011.6161406
- Empty Test Dispatcher, rebalances a vehicle every 30 mins and
- * performs a pickup every 30 mins if open requests are present.
- * Not functional, use as startpoint to build your own dispatcher.
- * 
- * Modify AV file and idsc properties:
- * CURRENTLY WORKING WITH 1 VEHICLE ONLY and small population i.e. 20..
+ * 10.1109/TAC.2013.2259993, 10.1109/CDC.2011.6161406 Empty Test Dispatcher,
+ * rebalances a vehicle every 30 mins and performs a pickup every 30 mins if
+ * open requests are present. Not functional, use as startpoint to build your
+ * own dispatcher. Modify AV file and idsc properties: CURRENTLY WORKING WITH 1
+ * VEHICLE ONLY and small population i.e. 20..
  * 
  * @author Nicolo Omezzano
  */
 public class SPLICEDispatcher extends RebalancingDispatcher {
+
 	private final int dispatchingPeriod;
 	private final Network network;
 	private final NetworkDistanceFunction ndf;
@@ -71,7 +71,7 @@ public class SPLICEDispatcher extends RebalancingDispatcher {
 
 		// TestBedDispatcher implementation
 		final long round_now = Math.round(now);
-		
+
 		// If there are more than x requests
 		if (scTAVrequests.isEmpty() && 12 < getAVRequests().size()) {
 
@@ -81,8 +81,8 @@ public class SPLICEDispatcher extends RebalancingDispatcher {
 
 			// Get stacker crane tour of requests
 			scTAVrequests = sct.calculate(getAVRequests());
-			
-			//Currently Working with 1 vehicle only
+
+			// Currently Working with 1 vehicle only
 			GlobalAssert.that(getRoboTaxis().size() == 1);
 			// Set iterator from AVlist
 			scTAVreqIterator = scTAVrequests.iterator();
@@ -101,7 +101,7 @@ public class SPLICEDispatcher extends RebalancingDispatcher {
 			pickupPairs = getPickupRoboTaxis();
 			System.out.println(round_now + " :Current pickup register: " + pickupPairs);
 
-			// If iterated through every request clear subtour. 
+			// If iterated through every request clear subtour.
 			if (!scTAVreqIterator.hasNext()) {
 				scTAVrequests.clear();
 
@@ -116,9 +116,8 @@ public class SPLICEDispatcher extends RebalancingDispatcher {
 			// --> Look at the GlobalBipartiteMatchingDispatcher
 			// connect
 			// REWIRE to get away the subtours
-			
-			
-			// TO DO --  multiple car case
+
+			// TO DO -- multiple car case
 			// 2 Break up tour for number of cars
 			// 3 assing each car a request on his tour chunk
 			// 4 do the actual pickup
