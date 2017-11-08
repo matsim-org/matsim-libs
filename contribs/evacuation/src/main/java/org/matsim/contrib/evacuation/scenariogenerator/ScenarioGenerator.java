@@ -294,6 +294,9 @@ public class ScenarioGenerator {
 		if (gcm.getMainTrafficType().equals("vehicular")) {
 			OsmNetworkReader reader = new OsmNetworkReader(sc.getNetwork(), ct,
 					true);
+			// The following is set as the ScenarioGeneratorIT is based on a network created with this setting,
+			// which is after latest revision not the default value in OSMNetworkReader anymore; dz,nov'17
+			reader.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600);
 			reader.setKeepPaths(true);
 			reader.parse(evacuationNetworkFile);
 		} else if (gcm.getMainTrafficType().equals("pedestrian")) {
