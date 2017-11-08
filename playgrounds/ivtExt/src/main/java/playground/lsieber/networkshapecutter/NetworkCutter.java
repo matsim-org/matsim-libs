@@ -18,3 +18,4 @@ public interface NetworkCutter {
     void checkNetworkConsistency();
 
 }
+

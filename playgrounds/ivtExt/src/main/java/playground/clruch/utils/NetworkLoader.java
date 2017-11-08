@@ -1,28 +1,33 @@
 package playground.clruch.utils;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import ch.ethz.idsc.queuey.util.GlobalAssert;
-
 /** @author Claudio Ruch */
-// TODO Lukas rewrite this in a way such that only the network file is loaded and the other files (population.xml etc. ) are not needed.
 public enum NetworkLoader {
     ;
     public static Network loadNetwork(File file) {
-        GlobalAssert.that(file.exists());
         Config config = ConfigUtils.loadConfig(file.toString());
-        
-        // TODO Lukas: see if you can change using the function below such that we can load a network without
-        // loading all the rest. 
-//         return NetworkUtils.createNetwork(config);
+        Set<Entry<String, ConfigGroup>> toDelete = new HashSet<>();
+        for (Entry<String, ConfigGroup> entry : config.getModules().entrySet()) {
+            if (!entry.getKey().equals(NetworkConfigGroup.GROUP_NAME)) {
+                toDelete.add(entry);
+            }
+        }
+
+        toDelete.stream().forEach(e -> config.removeModule(e.getKey()));
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         return scenario.getNetwork();
     }
-}
+} 

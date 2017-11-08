@@ -16,7 +16,8 @@ import ch.ethz.idsc.owly.data.GlobalAssert;
 /**
  * Created by Joel on 06.07.2017.
  */
-public abstract class EasyDijkstra {
+public enum EasyDijkstra {
+    ;
 
     public static LeastCostPathCalculator prepDijkstra(Network network) {
         PreProcessDijkstra preProcessData = new PreProcessDijkstra();
@@ -31,25 +32,25 @@ public abstract class EasyDijkstra {
 
             @Override
             public double getLinkMinimumTravelDisutility(Link link) {
-                return link.getLength()/link.getFreespeed();
+                return link.getLength() / link.getFreespeed();
             }
         };
 
         TravelTime travelTime = new TravelTime() {
             @Override
             public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-                return link.getLength()/link.getFreespeed();
+                return link.getLength() / link.getFreespeed();
             }
         };
 
-        return (new FastDijkstraFactory(preProcessData)).createPathCalculator(network, travelMinCost, travelTime);
+        return new FastDijkstraFactory(preProcessData).createPathCalculator(network, travelMinCost, travelTime);
     }
 
     public static LeastCostPathCalculator.Path executeDijkstra(LeastCostPathCalculator dijkstra, Node from, Node to) {
         // depending on implementation of traveldisutility and traveltime, starttime, person and vehicle are needed
-        GlobalAssert.that(dijkstra!=null);
-        GlobalAssert.that(from!=null);
-        GlobalAssert.that(to!=null);
+        GlobalAssert.that(dijkstra != null);
+        GlobalAssert.that(from != null);
+        GlobalAssert.that(to != null);
         return dijkstra.calcLeastCostPath(from, to, 0.0, null, null);
     }
 
