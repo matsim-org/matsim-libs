@@ -23,6 +23,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -225,10 +226,41 @@ public final class EditTrips {
 	 * @param departureTime
 	 * @param network
 	 * @param tripRouter
-	 * @deprecated Use {@link EditTrips#relocateFutureTrip(Trip,Plan,String,double)} instead.  kai, << oct'17
 	 */
 	public static boolean relocateFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, Network network, TripRouter tripRouter) {
 		return replanFutureTrip(trip, plan, mainMode, departureTime, tripRouter );
 	}
+	public StageActivityTypes getStageActivities() {
+		return tripRouter.getStageActivityTypes() ;
+	}
+	/**
+	 * @param trip
+	 * @return the departure time of the first leg of the trip
+	 */
+	public static double getDepartureTime(Trip trip) {
+		// does this always make sense?
+		Leg leg = (Leg) trip.getTripElements().get(0);
+		return leg.getDepartureTime();
+	}
+	/**
+		 * @param plan
+		 * @param fromActivity
+		 * @param tripRouter
+		 * @return the Trip that starts at the given activity or null, if no trip was found
+		 */
+		public static Trip findTripAfterActivity(Plan plan, Activity activity, TripRouter tripRouter) {
+			return TripStructureUtils.findTripStartingAtActivity(activity, plan, tripRouter.getStageActivityTypes() ) ;
+	//		List<Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes());
+	//
+	//		for (Trip trip : trips) {
+	//			if (trip.getOriginActivity() == fromActivity) return trip;
+	//		}
+	//
+	//		// no matching trip was found
+	//		return null;
+		}
+		public Trip findTripAfterActivity( Plan plan, Activity activity ) {
+			return findTripAfterActivity(plan, activity, tripRouter) ;
+		}
 
 }
