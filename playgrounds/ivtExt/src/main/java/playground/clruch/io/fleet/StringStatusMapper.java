@@ -10,17 +10,15 @@ public enum StringStatusMapper {
         case "Am Standplatz":
         	return check_stay(now, Double.parseDouble(distanceMoved), Double.parseDouble(timePassed));        	
         case "In Anfahrt":
-        	return AVStatus.DRIVETOCUSTMER;
+        	return AVStatus.DRIVETOCUSTOMER;
         case "Angemeldet":
             return check_stay(now, Double.parseDouble(distanceMoved), Double.parseDouble(timePassed));
         case "In Umgebung":
             return check_stay(now, Double.parseDouble(distanceMoved), Double.parseDouble(timePassed));
         case "Beim Kunden":
-            return AVStatus.DRIVETOCUSTMER;
+            return AVStatus.DRIVETOCUSTOMER;
         case "Besetzt mit Kunden":
-            return AVStatus.DRIVEWITHCUSTOMER;
         case "Besetzt mit Fahrziel":
-            return AVStatus.DRIVEWITHCUSTOMER;
         case "Besetzt mit Folgeauftrag":
             return AVStatus.DRIVEWITHCUSTOMER;
         default:

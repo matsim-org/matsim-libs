@@ -48,15 +48,11 @@ public class MatsimStaticDatabase {
 
     public static MatsimStaticDatabase INSTANCE;
 
-    /**
-     * rapid lookup from MATSIM side
-     */
+    /** rapid lookup from MATSIM side */
     private final Map<Link, Integer> linkInteger = new HashMap<>();
     public final ReferenceFrame referenceFrame;
 
-    /**
-     * rapid lookup from Viewer
-     */
+    /** rapid lookup from Viewer */
     private final List<OsmLink> list;
 
     private final IdIntegerDatabase requestIdIntegerDatabase = new IdIntegerDatabase();

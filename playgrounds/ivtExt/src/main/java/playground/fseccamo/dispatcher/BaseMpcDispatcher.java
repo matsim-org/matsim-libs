@@ -1,3 +1,4 @@
+// code by francesco, jph, clruch
 package playground.fseccamo.dispatcher;
 
 import java.util.HashMap;
@@ -46,7 +47,7 @@ abstract class BaseMpcDispatcher extends PartitionedDispatcher {
         Map<VirtualNode<Link>, List<RoboTaxi>> allVehicles = getVirtualNodeDivertableNotRebalancingRoboTaxis();
         for (VirtualNode<Link> vn : allVehicles.keySet()) {
             for (RoboTaxi robotaxi : allVehicles.get(vn)) {
-                if (!robotaxi.getAVStatus().equals(AVStatus.DRIVETOCUSTMER)) {
+                if (!robotaxi.getAVStatus().equals(AVStatus.DRIVETOCUSTOMER)) {
                     returnMap.get(vn).add(robotaxi);
                 }
             }

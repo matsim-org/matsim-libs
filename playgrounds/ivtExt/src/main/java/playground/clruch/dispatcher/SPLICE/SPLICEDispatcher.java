@@ -33,6 +33,9 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 /**
  * Splice Dispatcher based on Pavone and Frazzoli papers doi:
  * 10.1109/TAC.2013.2259993, 10.1109/CDC.2011.6161406
+ Empty Test Dispatcher, rebalances a vehicle every 30 mins and
+ * performs a pickup every 30 mins if open requests are present.
+ * Not functional, use as startpoint to build your own dispatcher.
  * 
  * Modify AV file and idsc properties:
  * CURRENTLY WORKING WITH 1 VEHICLE ONLY and small population i.e. 20..
@@ -166,5 +169,4 @@ public class SPLICEDispatcher extends RebalancingDispatcher {
 																										// //,ndf,scTAVrequests);
 		}
 	}
-
 }
