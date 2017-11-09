@@ -1,6 +1,7 @@
 // code by jph
 package playground.clruch.io.fleet;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
@@ -47,7 +48,7 @@ public class TaxiTrail {
         GlobalAssert.that(Objects.nonNull(entry));
         if (Objects.nonNull(entry))
             return entry;
-        return null;
+        return null; // TODO <- this case will never happen due to GlobalAssert, so "return entry;" is sufficient  
     }
 
     public Entry<Integer, TaxiStamp> getLastEntry(int now) {
@@ -128,7 +129,7 @@ public class TaxiTrail {
     }
     
     public Set<Integer> getKeySet() {
-        return sortedMap.keySet();
+        return Collections.unmodifiableSet(sortedMap.keySet());
     }
 
 }

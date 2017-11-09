@@ -43,6 +43,8 @@ public class RequestContainerUtils {
             // } else if (requestedTime == 0) {
             // return null;
         }
+        // TODO look into returning type Optional<Coord>, and instead of null simply "return Optional.empty();"
+        // this can prevent certain mistakes in the application layer
         return null;
     }
 

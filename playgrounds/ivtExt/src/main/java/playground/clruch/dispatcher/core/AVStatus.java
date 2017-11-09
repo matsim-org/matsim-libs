@@ -10,16 +10,22 @@ public enum AVStatus {
     OFFSERVICE("off", "off service"), // TODO check if useful.
     ;
 
-    public final String xmlTag;
+    public final String tag;
     public final String description;
 
     AVStatus(String xmlTag, String description) {
-        this.xmlTag = xmlTag;
+        this.tag = xmlTag;
         this.description = description;
     }
 
+    public String tag() {
+        return tag;
+    }
+
     @Override
+    @Deprecated // use tag() instead
     public String toString() {
-        return this.xmlTag;
+        // TODO andy, use tag() instead so that we have better control of where tag is used
+        return tag;
     }
 }
