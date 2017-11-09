@@ -92,8 +92,8 @@ enum SimulationFleetDump {
                             if (requestStatus != RequestStatus.CANCELLED) {
                                 RequestContainer rc = rcParser.populate(now, requestIndex, quadTree, db);
                                 simulationObject.requests.add(rc);
-                                // Check if a request has been completed
-                                if (requestStatus == RequestStatus.DROPOFF) {
+                                // Check if a request has been matched == Passenger has been picked up
+                                if (requestStatus == RequestStatus.PICKUP) {
                                     totalMatchedRequests++;
                                     simulationObject.total_matchedRequests = totalMatchedRequests;
                                 }

@@ -30,7 +30,7 @@ public enum VirtualNetworkGet {
             Map<String, Link> map = new HashMap<>();
             network.getLinks().entrySet().forEach(e -> map.put(e.getKey().toString(), e.getValue()));
 
-            return (new VirtualNetworkIO<Link>()).fromByte(map, virtualnetworkFile);
+            return (new VirtualNetworkIO()).fromByte(map, virtualnetworkFile);
         } catch (Exception e) {
             System.out.println("cannot load default " + virtualnetworkFile);
 

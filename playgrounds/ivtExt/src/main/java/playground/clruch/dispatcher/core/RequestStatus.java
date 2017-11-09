@@ -12,17 +12,22 @@ public enum RequestStatus {
     EMPTY("noc", "no customer"), //
     ;
 
-    public final String xmlTag;
+    public final String tag;
     public final String description;
 
     RequestStatus(String xmlTag, String description) {
-        this.xmlTag = xmlTag;
+        this.tag = xmlTag;
         this.description = description;
     }
 
+    public String tag() {
+        return tag;
+    }
+    
     @Override
+    @Deprecated // use tag() instead
     public String toString() {
-        return this.xmlTag;
+        return tag;
     }
 
     

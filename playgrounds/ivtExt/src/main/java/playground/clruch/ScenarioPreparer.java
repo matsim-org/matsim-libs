@@ -148,7 +148,7 @@ public class ScenarioPreparer {
 
         final File vnDir = new File(workingDirectory, VIRTUALNETWORKFOLDERNAME);
         vnDir.mkdir(); // create folder if necessary
-        (new VirtualNetworkIO<Link>()).toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
+        (new VirtualNetworkIO()).toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
         System.out.println("saved virtual network byte format to : " + new File(vnDir, VIRTUALNETWORKFILENAME));
         PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);
         prs.exportCsv();
