@@ -9,7 +9,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
@@ -40,8 +43,8 @@ public class NetworkCutterShape implements NetworkCutter {
     }
 
     @Override
-    public Network filter(Network network) throws MalformedURLException, IOException {
-        modifiedNetwork = filterInternal(network);
+    public Network filter(Network network, HashSet<String> modes) throws MalformedURLException, IOException {
+        modifiedNetwork = filterInternal(network, modes);
 
         long numberOfLinksOriginal = network.getLinks().size();
         long numberOfNodesOriginal = network.getNodes().size();
@@ -70,7 +73,7 @@ public class NetworkCutterShape implements NetworkCutter {
 
     }
 
-    public Network filterInternal(Network originalNetwork) throws IOException {
+    public Network filterInternal(Network originalNetwork, HashSet<String> modes) throws IOException {
 
         Network filteredNetwork = NetworkUtils.createNetwork();
 
@@ -102,14 +105,22 @@ public class NetworkCutterShape implements NetworkCutter {
             Node filteredToNode = filteredNetwork.getNodes().get(link.getToNode().getId());
 
             if (filteredFromNode != null && filteredToNode != null) {
-                if (link.getAllowedModes().contains("car")) {
+
+                Iterator<String> it = modes.iterator();
+                boolean allowedMode = false;
+                while (it.hasNext() && !allowedMode) {
+                    allowedMode = link.getAllowedModes().contains(it.next());
+                }
+                if (allowedMode) {
                     Link newLink = filteredNetwork.getFactory().createLink(link.getId(), filteredFromNode, filteredToNode);
 
-                    newLink.setAllowedModes(Collections.singleton("car"));
+                    // newLink.setAllowedModes(Collections.singleton("car"));
+                    newLink.setAllowedModes(link.getAllowedModes());
+
                     newLink.setLength(link.getLength());
                     newLink.setCapacity(link.getCapacity());
                     newLink.setFreespeed(link.getFreespeed());
-                    newLink.setNumberOfLanes(link.getNumberOfLanes());
+                    // newLink.setNumberOfLanes(link.getNumberOfLanes());
 
                     filteredNetwork.addLink(newLink);
                 }

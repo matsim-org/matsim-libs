@@ -3,6 +3,7 @@ package playground.lsieber.networkshapecutter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collections;
+import java.util.HashSet;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -18,7 +19,7 @@ public class old__NetworkCutterRadius2 implements NetworkCutter {
     private Coord center;
     private Network modifiedNetwork;
     private String cutInfo = null;
-    
+
     public old__NetworkCutterRadius2(Coord center, double radius) {
         // TODO Auto-generated constructor stub
         this.radius = radius;
@@ -26,21 +27,21 @@ public class old__NetworkCutterRadius2 implements NetworkCutter {
     }
 
     @Override
-    public Network filter(Network network) throws MalformedURLException, IOException {
+    public Network filter(Network network, HashSet<String> modes) throws MalformedURLException, IOException {
         modifiedNetwork = filterInternal(network);
 
         long numberOfLinksOriginal = network.getLinks().size();
         long numberOfNodesOriginal = network.getNodes().size();
         long numberOfLinksFiltered = modifiedNetwork.getLinks().size();
         long numberOfNodesFiltered = modifiedNetwork.getNodes().size();
-        
+
         cutInfo += "  Number of Links in original network: " + numberOfLinksOriginal + "\n";
         cutInfo += "  Number of nodes in original network: " + numberOfNodesOriginal + "\n";
         cutInfo += String.format("  Number of nodes in filtered network: %d (%.2f%%)", numberOfNodesFiltered,
                 100.0 * numberOfNodesFiltered / numberOfNodesOriginal) + "\n";
         cutInfo += String.format("  Number of links in filtered network: %d (%.2f%%)", numberOfLinksFiltered,
                 100.0 * numberOfLinksFiltered / numberOfLinksOriginal) + "\n";
-        
+
         printCutSummary();
         return modifiedNetwork;
     }
@@ -54,8 +55,9 @@ public class old__NetworkCutterRadius2 implements NetworkCutter {
     @Override
     public void checkNetworkConsistency() {
         // TODO Auto-generated method stub
-        
+
     }
+
     private Network filterInternal(Network originalNetwork) {
 
         Network filteredNetwork = NetworkUtils.createNetwork();
