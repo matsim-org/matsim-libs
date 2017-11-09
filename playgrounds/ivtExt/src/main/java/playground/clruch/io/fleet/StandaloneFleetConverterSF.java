@@ -21,6 +21,7 @@ import ch.ethz.idsc.queuey.datalys.MultiFileReader;
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.datalys.csv.CSVUtils;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import jogamp.graph.font.typecast.ot.table.ID;
 import playground.clruch.ScenarioOptions;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.IdIntegerDatabase;
@@ -31,55 +32,57 @@ import playground.clruch.utils.PropertiesExt;
 
 /** @author Claudio Ruch */
 enum StandaloneFleetConverterSF {
-    ;
-    public static void main(String[] args) throws Exception {
+	;
+	public static void main(String[] args) throws Exception {
 
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
-        File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
-        GlobalAssert.that(configFile.exists());
-        
-        Network network = NetworkLoader.loadNetwork(configFile);
-        GlobalAssert.that(network != null);
-        System.out.println("network has " + network.getNodes().size() + " nodes");
-        
-        File outputDirectory = new File(workingDirectory, "output/001");
-        File dataDirectory = new File(workingDirectory, "taxiTraces");
-        File headerDirectory = new File(dataDirectory, "HEADER");
-        File idDirectory= new File(dataDirectory, "_cabs.txt");
+		File workingDirectory = MultiFileTools.getWorkingDirectory();
+		PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+		File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
+		GlobalAssert.that(configFile.exists());
 
-        System.out.println("INFO working folder: " + workingDirectory.getAbsolutePath());
-        System.out.println("INFO data folder: " + dataDirectory.getAbsolutePath());
-        System.out.println("INFO output folder: " + outputDirectory.getAbsolutePath());
-        
-        List<File> trailFilesComplete = (new MultiFileReader(dataDirectory, "new_")).getFolderFiles();
-        System.out.println("NUMBER of data files = " + trailFilesComplete.size());
-        System.out.println("INFO found files: ");
-        for (File file : trailFilesComplete) {
-            System.out.println(file.getAbsolutePath());
-        }
-        
-        List<File> trailFiles = new ArrayList<>();
-        for(int i = 0; i < trailFilesComplete.size(); ++i){
-            trailFiles.add(trailFilesComplete.get(i));
-        }
+		Network network = NetworkLoader.loadNetwork(configFile);
+		GlobalAssert.that(network != null);
+		System.out.println("network has " + network.getNodes().size() + " nodes");
 
-        // TODO preprocess the taxi files and add one line with headers to each file
-        //HEADER:removed constant by adding file to our data 
+		File outputDirectory = new File(workingDirectory, "output/001");
+		File dataDirectory = new File(workingDirectory, "taxiTraces");
+		File headerDirectory = new File(dataDirectory, "HEADER");
+		File idDirectory = new File(dataDirectory, "_cabs.txt");
+
+		System.out.println("INFO working folder: " + workingDirectory.getAbsolutePath());
+		System.out.println("INFO data folder: " + dataDirectory.getAbsolutePath());
+		System.out.println("INFO output folder: " + outputDirectory.getAbsolutePath());
+
+		List<File> trailFilesComplete = (new MultiFileReader(dataDirectory, "new_")).getFolderFiles();
+		System.out.println("NUMBER of data files = " + trailFilesComplete.size());
+		System.out.println("INFO found files: ");
+		
+		for (File file : trailFilesComplete) {
+			System.out.println(file.getAbsolutePath());
+		}
+
+		List<File> trailFiles = new ArrayList<>();
+		for (int i = 0; i < trailFilesComplete.size(); ++i) {
+			trailFiles.add(trailFilesComplete.get(i));
+		}
+
+		// TODO preprocess the taxi files and add one line with headers to each file
+        //HEADER:removed constant by adding file to our data import in here
         if (headerDirectory.exists())
 			DayTaxiRecord.head(trailFilesComplete, headerDirectory, trailFiles);
 
-		// TODO get id for each car
-		if (idDirectory.exists())
-			DayTaxiRecord.id(trailFilesComplete, idDirectory, trailFiles);
-
-        ReferenceFrame referenceFrame = ReferenceFrame.IDENTITY;
-             
-        IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();        
+		// TODO get id for each car in here// get.(int)
+        ArrayList<String> people, number;
+			people = DayTaxiRecord.name(idDirectory);
+			number = DayTaxiRecord.id(idDirectory);
+		
+        ReferenceFrame referenceFrame = ReferenceFrame.IDENTITY;     
+        IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();  
+        
         // extract data from file and put into dayTaxiRecord
         DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
         CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);
-        reader.populateFrom(trailFiles);
+        reader.populateFrom(trailFiles,people,number);
 
         // STEP 2: DayTaxiRecord to MATSimStaticDatabase
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
@@ -96,4 +99,3 @@ enum StandaloneFleetConverterSF {
         SimulationFleetDump.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE, storageUtils);
     }
 }
-// ====================

@@ -16,36 +16,30 @@ import playground.clruch.dispatcher.core.RequestStatus;
 public class TaxiTrail {
     @SuppressWarnings("unused")
     private int override = 0;
-    private final NavigableMap<Integer, TaxiStamp> sortedMap = new TreeMap<>();
+	private final NavigableMap<Integer, TaxiStamp> sortedMap = new TreeMap<>();
 
-    public void insert(int now, List<String> list) {
-        TaxiStamp taxiStamp = new TaxiStamp();
-//        taxiStamp.avStatus = AVStatus.DRIVEWITHCUSTOMER; // TODO make the real status here. 
-        if (list.get(2)=="0") {
-        		list.add(2, "In Anfahrt");
-        }
-        if (list.get(2)=="1") {
-    		list.add(2, "Besetzt mit Kunden");
-    } 
-        taxiStamp.avStatus = StringStatusMapper.applysf(now, list.get(2));
+	public void insert(int now, List<String> list) {
+		TaxiStamp taxiStamp = new TaxiStamp();
+		taxiStamp.avStatus = AVStatus.DRIVEWITHCUSTOMER; // TODO make the real status here.
+		// StringStatusMapper.apply(now, list.get(3), list.get(4), list.get(5));
+		taxiStamp.gps = new Coord( //
+				Double.parseDouble(list.get(1)), //
+				Double.parseDouble(list.get(0)));
 
-        
-        taxiStamp.gps = new Coord( //
-                Double.parseDouble(list.get(1)), //
-                Double.parseDouble(list.get(0)));
+		if (sortedMap.containsKey(now)) {
+			System.err.println("override");
+			++override;
+		}
+		sortedMap.put(now, taxiStamp);
+	}
 
-        if (sortedMap.containsKey(now)) {
-            System.err.println("override");
-            ++override;
-        }
-        sortedMap.put(now, taxiStamp);
-    }
-
-    /*** Changed method to return the whole entry instead only the getvalue() part
-     * so we also know the timestamp it "interpolated" to.
-     * 
-     * @param now
-     * @return */
+	/***
+	 * Changed method to return the whole entry instead only the getvalue() part so
+	 * we also know the timestamp it "interpolated" to.
+	 * 
+	 * @param now
+	 * @return
+	 */
     public Entry<Integer, TaxiStamp> interp(int now) {
         // less than or equal to the given key
         Entry<Integer, TaxiStamp> entry = sortedMap.floorEntry(now);
