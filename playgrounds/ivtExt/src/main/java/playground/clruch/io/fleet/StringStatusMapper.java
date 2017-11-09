@@ -31,7 +31,19 @@ public enum StringStatusMapper {
     public static AVStatus check_stay(int now, double distanceMoved, double timePassed) {
         if (timePassed >= 150 && distanceMoved <= 150) // TODO magic const, check with AVSTATUS graph.
             return AVStatus.STAY;
-        else
-            return AVStatus.REBALANCEDRIVE;
-    }
+		else
+			return AVStatus.REBALANCEDRIVE;
+	}
+
+	public static AVStatus applysf(int now, String string) {
+		switch (string) {
+		case "0":
+			return AVStatus.DRIVETOCUSTOMER;
+		case "1":
+			return AVStatus.DRIVEWITHCUSTOMER;
+		default:
+			break;
+		}
+		throw new RuntimeException(string);
+	}
 }

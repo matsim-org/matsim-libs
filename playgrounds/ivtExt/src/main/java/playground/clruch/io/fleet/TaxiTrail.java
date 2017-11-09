@@ -20,8 +20,16 @@ public class TaxiTrail {
 
     public void insert(int now, List<String> list) {
         TaxiStamp taxiStamp = new TaxiStamp();
-        taxiStamp.avStatus = AVStatus.DRIVEWITHCUSTOMER; // TODO make the real status here. 
-        //StringStatusMapper.apply(now, list.get(3), list.get(4), list.get(5));
+//        taxiStamp.avStatus = AVStatus.DRIVEWITHCUSTOMER; // TODO make the real status here. 
+        if (list.get(2)=="0") {
+        		list.add(2, "In Anfahrt");
+        }
+        if (list.get(2)=="1") {
+    		list.add(2, "Besetzt mit Kunden");
+    } 
+        taxiStamp.avStatus = StringStatusMapper.applysf(now, list.get(2));
+
+        
         taxiStamp.gps = new Coord( //
                 Double.parseDouble(list.get(1)), //
                 Double.parseDouble(list.get(0)));

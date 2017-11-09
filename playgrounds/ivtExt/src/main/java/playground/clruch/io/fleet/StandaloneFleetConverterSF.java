@@ -38,23 +38,20 @@ enum StandaloneFleetConverterSF {
         PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
         File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
         GlobalAssert.that(configFile.exists());
+        
         Network network = NetworkLoader.loadNetwork(configFile);
         GlobalAssert.that(network != null);
         System.out.println("network has " + network.getNodes().size() + " nodes");
+        
         File outputDirectory = new File(workingDirectory, "output/001");
         File dataDirectory = new File(workingDirectory, "taxiTraces");
+        File headerDirectory = new File(dataDirectory, "HEADER");
+        File idDirectory= new File(dataDirectory, "_cabs.txt");
 
         System.out.println("INFO working folder: " + workingDirectory.getAbsolutePath());
         System.out.println("INFO data folder: " + dataDirectory.getAbsolutePath());
         System.out.println("INFO output folder: " + outputDirectory.getAbsolutePath());
-
-        // File shortTraceData = new File(dataDirectory, "new_abboip_short.txt");
-        // GlobalAssert.that(shortTraceData.exists());
-        // List<File> trailFiles = new ArrayList<>();
-        // trailFiles.add(shortTraceData);
-
-        // fillHeaders(dataDirectory);
-
+        
         List<File> trailFilesComplete = (new MultiFileReader(dataDirectory, "new_")).getFolderFiles();
         System.out.println("NUMBER of data files = " + trailFilesComplete.size());
         System.out.println("INFO found files: ");
@@ -63,66 +60,40 @@ enum StandaloneFleetConverterSF {
         }
         
         List<File> trailFiles = new ArrayList<>();
-        for(int i = 0; i < 30; ++i){
-            trailFiles.add(trailFilesComplete.get(i*5));
+        for(int i = 0; i < trailFilesComplete.size(); ++i){
+            trailFiles.add(trailFilesComplete.get(i));
         }
-        trailFiles.add(trailFilesComplete.get(1));
-        trailFiles.add(trailFilesComplete.get(100));
-        
 
         // TODO preprocess the taxi files and add one line with headers to each file
+        //HEADER:removed constant by adding file to our data 
+        if (headerDirectory.exists())
+			DayTaxiRecord.head(trailFilesComplete, headerDirectory, trailFiles);
+
+		// TODO get id for each car
+		if (idDirectory.exists())
+			DayTaxiRecord.id(trailFilesComplete, idDirectory, trailFiles);
 
         ReferenceFrame referenceFrame = ReferenceFrame.IDENTITY;
-        
+             
         IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();        
-        DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
         // extract data from file and put into dayTaxiRecord
+        DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
         CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);
         reader.populateFrom(trailFiles);
 
-        // // STEP 2: DayTaxiRecord to MATSimStaticDatabase
+        // STEP 2: DayTaxiRecord to MATSimStaticDatabase
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         // generate sim objects and store
 
         // TODO ana include this if you want to delete the old versions, but be careful, it can delete everything!!!
-        //// if (storageSupplierFile.exists()) {
-        //// FileDelete.of(storageSupplierFile, 5, 100000);
-        //// }
-        //// GlobalAssert.that(!storageSupplierFile.exists());
-        //// storageSupplierFile.mkdir();
+        // if (storageSupplierFile.exists()) {
+        // FileDelete.of(storageSupplierFile, 5, 100000);
+        // }
+        // GlobalAssert.that(!storageSupplierFile.exists());
+        // storageSupplierFile.mkdir();
 
         StorageUtils storageUtils = new StorageUtils(outputDirectory);
         SimulationFleetDump.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE, storageUtils);
     }
-
-    private static void fillHeaders(File dataDirectory) throws IOException {
-        String realHeader = "LATITUDE LONGITUDE OCCUPANCY TIME"; // TODO remove magic const.
-        List<File> trailFiles = (new MultiFileReader(dataDirectory, "new_")).getFolderFiles();
-        for (File file : trailFiles) {
-
-            // check if header is there
-            BufferedReader br = new BufferedReader(new FileReader(file));
-            String line1 = br.readLine();
-            if (!line1.equals(realHeader)) {
-                File headeredFile = new File(file.getParentFile(), "HEADERED" + file.getName());
-                BufferedWriter writer = new BufferedWriter(new FileWriter(headeredFile));
-                writer.write(realHeader);
-                writer.write("\n");
-
-                while (true) {
-                    String line = br.readLine();
-                    if (Objects.isNull(line))
-                        break;
-                    writer.write(line);
-                    writer.write("\n");
-
-                }
-            }
-
-        }
-    }
 }
-
-// ===========================
-// for later usage
-// ============================
+// ====================

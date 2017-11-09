@@ -27,9 +27,7 @@ public class CsvFleetReader {
 
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 {
-                    // String line = br.readLine();
-                    String realHeader = "LATITUDE LONGITUDE OCCUPANCY TIME"; // TODO remove magic const.
-                    String line = realHeader;
+                    String line = br.readLine();
                     List<String> list = CSVUtils.csvLineToList(line, " ");
                     int count = 0;
                     System.out.println("CSV HEADER");
@@ -68,11 +66,11 @@ public class CsvFleetReader {
         // out.close(); // Close the file
         // }
 
-        // Going through all timestamps and check for offservice vehicles && parse requests
+		// Going through all timestamps and check for offservice vehicles && parse
+		// requests
 
-        // TODO put both time we did this in one function, no double code
+     // TODO put both time we did this in one function, no double code
         final int MAXTIME = (int) Long.parseLong(dayTaxiRecord.lastTimeStamp) / 1000;
-
         // dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
 
         // OLD final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
