@@ -22,7 +22,10 @@
 
 package org.matsim.core.mobsim.qsim;
 
-import com.google.inject.*;
+import java.util.Collection;
+
+import javax.inject.Inject;
+
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
@@ -30,8 +33,9 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
-import javax.inject.Inject;
-import java.util.Collection;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import com.google.inject.Provider;
 
 public class QSimProvider implements Provider<QSim> {
 
@@ -46,10 +50,11 @@ public class QSimProvider implements Provider<QSim> {
 
     @Override
     public QSim get() {
-        AbstractModule module = new AbstractModule() {
+	    com.google.inject.AbstractModule module = new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
 				for (AbstractQSimPlugin plugin : plugins) {
+					// install each plugin's modules:
 					for (Module module1 : plugin.modules()) {
 						install(module1);
 					}
@@ -61,18 +66,23 @@ public class QSimProvider implements Provider<QSim> {
         Injector qSimLocalInjector = injector.createChildInjector(module);
         QSim qSim = qSimLocalInjector.getInstance(QSim.class);
         for (AbstractQSimPlugin plugin : plugins) {
+	  		// add each plugin's mobsim engines:
 			for (Class<? extends MobsimEngine> mobsimEngine : plugin.engines()) {
 				qSim.addMobsimEngine(qSimLocalInjector.getInstance(mobsimEngine));
 			}
+	  		// add each plugin's activity handlers:
 			for (Class<? extends ActivityHandler> activityHandler : plugin.activityHandlers()) {
 				qSim.addActivityHandler(qSimLocalInjector.getInstance(activityHandler));
 			}
+	  		// add each plugin's departure handlers:
 			for (Class<? extends DepartureHandler> mobsimEngine : plugin.departureHandlers()) {
 				qSim.addDepartureHandler(qSimLocalInjector.getInstance(mobsimEngine));
 			}
+	  		// add each plugin's mobsim listeners:
 			for (Class<? extends MobsimListener> mobsimListener : plugin.listeners()) {
 				qSim.addQueueSimulationListeners(qSimLocalInjector.getInstance(mobsimListener));
 			}
+	  		// add each plugin's agent sources:
 			for (Class<? extends AgentSource> agentSource : plugin.agentSources()) {
 				qSim.addAgentSource(qSimLocalInjector.getInstance(agentSource));
 			}
