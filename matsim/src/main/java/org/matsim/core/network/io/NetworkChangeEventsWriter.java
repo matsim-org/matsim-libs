@@ -125,6 +125,9 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 	}
 	
 	private void writeEvent(NetworkChangeEvent event) throws IOException {
+		if ( event.getLinks().isEmpty() ) {
+			return ;
+		}
 		this.writer.write(TAB);
 		this.writer.write(OPEN_TAG_1);
 		this.writer.write(NetworkChangeEventsParser.NETWORK_CHANGE_EVENT_TAG);
