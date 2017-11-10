@@ -137,7 +137,7 @@ public final class EditPlans {
 			// activity before:
 			Activity actBefore = findActBefore(agent, index);
 			if ( actBefore != null ) {
-				if ( EditPlans.indexOf(agent, actBefore) < WithinDayAgentUtils.getCurrentPlanElementIndex(agent) ) {
+				if ( EditPlans.indexOfPlanElement(agent, actBefore) < WithinDayAgentUtils.getCurrentPlanElementIndex(agent) ) {
 					// we are already under way
 					editTrips.replanCurrentTrip(agent, this.mobsim.getSimTimer().getTimeOfDay() );
 				} else {
@@ -158,11 +158,11 @@ public final class EditPlans {
 	}
 
 	// === search methods: ===
-	public static int indexOf(MobsimAgent agent, Object o) {
+	public static int indexOfPlanElement(MobsimAgent agent, PlanElement pe) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
 
-		return planElements.indexOf(o) ;
+		return planElements.indexOf(pe) ;
 	}
 	public static int indexOfNextActivityWithType( MobsimAgent agent, String type ) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
@@ -177,6 +177,10 @@ public final class EditPlans {
 			}
 		}
 		return -1 ;
+	}
+	public static Activity findNextActivityWithType( MobsimAgent agent, String type ) {
+		int index = indexOfNextActivityWithType( agent, type ) ;
+		return (Activity) WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements().get(index) ;
 	}
 	public static List<PlanElement> subList(MobsimAgent agent, int fromIndex, int toIndex) {
 		return WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements().subList( fromIndex, toIndex ) ;
@@ -333,6 +337,10 @@ public final class EditPlans {
 		plan.getPlanElements().add(index, newActivity);
 
 		return true;
+	}
+	public void rescheduleActivityEnd(MobsimAgent agent) {
+		// this is mostly for retrofitting existing code.  but maybe also useful by itself
+		this.mobsim.rescheduleActivityEnd(agent);
 	}
 
 }

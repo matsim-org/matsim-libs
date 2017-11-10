@@ -169,7 +169,7 @@ public class RunCarsharingIT {
 							
 				else if ( iteration==20 ) {
 					if ( TransportMode.walk.equals(legMode) ) {
-						Assert.assertEquals(0, nOfModeLegs );
+						Assert.assertEquals(4, nOfModeLegs );
 					} else if ( "twoway_vehicle".equals(legMode) ) {
 						Assert.assertEquals( 10, nOfModeLegs ) ;
 					} else if ( TransportMode.car.equals(legMode) ) {

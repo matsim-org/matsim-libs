@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -37,14 +36,15 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.HasPerson;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.LinkWrapperFacility;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.facilities.ActivityFacility;
@@ -55,7 +55,13 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-public class EditRoutes {
+public final class EditRoutes {
+	// I think that this class is now for the time being (nov'17) roughly ok: The pure replanning calls just find a possibly 
+	// different path to the same destination, which is ok.  The relocate calls are marked as "deprecated" to discourage use,
+	// but they are still ok if the user knows what she/he is doing; evidently, with access/egress routing, they will lead to
+	// disconnected trips.  kai, nov'17
+	
+	
 	/*
 	 * Design thoughts while adding access/egress walk legs to car trips:
 	 * . Matsim has a computer science router (LeastCostPathCalculator, from node to node) and a behavioral router (RoutingModule, from
@@ -77,6 +83,7 @@ public class EditRoutes {
 	private  LeastCostPathCalculator pathCalculator ;
 	private  RouteFactories routeFactories ;
 
+	@Deprecated // I think this only exists since some calls that are now static used to be non-static. kai, nov'17
 	public EditRoutes(){} // for backwards compatibility
 	// yyyyyy ??????
 
@@ -125,6 +132,17 @@ public class EditRoutes {
 		return true;
 	}
 
+	public final void replanCurrentLeg( MobsimAgent agent, double now ) {
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
+		PlanElement pe = plan.getPlanElements().get( WithinDayAgentUtils.getCurrentPlanElementIndex(agent)) ;
+		if ( !(pe instanceof Leg) ) {
+			return ;
+		}
+		int currentLinkIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent) ;
+		this.replanCurrentLegRoute((Leg)pe, ((HasPerson)agent).getPerson(), currentLinkIndex, now ) ;
+		WithinDayAgentUtils.resetCaches(agent);
+	}
+
 	/**
 	 * Re-locates a future route. The route is given by its leg.
 	 * 
@@ -135,7 +153,8 @@ public class EditRoutes {
 	@Deprecated // not consistent with access/egress approach; can only be used if you know exactly what you are doing.  
 	// Maybe replanXxx is already sufficient?  Otherwise use EditTrips or EditPlans.  kai, nov'17
 	public static boolean relocateFutureLegRoute(Leg leg, Id<Link> fromLinkId, Id<Link> toLinkId, Person person, Network network, TripRouter tripRouter) {
-
+		// TripRouter variant; everything else uses the PathCalculator
+		
 		Link fromLink = network.getLinks().get(fromLinkId);
 		Link toLink = network.getLinks().get(toLinkId);
 
@@ -331,34 +350,6 @@ public class EditRoutes {
 
 	// #########################################################################################
 	// helper methods below
-
-	/**
-	 * @param plan
-	 * @param fromActivity
-	 * @param tripRouter
-	 * @return the Trip that starts at the given activity or null, if no trip was found
-	 */
-	public static Trip findTripAfterActivity(Plan plan, Activity activity, TripRouter tripRouter) {
-		return TripStructureUtils.findTripStartingAtActivity(activity, plan, tripRouter.getStageActivityTypes() ) ;
-//		List<Trip> trips = TripStructureUtils.getTrips(plan, tripRouter.getStageActivityTypes());
-//
-//		for (Trip trip : trips) {
-//			if (trip.getOriginActivity() == fromActivity) return trip;
-//		}
-//
-//		// no matching trip was found
-//		return null;
-	}
-
-	/**
-	 * @param trip
-	 * @return the departure time of the first leg of the trip
-	 */
-	public static double getDepartureTime(Trip trip) {
-		// does this always make sense?
-		Leg leg = (Leg) trip.getTripElements().get(0);
-		return leg.getDepartureTime();
-	}
 
 	private static List<Id<Link>> getRouteLinkIds(Route route) {
 		List<Id<Link>> linkIds = new ArrayList<>();

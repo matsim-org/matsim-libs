@@ -73,7 +73,7 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 				if (pe2 instanceof Leg && carsharingLeg(pe2))
 					countCSLegs++;
 				if (countCSLegs > this.carsharingTrips) {
-					newTrip = carsharingManager.reserveAndrouteCarsharingTrip(this.getCurrentPlan(), legToBerouted.getMode(), 
+					newTrip = carsharingManager.reserveAndrouteCarsharingTrip(this.originalPlan, legToBerouted.getMode(), 
 							(Leg)(pe2), now);
 					carsharingTrips++;
 					break;
