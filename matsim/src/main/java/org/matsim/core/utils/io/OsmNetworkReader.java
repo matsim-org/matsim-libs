@@ -92,7 +92,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private static List<String> allTags = new LinkedList<>(Arrays.asList(TAG_LANES, TAG_LANES_FORWARD,
 			TAG_LANES_BACKWARD, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS));
 
-	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
+	protected final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
 	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
 	private final Set<String> unknownHighways = new HashSet<String>();
 	private final Set<String> unknownMaxspeedTags = new HashSet<String>();
@@ -395,6 +395,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			}
 		}
 		log.info("... done marking OSM nodes that shoud be kept.");
+		
+		preprocessingOsmData();
 
 		if (!this.keepPaths) {
 
@@ -437,6 +439,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			log.info("... done verifying that we did not mark nodes that build a loop.") ;
 
 		}
+		
+		furtherSimplificationOfOsmData();
 		
 		log.info("Create the required nodes ...") ;
 		for (OsmNode node : this.nodes.values()) {
@@ -488,12 +492,27 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			}
 		}
 		log.info("... done creating the links.");
+		
+		createAdditionalMatsimDataFromOsm(this.network, this.nodes, this.ways);
 
 		// free up memory
 		this.nodes.clear();
 		this.ways.clear();
 	}
 	
+	/**
+	 * Override this when additional data, e.g. signals, should be created from the osm data.
+	 */
+	protected void createAdditionalMatsimDataFromOsm(Network network, Map<Long, OsmNode> nodes, Map<Long, OsmWay> ways) {
+	}
+
+	/**
+	 * Override this when additionally preprocessing of OSM data is necessary in your reader.
+	 * It is called before the network (still based on osm data) gets simplified and before the matsim network is created.
+	 */
+	protected void preprocessingOsmData() {
+	}
+
 	/**
 	 * Override this when you want to change the definition of 'unused' nodes, e.g. to add a check for signals.
 	 * 
@@ -506,10 +525,17 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		/* note: checking here for counting stations changes the priority of filters and
 		 * counting stations: before, nodes with counting stations were kept also when
 		 * they are e.g. outside a bounding box (or not belonging to other filters). now
-		 * they are only kept inside the filtered nodes, i.e. only relevant when
+		 * they are only kept inside the filtered nodes. This is only relevant when
 		 * 'keepPaths' is set to true.
 		 * tthunig, oct'17
 		 */
+	}
+
+	/** 
+	 * Override this when further simplification of OSM data is necessary in your reader.
+	 */
+	protected void furtherSimplificationOfOsmData() {
+		// TODO try to merge this with preprocessingOsmData().
 	}
 
 	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, 
