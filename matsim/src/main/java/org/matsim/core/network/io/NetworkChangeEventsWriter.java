@@ -127,7 +127,8 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 	private void writeEvent(NetworkChangeEvent event) throws IOException {
 //		if ( event.getLinks().isEmpty() ) {
 //			return ;
-//			// yyyy is this a problem?  There is otherwise this condition (*) below ??  kai, nov'17
+//			// yyyy is this a problem?  There is otherwise this condition (*) below ?? 
+		// or is it a problem to just write the empty change event?  kai, nov'17
 //		}
 		this.writer.write(TAB);
 		this.writer.write(OPEN_TAG_1);
@@ -141,10 +142,10 @@ public final class NetworkChangeEventsWriter extends MatsimXmlWriter implements 
 		this.writer.write(CLOSE_TAG_1);
 		this.writer.write(NL);
 
-//		if (event.getLinks().isEmpty()) {
-//			throw new IllegalArgumentException("NetworkChangeEvent must contain at least one link.");
-//			// (*)
-//		}
+		if (event.getLinks().isEmpty()) {
+			throw new IllegalArgumentException("NetworkChangeEvent must contain at least one link.");
+			// (*)
+		}
 		for(Link link : event.getLinks()) {
 			this.writer.write(TAB);
 			this.writer.write(TAB);
