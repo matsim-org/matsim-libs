@@ -115,6 +115,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
 	private final org.matsim.core.mobsim.qsim.AgentCounter agentCounter;
 	private final Map<Id<Person>, MobsimAgent> agents = new LinkedHashMap<>();
+	private final Map<Id<Vehicle>,MobsimVehicle> vehicles = new LinkedHashMap<>() ;
 	private final List<AgentSource> agentSources = new ArrayList<>();
 
 	// for detailed run time analysis
@@ -263,17 +264,8 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	private static int wrnCnt = 0;
 	public void createAndParkVehicleOnLink(Vehicle vehicle, Id<Link> linkId) {
-		QVehicle veh = new QVehicle(vehicle);
-		if (this.netEngine != null) {
-			this.netEngine.addParkedVehicle(veh, linkId);
-		} else {
-			if (wrnCnt < 1) {
-				log.warn( "not able to add parked vehicle since there is no netsim engine.  continuing anyway, but it may "
-						+ "not be clear what this means ...");
-				log.warn(Gbl.ONLYONCE);
-				wrnCnt++ ;
-			}
-		}
+		QVehicle qveh = new QVehicle(vehicle);
+		addParkedVehicle ( qveh, linkId ) ;
 	}
 
 	private static int wrnCnt2 = 0;
@@ -288,6 +280,14 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 				wrnCnt2++;
 			}
 		}
+		if ( this.vehicles.containsKey( veh.getId() ) ) {
+			throw new RuntimeException( "vehicle with ID " + veh.getId() + " exists twice. Aborting ..." ) ;
+		}
+		this.vehicles.put( veh.getId(), veh ) ;
+	}
+	
+	public Map<Id<Vehicle>,MobsimVehicle> getVehicles() {
+		return Collections.unmodifiableMap( this.vehicles ) ;
 	}
 
 	void cleanupSim() {
