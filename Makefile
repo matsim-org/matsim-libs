@@ -17,7 +17,7 @@ release:
 	cd playgrounds/kairuns ; mvn clean ; mvn -Prelease -DskipTests=true
 
 matsim-quick:
-	mvn clean ; cd matsim ; mvn install ${QUICK}
+	cd matsim ; mvn clean install ${QUICK}
 
 
 #	cd matsim ; mvn clean ; mvn install -DskipTests=true 
