@@ -47,7 +47,7 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
             Network network, //
-            VirtualNetwork virtualNetwork) {
+            VirtualNetwork<Link> virtualNetwork) {
         super(config, avconfig, travelTime, router, eventsManager, virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(avconfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 10);
@@ -75,7 +75,7 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
                 List<AVRequest> unassignedRequests = getUnassignedAVRequests();
 
                 for (AVRequest avr : unassignedRequests) {
-                    VirtualNode vn = virtualNetwork.getVirtualNode(avr.getFromLink());
+                    VirtualNode<Link> vn = virtualNetwork.getVirtualNode(avr.getFromLink());
                     Optional<RoboTaxi> optVh = vehicles.stream().filter(v -> virtualNetwork.getVirtualNode(v.getDivertableLocation()).equals(vn)).findAny();
                     if (optVh.isPresent()) {
                         RoboTaxi vehicleToSend = optVh.get();
@@ -100,7 +100,7 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
                 // III: return all idle vehicles to wait Link
                 vehicles = getDivertableUnassignedRoboTaxis();
                 for (RoboTaxi roboTaxi : vehicles) {
-                    VirtualNode vn = virtualNetwork.getVirtualNode(roboTaxi.getDivertableLocation());
+                    VirtualNode<Link> vn = virtualNetwork.getVirtualNode(roboTaxi.getDivertableLocation());
                     if (!roboTaxi.getDivertableLocation().equals(waitLocations.get(vn))) {
                         setRoboTaxiRebalance(roboTaxi, waitLocations.get(vn));
                     }
@@ -151,7 +151,7 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
 
         @Inject
         private Network network;
-        public static VirtualNetwork virtualNetwork;
+        public static VirtualNetwork<Link> virtualNetwork;
 
         @Override
         public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {

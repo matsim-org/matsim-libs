@@ -20,7 +20,7 @@ import playground.clruch.net.SimulationObject;
  */
 /* package */ class MeanRequestDistanceVirtualNodeFunction extends AbstractVirtualNodeFunction {
 
-    public MeanRequestDistanceVirtualNodeFunction(MatsimStaticDatabase db, VirtualNetwork virtualNetwork) {
+    public MeanRequestDistanceVirtualNodeFunction(MatsimStaticDatabase db, VirtualNetwork<Link> virtualNetwork) {
         super(db, virtualNetwork);
     }
 
@@ -33,7 +33,7 @@ import playground.clruch.net.SimulationObject;
             double distance = Math.hypot( //
                     linkAnte.getCoord().getX() - linkPost.getCoord().getX(), //
                     linkAnte.getCoord().getY() - linkPost.getCoord().getY());
-            VirtualNode vn = virtualNetwork.getVirtualNode(linkAnte);
+            VirtualNode<Link> vn = virtualNetwork.getVirtualNode(linkAnte);
             collect.set(s -> s.append(DoubleScalar.of(distance)), vn.getIndex());
         }
         return Tensors.vector(i -> meanOrZero(collect.get(i)), virtualNetwork.getvNodesCount());

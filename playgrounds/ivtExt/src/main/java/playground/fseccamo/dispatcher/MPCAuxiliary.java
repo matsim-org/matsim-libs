@@ -1,6 +1,4 @@
-/**
- * 
- */
+// code by francesco, jph, clruch
 package playground.fseccamo.dispatcher;
 
 import java.util.HashMap;
@@ -20,7 +18,6 @@ import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
-/** @author Claudio Ruch */
 public class MPCAuxiliary {
 
     /** @param min
@@ -44,7 +41,7 @@ public class MPCAuxiliary {
                     avRequest.getFromLink().getCoord().getX(), //
                     avRequest.getFromLink().getCoord().getY());
 
-            GlobalAssert.that(!mpcDispatcher.getRoboTaxiSubset(AVStatus.DRIVETOCUSTMER).contains(robotaxi));
+            GlobalAssert.that(!mpcDispatcher.getRoboTaxiSubset(AVStatus.DRIVETOCUSTOMER).contains(robotaxi));
             {
                 boolean removed = cars.remove(robotaxi);
                 GlobalAssert.that(removed);

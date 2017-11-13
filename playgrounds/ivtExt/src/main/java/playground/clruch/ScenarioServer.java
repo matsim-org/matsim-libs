@@ -30,100 +30,102 @@ import playground.clruch.html.ReportGenerator;
 import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
-import playground.clruch.net.StorageUtils;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
-import playground.clruch.trb18.traveltime.reloading.WriteTravelTimesModule;
 import playground.clruch.utils.PropertiesExt;
-import playground.ivt.replanning.BlackListedTimeAllocationMutatorConfigGroup;
-import playground.ivt.replanning.BlackListedTimeAllocationMutatorStrategyModule;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 
-/** only one ScenarioServer can run at one time, since a fixed network port is reserved to serve the
- * simulation status */
+/**
+ * only one ScenarioServer can run at one time, since a fixed network port is
+ * reserved to serve the simulation status
+ */
 public class ScenarioServer {
 
-    public static void main(String[] args) throws MalformedURLException, Exception {
-        simulate();
-    }
+	public static void main(String[] args) throws MalformedURLException, Exception {
+		simulate();
+	}
 
-    /* package */ static void simulate() throws MalformedURLException, Exception {
-        // load options
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+	/* package */ static void simulate() throws MalformedURLException, Exception {
+		// load options
+		File workingDirectory = MultiFileTools.getWorkingDirectory();
+		PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
 
-        /** set to true in order to make server wait for at least 1 client, for instance viewer client */
-        boolean waitForClients = simOptions.getBoolean("waitForClients");
-        File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
-        ReferenceFrame referenceFrame = simOptions.getReferenceFrame();
+		System.out.println("Start--------------------"); // added no
+		
+		/**
+		 * set to true in order to make server wait for at least 1 client, for
+		 * instance viewer client
+		 */
+		boolean waitForClients = simOptions.getBoolean("waitForClients");
+		File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
+		ReferenceFrame referenceFrame = simOptions.getReferenceFrame();
 
-        // open server port for clients to connect to
-        SimulationServer.INSTANCE.startAcceptingNonBlocking();
-        SimulationServer.INSTANCE.setWaitForClients(waitForClients);
+		// open server port for clients to connect to
+		SimulationServer.INSTANCE.startAcceptingNonBlocking();
+		SimulationServer.INSTANCE.setWaitForClients(waitForClients);
 
-        // load MATSim configs
-        System.out.println("loading config file " + configFile.getAbsoluteFile());
-        GlobalAssert.that(configFile.exists());
-        DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
-        dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup, //
-                new BlackListedTimeAllocationMutatorConfigGroup());
-        String outputdirectory = config.controler().getOutputDirectory();
-        System.out.println("outputdirectory = " + outputdirectory);
 
-        // load scenario for simulation
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-        Network network = scenario.getNetwork();
-        Population population = scenario.getPopulation();
-        GlobalAssert.that(scenario != null && network != null && population != null);
+		// load MATSim configs - includign av.xml where dispatcher is selected. 
+		System.out.println("loading config file " + configFile.getAbsoluteFile());
+		
+		GlobalAssert.that(configFile.exists()); // Test wheather the config file directory exists
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
+		Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
+		String outputdirectory = config.controler().getOutputDirectory();
+		System.out.println("outputdirectory = " + outputdirectory);
 
-        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
-        Controler controler = new Controler(scenario);
+		// load scenario for simulation
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Network network = scenario.getNetwork();
+		Population population = scenario.getPopulation();
+		GlobalAssert.that(scenario != null && network != null && population != null);
 
-        controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
-        controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
-        controler.addOverridingModule(new AVModule());
-        controler.addOverridingModule(new DatabaseModule());
-        controler.addOverridingModule(new BlackListedTimeAllocationMutatorStrategyModule());
-        controler.addOverridingModule(new AVTravelTimeModule());
-        controler.addOverridingModule(new WriteTravelTimesModule());
+		MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
+		Controler controler = new Controler(scenario);
 
-        // run simulation
-        controler.run();
+		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
+		controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
+		controler.addOverridingModule(new AVModule());
+		controler.addOverridingModule(new DatabaseModule());
+		controler.addOverridingModule(new AVTravelTimeModule());
 
-        // close port for visualization
-        SimulationServer.INSTANCE.stopAccepting();
+		// run simulation
+		controler.run();
 
-        // perform analysis of results
-        AnalyzeAll analyzeAll = new AnalyzeAll();
-        AnalyzeSummary analyzeSummary = analyzeAll.analyze(configFile, outputdirectory);
-        VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
+		// close port for visualization
+		SimulationServer.INSTANCE.stopAccepting();
 
-        MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
-        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
-        TravelData travelData = null;
-        if (virtualNetwork != null) {
-            minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
-            performanceFleetSizeCalculator = PerformanceFleetSizeGet.readDefault();
-            if (performanceFleetSizeCalculator != null) {
-                String dataFolderName = outputdirectory + "/data";
-                File relativeDirectory = new File(dataFolderName);
-                performanceFleetSizeCalculator.saveAndPlot(dataFolderName, relativeDirectory);
-            }
+		// perform analysis of results
+		AnalyzeAll analyzeAll = new AnalyzeAll();
+		AnalyzeSummary analyzeSummary = analyzeAll.analyze(configFile, outputdirectory);
+		VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
 
-            travelData = TravelDataGet.readDefault(virtualNetwork);
-        }
+		MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
+		PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
+		TravelData travelData = null;
+		if (virtualNetwork != null) {
+			minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
+			performanceFleetSizeCalculator = PerformanceFleetSizeGet.readDefault();
+			if (performanceFleetSizeCalculator != null) {
+				String dataFolderName = outputdirectory + "/data";
+				File relativeDirectory = new File(dataFolderName);
+				performanceFleetSizeCalculator.saveAndPlot(dataFolderName, relativeDirectory);
+			}
 
-        new DataCollector(configFile, outputdirectory, controler, //
-                minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
+			travelData = TravelDataGet.readDefault(virtualNetwork);
+		}
 
-        // generate report
-        ReportGenerator reportGenerator = new ReportGenerator();
-        reportGenerator.from(configFile, outputdirectory);
+		new DataCollector(configFile, outputdirectory, controler, //
+				minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
 
-    }
+		// generate report
+		ReportGenerator reportGenerator = new ReportGenerator();
+		reportGenerator.from(configFile, outputdirectory);
+
+	}
 }
