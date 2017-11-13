@@ -20,16 +20,14 @@
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -39,7 +37,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
  */
 public final class RunOneTaxiExample {
 	private static final String CONFIG_FILE = "./src/main/resources/one_taxi/one_taxi_config.xml";
-	private static final String TAXIS_FILE = "./src/main/resources/one_taxi/one_taxi_vehicles.xml";
+	private static final String TAXIS_FILE = "one_taxi_vehicles.xml";
 
 	public static void run(boolean otfvis, int lastIteration) {
 		// load config
@@ -51,23 +49,14 @@ public final class RunOneTaxiExample {
 		// load scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		// load fleet
-		final FleetImpl fleet = new FleetImpl();
-		new VehicleReader(scenario.getNetwork(), fleet).readFile(TAXIS_FILE);
-
 		// setup controler
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(DvrpModule.create( //
 				OneTaxiOptimizer.class, // optimizer that dispatches taxis
 				OneTaxiRequestCreator.class, // converts departures of the "taxi" mode into taxi requests
 				OneTaxiActionCreator.class)); // converts scheduled tasks into simulated actions (legs and activities)
-
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(Fleet.class).toInstance(fleet);
-			}
-		});
+		controler.addOverridingModule(
+				FleetProvider.createModule(ConfigGroup.getInputFileURL(config.getContext(), TAXIS_FILE)));
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation

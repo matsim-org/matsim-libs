@@ -19,12 +19,12 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.io;
 
-import gnu.trove.map.hash.TObjectDoubleHashMap;
-import net.opengis.kml._2.PlacemarkType;
-
 import org.matsim.contrib.socnetgen.sna.graph.Graph;
 import org.matsim.contrib.socnetgen.sna.graph.Vertex;
 import org.matsim.contrib.socnetgen.sna.graph.analysis.Degree;
+
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+import net.opengis.kml.v_2_2_0.PlacemarkType;
 
 /**
  * A KMLVertexDescriptor adds a description to the placemark representing a

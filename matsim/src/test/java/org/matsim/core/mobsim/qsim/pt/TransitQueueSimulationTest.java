@@ -262,7 +262,7 @@ public class TransitQueueSimulationTest {
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
         QNetsimEngineModule.configure(qSim1);
-		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
+		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events);
 		qSim1.addMobsimEngine(teleportationEngine);
         QSim qSim = qSim1;
         AgentFactory agentFactory = new TransitAgentFactory(qSim);
@@ -276,7 +276,7 @@ public class TransitQueueSimulationTest {
         qSim.run();
 
         // check everything
-        assertEquals(1, transitEngine.getAgentTracker().getAgentsAtStop(stop1.getId()).size());
+        assertEquals(1, transitEngine.getAgentTracker().getAgentsAtFacility(stop1.getId()).size());
     }
 
     /**
@@ -529,7 +529,7 @@ public class TransitQueueSimulationTest {
             QNetsimEngine netsimEngine = new QNetsimEngine(qSim2);
 			qSim2.addMobsimEngine(netsimEngine);
 			qSim2.addDepartureHandler(netsimEngine.getDepartureHandler());
-			TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, events);
+			DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events);
 			qSim2.addMobsimEngine(teleportationEngine);
             QSim qSim1 = qSim2;
             AgentFactory agentFactory = new TransitAgentFactory(qSim1);

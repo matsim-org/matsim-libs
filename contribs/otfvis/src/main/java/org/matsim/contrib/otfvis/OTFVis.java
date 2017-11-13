@@ -34,6 +34,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.AgentTracker;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
@@ -171,8 +172,9 @@ public class OTFVis {
 
 			Network network = scenario.getNetwork();
 			TransitSchedule transitSchedule = scenario.getTransitSchedule();
-			TransitQSimEngine transitEngine = qSim.getTransitEngine();
-			TransitStopAgentTracker agentTracker = transitEngine.getAgentTracker();
+			
+//			TransitQSimEngine transitEngine = qSim.getTransitEngine();
+//			AgentTracker agentTracker = transitEngine.getAgentTracker();
 			
 //			AgentSnapshotInfoFactory snapshotInfoFactory = qSim.getVisNetwork().getagentsnapshotinfofactory();
 			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -181,9 +183,11 @@ public class OTFVis {
 				linkWidthCalculator.setLaneWidth( network.getEffectiveLaneWidth() );
 			}
 			AgentSnapshotInfoFactory snapshotInfoFactory = new AgentSnapshotInfoFactory(linkWidthCalculator);
-			
-			FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker, snapshotInfoFactory);
-			server.addAdditionalElement(facilityWriter);
+
+			for ( AgentTracker agentTracker : qSim.getAgentTrackers() ) {
+				FacilityDrawer.Writer facilityWriter = new FacilityDrawer.Writer(network, transitSchedule, agentTracker, snapshotInfoFactory);
+				server.addAdditionalElement(facilityWriter);
+			}
 		}
 
 		server.pause();

@@ -19,7 +19,14 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.io;
 
-import net.opengis.kml._2.*;
+import java.awt.Color;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.contrib.socnetgen.sna.graph.spatial.SpatialEdge;
@@ -31,9 +38,15 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import java.awt.*;
-import java.util.*;
-import java.util.List;
+import net.opengis.kml.v_2_2_0.DocumentType;
+import net.opengis.kml.v_2_2_0.FolderType;
+import net.opengis.kml.v_2_2_0.KmlType;
+import net.opengis.kml.v_2_2_0.LineStringType;
+import net.opengis.kml.v_2_2_0.LineStyleType;
+import net.opengis.kml.v_2_2_0.ObjectFactory;
+import net.opengis.kml.v_2_2_0.PlacemarkType;
+import net.opengis.kml.v_2_2_0.PointType;
+import net.opengis.kml.v_2_2_0.StyleType;
 
 /**
  * A class to encode spatial graphs into a KML format. The encode graph will be

@@ -1,10 +1,8 @@
 /* *********************************************************************** *
- * project: matsim
- * HasNextPlanElement.java
- *                                                                         *
+ * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,22 +16,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.framework;
+package org.matsim.contrib.dvrp.data.file;
 
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import java.net.URL;
+
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.data.FleetImpl;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.core.controler.AbstractModule;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.name.Named;
 
 /**
- * @author nagel
+ * @author michalm
  */
-public interface PlanAgent extends MobsimAgentMarkerInterface {
+public class FleetProvider implements Provider<Fleet> {
+	@Inject
+	@Named(DvrpModule.DVRP_ROUTING)
+	Network network;
 
-    public PlanElement getCurrentPlanElement();
+	private final URL url;
 
-    public PlanElement getNextPlanElement();
+	public FleetProvider(URL url) {
+		this.url = url;
+	}
 
-    public PlanElement getPreviousPlanElement();
+	@Override
+	public Fleet get() {
+		FleetImpl fleet = new FleetImpl();
+		new VehicleReader(network, fleet).parse(url);
+		return fleet;
+	}
 
-    public Plan getCurrentPlan();
-    
+	public static AbstractModule createModule(URL url) {
+		return new AbstractModule() {
+			@Override
+			public void install() {
+				bind(Fleet.class).toProvider(new FleetProvider(url)).asEagerSingleton();
+			}
+		};
+	}
 }

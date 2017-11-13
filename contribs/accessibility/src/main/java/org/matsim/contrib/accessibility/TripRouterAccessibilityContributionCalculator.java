@@ -66,6 +66,7 @@ public class TripRouterAccessibilityContributionCalculator implements Accessibil
 //		Vehicle vehicle = null ; // I think that this is ok
 		double utility = 0.;
 		List<Leg> legs = TripStructureUtils.getLegs(plan);
+		// TODO Doing it like this, the pt interaction (e.g. waiting) times will be omitted!
 		Gbl.assertIf(!legs.isEmpty());
 		
 		for (Leg leg : legs) {

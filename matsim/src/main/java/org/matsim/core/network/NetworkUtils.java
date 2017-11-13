@@ -430,6 +430,8 @@ public final class NetworkUtils {
      * @param coord
      *          the coordinate for which the closest link should be found
      * @return the link found closest to coord
+     * 
+     * @see {@link NetworkUtils#getNearestLinkExactly(Network, Coord)}
      */
     public static Link getNearestLink(Network network, final Coord coord) {
         Link nearestLink = null;
