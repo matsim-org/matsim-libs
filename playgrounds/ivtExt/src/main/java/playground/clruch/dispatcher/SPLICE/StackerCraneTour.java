@@ -9,25 +9,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 
 import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.queuey.math.HungarianAlgorithm;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.avtaxi.routing.AVRoute;
-import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
-import playground.clruch.dispatcher.utils.BipartiteMatchingUtils;
-import playground.clruch.dispatcher.utils.DistanceFunction;
-import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
 import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
-import playground.clruch.dispatcher.core.UniversalDispatcher;
-import playground.sebhoerl.avtaxi.framework.AVModule;
+import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /**
  * @author Nicolo Ormezzano

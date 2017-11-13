@@ -174,7 +174,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 // ------------------------------------------------------------------------------------------------------
                 Tensor waitTimes = Tensors.empty();
                 for (int i = 0; i < N_vStations; i++) {
-                    VirtualNode vStation = virtualNetwork.getVirtualNode(i);
+                    VirtualNode<Link> vStation = virtualNetwork.getVirtualNode(i);
                     Tensor waitTimes_i = Tensor.of(requests.get(vStation).stream().map(r -> RealScalar.of(now - r.getSubmissionTime())));
                     if (waitTimes_i.length() < 1) {
                         waitTimes.append(RealScalar.of(0));
@@ -245,7 +245,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                         // Get Link Imbalance
                         // ----------------------------------------------------------------------------------------------
                         // Get vLink info: weight and nodes
-                        VirtualLink vLink = entry.getKey();
+                        VirtualLink<Link> vLink = entry.getKey();
                         double linkWeight = entry.getValue();
                         int indexFrom = vLink.getFrom().getIndex();
                         int indexTo = vLink.getTo().getIndex();
@@ -367,8 +367,8 @@ public class DFRDispatcher extends PartitionedDispatcher {
 
                         int rebalanceCars = feasibleRebalanceOrder.Get(rebalanceFromidx, rebalanceToidx).number().intValue();
                         if (rebalanceCars != 0) {
-                            VirtualNode rebalanceFromvNode = virtualNetwork.getVirtualNode(rebalanceFromidx);
-                            VirtualNode rebalanceTovNode = virtualNetwork.getVirtualNode(rebalanceToidx);
+                            VirtualNode<Link> rebalanceFromvNode = virtualNetwork.getVirtualNode(rebalanceFromidx);
+                            VirtualNode<Link> rebalanceTovNode = virtualNetwork.getVirtualNode(rebalanceToidx);
                             List<Link> rebalanceTargets = virtualNodeDest.selectLinkSet(rebalanceTovNode, rebalanceCars);
                             destinationLinks.get(rebalanceFromvNode).addAll(rebalanceTargets);
                         }
@@ -384,7 +384,7 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 // send rebalancing vehicles using the setVehicleRebalance command
                 // TODO Count Rebalanced cars correctly!
                 // What happens if to many vehicles sent? does it send the ones it has and over or none if?or what happens here?
-                for (VirtualNode virtualNode : destinationLinks.keySet()) {
+                for (VirtualNode<Link> virtualNode : destinationLinks.keySet()) {
                     Map<RoboTaxi, Link> rebalanceMatching = vehicleDestMatcher.matchLink(available_Vehicles.get(virtualNode),
                             destinationLinks.get(virtualNode));
                     rebalanceMatching.keySet().forEach(v -> setRoboTaxiRebalance(v, rebalanceMatching.get(v)));

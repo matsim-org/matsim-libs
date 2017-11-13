@@ -16,7 +16,7 @@ import playground.clruch.net.VehicleContainer;
  * count vehicles
  */
 /* package */ class VehicleCountVirtualNodeFunction extends AbstractVirtualNodeFunction {
-    public VehicleCountVirtualNodeFunction(MatsimStaticDatabase db, VirtualNetwork virtualNetwork) {
+    public VehicleCountVirtualNodeFunction(MatsimStaticDatabase db, VirtualNetwork<Link> virtualNetwork) {
         super(db, virtualNetwork);
     }
 
@@ -26,7 +26,7 @@ import playground.clruch.net.VehicleContainer;
         for (VehicleContainer vc : ref.vehicles) {
             int linkIndex = vc.linkIndex;
             Link link = db.getOsmLink(linkIndex).link;
-            VirtualNode vn = virtualNetwork.getVirtualNode(link);
+            VirtualNode<Link> vn = virtualNetwork.getVirtualNode(link);
             count.set(Increment.ONE, vn.getIndex());
         }
         return count;

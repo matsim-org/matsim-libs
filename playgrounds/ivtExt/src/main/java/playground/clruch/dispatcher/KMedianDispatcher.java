@@ -20,7 +20,6 @@ import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
-import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
@@ -64,7 +63,7 @@ public class KMedianDispatcher extends PartitionedDispatcher {
         List<AVRequest> unassigned_requests = getUnassignedAVRequests();
 
         for (AVRequest avr : unassigned_requests) {
-            VirtualNode virtualNode = virtualNetwork.getVirtualNode(avr.getFromLink());
+            VirtualNode<Link> virtualNode = virtualNetwork.getVirtualNode(avr.getFromLink());
             Optional<RoboTaxi> optVh = vehicles.stream().filter(v -> virtualNetwork.getVirtualNode(v.getDivertableLocation()).equals(virtualNode)).findAny();
 
             if (optVh.isPresent()) {
@@ -77,7 +76,7 @@ public class KMedianDispatcher extends PartitionedDispatcher {
 
         vehicles = getDivertableUnassignedRoboTaxis();
         for (RoboTaxi roboTaxi : vehicles) {
-            VirtualNode vn = virtualNetwork.getVirtualNode(roboTaxi.getDivertableLocation());
+            VirtualNode<Link> vn = virtualNetwork.getVirtualNode(roboTaxi.getDivertableLocation());
             if (!roboTaxi.getDivertableLocation().equals(waitLocations.get(vn))) {
                 setRoboTaxiRebalance(roboTaxi, waitLocations.get(vn));
             }

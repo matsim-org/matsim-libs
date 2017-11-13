@@ -106,7 +106,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
             // Map<VirtualNode, List<RoboTaxi>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
             Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles = virtualNetwork.createVNodeTypeMap();
             for (RoboTaxi robotaxi : styRoboTaxis) {
-                VirtualNode vnode = virtualNetwork.getVirtualNode(robotaxi.getDivertableLocation());
+                VirtualNode<Link> vnode = virtualNetwork.getVirtualNode(robotaxi.getDivertableLocation());
                 availableVehicles.get(vnode).add(robotaxi);
             }
 
