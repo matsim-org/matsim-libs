@@ -23,7 +23,7 @@ import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
 public enum VehicleOnVirtualLinkCalculator {
     ;
 
-    public static Tensor countVehiclesPerVLink(List<RoboTaxi> rebalancingRoboTaxis, VirtualNetwork virtualNetwork) {
+    public static Tensor countVehiclesPerVLink(List<RoboTaxi> rebalancingRoboTaxis, VirtualNetwork<Link> virtualNetwork) {
         final int m = virtualNetwork.getvLinksCount();
         final Tensor vector = Array.zeros(m + virtualNetwork.getvNodesCount()); // self
                                                                                 // loops
@@ -45,7 +45,7 @@ public enum VehicleOnVirtualLinkCalculator {
                     // if no transition between virtual nodes is detected, ...
                     // then the vehicle is considered to remain within current
                     // virtual node
-                    VirtualNode vnode = virtualNetwork.getVirtualNode(current);
+                    VirtualNode<Link> vnode = virtualNetwork.getVirtualNode(current);
                     vector.set(Increment.ONE, m + vnode.getIndex()); // self loop
                 } else {
                     vector.set(Increment.ONE, vli);
@@ -53,7 +53,7 @@ public enum VehicleOnVirtualLinkCalculator {
             }
             if (task instanceof AVDropoffTask) {
                 // consider the vehicle on the self loop of current virtual node
-                VirtualNode vnode = virtualNetwork.getVirtualNode(current);
+                VirtualNode<Link> vnode = virtualNetwork.getVirtualNode(current);
                 vector.set(Increment.ONE, m + vnode.getIndex()); // self loop
             }
         }
@@ -64,14 +64,14 @@ public enum VehicleOnVirtualLinkCalculator {
      * @param current
      * @return virtual link index on which vehicle of drive task is traversing
      *         on, or NOLINKFOUND if such link cannot be identified */
-    public static int getVirtualLinkOfVehicle(AVDriveTask driveTask, Link current, VirtualNetwork virtualNetwork) {
+    public static int getVirtualLinkOfVehicle(AVDriveTask driveTask, Link current, VirtualNetwork<Link> virtualNetwork) {
         return getNextVirtualLinkOnPath(driveTask.getPath(), current, virtualNetwork);
     }
 
-    public static int getNextVirtualLinkOnPath(VrpPath vrpPath, Link current, VirtualNetwork virtualNetwork) {
+    public static int getNextVirtualLinkOnPath(VrpPath vrpPath, Link current, VirtualNetwork<Link> virtualNetwork) {
         final int NOLINKFOUND = -1;
-        VirtualNode fromIn = null;
-        VirtualNode toIn = null;
+        VirtualNode<Link> fromIn = null;
+        VirtualNode<Link> toIn = null;
         boolean fused = false;
         for (Link link : vrpPath) {
             fused |= link == current;
@@ -79,10 +79,10 @@ public enum VehicleOnVirtualLinkCalculator {
                 if (fromIn == null)
                     fromIn = virtualNetwork.getVirtualNode(link);
                 else {
-                    VirtualNode candidate = virtualNetwork.getVirtualNode(link);
+                    VirtualNode<Link> candidate = virtualNetwork.getVirtualNode(link);
                     if (fromIn != candidate) {
                         toIn = candidate;
-                        VirtualLink virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
+                        VirtualLink<Link> virtualLink = virtualNetwork.getVirtualLink(fromIn, toIn);
                         return virtualLink.getIndex();
                     }
                 }

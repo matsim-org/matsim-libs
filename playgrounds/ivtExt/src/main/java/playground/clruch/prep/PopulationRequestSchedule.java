@@ -42,10 +42,10 @@ public class PopulationRequestSchedule {
         }
     };
 
-    final VirtualNetwork virtualNetwork;
+    final VirtualNetwork<Link> virtualNetwork;
     final Tensor requestScheduleSorted;
 
-    public PopulationRequestSchedule(Network network, Population population, VirtualNetwork virtualNetwork) {
+    public PopulationRequestSchedule(Network network, Population population, VirtualNetwork<Link> virtualNetwork) {
         this.virtualNetwork = virtualNetwork;
         Tensor requestScheduleUnsorted = Tensors.empty();
         Map<Id<Link>, ? extends Link> linkMap = network.getLinks();

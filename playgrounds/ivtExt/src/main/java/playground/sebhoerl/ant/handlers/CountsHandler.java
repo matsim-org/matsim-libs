@@ -17,7 +17,7 @@ import playground.sebhoerl.ant.DataFrame;
 import playground.sebhoerl.av_paper.BinCalculator;
 
 public class CountsHandler extends AbstractHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityStartEventHandler {
-    final private Map<Id<Person>, Double> departures = new HashMap();
+    final private Map<Id<Person>, Double> departures = new HashMap<Id<Person>, Double>();
     final private Map<Id<Person>, PersonArrivalEvent> ptArrivals = new HashMap<>();
 
     public CountsHandler(DataFrame data) {

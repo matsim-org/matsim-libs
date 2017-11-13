@@ -37,14 +37,11 @@ public class MatsimCenterVirtualNetworkCreator {
 	Clustering<KMeansModel> c;
 	Relation<NumberVector> rel;
 
-	public VirtualNetwork<Link> creatVirtualNetwork(Network network) {
-		// TODO magic consts.
-		double centerRadius = 1500;
-		Tensor emptyTensor = Tensors.vector(0, 0);
+	public VirtualNetwork<Link> creatVirtualNetwork(Network network, double centerRadius, Tensor centerShift) {
 		Collection<Link> elements = (Collection<Link>) network.getLinks().values();
 
-		CenterVirtualNetworkCreator<Link> cvn = new CenterVirtualNetworkCreator<>(centerRadius, emptyTensor, elements,
-				PlaneLocation::of, NetworkCreatorUtils::linkToID);
+		CenterVirtualNetworkCreator<Link> cvn = new CenterVirtualNetworkCreator<>(centerRadius, centerShift, elements,
+				PlaneLocation::of, NetworkCreatorUtils::linkToID);  
 		return cvn.getVirtualNetwork();
 
 	}

@@ -180,6 +180,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
         @Override
         public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
             virtualNetwork = VirtualNetworkGet.readDefault(network);
+            GlobalAssert.that(virtualNetwork!=null);
             travelData = TravelDataGet.readDefault(virtualNetwork);
             GlobalAssert.that(virtualNetwork != null);
             GlobalAssert.that(travelData != null);

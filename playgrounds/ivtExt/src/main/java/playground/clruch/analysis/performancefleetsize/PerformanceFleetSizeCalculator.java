@@ -17,7 +17,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.math.MeanValueAnalysis;
-
 import ch.ethz.idsc.queuey.math.TensorOperations;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
@@ -31,7 +30,6 @@ import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.N;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.ScenarioOptions;
-import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.SaveUtils;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;

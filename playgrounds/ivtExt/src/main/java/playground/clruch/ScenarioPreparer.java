@@ -19,6 +19,7 @@ import ch.ethz.idsc.queuey.core.networks.VirtualNetworkIO;
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeIO;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
@@ -140,7 +141,7 @@ public class ScenarioPreparer {
         VirtualNetwork<Link> virtualNetwork;
         if (centerNetwork) {
             MatsimCenterVirtualNetworkCreator centercreator = new MatsimCenterVirtualNetworkCreator();
-            virtualNetwork = centercreator.creatVirtualNetwork(network);
+            virtualNetwork = centercreator.creatVirtualNetwork(network, 2000.0, Tensors.vector(-900.0, -2300.0));
         } else {
             MatsimKMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new MatsimKMEANSVirtualNetworkCreator();
             virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
@@ -148,6 +149,7 @@ public class ScenarioPreparer {
 
         final File vnDir = new File(workingDirectory, VIRTUALNETWORKFOLDERNAME);
         vnDir.mkdir(); // create folder if necessary
+        GlobalAssert.that(virtualNetwork!=null);
         VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
         System.out.println("saved virtual network byte format to : " + new File(vnDir, VIRTUALNETWORKFILENAME));
         PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);

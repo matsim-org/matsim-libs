@@ -71,10 +71,12 @@ public enum SequentialScenarioTools {
         Element rootNode = doc.getRootElement();
         Element operator = rootNode.getChild("operator");
         Element dispatcher = operator.getChild("generator");
+        @SuppressWarnings("unchecked")
         List<Element> children = dispatcher.getChildren();
 
         for (Element element : children) {
-            List<Attribute> theAttributes = element.getAttributes();
+            @SuppressWarnings("unchecked")
+            List<Attribute> theAttributes = (List<Attribute>) element.getAttributes();
 
             if (theAttributes.get(0).getValue().equals("numberOfVehicles")) {
                 theAttributes.get(1).setValue(Integer.toString(vehicleNumber));
@@ -109,9 +111,11 @@ public enum SequentialScenarioTools {
         Element rootNode = doc.getRootElement();
         Element operator = rootNode.getChild("operator");
         Element dispatcher = operator.getChild("dispatcher");
+        @SuppressWarnings("unchecked")
         List<Element> children = dispatcher.getChildren();
 
         for (Element element : children) {
+            @SuppressWarnings("unchecked")
             List<Attribute> theAttributes = element.getAttributes();
 
             if (theAttributes.get(0).getValue().equals("fareRatioMultiply")) {

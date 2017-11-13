@@ -1,6 +1,8 @@
 // code by francesco, jph, clruch
 package playground.fseccamo.dispatcher;
 
+import org.matsim.api.core.v01.network.Link;
+
 import ch.ethz.idsc.jmex.Container;
 import ch.ethz.idsc.jmex.DoubleArray;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
@@ -15,7 +17,7 @@ import playground.clruch.prep.PopulationRequestSchedule;
 enum MpcUtils {
     ;
 
-    public static Container getContainerInit(VirtualNetwork virtualNetwork, int samplingPeriod, int numberOfVehicles) throws Exception {
+    public static Container getContainerInit(VirtualNetwork<Link> virtualNetwork, int samplingPeriod, int numberOfVehicles) throws Exception {
         final int m = virtualNetwork.getvLinksCount();
         final int n = virtualNetwork.getvNodesCount();
 

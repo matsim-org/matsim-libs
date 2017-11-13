@@ -39,7 +39,7 @@ public class LPVehicleRebalancing {
      * @param virtualNetworkIn
      *            the virtual network (complete directed graph) on which the optimization is computed.
      */
-    public LPVehicleRebalancing(VirtualNetwork virtualNetworkIn) {
+    public LPVehicleRebalancing(VirtualNetwork<Link> virtualNetworkIn) {
         virtualNetwork = virtualNetworkIn;
         n = virtualNetwork.getvNodesCount();
         m = virtualNetwork.getvLinksCount();
@@ -143,7 +143,7 @@ public class LPVehicleRebalancing {
             for (int variableId = 1; variableId <= n * n; ++variableId) {
                 int linkIndex = varIDLinkID.get(variableId);
                 if (linkIndex > -1) {
-                    VirtualLink vLink = virtualNetwork.getVirtualLink(linkIndex);
+                    VirtualLink<Link> vLink = virtualNetwork.getVirtualLink(linkIndex);
                     GLPK.glp_set_obj_coef(lp, variableId, vLink.getDistance());
                 } else {
                     GLPK.glp_set_obj_coef(lp, variableId, 0.0);
