@@ -1,4 +1,4 @@
-package playground.clruch.net;
+package playground.clruch.io.fleet;
 
 import java.util.Objects;
 
@@ -7,7 +7,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.clruch.dispatcher.core.RequestStatus;
-import playground.clruch.io.fleet.TaxiTrail;
+import playground.clruch.net.MatsimStaticDatabase;
+import playground.clruch.net.RequestContainer;
 
 /** @author Andreas Aumiller */
 public class RequestContainerUtils {
