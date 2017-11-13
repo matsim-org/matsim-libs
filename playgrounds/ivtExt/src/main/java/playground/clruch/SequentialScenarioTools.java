@@ -20,6 +20,7 @@ import org.jdom.output.XMLOutputter;
 
 import ch.ethz.idsc.queuey.util.FileDelete;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import playground.clruch.utils.PropertiesExt;
 
 /** @author Claudio Ruch */
 public enum SequentialScenarioTools {
@@ -135,12 +136,13 @@ public enum SequentialScenarioTools {
 
     }
 
-    public static void changeOutputDirectoryTo(String name, File simFolder) //
+    public static void changeOutputDirectoryTo(String name, File simFolder,PropertiesExt simOptions) //
             throws ParserConfigurationException, JDOMException, IOException {
 
         System.out.println("changing output directory to " + name);
 
-        File xmlFile = new File(simFolder, "av_config.xml");
+        
+        File xmlFile = new File(simFolder, simOptions.getString("simuConfig"));
         GlobalAssert.that(xmlFile.exists());
 
         SAXBuilder builder = new SAXBuilder();

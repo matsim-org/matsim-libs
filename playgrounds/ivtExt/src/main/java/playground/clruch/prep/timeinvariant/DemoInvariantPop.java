@@ -40,13 +40,11 @@ public class DemoInvariantPop {
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Population population = scenario.getPopulation();
 
-        int numPeople = population.getPersons().size();
-//        TheApocalypse.decimatesThe(population).toNoMoreThan(500);
+        System.out.println(population.getPersons().size());
+        TheApocalypse.decimatesThe(population).toNoMoreThan(50000);
         PopulationTools.changeModesOfTransportToAV(population);
-        // Population populationInvariant = TimeInvariantPopulation.at(interval, population);
         Population populationInvariant = TimeInvariantPopulation.from(interval, population);
-        // TheApocalypse.decimatesThe(population).toNoMoreThan(2000);
-        int numPeopleUpd = population.getPersons().size();
+        System.out.println(population.getPersons().size());
 
         // write the modified population to file
         final File fileExportGz = new File(workingDirectory, POPULATIONUPDATEDNAME + ".xml.gz");

@@ -8,12 +8,15 @@ import java.net.MalformedURLException;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import playground.clruch.dispatcher.selfishdispatcher.FareRatioCalculator;
+import playground.clruch.utils.PropertiesExt;
 
 /** @author Claudio Ruch */
 public class SequentialScenarioServer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
         File workingDirectory = MultiFileTools.getWorkingDirectory();
+        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+
         /** Delete current content in outputfolder, DO NOT MODIFY THIS, POTENTIALLY VERY DANGEROUS. */
         SequentialScenarioTools.emptyOutputFolder(workingDirectory);
 
@@ -36,7 +39,8 @@ public class SequentialScenarioServer {
             // SequentialScenarioTools.changeVehicleNumberTo(vehicleNumbers[i], workingDirectory);
 
             // set the output-directory correctly
-            SequentialScenarioTools.changeOutputDirectoryTo("output/" + String.format("%04d", i), workingDirectory);
+            SequentialScenarioTools.changeOutputDirectoryTo("output/" + String.format("%04d", i), workingDirectory,//);
+                    simOptions);
 
             // simulate
             ScenarioServer.simulate();
