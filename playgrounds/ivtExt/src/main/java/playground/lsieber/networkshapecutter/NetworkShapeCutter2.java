@@ -46,6 +46,7 @@ public class NetworkShapeCutter2 extends ANetworkCutter {
     private Network filterInternal(Network originalNetwork) {
         // logger.info("Creating filtered network ...");
 
+        // TODO not used
         long numberOfLinksOriginal = originalNetwork.getLinks().size();
         long numberOfNodesOriginal = originalNetwork.getNodes().size();
 

@@ -33,7 +33,7 @@ public class MatsimMapComponent extends JMapViewer {
     public final List<ViewerLayer> viewerLayers = new ArrayList<>();
     private final List<InfoString> infoStrings = new LinkedList<>();
     private int infoFontSize = 13;
-    private static Font debugStringFont = new Font(Font.SERIF, Font.PLAIN, 8);
+    // private static Font debugStringFont = new Font(Font.SERIF, Font.PLAIN, 8);
 
     public JLabel jLabel = new JLabel(" ");
 
@@ -88,12 +88,12 @@ public class MatsimMapComponent extends JMapViewer {
         final Graphics2D graphics = (Graphics2D) g;
         // final Dimension dimension = getSize();
 
-//        if (ref != null) 
+        // if (ref != null)
         {
 
             infoStrings.clear();
-            if (ref != null) 
-            append("i=%-3s %s", "" + ref.iteration, new SecondsToHMS(ref.now).toDigitalWatch());
+            if (ref != null)
+                append("i=%-3s %s", "" + ref.iteration, new SecondsToHMS(ref.now).toDigitalWatch());
             appendSeparator();
 
             viewerLayers.forEach(viewerLayer -> {
@@ -117,8 +117,8 @@ public class MatsimMapComponent extends JMapViewer {
             append("%5d m/pixel", (int) Math.ceil(getMeterPerPixel()));
             appendSeparator();
 
-            if (ref != null) 
-            jLabel.setText(ref.infoLine);
+            if (ref != null)
+                jLabel.setText(ref.infoLine);
 
             if (0 < infoFontSize)
                 drawInfoStrings(graphics);

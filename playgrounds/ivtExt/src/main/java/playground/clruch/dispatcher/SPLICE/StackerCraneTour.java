@@ -47,7 +47,8 @@ public class StackerCraneTour {
 		final int m = ordered_requests.size(); // jobs
 
 		final double[][] requestsDistMatrix = new double[n][m];
-		double lengthAvReq = 0.0; // 
+		@SuppressWarnings("unused")
+        double lengthAvReq=0.0; // 
 		int i = -1;
 		for (AVRequest avRequest : ordered_requests) {
 			++i;

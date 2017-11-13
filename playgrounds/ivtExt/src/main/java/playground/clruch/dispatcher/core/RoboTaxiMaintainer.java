@@ -180,6 +180,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
     }
 
     private void updateCurrentLocations() {
+        @SuppressWarnings("unused")
         int failed = 0;
         if (!roboTaxis.isEmpty()) {
             for (RoboTaxi robotaxi : roboTaxis) {

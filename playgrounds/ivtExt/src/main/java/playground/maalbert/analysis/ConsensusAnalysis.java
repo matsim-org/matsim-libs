@@ -76,6 +76,7 @@ class ConsensusAnalysis {
             rev_linkIntegerMap.put(entry.getValue(), entry.getKey());
         }
 
+        @SuppressWarnings("null")
         int N_vStations = virtualNetwork.getvNodesCount();
 
         for (int index = 0; index < size; ++index) {
