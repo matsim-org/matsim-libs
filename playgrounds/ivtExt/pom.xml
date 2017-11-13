@@ -28,6 +28,7 @@
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
 <<<<<<< HEAD
+<<<<<<< HEAD
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>socnetsim</artifactId>
@@ -39,6 +40,8 @@
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
 =======
+=======
+>>>>>>> master
 <!-- 		<dependency> -->
 <!-- 			<groupId>org.matsim.contrib</groupId> -->
 <!-- 			<artifactId>socnetsim</artifactId> -->
@@ -49,6 +52,9 @@
 <!-- 			<artifactId>parking</artifactId> -->
 <!-- 			<version>0.9.0-SNAPSHOT</version> -->
 <!-- 		</dependency> -->
+<<<<<<< HEAD
+>>>>>>> master
+=======
 >>>>>>> master
 		<dependency>
 			<groupId>org.geotools</groupId>
@@ -57,11 +63,14 @@
 		</dependency>
 		<dependency>
 <<<<<<< HEAD
+<<<<<<< HEAD
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>accessibility</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
 =======
+=======
+>>>>>>> master
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
 			<version>3.7</version>
@@ -76,6 +85,9 @@
 <!-- 			<artifactId>accessibility</artifactId> -->
 <!-- 			<version>0.9.0-SNAPSHOT</version> -->
 <!-- 		</dependency> -->
+<<<<<<< HEAD
+>>>>>>> master
+=======
 >>>>>>> master
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
@@ -93,17 +105,23 @@
 			<version>0.1.54</version>
 		</dependency>
 <<<<<<< HEAD
+<<<<<<< HEAD
 		<dependency>
 			<groupId>com.github.gunnarfloetteroed</groupId>
 			<artifactId>java</artifactId>
 			<version>master</version>
 		</dependency>
 =======
+=======
+>>>>>>> master
 <!-- 		<dependency> -->
 <!-- 			<groupId>com.github.gunnarfloetteroed</groupId> -->
 <!-- 			<artifactId>java</artifactId> -->
 <!-- 			<version>master</version> -->
 <!-- 		</dependency> -->
+<<<<<<< HEAD
+>>>>>>> master
+=======
 >>>>>>> master
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
@@ -111,12 +129,18 @@
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> master
 <!-- 		<dependency> -->
 <!-- 			<groupId>org.matsim.contrib</groupId> -->
 <!-- 			<artifactId>taxi</artifactId> -->
 <!-- 			<version>0.9.0-SNAPSHOT</version> -->
 <!-- 		</dependency> -->
+<<<<<<< HEAD
+>>>>>>> master
+=======
 >>>>>>> master
 		<dependency>
 			<groupId>org.jdom</groupId>
@@ -132,7 +156,11 @@
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>tensor</artifactId>
 <<<<<<< HEAD
+<<<<<<< HEAD
 			<version>0.3.4</version>
+=======
+			<version>0.4.0</version>
+>>>>>>> master
 =======
 			<version>0.4.0</version>
 >>>>>>> master
@@ -141,7 +169,11 @@
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>owly</artifactId>
 <<<<<<< HEAD
+<<<<<<< HEAD
 			<version>0.0.4</version>
+=======
+			<version>0.0.7</version>
+>>>>>>> master
 =======
 			<version>0.0.7</version>
 >>>>>>> master

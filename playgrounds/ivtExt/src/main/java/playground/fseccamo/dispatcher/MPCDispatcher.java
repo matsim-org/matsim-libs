@@ -116,7 +116,7 @@ public class MPCDispatcher extends BaseMpcDispatcher {
         }
     }
 
-    private void performPickup(StringBuilder stringBuilder, Container container, VirtualNetwork virtualNetwork) {
+    private void performPickup(StringBuilder stringBuilder, Container container, VirtualNetwork<Link> virtualNetwork) {
 
         // <VirtualLink, Integer> pickupPerVLink: the number of vehicles at VirtualLink ij which should take a request and
         // transport the person to a virtualNode for all these u_ij select u_ij customers in vNode i which have any shortest
@@ -196,7 +196,7 @@ public class MPCDispatcher extends BaseMpcDispatcher {
         stringBuilder.append(String.format("%2dp, ", totalPickupEffective));
     }
 
-    private void performRebalance(StringBuilder stringBuilder, Container container, VirtualNetwork virtualNetwork) {
+    private void performRebalance(StringBuilder stringBuilder, Container container, VirtualNetwork<Link> virtualNetwork) {
 
         // 2) <VirtualLink, Integer> rebalancingPerVLink : for every VirtualLink select
         // this number of vehicles vehicle in the fromVNode and
@@ -229,9 +229,9 @@ public class MPCDispatcher extends BaseMpcDispatcher {
         int totalRebalanceEffective = 0;
         int selfRebalanceEffective = 0;
         for (int vectorIndex = 0; vectorIndex < m + n; ++vectorIndex) {
-            final VirtualNode vnFrom = vectorIndex < m ? //
+            final VirtualNode<Link> vnFrom = vectorIndex < m ? //
                     virtualNetwork.getVirtualLink(vectorIndex).getFrom() : virtualNetwork.getVirtualNode(vectorIndex - m);
-            final VirtualNode vnTo = vectorIndex < m ? //
+            final VirtualNode<Link> vnTo = vectorIndex < m ? //
                     virtualNetwork.getVirtualLink(vectorIndex).getTo() : virtualNetwork.getVirtualNode(vectorIndex - m);
             final Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
 

@@ -45,6 +45,7 @@ public class MatsimKMEANSVirtualNetworkCreator {
     public VirtualNetwork<Link> createVirtualNetwork(Population population, Network network, int numVNodes, boolean completeGraph) {
 
         double data[][] = NetworkCreatorUtils.fromPopulation(population, network);
+        @SuppressWarnings("unchecked")
         Collection<Link> elements = (Collection<Link>) network.getLinks().values();
         Tensor lbounds = NDTreeReducer.lowerBoudnsOf(network);
         Tensor ubounds = NDTreeReducer.upperBoudnsOf(network);

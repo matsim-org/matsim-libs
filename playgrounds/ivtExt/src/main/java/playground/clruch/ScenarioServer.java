@@ -12,6 +12,7 @@ import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -39,17 +40,15 @@ import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 
-/**
- * only one ScenarioServer can run at one time, since a fixed network port is
- * reserved to serve the simulation status
- */
+/** only one ScenarioServer can run at one time, since a fixed network port is
+ * reserved to serve the simulation status */
 public class ScenarioServer {
 
-	public static void main(String[] args) throws MalformedURLException, Exception {
-		simulate();
-	}
+    public static void main(String[] args) throws MalformedURLException, Exception {
+        simulate();
+    }
 
-	/* package */ static void simulate() throws MalformedURLException, Exception {
+    /* package */ static void simulate() throws MalformedURLException, Exception {
 		// load options
 		File workingDirectory = MultiFileTools.getWorkingDirectory();
 		PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
@@ -76,6 +75,10 @@ public class ScenarioServer {
 		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
 		dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 		Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
+
+		TestBed.astraActs(config);
+		
+		
 		String outputdirectory = config.controler().getOutputDirectory();
 		System.out.println("outputdirectory = " + outputdirectory);
 

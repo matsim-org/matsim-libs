@@ -25,6 +25,10 @@ import ch.ethz.idsc.queuey.util.GlobalAssert;
 public enum SequentialScenarioTools {
     ;
 
+    /** @param iterations any odd number for the number of iterations
+     * @param factorPlus a factor to scale the resulting array
+     * @return array of the form {..., factorPlus^-2,factorPlus^-1,1.0, factorPlus, factorPlus^2,...}
+     * @throws InterruptedException */
     public static double[] fareRatioCreator(int iterations, double factorPlus) throws InterruptedException {
         GlobalAssert.that(iterations % 2 != 0);
 
@@ -71,10 +75,12 @@ public enum SequentialScenarioTools {
         Element rootNode = doc.getRootElement();
         Element operator = rootNode.getChild("operator");
         Element dispatcher = operator.getChild("generator");
+        @SuppressWarnings("unchecked")
         List<Element> children = dispatcher.getChildren();
 
         for (Element element : children) {
-            List<Attribute> theAttributes = element.getAttributes();
+            @SuppressWarnings("unchecked")
+            List<Attribute> theAttributes = (List<Attribute>) element.getAttributes();
 
             if (theAttributes.get(0).getValue().equals("numberOfVehicles")) {
                 theAttributes.get(1).setValue(Integer.toString(vehicleNumber));
@@ -109,12 +115,14 @@ public enum SequentialScenarioTools {
         Element rootNode = doc.getRootElement();
         Element operator = rootNode.getChild("operator");
         Element dispatcher = operator.getChild("dispatcher");
+        @SuppressWarnings("unchecked")
         List<Element> children = dispatcher.getChildren();
 
         for (Element element : children) {
+            @SuppressWarnings("unchecked")
             List<Attribute> theAttributes = element.getAttributes();
 
-            if (theAttributes.get(0).getValue().equals("fareRatioMultiply")) {
+            if (theAttributes.get(0).getValue().equals("fareRatio")) {
                 theAttributes.get(1).setValue(Double.toString(fareRatio));
 
             }

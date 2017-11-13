@@ -60,6 +60,7 @@ public class LPFBDispatcher extends PartitionedDispatcher {
     private int total_rebalanceCount = 0;
     private Tensor printVals = Tensors.empty();
     private final LPVehicleRebalancing lpVehicleRebalancing;
+    @SuppressWarnings("unused")
     private final NetworkDistanceFunction ndf;
     private final Network network;
 
