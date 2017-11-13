@@ -10,6 +10,12 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
+<<<<<<< HEAD
+=======
+import ch.ethz.idsc.queuey.datalys.SaveUtils;
+import ch.ethz.idsc.queuey.plot.DiagramCreator;
+import ch.ethz.idsc.queuey.plot.UniqueDiagrams;
+>>>>>>> 8c3fede0f553a05993fe22f52e1096bbe2350777
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -69,7 +75,7 @@ public class AnalyzeAll {
     /* package */ void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis, File relativeDirectory) //
             throws Exception {
         Tensor summary = Join.of(1, coreAnalysis.getSummary(), distanceAnalysis.summary);
-        SaveUtils.saveFile(summary, "summary", relativeDirectory.getPath());
+        SaveUtils.saveFile(summary, "summary", relativeDirectory);
         System.out.println("Size of data summary: " + Dimensions.of(summary));
 
         getTotals(summary, coreAnalysis, relativeDirectory);

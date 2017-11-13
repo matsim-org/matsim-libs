@@ -16,6 +16,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.datalys.SaveUtils;
 import ch.ethz.idsc.queuey.math.MeanValueAnalysis;
 import ch.ethz.idsc.queuey.math.TensorOperations;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
@@ -30,7 +31,11 @@ import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.N;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.ScenarioOptions;
+<<<<<<< HEAD
 import playground.clruch.analysis.SaveUtils;
+=======
+import playground.clruch.analysis.AnalyzeAll;
+>>>>>>> 8c3fede0f553a05993fe22f52e1096bbe2350777
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
@@ -135,8 +140,8 @@ public class PerformanceFleetSizeCalculator implements Serializable {
 
     public void saveAndPlot(String dataFolderName, File relativeDirectory) {
         try {
-            SaveUtils.saveFile(meanByVehiclesOffPeak, "availabilitiesOffPeak", dataFolderName);
-            SaveUtils.saveFile(meanByVehiclesPeak, "availabilitiesPeak", dataFolderName);
+            SaveUtils.saveFile(meanByVehiclesOffPeak, "availabilitiesOffPeak", new File(dataFolderName));
+            SaveUtils.saveFile(meanByVehiclesPeak, "availabilitiesPeak", new File(dataFolderName));
             PerformanceFleetSizeUtils.plot(meanByVehiclesOffPeak, meanByVehiclesPeak, relativeDirectory);
         } catch (Exception e) {
             System.out.println("Error saving the availabilities");

@@ -21,6 +21,7 @@ import org.matsim.api.core.v01.network.Link;
 import ch.ethz.idsc.queuey.core.networks.VirtualLink;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNode;
+import ch.ethz.idsc.queuey.plot.DiagramCreator;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Scalars;
@@ -30,7 +31,6 @@ import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.red.Norm;
 import ch.ethz.idsc.tensor.red.Total;
-import playground.clruch.analysis.DiagramCreator;
 import playground.clruch.traveldata.TravelData;
 
 /** @author Claudio Ruch */

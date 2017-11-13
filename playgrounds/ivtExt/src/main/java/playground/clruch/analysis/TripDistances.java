@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
 import ch.ethz.idsc.queuey.math.AnalysisUtils;
+import ch.ethz.idsc.queuey.plot.DiagramCreator;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -50,7 +51,7 @@ public class TripDistances {
     }
 
     private void analyze(File relativeDirectory) throws Exception {
-        tripDistances = tripDistances.multiply(RealScalar.of(0.001));
+        tripDistances = tripDistances.multiply(RealScalar.of(0.001)); // TODO magic constant for m -> km 
 
         tripDistanceBinSize = AnalysisUtils.adaptBinSize(tripDistances, tripDistanceBinSize, RealScalar.of(0.5));
         tripDistanceBinCounter = BinCounts.of(tripDistances, tripDistanceBinSize);
