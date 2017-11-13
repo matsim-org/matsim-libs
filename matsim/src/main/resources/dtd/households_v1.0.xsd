@@ -60,11 +60,9 @@
     </xs:complexType>
 
     <xs:complexType name="attributeType">
-        <xs:sequence minOccurs="1" maxOccurs="1">
-            <xs:attribute name="key" type="xs:string"/>
-            <xs:attribute name="clazz" type="xs:string"/>
-            <xs:attribute name="value" type="xs:string"/>
-        </xs:sequence>
+        <xs:attribute name="key" type="xs:string"/>
+        <xs:attribute name="clazz" type="xs:string"/>
+        <xs:attribute name="value" type="xs:string"/>
     </xs:complexType>
 
 
