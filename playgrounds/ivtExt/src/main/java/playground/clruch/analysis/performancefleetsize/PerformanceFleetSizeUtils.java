@@ -186,11 +186,11 @@ public enum PerformanceFleetSizeUtils {
         }
 
         // set text fonts
-        timechart.getTitle().setFont(DiagramSettings.titleFont);
-        timechart.getXYPlot().getDomainAxis().setLabelFont(DiagramSettings.axisFont);
-        timechart.getXYPlot().getRangeAxis().setLabelFont(DiagramSettings.axisFont);
-        timechart.getXYPlot().getDomainAxis().setTickLabelFont(DiagramSettings.tickFont);
-        timechart.getXYPlot().getRangeAxis().setTickLabelFont(DiagramSettings.tickFont);
+        timechart.getTitle().setFont(DiagramSettings.FONT_AXIS);
+        timechart.getXYPlot().getDomainAxis().setLabelFont(DiagramSettings.FONT_AXIS);
+        timechart.getXYPlot().getRangeAxis().setLabelFont(DiagramSettings.FONT_AXIS);
+        timechart.getXYPlot().getDomainAxis().setTickLabelFont(DiagramSettings.FONT_TICK);
+        timechart.getXYPlot().getRangeAxis().setTickLabelFont(DiagramSettings.FONT_TICK);
 
         // save plot as png
         int width = 1000; // Width of the image

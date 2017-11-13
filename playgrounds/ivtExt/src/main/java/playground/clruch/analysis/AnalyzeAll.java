@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
+import ch.ethz.idsc.queuey.datalys.SaveUtils;
 import ch.ethz.idsc.queuey.plot.DiagramCreator;
 import ch.ethz.idsc.queuey.plot.HistogramPlot;
 import ch.ethz.idsc.queuey.plot.UniqueDiagrams;
@@ -21,7 +22,6 @@ import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.CsvFormat;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.Histogram;
 import playground.clruch.ScenarioOptions;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
@@ -74,7 +74,7 @@ public class AnalyzeAll {
     /* package */ void collectAndPlot(CoreAnalysis coreAnalysis, DistanceAnalysis distanceAnalysis, File relativeDirectory) //
             throws Exception {
         Tensor summary = Join.of(1, coreAnalysis.getSummary(), distanceAnalysis.summary);
-        SaveUtils.saveFile(summary, "summary", relativeDirectory.getPath());
+        SaveUtils.saveFile(summary, "summary", relativeDirectory);
         System.out.println("Size of data summary: " + Dimensions.of(summary));
 
         getTotals(summary, coreAnalysis, relativeDirectory);
