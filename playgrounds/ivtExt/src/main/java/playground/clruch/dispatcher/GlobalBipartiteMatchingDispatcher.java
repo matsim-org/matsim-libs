@@ -59,7 +59,7 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
     protected String getInfoLine() {
         return String.format("%s H=%s", //
                 super.getInfoLine(), //
-                printVals.toString() //
+                printVals.toString() //This is where Dispatcher@ V... R... MR.. H is printed on console
         );
     }
 

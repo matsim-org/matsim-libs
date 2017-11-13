@@ -13,4 +13,7 @@ public interface DistanceFunction {
     double getDistance(RoboTaxi robotaxi, AVRequest avRequest);
 
     double getDistance(RoboTaxi robotaxi, Link link);
+    
+    // Added Nicolo 29-10-17
+    double getDistance(Link from, Link to);
 }

@@ -56,10 +56,10 @@ class BinnedWaitingTimes extends AbstractData {
     String getDeltaKey(String key, double deltaT) {
         // necessary in case multiple waiting times of the same length exist
         int i = 1;
-        String deltaKey = String.valueOf(keyMap.keyForm.format(deltaT)) + "_" + String.valueOf(i);
+        String deltaKey = String.valueOf(KeyMap.KEYFORM.format(deltaT)) + "_" + String.valueOf(i);
         while (waitingTimes.get(key).containsKey(deltaKey)) {
             i++;
-            deltaKey = String.valueOf(keyMap.keyForm.format(deltaT)) + "_" + String.valueOf(i);
+            deltaKey = String.valueOf(KeyMap.KEYFORM.format(deltaT)) + "_" + String.valueOf(i);
         }
         return deltaKey;
     }
