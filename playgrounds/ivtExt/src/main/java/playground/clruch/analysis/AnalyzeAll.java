@@ -12,7 +12,9 @@ import org.matsim.core.config.ConfigUtils;
 
 import ch.ethz.idsc.queuey.datalys.SaveUtils;
 import ch.ethz.idsc.queuey.plot.DiagramCreator;
+import ch.ethz.idsc.queuey.plot.HistogramPlot;
 import ch.ethz.idsc.queuey.plot.UniqueDiagrams;
+import ch.ethz.idsc.tensor.RationalScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -81,20 +83,20 @@ public class AnalyzeAll {
         // maximum waiting time in the plot to have this uniform for all simulations
         plot("summary", "binnedTimeRatios", "Occupancy Ratio", 10, 11, relativeDirectory);
         plot("summary", "binnedDistanceRatios", "Distance Ratio", 15, 16, relativeDirectory);
-        DiagramCreator.binCountGraph(relativeDirectory, "waitBinCounter", //
-                "Requests per Waiting Time", coreAnalysis.waitBinCounter, waitBinSize.number().doubleValue(), //
-                100.0 / coreAnalysis.numRequests, "% of requests", //
-                "Waiting Times", " sec", 1000, 750);
-        DiagramCreator.binCountGraph(relativeDirectory, "totalDistanceVehicle", //
-                "Vehicles per Total Distance", distanceAnalysis.tdBinCounter, //
-                totalDistanceBinSize.number().doubleValue(), 100.0 / distanceAnalysis.numVehicles, //
-                "% of fleet", "Total Distances", " km", //
+        HistogramPlot.of(coreAnalysis.waitBinCounter, relativeDirectory, "Requests per Waiting Time", //
+                waitBinSize.number().doubleValue(), "% of requests", "Waiting Times [s]", //
                 1000, 750);
-        DiagramCreator.binCountGraph(relativeDirectory, "dwcVehicle", //
-                "Vehicles per Distance with Customer", distanceAnalysis.dwcBinCounter, //
-                distanceWCBinSize.number().doubleValue(), 100.0 / distanceAnalysis.numVehicles, //
-                "% of fleet", "Distances with Customer", " km", //
+
+        HistogramPlot.of(distanceAnalysis.tdBinCounter.multiply(RationalScalar.of(100, distanceAnalysis.numVehicles)), relativeDirectory,
+                "Vehicles per Total Distance", //
+                totalDistanceBinSize.number().doubleValue(), "% of fleet", "Total Distances [km]", //
                 1000, 750);
+
+        HistogramPlot.of(distanceAnalysis.dwcBinCounter.multiply(RationalScalar.of(100, distanceAnalysis.numVehicles)), relativeDirectory,
+                "Vehicles per Distance with Customer", //
+                distanceWCBinSize.number().doubleValue(), "% of fleet", "Distances with Customer [km]", //
+                1000, 750);
+
         UniqueDiagrams.distanceStack(relativeDirectory, "stackedDistance", "Distance Partition", //
                 distanceRebalance / distance, distancePickup / distance, distanceWithCust / distance);
         UniqueDiagrams.distanceDistribution(relativeDirectory, "distanceDistribution", //
