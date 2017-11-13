@@ -27,7 +27,6 @@
 			<artifactId>locationchoice</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
-<!-- <<<<<<< HEAD -->
 <!-- 		<dependency> -->
 <!-- 			<groupId>org.matsim.contrib</groupId> -->
 <!-- 			<artifactId>socnetsim</artifactId> -->
@@ -38,25 +37,11 @@
 <!-- 			<artifactId>parking</artifactId> -->
 <!-- 			<version>0.9.0-SNAPSHOT</version> -->
 <!-- 		</dependency> -->
-<!-- ======= -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.matsim.contrib</groupId> -->
-<!-- 			<artifactId>socnetsim</artifactId> -->
-<!-- 			<version>0.9.0-SNAPSHOT</version> -->
-<!-- 		</dependency> -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.matsim.contrib</groupId> -->
-<!-- 			<artifactId>parking</artifactId> -->
-<!-- 			<version>0.9.0-SNAPSHOT</version> -->
-<!-- 		</dependency> -->
-<!-- >>>>>>> 8c3fede0f553a05993fe22f52e1096bbe2350777 -->
-<!-- 		<dependency> -->
-<!-- 			<groupId>org.geotools</groupId> -->
-<!-- 			<artifactId>gt-geotiff</artifactId> -->
-<!-- 			<version>13.0</version> -->
-<!-- 		</dependency> -->
-
-<!-- <<<<<<< HEAD -->
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-geotiff</artifactId>
+			<version>13.0</version>
+		</dependency>
 		<dependency>
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
@@ -72,12 +57,6 @@
 <!-- 			<artifactId>accessibility</artifactId> -->
 <!-- 			<version>0.9.0-SNAPSHOT</version> -->
 <!-- 		</dependency> -->
-<!-- ======= -->
-<!-- 			<groupId>org.matsim.contrib</groupId> -->
-<!-- 			<artifactId>accessibility</artifactId> -->
-<!-- 			<version>0.9.0-SNAPSHOT</version> -->
-<!-- 		</dependency> -->
-<!-- >>>>>>> 8c3fede0f553a05993fe22f52e1096bbe2350777 -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>
 			<artifactId>jackson-databind</artifactId>
@@ -93,32 +72,21 @@
 			<artifactId>jsch</artifactId>
 			<version>0.1.54</version>
 		</dependency>
-<!-- <<<<<<< HEAD -->
-<!-- <!-- 		<dependency> --> -->
-<!-- <!-- 			<groupId>com.github.gunnarfloetteroed</groupId> --> -->
-<!-- <!-- 			<artifactId>java</artifactId> --> -->
-<!-- <!-- 			<version>master</version> --> -->
-<!-- <!-- 		</dependency> --> -->
-<!-- ======= -->
 <!-- 		<dependency> -->
 <!-- 			<groupId>com.github.gunnarfloetteroed</groupId> -->
 <!-- 			<artifactId>java</artifactId> -->
 <!-- 			<version>master</version> -->
 <!-- 		</dependency> -->
-<!-- >>>>>>> 8c3fede0f553a05993fe22f52e1096bbe2350777 -->
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>dvrp</artifactId>
 			<version>0.9.0-SNAPSHOT</version>
 		</dependency>
-<!-- <<<<<<< HEAD -->
-<!-- <!-- 		<dependency> --> -->
-<!-- <!-- 			<groupId>org.matsim.contrib</groupId> --> -->
-<!-- <!-- 			<artifactId>taxi</artifactId> --> -->
-<!-- <!-- 			<version>0.9.0-SNAPSHOT</version> --> -->
-<!-- <!-- 		</dependency> --> -->
-<!-- ======= -->
-<!-- >>>>>>> 8c3fede0f553a05993fe22f52e1096bbe2350777 -->
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.matsim.contrib</groupId> -->
+<!-- 			<artifactId>taxi</artifactId> -->
+<!-- 			<version>0.9.0-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>org.jdom</groupId>
 			<artifactId>jdom2</artifactId>
@@ -132,7 +100,7 @@
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>tensor</artifactId>
-			<version>0.3.4</version>
+			<version>0.4.0</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>

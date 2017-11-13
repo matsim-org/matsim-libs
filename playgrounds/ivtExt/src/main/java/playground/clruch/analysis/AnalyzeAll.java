@@ -10,12 +10,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
-<<<<<<< HEAD
-=======
 import ch.ethz.idsc.queuey.datalys.SaveUtils;
 import ch.ethz.idsc.queuey.plot.DiagramCreator;
-import ch.ethz.idsc.queuey.plot.UniqueDiagrams;
->>>>>>> 8c3fede0f553a05993fe22f52e1096bbe2350777
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
