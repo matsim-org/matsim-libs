@@ -19,15 +19,16 @@
  * *********************************************************************** */
 package org.matsim.households;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
+import com.google.inject.Inject;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Income.IncomePeriod;
+import org.matsim.utils.objectattributes.AttributeConverter;
+import org.matsim.utils.objectattributes.attributable.AttributesXmlReaderDelegate;
 import org.matsim.vehicles.Vehicle;
 import org.xml.sax.Attributes;
 
@@ -55,6 +56,12 @@ abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 	
 	private Counter counter = new Counter("  households # ");
 
+	private Household currentHousehold = null;
+
+	private final AttributesXmlReaderDelegate attributesReader = new AttributesXmlReaderDelegate();
+	private org.matsim.utils.objectattributes.attributable.Attributes currAttributes =
+			new org.matsim.utils.objectattributes.attributable.Attributes();
+
 	public AbstractHouseholdsReaderV10(Households households) {
 		if (households == null) {
 			throw new IllegalArgumentException("Container for households must not be null!");
@@ -62,12 +69,22 @@ abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 		this.households = households;
 		this.builder = households.getFactory();
 	}
-	
+
+	public void putAttributeConverter( final Class<?> clazz , AttributeConverter<?> converter ) {
+		attributesReader.putAttributeConverter( clazz , converter );
+	}
+
+	@Inject
+	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
+		attributesReader.putAttributeConverters( converters );
+	}
+
 	@Override
 	public void endTag(String name, String content, Stack<String> context) {
 		if (HouseholdsSchemaV10Names.HOUSEHOLD.equalsIgnoreCase(name)) {
-			Household currentHousehold = createHousehold();
+			fillHousehold();
 			((HouseholdsImpl)this.households).addHousehold(currentHousehold);
+			this.currentHousehold = null;
 			counter.incCounter();
 		}
 		else if (HouseholdsSchemaV10Names.INCOME.equalsIgnoreCase(name)) {
@@ -77,12 +94,30 @@ abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 		else if (HouseholdsSchemaV10Names.HOUSEHOLDS.equalsIgnoreCase(name)) {
 			counter.printCounter();
 		}
+		else if (name.equalsIgnoreCase(HouseholdsSchemaV10Names.ATTRIBUTES)) {
+			this.currAttributes = null;
+		}
+		else if (name.equalsIgnoreCase(HouseholdsSchemaV10Names.ATTRIBUTE)) {
+			this.attributesReader.endTag( name , content , context );
+		}
+	}
+
+	private void fillHousehold() {
+		((HouseholdImpl) this.currentHousehold).setMemberIds(this.currentmembers);
+		((HouseholdImpl) this.currentHousehold).setVehicleIds(this.currentVehicleIds);
+		this.currentHousehold.setIncome(this.currentincome);
+		this.currentHhId = null;
+		this.currentVehicleIds = null;
+		this.currentincome = null;
+		this.currentmembers = null;
+		this.currentIncomePeriod = null;
+		this.currentincomeCurrency = null;
 	}
 
 	/*package*/ Household createHousehold() {
 		Household hh = this.builder.createHousehold(this.currentHhId);
 		((HouseholdImpl) hh).setMemberIds(this.currentmembers);
-		((HouseholdImpl) hh).setVehicleIds(this.currentVehicleIds);		
+		((HouseholdImpl) hh).setVehicleIds(this.currentVehicleIds);
 		hh.setIncome(this.currentincome);
 		this.currentHhId = null;
 		this.currentVehicleIds = null;
@@ -100,8 +135,9 @@ abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (HouseholdsSchemaV10Names.HOUSEHOLD.equalsIgnoreCase(name)) {
 			this.currentHhId = Id.create(atts.getValue(HouseholdsSchemaV10Names.ID), Household.class);
-			this.currentmembers = new ArrayList<Id<Person>>();
-			this.currentVehicleIds = new ArrayList<Id<Vehicle>>();
+			this.currentHousehold = this.builder.createHousehold(this.currentHhId);
+			this.currentmembers = new ArrayList<>();
+			this.currentVehicleIds = new ArrayList<>();
 		}
 		else if (HouseholdsSchemaV10Names.MEMBERS.equalsIgnoreCase(name)) {
 //			this.currentmembers = new ArrayList<Id>();
@@ -120,6 +156,15 @@ abstract class AbstractHouseholdsReaderV10 extends MatsimXmlParser{
 		else if (HouseholdsSchemaV10Names.VEHICLEDEFINITIONID.equalsIgnoreCase(name)) {
 			Id<Vehicle> vehicleId = Id.create(atts.getValue(HouseholdsSchemaV10Names.REFID), Vehicle.class);
 			this.currentVehicleIds.add(vehicleId);
+		}
+		else if (name.equalsIgnoreCase(HouseholdsSchemaV10Names.ATTRIBUTES)) {
+			if (context.peek().equalsIgnoreCase(HouseholdsSchemaV10Names.HOUSEHOLD)) {
+				currAttributes = this.currentHousehold.getAttributes();
+				attributesReader.startTag( name , atts , context, currAttributes );
+			}
+		}
+		else if (name.equalsIgnoreCase(HouseholdsSchemaV10Names.ATTRIBUTE)) {
+			attributesReader.startTag( name , atts , context, currAttributes );
 		}
 	}
 

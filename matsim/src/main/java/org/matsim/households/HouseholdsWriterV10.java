@@ -121,7 +121,12 @@ public class HouseholdsWriterV10 extends MatsimXmlWriter implements HouseholdAlg
 
 		AttributesXmlWriterDelegate attributesWriter = new AttributesXmlWriterDelegate();
 		attributesWriter.putAttributeConverters(this.attributeConverters);
-		attributesWriter.writeAttributes( "\t" , this.writer , h.getAttributes() );
+		try {
+			this.writer.write(NL);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		attributesWriter.writeAttributes( "\t\t" , this.writer , h.getAttributes() );
 
 		this.writeEndTag(HouseholdsSchemaV10Names.HOUSEHOLD);
 	}
