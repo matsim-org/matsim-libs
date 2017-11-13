@@ -28,25 +28,22 @@ import playground.clruch.dispatcher.utils.PlaneLocation;
 /** @author Claudio Ruch */
 public class MatsimCenterVirtualNetworkCreator {
 
-    Random random = new Random();
-    DatabaseConnection dbc;
-    Database db;
-    SquaredEuclideanDistanceFunction dist = SquaredEuclideanDistanceFunction.STATIC;
-    RandomlyGeneratedInitialMeans init = new RandomlyGeneratedInitialMeans(RandomFactory.DEFAULT);
-    KMeansLloyd<NumberVector> km;
-    Clustering<KMeansModel> c;
-    Relation<NumberVector> rel;
+	Random random = new Random();
+	DatabaseConnection dbc;
+	Database db;
+	SquaredEuclideanDistanceFunction dist = SquaredEuclideanDistanceFunction.STATIC;
+	RandomlyGeneratedInitialMeans init = new RandomlyGeneratedInitialMeans(RandomFactory.DEFAULT);
+	KMeansLloyd<NumberVector> km;
+	Clustering<KMeansModel> c;
+	Relation<NumberVector> rel;
 
-    public VirtualNetwork<Link> creatVirtualNetwork(Network network) {
-        // TODO magic consts.
-        double centerRadius = 1500;
-        Tensor emptyTensor = Tensors.vector(0, 0);
-        Collection<Link> elements = (Collection<Link>) network.getLinks().values();
+	public VirtualNetwork<Link> creatVirtualNetwork(Network network, double centerRadius, Tensor centerShift) {
+		Collection<Link> elements = (Collection<Link>) network.getLinks().values();
 
-        CenterVirtualNetworkCreator<Link> cvn = new CenterVirtualNetworkCreator<>(centerRadius, emptyTensor, elements, PlaneLocation::of,
-                NetworkCreatorUtils::linkToID);
-        return cvn.getVirtualNetwork();
+		CenterVirtualNetworkCreator<Link> cvn = new CenterVirtualNetworkCreator<>(centerRadius, centerShift, elements,
+				PlaneLocation::of, NetworkCreatorUtils::linkToID);  
+		return cvn.getVirtualNetwork();
 
-    }
+	}
 
 }

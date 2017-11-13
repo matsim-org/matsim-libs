@@ -12,7 +12,6 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.utils.BipartiteMatchingUtils;
-import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
 import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
@@ -59,7 +58,7 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
     protected String getInfoLine() {
         return String.format("%s H=%s", //
                 super.getInfoLine(), //
-                printVals.toString() //
+                printVals.toString() //This is where Dispatcher@ V... R... MR.. H is printed on console
         );
     }
 

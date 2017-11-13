@@ -12,6 +12,7 @@ import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -39,21 +40,21 @@ import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 
-/**
- * only one ScenarioServer can run at one time, since a fixed network port is
- * reserved to serve the simulation status
- */
+/** only one ScenarioServer can run at one time, since a fixed network port is
+ * reserved to serve the simulation status */
 public class ScenarioServer {
 
-	public static void main(String[] args) throws MalformedURLException, Exception {
-		simulate();
-	}
+    public static void main(String[] args) throws MalformedURLException, Exception {
+        simulate();
+    }
 
-	/* package */ static void simulate() throws MalformedURLException, Exception {
+    /* package */ static void simulate() throws MalformedURLException, Exception {
 		// load options
 		File workingDirectory = MultiFileTools.getWorkingDirectory();
 		PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
 
+		System.out.println("Start--------------------"); // added no
+		
 		/**
 		 * set to true in order to make server wait for at least 1 client, for
 		 * instance viewer client
@@ -66,12 +67,18 @@ public class ScenarioServer {
 		SimulationServer.INSTANCE.startAcceptingNonBlocking();
 		SimulationServer.INSTANCE.setWaitForClients(waitForClients);
 
-		// load MATSim configs
+
+		// load MATSim configs - includign av.xml where dispatcher is selected. 
 		System.out.println("loading config file " + configFile.getAbsoluteFile());
-		GlobalAssert.that(configFile.exists());
+		
+		GlobalAssert.that(configFile.exists()); // Test wheather the config file directory exists
 		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
 		dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 		Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
+
+		TestBed.astraActs(config);
+		
+		
 		String outputdirectory = config.controler().getOutputDirectory();
 		System.out.println("outputdirectory = " + outputdirectory);
 

@@ -16,9 +16,8 @@ import playground.clruch.ScenarioOptions;
 public enum VirtualNetworkGet {
     ;
 
-
-/** @param network
- * @return null if file does not exist */
+    /** @param network
+     * @return null if file does not exist */
     public static VirtualNetwork<Link> readDefault(Network network) {
 
         Properties simOptions = ScenarioOptions.getDefault();
@@ -30,7 +29,7 @@ public enum VirtualNetworkGet {
             Map<String, Link> map = new HashMap<>();
             network.getLinks().entrySet().forEach(e -> map.put(e.getKey().toString(), e.getValue()));
 
-            return (new VirtualNetworkIO<Link>()).fromByte(map, virtualnetworkFile);
+            return VirtualNetworkIO.fromByte(map, virtualnetworkFile);
         } catch (Exception e) {
             System.out.println("cannot load default " + virtualnetworkFile);
 
