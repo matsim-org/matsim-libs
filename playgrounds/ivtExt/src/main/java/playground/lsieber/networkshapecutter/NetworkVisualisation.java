@@ -2,9 +2,19 @@ package playground.lsieber.networkshapecutter;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import java.util.Map.Entry;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansConfigGroup;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
@@ -20,6 +30,7 @@ import playground.clruch.utils.PropertiesExt;
 public class NetworkVisualisation {
     private PropertiesExt simOptions;
     private Network network;
+    private Population population;
 
     public NetworkVisualisation(Network network, PropertiesExt simOptions) throws IOException {
         this.simOptions = simOptions;
@@ -38,7 +49,14 @@ public class NetworkVisualisation {
 
     public NetworkVisualisation() throws IOException {
         this.simOptions = SimOptionsLoader.loadSimOptions();
-        this.network = SimOptionsLoader.LoadNetworkBasedOnSimOptions();
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
+        
+        File file = new File(workingDirectory, simOptions.getString("simuConfig"));
+        Config config = ConfigUtils.loadConfig(file.toString());
+        
+        Scenario scenario = ScenarioUtils.loadScenario(config);
+        this.network = scenario.getNetwork();
+        this.population = scenario.getPopulation();
     }
 
     public void run() throws IOException {
@@ -55,6 +73,14 @@ public class NetworkVisualisation {
 
     public void setNetwork(Network network) {
         this.network = network;
+    }
+    
+    public Population getPopulation() {
+        return this.population;
+    }
+    
+    public void setPopulation(Population population) {
+        this.population = population;
     }
 
     private void displayNetwork() throws IOException {

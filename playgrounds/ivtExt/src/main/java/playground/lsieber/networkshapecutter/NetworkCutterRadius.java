@@ -30,6 +30,12 @@ public class NetworkCutterRadius implements NetworkCutter {
 
     @Override
     public Network filter(Network network, HashSet<String> modes) throws MalformedURLException, IOException {
+        if (this.radius == 0.0) {
+            System.out.println("hey");
+            return network;
+        }else {
+            
+        
         modifiedNetwork = filterInternal(network, modes);
 
         long numberOfLinksOriginal = network.getLinks().size();
@@ -46,6 +52,7 @@ public class NetworkCutterRadius implements NetworkCutter {
 
         printCutSummary();
         return modifiedNetwork;
+        }
     }
 
     @Override
@@ -63,7 +70,7 @@ public class NetworkCutterRadius implements NetworkCutter {
     private Network filterInternal(Network originalNetwork, HashSet<String> modes) {
 
         Network filteredNetwork = NetworkUtils.createNetwork();
-        
+
         for (Node node : originalNetwork.getNodes().values()) {
             if (CoordUtils.calcEuclideanDistance(node.getCoord(), center) <= radius) {
                 filteredNetwork.addNode(filteredNetwork.getFactory().createNode(node.getId(), node.getCoord()));
@@ -74,9 +81,8 @@ public class NetworkCutterRadius implements NetworkCutter {
             Node filteredFromNode = filteredNetwork.getNodes().get(link.getFromNode().getId());
             Node filteredToNode = filteredNetwork.getNodes().get(link.getToNode().getId());
 
-
             if (filteredFromNode != null && filteredToNode != null) {
-               
+
                 Iterator<String> it = modes.iterator();
                 boolean allowedMode = false;
                 while (it.hasNext() && !allowedMode) {
@@ -95,7 +101,7 @@ public class NetworkCutterRadius implements NetworkCutter {
                 }
             }
         }
-        
+
         new NetworkCleaner().run(filteredNetwork);
 
         return filteredNetwork;

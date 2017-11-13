@@ -81,6 +81,8 @@ public class ScenarioServer {
 		Population population = scenario.getPopulation();
 		GlobalAssert.that(scenario != null && network != null && population != null);
 
+		
+		System.out.println("-----------Checkpoint 2---------------");
 		MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
 		Controler controler = new Controler(scenario);
 
