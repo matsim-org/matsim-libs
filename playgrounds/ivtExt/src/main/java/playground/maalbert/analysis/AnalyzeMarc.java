@@ -8,13 +8,13 @@ import java.nio.file.Paths;
 
 import org.matsim.api.core.v01.network.Network;
 
+import ch.ethz.idsc.queuey.plot.DiagramCreator;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.CsvFormat;
-import playground.clruch.analysis.DiagramCreator;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;

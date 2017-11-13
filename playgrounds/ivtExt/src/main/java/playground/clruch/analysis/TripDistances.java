@@ -11,6 +11,9 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 
 import ch.ethz.idsc.queuey.math.AnalysisUtils;
+import ch.ethz.idsc.queuey.plot.DiagramCreator;
+import ch.ethz.idsc.queuey.plot.HistogramPlot;
+import ch.ethz.idsc.tensor.RationalScalar;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
@@ -55,11 +58,9 @@ public class TripDistances {
         tripDistanceBinSize = AnalysisUtils.adaptBinSize(tripDistances, tripDistanceBinSize, RealScalar.of(0.5));
         tripDistanceBinCounter = BinCounts.of(tripDistances, tripDistanceBinSize);
 
-        DiagramCreator.binCountGraph(relativeDirectory, "tripDistances", //
-                "Trips per Distance", tripDistanceBinCounter, //
-                tripDistanceBinSize.number().doubleValue(), 100.0 / tripDistances.length(), //
-                "% of requests", "Distances according to Dijkstra", " km", //
-                1000, 750);
+        HistogramPlot.of(tripDistanceBinCounter.multiply(RationalScalar.of(100, tripDistances.length())), relativeDirectory, //
+                "Trips per Distance", tripDistanceBinSize.number().doubleValue(), //
+                "% of requests", "Distances according to Dijkstra [km]", 1000, 750);
     }
 
 }

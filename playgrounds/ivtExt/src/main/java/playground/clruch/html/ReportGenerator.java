@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 
 import org.matsim.core.utils.misc.Time;
 
+import ch.ethz.idsc.queuey.html.HTMLUtils;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.io.Export;
 import ch.ethz.idsc.tensor.io.Import;
@@ -48,7 +49,7 @@ public class ReportGenerator {
         AnalyzeSummary analyzeSummary = Import.object(new File(analyzeSummaryFileName));
         saveConfigs(configFile);
         
-        HtmlUtils htmlUtils = new HtmlUtils();
+        HTMLUtils htmlUtils = new HTMLUtils();
 
         // write report
         // -------------------------------------------------------------------------------------------------------------
@@ -160,7 +161,7 @@ public class ReportGenerator {
                 "\n" + Time.writeTime(analyzeSummary.maximumWaitTime));
         htmlUtils.newLine();
         htmlUtils.insertImg(IMAGE_FOLDER + "/binnedWaitingTimes.png", 800, 600);
-        htmlUtils.insertImg(IMAGE_FOLDER + "/waitBinCounter.png", 800, 600);
+        htmlUtils.insertImg(IMAGE_FOLDER + "/RequestsperWaitingTime.png", 800, 600);
 
         htmlUtils.insertSubTitle("Fleet Performance");
         htmlUtils.insertTextLeft( //
@@ -180,10 +181,10 @@ public class ReportGenerator {
                     link2km * analyzeSummary.distanceWithCust / analyzeSummary.numRequests) + " km");
             htmlUtils.newLine();
         }
-        htmlUtils.insertImg(IMAGE_FOLDER + "/tripDistances.png", 800, 600);
+        htmlUtils.insertImg(IMAGE_FOLDER + "/TripsperDistance.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/distanceDistribution.png", 800, 600);
-        htmlUtils.insertImg(IMAGE_FOLDER + "/totalDistanceVehicle.png", 800, 600);
-        htmlUtils.insertImg(IMAGE_FOLDER + "/dwcVehicle.png", 800, 600);
+        htmlUtils.insertImg(IMAGE_FOLDER + "/VehiclesperTotalDistance.png", 800, 600);
+        htmlUtils.insertImg(IMAGE_FOLDER + "/VehiclesperDistancewithCustomer.png", 800, 600);
         htmlUtils.insertImg(IMAGE_FOLDER + "/statusDistribution.png", 800, 600);
         if (scenarioParametersingleton.EMDks != null) {
             htmlUtils.newLine();
@@ -209,7 +210,7 @@ public class ReportGenerator {
         // save document
         // -------------------------------------------------------------------------------------------------------------
         try {
-            htmlUtils.saveFile(REPORT_NAME, outputdirectory);
+            htmlUtils.saveFile(REPORT_NAME, reportFolder);
         } catch (Exception e) {
             System.err.println("Not able to save report. ");
             e.printStackTrace();
