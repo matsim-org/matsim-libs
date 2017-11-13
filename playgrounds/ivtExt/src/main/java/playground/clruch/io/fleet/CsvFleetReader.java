@@ -15,14 +15,6 @@ import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 public class CsvFleetReader {
 
-<<<<<<< HEAD
-=======
-    // TODO moved to queuey
-    // public static List<String> csvLineToList(String line) {
-    // return Stream.of(line.split(";")).collect(Collectors.toList());
-    // }
-
->>>>>>> 8c3fede0f553a05993fe22f52e1096bbe2350777
     private final DayTaxiRecord dayTaxiRecord;
 
     public CsvFleetReader(DayTaxiRecord dayTaxiRecord) {
@@ -36,7 +28,6 @@ public class CsvFleetReader {
         dayTaxiRecord.lastTimeStamp = null;
         // for (File file : files) {
 
-<<<<<<< HEAD
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             {
                 String line = br.readLine();
@@ -61,26 +52,6 @@ public class CsvFleetReader {
             // ...
         }
         // }
-=======
-            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                {
-                    String line = br.readLine();
-
-                    List<String> list = CSVUtils.csvLineToList(line, ";");
-
-                    int count = 0;
-                    System.out.println("CSV HEADER");
-                    for (String token : list) {
-                        System.out.println(" col " + count + " = " + token);
-                        ++count;
-                    }
-                }
-                while (true) {
-                    String line = br.readLine();
-                    if (Objects.isNull(line))
-                        break;
-                    List<String> list = CSVUtils.csvLineToList(line, ";");
->>>>>>> 8c3fede0f553a05993fe22f52e1096bbe2350777
 
         // Going through all timestamps and check for offservice vehicles && parse requests
         final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);

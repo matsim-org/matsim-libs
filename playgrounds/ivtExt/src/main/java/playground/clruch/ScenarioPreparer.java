@@ -143,14 +143,9 @@ public class ScenarioPreparer {
         // TODO make this generic for any VirtualNetwork creators.
         VirtualNetwork<Link> virtualNetwork;
         if (centerNetwork) {
-<<<<<<< HEAD
             MatsimCenterVirtualNetworkCreator centercreator = new MatsimCenterVirtualNetworkCreator();
             virtualNetwork = centercreator.creatVirtualNetwork(network, 2000.0, Tensors.vector(-900.0, -2300.0));
-=======
-            Coord centerShift = new Coord(800, -2200);
-            double radius = 2500;
-            virtualNetwork = (new MatsimCenterVirtualNetworkCreator(centerShift, radius, network)).getVirtualNetwork();
->>>>>>> 8c3fede0f553a05993fe22f52e1096bbe2350777
+
         } else {
             MatsimKMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new MatsimKMEANSVirtualNetworkCreator();
             virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);

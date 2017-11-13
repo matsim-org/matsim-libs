@@ -31,11 +31,7 @@ import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.N;
 import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.ScenarioOptions;
-<<<<<<< HEAD
-import playground.clruch.analysis.SaveUtils;
-=======
-import playground.clruch.analysis.AnalyzeAll;
->>>>>>> 8c3fede0f553a05993fe22f52e1096bbe2350777
+
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;

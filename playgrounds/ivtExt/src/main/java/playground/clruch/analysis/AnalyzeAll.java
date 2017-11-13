@@ -12,6 +12,7 @@ import org.matsim.core.config.ConfigUtils;
 
 import ch.ethz.idsc.queuey.datalys.SaveUtils;
 import ch.ethz.idsc.queuey.plot.DiagramCreator;
+import ch.ethz.idsc.queuey.plot.UniqueDiagrams;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Scalar;
 import ch.ethz.idsc.tensor.Tensor;
