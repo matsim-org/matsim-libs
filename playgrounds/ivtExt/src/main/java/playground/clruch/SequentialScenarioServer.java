@@ -7,6 +7,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
+import playground.clruch.dispatcher.selfishdispatcher.FareRatioCalculator;
 
 /** @author Claudio Ruch */
 public class SequentialScenarioServer {
@@ -16,13 +17,15 @@ public class SequentialScenarioServer {
         /** Delete current content in outputfolder, DO NOT MODIFY THIS, POTENTIALLY VERY DANGEROUS. */
         SequentialScenarioTools.emptyOutputFolder(workingDirectory);
 
-        int iterations = 11;
+        int iterations = 31;
         if (iterations % 2 == 0) {
             iterations = iterations - 1;
         }
 
-        double factorPlus = 1.6;
+        double factorPlus = 1.9;
         double[] fareRatios = SequentialScenarioTools.fareRatioCreator(iterations, factorPlus);
+        //double[] fareRatios = new double[]{0.0001, 1.0, 10000.0};
+        
 
         // copy the raw folder name including changed settings
         for (int i = 0; i < iterations; ++i) {

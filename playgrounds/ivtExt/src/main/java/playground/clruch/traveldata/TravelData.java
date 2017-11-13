@@ -50,7 +50,7 @@ public class TravelData implements Serializable {
     public final long populationSize;
     public final int dayduration = 30 * 60 * 60;
     // private final Scalar factor;
-    protected transient VirtualNetwork virtualNetwork;
+    protected transient VirtualNetwork<Link> virtualNetwork;
     private final long virtualNetworkID;
 
     /**
@@ -61,7 +61,7 @@ public class TravelData implements Serializable {
      * @param dtIn
      *            time step for calculation
      */
-    public TravelData(VirtualNetwork virtualNetworkIn, Network network, Population population, int dtIn) {
+    public TravelData(VirtualNetwork<Link> virtualNetworkIn, Network network, Population population, int dtIn) {
         System.out.println("reading travel data for population of size " + population.getPersons().size());
         populationSize = population.getPersons().size();
         virtualNetwork = virtualNetworkIn;

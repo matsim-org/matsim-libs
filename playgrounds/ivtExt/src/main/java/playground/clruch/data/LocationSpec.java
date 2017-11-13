@@ -12,12 +12,16 @@ public enum LocationSpec {
             ReferenceFrame.SWITZERLAND, //
             new Coord(2683600.0, 1251400.0), //
             10000.0), //
+    ZURICH_CITY_ASTRA_Spenrich_Clruch( //
+            ReferenceFrame.SWITZERLAND, //
+            new Coord(2683600.0, 1251400.0), //
+            10000.0), //
     ZURICH_NOCUT(ReferenceFrame.SWITZERLAND, //
             new Coord(2683600.0, 1251400.0), //
             null), BASEL_CITY( //
                     ReferenceFrame.SWITZERLAND, //
                     new Coord(2612859.0, 1266343.0), //
-                    12000.0), //
+                    20000.0), //
     BASEL_REGION( //
             ReferenceFrame.SWITZERLAND, //
             new Coord(2612859.0, 1266343.0), //

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -50,7 +51,7 @@ enum PerformanceFleetSizeCalculatorStandalone {
         Population population = scenario.getPopulation();
         GlobalAssert.that(scenario != null && network != null && population != null);
 
-        VirtualNetwork virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
+        VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
         TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
 
         {// 4) calculate minimum and performance fleet size and save results
@@ -58,9 +59,7 @@ enum PerformanceFleetSizeCalculatorStandalone {
             // MinimumFleetSizeIO.toByte(new File(vnDir, MINIMUMFLEETSIZEFILENAME), minimumFleetSizeCalculator);
 
             int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
-            PerformanceFleetSizeCalculator performanceFleetSizeCalculator = //
-                    new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberVehiclesPerformanceCalculator);
-            // PerformanceFleetSizeIO.toByte(new File(vnDir, PERFORMANCEFLEETSIZEFILENAME), performanceFleetSizeCalculator);
+            new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberVehiclesPerformanceCalculator);
 
         }
     }
