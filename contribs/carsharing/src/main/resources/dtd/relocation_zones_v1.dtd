@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- ============================================================ -->
+
+
+<!ELEMENT relocationZones (company)*>
+
+<!ELEMENT company (relocationZone)*>
+<!ATTLIST company   name    CDATA #REQUIRED>
+
+<!ELEMENT relocationZone (node)*>
+<!ATTLIST relocationZone    id  	CDATA #REQUIRED>
+
+<!ELEMENT node EMPTY>
+<!ATTLIST node              x   CDATA #REQUIRED
+                            y   CDATA #REQUIRED>
+
+<!-- ============================================================ -->
