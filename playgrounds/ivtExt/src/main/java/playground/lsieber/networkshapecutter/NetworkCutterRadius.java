@@ -2,10 +2,8 @@ package playground.lsieber.networkshapecutter;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;

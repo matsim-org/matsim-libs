@@ -2,29 +2,19 @@ package playground.lsieber.networkshapecutter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
-import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.ScenarioOptions;
-import playground.clruch.data.ReferenceFrame;
 import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.clruch.utils.NetworkLoader;
 import playground.clruch.utils.PropertiesExt;
 
 public class NetworkVisualisation {
