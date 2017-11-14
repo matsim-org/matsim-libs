@@ -30,7 +30,7 @@ public class ScenarioViewer {
     public static void main(String[] args) throws FileNotFoundException, IOException {
 
         // load options
-        File workingDirectory = MultiFileTools.getWorkingDirectory();;
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
         PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
         File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
         System.out.println("showing simulation results stored in folder: " + outputDirectory.getName());

@@ -25,6 +25,10 @@ import ch.ethz.idsc.queuey.util.GlobalAssert;
 public enum SequentialScenarioTools {
     ;
 
+    /** @param iterations any odd number for the number of iterations
+     * @param factorPlus a factor to scale the resulting array
+     * @return array of the form {..., factorPlus^-2,factorPlus^-1,1.0, factorPlus, factorPlus^2,...}
+     * @throws InterruptedException */
     public static double[] fareRatioCreator(int iterations, double factorPlus) throws InterruptedException {
         GlobalAssert.that(iterations % 2 != 0);
 
@@ -118,7 +122,7 @@ public enum SequentialScenarioTools {
             @SuppressWarnings("unchecked")
             List<Attribute> theAttributes = element.getAttributes();
 
-            if (theAttributes.get(0).getValue().equals("fareRatioMultiply")) {
+            if (theAttributes.get(0).getValue().equals("fareRatio")) {
                 theAttributes.get(1).setValue(Double.toString(fareRatio));
 
             }
