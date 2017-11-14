@@ -76,7 +76,7 @@ public class ScenarioServer {
 		dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 		Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
 
-		TestBed.astraActs(config);
+//		TestBed.astraActs(config);
 		
 		
 		String outputdirectory = config.controler().getOutputDirectory();
