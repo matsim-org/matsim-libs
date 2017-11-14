@@ -34,14 +34,13 @@ public class DemoInvariantPop {
 
         // demo
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
-        File configFile = new File(workingDirectory, simOptions.getString("fullConfig"));
+        File configFile = new File(workingDirectory,"astra_config_fullBeforeMorning.xml");
         Config config = ConfigUtils.loadConfig(configFile.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Population population = scenario.getPopulation();
 
         System.out.println(population.getPersons().size());
-        TheApocalypse.decimatesThe(population).toNoMoreThan(50000);
+//        TheApocalypse.decimatesThe(population).toNoMoreThan(50000);
         PopulationTools.changeModesOfTransportToAV(population);
         Population populationInvariant = TimeInvariantPopulation.from(interval, population);
         System.out.println(population.getPersons().size());
