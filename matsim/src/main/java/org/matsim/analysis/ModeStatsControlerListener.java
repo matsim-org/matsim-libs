@@ -185,6 +185,7 @@ ShutdownListener {
 			chart.addMatsimLogo();
 			chart.saveAsPng(this.modeFileName + ".png", 800, 600);
 		}
+		modeCnt.clear();
 	}
 
 	@Override
