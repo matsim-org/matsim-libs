@@ -50,6 +50,8 @@ import org.matsim.vis.snapshotwriters.VisMobsim;
 import org.matsim.vis.snapshotwriters.VisNetwork;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
+import com.google.inject.Injector;
+
 import javax.inject.Inject;
 import java.util.*;
 import java.util.Map.Entry;
@@ -172,6 +174,8 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	private Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
 
+	private Injector childInjector;
+
 	@Override
 	public final void rescheduleActivityEnd(MobsimAgent agent) {
 		this.activityEngine.rescheduleActivityEnd(agent);
@@ -186,7 +190,11 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	 *
 	 */
 	@Inject
-	public QSim(final Scenario sc, EventsManager events) {
+	public QSim(final Scenario sc, EventsManager events, Injector childInjector ) {
+		this( sc, events ) ;
+		this.childInjector = childInjector ;
+	}
+	public QSim(final Scenario sc, EventsManager events ) {
 		this.scenario = sc;
 		if (sc.getConfig().qsim().getNumberOfThreads() > 1) {
 			this.events = EventsUtils.getParallelFeedableInstance(events);
@@ -196,6 +204,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		this.listenerManager = new MobsimListenerManager(this);
 		this.agentCounter = new org.matsim.core.mobsim.qsim.AgentCounter();
 		this.simTimer = new MobsimTimer(sc.getConfig().qsim().getTimeStepSize());
+		
 	}
 
 	// ============================================================================================================================
@@ -628,5 +637,12 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	public Collection<AgentTracker> getAgentTrackers() {
 		return Collections.unmodifiableCollection(agentTrackers) ;
+	}
+
+//	public void setChildInjector(Injector qSimLocalInjector) {
+//		this.childInjector  = qSimLocalInjector ;
+//	}
+	public Injector getChildInjector() {
+		return this.childInjector  ;
 	}
 }

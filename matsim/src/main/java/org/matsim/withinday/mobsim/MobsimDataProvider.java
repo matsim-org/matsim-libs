@@ -80,28 +80,11 @@ public final class MobsimDataProvider implements MobsimInitializedListener {
 	Kai
 	*/
 	
-//	private final Map<Id<Vehicle>, MobsimVehicle> vehicles = new HashMap<>();
-
-	private NetsimNetwork netsimNetwork;
 	private QSim qSim;
-
-	public MobsimDataProvider() {
-
-	}
 
 	@Override
 	public final void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		
 		qSim = (QSim) e.getQueueSimulation();
-		this.netsimNetwork = qSim.getNetsimNetwork();
-		
-//		// collect all vehicles
-//		this.vehicles.clear();
-//		for (NetsimLink netsimLink : netsimNetwork.getNetsimLinks().values()) {
-//			for (MobsimVehicle mobsimVehicle : netsimLink.getAllVehicles()) {
-//				this.vehicles.put(mobsimVehicle.getId(), mobsimVehicle);
-//			}
-//		}
 	}
 
 	public final Map<Id<Person>, MobsimAgent> getAgents() {
@@ -121,7 +104,7 @@ public final class MobsimDataProvider implements MobsimInitializedListener {
 	}
 	
 	public final Collection<MobsimVehicle> getEnrouteVehiclesOnLink(Id<Link> linkId) {
-		return this.netsimNetwork.getNetsimLink(linkId).getAllNonParkedVehicles();
+		return this.qSim.getNetsimNetwork().getNetsimLink(linkId).getAllNonParkedVehicles();
 	}
 	
 	public final MobsimVehicle getDriversVehicle(Id<Person> driverId) {

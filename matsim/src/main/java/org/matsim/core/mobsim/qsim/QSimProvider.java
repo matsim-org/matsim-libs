@@ -26,6 +26,7 @@ import java.util.Collection;
 
 import javax.inject.Inject;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
@@ -38,7 +39,8 @@ import com.google.inject.Module;
 import com.google.inject.Provider;
 
 public class QSimProvider implements Provider<QSim> {
-
+	private static final Logger log = Logger.getLogger( QSimProvider.class ) ;
+	
 	private Injector injector;
 	private Collection<AbstractQSimPlugin> plugins;
 
@@ -64,7 +66,9 @@ public class QSimProvider implements Provider<QSim> {
 			}
 		};
         Injector qSimLocalInjector = injector.createChildInjector(module);
+        org.matsim.core.controler.Injector.printInjector( qSimLocalInjector, log ) ;
         QSim qSim = qSimLocalInjector.getInstance(QSim.class);
+//        qSim.setChildInjector( qSimLocalInjector ) ;
         for (AbstractQSimPlugin plugin : plugins) {
 	  		// add each plugin's mobsim engines:
 			for (Class<? extends MobsimEngine> mobsimEngine : plugin.engines()) {

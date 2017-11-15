@@ -22,6 +22,7 @@ public abstract class AbstractQSimPlugin {
 	public final Config getConfig() {
 		return config;
 	}
+	@SuppressWarnings("static-method")
 	public Collection<? extends Module> modules() {
 		return Collections.emptyList();
 	}
