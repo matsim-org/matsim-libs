@@ -223,7 +223,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 	@Override
 	public byte[] getQuadConstStateBuffer() {
 		try {
-			playPauseSimulationControl.getAccessToQNetwork().acquire();
+			playPauseSimulationControl.getAccess().acquire();
 			byte[] result;
 			buf.position(0);
 			quad.writeConstData(buf);
@@ -235,14 +235,14 @@ public class OnTheFlyServer implements OTFLiveServer {
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} finally {
-			playPauseSimulationControl.getAccessToQNetwork().release();
+			playPauseSimulationControl.getAccess().release();
 		}
 	}
 
 	@Override
 	public byte[] getQuadDynStateBuffer(final QuadTree.Rect bounds) {
 		try {
-			playPauseSimulationControl.getAccessToQNetwork().acquire();
+			playPauseSimulationControl.getAccess().acquire();
 			byte[] result;
 			buf.position(0);
 			quad.writeDynData(bounds, buf);
@@ -254,19 +254,19 @@ public class OnTheFlyServer implements OTFLiveServer {
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} finally {
-			playPauseSimulationControl.getAccessToQNetwork().release();
+			playPauseSimulationControl.getAccess().release();
 		}
 	}
 
 	@Override
 	public OTFQueryRemote answerQuery(AbstractQuery query) {
 		try {
-			playPauseSimulationControl.getAccessToQNetwork().acquire();
+			playPauseSimulationControl.getAccess().acquire();
 			query.installQuery(currentTimeStepView);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		} finally {
-			playPauseSimulationControl.getAccessToQNetwork().release();
+			playPauseSimulationControl.getAccess().release();
 		}
 		activeQueries.add(query);
 		return query;

@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.vis.otfvis.interfaces;
+package org.matsim.core.mobsim.framework;
 
 /**
  * @author nagel
