@@ -25,6 +25,7 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -130,6 +131,8 @@ public final class OutputDirectoryLogging {
 			collectLogMessagesAppender.close();
 			collectLogMessagesAppender = null;
 		}
+		Gbl.printSystemInfo();
+		Gbl.printBuildInfo();
 	}
 
 	/**

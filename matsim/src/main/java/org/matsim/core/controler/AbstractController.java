@@ -22,7 +22,6 @@ package org.matsim.core.controler;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.IterationStopWatch;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.MatsimRandom;
 
@@ -54,7 +53,6 @@ public abstract class AbstractController {
     }
 
     AbstractController(ControlerListenerManagerImpl controlerListenerManager, IterationStopWatch stopWatch, MatsimServices matsimServices) {
-        ControlerUtils.initializeOutputLogging();
         log.info("Used Controler-Class: " + this.getClass().getCanonicalName());
         this.controlerListenerManagerImpl = controlerListenerManager;
         this.controlerListenerManagerImpl.setControler(matsimServices);
@@ -68,11 +66,6 @@ public abstract class AbstractController {
         // draw...
         // Fixme [kn] this should really be ten thousand draws instead of just
         // one
-    }
-
-    protected final void setupOutputDirectory(final String outputDirectory, String runId, final OverwriteFileSetting overwriteFiles) {
-        this.controlerIO = new OutputDirectoryHierarchy(outputDirectory, runId, overwriteFiles); // output dir needs to be there before logging
-        OutputDirectoryLogging.initLogging(this.getControlerIO()); // logging needs to be early
     }
 
     final void setupOutputDirectory(OutputDirectoryHierarchy controlerIO) {
