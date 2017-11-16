@@ -39,7 +39,7 @@ class ConsensusAnalysis {
     }
 
     @Inject
-    private Network network;
+//    private Network network;
 
     public void analyze() throws Exception {
         System.out.print("Saving Wait Times...");
@@ -61,7 +61,7 @@ class ConsensusAnalysis {
         GlobalAssert.that(virtualnetworkFile.isFile());
         // VirtualNetwork virtualNetwork = VirtualNetworkIO.fromXML(network, virtualnetworkFile);
 
-        VirtualNetwork virtualNetwork = null;
+        VirtualNetwork<Link> virtualNetwork = null;
         GlobalAssert.that(virtualNetwork != null);
         // TODO fromXML is deprecated, load differently.
 
@@ -76,6 +76,7 @@ class ConsensusAnalysis {
             rev_linkIntegerMap.put(entry.getValue(), entry.getKey());
         }
 
+        @SuppressWarnings("null")
         int N_vStations = virtualNetwork.getvNodesCount();
 
         for (int index = 0; index < size; ++index) {
@@ -96,7 +97,7 @@ class ConsensusAnalysis {
 
                 for (int i = 0; i < N_vStations; i++) {
                     // Get wait times per vNode
-                    VirtualNode vStation = virtualNetwork.getVirtualNode(i);
+                    VirtualNode<Link> vStation = virtualNetwork.getVirtualNode(i);
                     Tensor waitTimes_i = Tensor
                             .of(s.requests.stream().filter(r -> virtualNetwork.getVirtualNode(rev_linkIntegerMap.get(r.fromLinkIndex)) == vStation)
                                     .map(rc -> RealScalar.of(now - rc.submissionTime)));

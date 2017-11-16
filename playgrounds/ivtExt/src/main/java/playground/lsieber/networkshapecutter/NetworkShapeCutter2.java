@@ -46,6 +46,7 @@ public class NetworkShapeCutter2 extends ANetworkCutter {
     private Network filterInternal(Network originalNetwork) {
         // logger.info("Creating filtered network ...");
 
+        // TODO not used
         long numberOfLinksOriginal = originalNetwork.getLinks().size();
         long numberOfNodesOriginal = originalNetwork.getNodes().size();
 
@@ -54,6 +55,7 @@ public class NetworkShapeCutter2 extends ANetworkCutter {
 
         Network filteredNetwork = NetworkUtils.createNetwork();
 
+        // TODO parametrize map
         Map inputMap = new HashMap<>();
         try {
             inputMap.put("url", new File(shapefilePath).toURI().toURL());
@@ -123,6 +125,7 @@ public class NetworkShapeCutter2 extends ANetworkCutter {
 
         // logger.info("Finished creating filtered network!");
 
+        //TODO not used 
         long numberOfLinksFiltered = filteredNetwork.getLinks().size();
         long numberOfNodesFiltered = filteredNetwork.getNodes().size();
 

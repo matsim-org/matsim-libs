@@ -4,49 +4,45 @@
 package playground.clruch.netdata;
 
 import java.util.Collection;
-import java.util.Random;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.core.networks.CenterVirtualNetworkCreator;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
-import ch.ethz.idsc.tensor.Tensors;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyGeneratedInitialMeans;
-import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import playground.clruch.dispatcher.utils.PlaneLocation;
 
-/** @author Claudio Ruch */
+/** @author Claudio Ruch creates {@link VirtualNetwork} with a center node and a surrounding node. The center node
+ *         is located at the mean location of all {@link Network} {@link Link} and has a radius specified by the user, it is
+ *         shifted by centerShift, i.e. centerActual = centerComputed + centerShift */
 public class MatsimCenterVirtualNetworkCreator {
 
-    Random random = new Random();
-    DatabaseConnection dbc;
-    Database db;
-    SquaredEuclideanDistanceFunction dist = SquaredEuclideanDistanceFunction.STATIC;
-    RandomlyGeneratedInitialMeans init = new RandomlyGeneratedInitialMeans(RandomFactory.DEFAULT);
-    KMeansLloyd<NumberVector> km;
-    Clustering<KMeansModel> c;
-    Relation<NumberVector> rel;
 
-    public VirtualNetwork<Link> creatVirtualNetwork(Network network) {
-        // TODO magic consts.
-        double centerRadius = 1500;
-        Tensor emptyTensor = Tensors.vector(0, 0);
-        Collection<Link> elements = (Collection<Link>) network.getLinks().values();
 
-        CenterVirtualNetworkCreator<Link> cvn = new CenterVirtualNetworkCreator<>(centerRadius, emptyTensor, elements, PlaneLocation::of,
-                NetworkCreatorUtils::linkToID);
-        return cvn.getVirtualNetwork();
+//	DatabaseConnection dbc;
+//	Database db;
+//	SquaredEuclideanDistanceFunction dist = SquaredEuclideanDistanceFunction.STATIC;
+//	RandomlyGeneratedInitialMeans init = new RandomlyGeneratedInitialMeans(RandomFactory.DEFAULT);
+//	KMeansLloyd<NumberVector> km;
+//	Clustering<KMeansModel> c;
+//	Relation<NumberVector> rel;
 
-    }
+	public VirtualNetwork<Link> creatVirtualNetwork(Network network, double centerRadius, Tensor centerShift) {
+		Collection<Link> elements = (Collection<Link>) network.getLinks().values();
+
+		CenterVirtualNetworkCreator<Link> cvn = new CenterVirtualNetworkCreator<>(centerRadius, centerShift, elements,
+				PlaneLocation::of, NetworkCreatorUtils::linkToID);  
+		return cvn.getVirtualNetwork();
+
+	}
+
+//
+//    public VirtualNetwork<Link> getVirtualNetwork() {
+//        GlobalAssert.that(virtualNetwork != null);
+//        return virtualNetwork;
+//    }
 
 }

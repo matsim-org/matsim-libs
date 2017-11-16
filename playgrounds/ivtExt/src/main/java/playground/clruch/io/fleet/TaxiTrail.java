@@ -1,10 +1,12 @@
 // code by jph
 package playground.clruch.io.fleet;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
@@ -56,7 +58,7 @@ public class TaxiTrail {
         GlobalAssert.that(Objects.nonNull(entry));
         if (Objects.nonNull(entry))
             return entry;
-        return null;
+        return null; // TODO <- this case will never happen due to GlobalAssert, so "return entry;" is sufficient  
     }
 
     public Entry<Integer, TaxiStamp> getLastEntry(int now) {
@@ -124,7 +126,7 @@ public class TaxiTrail {
             sortedMap.replace(timeStamp, taxiStamp);
         }
     }
-
+  
     private void setOffService(int now) {
         // less than or equal to the given key
         Entry<Integer, TaxiStamp> entry = interp(now);
@@ -134,6 +136,10 @@ public class TaxiTrail {
             taxiStamp.avStatus = AVStatus.OFFSERVICE;
             sortedMap.replace(timeStamp, taxiStamp);
         }
+    }
+    
+    public Set<Integer> getKeySet() {
+        return Collections.unmodifiableSet(sortedMap.keySet());
     }
 
 }

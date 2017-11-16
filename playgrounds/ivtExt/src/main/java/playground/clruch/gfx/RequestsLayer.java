@@ -46,7 +46,7 @@ import playground.clruch.net.SimulationObject;
             Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
                     .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
             for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
-                if (entry.getKey() > 0) {
+                if (entry.getKey() > 0) { // FIXME andy, document rationale behind filter "> 0"
                     OsmLink osmLink = matsimMapComponent.db.getOsmLink(entry.getKey());
                     final int size = entry.getValue().size();
                     for (int count = 0; count < size; ++count) {
@@ -62,7 +62,7 @@ import playground.clruch.net.SimulationObject;
             Map<Integer, List<RequestContainer>> map = ref.requests.stream() //
                     .collect(Collectors.groupingBy(requestContainer -> requestContainer.toLinkIndex));
             for (Entry<Integer, List<RequestContainer>> entry : map.entrySet()) {
-                if (entry.getKey() > 0) {
+                if (entry.getKey() > 0) { // FIXME andy, document rationale behind filter "> 0"
                     OsmLink osmLink = matsimMapComponent.db.getOsmLink(entry.getKey());
                     final int size = entry.getValue().size();
                     for (int count = 0; count < size; ++count) {

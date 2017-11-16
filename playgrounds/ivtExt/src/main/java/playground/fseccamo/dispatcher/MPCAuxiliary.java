@@ -1,6 +1,4 @@
-/**
- * 
- */
+// code by francesco, jph, clruch
 package playground.fseccamo.dispatcher;
 
 import java.util.HashMap;
@@ -20,7 +18,6 @@ import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
-/** @author Claudio Ruch */
 public class MPCAuxiliary {
 
     /** @param min

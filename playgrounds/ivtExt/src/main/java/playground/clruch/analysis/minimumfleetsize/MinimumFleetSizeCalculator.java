@@ -19,11 +19,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.math.AnalysisUtils;
+import ch.ethz.idsc.queuey.plot.DiagramCreator;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.RealScalar;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import playground.clruch.analysis.DiagramCreator;
 import playground.clruch.analysis.RequestAnalysis;
 import playground.clruch.analysis.RequestObj;
 import playground.clruch.netdata.VirtualNetworkGet;

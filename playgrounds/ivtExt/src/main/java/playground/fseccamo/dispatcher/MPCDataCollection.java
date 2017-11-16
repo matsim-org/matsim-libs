@@ -1,6 +1,4 @@
-/**
- * 
- */
+// code by francesco, jph, clruch
 package playground.fseccamo.dispatcher;
 
 import java.util.Collection;
@@ -32,7 +30,6 @@ import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.core.VehicleOnVirtualLinkCalculator;
 import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
-/** @author Claudio Ruch */
 /* package */ class MPCDataCollection {
 
     private final int m;
@@ -109,7 +106,7 @@ import playground.sebhoerl.avtaxi.passenger.AVRequest;
             // Map<VirtualNode, List<RoboTaxi>> availableVehicles = getDivertableNotRebalancingNotPickupVehicles();
             Map<VirtualNode<Link>, List<RoboTaxi>> availableVehicles = virtualNetwork.createVNodeTypeMap();
             for (RoboTaxi robotaxi : styRoboTaxis) {
-                VirtualNode vnode = virtualNetwork.getVirtualNode(robotaxi.getDivertableLocation());
+                VirtualNode<Link> vnode = virtualNetwork.getVirtualNode(robotaxi.getDivertableLocation());
                 availableVehicles.get(vnode).add(robotaxi);
             }
 
