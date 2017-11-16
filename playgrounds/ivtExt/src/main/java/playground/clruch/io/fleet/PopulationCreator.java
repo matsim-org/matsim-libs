@@ -99,7 +99,7 @@ public class PopulationCreator {
             int id = 0;
             for (IterationFolder iter : list) {
                 storageSupplier = iter.storageSupplier;
-                final int MAX_ITER = 100; // storageSupplier.size()
+                final int MAX_ITER = storageSupplier.size(); // storageSupplier.size()
                 for (int index = 0; index < MAX_ITER; index++) {
                     SimulationObject simulationObject = storageSupplier.getSimulationObject(index);
                     List<RequestContainer> rc = simulationObject.requests;
@@ -111,7 +111,8 @@ public class PopulationCreator {
                         Plan plan = populationFactory.createPlan();
                         Id<Link> fromLinkID = Id.create(request.fromLinkIndex, Link.class);
                         Id<Link> toLinkID = Id.create(request.toLinkIndex, Link.class);
-                        Activity activity = populationFactory.createActivityFromLinkId("activitiy", fromLinkID);
+                        Activity startActivity = populationFactory.createActivityFromLinkId("activitiy", fromLinkID);
+                        Activity endActivity = populationFactory.createActivityFromLinkId("activitiy", toLinkID);
                         Leg leg = populationFactory.createLeg("av");
                         RouteFactory rf = new GenericRouteFactory();
                         Route route = rf.createRoute(fromLinkID, toLinkID);
@@ -122,9 +123,10 @@ public class PopulationCreator {
 
                         // Add person to the population
                         System.out.println("INFO Adding person ID " + id + " to population");
-                        plan.addActivity(activity);
+                        plan.addActivity(startActivity);
                         plan.addLeg(leg);
                         person.addPlan(plan);
+                        plan.addActivity(endActivity);
                         population.addPerson(person);
                     }
                 }
