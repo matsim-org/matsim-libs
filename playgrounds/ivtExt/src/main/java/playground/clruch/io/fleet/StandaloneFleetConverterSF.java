@@ -57,33 +57,25 @@ enum StandaloneFleetConverterSF {
 		System.out.println("NUMBER of data files = " + trailFilesComplete.size());
 		System.out.println("INFO found files: ");
 		
-		for (File file : trailFilesComplete) {
-			System.out.println(file.getAbsolutePath());
-		}
-
 		List<File> trailFiles = new ArrayList<>();
-		for (int i = 0; i < trailFilesComplete.size(); ++i) {
-			trailFiles.add(trailFilesComplete.get(i));
-		}
-
-		// TODO preprocess the taxi files and add one line with headers to each file
-        //HEADER:removed constant by adding file to our data import in here
-        if (headerDirectory.exists())
-			DayTaxiRecord.head(trailFilesComplete, headerDirectory, trailFiles);
-
-		// TODO get id for each car in here// get.(int)
-        ArrayList<String> people, number;
-			people = DayTaxiRecord.name(idDirectory);
-			number = DayTaxiRecord.id(idDirectory);
+		int num=0;
+		for (File file : trailFilesComplete) {
+			trailFiles.add(file);
+			System.out.println(file.getAbsolutePath());
 		
-        ReferenceFrame referenceFrame = ReferenceFrame.IDENTITY;     
-        IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();  
-        
-        // extract data from file and put into dayTaxiRecord
-        DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
-        CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);
-        reader.populateFrom(trailFiles,people,number);
+		//ID & HEADERfor Taxis
+		ChangeDataSF.head(trailFilesComplete, headerDirectory, trailFiles);
+		ArrayList<String> people, number;
+		people = ChangeDataSF.name(idDirectory);
+		number = ChangeDataSF.id(idDirectory);
 
+		// extract data from file and put into dayTaxiRecord
+		DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
+		CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);
+		
+        reader.populateFrom(trailFiles,people,num);
+		ReferenceFrame referenceFrame = ReferenceFrame.IDENTITY;
+		IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();
         // STEP 2: DayTaxiRecord to MATSimStaticDatabase
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         // generate sim objects and store
@@ -97,5 +89,7 @@ enum StandaloneFleetConverterSF {
 
         StorageUtils storageUtils = new StorageUtils(outputDirectory);
         SimulationFleetDump.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE, storageUtils);
+        num++;
+		}
     }
 }

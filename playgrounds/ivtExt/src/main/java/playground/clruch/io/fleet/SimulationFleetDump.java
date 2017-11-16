@@ -31,7 +31,8 @@ enum SimulationFleetDump {
             StorageUtils storageUtils) {
 
         // final int MAXTIME = 180000; // TODO magic const take this end time from the last info in the file...
-        final int MAXTIME = (int) Long.parseLong(dayTaxiRecord.lastTimeStamp)/1000;
+//        final int MAXTIME = (int) Long.parseLong(dayTaxiRecord.lastTimeStamp)/1000;
+        final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
         final int TIMESTEP = 10;
 
         final double[] networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
@@ -74,7 +75,8 @@ enum SimulationFleetDump {
                     VehicleContainer vc = new VehicleContainer();
                     vc.vehicleIndex = vehicleIndex;
                     vc.linkIndex = linkIndex;
-                    vc.avStatus = AVStatus.DRIVETOCUSTOMER; // TODO change this hack later...  = taxiStamp.avStatus;
+//                    vc.avStatus = AVStatus.DRIVETOCUSTOMER; // TODO change this hack later...  = taxiStamp.avStatus;
+                    vc.avStatus = taxiStamp.avStatus;
 
                     // Parse requests
                     RequestContainerUtils rcParser = new RequestContainerUtils(taxiTrail);

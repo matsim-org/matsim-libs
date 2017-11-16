@@ -20,8 +20,15 @@ public class TaxiTrail {
 
 	public void insert(int now, List<String> list) {
 		TaxiStamp taxiStamp = new TaxiStamp();
-		taxiStamp.avStatus = AVStatus.DRIVEWITHCUSTOMER; // TODO make the real status here.
-		// StringStatusMapper.apply(now, list.get(3), list.get(4), list.get(5));
+//		taxiStamp.avStatus = AVStatus.DRIVEWITHCUSTOMER; // TODO make the real status here.
+		String bool = list.get(2);
+		if (bool.startsWith("0")) {
+			bool= "In Umgebung";
+		}
+		if (bool.startsWith("1")) {
+			bool="Besetzt mit Kunden";
+		}
+		taxiStamp.avStatus = StringStatusMapper.apply(now, bool , Integer.toString(200), Integer.toString(100));
 		taxiStamp.gps = new Coord( //
 				Double.parseDouble(list.get(1)), //
 				Double.parseDouble(list.get(0)));
