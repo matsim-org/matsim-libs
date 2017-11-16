@@ -24,13 +24,13 @@ public class ShapeScenarioReducer extends AbstractScenarioReducer {
         // TODO @ lukas Decouple Modes and Nettworkcutting
 
         HashSet<String> modes = new HashSet<String>();
-        // modes.add("car");
+        modes.add("car");
         modes.add("pt");
         modes.add("tram");
         modes.add("bus");
 
         // TODO @ Lukas Implenment Shapefile from IDSC Options
-        File shapefile = new File(workingDirectory + "shapefiles/Export_Output_2.shp");
+        File shapefile = new File("shapefiles/Export_Output_2.shp");
 
         return new NetworkCutterShape(shapefile).filter(this.originalScenario.getNetwork(), modes);
     }

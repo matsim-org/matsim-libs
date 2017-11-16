@@ -8,6 +8,7 @@ public class TestScenarioReducer {
         ShapeScenarioReducer shapeScenarioReducer = new ShapeScenarioReducer();
         shapeScenarioReducer.run();
         shapeScenarioReducer.writeToXML();
+        shapeScenarioReducer.addConfigFilesinFolder();
     }
 
 }

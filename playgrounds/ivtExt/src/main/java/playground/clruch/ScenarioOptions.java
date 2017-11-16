@@ -65,5 +65,9 @@ public enum ScenarioOptions {
 
         return simOptions;
     }
+    
+    public static String getOptionsFileName() {
+        return OPTIONSFILENAME;
+    }
 
 }
