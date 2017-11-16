@@ -18,16 +18,6 @@ public class RequestContainerUtils {
         this.taxiTrail = taxiTrail;
     }
 
-    public boolean isValidRequest(int now) {
-        // System.out.println("Checking if request is valid at time: " + now);
-        RequestStatus requestStatus = taxiTrail.interp(now).getValue().requestStatus;
-        if (requestStatus != RequestStatus.EMPTY) {
-            if (findSubmissionTime(now) >= 0 && (propagateTo(now, RequestStatus.DROPOFF) >= 0 || propagateTo(now, RequestStatus.CANCELLED) >= 0))
-                return true;
-        }
-        return false;
-    }
-
     private int findSubmissionTime(int now) {
         // System.out.println("Trying to find submissionTime from Time: " + now);
         int submissionTime = propagateTo(now, RequestStatus.REQUESTED);
@@ -37,18 +27,14 @@ public class RequestContainerUtils {
             submissionTime = propagateTo(now, RequestStatus.PICKUP);
             if (submissionTime >= 0)
                 return submissionTime;
-<<<<<<< HEAD
             else {
 //                System.err.println("WARN Could not find submissionTime.");
             }
-=======
-            // System.err.println("WARN Could not find submissionTime.");
->>>>>>> master
         }
-        return -1; // TODO -1 seems to be a reoccurring magic const in this file
+        return -1;
     }
 
-    private Coord getCoordAt(int now, RequestStatus requestedStatus) {
+    public Coord getCoordAt(int now, RequestStatus requestedStatus) {
         RequestStatus requestStatus = taxiTrail.interp(now).getValue().requestStatus;
 
         // Check requestStatus and propagate to TaxiStamp with desired values
@@ -59,8 +45,6 @@ public class RequestContainerUtils {
                 return taxiTrail.interp(now).getValue().gps;
             }
         }
-        // TODO look into returning type Optional<Coord>, and instead of null simply "return Optional.empty();"
-        // this can prevent certain mistakes in the application layer
         return null;
     }
 
@@ -69,26 +53,18 @@ public class RequestContainerUtils {
         RequestStatus requestStatus = taxiTrail.interp(now).getValue().requestStatus;
         // System.out.println("Trying to find: " + requestedStatus.toString() + " from " + requestStatus.toString());
 
-        if (requestStatus != RequestStatus.EMPTY) {
+        if (requestStatus != RequestStatus.EMPTY && requestStatus != RequestStatus.CANCELLED) {
             if (requestedStatus.compareTo(requestStatus) > 0) {
                 if (Objects.nonNull(requestStatus = taxiTrail.getNextEntry(now).getValue().requestStatus)) {
                     int nextTimeStep = taxiTrail.getNextEntry(now).getKey();
                     return propagateTo(nextTimeStep, requestedStatus);
-<<<<<<< HEAD
                 } else {
 //                	 System.err.println("WARN getNextEntry is null");
                 }              
-=======
-                }
-                else 
-                    return -1; 
-                // System.err.println("WARN getNextEntry is null");
->>>>>>> master
             } else if (requestedStatus.compareTo(requestStatus) < 0) {
                 if (Objects.nonNull(requestStatus = taxiTrail.getLastEntry(now).getValue().requestStatus)) {
                     int nextTimeStep = taxiTrail.getLastEntry(now).getKey();
                     return propagateTo(nextTimeStep, requestedStatus);
-<<<<<<< HEAD
                 } else {
 //                	System.err.println("WARN getLastEntry is null");
                 }    
@@ -98,17 +74,6 @@ public class RequestContainerUtils {
             return now;
         }
 //        System.err.println("WARN Couldn't find requested Status, returning -1");
-=======
-                }
-                else
-                    return -1;
-                // System.err.println("WARN getLastEntry is null");
-            } else if (requestedStatus == requestStatus)
-                // System.out.println("INFO Found requestStatus: " + requestedStatus.toString());
-                return now;
-        }
-        // System.err.println("WARN Couldn't find requested Status, returning -1");
->>>>>>> master
         return -1;
     }
 
@@ -138,7 +103,7 @@ public class RequestContainerUtils {
             Coord to = getCoordAt(now, RequestStatus.DROPOFF);
             if (Objects.nonNull(to)) {
                 to = db.referenceFrame.coords_fromWGS84.transform(to);
-                rc.toLinkIndex = db.getLinkIndex(qt.getClosest(to.getX(), to.getY()));
+                rc.fromLinkIndex = db.getLinkIndex(qt.getClosest(to.getX(), to.getY()));
             }
         } catch (Exception exception) {
             System.err.println("WARN failed to get from/to Coords at time: " + now);
