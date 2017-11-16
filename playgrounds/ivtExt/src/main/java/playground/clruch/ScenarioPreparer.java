@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -58,7 +59,7 @@ public class ScenarioPreparer {
         File configFile = new File(workingDirectory, simOptions.getString("fullConfig"));
         System.out.println("loading config file to get data " + configFile.getAbsoluteFile());
 
-        // TODO wrap properties with new class, class contains function getBoolean...
+        // TODO can some of these be directly read from another source? Do all have to be user settings?
         boolean populationeliminateFreight = simOptions.getBoolean("populationeliminateFreight");
         boolean populationeliminateWalking = simOptions.getBoolean("populationeliminateWalking");
         boolean populationchangeModeToAV = simOptions.getBoolean("populationchangeModeToAV");
@@ -83,6 +84,8 @@ public class ScenarioPreparer {
         Population population = scenario.getPopulation();
 
         {// 1) cut network (and reduce population to new network)
+            if(network == null) System.out.println("its the network");
+            if(ls == null) System.out.println("its the ls");
             NetworkCutClean.elminateOutsideRadius(network, ls.center, ls.radius);
             final File fileExportGz = new File(workingDirectory, NETWORKUPDATEDNAME + ".xml.gz");
             final File fileExport = new File(workingDirectory, NETWORKUPDATEDNAME + ".xml");
@@ -142,6 +145,7 @@ public class ScenarioPreparer {
         if (centerNetwork) {
             MatsimCenterVirtualNetworkCreator centercreator = new MatsimCenterVirtualNetworkCreator();
             virtualNetwork = centercreator.creatVirtualNetwork(network, 2000.0, Tensors.vector(-900.0, -2300.0));
+
         } else {
             MatsimKMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new MatsimKMEANSVirtualNetworkCreator();
             virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);

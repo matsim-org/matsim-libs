@@ -21,8 +21,8 @@ public enum PlaneLocation {
     public static Tensor of(RoboTaxi robotaxi) {
         return tensorOf(robotaxi.getDivertableLocation());
     }
-    
-    public static Tensor of(Link link){
+
+    public static Tensor of(Link link) {
         return tensorOf(link);
     }
 
@@ -32,7 +32,4 @@ public enum PlaneLocation {
         return Tensors.vectorDouble(dx, dy);
 
     }
-    
-    
-
 }
