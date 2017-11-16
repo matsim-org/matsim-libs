@@ -16,11 +16,12 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.ScenarioOptions;
 import playground.clruch.utils.PropertiesExt;
 
 public abstract class AbstractScenarioReducer {
-    private File workingDirectory;
+    protected File workingDirectory;
     private Config config;
     private PropertiesExt simOptions;
     protected Scenario originalScenario;
@@ -45,6 +46,7 @@ public abstract class AbstractScenarioReducer {
 
     public void run() throws MalformedURLException, IOException {
         // Mandatory Fields of a Scenario
+        GlobalAssert.that(originalScenario != null);
         network = networkCutter();
         population = populationCutter();
         facilities = facilitiesCutter();
@@ -57,7 +59,14 @@ public abstract class AbstractScenarioReducer {
     protected abstract ActivityFacilities facilitiesCutter();
 
     public void writeToXML() {
+        
+        File dir = new File(reducedScenarioDirectory);
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
         // Mandatory Fields of a Scenario
+        GlobalAssert.that(facilities != null && network != null && population != null);
+
         new NetworkWriter(network).write(reducedScenarioDirectory + "/reducedNetwork.xml");
         new PopulationWriter(population).write(reducedScenarioDirectory + "/reducedPopulation.xml");
         new FacilitiesWriter(facilities).write(reducedScenarioDirectory + "/reducedFacilities.xml");

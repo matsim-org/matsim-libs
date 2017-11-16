@@ -12,9 +12,9 @@ import org.matsim.facilities.ActivityFacilities;
 import playground.lsieber.networkshapecutter.FacilityPopulationBasedCutter;
 import playground.lsieber.networkshapecutter.NetworkCutterShape;
 
-public class ShapeScenarioReducer extends AbstractScenarioReducer{
+public class ShapeScenarioReducer extends AbstractScenarioReducer {
 
-    public ShapeScenarioReducer() throws IOException{
+    public ShapeScenarioReducer() throws IOException {
         // TODO Auto-generated constructor stub
         super();
     }
@@ -22,16 +22,16 @@ public class ShapeScenarioReducer extends AbstractScenarioReducer{
     @Override
     protected Network networkCutter() throws MalformedURLException, IOException {
         // TODO @ lukas Decouple Modes and Nettworkcutting
-        
+
         HashSet<String> modes = new HashSet<String>();
         // modes.add("car");
         modes.add("pt");
         modes.add("tram");
         modes.add("bus");
-        
+
         // TODO @ Lukas Implenment Shapefile from IDSC Options
-        File shapefile = new File("shapefile.shp");
-        
+        File shapefile = new File(workingDirectory + "shapefiles/Export_Output_2.shp");
+
         return new NetworkCutterShape(shapefile).filter(this.originalScenario.getNetwork(), modes);
     }
 
