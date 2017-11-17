@@ -13,7 +13,6 @@ import org.matsim.core.utils.collections.QuadTree;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensors;
-import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RequestStatus;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.RequestContainer;

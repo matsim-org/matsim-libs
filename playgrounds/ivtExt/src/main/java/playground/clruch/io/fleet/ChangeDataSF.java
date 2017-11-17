@@ -1,15 +1,11 @@
 package playground.clruch.io.fleet;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Scanner;
 
 public class ChangeDataSF {
@@ -61,12 +57,4 @@ public class ChangeDataSF {
 		id.close();
 		return people;
 	}
-
-	public static ArrayList<String> id(java.io.File idDirectory) throws IOException {
-		ArrayList<String> number = new ArrayList<String>();	
-		for (int i = 0; i < 536; i++)
-			number.add(i, Integer.toString(i + 1));
-		return number;
-	}
-	
 }

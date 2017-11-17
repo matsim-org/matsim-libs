@@ -19,14 +19,13 @@ public class DayTaxiRecord {
 
     public void insert(List<String> list, int taxiStampID) {
         String timeStamp = list.get(3);
-
-//      System.out.println("In UNIX " + timeStamp);
+        
         long unixSeconds = Long.valueOf(timeStamp).longValue();
         Date date = new Date(unixSeconds * 1000L); // *1000 is to convert seconds to milliseconds
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss"); // the format of your date
         String formattedDate = sdf.format(date);
         timeStamp = formattedDate;
-        System.out.println("INFO DATA " + timeStamp);
+//        System.out.println("INFO DATA " + timeStamp);
 
         long cmp = DateParser.from(timeStamp.substring(0, 11) + "00:00:00");
         if (midnight == null) {
