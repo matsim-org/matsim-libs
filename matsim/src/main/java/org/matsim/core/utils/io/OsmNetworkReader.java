@@ -84,23 +84,23 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private final static String TAG_LANES = "lanes";
 	private final static String TAG_LANES_FORWARD = "lanes:forward";
 	private final static String TAG_LANES_BACKWARD = "lanes:backward";
-	private final static String TAG_HIGHWAY = "highway";
+	protected final static String TAG_HIGHWAY = "highway";
 	private final static String TAG_MAXSPEED = "maxspeed";
-	private final static String TAG_JUNCTION = "junction";
+	protected final static String TAG_JUNCTION = "junction";
     protected final static String TAG_ONEWAY = "oneway";
     private final static String TAG_ACCESS = "access";
 	private static List<String> allTags = new LinkedList<>(Arrays.asList(TAG_LANES, TAG_LANES_FORWARD,
 			TAG_LANES_BACKWARD, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS));
 
 	protected final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
-	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
+	protected final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
 	private final Set<String> unknownHighways = new HashSet<String>();
 	private final Set<String> unknownMaxspeedTags = new HashSet<String>();
 	private final Set<String> unknownLanesTags = new HashSet<String>();
 	private long id = 0;
 	protected final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
 	protected final Network network;
-	private final CoordinateTransformation transform;
+	protected final CoordinateTransformation transform;
 	private boolean keepPaths = false;
 	private boolean scaleMaxSpeed = false;
 
@@ -110,6 +110,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 	// nodes that are definitely to be kept (e.g. for counts later)
 	private Set<Long> nodeIDsToKeep = null;
+	
+	private OsmXmlParser parser;
 	
 	
 	/**
@@ -163,6 +165,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 			this.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600);
 		}
+		
+		this.parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
 	}
 
 	/**
@@ -197,37 +201,34 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			log.warn("No hierarchy layer specified. Will convert every highway specified by setHighwayDefaults.");
 		}
 
-		OsmXmlParser parser = null;
 		if (this.slowButLowMemory) {
 			log.info("parsing osm file first time: identifying nodes used by ways");
-			parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
-			parser.enableOptimization(1);
+			this.parser.enableOptimization(1);
 			if (stream != null) {
-				parser.parse(new InputSource(stream));
+				this.parser.parse(new InputSource(stream));
 			} else {
-				parser.readFile(osmFilename);
+				this.parser.readFile(osmFilename);
 			}
 			log.info("parsing osm file second time: loading required nodes and ways");
-			parser.enableOptimization(2);
+			this.parser.enableOptimization(2);
 			if (stream != null) {
-				parser.parse(new InputSource(stream));
+				this.parser.parse(new InputSource(stream));
 			} else {
-				parser.readFile(osmFilename);
+				this.parser.readFile(osmFilename);
 			}
 			log.info("done loading data");
 		} else {
-			parser = new OsmXmlParser(this.nodes, this.ways, this.transform);
 			if (stream != null) {
-				parser.parse(new InputSource(stream));
+				this.parser.parse(new InputSource(stream));
 			} else {
-				parser.readFile(osmFilename);
+				this.parser.readFile(osmFilename);
 			}
 			log.info("done loading data");
 		}
 		convert();
 		log.info("= conversion statistics: ==========================");
-		log.info("osm: # nodes read:       " + parser.nodeCounter.getCounter());
-		log.info("osm: # ways read:        " + parser.wayCounter.getCounter());
+		log.info("osm: # nodes read:       " + this.parser.nodeCounter.getCounter());
+		log.info("osm: # ways read:        " + this.parser.wayCounter.getCounter());
 		log.info("MATSim: # nodes created: " + this.network.getNodes().size());
 		log.info("MATSim: # links created: " + this.network.getLinks().size());
 
@@ -238,6 +239,14 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			}
 		}
 		log.info("= end of conversion statistics ====================");
+	}
+	
+	/**
+	 * Set a parser for OSM XML data. 
+	 * If no parser is set, the default parser from this class (OsmNetworkReader.OsmXmlParser) is used.
+	 */
+	public void setParser(OsmXmlParser parser) {
+		this.parser = parser;
 	}
 
 	/**
@@ -841,11 +850,12 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		}
 	}
 
-	private class OsmXmlParser extends MatsimXmlParser {
+	protected class OsmXmlParser extends MatsimXmlParser {
 
-		private OsmWay currentWay = null;
-		private final Map<Long, OsmNode> nodes;
-		private final Map<Long, OsmWay> ways;
+		protected OsmWay currentWay = null;
+		protected OsmNode currentNode = null;
+		protected final Map<Long, OsmNode> nodes;
+		protected final Map<Long, OsmWay> ways;
 		/*package*/ final Counter nodeCounter = new Counter("node ");
 		/*package*/ final Counter wayCounter = new Counter("way ");
 		private final CoordinateTransformation transform;
@@ -882,16 +892,15 @@ public class OsmNetworkReader implements MatsimSomeReader {
 					Long id = Long.valueOf(atts.getValue("id"));
 					double lat = Double.parseDouble(atts.getValue("lat"));
 					double lon = Double.parseDouble(atts.getValue("lon"));
-					this.nodes.put(id, new OsmNode(id, this.transform.transform(new Coord(lon, lat))));
+					this.currentNode = new OsmNode(id, this.transform.transform(new Coord(lon, lat)));
+					this.nodes.put(id, currentNode);
 					this.nodeCounter.incCounter();
 				} else if (this.mergeNodes) {
 					OsmNode node = this.nodes.get(Long.valueOf(atts.getValue("id")));
 					if (node != null) {
 						double lat = Double.parseDouble(atts.getValue("lat"));
 						double lon = Double.parseDouble(atts.getValue("lon"));
-						Coord c = this.transform.transform(new Coord(lon, lat));
-//						node.coord.setXY(c.getX(), c.getY());
-						node.coord = c ;
+						node.coord = this.transform.transform(new Coord(lon, lat)) ;
 						this.nodeCounter.incCounter();
 					}
 				}
@@ -955,6 +964,9 @@ public class OsmNetworkReader implements MatsimSomeReader {
 					}
 				}
 				this.currentWay = null;
+			} else if ("node".equals(name)) {
+				// was already added in startTag(...)
+				this.currentNode = null;
 			}
 		}
 
