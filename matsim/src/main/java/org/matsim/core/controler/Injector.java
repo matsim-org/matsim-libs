@@ -86,7 +86,7 @@ public final class Injector {
 				if ( entry.getValue() instanceof BindingImpl ) {
 					log.log( level, "  --> scope: " + ((BindingImpl<?>)entry.getValue()).getScoping() ) ;
 				}
-				log.log(level, "  ==full==> " + entry.getValue() );
+//				log.log(level, "  ==full==> " + entry.getValue() );
 				// yy could probably format the above in a better way. kai, may'16
 				log.log(level,  "" );
 			}

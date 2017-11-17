@@ -27,6 +27,7 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.config.ConfigWriter.Verbosity;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -226,5 +227,12 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
+	}
+	
+	public static void writeConfig( final Config config, String filename ) {
+		new ConfigWriter(config).write(filename);
+	}
+	public static void writeMinimalConfig( final Config config, String filename ) {
+		new ConfigWriter(config,Verbosity.minimal).write(filename);
 	}
 }
