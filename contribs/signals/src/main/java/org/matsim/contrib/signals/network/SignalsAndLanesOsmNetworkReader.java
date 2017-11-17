@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.signals.network;
 
+import java.util.*;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -56,8 +58,6 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.lanes.data.*;
 import org.matsim.lanes.data.consistency.LanesConsistencyChecker;
 import org.xml.sax.Attributes;
-
-import java.util.*;
 
 /**
  * @author tthunig, nschirrmacher
@@ -98,12 +98,19 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	// private final static String LANES_ESTIMATION = "realistic_restricted";
 	// private final static String LANES_ESTIMATION = "realistic_very_restricted";
 
-	private final Map<Id<Link>, LaneStack> laneStacks = new HashMap<Id<Link>, LaneStack>();
-	private final Map<Long, OsmNode> roundaboutNodes = new HashMap<Long, OsmNode>();
-	private final Map<Id<Link>, Map<Id<Link>, Double>> allToLinksAngles = new HashMap<Id<Link>, Map<Id<Link>, Double>>();
-	private final Map<Id<Lane>, List<Id<Lane>>> nonCritLanes = new HashMap<Id<Lane>, List<Id<Lane>>>();
-	private final Map<Id<Lane>, List<Id<Lane>>> critLanes = new HashMap<Id<Lane>, List<Id<Lane>>>();
-	private final Map<Long, Double> turnRadii = new HashMap<Long, Double>();
+	private final Map<Id<Link>, Stack<Stack<Integer>>> laneStacks = new HashMap<>();
+	private final Map<Long, OsmNode> roundaboutNodes = new HashMap<>();
+	private final Map<Id<Link>, Map<Id<Link>, Double>> allToLinksAngles = new HashMap<>();
+	private final Map<Id<Lane>, List<Id<Lane>>> nonCritLanes = new HashMap<>();
+	private final Map<Id<Lane>, List<Id<Lane>>> critLanes = new HashMap<>();
+	private final Map<Long, Double> turnRadii = new HashMap<>();
+	
+	// Node stuff
+	Set<Long> signalizedOsmNodes = new HashSet<>();
+	Set<Long> crossingOsmNodes = new HashSet<>();
+	Map<Long, OsmNode> oldToSimplifiedJunctionNodeMap = new HashMap<>();
+	Map<Long, Set<OsmRelation>> osmNodeRestrictions = new HashMap<>();
+	
 
 	private boolean minimizeSmallRoundabouts = true;
 	private boolean mergeOnewaySignalSystems = true;
@@ -504,6 +511,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				junctionNode.signalized = true;
 				junctionNode.used = true;
 				for (OsmNode tempNode : junctionNodes) {
+					// TODO tempNode.used = false; und node in way ersetzen -> repJunNode nicht mehr noetig?!
 					tempNode.repJunNode = junctionNode;
 					for (OsmRelation restriction : tempNode.restrictions)
 						junctionNode.restrictions.add(restriction);
@@ -1481,6 +1489,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			}
 			turnLaneStack.push(tempLane);
 		}
+		// TODO rather give an error message than filling with null-lanes here:
 		// fills up Stack with dummy Lanes if size of Stack does not match
 		// number of Lanes
 		Stack<Integer> tempLane = new Stack<Integer>();
@@ -1894,350 +1903,95 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 	}
 
-	// TODO how to change this such that this method is not needed anymore??
-
-	/*
-	 * -------- TODO NEW: length not final, because it might change if to Node
-	 * changes in junction ----------
-	 */
-
-	private void createLink(final Network network, final OsmWay way, final OsmNetworkReader.OsmNode fromNode,
-			final OsmNetworkReader.OsmNode toNode, final double length) {
-		String highway = way.tags.get(TAG_HIGHWAY);
-
-		if ("no".equals(way.tags.get(TAG_ACCESS))) {
-			return;
-		}
-
-		// load defaults
-		OsmHighwayDefaults defaults = this.highwayDefaults.get(highway);
-		if (defaults == null) {
-			this.unknownHighways.add(highway);
-			return;
-		}
-
-		/* ----------- TODO NEW starts ----------- */
-
-		Stack<Stack<Integer>> allTurnLanes = null;
-		Stack<Stack<Integer>> allTurnLanesForw = null;
-		Stack<Stack<Integer>> allTurnLanesBack = null;
-
-		/* ------------- TODO NEW ends ------------- */
-
-		double nofLanesForward = defaults.lanesPerDirection;
-		double nofLanesBackward = defaults.lanesPerDirection;
-		double laneCapacity = defaults.laneCapacity;
-		double freespeed = defaults.freespeed;
-		double freespeedFactor = defaults.freespeedFactor;
-
-		boolean oneway = isOneway(way);
-		boolean onewayReverse = isOnewayReverse(way);
-
-		// In case trunks, primary and secondary roads are marked as oneway,
-		// the default number of lanes should be two instead of one.
-		if (highway.equalsIgnoreCase("trunk") || highway.equalsIgnoreCase("primary")
-				|| highway.equalsIgnoreCase("secondary")) {
-			if (oneway && nofLanesForward == 1.0) {
-				nofLanesForward = 2.0;
-			} else if (onewayReverse && nofLanesBackward == 1.0) {
-				nofLanesBackward = 2.0;
-			}
-		}
-
-		String maxspeedTag = way.tags.get(TAG_MAXSPEED);
-		if (maxspeedTag != null) {
-			try {
-				if (maxspeedTag.endsWith("mph")) {
-					freespeed = Double.parseDouble(maxspeedTag.replace("mph", "").trim()) * 1.609344 / 3.6; // convert
-																											// mph to
-																											// m/s
-				} else {
-					freespeed = Double.parseDouble(maxspeedTag) / 3.6; // convert km/h to m/s
-				}
-			} catch (NumberFormatException e) {
-				if (!this.unknownMaxspeedTags.contains(maxspeedTag)) {
-					this.unknownMaxspeedTags.add(maxspeedTag);
-					log.warn("Could not parse maxspeed tag:" + e.getMessage() + ". Ignoring it.");
-				}
-			}
-		}
-
-		// check tag "lanes"
-		String lanesTag = way.tags.get(TAG_LANES);
-		String lanesForwardTag = way.tags.get(TAG_LANES_FORWARD);
-		String lanesBackwardTag = way.tags.get(TAG_LANES_BACKWARD);
-		try {
-
-			/*
-			 * If the tag "lanes:forward" or "lanes:backward" is set, use them. If not, give
-			 * each direction half of the total number of lanes (except it is a oneway
-			 * street) fzwick,nkuehnel, apr'17 If only one of them is set and total number
-			 * of lanes is known (as it is often the case), calculate missing value as the
-			 * difference... tthunig, oct'17
-			 */
-
-			if (lanesForwardTag != null && lanesBackwardTag != null) {
-				nofLanesForward = Double.parseDouble(lanesForwardTag);
-				nofLanesBackward = Double.parseDouble(lanesBackwardTag);
-				// done
-			} else if (oneway) {
-				nofLanesBackward = 0;
-				if (lanesForwardTag != null)
-					nofLanesForward = Double.parseDouble(lanesForwardTag);
-				else if (lanesTag != null)
-					nofLanesForward = Double.parseDouble(lanesTag);
-				// else keep default
-			} else if (onewayReverse) {
-				nofLanesForward = 0;
-				if (lanesBackwardTag != null)
-					nofLanesBackward = Double.parseDouble(lanesBackwardTag);
-				else if (lanesTag != null)
-					nofLanesBackward = Double.parseDouble(lanesTag);
-				// else keep default
-			} else if (lanesForwardTag != null) {
-				// i.e. lanesBackwardTag is null
-				nofLanesForward = Double.parseDouble(lanesForwardTag);
-				if (lanesTag != null)
-					nofLanesBackward = Double.parseDouble(lanesTag) - nofLanesForward;
-				// else keep default
-			} else if (lanesBackwardTag != null) {
-				// i.e. lanesForwardTag is null
-				nofLanesBackward = Double.parseDouble(lanesBackwardTag);
-				if (lanesTag != null)
-					nofLanesForward = Double.parseDouble(lanesTag) - nofLanesBackward;
-				// else keep default
-			} else { // i.e. lanesForwardTag and lanesBackwardTag are null. no oneway
-				if (lanesTag != null) {
-
-					/*
-					 * By default, the OSM lanes tag specifies the total number of lanes in both
-					 * direction. So, let's distribute them between both directions. michalm, jan'16
-					 */
-
-					nofLanesForward = Double.parseDouble(lanesTag) / 2;
-					nofLanesBackward = nofLanesForward;
-				}
-				// else keep default
-			}
-		} catch (Exception e) {
-			if (!this.unknownLanesTags.contains(lanesTag)) {
-				this.unknownLanesTags.add(lanesTag);
-				log.warn("Could not parse lanes tag:" + e.getMessage() + ". Ignoring it.");
-			}
-		}
-
-		/* --------- TODO NEW starts ---------- */
-
-		// added checker for turnlanes - using Stack to pop later--Array easier?
-		// - tempDir for alignment
-		// *********************************************************************************************
-		String turnLanes = way.tags.get(TAG_TURNLANES);
-		if (turnLanes != null) {
-			allTurnLanes = new Stack<Stack<Integer>>();
-			createLaneStack(turnLanes, allTurnLanes, nofLanesForw);
-			if (nofLanesForw < allTurnLanes.size()) {
-				double totalNumberOfLanes = nofLanesForw + nofLanesBack;
-				nofLanesForw = allTurnLanes.size();
-				nofLanesBack = totalNumberOfLanes - nofLanesForw;
-			}
-		}
-
-		String turnLanesForw = way.tags.get(TAG_TURNLANESFORW);
-		if (turnLanesForw != null) {
-			allTurnLanesForw = new Stack<Stack<Integer>>();
-			createLaneStack(turnLanesForw, allTurnLanesForw, nofLanesForw);
-			if (nofLanesForw < allTurnLanesForw.size()) {
-				double totalNumberOfLanes = nofLanesForw + nofLanesBack;
-				nofLanesForw = allTurnLanesForw.size();
-				nofLanesBack = totalNumberOfLanes - nofLanesForw;
-			}
-		}
-
-		String turnLanesBack = way.tags.get(TAG_TURNLANESBACK);
-		if (turnLanesBack != null) {
-			allTurnLanesBack = new Stack<Stack<Integer>>();
-			createLaneStack(turnLanesBack, allTurnLanesBack, nofLanesBack);
-			if (nofLanesBack < allTurnLanesBack.size()) {
-				double totalNumberOfLanes = nofLanesForw + nofLanesBack;
-				nofLanesBack = allTurnLanesBack.size();
-				if (turnLanesForw == null)
-					nofLanesForw = totalNumberOfLanes - nofLanesBack;
-			}
-		}
-
-		/* --------- TODO NEW ends ------------ */
-
-		double capacityForward = nofLanesForward * laneCapacity;
-		double capacityBackward = nofLanesBackward * laneCapacity;
-
-		if (this.scaleMaxSpeed) {
-			freespeed = freespeed * freespeedFactor;
-		}
-
-		// only create link, if both nodes were found, node could be null, since nodes
-		// outside a layer were dropped
-		Id<Node> fromId = Id.create(fromNode.id, Node.class);
-		Id<Node> toId = Id.create(toNode.id, Node.class);
-
-		/* -------- TODO NEW starts ------------ */
-
-		// TODO is this something that nils added??
-		if (fromNode.repJunNode != null) {
-			fromId = Id.create(fromNode.repJunNode.id, Node.class);
-			length = toNode.getDistance(fromNode.repJunNode);
-			// log.warn("used repJunNode @ Link " + id);
-		}
-		Id<Node> toId = Id.create(toNode.id, Node.class);
-		if (toNode.repJunNode != null) {
-			toId = Id.create(toNode.repJunNode.id, Node.class);
-			length = fromNode.getDistance(toNode.repJunNode);
-			// log.warn("used repJunNode @ Link " + id);
-		}
-
-		/* ---------- TODO NEW ends ------------- */
-
-		if (network.getNodes().get(fromId) != null && network.getNodes().get(toId) != null) {
-			String origId = Long.toString(way.id);
-
-			// Forward direction (in relation to the direction of the OSM way object)
-			if (forwardDirectionExists(way)) {
-				Link l = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(fromId),
-						network.getNodes().get(toId));
-				l.setLength(length);
-				l.setFreespeed(freespeed);
-				l.setCapacity(capacityForward);
-				l.setNumberOfLanes(nofLanesForward);
-				NetworkUtils.setOrigId(l, origId);
-				NetworkUtils.setType(l, highway);
-				setOrModifyLinkAttributes(l, way, true);
-				network.addLink(l);
-				this.id++;
-			}
-			// Backward/reverse direction (in relation to the direction of the OSM way
-			// object)
-			if (reverseDirectionExists(way)) {
-				Link l = network.getFactory().createLink(Id.create(this.id, Link.class), network.getNodes().get(toId),
-						network.getNodes().get(fromId));
-				l.setLength(length);
-				l.setFreespeed(freespeed);
-				l.setCapacity(capacityBackward);
-				l.setNumberOfLanes(nofLanesBackward);
-				NetworkUtils.setOrigId(l, origId);
-				NetworkUtils.setType(l, highway);
-				setOrModifyLinkAttributes(l, way, false);
-				network.addLink(l);
-				this.id++;
-			}
-		}
-	}
-
 	@Override
-	protected void setOrModifyNodeAttributes(Node n, OsmNode node) {
-		// TODO
+	protected void setOrModifyNodeAttributes(Node n, OsmNetworkReader.OsmNode node) {
+		// TODO wie loese ich problem mit casting? interfaces??
+		// create empty signal system for the node
+		if (((OsmNode)node).signalized && (bbox == null || bbox.contains(node.coord))) {
+			Id<SignalSystem> systemId = Id.create("System" + node.id, SignalSystem.class);
+			if (!this.systems.getSignalSystemData().containsKey(systemId)) {
+				SignalSystemData system = this.systems.getFactory().createSignalSystemData(systemId);
+				this.systems.getSignalSystemData().put(systemId, system);
+			}
+		}
 	}
 
 	@Override
 	protected void setOrModifyLinkAttributes(Link l, OsmWay way, boolean forwardDirection) {
-		// TODO combine to one
+		// convert lane directions
+		String turnLanesOsm;
+		if (forwardDirection) {
+			turnLanesOsm = way.tags.get(TAG_TURNLANESFORW);
+			if (turnLanesOsm == null) {
+				// use general turn lanes tag only if turn lanes forward not existent
+				turnLanesOsm = way.tags.get(TAG_TURNLANES);
+			}
+		} else { // i.e. backward direction
+			turnLanesOsm = way.tags.get(TAG_TURNLANESBACK);
+		}
+		Stack<Stack<Integer>> turnLanesOfThisLink = new Stack<Stack<Integer>>();
+		if (turnLanesOsm != null) {
+			createLaneStack(turnLanesOsm, turnLanesOfThisLink, l.getNumberOfLanes());
+			if (l.getNumberOfLanes() < turnLanesOfThisLink.size()) {
+				// TODO dies stellt die info der turn lanes über die info der #lanes. konsistent? adapt capacity too?
+				l.setNumberOfLanes(turnLanesOfThisLink.size());
+			}
+		}
+		
 		// create Lanes only if more than one Lane detected
-		if (nofLanesForw > 1 && (bbox == null || bbox.contains(toNode.coord))) {
-			createLanes(l, lanes, nofLanesForw);
-			// if turn:lanes:forward exists save it for later, otherwise
-			// save turn:lanes or save nothing
-			if (allTurnLanesForw != null) {
-				this.laneStacks.put(l.getId(), new LaneStack(allTurnLanesForw));
-			} else if (allTurnLanes != null) {
-				this.laneStacks.put(l.getId(), new LaneStack(allTurnLanes));
-			}
-
+		Node toNode = this.network.getNodes().get(l.getToNode());
+		if (l.getNumberOfLanes() > 1 && (bbox == null || bbox.contains(toNode.getCoord()))) {
+			createLanes(l, lanes, l.getNumberOfLanes());
+			if (turnLanesOfThisLink != null) {
+				this.laneStacks.put(l.getId(), turnLanesOfThisLink);
+			} 
 		}
-		if (toNode.signalized && (bbox == null || bbox.contains(toNode.coord))) {
-			Id<SignalSystem> systemId = Id.create("System" + Long.valueOf(toId.toString()), SignalSystem.class);
-			if (!this.systems.getSignalSystemData().containsKey(systemId)) {
-				SignalSystemData system = this.systems.getFactory().createSignalSystemData(systemId);
-				this.systems.getSignalSystemData().put(systemId, system);
-			}
-		}
+	} 
 
-		// create Lanes only if more than one Lane detected
-		if (nofLanesBack > 1 && (bbox == null || bbox.contains(fromNode.coord))) {
-			createLanes(l, lanes, nofLanesBack);
-			// if turn:lanes:forward exists save it for later, otherwise
-			// save turn:lanes or save nothing
-			if (allTurnLanesBack != null) {
-				this.laneStacks.put(l.getId(), new LaneStack(allTurnLanesBack));
-			} else if (allTurnLanes != null) {
-				this.laneStacks.put(l.getId(), new LaneStack(allTurnLanes));
-			}
-		}
-		if (fromNode.signalized && (bbox == null || bbox.contains(fromNode.coord))) {
-			Id<SignalSystem> systemId = Id.create("System" + Long.valueOf(fromId.toString()), SignalSystem.class);
-			if (!this.systems.getSignalSystemData().containsKey(systemId)) {
-				SignalSystemData system = this.systems.getFactory().createSignalSystemData(systemId);
-				this.systems.getSignalSystemData().put(systemId, system);
-			}
-		}
-	}
 
-	private static class OsmNode extends org.matsim.core.utils.io.OsmNetworkReader.OsmNode {
-		public boolean signalized = false;
-		public boolean crossing = false;
-		// public int signalDir = 0;
-		public OsmNode repJunNode = null;
-		// including traffic_signals:direction to prevent wrong signals in
-		// MATSim
-		// **********************************************************************
-		// public boolean restriction = false;
-		public List<OsmRelation> restrictions = new ArrayList<>();
-
-		public OsmNode(final long id, final Coord coord) {
-			super(id, coord);
-		}
-
-		public boolean isAtJunction() {
-			if (this.endPoint && this.ways.size() > 2)
-				return true;
-			if (!this.endPoint && this.ways.size() > 1)
-				return true;
-			if (this.endPoint && this.ways.size() == 2) {
-				for (OsmWay way : this.ways.values()) {
-					for (int i = 0; i < way.nodes.size(); i++) {
-						if (this.id == (way.nodes.get(i))) {
-							if (i != 0 && i != way.nodes.size() - 1)
-								return true;
-						}
+	public boolean isNodeAtJunction(OsmNode node) {
+		if (node.endPoint && node.ways.size() > 2)
+			return true;
+		if (!node.endPoint && node.ways.size() > 1)
+			return true;
+		if (node.endPoint && node.ways.size() == 2) {
+			for (OsmNetworkReader.OsmWay way : node.ways.values()) {
+				for (int i = 0; i < way.nodes.size(); i++) {
+					if (node.id == (way.nodes.get(i))) {
+						if (i != 0 && i != way.nodes.size() - 1)
+							return true;
 					}
 				}
 			}
-			return false;
 		}
+		return false;
+	}
 
-		private double getDistance(OsmNode node) {
-			double x = this.coord.getX() - node.coord.getX();
-			double y = this.coord.getY() - node.coord.getY();
-			double distance = Math.sqrt(x * x + y * y);
-			return distance;
+	private double calcNode2NodeDistance(OsmNode node1, OsmNode node2) {
+		double x = node1.coord.getX() - node2.coord.getX();
+		double y = node1.coord.getY() - node2.coord.getY();
+		double distance = Math.sqrt(x * x + y * y);
+		return distance;
+	}
+
+	private boolean hasNodeOneway(OsmNode node) {
+		boolean hasOneway = false;
+		for (OsmWay way : node.ways.values()) {
+			String oneway = way.tags.get(TAG_ONEWAY);
+			if (oneway != null && !oneway.equals("no"))
+				hasOneway = true;
 		}
-
-		private boolean hasOneway() {
-			boolean hasOneway = false;
-			for (OsmWay way : this.ways.values()) {
-				String oneway = way.tags.get(TAG_ONEWAY);
-				if (oneway != null && !oneway.equals("no"))
-					hasOneway = true;
+		return hasOneway;
+	}
+	
+	private void putRestrictionToNodeIfComplete(OsmRelation relation) {
+		// TODO ersetze diese methode
+		if (relation.resNode != null && relation.fromRestricted != null && relation.toRestricted != null) {
+			if (!osmNodeRestrictions.containsKey(relation.resNode.id)) {
+				osmNodeRestrictions.put(relation.resNode.id, new HashSet<>());
 			}
-			return hasOneway;
+			osmNodeRestrictions.get(relation.resNode.id).add(relation);
 		}
-
-		// public boolean isOnRoundabout() {
-		// boolean isOnRoundabout = false;
-		// for(OsmWay way : this.ways.values()){
-		// String roundabout = way.tags.get(TAG_JUNCTION);
-		// if(roundabout != null && roundabout.equals("roundabout"))
-		// isOnRoundabout = true;
-		// }
-		// return isOnRoundabout;
-		// }
 	}
 
 	// TODO find out how to extend OsmNetworkReader here!
@@ -2344,6 +2098,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					 */
 
 					if ("highway".equals(key) && "crossing".equals(value)) {
+						// TODO can we do this better?
 						currentNode.crossing = true;
 					}
 				}
@@ -2450,7 +2205,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	}
 
-	private static class OsmRelation {
+	private static final class OsmRelation {
 		public final long id;
 		public OsmNode resNode;
 		public OsmWay fromRestricted;
@@ -2460,15 +2215,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		public OsmRelation(final long id) {
 			this.id = id;
 		}
-
-		public void putRestrictionToNodeIfComplete() {
-			if (resNode != null && fromRestricted != null && toRestricted != null) {
-				resNode.restrictions.add(this);
-			}
-		}
 	}
 
-	public class LinkVector implements Comparable<LinkVector> {
+	private static final class LinkVector implements Comparable<LinkVector> {
 		private Link link;
 		private double x;
 		private double y;
@@ -2534,18 +2283,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	}
 
-	// TODO replace usage with plain Stack
-	private static class LaneStack {
-		public final Stack<Stack<Integer>> turnLanes;
-
-		public LaneStack(Stack<Stack<Integer>> turnLanes) {
-			this.turnLanes = turnLanes;
-		}
-
-	}
-
 	// TODO consider moving this out in some utils directory
-	public class BoundingBox {
+	private static final class BoundingBox {
 		private double south;
 		private double west;
 		private double north;
