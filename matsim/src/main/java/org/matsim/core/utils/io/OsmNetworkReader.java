@@ -87,7 +87,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private final static String TAG_HIGHWAY = "highway";
 	private final static String TAG_MAXSPEED = "maxspeed";
 	private final static String TAG_JUNCTION = "junction";
-    private final static String TAG_ONEWAY = "oneway";
+    protected final static String TAG_ONEWAY = "oneway";
     private final static String TAG_ACCESS = "access";
 	private static List<String> allTags = new LinkedList<>(Arrays.asList(TAG_LANES, TAG_LANES_FORWARD,
 			TAG_LANES_BACKWARD, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS));
@@ -99,7 +99,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private final Set<String> unknownLanesTags = new HashSet<String>();
 	private long id = 0;
 	protected final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
-	private final Network network;
+	protected final Network network;
 	private final CoordinateTransformation transform;
 	private boolean keepPaths = false;
 	private boolean scaleMaxSpeed = false;
@@ -444,6 +444,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		
 		log.info("Create the required nodes ...") ;
 		for (OsmNode node : this.nodes.values()) {
+			// TODO check and simplify junction simplification. otherwise check here for simplificated node
 			if (node.used) {
 				Node nn = this.network.getFactory().createNode(Id.create(node.id, Node.class), node.coord);
 				setOrModifyNodeAttributes(nn, node);
@@ -461,6 +462,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				double length = 0.0;
 				OsmNode lastToNode = fromNode;
 				if (fromNode.used) {
+					// TODO check and simplify junction simplification. otherwise check here for simplificated node
 					for (int i = 1, n = way.nodes.size(); i < n; i++) {
 						OsmNode toNode = this.nodes.get(way.nodes.get(i));
 						if (toNode != lastToNode) {
@@ -499,7 +501,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		this.nodes.clear();
 		this.ways.clear();
 	}
-	
+
 	/**
 	 * Override this when additional data, e.g. signals, should be created from the osm data.
 	 */
@@ -796,7 +798,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		}
 	}
 
-	protected static class OsmNode {
+	protected final static class OsmNode {
 		public final long id;
 		public boolean used = false;
 		public Map<Long, OsmWay> ways = new HashMap<>();
@@ -809,7 +811,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		}
 	}
 
-	protected static class OsmWay {
+	protected final static class OsmWay {
 		public final long id;
 		public final List<Long> nodes = new ArrayList<Long>(4);
 		public final Map<String, String> tags = new HashMap<String, String>(4);
