@@ -47,7 +47,6 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 
 	private ElevationDataParser elevationDataParser;
 
-	private final static String TAG_HIGHWAY = "highway";
 	private final static String TAG_BICYCLE = "bicycle";
 	private final static String TAG_ONEWAYBICYCLE = "oneway:bicycle";
 	
@@ -66,8 +65,7 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 //		String outputXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/2017-08-29_mitte.xml";
 		String outputXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/berlin-latest.xml";
 		
-		List<String> bicycleWayTags = Arrays.asList(
-				new String[]{BicycleLabels.CYCLEWAY, BicycleLabels.SURFACE, BicycleLabels.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE});
+		List<String> bicycleWayTags = Arrays.asList(BicycleLabels.CYCLEWAY, BicycleLabels.SURFACE, BicycleLabels.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE);
 
 		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
