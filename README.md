@@ -14,8 +14,7 @@ For more information, see the project website at http://www.matsim.org/.
 
 ## Questions
 
-Have any questions? Visit https://matsim.atlassian.net/wiki/questions
-and see if it has already been answered. If not, post a new question.
+Have any questions? Visit the [atlassian questions section](https://matsim.atlassian.net/wiki/display/MATPUB/customcontent/list/ac%3Acom.atlassian.confluence.plugins.confluence-questions%3Aquestion) and see if it has already been answered. If not, post a new question.
 
 ## Development
 
