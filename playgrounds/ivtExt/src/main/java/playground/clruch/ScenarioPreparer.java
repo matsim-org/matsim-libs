@@ -83,7 +83,7 @@ public class ScenarioPreparer {
 
         Population population = scenario.getPopulation();
 
-        {// 1) cut network (and reduce population to new network)
+/*        {// 1) cut network (and reduce population to new network)
             if (network == null)
                 System.out.println("its the network");
             if (ls == null)
@@ -140,7 +140,11 @@ public class ScenarioPreparer {
                 e.printStackTrace();
             }
         }
-
+*/
+        
+        System.out.println(network.getLinks().size());
+        System.out.println(population.getPersons().size());
+       
         // 3) create virtual Network
         // TODO make this generic for any VirtualNetwork creators.
         VirtualNetwork<Link> virtualNetwork;

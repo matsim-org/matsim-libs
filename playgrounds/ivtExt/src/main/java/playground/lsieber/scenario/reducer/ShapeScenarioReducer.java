@@ -11,6 +11,7 @@ import org.matsim.facilities.ActivityFacilities;
 
 import playground.lsieber.networkshapecutter.FacilityPopulationBasedCutter;
 import playground.lsieber.networkshapecutter.NetworkCutterShape;
+import playground.lsieber.networkshapecutter.PopulationFilter;
 
 public class ShapeScenarioReducer extends AbstractScenarioReducer {
 
@@ -37,8 +38,11 @@ public class ShapeScenarioReducer extends AbstractScenarioReducer {
 
     @Override
     protected Population populationCutter() {
-        // TODO @ Lukas generate Population Cutter
-        return originalScenario.getPopulation();
+
+
+        PopulationFilter populationFilter = new PopulationFilter(this.originalScenario.getPopulation());
+        populationFilter.run(this.network);
+        return populationFilter.getPopulation();
     }
 
     @Override

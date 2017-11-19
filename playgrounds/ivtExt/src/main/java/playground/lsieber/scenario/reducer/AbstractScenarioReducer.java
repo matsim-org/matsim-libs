@@ -76,6 +76,15 @@ public abstract class AbstractScenarioReducer {
         new FacilitiesWriter(facilities).write(reducedScenarioDirectory + "/reducedFacilities.xml");
 
     }
+    
+    public void ConvertPtToAV () {
+        if(population == null) {
+            population = originalScenario.getPopulation();
+        }
+        population = new ModeConverter(population).run();
+        new PopulationWriter(population).write(reducedScenarioDirectory + "/reducedPopulation.xml");
+
+    }
 
     public void addConfigFilesinFolder() throws IOException {
         // TODO Improve Copy Mechanism

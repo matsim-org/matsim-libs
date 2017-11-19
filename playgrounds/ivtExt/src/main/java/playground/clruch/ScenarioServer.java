@@ -75,6 +75,8 @@ public class ScenarioServer {
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
 
+        IncludeActTypeOf.BaselineCH(config);
+        
         String outputdirectory = config.controler().getOutputDirectory();
         System.out.println("outputdirectory = " + outputdirectory);
 
