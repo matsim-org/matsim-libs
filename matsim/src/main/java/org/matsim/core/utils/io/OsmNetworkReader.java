@@ -97,7 +97,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	private final Set<String> unknownHighways = new HashSet<String>();
 	private final Set<String> unknownMaxspeedTags = new HashSet<String>();
 	private final Set<String> unknownLanesTags = new HashSet<String>();
-	private long id = 0;
+	protected long id = 0;
 	protected final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
 	protected final Network network;
 	protected final CoordinateTransformation transform;
