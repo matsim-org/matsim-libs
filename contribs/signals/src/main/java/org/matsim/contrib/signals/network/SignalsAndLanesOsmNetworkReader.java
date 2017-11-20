@@ -52,8 +52,6 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.OsmNetworkReader;
-import org.matsim.core.utils.io.OsmNetworkReader.OsmNode;
-import org.matsim.core.utils.io.OsmNetworkReader.OsmWay;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.lanes.data.*;
 import org.matsim.lanes.data.consistency.LanesConsistencyChecker;
@@ -196,22 +194,13 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	public SignalsAndLanesOsmNetworkReader(Network network, CoordinateTransformation transformation,
 			boolean useHighwayDefaults, final SignalsData signalsData, final Lanes lanes) {
 		super(network, transformation, useHighwayDefaults);
-
+		
+		super.addWayTags(Arrays.asList(TAG_TURNLANES, TAG_TURNLANESFORW, TAG_TURNLANESBACK, TAG_RESTRICTION));
+		super.setParser(new SignalLanesOsmXmlParser(this.nodes, this.ways, this.transform));
 		this.systems = signalsData.getSignalSystemsData();
 		this.groups = signalsData.getSignalGroupsData();
 		this.control = signalsData.getSignalControlData();
-		this.lanes = lanes;
-
-		// TODO set highway defaults of missing types??
-
-		// TODO Was ist mit ALL_TAGS?? How to extend it:
-		/*
-		 * private final static String[] ALL_TAGS = new String[] { TAG_LANES,
-		 * TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY, TAG_ACCESS,
-		 * TAG_TURNLANES, TAG_TURNLANESFORW, TAG_TURNLANESBACK, TAG_LANESFORW,
-		 * TAG_LANESBACK, TAG_RESTRICTION, TAG_SIGNALS };
-		 */
-
+		this.lanes = lanes;		
 	}
 
 	private void stats() {
@@ -220,10 +209,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	}
 
 	// TODO rename 'mode' as it is to similiar to 'transport mode'
-
 	/**
-	 *
-	 *
 	 * @param modeOutLanes
 	 *            The mode in which ToLinks are determined in case of missing lane
 	 *            directions on the "Out"-lanes (farthest left and right lane). 1 :
@@ -236,7 +222,6 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	 *            and right lane). 1 : only straight 2 : straight, left and right
 	 *            (if existing and not reverse)
 	 */
-
 	public void setModesForDefaultLanes(int modeOutLanes, int modeMidLanes) {
 		this.modeOutLanes = modeOutLanes;
 		this.modeMidLanes = modeMidLanes;
@@ -281,17 +266,17 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		this.acceptFourPlusCrossings = acceptFourPlusCrossings;
 		setModesForDefaultLanes(lanesEstimation);
 	}
-	
+
 	@Override
-	protected boolean isNodeNecessary(org.matsim.core.utils.io.OsmNetworkReader.OsmNode node) {
-		return super.isNodeNecessary(node) || ((OsmNode)node).signalized;
-		// TODO how to make sure that node is type OsmNode from this class??
+	protected boolean isNodeNecessary(OsmNode node) {
+		return super.isNodeNecessary(node) || signalizedOsmNodes.contains(node.id);
 	}
 
 	@Override
 	protected void preprocessingOsmData() {
 		// simplify signals data: push them into main junctions
-		// this needs to be done before network simplification such that no signalized junctions are simplified
+		// this needs to be done before network simplification such that no signalized
+		// junctions are simplified
 
 		simplifiyRoundaboutSignals();
 		pushingSingnalsIntoCloseJunctions();
@@ -300,7 +285,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		pushingSignalsIntoRoundabouts();
 		// TODO check and clean this methods
 	}
-	
+
 	@Override
 	protected void furtherSimplificationOfOsmData() {
 		// TODO try to merge this with preprocessingOsmData()
@@ -329,23 +314,23 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		addingNodes.clear();
 		checkedNodes.clear();
 	}
-	
+
 	@Override
-	protected void createAdditionalMatsimDataFromOsm(Network network, Map<Long, org.matsim.core.utils.io.OsmNetworkReader.OsmNode> nodes, Map<Long, OsmWay> ways) {
+	protected void createAdditionalMatsimDataFromOsm(Network network,
+			Map<Long, OsmNode> nodes, Map<Long, OsmWay> ways) {
 		// TODO check and clean this method!
-		
+
 		// create signals and lanes:
 
-		// already created Lanes are given ToLinks
+		// lanes were already created but without toLinks. add toLinks now:
 		for (Link link : network.getLinks().values()) {
 			if (link.getToNode().getOutLinks().size() > 1) {
 				if (link.getNumberOfLanes() > 1) {
 					fillLanesAndCheckRestrictions(link);
 				} else {
-					// TODO check that this cast always works
-					if (!((OsmNode)nodes.get(Long.valueOf(link.getToNode().getId().toString()))).restrictions.isEmpty()
-							&& (this.bbox == null || this.bbox
-									.contains(nodes.get(Long.valueOf(link.getToNode().getId().toString())).coord))) {
+					Long toNodeId = Long.valueOf(link.getToNode().getId().toString());
+					Set<OsmRelation> restrictions = osmNodeRestrictions.get(toNodeId);
+					if (!restrictions.isEmpty() && (this.bbox == null || this.bbox.contains(nodes.get(toNodeId).coord))) {
 						// if there exists an Restriction in the ToNode, we want to
 						// create a Lane to represent the restriction,
 						// as the toLinks cannot be restricted otherwise
@@ -511,7 +496,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				junctionNode.signalized = true;
 				junctionNode.used = true;
 				for (OsmNode tempNode : junctionNodes) {
-					// TODO tempNode.used = false; und node in way ersetzen -> repJunNode nicht mehr noetig?!
+					// TODO tempNode.used = false; und node in way ersetzen -> repJunNode nicht mehr
+					// noetig?!
 					tempNode.repJunNode = junctionNode;
 					for (OsmRelation restriction : tempNode.restrictions)
 						junctionNode.restrictions.add(restriction);
@@ -564,7 +550,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				for (int i = way.nodes.indexOf(node.id) + 1; i < way.nodes.size(); i++) {
 					OsmNode otherNode = nodes.get(way.nodes.get(i));
 					if (otherNode.used && !checkedNodes.contains(otherNode) && !junctionNodes.contains(otherNode)) {
-						if (node.getDistance(otherNode) < distance) {
+						if (calcNode2NodeDistance(node, otherNode) < distance) {
 							if (otherNode.id == firstNode.id) {
 								junctionNodes.add(otherNode);
 							} else {
@@ -692,7 +678,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	private void findingTwoNodeJunctions(List<OsmNode> addingNodes, List<OsmNode> checkedNodes) {
 		for (OsmNode node : this.nodes.values()) {
-			if (!checkedNodes.contains(node) && node.used && node.isAtJunction()) {
+			if (!checkedNodes.contains(node) && node.used && isNodeAtJunction(node)) {
 				boolean suit = false;
 				OsmNode otherNode = null;
 				boolean otherSuit = false;
@@ -712,9 +698,12 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 								break;
 							otherNode = nodes.get(way.nodes.get(i));
 
-							if (node.getDistance(otherNode) < SIGNAL_MERGE_DISTANCE && !checkedNodes.contains(otherNode)
-									&& otherNode.isAtJunction() && otherNode.used && !node.equals(otherNode)
-									&& node.signalized == otherNode.signalized) {
+							boolean nodeSignalized = signalizedOsmNodes.contains(node.id);
+							boolean otherNodeSignalized = signalizedOsmNodes.contains(otherNode.id);
+							if (calcNode2NodeDistance(node, otherNode) < SIGNAL_MERGE_DISTANCE
+									&& !checkedNodes.contains(otherNode) && isNodeAtJunction(otherNode)
+									&& otherNode.used && !node.equals(otherNode)
+									&& nodeSignalized == otherNodeSignalized) {
 								for (OsmWay otherWay : otherNode.ways.values()) {
 									if (!node.ways.containsKey(otherWay.id)) {
 										String otherOneway = otherWay.tags.get(TAG_ONEWAY);
@@ -754,7 +743,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	private void findingFourNodeJunctions(List<OsmNode> addingNodes, List<OsmNode> checkedNodes) {
 		for (OsmNode node : this.nodes.values()) {
-			if (!checkedNodes.contains(node) && node.used && node.signalized && node.ways.size() > 1) {
+			if (!checkedNodes.contains(node) && node.used && signalizedOsmNodes.contains(node.id)
+					&& node.ways.size() > 1) {
 				List<OsmNode> junctionNodes = new ArrayList<>();
 				double distance = 30;
 				findCloseJunctionNodesWithSignals(node, node, junctionNodes, checkedNodes, distance, false);
@@ -767,14 +757,14 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					for (OsmNode tempNode : junctionNodes) {
 						repX += tempNode.coord.getX();
 						repY += tempNode.coord.getY();
-						leftTurnRadius += tempNode.getDistance(lastNode);
+						leftTurnRadius += calcNode2NodeDistance(tempNode, lastNode);
 						lastNode = tempNode;
 					}
 					leftTurnRadius /= junctionNodes.size();
 					repX /= junctionNodes.size();
 					repY /= junctionNodes.size();
 					OsmNode junctionNode = new OsmNode(this.id, new Coord(repX, repY));
-					junctionNode.signalized = true;
+					signalizedOsmNodes.add(junctionNode.id);
 					junctionNode.used = true;
 					for (OsmNode tempNode : junctionNodes) {
 						tempNode.repJunNode = junctionNode;
@@ -797,17 +787,18 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				OsmNode signalNode = null;
 				for (int i = 0; i < way.nodes.size(); i++) {
 					signalNode = this.nodes.get(way.nodes.get(i));
-					if (signalNode.signalized && !signalNode.isAtJunction())
-						signalNode.signalized = tryTofindRoundabout(signalNode, way, i);
+					if (signalizedOsmNodes.contains(signalNode.id) && !isNodeAtJunction(signalNode)
+							&& !tryTofindRoundabout(signalNode, way, i))
+						signalizedOsmNodes.remove(signalNode.id);
 				}
 			}
 			OsmNode node = this.nodes.get(way.nodes.get(0));
 			if (node.endPoint && node.ways.size() == 1) {
-				node.signalized = false;
+				signalizedOsmNodes.remove(node.id);
 			}
 			node = this.nodes.get(way.nodes.get(way.nodes.size() - 1));
 			if (node.endPoint && node.ways.size() == 1) {
-				node.signalized = false;
+				signalizedOsmNodes.remove(node.id);
 			}
 		}
 	}
@@ -818,11 +809,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			if (oneway != null && !oneway.equals("-1")) {
 				OsmNode firstNode = this.nodes.get(way.nodes.get(0));
 				OsmNode lastNode = this.nodes.get(way.nodes.get(1));
-				if (way.nodes.size() == 2 && firstNode.getDistance(lastNode) < SIGNAL_MERGE_DISTANCE) {
-					if (firstNode.ways.size() == 2 && lastNode.ways.size() > 2 && firstNode.signalized
-							&& !lastNode.signalized) {
-						firstNode.signalized = false;
-						lastNode.signalized = true;
+				if (way.nodes.size() == 2 && calcNode2NodeDistance(firstNode, lastNode) < SIGNAL_MERGE_DISTANCE) {
+					if (firstNode.ways.size() == 2 && lastNode.ways.size() > 2
+							&& signalizedOsmNodes.contains(firstNode.id) && !signalizedOsmNodes.contains(lastNode.id)) {
+						signalizedOsmNodes.remove(firstNode.id);
+						signalizedOsmNodes.add(lastNode.id);
 					}
 				}
 			}
@@ -830,12 +821,12 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 			if (oneway != null && !oneway.equals("yes") && !oneway.equals("true") && !oneway.equals("1")) {
 				OsmNode firstNode = this.nodes.get(way.nodes.get(1));
 				OsmNode lastNode = this.nodes.get(way.nodes.get(0));
-				if (way.nodes.size() == 2 && firstNode.getDistance(lastNode) < SIGNAL_MERGE_DISTANCE) {
-					if (firstNode.ways.size() == 2 && lastNode.ways.size() > 2 && firstNode.signalized
-							&& !lastNode.signalized) {
-						firstNode.signalized = false;
-						lastNode.signalized = true;
-						log.info("signal pushed over little way @ Node " + lastNode.id);
+				if (way.nodes.size() == 2 && calcNode2NodeDistance(firstNode, lastNode) < SIGNAL_MERGE_DISTANCE) {
+					if (firstNode.ways.size() == 2 && lastNode.ways.size() > 2
+							&& signalizedOsmNodes.contains(firstNode.id) && !signalizedOsmNodes.contains(lastNode.id)) {
+						signalizedOsmNodes.remove(firstNode.id);
+						signalizedOsmNodes.add(lastNode.id);
+						LOG.info("signal pushed over little way @ Node " + lastNode.id);
 					}
 				}
 			}
@@ -849,19 +840,19 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				OsmNode endPoint = null;
 				String oneway = way.tags.get(TAG_ONEWAY);
 
-				if (signalNode.signalized && !signalNode.isAtJunction()) {
+				if (signalizedOsmNodes.contains(signalNode) && !isNodeAtJunction(signalNode)) {
 					if ((oneway != null && !oneway.equals("-1") && !oneway.equals("no")) || oneway == null) {
 						endPoint = this.nodes.get(way.nodes.get(way.nodes.size() - 1));
-						if (endPoint.signalized && endPoint.isAtJunction()
-								&& signalNode.getDistance(endPoint) < SIGNAL_MERGE_DISTANCE)
-							signalNode.signalized = false;
+						if (signalizedOsmNodes.contains(endPoint.id) && isNodeAtJunction(endPoint)
+								&& calcNode2NodeDistance(signalNode, endPoint) < SIGNAL_MERGE_DISTANCE)
+							signalizedOsmNodes.remove(signalNode.id);
 					}
 					if ((oneway != null && !oneway.equals("yes") && !oneway.equals("true") && !oneway.equals("1")
 							&& !oneway.equals("no")) || oneway == null) {
 						endPoint = this.nodes.get(way.nodes.get(0));
-						if (endPoint.signalized && endPoint.isAtJunction()
-								&& signalNode.getDistance(endPoint) < SIGNAL_MERGE_DISTANCE)
-							signalNode.signalized = false;
+						if (signalizedOsmNodes.contains(endPoint.id) && isNodeAtJunction(endPoint)
+								&& calcNode2NodeDistance(signalNode, endPoint) < SIGNAL_MERGE_DISTANCE)
+							signalizedOsmNodes.remove(signalNode.id);
 					}
 				}
 			}
@@ -875,21 +866,22 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				OsmNode junctionNode = null;
 				String oneway = way.tags.get(TAG_ONEWAY);
 
-				if (signalNode.signalized && !signalNode.isAtJunction()) {
+				if (signalizedOsmNodes.contains(signalNode.id) && !isNodeAtJunction(signalNode)) {
 					if ((oneway != null && !oneway.equals("-1")) || oneway == null) {
 						if (this.nodes.get(way.nodes.get(i + 1)).ways.size() > 1) {
 							junctionNode = this.nodes.get(way.nodes.get(i + 1));
 						}
 						if (i < way.nodes.size() - 2) {
-							if (this.nodes.get(way.nodes.get(i + 1)).crossing
+							if (crossingOsmNodes.contains(way.nodes.get(i + 1))
 									&& this.nodes.get(way.nodes.get(i + 2)).ways.size() > 1) {
 								junctionNode = this.nodes.get(way.nodes.get(i + 2));
 							}
 						}
 					}
-					if (junctionNode != null && signalNode.getDistance(junctionNode) < SIGNAL_MERGE_DISTANCE) {
-						signalNode.signalized = false;
-						junctionNode.signalized = true;
+					if (junctionNode != null
+							&& calcNode2NodeDistance(signalNode, junctionNode) < SIGNAL_MERGE_DISTANCE) {
+						signalizedOsmNodes.remove(signalNode.id);
+						signalizedOsmNodes.add(junctionNode.id);
 					}
 
 					if ((oneway != null && !oneway.equals("yes") && !oneway.equals("true") && !oneway.equals("1"))
@@ -898,15 +890,16 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 							junctionNode = this.nodes.get(way.nodes.get(i - 1));
 						}
 						if (i > 1) {
-							if (this.nodes.get(way.nodes.get(i - 1)).crossing
+							if (crossingOsmNodes.contains(way.nodes.get(i - 1))
 									&& this.nodes.get(way.nodes.get(i - 2)).ways.size() > 1) {
 								junctionNode = this.nodes.get(way.nodes.get(i - 2));
 							}
 						}
 					}
-					if (junctionNode != null && signalNode.getDistance(junctionNode) < SIGNAL_MERGE_DISTANCE) {
-						signalNode.signalized = false;
-						junctionNode.signalized = true;
+					if (junctionNode != null
+							&& calcNode2NodeDistance(signalNode, junctionNode) < SIGNAL_MERGE_DISTANCE) {
+						signalizedOsmNodes.remove(signalNode.id);
+						signalizedOsmNodes.add(junctionNode.id);
 					}
 				}
 			}
@@ -920,12 +913,12 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				for (int i = 1; i < way.nodes.size() - 1; i++) {
 					OsmNode junctionNode = this.nodes.get(way.nodes.get(i));
 					OsmNode otherNode = null;
-					if (junctionNode.signalized)
+					if (signalizedOsmNodes.contains(junctionNode.id))
 						otherNode = findRoundaboutSignalNode(junctionNode, way, i);
 					if (otherNode != null) {
-						junctionNode.signalized = false;
-						otherNode.signalized = true;
-						log.info("signal push around roundabout");
+						signalizedOsmNodes.remove(junctionNode.id);
+						signalizedOsmNodes.add(otherNode.id);
+						LOG.info("signal push around roundabout");
 						roundaboutNodes.put(otherNode.id, otherNode);
 					}
 				}
@@ -963,13 +956,13 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				return true;
 			else {
 				if (roundaboutNodes.containsKey(endPoint.id)) {
-					log.info("Roundabout found @ " + endPoint.id);
+					LOG.info("Roundabout found @ " + endPoint.id);
 					return false;
 				}
 			}
 		} else {
 			if (roundaboutNodes.containsKey(endPoint.id)) {
-				log.info("Roundabout found @ " + endPoint.id);
+				LOG.info("Roundabout found @ " + endPoint.id);
 				return false;
 			}
 		}
@@ -1560,7 +1553,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		// otherwise fill by default
 		Id<Link> id = link.getId();
 		if (laneStacks.containsKey(id)) {
-			Stack<Stack<Integer>> laneStack = laneStacks.get(id).turnLanes;
+			Stack<Stack<Integer>> laneStack = laneStacks.get(id);
 			boolean leftLane = false;
 			for (int i = (int) link.getNumberOfLanes(); i > 0; i--) {
 				Lane lane = lanes.getLanesToLinkAssignments().get(link.getId()).getLanes()
@@ -1872,30 +1865,26 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	private void removeRestrictedLinks(Link fromLink, List<LinkVector> toLinks) {
 		OsmNode toNode = nodes.get(Long.valueOf(fromLink.getToNode().getId().toString()));
-		if (!toNode.restrictions.isEmpty()) {
-			for (OsmRelation restriction : toNode.restrictions) {
-				if (Long.valueOf(
-						fromLink.getAttributes().getAttribute(ORIG_ID).toString()) == restriction.fromRestricted.id) {
-					if (restriction.restrictionValue == false) {
-						LinkVector lvec2remove = null;
-						for (LinkVector linkVector : toLinks) {
-
-							if (Long.valueOf(linkVector.getLink().getAttributes().getAttribute(ORIG_ID)
-									.toString()) == restriction.toRestricted.id) {
-								lvec2remove = linkVector;
-								break;
-							}
+		for (OsmRelation restriction : osmNodeRestrictions.get(toNode.id)) {
+			if (Long.valueOf(fromLink.getAttributes().getAttribute(ORIG_ID).toString()) == restriction.fromRestricted.id) {
+				if (restriction.restrictionValue == false) {
+					LinkVector lvec2remove = null;
+					for (LinkVector linkVector : toLinks) {
+						if (Long.valueOf(linkVector.getLink().getAttributes().getAttribute(ORIG_ID)
+								.toString()) == restriction.toRestricted.id) {
+							lvec2remove = linkVector;
+							break;
 						}
-						toLinks.remove(lvec2remove);
-					} else {
-						for (LinkVector linkVector : toLinks) {
-							if (Long.valueOf(linkVector.getLink().getAttributes().getAttribute(ORIG_ID)
-									.toString()) == restriction.toRestricted.id) {
-								LinkVector onlyLink = linkVector;
-								toLinks.clear();
-								toLinks.add(onlyLink);
-								return;
-							}
+					}
+					toLinks.remove(lvec2remove);
+				} else {
+					for (LinkVector linkVector : toLinks) {
+						if (Long.valueOf(linkVector.getLink().getAttributes().getAttribute(ORIG_ID)
+								.toString()) == restriction.toRestricted.id) {
+							LinkVector onlyLink = linkVector;
+							toLinks.clear();
+							toLinks.add(onlyLink);
+							return;
 						}
 					}
 				}
@@ -1904,10 +1893,9 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	}
 
 	@Override
-	protected void setOrModifyNodeAttributes(Node n, OsmNetworkReader.OsmNode node) {
-		// TODO wie loese ich problem mit casting? interfaces??
+	protected void setOrModifyNodeAttributes(Node n, OsmNode node) {
 		// create empty signal system for the node
-		if (((OsmNode)node).signalized && (bbox == null || bbox.contains(node.coord))) {
+		if (signalizedOsmNodes.contains(node.id) && (bbox == null || bbox.contains(node.coord))) {
 			Id<SignalSystem> systemId = Id.create("System" + node.id, SignalSystem.class);
 			if (!this.systems.getSignalSystemData().containsKey(systemId)) {
 				SignalSystemData system = this.systems.getFactory().createSignalSystemData(systemId);
@@ -1933,21 +1921,21 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		if (turnLanesOsm != null) {
 			createLaneStack(turnLanesOsm, turnLanesOfThisLink, l.getNumberOfLanes());
 			if (l.getNumberOfLanes() < turnLanesOfThisLink.size()) {
-				// TODO dies stellt die info der turn lanes über die info der #lanes. konsistent? adapt capacity too?
+				// TODO dies stellt die info der turn lanes über die info der #lanes.
+				// konsistent? adapt capacity too?
 				l.setNumberOfLanes(turnLanesOfThisLink.size());
 			}
 		}
-		
+
 		// create Lanes only if more than one Lane detected
 		Node toNode = this.network.getNodes().get(l.getToNode());
 		if (l.getNumberOfLanes() > 1 && (bbox == null || bbox.contains(toNode.getCoord()))) {
 			createLanes(l, lanes, l.getNumberOfLanes());
 			if (turnLanesOfThisLink != null) {
 				this.laneStacks.put(l.getId(), turnLanesOfThisLink);
-			} 
+			}
 		}
-	} 
-
+	}
 
 	public boolean isNodeAtJunction(OsmNode node) {
 		if (node.endPoint && node.ways.size() > 2)
@@ -1983,146 +1971,54 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 		return hasOneway;
 	}
-	
-	private void putRestrictionToNodeIfComplete(OsmRelation relation) {
-		// TODO ersetze diese methode
-		if (relation.resNode != null && relation.fromRestricted != null && relation.toRestricted != null) {
-			if (!osmNodeRestrictions.containsKey(relation.resNode.id)) {
-				osmNodeRestrictions.put(relation.resNode.id, new HashSet<>());
-			}
-			osmNodeRestrictions.get(relation.resNode.id).add(relation);
-		}
-	}
 
-	// TODO find out how to extend OsmNetworkReader here!
-	private class OsmXmlParser extends MatsimXmlParser {
+	private final class SignalLanesOsmXmlParser extends OsmXmlParser {
 
-		private OsmWay currentWay = null;
-		private OsmNode currentNode = null;
 		private OsmRelation currentRelation = null;
-		private final Map<Long, OsmNode> nodes;
-		private final Map<Long, OsmWay> ways;
-
-		/* package */
-		final Counter nodeCounter = new Counter("node ");
-
-		/* package */
-		final Counter wayCounter = new Counter("way ");
-		// added counter for signals
-		// *************************
-
-		/* package */
-		final Counter signalsCounter = new Counter("traffic_signals ");
-		private final CoordinateTransformation transform;
-		private boolean loadNodes = true;
-		private boolean loadWays = true;
-		private boolean mergeNodes = false;
-		private boolean collectNodes = false;
-
-		public OsmXmlParser(final Map<Long, OsmNode> nodes, final Map<Long, OsmWay> ways,
+		
+		public SignalLanesOsmXmlParser(final Map<Long, OsmNode> nodes, final Map<Long, OsmWay> ways,
 				final CoordinateTransformation transform) {
-			super();
-			this.nodes = nodes;
-			this.ways = ways;
-			this.transform = transform;
-			this.setValidating(false);
+			super(nodes, ways, transform);
 		}
-
-		public void enableOptimization(final int step) {
-			this.loadNodes = false;
-			this.loadWays = false;
-			this.collectNodes = false;
-			this.mergeNodes = false;
-			if (step == 1) {
-				this.collectNodes = true;
-			} else if (step == 2) {
-				this.mergeNodes = true;
-				this.loadWays = true;
-			}
+		
+		@Override
+		public void enableOptimization(int step) {
+			throw new UnsupportedOperationException("slow but low memory is not supported for the signals and lanes osm reader");
 		}
 
 		@Override
 		public void startTag(final String name, final Attributes atts, final Stack<String> context) {
-			if ("node".equals(name)) {
-				if (this.loadNodes) {
-					Long id = Long.valueOf(atts.getValue("id"));
-					double lat = Double.parseDouble(atts.getValue("lat"));
-					double lon = Double.parseDouble(atts.getValue("lon"));
-					this.currentNode = new OsmNode(id, this.transform.transform(new Coord(lon, lat)));
-					// this.nodes.put(id, new OsmNode(id,
-					// this.transform.transform(new Coord(lon, lat)),
-					// signalized));
-					// this.nodeCounter.incCounter();
-				} else if (this.mergeNodes) {
-					OsmNode node = this.nodes.get(Long.valueOf(atts.getValue("id")));
-					if (node != null) {
-						double lat = Double.parseDouble(atts.getValue("lat"));
-						double lon = Double.parseDouble(atts.getValue("lon"));
-						node.coord = this.transform.transform(new Coord(lon, lat));
-						this.nodeCounter.incCounter();
-					}
-				}
-			} else if ("way".equals(name)) {
-				this.currentWay = new OsmWay(Long.parseLong(atts.getValue("id")));
-			} else if ("nd".equals(name)) {
-				if (this.currentWay != null) {
-					this.currentWay.nodes.add(Long.parseLong(atts.getValue("ref")));
-				}
-			} else if ("relation".equals(name)) {
+			super.startTag(name, atts, context);
+			
+			if ("relation".equals(name)) {
 				this.currentRelation = new OsmRelation(Long.parseLong(atts.getValue("id")));
 			} else if ("tag".equals(name)) {
-				if (this.currentWay != null) {
-					String key = StringCache.get(atts.getValue("k"));
-					for (String tag : ALL_TAGS) {
-						if (tag.equals(key)) {
-							this.currentWay.tags.put(key, StringCache.get(atts.getValue("v")));
-							break;
-						}
-					}
-				}
 				if (this.currentNode != null) {
-					String key = StringCache.get(atts.getValue("k"));
-					String value = StringCache.get(atts.getValue("v"));
+					// TODO just save tags here (as for ways) and evaluate in endTags??
+					String key = atts.getValue("k"); 
+					String value = atts.getValue("v");
 					if ("highway".equals(key) && "traffic_signals".equals(value)) {
-						this.currentNode.signalized = true;
-						this.signalsCounter.incCounter();
+						signalizedOsmNodes.add(currentNode.id);
 					}
-					// checks if traffic signals are just applying for one
-					// direction, if so changes signalDir variable
-					// ***********************************************************************************************
-
-					/*
-					 * if ("traffic_signals:direction".equals(key)) { if ("forward".equals(value)) {
-					 * this.currentNode.signalDir = 1; } if ("backward".equals(value)) {
-					 * this.currentNode.signalDir = 2; } }
-					 */
-
 					if ("highway".equals(key) && "crossing".equals(value)) {
-						// TODO can we do this better?
-						currentNode.crossing = true;
+						crossingOsmNodes.add(currentNode.id);
 					}
 				}
 				if (this.currentRelation != null) {
-					String key = StringCache.get(atts.getValue("k"));
-					String value = StringCache.get(atts.getValue("v"));
+					String key = atts.getValue("k");
+					String value = atts.getValue("v");
 					if ("restriction".equals(key)) {
 						if ("no".equals(value.substring(0, 2))) {
 							this.currentRelation.restrictionValue = false;
-							// log.info("Relation " + currentRelation.id + " @ Node " +
-							// currentRelation.resNode.id
-							// + " created! It Works :)");
 						} else if ("only".equals(value.substring(0, 4))) {
 							this.currentRelation.restrictionValue = true;
-							// log.info("Relation " + currentRelation.id + " @ Node " +
-							// currentRelation.resNode.id
-							// + " created! It Works :)");
 						}
 					}
 				}
 			} else if ("member".equals(name)) {
 				if (this.currentRelation != null) {
-					String type = StringCache.get(atts.getValue("type"));
-					String role = StringCache.get(atts.getValue("role"));
+					String type = atts.getValue("type");
+					String role = atts.getValue("role");
 					if ("node".equals(type)) {
 						this.currentRelation.resNode = this.nodes.get(Long.parseLong(atts.getValue("ref")));
 					} else if ("way".equals(type)) {
@@ -2139,64 +2035,17 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 		@Override
 		public void endTag(final String name, final String content, final Stack<String> context) {
-			if ("way".equals(name)) {
-				if (!this.currentWay.nodes.isEmpty()) {
-					boolean used = false;
-					OsmHighwayDefaults osmHighwayDefaults = this.highwayDefaults
-							.get(this.currentWay.tags.get(TAG_HIGHWAY));
-					if (osmHighwayDefaults != null) {
-						int hierarchy = osmHighwayDefaults.hierarchy;
-						this.currentWay.hierarchy = hierarchy;
-						if (this.hierarchyLayers.isEmpty()) {
-							used = true;
-						}
-						if (this.collectNodes) {
-							used = true;
-						} else {
-							for (OsmFilter osmFilter : this.hierarchyLayers) {
-								for (Long nodeId : this.currentWay.nodes) {
-									OsmNode node = this.nodes.get(nodeId);
-									if (node != null
-											&& osmFilter.coordInFilter(node.coord, this.currentWay.hierarchy)) {
-										used = true;
-										break;
-									}
-								}
-								if (used) {
-									break;
-								}
-							}
-						}
-					}
-					if (used) {
-
-						/*
-						 * if (this.collectNodes) { for (long id : this.currentWay.nodes) { if
-						 * (!this.nodes.containsKey(id)){ this.nodes.put(id, new OsmNode(id, new
-						 * Coord((double) 0, (double) 0))); } } } else
-						 */
-
-						if (this.loadWays) {
-							this.ways.put(this.currentWay.id, this.currentWay);
-							this.wayCounter.incCounter();
-						}
-					}
-				}
-				this.currentWay = null;
-			}
-			if ("node".equals(name)) {
-				if (this.collectNodes) {
-					throw new UnsupportedOperationException(
-							"osm network, lanes and signals reader does not work with low memory yet.");
-				}
-				this.nodes.put(this.currentNode.id, this.currentNode);
-				this.nodeCounter.incCounter();
-				this.currentNode = null;
-			}
-
+			super.endTag(name, content, context);
+			
+			// TODO check this!
 			if ("relation".equals(name)) {
 				if (this.currentRelation.fromRestricted != null) {
-					this.currentRelation.putRestrictionToNodeIfComplete();
+					if (this.currentRelation.resNode != null && this.currentRelation.toRestricted != null) {
+						if (!osmNodeRestrictions.containsKey(this.currentRelation.resNode.id)) {
+							osmNodeRestrictions.put(this.currentRelation.resNode.id, new HashSet<>());
+						}
+						osmNodeRestrictions.get(this.currentRelation.resNode.id).add(this.currentRelation);
+					}
 				} else {
 					this.currentRelation = null;
 				}
