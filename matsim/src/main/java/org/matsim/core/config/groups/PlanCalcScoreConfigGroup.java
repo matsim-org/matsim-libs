@@ -471,7 +471,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		super.checkConsistency(config);
 
 		for ( ActivityParams params : this.getActivityParams() ) {
-			if ( Time.isUndefinedTime( params.getTypicalDuration() ) ) {
+			if ( params.isScoringThisActivityAtAll() && Time.isUndefinedTime( params.getTypicalDuration() ) ) {
 				throw new RuntimeException( "In activity type=" + params.getActivityType() + 
 						", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
 						+ "so rather aborting here." ) ; 
