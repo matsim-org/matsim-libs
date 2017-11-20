@@ -78,7 +78,12 @@ public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory
 			
 			if (preProcessLandmarks == null) {
 				preProcessLandmarks = new PreProcessLandmarks(travelCosts);
-				preProcessLandmarks.setNumberOfThreads(globalConfig.getNumberOfThreads());
+				if ( globalConfig==null ) {
+					preProcessLandmarks.setNumberOfThreads(8);
+					// (if used without injection.  not so beautiful. kai, nov'17)
+				} else {
+					preProcessLandmarks.setNumberOfThreads(globalConfig.getNumberOfThreads());
+				}
 				preProcessLandmarks.run(network);
 				this.preProcessData.put(network, preProcessLandmarks);
 				
