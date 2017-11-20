@@ -458,12 +458,14 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private void mergeOnewaySignalSystems(List<OsmNode> addingNodes, List<OsmNode> checkedNodes) {
 		for (OsmNode node : this.nodes.values()) {
 			List<OsmNode> junctionNodes = new ArrayList<OsmNode>();
-			if (node.signalized && node.isAtJunction() && node.repJunNode == null && node.hasOneway()) {
+			if (signalizedOsmNodes.contains(node.id) && isNodeAtJunction(node) 
+					&& !oldToSimplifiedJunctionNodeMap.containsKey(node.id) && hasNodeOneway(node)) {
 				junctionNodes.add(node);
 				for (OsmNode otherNode : this.nodes.values()) {
-					if (otherNode.signalized && otherNode.isAtJunction()
-							&& otherNode.getDistance(node) < SIGNAL_MERGE_DISTANCE && node.repJunNode == null
-							&& otherNode.hasOneway()) {
+					if (signalizedOsmNodes.contains(otherNode.id) && isNodeAtJunction(otherNode)
+							&& calcNode2NodeDistance(node, otherNode) < SIGNAL_MERGE_DISTANCE 
+							&& !oldToSimplifiedJunctionNodeMap.containsKey(otherNode.id)
+							&& hasNodeOneway(otherNode)) {
 						junctionNodes.add(otherNode);
 					}
 				}
@@ -493,14 +495,14 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						junctionNodes.add(betweenNode);
 				}
 				OsmNode junctionNode = new OsmNode(this.id, new Coord(repX, repY));
-				junctionNode.signalized = true;
+				signalizedOsmNodes.add(junctionNode.id);
 				junctionNode.used = true;
 				for (OsmNode tempNode : junctionNodes) {
-					// TODO tempNode.used = false; und node in way ersetzen -> repJunNode nicht mehr
-					// noetig?!
-					tempNode.repJunNode = junctionNode;
-					for (OsmRelation restriction : tempNode.restrictions)
-						junctionNode.restrictions.add(restriction);
+					// TODO tempNode.used = false; node in way ersetzen -> repJunNode nicht noetig?!
+					oldToSimplifiedJunctionNodeMap.put(tempNode.id, junctionNode);
+					if (osmNodeRestrictions.containsKey(tempNode.id)) {
+						osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(tempNode.id));						
+					}
 					checkedNodes.add(tempNode);
 				}
 				addingNodes.add(junctionNode);
@@ -604,7 +606,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 							repYmin = tempNode.coord.getY();
 						if (repYmax == 0 || tempNode.coord.getY() > repYmax)
 							repYmax = tempNode.coord.getY();
-						circumference += tempNode.getDistance(lastNode);
+						circumference += calcNode2NodeDistance(tempNode,lastNode);
 						lastNode = tempNode;
 					}
 					repX = repXmin + (repXmax - repXmin) / 2;
@@ -613,9 +615,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						OsmNode roundaboutNode = new OsmNode(this.id, new Coord(repX, repY));
 						roundaboutNode.used = true;
 						for (OsmNode tempNode : roundaboutNodes) {
-							tempNode.repJunNode = roundaboutNode;
-							for (OsmRelation restriction : tempNode.restrictions)
-								roundaboutNode.restrictions.add(restriction);
+							oldToSimplifiedJunctionNodeMap.put(tempNode.id, roundaboutNode);
+							if (osmNodeRestrictions.containsKey(tempNode.id)) {
+								osmNodeRestrictions.put(roundaboutNode.id, osmNodeRestrictions.get(tempNode.id));						
+							}
 							checkedNodes.add(tempNode);
 							tempNode.used = true;
 						}
@@ -652,7 +655,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 							repYmin = tempNode.coord.getY();
 						if (repYmax == 0 || tempNode.coord.getY() > repYmax)
 							repYmax = tempNode.coord.getY();
-						if (tempNode.signalized)
+						if (signalizedOsmNodes.contains(tempNode.id))
 							signalized = true;
 					}
 					repX = repXmin + (repXmax - repXmin) / 2;
@@ -660,12 +663,13 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					leftTurnRadius = ((repXmax - repXmin) + (repYmax - repYmin)) / 2;
 					OsmNode junctionNode = new OsmNode(this.id, new Coord(repX, repY));
 					if (signalized)
-						junctionNode.signalized = true;
+						signalizedOsmNodes.add(junctionNode.id);
 					junctionNode.used = true;
 					for (OsmNode tempNode : junctionNodes) {
-						tempNode.repJunNode = junctionNode;
-						for (OsmRelation restriction : tempNode.restrictions)
-							junctionNode.restrictions.add(restriction);
+						oldToSimplifiedJunctionNodeMap.put(tempNode.id, junctionNode);
+						if (osmNodeRestrictions.containsKey(tempNode.id)) {
+							osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(tempNode.id));						
+						}
 						checkedNodes.add(tempNode);
 					}
 					addingNodes.add(junctionNode);
@@ -722,16 +726,18 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 						double repX = (node.coord.getX() + otherNode.coord.getX()) / 2;
 						double repY = (node.coord.getY() + otherNode.coord.getY()) / 2;
 						OsmNode junctionNode = new OsmNode(this.id, new Coord(repX, repY));
-						if (node.signalized || otherNode.signalized)
-							junctionNode.signalized = true;
+						if (signalizedOsmNodes.contains(node.id) || signalizedOsmNodes.contains(otherNode.id))
+							signalizedOsmNodes.add(junctionNode.id);
 						junctionNode.used = true;
-						node.repJunNode = junctionNode;
-						for (OsmRelation restriction : node.restrictions)
-							junctionNode.restrictions.add(restriction);
+						oldToSimplifiedJunctionNodeMap.put(node.id, junctionNode);
+						if (osmNodeRestrictions.containsKey(node.id)) {
+							osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(node.id));						
+						}
 						checkedNodes.add(node);
-						otherNode.repJunNode = junctionNode;
-						for (OsmRelation restriction : otherNode.restrictions)
-							junctionNode.restrictions.add(restriction);
+						oldToSimplifiedJunctionNodeMap.put(otherNode.id, junctionNode);
+						if (osmNodeRestrictions.containsKey(otherNode.id)) {
+							osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(otherNode.id));						
+						}
 						checkedNodes.add(otherNode);
 						addingNodes.add(junctionNode);
 						id++;
@@ -767,9 +773,10 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 					signalizedOsmNodes.add(junctionNode.id);
 					junctionNode.used = true;
 					for (OsmNode tempNode : junctionNodes) {
-						tempNode.repJunNode = junctionNode;
-						for (OsmRelation restriction : tempNode.restrictions)
-							junctionNode.restrictions.add(restriction);
+						oldToSimplifiedJunctionNodeMap.put(tempNode.id, junctionNode);
+						if (osmNodeRestrictions.containsKey(tempNode.id)) {
+							osmNodeRestrictions.put(junctionNode.id, osmNodeRestrictions.get(tempNode.id));						
+						}
 						checkedNodes.add(tempNode);
 					}
 					addingNodes.add(junctionNode);
