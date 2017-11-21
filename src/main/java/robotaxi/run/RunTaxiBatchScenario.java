@@ -61,4 +61,4 @@ public class RunTaxiBatchScenario {
 			controler.run();
 		}
 	}
-}
+	}
