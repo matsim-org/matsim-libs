@@ -57,32 +57,32 @@ public class Test {
 
         /** 1.b) Select Modes */
         HashSet<String> modes = new HashSet<String>();
-        // modes.add("car");
+        modes.add("car");
         modes.add("pt");
         modes.add("tram");
         modes.add("bus");
 
         /** 2. cut the Network */
-        // Network cutN = new NetworkCutterShape(new File("shapefiles/Export_Output_2.shp")).filter(network, modes);
-        Network cutN = new NetworkCutterRadius(LocationSpec.SIOUXFALLS_CITY.center, LocationSpec.SIOUXFALLS_CITY.radius).filter(network, modes);
+//        Network cutN = new NetworkCutterShape(new File("shapefiles/TargetArea.shp")).filter(network, modes);
+        Network cutN = new NetworkCutterRadius(LocationSpec.BASEL_REGION.center, LocationSpec.BASEL_REGION.radius).filter(network, modes);
 
         // Network cutN = new NetworkCutterRadius(LocationSpec.HOMBURGERTAL.center, LocationSpec.HOMBURGERTAL.radius).filter(network, modes);
         /** 3. update the Network in nV */
         nV.setNetwork(cutN);
 
         /** 4.a) load population */
-        // Population population = nV.getPopulation();
+        Population population = nV.getPopulation();
 
         // /** 5. Cut Population */
-        // Population cutP = population;
-        //
-        // System.out.println("Number of People before cutting:" + cutP.getPersons().size());
-        // PopulationTools.elminateOutsideNetwork(cutP,cutN);
-        // System.out.println("Number of People after cutting:" + cutP.getPersons().size());
+        Population cutP = population;
+        
+         System.out.println("Number of People before cutting:" + cutP.getPersons().size());
+         PopulationTools.elminateOutsideNetwork(cutP,cutN);
+         System.out.println("Number of People after cutting:" + cutP.getPersons().size());
 
         /** write to XML */
-        // new NetworkWriter(cutN).write("Homburgertal/network.xml");
-        // new PopulationWriter(cutP).write("Homburgertal/population.xml");
+        new NetworkWriter(cutN).write("Homburgertal/network.xml");
+        new PopulationWriter(cutP).write("Homburgertal/population.xml");
         // /** display on Map */
         nV.run();
 

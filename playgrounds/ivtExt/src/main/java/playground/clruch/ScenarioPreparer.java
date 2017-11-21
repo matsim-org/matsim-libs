@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -83,7 +82,7 @@ public class ScenarioPreparer {
 
         Population population = scenario.getPopulation();
 
-/*        {// 1) cut network (and reduce population to new network)
+        {// 1) cut network (and reduce population to new network)
             if (network == null)
                 System.out.println("its the network");
             if (ls == null)
@@ -140,7 +139,7 @@ public class ScenarioPreparer {
                 e.printStackTrace();
             }
         }
-*/
+
         
         System.out.println(network.getLinks().size());
         System.out.println(population.getPersons().size());

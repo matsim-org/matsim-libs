@@ -28,6 +28,8 @@ public class PopulationFilter {
     
     public void run(Network network) {
         reducePtToOneLeg();
+        System.out.println(" # people in middle between functions: " + population.getPersons().size());
+
         basedOnActivities(network);
 
     }
@@ -82,6 +84,8 @@ public class PopulationFilter {
                 }                
             }
         }
+        System.out.println(" # people After one PT Let: " + population.getPersons().size());
+
     }
     
     private void basedOnActivities(Network network) {
@@ -89,6 +93,7 @@ public class PopulationFilter {
 
         SecondPotenceSysout print = new SecondPotenceSysout("we are at person # ");
                 
+System.out.println(network.getLinks().size());
         while (itPerson.hasNext()) {           
             print.ifPotenceOf2();
             

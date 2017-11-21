@@ -30,6 +30,9 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
+import info.monitorenter.gui.chart.controls.LayoutFactory.BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped;
+import playground.lsieber.scenario.reducer.NetworkActions;
+
 /** @author Claudio Ruch */
 public class NetworkCutterShape implements NetworkCutter {
 
@@ -105,31 +108,60 @@ public class NetworkCutterShape implements NetworkCutter {
             Node filteredToNode = filteredNetwork.getNodes().get(link.getToNode().getId());
 
             if (filteredFromNode != null && filteredToNode != null) {
+                Link newLink = filteredNetwork.getFactory().createLink(link.getId(), filteredFromNode, filteredToNode);
 
-                Iterator<String> it = modes.iterator();
-                boolean allowedMode = false;
-                while (it.hasNext() && !allowedMode) {
-                    allowedMode = link.getAllowedModes().contains(it.next());
-                }
-                if (allowedMode) {
-                    Link newLink = filteredNetwork.getFactory().createLink(link.getId(), filteredFromNode, filteredToNode);
+                // newLink.setAllowedModes(Collections.singleton("car"));
+                newLink.setAllowedModes(link.getAllowedModes());
 
-                    // newLink.setAllowedModes(Collections.singleton("car"));
-                    newLink.setAllowedModes(link.getAllowedModes());
+                newLink.setLength(link.getLength());
+                newLink.setCapacity(link.getCapacity());
+                newLink.setFreespeed(link.getFreespeed());
+                // newLink.setNumberOfLanes(link.getNumberOfLanes());
 
-                    newLink.setLength(link.getLength());
-                    newLink.setCapacity(link.getCapacity());
-                    newLink.setFreespeed(link.getFreespeed());
-                    // newLink.setNumberOfLanes(link.getNumberOfLanes());
-
-                    filteredNetwork.addLink(newLink);
-                }
+                filteredNetwork.addLink(newLink);                
             }
         }
 
-        new NetworkCleaner().run(filteredNetwork);
+        Network modesFilteredNetwork = NetworkActions.modeFilter(filteredNetwork, modes);
+        // new NetworkCleaner().run(modesFilteredNetwork);
 
-        return filteredNetwork;
+//        new NetworkCleaner().run(filteredNetwork);
+
+        return modesFilteredNetwork;
     }
-
+    // TODO Delete 
+//    public Network modeFilter(Network originalNetwork, HashSet<String> modes) {
+//     // Filter out modes
+//        Network modesFilteredNetwork = NetworkUtils.createNetwork();
+//        for (Node node : originalNetwork.getNodes().values()) {
+//            modesFilteredNetwork.addNode(modesFilteredNetwork.getFactory().createNode(node.getId(), node.getCoord()));        
+//        }
+//        for (Link filteredlink : originalNetwork.getLinks().values()) {
+//            Node filteredFromNode = modesFilteredNetwork.getNodes().get(filteredlink.getFromNode().getId());
+//            Node filteredToNode = modesFilteredNetwork.getNodes().get(filteredlink.getToNode().getId());
+//            if (filteredFromNode != null && filteredToNode != null) {
+//         
+//                Iterator<String> it = modes.iterator();
+//                boolean allowedMode = false;
+//                while (it.hasNext() && !allowedMode) {
+//                    allowedMode = filteredlink.getAllowedModes().contains(it.next());
+//                }
+//                if (allowedMode) {
+//                    Link newLink = modesFilteredNetwork.getFactory().createLink(filteredlink.getId(), filteredFromNode, filteredToNode);
+//
+//                    // newLink.setAllowedModes(Collections.singleton("car"));
+//                    newLink.setAllowedModes(filteredlink.getAllowedModes());
+//
+//                    newLink.setLength(filteredlink.getLength());
+//                    newLink.setCapacity(filteredlink.getCapacity());
+//                    newLink.setFreespeed(filteredlink.getFreespeed());
+//                    // newLink.setNumberOfLanes(link.getNumberOfLanes());
+//
+//                    modesFilteredNetwork.addLink(newLink);   
+//                }
+//            }
+//            
+//        }
+//        return modesFilteredNetwork;     
+//    }
 }

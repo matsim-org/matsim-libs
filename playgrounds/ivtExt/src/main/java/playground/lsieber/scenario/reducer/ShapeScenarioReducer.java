@@ -9,11 +9,15 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.facilities.ActivityFacilities;
 
+import ch.ethz.idsc.owly.data.GlobalAssert;
 import playground.lsieber.networkshapecutter.FacilityPopulationBasedCutter;
 import playground.lsieber.networkshapecutter.NetworkCutterShape;
+import playground.lsieber.networkshapecutter.PopulationCutterShape;
 import playground.lsieber.networkshapecutter.PopulationFilter;
 
 public class ShapeScenarioReducer extends AbstractScenarioReducer {
+
+    protected Network targetAreaNetwork;
 
     public ShapeScenarioReducer() throws IOException {
         // TODO Auto-generated constructor stub
@@ -25,24 +29,23 @@ public class ShapeScenarioReducer extends AbstractScenarioReducer {
         // TODO @ lukas Decouple Modes and Nettworkcutting
 
         HashSet<String> modes = new HashSet<String>();
-        modes.add("car");
+        //modes.add("car");
         modes.add("pt");
-        modes.add("tram");
-        modes.add("bus");
+        //modes.add("tram");
+        //modes.add("bus");
 
         // TODO @ Lukas Implenment Shapefile from IDSC Options
-        File shapefile = new File("shapefiles/Export_Output_2.shp");
-
-        return new NetworkCutterShape(shapefile).filter(this.originalScenario.getNetwork(), modes);
+        File shapefileAvAccessArea = new File("shapefiles/AvAccess.shp");
+        return new NetworkCutterShape(shapefileAvAccessArea).filter(this.originalScenario.getNetwork(), modes);
     }
 
     @Override
     protected Population populationCutter() {
+        GlobalAssert.that(network.getNodes().size() > 0);
 
+        Population populationAVAccessArea = new PopulationCutterShape().elminateOutsideNetwork(this.originalScenario.getPopulation(), this.network);
 
-        PopulationFilter populationFilter = new PopulationFilter(this.originalScenario.getPopulation());
-        populationFilter.run(this.network);
-        return populationFilter.getPopulation();
+        return populationAVAccessArea;
     }
 
     @Override
@@ -50,4 +53,24 @@ public class ShapeScenarioReducer extends AbstractScenarioReducer {
         return new FacilityPopulationBasedCutter(this.population).filter(originalScenario.getActivityFacilities());
     }
 
+    protected void setTargetNetwork() throws MalformedURLException, IOException {
+        HashSet<String> modes = new HashSet<String>();
+        //modes.add("car");
+        modes.add("pt");
+        modes.add("tram");
+        modes.add("bus");
+
+        File shapefileTargetArea = new File("shapefiles/TargetArea.shp");
+        targetAreaNetwork = new NetworkCutterShape(shapefileTargetArea).filter(this.originalScenario.getNetwork(), modes);
+    }
+
+    protected void filterPopulationOfTargetAreaOnlyPt() throws MalformedURLException, IOException {
+        System.out.println(" # people before Target Area: " + population.getPersons().size());
+        this.setTargetNetwork();
+        GlobalAssert.that(population != null && targetAreaNetwork != null);
+        PopulationFilter populationFilter = new PopulationFilter(population);
+        populationFilter.run(targetAreaNetwork);
+        System.out.println(" # people after Target Area: " + population.getPersons().size());
+
+    }
 }
