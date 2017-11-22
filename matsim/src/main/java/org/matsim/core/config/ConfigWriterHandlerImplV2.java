@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.matsim.core.config.ConfigWriter.Verbosity;
 import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -42,6 +43,13 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 
 	private String newline = "\n";
 
+	private final Config comparisonConfig = ConfigUtils.createConfig() ;
+
+	private final Verbosity verbosity;
+	
+	ConfigWriterHandlerImplV2( Verbosity verbosity ) {
+		this.verbosity = verbosity ;
+	}
 
 	private void writeModule(
 			final BufferedWriter writer,
@@ -63,6 +71,18 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 			boolean lastHadComment = false;
 
 			for (Map.Entry<String, String> entry : params.entrySet()) {
+				
+				final String actual = entry.getValue();
+				if ( verbosity==Verbosity.minimal ) {
+					final String defaultValue = comparisonConfig.findParam(moduleName, entry.getKey());
+					if ( actual.equals( defaultValue ) ) {
+						continue ;
+					}
+//					if ( actual==null && defaultValue.equals("null") ) {
+//						continue ;
+//					}
+				}
+				
 				if (comments.get(entry.getKey()) != null) {
 					writer.write( this.newline );
 					writer.write( indent );
@@ -76,7 +96,7 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 					lastHadComment = false;
 				}
 				writer.write( indent );
-				writer.write("\t\t<"+PARAMETER+" name=\"" + entry.getKey() + "\" value=\"" + entry.getValue() + "\" />");
+				writer.write("\t\t<"+PARAMETER+" name=\"" + entry.getKey() + "\" value=\"" + actual + "\" />");
 				writer.write( this.newline );
 			}
 
