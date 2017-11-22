@@ -150,10 +150,10 @@ public final class EditTrips {
 	}
 	// future:
 	public final static boolean insertEmptyTrip( Plan plan, Activity fromActivity, Activity toActivity, String mainMode, PopulationFactory pf ) {
-		if ( true ) {
-			throw new RuntimeException(" this currently does not work, since the EvacAgents do not have the on-demand "
-					+ "replanning switched on.  kai, nov'17" ) ;
-		}
+//		if ( true ) {
+//			throw new RuntimeException(" this currently does not work, since the EvacAgents do not have the on-demand "
+//					+ "replanning switched on.  kai, nov'17" ) ;
+//		}
 		List<Leg> list = Collections.singletonList( pf.createLeg( mainMode ) ) ;
 		TripRouter.insertTrip(plan, fromActivity, list, toActivity ) ;
 		return true ;
