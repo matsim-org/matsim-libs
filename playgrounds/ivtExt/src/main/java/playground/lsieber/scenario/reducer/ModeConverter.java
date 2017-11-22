@@ -8,9 +8,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 
 public class ModeConverter {
-    
-    public Population population;
 
+    public final Population population;
 
     public ModeConverter(Population population) {
         // TODO Auto-generated constructor stub
@@ -22,40 +21,40 @@ public class ModeConverter {
         for (Person person : population.getPersons().values()) {
 
             for (Plan plan : person.getPlans()) {
-            {
-                // step 1: for all remaining legs set mode="av" and remove the routing
-                // information
-                for (PlanElement pE1 : plan.getPlanElements()) {
-                    if (pE1 instanceof Leg) {
-                        Leg leg = (Leg) pE1;
-                        if (leg.getMode().equals("pt")) {
-                            leg.setMode("av"); // TODO magic const
-                            leg.setRoute(null);
+                {
+                    // step 1: for all remaining legs set mode="av" and remove the routing
+                    // information
+                    for (PlanElement pE1 : plan.getPlanElements()) {
+                        if (pE1 instanceof Leg) {
+                            Leg leg = (Leg) pE1;
+                            if (leg.getMode().equals("pt")) {
+                                leg.setMode("av"); // TODO magic const
+                                leg.setRoute(null);
+                            }
+
                         }
-    
                     }
                 }
-            }
-            {
-                // step 2: consistency of departure and travel times between the av legs and the
-                // activities
-                double endTimeActivity = 0;
-                Leg prevLeg = null;
-                for (PlanElement pE1 : plan.getPlanElements()) {
-                    if (pE1 instanceof Activity) {
-                        Activity act = (Activity) pE1;
-                        if (prevLeg != null) {
-                            prevLeg.setTravelTime(act.getStartTime() - endTimeActivity);
+                {
+                    // step 2: consistency of departure and travel times between the av legs and the
+                    // activities
+                    double endTimeActivity = 0;
+                    Leg prevLeg = null;
+                    for (PlanElement pE1 : plan.getPlanElements()) {
+                        if (pE1 instanceof Activity) {
+                            Activity act = (Activity) pE1;
+                            if (prevLeg != null) {
+                                prevLeg.setTravelTime(act.getStartTime() - endTimeActivity);
+                            }
+                            endTimeActivity = act.getEndTime();
                         }
-                        endTimeActivity = act.getEndTime();
-                    }
-                    if (pE1 instanceof Leg) {
-                        Leg leg = (Leg) pE1;
-                        leg.setDepartureTime(endTimeActivity);
-                        prevLeg = leg;
+                        if (pE1 instanceof Leg) {
+                            Leg leg = (Leg) pE1;
+                            leg.setDepartureTime(endTimeActivity);
+                            prevLeg = leg;
+                        }
                     }
                 }
-            }
             }
         }
         return population;

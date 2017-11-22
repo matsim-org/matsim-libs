@@ -106,7 +106,7 @@ public class ScenarioPreparer {
 
         {// 2) adapt the population to new network
             System.out.println("Original population size: " + population.getPersons().values().size());
-             PopulationTools.elminateOutsideNetwork(population, network);
+            PopulationTools.elminateOutsideNetwork(population, network);
             // System.out.println("Population size after radius cut: " + population.getPersons().values().size());
             if (populationeliminateFreight)
                 PopulationTools.eliminateFreight(population);
@@ -140,10 +140,9 @@ public class ScenarioPreparer {
             }
         }
 
-        
         System.out.println(network.getLinks().size());
         System.out.println(population.getPersons().size());
-       
+
         // 3) create virtual Network
         // TODO make this generic for any VirtualNetwork creators.
         VirtualNetwork<Link> virtualNetwork;

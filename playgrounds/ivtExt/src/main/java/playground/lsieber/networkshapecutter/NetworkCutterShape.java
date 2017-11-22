@@ -37,16 +37,16 @@ import playground.lsieber.scenario.reducer.NetworkActions;
 public class NetworkCutterShape implements NetworkCutter {
 
     private String cutInfo = null;
-    private URL shapefileUrl;
+    private final URL shapefileUrl;
     private Network modifiedNetwork;
 
     public NetworkCutterShape(File shapefile) throws MalformedURLException {
         // TODO check your input here and make sure it fails if the input does not meet required conditions.
-        this.shapefileUrl = shapefile.toURI().toURL();
+        shapefileUrl = shapefile.toURI().toURL();
     }
 
     @Override
-    public Network filter(Network network, HashSet<String> modes) throws MalformedURLException, IOException {
+    public Network filter(Network network, Set<String> modes) throws MalformedURLException, IOException {
         modifiedNetwork = filterInternal(network, modes);
 
         long numberOfLinksOriginal = network.getLinks().size();
@@ -76,7 +76,7 @@ public class NetworkCutterShape implements NetworkCutter {
 
     }
 
-    public Network filterInternal(Network originalNetwork, HashSet<String> modes) throws IOException {
+    public Network filterInternal(Network originalNetwork, Set<String> modes) throws IOException {
 
         Network filteredNetwork = NetworkUtils.createNetwork();
 
@@ -118,50 +118,50 @@ public class NetworkCutterShape implements NetworkCutter {
                 newLink.setFreespeed(link.getFreespeed());
                 // newLink.setNumberOfLanes(link.getNumberOfLanes());
 
-                filteredNetwork.addLink(newLink);                
+                filteredNetwork.addLink(newLink);
             }
         }
 
         Network modesFilteredNetwork = NetworkActions.modeFilter(filteredNetwork, modes);
         // new NetworkCleaner().run(modesFilteredNetwork);
 
-//        new NetworkCleaner().run(filteredNetwork);
+        // new NetworkCleaner().run(filteredNetwork);
 
         return modesFilteredNetwork;
     }
-    // TODO Delete 
-//    public Network modeFilter(Network originalNetwork, HashSet<String> modes) {
-//     // Filter out modes
-//        Network modesFilteredNetwork = NetworkUtils.createNetwork();
-//        for (Node node : originalNetwork.getNodes().values()) {
-//            modesFilteredNetwork.addNode(modesFilteredNetwork.getFactory().createNode(node.getId(), node.getCoord()));        
-//        }
-//        for (Link filteredlink : originalNetwork.getLinks().values()) {
-//            Node filteredFromNode = modesFilteredNetwork.getNodes().get(filteredlink.getFromNode().getId());
-//            Node filteredToNode = modesFilteredNetwork.getNodes().get(filteredlink.getToNode().getId());
-//            if (filteredFromNode != null && filteredToNode != null) {
-//         
-//                Iterator<String> it = modes.iterator();
-//                boolean allowedMode = false;
-//                while (it.hasNext() && !allowedMode) {
-//                    allowedMode = filteredlink.getAllowedModes().contains(it.next());
-//                }
-//                if (allowedMode) {
-//                    Link newLink = modesFilteredNetwork.getFactory().createLink(filteredlink.getId(), filteredFromNode, filteredToNode);
-//
-//                    // newLink.setAllowedModes(Collections.singleton("car"));
-//                    newLink.setAllowedModes(filteredlink.getAllowedModes());
-//
-//                    newLink.setLength(filteredlink.getLength());
-//                    newLink.setCapacity(filteredlink.getCapacity());
-//                    newLink.setFreespeed(filteredlink.getFreespeed());
-//                    // newLink.setNumberOfLanes(link.getNumberOfLanes());
-//
-//                    modesFilteredNetwork.addLink(newLink);   
-//                }
-//            }
-//            
-//        }
-//        return modesFilteredNetwork;     
-//    }
+    // TODO Delete
+    // public Network modeFilter(Network originalNetwork, HashSet<String> modes) {
+    // // Filter out modes
+    // Network modesFilteredNetwork = NetworkUtils.createNetwork();
+    // for (Node node : originalNetwork.getNodes().values()) {
+    // modesFilteredNetwork.addNode(modesFilteredNetwork.getFactory().createNode(node.getId(), node.getCoord()));
+    // }
+    // for (Link filteredlink : originalNetwork.getLinks().values()) {
+    // Node filteredFromNode = modesFilteredNetwork.getNodes().get(filteredlink.getFromNode().getId());
+    // Node filteredToNode = modesFilteredNetwork.getNodes().get(filteredlink.getToNode().getId());
+    // if (filteredFromNode != null && filteredToNode != null) {
+    //
+    // Iterator<String> it = modes.iterator();
+    // boolean allowedMode = false;
+    // while (it.hasNext() && !allowedMode) {
+    // allowedMode = filteredlink.getAllowedModes().contains(it.next());
+    // }
+    // if (allowedMode) {
+    // Link newLink = modesFilteredNetwork.getFactory().createLink(filteredlink.getId(), filteredFromNode, filteredToNode);
+    //
+    // // newLink.setAllowedModes(Collections.singleton("car"));
+    // newLink.setAllowedModes(filteredlink.getAllowedModes());
+    //
+    // newLink.setLength(filteredlink.getLength());
+    // newLink.setCapacity(filteredlink.getCapacity());
+    // newLink.setFreespeed(filteredlink.getFreespeed());
+    // // newLink.setNumberOfLanes(link.getNumberOfLanes());
+    //
+    // modesFilteredNetwork.addLink(newLink);
+    // }
+    // }
+    //
+    // }
+    // return modesFilteredNetwork;
+    // }
 }

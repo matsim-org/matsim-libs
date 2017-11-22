@@ -28,17 +28,17 @@ public abstract class IdscSettingsLoader {
         File file = new File(workingDirectory, simOptions.getString("simuConfig"));
         config = ConfigUtils.loadConfig(file.toString());
     }
-    
+
     public Scenario loadScenario() throws IOException {
         return ScenarioUtils.loadScenario(config);
     }
-    
+
     public Config getConfig() {
-        return this.config;
+        return config;
     }
 
     public PropertiesExt getSimOptions() {
-        return this.simOptions;
+        return simOptions;
     }
 
     public File getWorkingDirectory() {

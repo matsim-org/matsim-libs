@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
@@ -20,7 +21,6 @@ public class ShapeScenarioReducer extends AbstractScenarioReducer {
     protected Network targetAreaNetwork;
 
     public ShapeScenarioReducer() throws IOException {
-        // TODO Auto-generated constructor stub
         super();
     }
 
@@ -28,15 +28,15 @@ public class ShapeScenarioReducer extends AbstractScenarioReducer {
     protected Network networkCutter() throws MalformedURLException, IOException {
         // TODO @ lukas Decouple Modes and Nettworkcutting
 
-        HashSet<String> modes = new HashSet<String>();
-        //modes.add("car");
+        Set<String> modes = new HashSet<>();
+        // modes.add("car");
         modes.add("pt");
-        //modes.add("tram");
-        //modes.add("bus");
+        // modes.add("tram");
+        // modes.add("bus");
 
         // TODO @ Lukas Implenment Shapefile from IDSC Options
         File shapefileAvAccessArea = new File("shapefiles/AvAccess.shp");
-        return new NetworkCutterShape(shapefileAvAccessArea).filter(this.originalScenario.getNetwork(), modes);
+        return new NetworkCutterShape(shapefileAvAccessArea).filter(originalScenario.getNetwork(), modes);
     }
 
     @Override
@@ -54,14 +54,14 @@ public class ShapeScenarioReducer extends AbstractScenarioReducer {
     }
 
     protected void setTargetNetwork() throws MalformedURLException, IOException {
-        HashSet<String> modes = new HashSet<String>();
-        //modes.add("car");
+        Set<String> modes = new HashSet<String>();
+        // modes.add("car");
         modes.add("pt");
         modes.add("tram");
         modes.add("bus");
 
         File shapefileTargetArea = new File("shapefiles/TargetArea.shp");
-        targetAreaNetwork = new NetworkCutterShape(shapefileTargetArea).filter(this.originalScenario.getNetwork(), modes);
+        targetAreaNetwork = new NetworkCutterShape(shapefileTargetArea).filter(originalScenario.getNetwork(), modes);
     }
 
     protected void filterPopulationOfTargetAreaOnlyPt() throws MalformedURLException, IOException {

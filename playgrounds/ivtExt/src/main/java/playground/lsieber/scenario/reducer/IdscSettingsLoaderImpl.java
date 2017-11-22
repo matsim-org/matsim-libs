@@ -2,11 +2,19 @@ package playground.lsieber.scenario.reducer;
 
 import java.io.IOException;
 
-public class IdscSettingsLoaderImpl extends IdscSettingsLoader{
+import org.matsim.core.config.Config;
+
+public class IdscSettingsLoaderImpl extends IdscSettingsLoader {
 
     public IdscSettingsLoaderImpl() throws IOException {
-        // TODO Auto-generated constructor stub
-        super();
+
+    }
+
+    @Override
+    public Config getConfig() {
+        Config hConfig = super.getConfig();
+        hConfig.getClass();
+        return hConfig;
     }
 
 }

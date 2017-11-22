@@ -2,8 +2,8 @@ package playground.lsieber.networkshapecutter;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -27,29 +27,28 @@ public class NetworkCutterRadius implements NetworkCutter {
     }
 
     @Override
-    public Network filter(Network network, HashSet<String> modes) throws MalformedURLException, IOException {
+    public Network filter(Network network, Set<String> modes) throws MalformedURLException, IOException {
         if (this.radius == 0.0) {
             System.out.println("hey");
             return network;
-        }else {
-            
-        
-        modifiedNetwork = filterInternal(network, modes);
+        } else {
 
-        long numberOfLinksOriginal = network.getLinks().size();
-        long numberOfNodesOriginal = network.getNodes().size();
-        long numberOfLinksFiltered = modifiedNetwork.getLinks().size();
-        long numberOfNodesFiltered = modifiedNetwork.getNodes().size();
+            modifiedNetwork = filterInternal(network, modes);
 
-        cutInfo += "  Number of Links in original network: " + numberOfLinksOriginal + "\n";
-        cutInfo += "  Number of nodes in original network: " + numberOfNodesOriginal + "\n";
-        cutInfo += String.format("  Number of nodes in filtered network: %d (%.2f%%)", numberOfNodesFiltered,
-                100.0 * numberOfNodesFiltered / numberOfNodesOriginal) + "\n";
-        cutInfo += String.format("  Number of links in filtered network: %d (%.2f%%)", numberOfLinksFiltered,
-                100.0 * numberOfLinksFiltered / numberOfLinksOriginal) + "\n";
+            long numberOfLinksOriginal = network.getLinks().size();
+            long numberOfNodesOriginal = network.getNodes().size();
+            long numberOfLinksFiltered = modifiedNetwork.getLinks().size();
+            long numberOfNodesFiltered = modifiedNetwork.getNodes().size();
 
-        printCutSummary();
-        return modifiedNetwork;
+            cutInfo += "  Number of Links in original network: " + numberOfLinksOriginal + "\n";
+            cutInfo += "  Number of nodes in original network: " + numberOfNodesOriginal + "\n";
+            cutInfo += String.format("  Number of nodes in filtered network: %d (%.2f%%)", numberOfNodesFiltered,
+                    100.0 * numberOfNodesFiltered / numberOfNodesOriginal) + "\n";
+            cutInfo += String.format("  Number of links in filtered network: %d (%.2f%%)", numberOfLinksFiltered,
+                    100.0 * numberOfLinksFiltered / numberOfLinksOriginal) + "\n";
+
+            printCutSummary();
+            return modifiedNetwork;
         }
     }
 
@@ -65,7 +64,7 @@ public class NetworkCutterRadius implements NetworkCutter {
 
     }
 
-    private Network filterInternal(Network originalNetwork, HashSet<String> modes) {
+    private Network filterInternal(Network originalNetwork, Set<String> modes) {
 
         Network filteredNetwork = NetworkUtils.createNetwork();
 

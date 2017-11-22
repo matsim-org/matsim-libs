@@ -32,9 +32,9 @@ public class TestScenarioReducer {
         shapeScenarioReducer.run();
         shapeScenarioReducer.filterPopulationOfTargetAreaOnlyPt();
         shapeScenarioReducer.writeToXML();
-        //shapeScenarioReducer.ConvertPtToAV();
+        // shapeScenarioReducer.ConvertPtToAV();
         shapeScenarioReducer.addConfigFilesinFolder();
-        //adaptedScenarioPreparer(shapeScenarioReducer);
+        // adaptedScenarioPreparer(shapeScenarioReducer);
 
         System.out.println("THIS IS THE END :)");
     }
