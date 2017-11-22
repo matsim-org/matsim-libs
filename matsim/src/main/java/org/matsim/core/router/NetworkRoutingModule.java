@@ -74,6 +74,9 @@ public final class NetworkRoutingModule implements RoutingModule {
 
 		Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
 		Link toLink = this.network.getLinks().get(toFacility.getLinkId());
+		
+		Gbl.assertNotNull(fromLink);
+		Gbl.assertNotNull(toLink);
 
 		if (toLink != fromLink) {
 			// (a "true" route)
