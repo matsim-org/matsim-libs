@@ -42,12 +42,12 @@ public class RunControlerWW {
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, args[0]);
 		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
-		final WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig());
+		final WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig(), controler.getEvents());
 		controler.getEvents().addHandler(waitTimeCalculator);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				bind(TransitRouter.class).toProvider(new TransitRouterEventsWLFactory(controler, waitTimeCalculator.getWaitTimes()));
+				bind(TransitRouter.class).toProvider(new TransitRouterEventsWLFactory(controler, waitTimeCalculator.get()));
 			}
 		});
 		controler.run();

@@ -76,11 +76,18 @@ public final class EditPlans {
 		WithinDayAgentUtils.rescheduleActivityEnd(agent, mobsim);
 	}
 	public final Activity replaceActivity(MobsimAgent agent, int index, Activity newAct, String upstreamMode, String downstreamMode ) {
+		System.err.println("here310");
+		printPlan(agent) ;
+		System.err.println("here320");
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
+		printPlan(plan) ;
+		System.err.println("here330");
+		
+		
 		List<PlanElement> planElements = plan.getPlanElements() ;
 
 		// make sure we have indeed an activity position:
-		if ( planElements.get(index) instanceof Activity ) {
+		if ( ! ( planElements.get(index) instanceof Activity ) ) {
 			throw new ReplanningException("trying to replace a non-activity in the plan by an activity; this is not possible") ;
 		}
 		Activity origAct = (Activity) planElements.get(index) ;
@@ -91,10 +98,12 @@ public final class EditPlans {
 
 		// set the new activity:
 		planElements.set(index, newAct) ;
+		System.err.println("here340");
+		printPlan(plan) ;
 
 		// trip before (if any):
 		if ( index > 0 ) {
-			Trip tripBeforeAct = TripStructureUtils.findTripEndingAtActivity(origAct,plan,tripRouter.getStageActivityTypes());
+			Trip tripBeforeAct = TripStructureUtils.findTripEndingAtActivity(newAct,plan,tripRouter.getStageActivityTypes());
 			Gbl.assertNotNull( tripBeforeAct );  // there could also just be a sequence of activities?!
 
 			final List<PlanElement> currentTripElements = tripBeforeAct.getTripElements();
@@ -135,7 +144,7 @@ public final class EditPlans {
 		planElements.add( index, activity ) ;
 		{
 			// activity before:
-			Activity actBefore = findActBefore(agent, index);
+			Activity actBefore = findRealActBefore(agent, index);
 			if ( actBefore != null ) {
 				if ( EditPlans.indexOfPlanElement(agent, actBefore) < WithinDayAgentUtils.getCurrentPlanElementIndex(agent) ) {
 					// we are already under way
@@ -148,7 +157,7 @@ public final class EditPlans {
 		}
 		{
 			// activity after:
-			Activity actAfter = findActAfter(agent, index);
+			Activity actAfter = findRealActAfter(agent, index);
 			if ( actAfter != null ) {
 				EditTrips.insertEmptyTrip(plan, activity, actAfter, downstreamMode, pf ) ;
 			}
@@ -239,22 +248,27 @@ public final class EditPlans {
 	//		}
 	//		return false ;
 	//	}
-	private Activity findActAfter(MobsimAgent agent, int index) {
+	public Activity findRealActAfter(MobsimAgent agent, int index) {
+		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
+		List<PlanElement> planElements = plan.getPlanElements() ;
+		return (Activity) planElements.get( findIndexOfRealActAfter(agent, index) ) ; 
+	}
+	public int findIndexOfRealActAfter(MobsimAgent agent, int index) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
 
-		Activity nextAct = null ;
+		int theIndex = -1 ;
 		for ( int ii=planElements.size()-1 ; ii>index; ii-- ) {
 			if ( planElements.get(ii) instanceof Activity ) {
 				Activity act = (Activity) planElements.get(ii) ;
 				if ( !this.tripRouter.getStageActivityTypes().isStageActivity( act.getType() ) ) {
-					nextAct = act ;
+					theIndex = ii ;
 				}
 			}
 		}
-		return nextAct;
+		return theIndex ;
 	}
-	private Activity findActBefore(MobsimAgent agent, int index) {
+	public Activity findRealActBefore(MobsimAgent agent, int index) {
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
 
@@ -341,6 +355,28 @@ public final class EditPlans {
 	public void rescheduleActivityEnd(MobsimAgent agent) {
 		// this is mostly for retrofitting existing code.  but maybe also useful by itself
 		this.mobsim.rescheduleActivityEnd(agent);
+	}
+	public boolean isAtRealActivity(MobsimAgent agent) {
+		PlanElement pe = WithinDayAgentUtils.getCurrentPlanElement(agent) ;
+		if ( isRealActivity(pe) ) {
+			return true ;
+		} else {
+			return false ;
+		}
+	}
+	public boolean isRealActivity(PlanElement pe) {
+		return pe instanceof Activity && ! ( tripRouter.getStageActivityTypes().isStageActivity( ((Activity)pe).getType() ) );
+	}
+	public static Plan printPlan(MobsimAgent agent1) {
+		final Plan plan = WithinDayAgentUtils.getModifiablePlan(agent1);
+		return printPlan(plan) ;
+	}
+	public static Plan printPlan(Plan plan) {
+		System.err.println( "plan=" + plan );
+		for ( int ii=0 ; ii<plan.getPlanElements().size() ; ii++ ) {
+			System.err.println( "\t" + ii + ":\t" + plan.getPlanElements().get(ii) );
+		}
+		return plan;
 	}
 
 }

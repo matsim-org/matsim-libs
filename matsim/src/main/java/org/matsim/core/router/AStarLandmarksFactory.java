@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessLandmarks;
@@ -41,6 +42,8 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 
 	private final Map<Network, PreProcessLandmarks> preProcessData = new HashMap<>();
 
+	@Inject private GlobalConfigGroup globalConfig ;
+	
 	@Inject
 	public AStarLandmarksFactory() {
 	}
@@ -50,7 +53,7 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 		PreProcessLandmarks preProcessLandmarks = this.preProcessData.get(network);
 		if (preProcessLandmarks == null) {
 			preProcessLandmarks = new PreProcessLandmarks(travelCosts);
-			preProcessLandmarks.setNumberOfThreads(8);
+			preProcessLandmarks.setNumberOfThreads( globalConfig.getNumberOfThreads());
 			preProcessLandmarks.run(network);
 			this.preProcessData.put(network, preProcessLandmarks);
 		}

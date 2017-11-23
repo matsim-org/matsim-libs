@@ -61,8 +61,8 @@ public ChoiceGenerationControler(String[] args) {
         @Override
         public void install() {
             bind(TransitRouter.class).toProvider(new TransitRouterEventsWSFactory(controler.getScenario(),
-                    waitTimeCalculator.getWaitTimes(),
-                    stopStopTimeCalculator.getStopStopTimes()));
+                    waitTimeCalculator.get(),
+                    stopStopTimeCalculator.get()));
         }
     });
     //    controler.setScoringFunctionFactory(
@@ -106,9 +106,9 @@ public ChoiceGenerationControler(String[] args) {
         for(Person person:controler.getScenario().getPopulation().getPersons().values()){
             plans.add(person.getSelectedPlan());
         }
-        pSimFactory.setWaitTime(waitTimeCalculator.getWaitTimes());
+        pSimFactory.setWaitTime(waitTimeCalculator.get());
         pSimFactory.setTravelTime(travelTimeCalculator.getLinkTravelTimes());
-        pSimFactory.setStopStopTime(stopStopTimeCalculator.getStopStopTimes());
+        pSimFactory.setStopStopTime(stopStopTimeCalculator.get());
         pSimFactory.setPlans(plans);
     }
 }

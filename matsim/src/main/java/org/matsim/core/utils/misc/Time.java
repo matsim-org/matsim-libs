@@ -36,6 +36,8 @@ public class Time {
 	 * time is given as {@link Time#UNDEFINED_TIME} then {@link Path#travelTime}
 	 * will return {@link Double#NaN}, even though the {@link TravelTime#getLinkTravelTime}
 	 * is independent of the start time. */
+	@Deprecated // rather use Time.isUndefinedTime( time ), since that opens up the path to a later change
+	// of the convention.  kai, nov'17
 	public final static double UNDEFINED_TIME = Double.NEGATIVE_INFINITY;
 	/**
 	 * The end of a day in MATSim in seconds
@@ -51,6 +53,11 @@ public class Time {
 	private static String defaultTimeFormat = TIMEFORMAT_HHMMSS;
 
 	private final static String[] timeElements;
+	
+	public static boolean isUndefinedTime( final double time ) {
+		// give the option to change the convention at some point in time.  kai, nov'17
+		return time==UNDEFINED_TIME ;
+	}
 
 	static {
 		timeElements = new String[60];
