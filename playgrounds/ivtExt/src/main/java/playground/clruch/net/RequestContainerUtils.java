@@ -106,7 +106,7 @@ public class RequestContainerUtils {
                 rc.fromLinkIndex = db.getLinkIndex(qt.getClosest(to.getX(), to.getY()));
             }
         } catch (Exception exception) {
-            System.err.println("WARN failed to get from/to Coords at time: " + now);
+//            System.err.println("WARN failed to get from/to Coords at time: " + now);
         }
         rc.requestIndex = taxiTrail.interp(now).getValue().requestIndex;
         rc.requestStatus = taxiTrail.interp(now).getValue().requestStatus;

@@ -10,40 +10,43 @@ import java.util.Scanner;
 
 public class ChangeDataSF {
 
-	public static void head(List<java.io.File> trailFilesComplete, java.io.File headerDirectory,
-			List<java.io.File> trailFiles) throws IOException {
-		for (int i = 0; i < trailFilesComplete.size(); ++i) {
-			BufferedReader reader = new BufferedReader(new FileReader(headerDirectory));
-			String line = null;
-			StringBuilder stringBuilder = new StringBuilder();
-			while ((line = reader.readLine()) != null) {
-				stringBuilder.append(line + " ");
-			}
-			String Header = stringBuilder.toString();
-			BufferedReader reader1 = new BufferedReader(new FileReader(trailFilesComplete.get(i)));
-			ArrayList<String> lista = new ArrayList<String>();
-			String line1 = reader1.readLine();
-			reader1.close();
-
-			if (!line1.equals(Header)) {
-				reader1 = new BufferedReader(new FileReader(trailFilesComplete.get(i)));
-				String dataRow = reader1.readLine();
-				while (dataRow != null) {
-					dataRow = reader1.readLine();
-					lista.add(dataRow);
-				}
-				FileWriter writer = new FileWriter(trailFilesComplete.get(i));
-				writer.append(Header + "\n" + line1);
-				for (int x = 0; x < lista.size() - 1; x++) {
-					writer.append("\n" + lista.get(x));
-				}
-				reader1.close();
-				writer.flush();
-				writer.close();
-				reader.close();
-			}
-		}
-	}
+	// public static void head(List<java.io.File> trailFilesComplete, java.io.File
+	// headerDirectory,
+	// List<java.io.File> trailFiles) throws IOException {
+	// for (int i = 0; i < trailFilesComplete.size(); ++i) {
+	// BufferedReader reader = new BufferedReader(new FileReader(headerDirectory));
+	// String line = null;
+	// StringBuilder stringBuilder = new StringBuilder();
+	// while ((line = reader.readLine()) != null) {
+	// stringBuilder.append(line + " ");
+	// }
+	// String Header = stringBuilder.toString();
+	// BufferedReader reader1 = new BufferedReader(new
+	// FileReader(trailFilesComplete.get(i)));
+	// ArrayList<String> lista = new ArrayList<String>();
+	// String line1 = reader1.readLine();
+	// reader1.close();
+	//
+	// System.out.println("Header: " +Header);
+	// if (!line1.equals(Header)) {
+	// reader1 = new BufferedReader(new FileReader(trailFilesComplete.get(i)));
+	// String dataRow = reader1.readLine();
+	// while (dataRow != null) {
+	// dataRow = reader1.readLine();
+	// lista.add(dataRow);
+	// }
+	// FileWriter writer = new FileWriter(trailFilesComplete.get(i));
+	// writer.append(Header + "\n" + line1);
+	// for (int x = 0; x < lista.size() - 1; x++) {
+	// writer.append("\n" + lista.get(x));
+	// }
+	// reader1.close();
+	// writer.flush();
+	// writer.close();
+	// reader.close();
+	// }
+	// }
+	// }
 
 	public static ArrayList<String> name(java.io.File idDirectory) throws IOException {
 		Scanner id = new Scanner(idDirectory);
