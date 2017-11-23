@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,8 +31,6 @@ public class CsvFleetReader {
 			String source = File.separator + file.getAbsolutePath();
 			String dest = File.separator + dataDirectory + "/usefordata/a" + file.getName();
 			File fin = new File(source);
-			PrintWriter pw = new PrintWriter(dest);
-			pw.close();
 			FileInputStream fis = new FileInputStream(fin);
 			BufferedReader in = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(file)));
 			FileWriter fstream = new FileWriter(dest, true);
@@ -59,13 +56,11 @@ public class CsvFleetReader {
 				Scanner id = new Scanner(file.getName());
 				ArrayList<String> nameFile = new ArrayList<String>();
 				while (id.hasNext()) {
-					id.useDelimiter("_");
-					id.next();
+					id.useDelimiter("_").next();
 					nameFile.add(id.next());
 				}
 				id.close();
-				String ha = nameFile.toString().replace(".txt]", "").replace("[", "");
-				System.out.println("INFO name: " + ha);
+				System.out.println("INFO name: " + nameFile.toString().replace(".txt]", "").replace("[", ""));
 				System.out.println("INFO Id: " + number);
 
 				String line = br.readLine();
@@ -102,16 +97,16 @@ public class CsvFleetReader {
 		// Going through all timestamps and check for offservice vehicles && parse
 		// requests
 
-		// TODO put both time we did this in one function, no double code
 		if (trail.length() != 34) {
 			final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
 			final int TIMESTEP = 5;
 
-//			System.out.println(
-//					"INFO Checking for OFFSERVICE & RequestStatus for " + dayTaxiRecord.size() + " vehicles...");
+			// System.out.println(
+			// "INFO Checking for OFFSERVICE & RequestStatus for " + dayTaxiRecord.size() +
+			// " vehicles...");
 			for (int now = 0; now < MAXTIME; now += TIMESTEP) {
-//				if (now % 10000 == 0)
-//					System.out.println("now=" + now);
+				// if (now % 10000 == 0)
+				// System.out.println("now=" + now);
 				for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
 					TaxiTrail taxiTrail = dayTaxiRecord.get(vehicleIndex);
 
@@ -123,10 +118,10 @@ public class CsvFleetReader {
 				}
 			}
 
-//			System.out.println("INFO lines      " + dataline);
-//			System.out.println("INFO vehicles   " + dayTaxiRecord.size());
-//			// System.out.println("timestamps " + dayTaxiRecord.keySet().size());
-//			// System.out.println(dayTaxiRecord.status);
+			// System.out.println("INFO lines " + dataline);
+			// System.out.println("INFO vehicles " + dayTaxiRecord.size());
+			// // System.out.println("timestamps " + dayTaxiRecord.keySet().size());
+			// // System.out.println(dayTaxiRecord.status);
 		}
 		trail.delete();
 		return dayTaxiRecord;
