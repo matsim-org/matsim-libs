@@ -62,7 +62,6 @@ public class CsvFleetReader {
 				id.close();
 				System.out.println("INFO name: " + nameFile.toString().replace(".txt]", "").replace("[", ""));
 				System.out.println("INFO Id: " + number);
-
 				String line = br.readLine();
 				List<String> list = CSVUtils.csvLineToList(line, " ");
 				int count = 0;
@@ -80,14 +79,12 @@ public class CsvFleetReader {
 					break;
 				List<String> list = CSVUtils.csvLineToList(line, " ");
 				dayTaxiRecord.insert(list, number);
-
 				String timeStamp = list.get(3);
 				long unixSeconds = Long.valueOf(timeStamp).longValue();
 				Date date = new Date(unixSeconds * 1000L); // *1000 is to convert seconds to milliseconds
 				SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss"); // the format of your date
 				String formattedDate = sdf.format(date);
 				timeStamp = formattedDate;
-
 				dayTaxiRecord.lastTimeStamp = timeStamp;
 			}
 		} finally {
