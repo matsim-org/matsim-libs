@@ -76,6 +76,7 @@ class SimStepParallelEventsManagerImpl implements EventsManager {
 	
 	public SimStepParallelEventsManagerImpl(int numOfThreads) {
 		this.numOfThreads = numOfThreads;
+		log.warn("number of threads=" + numOfThreads );
 		init();
 	}
 	

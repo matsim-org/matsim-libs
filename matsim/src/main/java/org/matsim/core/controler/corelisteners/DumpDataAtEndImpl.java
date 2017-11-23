@@ -133,6 +133,8 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		if (!event.isUnexpected() && vspConfig.isWritingOutputEvents()) {
 			dumpOutputEvents();
 		}
+		
+		dumpExperiencedPlans() ;
 	}
 
 	private void dumpOutputEvents() {
@@ -147,6 +149,23 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		} catch ( Exception ee ) {
 			Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
 					+ "generated in the final iteration") ;
+		}
+	}
+
+	private void dumpExperiencedPlans() {
+		if ( config.planCalcScore().isWriteExperiencedPlans() ) {
+		try {
+			File toFile = new File(	controlerIO.getOutputFilename("output_experienced_plans.xml.gz"));
+			File fromFile = new File(controlerIO.getIterationFilename(controlerConfigGroup.getLastIteration(), "experienced_plans.xml.gz"));
+			try {
+				Files.copy(fromFile.toPath(), toFile.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
+			} catch (IOException e) {
+				throw new UncheckedIOException(e);
+			}
+		} catch ( Exception ee ) {
+			Logger.getLogger(this.getClass()).error("writing output experienced plans did not work; probably parameters were such that they "
+					+ "were not generated in the final iteration") ;
+		}
 		}
 	}
 
