@@ -21,7 +21,8 @@ package org.matsim.contrib.taxi.run;
 
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.*;
+import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
+import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Inject;
@@ -33,6 +34,7 @@ public class TaxiOutputModule extends AbstractModule {
 	@Override
 	public void install() {
 		bind(SubmittedTaxiRequestsCollector.class).toInstance(new SubmittedTaxiRequestsCollector());
+		addControlerListenerBinding().to(SubmittedTaxiRequestsCollector.class);
 
 		addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
 		addControlerListenerBinding().to(TaxiStatsDumper.class);

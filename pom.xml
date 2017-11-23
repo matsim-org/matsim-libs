@@ -9,7 +9,6 @@
 	<modules>
 		<module>matsim</module>
 		<module>examples</module>
-		<module>tutorial</module>
 		<module>benchmark</module>
 		<module>contribs</module>
 		<module>distribution</module>

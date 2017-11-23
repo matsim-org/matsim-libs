@@ -27,6 +27,7 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.config.ConfigWriter.Verbosity;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -44,11 +45,8 @@ import org.matsim.core.utils.io.UncheckedIOException;
  */
 public abstract class ConfigUtils implements MatsimExtensionPoint {
 
-	public static Config createConfig(final String filename) {
-		// are there systematic arguments against such a method?  otherwise, users will return to new Controler( filename ), since that
-		// is easier to memorize. kai, jul'16
-		
-		URL url = IOUtils.getUrlFromFileOrResource(filename) ;
+	public static Config createConfig(final String context) {
+		URL url = IOUtils.getUrlFromFileOrResource(context) ;
 		return createConfig( url ) ;
 	}
 
@@ -229,5 +227,12 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 		config.plans().setRemovingUnneccessaryPlanAttributes(true);
 		config.plans().setActivityDurationInterpretation(PlansConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration);
 		config.vspExperimental().setVspDefaultsCheckingLevel(VspDefaultsCheckingLevel.warn);
+	}
+	
+	public static void writeConfig( final Config config, String filename ) {
+		new ConfigWriter(config).write(filename);
+	}
+	public static void writeMinimalConfig( final Config config, String filename ) {
+		new ConfigWriter(config,Verbosity.minimal).write(filename);
 	}
 }

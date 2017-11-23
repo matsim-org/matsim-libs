@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v1.dtd">
+<config>
+
+
+	<module name="network">
+		<param name="inputNetworkFile" value="../matsimExamples/tutorial/example8DemandGeneration/network.xml" />
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="../matsimExamples/tutorial/example8DemandGeneration/population.xml" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="../matsimExamples/tutorial/example8DemandGeneration/output" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="0" />
+	</module>
+
+	<module name="simulation">
+		<param name = "snapshotperiod"	value = "00:01:00"/> <!-- 00:00:00 means NO snapshot writing -->
+		<param name = "snapshotFormat"	value = "otfvis"/> <!-- netvis, googleearth, transims -->
+	</module>
+
+
+	<module name="planCalcScore">
+		<param name="activityType_0"            value="h" />
+		<param name="activityTypicalDuration_0" value="12:00:00" />
+	
+		<param name="activityType_1"            value="w" />
+		<param name="activityTypicalDuration_1" value="08:00:00" />
+		
+		<param name="activityType_2"            value="l" />
+		<param name="activityTypicalDuration_2" value="02:00:00" />
+	</module>
+	
+
+</config>

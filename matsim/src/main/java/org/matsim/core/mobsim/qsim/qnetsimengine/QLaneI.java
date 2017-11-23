@@ -31,32 +31,30 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 
 
 /**
- * Essentially an interface, but since I do not want the methods public for the time being, it is incarnated as an abstract class.
- * <p></p>
  * Interface for QLanes, which (can) make up the QLinks.
  * 
  * @author nagel
  *
  */
-abstract class QLaneI implements Identifiable<Lane> {
+interface QLaneI extends Identifiable<Lane> {
 	
-	abstract void addFromWait( final QVehicle veh);
+	void addFromWait( final QVehicle veh);
 
-	abstract boolean isAcceptingFromWait(QVehicle veh);
+	boolean isAcceptingFromWait(QVehicle veh);
 
-	abstract boolean isActive();
+	boolean isActive();
 
-	abstract double getSimulatedFlowCapacityPerTimeStep();
+	double getSimulatedFlowCapacityPerTimeStep();
 
-	abstract QVehicle getVehicle( final Id<Vehicle> vehicleId);
+	QVehicle getVehicle( final Id<Vehicle> vehicleId);
 
-	abstract double getStorageCapacity();
+	double getStorageCapacity();
 	
 	static interface VisData {
 		public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions, double now ) ;
 	}
 
-	abstract VisData getVisData();
+	VisData getVisData();
 
 	/**
 	 * Needs to be added _upstream_ of the regular stop location so that a possible second stop on the link can also be served.
@@ -65,40 +63,38 @@ abstract class QLaneI implements Identifiable<Lane> {
 	 * <li> is not only used for transit and should thus be renamed.  kai, nov'14
 	 * </ul>
 	 */
-	abstract void addTransitSlightlyUpstreamOfStop(final QVehicle veh);
+	void addTransitSlightlyUpstreamOfStop(final QVehicle veh);
 	
-	abstract void changeUnscaledFlowCapacityPerSecond( final double val ) ;
+	void changeUnscaledFlowCapacityPerSecond( final double val ) ;
 
-	abstract void changeEffectiveNumberOfLanes( final double val ) ;
+	void changeEffectiveNumberOfLanes( final double val ) ;
 
-	abstract boolean doSimStep();
+	boolean doSimStep();
 
-	abstract void clearVehicles();
+	void clearVehicles();
 
-	abstract Collection<MobsimVehicle> getAllVehicles();
+	Collection<MobsimVehicle> getAllVehicles();
 
-	abstract void addFromUpstream(final QVehicle veh);
+	void addFromUpstream(final QVehicle veh);
 
-	abstract boolean isNotOfferingVehicle();
+	boolean isNotOfferingVehicle();
 
-	abstract QVehicle popFirstVehicle();
+	QVehicle popFirstVehicle();
 
-	abstract QVehicle getFirstVehicle();
+	QVehicle getFirstVehicle();
 
-	abstract double getLastMovementTimeOfFirstVehicle();
+	double getLastMovementTimeOfFirstVehicle();
 
-	abstract boolean hasGreenForToLink(final Id<Link> toLinkId);
+	boolean isAcceptingFromUpstream();
 
-	abstract boolean isAcceptingFromUpstream();
-
-	abstract void changeSpeedMetersPerSecond(double val) ;
+	void changeSpeedMetersPerSecond(double val) ;
 
 	/**
 	 * When multiple lanes lead to the same next link, the QLinkLanesImpl needs to decide which lane to use.  It uses
 	 * the one with the smallest load.
 	 */
-	abstract double getLoadIndicator() ;
+	double getLoadIndicator() ;
 	
-	abstract void initBeforeSimStep();
+	void initBeforeSimStep();
 
 }

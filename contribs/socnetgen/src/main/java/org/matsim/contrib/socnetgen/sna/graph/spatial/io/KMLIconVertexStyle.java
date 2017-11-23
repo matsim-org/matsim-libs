@@ -19,20 +19,21 @@
  * *********************************************************************** */
 package org.matsim.contrib.socnetgen.sna.graph.spatial.io;
 
-import net.opengis.kml._2.IconStyleType;
-import net.opengis.kml._2.LinkType;
-import net.opengis.kml._2.ObjectFactory;
-import net.opengis.kml._2.StyleType;
-import org.matsim.contrib.socnetgen.sna.graph.Graph;
-import org.matsim.contrib.socnetgen.sna.graph.Vertex;
-import org.matsim.vis.kml.KMZWriter;
-
-import java.awt.*;
+import java.awt.Color;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import org.matsim.contrib.socnetgen.sna.graph.Graph;
+import org.matsim.contrib.socnetgen.sna.graph.Vertex;
+import org.matsim.vis.kml.KMZWriter;
+
+import net.opengis.kml.v_2_2_0.IconStyleType;
+import net.opengis.kml.v_2_2_0.LinkType;
+import net.opengis.kml.v_2_2_0.ObjectFactory;
+import net.opengis.kml.v_2_2_0.StyleType;
 
 /**
  * Implementation of {@link KMLObjectStyle} that displays an icon at the

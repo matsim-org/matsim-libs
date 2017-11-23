@@ -15,6 +15,9 @@
       <vehicleDefinitionId refId="42" />
     </vehicles>
     <income currency="eur" period="month">50000</income>
+    <attributes>
+      <attribute name="customAttribute1" class="java.lang.String" >customValue1</attribute>
+    </attributes>
   </household>
 
   <household id="24">

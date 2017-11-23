@@ -21,6 +21,9 @@ package org.matsim.contrib.bicycle.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.bicycle.MotorizedInteractionEvent;
+import org.matsim.contrib.bicycle.MotorizedInteractionEventHandler;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionsForPopulation;
@@ -45,6 +48,8 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 	@Inject Scenario scenario;
 	@Inject BicycleTravelTime bicycleTravelTime;
 	@Inject BicycleTravelDisutilityFactory bicycleTravelDisutilityFactory;
+	
+	@Inject EventsManager eventsManager;
 
 
 	@Override
@@ -52,7 +57,8 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 
 		final ScoringParameters params = parameters.getScoringParameters(person);
-		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
+		// No leg scoring here as it would only double-count
+		// sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
@@ -62,7 +68,23 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 		
 		BicycleScoring bicycleScoring = new BicycleScoring(scenario, bicycleTravelTime, bicycleTravelDisutilityFactory);
 		sumScoringFunction.addScoringFunction(bicycleScoring);
+		
+		CarCounter carCounter = new CarCounter(bicycleScoring);
+		eventsManager.addHandler(carCounter);
 
 		return sumScoringFunction;
+	}
+	
+	private class CarCounter implements MotorizedInteractionEventHandler {
+		private BicycleScoring bicycleScoring;
+
+		public CarCounter(BicycleScoring bicycleScoring) {
+			this.bicycleScoring = bicycleScoring;
+		}
+
+		@Override
+		public void handleEvent(MotorizedInteractionEvent event) {
+			bicycleScoring.handleEvent(event);
+		}
 	}
 }

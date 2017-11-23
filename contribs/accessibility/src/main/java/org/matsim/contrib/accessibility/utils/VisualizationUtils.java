@@ -35,7 +35,7 @@ public class VisualizationUtils {
 
 	
 	
-	public static void createQGisOutputGraduated(String actType, String mode, Envelope envelope,
+	public static void createQGisOutputGraduatedStandardColorRange(String actType, String mode, Envelope envelope,
 			String workingDirectory, String crs, boolean includeDensityLayer,
 			Double lowerBound, Double upperBound, Integer range,
 			int symbolSize, int populationThreshold) {
@@ -97,11 +97,11 @@ public class VisualizationUtils {
 	}
 	
     
-    public static void createQGisOutputRuleBased(String actType, String mode, Envelope envelope,
+    public static void createQGisOutputRuleBasedStandardColorRange(String actType, String mode, Envelope envelope,
 			String workingDirectory, String crs, boolean includeDensityLayer,
 			Double lowerBound, Double upperBound, Integer range,
 			int symbolSize, int populationThreshold) {
-	    createQGisOutputGraduated(actType, mode, envelope,
+    	createQGisOutputRuleBased(actType, mode, envelope,
 	    		workingDirectory, crs, includeDensityLayer, lowerBound, upperBound,
                 range, ColorRangeUtils.ColorRange.DEFAULT_RED_TO_BLUE, 
                 symbolSize, populationThreshold);

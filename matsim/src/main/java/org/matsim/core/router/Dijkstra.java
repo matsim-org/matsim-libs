@@ -302,7 +302,11 @@ public class Dijkstra implements LeastCostPathCalculator {
 			Node outNode = pendingNodes.poll();
 
 			if (outNode == null) {
-				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId());
+				log.warn("No route was found from node " + fromNode.getId() + " to node " + toNode.getId() + ". Some possible reasons:");
+				log.warn("  * Network is not connected.  Run NetworkCleaner().") ;
+				log.warn("  * Network for considered mode does not even exist.  Modes need to be entered for each link in network.xml.");
+				log.warn("  * Network for considered mode is not connected to starting or ending point of route.  Setting insertingAccessEgressWalk to true may help.");
+				log.warn("This will now return null, but it may fail later with a null pointer exception.");
 				return null;
 			}
 
@@ -463,7 +467,8 @@ public class Dijkstra implements LeastCostPathCalculator {
 		} else if (totalCost == nCost) {
 			// Special case: a node can be reached from two links with exactly the same costs.
 			// Decide based on the linkId which one to take... just have to common criteria to be deterministic.
-			if (data.getPrevLink().getId().compareTo(l.getId()) > 0) {
+			Link prevLink = data.getPrevLink();
+			if (prevLink != null && prevLink.getId().compareTo(l.getId()) > 0) {
 				revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
 				return true;
 			}

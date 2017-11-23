@@ -28,12 +28,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Timer;
 
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -44,17 +42,13 @@ import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleCollector;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
-import org.matsim.contrib.drt.scheduler.DrtScheduler;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.util.distance.DistanceUtils;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.misc.Time;
 
 import com.google.inject.name.Named;
 import com.vividsolutions.jts.geom.Geometry;
@@ -158,8 +152,13 @@ public class DemandBasedRebalancingStrategy implements RebalancingStrategy {
 		Map<String,Integer> requiredAdditionalVehiclesPerZone = new HashMap<>();
 		for (Entry<String, MutableInt> entry : expectedDemand.entrySet()){
 			double demand = entry.getValue().doubleValue();
-			int vehPerZone = (int) Math.floor((demand / totalDemand.doubleValue()) * rebalancableVehicles.size());
+			int vehPerZone = (int) Math.ceil((demand / totalDemand.doubleValue()) * rebalancableVehicles.size());
 			int idleVehiclesInZone = 0;
+			if (vehPerZone>demand){
+                vehPerZone=(int) demand;
+			}
+
+			
 			LinkedList<Id<Vehicle>> idleVehicleIds = idleVehicles.getIdleVehiclesPerZone(entry.getKey());
 			if (idleVehicleIds!=null & (!idleVehicleIds.isEmpty())){
 				idleVehiclesInZone = idleVehicleIds.size();

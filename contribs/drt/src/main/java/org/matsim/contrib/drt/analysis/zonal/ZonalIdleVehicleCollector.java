@@ -22,15 +22,12 @@
  */
 package org.matsim.contrib.drt.analysis.zonal;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
@@ -39,7 +36,6 @@ import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 /**

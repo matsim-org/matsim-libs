@@ -34,26 +34,18 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LaneEnterEvent;
-import org.matsim.core.api.experimental.events.LaneLeaveEvent;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.lanes.ModelLane;
+import org.matsim.lanes.data.ModelLane;
 import org.matsim.lanes.data.Lane;
 import org.matsim.lanes.vis.VisLane;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
-import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.VisData;
 
 /**
@@ -234,12 +226,12 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	List<QLaneI> getOfferingQLanes() {
+	public List<QLaneI> getOfferingQLanes() {
 		return this.toNodeLaneQueues;
 	}
 
 	@Override
-	void clearVehicles() {
+	public void clearVehicles() {
 		super.clearVehicles();
 		for (QLaneI lane : this.laneQueues.values()) {
 			lane.clearVehicles();
@@ -247,7 +239,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	boolean doSimStep() {
+	public boolean doSimStep() {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		
 		boolean lanesActive = false;
@@ -413,7 +405,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	boolean isNotOfferingVehicle() {
+	public boolean isNotOfferingVehicle() {
 		// otherwise we have to do a bit more work
 		for (QLaneI lane : this.toNodeLaneQueues) {
 			if (!lane.isNotOfferingVehicle()) {
@@ -435,7 +427,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	QVehicle getVehicle(Id<Vehicle> vehicleId) {
+	public QVehicle getVehicle(Id<Vehicle> vehicleId) {
 		QVehicle ret = super.getVehicle(vehicleId);
 		if (ret != null) {
 			return ret;
@@ -567,7 +559,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	}
 	
 	@Override
-	QLaneI getAcceptingQLane() {
+	public QLaneI getAcceptingQLane() {
 		return this.firstLaneQueue ;
 	}
 

@@ -34,7 +34,10 @@ import org.matsim.core.mobsim.qsim.*;
 
 /**
  * It might be nicer to have ActivityEngine as a delegate, not as the superclass. But there is a hardcoded
- * "instanceof ActivityEngine" check in QSim :-( TODO introduce an ActivityEngine interface?
+ * "instanceof ActivityEngine" check in QSim :-( TODO introduce an ActivityEngine interface?  
+ * <ul>
+ * <li> yyyy You can now implement it underneath the MobsimEngine and ActivityHandler interfaces.  kai, nov'17
+ * </ul>
  * 
  * DynActivityEngine and ActivityEngine could be decoupled (if we can ensure DynActivityEngine's handleActivity() is
  * called before that of ActivityEngine)

@@ -88,20 +88,23 @@ public class GraduatedSymbolRenderer extends QGisRenderer {
             this.ranges[i+1] = new Range(lowerBoundary, upperBoundary, lowerBoundary.toString() + " - " + upperBoundary.toString());
         }
 
-        this.ranges[this.range - 1] = createLastRange();
+        if (range > 1)
+            this.ranges[this.range - 1] = createLastRange();
 
         createQGisPointSymbolLayers();
     }
 
     private Range createFirstRange() {
-	    Range firstRange = new Range(" " + String.valueOf(lowerBound));
+	    Range firstRange = new Range("Smaller than " + String.valueOf(lowerBound));
+	    firstRange.setLowerBound(-100);
 	    firstRange.setUpperBound(lowerBound);
 	    return firstRange;
     }
 
     private Range createLastRange() {
-        Range lastRange = new Range(" " + String.valueOf(lowerBound));
+        Range lastRange = new Range("Greater than " + String.valueOf(lowerBound));
         lastRange.setLowerBound(upperBound);
+        lastRange.setUpperBound(100);
         return lastRange;
     }
 

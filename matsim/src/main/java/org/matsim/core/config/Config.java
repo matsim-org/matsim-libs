@@ -128,7 +128,6 @@ public final class Config implements MatsimExtensionPoint {
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);
 		}
-		log.info( "context=[" + context + "]" ) ;
 	}
 
 	/**
@@ -561,6 +560,7 @@ public final class Config implements MatsimExtensionPoint {
 	}
 
 	public void setContext(URL context) {
+		log.info( "setting context to [" + context + "]" ) ;
 		this.context = context;
 	}
 

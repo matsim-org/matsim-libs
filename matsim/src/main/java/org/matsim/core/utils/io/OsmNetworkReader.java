@@ -151,17 +151,19 @@ public class OsmNetworkReader implements MatsimSomeReader {
 
 			// Setting the following to considerably smaller values, since there are often traffic signals/non-prio intersections. 
 			// If someone does a systematic study, please report.  kai, jul'16
+			//
+			// We revised the below street types (removed "minor" and put "living_street", "residential", and "unclassified" into
+			// different hierarchy layers), trying to make this more reasonable based on the
+			// <a href="OMS Wiki">http://wiki.openstreetmap.org/wiki/DE:Key:highway</a>, ts/aa/dz, oct'17
 			this.setHighwayDefaults(4, "secondary",     1,  30.0/3.6, 1.0, 1000);
 			this.setHighwayDefaults(4, "secondary_link",     1,  30.0/3.6, 1.0, 1000);
 			this.setHighwayDefaults(5, "tertiary",      1,  25.0/3.6, 1.0,  600);
 			this.setHighwayDefaults(5, "tertiary_link",      1,  25.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(6, "minor",         1,  20.0/3.6, 1.0,  600); // According to OSM wiki this road type does not exist, dz, aug'18
-			this.setHighwayDefaults(6, "residential",   1,  15.0/3.6, 1.0,  600);
-			this.setHighwayDefaults(6, "living_street", 1,  10.0/3.6, 1.0,  300);
+			this.setHighwayDefaults(6, "unclassified",  1,  15.0/3.6, 1.0,  600);
+			this.setHighwayDefaults(7, "residential",   1,  15.0/3.6, 1.0,  600);
+			this.setHighwayDefaults(8, "living_street", 1,  10.0/3.6, 1.0,  300);
 			// changing the speed values failed the evacuation ScenarioGenerator test because of a different network -- DESPITE
 			// the fact that all the speed values are reset to some other value there.  No idea what happens there. kai, jul'16
-
-			this.setHighwayDefaults(6, "unclassified",  1,  45.0/3.6, 1.0,  600);
 		}
 	}
 
@@ -272,7 +274,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
         this.highwayDefaults.put(highwayType, new OsmHighwayDefaults(hierarchy, lanesPerDirection, freespeed, freespeedFactor, laneCapacity_vehPerHour, oneway));
     }
 
-
 	/**
 	 * Sets whether the detailed geometry of the roads should be retained in the conversion or not.
 	 * Keeping the detailed paths results in a much higher number of nodes and links in the resulting MATSim network.
@@ -315,6 +316,14 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	}
 	public void setHierarchyLayer(final int hierarchy) {
 		this.hierarchyLayers.add(new GeographicallyNonrestrictingOsmFilterImpl(hierarchy));
+	}
+
+	/**
+	 * Adds a new filter to hierarchy layer.
+	 * @param osmFilter
+	 */
+	public void addOsmFilter(final OsmFilter osmFilter) {
+		this.hierarchyLayers.add(osmFilter);
 	}
 
 	/**
@@ -450,7 +459,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			log.info("..found " + cnt + " out of " + nodeIDsToKeep.size() + " nodes to keep and marked them as used..");
 		}
 		
-		
 		log.info("Create the required nodes ...") ;
 		for (OsmNode node : this.nodes.values()) {
 			if (node.used) {
@@ -490,7 +498,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
 										}
 									}
 								}
-
 								fromNode = toNode;
 								length = 0.0;
 							}
@@ -604,7 +611,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				}
 			}
 		}
-
 		double capacityForward = nofLanesForward * laneCapacity;
 		double capacityBackward = nofLanesBackward * laneCapacity;
 
@@ -715,9 +721,10 @@ public class OsmNetworkReader implements MatsimSomeReader {
 		return !isOnewayReverse(way);
 	}
 
-	private static interface OsmFilter {
+	public static interface OsmFilter {
 		boolean coordInFilter( final Coord coord, final int hierarchyLevel ) ;
 	}
+	
 	private static class OsmFilterImpl implements OsmFilter {
 		private final Coord coordNW;
 		private final Coord coordSE;
@@ -739,6 +746,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				(this.coordNW.getY() > coord.getY() && coord.getY() > this.coordSE.getY()));
 		}
 	}
+	
 	private static class GeographicallyNonrestrictingOsmFilterImpl implements OsmFilter {
 		private final int hierarchy;
 		GeographicallyNonrestrictingOsmFilterImpl(final int hierarchy) {
@@ -797,7 +805,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	}
 
 	private class OsmXmlParser extends MatsimXmlParser {
-
 		private OsmWay currentWay = null;
 		private final Map<Long, OsmNode> nodes;
 		private final Map<Long, OsmWay> ways;
@@ -916,9 +923,8 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	}
 
 	private static class StringCache {
-
 		private static ConcurrentHashMap<String, String> cache = new ConcurrentHashMap<String, String>(10000);
-
+		
 		/**
 		 * Returns the cached version of the given String. If the strings was
 		 * not yet in the cache, it is added and returned as well.
@@ -934,5 +940,4 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			return s;
 		}
 	}
-
 }

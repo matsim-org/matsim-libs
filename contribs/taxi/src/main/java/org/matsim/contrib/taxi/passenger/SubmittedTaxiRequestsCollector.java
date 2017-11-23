@@ -19,25 +19,29 @@
 
 package org.matsim.contrib.taxi.passenger;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.taxi.data.TaxiRequest;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 
-public class SubmittedTaxiRequestsCollector {
+public class SubmittedTaxiRequestsCollector implements BeforeMobsimListener {
 	private final Map<Id<Request>, TaxiRequest> requests = new LinkedHashMap<>();
 
 	public Map<Id<Request>, ? extends TaxiRequest> getRequests() {
 		return Collections.unmodifiableMap(requests);
 	}
 
-	// to be used by TaxiRequestCreator
 	void addRequest(TaxiRequest request) {
 		requests.put(request.getId(), request);
 	}
 
-	public void reset() {
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		requests.clear();
 	}
 }

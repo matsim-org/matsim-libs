@@ -200,10 +200,19 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		change2.setFreespeedChange(new ChangeValue(ChangeType.FACTOR, 3.0));
     		link.applyEvent(change2);
     		// - third a change event starting at 10am
+    		{
     		NetworkChangeEvent change3 = new NetworkChangeEvent(10*3600.0);
     		change3.addLink(link);
     		change3.setFreespeedChange(new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 30));
     		link.applyEvent(change3);
+    		}
+    		// - ...
+    		{
+    		NetworkChangeEvent change4 = new NetworkChangeEvent(19*3600.0);
+    		change4.addLink(link);
+    		change4.setFreespeedChange(new ChangeValue(ChangeType.OFFSET_IN_SI_UNITS, +22.));
+    		link.applyEvent(change4);
+    		}
     
     		/* I would now expect the following speeds:
     		 * 0am-7am: 10
@@ -221,6 +230,7 @@ public class TimeVariantLinkImplTest extends MatsimTestCase {
     		assertEquals(60.0, link.getFreespeed(10*3600.0-1), EPSILON);
     		assertEquals(30.0, link.getFreespeed(10*3600.0), EPSILON);
     		assertEquals(30.0, link.getFreespeed(18*3600.0), EPSILON);
+    		assertEquals(52.0, link.getFreespeed(19.1*3600.0), EPSILON);
     
     		// everything fine so long, now add some more changes in a chronological arbitrary order
     

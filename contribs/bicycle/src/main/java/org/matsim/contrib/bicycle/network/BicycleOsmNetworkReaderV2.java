@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.bicycle.BicycleLabels;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -47,28 +48,26 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 	private ElevationDataParser elevationDataParser;
 
 	private final static String TAG_HIGHWAY = "highway";
-	
-	private final static String TAG_CYCLEWAYTYPE= "cycleway";
-	private final static String TAG_SURFACE = "surface";
-	private final static String TAG_SMOOTHNESS = "smoothness";
 	private final static String TAG_BICYCLE = "bicycle";
 	private final static String TAG_ONEWAYBICYCLE = "oneway:bicycle";
 	
 	private int countSmoothness = 0;
 	private int countSurfaceDirect = 0;
 	private int countSurfaceInferred = 0;
-	private int countHighwayType = 0;
 	private int countCyclewayType = 0;
 	private int countBicycle = 0;
 	
 	public static void main(String[] args) throws Exception {
 		String inputCRS = "EPSG:4326"; // WGS84
 		String outputCRS = "EPSG:31468"; // DHDN Gauss-Krüger Zone 4
-		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/input/osm/2017-08-29_mitte.osm";
-		String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/networkRawData/elevation_berlin/BerlinEUDEM.tif"; // Berlin EU-DEM
-		String outputXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/2017-08-29_mitte_NEW_Z_Grad_Surf_Cyc.xml";		
+//		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/input/osm/2017-08-29_mitte.osm";
+		String inputOSM = "../../../shared-svn/studies/countries/de/berlin-bike/input/osm/berlin-latest.osm";
+		String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/input/eu-dem/BerlinEUDEM.tif"; // Berlin EU-DEM
+//		String outputXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/2017-08-29_mitte.xml";
+		String outputXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/berlin-latest.xml";
 		
-		List<String> bicycleWayTags = Arrays.asList(new String[]{TAG_CYCLEWAYTYPE, TAG_SURFACE, TAG_SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE});
+		List<String> bicycleWayTags = Arrays.asList(
+				new String[]{BicycleLabels.CYCLEWAY, BicycleLabels.SURFACE, BicycleLabels.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE});
 
 		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
@@ -139,7 +138,7 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		LOG.info("Smoothness created: " + countSmoothness + " which is " + ((float) countSmoothness / network.getLinks().size()) * 100 + "%.");
 		LOG.info("Surface (direct) created: " + countSurfaceDirect  + " which is " + ((float) countSurfaceDirect / network.getLinks().size()) * 100 + "%.");
 		LOG.info("Surface (inferred) created: " + countSurfaceInferred  + " which is " + ((float) countSurfaceInferred / network.getLinks().size()) * 100 + "%.");
-		LOG.info("Highway type created: " + countHighwayType + " which is " + ((float) countHighwayType / network.getLinks().size()) * 100 + "%.");
+//		LOG.info("Highway type created: " + countHighwayType + " which is " + ((float) countHighwayType / network.getLinks().size()) * 100 + "%.");
 		LOG.info("Cycleway type created: " + countCyclewayType + " which is " + ((float) countCyclewayType / network.getLinks().size()) * 100 + "%.");
 		LOG.info("Bicyle created: " + countBicycle + " which is " + ((float) countBicycle / network.getLinks().size()) * 100 + "%.");
 	}
@@ -162,7 +161,7 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		// Allow bicycles on all infrastructures except motorways (hierarchy 1) and trunk roads (hierarchy 2)
 		if (defaults.hierarchy == 3 || defaults.hierarchy == 4 || defaults.hierarchy == 5 || defaults.hierarchy == 6
 				|| defaults.hierarchy == 7 || defaults.hierarchy == 8 || defaults.hierarchy == 9) {
-			modes.add("bicycle");
+			modes.add("bicycle"); // TODO add TRansportMode "bicycle"
 		}
 		
 		// Allow cars if the direction under consideration is open to cars and if we are not on an infrastructure mainly intended
@@ -175,29 +174,29 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		l.setAllowedModes(modes);
 		
 		// Gradient
-		double gradient = (l.getToNode().getCoord().getZ() - l.getFromNode().getCoord().getZ()) / l.getLength();
-		l.getAttributes().putAttribute("gradient", gradient);
+//		double gradient = (l.getToNode().getCoord().getZ() - l.getFromNode().getCoord().getZ()) / l.getLength();
+//		l.getAttributes().putAttribute(BicycleLabels.GRADIENT, gradient);
 		
 		// Elevation
 		double averageElevation = (l.getToNode().getCoord().getZ() + l.getFromNode().getCoord().getZ()) / 2;
-		l.getAttributes().putAttribute("average_elevation", averageElevation);
+		l.getAttributes().putAttribute(BicycleLabels.AVERAGE_ELEVATION, averageElevation);
 		
 		// Smoothness
-		String smoothness = way.tags.get(TAG_SMOOTHNESS);
+		String smoothness = way.tags.get(BicycleLabels.SMOOTHNESS);
 		if (smoothness != null) {
-			l.getAttributes().putAttribute("smoothness", smoothness);
+			l.getAttributes().putAttribute(BicycleLabels.SMOOTHNESS, smoothness);
 			this.countSmoothness++;
 		}
 		
 		// Surface
-		String surface = way.tags.get(TAG_SURFACE);
+		String surface = way.tags.get(BicycleLabels.SURFACE);
 		if (surface != null) {
-			l.getAttributes().putAttribute("surface", surface);
+			l.getAttributes().putAttribute(BicycleLabels.SURFACE, surface);
 			this.countSurfaceDirect++;
 		} else {
 			if (highwayType != null) {
 				if (defaults.hierarchy == 3 && defaults.hierarchy == 4) { // 3 = primary, 4 = secondary
-					l.getAttributes().putAttribute("surface", "asphalt");
+					l.getAttributes().putAttribute(BicycleLabels.SURFACE, "asphalt");
 					this.countSurfaceInferred++;
 				} else {
 					LOG.warn("Link did not get a surface.");
@@ -208,9 +207,9 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		}
 
 		// Cycleway
-		String cyclewayType = way.tags.get(TAG_CYCLEWAYTYPE);
+		String cyclewayType = way.tags.get(BicycleLabels.CYCLEWAY);
 		if (cyclewayType != null) {
-			l.getAttributes().putAttribute("cyclewaytype", cyclewayType);
+			l.getAttributes().putAttribute(BicycleLabels.CYCLEWAY, cyclewayType);
 			this.countCyclewayType++;
 		}
 
@@ -240,7 +239,7 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 				reverseDirectionAllowedForBicycles = true;
 			} 
 		}
-		String cyclewayType = way.tags.get(TAG_CYCLEWAYTYPE);
+		String cyclewayType = way.tags.get(BicycleLabels.CYCLEWAY);
 		if (cyclewayType != null) {
 			if ("opposite".equals(cyclewayType) || "opposite_track".equals(cyclewayType) || "opposite_lane".equals(cyclewayType)) {
 				reverseDirectionAllowedForBicycles = true;

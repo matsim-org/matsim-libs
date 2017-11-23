@@ -28,19 +28,11 @@ import com.vividsolutions.jts.geom.prep.PreparedGeometry;
 
 public class RandomPointUtils {
 	public static Point getRandomPointInGeometry(final Geometry geometry) {
-		return getRandomPointInEnvelope(new Predicate<Point>() {
-			public boolean apply(Point p) {
-				return geometry.contains(p);
-			}
-		}, geometry.getEnvelopeInternal());
+		return getRandomPointInEnvelope(p -> geometry.contains(p), geometry.getEnvelopeInternal());
 	}
 
 	public static Point getRandomPointInGeometry(final PreparedGeometry geometry) {
-		return getRandomPointInEnvelope(new Predicate<Point>() {
-			public boolean apply(Point p) {
-				return geometry.contains(p);
-			}
-		}, geometry.getGeometry().getEnvelopeInternal());
+		return getRandomPointInEnvelope(p -> geometry.contains(p), geometry.getGeometry().getEnvelopeInternal());
 	}
 
 	private static Point getRandomPointInEnvelope(Predicate<Point> contains, Envelope envelope) {
@@ -59,5 +51,4 @@ public class RandomPointUtils {
 
 		return p;
 	}
-
 }

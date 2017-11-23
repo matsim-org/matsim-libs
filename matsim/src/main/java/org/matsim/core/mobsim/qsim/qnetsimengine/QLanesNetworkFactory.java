@@ -30,12 +30,11 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
-import org.matsim.lanes.ModelLane;
+import org.matsim.lanes.data.ModelLane;
 import org.matsim.lanes.data.Lanes;
 import org.matsim.lanes.data.LanesToLinkAssignment;
-import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
-import org.matsim.lanes.LanesUtils;
+import org.matsim.lanes.data.LanesUtils;
 
 import java.util.List;
 
@@ -61,12 +60,12 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 	private NetsimInternalInterface netsimEngine;
 	
 	@Inject 
-	public QLanesNetworkFactory( QSimConfigGroup qsimConfig, EventsManager events, Network network, Scenario scenario, Lanes lanesDefinitions ) {
-		this.qsimConfig = qsimConfig ;
+	public QLanesNetworkFactory( EventsManager events, Scenario scenario ) {
+		this.qsimConfig = scenario.getConfig().qsim();
 		this.events = events ;
-		this.network = network ;
+		this.network = scenario.getNetwork() ;
 		this.scenario = scenario ;
-		this.laneDefinitions = lanesDefinitions;
+		this.laneDefinitions = scenario.getLanes();
 		delegate = new DefaultQNetworkFactory( events, scenario ) ;
 	}
 

@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package org.matsim.contrib.signals;
 
+import java.util.Collections;
+
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
@@ -163,7 +165,7 @@ public class TravelTimeOneWayTestIT {
 	}
 
 	private static void runQsimWithSignals(final Scenario scenario, EventHandler... eventHandlers) {
-		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), new AbstractModule() {
+		com.google.inject.Injector injector = Injector.createInjector(scenario.getConfig(), AbstractModule.override(Collections.singleton(new AbstractModule() {
 			@Override
 			public void install() {
 				// defaults
@@ -171,10 +173,8 @@ public class TravelTimeOneWayTestIT {
 				install(new ControlerDefaultCoreListenersModule());
 				install(new ControlerDefaultsModule());
 				install(new ScenarioByInstanceModule(scenario));
-				// signal specific module
-				install(new SignalsModule());
 			}
-		});
+		}), new SignalsModule()));
 	
 		EventsManager events = injector.getInstance(EventsManager.class);
 		events.initProcessing();

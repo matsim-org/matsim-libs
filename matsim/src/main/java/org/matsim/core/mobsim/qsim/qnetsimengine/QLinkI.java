@@ -33,8 +33,6 @@ import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
 import org.matsim.vehicles.Vehicle;
 
 /**
- * Essentially an interface, but since I do not want the methods public for the time being, it is incarnated as an abstract class.
- * <p></p>
  * Contains all the logic for the QLinks which make up the QNetwork.
  * <p></p>
  * One can argue that the QNetsimEngine could treat more general links than just "queues".  However, in the end they live with 
@@ -44,7 +42,7 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-abstract class QLinkI implements NetsimLink, TimeVariantLink {
+interface QLinkI extends NetsimLink, TimeVariantLink {
 	// yyyy might make make sense to also pass the "isAccepting/addFromUpstream" through something like 
 	// "getFromNodeQueueLanes". kai, feb'16
 	
@@ -52,7 +50,7 @@ abstract class QLinkI implements NetsimLink, TimeVariantLink {
 	// registerAdditionalAgentOnLink( MobsimAgent agent, String reason ) ;
 	
 
-	abstract QNodeI getToNode() ;
+	QNodeI getToNode() ;
 
 	/**
 	 * add vehicle at "activity" location
@@ -60,28 +58,28 @@ abstract class QLinkI implements NetsimLink, TimeVariantLink {
 	 * Seems ok as public interface function. 
 	 * Rename to "addToParking(...)".  kai, aug'15
 	 */
-	abstract void addParkedVehicle(MobsimVehicle vehicle) ;
+	void addParkedVehicle(MobsimVehicle vehicle) ;
 	
 	/**
 	 * remove vehicle from "activity" location
 	 */
-	abstract QVehicle removeParkedVehicle(Id<Vehicle> vehicleId) ;
+	QVehicle removeParkedVehicle(Id<Vehicle> vehicleId) ;
 
 	/**
 	 * returns the vehicle if it is parked at the link
 	 */
-	abstract QVehicle getParkedVehicle(Id<Vehicle> vehicleId) ; 
+	QVehicle getParkedVehicle(Id<Vehicle> vehicleId) ; 
 	
 	/**
 	 * if you want an agent visualized while he/she is computationally not on the link, register him/her here
 	 * (has --hopefully-- no effect on dynamics)
 	 */
-	abstract void registerAdditionalAgentOnLink(MobsimAgent planAgent) ;
+	void registerAdditionalAgentOnLink(MobsimAgent planAgent) ;
 
 	/**
 	 * inverse of "registerAdditionalAgentOnlyLink"
 	 */
-	abstract MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> mobsimAgentId) ;
+	MobsimAgent unregisterAdditionalAgentOnLink(Id<Person> mobsimAgentId) ;
 
 	/**
 	 * return all agents/vehicles/... that are NOT in traffic.
@@ -89,56 +87,56 @@ abstract class QLinkI implements NetsimLink, TimeVariantLink {
 	 * <br>
 	 * Seems ok as public interface function. kai, aug'15
 	 */
-	abstract Collection<MobsimAgent> getAdditionalAgentsOnLink() ;
+	Collection<MobsimAgent> getAdditionalAgentsOnLink() ;
 	
 	/**
 	 * Agent that ends a leg or an activity is computationally passed to the QSim.  If the next PlanElement is a leg,
 	 * and the leg is treated by _this_ NetsimEngine, then the QSim passes it to the NetsimEngine, which inserts it here.
 	 */
-	abstract void letVehicleDepart(QVehicle vehicle) ;
+	void letVehicleDepart(QVehicle vehicle) ;
 
-	abstract boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id<Vehicle> vehicleId);
+	boolean insertPassengerIntoVehicle(MobsimAgent passenger, Id<Vehicle> vehicleId);
 	
-	abstract QVehicle getVehicle(Id<Vehicle> vehicleId) ;
+	QVehicle getVehicle(Id<Vehicle> vehicleId) ;
 	
 	/**
 	 * this is for driver agents who want to depart but their car is not (yet) there.  Subject to design change.
 	 */
-	abstract void registerDriverAgentWaitingForCar(final MobsimDriverAgent agent) ;
+	void registerDriverAgentWaitingForCar(final MobsimDriverAgent agent) ;
 	
 	/**
 	 * this is for driver agents who want to depart but not all passengers are (yet) there.  Subject to design change.
 	 */
-	abstract void registerDriverAgentWaitingForPassengers(MobsimDriverAgent agent) ;
-	abstract MobsimAgent unregisterDriverAgentWaitingForPassengers(Id<Person> agentId) ;
+	void registerDriverAgentWaitingForPassengers(MobsimDriverAgent agent) ;
+	MobsimAgent unregisterDriverAgentWaitingForPassengers(Id<Person> agentId) ;
 	
 	/**
 	 * this is for passenger agents who want to depart but their car is not (yet) there.  Subject to design change.
 	 * TODO: create something like a PassengerAgent which knows the vehicle it is waiting for. 
 	 */
-	abstract void registerPassengerAgentWaitingForCar(MobsimAgent agent, Id<Vehicle> vehicleId) ;
-	abstract MobsimAgent unregisterPassengerAgentWaitingForCar(MobsimAgent agent, Id<Vehicle> vehicleId) ;
+	void registerPassengerAgentWaitingForCar(MobsimAgent agent, Id<Vehicle> vehicleId) ;
+	MobsimAgent unregisterPassengerAgentWaitingForCar(MobsimAgent agent, Id<Vehicle> vehicleId) ;
 
 	
 	/**
 	 * yy Can't we get this functionality from {@link #getAdditionalAgentsOnLink()}?
 	 */
-	abstract Set<MobsimAgent> getAgentsWaitingForCar(Id<Vehicle> vehicleId) ;
+	Set<MobsimAgent> getAgentsWaitingForCar(Id<Vehicle> vehicleId) ;
 
-	abstract List<QLaneI> getOfferingQLanes() ;
+	List<QLaneI> getOfferingQLanes() ;
 
 	/**
 	 * Seems ok as public interface function. kai, aug'15
 	 */
-	abstract boolean doSimStep();
+	boolean doSimStep();
 
 	/**
 	 * Seems ok as public interface function. kai, aug'15 
 	 */
-	abstract void clearVehicles();
+	void clearVehicles();
 
-	abstract boolean isNotOfferingVehicle();
+	boolean isNotOfferingVehicle();
 
-	abstract QLaneI getAcceptingQLane() ;
+	QLaneI getAcceptingQLane() ;
 
 }

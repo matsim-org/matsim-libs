@@ -35,6 +35,7 @@ import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.lanes.data.Lanes;
 import org.matsim.lanes.data.LanesImpl;
+import org.matsim.lanes.data.LanesUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.VehicleUtils;
@@ -73,10 +74,12 @@ public final class MutableScenario implements Scenario, Lockable {
 		this.population = PopulationUtils.createPopulation(this.config, this.network);
 		this.facilities = new ActivityFacilitiesImpl();
 		this.households = new HouseholdsImpl();
-		this.lanes = new LanesImpl();
+		this.lanes = LanesUtils.createLanesContainer();
 		this.vehicles = VehicleUtils.createVehiclesContainer();
 		this.transitVehicles = VehicleUtils.createVehiclesContainer();
 		this.transitSchedule = new TransitScheduleFactoryImpl().createTransitSchedule();
+		
+		this.config.network().setLocked();
 	}
 
 	@Override

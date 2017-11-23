@@ -24,6 +24,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 
 /**
  * Contains several helper methods for working with {@link ActivityFacility facilities}.
@@ -48,6 +49,14 @@ public class FacilitiesUtils {
 	 */
 	public static SortedMap<Id<ActivityFacility>, ActivityFacility> getSortedFacilities(final ActivityFacilities facilities) {
 		return new TreeMap<>(facilities.getFacilities());
+	}
+	
+	public static void setLinkID( final Facility facility , Id<Link> linkId ) {
+		if ( facility instanceof ActivityFacilityImpl ) {
+			((ActivityFacilityImpl) facility).setLinkId(linkId);
+		} else {
+			throw new RuntimeException("cannot set linkID for this facility type; API needs to be cleaned up") ;
+		}
 	}
 
 }

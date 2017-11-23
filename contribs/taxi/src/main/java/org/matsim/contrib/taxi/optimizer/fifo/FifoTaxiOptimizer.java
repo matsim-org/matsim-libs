@@ -19,26 +19,24 @@
 
 package org.matsim.contrib.taxi.optimizer.fifo;
 
-import java.util.*;
-
-import org.matsim.contrib.dvrp.data.Requests;
-import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.optimizer.*;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizer;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author michalm
  */
-public class FifoTaxiOptimizer extends AbstractTaxiOptimizer {
-	private final BestDispatchFinder dispatchFinder;
+public class FifoTaxiOptimizer extends DefaultTaxiOptimizer {
 
-	public FifoTaxiOptimizer(TaxiOptimizerContext optimContext, FifoTaxiOptimizerParams params) {
-		super(optimContext, params, new PriorityQueue<TaxiRequest>(100, Requests.T0_COMPARATOR), true, true);
-		dispatchFinder = new BestDispatchFinder(optimContext);
-	}
-
-	@Override
-	protected void scheduleUnplannedRequests() {
-		new FifoSchedulingProblem(getOptimContext(), dispatchFinder)
-				.scheduleUnplannedRequests((Queue<TaxiRequest>)getUnplannedRequests());
+	public FifoTaxiOptimizer(TaxiConfigGroup taxiCfg, Fleet fleet, Network network, MobsimTimer timer,
+			TravelTime travelTime, TravelDisutility travelDisutility, TaxiScheduler scheduler,
+			FifoTaxiOptimizerParams params) {
+		super(taxiCfg, fleet, scheduler, params,
+				new FifoRequestInserter(network, fleet, timer, travelTime, travelDisutility, scheduler));
 	}
 }

@@ -34,10 +34,12 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.network.algorithms.NetworkSimplifier;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
@@ -430,6 +432,8 @@ public final class NetworkUtils {
      * @param coord
      *          the coordinate for which the closest link should be found
      * @return the link found closest to coord
+     * 
+     * @see {@link NetworkUtils#getNearestLinkExactly(Network, Coord)}
      */
     public static Link getNearestLink(Network network, final Coord coord) {
         Link nearestLink = null;
@@ -774,4 +778,14 @@ public final class NetworkUtils {
 	}
 
 	public static final String ORIGID = "origid";
+	
+	public static void runNetworkCleaner( Network network ) {
+		new org.matsim.core.network.algorithms.NetworkCleaner().run( network );
+	}
+	public static void runNetworkSimplifier( Network network ) {
+		new NetworkSimplifier().run(network) ;
+	}
+	public static void writeNetwork(Network network, String string) {
+		new NetworkWriter(network).write(string) ;
+	}
 }

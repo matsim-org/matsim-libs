@@ -29,7 +29,6 @@ import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.router.FastAStarEuclideanFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -49,12 +48,11 @@ public class EmptyVehicleRelocator {
 	@Inject
 	public EmptyVehicleRelocator(@Named(DvrpModule.DVRP_ROUTING) Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory,
+			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility,
 			DrtScheduler scheduler) {
 		this.travelTime = travelTime;
 		this.scheduler = scheduler;
 
-		TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime);
 		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 

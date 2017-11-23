@@ -71,32 +71,24 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
  * @author dgrether
  * @author dstrippgen
  */
-public class QNetsimEngine implements MobsimEngine {
+public class QNetsimEngine implements MobsimEngine, NetsimEngine {
+
 	public interface NetsimInternalInterface {
-
 		QNetwork getNetsimNetwork();
-
 		void arrangeNextAgentState(MobsimAgent pp);
-
 		void letVehicleArrive(QVehicle veh);
 	}
-	NetsimInternalInterface ii = new NetsimInternalInterface(){
 
-		@Override
-		public QNetwork getNetsimNetwork() {
+	NetsimInternalInterface ii = new NetsimInternalInterface(){
+		@Override public QNetwork getNetsimNetwork() {
 			return network ;
 		}
-
-		@Override
-		public void arrangeNextAgentState(MobsimAgent driver) {
+		@Override public void arrangeNextAgentState(MobsimAgent driver) {
 			QNetsimEngine.this.arrangeNextAgentState(driver);
 		}
-
-		@Override
-		public void letVehicleArrive(QVehicle veh) {
+		@Override public void letVehicleArrive(QVehicle veh) {
 			QNetsimEngine.this.letVehicleArrive( veh ) ;
 		}
-		
 	} ;
 
 	private static final Logger log = Logger.getLogger(QNetsimEngine.class);

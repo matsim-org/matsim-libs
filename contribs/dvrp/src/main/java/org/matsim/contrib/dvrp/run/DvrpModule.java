@@ -19,15 +19,22 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.contrib.dvrp.passenger.PassengerEnginePlugin;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
-import org.matsim.contrib.dynagent.run.*;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSourcePlugin;
+import org.matsim.contrib.dynagent.run.DynQSimModule;
+import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -36,24 +43,20 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
-import com.google.inject.*;
+import com.google.inject.Inject;
+import com.google.inject.Module;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 
 public final class DvrpModule extends AbstractModule {
 	public static final String DVRP_ROUTING = "dvrp_routing";// TODO ==> dvrp_optimizer???
 
-	@Inject
-	private DvrpConfigGroup dvrpCfg;
-
-	private final Module module;
-	private final List<Class<? extends MobsimListener>> listeners;
-
 	@SuppressWarnings("unchecked")
-	public DvrpModule(final Class<? extends VrpOptimizer> vrpOptimizerClass,
+	public static DvrpModule create(final Class<? extends VrpOptimizer> vrpOptimizerClass,
 			final Class<? extends PassengerRequestCreator> passengerRequestCreatorClass,
 			final Class<? extends DynActionCreator> dynActionCreatorClass) {
-
-		module = new com.google.inject.AbstractModule() {
+		Module module = new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
 				bind(VrpOptimizer.class).to(vrpOptimizerClass).asEagerSingleton();
@@ -62,11 +65,15 @@ public final class DvrpModule extends AbstractModule {
 			}
 		};
 
-		listeners = new ArrayList<>();
-		if (MobsimListener.class.isAssignableFrom(vrpOptimizerClass)) {
-			listeners.add((Class<? extends MobsimListener>)vrpOptimizerClass);
-		}
+		return MobsimListener.class.isAssignableFrom(vrpOptimizerClass)
+				? new DvrpModule(module, (Class<? extends MobsimListener>)vrpOptimizerClass) : new DvrpModule(module);
 	}
+
+	@Inject
+	private DvrpConfigGroup dvrpCfg;
+
+	private final Module module;
+	private final List<Class<? extends MobsimListener>> listeners;
 
 	@SafeVarargs
 	public DvrpModule(Module module, Class<? extends MobsimListener>... listeners) {
@@ -115,18 +122,12 @@ public final class DvrpModule extends AbstractModule {
 
 		@Override
 		public Collection<? extends Module> modules() {
-			Collection<Module> result = new ArrayList<>();
-			result.add(module);
-			return result;
+			return Collections.singletonList(module);
 		}
 
 		@Override
 		public Collection<Class<? extends MobsimListener>> listeners() {
-			Collection<Class<? extends MobsimListener>> result = new ArrayList<>();
-			for (Class<? extends MobsimListener> l : listeners) {
-				result.add(l);
-			}
-			return result;
+			return new ArrayList<>(listeners);
 		}
 	}
 }
