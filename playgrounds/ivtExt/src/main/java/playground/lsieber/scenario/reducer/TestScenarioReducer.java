@@ -63,9 +63,6 @@ public class TestScenarioReducer {
         Network network = shapeScenarioReducer.getNetwork();
         Population population = shapeScenarioReducer.getPopulation();
 
-        // TODO delete this sysouts
-        System.out.println(network.getLinks().size());
-        System.out.println(population.getPersons().size());
 
         // 3) create virtual Network
         // TODO make this generic for any VirtualNetwork creators.

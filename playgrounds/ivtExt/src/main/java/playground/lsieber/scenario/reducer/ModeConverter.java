@@ -12,7 +12,6 @@ public class ModeConverter {
     public final Population population;
 
     public ModeConverter(Population population) {
-        // TODO Auto-generated constructor stub
         this.population = population;
     }
 

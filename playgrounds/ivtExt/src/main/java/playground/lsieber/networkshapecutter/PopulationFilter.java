@@ -21,7 +21,6 @@ public class PopulationFilter {
     protected Population population;
 
     public PopulationFilter(Population population) {
-        // TODO Auto-generated constructor stub
         this.population = population;
     }
 

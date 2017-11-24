@@ -2,8 +2,6 @@ package playground.lsieber.networkshapecutter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import playground.clruch.ScenarioOptions;
@@ -42,7 +40,7 @@ public class PrepSettings {
     public final int dtTravelData;
 
     public final LocationSpec locationSpec;
-    public Set<String> modes = null;
+    public final LinkModes modes;
     public final boolean networkCleaner;
 
     public PrepSettings() throws IOException {
@@ -74,7 +72,8 @@ public class PrepSettings {
         // Cutting Attribtes
         // shapefile = new File(simOptions.getString("shapefile"));
 
-        modes = new HashSet<>(); // TODO Lukas import Modes from IDSC Options
+        modes = new LinkModes(simOptions.getString("modes", "ALLMODES"));
+
         networkCleaner = simOptions.getBoolean("networkCleaner", true);
     }
 
@@ -93,5 +92,6 @@ public class PrepSettings {
     public VirtualNetworkCreators createVirtualNetworkCreator() {
         return VirtualNetworkCreators.valueOf(simOptions.getString("virtualNetworkCreator"));
     }
+    // TODO @Lukas create function which checks if the propertie value exists and returns an error otherwhise
 
 }

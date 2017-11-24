@@ -22,7 +22,6 @@ import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 public class TestNetworkMerger {
 
     public static void main(String[] args) throws IOException {
-        // TODO Auto-generated method stub
         File workingDirectory = MultiFileTools.getWorkingDirectory();
 
         // import Network 1

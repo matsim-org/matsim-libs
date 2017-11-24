@@ -20,9 +20,15 @@ public enum NetworkPreparer {
         if (settings.locationSpec == null)
             System.out.println("its the ls");
 
+        // Cut Network as defined in the IDSC Settings
         Network modifiedNetwork = settings.createNetworkCutter().cut(network, settings);
 
-        modifiedNetwork = NetworkCutterUtils.modeFilter(modifiedNetwork, settings.modes);
+        // Filter out only the modes defines in the IDSC Settings
+        if (!settings.modes.allModesAllowed) {
+            modifiedNetwork = NetworkCutterUtils.modeFilter(modifiedNetwork, settings.modes);
+        }
+        
+        // Clean the network if defined in the IDSC Settings
         if (settings.networkCleaner) {
             new NetworkCleaner().run(modifiedNetwork);
         }

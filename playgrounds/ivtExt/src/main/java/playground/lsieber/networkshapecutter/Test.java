@@ -1,30 +1,17 @@
 package playground.lsieber.networkshapecutter;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 
-import ch.ethz.idsc.queuey.datalys.MultiFileTools;
-import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.ScenarioOptions;
 import playground.clruch.data.LocationSpec;
-import playground.clruch.data.ReferenceFrame;
 import playground.clruch.prep.PopulationTools;
-import playground.clruch.utils.NetworkLoader;
-import playground.clruch.utils.PropertiesExt;
 
 public class Test {
 
@@ -61,10 +48,11 @@ public class Test {
         modes.add("pt");
         modes.add("tram");
         modes.add("bus");
-
+        LinkModes linkModes = new LinkModes(modes);
         /** 2. cut the Network */
-//        Network cutN = new NetworkCutterShape(new File("shapefiles/TargetArea.shp")).filter(network, modes);
-        Network cutN = NetworkCutterUtils.modeFilter(new NetworkCutterRadius(LocationSpec.BASEL_REGION.center, LocationSpec.BASEL_REGION.radius).process(network), modes);
+        // Network cutN = new NetworkCutterShape(new File("shapefiles/TargetArea.shp")).filter(network, modes);
+        Network cutN = NetworkCutterUtils
+                .modeFilter(new NetworkCutterRadius(LocationSpec.BASEL_REGION.center, LocationSpec.BASEL_REGION.radius).process(network), linkModes);
 
         // Network cutN = new NetworkCutterRadius(LocationSpec.HOMBURGERTAL.center, LocationSpec.HOMBURGERTAL.radius).filter(network, modes);
         /** 3. update the Network in nV */
@@ -75,10 +63,10 @@ public class Test {
 
         // /** 5. Cut Population */
         Population cutP = population;
-        
-         System.out.println("Number of People before cutting:" + cutP.getPersons().size());
-         PopulationTools.elminateOutsideNetwork(cutP,cutN);
-         System.out.println("Number of People after cutting:" + cutP.getPersons().size());
+
+        System.out.println("Number of People before cutting:" + cutP.getPersons().size());
+        PopulationTools.elminateOutsideNetwork(cutP, cutN);
+        System.out.println("Number of People after cutting:" + cutP.getPersons().size());
 
         /** write to XML */
         new NetworkWriter(cutN).write("Homburgertal/network.xml");

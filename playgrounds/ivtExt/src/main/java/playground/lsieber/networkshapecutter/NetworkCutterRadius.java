@@ -20,7 +20,6 @@ public class NetworkCutterRadius extends NetworkCutter {
     private Network modifiedNetwork;
 
     public NetworkCutterRadius(Coord center, double radius) {
-        // TODO Auto-generated constructor stub
         this.radius = radius;
         this.center = center;
     }

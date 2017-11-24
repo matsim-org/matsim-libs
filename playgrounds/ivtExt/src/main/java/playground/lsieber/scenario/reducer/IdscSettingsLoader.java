@@ -18,7 +18,6 @@ public abstract class IdscSettingsLoader {
     protected PropertiesExt simOptions;
 
     public IdscSettingsLoader() throws IOException {
-        // TODO Auto-generated constructor stub
         loadSettings();
     }
 

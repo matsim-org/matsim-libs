@@ -12,6 +12,7 @@ import org.matsim.facilities.ActivityFacilities;
 
 import ch.ethz.idsc.owly.data.GlobalAssert;
 import playground.lsieber.networkshapecutter.FacilityPopulationBasedCutter;
+import playground.lsieber.networkshapecutter.LinkModes;
 import playground.lsieber.networkshapecutter.NetworkCutterShape;
 import playground.lsieber.networkshapecutter.NetworkCutterUtils;
 import playground.lsieber.networkshapecutter.PopulationCutterShape;
@@ -34,10 +35,10 @@ public class ShapeScenarioReducer extends AbstractScenarioReducer {
         modes.add("pt");
         // modes.add("tram");
         // modes.add("bus");
-
+        LinkModes linkModes = new LinkModes(modes);
         // TODO @ Lukas Implenment Shapefile from IDSC Options
         File shapefileAvAccessArea = new File("shapefiles/AvAccess.shp");
-        return NetworkCutterUtils.modeFilter(new NetworkCutterShape(shapefileAvAccessArea).process(originalScenario.getNetwork()), modes);
+        return NetworkCutterUtils.modeFilter(new NetworkCutterShape(shapefileAvAccessArea).process(originalScenario.getNetwork()), linkModes);
     }
 
     @Override
@@ -60,10 +61,10 @@ public class ShapeScenarioReducer extends AbstractScenarioReducer {
         modes.add("pt");
         modes.add("tram");
         modes.add("bus");
-
+        LinkModes linkModes = new LinkModes(modes);
         File shapefileTargetArea = new File("shapefiles/TargetArea.shp");
         targetAreaNetwork = new NetworkCutterShape(shapefileTargetArea).process(originalScenario.getNetwork());
-        targetAreaNetwork = NetworkCutterUtils.modeFilter(targetAreaNetwork, modes);
+        targetAreaNetwork = NetworkCutterUtils.modeFilter(targetAreaNetwork, linkModes);
     }
              
 

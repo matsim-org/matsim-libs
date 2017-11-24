@@ -26,6 +26,7 @@ public enum VirtualNetworkPreparer {
 
         virtualNetwork = settings.createVirtualNetworkCreator().create(network, population, settings);
 
+        //
         final File vnDir = new File(settings.workingDirectory, settings.VIRTUALNETWORKFOLDERNAME);
         vnDir.mkdir(); // create folder if necessary
         GlobalAssert.that(virtualNetwork != null);
