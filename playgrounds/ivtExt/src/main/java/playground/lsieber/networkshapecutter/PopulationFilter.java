@@ -4,7 +4,6 @@ import static org.matsim.pt.PtConstants.TRANSIT_ACTIVITY_TYPE;
 
 import java.util.Iterator;
 
-import org.hamcrest.BaseDescription;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -25,7 +24,7 @@ public class PopulationFilter {
         // TODO Auto-generated constructor stub
         this.population = population;
     }
-    
+
     public void run(Network network) {
         reducePtToOneLeg();
         System.out.println(" # people in middle between functions: " + population.getPersons().size());
@@ -38,21 +37,21 @@ public class PopulationFilter {
         // iterate through population for changes
         /* Adapted form PopulationTOOés */
         for (Person person : population.getPersons().values()) {
-            
+
             for (Plan plan : person.getPlans()) {
                 // step 0: replace pt chains by single pt leg
                 Iterator<PlanElement> it = plan.getPlanElements().iterator();
-        
+
                 boolean isOnPtTrip = false;
                 long numberOfPtTripElements = 0;
                 Leg ptTripChainStart = null;
-        
+
                 while (it.hasNext()) {
                     PlanElement pE = it.next();
-        
+
                     if (pE instanceof Leg) {
                         Leg leg = (Leg) pE;
-        
+
                         if (!isOnPtTrip) {
                             if (leg.getMode().equals("pt") || leg.getMode().equals("transit_walk")) {
                                 isOnPtTrip = true;
@@ -65,13 +64,13 @@ public class PopulationFilter {
                             numberOfPtTripElements++;
                         }
                     }
-        
+
                     if (pE instanceof Activity && isOnPtTrip) {
                         Activity act = (Activity) pE;
-        
+
                         if (!act.getType().equals(TRANSIT_ACTIVITY_TYPE)) {
                             isOnPtTrip = false;
-        
+
                             if (numberOfPtTripElements == 1 && ptTripChainStart.getMode().equals("transit_walk")) {
                                 ptTripChainStart.setMode("walk");
                             } else {
@@ -81,22 +80,22 @@ public class PopulationFilter {
                             it.remove();
                         }
                     }
-                }                
+                }
             }
         }
         System.out.println(" # people After one PT Let: " + population.getPersons().size());
 
     }
-    
+
     private void basedOnActivities(Network network) {
         Iterator<? extends Person> itPerson = population.getPersons().values().iterator();
 
         SecondPotenceSysout print = new SecondPotenceSysout("we are at person # ");
-                
-System.out.println(network.getLinks().size());
-        while (itPerson.hasNext()) {           
+
+        System.out.println(network.getLinks().size());
+        while (itPerson.hasNext()) {
             print.ifPotenceOf2();
-            
+
             Person person = itPerson.next();
             boolean removePerson = true;
             for (Plan plan : person.getPlans()) {
@@ -116,7 +115,7 @@ System.out.println(network.getLinks().size());
                 itPerson.remove();
         }
     }
-    
+
     public Population getPopulation() {
         return population;
     }

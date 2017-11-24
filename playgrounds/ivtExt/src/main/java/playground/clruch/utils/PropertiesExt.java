@@ -37,6 +37,13 @@ public class PropertiesExt {
         return Boolean.valueOf(properties.getProperty(key));
     }
 
+    public boolean getBoolean(String key, boolean standard) {
+        if (!properties.containsKey(key)) {
+            return standard;
+        }
+        return Boolean.valueOf(properties.getProperty(key));
+    }
+
     public int getInt(String key) {
         return Integer.valueOf(properties.getProperty(key));
     }

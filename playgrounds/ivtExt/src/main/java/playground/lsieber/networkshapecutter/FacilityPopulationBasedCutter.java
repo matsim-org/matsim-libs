@@ -18,7 +18,6 @@ public class FacilityPopulationBasedCutter implements FacilitiesCutter {
     Population population;
 
     public FacilityPopulationBasedCutter(Population population) {
-        // TODO Auto-generated constructor stub
         this.population = population;
     }
 
