@@ -13,12 +13,11 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-public class NetworkCutterRadius implements NetworkCutter {
+public class NetworkCutterRadius extends NetworkCutter {
 
     private double radius;
     private Coord center;
     private Network modifiedNetwork;
-    private String cutInfo = null;
 
     public NetworkCutterRadius(Coord center, double radius) {
         // TODO Auto-generated constructor stub
@@ -27,13 +26,13 @@ public class NetworkCutterRadius implements NetworkCutter {
     }
 
     @Override
-    public Network filter(Network network, Set<String> modes) throws MalformedURLException, IOException {
+    public Network process(Network network) throws MalformedURLException, IOException {
         if (this.radius == 0.0) {
             System.out.println("hey");
             return network;
         } else {
 
-            modifiedNetwork = filterInternal(network, modes);
+            modifiedNetwork = filterInternal(network);
 
             long numberOfLinksOriginal = network.getLinks().size();
             long numberOfNodesOriginal = network.getNodes().size();
@@ -52,40 +51,25 @@ public class NetworkCutterRadius implements NetworkCutter {
         }
     }
 
-    @Override
-    public void printCutSummary() {
-        // TODO Auto-generated method stub
-        System.out.println(cutInfo);
-    }
+    private Network filterInternal(Network originalNetwork) {
+        if (radius == 0) {
+            cutInfo += "No cutting radius given! No cutting executed!";
+            return originalNetwork;
+        } else {
+            Network filteredNetwork = NetworkUtils.createNetwork();
 
-    @Override
-    public void checkNetworkConsistency() {
-        // TODO Auto-generated method stub
-
-    }
-
-    private Network filterInternal(Network originalNetwork, Set<String> modes) {
-
-        Network filteredNetwork = NetworkUtils.createNetwork();
-
-        for (Node node : originalNetwork.getNodes().values()) {
-            if (CoordUtils.calcEuclideanDistance(node.getCoord(), center) <= radius) {
-                filteredNetwork.addNode(filteredNetwork.getFactory().createNode(node.getId(), node.getCoord()));
-            }
-        }
-
-        for (Link link : originalNetwork.getLinks().values()) {
-            Node filteredFromNode = filteredNetwork.getNodes().get(link.getFromNode().getId());
-            Node filteredToNode = filteredNetwork.getNodes().get(link.getToNode().getId());
-
-            if (filteredFromNode != null && filteredToNode != null) {
-
-                Iterator<String> it = modes.iterator();
-                boolean allowedMode = false;
-                while (it.hasNext() && !allowedMode) {
-                    allowedMode = link.getAllowedModes().contains(it.next());
+            for (Node node : originalNetwork.getNodes().values()) {
+                if (CoordUtils.calcEuclideanDistance(node.getCoord(), center) <= radius) {
+                    filteredNetwork.addNode(filteredNetwork.getFactory().createNode(node.getId(), node.getCoord()));
                 }
-                if (allowedMode) {
+            }
+
+            for (Link link : originalNetwork.getLinks().values()) {
+                Node filteredFromNode = filteredNetwork.getNodes().get(link.getFromNode().getId());
+                Node filteredToNode = filteredNetwork.getNodes().get(link.getToNode().getId());
+
+                if (filteredFromNode != null && filteredToNode != null) {
+
                     Link newLink = filteredNetwork.getFactory().createLink(link.getId(), filteredFromNode, filteredToNode);
 
                     newLink.setAllowedModes(link.getAllowedModes());
@@ -95,13 +79,15 @@ public class NetworkCutterRadius implements NetworkCutter {
                     newLink.setNumberOfLanes(link.getNumberOfLanes());
 
                     filteredNetwork.addLink(newLink);
+                    
                 }
             }
+
+            new NetworkCleaner().run(filteredNetwork);
+
+            return filteredNetwork;
         }
-
-        new NetworkCleaner().run(filteredNetwork);
-
-        return filteredNetwork;
+        
     }
 
 }

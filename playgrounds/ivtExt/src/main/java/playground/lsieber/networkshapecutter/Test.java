@@ -64,7 +64,7 @@ public class Test {
 
         /** 2. cut the Network */
 //        Network cutN = new NetworkCutterShape(new File("shapefiles/TargetArea.shp")).filter(network, modes);
-        Network cutN = new NetworkCutterRadius(LocationSpec.BASEL_REGION.center, LocationSpec.BASEL_REGION.radius).filter(network, modes);
+        Network cutN = NetworkCutterUtils.modeFilter(new NetworkCutterRadius(LocationSpec.BASEL_REGION.center, LocationSpec.BASEL_REGION.radius).process(network), modes);
 
         // Network cutN = new NetworkCutterRadius(LocationSpec.HOMBURGERTAL.center, LocationSpec.HOMBURGERTAL.radius).filter(network, modes);
         /** 3. update the Network in nV */

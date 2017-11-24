@@ -13,6 +13,7 @@ import org.matsim.facilities.ActivityFacilities;
 import ch.ethz.idsc.owly.data.GlobalAssert;
 import playground.lsieber.networkshapecutter.FacilityPopulationBasedCutter;
 import playground.lsieber.networkshapecutter.NetworkCutterShape;
+import playground.lsieber.networkshapecutter.NetworkCutterUtils;
 import playground.lsieber.networkshapecutter.PopulationCutterShape;
 import playground.lsieber.networkshapecutter.PopulationFilter;
 
@@ -26,7 +27,7 @@ public class ShapeScenarioReducer extends AbstractScenarioReducer {
 
     @Override
     protected Network networkCutter() throws MalformedURLException, IOException {
-        // TODO @ lukas Decouple Modes and Nettworkcutting
+        // TODO @ lukas Modes directely in IDSC Options
 
         Set<String> modes = new HashSet<>();
         // modes.add("car");
@@ -36,7 +37,7 @@ public class ShapeScenarioReducer extends AbstractScenarioReducer {
 
         // TODO @ Lukas Implenment Shapefile from IDSC Options
         File shapefileAvAccessArea = new File("shapefiles/AvAccess.shp");
-        return new NetworkCutterShape(shapefileAvAccessArea).filter(originalScenario.getNetwork(), modes);
+        return NetworkCutterUtils.modeFilter(new NetworkCutterShape(shapefileAvAccessArea).process(originalScenario.getNetwork()), modes);
     }
 
     @Override
@@ -61,8 +62,10 @@ public class ShapeScenarioReducer extends AbstractScenarioReducer {
         modes.add("bus");
 
         File shapefileTargetArea = new File("shapefiles/TargetArea.shp");
-        targetAreaNetwork = new NetworkCutterShape(shapefileTargetArea).filter(originalScenario.getNetwork(), modes);
+        targetAreaNetwork = new NetworkCutterShape(shapefileTargetArea).process(originalScenario.getNetwork());
+        targetAreaNetwork = NetworkCutterUtils.modeFilter(targetAreaNetwork, modes);
     }
+             
 
     protected void filterPopulationOfTargetAreaOnlyPt() throws MalformedURLException, IOException {
         System.out.println(" # people before Target Area: " + population.getPersons().size());

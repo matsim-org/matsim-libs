@@ -16,7 +16,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetworkIO;
-import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensors;
@@ -24,7 +23,6 @@ import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeIO;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeIO;
-import playground.clruch.data.LocationSpec;
 import playground.clruch.netdata.MatsimCenterVirtualNetworkCreator;
 import playground.clruch.netdata.MatsimKMEANSVirtualNetworkCreator;
 import playground.clruch.prep.NetworkCutClean;
@@ -33,7 +31,7 @@ import playground.clruch.prep.PopulationTools;
 import playground.clruch.prep.TheApocalypse;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
-import playground.clruch.utils.PropertiesExt;
+import playground.lsieber.networkshapecutter.PrepSettings;
 
 /** Class to prepare a given scenario for MATSim, includes preparation of netowrk, population, creation of virtualNetwork
  * and travelData objects.
@@ -42,41 +40,17 @@ import playground.clruch.utils.PropertiesExt;
 // TODO clean up thoroughly this file
 public class ScenarioPreparer {
 
-    private final static String NETWORKUPDATEDNAME = "networkConverted";
-    private final static String POPULATIONUPDATEDNAME = "populationConverted";
-
     public static void main(String[] args) throws MalformedURLException, Exception {
         run(args);
     }
 
     public static void run(String[] args) throws MalformedURLException, Exception {
 
-        // load options
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
-
-        File configFile = new File(workingDirectory, simOptions.getString("fullConfig"));
-        System.out.println("loading config file to get data " + configFile.getAbsoluteFile());
-
-        // TODO can some of these be directly read from another source? Do all have to be user settings?
-        boolean populationeliminateFreight = simOptions.getBoolean("populationeliminateFreight");
-        boolean populationeliminateWalking = simOptions.getBoolean("populationeliminateWalking");
-        boolean populationchangeModeToAV = simOptions.getBoolean("populationchangeModeToAV");
-        LocationSpec ls = simOptions.getLocationSpec();
-        int numVirtualNodes = simOptions.getInt("numVirtualNodes");
-        boolean completeGraph = simOptions.getBoolean("completeGraph");
-        int maxPopulationSize = simOptions.getInt("maxPopulationSize");
-        int dtTravelData = simOptions.getInt("dtTravelData");
-        boolean calculatePerformanceFleetSize = simOptions.getBoolean("calculatePerformanceFleetSize");
-        boolean centerNetwork = simOptions.getBoolean("centerNetwork");
-        String VIRTUALNETWORKFOLDERNAME = simOptions.getString("virtualNetworkDir");
-        String VIRTUALNETWORKFILENAME = simOptions.getString("virtualNetworkName");
-        String TRAVELDATAFILENAME = simOptions.getString("travelDataName");
-        String MINIMUMFLEETSIZEFILENAME = simOptions.getString("minimumFleetSizeFileName");
-        String PERFORMANCEFLEETSIZEFILENAME = simOptions.getString("performanceFleetSizeFileName");
+        // load Settings from IDSC Options
+        PrepSettings settings = new PrepSettings();
 
         // 0) load files
-        Config config = ConfigUtils.loadConfig(configFile.toString());
+        Config config = ConfigUtils.loadConfig(settings.configFile.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
 
@@ -85,11 +59,11 @@ public class ScenarioPreparer {
         {// 1) cut network (and reduce population to new network)
             if (network == null)
                 System.out.println("its the network");
-            if (ls == null)
+            if (settings.locationSpec == null)
                 System.out.println("its the ls");
-            NetworkCutClean.elminateOutsideRadius(network, ls.center, ls.radius);
-            final File fileExportGz = new File(workingDirectory, NETWORKUPDATEDNAME + ".xml.gz");
-            final File fileExport = new File(workingDirectory, NETWORKUPDATEDNAME + ".xml");
+            NetworkCutClean.elminateOutsideRadius(network, settings.locationSpec.center, settings.locationSpec.radius);
+            final File fileExportGz = new File(settings.workingDirectory, settings.NETWORKUPDATEDNAME + ".xml.gz");
+            final File fileExport = new File(settings.workingDirectory, settings.NETWORKUPDATEDNAME + ".xml");
             {
                 // write the modified population to file
                 NetworkWriter nw = new NetworkWriter(network);
@@ -101,30 +75,30 @@ public class ScenarioPreparer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            System.out.println("saved converted network to: " + workingDirectory + NETWORKUPDATEDNAME + ".xml");
+            System.out.println("saved converted network to: " + settings.workingDirectory + settings.NETWORKUPDATEDNAME + ".xml");
         }
 
         {// 2) adapt the population to new network
             System.out.println("Original population size: " + population.getPersons().values().size());
             PopulationTools.elminateOutsideNetwork(population, network);
             // System.out.println("Population size after radius cut: " + population.getPersons().values().size());
-            if (populationeliminateFreight)
+            if (settings.populationeliminateFreight)
                 PopulationTools.eliminateFreight(population);
             System.out.println("Population size after removing freight: " + population.getPersons().values().size());
-            if (populationeliminateWalking)
+            if (settings.populationeliminateWalking)
                 PopulationTools.eliminateWalking(population);
             System.out.println("Population size after removing walking people: " + population.getPersons().values().size());
-            if (populationchangeModeToAV) { // FIXME not sure if this is still required, or should always happen !?
+            if (settings.populationchangeModeToAV) { // FIXME not sure if this is still required, or should always happen !?
                 System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
                 PopulationTools.changeModesOfTransportToAV(population);
             }
             System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
-            TheApocalypse.decimatesThe(population).toNoMoreThan(maxPopulationSize).people();
+            TheApocalypse.decimatesThe(population).toNoMoreThan(settings.maxPopulationSize).people();
             System.out.println("Population after decimation:" + population.getPersons().values().size());
             GlobalAssert.that(population.getPersons().size() > 0);
 
-            final File fileExportGz = new File(workingDirectory, POPULATIONUPDATEDNAME + ".xml.gz");
-            final File fileExport = new File(workingDirectory, POPULATIONUPDATEDNAME + ".xml");
+            final File fileExportGz = new File(settings.workingDirectory, settings.POPULATIONUPDATEDNAME + ".xml.gz");
+            final File fileExport = new File(settings.workingDirectory, settings.POPULATIONUPDATEDNAME + ".xml");
 
             {
                 // write the modified population to file
@@ -146,39 +120,39 @@ public class ScenarioPreparer {
         // 3) create virtual Network
         // TODO make this generic for any VirtualNetwork creators.
         VirtualNetwork<Link> virtualNetwork;
-        if (centerNetwork) {
+        if (settings.centerNetwork) {
             MatsimCenterVirtualNetworkCreator centercreator = new MatsimCenterVirtualNetworkCreator();
             virtualNetwork = centercreator.creatVirtualNetwork(network, 2000.0, Tensors.vector(-900.0, -2300.0));
 
         } else {
             MatsimKMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new MatsimKMEANSVirtualNetworkCreator();
-            virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, numVirtualNodes, completeGraph);
+            virtualNetwork = kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, settings.numVirtualNodes, settings.completeGraph);
         }
 
-        final File vnDir = new File(workingDirectory, VIRTUALNETWORKFOLDERNAME);
+        final File vnDir = new File(settings.workingDirectory, settings.VIRTUALNETWORKFOLDERNAME);
         vnDir.mkdir(); // create folder if necessary
         GlobalAssert.that(virtualNetwork != null);
-        VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
-        System.out.println("saved virtual network byte format to : " + new File(vnDir, VIRTUALNETWORKFILENAME));
+        VirtualNetworkIO.toByte(new File(vnDir, settings.VIRTUALNETWORKFILENAME), virtualNetwork);
+        System.out.println("saved virtual network byte format to : " + new File(vnDir, settings.VIRTUALNETWORKFILENAME));
         PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);
         prs.exportCsv();
         // 3) generate travelData
-        TravelData travelData = new TravelData(virtualNetwork, network, scenario.getPopulation(), dtTravelData);
-        TravelDataIO.toByte(new File(vnDir, TRAVELDATAFILENAME), travelData);
-        System.out.println("saved travelData byte format to : " + new File(vnDir, TRAVELDATAFILENAME));
+        TravelData travelData = new TravelData(virtualNetwork, network, scenario.getPopulation(), settings.dtTravelData);
+        TravelDataIO.toByte(new File(vnDir, settings.TRAVELDATAFILENAME), travelData);
+        System.out.println("saved travelData byte format to : " + new File(vnDir, settings.TRAVELDATAFILENAME));
 
         {// 4) calculate minimum and performance fleet size and save results
             MinimumFleetSizeCalculator minimumFleetSizeCalculator = new MinimumFleetSizeCalculator(network, population, virtualNetwork, travelData);
-            MinimumFleetSizeIO.toByte(new File(vnDir, MINIMUMFLEETSIZEFILENAME), minimumFleetSizeCalculator);
+            MinimumFleetSizeIO.toByte(new File(vnDir, settings.MINIMUMFLEETSIZEFILENAME), minimumFleetSizeCalculator);
 
-            if (calculatePerformanceFleetSize) {
+            if (settings.calculatePerformanceFleetSize) {
                 int maxNumberVehiclesPerformanceCalculator = (int) (population.getPersons().size() * 0.3);
                 PerformanceFleetSizeCalculator performanceFleetSizeCalculator = //
                         new PerformanceFleetSizeCalculator(virtualNetwork, travelData, maxNumberVehiclesPerformanceCalculator);
-                PerformanceFleetSizeIO.toByte(new File(vnDir, PERFORMANCEFLEETSIZEFILENAME), performanceFleetSizeCalculator);
+                PerformanceFleetSizeIO.toByte(new File(vnDir, settings.PERFORMANCEFLEETSIZEFILENAME), performanceFleetSizeCalculator);
             }
         }
         virtualNetwork.printVirtualNetworkInfo();
-        System.out.println("successfully converted simulation data files from in " + workingDirectory);
+        System.out.println("successfully converted simulation data files from in " + settings.workingDirectory);
     }
 }

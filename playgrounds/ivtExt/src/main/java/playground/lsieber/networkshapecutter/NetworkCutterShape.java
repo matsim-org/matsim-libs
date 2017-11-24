@@ -7,10 +7,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,19 +21,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.algorithms.NetworkCleaner;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
-import info.monitorenter.gui.chart.controls.LayoutFactory.BasicPropertyAdaptSupport.RemoveAsListenerFromComponentIfTraceIsDropped;
-import playground.lsieber.scenario.reducer.NetworkActions;
-
 /** @author Claudio Ruch */
-public class NetworkCutterShape implements NetworkCutter {
+public class NetworkCutterShape extends NetworkCutter {
 
-    private String cutInfo = null;
     private final URL shapefileUrl;
     private Network modifiedNetwork;
 
@@ -46,8 +38,8 @@ public class NetworkCutterShape implements NetworkCutter {
     }
 
     @Override
-    public Network filter(Network network, Set<String> modes) throws MalformedURLException, IOException {
-        modifiedNetwork = filterInternal(network, modes);
+    public Network process(Network network) throws MalformedURLException, IOException {
+        modifiedNetwork = filterInternal(network);
 
         long numberOfLinksOriginal = network.getLinks().size();
         long numberOfNodesOriginal = network.getNodes().size();
@@ -65,18 +57,7 @@ public class NetworkCutterShape implements NetworkCutter {
         return modifiedNetwork;
     }
 
-    @Override
-    public void printCutSummary() {
-        System.out.println(cutInfo); // TODO this will produce an exeption, fill thet info while cutting!
-    }
-
-    @Override
-    public void checkNetworkConsistency() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public Network filterInternal(Network originalNetwork, Set<String> modes) throws IOException {
+    public Network filterInternal(Network originalNetwork) throws IOException {
 
         Network filteredNetwork = NetworkUtils.createNetwork();
 
@@ -122,46 +103,11 @@ public class NetworkCutterShape implements NetworkCutter {
             }
         }
 
-        Network modesFilteredNetwork = NetworkActions.modeFilter(filteredNetwork, modes);
         // new NetworkCleaner().run(modesFilteredNetwork);
 
         // new NetworkCleaner().run(filteredNetwork);
 
-        return modesFilteredNetwork;
+        return filteredNetwork;
     }
-    // TODO Delete
-    // public Network modeFilter(Network originalNetwork, HashSet<String> modes) {
-    // // Filter out modes
-    // Network modesFilteredNetwork = NetworkUtils.createNetwork();
-    // for (Node node : originalNetwork.getNodes().values()) {
-    // modesFilteredNetwork.addNode(modesFilteredNetwork.getFactory().createNode(node.getId(), node.getCoord()));
-    // }
-    // for (Link filteredlink : originalNetwork.getLinks().values()) {
-    // Node filteredFromNode = modesFilteredNetwork.getNodes().get(filteredlink.getFromNode().getId());
-    // Node filteredToNode = modesFilteredNetwork.getNodes().get(filteredlink.getToNode().getId());
-    // if (filteredFromNode != null && filteredToNode != null) {
-    //
-    // Iterator<String> it = modes.iterator();
-    // boolean allowedMode = false;
-    // while (it.hasNext() && !allowedMode) {
-    // allowedMode = filteredlink.getAllowedModes().contains(it.next());
-    // }
-    // if (allowedMode) {
-    // Link newLink = modesFilteredNetwork.getFactory().createLink(filteredlink.getId(), filteredFromNode, filteredToNode);
-    //
-    // // newLink.setAllowedModes(Collections.singleton("car"));
-    // newLink.setAllowedModes(filteredlink.getAllowedModes());
-    //
-    // newLink.setLength(filteredlink.getLength());
-    // newLink.setCapacity(filteredlink.getCapacity());
-    // newLink.setFreespeed(filteredlink.getFreespeed());
-    // // newLink.setNumberOfLanes(link.getNumberOfLanes());
-    //
-    // modesFilteredNetwork.addLink(newLink);
-    // }
-    // }
-    //
-    // }
-    // return modesFilteredNetwork;
-    // }
+
 }

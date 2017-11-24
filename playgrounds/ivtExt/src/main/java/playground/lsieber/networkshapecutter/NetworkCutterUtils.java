@@ -1,6 +1,5 @@
-package playground.lsieber.scenario.reducer;
+package playground.lsieber.networkshapecutter;
 
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.Set;
 
@@ -9,9 +8,17 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkUtils;
 
-public enum NetworkActions {
+public enum NetworkCutterUtils {
     ;
+    
+    // TODO @Lukas directely filter original Network without return value -> save way....
     public static Network modeFilter(Network originalNetwork, Set<String> modes) {
+        if (modes == null) {
+            System.out.println("No modes filtered. Network was not modified");
+            return originalNetwork;
+        } else {
+
+        }
         // Filter out modes
         Network modesFilteredNetwork = NetworkUtils.createNetwork();
         for (Node node : originalNetwork.getNodes().values()) {
@@ -24,10 +31,8 @@ public enum NetworkActions {
                 boolean allowedMode = modes.stream().anyMatch(link.getAllowedModes()::contains);
                 if (allowedMode) {
                     Link newLink = modesFilteredNetwork.getFactory().createLink(link.getId(), filteredFromNode, filteredToNode);
-
-                    // newLink.setAllowedModes(Collections.singleton("car"));
+                    
                     newLink.setAllowedModes(link.getAllowedModes());
-
                     newLink.setLength(link.getLength());
                     newLink.setCapacity(link.getCapacity());
                     newLink.setFreespeed(link.getFreespeed());
@@ -38,6 +43,9 @@ public enum NetworkActions {
             }
 
         }
+        String output = modes.stream().toString();
+        System.out.println("The following modes are kept in the network: " + output);
+
         return modesFilteredNetwork;
     }
 
