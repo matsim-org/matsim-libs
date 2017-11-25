@@ -41,12 +41,29 @@ public enum NetworkCutterUtils {
 
             }
 
-            // TODO sysout of all modes which are kept. Maybe with Stream?!
             String output = modes.getModesSet().toString();
             System.out.println("The following modes are kept in the network: " + output);
 
             return modesFilteredNetwork;
         }
+    }
+    
+    public static void printNettworkCuttingInfo(Network originalNetwork, Network modifiedNetwork) {
+        long numberOfLinksOriginal = originalNetwork.getLinks().size();
+        long numberOfNodesOriginal = originalNetwork.getNodes().size();
+        long numberOfLinksFiltered = modifiedNetwork.getLinks().size();
+        long numberOfNodesFiltered = modifiedNetwork.getNodes().size();
+        
+        String cutInfo = "------------NETWORK CUTTING INFOS----------------\n";
+        cutInfo += "  Number of nodes in original network: " + numberOfNodesOriginal + "\n";
+        cutInfo += "  Number of Links in original network: " + numberOfLinksOriginal + "\n";
+        
+        cutInfo += String.format("  Number of nodes in filtered network: %d (%.2f%%)", numberOfNodesFiltered,
+                100.0 * numberOfNodesFiltered / numberOfNodesOriginal) + "\n";
+        cutInfo += String.format("  Number of links in filtered network: %d (%.2f%%)", numberOfLinksFiltered,
+                100.0 * numberOfLinksFiltered / numberOfLinksOriginal) + "\n";
+        System.out.println(cutInfo);
+        
     }
 
 }

@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 
-import playground.lsieber.scenario.reducer.SecondPotenceSysout;
+import playground.lsieber.oldCode.SecondPotenceSysout;
 
 public class PopulationFilter {
 

@@ -1,4 +1,4 @@
-package playground.lsieber.scenario.reducer;
+package playground.lsieber.oldCode;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;

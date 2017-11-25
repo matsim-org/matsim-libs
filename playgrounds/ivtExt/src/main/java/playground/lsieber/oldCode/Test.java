@@ -1,4 +1,4 @@
-package playground.lsieber.networkshapecutter;
+package playground.lsieber.oldCode;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,6 +12,10 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 
 import playground.clruch.data.LocationSpec;
 import playground.clruch.prep.PopulationTools;
+import playground.lsieber.networkshapecutter.LinkModes;
+import playground.lsieber.networkshapecutter.NetworkCutterRadius;
+import playground.lsieber.networkshapecutter.NetworkCutterUtils;
+import playground.lsieber.networkshapecutter.NetworkVisualisation;
 
 public class Test {
 

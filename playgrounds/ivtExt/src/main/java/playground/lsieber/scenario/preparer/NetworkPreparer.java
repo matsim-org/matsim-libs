@@ -1,4 +1,4 @@
-package playground.lsieber.scenario.reducer;
+package playground.lsieber.scenario.preparer;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,14 +27,14 @@ public enum NetworkPreparer {
         if (!settings.modes.allModesAllowed) {
             modifiedNetwork = NetworkCutterUtils.modeFilter(modifiedNetwork, settings.modes);
         }
-        
+
         // Clean the network if defined in the IDSC Settings
         if (settings.networkCleaner) {
             new NetworkCleaner().run(modifiedNetwork);
         }
 
-        final File fileExportGz = new File(settings.workingDirectory, settings.NETWORKUPDATEDNAME + ".xml.gz");
-        final File fileExport = new File(settings.workingDirectory, settings.NETWORKUPDATEDNAME + ".xml");
+        final File fileExportGz = new File(settings.preparedScenarioDirectory, settings.NETWORKUPDATEDNAME + ".xml.gz");
+        final File fileExport = new File(settings.preparedScenarioDirectory, settings.NETWORKUPDATEDNAME + ".xml");
         {
             // write the modified population to file
             NetworkWriter nw = new NetworkWriter(modifiedNetwork);
@@ -46,8 +46,11 @@ public enum NetworkPreparer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("saved converted network to: " + settings.workingDirectory + settings.NETWORKUPDATEDNAME + ".xml");
+        System.out.println("saved converted network to: " + settings.preparedScenarioDirectory + settings.NETWORKUPDATEDNAME + ".xml");
 
         network = modifiedNetwork;
+
+        NetworkCutterUtils.printNettworkCuttingInfo(network, modifiedNetwork);
     }
+
 }

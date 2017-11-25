@@ -1,4 +1,4 @@
-package playground.lsieber.scenario.reducer;
+package playground.lsieber.scenario.preparer;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,8 +35,8 @@ public enum PopulationPreparer {
         System.out.println("Population after decimation:" + population.getPersons().values().size());
         GlobalAssert.that(population.getPersons().size() > 0);
 
-        final File fileExportGz = new File(settings.workingDirectory, settings.POPULATIONUPDATEDNAME + ".xml.gz");
-        final File fileExport = new File(settings.workingDirectory, settings.POPULATIONUPDATEDNAME + ".xml");
+        final File fileExportGz = new File(settings.preparedScenarioDirectory, settings.POPULATIONUPDATEDNAME + ".xml.gz");
+        final File fileExport = new File(settings.preparedScenarioDirectory, settings.POPULATIONUPDATEDNAME + ".xml");
 
         {
             // write the modified population to file

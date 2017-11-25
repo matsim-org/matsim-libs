@@ -1,4 +1,4 @@
-package playground.lsieber.scenario.reducer;
+package playground.lsieber.oldCode;
 
 public class SecondPotenceSysout {
 

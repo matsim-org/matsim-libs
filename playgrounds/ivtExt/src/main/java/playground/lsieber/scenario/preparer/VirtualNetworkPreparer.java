@@ -1,4 +1,4 @@
-package playground.lsieber.scenario.reducer;
+package playground.lsieber.scenario.preparer;
 
 import java.io.File;
 
@@ -27,7 +27,7 @@ public enum VirtualNetworkPreparer {
         virtualNetwork = settings.createVirtualNetworkCreator().create(network, population, settings);
 
         //
-        final File vnDir = new File(settings.workingDirectory, settings.VIRTUALNETWORKFOLDERNAME);
+        final File vnDir = new File(settings.preparedScenarioDirectory, settings.VIRTUALNETWORKFOLDERNAME);
         vnDir.mkdir(); // create folder if necessary
         GlobalAssert.that(virtualNetwork != null);
         VirtualNetworkIO.toByte(new File(vnDir, settings.VIRTUALNETWORKFILENAME), virtualNetwork);
@@ -51,6 +51,6 @@ public enum VirtualNetworkPreparer {
             }
         }
         virtualNetwork.printVirtualNetworkInfo();
-        System.out.println("successfully converted simulation data files from in " + settings.workingDirectory);
+        System.out.println("successfully converted simulation data files from in " + settings.preparedScenarioDirectory);
     }
 }

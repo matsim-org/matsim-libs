@@ -3,6 +3,8 @@ package playground.lsieber.networkshapecutter;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.commons.io.FilenameUtils;
+
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import playground.clruch.ScenarioOptions;
 import playground.clruch.data.LocationSpec;
@@ -15,6 +17,7 @@ public class PrepSettings {
     /* Directories and Paths */
     public final File workingDirectory;
     public final File configFile;
+    public final File preparedScenarioDirectory;
 
     public final String VIRTUALNETWORKFOLDERNAME;
     public final String VIRTUALNETWORKFILENAME;
@@ -24,8 +27,8 @@ public class PrepSettings {
 
     // public final File shapefile = null;
 
-    public String NETWORKUPDATEDNAME = "networkConverted";
-    public String POPULATIONUPDATEDNAME = "populationConverted";
+    public String NETWORKUPDATEDNAME;
+    public String POPULATIONUPDATEDNAME;
 
     /* Booleans */
     public final boolean populationeliminateWalking;
@@ -46,7 +49,7 @@ public class PrepSettings {
     public PrepSettings() throws IOException {
         workingDirectory = MultiFileTools.getWorkingDirectory();
         simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
-
+        preparedScenarioDirectory = new File(workingDirectory,simOptions.getString("preparedScenarioDirectory", "preparedScenario"));
         configFile = new File(workingDirectory, simOptions.getString("fullConfig"));
         System.out.println("loading config file to get data " + configFile.getAbsoluteFile());
 
@@ -66,8 +69,8 @@ public class PrepSettings {
         MINIMUMFLEETSIZEFILENAME = simOptions.getString("minimumFleetSizeFileName");
         PERFORMANCEFLEETSIZEFILENAME = simOptions.getString("performanceFleetSizeFileName");
 
-        NETWORKUPDATEDNAME = simOptions.getString("NetworkUpdateName");
-        POPULATIONUPDATEDNAME = simOptions.getString("PopulationUpdateName");
+        NETWORKUPDATEDNAME = simOptions.getString("NetworkUpdateName", "networkConverted");
+        POPULATIONUPDATEDNAME = simOptions.getString("PopulationUpdateName", "populationConverted");
 
         // Cutting Attribtes
         // shapefile = new File(simOptions.getString("shapefile"));

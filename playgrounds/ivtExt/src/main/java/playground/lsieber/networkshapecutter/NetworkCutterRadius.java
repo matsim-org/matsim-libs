@@ -2,8 +2,6 @@ package playground.lsieber.networkshapecutter;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Iterator;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -27,25 +25,25 @@ public class NetworkCutterRadius extends NetworkCutter {
     @Override
     public Network process(Network network) throws MalformedURLException, IOException {
         if (this.radius == 0.0) {
-            System.out.println("hey");
+            System.out.println("THe Network was not cuttet. NO RADIUS GIVEN");
             return network;
         } else {
 
             modifiedNetwork = filterInternal(network);
-
-            long numberOfLinksOriginal = network.getLinks().size();
-            long numberOfNodesOriginal = network.getNodes().size();
-            long numberOfLinksFiltered = modifiedNetwork.getLinks().size();
-            long numberOfNodesFiltered = modifiedNetwork.getNodes().size();
-
-            cutInfo += "  Number of Links in original network: " + numberOfLinksOriginal + "\n";
-            cutInfo += "  Number of nodes in original network: " + numberOfNodesOriginal + "\n";
-            cutInfo += String.format("  Number of nodes in filtered network: %d (%.2f%%)", numberOfNodesFiltered,
-                    100.0 * numberOfNodesFiltered / numberOfNodesOriginal) + "\n";
-            cutInfo += String.format("  Number of links in filtered network: %d (%.2f%%)", numberOfLinksFiltered,
-                    100.0 * numberOfLinksFiltered / numberOfLinksOriginal) + "\n";
-
-            printCutSummary();
+            // TODO Lukas Check if still needed
+            // long numberOfLinksOriginal = network.getLinks().size();
+            // long numberOfNodesOriginal = network.getNodes().size();
+            // long numberOfLinksFiltered = modifiedNetwork.getLinks().size();
+            // long numberOfNodesFiltered = modifiedNetwork.getNodes().size();
+            //
+            // cutInfo += " Number of Links in original network: " + numberOfLinksOriginal + "\n";
+            // cutInfo += " Number of nodes in original network: " + numberOfNodesOriginal + "\n";
+            // cutInfo += String.format(" Number of nodes in filtered network: %d (%.2f%%)", numberOfNodesFiltered,
+            // 100.0 * numberOfNodesFiltered / numberOfNodesOriginal) + "\n";
+            // cutInfo += String.format(" Number of links in filtered network: %d (%.2f%%)", numberOfLinksFiltered,
+            // 100.0 * numberOfLinksFiltered / numberOfLinksOriginal) + "\n";
+            //
+            // printCutSummary();
             return modifiedNetwork;
         }
     }
@@ -78,7 +76,7 @@ public class NetworkCutterRadius extends NetworkCutter {
                     newLink.setNumberOfLanes(link.getNumberOfLanes());
 
                     filteredNetwork.addLink(newLink);
-                    
+
                 }
             }
 
@@ -86,7 +84,7 @@ public class NetworkCutterRadius extends NetworkCutter {
 
             return filteredNetwork;
         }
-        
+
     }
 
 }

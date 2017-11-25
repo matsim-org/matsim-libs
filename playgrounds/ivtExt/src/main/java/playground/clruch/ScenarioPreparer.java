@@ -10,9 +10,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.lsieber.networkshapecutter.PrepSettings;
-import playground.lsieber.scenario.reducer.NetworkPreparer;
-import playground.lsieber.scenario.reducer.PopulationPreparer;
-import playground.lsieber.scenario.reducer.VirtualNetworkPreparer;
+import playground.lsieber.scenario.preparer.NetworkPreparer;
+import playground.lsieber.scenario.preparer.PopulationPreparer;
+import playground.lsieber.scenario.preparer.VirtualNetworkPreparer;
 
 /** Class to prepare a given scenario for MATSim, includes preparation of netowrk, population, creation of virtualNetwork
  * and travelData objects.
@@ -33,6 +33,8 @@ public class ScenarioPreparer {
         // 0) load files
         Config config = ConfigUtils.loadConfig(settings.configFile.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
+        // create Reduced Scenario Folder if nesscesary
+        settings.preparedScenarioDirectory.mkdir();
 
         // 1) cut network (and reduce population to new network)
         Network network = scenario.getNetwork();
@@ -42,11 +44,15 @@ public class ScenarioPreparer {
         Population population = scenario.getPopulation();
         PopulationPreparer.run(network, population, settings);
 
-        // System.out.println("Number of Network Nodes: " + network.getLinks().size());
-        // System.out.println("Number of people: " + population.getPersons().size());
-
         // 3) create virtual Network
         VirtualNetworkPreparer.run(network, population, settings);
+        
+        
+        // TODO COPY and Modify CONFIG Files (IDSCOptions, AV and CONFIG)
+        
+        // TODO CREATE Report of the Preparing in a text (or other format) file which summarizes the preparation Steps
+        
+        
 
     }
 }

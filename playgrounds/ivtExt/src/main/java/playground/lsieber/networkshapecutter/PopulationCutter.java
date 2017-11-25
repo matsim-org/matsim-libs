@@ -1,7 +1,7 @@
 package playground.lsieber.networkshapecutter;
 
 public abstract class PopulationCutter implements PopulationCutterInterface {
-    protected String cutInfo = null;
+    protected String cutInfo ="";
 
     @Override
     public void printCutSummary() {
