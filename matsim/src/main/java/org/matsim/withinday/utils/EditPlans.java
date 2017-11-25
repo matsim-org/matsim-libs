@@ -378,5 +378,26 @@ public final class EditPlans {
 		}
 		return plan;
 	}
+	public String getModeOfCurrentOrNextTrip(MobsimAgent agent) {
+		Trip trip ;
+		if ( isAtRealActivity( agent ) ) {
+			Activity activity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(agent) ;
+			trip = editTrips.findTripAfterActivity(WithinDayAgentUtils.getModifiablePlan(agent), activity) ;
+		} else {
+			trip = editTrips.findCurrentTrip(agent) ;
+		}
+		return tripRouter.getMainModeIdentifier().identifyMainMode(trip.getTripElements()) ;
+	}
+	public void flushEverythingBeyondCurrent(MobsimAgent agent) {
+		List<PlanElement> pes = WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements() ;
+		Integer index = WithinDayAgentUtils.getCurrentPlanElementIndex(agent) ;
+		for ( int ii=pes.size()-1 ; ii>index ; ii-- ) {
+			pes.remove(ii) ;
+		}
+	}
+	public void rescheduleCurrentActivityEndtime(MobsimAgent agent, double newEndTime) {
+		Integer index = WithinDayAgentUtils.getCurrentPlanElementIndex(agent) ;
+		this.rescheduleActivityEndtime(agent, index, newEndTime);
+	}
 
 }

@@ -68,7 +68,6 @@ public abstract class MatsimRandom {
 	 * @param seed The seed used to draw random numbers.
 	 */
 	public static void reset(final long seed) {
-		System.err.println("just resetting global RNG to seed " + seed );
 		lastUsedSeed = seed;
 		internalCounter = 0;
 		getRandom().setSeed(seed);
@@ -85,7 +84,6 @@ public abstract class MatsimRandom {
 	 */
 	public static Random getLocalInstance() {
 		internalCounter++;
-		System.err.println("just giving out RNG instance # " + internalCounter ) ;
 		Random r = new Random(lastUsedSeed + internalCounter*23l);
 		prepareRNG(r);
 		return r;
