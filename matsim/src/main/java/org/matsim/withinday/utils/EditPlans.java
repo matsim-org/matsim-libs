@@ -2,6 +2,8 @@ package org.matsim.withinday.utils;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -399,5 +401,15 @@ public final class EditPlans {
 		Integer index = WithinDayAgentUtils.getCurrentPlanElementIndex(agent) ;
 		this.rescheduleActivityEndtime(agent, index, newEndTime);
 	}
-
+	
+	public Activity createAgentThatLetsMatsimEnd(String work, Id<Link> newLinkId) {
+		Activity newAct = this.pf.createActivityFromLinkId("work", newLinkId);;
+		newAct.setEndTime( Double.POSITIVE_INFINITY ) ;
+		return newAct ;
+	}
+	public Activity createAgentThatKeepsMatsimAlive(String work, Id<Link> newLinkId) {
+		Activity newAct = this.pf.createActivityFromLinkId("work", newLinkId);;
+		newAct.setEndTime( Double.MAX_VALUE ) ;
+		return newAct ;
+	}
 }
