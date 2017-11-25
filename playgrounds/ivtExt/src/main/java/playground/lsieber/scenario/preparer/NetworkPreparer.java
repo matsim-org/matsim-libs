@@ -50,6 +50,7 @@ public enum NetworkPreparer {
 
         network = modifiedNetwork;
 
+        settings.config.network().setInputFile(settings.NETWORKUPDATEDNAME + ".xml");
         NetworkCutterUtils.printNettworkCuttingInfo(network, modifiedNetwork);
     }
 

@@ -10,14 +10,10 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
-import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.AnalyzeSummary;
@@ -25,7 +21,6 @@ import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeGet;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeGet;
-import playground.clruch.data.ReferenceFrame;
 import playground.clruch.html.DataCollector;
 import playground.clruch.html.ReportGenerator;
 import playground.clruch.net.DatabaseModule;
@@ -36,8 +31,8 @@ import playground.clruch.prep.acttype.IncludeActTypeOf;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
-import playground.clruch.utils.PropertiesExt;
-import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
+import playground.lsieber.networkshapecutter.PrepSettings;
+import playground.lsieber.networkshapecutter.PrepSettings.SettingsType;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 
@@ -50,43 +45,24 @@ public class ScenarioServer {
     }
 
     /* package */ static void simulate() throws MalformedURLException, Exception {
-
-        // load options
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
-
-        System.out.println("Start--------------------"); // added no
-
-        /** set to true in order to make server wait for at least 1 client, for
-         * instance viewer client */
-        boolean waitForClients = simOptions.getBoolean("waitForClients");
-        File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
-        ReferenceFrame referenceFrame = simOptions.getReferenceFrame();
+        PrepSettings settings = new PrepSettings(SettingsType.Server);
+        String outputdirectory = settings.config.controler().getOutputDirectory();
+        System.out.println("outputdirectory = " + outputdirectory);
 
         // open server port for clients to connect to
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
-        SimulationServer.INSTANCE.setWaitForClients(waitForClients);
+        SimulationServer.INSTANCE.setWaitForClients(settings.waitForClients);
 
-        // load MATSim configs - includign av.xml where dispatcher is selected.
-        System.out.println("loading config file " + configFile.getAbsoluteFile());
+        // TODO Bring this into preparer
+        IncludeActTypeOf.BaselineCH(settings.config);
 
-        GlobalAssert.that(configFile.exists()); // Test wheather the config file directory exists
-        DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
-        dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
-
-        IncludeActTypeOf.BaselineCH(config);
-        
-        String outputdirectory = config.controler().getOutputDirectory();
-        System.out.println("outputdirectory = " + outputdirectory);
-
-        // load scenario for simulation
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+        // load scenario for simulation TODO Do Checks in helper functions...
+        Scenario scenario = ScenarioUtils.loadScenario(settings.config);
         Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();
         GlobalAssert.that(scenario != null && network != null && population != null);
 
-        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
+        MatsimStaticDatabase.initializeSingletonInstance(network, settings.referenceFrame);
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
@@ -103,7 +79,7 @@ public class ScenarioServer {
 
         // perform analysis of results
         AnalyzeAll analyzeAll = new AnalyzeAll();
-        AnalyzeSummary analyzeSummary = analyzeAll.analyze(configFile, outputdirectory);
+        AnalyzeSummary analyzeSummary = analyzeAll.analyze(settings.configFileName, outputdirectory);
         VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
@@ -121,12 +97,14 @@ public class ScenarioServer {
             travelData = TravelDataGet.readDefault(virtualNetwork);
         }
 
-        new DataCollector(configFile, outputdirectory, controler, //
+        new DataCollector(settings.configFileName, outputdirectory, controler, //
                 minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
 
         // generate report
         ReportGenerator reportGenerator = new ReportGenerator();
-        reportGenerator.from(configFile, outputdirectory);
+        reportGenerator.from(settings.configFileName, outputdirectory);
+
+        System.out.println("-----> END OF SCENARIO SERVER <-----");
 
     }
 }

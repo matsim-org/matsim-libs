@@ -1,15 +1,19 @@
 package playground.clruch;
 
+import java.io.File;
 import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.lsieber.networkshapecutter.PrepSettings;
+import playground.lsieber.networkshapecutter.PrepSettings.SettingsType;
 import playground.lsieber.scenario.preparer.NetworkPreparer;
 import playground.lsieber.scenario.preparer.PopulationPreparer;
 import playground.lsieber.scenario.preparer.VirtualNetworkPreparer;
@@ -18,7 +22,6 @@ import playground.lsieber.scenario.preparer.VirtualNetworkPreparer;
  * and travelData objects.
  * 
  * @author clruch */
-// TODO clean up thoroughly this file
 public class ScenarioPreparer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
@@ -28,11 +31,9 @@ public class ScenarioPreparer {
     public static void run(String[] args) throws MalformedURLException, Exception {
 
         // load Settings from IDSC Options
-        PrepSettings settings = new PrepSettings();
+        PrepSettings settings = new PrepSettings(SettingsType.Preparer);
 
-        // 0) load files
-        Config config = ConfigUtils.loadConfig(settings.configFile.toString());
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+        Scenario scenario = ScenarioUtils.loadScenario(settings.config);
         // create Reduced Scenario Folder if nesscesary
         settings.preparedScenarioDirectory.mkdir();
 
@@ -44,15 +45,27 @@ public class ScenarioPreparer {
         Population population = scenario.getPopulation();
         PopulationPreparer.run(network, population, settings);
 
+        
+        // FIXME LUKAS Add Facilities
+        
+        
         // 3) create virtual Network
         VirtualNetworkPreparer.run(network, population, settings);
-        
-        
-        // TODO COPY and Modify CONFIG Files (IDSCOptions, AV and CONFIG)
-        
-        // TODO CREATE Report of the Preparing in a text (or other format) file which summarizes the preparation Steps
-        
-        
 
+        // 4) coppy and prepare other files
+        // TODO NO Hardcoding!!!! COPY and Modify CONFIG Files (IDSCOptions, AV and CONFIG)
+        new ConfigWriter(settings.config).writeFileV2(new File(settings.preparedScenarioDirectory, settings.preparedConfigName).toString());
+        String IDSCOptions = ScenarioOptions.getOptionsFileName();
+        Path src = new File(settings.workingDirectory, IDSCOptions).toPath();
+        Path dest = new File(settings.preparedScenarioDirectory, IDSCOptions).toPath();
+        Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
+        Path avFile = new File(settings.workingDirectory, "av.xml").toPath();
+        if (Files.exists(avFile)) {
+            Files.copy(avFile, new File(settings.preparedScenarioDirectory, "av.xml").toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
+
+        // 5) TODO CREATE Report of the Preparing in a text (or other format) file which summarizes the preparation Steps
+
+        System.out.println("-----> END OF SCENARIO PREPARER <-----");
     }
 }

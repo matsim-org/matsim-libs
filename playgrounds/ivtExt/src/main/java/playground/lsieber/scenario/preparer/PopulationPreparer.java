@@ -50,5 +50,6 @@ public enum PopulationPreparer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        settings.config.plans().setInputFile(settings.POPULATIONUPDATEDNAME + ".xml");
     }
 }
