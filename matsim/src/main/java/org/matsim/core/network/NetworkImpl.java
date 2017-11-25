@@ -140,7 +140,7 @@ import java.util.Map;
 		// show counter
 		this.counter++;
 		if (this.counter % this.nextMsg == 0) {
-			this.nextMsg *= 2;
+			this.nextMsg *= 4;
 			printLinksCount();
 		}
 		if ( this.locked && link instanceof Lockable ) {
@@ -188,7 +188,7 @@ import java.util.Map;
 		// show counter
 		this.counter2++;
 		if (this.counter2 % this.nextMsg2 == 0) {
-			this.nextMsg2 *= 2;
+			this.nextMsg2 *= 4;
 			printNodesCount();
 		}
 
