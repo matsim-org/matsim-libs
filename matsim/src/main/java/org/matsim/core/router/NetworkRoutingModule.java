@@ -73,11 +73,18 @@ public final class NetworkRoutingModule implements RoutingModule {
 		Gbl.assertNotNull(toFacility);
 
 		Link fromLink = this.network.getLinks().get(fromFacility.getLinkId());
+		if ( fromLink==null ) {
+			Gbl.assertNotNull( fromFacility.getCoord() ) ;
+			fromLink = NetworkUtils.getNearestLink( network, fromFacility.getCoord()) ;
+		}
 		Link toLink = this.network.getLinks().get(toFacility.getLinkId());
-		
+		if ( toLink==null ) {
+			Gbl.assertNotNull( toFacility.getCoord() ) ;
+			toLink = NetworkUtils.getNearestLink(network, toFacility.getCoord());
+		}
 		Gbl.assertNotNull(fromLink);
 		Gbl.assertNotNull(toLink);
-
+		
 		if (toLink != fromLink) {
 			// (a "true" route)
 			Node startNode = fromLink.getToNode(); // start at the end of the "current" link
