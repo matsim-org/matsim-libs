@@ -15,6 +15,7 @@ import java.util.Set;
 import ch.ethz.idsc.queuey.datalys.csv.CSVUtils;
 import ch.ethz.idsc.queuey.util.FileDelete;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import playground.clruch.dispatcher.core.RequestStatus;
 
 public class CsvFleetReader {
 
@@ -101,6 +102,10 @@ public class CsvFleetReader {
             for (Integer now : dayTaxiRecord.get(vehicleIndex).getKeySet()) {
                 // System.out.println("Parsing requestStatus for vehicle " + vehicleIndex + " at time " + now);
                 taxiTrail.setRequestStatus(now, RequestStatusParser.parseRequestStatus(now, taxiTrail));
+                
+                if (taxiTrail.interp(now).getValue().requestStatus == RequestStatus.REQUESTED)
+                    if (taxiTrail.getLastEntry(now).getValue().requestStatus == RequestStatus.DRIVING)
+                        taxiTrail.setRequestStatus(taxiTrail.getLastEntry(now).getKey(), RequestStatus.DROPOFF);
 
                 // Writing each TaxiTrail to a file to check output
                 out.write(now + " \t " + taxiTrail.interp(now).getValue().avStatus + " \t\t " + taxiTrail.interp(now).getValue().requestStatus + "\n");

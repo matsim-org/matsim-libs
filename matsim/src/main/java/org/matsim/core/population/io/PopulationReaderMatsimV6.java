@@ -339,6 +339,7 @@ import java.util.Stack;
 			fromCoord = activity.getCoord();
 		} else {
 			if (!this.scenario.getNetwork().getLinks().isEmpty()) {
+				System.out.println(activity.getLinkId().toString());
 				fromCoord = this.scenario.getNetwork().getLinks().get(activity.getLinkId()).getCoord();
 			} else {
 				fromCoord = null;

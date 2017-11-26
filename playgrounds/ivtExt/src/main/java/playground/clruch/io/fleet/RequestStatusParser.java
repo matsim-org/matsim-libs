@@ -37,6 +37,7 @@ public enum RequestStatusParser {
             case STAY:
             case REBALANCEDRIVE:
             case OFFSERVICE:
+            case DRIVEWITHCUSTOMER:
                 return RequestStatus.REQUESTED;
             case DRIVETOCUSTOMER:
                 return RequestStatus.PICKUPDRIVE;

@@ -85,7 +85,7 @@ enum SimulationFleetDump {
 
                         // Check if there is valid requests and populate requestContainer
                         RequestContainerUtils rcParser = new RequestContainerUtils(taxiTrail);
-                        if (rcParser.isValidRequest(now)) {
+                        if (rcParser.isValidRequest(now, 0)) {
                             RequestStatus requestStatus = taxiStamp.requestStatus;
                             // System.out.println("Parsing RequestStatus " + requestStatus.toString() + " for vehicle " + vehicleIndex + " at time " + now);
                             if (requestStatus != RequestStatus.CANCELLED) {

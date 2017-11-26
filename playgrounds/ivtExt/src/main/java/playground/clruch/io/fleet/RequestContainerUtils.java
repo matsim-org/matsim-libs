@@ -19,9 +19,9 @@ public class RequestContainerUtils {
         this.taxiTrail = taxiTrail;
     }
 
-    public boolean isValidRequest(int now) {
+    public boolean isValidRequest(int now, int includeCancelled) {
         // System.out.println("Checking if request is valid at time: " + now);
-        if (findSubmissionTime(now) >= 0 && (propagateTo(now, RequestStatus.DROPOFF) > 0 || propagateTo(now, RequestStatus.CANCELLED) == 0))
+        if (findSubmissionTime(now) >= 0 && (propagateTo(now, RequestStatus.DROPOFF) > 0 || propagateTo(now, RequestStatus.CANCELLED) == includeCancelled))
             return true;
         return false;
     }
@@ -74,7 +74,7 @@ public class RequestContainerUtils {
                 // System.out.println("INFO Found requestStatus: " + requestedStatus.toString());
                 return now;
         } else if (requestStatus == RequestStatus.CANCELLED)
-            return 0;
+            return -1;
         // System.err.println("WARN Couldn't find requested Status, returning -1");
         return -1;
 
