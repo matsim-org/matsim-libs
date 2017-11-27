@@ -34,15 +34,18 @@ enum StandaloneFleetConverterSF {
 		GlobalAssert.that(network != null);
 		System.out.println("NETWORK has " + network.getNodes().size() + " nodes");
 
-		File outputDirectory = new File(workingDirectory, "output/001");
+		//File outputDirectory = new File(workingDirectory, "output/001");
+		File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
 		File dataDirectory = new File(workingDirectory, "taxiTraces");
 
 		System.out.println("INFO working folder: " + workingDirectory.getAbsolutePath());
 		System.out.println("INFO data folder: " + dataDirectory.getAbsolutePath());
 		System.out.println("INFO output folder: " + outputDirectory.getAbsolutePath());
 		
-		File dir = new File(dataDirectory, "usefordata");
+		File dir = new File(dataDirectory, "usefordata");		
 		dir.mkdir();
+		System.out.println(dir);
+		GlobalAssert.that(dir.exists());
 		FileUtils.cleanDirectory(dir);
 
 		List<File> trailFilesComplete = (new MultiFileReader(dataDirectory, "new_")).getFolderFiles();
