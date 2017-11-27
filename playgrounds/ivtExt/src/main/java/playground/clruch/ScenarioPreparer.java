@@ -12,7 +12,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.lsieber.networkshapecutter.NetworkCutterUtils;
 import playground.lsieber.networkshapecutter.PrepSettings;
 import playground.lsieber.networkshapecutter.PrepSettings.SettingsType;
 import playground.lsieber.scenario.preparer.NetworkPreparer;
