@@ -54,7 +54,10 @@ public class ScenarioPreparer {
 
         // 4) coppy and prepare other files
         // TODO NO Hardcoding!!!! COPY and Modify CONFIG Files (IDSCOptions, AV and CONFIG)
-        new ConfigWriter(settings.config).writeFileV2(new File(settings.preparedScenarioDirectory, settings.preparedConfigName).toString());
+        if (settings.preparedConfigName.exists()) {
+            
+        }
+        new ConfigWriter(settings.config).writeFileV2(settings.preparedConfigName.toString());
         String IDSCOptions = ScenarioOptions.getOptionsFileName();
         Path src = new File(settings.workingDirectory, IDSCOptions).toPath();
         Path dest = new File(settings.preparedScenarioDirectory, IDSCOptions).toPath();

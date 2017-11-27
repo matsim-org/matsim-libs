@@ -22,7 +22,7 @@ public class PrepSettings {
     public final File configFileName;
     public final Config config;
     public final File preparedScenarioDirectory;
-    public final String preparedConfigName;
+    public final File preparedConfigName;
 
     public final String VIRTUALNETWORKFOLDERNAME;
     public final String VIRTUALNETWORKFILENAME;
@@ -58,9 +58,9 @@ public class PrepSettings {
     public PrepSettings(SettingsType settingsType) throws IOException {
         workingDirectory = MultiFileTools.getWorkingDirectory();
         simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
-        preparedScenarioDirectory = new File(workingDirectory, simOptions.getString("preparedScenarioDirectory", "preparedScenario"));
+        preparedScenarioDirectory = new File(workingDirectory, simOptions.getString("preparedScenarioDirectory", ""));
         configFileName = new File(workingDirectory, simOptions.getString("fullConfig"));
-        preparedConfigName = simOptions.getString("preparedConfigName", "prepared_config.xml");
+        preparedConfigName = new File(workingDirectory, simOptions.getString("simuConfig", "prepared_config.xml"));
         if (SettingsType.Server == settingsType) {
             DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
             dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
@@ -100,8 +100,7 @@ public class PrepSettings {
         // TOTO Lukas Cutting Attribtes
         // shapefile = new File(simOptions.getString("shapefile"));
 
-        modes = new LinkModes(simOptions.getString("modes", "ALLMODES"));
-
+        modes = new LinkModes(simOptions.getString("modes", new LinkModes("all").ALLMODES));
         networkCleaner = simOptions.getBoolean("networkCleaner", true);
     }
 
@@ -110,15 +109,15 @@ public class PrepSettings {
     }
 
     public NetworkCutters createNetworkCutter() {
-        return NetworkCutters.valueOf(simOptions.getString("networkCutter"));
+        return NetworkCutters.valueOf(simOptions.getString("networkCutter","NONE"));
     }
 
     public PopulationCutters createPopulationCutter() {
-        return PopulationCutters.valueOf(simOptions.getString("populationCutter"));
+        return PopulationCutters.valueOf(simOptions.getString("populationCutter","NETWORKBASED"));
     }
 
     public VirtualNetworkCreators createVirtualNetworkCreator() {
-        return VirtualNetworkCreators.valueOf(simOptions.getString("virtualNetworkCreator"));
+        return VirtualNetworkCreators.valueOf(simOptions.getString("virtualNetworkCreator","KMEANS"));
     }
     // TODO @Lukas create function which checks if the propertie value exists and returns an error otherwhise
 

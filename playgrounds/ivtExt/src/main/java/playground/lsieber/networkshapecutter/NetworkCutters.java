@@ -18,6 +18,11 @@ public enum NetworkCutters {
             return modifiedNetwork;
         }
     },
+    NONE {
+        public Network cut(Network originalNetwork, PrepSettings settings) throws MalformedURLException, IOException {
+            return originalNetwork;
+        }
+    },
 
     // TODO @Lukas Implement Rectangular Cutter,
     // RECTANGULAR

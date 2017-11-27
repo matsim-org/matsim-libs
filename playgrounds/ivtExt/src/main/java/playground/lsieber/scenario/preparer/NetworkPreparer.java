@@ -23,10 +23,16 @@ public enum NetworkPreparer {
         // Cut Network as defined in the IDSC Settings
         Network modifiedNetwork = settings.createNetworkCutter().cut(network, settings);
 
+
+        
         // Filter out only the modes defines in the IDSC Settings
+
         if (!settings.modes.allModesAllowed) {
             modifiedNetwork = NetworkCutterUtils.modeFilter(modifiedNetwork, settings.modes);
         }
+        
+        NetworkCutterUtils.printNettworkCuttingInfo(network, modifiedNetwork);
+
 
         // Clean the network if defined in the IDSC Settings
         if (settings.networkCleaner) {
@@ -48,10 +54,11 @@ public enum NetworkPreparer {
         }
         System.out.println("saved converted network to: " + settings.preparedScenarioDirectory + settings.NETWORKUPDATEDNAME + ".xml");
 
+        NetworkCutterUtils.printNettworkCuttingInfo(network, modifiedNetwork);
+
         network = modifiedNetwork;
 
         settings.config.network().setInputFile(settings.NETWORKUPDATEDNAME + ".xml");
-        NetworkCutterUtils.printNettworkCuttingInfo(network, modifiedNetwork);
     }
 
 }

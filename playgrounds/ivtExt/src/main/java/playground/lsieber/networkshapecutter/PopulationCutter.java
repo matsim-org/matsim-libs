@@ -10,6 +10,6 @@ public abstract class PopulationCutter implements PopulationCutterInterface {
 
     @Override
     public void checkNetworkConsistency() {
-        // TODO @Lukas Create check on Network Consistency
+        // TODO @Lukas Create check on Network Consistency @clruch: What is a consistent Network
     }
 }
