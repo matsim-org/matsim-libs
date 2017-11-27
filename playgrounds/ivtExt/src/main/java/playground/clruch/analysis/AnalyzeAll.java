@@ -82,14 +82,16 @@ public class AnalyzeAll {
             throws Exception {
         Tensor summary = Join.of(1, coreAnalysis.getSummary(), distanceAnalysis.summary);
         SaveUtils.saveFile(summary, "summary", relativeDirectory);
+        File summaryDirectory = new File(relativeDirectory,"summary");
+        
         System.out.println("Size of data summary: " + Dimensions.of(summary));
 
         getTotals(summary, coreAnalysis, relativeDirectory);
 
-        plot("summary", "binnedWaitingTimes", "Waiting Times", 3, 6, maxWaitingTime, relativeDirectory);
+        plot("summary/summary", "binnedWaitingTimes", "Waiting Times", 3, 6, maxWaitingTime, relativeDirectory);
         // maximum waiting time in the plot to have this uniform for all simulations
-        plot("summary", "binnedTimeRatios", "Occupancy Ratio", 10, 11, relativeDirectory);
-        plot("summary", "binnedDistanceRatios", "Distance Ratio", 15, 16, relativeDirectory);
+        plot("summary/summary", "binnedTimeRatios", "Occupancy Ratio", 10, 11, relativeDirectory);
+        plot("summary/summary", "binnedDistanceRatios", "Distance Ratio", 15, 16, relativeDirectory);
         HistogramPlot.of(coreAnalysis.waitBinCounter, relativeDirectory, "Requests per Waiting Time", //
                 waitBinSize.number().doubleValue(), "% of requests", "Waiting Times [s]", //
                 1000, 750);
@@ -107,9 +109,9 @@ public class AnalyzeAll {
         UniqueDiagrams.distanceStack(relativeDirectory, "stackedDistance", "Distance Partition", //
                 distanceRebalance / distance, distancePickup / distance, distanceWithCust / distance);
         UniqueDiagrams.distanceDistribution(relativeDirectory, "distanceDistribution", //
-                "Distance Distribution", true, relativeDirectory.getPath());
+                "Distance Distribution", true, summaryDirectory.getPath());
         UniqueDiagrams.statusDistribution(relativeDirectory, "statusDistribution", //
-                "Status Distribution", true, relativeDirectory.getPath());
+                "Status Distribution", true, summaryDirectory.getPath());
     }
 
     /* package */ void getTotals(Tensor summary, CoreAnalysis coreAnalysis, File relativeDirectory) {
