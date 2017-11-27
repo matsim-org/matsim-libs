@@ -21,6 +21,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Names;
 
 import playground.clruch.traveltimetracker.AVTravelTimeRecorder;
+import playground.matsim_decoupling.TrackingHelper;
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
@@ -69,7 +70,7 @@ public class AVQSimModule extends com.google.inject.AbstractModule {
     @Provides
     @Singleton
     VrpLegs.LegCreator provideLegCreator(AVOptimizer avOptimizer) {
-        return VrpLegs.createLegWithOnlineTrackerCreator(avOptimizer, qsim.getSimTimer());
+    	return TrackingHelper.createLegCreatorWithIDSCTracking(avOptimizer, qsim.getSimTimer());
     }
 
     @Provides
