@@ -402,7 +402,7 @@ public final class EditPlans {
 		this.rescheduleActivityEndtime(agent, index, newEndTime);
 	}
 	
-	public Activity createAgentThatLetsMatsimEnd(String work, Id<Link> newLinkId) {
+	public Activity createFinalActivity(String work, Id<Link> newLinkId) {
 		Activity newAct = this.pf.createActivityFromLinkId("work", newLinkId);;
 		newAct.setEndTime( Double.POSITIVE_INFINITY ) ;
 		return newAct ;
