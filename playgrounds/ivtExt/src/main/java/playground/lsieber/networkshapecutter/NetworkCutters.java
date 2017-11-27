@@ -28,7 +28,7 @@ public enum NetworkCutters {
     // RECTANGULAR
     ;
 
-    public static final String SHAPEFILE = "shapefile";
+    public static final String SHAPEFILE = "shapefilePath";
 
     public abstract Network cut(Network network, PrepSettings settings) throws MalformedURLException, IOException;
 

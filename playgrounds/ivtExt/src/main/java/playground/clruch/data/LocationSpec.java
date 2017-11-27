@@ -29,7 +29,7 @@ public enum LocationSpec {
     HOMBURGERTAL( //
             ReferenceFrame.SWITZERLAND, //
             new Coord(2630647.0, 1251120.0), //
-            16000.0), // radius of 10000
+            2000.0), // radius of 10000
     SAN_FRANCISCO( //
             ReferenceFrame.IDENTITY, //
             new Coord(-122.4363005, 37.7511686), //

@@ -22,8 +22,9 @@ public class PrepSettings {
     public final File configFileName;
     public final Config config;
     public final File preparedScenarioDirectory;
-    public final File preparedConfigName;
-
+    public final File preparedConfigFile;
+    public final String preparedConfigName;
+    
     public final String VIRTUALNETWORKFOLDERNAME;
     public final String VIRTUALNETWORKFILENAME;
     public final String MINIMUMFLEETSIZEFILENAME;
@@ -52,6 +53,7 @@ public class PrepSettings {
     public final LocationSpec locationSpec;
     public final LinkModes modes;
     public final boolean networkCleaner;
+   //public final String shapefilePath;
     
     public enum SettingsType {Server, Preparer};
 
@@ -60,11 +62,13 @@ public class PrepSettings {
         simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
         preparedScenarioDirectory = new File(workingDirectory, simOptions.getString("preparedScenarioDirectory", ""));
         configFileName = new File(workingDirectory, simOptions.getString("fullConfig"));
-        preparedConfigName = new File(workingDirectory, simOptions.getString("simuConfig", "prepared_config.xml"));
+        preparedConfigName = simOptions.getString("simuConfig", "prepared_config.xml");
+        preparedConfigFile = new File(workingDirectory, preparedConfigName);
+
         if (SettingsType.Server == settingsType) {
             DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
             dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
-            config = ConfigUtils.loadConfig(preparedConfigName.toString(), new AVConfigGroup(), dvrpConfigGroup);
+            config = ConfigUtils.loadConfig(preparedConfigFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
         }else if (SettingsType.Preparer == settingsType) {
             config = ConfigUtils.loadConfig(configFileName.toString());
         }else {
@@ -98,7 +102,7 @@ public class PrepSettings {
         referenceFrame = simOptions.getReferenceFrame();
 
         // TOTO Lukas Cutting Attribtes
-        // shapefile = new File(simOptions.getString("shapefile"));
+        //shapefilePath = simOptions.getString("shapefile",null);
 
         modes = new LinkModes(simOptions.getString("modes", new LinkModes("all").ALLMODES));
         networkCleaner = simOptions.getBoolean("networkCleaner", true);

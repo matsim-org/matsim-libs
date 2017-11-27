@@ -18,7 +18,9 @@ public enum PopulationPreparer {
     ;
     public static void run(Network network, Population population, PrepSettings settings) throws MalformedURLException, IOException {
         System.out.println("Original population size: " + population.getPersons().values().size());
+        
         settings.createPopulationCutter().cut(network, population);
+        
         // System.out.println("Population size after radius cut: " + population.getPersons().values().size());
         if (settings.populationeliminateFreight)
             PopulationTools.eliminateFreight(population);

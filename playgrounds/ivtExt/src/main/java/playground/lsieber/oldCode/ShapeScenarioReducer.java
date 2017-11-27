@@ -15,7 +15,6 @@ import playground.lsieber.networkshapecutter.FacilityPopulationBasedCutter;
 import playground.lsieber.networkshapecutter.LinkModes;
 import playground.lsieber.networkshapecutter.NetworkCutterShape;
 import playground.lsieber.networkshapecutter.NetworkCutterUtils;
-import playground.lsieber.networkshapecutter.PopulationCutterShape;
 import playground.lsieber.networkshapecutter.PopulationFilter;
 
 public class ShapeScenarioReducer extends AbstractScenarioReducer {

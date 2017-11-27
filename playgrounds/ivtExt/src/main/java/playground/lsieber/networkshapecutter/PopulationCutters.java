@@ -11,7 +11,17 @@ public enum PopulationCutters {
         public void cut(Network network, Population population) throws MalformedURLException, IOException {
             new PopulationCutterNetworkBased(network).process(population);
         }
-    };
+    },
+    FULLLEGSINNETWORK{
+        public void cut(Network network, Population population) {
+            new PopulationCutterFullLegsInNetwork(network, null).process(population);
+        }
+    },
+    NONE{
+        public void cut(Network network, Population population) {
+        }
+    }
+    ;
 
     public abstract void cut(Network network, Population population) throws MalformedURLException, IOException;
 

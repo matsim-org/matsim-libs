@@ -79,7 +79,7 @@ public class ScenarioServer {
 
         // perform analysis of results
         AnalyzeAll analyzeAll = new AnalyzeAll();
-        AnalyzeSummary analyzeSummary = analyzeAll.analyze(settings.preparedConfigName, outputdirectory);
+        AnalyzeSummary analyzeSummary = analyzeAll.analyze(settings.preparedConfigFile, outputdirectory);
         VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
 
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;

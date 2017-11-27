@@ -14,7 +14,7 @@ import playground.lsieber.networkshapecutter.PrepSettings;
 
 public enum NetworkPreparer {
     ;
-    public static void run(Network network, PrepSettings settings) throws MalformedURLException, IOException {
+    public static Network run(Network network, PrepSettings settings) throws MalformedURLException, IOException {
         if (network == null)
             System.out.println("its the network");
         if (settings.locationSpec == null)
@@ -30,9 +30,6 @@ public enum NetworkPreparer {
         if (!settings.modes.allModesAllowed) {
             modifiedNetwork = NetworkCutterUtils.modeFilter(modifiedNetwork, settings.modes);
         }
-        
-        NetworkCutterUtils.printNettworkCuttingInfo(network, modifiedNetwork);
-
 
         // Clean the network if defined in the IDSC Settings
         if (settings.networkCleaner) {
@@ -56,9 +53,10 @@ public enum NetworkPreparer {
 
         NetworkCutterUtils.printNettworkCuttingInfo(network, modifiedNetwork);
 
-        network = modifiedNetwork;
-
         settings.config.network().setInputFile(settings.NETWORKUPDATEDNAME + ".xml");
+
+        return modifiedNetwork;
+
     }
 
 }
