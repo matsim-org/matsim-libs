@@ -5,11 +5,14 @@ package playground.clruch.dispatcher.core;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTrackerImpl;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
@@ -18,6 +21,8 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import jogamp.graph.font.typecast.ot.table.NameRecord;
+import playground.clruch.io.fleet.TaxiStamp;
 import playground.clruch.net.StorageUtils;
 import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.SafeConfig;
@@ -126,8 +131,8 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
         updateInfoLine();
         notifySimulationSubscribers(Math.round(now), storageUtils);
 
-        consistencyCheck();
-        beforeStepTasks();
+        consistencyCheck();       
+        beforeStepTasks(); // <- if problems with RoboTaxi Status to Completed consider to set "simEndtimeInterpretation" to "null"
         executePickups();
         redispatch(now);
         afterStepTasks();
