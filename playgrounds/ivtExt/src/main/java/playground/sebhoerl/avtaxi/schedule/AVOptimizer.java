@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
@@ -86,7 +87,7 @@ public class AVOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefore
         schedule.nextTask();
 
         if (nextTask != null) {
-            ((AVVehicle) schedule.getVehicle()).getDispatcher().onNextTaskStarted(nextTask);
+            ((AVVehicle) vehicle).getDispatcher().onNextTaskStarted((AVVehicle) vehicle);
         }
 
         if (nextTask != null && nextTask instanceof AVDropoffTask) {
@@ -107,11 +108,12 @@ public class AVOptimizer implements VrpOptimizerWithOnlineTracking, MobsimBefore
     }
 
     @Override
-    public void nextLinkEntered(DriveTask driveTask) {
+    public void vehicleEnteredNextLink(Vehicle vehicle, Link link) {
+    	DriveTask driveTask = (DriveTask) vehicle.getSchedule().getCurrentTask();
         TaskTracker taskTracker = driveTask.getTaskTracker();
         OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
         LinkTimePair linkTimePair = onlineDriveTaskTracker.getDiversionPoint();
-        AVVehicle avVehicle = (AVVehicle) driveTask.getSchedule().getVehicle();
+        AVVehicle avVehicle = (AVVehicle) vehicle;
         AVDispatcher avDispatcher = avVehicle.getDispatcher();
         avDispatcher.onNextLinkEntered(avVehicle, driveTask, linkTimePair);
 
