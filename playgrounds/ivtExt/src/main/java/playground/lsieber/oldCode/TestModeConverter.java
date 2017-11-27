@@ -1,4 +1,4 @@
-package playground.lsieber.scenario.reducer;
+package playground.lsieber.oldCode;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,7 +20,6 @@ public class TestModeConverter {
      * Hint: if Out of Memory error appears give the program more Memory with the -Xmx8192m argument in the Run Configurations VM paart
      */
     public static void main(String[] args) throws IOException {
-        // TODO Auto-generated constructor stub
         File workingDirectory = MultiFileTools.getWorkingDirectory();
         PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
         File file = new File(workingDirectory, simOptions.getString("simuConfig"));

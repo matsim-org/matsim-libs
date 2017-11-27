@@ -16,6 +16,7 @@ import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.PropertiesExt;
+import playground.lsieber.oldCode.SimOptionsLoader;
 
 public class NetworkVisualisation {
     private PropertiesExt simOptions;

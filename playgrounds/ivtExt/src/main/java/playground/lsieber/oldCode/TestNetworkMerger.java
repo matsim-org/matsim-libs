@@ -1,9 +1,7 @@
-package playground.lsieber.scenario.reducer;
+package playground.lsieber.oldCode;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -13,16 +11,14 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.network.algorithms.MultimodalNetworkCleaner;
-import org.matsim.core.network.algorithms.NetworkCleaner;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 
 public class TestNetworkMerger {
 
     public static void main(String[] args) throws IOException {
-        // TODO Auto-generated method stub
         File workingDirectory = MultiFileTools.getWorkingDirectory();
 
         // import Network 1
