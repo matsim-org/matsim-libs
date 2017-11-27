@@ -409,6 +409,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		case ABORT:
 			this.events.processEvent( new PersonStuckEvent(this.simTimer.getTimeOfDay(), agent.getId(), agent.getCurrentLinkId(), agent.getMode()));
 
+			// NOTE: in the same way as one can register departure handler or activity handler, we could allow to
+			// register abort handlers.  If someone ever comes to this place here and needs this.  kai, nov'17
+			
 			this.agents.remove(agent) ;
 			this.agentCounter.decLiving();
 			this.agentCounter.incLost();
