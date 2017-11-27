@@ -34,7 +34,7 @@ public class TestScenarioReducer {
         shapeScenarioReducer.writeToXML();
         // shapeScenarioReducer.ConvertPtToAV();
         shapeScenarioReducer.addConfigFilesinFolder();
-        // adaptedScenarioPreparer(shapeScenarioReducer);
+        adaptedScenarioPreparer(shapeScenarioReducer);
 
         System.out.println("THIS IS THE END :)");
     }

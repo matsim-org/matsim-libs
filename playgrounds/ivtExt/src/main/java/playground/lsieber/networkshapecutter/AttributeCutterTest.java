@@ -22,6 +22,7 @@ public class AttributeCutterTest {
         Config config = ConfigUtils.loadConfig(file.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         ObjectAttributes populationAttributes = scenario.getPopulation().getPersonAttributes();
+        System.out.println(populationAttributes.toString());
         // TODO is the attribute cutter realy needed???
 
     }
