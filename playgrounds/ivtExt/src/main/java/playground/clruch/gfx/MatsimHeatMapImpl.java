@@ -26,6 +26,7 @@ public class MatsimHeatMapImpl implements MatsimHeatMap {
         this.colorSchemes = colorSchemes;
     }
 
+    @Override
     public void render(Graphics graphics, Tile tile, int zoom, int posx, int posy) {
         if (show)
             try {
@@ -42,10 +43,12 @@ public class MatsimHeatMapImpl implements MatsimHeatMap {
 
     }
 
+    @Override
     public void clear() {
         matsimDataSource.clear();
     }
 
+    @Override
     public void addPoint(double x, double y) {
         matsimDataSource.addPoint(new PointLatLng(x, y));
     }

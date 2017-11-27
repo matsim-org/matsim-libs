@@ -15,10 +15,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
-import playground.clruch.ScenarioOptions;
 import playground.clruch.prep.PopulationTools;
-import playground.clruch.prep.TheApocalypse;
-import playground.clruch.utils.PropertiesExt;
 
 /** @author Claudio Ruch */
 public class DemoInvariantPop {

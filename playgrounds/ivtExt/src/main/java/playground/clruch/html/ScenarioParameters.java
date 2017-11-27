@@ -22,8 +22,6 @@ import ch.ethz.idsc.tensor.Tensor;
 import playground.clruch.ScenarioOptions;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeGet;
-import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
-import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeGet;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVConfig;
@@ -86,7 +84,6 @@ public enum ScenarioParameters {
 
         VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(network);
         MinimumFleetSizeCalculator minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
-        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = PerformanceFleetSizeGet.readDefault();
         GlobalAssert.that(virtualNetwork != null);
 
         virtualNodes = virtualNetwork.getvNodesCount();

@@ -93,6 +93,7 @@ public class KMedianDispatcher extends PartitionedDispatcher {
         Map<VirtualNode<Link>, Link> waitLocations = new HashMap<>();
         for (VirtualNode<Link> vn : virtualNetwork.getVirtualNodes()) {
             // select some link in virtualNode, if possible with high enough capacity
+            @SuppressWarnings("unused")
             Link link = null;
             Optional<Link> optLink = vn.getLinks().stream().filter(v -> v.getCapacity() > carsPerVNode).filter(v -> v.getAllowedModes().contains("car"))
                     .findAny();

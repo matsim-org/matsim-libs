@@ -154,13 +154,16 @@ public enum SequentialScenarioTools {
         Document doc = (Document) builder.build(xmlFile);
         Element rootNode = doc.getRootElement();
 
+        @SuppressWarnings("unchecked")
         List<Element> children = rootNode.getChildren();
 
         for (Element child : children) {
             if (child.getAttributeValue("name").equals("controler")) {
+                @SuppressWarnings("unchecked")
                 List<Element> cchildren = child.getChildren();
                 for (Element cchild : cchildren) {
                     if (cchild.getAttributeValue("name").equals("outputDirectory")) {
+                        @SuppressWarnings("unchecked")
                         List<Attribute> theAttributes = cchild.getAttributes();
                         if (theAttributes.get(0).getValue().equals("outputDirectory")) {
                             theAttributes.get(1).setValue(name);

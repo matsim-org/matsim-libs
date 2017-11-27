@@ -40,7 +40,6 @@ import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
  * @author Claudio Ruch */
 public class SelfishDispatcher extends PartitionedDispatcher {
     private final int dispatchPeriod;
-    private final Network network;
     private final AbstractRoboTaxiRequestMatcher roboTaxiRequestMatcher;
     private Set<RoboTaxi> waitingTaxis = new HashSet<>();
     private final TravelData travelData;
@@ -52,12 +51,11 @@ public class SelfishDispatcher extends PartitionedDispatcher {
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
-            Network network, VirtualNetwork<Link> virtualNetwork, //
+            VirtualNetwork<Link> virtualNetwork, //
             TravelData travelData) {
         super(config, avconfig, travelTime, router, eventsManager, virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(avconfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
-        this.network = network;
         roboTaxiRequestMatcher = new RequestCloseRoboTaxiMatcher();
         GlobalAssert.that(travelData != null);
         this.travelData = travelData;
@@ -176,7 +174,7 @@ public class SelfishDispatcher extends PartitionedDispatcher {
             travelData = TravelDataGet.readDefault(virtualNetwork);
             GlobalAssert.that(virtualNetwork != null);
             GlobalAssert.that(travelData != null);
-            return new SelfishDispatcher(config, avconfig, travelTime, router, eventsManager, network, virtualNetwork, travelData);
+            return new SelfishDispatcher(config, avconfig, travelTime, router, eventsManager, virtualNetwork, travelData);
         }
     }
 

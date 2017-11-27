@@ -99,13 +99,14 @@ import playground.clruch.net.SimulationObject;
 
                     {
                         graphics.setColor(new Color(32, 128, 32, 128));
+                        @SuppressWarnings("unused")
                         int index = numRequests;
                         for (RequestContainer rc : entry.getValue()) {
                             double waitTime = ref.now - rc.submissionTime;
                             maxWaitTime = Math.max(waitTime, maxWaitTime);
-                            int piy = y - index;
-                            int wid = (int) waitTime / 10;
-                            int left = x - wid / 2;
+                            // int piy = y - index;
+                            // int wid = (int) waitTime / 10;
+                            // int left = x - wid / 2;
                             // graphics.drawLine(left, piy, left + wid, piy);
                             --index;
                         }

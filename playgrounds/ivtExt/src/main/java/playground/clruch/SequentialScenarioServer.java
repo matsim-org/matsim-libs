@@ -7,7 +7,6 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
-import playground.clruch.dispatcher.selfishdispatcher.FareRatioCalculator;
 import playground.clruch.utils.PropertiesExt;
 
 /** @author Claudio Ruch */

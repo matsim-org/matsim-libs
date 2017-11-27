@@ -39,6 +39,7 @@ public enum PopulationUtils {
     /* package */ static void removePeopleWithoutPlans(Population population) {
         HashSet<Id<Person>> unneededPeople = new HashSet<>();
         for (Entry<Id<Person>, ? extends Person> entry : population.getPersons().entrySet()) {
+            @SuppressWarnings("unchecked")
             List<Plan> plans = (List<Plan>) entry.getValue().getPlans();
 
             if (plans.size() == 1) {
@@ -58,6 +59,7 @@ public enum PopulationUtils {
     /* package */ static void filterTo(Interval interval, Population population) {
         GlobalAssert.that(interval.getDim() == 1);
 
+        @SuppressWarnings("unchecked")
         Map<Id<Person>, Person> people = (Map<Id<Person>, Person>) population.getPersons();
         for (Person person : people.values()) {
             RemoveNonIntervalPlans.of(person, interval);
