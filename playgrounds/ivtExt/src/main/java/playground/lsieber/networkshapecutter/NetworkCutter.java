@@ -1,18 +1,18 @@
-/**
- * 
- */
 package playground.lsieber.networkshapecutter;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.Set;
 
 import org.matsim.api.core.v01.network.Network;
 
 /** @author Claudio Ruch */
 public interface NetworkCutter {
 
-    // TODO can we do it as an abstract function? 
-    Network filter(Network network);
+    Network filter(Network network, Set<String> modes) throws MalformedURLException, IOException;
+
     void printCutSummary();
-    default void checkNetworkConsistency() {
-        // TODO jan added implementation to precent compile error
-    }
+
+    void checkNetworkConsistency();
 
 }

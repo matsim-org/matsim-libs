@@ -44,7 +44,7 @@ import org.matsim.core.api.internal.MatsimExtensionPoint;
 public class ObjectAttributes implements MatsimExtensionPoint {
 
 	/*package*/ Map<String, Map<String, Object>> attributes = new LinkedHashMap<String, Map<String, Object>>(1000);
-	
+
 	@Override
 	public String toString() {
 		StringBuilder stb = new StringBuilder() ;

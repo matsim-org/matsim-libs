@@ -33,24 +33,25 @@ public class ScenarioViewer {
         File workingDirectory = MultiFileTools.getWorkingDirectory();
         PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
         File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
+        // File outputDirectory = new File(workingDirectory, "/simulation_output" );
+
         System.out.println("showing simulation results stored in folder: " + outputDirectory.getName());
-        
+
         ReferenceFrame referenceFrame = simOptions.getReferenceFrame();
         /** reference frame needs to be set manually in IDSCOptions.properties file */
-        GlobalAssert.that(Objects.nonNull(referenceFrame)); 
+        GlobalAssert.that(Objects.nonNull(referenceFrame));
         GlobalAssert.that(Objects.nonNull(simOptions.getLocationSpec()));
         Network network = NetworkLoader.loadNetwork(new File(workingDirectory, simOptions.getString("simuConfig")));
         System.out.println("INFO network loaded");
-        System.out.println("INFO total links " +  network.getLinks().size());
-        System.out.println("INFO total nodes " +  network.getNodes().size());
+        System.out.println("INFO total links " + network.getLinks().size());
+        System.out.println("INFO total nodes " + network.getNodes().size());
 
         // load viewer
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         MatsimMapComponent matsimJMapViewer = new MatsimMapComponent(MatsimStaticDatabase.INSTANCE);
 
         /** this is optional and should not cause problems if file does not exist. temporary solution */
-   //     matsimJMapViewer.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
-
+        matsimJMapViewer.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
         MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer, outputDirectory);
         matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
