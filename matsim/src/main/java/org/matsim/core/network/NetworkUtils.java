@@ -788,4 +788,13 @@ public final class NetworkUtils {
 	public static void writeNetwork(Network network, String string) {
 		new NetworkWriter(network).write(string) ;
 	}
+	
+	public static Link findLinkInOppositeDirection(Link link) {
+		for ( Link candidateLink : link.getToNode().getOutLinks().values() ) {
+			if ( candidateLink.getToNode().equals( link.getFromNode() ) ) {
+				return candidateLink ;
+			}
+		}
+		return null ;
+	}
 }
