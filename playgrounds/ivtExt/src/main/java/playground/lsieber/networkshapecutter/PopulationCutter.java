@@ -1,7 +1,7 @@
 package playground.lsieber.networkshapecutter;
 
-public abstract class NetworkCutter implements NetworkCutterInterface {
-    protected String cutInfo = null;
+public abstract class PopulationCutter implements PopulationCutterInterface {
+    protected String cutInfo ="";
 
     @Override
     public void printCutSummary() {
@@ -10,6 +10,6 @@ public abstract class NetworkCutter implements NetworkCutterInterface {
 
     @Override
     public void checkNetworkConsistency() {
-        // TODO @Lukas Create check on Network Consistency
+        // TODO @Lukas Create check on Network Consistency @clruch: What is a consistent Network
     }
 }

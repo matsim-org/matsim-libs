@@ -16,17 +16,14 @@ import playground.clruch.utils.PropertiesExt;
 public class AttributeCutterTest {
 
     public static void main(String[] args) throws IOException {
-        // TODO Auto-generated method stub
-
         File workingDirectory = MultiFileTools.getWorkingDirectory();
         PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
         File file = new File(workingDirectory, simOptions.getString("simuConfig"));
         Config config = ConfigUtils.loadConfig(file.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         ObjectAttributes populationAttributes = scenario.getPopulation().getPersonAttributes();
-// TODO is the attribute cutter realy needed???
-        
-        
+        // TODO is the attribute cutter realy needed???
+
     }
 
 }

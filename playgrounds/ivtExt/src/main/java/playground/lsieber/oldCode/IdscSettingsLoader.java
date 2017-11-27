@@ -1,4 +1,4 @@
-package playground.lsieber.scenario.reducer;
+package playground.lsieber.oldCode;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,7 +18,6 @@ public abstract class IdscSettingsLoader {
     protected PropertiesExt simOptions;
 
     public IdscSettingsLoader() throws IOException {
-        // TODO Auto-generated constructor stub
         loadSettings();
     }
 
