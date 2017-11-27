@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -84,8 +83,10 @@ public class ScenarioPreparer {
         Population population = scenario.getPopulation();
 
         {// 1) cut network (and reduce population to new network)
-            if(network == null) System.out.println("its the network");
-            if(ls == null) System.out.println("its the ls");
+            if (network == null)
+                System.out.println("its the network");
+            if (ls == null)
+                System.out.println("its the ls");
             NetworkCutClean.elminateOutsideRadius(network, ls.center, ls.radius);
             final File fileExportGz = new File(workingDirectory, NETWORKUPDATEDNAME + ".xml.gz");
             final File fileExport = new File(workingDirectory, NETWORKUPDATEDNAME + ".xml");
@@ -106,7 +107,7 @@ public class ScenarioPreparer {
         {// 2) adapt the population to new network
             System.out.println("Original population size: " + population.getPersons().values().size());
             PopulationTools.elminateOutsideNetwork(population, network);
-            System.out.println("Population size after radius cut: " + population.getPersons().values().size());
+            // System.out.println("Population size after radius cut: " + population.getPersons().values().size());
             if (populationeliminateFreight)
                 PopulationTools.eliminateFreight(population);
             System.out.println("Population size after removing freight: " + population.getPersons().values().size());
@@ -139,6 +140,9 @@ public class ScenarioPreparer {
             }
         }
 
+        System.out.println(network.getLinks().size());
+        System.out.println(population.getPersons().size());
+
         // 3) create virtual Network
         // TODO make this generic for any VirtualNetwork creators.
         VirtualNetwork<Link> virtualNetwork;
@@ -153,7 +157,7 @@ public class ScenarioPreparer {
 
         final File vnDir = new File(workingDirectory, VIRTUALNETWORKFOLDERNAME);
         vnDir.mkdir(); // create folder if necessary
-        GlobalAssert.that(virtualNetwork!=null);
+        GlobalAssert.that(virtualNetwork != null);
         VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
         System.out.println("saved virtual network byte format to : " + new File(vnDir, VIRTUALNETWORKFILENAME));
         PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);
