@@ -52,6 +52,8 @@ enum SimulationFleetDump {
             int dropped = 0;
             int cancelledRequests = 0;
             int requestIndex = 0;
+            int totalRequests = 0;
+            int totalDropoffs = 0;
             int totalMatchedRequests = 0;
             // NavigableMap<Integer, Integer> requestMap = new TreeMap<>();
             for (int now = 0; now < MAXTIME; now += TIMESTEP) {
@@ -62,7 +64,7 @@ enum SimulationFleetDump {
                 simulationObject.vehicles = new ArrayList<>();
 
                 for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
-                    // for (int vehicleIndex = 100; vehicleIndex < 120; ++vehicleIndex) {
+                    // for (int vehicleIndex = 0; vehicleIndex < 20; ++vehicleIndex) {
 
                     // Check and propagate offservice status
                     // dayTaxiRecord.get(vehicleIndex).check_offservice(now);
@@ -85,22 +87,27 @@ enum SimulationFleetDump {
 
                         // Check if there is valid requests and populate requestContainer
                         RequestContainerUtils rcParser = new RequestContainerUtils(taxiTrail);
-                        if (rcParser.isValidRequest(now, 0)) {
+                        boolean includeCancelled = false;
+                        // System.out.println("Parsing vehicle " + vehicleIndex + " at time " + now);
+                        if (rcParser.isValidRequest(now, includeCancelled)) {
                             RequestStatus requestStatus = taxiStamp.requestStatus;
-                            // System.out.println("Parsing RequestStatus " + requestStatus.toString() + " for vehicle " + vehicleIndex + " at time " + now);
+                            // System.out.println("Parsing RequestStatus " + requestStatus.tag() + " for vehicle " + vehicleIndex + " at time " + now);
                             if (requestStatus != RequestStatus.CANCELLED) {
                                 RequestContainer rc = rcParser.populate(now, requestIndex, quadTree, db);
                                 simulationObject.requests.add(rc);
                                 // Check if a request has been matched == Passenger has been picked up
-                                if (requestStatus == RequestStatus.PICKUP) {
+                                if (requestStatus == RequestStatus.PICKUP)
                                     totalMatchedRequests++;
-                                    simulationObject.total_matchedRequests = totalMatchedRequests;
-                                }
+                                if (requestStatus == RequestStatus.REQUESTED)
+                                    totalRequests++;
+                                if (requestStatus == RequestStatus.DROPOFF)
+                                    totalDropoffs++;
                                 if (rc.submissionTime == taxiTrail.interp(now).getKey())
                                     requestIndex++;
                             } else if (requestStatus == RequestStatus.CANCELLED)
                                 cancelledRequests++;
                         }
+                        simulationObject.total_matchedRequests = totalMatchedRequests;
                         GlobalAssert.that(Objects.nonNull(vc.avStatus));
                         simulationObject.vehicles.add(vc);
                     } catch (Exception exception) {
@@ -114,8 +121,10 @@ enum SimulationFleetDump {
             }
             ++iteration;
             System.out.println("INFO dropped total: " + dropped);
-            System.out.println("INFO total requests: " + requestIndex);
-            System.out.println("INFO total matched requests: " + totalMatchedRequests);
+            System.out.println("INFO total submitted requests: " + requestIndex);
+            System.out.println("INFO total requests: " + totalRequests);
+            System.out.println("INFO total pickups: " + totalMatchedRequests);
+            System.out.println("INFO total dropoffs: " + totalDropoffs);
             System.out.println("INFO cancelled requests: " + cancelledRequests);
         }
     }

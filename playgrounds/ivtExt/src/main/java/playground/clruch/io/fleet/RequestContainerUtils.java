@@ -19,25 +19,30 @@ public class RequestContainerUtils {
         this.taxiTrail = taxiTrail;
     }
 
-    public boolean isValidRequest(int now, int includeCancelled) {
+    public boolean isValidRequest(int now, boolean includeCancelled) {
         // System.out.println("Checking if request is valid at time: " + now);
-        if (findSubmissionTime(now) >= 0 && (propagateTo(now, RequestStatus.DROPOFF) > 0 || propagateTo(now, RequestStatus.CANCELLED) == includeCancelled))
-            return true;
+        if (includeCancelled) {
+            if (findSubmissionTime(now) >= 0 && (propagateTo(now, now, RequestStatus.DROPOFF) > 0 || propagateTo(now, now, RequestStatus.CANCELLED) == 0))
+                return true;
+        } else {
+            if (findSubmissionTime(now) >= 0 && (propagateTo(now, now, RequestStatus.DROPOFF) > 0 && propagateTo(now, now, RequestStatus.CANCELLED) < 0))
+                return true;
+        }
         return false;
     }
 
     private int findSubmissionTime(int now) {
         // System.out.println("Trying to find submissionTime from Time: " + now);
-        int submissionTime = propagateTo(now, RequestStatus.REQUESTED);
+        int submissionTime = propagateTo(now, now, RequestStatus.REQUESTED);
         if (submissionTime < 0)
-            submissionTime = propagateTo(now, RequestStatus.PICKUP);
+            submissionTime = propagateTo(now, now, RequestStatus.PICKUP);
         // System.err.println("WARN Could not find submissionTime.");
         return submissionTime;
     }
 
     private Coord getCoordAt(int now, RequestStatus requestedStatus) {
         // Check requestStatus and propagate to TaxiStamp with desired values
-        int requestedTime = propagateTo(now, requestedStatus);
+        int requestedTime = propagateTo(now, now, requestedStatus);
         if (requestedTime > 0) {
             // System.out.println("INFO Found gps data for requested Status: " + requestedStatus.toString());
             return taxiTrail.interp(requestedTime).getValue().gps;
@@ -49,7 +54,7 @@ public class RequestContainerUtils {
         return null;
     }
 
-    private int propagateTo(int now, RequestStatus requestedStatus) {
+    private int propagateTo(int now, int lastTimeStep, RequestStatus requestedStatus) {
         // Check requestStatus and propagate to TaxiStamp with desired values
         RequestStatus requestStatus = taxiTrail.interp(now).getValue().requestStatus;
         // System.out.println("Trying to find: " + requestedStatus.toString() + " from " + requestStatus.toString());
@@ -57,24 +62,28 @@ public class RequestContainerUtils {
             if (requestedStatus.compareTo(requestStatus) > 0) {
                 if (Objects.nonNull(taxiTrail.getNextEntry(now))) {
                     int nextTimeStep = taxiTrail.getNextEntry(now).getKey();
-                    return propagateTo(nextTimeStep, requestedStatus);
-                } else {
-                    // System.err.println("WARN getNextEntry is null");
-                    return -1;
+                    if (lastTimeStep != nextTimeStep) {
+                        lastTimeStep = now;
+                        return propagateTo(nextTimeStep, lastTimeStep, requestedStatus);
+                    }
                 }
+                // System.err.println("WARN getNextEntry is null");
+                return -1;
             } else if (requestedStatus.compareTo(requestStatus) < 0) {
                 if (Objects.nonNull(taxiTrail.getLastEntry(now))) {
                     int nextTimeStep = taxiTrail.getLastEntry(now).getKey();
-                    return propagateTo(nextTimeStep, requestedStatus);
-                } else {
-                    // System.err.println("WARN getLastEntry is null");
-                    return -1;
+                    if (lastTimeStep != nextTimeStep) {
+                        lastTimeStep = now;
+                        return propagateTo(nextTimeStep, lastTimeStep, requestedStatus);
+                    }
                 }
+                // System.err.println("WARN getLastEntry is null");
+                return -1;
             } else if (requestedStatus == requestStatus)
                 // System.out.println("INFO Found requestStatus: " + requestedStatus.toString());
                 return now;
         } else if (requestStatus == RequestStatus.CANCELLED)
-            return -1;
+            return 0;
         // System.err.println("WARN Couldn't find requested Status, returning -1");
         return -1;
 
@@ -84,8 +93,10 @@ public class RequestContainerUtils {
         // Handle requestIndex & submissionTime
         int submissionTime = -1;
 
+        RequestStatus nowRequest = taxiTrail.interp(now).getValue().requestStatus;
         RequestStatus lastRequest = taxiTrail.getLastEntry(now).getValue().requestStatus;
-        if (lastRequest == RequestStatus.EMPTY) {
+
+        if (RequestStatusParser.isNewSubmission(nowRequest, lastRequest)) {
             taxiTrail.setRequestIndex(now, requestIndex);
             submissionTime = taxiTrail.interp(now).getKey();
         } else {

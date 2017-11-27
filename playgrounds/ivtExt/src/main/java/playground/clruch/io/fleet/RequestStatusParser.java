@@ -29,6 +29,33 @@ public enum RequestStatusParser {
         return parse(nowState, lastState);
     }
 
+    public static boolean isNewSubmission(RequestStatus nowRequest, RequestStatus lastRequest) {
+        // Check change of AVStatus from the vehicle and map corresponding requestStatus
+        switch (nowRequest) {
+        case REQUESTED:
+            switch (lastRequest) {
+            case EMPTY:
+            case CANCELLED:
+            case DROPOFF:
+                return true;
+            default:
+                break;
+            }
+        case PICKUP:
+            switch (lastRequest) {
+            case CANCELLED:
+            case EMPTY:
+            case DROPOFF:
+                return true;
+            default:
+                break;
+            }
+        default:
+            break;
+        }
+        return false;
+    }
+
     private static RequestStatus parse(AVStatus nowState, AVStatus lastState) {
         // Check change of AVStatus from the vehicle and map corresponding requestStatus
         switch (nowState) {
@@ -37,10 +64,12 @@ public enum RequestStatusParser {
             case STAY:
             case REBALANCEDRIVE:
             case OFFSERVICE:
-            case DRIVEWITHCUSTOMER:
+                // case DRIVEWITHCUSTOMER:
                 return RequestStatus.REQUESTED;
             case DRIVETOCUSTOMER:
                 return RequestStatus.PICKUPDRIVE;
+            case DRIVEWITHCUSTOMER:
+                return RequestStatus.CANCELLED;
             default:
                 break;
             }

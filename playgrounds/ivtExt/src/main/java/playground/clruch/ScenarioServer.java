@@ -49,82 +49,86 @@ public class ScenarioServer {
     }
 
     /* package */ static void simulate() throws MalformedURLException, Exception {
-        // load options
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
 
-        System.out.println("Start--------------------"); // added no
+		// load options
+		File workingDirectory = MultiFileTools.getWorkingDirectory();
+		PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
 
-        /** set to true in order to make server wait for at least 1 client, for
-         * instance viewer client */
-        boolean waitForClients = simOptions.getBoolean("waitForClients");
-        File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
-        ReferenceFrame referenceFrame = simOptions.getReferenceFrame();
+		System.out.println("Start--------------------"); // added no
+		
+		/**
+		 * set to true in order to make server wait for at least 1 client, for
+		 * instance viewer client
+		 */
+		boolean waitForClients = simOptions.getBoolean("waitForClients");
+		File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
+		ReferenceFrame referenceFrame = simOptions.getReferenceFrame();
 
-        // open server port for clients to connect to
-        SimulationServer.INSTANCE.startAcceptingNonBlocking();
-        SimulationServer.INSTANCE.setWaitForClients(waitForClients);
+		// open server port for clients to connect to
+		SimulationServer.INSTANCE.startAcceptingNonBlocking();
+		SimulationServer.INSTANCE.setWaitForClients(waitForClients);
 
-        // load MATSim configs - includign av.xml where dispatcher is selected.
-        System.out.println("loading config file " + configFile.getAbsoluteFile());
 
-        GlobalAssert.that(configFile.exists()); // Test wheather the config file directory exists
-        DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
-        dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
+		// load MATSim configs - includign av.xml where dispatcher is selected. 
+		System.out.println("loading config file " + configFile.getAbsoluteFile());
+		
+		GlobalAssert.that(configFile.exists()); // Test wheather the config file directory exists
+		DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+		dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
+		Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
 
-        // TestBed.astraActs(config);
+		
+		
+		String outputdirectory = config.controler().getOutputDirectory();
+		System.out.println("outputdirectory = " + outputdirectory);
 
-        String outputdirectory = config.controler().getOutputDirectory();
-        System.out.println("outputdirectory = " + outputdirectory);
+		// load scenario for simulation
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Network network = scenario.getNetwork();
+		Population population = scenario.getPopulation();
+		GlobalAssert.that(scenario != null && network != null && population != null);
 
-        // load scenario for simulation
-        Scenario scenario = ScenarioUtils.loadScenario(config);
-        Network network = scenario.getNetwork();
-        Population population = scenario.getPopulation();
-        GlobalAssert.that(scenario != null && network != null && population != null);
+		MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
+		Controler controler = new Controler(scenario);
 
-        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
-        Controler controler = new Controler(scenario);
+		controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
+		controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
+		controler.addOverridingModule(new AVModule());
+		controler.addOverridingModule(new DatabaseModule());
+		controler.addOverridingModule(new AVTravelTimeModule());
 
-        controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
-        controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
-        controler.addOverridingModule(new AVModule());
-        controler.addOverridingModule(new DatabaseModule());
-        controler.addOverridingModule(new AVTravelTimeModule());
+		// run simulation
+		controler.run();
 
-        // run simulation
-        controler.run();
+		// close port for visualization
+		SimulationServer.INSTANCE.stopAccepting();
 
-        // close port for visualization
-        SimulationServer.INSTANCE.stopAccepting();
+		// perform analysis of results
+		AnalyzeAll analyzeAll = new AnalyzeAll();
+		AnalyzeSummary analyzeSummary = analyzeAll.analyze(configFile, outputdirectory);
+		VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
 
-        // perform analysis of results
-        AnalyzeAll analyzeAll = new AnalyzeAll();
-        AnalyzeSummary analyzeSummary = analyzeAll.analyze(configFile, outputdirectory);
-        VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());
+		MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
+		PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
+		TravelData travelData = null;
+		if (virtualNetwork != null) {
+			minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
+			performanceFleetSizeCalculator = PerformanceFleetSizeGet.readDefault();
+			if (performanceFleetSizeCalculator != null) {
+				String dataFolderName = outputdirectory + "/data";
+				File relativeDirectory = new File(dataFolderName);
+				performanceFleetSizeCalculator.saveAndPlot(dataFolderName, relativeDirectory);
+			}
 
-        MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
-        PerformanceFleetSizeCalculator performanceFleetSizeCalculator = null;
-        TravelData travelData = null;
-        if (virtualNetwork != null) {
-            minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
-            performanceFleetSizeCalculator = PerformanceFleetSizeGet.readDefault();
-            if (performanceFleetSizeCalculator != null) {
-                String dataFolderName = outputdirectory + "/data";
-                File relativeDirectory = new File(dataFolderName);
-                performanceFleetSizeCalculator.saveAndPlot(dataFolderName, relativeDirectory);
-            }
+			travelData = TravelDataGet.readDefault(virtualNetwork);
+		}
 
-            travelData = TravelDataGet.readDefault(virtualNetwork);
-        }
+		new DataCollector(configFile, outputdirectory, controler, //
+				minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
 
-        new DataCollector(configFile, outputdirectory, controler, //
-                minimumFleetSizeCalculator, analyzeSummary, network, population, travelData);
+		// generate report
+		ReportGenerator reportGenerator = new ReportGenerator();
+		reportGenerator.from(configFile, outputdirectory);
 
-        // generate report
-        ReportGenerator reportGenerator = new ReportGenerator();
-        reportGenerator.from(configFile, outputdirectory);
-
-    }
+	}
 }
