@@ -58,6 +58,12 @@
 
 	<repositories>
 		<repository>
+			<id>XypronRelease</id>
+			<name>Xypron Release</name>
+			<url>https://www.xypron.de/repository</url>
+			<layout>default</layout>
+		</repository>
+		<repository>
 			<id>bintray-matsim-eth-matsim</id>
 			<url>https://dl.bintray.com/matsim-eth/matsim</url>
 		</repository>
