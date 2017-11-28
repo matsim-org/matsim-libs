@@ -6,7 +6,6 @@ package playground.clruch.analysis.performancefleetsize;
 import java.io.File;
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.Properties;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
@@ -30,9 +29,8 @@ import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.N;
 import ch.ethz.idsc.tensor.sca.Round;
-import playground.clruch.ScenarioOptions;
-
 import playground.clruch.netdata.VirtualNetworkGet;
+import playground.clruch.options.ScenarioOptions;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveldata.TravelDataUtils;
@@ -150,8 +148,8 @@ public class PerformanceFleetSizeCalculator implements Serializable {
         File relativeDirectory = new File(dataFolderName);
 
         File workingDirectory = new File("").getCanonicalFile();
-        Properties simOptions = ScenarioOptions.load(workingDirectory);
-        File configFile = new File(workingDirectory, simOptions.getProperty("simuConfig"));
+        ScenarioOptions scenOptions = ScenarioOptions.load(workingDirectory);
+        File configFile = new File(workingDirectory, scenOptions.getSimulationConfigName());
         Config config = ConfigUtils.loadConfig(configFile.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(scenario.getNetwork());

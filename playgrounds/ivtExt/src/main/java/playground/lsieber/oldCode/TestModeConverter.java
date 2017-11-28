@@ -11,8 +11,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
-import playground.clruch.ScenarioOptions;
-import playground.clruch.utils.PropertiesExt;
+import playground.clruch.options.ScenarioOptions;
 
 public class TestModeConverter {
 
@@ -21,7 +20,7 @@ public class TestModeConverter {
      */
     public static void main(String[] args) throws IOException {
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);
         File file = new File(workingDirectory, simOptions.getString("simuConfig"));
         Config config = ConfigUtils.loadConfig(file.toString());
         Scenario originalScenario = ScenarioUtils.loadScenario(config);

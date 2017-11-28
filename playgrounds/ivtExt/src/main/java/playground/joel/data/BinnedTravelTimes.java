@@ -16,9 +16,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.utils.HelperPredicates;
+import playground.joel.helpers.BinnedHelper;
 import playground.joel.helpers.CSVcreator;
 import playground.joel.helpers.KeyMap;
-import playground.joel.helpers.BinnedHelper;
 
 /**
  * Created by Joel on 28.02.2017.

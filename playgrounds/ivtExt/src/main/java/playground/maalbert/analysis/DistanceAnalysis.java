@@ -16,6 +16,7 @@ import playground.clruch.net.VehicleStatistic;
 /**
  * Created by Joel on 05.04.2017.
  */
+@Deprecated
 class DistanceAnalysis {
     StorageSupplier storageSupplier;
     int size;

@@ -282,6 +282,7 @@ public class SpencerSelfishOldNotWorking extends RebalancingDispatcher {
                 // TODO fix this, not adapted to new API
                 Coord avCoord = null; // refPositions.get(vehicleLinkPair.getAVVehicle()).getCoord();
 
+                @SuppressWarnings("null")
                 double distance = Math.hypot(requestCoord.getX() - avCoord.getX(), requestCoord.getY() - avCoord.getY());
                 if (distance < closestDistance) {
                     closestDistance = distance;

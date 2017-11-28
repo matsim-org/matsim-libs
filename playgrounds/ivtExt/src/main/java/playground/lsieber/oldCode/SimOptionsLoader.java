@@ -10,31 +10,31 @@ import org.matsim.core.config.Config;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.ScenarioOptions;
 import playground.clruch.data.ReferenceFrame;
+import playground.clruch.options.ScenarioOptions;
 import playground.clruch.utils.NetworkLoader;
-import playground.clruch.utils.PropertiesExt;
 
+@Deprecated //TODO  why is this still needed?
 public class SimOptionsLoader {
 
     Config config;
     public static Network LoadNetworkBasedOnSimOptions() throws IOException {
-        PropertiesExt simOptions = loadSimOptions();
+        ScenarioOptions simOptions = loadSimOptions();
         return NetworkLoaderlukas(simOptions);
     }
 
-    public static Network LoadNetworkBasedOnSimOptions(PropertiesExt simOptions) throws IOException {
+    public static Network LoadNetworkBasedOnSimOptions(ScenarioOptions simOptions) throws IOException {
         return NetworkLoaderlukas(simOptions);
     }
 
-    public static PropertiesExt loadSimOptions() throws IOException {
+    public static ScenarioOptions loadSimOptions() throws IOException {
         // TODO: checkout this Class: NetworkLoader()
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        return PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        return ScenarioOptions.load(workingDirectory);
 
     }
 
-    public static Network NetworkLoaderlukas(PropertiesExt simOptions) throws IOException {
+    public static Network NetworkLoaderlukas(ScenarioOptions simOptions) throws IOException {
         File workingDirectory = MultiFileTools.getWorkingDirectory();
         File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
         System.out.println("showing simulation results stored in folder: " + outputDirectory.getName());
@@ -50,15 +50,15 @@ public class SimOptionsLoader {
     }
     
     public static Population LoadPopulationBasedOnSimOptions() throws IOException {
-        PropertiesExt simOptions = loadSimOptions();
+        ScenarioOptions simOptions = loadSimOptions();
         return PopulationLoaderLukas(simOptions);
     }
 
-    public static Population LoadPopulationBasedOnSimOptions(PropertiesExt simOptions) throws IOException {
+    public static Population LoadPopulationBasedOnSimOptions(ScenarioOptions simOptions) throws IOException {
         return PopulationLoaderLukas(simOptions);
     }
 
-    public static Population PopulationLoaderLukas(PropertiesExt simOptions) throws IOException {
+    public static Population PopulationLoaderLukas(ScenarioOptions simOptions) throws IOException {
         File workingDirectory = MultiFileTools.getWorkingDirectory();
 
         Population population = PopulationLoader.loadPopulation(new File(workingDirectory, simOptions.getString("simuConfig")));

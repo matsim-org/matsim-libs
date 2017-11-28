@@ -20,8 +20,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.ScenarioOptions;
-import playground.clruch.utils.PropertiesExt;
+import playground.clruch.options.ScenarioOptions;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
 /**
@@ -38,7 +37,7 @@ public class ActTypeFinder {
     public static void main(String[] args) throws IOException {
 
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);
         File configFile = new File(workingDirectory, simOptions.getString("fullConfig"));
         System.out.println("loading config file " + configFile.getAbsoluteFile());
         GlobalAssert.that(configFile.exists()); // Test wheather the config file directory exists

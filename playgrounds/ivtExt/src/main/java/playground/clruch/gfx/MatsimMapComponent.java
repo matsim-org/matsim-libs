@@ -25,6 +25,7 @@ import playground.clruch.net.SimulationObject;
 public class MatsimMapComponent extends JMapViewer {
 
     final MatsimStaticDatabase db;
+    @SuppressWarnings("unused")
     private int repaint_count = 0;
     SimulationObject simulationObject = null;
 

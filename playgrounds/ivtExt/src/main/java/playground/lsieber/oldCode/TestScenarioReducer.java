@@ -17,10 +17,10 @@ import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalcu
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeIO;
 import playground.clruch.netdata.MatsimCenterVirtualNetworkCreator;
 import playground.clruch.netdata.MatsimKMEANSVirtualNetworkCreator;
+import playground.clruch.options.ScenarioOptions;
 import playground.clruch.prep.PopulationRequestSchedule;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
-import playground.clruch.utils.PropertiesExt;
 
 public class TestScenarioReducer {
 
@@ -43,7 +43,7 @@ public class TestScenarioReducer {
 
         // load options
         File workingDirectory = shapeScenarioReducer.getWorkingDirectory();
-        PropertiesExt simOptions = shapeScenarioReducer.getSimOptions();
+        ScenarioOptions simOptions = shapeScenarioReducer.getSimOptions();
 
         // TODO can some of these be directly read from another source? Do all have to be user settings?
 

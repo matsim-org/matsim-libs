@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
-import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.datalys.SaveUtils;
 import ch.ethz.idsc.queuey.plot.DiagramCreator;
 import ch.ethz.idsc.queuey.plot.HistogramPlot;
@@ -23,12 +22,11 @@ import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.CsvFormat;
-import playground.clruch.ScenarioOptions;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.StorageUtils;
-import playground.clruch.utils.PropertiesExt;
+import playground.clruch.options.ScenarioOptions;
 import playground.joel.data.TotalData;
 
 /** Created by Joel on 05.04.2017.
@@ -58,12 +56,7 @@ public class AnalyzeAll {
 
     /* package */ void plot(String csv, String name, String title, int from, int to, Double maxRange, File relativeDirectory) //
             throws Exception {
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
-        // TODO: DELETE
-        // Path pathOfCSV = Paths.get(workingDirectory + "/" + relativeDirectory.getPath() + "/" + csv + ".csv");
-        // System.out.println(pathOfCSV.toString());
-        // Tensor table = CsvFormat.parse(Files.lines(pathOfCSV));
-
+        
         Tensor table = CsvFormat.parse(Files.lines(Paths.get(relativeDirectory.getPath() + "/" + csv + ".csv")));
         table = Transpose.of(table);
         try {
@@ -233,8 +226,8 @@ public class AnalyzeAll {
      * @throws Exception */
     public void main(String[] args) throws Exception {
         File workingDirectory = new File("").getCanonicalFile();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
-        File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
+        ScenarioOptions scenOptions = ScenarioOptions.load(workingDirectory);
+        File configFile = new File(workingDirectory, scenOptions.getString("simuConfig"));
         Config config = ConfigUtils.loadConfig(configFile.toString());
         String outputdirectory = config.controler().getOutputDirectory();
         // StorageUtils storageUtils = new StorageUtils(new File(outputdirectory));

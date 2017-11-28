@@ -2,18 +2,17 @@ package playground.clruch;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.lsieber.networkshapecutter.PrepSettings;
-import playground.lsieber.networkshapecutter.PrepSettings.SettingsType;
+import ch.ethz.idsc.queuey.datalys.MultiFileTools;
+import playground.clruch.options.ScenarioOptions;
 import playground.lsieber.scenario.preparer.NetworkPreparer;
 import playground.lsieber.scenario.preparer.PopulationPreparer;
 import playground.lsieber.scenario.preparer.VirtualNetworkPreparer;
@@ -30,44 +29,40 @@ public class ScenarioPreparer {
 
     public static void run(String[] args) throws MalformedURLException, Exception {
 
-        // load Settings from IDSC Options
-        PrepSettings settings = new PrepSettings(SettingsType.Preparer);
+        // run preparer in simulation working directory
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
+        ScenarioOptions scenarioOptions = ScenarioOptions.load(workingDirectory);
 
-        Scenario scenario = ScenarioUtils.loadScenario(settings.config);
+        // load Settings from IDSC Options
+        Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName());
+        Scenario scenario = ScenarioUtils.loadScenario(config);
         // create Reduced Scenario Folder if nesscesary
-        settings.preparedScenarioDirectory.mkdir();
 
         // 1) cut network (and reduce population to new network)
         Network network = scenario.getNetwork();
-        network = NetworkPreparer.run(network, settings);
+        network = NetworkPreparer.run(network, scenarioOptions);
 
         // 2) adapt the population to new network
         Population population = scenario.getPopulation();
-        PopulationPreparer.run(network, population, settings);
+        PopulationPreparer.run(network, population, scenarioOptions);
 
-        
-        // FIXME LUKAS Add Facilities
-        
-        
         // 3) create virtual Network
-        VirtualNetworkPreparer.run(network, population, settings);
+        VirtualNetworkPreparer.run(network, population, scenarioOptions);
 
-        // 4) coppy and prepare other files
-        // TODO NO Hardcoding!!!! 
-        //COPY and Modify CONFIG Files (IDSCOptions, AV and CONFIG)
-        new ConfigWriter(settings.config).writeFileV2(new File(settings.preparedScenarioDirectory, settings.preparedConfigName).toString());
-        String IDSCOptions = ScenarioOptions.getOptionsFileName();
-        Path src = new File(settings.workingDirectory, IDSCOptions).toPath();
-        Path dest = new File(settings.preparedScenarioDirectory, IDSCOptions).toPath();
-        Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
-        Path avFile = new File(settings.workingDirectory, "av.xml").toPath();
-        if (Files.exists(avFile)) {
-            Files.copy(avFile, new File(settings.preparedScenarioDirectory, "av.xml").toPath(), StandardCopyOption.REPLACE_EXISTING);
-        }
-        //TODO Check if other files are needed to copy into prepared Scenario Folder (e.g. Schedule, ...)
-
-        // 5) TODO CREATE Report of the Preparing in a text (or other format) file which summarizes the preparation Steps
+        // 4) save a simulation config file
+        createSimulationConfigFile(config, scenarioOptions);
 
         System.out.println("-----> END OF SCENARIO PREPARER <-----");
+    }
+
+    private static void createSimulationConfigFile(Config fullConfig, ScenarioOptions scenOptions) {
+
+        // change population and network such that converted is loaded
+        fullConfig.network().setInputFile(scenOptions.getPreparedNetworkName() + ".xml.gz");
+        fullConfig.plans().setInputFile(scenOptions.getPreparedPopulationName() + ".xml.gz");
+
+        // save under correct name
+        new ConfigWriter(fullConfig).writeFileV2(scenOptions.getSimulationConfigName());
+
     }
 }
