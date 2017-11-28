@@ -3,41 +3,42 @@ package playground.lsieber.scenario.preparer;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Objects;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.network.io.NetworkWriter;
 
+import ch.ethz.idsc.owly.data.GlobalAssert;
 import ch.ethz.idsc.queuey.util.GZHandler;
+import playground.clruch.options.ScenarioOptions;
+import playground.lsieber.networkshapecutter.LinkModes;
 import playground.lsieber.networkshapecutter.NetworkCutterUtils;
-import playground.lsieber.networkshapecutter.PrepSettings;
+import playground.lsieber.networkshapecutter.NetworkCutters;
 
 public enum NetworkPreparer {
     ;
-    public static Network run(Network network, PrepSettings settings) throws MalformedURLException, IOException {
-        if (network == null)
-            System.out.println("its the network");
-        if (settings.locationSpec == null)
-            System.out.println("its the ls");
+    public static Network run(Network network, ScenarioOptions scenOptions) throws MalformedURLException, IOException {
+        GlobalAssert.that(!Objects.isNull(network));
 
         // Cut Network as defined in the IDSC Settings
-        Network modifiedNetwork = settings.createNetworkCutter().cut(network, settings);
+        NetworkCutters networkCutter = scenOptions.getNetworkCutter();
+        Network modifiedNetwork = networkCutter.cut(network, scenOptions);
 
-
-        
         // Filter out only the modes defines in the IDSC Settings
 
-        if (!settings.modes.allModesAllowed) {
-            modifiedNetwork = NetworkCutterUtils.modeFilter(modifiedNetwork, settings.modes);
+        LinkModes linkModes = scenOptions.getLinkModes();
+        if (!linkModes.allModesAllowed) {
+            modifiedNetwork = NetworkCutterUtils.modeFilter(modifiedNetwork, scenOptions.getLinkModes());
         }
 
         // Clean the network if defined in the IDSC Settings
-        if (settings.networkCleaner) {
+        if (scenOptions.cleanNetwork()) {
             new NetworkCleaner().run(modifiedNetwork);
         }
 
-        final File fileExportGz = new File(settings.preparedScenarioDirectory, settings.NETWORKUPDATEDNAME + ".xml.gz");
-        final File fileExport = new File(settings.preparedScenarioDirectory, settings.NETWORKUPDATEDNAME + ".xml");
+        final File fileExportGz = new File(scenOptions.getPreparedNetworkName() + ".xml.gz");
+        final File fileExport = new File(scenOptions.getPreparedNetworkName() + ".xml");
         {
             // write the modified population to file
             NetworkWriter nw = new NetworkWriter(modifiedNetwork);
@@ -49,11 +50,9 @@ public enum NetworkPreparer {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        System.out.println("saved converted network to: " + settings.preparedScenarioDirectory + settings.NETWORKUPDATEDNAME + ".xml");
+        System.out.println("saved converted network to: " + scenOptions.getPreparedNetworkName() + ".xml");
 
         NetworkCutterUtils.printNettworkCuttingInfo(network, modifiedNetwork);
-
-        settings.config.network().setInputFile(settings.NETWORKUPDATEDNAME + ".xml");
 
         return modifiedNetwork;
 

@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Properties;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -19,10 +18,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
-import playground.clruch.ScenarioOptions;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeGet;
 import playground.clruch.netdata.VirtualNetworkGet;
+import playground.clruch.options.ScenarioOptions;
 import playground.clruch.utils.SafeConfig;
 import playground.sebhoerl.avtaxi.config.AVConfig;
 import playground.sebhoerl.avtaxi.config.AVConfigReader;
@@ -50,14 +49,14 @@ public enum ScenarioParameters {
 
     private ScenarioParameters() {
         File workingDirectory = null;
-        Properties simOptions = null;
+        ScenarioOptions scenOptions = null;
         try {
             workingDirectory = new File("").getCanonicalFile();
-            simOptions = ScenarioOptions.load(workingDirectory);
+            scenOptions = ScenarioOptions.load(workingDirectory);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        File configFile = new File(workingDirectory, simOptions.getProperty("simuConfig"));
+        File configFile = new File(workingDirectory, scenOptions.getSimulationConfigName());
         Config config = ConfigUtils.loadConfig(configFile.toString());
 
         user = System.getProperty("user.name");
@@ -82,15 +81,22 @@ public enum ScenarioParameters {
         Network network = scenario.getNetwork();
         networkName = network.getName();
 
-        VirtualNetwork<Link> virtualNetwork = VirtualNetworkGet.readDefault(network);
-        MinimumFleetSizeCalculator minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
+        VirtualNetwork<Link> virtualNetwork = null;
+        MinimumFleetSizeCalculator minimumFleetSizeCalculator = null;
+        try {
+            virtualNetwork = VirtualNetworkGet.readDefault(network);
+            minimumFleetSizeCalculator = MinimumFleetSizeGet.readDefault();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         GlobalAssert.that(virtualNetwork != null);
 
         virtualNodes = virtualNetwork.getvNodesCount();
         minFleet = minimumFleetSizeCalculator.getMinFleet();
         EMDks = minimumFleetSizeCalculator.getEMDk();
         minimumFleet = minimumFleetSizeCalculator.minimumFleet;
-        
+
         iterations = config.controler().getLastIteration();
 
     }

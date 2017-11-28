@@ -1,6 +1,5 @@
 package playground.lsieber.oldCode;
 
-import java.io.IOException;
 import java.util.HashSet;
 
 import org.matsim.api.core.v01.Scenario;

@@ -20,9 +20,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.clruch.utils.HelperPredicates;
+import playground.joel.helpers.BinnedHelper;
 import playground.joel.helpers.CSVcreator;
 import playground.joel.helpers.KeyMap;
-import playground.joel.helpers.BinnedHelper;
 
 
 /**

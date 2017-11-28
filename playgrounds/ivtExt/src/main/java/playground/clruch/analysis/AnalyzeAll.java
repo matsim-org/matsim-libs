@@ -22,12 +22,11 @@ import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.CsvFormat;
-import playground.clruch.ScenarioOptions;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.StorageUtils;
-import playground.clruch.utils.ScenarioOptionsExt;
+import playground.clruch.options.ScenarioOptions;
 import playground.joel.data.TotalData;
 
 /** Created by Joel on 05.04.2017.
@@ -227,8 +226,8 @@ public class AnalyzeAll {
      * @throws Exception */
     public void main(String[] args) throws Exception {
         File workingDirectory = new File("").getCanonicalFile();
-        ScenarioOptionsExt simOptions = ScenarioOptionsExt.wrap(ScenarioOptions.load(workingDirectory));
-        File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
+        ScenarioOptions scenOptions = ScenarioOptions.load(workingDirectory);
+        File configFile = new File(workingDirectory, scenOptions.getString("simuConfig"));
         Config config = ConfigUtils.loadConfig(configFile.toString());
         String outputdirectory = config.controler().getOutputDirectory();
         // StorageUtils storageUtils = new StorageUtils(new File(outputdirectory));

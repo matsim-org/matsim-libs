@@ -1,5 +1,6 @@
 package playground.clruch.dispatcher.selfishdispatcher.copy;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -169,9 +170,13 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
         @Override
         public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
-            virtualNetwork = VirtualNetworkGet.readDefault(network);
-            GlobalAssert.that(virtualNetwork!=null);
-            travelData = TravelDataGet.readDefault(virtualNetwork);
+            try {
+                virtualNetwork = VirtualNetworkGet.readDefault(network);
+                travelData = TravelDataGet.readDefault(virtualNetwork);
+            } catch (IOException e) {
+                e.printStackTrace();
+                GlobalAssert.that(false);
+            }
             GlobalAssert.that(virtualNetwork != null);
             GlobalAssert.that(travelData != null);
             return new SelfishDispatcher(config, avconfig, travelTime, router, eventsManager, virtualNetwork, travelData);

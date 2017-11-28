@@ -1,5 +1,6 @@
 package playground.clruch.dispatcher;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -122,7 +123,12 @@ public class KMedianDispatcher extends PartitionedDispatcher {
 
         @Override
         public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
-            virtualNetwork = VirtualNetworkGet.readDefault(network);
+            try {
+                virtualNetwork = VirtualNetworkGet.readDefault(network);
+            } catch (IOException e) {
+                e.printStackTrace();
+                GlobalAssert.that(false);
+            }
             return new KMedianDispatcher(config, avconfig, travelTime, generatorConfig, router, eventsManager, network, //
                     virtualNetwork);
         }

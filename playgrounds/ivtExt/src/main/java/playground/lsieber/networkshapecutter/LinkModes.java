@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+// TODO String Tokenizer
 public class LinkModes {
 
     public final String ALLMODES = "all";

@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.util.Objects;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
@@ -15,8 +17,8 @@ import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.netdata.VirtualNetworkGet;
+import playground.clruch.options.ScenarioOptions;
 import playground.clruch.utils.NetworkLoader;
-import playground.clruch.utils.ScenarioOptionsExt;
 
 /** the viewer allows to connect to the scenario server or to view saved
  * simulation results. */
@@ -31,8 +33,10 @@ public class ScenarioViewer {
         File workingDirectory = MultiFileTools.getWorkingDirectory();
         
         // load options
-        ScenarioOptionsExt simOptions = ScenarioOptionsExt.wrap(ScenarioOptions.load(workingDirectory));
-        File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
+        ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);
+        Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName());
+        File outputSubDirectory = new File(config.controler().getOutputDirectory()); 
+        File outputDirectory = outputSubDirectory.getParentFile();
         // File outputDirectory = new File(workingDirectory, "/simulation_output" );
 
         System.out.println("showing simulation results stored in folder: " + outputDirectory.getName());

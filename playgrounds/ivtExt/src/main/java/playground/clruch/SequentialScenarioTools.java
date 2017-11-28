@@ -20,7 +20,7 @@ import org.jdom.output.XMLOutputter;
 
 import ch.ethz.idsc.queuey.util.FileDelete;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.utils.ScenarioOptionsExt;
+import playground.clruch.options.ScenarioOptions;
 
 /** @author Claudio Ruch */
 public enum SequentialScenarioTools {
@@ -136,7 +136,7 @@ public enum SequentialScenarioTools {
 
     }
 
-    public static void changeOutputDirectoryTo(String name, File simFolder,ScenarioOptionsExt simOptions) //
+    public static void changeOutputDirectoryTo(String name, File simFolder,ScenarioOptions simOptions) //
             throws ParserConfigurationException, JDOMException, IOException {
 
         System.out.println("changing output directory to " + name);

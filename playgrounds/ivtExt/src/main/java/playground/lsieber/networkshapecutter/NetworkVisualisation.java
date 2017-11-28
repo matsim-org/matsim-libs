@@ -15,15 +15,15 @@ import playground.clruch.gfx.MatsimMapComponent;
 import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.clruch.utils.ScenarioOptionsExt;
+import playground.clruch.options.ScenarioOptions;
 import playground.lsieber.oldCode.SimOptionsLoader;
 
 public class NetworkVisualisation {
-    private ScenarioOptionsExt simOptions;
+    private ScenarioOptions simOptions;
     private Network network;
     private Population population;
 
-    public NetworkVisualisation(Network network, ScenarioOptionsExt simOptions) throws IOException {
+    public NetworkVisualisation(Network network, ScenarioOptions simOptions) throws IOException {
         this.simOptions = simOptions;
         this.network = network;
     }
@@ -33,7 +33,7 @@ public class NetworkVisualisation {
         this.network = network;
     }
 
-    public NetworkVisualisation(ScenarioOptionsExt simOptions) throws IOException {
+    public NetworkVisualisation(ScenarioOptions simOptions) throws IOException {
         this.simOptions = simOptions;
         this.network = SimOptionsLoader.LoadNetworkBasedOnSimOptions(simOptions);
     }
@@ -54,7 +54,7 @@ public class NetworkVisualisation {
         displayNetwork();
     }
 
-    public ScenarioOptionsExt getSimOptions() {
+    public ScenarioOptions getSimOptions() {
         return this.simOptions;
     }
 

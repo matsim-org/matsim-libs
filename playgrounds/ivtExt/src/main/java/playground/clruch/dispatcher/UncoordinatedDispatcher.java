@@ -1,5 +1,6 @@
 package playground.clruch.dispatcher;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import com.google.inject.name.Named;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNode;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.dispatcher.core.DispatcherUtils;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
@@ -156,8 +158,12 @@ public class UncoordinatedDispatcher extends PartitionedDispatcher {
 
         @Override
         public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
-
-            virtualNetwork = VirtualNetworkGet.readDefault(network);
+            try {
+                virtualNetwork = VirtualNetworkGet.readDefault(network);
+            } catch (IOException e) {
+                GlobalAssert.that(false);
+                e.printStackTrace();
+            }
             return new UncoordinatedDispatcher( //
                     config, avconfig, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork);
         }

@@ -16,7 +16,7 @@ import org.matsim.facilities.ActivityFacilities;
 import org.matsim.facilities.FacilitiesWriter;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.ScenarioOptions;
+import playground.clruch.options.ScenarioOptionsBase;
 
 public abstract class AbstractScenarioReducer extends IdscSettingsLoader {
 
@@ -86,7 +86,7 @@ public abstract class AbstractScenarioReducer extends IdscSettingsLoader {
 
         copyFileWorkDir2ReducedScenarioDir("av.xml");
 
-        copyFileWorkDir2ReducedScenarioDir(ScenarioOptions.getOptionsFileName());
+        copyFileWorkDir2ReducedScenarioDir(ScenarioOptionsBase.getOptionsFileName());
 
     }
 

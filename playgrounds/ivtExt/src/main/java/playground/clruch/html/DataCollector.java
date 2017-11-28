@@ -38,6 +38,7 @@ public class DataCollector {
         String dataFolderName = outputdirectory + "/data";
         File relativeDirectory = new File(dataFolderName);
 
+        System.out.println(relativeDirectory.getAbsolutePath());
         minimumFleetSizeCalculator.plot(relativeDirectory);
 
         LeastCostPathCalculator dijkstra = EasyDijkstra.prepDijkstra(network);

@@ -8,20 +8,23 @@ import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.netdata.MatsimCenterVirtualNetworkCreator;
 import playground.clruch.netdata.MatsimKMEANSVirtualNetworkCreator;
+import playground.clruch.options.ScenarioOptions;
 
 public enum VirtualNetworkCreators {
     CENTERNETWORK {
-        public VirtualNetwork<Link> create(Network network, Population population, PrepSettings settings) {
+        @Override
+        public VirtualNetwork<Link> create(Network network, Population population, ScenarioOptions scenOptions) {
             MatsimCenterVirtualNetworkCreator centercreator = new MatsimCenterVirtualNetworkCreator();
             return centercreator.creatVirtualNetwork(network, 2000.0, Tensors.vector(-900.0, -2300.0));
         }
     },
     KMEANS {
-        public VirtualNetwork<Link> create(Network network, Population population, PrepSettings settings) {
+        @Override
+        public VirtualNetwork<Link> create(Network network, Population population, ScenarioOptions scenOptions) {
             MatsimKMEANSVirtualNetworkCreator kmeansVirtualNetworkCreator = new MatsimKMEANSVirtualNetworkCreator();
-            return kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, settings.numVirtualNodes, settings.completeGraph);
+            return kmeansVirtualNetworkCreator.createVirtualNetwork(population, network, scenOptions.getNumVirtualNodes(), scenOptions.isCompleteGraph());
         }
     };
-    public abstract VirtualNetwork<Link> create(Network network, Population population, PrepSettings settings);
+    public abstract VirtualNetwork<Link> create(Network network, Population population, ScenarioOptions scenOptions);
 
 }
