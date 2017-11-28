@@ -10,6 +10,7 @@
 IDSCOptions.properties
 
 # jan and claudio  added:
+**/.classpath
 tutorial/output/
 tutorial/pop.xml.gz
 /playgrounds/ivtExt/src/main/java/playground/clruch/dispatcher/TestStrategiesDispatcher.java
