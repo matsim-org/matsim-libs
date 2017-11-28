@@ -10,23 +10,20 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
-import playground.clruch.ScenarioOptions;
-import playground.clruch.utils.PropertiesExt;
+import playground.clruch.options.ScenarioOptions;
 
 public class AttributeCutterTest {
 
     public static void main(String[] args) throws IOException {
-        // TODO Auto-generated method stub
-
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);
         File file = new File(workingDirectory, simOptions.getString("simuConfig"));
         Config config = ConfigUtils.loadConfig(file.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         ObjectAttributes populationAttributes = scenario.getPopulation().getPersonAttributes();
-// TODO is the attribute cutter realy needed???
-        
-        
+        System.out.println(populationAttributes.toString());
+        // TODO is the attribute cutter realy needed???
+
     }
 
 }

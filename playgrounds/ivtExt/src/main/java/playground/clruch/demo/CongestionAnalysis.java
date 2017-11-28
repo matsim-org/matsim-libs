@@ -83,6 +83,7 @@ class CongestionAnalysis {
         GlobalAssert.that(false); // TODO next lines disfunctional, check before continuing
         StorageUtils storageUtils = null;
 
+        @SuppressWarnings("null")
         CongestionAnalysis ca = new CongestionAnalysis(new StorageSupplier(storageUtils.getFirstAvailableIteration()));
         try {
             ca.analzye();

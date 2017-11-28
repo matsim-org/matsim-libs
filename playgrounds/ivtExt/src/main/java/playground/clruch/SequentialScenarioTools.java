@@ -20,6 +20,7 @@ import org.jdom.output.XMLOutputter;
 
 import ch.ethz.idsc.queuey.util.FileDelete;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import playground.clruch.options.ScenarioOptions;
 
 /** @author Claudio Ruch */
 public enum SequentialScenarioTools {
@@ -135,12 +136,13 @@ public enum SequentialScenarioTools {
 
     }
 
-    public static void changeOutputDirectoryTo(String name, File simFolder) //
+    public static void changeOutputDirectoryTo(String name, File simFolder,ScenarioOptions simOptions) //
             throws ParserConfigurationException, JDOMException, IOException {
 
         System.out.println("changing output directory to " + name);
 
-        File xmlFile = new File(simFolder, "av_config.xml");
+        
+        File xmlFile = new File(simFolder, simOptions.getString("simuConfig"));
         GlobalAssert.that(xmlFile.exists());
 
         SAXBuilder builder = new SAXBuilder();
@@ -152,13 +154,16 @@ public enum SequentialScenarioTools {
         Document doc = (Document) builder.build(xmlFile);
         Element rootNode = doc.getRootElement();
 
+        @SuppressWarnings("unchecked")
         List<Element> children = rootNode.getChildren();
 
         for (Element child : children) {
             if (child.getAttributeValue("name").equals("controler")) {
+                @SuppressWarnings("unchecked")
                 List<Element> cchildren = child.getChildren();
                 for (Element cchild : cchildren) {
                     if (cchild.getAttributeValue("name").equals("outputDirectory")) {
+                        @SuppressWarnings("unchecked")
                         List<Attribute> theAttributes = cchild.getAttributes();
                         if (theAttributes.get(0).getValue().equals("outputDirectory")) {
                             theAttributes.get(1).setValue(name);

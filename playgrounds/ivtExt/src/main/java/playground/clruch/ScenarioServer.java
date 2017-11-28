@@ -12,7 +12,6 @@ import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -32,11 +31,10 @@ import playground.clruch.net.DatabaseModule;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.clruch.prep.acttype.IncludeActTypeOf;
+import playground.clruch.options.ScenarioOptions;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
-import playground.clruch.utils.PropertiesExt;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
@@ -50,32 +48,33 @@ public class ScenarioServer {
     }
 
     /* package */ static void simulate() throws MalformedURLException, Exception {
-
         // load options
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
-
+        ScenarioOptions scenarioOptions = ScenarioOptions.load(workingDirectory);
         System.out.println("Start--------------------"); // added no
-
-        /** set to true in order to make server wait for at least 1 client, for
-         * instance viewer client */
-        boolean waitForClients = simOptions.getBoolean("waitForClients");
-        File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
-        ReferenceFrame referenceFrame = simOptions.getReferenceFrame();
+        
+        /**
+         * set to true in order to make server wait for at least 1 client, for
+         * instance viewer client
+         */
+        boolean waitForClients = scenarioOptions.getBoolean("waitForClients");
+        File configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
+        ReferenceFrame referenceFrame = scenarioOptions.getReferenceFrame();
 
         // open server port for clients to connect to
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
         SimulationServer.INSTANCE.setWaitForClients(waitForClients);
 
-        // load MATSim configs - includign av.xml where dispatcher is selected.
-        System.out.println("loading config file " + configFile.getAbsoluteFile());
 
+        // load MATSim configs - includign av.xml where dispatcher is selected. 
+        System.out.println("loading config file " + configFile.getAbsoluteFile());
+        
         GlobalAssert.that(configFile.exists()); // Test wheather the config file directory exists
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
 
-        IncludeActTypeOf.BaselineCH(config);
+        
         
         String outputdirectory = config.controler().getOutputDirectory();
         System.out.println("outputdirectory = " + outputdirectory);
@@ -130,3 +129,5 @@ public class ScenarioServer {
 
     }
 }
+
+

@@ -1,4 +1,4 @@
-package playground.lsieber.scenario.reducer;
+package playground.lsieber.oldCode;
 
 import java.io.File;
 
@@ -17,10 +17,10 @@ import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalcu
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeIO;
 import playground.clruch.netdata.MatsimCenterVirtualNetworkCreator;
 import playground.clruch.netdata.MatsimKMEANSVirtualNetworkCreator;
+import playground.clruch.options.ScenarioOptions;
 import playground.clruch.prep.PopulationRequestSchedule;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
-import playground.clruch.utils.PropertiesExt;
 
 public class TestScenarioReducer {
 
@@ -34,7 +34,7 @@ public class TestScenarioReducer {
         shapeScenarioReducer.writeToXML();
         // shapeScenarioReducer.ConvertPtToAV();
         shapeScenarioReducer.addConfigFilesinFolder();
-        // adaptedScenarioPreparer(shapeScenarioReducer);
+        adaptedScenarioPreparer(shapeScenarioReducer);
 
         System.out.println("THIS IS THE END :)");
     }
@@ -43,7 +43,7 @@ public class TestScenarioReducer {
 
         // load options
         File workingDirectory = shapeScenarioReducer.getWorkingDirectory();
-        PropertiesExt simOptions = shapeScenarioReducer.getSimOptions();
+        ScenarioOptions simOptions = shapeScenarioReducer.getSimOptions();
 
         // TODO can some of these be directly read from another source? Do all have to be user settings?
 
@@ -63,9 +63,6 @@ public class TestScenarioReducer {
         Network network = shapeScenarioReducer.getNetwork();
         Population population = shapeScenarioReducer.getPopulation();
 
-        // TODO delete this sysouts
-        System.out.println(network.getLinks().size());
-        System.out.println(population.getPersons().size());
 
         // 3) create virtual Network
         // TODO make this generic for any VirtualNetwork creators.
