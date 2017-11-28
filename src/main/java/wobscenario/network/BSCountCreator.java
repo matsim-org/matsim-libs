@@ -46,17 +46,17 @@ public class BSCountCreator {
  */
 public static void main(String[] args) {
 	Counts<Link> counts = new Counts<>(); 
-	new MatsimCountsReader(counts).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/counts_added.xml");
+	new MatsimCountsReader(counts).readFile("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/counts_added_bs.xml");
 	
 	TabularFileParserConfig config = new TabularFileParserConfig();
-	config.setDelimiterRegex(";");
-	config.setFileName("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/LoopsCounts_1hr_LinkID.csv");
+	config.setDelimiterRegex(",");
+	config.setFileName("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/counts_wvi.txt");
 	TabularFileParser parser = new  TabularFileParser();
 	TabularFileHandler handler = new TabularFileHandler() {
 	
 		@Override
 		public void startRow(String[] row) {
-			Id<Link> linkId = Id.createLinkId(row[5]);
+			Id<Link> linkId = Id.createLinkId(row[4]);
 			Count<Link> count = counts.getCount(linkId);
 			if (count== null){
 				counts.createAndAddCount(linkId, row[0]);
@@ -71,7 +71,7 @@ public static void main(String[] args) {
 	};
 	parser.parse(config, handler);
 	
-	new CountsWriter(counts).write("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/counts_added_bs.xml");
+	new CountsWriter(counts).write("C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/input/network/counts_added_bs_wvi.xml");
 	
 }
 }
