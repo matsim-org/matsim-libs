@@ -25,7 +25,9 @@ package cemdap4wob.run;
 import javax.inject.Inject;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.cadyts.car.CadytsCarModule;
 import org.matsim.contrib.cadyts.car.CadytsContext;
@@ -49,14 +51,13 @@ import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
  * @author  jbischoff
  *
  */
-/**
- *
- */
+
 public class RunCemdapBasecase {
 public static void main(String[] args) {
 	
 	Config config = ConfigUtils.loadConfig(args[0], new CadytsConfigGroup());
 	Scenario scenario = ScenarioUtils.loadScenario(config);
+	adjustPtNetworkCapacity(scenario.getNetwork(),config.qsim().getFlowCapFactor());
 	
 	Controler controler = new Controler(scenario);
 	controler.addOverridingModule(new CadytsCarModule());
@@ -88,4 +89,17 @@ public static void main(String[] args) {
 	
 	
 }
+/**
+ * this is useful for pt links when only a fraction of the population is simulated, but bus frequency remains the same. 
+ * Otherwise, pt vehicles may get stuck.
+ */
+	private static void adjustPtNetworkCapacity(Network network, double flowCapacityFactor){
+		if (flowCapacityFactor<1.0){
+			for (Link l : network.getLinks().values()){
+				if (l.getAllowedModes().contains(TransportMode.pt)){
+					l.setCapacity(l.getCapacity()/flowCapacityFactor);
+				}
+			}
+		}
+	}
 }

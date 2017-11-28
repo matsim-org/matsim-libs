@@ -41,6 +41,8 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultPlansRemover;
+import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
@@ -60,7 +62,7 @@ public class WobCemdapBasecaseConfigGenerator {
 		double flowCap = 1.0;
 		
 		//network
-		config.network().setInputFile("input/networkpt-av-nov17.xml.gz");
+		config.network().setInputFile("input/networkpt-av-nov17_cleaned.xml.gz");
 		config.counts().setInputFile("input/counts_added_bs_wvi.xml");
 	
 		config.transit().setTransitScheduleFile("input/transitschedule.xml");
@@ -151,6 +153,12 @@ public class WobCemdapBasecaseConfigGenerator {
 		timeAllocationReroute.setStrategyName(DefaultStrategy.TimeAllocationMutator_ReRoute.toString());
 		timeAllocationReroute.setWeight(0.1);
 		config.strategy().addStrategySettings(timeAllocationReroute);
+		
+		StrategySettings changeExpBeta = new StrategySettings();
+		changeExpBeta.setStrategyName(DefaultSelector.ChangeExpBeta.toString());
+		changeExpBeta.setWeight(0.6);
+		config.strategy().addStrategySettings(changeExpBeta);
+		
 		
 		config.strategy().setFractionOfIterationsToDisableInnovation(.8);
 		
