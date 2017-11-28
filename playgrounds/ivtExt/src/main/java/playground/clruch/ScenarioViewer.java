@@ -16,7 +16,7 @@ import playground.clruch.gfx.MatsimViewerFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.NetworkLoader;
-import playground.clruch.utils.PropertiesExt;
+import playground.clruch.utils.ScenarioOptionsExt;
 
 /** the viewer allows to connect to the scenario server or to view saved
  * simulation results. */
@@ -28,10 +28,10 @@ public class ScenarioViewer {
      * @throws FileNotFoundException
      * @throws IOException */
     public static void main(String[] args) throws FileNotFoundException, IOException {
-
-        // load options
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        
+        // load options
+        ScenarioOptionsExt simOptions = ScenarioOptionsExt.wrap(ScenarioOptions.load(workingDirectory));
         File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
         // File outputDirectory = new File(workingDirectory, "/simulation_output" );
 

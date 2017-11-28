@@ -13,6 +13,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
+import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.AnalyzeSummary;
@@ -30,8 +31,7 @@ import playground.clruch.prep.acttype.IncludeActTypeOf;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
-import playground.lsieber.networkshapecutter.PrepSettings;
-import playground.lsieber.networkshapecutter.PrepSettings.SettingsType;
+import playground.clruch.utils.ScenarioOptionsExt;
 import playground.sebhoerl.avtaxi.framework.AVModule;
 import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
 
@@ -44,7 +44,9 @@ public class ScenarioServer {
     }
 
     /* package */ static void simulate() throws MalformedURLException, Exception {
-        PrepSettings settings = new PrepSettings(SettingsType.Server);
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
+        ScenarioOptionsExt simOptions = ScenarioOptionsExt.wrap(ScenarioOptions.load(workingDirectory));
+        File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
         String outputdirectory = settings.config.controler().getOutputDirectory();
         System.out.println("outputdirectory = " + outputdirectory);
 

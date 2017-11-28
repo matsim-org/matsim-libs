@@ -7,20 +7,19 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 
-import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import playground.clruch.ScenarioOptions;
 import playground.clruch.data.LocationSpec;
 import playground.clruch.data.ReferenceFrame;
-import playground.clruch.utils.PropertiesExt;
+import playground.clruch.utils.ScenarioOptionsExt;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
 public class PrepSettings {
-    private final PropertiesExt simOptions;
+    private final ScenarioOptionsExt simOptions;
 
     /* Directories and Paths */
-    public final File workingDirectory;
-    public final File configFileName;
-    public final Config config;
+    private final File workingDirectory;
+    private final File configFileName;
+    private final Config config;
     public final File preparedScenarioDirectory;
     public final File preparedConfigFile;
     public final String preparedConfigName;
@@ -55,27 +54,18 @@ public class PrepSettings {
     public final boolean networkCleaner;
    //public final String shapefilePath;
     
-    public enum SettingsType {Server, Preparer};
 
-    public PrepSettings(SettingsType settingsType) throws IOException {
-        workingDirectory = MultiFileTools.getWorkingDirectory();
-        simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+    public PrepSettings(File workingDirectory) throws IOException {
+        this.workingDirectory = workingDirectory;
+        simOptions = ScenarioOptionsExt.wrap(ScenarioOptions.load(workingDirectory));
         preparedScenarioDirectory = new File(workingDirectory, simOptions.getString("preparedScenarioDirectory", ""));
         configFileName = new File(workingDirectory, simOptions.getString("fullConfig"));
         preparedConfigName = simOptions.getString("simuConfig", "prepared_config.xml");
         preparedConfigFile = new File(workingDirectory, preparedConfigName);
 
-        if (SettingsType.Server == settingsType) {
-            DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
-            dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
-            config = ConfigUtils.loadConfig(preparedConfigFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
-        }else if (SettingsType.Preparer == settingsType) {
-            config = ConfigUtils.loadConfig(configFileName.toString());
-        }else {
-            System.out.println("ERROR, Something went Wrong with the Loading of the Config Files");
-            config = ConfigUtils.loadConfig(configFileName.toString());
-        }
-        System.out.println("loading config file to get data " + configFileName.getAbsoluteFile());
+        DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
+        dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
+        config = ConfigUtils.loadConfig(preparedConfigFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
 
         populationeliminateFreight = simOptions.getBoolean("populationeliminateFreight");
         populationeliminateWalking = simOptions.getBoolean("populationeliminateWalking");

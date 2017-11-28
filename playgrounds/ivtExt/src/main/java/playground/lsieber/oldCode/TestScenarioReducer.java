@@ -20,7 +20,7 @@ import playground.clruch.netdata.MatsimKMEANSVirtualNetworkCreator;
 import playground.clruch.prep.PopulationRequestSchedule;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataIO;
-import playground.clruch.utils.PropertiesExt;
+import playground.clruch.utils.ScenarioOptionsExt;
 
 public class TestScenarioReducer {
 
@@ -43,7 +43,7 @@ public class TestScenarioReducer {
 
         // load options
         File workingDirectory = shapeScenarioReducer.getWorkingDirectory();
-        PropertiesExt simOptions = shapeScenarioReducer.getSimOptions();
+        ScenarioOptionsExt simOptions = shapeScenarioReducer.getSimOptions();
 
         // TODO can some of these be directly read from another source? Do all have to be user settings?
 

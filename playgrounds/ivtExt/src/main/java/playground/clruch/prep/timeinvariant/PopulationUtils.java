@@ -22,7 +22,7 @@ public enum PopulationUtils {
     ;
 
     /** @return random time during daylength */
-    /* package */ public static double getRandomDayTime() {
+    /* package */ public static double getRandomDayTime() {        
         return Constants.nextDouble() * Constants.getDayLength();
     }
 

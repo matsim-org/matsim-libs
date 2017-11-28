@@ -7,16 +7,16 @@ import playground.clruch.data.ReferenceFrame;
 
 /** @author Claudio Ruch */
 // TODO make sure only PropertiesExt visible in Server, Viewer, Preparer.
-public class PropertiesExt {
+public class ScenarioOptionsExt {
 
     private final Properties properties;
 
-    public static PropertiesExt wrap(Properties properties) {
-        return new PropertiesExt(properties);
+    public static ScenarioOptionsExt wrap(Properties properties) {
+        return new ScenarioOptionsExt(properties);
 
     }
 
-    private PropertiesExt(Properties properties) {
+    private ScenarioOptionsExt(Properties properties) {
         this.properties = properties;
     }
 

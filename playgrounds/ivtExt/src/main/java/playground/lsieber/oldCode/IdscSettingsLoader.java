@@ -10,12 +10,12 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import playground.clruch.ScenarioOptions;
-import playground.clruch.utils.PropertiesExt;
+import playground.clruch.utils.ScenarioOptionsExt;
 
 public abstract class IdscSettingsLoader {
     protected File workingDirectory;
     protected Config config;
-    protected PropertiesExt simOptions;
+    protected ScenarioOptionsExt simOptions;
 
     public IdscSettingsLoader() throws IOException {
         loadSettings();
@@ -23,7 +23,7 @@ public abstract class IdscSettingsLoader {
 
     private void loadSettings() throws IOException {
         workingDirectory = MultiFileTools.getWorkingDirectory();
-        simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        simOptions = ScenarioOptionsExt.wrap(ScenarioOptions.load(workingDirectory));
         File file = new File(workingDirectory, simOptions.getString("simuConfig"));
         config = ConfigUtils.loadConfig(file.toString());
     }
@@ -36,7 +36,7 @@ public abstract class IdscSettingsLoader {
         return config;
     }
 
-    public PropertiesExt getSimOptions() {
+    public ScenarioOptionsExt getSimOptions() {
         return simOptions;
     }
 

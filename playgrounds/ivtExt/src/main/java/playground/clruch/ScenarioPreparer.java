@@ -12,6 +12,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import playground.lsieber.networkshapecutter.PrepSettings;
 import playground.lsieber.networkshapecutter.PrepSettings.SettingsType;
 import playground.lsieber.scenario.preparer.NetworkPreparer;
@@ -29,9 +30,12 @@ public class ScenarioPreparer {
     }
 
     public static void run(String[] args) throws MalformedURLException, Exception {
+        
+        // run preparer in simulation working directory
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
 
         // load Settings from IDSC Options
-        PrepSettings settings = new PrepSettings(SettingsType.Preparer);
+        PrepSettings settings = new PrepSettings(workingDirectory);
 
         Scenario scenario = ScenarioUtils.loadScenario(settings.config);
         // create Reduced Scenario Folder if nesscesary
@@ -57,10 +61,10 @@ public class ScenarioPreparer {
         //COPY and Modify CONFIG Files (IDSCOptions, AV and CONFIG)
         new ConfigWriter(settings.config).writeFileV2(new File(settings.preparedScenarioDirectory, settings.preparedConfigName).toString());
         String IDSCOptions = ScenarioOptions.getOptionsFileName();
-        Path src = new File(settings.workingDirectory, IDSCOptions).toPath();
+        Path src = new File(workingDirectory, IDSCOptions).toPath();
         Path dest = new File(settings.preparedScenarioDirectory, IDSCOptions).toPath();
         Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
-        Path avFile = new File(settings.workingDirectory, "av.xml").toPath();
+        Path avFile = new File(workingDirectory, "av.xml").toPath();
         if (Files.exists(avFile)) {
             Files.copy(avFile, new File(settings.preparedScenarioDirectory, "av.xml").toPath(), StandardCopyOption.REPLACE_EXISTING);
         }

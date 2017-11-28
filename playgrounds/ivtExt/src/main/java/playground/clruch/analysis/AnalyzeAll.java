@@ -27,7 +27,7 @@ import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.StorageUtils;
-import playground.clruch.utils.PropertiesExt;
+import playground.clruch.utils.ScenarioOptionsExt;
 import playground.joel.data.TotalData;
 
 /** Created by Joel on 05.04.2017.
@@ -227,7 +227,7 @@ public class AnalyzeAll {
      * @throws Exception */
     public void main(String[] args) throws Exception {
         File workingDirectory = new File("").getCanonicalFile();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        ScenarioOptionsExt simOptions = ScenarioOptionsExt.wrap(ScenarioOptions.load(workingDirectory));
         File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
         Config config = ConfigUtils.loadConfig(configFile.toString());
         String outputdirectory = config.controler().getOutputDirectory();

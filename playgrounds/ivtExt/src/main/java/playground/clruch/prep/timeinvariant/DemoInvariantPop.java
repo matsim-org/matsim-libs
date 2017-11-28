@@ -15,6 +15,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.prep.PopulationTools;
 
 /** @author Claudio Ruch */
@@ -32,12 +33,12 @@ public class DemoInvariantPop {
         // demo
         File workingDirectory = MultiFileTools.getWorkingDirectory();
         File configFile = new File(workingDirectory,"astra_config_fullBeforeMorning.xml");
+        GlobalAssert.that(configFile.exists());
         Config config = ConfigUtils.loadConfig(configFile.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Population population = scenario.getPopulation();
 
         System.out.println(population.getPersons().size());
-//        TheApocalypse.decimatesThe(population).toNoMoreThan(50000);
         PopulationTools.changeModesOfTransportToAV(population);
         Population populationInvariant = TimeInvariantPopulation.from(interval, population);
         System.out.println(population.getPersons().size());

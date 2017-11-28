@@ -7,14 +7,14 @@ import java.io.File;
 import java.net.MalformedURLException;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
-import playground.clruch.utils.PropertiesExt;
+import playground.clruch.utils.ScenarioOptionsExt;
 
 /** @author Claudio Ruch */
 public class SequentialScenarioServer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        ScenarioOptionsExt simOptions = ScenarioOptionsExt.wrap(ScenarioOptions.load(workingDirectory));
 
         /** Delete current content in outputfolder, DO NOT MODIFY THIS, POTENTIALLY VERY DANGEROUS. */
         SequentialScenarioTools.emptyOutputFolder(workingDirectory);

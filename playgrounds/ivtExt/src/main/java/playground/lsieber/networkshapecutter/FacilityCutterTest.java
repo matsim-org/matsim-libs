@@ -12,13 +12,13 @@ import org.matsim.facilities.FacilitiesWriter;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import playground.clruch.ScenarioOptions;
-import playground.clruch.utils.PropertiesExt;
+import playground.clruch.utils.ScenarioOptionsExt;
 
 public class FacilityCutterTest {
 
     public static void main(String[] args) throws IOException {
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        ScenarioOptionsExt simOptions = ScenarioOptionsExt.wrap(ScenarioOptions.load(workingDirectory));
         File file = new File(workingDirectory, simOptions.getString("simuConfig"));
         Config config = ConfigUtils.loadConfig(file.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
