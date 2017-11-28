@@ -21,7 +21,7 @@ import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.red.Median;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
+import ch.ethz.matsim.av.passenger.AVRequest;
 
 public class MatsimStaticDatabase {
 

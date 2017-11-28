@@ -10,11 +10,11 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.utils.VrpPathUtils;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
-import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
-import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
-import playground.sebhoerl.avtaxi.schedule.AVStayTask;
+import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.schedule.AVDriveTask;
+import ch.ethz.matsim.av.schedule.AVDropoffTask;
+import ch.ethz.matsim.av.schedule.AVPickupTask;
+import ch.ethz.matsim.av.schedule.AVStayTask;
 
 /**
  * for vehicles that are in stay task and should pickup a customer at the link:

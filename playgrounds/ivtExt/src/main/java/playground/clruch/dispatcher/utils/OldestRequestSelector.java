@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
+import ch.ethz.matsim.av.passenger.AVRequest;
 
 /**
  * OldestRequestSelector orders {@link AVRequest} according to the submission time.

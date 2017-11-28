@@ -23,10 +23,10 @@ import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeGet;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.options.ScenarioOptions;
 import playground.clruch.utils.SafeConfig;
-import playground.sebhoerl.avtaxi.config.AVConfig;
-import playground.sebhoerl.avtaxi.config.AVConfigReader;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVOperatorConfig;
+import ch.ethz.matsim.av.config.AVConfig;
+import ch.ethz.matsim.av.config.AVConfigReader;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.config.AVOperatorConfig;
 
 /** @author Claudio Ruch */
 public enum ScenarioParameters {

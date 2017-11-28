@@ -14,7 +14,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.PlaneEuclideanDistance;
 import playground.clruch.dispatcher.utils.PlaneLocation;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
+import ch.ethz.matsim.av.passenger.AVRequest;
 
 /** @author Claudio Ruch */
 // TODO doc

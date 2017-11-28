@@ -28,7 +28,7 @@ import ch.ethz.idsc.tensor.sca.Chop;
 import ch.ethz.idsc.tensor.sca.Increment;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.core.VehicleOnVirtualLinkCalculator;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
+import ch.ethz.matsim.av.passenger.AVRequest;
 
 /* package */ class MPCDataCollection {
 

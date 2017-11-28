@@ -20,15 +20,15 @@ import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.SafeConfig;
 import playground.matsim_decoupling.IDSCDriveTaskTracker;
 import playground.matsim_decoupling.ScheduleHelper;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.dispatcher.AVVehicleAssignmentEvent;
-import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
-import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
-import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
-import playground.sebhoerl.avtaxi.schedule.AVStayTask;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.data.AVVehicle;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.dispatcher.AVVehicleAssignmentEvent;
+import ch.ethz.matsim.av.schedule.AVDriveTask;
+import ch.ethz.matsim.av.schedule.AVDropoffTask;
+import ch.ethz.matsim.av.schedule.AVPickupTask;
+import ch.ethz.matsim.av.schedule.AVStayTask;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 
 /** The purpose of RoboTaxiMaintainer is to register {@link AVVehicle} and provide the collection of
  * available vehicles to derived class.
@@ -112,7 +112,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
     }
 
     @Override
-    public final void registerVehicle(AVVehicle vehicle) {
+    public final void addVehicle(AVVehicle vehicle) {
         GlobalAssert.that(vehicle.getStartLink() != null);
         roboTaxis.add(new RoboTaxi(vehicle, new LinkTimePair(vehicle.getStartLink(), 0.0), vehicle.getStartLink()));
         eventsManager.processEvent(new AVVehicleAssignmentEvent(vehicle, 0));

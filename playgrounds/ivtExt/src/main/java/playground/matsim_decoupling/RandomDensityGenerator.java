@@ -1,4 +1,4 @@
-package playground.sebhoerl.avtaxi.generator;
+package playground.matsim_decoupling;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -10,8 +10,9 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import com.google.inject.Inject;
 
-import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
+import ch.ethz.matsim.av.config.AVGeneratorConfig;
+import ch.ethz.matsim.av.data.AVVehicle;
+import ch.ethz.matsim.av.generator.AVGenerator;
 
 /**
  * class generates {@link AVVehicle}s and places them randomly.

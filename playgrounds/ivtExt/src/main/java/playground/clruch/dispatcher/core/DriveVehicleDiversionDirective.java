@@ -12,8 +12,8 @@ import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.utils.VrpPathUtils;
 import playground.matsim_decoupling.IDSCDriveTaskTracker;
-import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
-import playground.sebhoerl.avtaxi.schedule.AVStayTask;
+import ch.ethz.matsim.av.schedule.AVDriveTask;
+import ch.ethz.matsim.av.schedule.AVStayTask;
 
 /**
  * for vehicles that are currently driving, but should go to a new destination:

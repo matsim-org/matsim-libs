@@ -8,7 +8,7 @@ import com.google.inject.Singleton;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 
-import playground.sebhoerl.avtaxi.framework.AVModule;
+import ch.ethz.matsim.av.framework.AVModule;
 
 public class AVTravelTimeModule extends AbstractModule {
     

@@ -8,7 +8,7 @@ import org.matsim.core.router.util.TravelTime;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.utils.VrpPathUtils;
-import playground.sebhoerl.plcpc.LeastCostPathFuture;
+import ch.ethz.matsim.av.plcpc.LeastCostPathFuture;
 
 /**
  * the purpose of the container is to store an initiated path computation represented by

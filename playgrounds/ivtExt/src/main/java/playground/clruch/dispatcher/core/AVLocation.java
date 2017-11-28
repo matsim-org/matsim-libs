@@ -10,10 +10,10 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.utils.AVTaskAdapter;
-import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
-import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
-import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
-import playground.sebhoerl.avtaxi.schedule.AVStayTask;
+import ch.ethz.matsim.av.schedule.AVDriveTask;
+import ch.ethz.matsim.av.schedule.AVDropoffTask;
+import ch.ethz.matsim.av.schedule.AVPickupTask;
+import ch.ethz.matsim.av.schedule.AVStayTask;
 
 public class AVLocation extends AVTaskAdapter {
 

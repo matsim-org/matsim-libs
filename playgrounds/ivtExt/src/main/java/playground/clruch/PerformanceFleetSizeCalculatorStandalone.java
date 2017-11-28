@@ -20,7 +20,7 @@ import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.options.ScenarioOptions;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
-import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
+import ch.ethz.matsim.av.framework.AVConfigGroup;
 
 @Deprecated // TODO remove this
 enum PerformanceFleetSizeCalculatorStandalone {

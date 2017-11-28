@@ -4,7 +4,7 @@ package playground.clruch.dispatcher.utils;
 import java.util.Collection;
 
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
+import ch.ethz.matsim.av.passenger.AVRequest;
 
 public abstract class AbstractRequestSelector {
     public abstract Collection<AVRequest> selectRequests( //

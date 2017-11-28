@@ -11,7 +11,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import ch.ethz.idsc.owly.data.GlobalAssert;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.joel.helpers.EasyDijkstra;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
+import ch.ethz.matsim.av.passenger.AVRequest;
 
 /** @author Claudio Ruch */
 public class NetworkDistanceFunction implements DistanceFunction {

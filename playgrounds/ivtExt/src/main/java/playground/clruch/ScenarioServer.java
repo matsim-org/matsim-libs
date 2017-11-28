@@ -40,9 +40,12 @@ import playground.clruch.options.ScenarioOptions;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
-import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
+import playground.matsim_decoupling.IDSCDispatcherModule;
+import playground.matsim_decoupling.IDSCGeneratorModule;
+import playground.matsim_decoupling.qsim.IDSCQSimProvider;
+import ch.ethz.matsim.av.framework.AVConfigGroup;
+import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.framework.AVQSimProvider;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */
@@ -94,10 +97,12 @@ public class ScenarioServer {
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(new DvrpTravelTimeModule());
-        controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
+        controler.addOverridingModule(new DynQSimModule<>(IDSCQSimProvider.class));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AVTravelTimeModule());
+        controler.addOverridingModule(new IDSCGeneratorModule());
+        controler.addOverridingModule(new IDSCDispatcherModule());
         
         controler.addOverridingModule(new AbstractModule() {
 			@Override

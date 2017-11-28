@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.network.Link;
 import ch.ethz.idsc.queuey.math.HungarianAlgorithm;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
+import ch.ethz.matsim.av.passenger.AVRequest;
 
 /**
  * array matching with Euclidean distance as criteria

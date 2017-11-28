@@ -33,13 +33,12 @@ import playground.clruch.router.FuturePathContainer;
 import playground.clruch.router.FuturePathFactory;
 import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.SafeConfig;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.dispatcher.AbstractDispatcher;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
-import playground.sebhoerl.avtaxi.schedule.AVStayTask;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.schedule.AVDriveTask;
+import ch.ethz.matsim.av.schedule.AVStayTask;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 
 /** purpose of {@link UniversalDispatcher} is to collect and manage {@link AVRequest}s alternative
  * implementation of {@link AVDispatcher}; supersedes

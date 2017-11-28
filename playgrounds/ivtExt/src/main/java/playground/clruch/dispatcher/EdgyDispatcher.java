@@ -17,12 +17,12 @@ import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.DrivebyRequestStopper;
 import playground.clruch.utils.SafeConfig;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.config.AVGeneratorConfig;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 
 /** this dispatcher is a bad example, it performs poorly in many scenarios
  * 
@@ -105,9 +105,12 @@ public class EdgyDispatcher extends RebalancingDispatcher {
 
         @Inject
         private EventsManager eventsManager;
+        
+        @Inject
+        private Config config;
 
         @Override
-        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig avconfig) {
             return new EdgyDispatcher( //
                     config, avconfig, travelTime, router, eventsManager);
         }

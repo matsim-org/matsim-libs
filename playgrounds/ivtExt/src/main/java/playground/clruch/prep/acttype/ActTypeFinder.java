@@ -21,7 +21,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.options.ScenarioOptions;
-import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
+import ch.ethz.matsim.av.framework.AVConfigGroup;
 
 /**
  * @author Claudio Ruch

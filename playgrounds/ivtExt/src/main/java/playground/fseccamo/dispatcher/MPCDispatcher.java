@@ -41,12 +41,12 @@ import ch.ethz.idsc.tensor.sca.Round;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.config.AVGeneratorConfig;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 
 /** MPC Dispatcher 1 contains the implementation that generated the results
  * in Francesco's Master thesis.
@@ -302,9 +302,13 @@ public class MPCDispatcher extends BaseMpcDispatcher {
 
         public static VirtualNetwork<Link> virtualNetwork;
         public static Map<VirtualLink<Link>, Double> travelTimes;
+        
+        @Inject
+        private Config config;
 
         @Override
-        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig avconfig) {
+        	AVGeneratorConfig generatorConfig = avconfig.getParent().getGeneratorConfig();
 
             try {
                 virtualNetwork = VirtualNetworkGet.readDefault(network);

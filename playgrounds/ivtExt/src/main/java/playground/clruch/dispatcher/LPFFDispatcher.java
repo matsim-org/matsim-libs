@@ -46,11 +46,11 @@ import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.utils.SafeConfig;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.config.AVGeneratorConfig;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 
 public class LPFFDispatcher extends PartitionedDispatcher {
     public final int dispatchPeriod;
@@ -172,9 +172,13 @@ public class LPFFDispatcher extends PartitionedDispatcher {
         private Network network;
 
         public static VirtualNetwork<Link> virtualNetwork;
+        
+        @Inject
+        private Config config;
 
         @Override
-        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig avconfig) {
+        	AVGeneratorConfig generatorConfig = avconfig.getParent().getGeneratorConfig();
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
