@@ -77,10 +77,10 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
                 @Override
                 public void handle(AVDriveTask avDriveTask) {
                     // for empty cars the drive task is second to last task
-                    if (ScheduleHelper.isNextToLastTask(schedule, avDriveTask)) {
+                    if (Schedules.isNextToLastTask(avDriveTask)) {
                         TaskTracker taskTracker = avDriveTask.getTaskTracker();
-                        IDSCDriveTaskTracker onlineDriveTaskTracker = (IDSCDriveTaskTracker) taskTracker;
-                        LinkTimePair linkTimePair = onlineDriveTaskTracker.getSafeDiversionPoint();
+                        OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
+                        LinkTimePair linkTimePair = ((OnlineDriveTaskTrackerImpl) onlineDriveTaskTracker).getSafeDiversionPoint();
                         GlobalAssert.that(linkTimePair != null);
                         robotaxi.setDivertableLinkTime(linkTimePair);
                         robotaxi.setCurrentDriveDestination(avDriveTask.getPath().getToLink());
@@ -102,7 +102,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
                 @Override
                 public void handle(AVStayTask avStayTask) {
                     // for empty vehicles the current task has to be the last task
-                    if (ScheduleHelper.isLastTask(schedule, avStayTask) && !isInPickupRegister(robotaxi)) {
+                    if (Schedules.isLastTask(avStayTask) && !isInPickupRegister(robotaxi)) {
                         GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow());
                         GlobalAssert.that(avStayTask.getLink() != null);
                         robotaxi.setDivertableLinkTime(new LinkTimePair(avStayTask.getLink(), getTimeNow()));
@@ -128,7 +128,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
         notifySimulationSubscribers(Math.round(now), storageUtils);
 
         consistencyCheck();
-        beforeStepTasks();
+        beforeStepTasks(); // <- if problems with RoboTaxi Status to Completed consider to set "simEndtimeInterpretation" to "null"
         executePickups();
         redispatch(now);
         afterStepTasks();
@@ -207,7 +207,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
     /* package */ abstract boolean isInPickupRegister(RoboTaxi robotaxi);
 
     @Override
-    public final void onNextTaskStarted(AVVehicle task) {
+    public final void onNextTaskStarted(AVTask task) {
         // intentionally empty
     }
 

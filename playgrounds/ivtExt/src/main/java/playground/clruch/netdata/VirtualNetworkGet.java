@@ -2,27 +2,28 @@
 package playground.clruch.netdata;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetworkIO;
-import playground.clruch.ScenarioOptions;
+import ch.ethz.idsc.queuey.datalys.MultiFileTools;
+import playground.clruch.options.ScenarioOptions;
 
 public enum VirtualNetworkGet {
     ;
 
     /** @param network
-     * @return null if file does not exist */
-    public static VirtualNetwork<Link> readDefault(Network network) {
+     * @return null if file does not exist
+     * @throws IOException */
+    public static VirtualNetwork<Link> readDefault(Network network) throws IOException {
 
-        Properties simOptions = ScenarioOptions.getDefault();
-        final File virtualnetworkFile = new File(simOptions.getProperty("virtualNetworkDir"), //
-                simOptions.getProperty("virtualNetworkName"));
+        ScenarioOptions scenarioOptions = ScenarioOptions.load(MultiFileTools.getWorkingDirectory());
+        final File virtualnetworkFile = new File(scenarioOptions.getVirtualNetworkName(),scenarioOptions.getVirtualNetworkName());
         System.out.println("reading network from" + virtualnetworkFile.getAbsoluteFile());
         try {
 

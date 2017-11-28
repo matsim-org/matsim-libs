@@ -5,13 +5,11 @@ package playground.clruch.netdata;
 
 import java.util.Collection;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.core.networks.CenterVirtualNetworkCreator;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
-import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
 import playground.clruch.dispatcher.utils.PlaneLocation;
 
@@ -20,29 +18,14 @@ import playground.clruch.dispatcher.utils.PlaneLocation;
  *         shifted by centerShift, i.e. centerActual = centerComputed + centerShift */
 public class MatsimCenterVirtualNetworkCreator {
 
+    public VirtualNetwork<Link> creatVirtualNetwork(Network network, double centerRadius, Tensor centerShift) {
+        @SuppressWarnings("unchecked")
+        Collection<Link> elements = (Collection<Link>) network.getLinks().values();
 
+        CenterVirtualNetworkCreator<Link> cvn = new CenterVirtualNetworkCreator<>(centerRadius, centerShift, elements, PlaneLocation::of,
+                NetworkCreatorUtils::linkToID);
+        return cvn.getVirtualNetwork();
 
-//	DatabaseConnection dbc;
-//	Database db;
-//	SquaredEuclideanDistanceFunction dist = SquaredEuclideanDistanceFunction.STATIC;
-//	RandomlyGeneratedInitialMeans init = new RandomlyGeneratedInitialMeans(RandomFactory.DEFAULT);
-//	KMeansLloyd<NumberVector> km;
-//	Clustering<KMeansModel> c;
-//	Relation<NumberVector> rel;
-
-	public VirtualNetwork<Link> creatVirtualNetwork(Network network, double centerRadius, Tensor centerShift) {
-		Collection<Link> elements = (Collection<Link>) network.getLinks().values();
-
-		CenterVirtualNetworkCreator<Link> cvn = new CenterVirtualNetworkCreator<>(centerRadius, centerShift, elements,
-				PlaneLocation::of, NetworkCreatorUtils::linkToID);  
-		return cvn.getVirtualNetwork();
-
-	}
-
-//
-//    public VirtualNetwork<Link> getVirtualNetwork() {
-//        GlobalAssert.that(virtualNetwork != null);
-//        return virtualNetwork;
-//    }
+    }
 
 }

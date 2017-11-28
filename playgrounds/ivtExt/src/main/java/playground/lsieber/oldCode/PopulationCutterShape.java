@@ -1,4 +1,4 @@
-package playground.lsieber.networkshapecutter;
+package playground.lsieber.oldCode;
 
 import java.util.Iterator;
 
@@ -14,7 +14,6 @@ import org.matsim.api.core.v01.population.Population;
 public class PopulationCutterShape {
 
     public PopulationCutterShape() {
-        // TODO Auto-generated constructor stub
     }
 
     

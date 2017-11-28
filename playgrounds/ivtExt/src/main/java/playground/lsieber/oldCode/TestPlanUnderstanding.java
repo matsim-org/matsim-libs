@@ -1,12 +1,10 @@
-package playground.lsieber.scenario.reducer;
+package playground.lsieber.oldCode;
 
-import java.io.IOException;
 import java.util.HashSet;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
-import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 
 public class TestPlanUnderstanding {
@@ -15,7 +13,7 @@ public class TestPlanUnderstanding {
         IdscSettingsLoaderImpl settings = new IdscSettingsLoaderImpl();
         Scenario scenario = settings.loadScenario();
 
-        Population population = scenario.getPopulation();
+        // Population population = scenario.getPopulation();
 
         // population.getPersons();
 

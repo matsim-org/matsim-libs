@@ -15,10 +15,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
-import playground.clruch.ScenarioOptions;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.prep.PopulationTools;
-import playground.clruch.prep.TheApocalypse;
-import playground.clruch.utils.PropertiesExt;
 
 /** @author Claudio Ruch */
 public class DemoInvariantPop {
@@ -34,19 +32,16 @@ public class DemoInvariantPop {
 
         // demo
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
-        File configFile = new File(workingDirectory, simOptions.getString("fullConfig"));
+        File configFile = new File(workingDirectory,"astra_config_fullBeforeMorning.xml");
+        GlobalAssert.that(configFile.exists());
         Config config = ConfigUtils.loadConfig(configFile.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Population population = scenario.getPopulation();
 
-        int numPeople = population.getPersons().size();
-//        TheApocalypse.decimatesThe(population).toNoMoreThan(500);
+        System.out.println(population.getPersons().size());
         PopulationTools.changeModesOfTransportToAV(population);
-        // Population populationInvariant = TimeInvariantPopulation.at(interval, population);
         Population populationInvariant = TimeInvariantPopulation.from(interval, population);
-        // TheApocalypse.decimatesThe(population).toNoMoreThan(2000);
-        int numPeopleUpd = population.getPersons().size();
+        System.out.println(population.getPersons().size());
 
         // write the modified population to file
         final File fileExportGz = new File(workingDirectory, POPULATIONUPDATEDNAME + ".xml.gz");

@@ -27,9 +27,7 @@ import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.red.Total;
 import playground.clruch.dispatcher.utils.LPVehicleRebalancing;
 
-/**
- * Created by Claudio on 5/6/2017.
- */
+/** Created by Claudio on 5/6/2017. */
 public class TravelData implements Serializable {
     /**
      * 
@@ -37,14 +35,14 @@ public class TravelData implements Serializable {
     // general
     private Tensor lambda; // tensor of dimension (numberofTimeSteps, numberVirtualNodes) that contains mean arrival rates per virtual Node in timestep
     private Tensor pij; // tensor of dimension (numberofTimeSteps, numberVirtualNodes, numberVirtualNodes) pij(t,i,j) probability of moving from i to j in
-                // timestep t
+    // timestep t
     // framework from Pavone, Marco, Stephen L. Smith, and Emilio Frazzoli Daniela Rus. "Load balancing for mobility-on-demand systems." (2011).
     private Tensor lambdaPSF;
     private Tensor pijPSF;
     private Tensor alphaijPSF; // tensor of dimension (numberofTimeSteps, numberVirtualNodes, numberVirtualNodes) alpha(t,i,j) static rebalancing rates from i
-                       // to j at timestep t
+    // to j at timestep t
     private Tensor lambdaPSFij;
-    
+
     private int numberTimeSteps;
     private final int dt; // used as lookup
     public final long populationSize;
@@ -53,14 +51,12 @@ public class TravelData implements Serializable {
     protected transient VirtualNetwork<Link> virtualNetwork;
     private final long virtualNetworkID;
 
-    /**
-     * Constructor for TravelData object creating historic travel information based on virtualNetwork and population
+    /** Constructor for TravelData object creating historic travel information based on virtualNetwork and population
      * 
      * @param virtualNetworkIn
      * @param population
      * @param dtIn
-     *            time step for calculation
-     */
+     *            time step for calculation */
     public TravelData(VirtualNetwork<Link> virtualNetworkIn, Network network, Population population, int dtIn) {
         System.out.println("reading travel data for population of size " + population.getPersons().size());
         populationSize = population.getPersons().size();
@@ -93,7 +89,8 @@ public class TravelData implements Serializable {
                         Leg leg = (Leg) planElMidl;
                         if (leg.getMode().equals("av")) {
                             // get time and vNode index
-                            double depTime = ((Leg) planElMidl).getDepartureTime();
+                            double depTime = leg.getDepartureTime();
+                            System.out.println("depTime:" + depTime);
                             int timeIndex = (int) Math.floor((depTime / dt));
                             Link linkFrom = network.getLinks().get(((Activity) planElMins).getLinkId());
                             Link linkTo = network.getLinks().get(((Activity) planElPlus).getLinkId());
@@ -115,8 +112,6 @@ public class TravelData implements Serializable {
                 }
             }
         }
-        
-
 
         // norm pij such that it is row stochastic, i.e. sum(p_ij)_j = 1 for all i and all time indexes
         // count the total of the rows
@@ -135,8 +130,6 @@ public class TravelData implements Serializable {
         for (int t = 0; t < numberTimeSteps; ++t) {
             pijPSF.set(TensorOperations.normToRowStochastic(pijPSF.get(t)), t);
         }
-        
-        
 
         // compute lambdaPSF
         // lambda PSF = lambda - pii*lambda
@@ -151,23 +144,16 @@ public class TravelData implements Serializable {
                 lambdaPSF.set(labmdaold.subtract(labmdaold.multiply((Scalar) pii)), t, i);
             }
         }
-        
-        
+
         // compute lambdaPSFij
         // lambdaPSFij (i,j) = lambdaPSF (i) * pijPSF (i,j)
         lambdaPSFij = pijPSF.copy();
         for (int t = 0; t < numberTimeSteps; ++t) {
             for (int i = 0; i < virtualNetwork.getvNodesCount(); ++i) {
-                Tensor replace = lambdaPSFij.get(t,i).multiply(lambdaPSF.Get(t,i));
-                lambdaPSFij.set(replace,t,i);
+                Tensor replace = lambdaPSFij.get(t, i).multiply(lambdaPSF.Get(t, i));
+                lambdaPSFij.set(replace, t, i);
             }
         }
-        
-
-       
-        
-        
-
 
         // compute alphaij rates according to Pavone, Marco, Stephen L. Smith, and Emilio Frazzoli Daniela Rus. "Load balancing for mobility-on-demand
         // systems." (2011).
@@ -194,14 +180,15 @@ public class TravelData implements Serializable {
 
             rebalancingRate.flatten(-1).forEach(v -> GlobalAssert.that(v.Get().number().doubleValue() > -10E-12));
             // make negative values positive to ensure no problems in subsequent steps
-            for(int i = 0; i<Dimensions.of(rebalancingRate).get(0);++i){
-                for(int j = 0;j<Dimensions.of(rebalancingRate).get(1);++j){
-                    if( Scalars.lessEquals(rebalancingRate.Get(i,j), RealScalar.ZERO)){
-                        rebalancingRate.set(RealScalar.ZERO, i,j);                        
-                    };
+            for (int i = 0; i < Dimensions.of(rebalancingRate).get(0); ++i) {
+                for (int j = 0; j < Dimensions.of(rebalancingRate).get(1); ++j) {
+                    if (Scalars.lessEquals(rebalancingRate.Get(i, j), RealScalar.ZERO)) {
+                        rebalancingRate.set(RealScalar.ZERO, i, j);
+                    }
+                    ;
                 }
-            }            
-            
+            }
+
             alphaijPSF.set(rebalancingRate, t);
 
         }
@@ -212,19 +199,6 @@ public class TravelData implements Serializable {
         System.out.println("successfully created pij matrix of size " + "?" + " x " + "?" + " x " + "?");
         System.out.println("successfully created alphaij matrix of size" + "?" + " x " + "?" + " x " + "?");
 
-    }
-
-    /**
-     * @param timeString
-     *            in the format hh:mm:ss
-     * @return time in secons
-     */
-    private int secfromStringTime(String timeString) {
-        String[] parts = timeString.split(":");
-        int hours = Integer.parseInt(parts[0]);
-        int minutes = Integer.parseInt(parts[1]);
-        int seconds = Integer.parseInt(parts[2]);
-        return hours * 60 * 60 + minutes * 60 + seconds;
     }
 
     public Tensor getLambdaforTime(int time) {
@@ -276,12 +250,11 @@ public class TravelData implements Serializable {
         int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
         return pijPSF.get(timestep).copy();
     }
-    
+
     public Tensor getlambdaijPSFforTime(int time) {
         int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
         return lambdaPSFij.get(timestep).copy();
     }
-    
 
     public Scalar getpijPSFforTime(int time, int from, int to) {
         int timestep = (int) Math.min(time / dt, numberTimeSteps - 1);
@@ -296,7 +269,7 @@ public class TravelData implements Serializable {
     protected void fillSerializationInfo(VirtualNetwork<Link> virtualNetwork) {
         // check if TravelData object was created with the supplied virtualNetwork
         System.out.println("in network ID: " + virtualNetwork.getvNetworkID());
-        System.out.println("inside network ID: " + virtualNetworkID);        
+        System.out.println("inside network ID: " + virtualNetworkID);
         GlobalAssert.that(virtualNetwork.getvNetworkID() == virtualNetworkID);
         this.virtualNetwork = virtualNetwork;
     }
@@ -309,17 +282,13 @@ public class TravelData implements Serializable {
         GlobalAssert.that(dayduration % numberTimeSteps == 0);
         return numberTimeSteps;
     }
-    
-    public int getdt(){
+
+    public int getdt() {
         GlobalAssert.that(dayduration % numberTimeSteps == 0);
-        return dayduration/numberTimeSteps;
+        return dayduration / numberTimeSteps;
     }
 
-
-
-    /**
-     * Perform consistency checks after completion of constructor operations.
-     */
+    /** Perform consistency checks after completion of constructor operations. */
     public void checkConsistency() {
         // row-stochasticity of pij matrix
         for (int t = 0; t < numberTimeSteps; ++t) {
@@ -332,118 +301,3 @@ public class TravelData implements Serializable {
 
     }
 }
-
-
-
-
-
-
-
-
-//@Deprecated
-//public TravelData(VirtualNetwork virtualNetworkIn, File lambdaFile, File pijFile, File alphaijFile, long populationSize, int rebalancingPeriod)
-//        throws JDOMException, IOException {
-//    virtualNetwork = virtualNetworkIn;
-//    virtualNetworkID = -1; // Must be wrong since unkknown with what virtualNetwork the XML was created.
-//    this.populationSize = populationSize;
-//    System.out.println("reading historic travel data");
-//    {// arrival rates lambda
-//        SAXBuilder builder = new SAXBuilder();
-//        Document document = builder.build(lambdaFile);
-//        Element rootNode = document.getRootElement();
-//        List<Element> children = rootNode.getChildren();
-//
-//        // get number of time steps and time step size
-//        numberTimeSteps = children.get(0).getChildren().size();
-//        Attribute attribute = rootNode.getAttribute("dt");
-//        dt = secfromStringTime(attribute.getValue());
-//
-//        // construct matrices based on xml
-//        // the lambdas are normalized of their population size and time bin width
-//        Scalar factor = RealScalar.of(populationSize * rebalancingPeriod);
-//        lambda = Tensors.matrix((i, j) -> getLambdafromFile(i, j, rootNode).multiply(factor), numberTimeSteps, virtualNetwork.getvNodesCount());
-//    }
-//    {// transition probabilities pij
-//        SAXBuilder builder = new SAXBuilder();
-//        Document document = builder.build(pijFile);
-//        Element rootNode = document.getRootElement();
-//        // List<Element> children = rootNode.getChildren();
-//
-//        pij = Tensors.empty();
-//        for (int k = 0; k < numberTimeSteps; ++k) {
-//            final int timestep = k;
-//            pij.append(Tensors.matrix((i, j) -> getpijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(),
-//                    virtualNetwork.getvNodesCount()));
-//        }
-//    }
-//    {// rebalancing rates alpha_ij
-//        SAXBuilder builder = new SAXBuilder();
-//        Document document = builder.build(alphaijFile);
-//        Element rootNode = document.getRootElement();
-//        // List<Element> children = rootNode.getChildren();
-//
-//        alphaijPSF = Tensors.empty();
-//        for (int k = 0; k < numberTimeSteps; ++k) {
-//            final int timestep = k;
-//            alphaijPSF.append(Tensors.matrix((i, j) -> getalphaijfromFile(i, j, timestep, rootNode), virtualNetwork.getvNodesCount(),
-//                    virtualNetwork.getvNodesCount()));
-//        }
-//    }
-// @Deprecated
-// private Scalar getLambdafromFile(int row, int col, Element rootNode) {
-// List<Element> children = rootNode.getChildren();
-//
-// // get element with virtualNode col
-// VirtualNode correctNode = virtualNetwork.getVirtualNode(col);
-// Element vNodeelem = children.stream().filter(v ->
-// v.getAttribute("id").getValue().toString().equals(correctNode.getId())).findFirst().get();
-//
-// // get element with number row
-// Element timeatvNode = vNodeelem.getChildren().get(row);
-//
-// // return entry
-// return RealScalar.of(Double.parseDouble(timeatvNode.getAttribute("lambda").getValue()));
-// }
-//
-// @Deprecated
-// private Scalar getpijfromFile(int from, int to, int timestep, Element rootNode) {
-// List<Element> children = rootNode.getChildren();
-//
-// // get element with virtualLink col
-// VirtualNode vNodeFrom = virtualNetwork.getVirtualNode(from);
-// VirtualNode vNodeTo = virtualNetwork.getVirtualNode(to);
-//
-// Optional<Element> optional = children.stream().filter(v ->
-// v.getAttribute("from").getValue().toString().equals(vNodeFrom.getId())
-// && v.getAttribute("to").getValue().toString().equals(vNodeTo.getId())).findFirst();
-//
-// if (optional.isPresent()) {
-// Element vLinkElem = optional.get();
-// Element timeatvLink = vLinkElem.getChildren().get(timestep);
-// return RealScalar.of(Double.parseDouble(timeatvLink.getAttribute("P_ij").getValue()));
-// }
-// GlobalAssert.that(false);
-// return null; // <- this will never be returned since above GlobalAssert
-// }
-//
-// @Deprecated
-// private Scalar getalphaijfromFile(int from, int to, int timestep, Element rootNode) {
-// List<Element> children = rootNode.getChildren();
-//
-// // get element with virtualLink col
-// VirtualNode vNodeFrom = virtualNetwork.getVirtualNode(from);
-// VirtualNode vNodeTo = virtualNetwork.getVirtualNode(to);
-//
-// Optional<Element> optional = children.stream().filter(v ->
-// v.getAttribute("from").getValue().toString().equals(vNodeFrom.getId())
-// && v.getAttribute("to").getValue().toString().equals(vNodeTo.getId())).findFirst();
-//
-// if (optional.isPresent()) {
-// Element vLinkElem = optional.get();
-// Element timeatvLink = vLinkElem.getChildren().get(timestep);
-// return RealScalar.of(Double.parseDouble(timeatvLink.getAttribute("alpha_ij").getValue()));
-// }
-// GlobalAssert.that(false);
-// return null; // <- this will never be returned since above GlobalAssert
-// }
-

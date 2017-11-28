@@ -4,7 +4,6 @@
 package playground.clruch.dispatcher.selfishdispatcher;
 
 import ch.ethz.idsc.tensor.Tensor;
-import playground.clruch.traveldata.TravelData;
 
 /** @author Claudio Ruch */
 public enum FareRatioCalculator {
