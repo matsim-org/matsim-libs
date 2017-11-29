@@ -18,6 +18,7 @@ import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
 
 /** @author Claudio Ruch */
+// TODO jan suggests: move ThroughputCalculator to queuey
 public enum ThroughputCalculator {
     ;
 

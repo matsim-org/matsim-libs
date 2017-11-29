@@ -12,7 +12,7 @@
 		<skipTests>false</skipTests>
 	</properties>
 
-	<description>Extensions used in several scenarios maintained by ivt, ethz. Code in here might sooner or later find its way into contrib or org.matsim.</description>
+	<description>Extensions used in several scenarios maintained by ivt, ethz.</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.matsim</groupId>
@@ -92,4 +92,42 @@
 			</snapshots>
 		</repository>
 	</repositories>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.4</version>
+				<configuration>
+				</configuration>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
 </project>
