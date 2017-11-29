@@ -26,12 +26,18 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.signals.SignalSystemsConfigGroup;
 import org.matsim.contrib.signals.data.SignalsData;
 import org.matsim.contrib.signals.data.SignalsDataImpl;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalControlDataImpl;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalGroupSettingsDataImpl;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalPlanDataImpl;
+import org.matsim.contrib.signals.data.signalcontrol.v20.SignalSystemControllerDataImpl;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalControlDataFactory;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupSettingsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalGroupsData;
 import org.matsim.contrib.signals.data.signalgroups.v20.SignalPlanData;
+import org.matsim.contrib.signals.data.signalgroups.v20.SignalSystemControllerData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemData;
 import org.matsim.contrib.signals.data.signalsystems.v20.SignalSystemsDataFactory;
 import org.matsim.contrib.signals.model.Signal;
@@ -141,6 +147,33 @@ public class SignalUtils {
 		signalGroupSettings.setOnset(onset);
 		signalGroupSettings.setDropping(dropping);
 		return signalGroupSettings;
+	}
+	
+	/**
+	 * Clones the SignalControlData given as argument and returns a new instance of SignalControlData with the same content.
+	 */
+	public static SignalControlData copySignalControlData (SignalControlData oldSignalControlData) {
+		SignalControlData newSignalControlData = new SignalControlDataImpl();
+		for (SignalSystemControllerData oldSystemControl : oldSignalControlData.getSignalSystemControllerDataBySystemId().values()) {
+			SignalSystemControllerData newSystemControl = new SignalSystemControllerDataImpl(oldSystemControl.getSignalSystemId());
+			newSystemControl.setControllerIdentifier(oldSystemControl.getControllerIdentifier());
+			for (SignalPlanData oldPlan : oldSystemControl.getSignalPlanData().values()) {
+				SignalPlanData newPlan = new SignalPlanDataImpl(oldPlan.getId());
+				newPlan.setStartTime(oldPlan.getStartTime());
+				newPlan.setEndTime(oldPlan.getEndTime());
+				newPlan.setCycleTime(oldPlan.getCycleTime());
+				newPlan.setOffset(oldPlan.getOffset());
+				for (SignalGroupSettingsData oldGroupSetting : oldPlan.getSignalGroupSettingsDataByGroupId().values()) {
+					SignalGroupSettingsData newGroupSettings = new SignalGroupSettingsDataImpl(oldGroupSetting.getSignalGroupId());
+					newGroupSettings.setOnset(oldGroupSetting.getOnset());
+					newGroupSettings.setDropping(oldGroupSetting.getDropping());
+					newPlan.addSignalGroupSettings(newGroupSettings);
+				}
+				newSystemControl.addSignalPlanData(newPlan);
+			}
+			newSignalControlData.addSignalSystemControllerData(newSystemControl);
+		}
+		return newSignalControlData;
 	}
 
 }
