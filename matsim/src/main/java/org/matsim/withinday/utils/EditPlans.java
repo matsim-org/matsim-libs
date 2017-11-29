@@ -402,13 +402,13 @@ public final class EditPlans {
 		this.rescheduleActivityEndtime(agent, index, newEndTime);
 	}
 	
-	public Activity createFinalActivity(String work, Id<Link> newLinkId) {
-		Activity newAct = this.pf.createActivityFromLinkId("work", newLinkId);;
+	public Activity createFinalActivity(String type, Id<Link> newLinkId) {
+		Activity newAct = this.pf.createActivityFromLinkId(type, newLinkId);;
 		newAct.setEndTime( Double.POSITIVE_INFINITY ) ;
 		return newAct ;
 	}
-	public Activity createAgentThatKeepsMatsimAlive(String work, Id<Link> newLinkId) {
-		Activity newAct = this.pf.createActivityFromLinkId("work", newLinkId);;
+	public Activity createAgentThatKeepsMatsimAlive(String type, Id<Link> newLinkId) {
+		Activity newAct = this.pf.createActivityFromLinkId( type, newLinkId);;
 		newAct.setEndTime( Double.MAX_VALUE ) ;
 		return newAct ;
 	}
