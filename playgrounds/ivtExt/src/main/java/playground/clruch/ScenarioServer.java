@@ -8,12 +8,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
@@ -88,11 +93,18 @@ public class ScenarioServer {
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
         Controler controler = new Controler(scenario);
 
-        controler.addOverridingModule(VrpTravelTimeModules.createTravelTimeEstimatorModule(0.05));
+        controler.addOverridingModule(new DvrpTravelTimeModule());
         controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AVTravelTimeModule());
+        
+        controler.addOverridingModule(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(Key.get(Network.class, Names.named("dvrp_routing"))).to(Network.class);
+			}
+		});
 
         // run simulation
         controler.run();

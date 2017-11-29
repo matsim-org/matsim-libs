@@ -2,6 +2,7 @@ package playground.sebhoerl.avtaxi.routing;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -20,6 +21,7 @@ public class AVParallelRouterFactory implements ParallelLeastCostPathCalculatorF
 
     @Override
     public LeastCostPathCalculator createRouter() {
-        return new Dijkstra(network, new OnlyTimeDependentTravelDisutility(travelTime), travelTime);
+    	DijkstraFactory factory = new DijkstraFactory();
+        return factory.createPathCalculator(network, new OnlyTimeDependentTravelDisutility(travelTime), travelTime);
     }
 }

@@ -69,9 +69,10 @@ public class SingleHeuristicDispatcher extends AbstractDispatcher {
     }
 
     @Override
-    public void onNextTaskStarted(AVTask task) {
+    public void onNextTaskStarted(AVVehicle vehicle) {
+    	AVTask task = (AVTask)vehicle.getSchedule().getCurrentTask();
         if (task.getAVTaskType() == AVTask.AVTaskType.STAY) {
-            private_addVehicle((AVVehicle) task.getSchedule().getVehicle(), ((AVStayTask) task).getLink());
+            private_addVehicle(vehicle, ((AVStayTask) task).getLink());
         }
     }
 

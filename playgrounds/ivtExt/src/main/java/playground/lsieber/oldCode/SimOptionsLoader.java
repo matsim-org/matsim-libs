@@ -14,10 +14,11 @@ import playground.clruch.data.ReferenceFrame;
 import playground.clruch.options.ScenarioOptions;
 import playground.clruch.utils.NetworkLoader;
 
-@Deprecated //TODO  why is this still needed?
+@Deprecated // TODO why is this still needed?
 public class SimOptionsLoader {
 
     Config config;
+
     public static Network LoadNetworkBasedOnSimOptions() throws IOException {
         ScenarioOptions simOptions = loadSimOptions();
         return NetworkLoaderlukas(simOptions);
@@ -48,7 +49,7 @@ public class SimOptionsLoader {
         return network;
 
     }
-    
+
     public static Population LoadPopulationBasedOnSimOptions() throws IOException {
         ScenarioOptions simOptions = loadSimOptions();
         return PopulationLoaderLukas(simOptions);
@@ -64,35 +65,35 @@ public class SimOptionsLoader {
         Population population = PopulationLoader.loadPopulation(new File(workingDirectory, simOptions.getString("simuConfig")));
         return population;
     }
-    
+
     // TODO copied from ScenarioLoaderImpl. maybe this can be done nicer...
-//    private void loadNetwork(Config config) {
-//       this.config = config;
-//        if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
-//            URL networkUrl = this.config.network().getInputFileURL(this.config.getContext());
-//            if ( config.network().getInputCRS() == null ) {
-//                MatsimNetworkReader reader = new MatsimNetworkReader(NetworkUtils.createNetwork(this.config));
-//                reader.putAttributeConverters( attributeConverters );
-//                reader.parse(networkUrl);
-//            }
-//            else {
-//                final CoordinateTransformation transformation =
-//                        TransformationFactory.getCoordinateTransformation(
-//                                config.network().getInputCRS(),
-//                                config.global().getCoordinateSystem() );
-//                MatsimNetworkReader reader = new MatsimNetworkReader( transformation , NetworkUtils.createNetwork(this.config));
-//                reader.putAttributeConverters( attributeConverters );
-//                reader.parse(networkUrl);
-//            }
-//
-//            if ((this.config.network().getChangeEventsInputFile()!= null) && this.config.network().isTimeVariantNetwork()) {
-//                Network network = this.scenario.getNetwork();
-//                List<NetworkChangeEvent> changeEvents = new ArrayList<>() ;
-//                NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network,changeEvents);
-//                parser.parse(this.config.network().getChangeEventsInputFileUrl(config.getContext()));
-//                NetworkUtils.setNetworkChangeEvents(network,changeEvents);
-//            }
-//        }
-//    }
+    // private void loadNetwork(Config config) {
+    // this.config = config;
+    // if ((this.config.network() != null) && (this.config.network().getInputFile() != null)) {
+    // URL networkUrl = this.config.network().getInputFileURL(this.config.getContext());
+    // if ( config.network().getInputCRS() == null ) {
+    // MatsimNetworkReader reader = new MatsimNetworkReader(NetworkUtils.createNetwork(this.config));
+    // reader.putAttributeConverters( attributeConverters );
+    // reader.parse(networkUrl);
+    // }
+    // else {
+    // final CoordinateTransformation transformation =
+    // TransformationFactory.getCoordinateTransformation(
+    // config.network().getInputCRS(),
+    // config.global().getCoordinateSystem() );
+    // MatsimNetworkReader reader = new MatsimNetworkReader( transformation , NetworkUtils.createNetwork(this.config));
+    // reader.putAttributeConverters( attributeConverters );
+    // reader.parse(networkUrl);
+    // }
+    //
+    // if ((this.config.network().getChangeEventsInputFile()!= null) && this.config.network().isTimeVariantNetwork()) {
+    // Network network = this.scenario.getNetwork();
+    // List<NetworkChangeEvent> changeEvents = new ArrayList<>() ;
+    // NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network,changeEvents);
+    // parser.parse(this.config.network().getChangeEventsInputFileUrl(config.getContext()));
+    // NetworkUtils.setNetworkChangeEvents(network,changeEvents);
+    // }
+    // }
+    // }
 
 }

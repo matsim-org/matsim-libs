@@ -13,7 +13,7 @@ import playground.sebhoerl.avtaxi.routing.AVRoute;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
 
-public class AVRequest extends RequestImpl implements PassengerRequest {
+public class AVRequest implements PassengerRequest {
     final private Link pickupLink;
     final private Link dropoffLink;
     final private MobsimPassengerAgent passengerAgent;
@@ -23,9 +23,11 @@ public class AVRequest extends RequestImpl implements PassengerRequest {
 
     private AVPickupTask pickupTask;
     private AVDropoffTask dropoffTask;
+    
+    final private RequestImpl delegate;
 
     public AVRequest(Id<Request> id, MobsimPassengerAgent passengerAgent, Link pickupLink, Link dropoffLink, double pickupTime, double submissionTime, AVRoute route, AVOperator operator, AVDispatcher dispatcher) {
-        super(id, 1.0, pickupTime, pickupTime, submissionTime);
+        this.delegate = new RequestImpl(id, 1.0, pickupTime, pickupTime, submissionTime);
 
         this.passengerAgent = passengerAgent;
         this.pickupLink = pickupLink;
@@ -77,5 +79,35 @@ public class AVRequest extends RequestImpl implements PassengerRequest {
     public AVRoute getRoute() {
         return route;
     }
+
+	@Override
+	public double getEarliestStartTime() {
+		return delegate.getEarliestStartTime();
+	}
+
+	@Override
+	public double getLatestStartTime() {
+		return delegate.getLatestStartTime();
+	}
+
+	@Override
+	public double getQuantity() {
+		return delegate.getQuantity();
+	}
+
+	@Override
+	public double getSubmissionTime() {
+		return delegate.getSubmissionTime();
+	}
+
+	@Override
+	public boolean isRejected() {
+		return delegate.isRejected();
+	}
+
+	@Override
+	public Id<Request> getId() {
+		return delegate.getId();
+	}
 
 }

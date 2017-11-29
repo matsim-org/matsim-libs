@@ -5,6 +5,7 @@ import java.util.NavigableMap;
 /**
  * Created by Joel on 18.03.2017.
  */
+// TODO possibly move to queuey and write tests
 public class BinnedHelper {
 
     public static void checkFull(NavigableMap<String, Double> map, double binSize, KeyMap keyMap) {
