@@ -78,6 +78,8 @@ public enum TimeInvariantPopulation {
                 population.addPerson(newPerson);
             }
         }
+        population.getPersons().values().forEach(// 
+                p->GlobalAssert.that(consistencyOf(p)));
         return population;
     }
 
@@ -131,7 +133,7 @@ public enum TimeInvariantPopulation {
                     }
                 }
             }
-        }
+        }        
         return isOk;
     }
 }
