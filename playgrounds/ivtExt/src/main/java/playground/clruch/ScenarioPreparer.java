@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -79,13 +78,16 @@ public class ScenarioPreparer {
         // 0) load files
         Config config = ConfigUtils.loadConfig(configFile.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
+        // Network network = NetworkLoader.loadNetwork(new File(workingDirectory, simOptions.getString("fullConfig")));
         Network network = scenario.getNetwork();
 
         Population population = scenario.getPopulation();
 
         {// 1) cut network (and reduce population to new network)
-            if(network == null) System.out.println("its the network");
-            if(ls == null) System.out.println("its the ls");
+            if (network == null)
+                System.out.println("its the network");
+            if (ls == null)
+                System.out.println("its the ls");
             NetworkCutClean.elminateOutsideRadius(network, ls.center, ls.radius);
             final File fileExportGz = new File(workingDirectory, NETWORKUPDATEDNAME + ".xml.gz");
             final File fileExport = new File(workingDirectory, NETWORKUPDATEDNAME + ".xml");
@@ -153,7 +155,7 @@ public class ScenarioPreparer {
 
         final File vnDir = new File(workingDirectory, VIRTUALNETWORKFOLDERNAME);
         vnDir.mkdir(); // create folder if necessary
-        GlobalAssert.that(virtualNetwork!=null);
+        GlobalAssert.that(virtualNetwork != null);
         VirtualNetworkIO.toByte(new File(vnDir, VIRTUALNETWORKFILENAME), virtualNetwork);
         System.out.println("saved virtual network byte format to : " + new File(vnDir, VIRTUALNETWORKFILENAME));
         PopulationRequestSchedule prs = new PopulationRequestSchedule(network, population, virtualNetwork);

@@ -66,9 +66,6 @@ enum SimulationFleetDump {
                 for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
                     // for (int vehicleIndex = 0; vehicleIndex < 20; ++vehicleIndex) {
 
-                    // Check and propagate offservice status
-                    // dayTaxiRecord.get(vehicleIndex).check_offservice(now);
-
                     // Get corresponding dayTaxiRecord entry according to time now
                     TaxiTrail taxiTrail = dayTaxiRecord.get(vehicleIndex);
                     Entry<Integer, TaxiStamp> dayTaxiRecordEntry = taxiTrail.interp(now);

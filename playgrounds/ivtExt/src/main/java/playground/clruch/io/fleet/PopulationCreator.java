@@ -5,10 +5,11 @@ package playground.clruch.io.fleet;
 
 import java.io.File;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -30,8 +31,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
 import playground.clruch.ScenarioOptions;
+import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.DummyStorageSupplier;
 import playground.clruch.net.IterationFolder;
+import playground.clruch.net.MatsimStaticDatabase;
+import playground.clruch.net.OsmLink;
 import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
@@ -72,7 +76,10 @@ public class PopulationCreator {
         // Create new population
         System.out.println("INFO creating new population file");
         Population population = PopulationUtils.createPopulation(plansConfigGroup, network);
-        populate(population);
+        ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
+        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
+        populate(population, network, MatsimStaticDatabase.INSTANCE);
+        // populate(population);
 
         // Write new population to file
         final File populationFile = new File(workingDirectory, "TestPopulation.xml");
@@ -89,7 +96,7 @@ public class PopulationCreator {
         GZHandler.extract(populationGzFile, populationFile);
     }
 
-    private static void populate(Population population) throws Exception {
+    private static void populate(Population population, Network network, MatsimStaticDatabase db) throws Exception {
         // Parse RequestContainer into population
         List<IterationFolder> list = storageUtils.getAvailableIterations();
         if (list.isEmpty() != true) {
@@ -102,20 +109,35 @@ public class PopulationCreator {
                 final int MAX_ITER = storageSupplier.size(); // storageSupplier.size()
                 for (int index = 0; index < MAX_ITER; index++) {
                     SimulationObject simulationObject = storageSupplier.getSimulationObject(index);
+
+                    Map<Integer, List<RequestContainer>> fromMap = simulationObject.requests.stream() //
+                            .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
+
                     List<RequestContainer> rc = simulationObject.requests;
 
                     // Initialize all necessary properties
                     for (RequestContainer request : rc) {
+                        // for (Entry<Integer, List<RequestContainer>> entry : fromMap.entrySet()) {
+                        // if (entry.getKey() > 0) { // FIXME andy, document rationale behind filter "> 0"
+                        // OsmLink fromLink = db.getOsmLink(entry.getKey());
+                        // for (RequestContainer rc : entry.getValue()) {
+                        // OsmLink toLink = db.getOsmLink(rc.toLinkIndex);
+                        // Id<Link> fromLinkID = Id.createLinkId(fromLink.toString());
+                        // Id<Link> toLinkID = Id.createLinkId(toLink.toString());
+                        // final int size = entry.getValue().size();
+
                         Id<Person> personID = Id.create(id, Person.class);
                         Person person = populationFactory.createPerson(personID);
                         Plan plan = populationFactory.createPlan();
-                        Id<Link> fromLinkID = Id.create(request.fromLinkIndex, Link.class);
-                        Id<Link> toLinkID = Id.create(request.toLinkIndex, Link.class);
-                        Activity startActivity = populationFactory.createActivityFromLinkId("activitiy", fromLinkID);
-                        Activity endActivity = populationFactory.createActivityFromLinkId("activitiy", toLinkID);
+
+                        OsmLink fromLink = db.getOsmLink(request.fromLinkIndex);
+                        OsmLink toLink = db.getOsmLink(request.toLinkIndex);
+
+                        Activity startActivity = populationFactory.createActivityFromLinkId("activitiy", fromLink.link.getId());
+                        Activity endActivity = populationFactory.createActivityFromLinkId("activitiy", toLink.link.getId());
                         Leg leg = populationFactory.createLeg("av");
                         RouteFactory rf = new GenericRouteFactory();
-                        Route route = rf.createRoute(fromLinkID, toLinkID);
+                        Route route = rf.createRoute(fromLink.link.getId(), toLink.link.getId());
                         leg.setDepartureTime(request.submissionTime);
                         // leg.setTravelTime(200);
                         leg.setRoute(route);
