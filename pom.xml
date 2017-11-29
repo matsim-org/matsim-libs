@@ -3,11 +3,11 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.matsim.projects</groupId>
-	<artifactId>freight-project</artifactId>
+	<artifactId>freight-dfg17</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
-	<name>Freight project</name>
-	<description>Freight project</description>
+	<name>freight-dfg17</name>
+	<description>freight-dfg17 internal data not to be put on public github matsim/freight-contrib repository</description>
 
 	<repositories>
 		<!-- Repository for MATSim releases (MATSim is not on Maven central) -->
