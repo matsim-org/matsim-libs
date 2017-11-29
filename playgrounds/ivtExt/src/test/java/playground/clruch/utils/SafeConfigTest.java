@@ -7,7 +7,7 @@ public class SafeConfigTest extends TestCase {
     public void testNullEx() {
         try {
             SafeConfig.wrap(null);
-            assertTrue(false);  
+            assertTrue(false);
         } catch (Exception exception) {
             // ---
         }
