@@ -6,6 +6,9 @@ package org.matsim.withinday.utils;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -27,6 +30,7 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.facilities.Facility;
 
 /**
@@ -35,12 +39,14 @@ import org.matsim.facilities.Facility;
  * @author kainagel
  */
 public final class EditTrips {
+	private static final Logger log = Logger.getLogger(EditTrips.class) ;
 
 	private final TripRouter tripRouter;
 	private final PopulationFactory pf;
 	private Scenario scenario;
 
 	public EditTrips( TripRouter tripRouter, Scenario scenario ) {
+		log.setLevel(Level.DEBUG);
 		this.tripRouter = tripRouter;
 		this.scenario = scenario;
 		this.pf = scenario.getPopulation().getFactory() ;
@@ -50,10 +56,15 @@ public final class EditTrips {
 		return findTripAtPlanElement(agent, pe);
 	}
 	public Trip findTripAtPlanElement(MobsimAgent agent, PlanElement pe) {
+		log.debug("plan element to be found=" + pe ) ;
 		List<Trip> trips = TripStructureUtils.getTrips( WithinDayAgentUtils.getModifiablePlan(agent), tripRouter.getStageActivityTypes() ) ;
 		for ( Trip trip : trips ) {
-			if ( trip.getTripElements().contains(pe) ) {
-				return trip ;
+			for ( PlanElement te : trip.getTripElements() ) {
+				log.debug("trip element to be compared with=" + te ) ;
+				if ( te==pe ) {
+					log.debug("found trip element") ;
+					return trip;
+				}
 			}
 		}
 		throw new ReplanningException("trip not found") ;
@@ -62,7 +73,9 @@ public final class EditTrips {
 		return findTripAtPlanElement( agent, WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements().get(index) ) ;
 	}
 	// current trip:
-	public final void replanCurrentTrip(MobsimAgent agent, double now ) {
+	public final boolean replanCurrentTrip(MobsimAgent agent, double now ) {
+		log.debug("entering replanCurrentTrip") ;
+
 		// I will treat that in the way that it will make the trip consistent with the activities.  So if the activity in the
 		// plan has changed, the trip will go to a new location.
 		
@@ -82,9 +95,11 @@ public final class EditTrips {
 			replanCurrentTripFromLeg(trip.getDestinationActivity(), currentPlanElement, currentMode, now, agent, scenario);
 		}
 		WithinDayAgentUtils.resetCaches(agent);
+		return true ;
 	}
 	private void replanCurrentTripFromLeg(Activity newAct, final PlanElement currentPlanElement, final String currentMode, 
 			double now, MobsimAgent agent, Scenario scenario) {
+		log.debug("entering replanCurrentTripFromLeg");
 		Leg currentLeg = (Leg) currentPlanElement ;
 		if ( currentLeg.getRoute() instanceof NetworkRoute ) {
 			replanCurrentLegWithNetworkRoute(newAct, currentMode, currentLeg, now, agent);
@@ -98,7 +113,8 @@ public final class EditTrips {
 	}
 	private void replanCurrentLegWithNetworkRoute(Activity newAct, String mainMode, Leg currentLeg, double now, 
 			MobsimAgent agent) {
-
+		log.debug("entering replanCurrentLegWithNetworkRoute") ;
+		
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent) ;
 		List<PlanElement> planElements = plan.getPlanElements() ;
 		Person person = plan.getPerson() ;
@@ -127,6 +143,7 @@ public final class EditTrips {
 	}
 	private List<? extends PlanElement> newTripToNewActivity(Activity newAct, String mainMode, double now, 
 			MobsimAgent agent, Person person, Scenario scenario) {
+		log.debug("entering newTripToNewActivity") ;
 		Link currentLink = scenario.getNetwork().getLinks().get( agent.getCurrentLinkId() ) ;
 		Facility<?> fromFacility = new LinkWrapperFacility( currentLink ) ; 
 		Facility<?> toFacility = scenario.getActivityFacilities().getFacilities().get( newAct.getFacilityId() ) ;
@@ -183,17 +200,25 @@ public final class EditTrips {
 		Gbl.assertNotNull(newCurrentLeg);
 
 		// prune remaining route from current route:
-		NetworkRoute currentNWRoute = (NetworkRoute) currentLeg.getRoute();
-		for ( int ii = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent) ; ii<currentNWRoute.getLinkIds().size() ; ii++ ) {
-			currentNWRoute.getLinkIds().remove(ii) ;
-		}
-
-		// now add the new route (yyyyyy not sure if it starts with correct link)
+		NetworkRoute oldNWRoute = (NetworkRoute) currentLeg.getRoute();
+		
+		final Integer currentRouteLinkIdIndex = WithinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
+		
 		final NetworkRoute newNWRoute = (NetworkRoute)newCurrentLeg.getRoute();
-		currentNWRoute.getLinkIds().addAll( newNWRoute.getLinkIds() ) ;
-
-		// also change the arrival link id:
-		currentNWRoute.setEndLinkId( newNWRoute.getEndLinkId() ) ;
+		
+		final List<Id<Link>> newLinksIds = newNWRoute.getLinkIds().subList(0,newNWRoute.getLinkIds().size()) ;
+		EditRoutes.spliceNewPathIntoOldRoute(currentRouteLinkIdIndex, newNWRoute.getEndLinkId(), oldNWRoute, oldNWRoute.getLinkIds(), newLinksIds) ;
+		// yyyyyy Christoph's method is one index off, I don't know why. yyyyyy
+		
+//		for (int ii = currentRouteLinkIdIndex; ii<oldNWRoute.getLinkIds().size() ; ii++ ) {
+//			oldNWRoute.getLinkIds().remove(ii) ;
+//		}
+//
+//		// now add the new route (yyyyyy not sure if it starts with correct link)
+//		oldNWRoute.getLinkIds().addAll( newNWRoute.getLinkIds() ) ;
+//
+//		// also change the arrival link id:
+//		oldNWRoute.setEndLinkId( newNWRoute.getEndLinkId() ) ;
 		WithinDayAgentUtils.resetCaches(agent);
 	}
 	private static void pruneUpToCurrentLeg(Leg currentLeg, List<? extends PlanElement> newTrip) {
@@ -246,7 +271,7 @@ public final class EditTrips {
 	}
 	/**
 		 * @param plan
-		 * @param fromActivity
+		 * @param activity
 		 * @param tripRouter
 		 * @return the Trip that starts at the given activity or null, if no trip was found
 		 */

@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -105,6 +106,8 @@ public class TravelTimeCollector implements TravelTime,
 	}
 
 	public TravelTimeCollector(Scenario scenario, Set<String> analyzedModes) {
+		log.setLevel(Level.DEBUG);
+		
 		/*
 		 * The parallelization should scale almost linear, therefore we do use
 		 * the number of available threads according to the config file.
@@ -168,7 +171,11 @@ public class TravelTimeCollector implements TravelTime,
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		return this.travelTimeInfoProvider.getTravelTimeData(link).travelTime;
+		final double travelTime = this.travelTimeInfoProvider.getTravelTimeData(link).travelTime;
+		if ( Id.createLinkId(51825).equals(link.getId())) {
+			log.debug( "link=" + link.getId() + ";\ttime=" + time + ";\tttime=" + travelTime ) ;
+		}
+		return travelTime;
 	}
 
 	@Override
@@ -298,6 +305,11 @@ public class TravelTimeCollector implements TravelTime,
 		if (links != null) {
 			for (Link link : links) {
 				double freeSpeedTravelTime = link.getLength() / link.getFreespeed(e.getSimulationTime());
+				if ( e.getSimulationTime() > 0 ) {
+					log.debug("time=" + e.getSimulationTime() +
+									  ";\tnetwork change event for link=" + link.getId() +
+									  ";\tnew ttime="+ freeSpeedTravelTime );
+				}
 				TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeData(link);
 				travelTimeInfo.init(freeSpeedTravelTime);
 				travelTimeInfo.checkActiveState();	// ensure that the estimated link travel time is updated
