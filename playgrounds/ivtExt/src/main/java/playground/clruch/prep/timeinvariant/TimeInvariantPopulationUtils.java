@@ -18,17 +18,23 @@ import org.matsim.api.core.v01.population.Population;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 /** @author Claudio Ruch */
-public enum PopulationUtils {
+public enum TimeInvariantPopulationUtils {
     ;
 
     /** @return random time during daylength */
     /* package */ public static double getRandomDayTime() {        
         return Constants.nextDouble() * Constants.getDayLength();
     }
+    
+    /** @return random time during daylength */
+    /* package */ public static double getRandomDayTimeShift() {       
+        double sign = Constants.nextDouble() > 0.5? 1.0 : -1.0;
+        return getRandomDayTime()*sign;
+    }
 
     /** @param people
      * @return random {@link Person} from the map */
-    /* package */ static Person getRandomPerson(HashMap<Id<Person>, ? extends Person> people) {
+    /* package */ static Person getRandomPerson(Map<Id<Person>, ? extends Person> people) {
         int el = Constants.nextInt(people.size());
         return people.values().stream().collect(Collectors.toList()).get(el);
     }
@@ -65,7 +71,7 @@ public enum PopulationUtils {
             RemoveNonIntervalPlans.of(person, interval);
         }
 
-        PopulationUtils.removePeopleWithoutPlans(population);
+        TimeInvariantPopulationUtils.removePeopleWithoutPlans(population);
 
         GlobalAssert.that(CountLegs.of(population, interval) == CountLegs.countLegsOf(population));
     }

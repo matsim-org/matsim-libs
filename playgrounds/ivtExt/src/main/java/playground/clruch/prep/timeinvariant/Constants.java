@@ -17,23 +17,23 @@ public enum Constants {
     private static int randomSeed = 12345;
     private static Random rand = new Random(randomSeed);
 
-    /*package*/ static double getDayLength() {
+    /* package */ static double getDayLength() {
         return dayLenght;
     }
 
-    /*package*/ static int nextInt(int bound) {
+    /* package */ static int nextInt(int bound) {
         return rand.nextInt(bound);
     }
-    
-    /*package*/ static double nextDouble() {
+
+    /* package */ static double nextDouble() {
         return rand.nextDouble();
     }
 
-    /*package*/ static double getMaxTime() {
+    /* package */ static double getMaxTime() {
         return TIME_MAX;
     }
 
-    /*package*/ static double getMinTime() {
+    /* package */ static double getMinTime() {
         return TIME_MIN;
     }
 

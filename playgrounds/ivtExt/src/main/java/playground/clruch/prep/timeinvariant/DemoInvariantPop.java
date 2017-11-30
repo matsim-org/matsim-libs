@@ -17,6 +17,7 @@ import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.prep.PopulationTools;
+import playground.clruch.prep.TheApocalypse;
 
 /** @author Claudio Ruch */
 public class DemoInvariantPop {
@@ -39,8 +40,9 @@ public class DemoInvariantPop {
         Population population = scenario.getPopulation();
 
         System.out.println(population.getPersons().size());
+        TheApocalypse.decimatesThe(population).toNoMoreThan(10000);
         PopulationTools.changeModesOfTransportToAV(population);
-        Population populationInvariant = TimeInvariantPopulation.from(interval, population);
+        Population populationInvariant = TimeInvariantPopulation.from(interval, population,config,scenario.getNetwork());
         System.out.println(population.getPersons().size());
 
         // write the modified population to file

@@ -24,13 +24,14 @@ import playground.lsieber.scenario.preparer.VirtualNetworkPreparer;
 public class ScenarioPreparer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
-        run(args);
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
+        run(workingDirectory);
     }
 
-    public static void run(String[] args) throws MalformedURLException, Exception {
+    public static void run(File workingDirectory) throws MalformedURLException, Exception {
 
         // run preparer in simulation working directory
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
+
         ScenarioOptions scenarioOptions = ScenarioOptions.load(workingDirectory);
 
         // load Settings from IDSC Options
