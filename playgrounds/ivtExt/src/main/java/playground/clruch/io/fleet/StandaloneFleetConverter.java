@@ -21,28 +21,29 @@ import playground.clruch.utils.NetworkLoader;
 enum StandaloneFleetConverter {
     ;
     public static void main(String[] args) throws Exception {
-        // STEP 1: File to DayTaxiRecord
-        // selection of reference frame, file
-        // TODO change this to generic input... rename in a way to show what it is.
-
-        // File directory = //
-        // new File("/home/andya/Desktop/idsc_st/10_Daten/2017-10-11_ZurichNew");
-
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        // File simulationDirectory = new File(args[0]);
         ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);
+
+        // File config = new File(workingDirectory, simOptions.getString("simuConfig"));
+        // Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName());
+        
         File networkFile = new File(workingDirectory, simOptions.getString("simuConfig"));
+        Network network = NetworkLoader.loadNetwork(networkFile);
         // File networkFile = new File(workingDirectory, "trb_config.xml");
+        
         System.out.println("INFO working folder: " + workingDirectory.getAbsolutePath());
         System.out.println("INFO network file: " + networkFile.getAbsolutePath());
         ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
         List<File> trailFiles = (new MultiFileReader(workingDirectory, "Fahrtstrecken")).getFolderFiles();
         List<DayTaxiRecord> dayTaxiRecords = new ArrayList<>();
         List<File> outputFolders = new ArrayList<>();
-        File outputFolder = new File(workingDirectory, "output/");
+        File outputDirectory = new File(workingDirectory, "output/");
+
+        // File outputSubDirectory = new File(config.controler().getOutputDirectory());
+        // File outputDirectory = outputSubDirectory.getParentFile();
 
         System.err.println("WARN All files in the following folder will be deleted. Hit ENTER key to continue:");
-        System.err.println(outputFolder.getAbsolutePath());
+        System.err.println(outputDirectory.getAbsolutePath());
 
         try {
             System.in.read();
@@ -51,9 +52,9 @@ enum StandaloneFleetConverter {
         }
 
         if (workingDirectory.exists()) {
-            if (outputFolder.exists())
-                FileDelete.of(outputFolder, 5, 90000);
-            outputFolder.mkdir();
+            if (outputDirectory.exists())
+                FileDelete.of(outputDirectory, 5, 90000);
+            outputDirectory.mkdir();
         }
 
         // Generate dayTaxiRecords and output folders according to date of csv-data
@@ -67,22 +68,18 @@ enum StandaloneFleetConverter {
             reader.populateFrom(file);
             dayTaxiRecords.add(dayTaxiRecord);
 
-            outputFolder = new File(workingDirectory, "output/" + file.getName().substring(0, 10));
-            if (outputFolder.exists() == false)
-                outputFolder.mkdir();
-            GlobalAssert.that(outputFolder.isDirectory());
-            outputFolders.add(outputFolder);
-            System.out.println("INFO output Folder: " + outputFolder.getAbsolutePath());
+            outputDirectory = new File(workingDirectory, "output/" + file.getName().substring(0, 10));
+            if (outputDirectory.exists() == false)
+                outputDirectory.mkdir();
+            GlobalAssert.that(outputDirectory.isDirectory());
+            outputFolders.add(outputDirectory);
+            System.out.println("INFO output Folder: " + outputDirectory.getAbsolutePath());
         }
 
         // STEP 2: DayTaxiRecord to MATSimStaticDatabase
-        Network network = NetworkLoader.loadNetwork(networkFile);
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
 
         // generate sim objects and store
         SimulationFleetDump.of(dayTaxiRecords, network, MatsimStaticDatabase.INSTANCE, outputFolders);
     }
 }
-
-// File file = new File("/media/datahaki/media/ethz/taxi", "2017-06-27 - GPS
-// List<File> trailFiles = (new MultiFileReader(directory, "Fahrtstrecken")).getFolderFiles();

@@ -39,7 +39,7 @@ import playground.clruch.net.VehicleContainer;
         for (Entry<Integer, List<VehicleContainer>> entry : map.entrySet()) {
             final int index = entry.getKey();
             List<VehicleContainer> list = entry.getValue();
-            final long total = list.stream().filter(vc -> !vc.avStatus.equals(AVStatus.STAY)).count();
+            final long total = list.stream().filter(vc -> !vc.avStatus.equals(AVStatus.STAY) && !vc.avStatus.equals(AVStatus.OFFSERVICE)).count();
             if (0 < total) {
                 final Tensor array;
                 if (linkTensor.containsKey(index))
