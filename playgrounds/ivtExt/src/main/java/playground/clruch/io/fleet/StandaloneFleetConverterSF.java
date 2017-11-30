@@ -59,12 +59,12 @@ enum StandaloneFleetConverterSF {
 		}
 
 		ReferenceFrame referenceFrame = ReferenceFrame.IDENTITY;
-		// STEP 2: DayTaxiRecord to MATSimStaticDatabase
-		MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
-		
-		// generate sim objects and store
-		StorageUtils storageUtils = new StorageUtils(outputDirectory);
-		SimulationFleetDump.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE, storageUtils);
-		dir.delete();
+//		// STEP 2: DayTaxiRecord to MATSimStaticDatabase
+//		MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
+//		
+//		// generate sim objects and store
+//		StorageUtils storageUtils = new StorageUtils(outputDirectory);
+//		SimulationFleetDump.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE, storageUtils);
+//		dir.delete();
 	}
 }
