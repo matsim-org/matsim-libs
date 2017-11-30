@@ -83,9 +83,9 @@ public class WithinDayAgentUtils {
 		 * () Routes may have loops, in which case the "indexOf" approach does not work.
 		 */
 
-		if (agent instanceof PersonDriverAgentImpl) {
+		if (agent instanceof HasModifiablePlan) {
 
-			return ((PersonDriverAgentImpl) agent).getCurrentLinkIndex();			
+			return ((HasModifiablePlan) agent).getCurrentLinkIndex();
 
 //		} else if ( agent instanceof PlanAgent ) {
 //			
