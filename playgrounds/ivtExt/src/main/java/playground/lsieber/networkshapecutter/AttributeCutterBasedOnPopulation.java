@@ -1,0 +1,65 @@
+package playground.lsieber.networkshapecutter;
+
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.utils.objectattributes.ObjectAttributes;
+
+public class AttributeCutterBasedOnPopulation implements AttributeCutter {
+
+    Population population;
+
+    public AttributeCutterBasedOnPopulation(Population population) {
+        this.population = population;
+    }
+
+    @Override
+    public ObjectAttributes filter(ObjectAttributes objectAttributes) {
+        
+        
+        ObjectAttributes reducedAttributes = objectAttributes;
+        return reducedAttributes;
+        
+        
+
+        
+//        
+//        System.out.println("    running " + this.getClass().getName() + " module...");
+//
+//        HashSet<Id<ActivityFacility>> population_fid = new HashSet<Id<>>();
+//
+//        // create Hash Set of Activity IDs in Population
+//        Iterator<? extends Person> itPerson = population.getPersons().values().iterator();
+//        while (itPerson.hasNext()) {
+//            Person person = itPerson.next();
+//            for (Plan plan : person.getPlans()) {
+//                for (PlanElement planElement : plan.getPlanElements()) {
+//                    if (planElement instanceof Activity) {
+//                        Activity act = (Activity) planElement;
+//                        population_fid.add(act.getFacilityId());
+//                    }
+//                }
+//            }
+//        }
+//
+//        // Create TreeSet of ids to delete from original facilities
+//        TreeSet<Id<ActivityFacility>> fid_set = new TreeSet<Id<ActivityFacility>>();
+//        Iterator<Id<ActivityFacility>> fid_it = facilities.getFacilities().keySet().iterator();
+//        while (fid_it.hasNext()) {
+//            Id<ActivityFacility> fid = fid_it.next();
+//            if (!population_fid.contains(fid)) {
+//                fid_set.add(fid);
+//            }
+//        }
+//
+//        // delete the facilities in Tree Set from the original Facilities
+//        System.out.println("      Number of facilities to be cut = " + fid_set.size() + "...");
+//        fid_it = fid_set.iterator();
+//        while (fid_it.hasNext()) {
+//            Id<ActivityFacility> fid = fid_it.next();
+//            facilities.getFacilities().remove(fid);
+//        }
+//        System.out.println(" ------>>> NUmber of Facilities in new output: " + facilities.getFacilities().size());
+//        System.out.println("    done.");
+//        return facilities;
+    }
+
+}

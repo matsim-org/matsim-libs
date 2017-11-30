@@ -25,7 +25,7 @@ public interface AVDispatcher {
      * 
      * @param task
      */
-    void onNextTaskStarted(AVTask task);
+    void onNextTaskStarted(AVVehicle vehicle);
     
     void onNextTimestep(double now);
 

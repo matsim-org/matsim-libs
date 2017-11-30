@@ -24,6 +24,7 @@ import playground.joel.data.TotalData;
 /**
  * Created by Joel on 05.04.2017.
  */
+@Deprecated
 public class AnalyzeMarc {
 
     public static void main(String[] args) throws Exception {
@@ -114,6 +115,7 @@ public class AnalyzeMarc {
         GlobalAssert.that(false); // TODO next line was commented, adapt to make code usable again.
         //StorageSupplier storageSupplier = StorageSupplier.getDefault();
         StorageSupplier storageSupplier = null;
+        @SuppressWarnings("null")
         final int size = storageSupplier.size();
         System.out.println("found files: " + size);
 

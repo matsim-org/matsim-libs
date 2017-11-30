@@ -5,8 +5,6 @@ package playground.clruch.io.fleet;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -30,7 +28,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
-import playground.clruch.ScenarioOptions;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.DummyStorageSupplier;
 import playground.clruch.net.IterationFolder;
@@ -40,7 +37,7 @@ import playground.clruch.net.RequestContainer;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.StorageUtils;
-import playground.clruch.utils.PropertiesExt;
+import playground.clruch.options.ScenarioOptions;
 import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
 /** @author Andreas Aumiller */
@@ -54,7 +51,7 @@ public class PopulationCreator {
     public static void main(String[] args) throws Exception {
         // Loading simulationObjects
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);
         File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
         System.out.println("INFO getting all output folders from: " + outputDirectory.getAbsolutePath());
         outputFolders = MultiFileTools.getAllDirectoriesSorted(outputDirectory);
@@ -110,21 +107,10 @@ public class PopulationCreator {
                 for (int index = 0; index < MAX_ITER; index++) {
                     SimulationObject simulationObject = storageSupplier.getSimulationObject(index);
 
-                    Map<Integer, List<RequestContainer>> fromMap = simulationObject.requests.stream() //
-                            .collect(Collectors.groupingBy(requestContainer -> requestContainer.fromLinkIndex));
-
                     List<RequestContainer> rc = simulationObject.requests;
 
                     // Initialize all necessary properties
                     for (RequestContainer request : rc) {
-                        // for (Entry<Integer, List<RequestContainer>> entry : fromMap.entrySet()) {
-                        // if (entry.getKey() > 0) { // FIXME andy, document rationale behind filter "> 0"
-                        // OsmLink fromLink = db.getOsmLink(entry.getKey());
-                        // for (RequestContainer rc : entry.getValue()) {
-                        // OsmLink toLink = db.getOsmLink(rc.toLinkIndex);
-                        // Id<Link> fromLinkID = Id.createLinkId(fromLink.toString());
-                        // Id<Link> toLinkID = Id.createLinkId(toLink.toString());
-                        // final int size = entry.getValue().size();
 
                         Id<Person> personID = Id.create(id, Person.class);
                         Person person = populationFactory.createPerson(personID);

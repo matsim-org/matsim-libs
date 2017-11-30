@@ -15,7 +15,7 @@ public class AVTravelTimeRecorder implements MobsimBeforeSimStepListener {
     AVTravelTimeTracker travelTimeTracker;
     
     @Override
-    public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
         double now = e.getSimulationTime();
         if(now % 60 == 0){
             String theLinkToTrack = "9908557_0_rL2";
@@ -23,10 +23,9 @@ public class AVTravelTimeRecorder implements MobsimBeforeSimStepListener {
                     
 
             double travelTime = travelTimeTracker.getLinkTravelTime(linkToTrackID).travelTime;
-            
-            // System.out.println("juhui");
-            // System.out.println(travelTime);
-            // System.out.println("================================================");
+            System.out.println(travelTime);
+            // TODO did not continue work here. 
+
         }
     }
 }

@@ -11,11 +11,12 @@ import javax.inject.Named;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.trafficmonitoring.VrpTravelTimeModules;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.population.routes.RouteFactories;
 import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.DijkstraFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelTime;
@@ -74,7 +75,7 @@ public class AVModule extends AbstractModule {
 
         // Bind the AV travel time to the DVRP estimated travel time
         // TODO add different travel time to avoid congestions
-        bind(TravelTime.class).annotatedWith(Names.named(AVModule.AV_MODE)).to(Key.get(TravelTime.class, Names.named(VrpTravelTimeModules.DVRP_ESTIMATED)));
+        bind(TravelTime.class).annotatedWith(Names.named(AVModule.AV_MODE)).to(Key.get(TravelTime.class, Names.named(DvrpTravelTimeModule.DVRP_ESTIMATED)));
 
         bind(VehicleType.class).annotatedWith(Names.named(AVModule.AV_MODE)).toInstance(VehicleUtils.getDefaultVehicleType());
 
@@ -181,8 +182,9 @@ public class AVModule extends AbstractModule {
 
     @Provides
     @Named(AVModule.AV_MODE)
-    LeastCostPathCalculator provideLeastCostPathCalculator(Network network, @Named(VrpTravelTimeModules.DVRP_ESTIMATED) TravelTime travelTime) {
-        return new Dijkstra(network, new OnlyTimeDependentTravelDisutility(travelTime), travelTime);
+    LeastCostPathCalculator provideLeastCostPathCalculator(Network network, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime) {
+        DijkstraFactory dijkstraFactory = new DijkstraFactory();
+    	return dijkstraFactory.createPathCalculator(network, new OnlyTimeDependentTravelDisutility(travelTime), travelTime);
     }
 
     @Provides

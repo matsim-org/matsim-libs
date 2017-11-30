@@ -177,7 +177,18 @@ public class PopulationTools {
 
         Iterator<? extends Person> itPerson = population.getPersons().values().iterator();
 
+        int counter = 0;
+        int nextMsg = 1;
+        
         while (itPerson.hasNext()) {
+            
+            counter++;
+            if (counter % nextMsg == 0) {
+                nextMsg *= 2;
+                System.out.println("we are at person # "+ counter + ". ");
+            }
+            
+            
             Person person = itPerson.next();
             boolean removePerson = false;
             for (Plan plan : person.getPlans()) {

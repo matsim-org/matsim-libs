@@ -28,8 +28,8 @@ public class InterCityScheduleConverter {
         // load schedules file
         // define input/ouptput file names
         final File fileImport = new File(dir, "2015_ch_schedule_Corrected.xml");
-        final File fileExportGz = new File(dir, "2015_ch_schedule_CorrectedIntercityOnly.xml.gz");
-        final File fileExport = new File(dir, "2015_ch_schedule_CorrectedIntercityOnly.xml");
+        // final File fileExportGz = new File(dir, "2015_ch_schedule_CorrectedIntercityOnly.xml.gz");
+        // final File fileExport = new File(dir, "2015_ch_schedule_CorrectedIntercityOnly.xml");
 
         // load existing XML file
         System.out.println("starting conversion");
@@ -162,7 +162,6 @@ public class InterCityScheduleConverter {
     private static void RemoveEmptyTransitLines(Document document){
         Element rootNode = document.getRootElement();
         List<Element> childrenNodes = rootNode.getChildren();
-        int removedelements = 0;
         Iterator<Element> eelementIterator = childrenNodes.iterator();
         while(eelementIterator.hasNext()){
             Element eelement = eelementIterator.next();

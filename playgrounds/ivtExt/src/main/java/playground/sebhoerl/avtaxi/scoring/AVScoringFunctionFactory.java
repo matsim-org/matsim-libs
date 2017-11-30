@@ -6,8 +6,8 @@ import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParametersForPerson;
-import org.matsim.core.scoring.functions.SubpopulationCharyparNagelScoringParameters;
+import org.matsim.core.scoring.functions.ScoringParametersForPerson;
+import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -19,12 +19,12 @@ import playground.sebhoerl.avtaxi.framework.AVModule;
 public class AVScoringFunctionFactory implements ScoringFunctionFactory {
     final private AVConfig config;
     final private ScoringFunctionFactory standardFactory;
-    final private CharyparNagelScoringParametersForPerson params;
+    final private ScoringParametersForPerson params;
 
     @Inject
     public AVScoringFunctionFactory(Scenario scenario, AVConfig config) {
 	this.config = config;
-	params = new SubpopulationCharyparNagelScoringParameters(scenario);
+	params = new SubpopulationScoringParameters(scenario);
 	standardFactory = new CharyparNagelScoringFunctionFactory(scenario);
     }
 

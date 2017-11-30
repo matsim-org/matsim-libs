@@ -22,12 +22,11 @@ import ch.ethz.idsc.tensor.alg.Dimensions;
 import ch.ethz.idsc.tensor.alg.Join;
 import ch.ethz.idsc.tensor.alg.Transpose;
 import ch.ethz.idsc.tensor.io.CsvFormat;
-import playground.clruch.ScenarioOptions;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageSupplier;
 import playground.clruch.net.StorageUtils;
-import playground.clruch.utils.PropertiesExt;
+import playground.clruch.options.ScenarioOptions;
 import playground.joel.data.TotalData;
 
 /** Created by Joel on 05.04.2017.
@@ -57,6 +56,7 @@ public class AnalyzeAll {
 
     /* package */ void plot(String csv, String name, String title, int from, int to, Double maxRange, File relativeDirectory) //
             throws Exception {
+        
         Tensor table = CsvFormat.parse(Files.lines(Paths.get(relativeDirectory.getPath() + "/" + csv + ".csv")));
         table = Transpose.of(table);
         try {
@@ -75,14 +75,16 @@ public class AnalyzeAll {
             throws Exception {
         Tensor summary = Join.of(1, coreAnalysis.getSummary(), distanceAnalysis.summary);
         SaveUtils.saveFile(summary, "summary", relativeDirectory);
+        File summaryDirectory = new File(relativeDirectory,"summary");
+        
         System.out.println("Size of data summary: " + Dimensions.of(summary));
 
         getTotals(summary, coreAnalysis, relativeDirectory);
 
-        plot("summary", "binnedWaitingTimes", "Waiting Times", 3, 6, maxWaitingTime, relativeDirectory);
+        plot("summary/summary", "binnedWaitingTimes", "Waiting Times", 3, 6, maxWaitingTime, relativeDirectory);
         // maximum waiting time in the plot to have this uniform for all simulations
-        plot("summary", "binnedTimeRatios", "Occupancy Ratio", 10, 11, relativeDirectory);
-        plot("summary", "binnedDistanceRatios", "Distance Ratio", 15, 16, relativeDirectory);
+        plot("summary/summary", "binnedTimeRatios", "Occupancy Ratio", 10, 11, relativeDirectory);
+        plot("summary/summary", "binnedDistanceRatios", "Distance Ratio", 15, 16, relativeDirectory);
         HistogramPlot.of(coreAnalysis.waitBinCounter, relativeDirectory, "Requests per Waiting Time", //
                 waitBinSize.number().doubleValue(), "% of requests", "Waiting Times [s]", //
                 1000, 750);
@@ -100,9 +102,9 @@ public class AnalyzeAll {
         UniqueDiagrams.distanceStack(relativeDirectory, "stackedDistance", "Distance Partition", //
                 distanceRebalance / distance, distancePickup / distance, distanceWithCust / distance);
         UniqueDiagrams.distanceDistribution(relativeDirectory, "distanceDistribution", //
-                "Distance Distribution", true, relativeDirectory.getPath());
+                "Distance Distribution", true, summaryDirectory.getPath());
         UniqueDiagrams.statusDistribution(relativeDirectory, "statusDistribution", //
-                "Status Distribution", true, relativeDirectory.getPath());
+                "Status Distribution", true, summaryDirectory.getPath());
     }
 
     /* package */ void getTotals(Tensor summary, CoreAnalysis coreAnalysis, File relativeDirectory) {
@@ -224,8 +226,8 @@ public class AnalyzeAll {
      * @throws Exception */
     public void main(String[] args) throws Exception {
         File workingDirectory = new File("").getCanonicalFile();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
-        File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
+        ScenarioOptions scenOptions = ScenarioOptions.load(workingDirectory);
+        File configFile = new File(workingDirectory, scenOptions.getString("simuConfig"));
         Config config = ConfigUtils.loadConfig(configFile.toString());
         String outputdirectory = config.controler().getOutputDirectory();
         // StorageUtils storageUtils = new StorageUtils(new File(outputdirectory));

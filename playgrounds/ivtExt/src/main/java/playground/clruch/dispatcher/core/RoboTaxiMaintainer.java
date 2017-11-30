@@ -9,9 +9,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedules;
-import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
-import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTrackerImpl;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -21,6 +18,8 @@ import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.net.StorageUtils;
 import playground.clruch.utils.AVTaskAdapter;
 import playground.clruch.utils.SafeConfig;
+import playground.matsim_decoupling.IDSCDriveTaskTracker;
+import playground.matsim_decoupling.ScheduleHelper;
 import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
 import playground.sebhoerl.avtaxi.data.AVVehicle;
 import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
@@ -29,7 +28,6 @@ import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
 import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
 import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
 import playground.sebhoerl.avtaxi.schedule.AVStayTask;
-import playground.sebhoerl.avtaxi.schedule.AVTask;
 import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /** The purpose of RoboTaxiMaintainer is to register {@link AVVehicle} and provide the collection of
@@ -76,10 +74,10 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
                 @Override
                 public void handle(AVDriveTask avDriveTask) {
                     // for empty cars the drive task is second to last task
-                    if (Schedules.isNextToLastTask(avDriveTask)) {
+                    if (ScheduleHelper.isNextToLastTask(schedule, avDriveTask)) {
                         TaskTracker taskTracker = avDriveTask.getTaskTracker();
-                        OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
-                        LinkTimePair linkTimePair = ((OnlineDriveTaskTrackerImpl) onlineDriveTaskTracker).getSafeDiversionPoint();
+                        IDSCDriveTaskTracker onlineDriveTaskTracker = (IDSCDriveTaskTracker) taskTracker;
+                        LinkTimePair linkTimePair = onlineDriveTaskTracker.getSafeDiversionPoint();
                         GlobalAssert.that(linkTimePair != null);
                         robotaxi.setDivertableLinkTime(linkTimePair);
                         robotaxi.setCurrentDriveDestination(avDriveTask.getPath().getToLink());
@@ -101,7 +99,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
                 @Override
                 public void handle(AVStayTask avStayTask) {
                     // for empty vehicles the current task has to be the last task
-                    if (Schedules.isLastTask(avStayTask) && !isInPickupRegister(robotaxi)) {
+                    if (ScheduleHelper.isLastTask(schedule, avStayTask) && !isInPickupRegister(robotaxi)) {
                         GlobalAssert.that(avStayTask.getBeginTime() <= getTimeNow());
                         GlobalAssert.that(avStayTask.getLink() != null);
                         robotaxi.setDivertableLinkTime(new LinkTimePair(avStayTask.getLink(), getTimeNow()));
@@ -127,7 +125,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
         notifySimulationSubscribers(Math.round(now), storageUtils);
 
         consistencyCheck();
-        beforeStepTasks();
+        beforeStepTasks(); // <- if problems with RoboTaxi Status to Completed consider to set "simEndtimeInterpretation" to "null"
         executePickups();
         redispatch(now);
         afterStepTasks();
@@ -206,7 +204,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
     /* package */ abstract boolean isInPickupRegister(RoboTaxi robotaxi);
 
     @Override
-    public final void onNextTaskStarted(AVTask task) {
+    public final void onNextTaskStarted(AVVehicle task) {
         // intentionally empty
     }
 

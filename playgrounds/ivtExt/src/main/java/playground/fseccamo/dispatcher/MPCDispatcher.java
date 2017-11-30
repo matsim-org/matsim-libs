@@ -1,6 +1,7 @@
 // code by francesco, jph, clruch
 package playground.fseccamo.dispatcher;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -305,7 +306,12 @@ public class MPCDispatcher extends BaseMpcDispatcher {
         @Override
         public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
 
-            virtualNetwork = VirtualNetworkGet.readDefault(network);
+            try {
+                virtualNetwork = VirtualNetworkGet.readDefault(network);
+            } catch (IOException e) {                
+                e.printStackTrace();
+                GlobalAssert.that(false);
+            }
 
             return new MPCDispatcher(config, avconfig, generatorConfig, travelTime, router, eventsManager, virtualNetwork, network, travelTimes);
         }

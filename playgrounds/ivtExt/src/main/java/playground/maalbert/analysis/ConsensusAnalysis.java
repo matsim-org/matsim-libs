@@ -38,6 +38,7 @@ class ConsensusAnalysis {
         args = argmnts;
     }
 
+    @SuppressWarnings("deprecation")
     @Inject
 //    private Network network;
 

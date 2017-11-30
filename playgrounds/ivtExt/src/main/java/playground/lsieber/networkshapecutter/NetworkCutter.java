@@ -1,18 +1,15 @@
-/**
- * 
- */
 package playground.lsieber.networkshapecutter;
 
-import org.matsim.api.core.v01.network.Network;
+public abstract class NetworkCutter implements NetworkCutterInterface {
+    protected String cutInfo = null;
 
-/** @author Claudio Ruch */
-public interface NetworkCutter {
-
-    // TODO can we do it as an abstract function? 
-    Network filter(Network network);
-    void printCutSummary();
-    default void checkNetworkConsistency() {
-        // TODO jan added implementation to precent compile error
+    @Override
+    public void printCutSummary() {
+        System.out.println(cutInfo); // TODO this will produce an exeption, fill thet info while cutting!
     }
 
+    @Override
+    public void checkNetworkConsistency() {
+        // TODO @Lukas Create check on Network Consistency
+    }
 }

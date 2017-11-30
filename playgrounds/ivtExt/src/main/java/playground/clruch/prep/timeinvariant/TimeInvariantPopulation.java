@@ -69,25 +69,25 @@ public enum TimeInvariantPopulation {
             if (i % 500 == 0)
                 System.out.println("creating person " + i + " of " + totalP);
 
-            // adapt a random person to choice random time in the day            
+            // adapt a random person to choice random time in the day
             Person newPerson = createNewPerson(PopulationUtils.getRandomPerson(people), //
                     PopulationUtils.getRandomDayTime(), generator);
 
             // add to new population
-            population.addPerson(newPerson);
-
+            if (consistencyOf(newPerson)) {
+                population.addPerson(newPerson);
+            }
         }
-
+        population.getPersons().values().forEach(// 
+                p->GlobalAssert.that(consistencyOf(p)));
         return population;
-
     }
 
     /** @param randomP a {@link Person}
      * @param time {@link double} when the person should start its travel
      * @return new {@link Person} identical to @param randomP starting its first travel at @param time */
     private static Person createNewPerson(Person randomP, double time, IDGenerator generator) {
-        
-        
+
         Id<Person> newID = generator.generateUnusedID();
         Person newPerson = new PersonImplAdd(newID);
 
@@ -115,11 +115,25 @@ public enum TimeInvariantPopulation {
                     planShifted.addLeg(leg);
                 }
             }
+
             newPerson.addPlan(planShifted);
         }
         return newPerson;
     }
 
-
-
+    private static boolean consistencyOf(Person person) {
+        boolean isOk = true;
+        for (Plan plan : person.getPlans()) {
+            for (PlanElement planElement : plan.getPlanElements()) {
+                if (planElement instanceof Leg) {
+                    Leg leg = (Leg) planElement;
+                    double depTime = leg.getDepartureTime();
+                    if (depTime < 0.0 || depTime >= 108000.0) { // TODO magic const.
+                        isOk = false;
+                    }
+                }
+            }
+        }        
+        return isOk;
+    }
 }

@@ -9,6 +9,7 @@
 
 package playground.clruch.dispatcher;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -177,9 +178,14 @@ public class LPFFDispatcher extends PartitionedDispatcher {
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
-
-            virtualNetwork = VirtualNetworkGet.readDefault(network);
-            TravelData travelData = TravelDataGet.readDefault(virtualNetwork);
+            TravelData travelData = null;
+            try {
+                virtualNetwork = VirtualNetworkGet.readDefault(network);
+                travelData = TravelDataGet.readDefault(virtualNetwork);
+            } catch (IOException e) {
+                e.printStackTrace();
+                GlobalAssert.that(false);
+            }
 
             return new LPFFDispatcher(config, avconfig, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork, abstractVirtualNodeDest,
                     abstractVehicleDestMatcher, travelData);
