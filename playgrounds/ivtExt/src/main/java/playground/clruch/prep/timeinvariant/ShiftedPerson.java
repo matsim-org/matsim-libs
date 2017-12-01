@@ -15,14 +15,16 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 public enum ShiftedPerson {
     ;
 
-    public static Person of(Person randomP, double timediff, //
-            Id<Person> newID, PopulationFactory populationFactory) {
+    public static Person of(Person oldPerson, Id<Person> newID, PopulationFactory populationFactory) {
         Person newPerson = populationFactory.createPerson(newID);
-        randomP.getPlans().stream().forEach(p -> newPerson.addPlan(p));
+        double[] minMax = MinMaxTime.of(oldPerson);
+        Double timediff = validTimeShiftFor(minMax);
+        if (timediff == null)
+            return null;
 
         // TODO attributes are lost in current implementation.
 
-        for (Plan plan : randomP.getPlans()) {
+        for (Plan plan : oldPerson.getPlans()) {
             Plan planShifted = populationFactory.createPlan();
             planShifted.setPerson(newPerson);
             planShifted.setScore(plan.getScore());
@@ -45,8 +47,7 @@ public enum ShiftedPerson {
                 }
             }
             newPerson.addPlan(planShifted);
-            newPerson.setSelectedPlan(planShifted);
-            newPerson.removePlan(plan);
+
         }
         return newPerson;
     }
@@ -62,5 +63,22 @@ public enum ShiftedPerson {
                 }
             }
         }
+    }
+
+    private static double validTimeShiftFor(double[] minMax) {
+        Double timeShift = null;
+        boolean timeShiftOk = false;
+        int counter = 0;
+        while (counter < 40 && !timeShiftOk) {
+            counter++;
+            double timeDiff = TimeInvariantPopulationUtils.getRandomDayTimeShift();
+            boolean okTop = minMax[1] + timeDiff < TimeConstants.getMaxTime();
+            boolean okBottom = minMax[0] - timeDiff > TimeConstants.getMinTime();
+            timeShiftOk = okTop && okBottom;
+            if (timeShiftOk)
+                timeShift = timeDiff;
+
+        }
+        return timeShift;
     }
 }

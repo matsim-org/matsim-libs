@@ -182,6 +182,7 @@ abstract class RoboTaxiMaintainer implements AVDispatcher {
         int failed = 0;
         if (!roboTaxis.isEmpty()) {
             for (RoboTaxi robotaxi : roboTaxis) {
+                System.out.println("robotaxi id " +  robotaxi.getId().toString());
                 final Link link = AVLocation.of(robotaxi);
                 if (link != null) {
                     robotaxi.setLastKnownLocation(link);

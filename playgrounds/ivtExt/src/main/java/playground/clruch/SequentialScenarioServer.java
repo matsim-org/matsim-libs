@@ -19,7 +19,7 @@ public class SequentialScenarioServer {
         /** Delete current content in outputfolder, DO NOT MODIFY THIS, POTENTIALLY VERY DANGEROUS. */
         SequentialScenarioTools.emptyOutputFolder(workingDirectory);
 
-        int iterations = 31;
+        int iterations = 3;
         if (iterations % 2 == 0) {
             iterations = iterations - 1;
         }

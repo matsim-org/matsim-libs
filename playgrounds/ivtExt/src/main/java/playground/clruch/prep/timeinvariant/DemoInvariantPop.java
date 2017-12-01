@@ -40,7 +40,6 @@ public class DemoInvariantPop {
         Population population = scenario.getPopulation();
 
         System.out.println(population.getPersons().size());
-        TheApocalypse.decimatesThe(population).toNoMoreThan(10000);
         PopulationTools.changeModesOfTransportToAV(population);
         Population populationInvariant = TimeInvariantPopulation.from(interval, population,config,scenario.getNetwork());
         System.out.println(population.getPersons().size());

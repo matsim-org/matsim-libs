@@ -55,7 +55,7 @@ public enum TimeInvariantPopulation {
 
 
         // calculate total for entire day
-        int totalP = (int) ((Constants.getDayLength() / interval.getLength()[0]) * ((double) populationOld.getPersons().size()));
+        int totalP = (int) ((TimeConstants.getDayLength() / interval.getLength()[0]) * ((double) populationOld.getPersons().size()));
         System.out.println(populationOld.getPersons().size() + " in interval " + interval.print());
         System.out.println(totalP + " in interval " + 0 + "-->" + 108000);
 
@@ -66,8 +66,13 @@ public enum TimeInvariantPopulation {
                 System.out.println("creating person " + i + " of " + totalP);
 
             // adapt a random person to choice random time in the day
-            Person newPerson = createNewPerson(TimeInvariantPopulationUtils.getRandomPerson(populationOld.getPersons()), //
-                    generator, populationNew.getFactory());
+            Id<Person> newID = generator.generateUnusedID();
+            Person newPerson = ShiftedPerson.of(TimeInvariantPopulationUtils.getRandomPerson(populationOld.getPersons()),// 
+                    newID, populationNew.getFactory());
+            
+            
+//            Person newPerson = createNewPerson(TimeInvariantPopulationUtils.getRandomPerson(populationOld.getPersons()), //
+//                    generator, populationNew.getFactory());
 
             // add to new population
             if (Consistency.of(newPerson)) {
@@ -106,27 +111,66 @@ public enum TimeInvariantPopulation {
         return populationOld;
     }
 
-    /** @param randomP a {@link Person}
-     * @return new {@link Person} identical to @param randomP starting its first travel at a randomly shifted time */
-    public static Person createNewPerson(Person randomP, IDGenerator generator, PopulationFactory populationFactory) {
-        Id<Person> newID = generator.generateUnusedID();
-        
-        boolean isConsistent = false;
-        Person newPerson = null;
-        int counter = 0;
-        while (!isConsistent && counter < 20) {
-            double timediff = TimeInvariantPopulationUtils.getRandomDayTimeShift();
-            GlobalAssert.that(timediff>=-108000.0 && timediff<=108000.0);
-            newPerson = ShiftedPerson.of(randomP, timediff, newID, populationFactory);
-            isConsistent = Consistency.of(newPerson);
-            ++counter;
-        }
-        if(counter==10){
-            System.out.println("not able to shift person " + randomP.getId().toString());
-            return null;
-        }
-        
-        return newPerson;
-    }
+//    /** @param randomP a {@link Person}
+//     * @return new {@link Person} identical to @param randomP starting its first travel at a randomly shifted time */
+//    public static Person createNewPerson(Person randomP, IDGenerator generator, PopulationFactory populationFactory) {
+//        Id<Person> newID = generator.generateUnusedID();
+//        
+//        boolean isConsistent = false;
+//        Person newPerson = null;
+//        int counter = 0;
+//        while (!isConsistent && counter < 20) {
+//            double timediff = TimeInvariantPopulationUtils.getRandomDayTimeShift(); 
+//            GlobalAssert.that(timediff>=-108000.0 && timediff<=108000.0);
+//            newPerson = ShiftedPerson.of(randomP, timediff, newID, populationFactory);
+//            isConsistent = Consistency.of(newPerson);
+//            ++counter;
+//        }
+//        if(counter==10){
+//            System.out.println("not able to shift person " + randomP.getId().toString());
+//            return null;
+//        }
+//        
+//        return newPerson;
+//    }
+//
+//    
+//    /** @param randomP a {@link Person}
+//     * @return new {@link Person} identical to @param randomP starting its first travel at a randomly shifted time */
+//    public static Person createNewPersonFast(Person randomP, IDGenerator generator, PopulationFactory populationFactory) {
+//        Id<Person> newID = generator.generateUnusedID();
+//        Person newPerson = ShiftedPerson.of(randomP, newID, populationFactory);
+//        
+//        
+//        
+//        double[] minMax = MinMaxTime.of(randomP);
+//        boolean timeDiffOk = false; 
+//        int counter = 0;
+//        while(!timeDiffOk && counter<50){
+//            
+//            ++counter
+//        }
+//        
+//        
+//        
+//        boolean isConsistent = false;
+//        Person newPerson = null;
+//
+//        while (!isConsistent && counter < 20) {
+//            double timediff = TimeInvariantPopulationUtils.getRandomDayTimeShift(); 
+//            GlobalAssert.that(timediff>=-108000.0 && timediff<=108000.0);
+//            newPerson = ShiftedPerson.of(randomP, timediff, newID, populationFactory);
+//            isConsistent = Consistency.of(newPerson);
+//            ++counter;
+//        }
+//        if(counter==10){
+//            System.out.println("not able to shift person " + randomP.getId().toString());
+//            return null;
+//        }
+//        
+//        return newPerson;
+//    }
 
+    
+    
 }

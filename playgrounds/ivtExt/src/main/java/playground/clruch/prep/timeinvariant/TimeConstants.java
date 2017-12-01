@@ -6,12 +6,12 @@ package playground.clruch.prep.timeinvariant;
 import java.util.Random;
 
 /** @author Claudio Ruch */
-public enum Constants {
+public enum TimeConstants {
     ;
 
     // TODO Magic consts
     private static double TIME_MIN = 0.0;
-    private static double TIME_MAX = 108000.0;
+    private static double TIME_MAX = 105000.0;
     private static double dayLenght = TIME_MAX - TIME_MIN;
 
     private static int randomSeed = 12345;

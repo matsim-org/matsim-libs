@@ -23,19 +23,19 @@ public enum TimeInvariantPopulationUtils {
 
     /** @return random time during daylength */
     /* package */ public static double getRandomDayTime() {        
-        return Constants.nextDouble() * Constants.getDayLength();
+        return TimeConstants.nextDouble() * TimeConstants.getDayLength();
     }
     
     /** @return random time during daylength */
     /* package */ public static double getRandomDayTimeShift() {       
-        double sign = Constants.nextDouble() > 0.5? 1.0 : -1.0;
+        double sign = TimeConstants.nextDouble() > 0.5? 1.0 : -1.0;
         return getRandomDayTime()*sign;
     }
 
     /** @param people
      * @return random {@link Person} from the map */
     /* package */ static Person getRandomPerson(Map<Id<Person>, ? extends Person> people) {
-        int el = Constants.nextInt(people.size());
+        int el = TimeConstants.nextInt(people.size());
         return people.values().stream().collect(Collectors.toList()).get(el);
     }
 

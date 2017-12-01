@@ -45,12 +45,10 @@ public enum Consistency {
 
         if (startTime != Double.NEGATIVE_INFINITY && !isInDay(startTime)) {
             isConsistent = false;
-            System.out.println("act start time: " + act.getStartTime());
         }
 
         if (endTime != Double.NEGATIVE_INFINITY && !isInDay(endTime)) {
             isConsistent = false;
-            System.out.println("act end time: " + act.getEndTime());
         }
 
         return isConsistent;
@@ -61,12 +59,11 @@ public enum Consistency {
         double depTime = leg.getDepartureTime();
         if (isInDay(depTime)) {
             isConsistent = false;
-            System.out.println("leg dep time: " + leg.getDepartureTime());
         }
         return isConsistent;
     }
 
-    private static boolean isInDay(double time) {
-        return (time >= Constants.getMinTime() && time <= Constants.getMaxTime());
+    public static boolean isInDay(double time) {
+        return (time >= TimeConstants.getMinTime() && time <= TimeConstants.getMaxTime());
     }
 }

@@ -34,8 +34,8 @@ public enum CountLegs {
                     if (planEl instanceof Leg) {
                         Leg leg = (Leg) planEl;
                         double depTime = leg.getDepartureTime();
-                        GlobalAssert.that(depTime >= Constants.getMinTime());
-                        GlobalAssert.that(depTime <= Constants.getMaxTime());
+                        GlobalAssert.that(depTime >= TimeConstants.getMinTime());
+                        GlobalAssert.that(depTime <= TimeConstants.getMaxTime());
 
                         if (interval.contains(new double[] { depTime })) {
                             ++legCount;
