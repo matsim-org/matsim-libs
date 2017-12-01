@@ -1,3 +1,12 @@
+# Status: Somehow, a stage does not seem to pick up the result of the
+# previous stage.  For example, even after "mvn package", it attempts to
+# download matsim snapshots from the internet.  My next attempt would now be along the lines of
+#
+# mvn -o -f ~/git/matsim/pom.xml --projects contribs/otfvis --also-make install -DskipTests
+# mvn -o -f ~/git/matsim/contribs/otfvis/pom.xml exec:java -Dexec.mainClass="org.matsim.contrib.otfvis.OTFVis" -Dexec.vmargs="-Xmx2000m" -Dexec.args="$*"
+#
+# Well, since the commit of this note will trigger another build, I am giving it a first shot, see below. kai
+
 language: java
 jdk: oraclejdk8
 addons:
@@ -17,18 +26,18 @@ install: true
 # in stage called "test".  kai, dec'17
 
 # define the order of the stages:
-stages:
-  - package
-  - test
+# stages:
+#   - package
+#   - test
 
 # this is the script run in the "test" stage:
-script: cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+script: mvn install --also-make --projects ${MODULE} -DskipTests && cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
 
 # this defines all other stages.
-jobs:
-  include:
-    - stage: package
-      script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+# jobs:
+#   include:
+#     - stage: package
+#       script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
 
 cache:
   directories:
