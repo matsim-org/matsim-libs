@@ -3,7 +3,6 @@
  */
 package playground.clruch.prep.timeinvariant;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -21,16 +20,7 @@ import ch.ethz.idsc.queuey.util.GlobalAssert;
 public enum TimeInvariantPopulationUtils {
     ;
 
-    /** @return random time during daylength */
-    /* package */ public static double getRandomDayTime() {        
-        return TimeConstants.nextDouble() * TimeConstants.getDayLength();
-    }
-    
-    /** @return random time during daylength */
-    /* package */ public static double getRandomDayTimeShift() {       
-        double sign = TimeConstants.nextDouble() > 0.5? 1.0 : -1.0;
-        return getRandomDayTime()*sign;
-    }
+
 
     /** @param people
      * @return random {@link Person} from the map */

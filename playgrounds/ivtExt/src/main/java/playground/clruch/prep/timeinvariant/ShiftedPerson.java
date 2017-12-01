@@ -11,13 +11,16 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
+
 /** @author Claudio Ruch */
 public enum ShiftedPerson {
     ;
 
     public static Person of(Person oldPerson, Id<Person> newID, PopulationFactory populationFactory) {
         Person newPerson = populationFactory.createPerson(newID);
-        double[] minMax = MinMaxTime.of(oldPerson);
+        Interval minMax = MinMaxTime.of(oldPerson);
         Double timediff = validTimeShiftFor(minMax);
         if (timediff == null)
             return null;
@@ -52,33 +55,22 @@ public enum ShiftedPerson {
         return newPerson;
     }
 
-    public static void printPerson(Person person) {
-        for (Plan plan : person.getPlans()) {
-            for (PlanElement planElement : plan.getPlanElements()) {
-                if (planElement instanceof Leg) {
-                    Leg leg = (Leg) planElement;
-                }
-                if (planElement instanceof Activity) {
-                    Activity act = (Activity) planElement;
-                }
-            }
-        }
-    }
-
-    private static double validTimeShiftFor(double[] minMax) {
-        Double timeShift = null;
+    public static Double validTimeShiftFor(Interval minMax) {
         boolean timeShiftOk = false;
         int counter = 0;
-        while (counter < 40 && !timeShiftOk) {
+        while (counter < 1000 && !timeShiftOk) {
             counter++;
-            double timeDiff = TimeInvariantPopulationUtils.getRandomDayTimeShift();
-            boolean okTop = minMax[1] + timeDiff < TimeConstants.getMaxTime();
-            boolean okBottom = minMax[0] - timeDiff > TimeConstants.getMinTime();
-            timeShiftOk = okTop && okBottom;
-            if (timeShiftOk)
-                timeShift = timeDiff;
+            double timeDiff = TimeConstants.getRandomDayTimeShift();
 
+            Tensor lbNew = minMax.getLb().add(Tensors.vector(timeDiff));
+            Tensor ubNew = minMax.getUb().add(Tensors.vector(timeDiff));
+
+            Interval iNew = new Interval(lbNew, ubNew);
+
+            if (TimeConstants.getDayInterval().contains(iNew)) {
+                return timeDiff;
+            }
         }
-        return timeShift;
+        return null;
     }
 }

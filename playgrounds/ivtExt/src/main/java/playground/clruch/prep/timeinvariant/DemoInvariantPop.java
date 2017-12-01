@@ -16,6 +16,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.prep.PopulationTools;
 import playground.clruch.prep.TheApocalypse;
 
@@ -28,12 +30,14 @@ public class DemoInvariantPop {
      * @param args
      * @throws IOException */
     public static void main(String[] args) throws IOException {
-        final Interval interval = new Interval(new double[] { 27900.0, 27900.0 + 3600.0 });
+        Tensor start = Tensors.vector(27900.0);
+        Tensor end = Tensors.vector(27900.0 + 3600.0);
+        final Interval interval = new Interval(start, end);
         final String POPULATIONUPDATEDNAME = "populationMorning";
 
         // demo
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        File configFile = new File(workingDirectory,"astra_config_fullBeforeMorning.xml");
+        File configFile = new File(workingDirectory, "astra_config_fullBeforeMorning.xml");
         GlobalAssert.that(configFile.exists());
         Config config = ConfigUtils.loadConfig(configFile.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -41,7 +45,8 @@ public class DemoInvariantPop {
 
         System.out.println(population.getPersons().size());
         PopulationTools.changeModesOfTransportToAV(population);
-        Population populationInvariant = TimeInvariantPopulation.from(interval, population,config,scenario.getNetwork());
+        TheApocalypse.decimatesThe(population).toNoMoreThan(20000);
+        Population populationInvariant = TimeInvariantPopulation.from(interval, population, config, scenario.getNetwork());
         System.out.println(population.getPersons().size());
 
         // write the modified population to file

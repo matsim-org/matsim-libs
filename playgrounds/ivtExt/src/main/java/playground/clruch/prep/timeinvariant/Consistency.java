@@ -9,11 +9,18 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 
+import ch.ethz.idsc.tensor.Tensors;
+
 /** @author Claudio Ruch */
 public enum Consistency {
     ;
 
-    static boolean of(Person person) {
+    /**
+     * 
+     * @param person
+     * @return true if all timestamps of person are within the specified day
+     */
+    /* package */static boolean of(Person person) {
         if (person == null)
             return false;
         boolean isOk = true;
@@ -44,10 +51,12 @@ public enum Consistency {
         double endTime = act.getEndTime();
 
         if (startTime != Double.NEGATIVE_INFINITY && !isInDay(startTime)) {
+            System.out.println("startTime = " + startTime);
             isConsistent = false;
         }
 
         if (endTime != Double.NEGATIVE_INFINITY && !isInDay(endTime)) {
+            System.out.println("endTime = " + endTime);
             isConsistent = false;
         }
 
@@ -57,13 +66,14 @@ public enum Consistency {
     private static boolean of(Leg leg) {
         boolean isConsistent = true;
         double depTime = leg.getDepartureTime();
-        if (isInDay(depTime)) {
+        if (!isInDay(depTime)) {
+            System.out.println("depTime = " + depTime);
             isConsistent = false;
         }
         return isConsistent;
     }
 
     public static boolean isInDay(double time) {
-        return (time >= TimeConstants.getMinTime() && time <= TimeConstants.getMaxTime());
+        return TimeConstants.getDayInterval().contains(Tensors.vector(time));
     }
 }

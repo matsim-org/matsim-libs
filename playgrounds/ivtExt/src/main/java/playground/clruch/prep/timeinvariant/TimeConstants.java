@@ -5,6 +5,8 @@ package playground.clruch.prep.timeinvariant;
 
 import java.util.Random;
 
+import ch.ethz.idsc.tensor.Tensors;
+
 /** @author Claudio Ruch */
 public enum TimeConstants {
     ;
@@ -29,12 +31,20 @@ public enum TimeConstants {
         return rand.nextDouble();
     }
 
-    /* package */ static double getMaxTime() {
-        return TIME_MAX;
+ 
+    /* package */ static Interval getDayInterval() {
+        return new Interval(Tensors.vector(TIME_MIN), Tensors.vector(TIME_MAX));
     }
 
-    /* package */ static double getMinTime() {
-        return TIME_MIN;
+    
+    /** @return random time during daylength */
+    /* package */ public static double getRandomDayTime() {        
+        return TimeConstants.nextDouble() * TimeConstants.getDayLength();
     }
-
+    
+    /** @return random time during daylength */
+    /* package */ public static double getRandomDayTimeShift() {       
+        double sign = TimeConstants.nextDouble() > 0.5? 1.0 : -1.0;
+        return getRandomDayTime()*sign;
+    }
 }

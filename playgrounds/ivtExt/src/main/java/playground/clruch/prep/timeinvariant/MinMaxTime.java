@@ -3,8 +3,6 @@
  */
 package playground.clruch.prep.timeinvariant;
 
-import java.util.Objects;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -12,33 +10,35 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 
 /** @author Claudio Ruch */
 public enum MinMaxTime {
     ;
 
-    public static double[] of(Person person) {
+    public static Interval of(Person person) {
 
-        double[] minMax = new double[] { Double.MAX_VALUE, Double.MIN_VALUE };
+        Interval minMax = new Interval(Tensors.vector(Double.MAX_VALUE), Tensors.vector(Double.MIN_VALUE));
 
         for (Plan plan : person.getPlans()) {
             for (PlanElement pE : plan.getPlanElements()) {
                 if (pE instanceof Activity) {
                     Activity act = (Activity) pE;
-                    double[] minMaxA = MinMaxTime.of(act);
-                    minMax = MinMaxTime.of(minMax, minMaxA);
+                    Interval minMaxA = MinMaxTime.of(act);
+                    minMax = IntervalWrap.of(minMax, minMaxA);
                 }
                 if (pE instanceof Leg) {
                     Leg leg = (Leg) pE;
-                    double[] minMaxL = MinMaxTime.of(leg);
-                    minMax = MinMaxTime.of(minMax, minMaxL);
+                    Interval minMaxL = MinMaxTime.of(leg);
+                    minMax = IntervalWrap.of(minMax, minMaxL);
                 }
             }
         }
         return minMax;
     }
 
-    public static double[] of(Activity activity) {
+    public static Interval of(Activity activity) {
         double staTime = activity.getStartTime();
         double endTime = activity.getEndTime();
 
@@ -47,27 +47,20 @@ public enum MinMaxTime {
 
         if (staTimeDefined && endTimeDefined) {
             GlobalAssert.that(staTime <= endTime);
-            return new double[] { staTime, endTime };
+            return new Interval(Tensors.vector(staTime), Tensors.vector(endTime));
         }
         if (staTimeDefined && !endTimeDefined) {
-            return new double[] { staTime, staTime };
+            return new Interval(Tensors.vector(staTime), Tensors.vector(staTime));
         }
         if (!staTimeDefined && endTimeDefined) {
-            return new double[] { endTime, endTime };
+            return new Interval(Tensors.vector(endTime), Tensors.vector(endTime));
         }
         return null;
     }
 
-    public static double[] of(Leg leg) {
-        double depTime = leg.getDepartureTime();
-        return new double[] { depTime, depTime };
+    public static Interval of(Leg leg) {
+        Tensor depTime = Tensors.vector(leg.getDepartureTime());
+        return new Interval(depTime, depTime);
     }
 
-    public static double[] of(double[] minMax, double[] i2) {
-        if (Objects.isNull(i2))
-            return minMax;
-        double min = minMax[0] <= i2[0] ? minMax[0] : i2[0];
-        double max = minMax[1] >= i2[1] ? minMax[1] : i2[1];
-        return new double[] { min, max };
-    }
 }
