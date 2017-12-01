@@ -22,7 +22,7 @@ package org.matsim.contrib.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.Assert;
+
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -40,6 +40,9 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
+
+import junit.framework.Assert;
+import roadTypeMapping.VisumHbefaRoadTypeMapping;
 
 
 /**
@@ -76,12 +79,12 @@ public class TestWarmEmissionAnalysisModule {
 	
 	private final int numberOfWarmPollutants= WarmPollutant.values().length;
 	private final String hbefaRoadCategory = "URB";
-//    private final String roadType = "0";
+    private final String roadType = "0";
 	private final int leaveTime = 0;
 	private boolean excep =false;
 	private final String passengercar= "PASSENGER_CAR";
 
-//    private VisumHbefaRoadTypeMapping roadTypeMapping;
+    private VisumHbefaRoadTypeMapping roadTypeMapping;
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
     private WarmEmissionAnalysisModule weam;
@@ -152,9 +155,9 @@ public class TestWarmEmissionAnalysisModule {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
-		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, null, ecg);
+		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, null, ecg);
 		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
-		weamp = new WarmEmissionAnalysisModuleParameter(null, detailedHbefaWarmTable, ecg);
+		weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, null, detailedHbefaWarmTable, ecg);
 		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
 	}
 	
@@ -182,7 +185,7 @@ public class TestWarmEmissionAnalysisModule {
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(vehicleTypeId));
 
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, /*roadType*/hbefaRoadCategory, petrolSpeedFf/3.6, linkLength, linkLength/petrolSpeedFf*3.6);
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, petrolSpeedFf/3.6, linkLength, linkLength/petrolSpeedFf*3.6);
 		Assert.assertEquals(detailedPetrolFactorFf*linkLength/1000., warmEmissions.get(WarmPollutant.CO2_TOTAL), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		
@@ -205,14 +208,14 @@ public class TestWarmEmissionAnalysisModule {
 		Vehicle pcVehicle = vehFac.createVehicle(pcVehicleId, vehFac.createVehicleType(pcVehicleTypeId));
 		
 		// sub case avg speed = free flow speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, /*roadType*/hbefaRoadCategory, pcfreeVelocity/3.6, pclinkLength, pclinkLength/pcfreeVelocity*3.6);
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, roadType, pcfreeVelocity/3.6, pclinkLength, pclinkLength/pcfreeVelocity*3.6);
 		Assert.assertEquals(avgPcFactorFf*pclinkLength/1000., warmEmissions.get(WarmPollutant.NMHC), MatsimTestUtils.EPSILON);
 		weam.throwWarmEmissionEvent(leaveTime, pcLinkId, pcVehicleId, warmEmissions);
 		Assert.assertEquals(numberOfWarmPollutants*avgPcFactorFf*pclinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset(); warmEmissions.clear();
 
 		// sub case avg speed = stop go speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, /*roadType*/hbefaRoadCategory, pcfreeVelocity/3.6, pclinkLength, pclinkLength/pcsgVelocity*3.6);
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, roadType, pcfreeVelocity/3.6, pclinkLength, pclinkLength/pcsgVelocity*3.6);
 		Assert.assertEquals(avgPcFactorSg*pclinkLength/1000., warmEmissions.get(WarmPollutant.NMHC), MatsimTestUtils.EPSILON);
 		weam.throwWarmEmissionEvent(leaveTime, pcLinkId, pcVehicleId, warmEmissions);
 		Assert.assertEquals(numberOfWarmPollutants*avgPcFactorSg*pclinkLength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
@@ -234,7 +237,7 @@ public class TestWarmEmissionAnalysisModule {
 		Vehicle dieselVehicle = vehFac.createVehicle(dieselVehicleId, vehFac.createVehicleType(dieselVehicleTypeId));
 		
 		// sub case avg speed = free flow speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, /*roadType*/hbefaRoadCategory, dieselFreeVelocity/3.6, dieselLinkLength, dieselLinkLength/dieselFreeVelocity*3.6);
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, roadType, dieselFreeVelocity/3.6, dieselLinkLength, dieselLinkLength/dieselFreeVelocity*3.6);
 		Assert.assertEquals(avgDieselFactorFf*dieselLinkLength/1000., warmEmissions.get(WarmPollutant.PM), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		weam.throwWarmEmissionEvent(leaveTime, dieselLinkId, dieselVehicleId, warmEmissions);
@@ -242,7 +245,7 @@ public class TestWarmEmissionAnalysisModule {
 		HandlerToTestEmissionAnalysisModules.reset(); warmEmissions.clear();
 
 		// sub case avg speed = stop go speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, /*roadType*/hbefaRoadCategory, dieselFreeVelocity/3.6, dieselLinkLength, dieselLinkLength/dieselSgVelocity*3.6);
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, roadType, dieselFreeVelocity/3.6, dieselLinkLength, dieselLinkLength/dieselSgVelocity*3.6);
 		Assert.assertEquals(avgDieselFactorSg*dieselLinkLength/1000., warmEmissions.get(WarmPollutant.PM), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		weam.throwWarmEmissionEvent(leaveTime, dieselLinkId, dieselVehicleId, warmEmissions);
@@ -265,7 +268,7 @@ public class TestWarmEmissionAnalysisModule {
 		Vehicle lpgVehicle = vehFac.createVehicle(lpgVehicleId, vehFac.createVehicleType(lpgVehicleTypeId));
 		
 		// sub case avg speed = free flow speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, /*roadType*/hbefaRoadCategory, lpgFreeVelocity/3.6, lpgLinkLength, lpgLinkLength/lpgFreeVelocity*3.6);
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, roadType, lpgFreeVelocity/3.6, lpgLinkLength, lpgLinkLength/lpgFreeVelocity*3.6);
 		Assert.assertEquals(avgLpgFactorFf*lpgLinkLength/1000., warmEmissions.get(WarmPollutant.PM), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		weam.throwWarmEmissionEvent(leaveTime, lpgLinkId, lpgVehicleId, warmEmissions);
@@ -273,7 +276,7 @@ public class TestWarmEmissionAnalysisModule {
 		HandlerToTestEmissionAnalysisModules.reset(); warmEmissions.clear();
 
 		// sub case avg speed = stop go speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, /*roadType*/hbefaRoadCategory, lpgFreeVelocity/3.6, lpgLinkLength, lpgLinkLength/lpgSgVelocity*3.6);
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(lpgVehicle, roadType, lpgFreeVelocity/3.6, lpgLinkLength, lpgLinkLength/lpgSgVelocity*3.6);
 		Assert.assertEquals(avgLpgFactorSg*lpgLinkLength/1000., warmEmissions.get(WarmPollutant.PM), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		weam.throwWarmEmissionEvent(leaveTime, lpgLinkId, lpgVehicleId, warmEmissions);
@@ -295,7 +298,7 @@ public class TestWarmEmissionAnalysisModule {
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle zeroVehicle = vehFac.createVehicle(zeroVehicleId, vehFac.createVehicleType(zeroVehicleTypeId));
 		
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(zeroVehicle, /*roadType*/hbefaRoadCategory, zeroFreeVelocity/3.6, zeroLinklength, 2*zeroLinklength/(zeroFreeVelocity+zeroSgVelocity)*3.6);
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(zeroVehicle, roadType, zeroFreeVelocity/3.6, zeroLinklength, 2*zeroLinklength/(zeroFreeVelocity+zeroSgVelocity)*3.6);
 		Assert.assertEquals(detailedZeroFactorFf*zeroLinklength/1000., warmEmissions.get(WarmPollutant.PM), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset();
 		
@@ -319,7 +322,7 @@ public class TestWarmEmissionAnalysisModule {
 		//avg>ff
 		boolean exceptionThrown = false;
 		try{
-			warmEmissions= weam.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, /*roadType*/hbefaRoadCategory, sgffDetailedFfSpeed/3.6, sgffLinklength, .5*sgffLinklength/sgffDetailedFfSpeed*3.6);
+			warmEmissions= weam.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, roadType, sgffDetailedFfSpeed/3.6, sgffLinklength, .5*sgffLinklength/sgffDetailedFfSpeed*3.6);
 		}
 		catch(RuntimeException re){
 			exceptionThrown = true;
@@ -327,10 +330,10 @@ public class TestWarmEmissionAnalysisModule {
 		Assert.assertTrue("An average speed higher than the free flow speed should throw a runtime exception",exceptionThrown);
 		//Assert.assertEquals(detailedSgffFactorFf*sgffLinklength/1000., warmEmissions.get(WarmPollutant.NO2), MatsimTestUtils.EPSILON);
 		//avg=ff=sg -> use ff factors
-		warmEmissions= weam.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, /*roadType*/hbefaRoadCategory, sgffDetailedFfSpeed/3.6, sgffLinklength, sgffLinklength/sgffDetailedFfSpeed*3.6);
+		warmEmissions= weam.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, roadType, sgffDetailedFfSpeed/3.6, sgffLinklength, sgffLinklength/sgffDetailedFfSpeed*3.6);
 		Assert.assertEquals(detailedSgffFactorFf*sgffLinklength/1000., warmEmissions.get(WarmPollutant.NO2), MatsimTestUtils.EPSILON);
 		//avg<sg -> use sg factors 
-		warmEmissions= weam.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, /*roadType*/hbefaRoadCategory, sgffDetailedFfSpeed/3.6, sgffLinklength, 2*sgffLinklength/sgffDetailedFfSpeed*3.6);
+		warmEmissions= weam.checkVehicleInfoAndCalculateWarmEmissions(sgffVehicle, roadType, sgffDetailedFfSpeed/3.6, sgffLinklength, 2*sgffLinklength/sgffDetailedFfSpeed*3.6);
 		Assert.assertEquals(detailedSgffFactorSg*sgffLinklength/1000., warmEmissions.get(WarmPollutant.NO2), MatsimTestUtils.EPSILON);
 	}
 	
@@ -352,7 +355,7 @@ public class TestWarmEmissionAnalysisModule {
 		excep= false;
 		try{
 			Map<WarmPollutant, Double> warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions
-					(noeVehicle, /*roadType*/hbefaRoadCategory, noeFreeSpeed, 22., 1.5*22./noeFreeSpeed);
+					(noeVehicle, roadType, noeFreeSpeed, 22., 1.5*22./noeFreeSpeed);
 			weam.throwWarmEmissionEvent(10., noeLinkId, noeVehicleId, warmEmissions);
 		}catch(Exception e){
 			excep = true;
@@ -376,7 +379,7 @@ public class TestWarmEmissionAnalysisModule {
 		excep= false;
 		try{
 			Map<WarmPollutant, Double> warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions
-					(noeVehicle, /*roadType*/hbefaRoadCategory, noeFreeSpeed, 22., 1.5*22./noeFreeSpeed);
+					(noeVehicle, roadType, noeFreeSpeed, 22., 1.5*22./noeFreeSpeed);
 			weam.throwWarmEmissionEvent(10., noeLinkId, noeVehicleId, warmEmissions);
 		}catch(Exception e){
 			excep = true;
@@ -399,7 +402,7 @@ public class TestWarmEmissionAnalysisModule {
 		excep= false;
 		try{
 			Map<WarmPollutant, Double> warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions
-					(noeVehicle, /*roadType*/hbefaRoadCategory, noeFreeSpeed, 22., 1.5*22./noeFreeSpeed);
+					(noeVehicle, roadType, noeFreeSpeed, 22., 1.5*22./noeFreeSpeed);
 			weam.throwWarmEmissionEvent(10., noeLinkId, noeVehicleId, warmEmissions);
 		}catch(Exception e){
 			excep = true;
@@ -421,7 +424,7 @@ public class TestWarmEmissionAnalysisModule {
 		excep= false;
 		try{
 			Map<WarmPollutant, Double> warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions
-					(noeVehicle, /*roadType*/hbefaRoadCategory, noeFreeSpeed, 22., 1.5*22./noeFreeSpeed);
+					(noeVehicle, roadType, noeFreeSpeed, 22., 1.5*22./noeFreeSpeed);
 			weam.throwWarmEmissionEvent(10., noeLinkId, noeVehicleId, warmEmissions);
 		}catch(Exception e){
 			excep = true;
@@ -448,7 +451,7 @@ public class TestWarmEmissionAnalysisModule {
 		
 		// <stop&go speed
 		Double travelTime = linkLength/petrolSpeedSg*1.2; 
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, /*roadType*/hbefaRoadCategory, petrolSpeedFf/3.6,
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, petrolSpeedFf/3.6, 
 				linkLength, travelTime*3.6);
 		Assert.assertEquals(0, weam.getFractionOccurences(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(0., weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
@@ -460,7 +463,7 @@ public class TestWarmEmissionAnalysisModule {
 		weam.reset();
 		
 		// = s&g speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, /*roadType*/hbefaRoadCategory, petrolSpeedFf/3.6,
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, petrolSpeedFf/3.6, 
 				linkLength, linkLength/petrolSpeedSg*3.6);
 		Assert.assertEquals(0, weam.getFractionOccurences());
 		Assert.assertEquals(0., weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
@@ -474,7 +477,7 @@ public class TestWarmEmissionAnalysisModule {
 		// > s&g speed, <ff speed
 		// speed in km/h
 		travelTime = .5 * linkLength/petrolSpeedFf *3.6 + .5* (linkLength/petrolSpeedSg)*3.6; //540 seconds
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, /*roadType*/hbefaRoadCategory, petrolSpeedFf/3.6,
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, petrolSpeedFf/3.6, 
 				linkLength, travelTime);
 		Assert.assertEquals(1, weam.getFractionOccurences());
 		Assert.assertEquals(1., weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
@@ -488,7 +491,7 @@ public class TestWarmEmissionAnalysisModule {
 		weam.reset();
 		
 		// = ff speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, /*roadType*/hbefaRoadCategory, petrolSpeedFf/3.6,
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, petrolSpeedFf/3.6, 
 				linkLength, linkLength/petrolSpeedFf*3.6);
 		Assert.assertEquals(0, weam.getFractionOccurences());
 		Assert.assertEquals(linkLength/1000, weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
@@ -502,7 +505,7 @@ public class TestWarmEmissionAnalysisModule {
 		//> ff speed
 		boolean exceptionThrown = false;
 		try{
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, /*roadType*/hbefaRoadCategory, petrolSpeedFf/3.6,
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, petrolSpeedFf/3.6, 
 				linkLength, 0.4*linkLength/petrolSpeedFf*3.6);
 		}catch(RuntimeException re){
 			exceptionThrown = true;
@@ -526,7 +529,7 @@ public class TestWarmEmissionAnalysisModule {
 		Vehicle vehicle = vehFac.createVehicle(vehicleId, vehFac.createVehicleType(lpgVehicleTypeId));
 
 		// sub case: current speed equals free flow speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, /*roadType*/hbefaRoadCategory, lpgFreeVelocity/3.6,
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, lpgFreeVelocity/3.6, 
 				lpgLinkLength, lpgLinkLength/lpgFreeVelocity*3.6);
 		Assert.assertEquals(0, weam.getFractionOccurences());
 		Assert.assertEquals(lpgLinkLength/1000, weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
@@ -538,7 +541,7 @@ public class TestWarmEmissionAnalysisModule {
 		weam.reset();
 		
 		// sub case: current speed equals free flow speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, /*roadType*/hbefaRoadCategory, lpgFreeVelocity/3.6,
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, lpgFreeVelocity/3.6, 
 				lpgLinkLength, lpgLinkLength/lpgSgVelocity*3.6);
 		Assert.assertEquals(0, weam.getFractionOccurences());
 		Assert.assertEquals(0., weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
@@ -563,7 +566,7 @@ public class TestWarmEmissionAnalysisModule {
 		Vehicle pcVehicle = vehFac.createVehicle(pcVehicleId, vehFac.createVehicleType(pcVehicleTypeId));
 		
 		// sub case: current speed equals free flow speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, /*roadType*/hbefaRoadCategory, pcfreeVelocity/3.6, pclinkLength, pclinkLength/pcfreeVelocity*3.6);
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, roadType, pcfreeVelocity/3.6, pclinkLength, pclinkLength/pcfreeVelocity*3.6);
 		Assert.assertEquals(0, weam.getFractionOccurences());
 		Assert.assertEquals(pclinkLength/1000, weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, weam.getFreeFlowOccurences());
@@ -574,7 +577,7 @@ public class TestWarmEmissionAnalysisModule {
 		weam.reset();
 		
 		// sub case: current speed equals stop go speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, /*roadType*/hbefaRoadCategory, pcfreeVelocity/3.6, pclinkLength, pclinkLength/pcsgVelocity*3.6);
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcVehicle, roadType, pcfreeVelocity/3.6, pclinkLength, pclinkLength/pcsgVelocity*3.6);
 		Assert.assertEquals(0, weam.getFractionOccurences());
 		Assert.assertEquals(0., weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(0, weam.getFreeFlowOccurences());
@@ -599,7 +602,7 @@ public class TestWarmEmissionAnalysisModule {
 	Vehicle dieselVehicle = vehFac.createVehicle(dieselVehicleId, vehFac.createVehicleType(dieselVehicleTypeId));
 	
 	// sub case: current speed equals free flow speed
-	warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, /*roadType*/hbefaRoadCategory, dieselFreeVelocity/3.6, dieselLinkLength, dieselLinkLength/dieselFreeVelocity*3.6);
+	warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, roadType, dieselFreeVelocity/3.6, dieselLinkLength, dieselLinkLength/dieselFreeVelocity*3.6);
 	Assert.assertEquals(0, weam.getFractionOccurences());
 	Assert.assertEquals(dieselLinkLength/1000., weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
 	Assert.assertEquals(1, weam.getFreeFlowOccurences());
@@ -610,7 +613,7 @@ public class TestWarmEmissionAnalysisModule {
 	weam.reset();
 	
 	// sub case: current speed equals stop go speed
-	warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, /*roadType*/hbefaRoadCategory, dieselFreeVelocity/3.6, dieselLinkLength, dieselLinkLength/dieselSgVelocity*3.6);
+	warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselVehicle, roadType, dieselFreeVelocity/3.6, dieselLinkLength, dieselLinkLength/dieselSgVelocity*3.6);
 	Assert.assertEquals(0, weam.getFractionOccurences());
 	Assert.assertEquals(0., weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
 	Assert.assertEquals(0, weam.getFreeFlowOccurences());
@@ -636,7 +639,7 @@ public class TestWarmEmissionAnalysisModule {
 		Vehicle inconffVehicle = vehFac.createVehicle(inconffVehicleId, vehFac.createVehicleType(inconffVehicleTypeId));
 
 		// average speed equals free flow speed from table
-		warmEmissions =weam.checkVehicleInfoAndCalculateWarmEmissions(inconffVehicle, /*roadType*/hbefaRoadCategory, inconffavgSpeed/3.6, inconff, inconff/petrolSpeedFf*3.6);
+		warmEmissions =weam.checkVehicleInfoAndCalculateWarmEmissions(inconffVehicle, roadType, inconffavgSpeed/3.6, inconff, inconff/petrolSpeedFf*3.6);
 		Assert.assertEquals(1, weam.getFractionOccurences());
 		Assert.assertEquals(0, weam.getFreeFlowOccurences());
 		Assert.assertEquals(inconff/1000, weam.getKmCounter(), MatsimTestUtils.EPSILON);
@@ -645,14 +648,14 @@ public class TestWarmEmissionAnalysisModule {
 		weam.reset();
 		
 		// average speed equals wrong free flow speed
-		warmEmissions =weam.checkVehicleInfoAndCalculateWarmEmissions(inconffVehicle, /*roadType*/hbefaRoadCategory, inconffavgSpeed/3.6, inconff, inconff/inconffavgSpeed*3.6);
+		warmEmissions =weam.checkVehicleInfoAndCalculateWarmEmissions(inconffVehicle, roadType, inconffavgSpeed/3.6, inconff, inconff/inconffavgSpeed*3.6);
 		Assert.assertEquals(0, weam.getFractionOccurences());
 		Assert.assertEquals(1, weam.getFreeFlowOccurences());
 		Assert.assertEquals(inconff/1000, weam.getKmCounter(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(0, weam.getStopGoOccurences());
 		Assert.assertEquals(1, weam.getWarmEmissionEventCounter());
 		
-		warmEmissions =weam.checkVehicleInfoAndCalculateWarmEmissions(inconffVehicle, /*roadType*/hbefaRoadCategory, inconffavgSpeed/3.6, inconff, 2*inconff/(petrolSpeedFf+petrolSpeedSg)*3.6);
+		warmEmissions =weam.checkVehicleInfoAndCalculateWarmEmissions(inconffVehicle, roadType, inconffavgSpeed/3.6, inconff, 2*inconff/(petrolSpeedFf+petrolSpeedSg)*3.6);
 	}
 	
 	@Test
@@ -669,7 +672,7 @@ public class TestWarmEmissionAnalysisModule {
 
 		// ff < avg < ff+1 - handled like free flow
 		Double travelTime =  tableLinkLength/(tableffSpeed+0.5)*3.6;
-		weam.checkVehicleInfoAndCalculateWarmEmissions(tableVehicle, /*roadType*/hbefaRoadCategory, tableffSpeed/3.6, tableLinkLength, travelTime);
+		weam.checkVehicleInfoAndCalculateWarmEmissions(tableVehicle, roadType, tableffSpeed/3.6, tableLinkLength, travelTime);
 		Assert.assertEquals(0, weam.getFractionOccurences());
 		Assert.assertEquals(tableLinkLength/1000., weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, weam.getFreeFlowOccurences());
@@ -681,7 +684,7 @@ public class TestWarmEmissionAnalysisModule {
 		
 		// ff < sg < avg - handled like free flow as well - no additional test needed
 		// avg < ff < sg - handled like stop go 
-		weam.checkVehicleInfoAndCalculateWarmEmissions(tableVehicle, /*roadType*/hbefaRoadCategory, tableffSpeed/3.6, tableLinkLength, 2* tableLinkLength/(tableffSpeed)*3.6);
+		weam.checkVehicleInfoAndCalculateWarmEmissions(tableVehicle, roadType, tableffSpeed/3.6, tableLinkLength, 2* tableLinkLength/(tableffSpeed)*3.6);
 		Assert.assertEquals(0, weam.getFractionOccurences());
 		Assert.assertEquals(0., weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(0, weam.getFreeFlowOccurences());
@@ -710,25 +713,25 @@ public class TestWarmEmissionAnalysisModule {
 
 		weam.reset();
 		Assert.assertEquals(0, weam.getFractionOccurences());
-		Assert.assertEquals(0., weam.getFreeFlowKmCounter(), 1e-7);
+		Assert.assertEquals(0., weam.getFreeFlowKmCounter());
 		Assert.assertEquals(0, weam.getFreeFlowOccurences());
-		Assert.assertEquals(0., weam.getKmCounter(), 1e-7);
-		Assert.assertEquals(0., weam.getStopGoKmCounter(), 1e-7);
+		Assert.assertEquals(0., weam.getKmCounter());
+		Assert.assertEquals(0., weam.getStopGoKmCounter());
 		Assert.assertEquals(0, weam.getStopGoOccurences());
 		Assert.assertEquals(0, weam.getWarmEmissionEventCounter());
 	
 		// < s&g speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, /*roadType*/hbefaRoadCategory, petrolSpeedFf/3.6,
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, petrolSpeedFf/3.6, 
 				linkLength, travelTime*3.6);
 		// = s&g speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, /*roadType*/hbefaRoadCategory, petrolSpeedFf/3.6,
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, petrolSpeedFf/3.6, 
 				linkLength, linkLength/petrolSpeedSg*3.6);
 		// > s&g speed, <ff speed
 		travelTime = .5 * linkLength/petrolSpeedFf *3.6 + .5* (linkLength/petrolSpeedSg)*3.6; //540 seconds
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, /*roadType*/hbefaRoadCategory, petrolSpeedFf/3.6,
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, petrolSpeedFf/3.6, 
 				linkLength, travelTime);
 		// = ff speed
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, /*roadType*/hbefaRoadCategory, petrolSpeedFf/3.6,
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicle, roadType, petrolSpeedFf/3.6, 
 				linkLength, linkLength/petrolSpeedFf*3.6);
 		//> ff speed - has been tested to throw runtime exceptions
 	}
@@ -740,10 +743,10 @@ public class TestWarmEmissionAnalysisModule {
 		// setup ----
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
-//		VisumHbefaRoadTypeMapping roadTypeMapping = VisumHbefaRoadTypeMapping.emptyMapping();
+		VisumHbefaRoadTypeMapping roadTypeMapping = VisumHbefaRoadTypeMapping.emptyMapping();
 		fillAverageTable(avgHbefaWarmTable);
 		fillDetailedTable(detailedHbefaWarmTable);
-//		fillRoadTypeMapping(roadTypeMapping);
+		fillRoadTypeMapping(roadTypeMapping);
 		Map<WarmPollutant, Double> warmEmissions;
 		
 		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
@@ -753,7 +756,7 @@ public class TestWarmEmissionAnalysisModule {
 		EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
-		WarmEmissionAnalysisModuleParameter weamParameter = new WarmEmissionAnalysisModuleParameter(avgHbefaWarmTable, detailedHbefaWarmTable, ecg);
+		WarmEmissionAnalysisModuleParameter weamParameter = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg);
 		WarmEmissionAnalysisModule weam = new WarmEmissionAnalysisModule(weamParameter , emissionEventManager, rescaleF);
 		HandlerToTestEmissionAnalysisModules.reset();
 		// ---- end of setup
@@ -765,7 +768,7 @@ public class TestWarmEmissionAnalysisModule {
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
 		Vehicle vehicleForAvgTable = vehFac.createVehicle(vehicleIdForAvgTable, vehFac.createVehicleType(dieselVehicleTypeId));
 		
-		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicleForAvgTable, /*roadType*/hbefaRoadCategory, dieselFreeVelocity/3.6, 1000., 1000./dieselFreeVelocity*3.6);
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(vehicleForAvgTable, roadType, dieselFreeVelocity/3.6, 1000., 1000./dieselFreeVelocity*3.6);
 		weam.throwWarmEmissionEvent(10, idForAvgTable, vehicleIdForAvgTable, warmEmissions);
 		
 		int numberOfWarmEmissions = WarmPollutant.values().length;
@@ -779,11 +782,11 @@ public class TestWarmEmissionAnalysisModule {
 	}
 	
 	private void setUp() {
-//		roadTypeMapping = new VisumHbefaRoadTypeMapping();
+		roadTypeMapping = new VisumHbefaRoadTypeMapping();
 		avgHbefaWarmTable = new HashMap<>();
 		detailedHbefaWarmTable = new HashMap<>();
 		
-//		fillRoadTypeMapping(roadTypeMapping);
+		fillRoadTypeMapping(roadTypeMapping);
 		fillAverageTable(avgHbefaWarmTable);
 		fillDetailedTable(detailedHbefaWarmTable);
 
@@ -791,8 +794,7 @@ public class TestWarmEmissionAnalysisModule {
         EmissionsConfigGroup ecg = new EmissionsConfigGroup();
 		ecg.setUsingVehicleTypeIdAsVehicleDescription(true);
 
-		WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(
-				avgHbefaWarmTable, detailedHbefaWarmTable, ecg);
+		WarmEmissionAnalysisModuleParameter warmEmissionParameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg);
 		weam = new WarmEmissionAnalysisModule(warmEmissionParameterObject, emissionEventManager, null);
 	}
 	
@@ -1213,10 +1215,10 @@ public class TestWarmEmissionAnalysisModule {
 		
 	}
 
-//	private void fillRoadTypeMapping(VisumHbefaRoadTypeMapping roadTypeMapping) {
-//		roadTypeMapping.put("0", hbefaRoadCategory);
-//
-//	}
+	private void fillRoadTypeMapping(VisumHbefaRoadTypeMapping roadTypeMapping) {
+		roadTypeMapping.put("0", hbefaRoadCategory);
+		
+	}
 
 }
 	

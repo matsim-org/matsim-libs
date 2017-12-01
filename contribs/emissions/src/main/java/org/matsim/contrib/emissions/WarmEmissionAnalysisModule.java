@@ -23,12 +23,12 @@ package org.matsim.contrib.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.emissions.events.WarmEmissionEvent;
-import org.matsim.contrib.emissions.types.HbefaRoadTypeMapping;
 import org.matsim.contrib.emissions.types.HbefaTrafficSituation;
 import org.matsim.contrib.emissions.types.HbefaVehicleAttributes;
 import org.matsim.contrib.emissions.types.HbefaVehicleCategory;
@@ -41,6 +41,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+import roadTypeMapping.HbefaRoadTypeMapping;
 
 
 /**
@@ -50,7 +51,7 @@ import org.matsim.vehicles.Vehicle;
 public class WarmEmissionAnalysisModule {
 	private static final Logger logger = Logger.getLogger(WarmEmissionAnalysisModule.class);
 
-//	private final HbefaRoadTypeMapping roadTypeMapping;
+	private final HbefaRoadTypeMapping roadTypeMapping;
 
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 	private final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
@@ -77,24 +78,24 @@ public class WarmEmissionAnalysisModule {
 
 	public static class WarmEmissionAnalysisModuleParameter {
 
-//		public final HbefaRoadTypeMapping roadTypeMapping;
+		public final HbefaRoadTypeMapping roadTypeMapping;
 		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 		public final Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
 		private final EmissionsConfigGroup ecg;
 
 		public WarmEmissionAnalysisModuleParameter(
-//				HbefaRoadTypeMapping roadTypeMapping,
+				HbefaRoadTypeMapping roadTypeMapping,
 				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable,
 				Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable, EmissionsConfigGroup emissionsConfigGroup) {
-//			this.roadTypeMapping = roadTypeMapping;
+			this.roadTypeMapping = roadTypeMapping;
 			this.avgHbefaWarmTable = avgHbefaWarmTable;
 			this.detailedHbefaWarmTable = detailedHbefaWarmTable;
 			this.ecg = emissionsConfigGroup;
 			// check if all needed tables are non-null
-//			if(roadTypeMapping == null){
-//				 logger.error("Road type mapping not set. Aborting...");
-//				 System.exit(0);
-//			}
+			if(roadTypeMapping == null){
+				 logger.error("Road type mapping not set. Aborting...");
+				 System.exit(0);
+			}
 			if(avgHbefaWarmTable == null && detailedHbefaWarmTable == null){
 				 logger.error("Neither average nor detailed table vor Hbefa warm emissions set. Aborting...");
 				 System.exit(0);
@@ -114,7 +115,7 @@ public class WarmEmissionAnalysisModule {
 			logger.error("Event manager not set. Please check the configuration of your scenario. Aborting..." );
 			System.exit(0);
 		}
-//		this.roadTypeMapping = parameterObject.roadTypeMapping;
+		this.roadTypeMapping = parameterObject.roadTypeMapping;
 		this.avgHbefaWarmTable = parameterObject.avgHbefaWarmTable;
 		this.detailedHbefaWarmTable = parameterObject.detailedHbefaWarmTable;
 		this.eventsManager = emissionEventsManager;
@@ -209,12 +210,7 @@ public class WarmEmissionAnalysisModule {
 
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = new HashMap<>();
 
-		final String hbefaRoadTypeName ;
-//		if ( ecg.isUsingVehicleTypeIdAsVehicleDescription() ) {
-			hbefaRoadTypeName = roadType;
-//		} else {
-//			hbefaRoadTypeName = this.roadTypeMapping.get( roadType, freeVelocity );
-//		}
+		String hbefaRoadTypeName = this.roadTypeMapping.get(roadType, freeVelocity);
 
 		HbefaWarmEmissionFactorKey keyFreeFlow = new HbefaWarmEmissionFactorKey();
 		HbefaWarmEmissionFactorKey keyStopAndGo = new HbefaWarmEmissionFactorKey();
@@ -254,7 +250,7 @@ public class WarmEmissionAnalysisModule {
 		double freeFlowSpeed_kmh = freeVelocity * 3.6;
 		double averageSpeed_kmh = linkLength_km / travelTime_h;
 		
-//		double freeFlowSpeedFromTable_kmh;
+		double freeFlowSpeedFromTable_kmh;
 		double stopGoSpeedFromTable_kmh;
 		double efFreeFlow_gpkm;
 		double efStopGo_gpkm;
@@ -266,20 +262,18 @@ public class WarmEmissionAnalysisModule {
 			keyStopAndGo.setHbefaComponent(warmPollutant);
 			
 			if(this.detailedHbefaWarmTable != null){
-//				logger.warn("keyFreeFlow=" + keyFreeFlow ) ;
-//				logger.warn("keyStopAndGo=" + keyStopAndGo ) ;
 				if(this.detailedHbefaWarmTable.get(keyFreeFlow) != null && this.detailedHbefaWarmTable.get(keyStopAndGo) != null){
 					stopGoSpeedFromTable_kmh = this.detailedHbefaWarmTable.get(keyStopAndGo).getSpeed();
 					efFreeFlow_gpkm = this.detailedHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 					efStopGo_gpkm = this.detailedHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
-//					freeFlowSpeedFromTable_kmh = this.detailedHbefaWarmTable.get(keyFreeFlow).getSpeed();
+					freeFlowSpeedFromTable_kmh = this.detailedHbefaWarmTable.get(keyFreeFlow).getSpeed();
 
 				} else {
 					vehAttributesNotSpecifiedCnt++;
 					stopGoSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 					efFreeFlow_gpkm = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 					efStopGo_gpkm = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
-//					freeFlowSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
+					freeFlowSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
 
                     int maxWarnCnt = 3;
                     if(vehAttributesNotSpecifiedCnt <= maxWarnCnt) {
@@ -293,7 +287,7 @@ public class WarmEmissionAnalysisModule {
 				stopGoSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 				efFreeFlow_gpkm = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 				efStopGo_gpkm = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
-//				freeFlowSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
+				freeFlowSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
 //				vehAttributesNotSpecified.add(personId);
 			}
 			
