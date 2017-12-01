@@ -9,7 +9,7 @@ jobs:
     - stage: package
       script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
     - stage: integration tests
-      script: mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+      script: cd matsim && mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
 env:
   global:
     - MAVEN_OPTS="-Xmx2g"
