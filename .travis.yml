@@ -5,6 +5,10 @@ addons:
     packages:
       - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
 
+# This skips the mvn install that is otherwise run
+# https://docs.travis-ci.com/user/customizing-the-build/#Skipping-the-Installation-Step
+install: true
+
 
 # For the following, see
 # https://blog.travis-ci.com/2017-09-12-build-stages-order-and-conditions.
