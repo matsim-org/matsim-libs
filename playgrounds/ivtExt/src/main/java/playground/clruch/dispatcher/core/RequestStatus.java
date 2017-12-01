@@ -1,3 +1,4 @@
+// code by andya
 package playground.clruch.dispatcher.core;
 
 /** @author Andreas Aumiller */

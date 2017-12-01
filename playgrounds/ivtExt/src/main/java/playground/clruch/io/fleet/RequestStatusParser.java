@@ -1,3 +1,4 @@
+// code by andya
 package playground.clruch.io.fleet;
 
 import java.util.Map.Entry;
@@ -6,6 +7,7 @@ import java.util.Objects;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RequestStatus;
 
+/** @author Andreas Aumiller */
 public enum RequestStatusParser {
     ;
 

@@ -39,6 +39,7 @@ public class PopulationCreator {
         Config configFile = ConfigUtils.loadConfig(simOptions.getSimulationConfigName());
         System.out.println(simOptions.getSimulationConfigName());
         File outputDirectory = new File(configFile.controler().getOutputDirectory());
+        // File outputDirectory = outputSubDirectory.getParentFile();
         // File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
         System.out.println("INFO getting all output folders from: " + outputDirectory.getAbsolutePath());
         outputFolders = MultiFileTools.getAllDirectoriesSorted(outputDirectory);
@@ -79,5 +80,6 @@ public class PopulationCreator {
 
         // extract the created .gz file
         GZHandler.extract(populationGzFile, populationFile);
+        System.out.println("INFO successfully created population");
     }
 }

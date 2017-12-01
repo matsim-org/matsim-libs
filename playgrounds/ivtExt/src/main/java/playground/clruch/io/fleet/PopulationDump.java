@@ -36,6 +36,7 @@ enum PopulationDump {
             System.out.println("INFO initializing factories and properties");
             PopulationFactory populationFactory = population.getFactory();
             int id = 0;
+            final int TRAVEL_TIME = 3600;
             for (IterationFolder iter : list) {
                 storageSupplier = iter.storageSupplier;
                 final int MAX_ITER = storageSupplier.size(); // storageSupplier.size()
@@ -55,13 +56,17 @@ enum PopulationDump {
                             OsmLink toLink = db.getOsmLink(request.toLinkIndex);
 
                             Activity startActivity = populationFactory.createActivityFromLinkId("activitiy", fromLink.link.getId());
+                            startActivity.setEndTime(request.submissionTime);
                             Activity endActivity = populationFactory.createActivityFromLinkId("activitiy", toLink.link.getId());
+                            endActivity.setStartTime(request.submissionTime + TRAVEL_TIME);
                             Leg leg = populationFactory.createLeg("av");
                             RouteFactory rf = new GenericRouteFactory();
                             Route route = rf.createRoute(fromLink.link.getId(), toLink.link.getId());
+                            route.setTravelTime(TRAVEL_TIME);
                             leg.setDepartureTime(request.submissionTime);
                             // leg.setTravelTime(200);
                             leg.setRoute(route);
+                            leg.setTravelTime(TRAVEL_TIME);
 
                             // Add person to the population
                             if (id % 100 == 0)
