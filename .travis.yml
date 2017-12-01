@@ -4,15 +4,28 @@ addons:
   apt:
     packages:
       - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
+
+
+# For the following, see
+# https://blog.travis-ci.com/2017-09-12-build-stages-order-and-conditions.
+# Note that you cannot get rid of the "test" stage, and it is the only
+# stage that does get matrix-expanded.  So the IT tests need to be run
+# in stage called "test", and that is the end to it.  kai, dec'17
+
+# define the order of the stages:
 stages:
   - package
   - test
+
+# this is the script run in the "test" stage:
+script: cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+
+# this defines all other stages.  The test stage is defined by the script above!
 jobs:
   include:
     - stage: package
       script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
-    - stage: test
-      script: cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+
 cache:
   directories:
   - $HOME/.m2
