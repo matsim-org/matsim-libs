@@ -4,68 +4,122 @@ addons:
   apt:
     packages:
       - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
-
-
-# For the following, see
-# https://blog.travis-ci.com/2017-09-12-build-stages-order-and-conditions.
-# Note that you cannot get rid of the "test" stage, and it is the only
-# stage that does get matrix-expanded.  So the IT tests need to be run
-# in stage called "test", and that is the end to it.  kai, dec'17
-
-# define the order of the stages:
-stages:
-  - package
-  - test
-
-# this is the script run in the "test" stage:
-script: cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
-
-# this defines all other stages.  The test stage is defined by the script above!
 jobs:
   include:
-    - stage: package
+    - stage: mvn package
       script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
-
-cache:
-  directories:
-  - $HOME/.m2
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/matsim              && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/accessibility       && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/av                  && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/analysis            && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/cadytsIntegration   && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/carsharing          && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/drt                 && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/dvrp                && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/taxi                && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/emissions           && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/freight             && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/signals             && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/locationchoice      && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/matsim4urbansim     && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/minibus             && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/networkEditor       && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/otfvis              && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/matrixbasedptrouter && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/parking             && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/socnetsim           && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/socnetgen           && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/transEnergySim      && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/roadpricing         && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/opdytsIntegration   && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/multimodal          && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/integration         && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/wagonSim            && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/pseudosimulation    && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/common              && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/eventsBasedPTRouter && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/travelsummary       && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/deprecated          && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/protobuf            && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/hybridsim           && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/noise               && ${MVN_IT_CMD} 
+    - stage:
+      script: 
+        cd ${TRAVIS_BUILD_DIR}/contribs/bicycle             && ${MVN_IT_CMD} 
 env:
   global:
     - MAVEN_OPTS="-Xmx2g"
-  matrix:
-    - MODULE=matsim                        
-    - MODULE=contribs/accessibility        
-    - MODULE=contribs/av                   
-    - MODULE=contribs/analysis             
-    - MODULE=contribs/cadytsIntegration    
-    - MODULE=contribs/carsharing           
-    - MODULE=contribs/drt                  
-    - MODULE=contribs/dvrp                 
-    - MODULE=contribs/taxi                 
-    - MODULE=contribs/emissions            
-    - MODULE=contribs/freight              
-    - MODULE=contribs/signals              
-    - MODULE=contribs/locationchoice       
-    - MODULE=contribs/matsim4urbansim      
-    - MODULE=contribs/minibus              
-    - MODULE=contribs/networkEditor        
-    - MODULE=contribs/otfvis               
-    - MODULE=contribs/matrixbasedptrouter  
-    - MODULE=contribs/parking              
-    - MODULE=contribs/socnetsim            
-    - MODULE=contribs/socnetgen            
-    - MODULE=contribs/transEnergySim       
-    - MODULE=contribs/roadpricing          
-    - MODULE=contribs/opdytsIntegration    
-    - MODULE=contribs/multimodal           
-    - MODULE=contribs/integration          
-    - MODULE=contribs/wagonSim             
-    - MODULE=contribs/pseudosimulation     
-    - MODULE=contribs/common               
-    - MODULE=contribs/eventsBasedPTRouter  
-    - MODULE=contribs/travelsummary        
-    - MODULE=contribs/deprecated           
-    - MODULE=contribs/protobuf             
-    - MODULE=contribs/hybridsim            
-    - MODULE=contribs/noise                
-    - MODULE=contribs/bicycle              
+    - MVN_IT_CMD="mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end"
+cache:
+  directories:
+  - $HOME/.m2
