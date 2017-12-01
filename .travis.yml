@@ -6,13 +6,50 @@ addons:
       - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
 jobs:
   include:
-    - stage: package
+    - stage: mvn package
       script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
     - stage: integration tests
-      script: cd matsim && mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+      script: 
+        cd matsim              && ${MVN_IT_CMD} 
+        cd accessibility       && ${MVN_IT_CMD} 
+        cd av                  && ${MVN_IT_CMD} 
+        cd analysis            && ${MVN_IT_CMD} 
+        cd cadytsIntegration   && ${MVN_IT_CMD} 
+        cd carsharing          && ${MVN_IT_CMD} 
+        cd drt                 && ${MVN_IT_CMD} 
+        cd dvrp                && ${MVN_IT_CMD} 
+        cd taxi                && ${MVN_IT_CMD} 
+        cd emissions           && ${MVN_IT_CMD} 
+        cd freight             && ${MVN_IT_CMD} 
+        cd signals             && ${MVN_IT_CMD} 
+        cd locationchoice      && ${MVN_IT_CMD} 
+        cd matsim4urbansim     && ${MVN_IT_CMD} 
+        cd minibus             && ${MVN_IT_CMD} 
+        cd networkEditor       && ${MVN_IT_CMD} 
+        cd otfvis              && ${MVN_IT_CMD} 
+        cd matrixbasedptrouter && ${MVN_IT_CMD} 
+        cd parking             && ${MVN_IT_CMD} 
+        cd socnetsim           && ${MVN_IT_CMD} 
+        cd socnetgen           && ${MVN_IT_CMD} 
+        cd transEnergySim      && ${MVN_IT_CMD} 
+        cd roadpricing         && ${MVN_IT_CMD} 
+        cd opdytsIntegration   && ${MVN_IT_CMD} 
+        cd multimodal          && ${MVN_IT_CMD} 
+        cd integration         && ${MVN_IT_CMD} 
+        cd wagonSim            && ${MVN_IT_CMD} 
+        cd pseudosimulation    && ${MVN_IT_CMD} 
+        cd common              && ${MVN_IT_CMD} 
+        cd eventsBasedPTRouter && ${MVN_IT_CMD} 
+        cd travelsummary       && ${MVN_IT_CMD} 
+        cd deprecated          && ${MVN_IT_CMD} 
+        cd protobuf            && ${MVN_IT_CMD} 
+        cd hybridsim           && ${MVN_IT_CMD} 
+        cd noise               && ${MVN_IT_CMD} 
+        cd bicycle             && ${MVN_IT_CMD} 
 env:
   global:
     - MAVEN_OPTS="-Xmx2g"
+    - MVN_IT_CMD="mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end"
 cache:
   directories:
   - $HOME/.m2
