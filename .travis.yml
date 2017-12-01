@@ -4,11 +4,14 @@ addons:
   apt:
     packages:
       - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
+stages:
+  - package
+  - integration-tests
 jobs:
   include:
     - stage: package
       script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
-    - stage: test
+    - stage: integration-tests
       script: cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
 cache:
   directories:
