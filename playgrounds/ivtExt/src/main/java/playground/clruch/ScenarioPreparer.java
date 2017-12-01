@@ -67,6 +67,7 @@ public class ScenarioPreparer {
         fullConfig.plans().setInputFile(scenOptions.getPreparedPopulationName() + ".xml.gz");
         AVConfigGroup avConfigGroup = new AVConfigGroup();
         fullConfig.addModule(avConfigGroup);
+        
 
         // save under correct name
         new ConfigWriter(fullConfig).writeFileV2(scenOptions.getSimulationConfigName());
