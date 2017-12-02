@@ -46,7 +46,7 @@ public final class EditTrips {
 	private Scenario scenario;
 
 	public EditTrips( TripRouter tripRouter, Scenario scenario ) {
-		log.setLevel(Level.DEBUG);
+//		log.setLevel(Level.DEBUG);
 		this.tripRouter = tripRouter;
 		this.scenario = scenario;
 		this.pf = scenario.getPopulation().getFactory() ;
@@ -73,8 +73,8 @@ public final class EditTrips {
 		return findTripAtPlanElement( agent, WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements().get(index) ) ;
 	}
 	// current trip:
-	public final boolean replanCurrentTrip(MobsimAgent agent, double now ) {
-		log.debug("entering replanCurrentTrip") ;
+	public final boolean replanCurrentTrip(MobsimAgent agent, double now, String routingMode ) {
+		log.debug("entering replanCurrentTrip with routingMode=" + routingMode) ;
 
 		// I will treat that in the way that it will make the trip consistent with the activities.  So if the activity in the
 		// plan has changed, the trip will go to a new location.
@@ -85,24 +85,24 @@ public final class EditTrips {
 		final PlanElement currentPlanElement = WithinDayAgentUtils.getCurrentPlanElement(agent) ;
 		final List<PlanElement> tripElements = trip.getTripElements();
 		int tripElementsIndex = tripElements.indexOf( currentPlanElement ) ;
-		final String currentMode = tripRouter.getMainModeIdentifier().identifyMainMode( tripElements ) ;
+//		final String currentMode = tripRouter.getMainModeIdentifier().identifyMainMode( tripElements ) ;
 
 		if ( currentPlanElement instanceof Activity ) {
 			// we are on a stage activity.  Take it from there:
-			replanCurrentTripFromStageActivity(tripElements, tripElementsIndex, agent);
+			replanCurrentTripFromStageActivity(tripElements, tripElementsIndex, agent, routingMode);
 		} else {
 			// we are on a leg
-			replanCurrentTripFromLeg(trip.getDestinationActivity(), currentPlanElement, currentMode, now, agent, scenario);
+			replanCurrentTripFromLeg(trip.getDestinationActivity(), currentPlanElement, routingMode, now, agent, scenario);
 		}
 		WithinDayAgentUtils.resetCaches(agent);
 		return true ;
 	}
-	private void replanCurrentTripFromLeg(Activity newAct, final PlanElement currentPlanElement, final String currentMode, 
+	private void replanCurrentTripFromLeg(Activity newAct, final PlanElement currentPlanElement, final String routingMode,
 			double now, MobsimAgent agent, Scenario scenario) {
 		log.debug("entering replanCurrentTripFromLeg");
 		Leg currentLeg = (Leg) currentPlanElement ;
 		if ( currentLeg.getRoute() instanceof NetworkRoute ) {
-			replanCurrentLegWithNetworkRoute(newAct, currentMode, currentLeg, now, agent);
+			replanCurrentLegWithNetworkRoute(newAct, routingMode, currentLeg, now, agent);
 		} else {
 			throw new ReplanningException("not implemented") ;
 			// Does not feel so hard: 
@@ -155,9 +155,9 @@ public final class EditTrips {
 	}
 	// replan from stage activity:
 	private void replanCurrentTripFromStageActivity(final List<PlanElement> tripElements, int tripElementsIndex, 
-			MobsimAgent agent) {
+			MobsimAgent agent, String mainMode) {
 
-		String mainMode = tripRouter.getMainModeIdentifier().identifyMainMode(tripElements) ;
+//		String mainMode = tripRouter.getMainModeIdentifier().identifyMainMode(tripElements) ;
 		// yyyy I wonder what this will do if we are already at the egress stage.  kai, oct'17
 		
 		List<PlanElement> subTripPlanElements = tripElements.subList(tripElementsIndex,tripElements.size()-1) ;
@@ -190,8 +190,8 @@ public final class EditTrips {
 		double departureTime = PlanRouter.calcEndOfActivity( trip.getOriginActivity(), plan, tripRouter.getConfig() ) ;
 		return replanFutureTrip( trip, plan, mainMode, departureTime ) ;
 	}
-	public final boolean replanFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime) {
-		return replanFutureTrip(trip, plan, mainMode, departureTime, tripRouter);
+	public final boolean replanFutureTrip(Trip trip, Plan plan, String routingMode, double departureTime) {
+		return replanFutureTrip(trip, plan, routingMode, departureTime, tripRouter);
 	}
 
 	// utility methods (plans splicing):
@@ -222,9 +222,11 @@ public final class EditTrips {
 		WithinDayAgentUtils.resetCaches(agent);
 	}
 	private static void pruneUpToCurrentLeg(Leg currentLeg, List<? extends PlanElement> newTrip) {
-		while ( newTrip.get(0) instanceof Leg && !((Leg)newTrip.get(0)).getMode().equals( currentLeg.getMode()) ) {
-			newTrip.remove(0) ;
-		}
+//		while ( newTrip.get(0) instanceof Leg && !((Leg)newTrip.get(0)).getMode().equals( currentLeg.getMode()) ) {
+//			newTrip.remove(0) ;
+//		}
+		// yyyyyy do nothing for time being and hope for the best.
+		log.warn("yyyyyy pruneUpToCurrentLeg needs to be fixed.") ;
 	}
 
 	// static methods:
@@ -233,13 +235,13 @@ public final class EditTrips {
 	 * by a new one. This is e.g. necessary when replacing a pt trip which might consists of multiple legs
 	 * and pt_interaction activities.  
 	 */
-	public static boolean replanFutureTrip(Trip trip, Plan plan, String mainMode, double departureTime, TripRouter tripRouter) {
+	public static boolean replanFutureTrip(Trip trip, Plan plan, String routingMode, double departureTime, TripRouter tripRouter) {
 		Person person = plan.getPerson();
 
 		Facility<?> fromFacility = new ActivityWrapperFacility( trip.getOriginActivity() ) ;
 		Facility<?> toFacility = new ActivityWrapperFacility( trip.getDestinationActivity() ) ;
 
-		final List<? extends PlanElement> newTrip = tripRouter.calcRoute(mainMode, fromFacility, toFacility, departureTime, person);
+		final List<? extends PlanElement> newTrip = tripRouter.calcRoute(routingMode, fromFacility, toFacility, departureTime, person);
 		
 		log.debug("new trip:" + newTrip ) ;
 		for ( PlanElement pe : newTrip ) {

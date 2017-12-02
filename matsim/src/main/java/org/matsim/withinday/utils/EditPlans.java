@@ -39,8 +39,8 @@ public final class EditPlans {
 	//	public void setAllowedLinks(AllowedLinks allowedLinks) {
 	//	}
 	// ---
-	public boolean addActivityAtEnd(MobsimAgent agent, Activity activity, String mode) {
-		log.debug("entering addActivityAtEnd") ;
+	public boolean addActivityAtEnd(MobsimAgent agent, Activity activity, String routingMode) {
+		log.debug("entering addActivityAtEnd with routingMode=" + routingMode) ;
 		Link link = mobsim.getScenario().getNetwork().getLinks().get(Id.createLinkId(51825));;
 		log.debug( "link 51825 free speed=" + link.getFreespeed( mobsim.getSimTimer().getTimeOfDay()) );
 
@@ -48,14 +48,16 @@ public final class EditPlans {
 		List<PlanElement> planElements = plan.getPlanElements();
 		
 		boolean retVal1 = false;
+		
 		if (isAtRealActivity(agent)) {
-			retVal1 = planElements.add(pf.createLeg(mode));
+			retVal1 = planElements.add(pf.createLeg(routingMode));
 		}
+		
 		final boolean retVal = planElements.add(activity);
+		// (need the terminating activity in order to find the current trip. kai, nov'17)
 		
 		if (!isAtRealActivity(agent)) {
-			retVal1 = editTrips.replanCurrentTrip(agent,mobsim.getSimTimer().getTimeOfDay());
-			// (need to terminating activity in order to find the current trip. kai, nov'17)
+			retVal1 = editTrips.replanCurrentTrip(agent,mobsim.getSimTimer().getTimeOfDay(),routingMode);
 		}
 		
 		
@@ -82,7 +84,7 @@ public final class EditPlans {
 		}
 		PlanElement pe = planElements.remove(index) ; 
 		if ( checkIfTripHasAlreadyStarted( agent, tripBefore.getTripElements() ) ) {
-			editTrips.replanCurrentTrip(agent, mobsim.getSimTimer().getTimeOfDay() );
+			editTrips.replanCurrentTrip(agent, mobsim.getSimTimer().getTimeOfDay() , mode);
 		} else {
 			editTrips.insertEmptyTrip(plan, tripBefore.getOriginActivity(), tripAfter.getDestinationActivity(), mode ) ;
 		}
@@ -133,7 +135,7 @@ public final class EditPlans {
 			if ( checkIfTripHasAlreadyStarted(agent, currentTripElements) ) {
 				// trip has already started
 				checkIfSameMode(upstreamMode, currentMode);
-				this.editTrips.replanCurrentTrip(agent, this.mobsim.getSimTimer().getTimeOfDay() );
+				this.editTrips.replanCurrentTrip(agent, this.mobsim.getSimTimer().getTimeOfDay(), currentMode );
 			} else {
 				// trip has not yet started
 				if ( upstreamMode == null ) {
@@ -169,7 +171,7 @@ public final class EditPlans {
 			if ( actBefore != null ) {
 				if ( EditPlans.indexOfPlanElement(agent, actBefore) < WithinDayAgentUtils.getCurrentPlanElementIndex(agent) ) {
 					// we are already under way
-					editTrips.replanCurrentTrip(agent, this.mobsim.getSimTimer().getTimeOfDay() );
+					editTrips.replanCurrentTrip(agent, this.mobsim.getSimTimer().getTimeOfDay(), upstreamMode );
 				} else {
 					// we are not yet under way; inserting empty trip:
 					EditTrips.insertEmptyTrip(plan, actBefore, activity, upstreamMode, pf ) ;
