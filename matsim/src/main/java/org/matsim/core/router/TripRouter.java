@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -101,6 +102,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 	@Inject
 	TripRouter(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier,
 			Config config ) {
+		log.setLevel(Level.DEBUG);
 		for (Map.Entry<String, Provider<RoutingModule>> entry : routingModules.entrySet()) {
 			setRoutingModule(entry.getKey(), entry.getValue().get());
 		}
@@ -210,6 +212,8 @@ public final class TripRouter implements MatsimExtensionPoint {
 		Gbl.assertNotNull( toFacility );
 		
 		RoutingModule module = routingModules.get( mainMode );
+		
+		log.debug( "mainMode=" + mainMode + ";\troutingModule=" + module ) ;
 		
 		if (module != null) {
 			final List<? extends PlanElement> trip =

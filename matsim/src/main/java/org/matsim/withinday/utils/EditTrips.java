@@ -240,6 +240,11 @@ public final class EditTrips {
 		Facility<?> toFacility = new ActivityWrapperFacility( trip.getDestinationActivity() ) ;
 
 		final List<? extends PlanElement> newTrip = tripRouter.calcRoute(mainMode, fromFacility, toFacility, departureTime, person);
+		
+		log.debug("new trip:" + newTrip ) ;
+		for ( PlanElement pe : newTrip ) {
+			log.debug( pe ) ;
+		}
 
 		TripRouter.insertTrip(plan, trip.getOriginActivity(), newTrip, trip.getDestinationActivity());
 
