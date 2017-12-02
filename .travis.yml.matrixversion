@@ -1,12 +1,3 @@
-# Status: Somehow, a stage does not seem to pick up the result of the
-# previous stage.  For example, even after "mvn package", it attempts to
-# download matsim snapshots from the internet.  My next attempt would now be along the lines of
-#
-# mvn -o -f ~/git/matsim/pom.xml --projects contribs/otfvis --also-make install -DskipTests
-# mvn -o -f ~/git/matsim/contribs/otfvis/pom.xml exec:java -Dexec.mainClass="org.matsim.contrib.otfvis.OTFVis" -Dexec.vmargs="-Xmx2000m" -Dexec.args="$*"
-#
-# Well, since the commit of this note will trigger another build, I am giving it a first shot, see below. kai
-
 language: java
 jdk: oraclejdk8
 addons:
@@ -14,16 +5,12 @@ addons:
     packages:
       - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
 
-# This skips the mvn install that is otherwise run
-# https://docs.travis-ci.com/user/customizing-the-build/#Skipping-the-Installation-Step
-install: true
-
 
 # For the following, see
 # https://blog.travis-ci.com/2017-09-12-build-stages-order-and-conditions.
 # Note that you cannot get rid of the "test" stage, and it is the only
 # stage that does get matrix-expanded.  So the IT tests need to be run
-# in stage called "test".  kai, dec'17
+# in stage called "test", and that is the end to it.  kai, dec'17
 
 # define the order of the stages:
 stages:
@@ -31,19 +18,13 @@ stages:
   - test
 
 # this is the script run in the "test" stage:
-script: mvn install --also-make --projects ${MODULE} -DskipTests && cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+script: cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
 
 # this defines all other stages.
 jobs:
   include:
     - stage: package
       script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
-
-# (would be nice to run this also in parallel with the others.  But it
-# is either the matrix thing and then exactly the same command for
-# each module.  Or hand-written entries (see .travis.yml.nomatrix),
-# which in particular has the disadvantage that one cannot see the
-# failing module at the travis toplevel.)
 
 cache:
   directories:
