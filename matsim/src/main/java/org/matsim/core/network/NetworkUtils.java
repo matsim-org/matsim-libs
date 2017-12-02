@@ -432,7 +432,8 @@ public final class NetworkUtils {
         Link nearestLink = null;
         Node nearestNode = NetworkUtils.getNearestNode((network),coord);
         if ( nearestNode == null ) {
-            log.warn("[nearestNode not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" + network) ;
+            log.warn("[nearestNode not found.  Will probably crash eventually. Maybe run NetworkCleaner?  " +
+							 "Also may mean that network for mode is not defined.]" + network) ;
             return null ;
         }
 

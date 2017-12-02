@@ -89,6 +89,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final Network network,
 			final LeastCostPathCalculator routeAlgo,
 			PlansCalcRouteConfigGroup calcRouteConfig) {
+		Gbl.assertNotNull(network);
+		Gbl.assertIf( network.getLinks().size()>0 ) ; // otherwise network for mode probably not defined
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.mode = mode;

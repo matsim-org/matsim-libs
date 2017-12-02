@@ -58,10 +58,12 @@ public final class NetworkRoutingModule implements RoutingModule {
 			final PopulationFactory populationFactory,
 			final Network network,
 			final LeastCostPathCalculator routeAlgo) {
-		this.network = network;
-		this.routeAlgo = routeAlgo;
-		this.mode = mode;
-		this.populationFactory = populationFactory;
+		 Gbl.assertNotNull(network);
+		 Gbl.assertIf( network.getLinks().size()>0 ) ; // otherwise network for mode probably not defined
+		 this.network = network;
+		 this.routeAlgo = routeAlgo;
+		 this.mode = mode;
+		 this.populationFactory = populationFactory;
 	}
 
 	@Override
