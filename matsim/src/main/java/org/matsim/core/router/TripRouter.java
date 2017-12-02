@@ -102,7 +102,6 @@ public final class TripRouter implements MatsimExtensionPoint {
 	@Inject
 	TripRouter(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier,
 			Config config ) {
-		log.setLevel(Level.DEBUG);
 		for (Map.Entry<String, Provider<RoutingModule>> entry : routingModules.entrySet()) {
 			setRoutingModule(entry.getKey(), entry.getValue().get());
 		}
@@ -212,8 +211,6 @@ public final class TripRouter implements MatsimExtensionPoint {
 		Gbl.assertNotNull( toFacility );
 		
 		RoutingModule module = routingModules.get( mainMode );
-		
-		log.debug( "mainMode=" + mainMode + ";\troutingModule=" + module ) ;
 		
 		if (module != null) {
 			final List<? extends PlanElement> trip =

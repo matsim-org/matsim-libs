@@ -39,14 +39,10 @@ public class FreeSpeedTravelTime implements TravelTime {
 	
 	@Inject
 	public FreeSpeedTravelTime() {
-		log.setLevel(Level.DEBUG);
 	}
 	
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		if ( link.getId().equals(Id.createLinkId( 51825) ) ) {
-			log.debug( "link 51825 speed=" + link.getFreespeed(time) );
-		}
 		return link.getLength() / link.getFreespeed(time);
 	}
 

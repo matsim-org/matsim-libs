@@ -208,7 +208,6 @@ public final class EditTrips {
 		
 		final List<Id<Link>> newLinksIds = newNWRoute.getLinkIds().subList(0,newNWRoute.getLinkIds().size()) ;
 		EditRoutes.spliceNewPathIntoOldRoute(currentRouteLinkIdIndex, newNWRoute.getEndLinkId(), oldNWRoute, oldNWRoute.getLinkIds(), newLinksIds) ;
-		// yyyyyy Christoph's method is one index off, I don't know why. yyyyyy
 		
 //		for (int ii = currentRouteLinkIdIndex; ii<oldNWRoute.getLinkIds().size() ; ii++ ) {
 //			oldNWRoute.getLinkIds().remove(ii) ;
