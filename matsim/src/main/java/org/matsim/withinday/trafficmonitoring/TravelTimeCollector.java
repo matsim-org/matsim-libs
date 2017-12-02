@@ -99,7 +99,8 @@ public class TravelTimeCollector implements TravelTime,
 	private final boolean filterModes;
 
 	private boolean problem = true ;
-
+	private int resetCnt = 0;
+	
 	@Inject
 	TravelTimeCollector(Scenario scenario) {
 		this(scenario, null);
@@ -180,18 +181,16 @@ public class TravelTimeCollector implements TravelTime,
 		return travelTime;
 	}
 	
-	private static int resetCnt = 0;
-
 	@Override
 	public void reset(int iteration) {
 		init();
-		if ( resetCnt >=1 ) {
+		resetCnt++ ;
+		if ( resetCnt >1 ) {
 			if ( problem ) {
 				throw new RuntimeException("using TravelTimeCollector, but mobsim notifications not called between two resets.  "
 						+ "Did you really add this as a mobsim listener?") ;
 			}
 		}
-		resetCnt++ ;
 	}
 
 	@Override
