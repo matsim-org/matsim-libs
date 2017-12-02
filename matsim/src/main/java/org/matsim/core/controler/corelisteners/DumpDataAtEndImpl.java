@@ -244,7 +244,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 	private void dumpNetworkChangeEvents() {
 		if (config.network().isTimeVariantNetwork()) {
 			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename("output_change_events.xml.gz"),
-					NetworkUtils.getNetworkChangeEvents(((Network) network)));
+					NetworkUtils.getNetworkChangeEvents(network));
 		}
 	}
 

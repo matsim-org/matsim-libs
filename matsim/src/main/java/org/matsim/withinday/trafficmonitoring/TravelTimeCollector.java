@@ -98,7 +98,7 @@ public class TravelTimeCollector implements TravelTime,
 	private final Set<String> analyzedModes;
 	private final boolean filterModes;
 
-	boolean problem = true ;
+	private boolean problem = true ;
 
 	@Inject
 	TravelTimeCollector(Scenario scenario) {
@@ -150,46 +150,48 @@ public class TravelTimeCollector implements TravelTime,
 		 * If the network is time variant, we have to update the link parameters
 		 * according to the network change events.
 		 */
-		if (this.network instanceof Network) {
-			Collection<NetworkChangeEvent> networkChangeEvents = NetworkUtils.getNetworkChangeEvents(((Network) this.network));
-			if (networkChangeEvents != null) {
-				for (NetworkChangeEvent networkChangeEvent : networkChangeEvents) {
-					ChangeValue freespeedChange = networkChangeEvent.getFreespeedChange();
-					if (freespeedChange != null) {
-						double startTime = networkChangeEvent.getStartTime();
-						Collection<Link> links = changedLinks.get(startTime);
-						if (links == null) {
-							links = new HashSet<>();
-							changedLinks.put(startTime, links);
-						}
-						links.addAll(networkChangeEvent.getLinks());
-					}
-				}				
+		Queue<NetworkChangeEvent> networkChangeEvents = NetworkUtils.getNetworkChangeEvents(this.network);
+		
+		// I just changed the return type of the network change events from Collection to Queue.
+		// This should, in a first step, allow to remove the separate changedLinks data structure.
+		// In a second step, this should allow to insert link change events after everything
+		// has started.  kai, dec'17
+		// Well, but maybe I don't even want this, and I want this class here recognize changes
+		// only when someone observes them??? (bushfire evacuation use case). kai, dec'17
+		
+		if (networkChangeEvents != null) {
+			for (NetworkChangeEvent networkChangeEvent : networkChangeEvents) {
+				ChangeValue freespeedChange = networkChangeEvent.getFreespeedChange();
+				if (freespeedChange != null) {
+					double startTime = networkChangeEvent.getStartTime();
+					Collection<Link> links = changedLinks.computeIfAbsent(startTime, k -> new HashSet<>());
+					links.addAll(networkChangeEvent.getLinks());
+				}
 			}
-		}		
+		}
 	}
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		final double travelTime = this.travelTimeInfoProvider.getTravelTimeData(link).travelTime;
+		final double travelTime = this.travelTimeInfoProvider.getTravelTimeInfo(link).travelTime;
 		if ( Id.createLinkId(51825).equals(link.getId())) {
 			log.debug( "link=" + link.getId() + ";\ttime=" + time + ";\tttime=" + travelTime ) ;
 		}
 		return travelTime;
 	}
+	
+	private static int resetCnt = 0;
 
 	@Override
 	public void reset(int iteration) {
 		init();
-		int resetCnt = 0;
 		if ( resetCnt >=1 ) {
-			// yyyy this can never be reached, or can it?  kai, may'17
 			if ( problem ) {
 				throw new RuntimeException("using TravelTimeCollector, but mobsim notifications not called between two resets.  "
 						+ "Did you really add this as a mobsim listener?") ;
-				// in practice, it seems to fail even earlier with some null pointer exception. kai, may'15
 			}
 		}
+		resetCnt++ ;
 	}
 
 	@Override
@@ -221,7 +223,7 @@ public class TravelTimeCollector implements TravelTime,
 
 			double tripTime = tripBin.leaveTime - tripBin.enterTime;
 
-			TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeData(linkId);
+			TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeInfo(linkId);
 			travelTimeInfo.tripBins.add(tripBin);
 			travelTimeInfo.addedTravelTimes += tripTime;
 			travelTimeInfo.addedTrips++;
@@ -286,7 +288,7 @@ public class TravelTimeCollector implements TravelTime,
 		for (Link link : this.network.getLinks().values()) {
 			double freeSpeedTravelTime = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
 
-			TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeData(link);
+			TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeInfo(link);
 			travelTimeInfo.travelTime = freeSpeedTravelTime;
 			travelTimeInfo.init(freeSpeedTravelTime);
 		}
@@ -300,7 +302,13 @@ public class TravelTimeCollector implements TravelTime,
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		problem = false ;
 		
+		// yyyy In terms of "bushfire evacuation" design (and maybe even in terms of more general transport telematics)
+		// one would need some settable TimeDependentNetworkUpdater class.  kai, dec'17
+		
 		Collection<Link> links = changedLinks.remove(e.getSimulationTime());
+		// yyyyyy I find it quite optimistic to do this with doubles. What
+		// if someone adds a link change event in between two integer
+		// time steps?  kai, dec'17
 		
 		if (links != null) {
 			for (Link link : links) {
@@ -310,7 +318,7 @@ public class TravelTimeCollector implements TravelTime,
 									  ";\tnetwork change event for link=" + link.getId() +
 									  ";\tnew ttime="+ freeSpeedTravelTime );
 				}
-				TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeData(link);
+				TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeInfo(link);
 				travelTimeInfo.init(freeSpeedTravelTime);
 				travelTimeInfo.checkActiveState();	// ensure that the estimated link travel time is updated
 			}

@@ -35,15 +35,15 @@ public class MapBasedTravelTimeInfoProvider implements TravelTimeInfoProvider {
 	}
 	
 	@Override 
-	public TravelTimeInfo getTravelTimeData(final Id<Link> linkId) {
+	public TravelTimeInfo getTravelTimeInfo(final Id<Link> linkId) {
 		TravelTimeInfo data = this.linkData.get(linkId);
 		return data;
 	}
 		
 	@Override
-	public TravelTimeInfo getTravelTimeData(Link link) {
+	public TravelTimeInfo getTravelTimeInfo(Link link) {
 		Id<Link> linkId = link.getId();
-		return this.getTravelTimeData(linkId);
+		return this.getTravelTimeInfo(linkId);
 	}
 	
 }

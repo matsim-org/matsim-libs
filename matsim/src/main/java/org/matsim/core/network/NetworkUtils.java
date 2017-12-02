@@ -20,14 +20,7 @@
 
 package org.matsim.core.network;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -734,7 +727,7 @@ public final class NetworkUtils {
 	}
 
 
-	public static Collection<NetworkChangeEvent> getNetworkChangeEvents( Network network ) {
+	public static Queue<NetworkChangeEvent> getNetworkChangeEvents(Network network ) {
 		if ( network instanceof TimeDependentNetwork ) {
 			return ((TimeDependentNetwork) network).getNetworkChangeEvents() ;
 		} else {
