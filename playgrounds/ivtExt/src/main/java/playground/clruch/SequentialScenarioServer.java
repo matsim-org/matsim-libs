@@ -6,6 +6,8 @@ package playground.clruch;
 import java.io.File;
 import java.net.MalformedURLException;
 
+import javax.measure.unit.SystemOfUnits;
+
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import playground.clruch.options.ScenarioOptions;
 
@@ -13,13 +15,14 @@ import playground.clruch.options.ScenarioOptions;
 public class SequentialScenarioServer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
+        long startT = System.currentTimeMillis();
         File workingDirectory = MultiFileTools.getWorkingDirectory();
         ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);
 
         /** Delete current content in outputfolder, DO NOT MODIFY THIS, POTENTIALLY VERY DANGEROUS. */
         SequentialScenarioTools.emptyOutputFolder(workingDirectory);
 
-        int iterations = 3;
+        int iterations = 13;
         if (iterations % 2 == 0) {
             iterations = iterations - 1;
         }
@@ -46,6 +49,7 @@ public class SequentialScenarioServer {
 
         }
 
+        System.out.println("duration: " +  (System.currentTimeMillis()-startT) + " milliseconds");
     }
 
 }
