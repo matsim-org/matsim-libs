@@ -93,7 +93,10 @@ public class AVTravelTimeTracker implements LinkEnterEventHandler, LinkLeaveEven
         if (travelTime == null) {
             return new LinkTravelTime();
         } else {
-            GlobalAssert.that(travelTime.travelTime >= 0.0);
+            if(travelTime.travelTime<0.0){
+                System.out.println("travelTime =" + travelTime.travelTime);
+                GlobalAssert.that(travelTime.travelTime >= 0.0);                
+            }
             return travelTime;
         }
     };

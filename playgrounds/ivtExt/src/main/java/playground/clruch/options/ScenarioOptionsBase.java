@@ -57,7 +57,6 @@ public enum ScenarioOptionsBase {
         returnP.setProperty(CALCPERFFLAGID, "true");
         returnP.setProperty(MINIMUMFLEETSIZEFILENAME, "minimumFleetSizeCalculator");
         returnP.setProperty(PERFORMANCEFLEETSIZEFILENAME, "performanceFleetSizeCalculator");
-        returnP.setProperty("centerNetwork", "false");
         returnP.setProperty(NETWORKUPDATEDNAMEIDENTIFIER, "networkPrepared");
         returnP.setProperty(POPULATIONUPDATEDNAMEIDENTIFIER, "populationPrepared");
         returnP.setProperty(NETWORKCUTTERIDENTIFIER, "NONE");

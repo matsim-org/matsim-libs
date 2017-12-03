@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.PopulationUtils;
 
 import ch.ethz.idsc.owly.data.GlobalAssert;
+import ch.ethz.idsc.tensor.Tensors;
 
 /** @author Claudio Ruch */
 public enum RemoveNonIntervalPlans {
@@ -44,7 +45,7 @@ public enum RemoveNonIntervalPlans {
                 if (planE2 instanceof Leg) {
                     Leg leg = (Leg) planE2;
                     double depTime = leg.getDepartureTime();
-                    if (interval.contains(new double[] { depTime })) {
+                    if (interval.contains(Tensors.vector(depTime))) {
                         GlobalAssert.that(planE3 instanceof Activity);
                         newPlan.addActivity((Activity) planE3);
 

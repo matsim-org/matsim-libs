@@ -26,11 +26,11 @@ public class AVConfigGroup extends ReflectiveConfigGroup {
 
 	@StringGetter(PARALLEL_ROUTERS)
 	public double getParallelRouters() {
-		return parallelRouters;
+		return (double) parallelRouters;
 	}
 
 	@StringSetter(PARALLEL_ROUTERS)
-	public void setParallelRouters(long parallelRouters) {
-		this.parallelRouters = parallelRouters;
+	public void setParallelRouters(double parallelRouters) {
+		this.parallelRouters = (long)parallelRouters;
 	}
 }

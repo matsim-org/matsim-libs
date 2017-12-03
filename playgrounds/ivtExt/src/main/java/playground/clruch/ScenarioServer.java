@@ -2,6 +2,7 @@ package playground.clruch;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.util.Objects;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -37,6 +38,7 @@ import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.options.ScenarioOptions;
+import playground.clruch.prep.acttype.IncludeActTypeOf;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
@@ -57,30 +59,30 @@ public class ScenarioServer {
         File workingDirectory = MultiFileTools.getWorkingDirectory();
         ScenarioOptions scenarioOptions = ScenarioOptions.load(workingDirectory);
         System.out.println("Start--------------------"); // added no
-        
-        /**
-         * set to true in order to make server wait for at least 1 client, for
-         * instance viewer client
-         */
+
+        /** set to true in order to make server wait for at least 1 client, for
+         * instance viewer client */
         boolean waitForClients = scenarioOptions.getBoolean("waitForClients");
         File configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
         ReferenceFrame referenceFrame = scenarioOptions.getReferenceFrame();
+        GlobalAssert.that(!Objects.isNull(referenceFrame)); // Referenceframe needs to be set manually in IDSCOptions.properties
+        GlobalAssert.that(!Objects.isNull(scenarioOptions.getLocationSpec())); // Locationspec needs to be set manually in IDSCOptions.properties
 
         // open server port for clients to connect to
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
         SimulationServer.INSTANCE.setWaitForClients(waitForClients);
 
-
-        // load MATSim configs - includign av.xml where dispatcher is selected. 
+        // load MATSim configs - includign av.xml where dispatcher is selected.
         System.out.println("loading config file " + configFile.getAbsoluteFile());
-        
+
         GlobalAssert.that(configFile.exists()); // Test wheather the config file directory exists
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
+        
+        IncludeActTypeOf.zurichConsensus(config);
+        
 
-        
-        
         String outputdirectory = config.controler().getOutputDirectory();
         System.out.println("outputdirectory = " + outputdirectory);
 
@@ -98,13 +100,13 @@ public class ScenarioServer {
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AVTravelTimeModule());
-        
+
         controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(Key.get(Network.class, Names.named("dvrp_routing"))).to(Network.class);
-			}
-		});
+            @Override
+            public void install() {
+                bind(Key.get(Network.class, Names.named("dvrp_routing"))).to(Network.class);
+            }
+        });
 
         // run simulation
         controler.run();
@@ -141,5 +143,3 @@ public class ScenarioServer {
 
     }
 }
-
-

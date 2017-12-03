@@ -3,7 +3,6 @@
  */
 package playground.clruch.prep.timeinvariant;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -18,18 +17,15 @@ import org.matsim.api.core.v01.population.Population;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 /** @author Claudio Ruch */
-public enum PopulationUtils {
+public enum TimeInvariantPopulationUtils {
     ;
 
-    /** @return random time during daylength */
-    /* package */ public static double getRandomDayTime() {        
-        return Constants.nextDouble() * Constants.getDayLength();
-    }
+
 
     /** @param people
      * @return random {@link Person} from the map */
-    /* package */ static Person getRandomPerson(HashMap<Id<Person>, ? extends Person> people) {
-        int el = Constants.nextInt(people.size());
+    /* package */ static Person getRandomPerson(Map<Id<Person>, ? extends Person> people) {
+        int el = TimeConstants.nextInt(people.size());
         return people.values().stream().collect(Collectors.toList()).get(el);
     }
 
@@ -65,7 +61,7 @@ public enum PopulationUtils {
             RemoveNonIntervalPlans.of(person, interval);
         }
 
-        PopulationUtils.removePeopleWithoutPlans(population);
+        TimeInvariantPopulationUtils.removePeopleWithoutPlans(population);
 
         GlobalAssert.that(CountLegs.of(population, interval) == CountLegs.countLegsOf(population));
     }
