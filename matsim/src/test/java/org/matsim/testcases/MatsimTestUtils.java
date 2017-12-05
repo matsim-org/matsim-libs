@@ -298,7 +298,7 @@ public final class MatsimTestUtils extends TestWatchman {
   }
   
   public static int compareEventsFiles( String filename1, String filename2 ) {
-	  return EventsFileComparator.compare(filename1, filename2) ;
+	  return EventsFileComparator.compareAndReturnInt(filename1, filename2) ;
   }
   public static void compareFilesBasedOnCRC( String filename1, String filename2 ) {
 	  long checksum1 = CRCChecksum.getCRCFromFile(filename1) ;

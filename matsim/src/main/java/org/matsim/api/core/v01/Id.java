@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.vehicles.Vehicle;
 
 
@@ -62,6 +63,7 @@ public abstract class Id<T> implements Comparable<Id<T>> {
 			map = new ConcurrentHashMap<String, Id<?>>();
 			cache.put(type, map);
 		}
+		Gbl.assertNotNull(key);
 		Id<?> id = map.get(key);
 		if (id == null) {
 			id = new IdImpl<T>(key);

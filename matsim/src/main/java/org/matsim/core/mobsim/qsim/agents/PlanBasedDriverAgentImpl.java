@@ -180,7 +180,7 @@ public final class PlanBasedDriverAgentImpl implements DriverAgent {
 	 * If the Leg has not changed, calling this method should have no effect
 	 * on the Results of the Simulation!
 	 */
-	/* package */ final void resetCaches() {
+	/* package */ public final void resetCaches() {
 
 		// moving this method not to WithinDay for the time being since it seems to make some sense to keep this where the internals are
 		// known best.  kai, oct'10

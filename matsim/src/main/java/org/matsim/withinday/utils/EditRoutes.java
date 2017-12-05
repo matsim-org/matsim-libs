@@ -33,9 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -262,8 +260,15 @@ public final class EditRoutes {
 
 		Vehicle vehicle = null ;
 		Path path = this.pathCalculator.calcLeastCostPath(startLink.getToNode(), endLink.getFromNode(), time, person, vehicle) ;
+		
+		spliceNewPathIntoOldRoute(currentLinkIndex, toLinkId, oldRoute, oldLinkIds, NetworkUtils.getLinkIds(path.links) ) ;
 
-		List<Id<Link>> newLinkIds = new ArrayList<>();
+		return true;
+	}
+	
+	static void spliceNewPathIntoOldRoute(int currentLinkIndex, Id<Link> toLinkId, NetworkRoute oldRoute,
+										  List<Id<Link>> oldLinkIds, List<Id<Link>> newLinksIds) {
+		List<Id<Link>> resultingLinkIds = new ArrayList<>();
 
 		/*
 		 * Get those Links which have already been passed.
@@ -272,12 +277,12 @@ public final class EditRoutes {
 		 * at index 1.
 		 */
 		if (currentLinkIndex > 0) {
-			newLinkIds.addAll(oldLinkIds.subList(1, currentLinkIndex + 1));
+			resultingLinkIds.addAll(oldLinkIds.subList(1, currentLinkIndex + 1));
 		}
-
+		
 		//		Leg newLeg = (Leg) planElements.get(0);
 		//		Route newRoute = newLeg.getRoute();
-
+		
 		// Merge old and new Route.
 		/*
 		 * Edit cdobler 25.5.2010
@@ -286,16 +291,14 @@ public final class EditRoutes {
 		 * in the endLinkId field of the route.
 		 */
 //		if (newLinkIds.size() > 0 && path.links.size()>0 && newLinkIds.get(newLinkIds.size() - 1).equals( path.links.get( path.links.size()-1 ) ) ) {
-		if (newLinkIds.size() > 0 && path.links.size()>0 && newLinkIds.get(newLinkIds.size() - 1).equals( path.links.get( path.links.size()-1 ).getId() ) ) {
-			newLinkIds.remove( newLinkIds.size()-1 );
+		if (resultingLinkIds.size() > 0 && newLinksIds.size()>0 && resultingLinkIds.get(resultingLinkIds.size() - 1).equals( newLinksIds.get( newLinksIds.size()-1 ) ) ) {
+			resultingLinkIds.remove( resultingLinkIds.size()-1 );
 		}
-
-		newLinkIds.addAll( NetworkUtils.getLinkIds( path.links ) ) ;
-
+		
+		resultingLinkIds.addAll( newLinksIds ) ;
+		
 		// Overwrite old Route
-		oldRoute.setLinkIds(oldRoute.getStartLinkId(), newLinkIds, toLinkId );
-
-		return true;
+		oldRoute.setLinkIds(oldRoute.getStartLinkId(), resultingLinkIds, toLinkId );
 	}
 
 

@@ -116,7 +116,7 @@ public class TravelTimeFourWaysTest {
 		mobsim.run();
 		
 		eventsXmlWriter.closeFile();
-	    Assert.assertEquals("different events files", EventsFileComparator.compare(this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut), 0);
+	    Assert.assertEquals("different events files", EventsFileComparator.compareAndReturnInt(this.testUtils.getInputDirectory() + EVENTSFILE, eventsOut), 0);
 	}
 	
 }

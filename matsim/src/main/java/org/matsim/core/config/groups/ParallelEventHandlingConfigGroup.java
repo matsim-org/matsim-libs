@@ -34,7 +34,7 @@ public final class ParallelEventHandlingConfigGroup extends ReflectiveConfigGrou
 
 	private final static String NUMBER_OF_THREADS = "numberOfThreads";
 	private Integer numberOfThreads = null;
-	public final static String NUMBER_OF_THREADS_COMMENT = "Number of threads for parallel events handler. 0 or null means the framework decides by itself.";
+	public final static String NUMBER_OF_THREADS_COMMENT = "Number of threads for parallel events handler. _null_ means the framework decides by itself. 0 is currently not possible.";
 
 	private final static String ESTIMATED_NUMBER_OF_EVENTS = "estimatedNumberOfEvents";
 	private Long estimatedNumberOfEvents = null;
