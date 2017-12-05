@@ -344,7 +344,7 @@ public class TravelTimeCollector implements TravelTime,
 		// if someone adds a link change event in between two integer
 		// time steps?  kai, dec'17
 		
-		while( changedLinks.firstKey() >= e.getSimulationTime() ) {
+		while( !changedLinks.isEmpty() && changedLinks.firstKey() >= e.getSimulationTime() ) {
 			Map<Link, Double> map = changedLinks.pollFirstEntry().getValue();
 			for ( Map.Entry<Link,Double> link2speed : map.entrySet() ) {
 				Link link = link2speed.getKey() ;
