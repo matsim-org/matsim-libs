@@ -28,17 +28,12 @@ public final class EditPlans {
 	private final EditTrips editTrips;
 	private final PopulationFactory pf;
 	public EditPlans( QSim mobsim, TripRouter tripRouter, EditTrips editTrips, PopulationFactory pf ) {
-		log.setLevel(Level.DEBUG);
+//		log.setLevel(Level.DEBUG);
 		Gbl.assertNotNull( this.mobsim = mobsim );
 		Gbl.assertNotNull( this.tripRouter = tripRouter );
 		Gbl.assertNotNull( this.editTrips = editTrips ) ;
 		Gbl.assertNotNull( this.pf = pf ) ;
 	}
-	//	public void setRouting(Congestion routing) {
-	//	}
-	//	public void setAllowedLinks(AllowedLinks allowedLinks) {
-	//	}
-	// ---
 	public boolean addActivityAtEnd(MobsimAgent agent, Activity activity, String routingMode) {
 		log.debug("entering addActivityAtEnd with routingMode=" + routingMode) ;
 		Link link = mobsim.getScenario().getNetwork().getLinks().get(Id.createLinkId(51825));;
