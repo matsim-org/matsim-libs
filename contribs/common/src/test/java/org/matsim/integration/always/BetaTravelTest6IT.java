@@ -20,14 +20,6 @@
 
 package org.matsim.integration.always;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,11 +32,7 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
@@ -69,6 +57,13 @@ import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+
 /**
  * This TestCase should ensure the correct behavior of agents when different
  * values for beta_travel-parameters are used, it does so by basically
@@ -84,7 +79,7 @@ import org.matsim.testcases.MatsimTestCase;
  *
  * @author mrieser
  */
-public class BetaTravelTestIT extends MatsimTestCase {
+public class BetaTravelTest6IT extends MatsimTestCase {
 
 	/* This TestCase uses a custom Controler, named TestControler, to load
 	 * specific strategies. The strategies make use of a test-specific
@@ -124,11 +119,11 @@ public class BetaTravelTestIT extends MatsimTestCase {
 	public void testBetaTravel_6() {
 		Config config = loadConfig("../../examples/scenarios/equil/config.xml"); // default config
 		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml"); // specific setting for this test
-		config.controler().setWritePlansInterval(0);	
+		config.controler().setWritePlansInterval(0);
 		config.plans().setActivityDurationInterpretation( ActivityDurationInterpretation.tryEndTimeThenDuration );
 		/*
 		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
-		 * to store the persons in the population, we have to sort the population manually.  
+		 * to store the persons in the population, we have to sort the population manually.
 		 * cdobler, oct'11
 		 */
 		Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -147,37 +142,6 @@ public class BetaTravelTestIT extends MatsimTestCase {
 		controler.run();
 	}
 
-	/**
-	 * Runs the test with a value of -66 for beta_travel.
-	 *
-	 * @author mrieser
-	 */
-	public void testBetaTravel_66() {
-		Config config = loadConfig("../../examples/scenarios/equil/config.xml");
-		ConfigUtils.loadConfig(config, getInputDirectory() + "config.xml");
-		config.controler().setWritePlansInterval(0);
-		// ---
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		/*
-		 * The input plans file is not sorted. After switching from TreeMap to LinkedHashMap
-		 * to store the persons in the population, we have to sort the population manually.  
-		 * cdobler, oct'11
-		 */
-		PopulationUtils.sortPersons(scenario.getPopulation());
-		// ---
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bind(StrategyManager.class).toProvider(MyStrategyManagerProvider.class);
-			}
-		});
-		controler.addControlerListener(new TestControlerListener());
-		controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.run();
-	}
 
 	/**
 	 * Collects some statistics on a specific link. Used to automatically verify
@@ -187,11 +151,11 @@ public class BetaTravelTestIT extends MatsimTestCase {
 	 */
 	private static class LinkAnalyzer implements LinkEnterEventHandler, LinkLeaveEventHandler {
 		private final String linkId;
-		protected double firstCarEnter = Double.POSITIVE_INFINITY;
+		double firstCarEnter = Double.POSITIVE_INFINITY;
 		protected double lastCarEnter = Double.NEGATIVE_INFINITY;
 		protected double firstCarLeave = Double.POSITIVE_INFINITY;
-		protected double lastCarLeave = Double.NEGATIVE_INFINITY;
-		protected int maxCarsOnLink = Integer.MIN_VALUE;
+		private double lastCarLeave = Double.NEGATIVE_INFINITY;
+		int maxCarsOnLink = Integer.MIN_VALUE;
 		protected double maxCarsOnLinkTime = Double.NEGATIVE_INFINITY;
 		private int iteration = -1;
 
