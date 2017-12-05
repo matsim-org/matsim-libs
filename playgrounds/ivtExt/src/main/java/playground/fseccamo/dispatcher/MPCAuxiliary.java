@@ -13,10 +13,10 @@ import org.matsim.core.utils.collections.QuadTree;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.matsim.av.passenger.AVRequest;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 public class MPCAuxiliary {
 

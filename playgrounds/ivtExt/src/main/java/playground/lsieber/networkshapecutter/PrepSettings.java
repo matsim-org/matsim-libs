@@ -10,7 +10,7 @@
 //import playground.clruch.data.LocationSpec;
 //import playground.clruch.data.ReferenceFrame;
 //import playground.clruch.options.ScenarioOptions;
-//import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
+//import ch.ethz.matsim.av.framework.AVConfigGroup;
 //
 //@Deprecated // TODO delete this class
 //public class PrepSettings {

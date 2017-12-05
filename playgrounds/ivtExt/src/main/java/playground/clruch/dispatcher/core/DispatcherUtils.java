@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.network.Link;
 
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
+import ch.ethz.matsim.av.passenger.AVRequest;
 
 public enum DispatcherUtils {
     ;

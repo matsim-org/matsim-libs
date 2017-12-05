@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dynagent.run.DynQSimModule;
 import org.matsim.core.config.Config;
@@ -24,6 +23,8 @@ import com.google.inject.name.Names;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.matsim.av.framework.AVConfigGroup;
+import ch.ethz.matsim.av.framework.AVModule;
 import playground.clruch.analysis.AnalyzeAll;
 import playground.clruch.analysis.AnalyzeSummary;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
@@ -42,9 +43,9 @@ import playground.clruch.prep.acttype.IncludeActTypeOf;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.traveltimetracker.AVTravelTimeModule;
-import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.framework.AVQSimProvider;
+import playground.matsim_decoupling.IDSCDispatcherModule;
+import playground.matsim_decoupling.IDSCGeneratorModule;
+import playground.matsim_decoupling.qsim.IDSCQSimProvider;
 
 /** only one ScenarioServer can run at one time, since a fixed network port is
  * reserved to serve the simulation status */
@@ -79,9 +80,8 @@ public class ScenarioServer {
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
-        
+
         IncludeActTypeOf.zurichConsensus(config);
-        
 
         String outputdirectory = config.controler().getOutputDirectory();
         System.out.println("outputdirectory = " + outputdirectory);
@@ -96,11 +96,12 @@ public class ScenarioServer {
         Controler controler = new Controler(scenario);
 
         controler.addOverridingModule(new DvrpTravelTimeModule());
-        controler.addOverridingModule(new DynQSimModule<>(AVQSimProvider.class));
+        controler.addOverridingModule(new DynQSimModule<>(IDSCQSimProvider.class));
         controler.addOverridingModule(new AVModule());
         controler.addOverridingModule(new DatabaseModule());
         controler.addOverridingModule(new AVTravelTimeModule());
-
+        controler.addOverridingModule(new IDSCGeneratorModule());
+        controler.addOverridingModule(new IDSCDispatcherModule());
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {

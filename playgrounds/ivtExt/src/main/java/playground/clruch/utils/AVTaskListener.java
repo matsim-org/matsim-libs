@@ -1,10 +1,10 @@
 // code by jph
 package playground.clruch.utils;
 
-import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
-import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
-import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
-import playground.sebhoerl.avtaxi.schedule.AVStayTask;
+import ch.ethz.matsim.av.schedule.AVDriveTask;
+import ch.ethz.matsim.av.schedule.AVDropoffTask;
+import ch.ethz.matsim.av.schedule.AVPickupTask;
+import ch.ethz.matsim.av.schedule.AVStayTask;
 
 public interface AVTaskListener {
     void handle(AVPickupTask avPickupTask);

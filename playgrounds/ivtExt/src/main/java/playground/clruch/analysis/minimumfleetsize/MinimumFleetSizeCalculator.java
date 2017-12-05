@@ -121,7 +121,7 @@ public class MinimumFleetSizeCalculator implements Serializable {
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
 
         File configFile = new File(args[0]);
-        Config config = ConfigUtils.loadConfig(configFile.toString(), new playground.sebhoerl.avtaxi.framework.AVConfigGroup(), dvrpConfigGroup);
+        Config config = ConfigUtils.loadConfig(configFile.toString(), new ch.ethz.matsim.av.framework.AVConfigGroup(), dvrpConfigGroup);
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Network network = scenario.getNetwork();
         Population population = scenario.getPopulation();
