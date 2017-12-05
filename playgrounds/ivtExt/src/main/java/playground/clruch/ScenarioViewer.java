@@ -24,21 +24,26 @@ import playground.clruch.utils.NetworkLoader;
  * simulation results. */
 public class ScenarioViewer {
 
+    public static void main(String[] args) throws FileNotFoundException, IOException {
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
+        run(workingDirectory);
+    }
+
     /** Execute in simulation folder to view past results or connect to simulation s
      * 
      * @param args not used
      * @throws FileNotFoundException
      * @throws IOException */
-    public static void main(String[] args) throws FileNotFoundException, IOException {
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
-        
+    public static void run(File workingDirectory) throws FileNotFoundException, IOException {
+
         // load options
         ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);
         Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName());
-        File outputSubDirectory = new File(config.controler().getOutputDirectory()); 
+        File outputSubDirectory = new File(config.controler().getOutputDirectory());
         File outputDirectory = outputSubDirectory.getParentFile();
         // File outputDirectory = new File(workingDirectory, "/simulation_output" );
 
+        System.out.println(outputSubDirectory.getAbsolutePath());
         System.out.println("showing simulation results stored in folder: " + outputDirectory.getName());
 
         ReferenceFrame referenceFrame = simOptions.getReferenceFrame();

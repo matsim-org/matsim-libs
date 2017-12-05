@@ -22,7 +22,7 @@ public class IDGenerator {
     private final String idName = "IDGenerator";
     private final String format = "%012d";
 
-    /* package */ IDGenerator(HashSet<Id<Person>> usedIDs) {
+    /* package */ public IDGenerator(HashSet<Id<Person>> usedIDs) {
         this.usedIDs = usedIDs;
 
         // find largest integer used in IDs
@@ -40,7 +40,7 @@ public class IDGenerator {
 
     /** @param usedIDs
      * @return new ID which is not yet in set usedIDs */
-    /* package */ Id<Person> generateUnusedID() {
+    public Id<Person> generateUnusedID() {
         smallestUnusedInt = smallestUnusedInt + 1;
         String newIDs = idName + String.format(format, smallestUnusedInt);
         Id<Person> newId = Id.create(newIDs, Person.class);
