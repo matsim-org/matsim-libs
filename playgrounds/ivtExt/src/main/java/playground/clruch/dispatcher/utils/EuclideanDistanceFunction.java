@@ -6,8 +6,8 @@ package playground.clruch.dispatcher.utils;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.clruch.dispatcher.core.RoboTaxi;
 import ch.ethz.matsim.av.passenger.AVRequest;
+import playground.clruch.dispatcher.core.RoboTaxi;
 
 /**
  * @author Claudio Ruch

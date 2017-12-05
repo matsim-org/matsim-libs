@@ -11,8 +11,8 @@ import org.matsim.api.core.v01.network.Network;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
-import playground.clruch.dispatcher.core.RoboTaxi;
 import ch.ethz.matsim.av.passenger.AVRequest;
+import playground.clruch.dispatcher.core.RoboTaxi;
 
 public enum BipartiteMatchingUtils {
     ;

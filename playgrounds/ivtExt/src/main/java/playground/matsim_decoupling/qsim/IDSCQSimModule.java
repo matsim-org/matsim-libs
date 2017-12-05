@@ -7,8 +7,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
 
-import ch.ethz.matsim.av.config.AVConfig;
-import ch.ethz.matsim.av.framework.AVQSimModule;
 import ch.ethz.matsim.av.schedule.AVOptimizer;
 import playground.clruch.traveltimetracker.AVTravelTimeRecorder;
 import playground.matsim_decoupling.TrackingHelper;

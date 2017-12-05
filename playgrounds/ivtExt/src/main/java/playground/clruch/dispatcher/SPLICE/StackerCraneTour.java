@@ -15,8 +15,8 @@ import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.queuey.math.HungarianAlgorithm;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
 import ch.ethz.matsim.av.passenger.AVRequest;
+import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
 
 /**
  * @author Nicolo Ormezzano

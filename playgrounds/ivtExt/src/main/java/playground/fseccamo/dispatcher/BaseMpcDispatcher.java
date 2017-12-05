@@ -15,13 +15,13 @@ import ch.ethz.idsc.queuey.core.networks.VirtualLink;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.router.InstantPathFactory;
-import ch.ethz.matsim.av.config.AVDispatcherConfig;
-import ch.ethz.matsim.av.passenger.AVRequest;
-import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 
 abstract class BaseMpcDispatcher extends PartitionedDispatcher {
     protected final int samplingPeriod;

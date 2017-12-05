@@ -34,6 +34,13 @@ import ch.ethz.idsc.tensor.red.Mean;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Ceiling;
 import ch.ethz.idsc.tensor.sca.Floor;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.config.AVGeneratorConfig;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.generator.PopulationDensityGenerator;
+import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractRequestSelector;
@@ -45,13 +52,6 @@ import playground.clruch.dispatcher.utils.virtualnodedestselector.AbstractVirtua
 import playground.clruch.dispatcher.utils.virtualnodedestselector.KMeansVirtualNodeDest;
 //import playground.clruch.netdata.vLinkDataReader; // this was deleted // TODO think if need something else for replacement. 
 import playground.clruch.traveldata.TravelData;
-import ch.ethz.matsim.av.config.AVDispatcherConfig;
-import ch.ethz.matsim.av.config.AVGeneratorConfig;
-import ch.ethz.matsim.av.dispatcher.AVDispatcher;
-import ch.ethz.matsim.av.framework.AVModule;
-import ch.ethz.matsim.av.generator.PopulationDensityGenerator;
-import ch.ethz.matsim.av.passenger.AVRequest;
-import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 
 /** {@link PopulationDensityGenerator} */
 public class DFRDispatcher extends PartitionedDispatcher {

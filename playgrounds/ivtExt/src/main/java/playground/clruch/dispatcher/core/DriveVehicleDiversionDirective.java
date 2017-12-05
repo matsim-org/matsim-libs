@@ -9,11 +9,11 @@ import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.matsim.av.schedule.AVDriveTask;
+import ch.ethz.matsim.av.schedule.AVStayTask;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.utils.VrpPathUtils;
 import playground.matsim_decoupling.IDSCDriveTaskTracker;
-import ch.ethz.matsim.av.schedule.AVDriveTask;
-import ch.ethz.matsim.av.schedule.AVStayTask;
 
 /**
  * for vehicles that are currently driving, but should go to a new destination:

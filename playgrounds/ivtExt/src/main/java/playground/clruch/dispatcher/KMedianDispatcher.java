@@ -19,17 +19,16 @@ import com.google.inject.name.Named;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.dispatcher.core.AVStatus;
-import playground.clruch.dispatcher.core.PartitionedDispatcher;
-import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.clruch.netdata.VirtualNetworkGet;
-import ch.ethz.matsim.av.config.AVConfig;
 import ch.ethz.matsim.av.config.AVDispatcherConfig;
 import ch.ethz.matsim.av.config.AVGeneratorConfig;
 import ch.ethz.matsim.av.dispatcher.AVDispatcher;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
+import playground.clruch.dispatcher.core.AVStatus;
+import playground.clruch.dispatcher.core.PartitionedDispatcher;
+import playground.clruch.dispatcher.core.RoboTaxi;
+import playground.clruch.netdata.VirtualNetworkGet;
 
 /** Upon arrival, a demand is assigned to the depot closest to its pick-up location. The RoboTaxi services its demands in FIFO order
  * returning to the depot after each delivery */

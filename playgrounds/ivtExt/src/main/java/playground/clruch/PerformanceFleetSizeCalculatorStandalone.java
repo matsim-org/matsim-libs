@@ -14,13 +14,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.matsim.av.framework.AVConfigGroup;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.net.SimulationServer;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.options.ScenarioOptions;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
-import ch.ethz.matsim.av.framework.AVConfigGroup;
 
 @Deprecated // TODO remove this
 enum PerformanceFleetSizeCalculatorStandalone {

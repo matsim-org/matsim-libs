@@ -26,9 +26,9 @@ import ch.ethz.idsc.tensor.red.Max;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Chop;
 import ch.ethz.idsc.tensor.sca.Increment;
+import ch.ethz.matsim.av.passenger.AVRequest;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.core.VehicleOnVirtualLinkCalculator;
-import ch.ethz.matsim.av.passenger.AVRequest;
 
 /* package */ class MPCDataCollection {
 

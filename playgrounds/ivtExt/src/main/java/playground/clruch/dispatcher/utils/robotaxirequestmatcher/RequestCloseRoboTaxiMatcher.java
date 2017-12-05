@@ -11,10 +11,10 @@ import java.util.function.BiConsumer;
 
 import ch.ethz.idsc.owly.data.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.matsim.av.passenger.AVRequest;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.PlaneEuclideanDistance;
 import playground.clruch.dispatcher.utils.PlaneLocation;
-import ch.ethz.matsim.av.passenger.AVRequest;
 
 /** @author Claudio Ruch */
 // TODO doc

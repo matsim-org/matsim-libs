@@ -10,15 +10,14 @@ import com.google.inject.name.Named;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.utils.BipartiteMatchingUtils;
 import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
 import playground.clruch.utils.SafeConfig;
-import ch.ethz.matsim.av.config.AVDispatcherConfig;
-import ch.ethz.matsim.av.config.AVGeneratorConfig;
-import ch.ethz.matsim.av.dispatcher.AVDispatcher;
-import ch.ethz.matsim.av.framework.AVModule;
-import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 
 public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
 

@@ -19,7 +19,6 @@ import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.prep.PopulationTools;
-import playground.clruch.prep.TheApocalypse;
 
 /** @author Claudio Ruch */
 public class DemoInvariantPop {

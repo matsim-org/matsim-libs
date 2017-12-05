@@ -21,11 +21,6 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.dispatcher.core.RebalancingDispatcher;
-import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.clruch.dispatcher.utils.AbstractRequestSelector;
-import playground.clruch.dispatcher.utils.OldestRequestSelector;
-import playground.clruch.utils.SafeConfig;
 import ch.ethz.matsim.av.config.AVDispatcherConfig;
 import ch.ethz.matsim.av.config.AVGeneratorConfig;
 import ch.ethz.matsim.av.data.AVVehicle;
@@ -33,6 +28,11 @@ import ch.ethz.matsim.av.dispatcher.AVDispatcher;
 import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.passenger.AVRequest;
 import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
+import playground.clruch.dispatcher.core.RebalancingDispatcher;
+import playground.clruch.dispatcher.core.RoboTaxi;
+import playground.clruch.dispatcher.utils.AbstractRequestSelector;
+import playground.clruch.dispatcher.utils.OldestRequestSelector;
+import playground.clruch.utils.SafeConfig;
 
 @Deprecated
 // ATTENTION: THIS DISPATCHER HAS NOT BEEN TESTED WITH THE NEW INTERFACE, LIKELY NOT TO

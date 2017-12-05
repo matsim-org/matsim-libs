@@ -7,8 +7,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.network.Link;
 
-import playground.clruch.dispatcher.core.RoboTaxi;
 import ch.ethz.matsim.av.passenger.AVRequest;
+import playground.clruch.dispatcher.core.RoboTaxi;
 
 public abstract class AbstractVehicleDestMatcher {
 

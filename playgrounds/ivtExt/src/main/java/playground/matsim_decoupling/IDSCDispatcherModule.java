@@ -2,6 +2,7 @@ package playground.matsim_decoupling;
 
 import org.matsim.core.controler.AbstractModule;
 
+import ch.ethz.matsim.av.framework.AVUtils;
 import playground.clruch.dispatcher.DriveByDispatcher;
 import playground.clruch.dispatcher.EdgyDispatcher;
 import playground.clruch.dispatcher.GlobalBipartiteMatchingDispatcher;
@@ -13,7 +14,6 @@ import playground.clruch.dispatcher.TestBedDispatcher;
 import playground.clruch.dispatcher.UncoordinatedDispatcher;
 import playground.clruch.dispatcher.selfishdispatcher.SelfishDispatcher;
 import playground.fseccamo.dispatcher.MPCDispatcher;
-import ch.ethz.matsim.av.framework.AVUtils;
 
 public class IDSCDispatcherModule extends AbstractModule {
 	@Override
