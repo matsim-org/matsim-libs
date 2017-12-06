@@ -12,11 +12,11 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
+import ch.ethz.matsim.av.framework.AVConfigGroup;
 import playground.clruch.options.ScenarioOptions;
 import playground.lsieber.scenario.preparer.NetworkPreparer;
 import playground.lsieber.scenario.preparer.PopulationPreparer;
 import playground.lsieber.scenario.preparer.VirtualNetworkPreparer;
-import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
 
 /** Class to prepare a given scenario for MATSim, includes preparation of netowrk, population, creation of virtualNetwork
  * and travelData objects.
