@@ -166,7 +166,10 @@ public class RunDemandGenerationFromShapefileExample {
 			x = ft.getBounds().getMinX() + rnd.nextDouble() * (ft.getBounds().getMaxX() - ft.getBounds().getMinX());
 			y = ft.getBounds().getMinY() + rnd.nextDouble() * (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
 			p = MGC.xy2Point(x, y);
-		} while (((Geometry) ft.getDefaultGeometry()).contains(p));
+//		} while (((Geometry) ft.getDefaultGeometry()).contains(p));
+		} while ( ! ((Geometry) ft.getDefaultGeometry()).contains(p));
+		// the above has been wrong when we found this, presumably for many years
+		
 		return p;
 	}
 
