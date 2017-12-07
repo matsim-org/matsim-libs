@@ -2,7 +2,9 @@
 package playground.clruch.io.fleet;
 
 import java.util.List;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -11,9 +13,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.routes.GenericRouteFactory;
-import org.matsim.core.population.routes.RouteFactory;
 
 import playground.clruch.net.DummyStorageSupplier;
 import playground.clruch.net.IterationFolder;
@@ -40,45 +39,61 @@ enum PopulationDump {
             for (IterationFolder iter : list) {
                 storageSupplier = iter.storageSupplier;
                 final int MAX_ITER = storageSupplier.size(); // storageSupplier.size()
-                for (int index = 0; index < MAX_ITER / 10; index++) {
-                    SimulationObject simulationObject = storageSupplier.getSimulationObject(index);
+                for (int index = 0; index < MAX_ITER; index++) {
+                    if (index % 200 == 0) {
+                        SimulationObject simulationObject = storageSupplier.getSimulationObject(index);
 
-                    List<RequestContainer> rc = simulationObject.requests;
+                        List<RequestContainer> rc = simulationObject.requests;
 
-                    // Initialize all necessary properties
-                    for (RequestContainer request : rc) {
-                        try {
-                            Id<Person> personID = Id.create(id, Person.class);
-                            Person person = populationFactory.createPerson(personID);
-                            Plan plan = populationFactory.createPlan();
+                        // Initialize all necessary properties
+                        for (RequestContainer request : rc) {
+                            try {
+                                Id<Person> personID = Id.create(request.requestIndex, Person.class);
+                                Map<Id<Person>, ? extends Person> persons = population.getPersons();
+                                if (persons.containsKey(personID) == false) {
+                                    Person person = populationFactory.createPerson(personID);
+                                    Plan plan = populationFactory.createPlan();
 
-                            OsmLink fromLink = db.getOsmLink(request.fromLinkIndex);
-                            OsmLink toLink = db.getOsmLink(request.toLinkIndex);
+                                    // Get links and coordinates
+                                    OsmLink fromLink = db.getOsmLink(request.fromLinkIndex);
+                                    Coord fromCoord = fromLink.getAt(0.5);
+                                    OsmLink toLink = db.getOsmLink(request.toLinkIndex);
+                                    Coord toCoord = toLink.getAt(0.5);
 
-                            Activity startActivity = populationFactory.createActivityFromLinkId("activitiy", fromLink.link.getId());
-                            startActivity.setEndTime(request.submissionTime);
-                            Activity endActivity = populationFactory.createActivityFromLinkId("activitiy", toLink.link.getId());
-                            endActivity.setStartTime(request.submissionTime + TRAVEL_TIME);
-                            Leg leg = populationFactory.createLeg("av");
-                            RouteFactory rf = new GenericRouteFactory();
-                            Route route = rf.createRoute(fromLink.link.getId(), toLink.link.getId());
-                            route.setTravelTime(TRAVEL_TIME);
-                            leg.setDepartureTime(request.submissionTime);
-                            // leg.setTravelTime(200);
-                            leg.setRoute(route);
-                            leg.setTravelTime(TRAVEL_TIME);
+                                    // Create activities
+                                    Activity startActivity = populationFactory.createActivityFromLinkId("activity", fromLink.link.getId());
+                                    startActivity.setEndTime(request.submissionTime);
+                                    startActivity.setCoord(fromCoord);
+                                    Activity endActivity = populationFactory.createActivityFromLinkId("activity", toLink.link.getId());
+                                    endActivity.setStartTime(request.submissionTime + TRAVEL_TIME);
+                                    endActivity.setCoord(toCoord);
 
-                            // Add person to the population
-                            if (id % 100 == 0)
-                                System.out.println("INFO Adding person ID " + id + " to population");
-                            plan.addActivity(startActivity);
-                            plan.addLeg(leg);
-                            person.addPlan(plan);
-                            plan.addActivity(endActivity);
-                            population.addPerson(person);
-                            id++;
-                        } catch (Exception e) {
-                            System.err.println("WARN failed to add person ID " + id + " to current population container");
+                                    // Create legs and routes
+                                    Leg leg = populationFactory.createLeg("av");
+                                    // RouteFactory routeFactory = new AVRouteFactory();
+                                    // Route route = routeFactory.createRoute(fromLink.link.getId(), toLink.link.getId());
+                                    // // NetworkRoute nwRoute = RouteUtils.createLinkNetworkRouteImpl(fromLink.link.getId(), toLink.link.getId());
+                                    // // route.setDistance(RouteUtils.calcDistance(nwRoute, 0.5, 0.5, network));
+                                    // route.setTravelTime(TRAVEL_TIME);
+                                    // route.setRouteDescription("av");
+                                    // leg.setRoute(route);
+                                    leg.setTravelTime(200);
+                                    leg.setDepartureTime(request.submissionTime);
+                                    leg.setTravelTime(TRAVEL_TIME);
+
+                                    // Add person to the population
+                                    if (id % 100 == 0)
+                                        System.out.println("INFO Adding request ID " + request.requestIndex + " to population");
+                                    plan.addActivity(startActivity);
+                                    plan.addLeg(leg);
+                                    plan.addActivity(endActivity);
+                                    person.addPlan(plan);
+                                    population.addPerson(person);
+                                    id++;
+                                }
+                            } catch (Exception e) {
+                                System.err.println("WARN failed to add request ID " + request.requestIndex + " to current population container");
+                            }
                         }
                     }
                 }

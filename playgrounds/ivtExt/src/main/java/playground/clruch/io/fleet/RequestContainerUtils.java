@@ -1,5 +1,7 @@
 package playground.clruch.io.fleet;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import org.matsim.api.core.v01.Coord;
@@ -7,6 +9,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.clruch.dispatcher.core.RequestStatus;
+import playground.clruch.net.LinkSpeedUtils;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.RequestContainer;
 
@@ -14,19 +17,24 @@ import playground.clruch.net.RequestContainer;
 public class RequestContainerUtils {
 
     private TaxiTrail taxiTrail;
+    private LinkSpeedUtils lsUtils;
 
-    public RequestContainerUtils(TaxiTrail taxiTrail) {
+    public RequestContainerUtils(TaxiTrail taxiTrail, LinkSpeedUtils lsUtils) {
         this.taxiTrail = taxiTrail;
+        this.lsUtils = lsUtils;
     }
 
     public boolean isValidRequest(int now, boolean includeCancelled) {
         // System.out.println("Checking if request is valid at time: " + now);
         if (includeCancelled) {
-            if (findSubmissionTime(now) >= 0 && (propagateTo(now, now, RequestStatus.DROPOFF) > 0 || propagateTo(now, now, RequestStatus.CANCELLED) == 0))
+            if (findSubmissionTime(now) > 0 && (propagateTo(now, now, RequestStatus.DROPOFF) > 0 || propagateTo(now, now, RequestStatus.CANCELLED) == 0))
                 return true;
         } else {
-            if (findSubmissionTime(now) >= 0 && (propagateTo(now, now, RequestStatus.DROPOFF) > 0 && propagateTo(now, now, RequestStatus.CANCELLED) < 0))
+            if (findSubmissionTime(now) > 0 && propagateTo(now, now, RequestStatus.DROPOFF) > 0 && propagateTo(now, now, RequestStatus.CANCELLED) < 0) {
+                // System.out.println("Found request starting at " + findSubmissionTime(now) + " and ending at " + propagateTo(now, now, RequestStatus.DROPOFF)
+                // + " in total taking " + (propagateTo(now, now, RequestStatus.DROPOFF) - findSubmissionTime(now)) + " seconds");
                 return true;
+            }
         }
         return false;
     }
@@ -38,6 +46,21 @@ public class RequestContainerUtils {
             submissionTime = propagateTo(now, now, RequestStatus.PICKUP);
         // System.err.println("WARN Could not find submissionTime.");
         return submissionTime;
+    }
+
+    public List<String> dumpRequestTrail(int now) {
+        List<String> requestTrail = new ArrayList<String>();
+        int requestStart = findSubmissionTime(now);
+        int requestEnd = propagateTo(now, now, RequestStatus.DROPOFF);
+        now = requestStart;
+        while (now <= requestEnd) {
+            requestTrail.add(taxiTrail.interp(now).getValue().requestStatus.tag());
+            if (Objects.nonNull(taxiTrail.getNextEntry(now)))
+                now = taxiTrail.getNextEntry(now).getKey();
+            else
+                break;
+        }
+        return requestTrail;
     }
 
     private Coord getCoordAt(int now, RequestStatus requestedStatus) {
@@ -62,7 +85,7 @@ public class RequestContainerUtils {
             if (requestedStatus.compareTo(requestStatus) > 0) {
                 if (Objects.nonNull(taxiTrail.getNextEntry(now))) {
                     int nextTimeStep = taxiTrail.getNextEntry(now).getKey();
-                    if (lastTimeStep != nextTimeStep) {
+                    if (lastTimeStep != nextTimeStep && taxiTrail.interp(nextTimeStep).getValue().requestStatus.compareTo(requestStatus) >= 0) {
                         lastTimeStep = now;
                         return propagateTo(nextTimeStep, lastTimeStep, requestedStatus);
                     }
@@ -72,7 +95,7 @@ public class RequestContainerUtils {
             } else if (requestedStatus.compareTo(requestStatus) < 0) {
                 if (Objects.nonNull(taxiTrail.getLastEntry(now))) {
                     int nextTimeStep = taxiTrail.getLastEntry(now).getKey();
-                    if (lastTimeStep != nextTimeStep) {
+                    if (lastTimeStep != nextTimeStep && taxiTrail.interp(nextTimeStep).getValue().requestStatus.compareTo(requestStatus) <= 0) {
                         lastTimeStep = now;
                         return propagateTo(nextTimeStep, lastTimeStep, requestedStatus);
                     }
@@ -98,6 +121,7 @@ public class RequestContainerUtils {
 
         if (RequestStatusParser.isNewSubmission(nowRequest, lastRequest)) {
             taxiTrail.setRequestIndex(now, requestIndex);
+            // System.out.println("Processing requestIndex: " + requestIndex);
             submissionTime = taxiTrail.interp(now).getKey();
         } else {
             taxiTrail.setRequestIndex(now, taxiTrail.getLastEntry(now).getValue().requestIndex);
@@ -109,13 +133,11 @@ public class RequestContainerUtils {
         try {
             Coord from = getCoordAt(now, RequestStatus.PICKUP);
             if (Objects.nonNull(from)) {
-                from = db.referenceFrame.coords_fromWGS84.transform(from);
-                rc.fromLinkIndex = db.getLinkIndex(qt.getClosest(from.getX(), from.getY()));
+                rc.fromLinkIndex = lsUtils.getLinkfromCoord(from);
             }
             Coord to = getCoordAt(now, RequestStatus.DROPOFF);
             if (Objects.nonNull(to)) {
-                to = db.referenceFrame.coords_fromWGS84.transform(to);
-                rc.toLinkIndex = db.getLinkIndex(qt.getClosest(to.getX(), to.getY()));
+                rc.toLinkIndex = lsUtils.getLinkfromCoord(to);
             }
         } catch (Exception exception) {
             System.err.println("WARN failed to get from/to Coords at time: " + now);

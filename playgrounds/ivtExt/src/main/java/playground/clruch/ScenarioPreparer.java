@@ -17,7 +17,7 @@ import playground.lsieber.scenario.preparer.NetworkPreparer;
 import playground.lsieber.scenario.preparer.PopulationPreparer;
 import playground.lsieber.scenario.preparer.VirtualNetworkPreparer;
 
-/** Class to prepare a given scenario for MATSim, includes preparation of netowrk, population, creation of virtualNetwork
+/** Class to prepare a given scenario for MATSim, includes preparation of network, population, creation of virtualNetwork
  * and travelData objects.
  * 
  * @author clruch */

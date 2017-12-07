@@ -62,7 +62,7 @@ public class ScenarioServer {
          * instance viewer client
          */
         boolean waitForClients = scenarioOptions.getBoolean("waitForClients");
-        File configFile = new File(workingDirectory, scenarioOptions.getPreparerConfigName());
+        File configFile = new File(workingDirectory, scenarioOptions.getSimulationConfigName());
         ReferenceFrame referenceFrame = scenarioOptions.getReferenceFrame();
 
         // open server port for clients to connect to

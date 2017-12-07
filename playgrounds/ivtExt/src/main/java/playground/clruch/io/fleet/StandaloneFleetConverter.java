@@ -26,11 +26,11 @@ enum StandaloneFleetConverter {
 
         // File config = new File(workingDirectory, simOptions.getString("simuConfig"));
         // Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName());
-        
+
         File networkFile = new File(workingDirectory, simOptions.getString("simuConfig"));
         Network network = NetworkLoader.loadNetwork(networkFile);
         // File networkFile = new File(workingDirectory, "trb_config.xml");
-        
+
         System.out.println("INFO working folder: " + workingDirectory.getAbsolutePath());
         System.out.println("INFO network file: " + networkFile.getAbsolutePath());
         ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
@@ -65,7 +65,7 @@ enum StandaloneFleetConverter {
             DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
             // extract data from file and put into dayTaxiRecord
             CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);
-            reader.populateFrom(file);
+            reader.populateFrom(file, true);
             dayTaxiRecords.add(dayTaxiRecord);
 
             outputDirectory = new File(workingDirectory, "output/" + file.getName().substring(0, 10));

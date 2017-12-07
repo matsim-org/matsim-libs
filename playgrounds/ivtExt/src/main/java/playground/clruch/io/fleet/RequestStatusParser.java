@@ -30,6 +30,31 @@ public enum RequestStatusParser {
     public static RequestStatus parseRequestStatus(AVStatus nowState, AVStatus lastState) {
         return parse(nowState, lastState);
     }
+    
+    public static boolean isOutlierRequest(RequestStatus nowRequest, RequestStatus lastRequest) {
+        // TODO This is just a quickfix for strange taxidata
+        switch (nowRequest) {
+        case REQUESTED:
+            switch (lastRequest) {
+            case PICKUPDRIVE:
+            case DRIVING:
+            case PICKUP:
+                return true;
+            default:
+                break;
+            }
+        case PICKUP:
+            switch (lastRequest) {
+            case DRIVING:
+                return true;
+            default:
+                break;
+            }
+        default:
+            break;
+        }
+        return false;
+    }
 
     public static boolean isNewSubmission(RequestStatus nowRequest, RequestStatus lastRequest) {
         // Check change of AVStatus from the vehicle and map corresponding requestStatus

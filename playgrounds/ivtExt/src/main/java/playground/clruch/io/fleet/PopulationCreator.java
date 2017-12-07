@@ -38,8 +38,8 @@ public class PopulationCreator {
         ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);
         Config configFile = ConfigUtils.loadConfig(simOptions.getSimulationConfigName());
         System.out.println(simOptions.getSimulationConfigName());
-        File outputDirectory = new File(configFile.controler().getOutputDirectory());
-        // File outputDirectory = outputSubDirectory.getParentFile();
+        File outputSubDirectory = new File(configFile.controler().getOutputDirectory());
+        File outputDirectory = outputSubDirectory.getParentFile();
         // File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
         System.out.println("INFO getting all output folders from: " + outputDirectory.getAbsolutePath());
         outputFolders = MultiFileTools.getAllDirectoriesSorted(outputDirectory);
@@ -48,6 +48,7 @@ public class PopulationCreator {
             outputFolderNames[i] = outputFolders[i].getName();
         }
         storageUtils = new StorageUtils(new File(outputDirectory, outputFolderNames[0]));
+        storageUtils.printStorageProperties();
 
         // Initialize ConfigGroups and Files
         System.out.println("INFO loading simulation configuration");

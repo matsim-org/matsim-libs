@@ -31,7 +31,8 @@ public class AVRequestCreator implements PassengerRequestCreator {
     Map<Id<AVOperator>, AVDispatcher> dispatchers;
 
     @Override
-    public PassengerRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link pickupLink, Link dropoffLink, double departureTime, double submissionTime) {
+    public PassengerRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link pickupLink, Link dropoffLink, double departureTime,
+            double submissionTime) {
         if (!(passenger instanceof PlanAgent)) {
             throw new RuntimeException("Need PlanAgent in order to figure out the operator");
         }
@@ -39,7 +40,8 @@ public class AVRequestCreator implements PassengerRequestCreator {
         PlanAgent agent = (PlanAgent) passenger;
         Leg leg = (Leg) agent.getCurrentPlanElement();
 
-        AVRoute route = (AVRoute) leg.getRoute();
+        // AVRoute route = (AVRoute) leg.getRoute();
+        AVRoute route = new AVRoute(leg.getRoute());
         route.setDistance(Double.NaN);
 
         AVOperator operator = operators.get(route.getOperatorId());

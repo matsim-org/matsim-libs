@@ -42,7 +42,7 @@ public class ScenarioViewer {
         System.out.println(simOptions.getSimulationConfigName());
         File outputSubDirectory = new File(config.controler().getOutputDirectory());
         System.out.println(outputSubDirectory.getAbsolutePath());
-        // File outputDirectory = outputSubDirectory.getParentFile();
+        File outputDirectory = outputSubDirectory.getParentFile();
         // File outputDirectory = new File(workingDirectory, "/simulation_output" );
 
         // System.out.println("showing simulation results stored in folder: " + outputDirectory.getAbsolutePath());
@@ -63,7 +63,7 @@ public class ScenarioViewer {
         /** this is optional and should not cause problems if file does not exist. temporary solution */
         matsimJMapViewer.virtualNetworkLayer.setVirtualNetwork(VirtualNetworkGet.readDefault(network));
 
-        MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer, outputSubDirectory);
+        MatsimViewerFrame matsimViewer = new MatsimViewerFrame(matsimJMapViewer, outputDirectory);
         matsimViewer.setDisplayPosition(MatsimStaticDatabase.INSTANCE.getCenter(), 12);
         matsimViewer.jFrame.setSize(900, 900);
         matsimViewer.jFrame.setVisible(true);
