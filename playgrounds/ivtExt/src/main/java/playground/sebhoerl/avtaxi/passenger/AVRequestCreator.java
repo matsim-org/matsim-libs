@@ -14,10 +14,11 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
-import playground.sebhoerl.avtaxi.data.AVData;
-import playground.sebhoerl.avtaxi.data.AVOperator;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.routing.AVRoute;
+import ch.ethz.matsim.av.data.AVData;
+import ch.ethz.matsim.av.data.AVOperator;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.routing.AVRoute;
 
 @Singleton
 public class AVRequestCreator implements PassengerRequestCreator {

@@ -12,6 +12,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
+import ch.ethz.matsim.av.framework.AVConfigGroup;
 import playground.clruch.options.ScenarioOptions;
 import playground.lsieber.scenario.preparer.NetworkPreparer;
 import playground.lsieber.scenario.preparer.PopulationPreparer;
@@ -24,19 +25,18 @@ import playground.lsieber.scenario.preparer.VirtualNetworkPreparer;
 public class ScenarioPreparer {
 
     public static void main(String[] args) throws MalformedURLException, Exception {
-        run(args);
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
+        run(workingDirectory);
     }
 
-    public static void run(String[] args) throws MalformedURLException, Exception {
+    public static void run(File workingDirectory) throws MalformedURLException, Exception {
 
         // run preparer in simulation working directory
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
         ScenarioOptions scenarioOptions = ScenarioOptions.load(workingDirectory);
 
         // load Settings from IDSC Options
         Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName());
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        // create Reduced Scenario Folder if nesscesary
 
         // 1) cut network (and reduce population to new network)
         Network network = scenario.getNetwork();
@@ -52,14 +52,16 @@ public class ScenarioPreparer {
         // 4) save a simulation config file
         createSimulationConfigFile(config, scenarioOptions);
 
-        System.out.println("-----> END OF SCENARIO PREPARER <-----");
     }
 
-    private static void createSimulationConfigFile(Config fullConfig, ScenarioOptions scenOptions) {
+    public static void createSimulationConfigFile(Config fullConfig, ScenarioOptions scenOptions) {
 
         // change population and network such that converted is loaded
         fullConfig.network().setInputFile(scenOptions.getPreparedNetworkName() + ".xml.gz");
         fullConfig.plans().setInputFile(scenOptions.getPreparedPopulationName() + ".xml.gz");
+        AVConfigGroup avConfigGroup = new AVConfigGroup();
+        fullConfig.addModule(avConfigGroup);
+        
 
         // save under correct name
         new ConfigWriter(fullConfig).writeFileV2(scenOptions.getSimulationConfigName());

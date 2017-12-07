@@ -15,7 +15,8 @@ public enum VirtualNetworkCreators {
         @Override
         public VirtualNetwork<Link> create(Network network, Population population, ScenarioOptions scenOptions) {
             MatsimCenterVirtualNetworkCreator centercreator = new MatsimCenterVirtualNetworkCreator();
-            return centercreator.creatVirtualNetwork(network, 2000.0, Tensors.vector(-900.0, -2300.0));
+          //TODO thereare parameters here that should be moved to config
+            return centercreator.creatVirtualNetwork(network, 5000.0, Tensors.vector(0.0, 0.0)); 
         }
     },
     KMEANS {

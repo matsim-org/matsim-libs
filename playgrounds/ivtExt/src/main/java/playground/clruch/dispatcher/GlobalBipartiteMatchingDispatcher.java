@@ -10,15 +10,14 @@ import com.google.inject.name.Named;
 
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.utils.BipartiteMatchingUtils;
 import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
 import playground.clruch.utils.SafeConfig;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
 
@@ -76,9 +75,12 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
 
         @Inject
         private Network network;
+        
+        @Inject
+        private Config config;
 
         @Override
-        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig avconfig) {
             return new GlobalBipartiteMatchingDispatcher( //
                     network,config, avconfig, travelTime, router, eventsManager);
         }

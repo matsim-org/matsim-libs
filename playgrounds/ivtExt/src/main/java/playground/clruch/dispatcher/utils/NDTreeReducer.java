@@ -16,8 +16,8 @@ import ch.ethz.idsc.owly.data.nd.NdTreeMap;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.matsim.av.passenger.AVRequest;
 import playground.clruch.dispatcher.core.RoboTaxi;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /** @author Claudio Ruch */
 public enum NDTreeReducer {

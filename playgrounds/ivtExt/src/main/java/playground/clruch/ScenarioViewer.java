@@ -45,7 +45,8 @@ public class ScenarioViewer {
         File outputDirectory = outputSubDirectory.getParentFile();
         // File outputDirectory = new File(workingDirectory, "/simulation_output" );
 
-        // System.out.println("showing simulation results stored in folder: " + outputDirectory.getAbsolutePath());
+        System.out.println(outputSubDirectory.getAbsolutePath());
+        System.out.println("showing simulation results stored in folder: " + outputDirectory.getName());
 
         ReferenceFrame referenceFrame = simOptions.getReferenceFrame();
         /** reference frame needs to be set manually in IDSCOptions.properties file */

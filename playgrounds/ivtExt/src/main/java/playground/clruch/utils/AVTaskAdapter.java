@@ -3,12 +3,12 @@ package playground.clruch.utils;
 
 import org.matsim.contrib.dvrp.schedule.Task;
 
-import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
-import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
-import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
-import playground.sebhoerl.avtaxi.schedule.AVStayTask;
-import playground.sebhoerl.avtaxi.schedule.AVTask;
-import playground.sebhoerl.avtaxi.schedule.AVTask.AVTaskType;
+import ch.ethz.matsim.av.schedule.AVDriveTask;
+import ch.ethz.matsim.av.schedule.AVDropoffTask;
+import ch.ethz.matsim.av.schedule.AVPickupTask;
+import ch.ethz.matsim.av.schedule.AVStayTask;
+import ch.ethz.matsim.av.schedule.AVTask;
+import ch.ethz.matsim.av.schedule.AVTask.AVTaskType;
 
 /**
  * An {@link AVTaskAdapter} is created using a {@link Task}, which is casted

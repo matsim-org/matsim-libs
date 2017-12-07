@@ -3,7 +3,7 @@ package playground.fseccamo.dispatcher;
 
 import java.util.Comparator;
 
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
+import ch.ethz.matsim.av.passenger.AVRequest;
 
 public enum AVRequestComparator implements Comparator<AVRequest> {
     INSTANCE;
