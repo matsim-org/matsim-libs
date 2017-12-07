@@ -12,10 +12,10 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 
 /** @author Claudio Ruch */
-public class Interval {
+class Interval {
     private final Tensor lb;
     private final Tensor ub;
-    private int n; // dimension
+    private final int n; // dimension
 
     public Interval(Tensor lb, Tensor ub) {
         GlobalAssert.that(Dimensions.of(ub).size() == 1);
@@ -48,7 +48,7 @@ public class Interval {
     public Tensor getLength() {
         Tensor length = Tensors.empty();
         for (int i = 0; i < lb.length(); ++i) {
-            Scalar li = ub.Get(i).subtract(lb.Get(i));
+            Scalar li = ub.Get(i).subtract(lb.Get(i)); // TODO simplify
             if (Scalars.lessThan(li, RealScalar.ZERO)) {
                 length.append(RealScalar.ZERO);
             } else {
@@ -79,13 +79,13 @@ public class Interval {
     @Override
     public boolean equals(Object intervalIn) {
         Interval interval = (Interval) intervalIn;
-        boolean lbsame = interval.getLb().equals(getLb());
-        boolean ubsame = interval.getUb().equals(getUb());
+        boolean lbsame = interval.lb.equals(lb);
+        boolean ubsame = interval.ub.equals(ub);
         return lbsame && ubsame;
     }
 
     public boolean contains(Interval interval) {
-        return contains(interval.getLb()) && contains(interval.getUb());
+        return contains(interval.lb) && contains(interval.ub);
     }
 
 }

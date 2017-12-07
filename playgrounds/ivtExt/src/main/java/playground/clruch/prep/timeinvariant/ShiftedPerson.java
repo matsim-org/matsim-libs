@@ -15,7 +15,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
 /** @author Claudio Ruch */
-public enum ShiftedPerson {
+enum ShiftedPerson {
     ;
 
     public static Person of(Person oldPerson, Id<Person> newID, PopulationFactory populationFactory) {

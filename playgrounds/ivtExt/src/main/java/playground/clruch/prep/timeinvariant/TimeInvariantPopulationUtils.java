@@ -17,7 +17,7 @@ import org.matsim.api.core.v01.population.Population;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 /** @author Claudio Ruch */
-public enum TimeInvariantPopulationUtils {
+enum TimeInvariantPopulationUtils {
     ;
 
 

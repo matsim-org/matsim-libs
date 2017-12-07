@@ -13,12 +13,13 @@ import ch.ethz.idsc.owly.data.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensors;
 
 /** @author Claudio Ruch */
-public enum CountLegs {
+enum CountLegs {
     ;
 
     /** @param population
      * @return number of {@link Leg} in population. */
     public static int countLegsOf(Population population) {
+        // FIXME "-Double.MIN_VALUE" probably used incorrectly
         return of(population, new Interval(Tensors.vector(-Double.MIN_VALUE), Tensors.vector(Double.MAX_VALUE)));
     }
 

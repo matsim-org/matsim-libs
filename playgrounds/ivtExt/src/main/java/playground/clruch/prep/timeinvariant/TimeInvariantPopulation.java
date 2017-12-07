@@ -12,7 +12,7 @@ import org.matsim.core.population.PopulationUtils;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 
 /** @author Claudio Ruch */
-public enum TimeInvariantPopulation {
+enum TimeInvariantPopulation {
     ;
 
     /** @param interval

@@ -10,7 +10,7 @@ import ch.ethz.idsc.tensor.Tensor;
  * @author Claudio Ruch
  *
  */
-public class Max {
+class Max {
     ;
     
     public static Tensor of(Tensor... tensors) {

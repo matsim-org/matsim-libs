@@ -11,6 +11,7 @@ import org.matsim.contrib.dvrp.path.VrpPath;
 public enum VrpPathUtils {
     ;
     public static double getDistance(VrpPath vrpPath) {
+        // TODO implement using stream and sum
         double distance = 0;
         for (Link link : vrpPath)
             distance += link.getLength();
