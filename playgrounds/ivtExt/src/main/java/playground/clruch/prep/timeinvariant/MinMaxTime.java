@@ -14,7 +14,7 @@ import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
 /** @author Claudio Ruch */
-public enum MinMaxTime {
+enum MinMaxTime {
     ;
 
     public static Interval of(Person person) {

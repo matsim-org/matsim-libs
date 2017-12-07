@@ -12,7 +12,7 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Dimensions;
 
 /** @author Claudio Ruch */
-public enum Min {
+enum Min {
     ;
 
     public static Tensor of(Tensor... tensors) {

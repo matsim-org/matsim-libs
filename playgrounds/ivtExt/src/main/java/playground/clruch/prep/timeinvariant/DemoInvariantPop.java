@@ -21,7 +21,8 @@ import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.prep.PopulationTools;
 
 /** @author Claudio Ruch */
-public class DemoInvariantPop {
+enum DemoInvariantPop {
+    ;
 
     /** Takes the full config population in the working directory and creates a population only in the interval
      * or the interval population resampled during the entire day.
