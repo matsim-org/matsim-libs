@@ -42,11 +42,17 @@ import org.matsim.core.scenario.ScenarioUtils;
  *
  */
 public class WobCemdapPlansSample {
-
+	
 	public static void main(String[] args) {
+		final String fullSamplePlansFile = "D:/cemdap-vw/Output/mergedplans_filtered.xml.gz";
 		double scale = 0.01;
+		new WobCemdapPlansSample().run(fullSamplePlansFile, scale);
+	}		
+
+	public void run(String fullSamplePlansFile, double scale) {
+		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenario).readFile("D:/cemdap-vw/Output/mergedplans_filtered.xml.gz");
+		new PopulationReader(scenario).readFile(fullSamplePlansFile);
 		Random r = MatsimRandom.getRandom();
 		Population exportPop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		for (Person p : scenario.getPopulation().getPersons().values()){
@@ -54,7 +60,7 @@ public class WobCemdapPlansSample {
 				exportPop.addPerson(p);
 			}
 		}
-		new PopulationWriter(exportPop).write("D:/cemdap-vw/Output/mergedplans_filtered.xml"+scale+".gz");
+		new PopulationWriter(exportPop).write(fullSamplePlansFile.replace(".xml.gz", "_"+scale+".xml.gz"));
 		
 	}
 }

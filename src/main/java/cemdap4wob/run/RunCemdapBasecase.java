@@ -35,6 +35,7 @@ import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
@@ -62,6 +63,14 @@ public static void main(String[] args) {
 	Controler controler = new Controler(scenario);
 	controler.addOverridingModule(new CadytsCarModule());
 
+	// tell the system to use the congested car router for the ride mode:
+	controler.addOverridingModule(new AbstractModule(){
+		@Override public void install() {
+			addTravelTimeBinding(TransportMode.ride).to(networkTravelTime());
+			addTravelDisutilityFactoryBinding(TransportMode.ride).to(carTravelDisutilityFactoryKey());		}
+	});
+	
+	
 	// include cadyts into the plan scoring (this will add the cadyts corrections to the scores):
 	controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 		private final ScoringParametersForPerson parameters = new SubpopulationScoringParameters( scenario );

@@ -20,7 +20,7 @@
 /**
  * 
  */
-package cemdap4wob.run;
+package cemdap4wob.planspreprocessing;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -56,11 +56,14 @@ import org.matsim.counts.MatsimCountsReader;
  */
 public class WobCemdapBasecaseConfigGenerator {
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("D:/cemdap-vw/cemdap_output/activityConfig.xml");
+		String basefolder = "D:/cemdap-vw/";
+		new WobCemdapBasecaseConfigGenerator().run(basefolder,1.0,1.0);
+	}
+	
+	public void run(String basefolder, double flowCap, double storageCap){		
+		Config config = ConfigUtils.loadConfig(basefolder+"cemdap_output/activityConfig.xml");
 		
-		double storageCap = 1.0;
-		double flowCap = 1.0;
-		
+	
 		//network
 		config.network().setInputFile("input/networkpt-av-nov17_cleaned.xml.gz");
 		config.counts().setInputFile("input/counts_added_bs_wvi.xml");
@@ -70,7 +73,7 @@ public class WobCemdapBasecaseConfigGenerator {
 		config.transit().setVehiclesFile("input/transitvehicles.xml");
 		
 		ControlerConfigGroup ccg = config.controler();
-		ccg.setRunId("vw200"+"."+flowCap);
+		ccg.setRunId("vw203"+"."+flowCap);
 		ccg.setOutputDirectory("output/"+ccg.getRunId()+"/");
 		ccg.setFirstIteration(0);
 		int lastIteration = 300;
@@ -96,7 +99,7 @@ public class WobCemdapBasecaseConfigGenerator {
 		config.plans().setInputFile("cemdap_output/mergedplans_filtered_"+flowCap+".xml.gz");
 		Counts<Link> counts = new Counts<>();
 		
-		new MatsimCountsReader(counts).readFile("D:/cemdap-vw/input/counts_added_bs_wvi.xml");
+		new MatsimCountsReader(counts).readFile(basefolder+"/input/counts_added_bs_wvi.xml");
 		
 		Set<String> countLinks = new HashSet<>();
 		for (Id<Link> lid : counts.getCounts().keySet()){
@@ -112,19 +115,24 @@ public class WobCemdapBasecaseConfigGenerator {
 		
 		ModeParams car = config.planCalcScore().getModes().get(TransportMode.car);
 		car.setMonetaryDistanceRate(-0.0001);
-		car.setMarginalUtilityOfTraveling(-3);
-		car.setConstant(-3);
+		car.setMarginalUtilityOfTraveling(-5);
+		car.setConstant(-5);
+		
+		ModeParams ride = config.planCalcScore().getModes().get(TransportMode.ride);
+		ride.setMonetaryDistanceRate(-0.0001);
+		ride.setMarginalUtilityOfTraveling(-5);
+		ride.setConstant(-6);
 		
 		ModeParams pt = config.planCalcScore().getModes().get(TransportMode.pt);
 		pt.setMarginalUtilityOfTraveling(-0.5);
 		pt.setConstant(-1.5);
 	
 		ModeParams walk= config.planCalcScore().getModes().get(TransportMode.walk);
-		walk.setMarginalUtilityOfTraveling(-6);
+		walk.setMarginalUtilityOfTraveling(-2);
 		
 		ModeParams bike = config.planCalcScore().getModes().get(TransportMode.bike);
 		bike.setMarginalUtilityOfTraveling(-6);
-		bike.setConstant(-3);
+		bike.setConstant(-2);
 		
 		ModeRoutingParams bikeP = config.plansCalcRoute().getOrCreateModeRoutingParams(TransportMode.bike);
 		bikeP.setBeelineDistanceFactor(1.3);
@@ -173,8 +181,10 @@ public class WobCemdapBasecaseConfigGenerator {
 		config.planCalcScore().getActivityParams("shopping").setTypicalDuration(1*3600);
 		config.planCalcScore().getActivityParams("leisure").setTypicalDuration(1*3600);
 		
+		config.subtourModeChoice().setConsiderCarAvailability(true);
+		config.subtourModeChoice().setModes(new String[]{"car","bike","walk","pt","ride"});
 		
-		new ConfigWriter(config).write("D:/cemdap-vw/config_"+flowCap+".xml");
+		new ConfigWriter(config).write(basefolder+"/config_"+flowCap+".xml");
 
 		
 		
