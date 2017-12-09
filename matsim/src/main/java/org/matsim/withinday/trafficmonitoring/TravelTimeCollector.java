@@ -190,6 +190,10 @@ public class TravelTimeCollector implements TravelTime,
 							default:
 								throw new RuntimeException("change event type not implemented") ;
 						}
+						if ( startTime > 0. ) {
+							log.debug( "registering a change event for time=" + startTime
+							+ "; linkId=" + link.getId() ) ;
+						}
 						links.put( link, newSpeed ) ;
 					}
 				}
@@ -344,12 +348,13 @@ public class TravelTimeCollector implements TravelTime,
 		// if someone adds a link change event in between two integer
 		// time steps?  kai, dec'17
 		
-		while( !changedLinks.isEmpty() && changedLinks.firstKey() >= e.getSimulationTime() ) {
+		while( !changedLinks.isEmpty() && changedLinks.firstKey() <= e.getSimulationTime() ) {
 			Map<Link, Double> map = changedLinks.pollFirstEntry().getValue();
 			for ( Map.Entry<Link,Double> link2speed : map.entrySet() ) {
 				Link link = link2speed.getKey() ;
 				double freeSpeedTravelTime = link.getLength() / link2speed.getValue() ;
-				if ( e.getSimulationTime() > 0 ) {
+				if ( e.getSimulationTime() > ((QSim)e.getQueueSimulation()).getSimTimer().getSimStartTime() ) {
+					// (otherwise, in some simulations one gets a lot of change events at time 0. kai, dec'17)
 					log.debug("time=" + e.getSimulationTime() +
 									  "; network change event for link=" + link.getId() +
 									  "; new ttime="+ freeSpeedTravelTime );
