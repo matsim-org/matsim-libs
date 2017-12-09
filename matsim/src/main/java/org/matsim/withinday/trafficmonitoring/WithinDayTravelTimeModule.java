@@ -4,18 +4,18 @@ import org.matsim.core.controler.AbstractModule;
 
 import javax.inject.Singleton;
 
-public class TravelTimeCollectorModule extends AbstractModule {
+public class WithinDayTravelTimeModule extends AbstractModule {
 	
-	public TravelTimeCollectorModule(){}
+	public WithinDayTravelTimeModule(){}
 	
 	@Override
 	public void install() {
-		bind(TravelTimeCollector.class).in(Singleton.class);
-		addEventHandlerBinding().to(TravelTimeCollector.class);
-		bindNetworkTravelTime().to(TravelTimeCollector.class);
+		bind(WithinDayTravelTime.class).in(Singleton.class);
+		addEventHandlerBinding().to(WithinDayTravelTime.class);
+		bindNetworkTravelTime().to(WithinDayTravelTime.class);
 		// yyyyyy also needs to be bound as mobsim listener.  There is maybe a reason
 		// why this is not added here, but could someone please explain?  thx.  kai, dec'17
 		// Trying it out:
-		addMobsimListenerBinding().to(TravelTimeCollector.class) ;
+		addMobsimListenerBinding().to(WithinDayTravelTime.class) ;
 	}
 }
