@@ -73,10 +73,11 @@ public class ScenarioServer {
         SimulationServer.INSTANCE.startAcceptingNonBlocking();
         SimulationServer.INSTANCE.setWaitForClients(waitForClients);
 
-        // load MATSim configs - includign av.xml where dispatcher is selected.
+        // load MATSim configs - including av.xml where dispatcher is selected. 
         System.out.println("loading config file " + configFile.getAbsoluteFile());
+        
+        GlobalAssert.that(configFile.exists()); // Test whether the config file directory exists
 
-        GlobalAssert.that(configFile.exists()); // Test wheather the config file directory exists
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);

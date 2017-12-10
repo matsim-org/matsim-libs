@@ -3,9 +3,15 @@ package playground.lsieber.scenario.preparer;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Iterator;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.io.PopulationWriter;
 
 import ch.ethz.idsc.queuey.util.GZHandler;
@@ -30,10 +36,8 @@ public enum PopulationPreparer {
         if (scenOptions.eliminateWalking())
             PopulationTools.eliminateWalking(population);
         System.out.println("Population size after removing walking people: " + population.getPersons().values().size());
-        if (scenOptions.changeModeToAV()) { // FIXME not sure if this is still required, or should always happen !?
-            System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
+        if (scenOptions.changeModeToAV()) // FIXME not sure if this is still required, or should always happen !?
             PopulationTools.changeModesOfTransportToAV(population);
-        }
         System.out.println("Population size after conversion to mode AV:" + population.getPersons().values().size());
         TheApocalypse.decimatesThe(population).toNoMoreThan(scenOptions.getMaxPopulationSize()).people();
         System.out.println("Population after decimation:" + population.getPersons().values().size());
@@ -55,5 +59,22 @@ public enum PopulationPreparer {
             e.printStackTrace();
         }
 
+    }
+
+    public static void checkRouteType(Population population) {
+        Iterator<? extends Person> itPerson = population.getPersons().values().iterator();
+        Person person = null;
+        while (itPerson.hasNext()) {
+            person = itPerson.next();
+        }
+        for (Plan plan : person.getPlans()) {
+            for (PlanElement pE1 : plan.getPlanElements()) {
+                if (pE1 instanceof Leg) {
+                    Leg leg = (Leg) pE1;
+                    Route route = leg.getRoute();
+                    System.out.println("RouteType of last person: " + route.getRouteType());
+                }
+            }
+        }
     }
 }

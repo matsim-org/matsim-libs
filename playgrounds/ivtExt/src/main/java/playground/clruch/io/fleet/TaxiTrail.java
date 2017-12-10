@@ -22,7 +22,7 @@ public class TaxiTrail {
 
     public void insert(int now, List<String> list) {
         TaxiStamp taxiStamp = new TaxiStamp();
-        taxiStamp.avStatus = StringStatusMapper.apply(now, list.get(3), list.get(4), list.get(5));
+        taxiStamp.avStatus = StringStatusMapper.apply(list.get(3), Double.parseDouble(list.get(4)), Double.parseDouble(list.get(5)));
         taxiStamp.gps = new Coord( //
                 Double.parseDouble(list.get(10)), //
                 Double.parseDouble(list.get(11)));

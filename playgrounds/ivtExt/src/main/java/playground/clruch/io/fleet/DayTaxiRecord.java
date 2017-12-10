@@ -31,7 +31,7 @@ public class DayTaxiRecord {
                 // throw new RuntimeException();
             }
             cmp = DateParser.from(timeStamp);
-            if (cmp % 600000 == 0)
+            if (cmp % 1200000 == 0)
                 System.out.println("INFO reading " + timeStamp);
         }
 

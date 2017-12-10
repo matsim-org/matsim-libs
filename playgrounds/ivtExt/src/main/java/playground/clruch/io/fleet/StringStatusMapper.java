@@ -5,16 +5,16 @@ import playground.clruch.dispatcher.core.AVStatus;
 public enum StringStatusMapper {
     ;
     // TODO check assignments
-    public static AVStatus apply(int now, String string, String distanceMoved, String timePassed) {
+    public static AVStatus apply(String string, double distanceMoved, double timePassed) {
         switch (string) {
         case "Am Standplatz":
-        	return check_stay(now, Double.parseDouble(distanceMoved), Double.parseDouble(timePassed));        	
+        	return check_stay(distanceMoved, timePassed);        	
         case "In Anfahrt":
         	return AVStatus.DRIVETOCUSTOMER;
         case "Angemeldet":
-            return check_stay(now, Double.parseDouble(distanceMoved), Double.parseDouble(timePassed));
+            return check_stay(distanceMoved, timePassed);  
         case "In Umgebung":
-            return check_stay(now, Double.parseDouble(distanceMoved), Double.parseDouble(timePassed));
+            return check_stay(distanceMoved, timePassed);  
         case "Beim Kunden":
             return AVStatus.DRIVETOCUSTOMER;
         case "Besetzt mit Kunden":
@@ -28,7 +28,7 @@ public enum StringStatusMapper {
     }
     
     // New method checking for real stay, rebalance drive or offservice
-    public static AVStatus check_stay(int now, double distanceMoved, double timePassed) {
+    public static AVStatus check_stay(double distanceMoved, double timePassed) {
         if (timePassed >= 150 && distanceMoved <= 150) // TODO magic const, check with AVSTATUS graph.
             return AVStatus.STAY;
         else

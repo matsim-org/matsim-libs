@@ -16,9 +16,9 @@ import org.matsim.core.utils.collections.QuadTree;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.dispatcher.core.RequestStatus;
+import playground.clruch.net.LinkSpeedUtils;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.RequestContainer;
-import playground.clruch.net.RequestContainerUtils;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationObjects;
 import playground.clruch.net.StorageSubscriber;
@@ -53,6 +53,10 @@ enum SimulationFleetDump {
             int dropped = 0;
             int cancelledRequests = 0;
             int requestIndex = 0;
+            int totalRequests = 0;
+            int totalDropoffs = 0;
+            int totalMatchedRequests = 0;
+            
             // NavigableMap<Integer, Integer> requestMap = new TreeMap<>();
             for (int now = 0; now < MAXTIME; now += TIMESTEP) {
                 if (now % 10000 == 0)
@@ -60,13 +64,9 @@ enum SimulationFleetDump {
                 SimulationObject simulationObject = new SimulationObject();
                 simulationObject.now = now;
                 simulationObject.vehicles = new ArrayList<>();
-                simulationObject.requests = new ArrayList<>();
-                // simulationObject.requests are already initialize in SimulationObject
 
                 for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
-
-                    // Check and propagate offservice status
-                    // dayTaxiRecord.get(vehicleIndex).check_offservice(now);
+                    // for (int vehicleIndex = 0; vehicleIndex < 20; ++vehicleIndex) {
 
                     // Get corresponding dayTaxiRecord entry according to time now
                     TaxiTrail taxiTrail = dayTaxiRecord.get(vehicleIndex);
@@ -78,6 +78,10 @@ enum SimulationFleetDump {
                         Link center = quadTree.getClosest(xy.getX(), xy.getY());
                         int linkIndex = db.getLinkIndex(center);
 
+                        LinkSpeedUtils lsUtils = new LinkSpeedUtils(taxiTrail, quadTree, db);
+                        double linkSpeed = lsUtils.getLinkSpeed(now);
+                        // System.out.println("Linkspeed of linkIndex " + linkIndex + ": " + linkSpeed + " m/s");
+
                         // ---
                         VehicleContainer vc = new VehicleContainer();
                         vc.vehicleIndex = vehicleIndex;
@@ -85,18 +89,28 @@ enum SimulationFleetDump {
                         vc.avStatus = taxiStamp.avStatus;
 
                         // Check if there is valid requests and populate requestContainer
-                        RequestContainerUtils rcParser = new RequestContainerUtils(taxiTrail);
-                        if (rcParser.isValidRequest(now)) {
+                        RequestContainerUtils rcUtils = new RequestContainerUtils(taxiTrail, lsUtils);
+                        boolean includeCancelled = false;
+                        // System.out.println("Parsing vehicle " + vehicleIndex + " at time " + now);
+                        if (rcUtils.isValidRequest(now, includeCancelled)) {
                             RequestStatus requestStatus = taxiStamp.requestStatus;
-                            // System.out.println("Parsing RequestStatus for vehicle " + vehicleIndex + ": " + requestStatus.toString());
-
+                            // System.out.println("Parsing RequestStatus " + requestStatus.tag() + " for vehicle " + vehicleIndex + " at time " + now);
                             if (requestStatus != RequestStatus.CANCELLED) {
-                                RequestContainer rc = rcParser.populate(now, requestIndex, quadTree, db);
+                                RequestContainer rc = rcUtils.populate(now, requestIndex, quadTree, db);
                                 simulationObject.requests.add(rc);
-                            } else if (requestStatus == RequestStatus.CANCELLED) {
+                                // Check if a request has been matched == Passenger has been picked up
+                                if (requestStatus == RequestStatus.PICKUP)
+                                    totalMatchedRequests++;
+                                if (requestStatus == RequestStatus.REQUESTED)
+                                    totalRequests++;
+                                if (requestStatus == RequestStatus.DROPOFF)
+                                    totalDropoffs++;
+                                if (RequestStatusParser.isNewSubmission(requestStatus, taxiTrail.getLastEntry(now).getValue().requestStatus))
+                                    requestIndex++;
+                            } else if (requestStatus == RequestStatus.CANCELLED)
                                 cancelledRequests++;
-                            }
                         }
+                        simulationObject.total_matchedRequests = totalMatchedRequests;
                         GlobalAssert.that(Objects.nonNull(vc.avStatus));
                         simulationObject.vehicles.add(vc);
                     } catch (Exception exception) {
@@ -110,8 +124,11 @@ enum SimulationFleetDump {
             }
             ++iteration;
             System.out.println("INFO dropped total: " + dropped);
-            System.out.println("INFO total requests: " + requestIndex);
-            System.out.println("INFO canceled requests: " + cancelledRequests);
+            System.out.println("INFO total submitted requests: " + requestIndex);
+            System.out.println("INFO total requests: " + totalRequests);
+            System.out.println("INFO total pickups: " + totalMatchedRequests);
+            System.out.println("INFO total dropoffs: " + totalDropoffs);
+            System.out.println("INFO cancelled requests: " + cancelledRequests);
         }
     }
 }
