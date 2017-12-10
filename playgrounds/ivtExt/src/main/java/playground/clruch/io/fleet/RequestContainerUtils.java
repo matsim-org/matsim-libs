@@ -1,3 +1,4 @@
+// code by andya
 package playground.clruch.io.fleet;
 
 import java.util.ArrayList;
@@ -16,8 +17,8 @@ import playground.clruch.net.RequestContainer;
 /** @author Andreas Aumiller */
 public class RequestContainerUtils {
 
-    private TaxiTrail taxiTrail;
-    private LinkSpeedUtils lsUtils;
+    private final TaxiTrail taxiTrail;
+    private final LinkSpeedUtils lsUtils;
 
     public RequestContainerUtils(TaxiTrail taxiTrail, LinkSpeedUtils lsUtils) {
         this.taxiTrail = taxiTrail;
@@ -72,7 +73,7 @@ public class RequestContainerUtils {
             // } else if (requestedTime == 0) {
             // return null;
         }
-        // TODO look into returning type Optional<Coord>, and instead of null simply "return Optional.empty();"
+        // TODO Andy: look into returning type Optional<Coord>, and instead of null simply "return Optional.empty();"
         // this can prevent certain mistakes in the application layer
         return null;
     }

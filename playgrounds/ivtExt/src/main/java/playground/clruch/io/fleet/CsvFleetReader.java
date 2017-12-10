@@ -33,9 +33,9 @@ public class CsvFleetReader {
         String lastAVState = null;
 
         // HashSets for logging purposes
-        final HashSet<List<String>> avStateTransitions = new HashSet<>();
-        final HashSet<List<String>> requestStateTransitions = new HashSet<>();
-        final HashSet<List<String>> requestTrails = new HashSet<>();
+        final Set<List<String>> avStateTransitions = new HashSet<>();
+        final Set<List<String>> requestStateTransitions = new HashSet<>();
+        final Set<List<String>> requestTrails = new HashSet<>();
         // for (File file : files) {
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {

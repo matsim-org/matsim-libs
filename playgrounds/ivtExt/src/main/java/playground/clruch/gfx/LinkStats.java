@@ -19,9 +19,9 @@ import playground.clruch.net.VehicleContainer;
 // zurich scenario has ~200k roads
 /* package */ class LinkStats {
 
-    static AVStatus[] INTERP = new AVStatus[] { //
+    static final AVStatus[] INTERP = new AVStatus[] { //
             AVStatus.DRIVEWITHCUSTOMER, AVStatus.DRIVETOCUSTOMER, AVStatus.REBALANCEDRIVE };
-
+    
     final MatsimStaticDatabase db;
     final int width;
 
@@ -39,6 +39,7 @@ import playground.clruch.net.VehicleContainer;
         for (Entry<Integer, List<VehicleContainer>> entry : map.entrySet()) {
             final int index = entry.getKey();
             List<VehicleContainer> list = entry.getValue();
+            // TODO Andy: use EnumSet and Set::contains predicate to make filtering more elegant
             final long total = list.stream().filter(vc -> !vc.avStatus.equals(AVStatus.STAY) && !vc.avStatus.equals(AVStatus.OFFSERVICE)).count();
             if (0 < total) {
                 final Tensor array;

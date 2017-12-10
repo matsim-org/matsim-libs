@@ -1,6 +1,4 @@
-/**
- * 
- */
+// code by andya
 package playground.clruch.io.fleet;
 
 import java.io.File;
@@ -25,9 +23,11 @@ import playground.clruch.net.StorageUtils;
 import playground.clruch.options.ScenarioOptions;
 
 /** @author Andreas Aumiller */
-public class PopulationCreator {
+enum PopulationCreator {
+    ;
 
     public static int STEPSIZE = 10; // TODO this should be derived from storage files
+    // TODO Andi: variables can be local in function
     private static StorageUtils storageUtils;
     private static File[] outputFolders;
     private static String[] outputFolderNames;

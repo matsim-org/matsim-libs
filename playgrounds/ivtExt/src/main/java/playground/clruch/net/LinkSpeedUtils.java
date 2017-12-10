@@ -1,3 +1,4 @@
+// code by andya
 package playground.clruch.net;
 
 import java.util.Objects;
@@ -11,9 +12,9 @@ import playground.clruch.io.fleet.TaxiTrail;
 /** @author Andreas Aumiller */
 public class LinkSpeedUtils {
 
-    private TaxiTrail taxiTrail;
-    private QuadTree<Link> qt;
-    private MatsimStaticDatabase db;
+    private final TaxiTrail taxiTrail;
+    private final QuadTree<Link> qt;
+    private final MatsimStaticDatabase db;
 
     public LinkSpeedUtils(TaxiTrail taxiTrail, QuadTree<Link> qt, MatsimStaticDatabase db) {
         this.taxiTrail = taxiTrail;
@@ -44,7 +45,8 @@ public class LinkSpeedUtils {
         return linkIndex;
     }
 
-    public double getGPSDistance(double latitude1, double longitude1, double latitude2, double longitude2) {
+    // TODO Andy: cite reference for geodesic formula
+    public static double getGPSDistance(double latitude1, double longitude1, double latitude2, double longitude2) {
         double R = 6371000; // in meters
         double dLat = Math.toRadians(latitude2 - latitude1);
         double dLon = Math.toRadians(longitude2 - longitude1);
