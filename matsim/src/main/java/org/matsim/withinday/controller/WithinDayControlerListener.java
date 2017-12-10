@@ -36,7 +36,7 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
-import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
+import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -59,7 +59,7 @@ public class WithinDayControlerListener implements StartupListener {
 	private static final Logger log = Logger.getLogger(WithinDayControlerListener.class);
 
 	private int numReplanningThreads = 0;
-	@Inject private WithinDayTravelTime travelTimeCollector;
+	@Inject private TravelTimeCollector travelTimeCollector;
 	@Inject private ActivityReplanningMap activityReplanningMap;
 	@Inject private LinkReplanningMap linkReplanningMap;
 	@Inject private MobsimDataProvider mobsimDataProvider;
@@ -106,7 +106,7 @@ public class WithinDayControlerListener implements StartupListener {
 		throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
 	}
 
-	public WithinDayTravelTime getTravelTimeCollector() {
+	public TravelTimeCollector getTravelTimeCollector() {
 		return this.travelTimeCollector;
 	}
 

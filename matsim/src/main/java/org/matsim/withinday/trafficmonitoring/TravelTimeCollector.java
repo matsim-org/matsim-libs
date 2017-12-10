@@ -20,7 +20,6 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -64,13 +63,13 @@ import java.util.concurrent.CyclicBarrier;
  * @author cdobler
  */
 @Singleton
-public class WithinDayTravelTime implements TravelTime,
+public class TravelTimeCollector implements TravelTime,
 		LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler,
 		VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler,
 		MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener,
 		MobsimBeforeCleanupListener {
 
-	private static final Logger log = Logger.getLogger(WithinDayTravelTime.class);
+	private static final Logger log = Logger.getLogger(TravelTimeCollector.class);
 
 	private Network network;
 
@@ -105,11 +104,11 @@ public class WithinDayTravelTime implements TravelTime,
 	private double now = Double.NEGATIVE_INFINITY ;
 	
 	@Inject
-	WithinDayTravelTime(Scenario scenario) {
+	TravelTimeCollector(Scenario scenario) {
 		this(scenario, null);
 	}
 
-	public WithinDayTravelTime(Scenario scenario, Set<String> analyzedModes) {
+	public TravelTimeCollector(Scenario scenario, Set<String> analyzedModes) {
 //		log.setLevel(Level.DEBUG);
 		
 		/*
