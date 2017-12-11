@@ -44,6 +44,7 @@ public class ScenarioPreparer {
 
         // 2) adapt the population to new network
         Population population = scenario.getPopulation();
+        System.out.println("population size: " + population.getPersons().size());
         PopulationPreparer.run(network, population, scenarioOptions);
 
         // 3) create virtual Network

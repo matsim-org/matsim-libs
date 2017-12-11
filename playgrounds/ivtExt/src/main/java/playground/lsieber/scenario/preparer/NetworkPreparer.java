@@ -35,7 +35,7 @@ public enum NetworkPreparer {
 
         // Clean the network if defined in the IDSC Settings
         if (scenOptions.removeShortLinks()) {
-            RemoveShortLinks.of(network).fromLength(20.0); //TODO magic const
+            RemoveShortLinks.of(network).fromLength(60.0); //TODO magic const
         }
 
         if (scenOptions.cleanNetwork()) {

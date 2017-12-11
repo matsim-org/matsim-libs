@@ -33,7 +33,9 @@ public final class RemoveShortLinks {
                 toRemove.add(entry.getKey());
             }
         }
-        toRemove.stream().forEach(id -> network.removeLink(id));
+//        toRemove.stream().forEach(id -> network.removeLink(id));
+        
+        toRemove.stream().forEach(id->network.getLinks().get(id).setLength(100.0)); // TODO magic const.
         
         return network;
 
