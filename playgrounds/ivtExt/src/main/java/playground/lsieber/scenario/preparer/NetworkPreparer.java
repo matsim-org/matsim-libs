@@ -15,6 +15,7 @@ import playground.clruch.options.ScenarioOptions;
 import playground.lsieber.networkshapecutter.LinkModes;
 import playground.lsieber.networkshapecutter.NetworkCutterUtils;
 import playground.lsieber.networkshapecutter.NetworkCutters;
+import playground.lsieber.networkshapecutter.RemoveShortLinks;
 
 public enum NetworkPreparer {
     ;
@@ -33,6 +34,10 @@ public enum NetworkPreparer {
         }
 
         // Clean the network if defined in the IDSC Settings
+        if (scenOptions.removeShortLinks()) {
+            RemoveShortLinks.of(network).fromLength(20.0); //TODO magic const
+        }
+
         if (scenOptions.cleanNetwork()) {
             new NetworkCleaner().run(modifiedNetwork);
         }
