@@ -31,6 +31,8 @@ enum SimulationFleetDump {
     public static void of(List<DayTaxiRecord> dayTaxiRecords, Network network, MatsimStaticDatabase db, //
             List<File> outputFolders) {
 
+        System.out.println(outputFolders.get(0).toString());
+        
         final double[] networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         final QuadTree<Link> quadTree = new QuadTree<>( //
                 networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
@@ -56,7 +58,7 @@ enum SimulationFleetDump {
             int totalRequests = 0;
             int totalDropoffs = 0;
             int totalMatchedRequests = 0;
-            
+
             // NavigableMap<Integer, Integer> requestMap = new TreeMap<>();
             for (int now = 0; now < MAXTIME; now += TIMESTEP) {
                 if (now % 10000 == 0)
@@ -130,5 +132,10 @@ enum SimulationFleetDump {
             System.out.println("INFO total dropoffs: " + totalDropoffs);
             System.out.println("INFO cancelled requests: " + cancelledRequests);
         }
+
+//        // Write new network with adapted traffic data / speeds
+//        NetworkWriter networkWriter = new NetworkWriter(network);
+//        final File networkGzFile = new File(workingDirectory, "TestPopulation.xml.gz");
+//        networkWriter.write(networkGzFile);
     }
 }

@@ -12,4 +12,6 @@ public class TaxiStamp {
 	public RequestStatus requestStatus;
 	public int requestIndex;
 	public Coord gps;
+	public int linkIndex;
+	public double linkSpeed;
 }

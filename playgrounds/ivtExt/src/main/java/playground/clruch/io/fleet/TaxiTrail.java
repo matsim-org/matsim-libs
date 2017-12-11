@@ -94,6 +94,18 @@ public class TaxiTrail {
             }
         }
     }
+    
+    public void setLinkData(int now, int linkIndex, double linkSpeed) {
+        // less than or equal to the given key
+        Entry<Integer, TaxiStamp> entry = interp(now);
+        if (Objects.nonNull(entry)) {
+            TaxiStamp taxiStamp = entry.getValue();
+            int timeStamp = entry.getKey();
+            taxiStamp.linkIndex = linkIndex;
+            taxiStamp.linkSpeed = linkSpeed;
+            sortedMap.replace(timeStamp, taxiStamp);
+        }
+    }
 
     public void setRequestIndex(int now, int requestIndex) {
         // less than or equal to the given key

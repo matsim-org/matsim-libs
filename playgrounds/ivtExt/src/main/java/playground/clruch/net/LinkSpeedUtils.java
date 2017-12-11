@@ -4,6 +4,8 @@ import java.util.Objects;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.clruch.io.fleet.TaxiTrail;
@@ -21,6 +23,15 @@ public class LinkSpeedUtils {
         this.db = db;
     }
 
+    public LinkSpeedUtils(TaxiTrail taxiTrail, Network network, MatsimStaticDatabase db) {
+        final double[] networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
+        final QuadTree<Link> qt = new QuadTree<>( //
+                networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
+        this.taxiTrail = taxiTrail;
+        this.qt = qt;
+        this.db = db;
+    }
+    
     public double getLinkSpeed(int now) {
         if (Objects.nonNull(taxiTrail.getLastEntry(now))) {
             Coord nowXY = taxiTrail.interp(now).getValue().gps;

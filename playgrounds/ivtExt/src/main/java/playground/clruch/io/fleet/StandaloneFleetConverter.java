@@ -34,6 +34,8 @@ enum StandaloneFleetConverter {
         System.out.println("INFO working folder: " + workingDirectory.getAbsolutePath());
         System.out.println("INFO network file: " + networkFile.getAbsolutePath());
         ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
+        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
+        
         List<File> trailFiles = (new MultiFileReader(workingDirectory, "Fahrtstrecken")).getFolderFiles();
         List<DayTaxiRecord> dayTaxiRecords = new ArrayList<>();
         List<File> outputFolders = new ArrayList<>();
@@ -59,13 +61,16 @@ enum StandaloneFleetConverter {
 
         // Generate dayTaxiRecords and output folders according to date of csv-data
         System.out.println("INFO found files: ");
+        boolean takeLog = true;
         for (File file : trailFiles) {
             System.out.println(file.getAbsolutePath());
 
             DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
             // extract data from file and put into dayTaxiRecord
             CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);
-            reader.populateFrom(file, true);
+            reader.populateFrom(file, takeLog);
+            FleetUtils.processData(file, dayTaxiRecord, takeLog);
+            FleetUtils.getLinkData(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE);
             dayTaxiRecords.add(dayTaxiRecord);
 
             outputDirectory = new File(workingDirectory, "output/" + file.getName().substring(0, 10));
@@ -77,7 +82,6 @@ enum StandaloneFleetConverter {
         }
 
         // STEP 2: DayTaxiRecord to MATSimStaticDatabase
-        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
 
         // generate sim objects and store
         SimulationFleetDump.of(dayTaxiRecords, network, MatsimStaticDatabase.INSTANCE, outputFolders);

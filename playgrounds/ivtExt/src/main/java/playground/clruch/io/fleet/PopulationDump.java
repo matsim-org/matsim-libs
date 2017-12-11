@@ -40,7 +40,7 @@ enum PopulationDump {
                 storageSupplier = iter.storageSupplier;
                 final int MAX_ITER = storageSupplier.size(); // storageSupplier.size()
                 for (int index = 0; index < MAX_ITER; index++) {
-                    if (index % 200 == 0) {
+                    if (index % 1000 == 0) {
                         SimulationObject simulationObject = storageSupplier.getSimulationObject(index);
 
                         List<RequestContainer> rc = simulationObject.requests;
