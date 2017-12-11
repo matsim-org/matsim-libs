@@ -5,8 +5,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.sebhoerl.plcpc.LeastCostPathFuture;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
+import ch.ethz.matsim.av.plcpc.LeastCostPathFuture;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 
 public class InstantPathFactory {
     final ParallelLeastCostPathCalculator parallelLeastCostPathCalculator;

@@ -7,9 +7,9 @@ import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Task;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.matsim.av.schedule.AVDriveTask;
+import ch.ethz.matsim.av.schedule.AVStayTask;
 import playground.clruch.router.FuturePathContainer;
-import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
-import playground.sebhoerl.avtaxi.schedule.AVStayTask;
 
 /**
  * for vehicles that are in stay task:

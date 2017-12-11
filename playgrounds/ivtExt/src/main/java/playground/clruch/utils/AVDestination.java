@@ -6,11 +6,11 @@ import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.Task;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.sebhoerl.avtaxi.data.AVVehicle;
-import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
-import playground.sebhoerl.avtaxi.schedule.AVDropoffTask;
-import playground.sebhoerl.avtaxi.schedule.AVPickupTask;
-import playground.sebhoerl.avtaxi.schedule.AVStayTask;
+import ch.ethz.matsim.av.data.AVVehicle;
+import ch.ethz.matsim.av.schedule.AVDriveTask;
+import ch.ethz.matsim.av.schedule.AVDropoffTask;
+import ch.ethz.matsim.av.schedule.AVPickupTask;
+import ch.ethz.matsim.av.schedule.AVStayTask;
 
 public class AVDestination extends AVTaskAdapter {
 

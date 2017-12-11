@@ -10,8 +10,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.router.util.TravelTime;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 
 /** @author Claudio Ruch class for wich all Dispatchers performing rebalancing, i.e., replacement of empty vehicles should be derived */
 public abstract class RebalancingDispatcher extends UniversalDispatcher {

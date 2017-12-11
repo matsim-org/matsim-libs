@@ -20,6 +20,10 @@ import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.math.utils.Max;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
@@ -30,11 +34,6 @@ import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.utils.SafeConfig;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /** Dispatcher used to create datasets to verify the theory of selfish fleet performance.
  * 
@@ -164,12 +163,15 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
         @Inject
         private Network network;
+        
+        @Inject
+        private Config config;
 
         public static VirtualNetwork<Link> virtualNetwork;
         public static TravelData travelData;
 
         @Override
-        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig avconfig) {
             try {
                 virtualNetwork = VirtualNetworkGet.readDefault(network);
                 travelData = TravelDataGet.readDefault(virtualNetwork);

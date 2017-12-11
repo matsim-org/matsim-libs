@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import ch.ethz.idsc.tensor.Tensors;
 
 /** @author Claudio Ruch */
-public enum Consistency {
+enum Consistency {
     ;
 
     /**

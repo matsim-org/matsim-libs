@@ -15,16 +15,15 @@ import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /** Empty Test Dispatcher, rebalances a vehicle every 30 mins and performs a
  * pickup every 30 mins if open requests are present. Not functional, use as
@@ -150,6 +149,9 @@ public class SPLICEDispatcher extends RebalancingDispatcher {
 
         @Inject
         private Network network;
+        
+        @Inject
+        private Config config;
 
         // @Inject
         // private NetworkDistanceFunction ndf;
@@ -158,7 +160,7 @@ public class SPLICEDispatcher extends RebalancingDispatcher {
         // private List<AVRequest> scTAVrequests;
 
         @Override
-        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig avconfig) {
             return new SPLICEDispatcher(config, avconfig, travelTime, router, eventsManager, network);// ,
                                                                                                       // scTAVrequests);
                                                                                                       // //,ndf,scTAVrequests);

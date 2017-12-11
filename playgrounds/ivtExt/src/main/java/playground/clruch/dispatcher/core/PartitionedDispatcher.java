@@ -12,9 +12,9 @@ import org.matsim.core.router.util.TravelTime;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 
 /** All dispatchers wich perform rebalancing and use a virtualNetwork dividing the city into zones are derived from {@link PartitionedDispatcher}.
  * A {@link PartitionedDispatcher} always has a {@link VirtualNetwork}

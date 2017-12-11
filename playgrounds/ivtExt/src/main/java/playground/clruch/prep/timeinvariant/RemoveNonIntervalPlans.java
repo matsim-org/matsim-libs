@@ -14,7 +14,7 @@ import ch.ethz.idsc.owly.data.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensors;
 
 /** @author Claudio Ruch */
-public enum RemoveNonIntervalPlans {
+enum RemoveNonIntervalPlans {
     ;
 
     /** removes all plans of person which are not in the interval

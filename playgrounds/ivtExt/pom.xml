@@ -15,6 +15,11 @@
 	<description>Extensions used in several scenarios maintained by ivt, ethz.</description>
 	<dependencies>
 		<dependency>
+			<groupId>ch.ethz.matsim</groupId>
+			<artifactId>av</artifactId>
+			<version>0.1.2-nov17</version>
+		</dependency>
+		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
 			<version>0.10.0-nov17</version>
@@ -37,7 +42,7 @@
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>
 			<artifactId>tensor</artifactId>
-			<version>0.4.4</version>
+			<version>0.4.5</version>
 		</dependency>
 		<dependency>
 			<groupId>ch.ethz.idsc</groupId>

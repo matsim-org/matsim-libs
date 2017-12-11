@@ -6,8 +6,6 @@ package playground.clruch;
 import java.io.File;
 import java.net.MalformedURLException;
 
-import javax.measure.unit.SystemOfUnits;
-
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import playground.clruch.options.ScenarioOptions;
 

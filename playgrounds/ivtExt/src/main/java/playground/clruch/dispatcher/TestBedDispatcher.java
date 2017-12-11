@@ -12,15 +12,14 @@ import org.matsim.core.router.util.TravelTime;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 import playground.clruch.dispatcher.core.RebalancingDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.utils.SafeConfig;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /** Empty Test Dispatcher, rebalances a vehicle every 30 mins and
  * performs a pickup every 30 mins if open reqeutss are present.
@@ -87,9 +86,12 @@ public class TestBedDispatcher extends RebalancingDispatcher {
 
         @Inject
         private Network network;
+        
+        @Inject
+        private Config config;
 
         @Override
-        public AVDispatcher createDispatcher(Config config,AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig avconfig) {
             return new TestBedDispatcher(config, avconfig, travelTime, router, eventsManager, network);
         }
     }

@@ -15,7 +15,7 @@ import org.matsim.api.core.v01.population.Person;
  *         and then finds the largest integer value in these IDs, every call of generateUnusedID
  *         then creates an id idName + largestinteger +i where i is initialized with the largest
  *         found integer */
-public class IDGenerator {
+class IDGenerator {
 
     private HashSet<Id<Person>> usedIDs;
     private Integer smallestUnusedInt;

@@ -39,7 +39,9 @@ public class ScenarioViewer {
         // load options
         ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);
         Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName());
+        System.out.println(simOptions.getSimulationConfigName());
         File outputSubDirectory = new File(config.controler().getOutputDirectory());
+        System.out.println(outputSubDirectory.getAbsolutePath());
         File outputDirectory = outputSubDirectory.getParentFile();
         // File outputDirectory = new File(workingDirectory, "/simulation_output" );
 
