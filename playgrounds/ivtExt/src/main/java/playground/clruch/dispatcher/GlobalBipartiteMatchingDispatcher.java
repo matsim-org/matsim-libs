@@ -16,6 +16,7 @@ import ch.ethz.matsim.av.framework.AVModule;
 import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 import playground.clruch.dispatcher.core.UniversalDispatcher;
 import playground.clruch.dispatcher.utils.BipartiteMatchingUtils;
+import playground.clruch.dispatcher.utils.EuclideanDistanceFunction;
 import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
 import playground.clruch.utils.SafeConfig;
 
@@ -47,8 +48,8 @@ public class GlobalBipartiteMatchingDispatcher extends UniversalDispatcher {
         if (round_now % dispatchPeriod == 0) {
             printVals = BipartiteMatchingUtils.executePickup(this::setRoboTaxiPickup, //
                     getDivertableRoboTaxis(), getAVRequests(), //
-                    // new EuclideanDistanceFunction(), network, false);
-                    ndf, network, false);
+                    new EuclideanDistanceFunction(), network, false);
+                    // ndf, network, false);
 
         }
     }
