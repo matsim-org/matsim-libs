@@ -22,7 +22,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -33,11 +39,10 @@ import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.households.Household;
 import org.matsim.households.HouseholdImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.opengis.feature.simple.SimpleFeature;
+
 import playground.vsp.demandde.cemdap.LogToOutputSaver;
 import playground.vsp.demandde.cemdap.input.CommuterRelationV2;
 

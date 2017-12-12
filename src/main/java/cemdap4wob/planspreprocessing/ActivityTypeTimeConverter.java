@@ -121,7 +121,6 @@ public class ActivityTypeTimeConverter {
 								
 							if (lastActivityCoord!=null){
 									double traveltime = CoordUtils.calcEuclideanDistance(lastActivityCoord, ((Activity) pe).getCoord())/8.33;
-									@SuppressWarnings("null")
 									double actStartTime = lastActivityEndtime + traveltime;
 									if (!Time.isUndefinedTime(((Activity) pe).getEndTime())){
 									int duration = (int) Math.round((((Activity) pe).getEndTime() - actStartTime)/3600);
