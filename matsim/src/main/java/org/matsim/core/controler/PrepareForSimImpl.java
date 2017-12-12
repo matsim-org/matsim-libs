@@ -149,6 +149,8 @@ class PrepareForSimImpl implements PrepareForSim {
 	}
 
 	private void createVehiclesInAdvance(final Map<String, VehicleType> modeVehicleTypes) {
+		// yyyy maybe better just take the modes from qsim.mainMode???  kai, dec'17
+		
 		boolean isModeChoicePresent = false;
 		Collection<StrategyConfigGroup.StrategySettings> strategySettings = scenario.getConfig().strategy().getStrategySettings();
 		for (StrategyConfigGroup.StrategySettings strategySetting : strategySettings) {

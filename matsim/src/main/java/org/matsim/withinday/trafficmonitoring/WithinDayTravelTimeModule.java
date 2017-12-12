@@ -4,9 +4,9 @@ import org.matsim.core.controler.AbstractModule;
 
 import javax.inject.Singleton;
 
-public class TravelTimeCollectorModule extends AbstractModule {
+public class WithinDayTravelTimeModule extends AbstractModule {
 	
-	public TravelTimeCollectorModule(){}
+	public WithinDayTravelTimeModule(){}
 	
 	@Override
 	public void install() {
