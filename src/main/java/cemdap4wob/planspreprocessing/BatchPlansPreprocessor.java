@@ -50,7 +50,7 @@ public class BatchPlansPreprocessor {
 		new MergeStudentsIntoPopulation().run(baseFolder+"/add_data/initial_plans1.0.xml.gz", cemdapOutputFolder+"mergedPlans_filtered.xml.gz", cemdapOutputFolder+"activityConfig.xml");
 		
 		// Attribute (alter, Geschlecht, Autobesitz) aus dem Vor-Cemdap-Populationsfile übernehmen
-		new MergeInputAttributes().run(cemdapOutputFolder+"mergedPlans_filtered.xml.gz", baseFolder+"/add_data/precemdap-baseplans.xml.gz");
+		new MergeInputAttributes().run(cemdapOutputFolder+"mergedPlans_filtered.xml.gz", baseFolder+"/cemdap_input/plans.xml.gz");
 		new RenameAgents().run(baseFolder+"/add_data/shp/Statistische_Bezirke_mainzone.SHP", cemdapOutputFolder+"mergedPlans_filtered.xml.gz", "NO", TransformationFactory.getCoordinateTransformation("EPSG:25832", "EPSG:4647"));
 		
 		//Sample für 10 / bzw. 1 % erstellen
