@@ -213,9 +213,6 @@ public class TravelTimeCollector implements TravelTime,
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		final double travelTime = this.travelTimeInfoProvider.getTravelTimeInfo(link).travelTime;
-		if ( Id.createLinkId(51825).equals(link.getId())) {
-			log.debug( "link=" + link.getId() + ";\ttime=" + time + ";\tttime=" + travelTime ) ;
-		}
 		return travelTime;
 	}
 	
