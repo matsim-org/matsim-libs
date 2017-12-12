@@ -96,7 +96,7 @@ public class WobCemdapBasecaseConfigGenerator {
 		
 		config.counts().setCountsScaleFactor(1.0/flowCap);
 		
-		config.plans().setInputFile("cemdap_output/mergedplans_filtered_"+flowCap+".xml.gz");
+		config.plans().setInputFile("cemdap_output/mergedPlans_filtered_"+flowCap+".xml.gz");
 		Counts<Link> counts = new Counts<>();
 		
 		new MatsimCountsReader(counts).readFile(basefolder+"/input/counts_added_bs_wvi.xml");
