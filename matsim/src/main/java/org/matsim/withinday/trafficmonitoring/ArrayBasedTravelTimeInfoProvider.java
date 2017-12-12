@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.priorityqueue.HasIndex;
-import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime.TravelTimeInfo;
+import org.matsim.withinday.trafficmonitoring.TravelTimeCollector.TravelTimeInfo;
 
 public class ArrayBasedTravelTimeInfoProvider implements TravelTimeInfoProvider {
 
