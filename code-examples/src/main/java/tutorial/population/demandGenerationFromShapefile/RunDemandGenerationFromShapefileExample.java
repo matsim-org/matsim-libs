@@ -22,6 +22,9 @@ package tutorial.population.demandGenerationFromShapefile;
 import java.io.IOException;
 import java.util.Random;
 
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.shape.random.RandomPointsBuilder;
 import org.apache.log4j.Logger;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
@@ -160,17 +163,23 @@ public class RunDemandGenerationFromShapefileExample {
 	}
 
 	private static Point getRandomPointInFeature(Random rnd, SimpleFeature ft) {
-		Point p = null;
-		double x, y;
-		do {
-			x = ft.getBounds().getMinX() + rnd.nextDouble() * (ft.getBounds().getMaxX() - ft.getBounds().getMinX());
-			y = ft.getBounds().getMinY() + rnd.nextDouble() * (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
-			p = MGC.xy2Point(x, y);
-//		} while (((Geometry) ft.getDefaultGeometry()).contains(p));
-		} while ( ! ((Geometry) ft.getDefaultGeometry()).contains(p));
-		// the above has been wrong when we found this, presumably for many years
-		
-		return p;
+//		Point p = null;
+//		double x, y;
+//		do {
+//			x = ft.getBounds().getMinX() + rnd.nextDouble() * (ft.getBounds().getMaxX() - ft.getBounds().getMinX());
+//			y = ft.getBounds().getMinY() + rnd.nextDouble() * (ft.getBounds().getMaxY() - ft.getBounds().getMinY());
+//			p = MGC.xy2Point(x, y);
+////		} while (((Geometry) ft.getDefaultGeometry()).contains(p));
+//		} while ( ! ((Geometry) ft.getDefaultGeometry()).contains(p));
+//		// the above has been wrong when we found this, presumably for many years
+//        return p;
+
+        // alternative and about 10 times faster way to generate random point inside a geometry. Amit Dec'17
+        RandomPointsBuilder randomPointsBuilder = new RandomPointsBuilder(new GeometryFactory());
+        randomPointsBuilder.setNumPoints(1);
+        randomPointsBuilder.setExtent( (Geometry)ft.getDefaultGeometry());
+        Coordinate coordinate = randomPointsBuilder.getGeometry().getCoordinates()[0];
+        return MGC.coordinate2Point(coordinate);
 	}
 
 
