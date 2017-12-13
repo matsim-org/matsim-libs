@@ -28,7 +28,7 @@ public class SequentialScenarioServer {
         //double factorPlus = 1.9;
         //double[] fareRatios = SequentialScenarioTools.fareRatioCreator(iterations, factorPlus);
         //double[] fareRatios = new double[]{0.0001, 1.0, 10000.0};
-        int[] vehicleNumbers = new int[]{5,15,20,25,30,35,40,45,50,250};
+        int[] vehicleNumbers = new int[]{20,40,60,80,100,120,140,160,180,200};
         
 
         // copy the raw folder name including changed settings

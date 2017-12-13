@@ -9,6 +9,7 @@ import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.matsim.av.data.AVVehicle;
+import playground.clruch.router.FuturePathContainer;
 
 /** RoboTaxi is central classs to be used in all dispatchers.
  * Dispatchers control a fleet of RoboTaxis, each is uniquely
@@ -144,7 +145,13 @@ public class RoboTaxi {
 
     /** execute the directive of a RoboTaxi, to be used only inside core package */
     /* package */ void executeDirective() {
-        directive.execute();
+//        directive.execute();
+        try {
+            directive.execute();
+        } catch (Exception e) {
+            System.err.println("could not execute directive");
+            setAVStatus(AVStatus.STAY);
+        }
         directive = null;
     }
 

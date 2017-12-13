@@ -5,11 +5,9 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
 import playground.clruch.router.FuturePathContainer;
 
-/**
- * class maintains a {@link FuturePathContainer}
+/** class maintains a {@link FuturePathContainer}
  * while the path is being computer.
- * the resulting path is available upon the function call execute(...)
- */
+ * the resulting path is available upon the function call execute(...) */
 abstract class FuturePathDirective implements AbstractDirective {
     protected final FuturePathContainer futurePathContainer;
 
@@ -26,7 +24,7 @@ abstract class FuturePathDirective implements AbstractDirective {
     abstract void executeWithPath(VrpPathWithTravelData vrpPathWithTravelData);
 
     protected void reportExecutionBypass(double excess) {
-//        System.out.println(" \\- bypass " + getClass().getSimpleName() + ", exceeds EndTime by " + excess + " sec");
+        // System.out.println(" \\- bypass " + getClass().getSimpleName() + ", exceeds EndTime by " + excess + " sec");
     }
 
 }

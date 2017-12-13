@@ -54,8 +54,8 @@ enum PopulationCreator {
         System.out.println("INFO loading simulation configuration");
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         // File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
-        Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName(), new AVConfigGroup(), dvrpConfigGroup);
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+        // Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName(), new AVConfigGroup(), dvrpConfigGroup);
+        Scenario scenario = ScenarioUtils.loadScenario(configFile);
         Network network = scenario.getNetwork();
         PlansConfigGroup plansConfigGroup = new PlansConfigGroup();
 
