@@ -95,7 +95,7 @@ public class EquilOpdytsIT {
 
         opdytsConfigGroup.setMaxIteration(4);
         opdytsConfigGroup.setOutputDirectory(scenario.getConfig().controler().getOutputDirectory());
-        opdytsConfigGroup.setVariationSizeOfRandomizeDecisionVariable(stepSize);
+        opdytsConfigGroup.setDecisionVariableStepSize(stepSize);
         opdytsConfigGroup.setUseAllWarmUpIterations(false);
         opdytsConfigGroup.setWarmUpIterations(5); //this should be tested (parametrized).
         opdytsConfigGroup.setPopulationSize(2);

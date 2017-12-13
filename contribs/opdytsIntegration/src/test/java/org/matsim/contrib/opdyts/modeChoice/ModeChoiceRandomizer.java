@@ -70,14 +70,14 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
             { // positive
                 PlanCalcScoreConfigGroup configGroupWithStartingModeParams = copyOfPlanCalcScore(oldParameterSet);
                 PlanCalcScoreConfigGroup.ModeParams sourceModeParam = configGroupWithStartingModeParams.getModes().get(mode);
-                double newASC =  sourceModeParam.getConstant() + opdytsConfigGroup.getVariationSizeOfRandomizeDecisionVariable() ;
+                double newASC =  sourceModeParam.getConstant() + opdytsConfigGroup.getDecisionVariableStepSize() ;
                 sourceModeParam.setConstant(newASC);
                 allCombinations.add(configGroupWithStartingModeParams);
             }
             { // negative
                 PlanCalcScoreConfigGroup configGroupWithStartingModeParams = copyOfPlanCalcScore(oldParameterSet);
                 PlanCalcScoreConfigGroup.ModeParams sourceModeParam = configGroupWithStartingModeParams.getModes().get(mode);
-                double newASC =  sourceModeParam.getConstant() - opdytsConfigGroup.getVariationSizeOfRandomizeDecisionVariable() ;
+                double newASC =  sourceModeParam.getConstant() - opdytsConfigGroup.getDecisionVariableStepSize() ;
                 sourceModeParam.setConstant(newASC);
                 allCombinations.add(configGroupWithStartingModeParams);
             }
