@@ -38,14 +38,14 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
     private final Random rnd;
 
     private final OpdytsConfigGroup opdytsConfigGroup;
-    private final Collection<String> considerdModes ;
+    private final Collection<String> consideredModes;
 
-    public ModeChoiceRandomizer(final Scenario scenario, final Collection<String> considerdModes) {
+    public ModeChoiceRandomizer(final Scenario scenario, final Collection<String> consideredModes) {
         this.scenario = scenario;
         this.opdytsConfigGroup = (OpdytsConfigGroup) scenario.getConfig().getModules().get(OpdytsConfigGroup.GROUP_NAME);
         this.rnd = new Random(opdytsConfigGroup.getRandomSeedToRandomizeDecisionVariable());
         log.warn("The random seed to randomizing decision variable is :"+ opdytsConfigGroup.getRandomSeedToRandomizeDecisionVariable());
-        this.considerdModes = considerdModes;
+        this.consideredModes = consideredModes;
     }
 
     @Override
@@ -55,18 +55,17 @@ public final class ModeChoiceRandomizer implements DecisionVariableRandomizer<Mo
         final PlanCalcScoreConfigGroup oldScoringConfig = decisionVariable.getScoreConfig();
         PlanCalcScoreConfigGroup.ScoringParameterSet oldParameterSet = oldScoringConfig.getScoringParametersPerSubpopulation().get(null);
 
-        int totalNumberOfCombination = (int) Math.pow(2, this.considerdModes.size()-1); // exclude car
+        int totalNumberOfCombination = (int) Math.pow(2, this.consideredModes.size()-1); // exclude car
         List<PlanCalcScoreConfigGroup> allCombinations = new ArrayList<>(totalNumberOfCombination);
-        List<String> remainingModes = new ArrayList<>(this.considerdModes);
 
         { // create one planCalcScoreConfigGroup with all starting params.
-            PlanCalcScoreConfigGroup configGroupWithStartingModeParams = copyOfPlanCalcScore(oldParameterSet);
-            allCombinations.add(configGroupWithStartingModeParams);
-            remainingModes.remove(TransportMode.car);
+            // if this is required, use switch related to includeCurrentBest in opdytsConfigGroup. Amit Dec'17
+//            PlanCalcScoreConfigGroup configGroupWithStartingModeParams = copyOfPlanCalcScore(oldParameterSet);
+//            allCombinations.add(configGroupWithStartingModeParams);
         }
 
         log.warn("creating randomVariation combinations of decision variable as : axial_fixed");
-        for(String mode : this.considerdModes) {
+        for(String mode : this.consideredModes) {
             if ( mode.equals(TransportMode.car)) continue;
             { // positive
                 PlanCalcScoreConfigGroup configGroupWithStartingModeParams = copyOfPlanCalcScore(oldParameterSet);
