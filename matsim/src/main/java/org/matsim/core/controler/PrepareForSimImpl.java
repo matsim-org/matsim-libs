@@ -1,6 +1,7 @@
 package org.matsim.core.controler;
 
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -164,6 +165,12 @@ class PrepareForSimImpl implements PrepareForSim {
 				log.warn("Creating one vehicle corresponding to each network mode for every agent and parking it to the departure link. \n" +
 						"If this is undesirable, then write a new PrepareForSim +" +
 						"or, somehow get vehicles generation in your plan strategy.");
+			} else if ( ! Arrays.stream( DefaultPlanStrategiesModule.DefaultStrategy.values() ).anyMatch( e -> e.name().equals(strategySetting.getStrategyName()))
+					&&
+					! Arrays.stream( DefaultPlanStrategiesModule.DefaultSelector.class.getFields() ).anyMatch( e -> e.getName().equals(strategySetting.getStrategyName()))
+					){
+				log.warn("Vehicles are created internally for all re-planning strategies. However, "+strategySetting.getStrategyName()+" is not one of the recognized strategy." +
+						" \n Simulation should run without a problem if it does not include mode choice. Please provide vehicles file is this is not the case.");
 			}
 		}
 
