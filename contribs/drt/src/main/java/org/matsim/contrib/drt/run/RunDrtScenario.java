@@ -21,7 +21,7 @@ package org.matsim.contrib.drt.run;
 
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.*;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
@@ -34,7 +34,7 @@ public class RunDrtScenario {
 		createControler(config, otfvis).run();
 	}
 
-	public static Controler createControler(Config config, boolean otfvis) {
+	public static Controller createControler(Config config, boolean otfvis) {
 		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
 		config.checkConsistency();
 		return DrtControlerCreator.createControler(config, otfvis);

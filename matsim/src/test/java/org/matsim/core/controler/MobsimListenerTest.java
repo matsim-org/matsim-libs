@@ -41,7 +41,7 @@ public class MobsimListenerTest {
         Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
         cfg.controler().setLastIteration(1);
         cfg.controler().setWritePlansInterval(0);
-        final Controler c = new Controler(cfg);
+        final Controller c = new Controller(cfg);
         c.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -59,7 +59,7 @@ public class MobsimListenerTest {
         Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
         cfg.controler().setLastIteration(1);
         cfg.controler().setWritePlansInterval(0);
-        final Controler c = new Controler(cfg);
+        final Controller c = new Controller(cfg);
         c.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {

@@ -45,7 +45,7 @@ import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.PlanStrategy;
@@ -91,7 +91,7 @@ public class CadytsPtIT {
 		config.strategy().addStrategySettings(stratSets) ;
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		final Controler controler = new Controler(scenario);
+		final Controller controler = new Controller(scenario);
 		controler.addOverridingModule(new CadytsPtModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
@@ -157,7 +157,7 @@ public class CadytsPtIT {
 
 		// ===
 
-		final Controler controler = new Controler(config);
+		final Controller controler = new Controller(config);
 		controler.getConfig().controler().setCreateGraphs(false);
 		controler.addOverridingModule(new CadytsPtModule());
 
@@ -313,7 +313,7 @@ public class CadytsPtIT {
 
 		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
 
-		final Controler controler = new Controler( scenario );
+		final Controller controler = new Controller( scenario );
         controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 
@@ -466,7 +466,7 @@ public class CadytsPtIT {
 
 		// ---
 
-		final Controler controler = new Controler(config);
+		final Controller controler = new Controller(config);
 		controler.addOverridingModule(new CadytsPtModule());
 //		controler.setOverwriteFiles(true);
 		controler.addOverridingModule(new AbstractModule() {

@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -82,7 +82,7 @@ final class EventsHandlingImpl implements EventsHandling, BeforeMobsimListener,
 				switch (format) {
 				case xml:
 					this.eventWriters.add(new EventWriterXML(controlerIO.getIterationFilename(event.getIteration(), 
-							Controler.FILENAME_EVENTS_XML)));
+							Controller.FILENAME_EVENTS_XML)));
 					break;
 				default:
 					log.warn("Unknown events file format specified: " + format.toString() + ".");

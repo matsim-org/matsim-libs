@@ -29,7 +29,7 @@ import org.matsim.contrib.locationchoice.bestresponse.scoring.DCScoringFunctionF
 import org.matsim.contrib.locationchoice.facilityload.FacilitiesLoadCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class RunLocationChoiceBestResponse {
@@ -51,7 +51,7 @@ public class RunLocationChoiceBestResponse {
             dcScoringFunctionFactory.setUsingConfigParamsForScoring(true);
         }
 
-        Controler controler = new Controler(scenario);
+        Controller controler = new Controller(scenario);
         controler.addControlerListener(new DestinationChoiceInitializer(dcContext));
         if (dccg.getRestraintFcnExp() > 0.0 && dccg.getRestraintFcnFactor() > 0.0) {
             controler.addControlerListener(new FacilitiesLoadCalculator(dcContext.getFacilityPenalties()));

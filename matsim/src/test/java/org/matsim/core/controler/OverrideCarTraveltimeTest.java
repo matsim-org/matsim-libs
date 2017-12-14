@@ -26,7 +26,7 @@ public class OverrideCarTraveltimeTest {
         final Config config = ConfigUtils.createConfig();
         config.controler().setLastIteration(1);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
-        Controler controler = new Controler(ScenarioUtils.createScenario(config));
+        Controller controler = new Controller(ScenarioUtils.createScenario(config));
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {

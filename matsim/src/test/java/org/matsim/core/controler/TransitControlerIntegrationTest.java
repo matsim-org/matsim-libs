@@ -134,7 +134,7 @@ public class TransitControlerIntegrationTest extends MatsimTestCase {
 		config.strategy().addStrategySettings(tam);
 
 		// run
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.getConfig().controler().setWriteEventsInterval(0);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.run();

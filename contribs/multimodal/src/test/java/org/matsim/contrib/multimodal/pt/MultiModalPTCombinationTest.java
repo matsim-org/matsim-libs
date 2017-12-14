@@ -50,7 +50,7 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.testcases.MatsimTestUtils;
@@ -112,7 +112,7 @@ public class MultiModalPTCombinationTest {
 
         config.travelTimeCalculator().setFilterModes(true);
 
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
         controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);

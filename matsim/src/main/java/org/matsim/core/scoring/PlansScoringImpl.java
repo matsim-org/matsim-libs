@@ -39,7 +39,7 @@ import org.matsim.core.controler.listener.ScoringListener;
  * A {@link org.matsim.core.controler.listener.ControlerListener} that manages the
  * scoring of plans in every iteration. Basically it integrates the
  * {@link org.matsim.core.scoring.ScoringFunctionsForPopulation} with the
- * {@link org.matsim.core.controler.Controler}.
+ * {@link org.matsim.core.controler.Controller}.
  *
  * @author mrieser, michaz
  */

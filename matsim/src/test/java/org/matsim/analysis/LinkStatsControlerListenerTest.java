@@ -290,7 +290,7 @@ public class LinkStatsControlerListenerTest {
 		lsConfig.setWriteLinkStatsInterval(3);
 		lsConfig.setAverageLinkStatsOverIterations(1);
 		
-		final Controler controler = new Controler(ScenarioUtils.createScenario(config));
+		final Controller controler = new Controller(ScenarioUtils.createScenario(config));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -337,7 +337,7 @@ public class LinkStatsControlerListenerTest {
 		scenario.getNetwork().addNode(node2);
 		Link link = scenario.getNetwork().getFactory().createLink(Id.create("100", Link.class), node1, node2);
 		scenario.getNetwork().addLink(link);
-		final Controler controler = new Controler(scenario);
+		final Controller controler = new Controller(scenario);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

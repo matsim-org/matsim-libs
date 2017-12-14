@@ -95,7 +95,7 @@
  *
  * <h3>Example</h3>
  * This class contains the "RunEmissionTool" classes and a control listener which implements
- * some functions from {@link org.matsim.core.controler.Controler Controler}.
+ * some functions from {@link org.matsim.core.controler.Controller Controler}.
  *
  * <h3>Types</h3>
  * {@link org.matsim.contrib.emissions.types.ColdPollutant ColdPollutant} and {@link org.matsim.contrib.emissions.types.WarmPollutant WarmPollutant} are enumerations of emission factors. 

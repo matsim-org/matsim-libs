@@ -37,7 +37,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -113,7 +113,7 @@ public class AccessibilityIT implements SpatialGridDataExchangeInterface, Facili
 		// ---
 
 		//create a new controler for the simulation
-		Controler ctrl = new Controler(scenario);
+		Controller ctrl = new Controller(scenario);
 
 		{
 
@@ -170,7 +170,7 @@ public class AccessibilityIT implements SpatialGridDataExchangeInterface, Facili
 		// ---
 
 		//create a new controler for the simulation
-		final Controler ctrl = new Controler(scenario);
+		final Controller ctrl = new Controller(scenario);
 		ctrl.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		//create a box with 9 measuring points (one for each node)

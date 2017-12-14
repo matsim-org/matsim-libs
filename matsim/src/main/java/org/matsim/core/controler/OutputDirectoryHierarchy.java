@@ -218,10 +218,10 @@ public final class OutputDirectoryHierarchy {
 			throw new RuntimeException("The tmp directory "
 					+ getTempPath() + " could not be created.");
 		}
-		File itersDir = new File(outputPath + "/" + Controler.DIRECTORY_ITERS);
+		File itersDir = new File(outputPath + "/" + Controller.DIRECTORY_ITERS);
 		if (!itersDir.mkdir() && !itersDir.exists()) {
 			throw new RuntimeException("The iterations directory "
-					+ (outputPath + "/" + Controler.DIRECTORY_ITERS)
+					+ (outputPath + "/" + Controller.DIRECTORY_ITERS)
 					+ " could not be created.");
 		}
 	}

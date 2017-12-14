@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.population.algorithms.TestsUtil;
@@ -51,7 +51,7 @@ public class RoadPricingControlerIT {
 		config.plans().setInputFile("plans1.xml");
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/basecase/");
 		config.controler().setWritePlansInterval(0);
-		Controler controler1 = new Controler(config);
+		Controller controler1 = new Controller(config);
         controler1.getConfig().controler().setCreateGraphs(false);
 		controler1.getConfig().controler().setDumpDataAtEnd(false);
 		controler1.getConfig().controler().setWriteEventsInterval(0);
@@ -62,7 +62,7 @@ public class RoadPricingControlerIT {
 //        ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setUseRoadpricing(true);
         ConfigUtils.addOrGetModule(config, RoadPricingConfigGroup.GROUP_NAME, RoadPricingConfigGroup.class).setTollLinksFile(IOUtils.newUrl(utils.inputResourcePath(), "distanceToll.xml").toString());
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/tollcase/");
-		Controler controler2 = new Controler(config);
+		Controller controler2 = new Controller(config);
         controler2.setModules(new ControlerDefaultsWithRoadPricingModule());
         controler2.getConfig().controler().setCreateGraphs(false);
 		controler2.getConfig().controler().setDumpDataAtEnd(false);

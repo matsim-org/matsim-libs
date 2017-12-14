@@ -33,7 +33,7 @@ import javax.inject.Inject;
 
 /**
  * Integrates the {@link org.matsim.analysis.LegHistogram} into the
- * {@link org.matsim.core.controler.Controler}, so the leg histogram is
+ * {@link org.matsim.core.controler.Controller}, so the leg histogram is
  * automatically created every iteration.
  *
  * @author mrieser

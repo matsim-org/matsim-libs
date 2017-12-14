@@ -39,7 +39,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -125,7 +125,7 @@ public class EquilOpdytsIT {
             time++ ;
         }
 
-        Controler controler = new Controler(scenarioPlansRelaxor);
+        Controller controler = new Controller(scenarioPlansRelaxor);
         controler.run();
 
         // set back settings for opdyts

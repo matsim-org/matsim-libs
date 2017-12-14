@@ -35,7 +35,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -71,7 +71,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
     private static boolean initialRoutingOnSlaves = true;
     private final int slaveIterationsPerMasterIteration;
     private Config config;
-    private Controler matsimControler;
+    private Controller matsimControler;
     private TreeMap<Integer, SlaveHandler> slaveHandlerTreeMap;
     private WaitTimeCalculatorSerializable waitTimeCalculator;
     private StopStopTimeCalculatorSerializable stopStopTimeCalculator;
@@ -148,7 +148,7 @@ public class MasterControler implements AfterMobsimListener, ShutdownListener, S
         bytesPerPerson = bytesPerPlan;
         masterInitialLogString.append("Estimated memory use per plan is " + bytesPerPlan + " bytes\n");
 
-        matsimControler = new Controler(scenario);
+        matsimControler = new Controller(scenario);
         matsimControler.addControlerListener(new SlaveScoreWriter(this));
 
         //split the population to be sent to the slaveHandlers

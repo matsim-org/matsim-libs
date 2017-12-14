@@ -49,7 +49,7 @@ import org.matsim.contrib.pseudosimulation.trafficinfo.PSimWaitTimeCalculator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
@@ -82,7 +82,7 @@ public class RunPSim {
     private final boolean Diversity;
     private TransitPerformanceRecorder transitPerformanceRecorder;
     private MobSimSwitcher mobSimSwitcher;
-    private Controler matsimControler;
+    private Controller matsimControler;
     private boolean IntelligentRouters;
     private boolean TrackGenome;
     private boolean QuickReplanning;
@@ -189,7 +189,7 @@ public class RunPSim {
         if (IterationsPerCycle > 0)
             initPSim();
         else {
-            this.matsimControler = new Controler(scenario);
+            this.matsimControler = new Controller(scenario);
             if (TrackGenome) {
                 DistributedPlanStrategyTranslationAndRegistration.TrackGenome = true;
                 DistributedPlanStrategyTranslationAndRegistration.substituteStrategies(config, false, 1);
@@ -290,7 +290,7 @@ public class RunPSim {
         this.plancatcher = new PlanCatcher();
         DistributedPlanStrategyTranslationAndRegistration.TrackGenome = TrackGenome;
         DistributedPlanStrategyTranslationAndRegistration.substituteStrategies(config, QuickReplanning, IterationsPerCycle);
-        this.matsimControler = new Controler(scenario);
+        this.matsimControler = new Controller(scenario);
         DistributedPlanStrategyTranslationAndRegistration.registerStrategiesWithControler(this.matsimControler, plancatcher, QuickReplanning, IterationsPerCycle);
         mobSimSwitcher = new MobSimSwitcher(IterationsPerCycle);
         matsimControler.addOverridingModule(new AbstractModule() {

@@ -47,7 +47,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacilities;
@@ -124,7 +124,7 @@ public class AccessibilityIntegrationTest {
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
 		
-		Controler controler = new Controler(sc);
+		Controller controler = new Controller(sc);
 
 		final AccessibilityModule module = new AccessibilityModule();
 		final EvaluateTestResults evaluateListener = new EvaluateTestResults(false);
@@ -166,7 +166,7 @@ public class AccessibilityIntegrationTest {
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
 		
-		Controler controler = new Controler(sc);
+		Controller controler = new Controller(sc);
 
 		final AccessibilityModule module = new AccessibilityModule();
 		final EvaluateTestResults evaluateListener = new EvaluateTestResults(true);
@@ -195,7 +195,7 @@ public class AccessibilityIntegrationTest {
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
 
-		Controler controler = new Controler(sc);
+		Controller controler = new Controller(sc);
 
 		final AccessibilityModule module = new AccessibilityModule();
 		final EvaluateTestResults evaluateListener = new EvaluateTestResults(false);
@@ -239,7 +239,7 @@ public class AccessibilityIntegrationTest {
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), BoundingBox.createBoundingBox(sc.getNetwork()), mbConfig) ;
 		sc.addScenarioElement(PtMatrix.NAME, ptMatrix);
 
-		Controler controler = new Controler(sc);
+		Controller controler = new Controller(sc);
 
 		final AccessibilityModule module = new AccessibilityModule();
 		final EvaluateTestResults evaluateListener = new EvaluateTestResults(false);
@@ -277,7 +277,7 @@ public class AccessibilityIntegrationTest {
 		
 		final Scenario sc = createTestScenario(config);
 		
-		Controler controler = new Controler(sc);
+		Controller controler = new Controller(sc);
 		
 		final AccessibilityModule module = new AccessibilityModule();
 //		module.addSpatialGridDataExchangeListener( new EvaluateTestResults(true,true,true,true,true) ) ;

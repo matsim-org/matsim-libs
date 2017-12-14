@@ -11,7 +11,7 @@ import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.EventsManagerImpl;
@@ -38,7 +38,7 @@ public class ChoiceGenerationControler implements BeforeMobsimListener{
         final TravelTimeCalculator travelTimeCalculator;
     private final PSimFactory pSimFactory;
     Config config;
-        Controler controler;
+        Controller controler;
         Scenario scenario;
 public ChoiceGenerationControler(String[] args) {
     config = ConfigUtils.loadConfig(args[0]);
@@ -46,7 +46,7 @@ public ChoiceGenerationControler(String[] args) {
     config.parallelEventHandling().setNumberOfThreads(1);
     config.planCalcScore().setWriteExperiencedPlans(true);
     scenario = ScenarioUtils.loadScenario(config);
-    controler = new Controler(scenario);
+    controler = new Controller(scenario);
 
     waitTimeCalculator = new WaitTimeStuckCalculator(
             controler.getScenario().getPopulation(),

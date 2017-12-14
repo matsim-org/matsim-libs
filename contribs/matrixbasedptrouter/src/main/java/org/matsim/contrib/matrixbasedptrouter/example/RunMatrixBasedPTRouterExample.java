@@ -27,7 +27,7 @@ import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -47,7 +47,7 @@ public class RunMatrixBasedPTRouterExample
         String path = "src/main/resources/example/";
         Config config = ConfigUtils.loadConfig(path+"example_config.xml", new MatrixBasedPtRouterConfigGroup());
         
-        Controler controler = new Controler(config);
+        Controller controler = new Controller(config);
         controler.addOverridingModule(new MatrixBasedPtModule());
         controler.run();
     }

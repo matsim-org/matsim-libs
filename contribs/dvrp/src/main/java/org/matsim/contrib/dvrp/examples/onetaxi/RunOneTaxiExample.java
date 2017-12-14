@@ -28,7 +28,7 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -50,7 +50,7 @@ public final class RunOneTaxiExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// setup controler
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.addOverridingModule(DvrpModule.create( //
 				OneTaxiOptimizer.class, // optimizer that dispatches taxis
 				OneTaxiRequestCreator.class, // converts departures of the "taxi" mode into taxi requests

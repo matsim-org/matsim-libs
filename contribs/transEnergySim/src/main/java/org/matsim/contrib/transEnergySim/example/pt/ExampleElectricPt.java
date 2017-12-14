@@ -28,7 +28,7 @@ import org.matsim.contrib.transEnergySim.pt.PtVehicleEnergyControl;
 import org.matsim.contrib.transEnergySim.pt.PtVehicleEnergyState;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ConstantEnergyConsumptionModel;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
@@ -45,7 +45,7 @@ public class ExampleElectricPt {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Controler controler = new Controler(args);
+		Controller controler = new Controller(args);
 		HashMap<Id<Vehicle>, PtVehicleEnergyState> ptEnergyMangementModels = new HashMap<>();
 		EnergyConsumptionModel ecm=new ConstantEnergyConsumptionModel(600);
 		double batterySize=24*3600000;

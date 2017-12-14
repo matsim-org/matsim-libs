@@ -25,7 +25,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -47,7 +47,7 @@ public class TransitLoadIntegrationTest {
 		final Config cfg = this.util.loadConfig("test/scenarios/pt-tutorial/0.config.xml");
 		cfg.controler().setLastIteration(0);
 		final Scenario s = ScenarioUtils.loadScenario(cfg);
-		final Controler c = new Controler(s);
+		final Controller c = new Controller(s);
 		final TransitLoad transitload = new TransitLoad();
 
 		c.addControlerListener(new StartupListener() {

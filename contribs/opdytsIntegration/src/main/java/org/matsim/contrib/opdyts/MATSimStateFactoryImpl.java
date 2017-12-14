@@ -3,7 +3,7 @@ package org.matsim.contrib.opdyts;
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Vector;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 
 /**
  * 
@@ -14,13 +14,13 @@ import org.matsim.core.controler.Controler;
  */
 public class MATSimStateFactoryImpl<U extends DecisionVariable> implements MATSimStateFactory<U> {
 
-	protected Controler controler;
+	protected Controller controler;
 
 	public MATSimStateFactoryImpl() {
 	}
 
 	@Override
-	public void registerControler(final Controler controler) {
+	public void registerControler(final Controller controler) {
 		this.controler = controler;
 	}
 

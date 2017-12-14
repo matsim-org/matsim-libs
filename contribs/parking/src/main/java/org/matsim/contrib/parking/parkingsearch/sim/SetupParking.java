@@ -37,7 +37,7 @@ import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogi
 import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
 import org.matsim.contrib.parking.parkingsearch.routing.WithinDayParkingRouter;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.PrepareForSim;
 import org.matsim.core.router.StageActivityTypes;
 
@@ -52,7 +52,7 @@ import com.google.inject.name.Names;
 public class SetupParking {
 	// TODO: create config group and make this all configurable?
 
-	static public void installParkingModules(Controler controler) {
+	static public void installParkingModules(Controller controler) {
 		// No need to route car routes in Routing module in advance, as they are
 		// calculated on the fly
 		if (!controler.getConfig().getModules().containsKey(DvrpConfigGroup.GROUP_NAME)){

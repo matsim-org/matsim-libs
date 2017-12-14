@@ -6,7 +6,7 @@ import org.matsim.contrib.pseudosimulation.replanning.factories.DistributedPlanS
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.strategies.*;
 
@@ -81,7 +81,7 @@ public class DistributedPlanStrategyTranslationAndRegistration {
 
     }
 
-    public static void registerStrategiesWithControler(final Controler controler, final PlanCatcher slave, final boolean quickReplanning, final int selectionInflationFactor) {
+    public static void registerStrategiesWithControler(final Controller controler, final PlanCatcher slave, final boolean quickReplanning, final int selectionInflationFactor) {
         for (final Map.Entry<String, Class<? extends Provider<PlanStrategy>>> e : SupportedSelectors.entrySet()) {
             controler.addOverridingModule(new AbstractModule() {
                 @Override

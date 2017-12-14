@@ -11,7 +11,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -143,7 +143,7 @@ public class NetworkReprojectionIOTest {
 		config.controler().setLastIteration( 0 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
 		config.controler().setOutputDirectory( outputDirectory );
-		final Controler controler = new Controler( scenario );
+		final Controller controler = new Controller( scenario );
 		controler.run();
 
 		final Network dumpedNetwork = NetworkUtils.createNetwork();

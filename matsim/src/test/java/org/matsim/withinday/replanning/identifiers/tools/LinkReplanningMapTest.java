@@ -23,7 +23,7 @@ package org.matsim.withinday.replanning.identifiers.tools;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -52,7 +52,7 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 		config.controler().setMobsim("qsim");
 		config.controler().setLastIteration(0);
 
-		Controler controler = new Controler(config);
+		Controller controler = new Controller(config);
 		controler.addOverridingModule(new WithinDayModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

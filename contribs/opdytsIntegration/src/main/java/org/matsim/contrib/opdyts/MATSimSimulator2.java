@@ -9,7 +9,7 @@ import floetteroed.opdyts.searchalgorithms.Simulator;
 import floetteroed.opdyts.trajectorysampling.TrajectorySampler;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.TerminationCriterion;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
@@ -114,7 +114,7 @@ public class MATSimSimulator2<U extends DecisionVariable> implements Simulator<U
 		 * 
 		 * TODO Is this done correctly?
 		 */
-		final Controler controler = new Controler(this.scenario);
+		final Controller controler = new Controller(this.scenario);
 		if ((this.replacingModules != null) && (this.replacingModules.length > 0)) {
 			controler.setModules(this.replacingModules);
 

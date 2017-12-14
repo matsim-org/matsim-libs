@@ -56,7 +56,7 @@ import org.matsim.contrib.noise.handler.NoiseEquations;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -158,7 +158,7 @@ public class NoiseIT {
 	}
 		
 	private static void runTest2a( Config runConfig ) {
-		Controler controler = new Controler(runConfig);
+		Controller controler = new Controller(runConfig);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		controler.run();
 		
@@ -940,7 +940,7 @@ public class NoiseIT {
 		runConfig.plansCalcRoute().setInsertingAccessEgressWalk(false);
 		// I made test2a test both versions, but I don't really want to do that work again myself. kai, feb'16 
 		
-		Controler controler = new Controler(runConfig);
+		Controller controler = new Controller(runConfig);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		controler.run();
 		
@@ -1028,7 +1028,7 @@ public class NoiseIT {
 		
 		// start a simple MATSim run with a single iteration
 		String configFile = testUtils.getPackageInputDirectory() + "NoiseTest/config2.xml";
-		Controler controler = new Controler(configFile);
+		Controller controler = new Controller(configFile);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		controler.run();
 		

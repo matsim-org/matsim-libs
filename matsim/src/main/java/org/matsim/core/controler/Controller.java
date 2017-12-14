@@ -64,7 +64,7 @@ import java.util.Map;
  *
  * @author mrieser
  */
-public final class Controler implements ControlerI, MatsimServices {
+public final class Controller implements ControlerI, MatsimServices {
 	// yyyy Design thoughts:
 	// * Seems to me that we should try to get everything here final.  Flexibility is provided by the ability to set or add factories.  If this is
 	// not sufficient, people should use AbstractController.  kai, jan'13
@@ -81,7 +81,7 @@ public final class Controler implements ControlerI, MatsimServices {
 	public static final String FILENAME_PERSON_ATTRIBUTES = "output_personAttributes.xml.gz" ; 
 	public static final String FILENAME_COUNTS = "output_counts.xml.gz" ;
 
-	private static final Logger log = Logger.getLogger(Controler.class);
+	private static final Logger log = Logger.getLogger(Controller.class);
 
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(
 			"%d{ISO8601} %5p %C{1}:%L %m%n");
@@ -111,7 +111,7 @@ public final class Controler implements ControlerI, MatsimServices {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final Controler controler = new Controler(args);
+			final Controller controler = new Controller(args);
 			controler.run();
 		}
 		System.exit(0);
@@ -127,23 +127,23 @@ public final class Controler implements ControlerI, MatsimServices {
 	 *            to contain the path to a local copy of the DTD file used in
 	 *            the configuration file.
 	 */
-	public Controler(final String[] args) {
+	public Controller(final String[] args) {
 		this(args.length > 0 ? args[0] : null, null, null);
 	}
 
-	public Controler(final String configFileName) {
+	public Controller(final String configFileName) {
 		this(configFileName, null, null);
 	}
 
-	public Controler(final Config config) {
+	public Controller(final Config config) {
 		this(null, config, null);
 	}
 
-	public Controler(final Scenario scenario) {
+	public Controller(final Scenario scenario) {
 		this(null, null, scenario);
 	}
 
-	private Controler(final String configFileName, final Config config, Scenario scenario) {
+	private Controller(final String configFileName, final Config config, Scenario scenario) {
 		if (scenario != null) {
 			// scenario already loaded (recommended):
 			this.config = scenario.getConfig();
@@ -275,7 +275,7 @@ public final class Controler implements ControlerI, MatsimServices {
 			return new EventsManager() {
 				@Override
 				public void processEvent(Event event) {
-					Controler.this.injector.getInstance(EventsManager.class).processEvent(event);
+					Controller.this.injector.getInstance(EventsManager.class).processEvent(event);
 				}
 
 				@Override

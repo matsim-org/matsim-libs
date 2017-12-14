@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -77,7 +77,7 @@ public class ReRoutingIT {
 	public void testReRoutingDijkstra() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
@@ -88,7 +88,7 @@ public class ReRoutingIT {
 	public void testReRoutingFastDijkstra() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastDijkstra);
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
@@ -99,7 +99,7 @@ public class ReRoutingIT {
 	public void testReRoutingAStarLandmarks() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
@@ -110,7 +110,7 @@ public class ReRoutingIT {
 	public void testReRoutingFastAStarLandmarks() throws MalformedURLException {
 		Scenario scenario = this.loadScenario();
 		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks);
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();

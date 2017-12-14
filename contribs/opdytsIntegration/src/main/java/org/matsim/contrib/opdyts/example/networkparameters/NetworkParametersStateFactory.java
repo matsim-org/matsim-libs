@@ -4,7 +4,7 @@ import floetteroed.utilities.math.Vector;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.opdyts.MATSimState;
 import org.matsim.contrib.opdyts.MATSimStateFactory;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 
 /**
  * 
@@ -19,6 +19,6 @@ class NetworkParametersStateFactory implements MATSimStateFactory<NetworkParamet
 	}
 
 	@Override
-	public void registerControler(Controler controler) {
+	public void registerControler(Controller controler) {
 	}
 }

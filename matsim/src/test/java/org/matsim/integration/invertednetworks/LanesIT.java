@@ -33,7 +33,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -69,7 +69,7 @@ public class LanesIT {
 		config.controler().setLastIteration(lastIteration);
 		config.controler().setCreateGraphs(false);
 		config.vspExperimental().setWritingOutputEvents(false);
-		Controler controler = new Controler(config);
+		Controller controler = new Controller(config);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

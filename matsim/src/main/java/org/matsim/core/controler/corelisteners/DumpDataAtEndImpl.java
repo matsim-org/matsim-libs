@@ -31,7 +31,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -176,7 +176,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 				final String internalCRS = config.global().getCoordinateSystem();
 
 				if ( inputCRS == null ) {
-					new CountsWriter(counts).write(controlerIO.getOutputFilename(Controler.FILENAME_COUNTS));
+					new CountsWriter(counts).write(controlerIO.getOutputFilename(Controller.FILENAME_COUNTS));
 				}
 				else {
 					log.info( "re-projecting counts from "+internalCRS+" back to "+inputCRS+" for export" );
@@ -186,7 +186,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 									internalCRS,
 									inputCRS );
 
-					new CountsWriter( transformation , counts).write(controlerIO.getOutputFilename(Controler.FILENAME_COUNTS));
+					new CountsWriter( transformation , counts).write(controlerIO.getOutputFilename(Controller.FILENAME_COUNTS));
 				}
 			}
 		} catch ( Exception ee ) {}
@@ -194,13 +194,13 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpLanes() {
 		try {
-			new LanesWriter(lanes).write(controlerIO.getOutputFilename(Controler.FILENAME_LANES));
+			new LanesWriter(lanes).write(controlerIO.getOutputFilename(Controller.FILENAME_LANES));
 		} catch ( Exception ee ) {}
 	}
 
 	private void dumpHouseholds() {
 		try {
-			new HouseholdsWriterV10(households).writeFile(controlerIO.getOutputFilename(Controler.FILENAME_HOUSEHOLDS));
+			new HouseholdsWriterV10(households).writeFile(controlerIO.getOutputFilename(Controller.FILENAME_HOUSEHOLDS));
 		} catch ( Exception ee ) {}
 	}
 
@@ -272,13 +272,13 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 	private void dumpConfig() {
 		// dump config
-		new ConfigWriter(config).write(controlerIO.getOutputFilename(Controler.FILENAME_CONFIG));
+		new ConfigWriter(config).write(controlerIO.getOutputFilename(Controller.FILENAME_CONFIG));
 	}
 
 	private void dumpNetwork() {
 		// dump network
 		if ( config.network().getInputCRS() == null ) {
-			new NetworkWriter(network).write(controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
+			new NetworkWriter(network).write(controlerIO.getOutputFilename(Controller.FILENAME_NETWORK));
 		}
 		else {
 			log.info( "re-projecting network from "+config.global().getCoordinateSystem()+" back to "+config.network().getInputCRS()+" for export" );
@@ -287,7 +287,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 					TransformationFactory.getCoordinateTransformation(
 							config.global().getCoordinateSystem(),
 							config.network().getInputCRS() );
-			new NetworkWriter( transformation , network ).write(controlerIO.getOutputFilename(Controler.FILENAME_NETWORK));
+			new NetworkWriter( transformation , network ).write(controlerIO.getOutputFilename(Controller.FILENAME_NETWORK));
 		}
 	}
 
@@ -300,7 +300,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		if ( inputCRS == null ) {
 			final PopulationWriter writer = new PopulationWriter(population, network);
 			writer.putAttributeConverters( attributeConverters );
-			writer.write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
+			writer.write(controlerIO.getOutputFilename(Controller.FILENAME_POPULATION));
 		}
 		else {
 			log.info( "re-projecting population from "+internalCRS+" back to "+inputCRS+" for export" );
@@ -312,7 +312,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 			final PopulationWriter writer = new PopulationWriter(transformation , population, network);
 			writer.putAttributeConverters( attributeConverters );
-			writer.write(controlerIO.getOutputFilename(Controler.FILENAME_POPULATION));
+			writer.write(controlerIO.getOutputFilename(Controller.FILENAME_POPULATION));
 
 		}
 
@@ -321,7 +321,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			ObjectAttributesXmlWriter writer = new ObjectAttributesXmlWriter(personAttributes) ;
 			writer.setPrettyPrint(true);
 			writer.putAttributeConverters( attributeConverters );
-			writer.writeFile( controlerIO.getOutputFilename( Controler.FILENAME_PERSON_ATTRIBUTES ) );
+			writer.writeFile( controlerIO.getOutputFilename( Controller.FILENAME_PERSON_ATTRIBUTES ) );
 		}
 	}
 

@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.StrategyManager;
@@ -271,7 +271,7 @@ public class DeterministicMultithreadedReplanningIT {
 	 * @author mrieser
 	 */
 	private static class TestControler {
-		Controler controler ;
+		Controller controler ;
 
 		private StrategyManager manager;
 
@@ -280,7 +280,7 @@ public class DeterministicMultithreadedReplanningIT {
 		}
 
 		public TestControler(final Scenario scenario, final StrategyManager manager) {
-			controler = new Controler( scenario ) ;
+			controler = new Controller( scenario ) ;
 			controler.getConfig().controler().setCreateGraphs(false);
 			controler.getConfig().controler().setWriteEventsInterval(1);
 			controler.getConfig().controler().setDumpDataAtEnd(false);

@@ -34,7 +34,7 @@ import org.matsim.contrib.socnetsim.usage.analysis.SocnetsimDefaultAnalysisModul
 import org.matsim.contrib.socnetsim.usage.replanning.DefaultGroupStrategyRegistryModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 
 /**
  * Starts a simulation with a social network, joint trips and joint activities.
@@ -57,7 +57,7 @@ public class RunExampleSocialSimulation {
 			if ( !sn.getEgos().contains( p ) ) sn.addEgo( p );
 		}
 
-		final Controler controler = new Controler( scenario );
+		final Controller controler = new Controller( scenario );
 		// The first step is to set the modifications to the co-evolutionary algorithm
 		controler.addOverridingModule( new JointDecisionProcessModule() );
 

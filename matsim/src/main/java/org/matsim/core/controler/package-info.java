@@ -66,7 +66,7 @@
  * The Controler offers several <em>extension points</em>, where additional functionality can be plugged in.
  * These extension points are realized with <em>Events</em> and <em>Listeners</em>:
  * Classes can implement one or more {@link org.matsim.core.controler.listener Listener Interfaces} and can be registered
- * with the Controler with {@link org.matsim.core.controler.Controler#addControlerListener(org.matsim.core.controler.listener.ControlerListener) addControlerListener()}.
+ * with the Controler with {@link org.matsim.core.controler.Controller#addControlerListener(org.matsim.core.controler.listener.ControlerListener) addControlerListener()}.
  * The Controler sends {@link org.matsim.core.controler.events Controler Events} at the corresponding points during the run
  * to the registered Listeners, at which point the Listeners can execute their own code.<br>
  *
@@ -93,7 +93,7 @@
  * <li>(8) Shutdown</li>
  * </ul>
  *
- * All Events are issued when {@link org.matsim.core.controler.Controler#run()} is called.
+ * All Events are issued when {@link org.matsim.core.controler.Controller#run()} is called.
  * When the Startup-Event is issued, the configuration as well as other data (plans, network, ...) are already
  * loaded and initialized.
  *

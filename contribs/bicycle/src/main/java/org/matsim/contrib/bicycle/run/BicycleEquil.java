@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
@@ -65,7 +65,7 @@ public class BicycleEquil {
 
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		
 		BicycleModule bicycleModule = new BicycleModule();
 		bicycleModule.setConsiderMotorizedInteraction(true);

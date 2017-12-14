@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -43,7 +43,7 @@ public class TransitIntegrationTest {
 		// ---
 		config.controler().setLastIteration(0); // in case the exception is _not_ thrown, we don't need 100 iterations to find that out ...
 		// ---
-		Controler controler = new Controler(config);
+		Controller controler = new Controller(config);
 		controler.run();
 	}
 

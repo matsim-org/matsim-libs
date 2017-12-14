@@ -25,7 +25,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
@@ -65,7 +65,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private int masterCurrentIteration = -1;
     private Config config;
     private double totalIterationTime;
-    private Controler matsimControler;
+    private Controller matsimControler;
     private TravelTime linkTravelTimes;
     private WaitTime waitTimes;
     private StopStopTime stopStopTimes;
@@ -228,7 +228,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 //        as its original function is to mark plans for execution by PSim. But here, all plans are executed by PSim
 //        should rather be that PSim marks activities for execution in some other way
         DistributedPlanStrategyTranslationAndRegistration.substituteStrategies(config, quickReplannning, numberOfPSimIterationsPerCycle);
-        matsimControler = new Controler(scenario);
+        matsimControler = new Controller(scenario);
         plancatcher = new PlanCatcher();
         DistributedPlanStrategyTranslationAndRegistration.registerStrategiesWithControler(this.matsimControler, plancatcher, quickReplannning, numberOfPSimIterationsPerCycle);
         matsimControler.getConfig().controler().setOverwriteFileSetting(

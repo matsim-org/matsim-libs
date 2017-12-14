@@ -33,7 +33,7 @@ import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.hook.PModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
@@ -69,7 +69,7 @@ public class SubsidyContextTestIT implements TabularFileHandler {
 		config1.controler().setOutputDirectory(utils.getOutputDirectory());
 		
 		Scenario scenario1 = ScenarioUtils.loadScenario(config1);	
-		Controler controler1 = new Controler(scenario1);
+		Controller controler1 = new Controller(scenario1);
 		
 		controler1.getConfig().controler().setCreateGraphs(true);
 		controler1.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
@@ -131,7 +131,7 @@ public class SubsidyContextTestIT implements TabularFileHandler {
 		config2.controler().setOutputDirectory(utils.getOutputDirectory());
 		
 		Scenario scenario2 = ScenarioUtils.loadScenario(config2);	
-		Controler controler2 = new Controler(scenario2);
+		Controller controler2 = new Controller(scenario2);
 		
 		controler2.getConfig().controler().setCreateGraphs(true);
 		controler2.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );

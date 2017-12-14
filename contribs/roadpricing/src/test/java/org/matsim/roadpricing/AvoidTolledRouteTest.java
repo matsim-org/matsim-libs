@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -64,7 +64,7 @@ public class AvoidTolledRouteTest {
 		config1.controler().setOutputDirectory(testUtils.getOutputDirectory() + "bc");
 		
 		Scenario scenario1 = ScenarioUtils.loadScenario(config1);
-		Controler controler1 = new Controler(scenario1);
+		Controller controler1 = new Controller(scenario1);
 		
 		final Map<Id<Link>,Integer> linkId2demand1 = new HashMap<>();
 		controler1.getEvents().addHandler(new LinkLeaveEventHandler() {
@@ -94,7 +94,7 @@ public class AvoidTolledRouteTest {
 		config2.controler().setOutputDirectory(testUtils.getOutputDirectory() + "cordon");
 				
 		Scenario scenario2 = ScenarioUtils.loadScenario(config2);
-		Controler controler2 = new Controler(scenario2);
+		Controller controler2 = new Controller(scenario2);
 		controler2.addOverridingModule(new RoadPricingModule());
 		
 		final Map<Id<Link>,Integer> linkId2demand2 = new HashMap<Id<Link>, Integer>();

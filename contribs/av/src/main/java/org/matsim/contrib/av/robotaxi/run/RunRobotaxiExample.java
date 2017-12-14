@@ -54,13 +54,13 @@ public class RunRobotaxiExample {
 		createControler(config, otfvis).run();
 	}
 
-	public static Controler createControler(Config config, boolean otfvis) {
+	public static Controller createControler(Config config, boolean otfvis) {
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

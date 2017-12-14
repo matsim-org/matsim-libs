@@ -3,7 +3,7 @@ package org.matsim.contrib.opdyts;
 import floetteroed.opdyts.DecisionVariable;
 import floetteroed.utilities.math.Vector;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 
 /**
  * A factory for MATSim simulation states.
@@ -20,7 +20,7 @@ public interface MATSimStateFactory<U extends DecisionVariable> {
 	 * 
 	 * TODO What could this be good for? Is it used at all?
 	 */
-	public void registerControler(final Controler controler);
+	public void registerControler(final Controller controler);
 
 	/**
 	 * Creates a new object representation of the current MATSim simulation

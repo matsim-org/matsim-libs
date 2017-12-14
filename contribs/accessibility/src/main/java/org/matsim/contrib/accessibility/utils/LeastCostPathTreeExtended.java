@@ -36,7 +36,7 @@ import org.matsim.contrib.matrixbasedptrouter.utils.TempDirectoryUtil;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -185,7 +185,7 @@ public final class LeastCostPathTreeExtended extends LeastCostPathTree{
 		ScenarioUtils.ScenarioBuilder builder = new ScenarioUtils.ScenarioBuilder(config) ;
 		builder.setNetwork( createTriangularNetwork() ) ;
 		Scenario scenario = builder.build() ;
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.run();
 		// init lcpte
 		LeastCostPathTreeExtended lcpte = new LeastCostPathTreeExtended(controler.getLinkTravelTimes(), controler.createTravelDisutilityCalculator(), (RoadPricingSchemeImpl) controler.getScenario().getScenarioElement(RoadPricingScheme.ELEMENT_NAME));

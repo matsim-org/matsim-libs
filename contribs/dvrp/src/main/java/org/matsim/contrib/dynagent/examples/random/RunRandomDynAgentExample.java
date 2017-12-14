@@ -24,7 +24,7 @@ import org.matsim.contrib.dynagent.run.*;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.*;
 import org.matsim.core.config.groups.QSimConfigGroup.*;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -53,7 +53,7 @@ public class RunRandomDynAgentExample {
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.addOverridingModule(new DynQSimModule<>(RandomDynQSimProvider.class));
 
 		if (otfvis) {

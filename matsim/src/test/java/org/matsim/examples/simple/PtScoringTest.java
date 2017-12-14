@@ -40,7 +40,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.TypicalDurationScoreComputation;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scoring.functions.ActivityUtilityParameters;
 import org.matsim.core.utils.io.IOUtils;
@@ -79,7 +79,7 @@ public class PtScoringTest {
 		
 		pcs.setWriteExperiencedPlans(true);
 
-		Controler controler = new Controler(config);
+		Controller controler = new Controller(config);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
 
@@ -231,7 +231,7 @@ public class PtScoringTest {
 		pcs.setWriteExperiencedPlans(true);
 		pcs.getModes().get(TransportMode.pt).setConstant(1.);
 
-		Controler controler = new Controler(config);
+		Controller controler = new Controller(config);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
 
@@ -387,7 +387,7 @@ public class PtScoringTest {
 		pcs.setWriteExperiencedPlans(true);
 		pcs.setMarginalUtlOfWaitingPt_utils_hr(-18.0) ;
 		
-		Controler controler = new Controler(config);
+		Controller controler = new Controller(config);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
 
@@ -471,7 +471,7 @@ public class PtScoringTest {
 		
 		pcs.setWriteExperiencedPlans(true);
 
-		Controler controler = new Controler(config);
+		Controller controler = new Controller(config);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		controler.getConfig().controler().setCreateGraphs(false);
 

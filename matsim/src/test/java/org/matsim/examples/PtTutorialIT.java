@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
@@ -68,7 +68,7 @@ public class PtTutorialIT {
 
 
 		try {
-			Controler controler = new Controler(config);
+			Controller controler = new Controller(config);
 			final EnterVehicleEventCounter enterVehicleEventCounter = new EnterVehicleEventCounter();
 			controler.addOverridingModule( new AbstractModule(){
 				@Override public void install() {
@@ -100,7 +100,7 @@ public class PtTutorialIT {
 		config.controler().setLastIteration(10);
 
 		try {
-			Controler controler = new Controler(config);
+			Controller controler = new Controller(config);
 			final EnterVehicleEventCounter enterVehicleEventCounter = new EnterVehicleEventCounter();
 			controler.addOverridingModule( new AbstractModule(){
 				@Override public void install() {

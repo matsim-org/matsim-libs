@@ -37,7 +37,7 @@ import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.contrib.wagonSim.WagonSimConstants;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -53,7 +53,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
- * Plugs a handler to the {@link Controler} which observes the locomotives (pt-vehicles), more precisely their
+ * Plugs a handler to the {@link Controller} which observes the locomotives (pt-vehicles), more precisely their
  * load. Furthermore this class provides access to the current-vehicleload (and those of the last iteration).
  * 
  * @author droeder

@@ -47,7 +47,7 @@ public class ControlerMobsimIntegrationTest {
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("counting");
 		cfg.controler().setWritePlansInterval(0);
-		final Controler c = new Controler(cfg);
+		final Controller c = new Controller(cfg);
 		final CountingMobsimFactory mf = new CountingMobsimFactory();
 		c.addOverridingModule(new AbstractModule() {
 			@Override
@@ -75,7 +75,7 @@ public class ControlerMobsimIntegrationTest {
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("counting");
 		cfg.controler().setWritePlansInterval(0);
-		Controler c = new Controler(cfg);
+		Controller c = new Controller(cfg);
         c.getConfig().controler().setCreateGraphs(false);
 		c.getConfig().controler().setDumpDataAtEnd(false);
 		c.getConfig().controler().setWriteEventsInterval(0);

@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -37,7 +37,7 @@ public class CadytsCarWithPtScenarioIT {
         for (int i=1; i<24; i++) {
             count.createVolume(i, 10.0);
         }
-        final Controler controler = new Controler(scenario);
+        final Controller controler = new Controller(scenario);
         controler.addOverridingModule(new CadytsCarModule(calibrationCounts));
         AtomicInteger bussesSeenOnLink = new AtomicInteger();
         controler.getEvents().addHandler((LinkLeaveEventHandler) event -> {

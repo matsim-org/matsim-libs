@@ -72,7 +72,7 @@ import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWrite
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -297,7 +297,7 @@ class MATSim4UrbanSimParcel{
 	 */
 	void runControler( ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels,ActivityFacilitiesImpl opportunities){
 
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		if (ConfigUtils.addOrGetModule(scenario.getConfig(), Matsim4UrbansimConfigGroup.GROUP_NAME, Matsim4UrbansimConfigGroup.class).isUsingRoadPricing()) {
 			controler.setModules(new ControlerDefaultsWithRoadPricingModule());
 			//  this is a quick fix in order to make the SustainCity case studies work.  The more longterm goal is to
@@ -355,7 +355,7 @@ class MATSim4UrbanSimParcel{
 	 * @param parcels
 	 * @param controler
 	 */
-	final void addControlerListener(final ActivityFacilitiesImpl zones, final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl opportunities, final Controler controler, final PtMatrix ptMatrix) {
+	final void addControlerListener(final ActivityFacilitiesImpl zones, final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl opportunities, final Controller controler, final PtMatrix ptMatrix) {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

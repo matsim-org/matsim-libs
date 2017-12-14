@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -39,7 +39,7 @@ public class ModuleTest {
     @Test(expected = RuntimeException.class)
     public void testControlerWithoutRoadPricingDoesntWork() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
-        Controler controler = new Controler(config);
+        Controller controler = new Controller(config);
         controler.run();
         // config has a roadpricing config group, but controler does not know about
         // road pricing.
@@ -48,7 +48,7 @@ public class ModuleTest {
     @Test
     public void testControlerWithRoadPricingWorks() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
-        Controler controler = new Controler(config);
+        Controller controler = new Controller(config);
         controler.setModules(new ControlerDefaultsWithRoadPricingModule());
         controler.run();
     }
@@ -57,7 +57,7 @@ public class ModuleTest {
     public void testControlerWithRoadPricingByScenarioWorks() {
         Config config = utils.loadConfig(utils.getClassInputDirectory() + "/config.xml");
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        Controler controler = new Controler(scenario);
+        Controller controler = new Controller(scenario);
         controler.setModules(new ControlerDefaultsWithRoadPricingModule());
         controler.run();
     }
@@ -70,11 +70,11 @@ public class ModuleTest {
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
 
-        Controler controler1 = new Controler(scenario);
+        Controller controler1 = new Controller(scenario);
         controler1.setModules(new ControlerDefaultsWithRoadPricingModule());
         controler1.run();
         config.controler().setOutputDirectory(utils.getOutputDirectory()+"/2");
-        Controler controler2 = new Controler(scenario);
+        Controller controler2 = new Controller(scenario);
         controler2.setModules(new ControlerDefaultsWithRoadPricingModule());
         controler2.run();
     }

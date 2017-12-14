@@ -13,7 +13,7 @@ import org.matsim.contrib.freight.usecases.chessboard.CarrierScoringFunctionFact
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -36,7 +36,7 @@ public class RunPassengerAlongWithCarriers {
         Config config = ConfigUtils.loadConfig(configFile);
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        Controler controler = new Controler(config);
+        Controller controler = new Controller(config);
         final Carriers carriers = new Carriers();
         new CarrierPlanXmlReaderV2(carriers).readFile("input/usecases/chessboard/freight/carrierPlans.xml");
 

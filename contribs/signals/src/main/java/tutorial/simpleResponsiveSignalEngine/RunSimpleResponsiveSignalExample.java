@@ -59,7 +59,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -72,7 +72,7 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 public class RunSimpleResponsiveSignalExample {
 	
-	private final Controler controler;
+	private final Controller controler;
 
 	public static void main(String[] args) {
 		new RunSimpleResponsiveSignalExample().run();
@@ -81,7 +81,7 @@ public class RunSimpleResponsiveSignalExample {
 	public RunSimpleResponsiveSignalExample() {
 		final Config config = defineConfig();
 		final Scenario scenario = defineScenario(config);
-		controler = new Controler(scenario);
+		controler = new Controller(scenario);
 
 		// add the general signals module
 		controler.addOverridingModule(new SignalsModule());
@@ -100,7 +100,7 @@ public class RunSimpleResponsiveSignalExample {
 		controler.run();
 	}
 
-	public Controler getControler() {
+	public Controller getControler() {
 		return controler;
 	}
 

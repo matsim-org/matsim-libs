@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -80,7 +80,7 @@ public class CountsReprojectionIOTest {
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
 		config.controler().setOutputDirectory( outputDirectory );
 
-		final Controler controler = new Controler( scenario );
+		final Controller controler = new Controller( scenario );
 		controler.run();
 
 		final Counts<Link> internalCounts = controler.getInjector().getInstance( Key.get( new TypeLiteral<Counts<Link>>() {} ) );

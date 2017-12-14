@@ -39,7 +39,7 @@ import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -65,7 +65,7 @@ public class RunCarsharing {
 
 		final Scenario sc = ScenarioUtils.loadScenario(config);
 
-		final Controler controler = new Controler( sc );
+		final Controller controler = new Controller( sc );
 		
 		installCarSharing(controler);
 		
@@ -73,7 +73,7 @@ public class RunCarsharing {
 
 	}
 
-	public static void installCarSharing(final Controler controler) {		
+	public static void installCarSharing(final Controller controler) {		
 		
 		final Scenario scenario = controler.getScenario();
 		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(scenario.getNetwork());

@@ -28,7 +28,7 @@ import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.config.*;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -50,7 +50,7 @@ public class RunTaxiExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		// setup controler
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 
 		final boolean ownTaxiOptimizer = false;
 		if (!ownTaxiOptimizer) {

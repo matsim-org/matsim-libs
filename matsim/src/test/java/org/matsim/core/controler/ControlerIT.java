@@ -94,7 +94,7 @@ public class ControlerIT {
 	@Test
 	public void testScenarioLoading() {
 		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		Controler controler = new Controler( config );
+		Controller controler = new Controller( config );
 
 		// need to run the controler to get Scenario initilized
 		controler.getConfig().controler().setLastIteration( 0 );
@@ -112,7 +112,7 @@ public class ControlerIT {
 	public void testTerminationCriterion() {
 		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		Controler controler = new Controler(config);
+		Controller controler = new Controller(config);
 		controler.setTerminationCriterion(new TerminationCriterion() {
 			@Override
 			public boolean continueIterations(int iteration) {
@@ -125,7 +125,7 @@ public class ControlerIT {
 	@Test
 	public void testConstructor_EventsManagerTypeImmutable() {
 		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		MatsimServices controler = new Controler(config);
+		MatsimServices controler = new Controller(config);
 		try {
 			controler.getConfig().setParam("parallelEventHandling", "numberOfThreads", "2");
 			Assert.fail("Expected exception");
@@ -207,7 +207,7 @@ public class ControlerIT {
 		config.qsim().setUsingFastCapacityUpdate(this.isUsingFastCapacityUpdate);
 		
 		// Now run the simulation
-		Controler controler = new Controler(f.scenario);
+		Controller controler = new Controller(f.scenario);
 		controler.run();
 
 		// test if the travel time calculator got the right result
@@ -224,7 +224,7 @@ public class ControlerIT {
 		strat.setWeight(1.);
 		config.strategy().addStrategySettings(strat);
 		// Run the simulation again
-		controler = new Controler(f.scenario);
+		controler = new Controller(f.scenario);
 		controler.run();
 
 		// test that the plans have the correct travel times 
@@ -259,7 +259,7 @@ public class ControlerIT {
 		link.setCapacity(3600.0);
 		link.setNumberOfLanes(1);
 
-		final Controler controler = new Controler(scenario);
+		final Controller controler = new Controller(scenario);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.setScoringFunctionFactory(new DummyScoringFunctionFactory());
@@ -337,7 +337,7 @@ public class ControlerIT {
 		config.qsim().setUsingFastCapacityUpdate( this.isUsingFastCapacityUpdate );
 		
 		// Now run the simulation
-		Controler controler = new Controler(f.scenario);
+		Controller controler = new Controller(f.scenario);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.addOverridingModule(new AbstractModule() {
@@ -435,7 +435,7 @@ public class ControlerIT {
 		config.qsim().setUsingFastCapacityUpdate( this.isUsingFastCapacityUpdate );
 		
 		// Now run the simulation
-		Controler controler = new Controler(f.scenario);
+		Controller controler = new Controller(f.scenario);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.addOverridingModule(new AbstractModule() {
@@ -495,7 +495,7 @@ public class ControlerIT {
 		config.controler().setLastIteration(10);
 		config.controler().setWritePlansInterval(0);
 
-		final Controler controler = new Controler(config);
+		final Controller controler = new Controller(config);
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
 				3 == controler.getConfig().controler().getWriteEventsInterval());
 
@@ -517,17 +517,17 @@ public class ControlerIT {
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controler.FILENAME_EVENTS_XML)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(3, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(4, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controler.FILENAME_EVENTS_XML)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(6, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(8, Controler.FILENAME_EVENTS_XML)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(9, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(10, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controller.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(3, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(4, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controller.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(6, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(8, Controller.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(9, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(10, Controller.FILENAME_EVENTS_XML)).exists());
 	}
 
 	/**
@@ -539,7 +539,7 @@ public class ControlerIT {
 		config.controler().setLastIteration(10);
 		config.controler().setWritePlansInterval(0);
 
-		final Controler controler = new Controler(config);
+		final Controller controler = new Controller(config);
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
 				3 == controler.getConfig().controler().getWriteEventsInterval());
         controler.getConfig().controler().setCreateGraphs(false);
@@ -558,17 +558,17 @@ public class ControlerIT {
 		controler.run();
 		assertEquals(4, controler.getConfig().controler().getWriteEventsInterval());
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(3, Controler.FILENAME_EVENTS_XML)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(4, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(6, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controler.FILENAME_EVENTS_XML)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(8, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(9, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(10, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(2, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(3, Controller.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(4, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(5, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(6, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(7, Controller.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(8, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(9, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(10, Controller.FILENAME_EVENTS_XML)).exists());
 	}
 
 	/**
@@ -580,7 +580,7 @@ public class ControlerIT {
 		config.controler().setLastIteration(1);
 		config.controler().setWritePlansInterval(0);
 
-		final Controler controler = new Controler(config);
+		final Controller controler = new Controller(config);
 		assertFalse("Default for Controler.writeEventsInterval should be different from the interval we plan to use, otherwise it's hard to decide if it works correctly.",
 				0 == controler.getConfig().controler().getWriteEventsInterval());
 		controler.getConfig().controler().setWriteEventsInterval(0);
@@ -600,8 +600,8 @@ public class ControlerIT {
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
-		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(0, Controller.FILENAME_EVENTS_XML)).exists());
+		assertFalse(new File(controler.getControlerIO().getIterationFilename(1, Controller.FILENAME_EVENTS_XML)).exists());
 	}
 
 	/**
@@ -613,7 +613,7 @@ public class ControlerIT {
 		config.controler().setLastIteration(1);
 		config.controler().setWritePlansInterval(0);
 
-		final Controler controler = new Controler(config);
+		final Controller controler = new Controller(config);
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
         controler.getConfig().controler().setCreateGraphs(false);
@@ -631,8 +631,8 @@ public class ControlerIT {
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controller.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, Controller.FILENAME_EVENTS_XML)).exists());
 	}
 
 	/**
@@ -645,7 +645,7 @@ public class ControlerIT {
 		config.controler().setWritePlansInterval(0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.xml));
 
-		final Controler controler = new Controler(config);
+		final Controller controler = new Controller(config);
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		assertEquals(1, controler.getConfig().controler().getWriteEventsInterval());
         controler.getConfig().controler().setCreateGraphs(false);
@@ -663,7 +663,7 @@ public class ControlerIT {
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controler.FILENAME_EVENTS_XML)).exists());
+		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, Controller.FILENAME_EVENTS_XML)).exists());
 	}
 
 	/**
@@ -675,7 +675,7 @@ public class ControlerIT {
 		config.controler().setLastIteration(0);
 		config.controler().setWritePlansInterval(0);
 
-		final Controler controler = new Controler(config);
+		final Controller controler = new Controller(config);
 		controler.getConfig().controler().setWriteEventsInterval(0);
         controler.getConfig().controler().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
@@ -693,7 +693,7 @@ public class ControlerIT {
 		controler.getConfig().controler().setDumpDataAtEnd(true);
 		controler.run();
 
-		assertTrue(new File(controler.getControlerIO().getOutputFilename(Controler.FILENAME_POPULATION)).exists());
+		assertTrue(new File(controler.getControlerIO().getOutputFilename(Controller.FILENAME_POPULATION)).exists());
 	}
 
 	/**
@@ -705,7 +705,7 @@ public class ControlerIT {
 		config.controler().setLastIteration(0);
 		config.controler().setWritePlansInterval(0);
 
-		final Controler controler = new Controler(config);
+		final Controller controler = new Controller(config);
 		controler.getConfig().controler().setWriteEventsInterval(0);
         controler.getConfig().controler().setCreateGraphs(false);
 		controler.addOverridingModule(new AbstractModule() {
@@ -724,7 +724,7 @@ public class ControlerIT {
 		controler.run();
 
 
-		assertFalse(new File(controler.getControlerIO().getOutputFilename(Controler.FILENAME_POPULATION)).exists());
+		assertFalse(new File(controler.getControlerIO().getOutputFilename(Controller.FILENAME_POPULATION)).exists());
 	}
 
 	@Test(expected = RuntimeException.class)
@@ -732,7 +732,7 @@ public class ControlerIT {
 		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration(1);
 
-		Controler controler = new Controler(config);
+		Controller controler = new Controller(config);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -753,7 +753,7 @@ public class ControlerIT {
 		config.plans().setInputFile("dummy/non-existing/population.xml");
 
 		try {
-			Controler controler = new Controler(config);
+			Controller controler = new Controller(config);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -788,7 +788,7 @@ public class ControlerIT {
 		config.controler().setWritePlansInterval(0);
 		config.network().setInputFile("dummy/non-existing/network.xml");
 
-		final Controler controler = new Controler(config);
+		final Controller controler = new Controller(config);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -823,7 +823,7 @@ public class ControlerIT {
 		config.controler().setWritePlansInterval(0);
 		config.facilities().setInputFile("dummy/non-existing/network.xml");
 
-		final Controler controler = new Controler(config);
+		final Controller controler = new Controller(config);
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
@@ -860,7 +860,7 @@ public class ControlerIT {
 		config.qsim().setSnapshotPeriod(600);
 		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;
 
-		final Controler controler = new Controler(config);
+		final Controller controler = new Controller(config);
         controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
@@ -879,7 +879,7 @@ public class ControlerIT {
 		config.qsim().setSnapshotPeriod(10);
 		config.qsim().setSnapshotStyle(SnapshotStyle.equiDist) ;;
 
-		final Controler controler = new Controler(config);
+		final Controller controler = new Controller(config);
         controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
@@ -898,7 +898,7 @@ public class ControlerIT {
 		config.qsim().setSnapshotPeriod(600);
 		config.qsim().setSnapshotStyle( SnapshotStyle.equiDist ) ;;
 
-		final Controler controler = new Controler(config);
+		final Controller controler = new Controller(config);
         controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.run();
@@ -920,7 +920,7 @@ public class ControlerIT {
 	public void testGuiceModulesCannotAddModules() {
 		final Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config_plans1.xml"));
 		config.controler().setLastIteration( 0 );
-		final Controler controler = new Controler( config );
+		final Controller controler = new Controller( config );
 
 		final Scenario replacementScenario = ScenarioUtils.createScenario( config );
 

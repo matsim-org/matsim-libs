@@ -17,7 +17,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
@@ -185,7 +185,7 @@ public class PopulationReprojectionIOIT {
 		config.controler().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
 		config.controler().setOutputDirectory( outputDirectory );
-		final Controler controler = new Controler( scenario );
+		final Controller controler = new Controller( scenario );
 		controler.run();
 
 		final Scenario dumpedScenario = ScenarioUtils.createScenario( config );

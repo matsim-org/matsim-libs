@@ -45,7 +45,7 @@ public class RunTaxiBenchmark {
 		createControler(config, runs).run();
 	}
 
-	public static Controler createControler(Config config, int runs) {
+	public static Controller createControler(Config config, int runs) {
 		config.controler().setLastIteration(runs - 1);
 		DvrpConfigGroup.get(config).setNetworkMode(null);//to switch off network filtering
 		config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
@@ -53,7 +53,7 @@ public class RunTaxiBenchmark {
 
 		Scenario scenario = loadBenchmarkScenario(config, 15 * 60, 30 * 3600);
 
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.setModules(new DvrpBenchmarkControlerModule());
 		controler.addOverridingModule(new TaxiOutputModule());
 

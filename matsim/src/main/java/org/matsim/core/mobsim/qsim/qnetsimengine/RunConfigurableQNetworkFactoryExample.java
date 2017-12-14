@@ -23,7 +23,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -43,7 +43,7 @@ public class RunConfigurableQNetworkFactoryExample {
 	static void run(Config config) {
 		final Scenario scenario = ScenarioUtils.createScenario( config ) ;
 		
-		Controler controler = new Controler( scenario ) ;
+		Controller controler = new Controller( scenario ) ;
 		
 		final EventsManager events = controler.getEvents() ;
 		

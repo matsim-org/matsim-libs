@@ -39,7 +39,7 @@ import org.matsim.analysis.ScoreStatsControlerListener;
 import org.matsim.analysis.ScoreStatsControlerListener.ScoreItem;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.testcases.MatsimTestUtils;
@@ -78,7 +78,7 @@ public class ScoreStatsModuleTest {
 		config.plansCalcRoute().setInsertingAccessEgressWalk(this.isInsertingAccessEgressWalk);
 
 		config.controler().setLastIteration(1);
-		Controler controler = new Controler(config);
+		Controller controler = new Controller(config);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

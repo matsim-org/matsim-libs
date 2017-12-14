@@ -39,7 +39,7 @@ import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.contrib.accessibility.utils.VisualizationUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -129,7 +129,7 @@ public class AccessibilityComputationSantaBarbaraTest {
 		// Network density points (as proxy for population density)
 		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(scenario.getNetwork()); // will be aggregated in downstream code!
 		
-		final Controler controler = new Controler(scenario);
+		final Controller controler = new Controller(scenario);
 		
 		for (String activityType : activityTypes) {
 			AccessibilityModule module = new AccessibilityModule();

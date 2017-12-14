@@ -29,7 +29,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
@@ -88,7 +88,7 @@ public class RunFlexibleQNetworkFactoryExample {
 		
 		Scenario scenario = ScenarioUtils.createScenario( config ) ;
 		
-		Controler controler = new Controler( scenario ) ;
+		Controller controler = new Controller( scenario ) ;
 		
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install() {

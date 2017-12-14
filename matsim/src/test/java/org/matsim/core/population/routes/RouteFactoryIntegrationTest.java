@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.population.routes.*;
 import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -63,7 +63,7 @@ public class RouteFactoryIntegrationTest {
 
 //		 test the default
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/default");
-		Controler controler = new Controler(config);
+		Controller controler = new Controller(config);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();
@@ -89,7 +89,7 @@ public class RouteFactoryIntegrationTest {
 		scenario.getPopulation().getFactory().getRouteFactories().setRouteFactory(NetworkRoute.class, new CompressedNetworkRouteFactory(scenario.getNetwork()));
 		ScenarioUtils.loadScenario(scenario);
 
-		Controler controler2 = new Controler(scenario);
+		Controller controler2 = new Controller(scenario);
         controler2.getConfig().controler().setCreateGraphs(false);
         controler2.getConfig().controler().setWriteEventsInterval(0);
 		controler2.run();

@@ -22,7 +22,7 @@ package org.matsim.analysis;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -58,7 +58,7 @@ final class LinkStatsControlerListener implements IterationEndsListener, Iterati
 		}
 
 		if (createLinkStatsInIteration(iteration)) {
-			linkStats.writeFile(this.controlerIO.getIterationFilename(iteration, Controler.FILENAME_LINKSTATS));
+			linkStats.writeFile(this.controlerIO.getIterationFilename(iteration, Controller.FILENAME_LINKSTATS));
 			this.doReset = true;
 		}
 	}

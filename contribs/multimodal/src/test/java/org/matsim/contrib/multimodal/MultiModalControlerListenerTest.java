@@ -54,7 +54,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -161,7 +161,7 @@ public class MultiModalControlerListenerTest {
 		scenario.getPopulation().addPerson(createPerson(scenario, "p2", "walk"));
 		scenario.getPopulation().addPerson(createPerson(scenario, "p3", "other"));
 
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
         controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);
@@ -248,7 +248,7 @@ public class MultiModalControlerListenerTest {
 
 		PrepareMultiModalScenario.run(scenario);
 
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
         controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);

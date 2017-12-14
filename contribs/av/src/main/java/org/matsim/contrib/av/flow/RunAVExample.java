@@ -31,7 +31,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
@@ -77,7 +77,7 @@ public class RunAVExample {
 			scenario.getVehicles().addVehicle(v);
 		}
 		
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		if (otfvis){
 		controler.addOverridingModule(new OTFVisLiveModule());
 		}

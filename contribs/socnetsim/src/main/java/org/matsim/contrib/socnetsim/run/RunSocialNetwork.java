@@ -23,7 +23,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.contrib.socnetsim.framework.SocialNetworkConfigGroup;
 import org.matsim.contrib.socnetsim.framework.controller.JointDecisionProcessModule;
 import org.matsim.contrib.socnetsim.framework.controller.SocialNetworkModule;
@@ -57,7 +57,7 @@ public class RunSocialNetwork {
 			if ( !sn.getEgos().contains( p ) ) sn.addEgo( p );
 		}
 
-		final Controler controler = new Controler( scenario );
+		final Controller controler = new Controller( scenario );
 		controler.addOverridingModule( new JointDecisionProcessModule() );
 		// One needs to add the various features one wants to use in one module to be safe:
 		// this way, if two features conflict, a crash will occur at injection.

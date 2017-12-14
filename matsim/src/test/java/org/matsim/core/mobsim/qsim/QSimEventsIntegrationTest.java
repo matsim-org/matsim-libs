@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -61,7 +61,7 @@ public class QSimEventsIntegrationTest {
 	public void controlerHandlesExceptionCorrectly() {
 		Config config = utils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		//		config.qsim().setUsingThreadpool(false);
-		Controler controler = new Controler(config);
+		Controller controler = new Controller(config);
 		controler.getEvents().addHandler(new LinkLeaveEventHandler() {
 			@Override
 			public void handleEvent(LinkLeaveEvent event) {

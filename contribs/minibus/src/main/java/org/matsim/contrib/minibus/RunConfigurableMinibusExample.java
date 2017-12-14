@@ -31,7 +31,7 @@ import org.matsim.contrib.minibus.fare.TicketMachineI;
 import org.matsim.contrib.minibus.hook.PModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -61,7 +61,7 @@ public final class RunConfigurableMinibusExample {
 		final Set<Id<TransitStopFacility>> subsidizedStops = new TreeSet<>() ;
 		// subsidizedStops.add(...) ; // add subsidized stops
 		
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.getConfig().controler().setCreateGraphs(false);
 		
 		if ( true ) {

@@ -27,7 +27,7 @@ import org.matsim.contrib.signals.controler.SignalsModule;
 import org.matsim.contrib.signals.data.*;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
@@ -73,7 +73,7 @@ public class SignalSystemsIT {
 
 		// ---
 
-		Controler c = new Controler(scenario);
+		Controller c = new Controller(scenario);
 		c.addOverridingModule(new SignalsModule());
 		
 		c.getConfig().controler().setDumpDataAtEnd(false);
@@ -165,7 +165,7 @@ public class SignalSystemsIT {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		scenario.addScenarioElement(SignalsData.ELEMENT_NAME, new SignalsDataLoader(config).loadSignalsData());
 
-		Controler c = new Controler(scenario);
+		Controller c = new Controller(scenario);
 		c.addOverridingModule(new SignalsModule());
 		c.getConfig().controler().setOutputDirectory(controlerOutputDir);
 		c.getConfig().controler().setCreateGraphs(false);

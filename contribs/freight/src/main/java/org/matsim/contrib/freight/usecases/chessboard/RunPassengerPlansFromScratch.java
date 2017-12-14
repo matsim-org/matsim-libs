@@ -4,7 +4,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 public class RunPassengerPlansFromScratch {
@@ -40,7 +40,7 @@ public class RunPassengerPlansFromScratch {
 		config.strategy().addStrategySettings(bestScore);
 		config.strategy().addStrategySettings(reRoute);
 //		
-		Controler controler = new Controler(config);
+		Controller controler = new Controller(config);
 		controler.getConfig().controler().setWriteEventsInterval(1);
         controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setOverwriteFileSetting(

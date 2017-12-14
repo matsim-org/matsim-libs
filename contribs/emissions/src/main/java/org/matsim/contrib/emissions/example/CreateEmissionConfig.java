@@ -25,7 +25,7 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.*;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.MatsimServices;
 
 /**
@@ -73,7 +73,7 @@ public class CreateEmissionConfig {
 			
 			Config config = new Config();
 			config.addCoreModules();
-			MatsimServices controler = new Controler(config);
+			MatsimServices controler = new Controller(config);
 			
 		// controlerConfigGroup
 			ControlerConfigGroup ccg = controler.getConfig().controler();

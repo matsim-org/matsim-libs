@@ -31,7 +31,7 @@ import org.matsim.contrib.noise.data.NoiseAllocationApproach;
 import org.matsim.contrib.noise.utils.ProcessNoiseImmissions;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -55,7 +55,7 @@ public class NoiseOnlineControlerExample {
 		Config config = ConfigUtils.loadConfig(configFile, new NoiseConfigGroup());
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.addOverridingModule(new NoiseModule(scenario));
 		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);

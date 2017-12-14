@@ -42,7 +42,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.CountsConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -257,7 +257,7 @@ public class CountsControlerListenerTest {
 		cConfig.setOutputFormat("txt");
 		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
 		
-		final Controler controler = new Controler(ScenarioUtils.createScenario(config));
+		final Controller controler = new Controller(ScenarioUtils.createScenario(config));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -295,7 +295,7 @@ public class CountsControlerListenerTest {
 		cConfig.setOutputFormat("txt");
 		cConfig.setInputFile("counts.xml"); // just any file to activate the counts feature
 		
-		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
+		final Controller controler = new Controller(ScenarioUtils.loadScenario(config));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
@@ -365,7 +365,7 @@ public class CountsControlerListenerTest {
 	}
 
 	private void createAndRunControler(Config config) {
-		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
+		final Controller controler = new Controller(ScenarioUtils.loadScenario(config));
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

@@ -47,7 +47,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -104,7 +104,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 		lcContext.init();
 
 		// CONTROL(L)ER:
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
@@ -181,7 +181,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 		lcContext.init();
 
 		// CONTROL(L)ER:
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
@@ -296,7 +296,7 @@ public class LocationChoiceIT extends MatsimTestCase {
 
 		Person person = localCreatePopWOnePerson(scenario, link, facility1, 17.*60.*60.);
 
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 
 		// set locachoice strategy:
 		controler.addOverridingModule(new AbstractModule() {

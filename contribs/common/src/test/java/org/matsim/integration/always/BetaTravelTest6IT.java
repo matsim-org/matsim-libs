@@ -37,7 +37,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -128,7 +128,7 @@ public class BetaTravelTest6IT extends MatsimTestCase {
 		 */
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		PopulationUtils.sortPersons(scenario.getPopulation());
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

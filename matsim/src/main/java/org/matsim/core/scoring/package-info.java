@@ -23,10 +23,10 @@
  * the effective score.
  *
  * <h3>Typical Usage</h3>
- * If you are using the MATSim-{@linkplain org.matsim.core.controler.Controler} but
+ * If you are using the MATSim-{@linkplain org.matsim.core.controler.Controller} but
  * want to use your own ScoringFunction, you can provide a factory for your
  * ScoringFunction and set it with
- * {@link org.matsim.core.controler.Controler#setScoringFunctionFactory(org.matsim.core.scoring.ScoringFunctionFactory)}.
+ * {@link org.matsim.core.controler.Controller#setScoringFunctionFactory(org.matsim.core.scoring.ScoringFunctionFactory)}.
  * If you do not use the Controler, you can can use
  * {@link org.matsim.core.scoring.EventsToScore} as events handler with your
  * {@link org.matsim.core.events.EventsManager}-object to calculate the scores. Do not
@@ -40,7 +40,7 @@
  * utility-terms to it (e.g. tolls paid, money paid for parking lots, ...).
  * For the first case (use a complete different scoring algorithm), write your
  * own scoring function and scoring function factory, and add it to the
- * Controler with {@link org.matsim.core.controler.Controler#setScoringFunctionFactory(org.matsim.core.scoring.ScoringFunctionFactory)}.
+ * Controler with {@link org.matsim.core.controler.Controller#setScoringFunctionFactory(org.matsim.core.scoring.ScoringFunctionFactory)}.
  * But if you only plan to add or subtract some utility amounts from agents'
  * score, you can generate {@link org.matsim.api.core.v01.events.PersonMoneyEvent}s.
  * Scoring functions should listen for <code>AgentUtilityEvent</code>s and just

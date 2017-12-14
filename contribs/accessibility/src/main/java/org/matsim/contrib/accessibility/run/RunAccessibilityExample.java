@@ -28,7 +28,7 @@ import org.matsim.contrib.accessibility.Modes4Accessibility;
 import org.matsim.contrib.accessibility.utils.AccessibilityUtils;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -70,7 +70,7 @@ final public class RunAccessibilityExample {
 		List<String> activityTypes = AccessibilityUtils.collectAllFacilityOptionTypes(scenario) ;
 		log.warn( "found the following activity types: " + activityTypes );
 		
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 
 		for (final String actType : activityTypes) { // add an overriding module per activity type:
 			final AccessibilityModule module = new AccessibilityModule();

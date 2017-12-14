@@ -22,7 +22,7 @@ package org.matsim.core.replanning.modules;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.population.algorithms.PlanAlgorithm;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -31,7 +31,7 @@ import org.matsim.facilities.ActivityFacilities;
 import javax.inject.Provider;
 
 /**
- * Uses the routing algorithm provided by the {@linkplain Controler} for 
+ * Uses the routing algorithm provided by the {@linkplain Controller} for 
  * calculating the routes of plans during Replanning.
  *
  * @author mrieser

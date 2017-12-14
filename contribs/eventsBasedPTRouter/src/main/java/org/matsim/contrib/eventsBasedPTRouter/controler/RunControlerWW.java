@@ -24,7 +24,7 @@ import org.matsim.contrib.eventsBasedPTRouter.TransitRouterEventsWLFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
 import org.matsim.pt.router.TransitRouter;
@@ -41,7 +41,7 @@ public class RunControlerWW {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		ConfigUtils.loadConfig(config, args[0]);
-		final Controler controler = new Controler(ScenarioUtils.loadScenario(config));
+		final Controller controler = new Controller(ScenarioUtils.loadScenario(config));
 		final WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getScenario().getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig(), controler.getEvents());
 		controler.getEvents().addHandler(waitTimeCalculator);
 		controler.addOverridingModule(new AbstractModule() {

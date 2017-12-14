@@ -38,7 +38,7 @@ import org.matsim.contrib.matrixbasedptrouter.utils.CreateTestPopulation;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.io.NetworkWriter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -115,7 +115,7 @@ public class MatrixBasedPtRouterIT {
 		BoundingBox nbb = BoundingBox.createBoundingBox(network);
 		final PtMatrix ptMatrix = PtMatrix.createPtMatrix(config.plansCalcRoute(), nbb, ConfigUtils.addOrGetModule(config, MatrixBasedPtRouterConfigGroup.GROUP_NAME, MatrixBasedPtRouterConfigGroup.class));
 
-		Controler controler = new Controler(scenario) ;
+		Controller controler = new Controller(scenario) ;
 		controler.addOverridingModule(new MatrixBasedPtModule());
 		controler.run();
 		

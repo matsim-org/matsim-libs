@@ -21,14 +21,14 @@ package org.matsim.contrib.locationchoice;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.testcases.MatsimTestCase;
 
 public class Initializer {
 
-	private Controler controler;
+	private Controller controler;
 
 	public void init(MatsimTestCase testCase) {
 		// lnk does not work. get path to locationchcoice
@@ -38,7 +38,7 @@ public class Initializer {
 		
 		//Config config = testCase.loadConfig(path);
 				
-		this.controler = new Controler(config);
+		this.controler = new Controller(config);
         this.controler.getConfig().controler().setCreateGraphs(false);
         this.controler.getConfig().controler().setWriteEventsInterval(0); // disables events-writing
 		this.controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);

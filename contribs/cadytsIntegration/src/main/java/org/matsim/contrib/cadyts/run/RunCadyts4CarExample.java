@@ -27,7 +27,7 @@ import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -57,7 +57,7 @@ public class RunCadyts4CarExample {
 		
 		// ---
 
-		final Controler controler = new Controler( scenario ) ;
+		final Controller controler = new Controller( scenario ) ;
 		controler.addOverridingModule(new CadytsCarModule());
 
 		// include cadyts into the plan scoring (this will add the cadyts corrections to the scores):

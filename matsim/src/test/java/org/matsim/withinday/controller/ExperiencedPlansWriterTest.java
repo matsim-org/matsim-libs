@@ -38,7 +38,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -97,7 +97,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 		population.addPerson(createPerson(scenario, "p01"));
 		population.addPerson(createPerson(scenario, "p02"));
 		
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
         controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);

@@ -38,7 +38,7 @@ import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -142,7 +142,7 @@ public class StuckAgentTest {
 		scenario.getPopulation().addPerson(createPerson(scenario, "p3", "walk", null, 23.5*3600));	// en-route when simulation ends
 		scenario.getPopulation().addPerson(createPerson(scenario, "p4", "walk", null, 24.5*3600));	// departs after simulation has ended
 		
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
         controler.getConfig().controler().setCreateGraphs(false);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setWriteEventsInterval(0);

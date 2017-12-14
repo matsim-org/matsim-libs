@@ -21,7 +21,7 @@ package org.matsim.benchmark;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
@@ -31,7 +31,7 @@ public class Benchmark {
 
 	public static void main(String[] args) throws IOException {
 		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("benchmark"), "config.xml"));
-		Controler ctl = new Controler(config);
+		Controller ctl = new Controller(config);
         ctl.getConfig().controler().setCreateGraphs(false);
         ctl.run();
 	}

@@ -27,7 +27,7 @@ import org.matsim.contrib.taxi.benchmark.RunTaxiBenchmark;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider.OptimizerType;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.*;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 
 public class TaxiOptimizerTests {
 	public static class TaxiConfigVariant {
@@ -86,7 +86,7 @@ public class TaxiOptimizerTests {
 
 	public static class PreloadedBenchmark {
 		private final Config config;
-		private final Controler controler;
+		private final Controller controler;
 
 		public PreloadedBenchmark(String plansSuffix, String taxisSuffix) {
 			String dir = "./src/main/resources/mielec_2014_02/";

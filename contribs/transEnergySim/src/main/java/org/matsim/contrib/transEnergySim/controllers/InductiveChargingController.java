@@ -28,7 +28,7 @@ import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.HashMap;
@@ -41,7 +41,7 @@ import java.util.HashMap;
  */
 public class InductiveChargingController {
 
-	private final Controler controler;
+	private final Controller controler;
 	private InductiveStreetCharger inductiveCharger;
 	private ChargingUponArrival chargingUponArrival;
 	private EnergyConsumptionTracker energyConsumptionTracker;
@@ -49,7 +49,7 @@ public class InductiveChargingController {
 
 	public InductiveChargingController(Config config, HashMap<Id<Vehicle>, Vehicle> vehicles) {
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
-		this.controler = new Controler( scenario );
+		this.controler = new Controller( scenario );
 		init(vehicles);
 	}
 

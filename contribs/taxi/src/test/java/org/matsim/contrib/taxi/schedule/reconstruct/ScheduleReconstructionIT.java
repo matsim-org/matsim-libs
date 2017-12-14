@@ -58,7 +58,7 @@ public class ScheduleReconstructionIT {
 				new OTFVisConfigGroup());
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 
-		Controler controler = RunTaxiBenchmark.createControler(config, 1);
+		Controller controler = RunTaxiBenchmark.createControler(config, 1);
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {

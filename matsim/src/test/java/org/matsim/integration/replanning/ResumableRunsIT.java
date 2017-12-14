@@ -25,7 +25,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -71,7 +71,7 @@ public class ResumableRunsIT {
 		 */
 		Scenario scenario1 = ScenarioUtils.loadScenario(config);
 		PopulationUtils.sortPersons(scenario1.getPopulation());
-		Controler controler1 = new Controler(scenario1);
+		Controller controler1 = new Controller(scenario1);
         controler1.getConfig().controler().setCreateGraphs(false);
 		controler1.getConfig().controler().setDumpDataAtEnd(false);
 		controler1.run();
@@ -80,7 +80,7 @@ public class ResumableRunsIT {
 		config.controler().setOutputDirectory(utils.getOutputDirectory() + "/run2/");
 		config.controler().setFirstIteration(10);
 		config.plans().setInputFile(new File(utils.getOutputDirectory() + "/run1/ITERS/it.10/10.plans.xml.gz").toURI().toURL().toString());
-		Controler controler2 = new Controler(config);
+		Controller controler2 = new Controller(config);
         controler2.getConfig().controler().setCreateGraphs(false);
 		controler2.getConfig().controler().setDumpDataAtEnd(false);
 		controler2.run();

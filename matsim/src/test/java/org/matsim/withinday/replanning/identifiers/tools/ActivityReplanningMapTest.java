@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -96,7 +96,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		config.qsim().setStartTime(0.0);
 		config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.StarttimeInterpretation.onlyUseStarttime);
 
-		Controler controler = new Controler(config);
+		Controller controler = new Controller(config);
 		controler.addOverridingModule(new WithinDayModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override

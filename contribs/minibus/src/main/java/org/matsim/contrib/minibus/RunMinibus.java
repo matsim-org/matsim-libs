@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.minibus.hook.PModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
@@ -50,7 +50,7 @@ public final class RunMinibus {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.getConfig().controler().setCreateGraphs(false);
 
 		controler.addOverridingModule(new PModule()) ;

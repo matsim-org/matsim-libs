@@ -29,7 +29,7 @@ import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.ControlerDefaults;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.router.FastDijkstraFactory;
@@ -54,7 +54,7 @@ public class RunMultimodalExample {
 		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		PrepareMultiModalScenario.run(scenario);
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.setModules(new ControlerDefaultsWithMultiModalModule());
 		controler.run();
 	}

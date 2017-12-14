@@ -21,7 +21,7 @@
 package org.matsim.vis.otfvis.checklists;
 
 import org.matsim.contrib.otfvis.OTFVisFileWriterModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 
 /**
@@ -30,7 +30,7 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 public class T2_RunControlerWithMovieOutput {
 
 	public static void main(String[] args) {
-		Controler con = new Controler("test/scenarios/equil/config-qsim.xml");
+		Controller con = new Controller("test/scenarios/equil/config-qsim.xml");
 		con.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
 		con.addOverridingModule(new OTFVisFileWriterModule());
 		con.run();

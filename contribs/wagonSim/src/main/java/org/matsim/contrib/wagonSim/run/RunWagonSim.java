@@ -33,7 +33,7 @@ import org.matsim.contrib.wagonSim.pt.router.WagonSimRouterFactoryImpl;
 import org.matsim.contrib.wagonSim.pt.router.WagonSimTripRouterFactoryImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -54,9 +54,9 @@ import java.util.Map;
 public final class RunWagonSim {
 	private static final Logger log = Logger.getLogger( RunWagonSim.class ) ;
 	
-	public static final Controler init(Scenario scenario, final ObjectAttributes vehicleLinkSpeedAttributes, Map<Id<TransitStopFacility>, Double> minShuntingTimes) {
+	public static final Controller init(Scenario scenario, final ObjectAttributes vehicleLinkSpeedAttributes, Map<Id<TransitStopFacility>, Double> minShuntingTimes) {
 //		super(scenario);
-		final Controler controler = new Controler( scenario ) ;
+		final Controller controler = new Controller( scenario ) ;
 		Config config = controler.getConfig() ;
 		
 		final WagonSimVehicleLoadListener listener = new WagonSimVehicleLoadListener(scenario.getPopulation().getPersonAttributes());
@@ -147,7 +147,7 @@ public final class RunWagonSim {
 		try { minShuntingTimes = Utils.parseShuntingTimes(shuntingTimesFile); }
 		catch (IOException e) { throw new RuntimeException(e); }
 		
-		Controler controler = init(scenario,vehicleLinkSpeedAttributes,minShuntingTimes);
+		Controller controler = init(scenario,vehicleLinkSpeedAttributes,minShuntingTimes);
 		controler.run();
 	}
 

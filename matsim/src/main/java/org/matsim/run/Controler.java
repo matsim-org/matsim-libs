@@ -31,14 +31,14 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
  */
 public class Controler {
 
-	private final org.matsim.core.controler.Controler controler;
+	private final org.matsim.core.controler.Controller controler;
 	
 	public Controler(final String[] args) {
-		this.controler = new org.matsim.core.controler.Controler(args);
+		this.controler = new org.matsim.core.controler.Controller(args);
 	}
 	
 	public Controler(final String configFilename) {
-		this.controler = new org.matsim.core.controler.Controler(configFilename);
+		this.controler = new org.matsim.core.controler.Controller(configFilename);
 	}
 	
 	public void setOverwriteFiles(final boolean overwriteFiles) {

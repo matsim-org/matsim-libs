@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -72,7 +72,7 @@ public class NonAlternatingPlanElementsIT {
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setCreateGraphs(false);
         controler.run();
@@ -99,7 +99,7 @@ public class NonAlternatingPlanElementsIT {
 		person.addPlan(plan);
 		scenario.getPopulation().addPerson(person);
 
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.getConfig().controler().setDumpDataAtEnd(false);
 		controler.getConfig().controler().setCreateGraphs(false);
         controler.run();

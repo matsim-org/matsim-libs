@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricingConfigGroup;
 import org.matsim.roadpricing.RoadPricingModule;
@@ -70,7 +70,7 @@ public class RunRoadPricingUsingTollFactorExample {
 		RoadPricingSchemeUsingTollFactor scheme = new RoadPricingSchemeUsingTollFactor(rpConfig.getTollLinksFile(), tollFactor) ;
 		
 		// instantiate the control(l)er:
-		Controler controler = new Controler( scenario ) ;
+		Controller controler = new Controller( scenario ) ;
 		
 		// add the road pricing module, with our scheme from above inserted:
 		controler.addOverridingModule( new RoadPricingModule( scheme ) ) ;

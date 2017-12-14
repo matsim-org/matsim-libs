@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEvent;
 import org.matsim.contrib.signals.events.SignalGroupStateChangedEventHandler;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -66,7 +66,7 @@ public class ControlerTest {
 		scenario.getConfig().controler().setLastIteration(1);
 		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
         controler.getConfig().controler().setCreateGraphs(false);
         controler.addControlerListener(new AfterMobsimListener() {
 

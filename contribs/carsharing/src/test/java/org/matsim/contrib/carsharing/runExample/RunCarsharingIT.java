@@ -32,7 +32,7 @@ import org.matsim.contrib.carsharing.config.TwoWayCarsharingConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -86,7 +86,7 @@ public class RunCarsharingIT {
 
 		// ---
 
-		final Controler controler = new Controler( scenario );
+		final Controller controler = new Controller( scenario );
 //		controler.setDirtyShutdown(true);
 		
 		RunCarsharing.installCarSharing(controler);

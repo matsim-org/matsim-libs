@@ -35,7 +35,7 @@ import org.matsim.contrib.parking.parkingchoice.example.ParkingBetaExample;
 import org.matsim.contrib.parking.parkingchoice.example.ParkingCostCalculatorExample;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -55,7 +55,7 @@ public class RunParkingChoiceExample {
 	public static void run(Config config) {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
-		Controler controler = new Controler(scenario);
+		Controller controler = new Controller(scenario);
 		controler.getConfig().controler().setOverwriteFileSetting( OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles );
 
 		// ---

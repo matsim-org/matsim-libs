@@ -65,10 +65,10 @@ public final class OutputDirectoryLogging {
 		} else {
 			Logger root = Logger.getRootLogger();
 			root.setLevel(Level.INFO);
-			ConsoleAppender consoleAppender = new ConsoleAppender(Controler.DEFAULTLOG4JLAYOUT, "System.out");
+			ConsoleAppender consoleAppender = new ConsoleAppender(Controller.DEFAULTLOG4JLAYOUT, "System.out");
 			consoleAppender.setName("A1");
 			root.addAppender(consoleAppender);
-			consoleAppender.setLayout(Controler.DEFAULTLOG4JLAYOUT);
+			consoleAppender.setLayout(Controller.DEFAULTLOG4JLAYOUT);
 			log.error("");
 			log.error("Could not find configuration file " + logProperties + " for Log4j in the classpath.");
 			log.error("A default configuration is used, setting log level to INFO with a ConsoleAppender.");
@@ -139,10 +139,10 @@ public final class OutputDirectoryLogging {
 	private static void initLogging(String outputFilename, String warnLogfileName) throws IOException {
 		Logger root = Logger.getRootLogger();
 		final boolean appendToExistingFile = false; 
-		FileAppender appender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, outputFilename, appendToExistingFile);
+		FileAppender appender = new FileAppender(Controller.DEFAULTLOG4JLAYOUT, outputFilename, appendToExistingFile);
 		appender.setName(LOGFILE);
 		root.addAppender(appender);
-		FileAppender warnErrorAppender = new FileAppender(Controler.DEFAULTLOG4JLAYOUT, warnLogfileName, appendToExistingFile);
+		FileAppender warnErrorAppender = new FileAppender(Controller.DEFAULTLOG4JLAYOUT, warnLogfileName, appendToExistingFile);
 		warnErrorAppender.setName(WARNLOGFILE);
 		warnErrorAppender.setThreshold(Level.WARN);
 		root.addAppender(warnErrorAppender);

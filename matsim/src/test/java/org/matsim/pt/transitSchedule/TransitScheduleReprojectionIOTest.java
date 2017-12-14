@@ -9,7 +9,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -100,7 +100,7 @@ public class TransitScheduleReprojectionIOTest {
 		config.controler().setLastIteration( -1 );
 		final String outputDirectory = utils.getOutputDirectory()+"/output/";
 		config.controler().setOutputDirectory( outputDirectory );
-		final Controler controler = new Controler( scenario );
+		final Controller controler = new Controller( scenario );
 		controler.run();
 
 		final Scenario dumpedScenario = ScenarioUtils.createScenario( config );

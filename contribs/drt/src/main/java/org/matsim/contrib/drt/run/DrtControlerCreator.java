@@ -46,7 +46,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -64,21 +64,21 @@ import com.google.inject.name.Named;
  */
 public final class DrtControlerCreator {
 
-	public static Controler createControler(Config config, boolean otfvis) {
+	public static Controller createControler(Config config, boolean otfvis) {
 		adjustConfig(config);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		return adjustControler(otfvis, scenario);
 	}
 
-	public static Controler createControler(Scenario scenario, boolean otfvis) {
+	public static Controller createControler(Scenario scenario, boolean otfvis) {
 		// yy I know that this one breaks the sequential loading of the building blocks, but I would like to be able
 		// to modify the scenario before I pass it to the controler.  kai, oct'17
 		adjustConfig(scenario.getConfig());
 		return adjustControler(otfvis, scenario);
 	}
 
-	private static Controler adjustControler(boolean otfvis, Scenario scenario) {
-		Controler controler = new Controler(scenario);
+	private static Controller adjustControler(boolean otfvis, Scenario scenario) {
+		Controller controler = new Controller(scenario);
 		controler.addOverridingModule(new DvrpModule(DrtControlerCreator.createModuleForQSimPlugin(),
 				DrtOptimizer.class, DefaultUnplannedRequestInserter.class));
 		controler.addOverridingModule(new DrtModule());

@@ -145,7 +145,7 @@
  * </strike>
  *
  * <h3><a name="controler"> RoadPricing with the Controler</a></h3>
- * To simulate road pricing with the default MATSim {@link org.matsim.core.controler.Controler}, prepare the
+ * To simulate road pricing with the default MATSim {@link org.matsim.core.controler.Controller}, prepare the
  * road pricing XML file (more details and examples can be found with the description of each
  * <a href="#schemes">supported toll scheme</a>). Then add the following part to your configuration:
  * <pre>

@@ -42,7 +42,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.Controller;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultSelector;
@@ -113,7 +113,7 @@ public class TeleportationEngineWDistanceCheckTest {
 			plan.addActivity(act);
 		}
 		
-		Controler controler = new Controler( scenario ) ;
+		Controller controler = new Controller( scenario ) ;
 		controler.addOverridingModule( new AbstractModule(){
 			@Override public void install() {
 				this.addEventHandlerBinding().toInstance( new BasicEventHandler(){
