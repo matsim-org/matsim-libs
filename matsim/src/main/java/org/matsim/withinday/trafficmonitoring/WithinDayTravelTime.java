@@ -63,13 +63,13 @@ import java.util.concurrent.CyclicBarrier;
  * @author cdobler
  */
 @Singleton
-public class TravelTimeCollector implements TravelTime,
+public class WithinDayTravelTime implements TravelTime,
 		LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler,
 		VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler,
 		MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener,
 		MobsimBeforeCleanupListener {
 
-	private static final Logger log = Logger.getLogger(TravelTimeCollector.class);
+	private static final Logger log = Logger.getLogger(WithinDayTravelTime.class);
 
 	private Network network;
 
@@ -104,11 +104,11 @@ public class TravelTimeCollector implements TravelTime,
 	private double now = Double.NEGATIVE_INFINITY ;
 	
 	@Inject
-	TravelTimeCollector(Scenario scenario) {
+	WithinDayTravelTime(Scenario scenario) {
 		this(scenario, null);
 	}
 
-	public TravelTimeCollector(Scenario scenario, Set<String> analyzedModes) {
+	public WithinDayTravelTime(Scenario scenario, Set<String> analyzedModes) {
 //		log.setLevel(Level.DEBUG);
 		
 		/*
@@ -213,9 +213,6 @@ public class TravelTimeCollector implements TravelTime,
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 		final double travelTime = this.travelTimeInfoProvider.getTravelTimeInfo(link).travelTime;
-		if ( Id.createLinkId(51825).equals(link.getId())) {
-			log.debug( "link=" + link.getId() + ";\ttime=" + time + ";\tttime=" + travelTime ) ;
-		}
 		return travelTime;
 	}
 	

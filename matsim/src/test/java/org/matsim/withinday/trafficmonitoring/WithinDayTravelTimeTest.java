@@ -59,7 +59,7 @@ import junitparams.Parameters;
  * @author cdobler
  */
 @RunWith(JUnitParamsRunner.class)
-public class TravelTimeCollectorTest extends MatsimTestCase {
+public class WithinDayTravelTimeTest extends MatsimTestCase {
 
 	@Rule
 	public MatsimTestUtils helper = new MatsimTestUtils();
@@ -118,7 +118,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 			event.addLink(link22);
 		}
 		
-		final TravelTimeCollector travelTime = new TravelTimeCollector(scenario, null);
+		final WithinDayTravelTime travelTime = new WithinDayTravelTime(scenario, null);
 		final MobsimListener listener = new MobsimListenerForTests(scenario, travelTime);
 		final FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 		fosl.addSimulationListener(travelTime);
