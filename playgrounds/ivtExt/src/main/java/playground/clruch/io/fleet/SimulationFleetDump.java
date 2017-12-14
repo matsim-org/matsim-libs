@@ -79,9 +79,6 @@ enum SimulationFleetDump {
                         int linkIndex = db.getLinkIndex(center);
 
                         LinkSpeedUtils lsUtils = new LinkSpeedUtils(taxiTrail, quadTree, db);
-                        double linkSpeed = lsUtils.getLinkSpeed(now);
-                        // System.out.println("Linkspeed of linkIndex " + linkIndex + ": " + linkSpeed + " m/s");
-
                         // ---
                         VehicleContainer vc = new VehicleContainer();
                         vc.vehicleIndex = vehicleIndex;

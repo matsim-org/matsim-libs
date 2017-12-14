@@ -6,7 +6,6 @@ import java.io.File;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
@@ -16,7 +15,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
-import ch.ethz.matsim.av.framework.AVConfigGroup;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageUtils;
@@ -25,13 +23,6 @@ import playground.clruch.options.ScenarioOptions;
 /** @author Andreas Aumiller */
 enum PopulationCreator {
     ;
-
-    public static int STEPSIZE = 10; // TODO this should be derived from storage files
-    // TODO Andi: variables can be local in function
-    private static StorageUtils storageUtils;
-    private static File[] outputFolders;
-    private static String[] outputFolderNames;
-
     public static void main(String[] args) throws Exception {
         // Loading simulationObjects
         File workingDirectory = MultiFileTools.getWorkingDirectory();
@@ -40,21 +31,18 @@ enum PopulationCreator {
         System.out.println(simOptions.getSimulationConfigName());
         File outputSubDirectory = new File(configFile.controler().getOutputDirectory());
         File outputDirectory = outputSubDirectory.getParentFile();
-        // File outputDirectory = new File(workingDirectory, simOptions.getString("visualizationFolder"));
+        
         System.out.println("INFO getting all output folders from: " + outputDirectory.getAbsolutePath());
-        outputFolders = MultiFileTools.getAllDirectoriesSorted(outputDirectory);
-        outputFolderNames = new String[outputFolders.length];
+        File[] outputFolders = MultiFileTools.getAllDirectoriesSorted(outputDirectory);
+        String[] outputFolderNames = new String[outputFolders.length];
         for (int i = 0; i < outputFolders.length; ++i) {
             outputFolderNames[i] = outputFolders[i].getName();
         }
-        storageUtils = new StorageUtils(new File(outputDirectory, outputFolderNames[0]));
+        StorageUtils storageUtils = new StorageUtils(new File(outputDirectory, outputFolderNames[0])); // TODO process all data from outputFolderNames
         storageUtils.printStorageProperties();
 
         // Initialize ConfigGroups and Files
         System.out.println("INFO loading simulation configuration");
-        DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
-        // File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
-        // Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName(), new AVConfigGroup(), dvrpConfigGroup);
         Scenario scenario = ScenarioUtils.loadScenario(configFile);
         Network network = scenario.getNetwork();
         PlansConfigGroup plansConfigGroup = new PlansConfigGroup();
@@ -66,7 +54,6 @@ enum PopulationCreator {
         MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
 
         population = PopulationDump.of(population, network, MatsimStaticDatabase.INSTANCE, storageUtils);
-        // populate(population);
 
         // Write new population to file
         final File populationFile = new File(workingDirectory, "TestPopulation.xml");
