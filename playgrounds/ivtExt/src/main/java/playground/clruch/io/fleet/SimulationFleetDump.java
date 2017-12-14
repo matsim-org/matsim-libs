@@ -51,7 +51,8 @@ enum SimulationFleetDump {
             StorageUtils storageUtils = new StorageUtils(outputFolders.get(iteration));
 
             final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
-            final HashSet<List<RequestStatus>> requestTrails = new HashSet<>();
+            HashSet<List<RequestStatus>> requestTrails = new HashSet<>();
+            HashSet<RequestContainer> uniqueRequests = new HashSet<>();
 
             int dropped = 0;
             // int cancelledRequests = 0;
@@ -95,26 +96,14 @@ enum SimulationFleetDump {
                         if (rcUtils.isValidRequest(now, includeCancelled)) {
                             // RequestStatus requestStatus = taxiStamp.requestStatus;
                             RequestContainer rc = rcUtils.populate(now, requestIndex, quadTree, db);
+                            System.out.println("Parsing vehicle " + vehicleIndex + " at time " + now);
                             simulationObject.requests.add(rc);
 
                             List<RequestStatus> requestTrail = new ArrayList<RequestStatus>();
                             requestTrail = rcUtils.dumpRequestTrail(now);
                             requestTrails.add(requestTrail);
-                            if (rc.requestIndex > requestIndex) {
-                                requestIndex = rc.requestIndex;
-                                // System.out.println("New request (" + requestIndex + ") for vehicle " + vehicleIndex + " at time " + now);
-                            }
-                            // // Check if a request has been matched == Passenger has been picked up
-                            // if (requestStatus == RequestStatus.PICKUP)
-                            // totalMatchedRequests++;
-                            // if (requestStatus == RequestStatus.REQUESTED)
-                            // totalRequests++;
-                            // if (requestStatus == RequestStatus.DROPOFF)
-                            // totalDropoffs++;
-                            // if (RequestStatusParser.isNewSubmission(requestStatus, taxiTrail.getLastEntry(now).getValue().requestStatus))
-                            // requestIndex++;
-                            // if (requestStatus == RequestStatus.CANCELLED)
-                            // cancelledRequests++;
+                            uniqueRequests.add(rc);
+                            requestIndex = uniqueRequests.size();
                         }
                         simulationObject.total_matchedRequests = totalMatchedRequests;
                         GlobalAssert.that(Objects.nonNull(vc.avStatus));
@@ -132,6 +121,7 @@ enum SimulationFleetDump {
             System.out.println("INFO dropped total: " + dropped);
             FleetReaderLogUtils.countAllRequests(requestTrails);
             System.out.println("INFO total submitted requests: " + requestIndex);
+            System.err.println("INFO total amount of unique Requests: " + uniqueRequests.size());
             // System.out.println("INFO total requests: " + totalRequests);
             // System.out.println("INFO total pickups: " + totalMatchedRequests);
             // System.out.println("INFO total dropoffs: " + totalDropoffs);

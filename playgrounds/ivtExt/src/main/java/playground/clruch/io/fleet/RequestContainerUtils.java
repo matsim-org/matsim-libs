@@ -117,10 +117,11 @@ public class RequestContainerUtils {
 
         if (RequestStatusParser.isNewSubmission(nowRequest, lastRequest)) {
             requestIndex++;
-            // System.out.println("Check for new submission: [ " + lastRequest.name() + " / " + nowRequest.name() + "] --> RequestIndex: " + requestIndex);
+            System.out.println("Check for new submission: [ " + lastRequest.name() + " / " + nowRequest.name() + "] --> RequestIndex: " + requestIndex);
             taxiTrail.setRequestIndex(now, requestIndex);
             // System.out.println("Processing requestIndex: " + requestIndex);
             submissionTime = taxiTrail.interp(now).getKey();
+            System.out.println("Submission time is: " + submissionTime);
         } else {
             taxiTrail.setRequestIndex(now, taxiTrail.getLastEntry(now).getValue().requestIndex);
             submissionTime = findSubmissionTime(now);
