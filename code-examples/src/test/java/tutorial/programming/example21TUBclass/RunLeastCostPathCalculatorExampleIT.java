@@ -19,20 +19,30 @@
 
 package tutorial.programming.example21TUBclass;
 
-import org.junit.Test;
+import java.io.File;
 
+import org.junit.Test;
+import org.matsim.core.utils.io.IOUtils;
+
+import tutorial.programming.example06EventsHandling.RunEventsHandlingWithControlerExample;
 import tutorial.programming.example21tutorialTUBclass.leastCostPath.RunLeastCostPathCalculatorExample;
 
 /**
  * @author  jbischoff
  *
  */
-public class IntegrationTest {
-	
+public class RunLeastCostPathCalculatorExampleIT {
 
 	@Test
 	public void test() {
+		try {
+			IOUtils.deleteDirectoryRecursively(new File( RunLeastCostPathCalculatorExample.outputDirectory ).toPath());
+		} catch ( Exception ee ) {
+			// deletion may fail; is ok.
+		}
 			RunLeastCostPathCalculatorExample.main(null);
+			IOUtils.deleteDirectoryRecursively(new File( RunLeastCostPathCalculatorExample.outputDirectory ).toPath());
+			// if this fails, then it is a test failure (since the directory should have been constructed)
 
 	}
 

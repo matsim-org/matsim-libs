@@ -35,8 +35,11 @@ import org.matsim.examples.ExamplesUtils;
  *
  */
 public class RunLeastCostPathCalculatorExample {
+	public static final String outputDirectory = "output/leastCostPathCalculatorExample" ;
+
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
+		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.controler().setLastIteration(1);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
