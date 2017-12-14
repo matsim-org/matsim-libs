@@ -90,10 +90,10 @@ public class EquilOpdytsIT {
         double stepSize = 1.0;
 
         OpdytsConfigGroup opdytsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), OpdytsConfigGroup.class);
-        opdytsConfigGroup.setNumberOfIterationsForAveraging(2);
-        opdytsConfigGroup.setNumberOfIterationsForConvergence(5);
+        opdytsConfigGroup.setNumberOfIterationsForAveraging(10);
+        opdytsConfigGroup.setNumberOfIterationsForConvergence(20);
 
-        opdytsConfigGroup.setMaxIteration(4);
+        opdytsConfigGroup.setMaxIteration(6);
         opdytsConfigGroup.setOutputDirectory(scenario.getConfig().controler().getOutputDirectory());
         opdytsConfigGroup.setDecisionVariableStepSize(stepSize);
         opdytsConfigGroup.setUseAllWarmUpIterations(false);
@@ -132,9 +132,9 @@ public class EquilOpdytsIT {
         String outputDir = helper.getOutputDirectory();
         //check the max opdyts transition
         if(isPlansRelaxed) {
-            Assert.assertEquals("Maximum number of OpDyTS transitions are wrong.", new File(outDir).listFiles(File::isDirectory).length, 4);
+            Assert.assertEquals("Maximum number of OpDyTS transitions are wrong.", new File(outDir).listFiles(File::isDirectory).length, 6);
         } else {
-            Assert.assertEquals("Maximum number of OpDyTS transitions are wrong.", new File(outDir).listFiles(File::isDirectory).length, 5); // additional directory for relaxed plans.
+            Assert.assertEquals("Maximum number of OpDyTS transitions are wrong.", new File(outDir).listFiles(File::isDirectory).length, 7); // additional directory for relaxed plans.
         }
 
 
@@ -148,7 +148,26 @@ public class EquilOpdytsIT {
             bikeInitialASC = bestASCAfterItr;
         }
         //in order to get 75% bicycle trips, it must be positive
-        Assert.assertTrue("The best overall solution is wrong.", bestASCAfterItr > 0.); //
+        Assert.assertEquals("The best overall solution is wrong.", bestASCAfterItr, 5.0, MatsimTestUtils.EPSILON ); //
+
+        double valueOfObjFun = getValueOfObjFun(outputDir+"/opdyts.log");
+        Assert.assertEquals("The best overall objective function", valueOfObjFun, 0.0045, MatsimTestUtils.EPSILON ); //
+    }
+
+    private double getValueOfObjFun(String logFile){
+        double value = Double.MAX_VALUE;
+        BufferedReader reader = IOUtils.getBufferedReader(logFile);
+        try {
+            String line = reader.readLine();
+            while (line!=null){
+                String parts [] = line.split("\t");
+                value = Double.valueOf( parts[3] );
+                line = reader.readLine();
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Data is not written/read. Reason : " + e);
+        }
+        return value;
     }
 
     /**
