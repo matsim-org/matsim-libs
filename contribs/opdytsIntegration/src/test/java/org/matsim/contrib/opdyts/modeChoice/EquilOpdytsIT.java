@@ -88,12 +88,13 @@ public class EquilOpdytsIT {
     private void runOpdyts(final List<String> modes2consider, final Scenario scenario, final String outDir){
 
         double stepSize = 1.0;
+        int opdytsTransitions = 6;
 
         OpdytsConfigGroup opdytsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), OpdytsConfigGroup.class);
         opdytsConfigGroup.setNumberOfIterationsForAveraging(10);
         opdytsConfigGroup.setNumberOfIterationsForConvergence(20);
 
-        opdytsConfigGroup.setMaxIteration(6);
+        opdytsConfigGroup.setMaxIteration(opdytsTransitions);
         opdytsConfigGroup.setOutputDirectory(scenario.getConfig().controler().getOutputDirectory());
         opdytsConfigGroup.setDecisionVariableStepSize(stepSize);
         opdytsConfigGroup.setUseAllWarmUpIterations(false);
@@ -137,12 +138,11 @@ public class EquilOpdytsIT {
             Assert.assertEquals("Maximum number of OpDyTS transitions are wrong.", new File(outDir).listFiles(File::isDirectory).length, 7); // additional directory for relaxed plans.
         }
 
-
         // axial_fixed, check step size
         double maxASCChange = stepSize;
         double bikeInitialASC = 0.;
         double bestASCAfterItr = 0;
-        for (int i=0; i<4;i++){
+        for (int i=0; i<opdytsTransitions;i++){
             bestASCAfterItr = getBestOverallDecisionVariable(outputDir+"/opdyts.log",String.valueOf(i));
             Assert.assertTrue("Change in ASC for " + i + " opdyts transition is wrong.", Math.abs( bestASCAfterItr - bikeInitialASC) <= maxASCChange);
             bikeInitialASC = bestASCAfterItr;
@@ -152,17 +152,48 @@ public class EquilOpdytsIT {
 
         double valueOfObjFun = getValueOfObjFun(outputDir+"/opdyts.log");
         Assert.assertEquals("The best overall objective function", valueOfObjFun, 0.0045, MatsimTestUtils.EPSILON ); //
+
+        double bicycleShare = getBicycleShareFromModeStatsFile(outputDir+"/_"+opdytsTransitions+"/modestats.txt");
+        Assert.assertTrue("Resulting bicycle share is wrong.", bicycleShare > 0.75 && bicycleShare < 0.80 );
+    }
+
+    private double getBicycleShareFromModeStatsFile(String file){
+        double share = 0;
+        boolean header = true;
+        BufferedReader reader = IOUtils.getBufferedReader(file);
+        try {
+            String line = reader.readLine();
+            while (line!=null){
+                if ( header ) {
+                    header = false;
+                    line = reader.readLine();
+                } else {
+                    String parts[] = line.split("\t");
+                    share = Double.valueOf(parts[7]);
+                    line = reader.readLine();
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Data is not written/read. Reason : " + e);
+        }
+        return share;
     }
 
     private double getValueOfObjFun(String logFile){
         double value = Double.MAX_VALUE;
         BufferedReader reader = IOUtils.getBufferedReader(logFile);
+        boolean header = true;
         try {
             String line = reader.readLine();
             while (line!=null){
                 String parts [] = line.split("\t");
-                value = Double.valueOf( parts[3] );
-                line = reader.readLine();
+                if ( header || parts[3].isEmpty()) {
+                    header = false;
+                    line = reader.readLine();
+                } else {
+                    value = Double.valueOf(parts[3]);
+                    line = reader.readLine();
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException("Data is not written/read. Reason : " + e);
@@ -270,6 +301,4 @@ public class EquilOpdytsIT {
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         return config;
     }
-
-
 }
