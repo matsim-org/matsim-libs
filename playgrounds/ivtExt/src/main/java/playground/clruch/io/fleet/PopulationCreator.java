@@ -2,6 +2,7 @@
 package playground.clruch.io.fleet;
 
 import java.io.File;
+import java.net.MalformedURLException;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -23,7 +24,8 @@ import playground.clruch.options.ScenarioOptions;
 /** @author Andreas Aumiller */
 enum PopulationCreator {
     ;
-    public static void main(String[] args) throws Exception {
+
+    public static void main(String[] args) throws MalformedURLException, Exception {
         // Loading simulationObjects
         File workingDirectory = MultiFileTools.getWorkingDirectory();
         ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);
@@ -31,7 +33,18 @@ enum PopulationCreator {
         System.out.println(simOptions.getSimulationConfigName());
         File outputSubDirectory = new File(configFile.controler().getOutputDirectory());
         File outputDirectory = outputSubDirectory.getParentFile();
-        
+
+        // Initialize ConfigGroups and Files
+        System.out.println("INFO loading simulation configuration");
+        Scenario scenario = ScenarioUtils.loadScenario(configFile);
+        Network network = scenario.getNetwork();
+        ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
+        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
+        createAdamAndEva(workingDirectory, outputDirectory, network, MatsimStaticDatabase.INSTANCE);
+    }
+
+    public static void createAdamAndEva(File workingDirectory, File outputDirectory, Network network, MatsimStaticDatabase db) throws Exception {
+        System.out.println("\nINFO Running PopulatioCreater with following data");
         System.out.println("INFO getting all output folders from: " + outputDirectory.getAbsolutePath());
         File[] outputFolders = MultiFileTools.getAllDirectoriesSorted(outputDirectory);
         String[] outputFolderNames = new String[outputFolders.length];
@@ -41,19 +54,13 @@ enum PopulationCreator {
         StorageUtils storageUtils = new StorageUtils(new File(outputDirectory, outputFolderNames[0])); // TODO process all data from outputFolderNames
         storageUtils.printStorageProperties();
 
-        // Initialize ConfigGroups and Files
-        System.out.println("INFO loading simulation configuration");
-        Scenario scenario = ScenarioUtils.loadScenario(configFile);
-        Network network = scenario.getNetwork();
         PlansConfigGroup plansConfigGroup = new PlansConfigGroup();
 
         // Create new population
         System.out.println("INFO creating new population file");
         Population population = PopulationUtils.createPopulation(plansConfigGroup, network);
-        ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
-        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
 
-        population = PopulationDump.of(population, network, MatsimStaticDatabase.INSTANCE, storageUtils);
+        population = PopulationDump.of(population, network, db, storageUtils);
 
         // Write new population to file
         final File populationFile = new File(workingDirectory, "TestPopulation.xml");

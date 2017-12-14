@@ -3,6 +3,7 @@ package playground.clruch.io.fleet;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -29,7 +30,9 @@ enum SimulationFleetDump {
     ;
 
     public static void of(List<DayTaxiRecord> dayTaxiRecords, Network network, MatsimStaticDatabase db, //
-            List<File> outputFolders) {
+            List<File> outputFolders, int TIME_STEP) {
+
+        System.out.println(outputFolders.get(0).toString());
 
         final double[] networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
         final QuadTree<Link> quadTree = new QuadTree<>( //
@@ -48,17 +51,17 @@ enum SimulationFleetDump {
             StorageUtils storageUtils = new StorageUtils(outputFolders.get(iteration));
 
             final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
-            final int TIMESTEP = 10;
+            final HashSet<List<RequestStatus>> requestTrails = new HashSet<>();
 
             int dropped = 0;
-            int cancelledRequests = 0;
+            // int cancelledRequests = 0;
             int requestIndex = 0;
-            int totalRequests = 0;
-            int totalDropoffs = 0;
+            // int totalRequests = 0;
+            // int totalDropoffs = 0;
             int totalMatchedRequests = 0;
-            
+
             // NavigableMap<Integer, Integer> requestMap = new TreeMap<>();
-            for (int now = 0; now < MAXTIME; now += TIMESTEP) {
+            for (int now = 0; now < MAXTIME; now += TIME_STEP) {
                 if (now % 10000 == 0)
                     System.out.println("INFO processing timestep = " + now + "\r");
                 SimulationObject simulationObject = new SimulationObject();
@@ -90,22 +93,28 @@ enum SimulationFleetDump {
                         boolean includeCancelled = false;
                         // System.out.println("Parsing vehicle " + vehicleIndex + " at time " + now);
                         if (rcUtils.isValidRequest(now, includeCancelled)) {
-                            RequestStatus requestStatus = taxiStamp.requestStatus;
-                            // System.out.println("Parsing RequestStatus " + requestStatus.tag() + " for vehicle " + vehicleIndex + " at time " + now);
-                            if (requestStatus != RequestStatus.CANCELLED) {
-                                RequestContainer rc = rcUtils.populate(now, requestIndex, quadTree, db);
-                                simulationObject.requests.add(rc);
-                                // Check if a request has been matched == Passenger has been picked up
-                                if (requestStatus == RequestStatus.PICKUP)
-                                    totalMatchedRequests++;
-                                if (requestStatus == RequestStatus.REQUESTED)
-                                    totalRequests++;
-                                if (requestStatus == RequestStatus.DROPOFF)
-                                    totalDropoffs++;
-                                if (RequestStatusParser.isNewSubmission(requestStatus, taxiTrail.getLastEntry(now).getValue().requestStatus))
-                                    requestIndex++;
-                            } else if (requestStatus == RequestStatus.CANCELLED)
-                                cancelledRequests++;
+                            // RequestStatus requestStatus = taxiStamp.requestStatus;
+                            RequestContainer rc = rcUtils.populate(now, requestIndex, quadTree, db);
+                            simulationObject.requests.add(rc);
+
+                            List<RequestStatus> requestTrail = new ArrayList<RequestStatus>();
+                            requestTrail = rcUtils.dumpRequestTrail(now);
+                            requestTrails.add(requestTrail);
+                            if (rc.requestIndex > requestIndex) {
+                                requestIndex = rc.requestIndex;
+                                // System.out.println("New request (" + requestIndex + ") for vehicle " + vehicleIndex + " at time " + now);
+                            }
+                            // // Check if a request has been matched == Passenger has been picked up
+                            // if (requestStatus == RequestStatus.PICKUP)
+                            // totalMatchedRequests++;
+                            // if (requestStatus == RequestStatus.REQUESTED)
+                            // totalRequests++;
+                            // if (requestStatus == RequestStatus.DROPOFF)
+                            // totalDropoffs++;
+                            // if (RequestStatusParser.isNewSubmission(requestStatus, taxiTrail.getLastEntry(now).getValue().requestStatus))
+                            // requestIndex++;
+                            // if (requestStatus == RequestStatus.CANCELLED)
+                            // cancelledRequests++;
                         }
                         simulationObject.total_matchedRequests = totalMatchedRequests;
                         GlobalAssert.that(Objects.nonNull(vc.avStatus));
@@ -121,11 +130,17 @@ enum SimulationFleetDump {
             }
             ++iteration;
             System.out.println("INFO dropped total: " + dropped);
+            FleetReaderLogUtils.countAllRequests(requestTrails);
             System.out.println("INFO total submitted requests: " + requestIndex);
-            System.out.println("INFO total requests: " + totalRequests);
-            System.out.println("INFO total pickups: " + totalMatchedRequests);
-            System.out.println("INFO total dropoffs: " + totalDropoffs);
-            System.out.println("INFO cancelled requests: " + cancelledRequests);
+            // System.out.println("INFO total requests: " + totalRequests);
+            // System.out.println("INFO total pickups: " + totalMatchedRequests);
+            // System.out.println("INFO total dropoffs: " + totalDropoffs);
+            // System.out.println("INFO cancelled requests: " + cancelledRequests);
         }
+
+        // // Write new network with adapted traffic data / speeds
+        // NetworkWriter networkWriter = new NetworkWriter(network);
+        // final File networkGzFile = new File(workingDirectory, "TestNetwork.xml.gz");
+        // networkWriter.write(networkGzFile);
     }
 }

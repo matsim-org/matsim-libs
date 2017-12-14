@@ -12,6 +12,8 @@ import ch.ethz.idsc.queuey.datalys.MultiFileReader;
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.FileDelete;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import playground.clruch.ScenarioPreparer;
+import playground.clruch.ScenarioServer;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.options.ScenarioOptions;
@@ -20,6 +22,9 @@ import playground.clruch.utils.NetworkLoader;
 /** @author Claudio Ruch */
 enum StandaloneFleetConverter {
     ;
+    
+    private static int TIME_STEP = 10; // TODO Magic const. <=> Simulation resolution
+    
     public static void main(String[] args) throws Exception {
         File workingDirectory = MultiFileTools.getWorkingDirectory();
         ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);
@@ -29,11 +34,14 @@ enum StandaloneFleetConverter {
 
         File configFile = new File(workingDirectory, simOptions.getSimulationConfigName());
         Network network = NetworkLoader.loadNetwork(configFile);
+        
         // File networkFile = new File(workingDirectory, "trb_config.xml");
 
         System.out.println("INFO working folder: " + workingDirectory.getAbsolutePath());
         System.out.println("INFO network file: " + configFile.getAbsolutePath());
         ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
+        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
+        
         List<File> trailFiles = (new MultiFileReader(workingDirectory, "Fahrtstrecken")).getFolderFiles();
         List<DayTaxiRecord> dayTaxiRecords = new ArrayList<>();
         List<File> outputFolders = new ArrayList<>();
@@ -59,13 +67,16 @@ enum StandaloneFleetConverter {
 
         // Generate dayTaxiRecords and output folders according to date of csv-data
         System.out.println("INFO found files: ");
+        boolean takeLog = false;
         for (File file : trailFiles) {
             System.out.println(file.getAbsolutePath());
 
             DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
             // extract data from file and put into dayTaxiRecord
             CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);
-            reader.populateFrom(file, true);
+            reader.populateFrom(file, takeLog);
+            FleetUtils.postProcessData(file, dayTaxiRecord, takeLog, TIME_STEP);
+            FleetUtils.getLinkData(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE);
             dayTaxiRecords.add(dayTaxiRecord);
 
             outputDirectory = new File(workingDirectory, "output/" + file.getName().substring(0, 10));
@@ -77,9 +88,19 @@ enum StandaloneFleetConverter {
         }
 
         // STEP 2: DayTaxiRecord to MATSimStaticDatabase
-        MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
-
         // generate sim objects and store
-        SimulationFleetDump.of(dayTaxiRecords, network, MatsimStaticDatabase.INSTANCE, outputFolders);
+        SimulationFleetDump.of(dayTaxiRecords, network, MatsimStaticDatabase.INSTANCE, outputFolders, TIME_STEP);
+        
+        // STEP 3: Generate Population.xml
+        outputDirectory = new File(workingDirectory, "output/");
+        PopulationCreator.createAdamAndEva(workingDirectory, outputDirectory, network, MatsimStaticDatabase.INSTANCE);
+
+        // STEP 4: Run ScenarioPreparer
+        ScenarioPreparer scenarioPreparer = new ScenarioPreparer();
+        scenarioPreparer.run(workingDirectory);
+
+        // STEP 5: Run ScenarioServer
+        ScenarioServer scenarioServer = new ScenarioServer();
+        scenarioServer.main(null);
     }
 }

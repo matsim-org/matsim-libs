@@ -26,7 +26,6 @@ import playground.clruch.net.StorageUtils;
 /** @author Andreas Aumiller */
 enum PopulationDump {
     ;
-
     public static Population of(Population population, Network network, MatsimStaticDatabase db, StorageUtils storageUtils) throws Exception {
         HashSet<RequestContainer> allRequests = findAllRequests(storageUtils);
         final int TRAVEL_TIME = 3600; // TODO magic const.
@@ -39,6 +38,7 @@ enum PopulationDump {
     }
 
     private static HashSet<RequestContainer> findAllRequests(StorageUtils storageUtils) throws Exception {
+        System.out.println("INFO Remove redundant requests from SimulationObjects");
         HashMap<Integer, RequestContainer> uniqueRequests = new HashMap<>();
         HashSet<RequestContainer> allRequests = new HashSet<>();
         List<IterationFolder> list = storageUtils.getAvailableIterations();
@@ -51,6 +51,8 @@ enum PopulationDump {
             }
         }
         uniqueRequests.values().forEach(r -> allRequests.add(r));
+        System.out.println("INFO Passing " + allRequests.size() + " unique Requests");
+        System.out.println("INFO From " + uniqueRequests.size() + " total amount of Requests");
         return allRequests;
     }
 
@@ -62,29 +64,18 @@ enum PopulationDump {
             Person person = populationFactory.createPerson(personID);
             Plan plan = populationFactory.createPlan();
 
-            // Get links and coordinates
+            // Get links
             OsmLink fromLink = db.getOsmLink(rc.fromLinkIndex);
-            // Coord fromCoord = fromLink.getAt(0.5);
             OsmLink toLink = db.getOsmLink(rc.toLinkIndex);
-            // Coord toCoord = toLink.getAt(0.5);
 
             // Create activities
             Activity startActivity = populationFactory.createActivityFromLinkId("activity", fromLink.link.getId());
             startActivity.setEndTime(rc.submissionTime);
-            // startActivity.setCoord(fromCoord);
             Activity endActivity = populationFactory.createActivityFromLinkId("activity", toLink.link.getId());
             endActivity.setStartTime(rc.submissionTime + TRAVEL_TIME);
-            // endActivity.setCoord(toCoord);
 
             // Create legs and routes
             Leg leg = populationFactory.createLeg("av");
-            // RouteFactory routeFactory = new AVRouteFactory();
-            // Route route = routeFactory.createRoute(fromLink.link.getId(), toLink.link.getId());
-            // // NetworkRoute nwRoute = RouteUtils.createLinkNetworkRouteImpl(fromLink.link.getId(), toLink.link.getId());
-            // // route.setDistance(RouteUtils.calcDistance(nwRoute, 0.5, 0.5, network));
-            // route.setTravelTime(TRAVEL_TIME);
-            // route.setRouteDescription("av");
-            // leg.setRoute(route);
             // leg.setTravelTime(200);
             // leg.setDepartureTime(rc.submissionTime);
             // leg.setTravelTime(TRAVEL_TIME);
@@ -94,10 +85,6 @@ enum PopulationDump {
             person.addPlan(plan);
             population.addPerson(person);
         }
-
         GlobalAssert.that(population.getPersons().size() == allRequests.size());
-
     }
-
 }
-
