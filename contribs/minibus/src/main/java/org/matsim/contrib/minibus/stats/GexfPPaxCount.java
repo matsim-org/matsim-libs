@@ -159,6 +159,7 @@ final class GexfPPaxCount extends MatsimJaxbXmlWriter implements StartupListener
 //			attValue.setValue(Integer.toString(Math.max(1, countForLink)));
 			attValue.setValue(Integer.toString(countForLink));
 			attValue.setStart(Double.toString(iteration));
+			attValue.setEnd(Double.toString(iteration));
 
 			entry.getValue().getAttvalue().add(attValue);
 			this.linkId2CountsFromLastIteration.put(entry.getKey(), countForLink);

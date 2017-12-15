@@ -177,6 +177,7 @@ final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEnds
 			attValue.setFor("weight");
 			attValue.setValue(Integer.toString(countForLink));
 			attValue.setStart(Double.toString(iteration));
+			attValue.setEnd(Double.toString(iteration));
 
 			linkEntry.getValue().getAttvalue().add(attValue);
 			this.linkId2TotalCountsFromLastIteration.put(linkEntry.getKey(), countForLink);
@@ -198,6 +199,7 @@ final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEnds
 			attValue.setFor("nVeh");
 			attValue.setValue(Integer.toString(countForLink));
 			attValue.setStart(Double.toString(iteration));
+			attValue.setEnd(Double.toString(iteration));
 
 			linkEntry.getValue().getAttvalue().add(attValue);
 			this.linkId2VehCountsFromLastIteration.put(linkEntry.getKey(), countForLink);

@@ -208,6 +208,7 @@ final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, It
 			attValue.setFor("weight");
 			attValue.setValue(Integer.toString(countForLink));
 			attValue.setStart(Double.toString(iteration));
+			attValue.setEnd(Double.toString(iteration));
 
 			linkEntry.getValue().getAttvalue().add(attValue);
 			this.linkId2TotalCountsFromLastIteration.put(linkEntry.getKey(), countForLink);
@@ -249,7 +250,9 @@ final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, It
 			}
 			
 			operatorIdValue.setStart(Double.toString(iteration));
+			operatorIdValue.setEnd(Double.toString(iteration));
 			operatorCountValue.setStart(Double.toString(iteration));			
+			operatorCountValue.setEnd(Double.toString(iteration));	
 
 			linkEntry.getValue().getAttvalue().add(operatorIdValue);
 			linkEntry.getValue().getAttvalue().add(operatorCountValue);
@@ -272,6 +275,7 @@ final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, It
 			attValue.setFor("nVeh");
 			attValue.setValue(Integer.toString(countForLink));
 			attValue.setStart(Double.toString(iteration));
+			attValue.setEnd(Double.toString(iteration));
 
 			linkEntry.getValue().getAttvalue().add(attValue);
 			this.linkId2VehCountsFromLastIteration.put(linkEntry.getKey(), countForLink);
@@ -300,6 +304,7 @@ final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, It
 						attValue.setFor(lineId);
 						attValue.setValue(Integer.toString(0));
 						attValue.setStart(Double.toString(iteration));
+						attValue.setEnd(Double.toString(iteration));
 						linkEntry.getValue().getAttvalue().add(attValue);
 					}
 				}
@@ -337,6 +342,7 @@ final class GexfPStat extends MatsimJaxbXmlWriter implements StartupListener, It
 					attributeContent.setFor(lineId);
 					attributeContent.setValue(Integer.toString(countForLinkAndLineId));
 					attributeContent.setStart(Double.toString(iteration));
+					attributeContent.setEnd(Double.toString(iteration));
 
 					linkEntry.getValue().getAttvalue().add(attributeContent);
 

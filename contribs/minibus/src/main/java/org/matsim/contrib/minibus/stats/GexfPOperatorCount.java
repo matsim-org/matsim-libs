@@ -181,7 +181,9 @@ final class GexfPOperatorCount extends MatsimJaxbXmlWriter implements StartupLis
 			}
 			
 			operatorIdValue.setStart(Double.toString(iteration));
-			operatorCountValue.setStart(Double.toString(iteration));			
+			operatorIdValue.setEnd(Double.toString(iteration));
+			operatorCountValue.setStart(Double.toString(iteration));		
+			operatorCountValue.setEnd(Double.toString(iteration));	
 
 			entry.getValue().getAttvalue().add(operatorIdValue);
 			entry.getValue().getAttvalue().add(operatorCountValue);
