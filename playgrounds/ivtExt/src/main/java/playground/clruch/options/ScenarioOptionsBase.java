@@ -39,6 +39,7 @@ public enum ScenarioOptionsBase {
     /* package */ static final String CHANGEMODETOAVIDENTIFIER = "populationchangeModeToAV";
     /* package */ static final String VIRTUALNETWORKcREATORIDENTIFIER = "virtualNetworkCreator";
     /* package */ static final String NETWORKCLEANERIDENTIFIER = "networkCleaner";
+    /* package */ static final String NETWORKREMOVESHORTLINKS = "networkRemoveShortLinks";
 
     public static Properties getDefault() {
         Properties returnP = new Properties();
@@ -65,7 +66,7 @@ public enum ScenarioOptionsBase {
         returnP.setProperty(POPULATIONCUTTERIDENTIFIER, "NETWORKBASED");
         returnP.setProperty(VIRTUALNETWORKcREATORIDENTIFIER, "KMEANS");
         returnP.setProperty(NETWORKCLEANERIDENTIFIER, "true");
-
+        returnP.setProperty(NETWORKREMOVESHORTLINKS, "true");
         return returnP;
     }
 
@@ -78,8 +79,8 @@ public enum ScenarioOptionsBase {
         try (FileOutputStream ostream = new FileOutputStream(defaultFile)) {
             prop.store(ostream,
                     "This is a default config file that needs to be modified. \n "
-                    + "The parameters ReferenceFrame and LocationSpec need to be set in order to simulate,"
-                    + " e.g., ReferenceFrame=SIOUXFALLS, LocationSpec=SIOUXFALLS_CITY ");
+                            + "The parameters ReferenceFrame and LocationSpec need to be set in order to simulate,"
+                            + " e.g., ReferenceFrame=SIOUXFALLS, LocationSpec=SIOUXFALLS_CITY ");
         }
     }
 

@@ -128,6 +128,10 @@ public class ScenarioOptions {
         return getBoolean(ScenarioOptionsBase.NETWORKCLEANERIDENTIFIER);
     }
     
+    public boolean removeShortLinks(){
+        return getBoolean(ScenarioOptionsBase.NETWORKREMOVESHORTLINKS);
+    }
+    
     // base access functions ==================================================
     public String getString(String key) {
         return properties.getProperty(key);

@@ -32,7 +32,6 @@ public enum NetworkPreparer {
             modifiedNetwork = NetworkCutterUtils.modeFilter(modifiedNetwork, scenOptions.getLinkModes());
         }
 
-        // Clean the network if defined in the IDSC Settings
         if (scenOptions.cleanNetwork()) {
             new NetworkCleaner().run(modifiedNetwork);
         }

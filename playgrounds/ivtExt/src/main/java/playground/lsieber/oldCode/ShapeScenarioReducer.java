@@ -13,9 +13,9 @@ import org.matsim.facilities.ActivityFacilities;
 import ch.ethz.idsc.owly.data.GlobalAssert;
 import playground.lsieber.networkshapecutter.FacilityPopulationBasedCutter;
 import playground.lsieber.networkshapecutter.LinkModes;
-import playground.lsieber.networkshapecutter.NetworkCutterShape;
 import playground.lsieber.networkshapecutter.NetworkCutterUtils;
 import playground.lsieber.networkshapecutter.PopulationFilter;
+import playground.lsieber.networkshapecutter.networkcuttershape.NetworkCutterShape;
 
 public class ShapeScenarioReducer extends AbstractScenarioReducer {
 

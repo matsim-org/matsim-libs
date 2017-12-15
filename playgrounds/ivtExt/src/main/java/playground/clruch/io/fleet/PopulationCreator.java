@@ -16,7 +16,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
-import ch.ethz.matsim.av.framework.AVConfigGroup;
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageUtils;
@@ -54,8 +53,8 @@ enum PopulationCreator {
         System.out.println("INFO loading simulation configuration");
         DvrpConfigGroup dvrpConfigGroup = new DvrpConfigGroup();
         // File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
-        Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName(), new AVConfigGroup(), dvrpConfigGroup);
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+        // Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName(), new AVConfigGroup(), dvrpConfigGroup);
+        Scenario scenario = ScenarioUtils.loadScenario(configFile);
         Network network = scenario.getNetwork();
         PlansConfigGroup plansConfigGroup = new PlansConfigGroup();
 

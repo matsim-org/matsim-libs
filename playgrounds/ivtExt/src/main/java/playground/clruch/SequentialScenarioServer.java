@@ -20,14 +20,15 @@ public class SequentialScenarioServer {
         /** Delete current content in outputfolder, DO NOT MODIFY THIS, POTENTIALLY VERY DANGEROUS. */
         SequentialScenarioTools.emptyOutputFolder(workingDirectory);
 
-        int iterations = 13;
-        if (iterations % 2 == 0) {
-            iterations = iterations - 1;
-        }
+        int iterations = 10;
+//        if (iterations % 2 == 0) {
+//            iterations = iterations - 1;
+//        }
 
-        double factorPlus = 1.9;
-        double[] fareRatios = SequentialScenarioTools.fareRatioCreator(iterations, factorPlus);
+        //double factorPlus = 1.9;
+        //double[] fareRatios = SequentialScenarioTools.fareRatioCreator(iterations, factorPlus);
         //double[] fareRatios = new double[]{0.0001, 1.0, 10000.0};
+        int[] vehicleNumbers = new int[]{20,40,60,80,100,120,140,160,180,200};
         
 
         // copy the raw folder name including changed settings
@@ -35,8 +36,8 @@ public class SequentialScenarioServer {
             System.out.println("working in the directory " + workingDirectory.getAbsolutePath());
 
             // modify the av.xml file
-            SequentialScenarioTools.changeFareRatioTo(fareRatios[i], workingDirectory);
-            // SequentialScenarioTools.changeVehicleNumberTo(vehicleNumbers[i], workingDirectory);
+            //SequentialScenarioTools.changeFareRatioTo(fareRatios[i], workingDirectory);
+            SequentialScenarioTools.changeVehicleNumberTo(vehicleNumbers[i], workingDirectory);
 
             // set the output-directory correctly
             SequentialScenarioTools.changeOutputDirectoryTo("output/" + String.format("%04d", i), workingDirectory,//);

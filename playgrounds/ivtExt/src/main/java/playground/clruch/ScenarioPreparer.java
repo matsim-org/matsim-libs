@@ -36,7 +36,7 @@ public class ScenarioPreparer {
 
         // load Settings from IDSC Options
         Config config = ConfigUtils.loadConfig(scenarioOptions.getPreparerConfigName());
-        Scenario scenario = ScenarioUtils.loadScenario(config);
+        Scenario scenario = ScenarioUtils.loadScenario(config);     
 
         // 1) cut network (and reduce population to new network)
         Network network = scenario.getNetwork();
@@ -44,6 +44,7 @@ public class ScenarioPreparer {
 
         // 2) adapt the population to new network
         Population population = scenario.getPopulation();
+        System.out.println("population size: " + population.getPersons().size());
         PopulationPreparer.run(network, population, scenarioOptions);
 
         // 3) create virtual Network

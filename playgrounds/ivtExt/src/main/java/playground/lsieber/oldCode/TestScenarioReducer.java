@@ -15,7 +15,7 @@ import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeCalculator;
 import playground.clruch.analysis.minimumfleetsize.MinimumFleetSizeIO;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeCalculator;
 import playground.clruch.analysis.performancefleetsize.PerformanceFleetSizeIO;
-import playground.clruch.netdata.MatsimCenterVirtualNetworkCreator;
+import playground.clruch.netdata.MatsimCenterVirtualNetworkCreatorOld;
 import playground.clruch.netdata.MatsimKMEANSVirtualNetworkCreator;
 import playground.clruch.options.ScenarioOptions;
 import playground.clruch.prep.PopulationRequestSchedule;
@@ -68,7 +68,7 @@ public class TestScenarioReducer {
         // TODO make this generic for any VirtualNetwork creators.
         VirtualNetwork<Link> virtualNetwork;
         if (centerNetwork) {
-            MatsimCenterVirtualNetworkCreator centercreator = new MatsimCenterVirtualNetworkCreator();
+            MatsimCenterVirtualNetworkCreatorOld centercreator = new MatsimCenterVirtualNetworkCreatorOld();
             virtualNetwork = centercreator.creatVirtualNetwork(network, 2000.0, Tensors.vector(-900.0, -2300.0));
 
         } else {

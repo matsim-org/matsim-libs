@@ -145,5 +145,14 @@ public enum IncludeActTypeOf {
         config.planCalcScore().addActivityParams(new ActivityParams("remote_work_6"));
     }
     
+    public static void artificial(Config config){
+        config.planCalcScore().addActivityParams(new ActivityParams("activity"));
+        
+        for(ActivityParams activityParams : config.planCalcScore().getActivityParams()){
+            activityParams.setTypicalDuration(3600.0); //TODO fix this to meaningful values            
+        }
+    }
+
+    
     
 }

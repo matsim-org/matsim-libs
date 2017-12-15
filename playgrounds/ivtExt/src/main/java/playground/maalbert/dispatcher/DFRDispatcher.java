@@ -117,7 +117,8 @@ public class DFRDispatcher extends PartitionedDispatcher {
         // TODO: Get rid of Loop
         neighCount = Array.zeros(N_vStations);
         for (int i = 0; i < N_vStations; i++) {
-            neighCount.set(RealScalar.of(virtualNetwork.getVirtualNode(i).getNeighCount()), i);
+            // FIXME
+            // neighCount.set(RealScalar.of(virtualNetwork.getVirtualNode(i).getNeighCount()), i);
         }
 
     }
@@ -434,19 +435,19 @@ public class DFRDispatcher extends PartitionedDispatcher {
         return lambda.multiply(factor);
     }
 
-//    private Tensor avg_WaitTimePerVirtualNode(Map<VirtualNode<Link>, List<AVRequest>> requests, long timenow) {
-//        // TODO remove for-loop for more elgancy
-//        Tensor meanWaitTimepervNode = Tensors.empty();
-//        for (List<AVRequest> avRequests : requests.values()) {
-//            Tensor submission = Tensor.of(avRequests.stream().map(rc -> RealScalar.of(timenow - (long) rc.getSubmissionTime())));
-//            Scalar waitTimeMean = RealScalar.of(0);
-//            if (submission.length() != 0) {
-//                waitTimeMean = Mean.of(submission).Get();
-//            }
-//            meanWaitTimepervNode.append(waitTimeMean);
-//        }
-//        return meanWaitTimepervNode;
-//    }
+    // private Tensor avg_WaitTimePerVirtualNode(Map<VirtualNode<Link>, List<AVRequest>> requests, long timenow) {
+    // // TODO remove for-loop for more elgancy
+    // Tensor meanWaitTimepervNode = Tensors.empty();
+    // for (List<AVRequest> avRequests : requests.values()) {
+    // Tensor submission = Tensor.of(avRequests.stream().map(rc -> RealScalar.of(timenow - (long) rc.getSubmissionTime())));
+    // Scalar waitTimeMean = RealScalar.of(0);
+    // if (submission.length() != 0) {
+    // waitTimeMean = Mean.of(submission).Get();
+    // }
+    // meanWaitTimepervNode.append(waitTimeMean);
+    // }
+    // return meanWaitTimepervNode;
+    // }
 
     @Override
     public String getInfoLine() {
@@ -470,21 +471,21 @@ public class DFRDispatcher extends PartitionedDispatcher {
         @Inject
         private EventsManager eventsManager;
 
-//        @Inject
-//        private Network network;
+        // @Inject
+        // private Network network;
 
-//        @Inject
-//        private Population population;
+        // @Inject
+        // private Population population;
 
         public static VirtualNetwork<Link> virtualNetwork;
         public static Map<VirtualLink<Link>, Double> linkWeights;
-        
+
         @Inject
         private Config config;
 
         @Override
         public AVDispatcher createDispatcher(AVDispatcherConfig avconfig) {
-        	AVGeneratorConfig generatorConfig = avconfig.getParent().getGeneratorConfig();
+            AVGeneratorConfig generatorConfig = avconfig.getParent().getGeneratorConfig();
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new KMeansVirtualNodeDest();
             AbstractRequestSelector abstractRequestSelector = new OldestRequestSelector();
@@ -526,8 +527,8 @@ public class DFRDispatcher extends PartitionedDispatcher {
                 GlobalAssert.that(alphaijFile.isFile());
 
                 try {
-//                    long populationSize = population.getPersons().size();
-//                    int rebalancingPeriod = Integer.parseInt(avconfig.getParams().get("rebalancingPeriod"));
+                    // long populationSize = population.getPersons().size();
+                    // int rebalancingPeriod = Integer.parseInt(avconfig.getParams().get("rebalancingPeriod"));
                     GlobalAssert.that(false);
                     arrivalInformation = null;
                     // TODO load from serialized data not XML, XML load function deleted.

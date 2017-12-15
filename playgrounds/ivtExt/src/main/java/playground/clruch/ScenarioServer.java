@@ -42,7 +42,7 @@ import playground.clruch.options.ScenarioOptions;
 import playground.clruch.prep.acttype.IncludeActTypeOf;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
-import playground.clruch.traveltimetracker.AVTravelTimeModule;
+import playground.clruch.traveltimetracker.AVTravelTimeModule;  
 import playground.matsim_decoupling.IDSCDispatcherModule;
 import playground.matsim_decoupling.IDSCGeneratorModule;
 import playground.matsim_decoupling.qsim.IDSCQSimProvider;
@@ -82,7 +82,9 @@ public class ScenarioServer {
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
 
+
         IncludeActTypeOf.zurichConsensus(config);
+        IncludeActTypeOf.artificial(config);
 
         String outputdirectory = config.controler().getOutputDirectory();
         System.out.println("outputdirectory = " + outputdirectory);
@@ -109,6 +111,8 @@ public class ScenarioServer {
                 bind(Key.get(Network.class, Names.named("dvrp_routing"))).to(Network.class);
             }
         });
+        
+
 
         // run simulation
         controler.run();

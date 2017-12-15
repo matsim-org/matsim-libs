@@ -27,12 +27,12 @@ enum StandaloneFleetConverter {
         // File config = new File(workingDirectory, simOptions.getString("simuConfig"));
         // Config config = ConfigUtils.loadConfig(simOptions.getSimulationConfigName());
 
-        File networkFile = new File(workingDirectory, simOptions.getString("simuConfig"));
-        Network network = NetworkLoader.loadNetwork(networkFile);
+        File configFile = new File(workingDirectory, simOptions.getSimulationConfigName());
+        Network network = NetworkLoader.loadNetwork(configFile);
         // File networkFile = new File(workingDirectory, "trb_config.xml");
 
         System.out.println("INFO working folder: " + workingDirectory.getAbsolutePath());
-        System.out.println("INFO network file: " + networkFile.getAbsolutePath());
+        System.out.println("INFO network file: " + configFile.getAbsolutePath());
         ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
         List<File> trailFiles = (new MultiFileReader(workingDirectory, "Fahrtstrecken")).getFolderFiles();
         List<DayTaxiRecord> dayTaxiRecords = new ArrayList<>();

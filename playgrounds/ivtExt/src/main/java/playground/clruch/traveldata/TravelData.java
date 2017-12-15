@@ -90,8 +90,6 @@ public class TravelData implements Serializable {
                         if (leg.getMode().equals("av")) {
                             // get time and vNode index
                             double depTime = leg.getDepartureTime();
-                            System.out.println("depTime:" + depTime);
-                            System.out.println(person.getId().toString());
                             int timeIndex = (int) Math.floor((depTime / dt));
                             Link linkFrom = network.getLinks().get(((Activity) planElMins).getLinkId());
                             Link linkTo = network.getLinks().get(((Activity) planElPlus).getLinkId());
