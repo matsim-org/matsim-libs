@@ -25,23 +25,21 @@ public class CsvFleetReader {
 		this.dayTaxiRecord = dayTaxiRecord;
 	}
 
-	public DayTaxiRecord populateFrom(File file, File dataDirectory, int number) throws Exception {
+	public DayTaxiRecord populateFrom(File file, File dataDirectory, int taxiStampID) throws Exception {
 		dayTaxiRecord.lastTimeStamp = null;
 		if (file.isFile()) {
-			String source = File.separator + file.getAbsolutePath();
-			String dest = File.separator + dataDirectory + "/usefordata/a" + file.getName();
-			File fin = new File(source);
+			File fin = new File(File.separator + file.getAbsolutePath());
 			FileInputStream fis = new FileInputStream(fin);
 			BufferedReader in = new BufferedReader(new InputStreamReader(new ReverseLineInputStream(file)));
-			FileWriter fstream = new FileWriter(dest, true);
+			FileWriter fstream = new FileWriter(File.separator + dataDirectory + "/usefordata/a" + file.getName(), true);
 			BufferedWriter out = new BufferedWriter(fstream);
-			String aLine = null;
+			String line = null;
 			out.write("LATITUDE LONGITUDE OCCUPANCY TIME" + "\n");
-			while ((aLine = in.readLine()) != null) {
-				java.util.List<String> lista = CSVUtils.csvLineToList(aLine, " ");
+			while ((line = in.readLine()) != null) {
+				java.util.List<String> lista = CSVUtils.csvLineToList(line, " ");
 				Long timeStamp = Long.parseLong(lista.get(3));
 				if (timeStamp < 1211147969 && timeStamp > 1211061600) {
-					out.write(aLine);
+					out.write(line);
 					out.newLine();
 				}
 			}
@@ -49,8 +47,34 @@ public class CsvFleetReader {
 			fis.close();
 			out.close();
 		}
-
+		int x=0;
 		File trail = (new File(dataDirectory, "/usefordata/a" + file.getName()));
+		List<String> coord1 = new ArrayList<String>();
+		List<String> coord2 = new ArrayList<String>();
+		List<String> occup = new ArrayList<String>();
+		List<String> time = new ArrayList<String>();
+		try (BufferedReader br = new BufferedReader(new FileReader(trail))) {
+			{
+				String line = br.readLine();
+			}
+			while (true) {
+				if (trail.length() == 34L)
+					break;
+				String line = br.readLine();
+				if (Objects.isNull(line))
+					break;
+				List<String> list = CSVUtils.csvLineToList(line, " ");
+				coord1.add(list.get(0));
+				coord2.add(list.get(1));
+				occup.add(list.get(2));
+				time.add(list.get(3));
+				x++;
+			}
+		}
+		int z=1;
+		String status=null;
+		List<Object> pairs = AVStatusSF.status(coord1, coord2, occup, time, x);
+//		System.out.println("jej"+pairs.get(73));
 		try (BufferedReader br = new BufferedReader(new FileReader(trail))) {
 			{
 				Scanner id = new Scanner(file.getName());
@@ -61,31 +85,39 @@ public class CsvFleetReader {
 				}
 				id.close();
 				System.out.println("INFO name: " + nameFile.toString().replace(".txt]", "").replace("[", ""));
-				System.out.println("INFO Id: " + number);
+				System.out.println("INFO Id: " + taxiStampID);
 				String line = br.readLine();
 				List<String> list = CSVUtils.csvLineToList(line, " ");
 				int count = 0;
-				System.out.println("CSV HEADER");
+				System.out.println("CSV HEADER");		
 				for (String token : list) {
 					System.out.println(" col " + count + " = " + token);
 					++count;
 				}
 			}
-			while (true) {
+			while (z<x) {
 				if (trail.length() == 34L)
 					break;
 				String line = br.readLine();
 				if (Objects.isNull(line))
 					break;
 				List<String> list = CSVUtils.csvLineToList(line, " ");
-				dayTaxiRecord.insert(list, number);
+				
+				
+				status = pairs.get(z).toString();
+//				System.out.println("status2: "+status);
+							
 				String timeStamp = list.get(3);
 				long unixSeconds = Long.valueOf(timeStamp).longValue();
 				Date date = new Date(unixSeconds * 1000L); // *1000 is to convert seconds to milliseconds
 				SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss"); // the format of your date
 				String formattedDate = sdf.format(date);
 				timeStamp = formattedDate;
+				
+				dayTaxiRecord.insert(list, taxiStampID, timeStamp, status);
 				dayTaxiRecord.lastTimeStamp = timeStamp;
+				
+				z++;
 			}
 		} finally {
 			// ...
@@ -98,9 +130,6 @@ public class CsvFleetReader {
 			final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
 			final int TIMESTEP = 5;
 
-			// System.out.println(
-			// "INFO Checking for OFFSERVICE & RequestStatus for " + dayTaxiRecord.size() +
-			// " vehicles...");
 			for (int now = 0; now < MAXTIME; now += TIMESTEP) {
 				// if (now % 10000 == 0)
 				// System.out.println("now=" + now);

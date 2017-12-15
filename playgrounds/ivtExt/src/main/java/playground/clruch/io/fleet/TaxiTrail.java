@@ -20,17 +20,20 @@ public class TaxiTrail {
     private int override = 0;
 	private final NavigableMap<Integer, TaxiStamp> sortedMap = new TreeMap<>();
 
-	public void insert(int now, List<String> list) {
+	public void insert(int now, List<String> list, String status) {
 		TaxiStamp taxiStamp = new TaxiStamp();
-//		taxiStamp.avStatus = AVStatus.DRIVEWITHCUSTOMER; // TODO make the real status here.
-		String bool = list.get(2);
-		if (bool.startsWith("0")) {
-			bool= "In Umgebung";
-		}
-		if (bool.startsWith("1")) {
-			bool="Besetzt mit Kunden";
-		}
-		taxiStamp.avStatus = StringStatusMapper.apply(now, bool , Integer.toString(200), Integer.toString(100));
+		if (status.equals("DRIVEWITHCOSTUMER"))
+			taxiStamp.avStatus = AVStatus.DRIVEWITHCUSTOMER;
+		if (status.equals("REBALANCE"))
+			taxiStamp.avStatus = AVStatus.REBALANCEDRIVE;
+		if (status.equals("DRIVETOCUSTOMER"))
+			taxiStamp.avStatus = AVStatus.DRIVETOCUSTOMER;
+		if (status.equals("OFFSERVICE"))
+			taxiStamp.avStatus = AVStatus.OFFSERVICE;
+		if (status.equals("STAY"))
+			taxiStamp.avStatus = AVStatus.STAY;
+
+		// TODO make the real status here.
 		taxiStamp.gps = new Coord( //
 				Double.parseDouble(list.get(1)), //
 				Double.parseDouble(list.get(0)));

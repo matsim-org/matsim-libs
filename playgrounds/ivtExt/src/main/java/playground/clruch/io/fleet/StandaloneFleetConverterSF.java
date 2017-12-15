@@ -40,7 +40,7 @@ enum StandaloneFleetConverterSF {
 		System.out.println("INFO working folder: " + workingDirectory.getAbsolutePath());
 		System.out.println("INFO data folder: " + dataDirectory.getAbsolutePath());
 		System.out.println("INFO output folder: " + outputDirectory.getAbsolutePath());
-		
+
 		File dir = new File(dataDirectory, "usefordata");
 		dir.mkdir();
 		FileUtils.cleanDirectory(dir);
@@ -48,23 +48,23 @@ enum StandaloneFleetConverterSF {
 		List<File> trailFilesComplete = (new MultiFileReader(dataDirectory, "new_")).getFolderFiles();
 		System.out.println("NUMBER of data files = " + trailFilesComplete.size());
 
-
 		// extract data from file and put into dayTaxiRecord
 		DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
 		CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);
-		
+
 		for (int num = 1; num <= trailFilesComplete.size(); num++) {
-			System.out.println("Now processing: " + trailFilesComplete.get(num-1).getName());
-			reader.populateFrom(trailFilesComplete.get(num-1),dataDirectory, num);
+			System.out.println("Now processing: " + trailFilesComplete.get(num - 1).getName());
+			reader.populateFrom(trailFilesComplete.get(num - 1), dataDirectory, num);
 		}
 
 		ReferenceFrame referenceFrame = ReferenceFrame.IDENTITY;
-//		// STEP 2: DayTaxiRecord to MATSimStaticDatabase
-//		MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
-//		
-//		// generate sim objects and store
-//		StorageUtils storageUtils = new StorageUtils(outputDirectory);
-//		SimulationFleetDump.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE, storageUtils);
-//		dir.delete();
+		 // STEP 2: DayTaxiRecord to MATSimStaticDatabase
+		 MatsimStaticDatabase.initializeSingletonInstance(network, referenceFrame);
+		
+		 // generate sim objects and store
+		 StorageUtils storageUtils = new StorageUtils(outputDirectory);
+		 SimulationFleetDump.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE,
+		 storageUtils);
+		 dir.delete();
 	}
 }
