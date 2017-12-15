@@ -25,6 +25,7 @@ package org.matsim.contrib.parking.parkingsearch;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.contrib.parking.parkingsearch.evaluation.ParkingSlotVisualiser;
+import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
 import org.matsim.contrib.parking.parkingsearch.sim.SetupParking;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -47,7 +48,7 @@ public class RunParkingSearchExample {
 
 	public static void main(String[] args) {
 		
-		Config config = ConfigUtils.loadConfig("parkingsearch/config.xml");
+		Config config = ConfigUtils.loadConfig("parkingsearch/config.xml", new ParkingSearchConfigGroup());
 		//all further input files are set in the config.
 		
 		// set to false, if you don't require visualisation, then the example will run for 11 iterations, with OTFVis, only one iteration is performed. 
@@ -82,7 +83,6 @@ public class RunParkingSearchExample {
 				addControlerListenerBinding().toInstance(visualiser);
 			}
 		});
-		
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule());
 		}

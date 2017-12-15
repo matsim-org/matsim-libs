@@ -37,14 +37,8 @@ public class ParkingSearchConfigGroup extends ReflectiveConfigGroup {
 	private static final String PARKINGSEARCH_STRATEGY = "parkingSearchStrategy";
 	private static ParkingSearchStrategy parkingSearchStrategy = ParkingSearchStrategy.Random;
 	
-	public ParkingSearchConfigGroup(String name) {
-		super(name);
-		// TODO Auto-generated constructor stub
-	}
-
-	public ParkingSearchConfigGroup(String name, boolean storeUnknownParametersAsStrings) {
-		super(name, storeUnknownParametersAsStrings);
-		// TODO Auto-generated constructor stub
+	public ParkingSearchConfigGroup() {
+		super(GROUP_NAME);
 	}
 
 	@StringGetter(UNPARKDURATION)
