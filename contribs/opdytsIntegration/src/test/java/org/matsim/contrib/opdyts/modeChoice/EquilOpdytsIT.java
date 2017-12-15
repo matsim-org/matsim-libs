@@ -151,9 +151,9 @@ public class EquilOpdytsIT {
         Assert.assertEquals("The best overall solution is wrong.", bestASCAfterItr, 5.0, MatsimTestUtils.EPSILON ); //
 
         double valueOfObjFun = getValueOfObjFun(outputDir+"/opdyts.log");
-        Assert.assertEquals("The best overall objective function", valueOfObjFun, 0.0045, MatsimTestUtils.EPSILON ); //
+        Assert.assertEquals("The best overall objective function", valueOfObjFun, 0.0045, 0.0001 ); // accuracy up to 4 decimal places
 
-        double bicycleShare = getBicycleShareFromModeStatsFile(outputDir+"/_"+opdytsTransitions+"/modestats.txt");
+        double bicycleShare = getBicycleShareFromModeStatsFile(outputDir+"/_"+String.valueOf(opdytsTransitions-1)+"/modestats.txt");
         Assert.assertTrue("Resulting bicycle share is wrong.", bicycleShare > 0.75 && bicycleShare < 0.80 );
     }
 
