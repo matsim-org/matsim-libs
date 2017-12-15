@@ -88,12 +88,13 @@ public class EquilOpdytsIT {
     private void runOpdyts(final List<String> modes2consider, final Scenario scenario, final String outDir){
 
         double stepSize = 1.0;
+        int opdytsTransitions = 5;
 
         OpdytsConfigGroup opdytsConfigGroup = ConfigUtils.addOrGetModule(scenario.getConfig(), OpdytsConfigGroup.class);
-        opdytsConfigGroup.setNumberOfIterationsForAveraging(2);
-        opdytsConfigGroup.setNumberOfIterationsForConvergence(5);
+        opdytsConfigGroup.setNumberOfIterationsForAveraging(5);
+        opdytsConfigGroup.setNumberOfIterationsForConvergence(15);
 
-        opdytsConfigGroup.setMaxIteration(4);
+        opdytsConfigGroup.setMaxIteration(opdytsTransitions);
         opdytsConfigGroup.setOutputDirectory(scenario.getConfig().controler().getOutputDirectory());
         opdytsConfigGroup.setDecisionVariableStepSize(stepSize);
         opdytsConfigGroup.setUseAllWarmUpIterations(false);
@@ -132,23 +133,73 @@ public class EquilOpdytsIT {
         String outputDir = helper.getOutputDirectory();
         //check the max opdyts transition
         if(isPlansRelaxed) {
-            Assert.assertEquals("Maximum number of OpDyTS transitions are wrong.", new File(outDir).listFiles(File::isDirectory).length, 4);
+            Assert.assertEquals("Maximum number of OpDyTS transitions are wrong.", new File(outDir).listFiles(File::isDirectory).length, opdytsTransitions);
         } else {
-            Assert.assertEquals("Maximum number of OpDyTS transitions are wrong.", new File(outDir).listFiles(File::isDirectory).length, 5); // additional directory for relaxed plans.
+            Assert.assertEquals("Maximum number of OpDyTS transitions are wrong.", new File(outDir).listFiles(File::isDirectory).length, opdytsTransitions+1); // additional directory for relaxed plans.
         }
-
 
         // axial_fixed, check step size
         double maxASCChange = stepSize;
         double bikeInitialASC = 0.;
         double bestASCAfterItr = 0;
-        for (int i=0; i<4;i++){
+        for (int i=0; i<opdytsTransitions;i++){
             bestASCAfterItr = getBestOverallDecisionVariable(outputDir+"/opdyts.log",String.valueOf(i));
             Assert.assertTrue("Change in ASC for " + i + " opdyts transition is wrong.", Math.abs( bestASCAfterItr - bikeInitialASC) <= maxASCChange);
             bikeInitialASC = bestASCAfterItr;
         }
         //in order to get 75% bicycle trips, it must be positive
-        Assert.assertTrue("The best overall solution is wrong.", bestASCAfterItr > 0.); //
+        Assert.assertEquals("The best overall solution is wrong.", bestASCAfterItr, opdytsTransitions-1, MatsimTestUtils.EPSILON ); // stepSize=1 and in every transition bicycle ASC increases
+
+        double valueOfObjFun = getValueOfObjFun(outputDir+"/opdyts.log");
+//        Assert.assertEquals("The best overall objective function", valueOfObjFun, 0.0067, 0.0001 ); // accuracy up to 4 decimal places (for 6 opdyts transitions)
+         Assert.assertEquals("The best overall objective function", valueOfObjFun, 0.0245, 0.0001 ); // accuracy up to 4 decimal places
+
+        double bicycleShare = getBicycleShareFromModeStatsFile(outputDir+"/_"+String.valueOf(opdytsTransitions-1)+"/modestats.txt");
+        Assert.assertTrue("Resulting bicycle share is wrong.", bicycleShare > 0.70 && bicycleShare < 0.80 );
+    }
+
+    private double getBicycleShareFromModeStatsFile(String file){
+        double share = 0;
+        boolean header = true;
+        BufferedReader reader = IOUtils.getBufferedReader(file);
+        try {
+            String line = reader.readLine();
+            while (line!=null){
+                if ( header ) {
+                    header = false;
+                    line = reader.readLine();
+                } else {
+                    String parts[] = line.split("\t");
+                    share = Double.valueOf(parts[7]);
+                    line = reader.readLine();
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Data is not written/read. Reason : " + e);
+        }
+        return share;
+    }
+
+    private double getValueOfObjFun(String logFile){
+        double value = Double.MAX_VALUE;
+        BufferedReader reader = IOUtils.getBufferedReader(logFile);
+        boolean header = true;
+        try {
+            String line = reader.readLine();
+            while (line!=null){
+                String parts [] = line.split("\t");
+                if ( header || parts[3].isEmpty()) {
+                    header = false;
+                    line = reader.readLine();
+                } else {
+                    value = Double.valueOf(parts[3]);
+                    line = reader.readLine();
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Data is not written/read. Reason : " + e);
+        }
+        return value;
     }
 
     /**
@@ -179,7 +230,7 @@ public class EquilOpdytsIT {
     private void relaxPlansAndUpdateConfig(final Config config, final String outDir, final List<String> modes2consider){
 
         config.controler().setOutputDirectory(outDir+"/relaxingPlans/");
-        config.controler().setLastIteration(20);
+        config.controler().setLastIteration(10);
         config.strategy().setFractionOfIterationsToDisableInnovation(0.8);
 
         Scenario scenarioPlansRelaxor = ScenarioUtils.loadScenario(config);
@@ -251,6 +302,4 @@ public class EquilOpdytsIT {
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         return config;
     }
-
-
 }
