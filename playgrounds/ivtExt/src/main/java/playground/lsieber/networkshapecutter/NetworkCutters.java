@@ -8,6 +8,7 @@ import org.matsim.api.core.v01.network.Network;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.options.ScenarioOptions;
+import playground.lsieber.networkshapecutter.networkcuttershape.NetworkCutterShape;
 
 public enum NetworkCutters {
     SHAPE {
