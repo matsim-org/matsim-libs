@@ -10,7 +10,7 @@ import playground.clruch.dispatcher.core.RequestStatus;
 /** @author Andreas Aumiller */
 public enum RequestStatusParser {
     ;
-    
+
     public static RequestStatus parseRequestStatus(int now, TaxiTrail taxiTrail) {
         if (now != 0) {
             Entry<Integer, TaxiStamp> nowEntry = taxiTrail.interp(now);
@@ -30,7 +30,7 @@ public enum RequestStatusParser {
     public static RequestStatus parseRequestStatus(AVStatus nowState, AVStatus lastState) {
         return parse(nowState, lastState);
     }
-    
+
     public static boolean isOutlierRequest(RequestStatus nowRequest, RequestStatus lastRequest) {
         // TODO This is just a quickfix for strange taxidata
         switch (nowRequest) {
@@ -56,8 +56,11 @@ public enum RequestStatusParser {
         return false;
     }
 
-    public static boolean isNewSubmission(RequestStatus nowRequest, RequestStatus lastRequest) {
+    public static boolean isNewSubmission(int now, TaxiTrail taxiTrail) {
         // Check change of AVStatus from the vehicle and map corresponding requestStatus
+        RequestStatus nowRequest = taxiTrail.interp(now).getValue().requestStatus;
+        RequestStatus lastRequest = taxiTrail.getLastEntry(now).getValue().requestStatus;
+
         switch (nowRequest) {
         case REQUESTED:
             switch (lastRequest) {

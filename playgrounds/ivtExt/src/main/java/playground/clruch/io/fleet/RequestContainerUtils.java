@@ -108,20 +108,20 @@ public class RequestContainerUtils {
 
     }
 
-    public RequestContainer populate(int now, int requestIndex, QuadTree<Link> qt, MatsimStaticDatabase db) {
+    public RequestContainer populate(int now, int requestIndex, boolean newRequest, QuadTree<Link> qt, MatsimStaticDatabase db) {
         // Handle requestIndex & submissionTime
         int submissionTime = -1;
 
         RequestStatus nowRequest = taxiTrail.interp(now).getValue().requestStatus;
         RequestStatus lastRequest = taxiTrail.getLastEntry(now).getValue().requestStatus;
 
-        if (RequestStatusParser.isNewSubmission(nowRequest, lastRequest)) {
-            requestIndex++;
-            System.out.println("Check for new submission: [ " + lastRequest.name() + " / " + nowRequest.name() + "] --> RequestIndex: " + requestIndex);
+        if (newRequest) {
+            // requestIndex++;
+            System.out.println("Adding new Request: " + requestIndex + " [ " + lastRequest.name() + " / " + nowRequest.name() + " ]");
             taxiTrail.setRequestIndex(now, requestIndex);
             // System.out.println("Processing requestIndex: " + requestIndex);
             submissionTime = taxiTrail.interp(now).getKey();
-            System.out.println("Submission time is: " + submissionTime);
+            // System.out.println("Submission time is: " + submissionTime);
         } else {
             taxiTrail.setRequestIndex(now, taxiTrail.getLastEntry(now).getValue().requestIndex);
             submissionTime = findSubmissionTime(now);

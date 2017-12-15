@@ -52,7 +52,6 @@ enum SimulationFleetDump {
 
             final int MAXTIME = dayTaxiRecord.getNow(dayTaxiRecord.lastTimeStamp);
             HashSet<List<RequestStatus>> requestTrails = new HashSet<>();
-            HashSet<RequestContainer> uniqueRequests = new HashSet<>();
 
             int dropped = 0;
             // int cancelledRequests = 0;
@@ -92,18 +91,22 @@ enum SimulationFleetDump {
                         // Check if there is valid requests and populate requestContainer
                         RequestContainerUtils rcUtils = new RequestContainerUtils(taxiTrail, lsUtils);
                         boolean includeCancelled = false;
+                        boolean newRequest = false;
                         // System.out.println("Parsing vehicle " + vehicleIndex + " at time " + now);
                         if (rcUtils.isValidRequest(now, includeCancelled)) {
-                            // RequestStatus requestStatus = taxiStamp.requestStatus;
-                            RequestContainer rc = rcUtils.populate(now, requestIndex, quadTree, db);
-                            System.out.println("Parsing vehicle " + vehicleIndex + " at time " + now);
+                            if (Objects.nonNull(taxiTrail.interp(now - TIME_STEP).getValue())) {
+                                if (RequestStatusParser.isNewSubmission(now, taxiTrail) && !RequestStatusParser.isNewSubmission(now - TIME_STEP, taxiTrail)) {
+                                    newRequest = true;
+                                    requestIndex++;
+                                }
+                            }
+                            RequestContainer rc = rcUtils.populate(now, requestIndex, newRequest, quadTree, db);
+                            // System.out.println("Parsing vehicle " + vehicleIndex + " at time " + now);
                             simulationObject.requests.add(rc);
 
                             List<RequestStatus> requestTrail = new ArrayList<RequestStatus>();
                             requestTrail = rcUtils.dumpRequestTrail(now);
                             requestTrails.add(requestTrail);
-                            uniqueRequests.add(rc);
-                            requestIndex = uniqueRequests.size();
                         }
                         simulationObject.total_matchedRequests = totalMatchedRequests;
                         GlobalAssert.that(Objects.nonNull(vc.avStatus));
@@ -121,7 +124,6 @@ enum SimulationFleetDump {
             System.out.println("INFO dropped total: " + dropped);
             FleetReaderLogUtils.countAllRequests(requestTrails);
             System.out.println("INFO total submitted requests: " + requestIndex);
-            System.err.println("INFO total amount of unique Requests: " + uniqueRequests.size());
             // System.out.println("INFO total requests: " + totalRequests);
             // System.out.println("INFO total pickups: " + totalMatchedRequests);
             // System.out.println("INFO total dropoffs: " + totalDropoffs);
