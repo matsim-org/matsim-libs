@@ -41,35 +41,3 @@ public class NetworkCutterShape extends NetworkCutter {
     }
 
 }
-
-// GeometryFactory factory = new GeometryFactory();
-//
-// for (Node node : originalNetwork.getNodes().values()) {
-// SimpleFeatureIterator iterator = collection.features();
-// System.out.println("the iterator has " + collection.size() + " entries.");
-//
-// while (iterator.hasNext()) {
-// MultiPolygon polygon = (MultiPolygon) iterator.next().getDefaultGeometry();
-//
-// if (polygon.contains(factory.createPoint(new Coordinate(node.getCoord().getX(), node.getCoord().getY())))) {
-// modifiedNetwork.addNode(modifiedNetwork.getFactory().createNode(node.getId(), node.getCoord()));
-// break;
-// }
-// }
-// }
-
-// private final void addContainedNodesIn(HashSet<MultiPolygon> polygons, Network originalNetwork) {
-//
-// GeometryFactory factory = new GeometryFactory();
-// for (Node node : originalNetwork.getNodes().values()) {
-// for (MultiPolygon polygon : polygons) {
-// Coordinate coordinate = new Coordinate(node.getCoord().getX(), node.getCoord().getY());
-// if (polygon.contains(factory.createPoint(coordinate))) {
-// modifiedNetwork.addNode(modifiedNetwork.getFactory().createNode(node.getId(), node.getCoord()));
-// break;
-// }
-// }
-// }
-// }
-
-// addContainedNodesIn(polygons, originalNetwork);
