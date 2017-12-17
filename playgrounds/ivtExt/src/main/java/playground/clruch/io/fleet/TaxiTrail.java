@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.NavigableMap;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -52,17 +53,17 @@ public class TaxiTrail {
     }
 
     public Entry<Integer, TaxiStamp> getLastEntry(int now) {
-        Entry<Integer, TaxiStamp> lastEntry = sortedMap.lowerEntry(interp(now).getKey());
-        if (Objects.nonNull(lastEntry))
-            return lastEntry;
+        Optional<Entry<Integer, TaxiStamp>> lastEntry = Optional.ofNullable(sortedMap.lowerEntry(interp(now).getKey()));
+        if (lastEntry.isPresent())
+            return lastEntry.get();
         // GlobalAssert.that(Objects.nonNull(lastEntry));
         return null;
     }
 
     public Entry<Integer, TaxiStamp> getNextEntry(int now) {
-        Entry<Integer, TaxiStamp> nextEntry = sortedMap.higherEntry(interp(now).getKey());
-        if (Objects.nonNull(nextEntry))
-            return nextEntry;
+        Optional<Entry<Integer, TaxiStamp>> nextEntry = Optional.ofNullable(sortedMap.higherEntry(interp(now).getKey()));
+        if (nextEntry.isPresent())
+            return nextEntry.get();
         // GlobalAssert.that(Objects.nonNull(nextEntry));
         return null;
     }
@@ -92,6 +93,18 @@ public class TaxiTrail {
                 if (Objects.nonNull(lastEntry))
                     setOffService(lastEntry.getKey());
             }
+        }
+    }
+    
+    public void setLinkData(int now, int linkIndex, double linkSpeed) {
+        // less than or equal to the given key
+        Entry<Integer, TaxiStamp> entry = interp(now);
+        if (Objects.nonNull(entry)) {
+            TaxiStamp taxiStamp = entry.getValue();
+            int timeStamp = entry.getKey();
+            taxiStamp.linkIndex = linkIndex;
+            taxiStamp.linkSpeed = linkSpeed;
+            sortedMap.replace(timeStamp, taxiStamp);
         }
     }
 

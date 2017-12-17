@@ -5,6 +5,8 @@ import java.util.Objects;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.clruch.io.fleet.TaxiTrail;
@@ -12,7 +14,7 @@ import playground.clruch.io.fleet.TaxiTrail;
 /** @author Andreas Aumiller */
 public class LinkSpeedUtils {
 
-    private final TaxiTrail taxiTrail;
+    private TaxiTrail taxiTrail;
     private final QuadTree<Link> qt;
     private final MatsimStaticDatabase db;
 
@@ -22,6 +24,21 @@ public class LinkSpeedUtils {
         this.db = db;
     }
 
+    public LinkSpeedUtils(TaxiTrail taxiTrail, Network network, MatsimStaticDatabase db) {
+        final double[] networkBounds = NetworkUtils.getBoundingBox(network.getNodes().values());
+        final QuadTree<Link> qt = new QuadTree<>( //
+                networkBounds[0], networkBounds[1], networkBounds[2], networkBounds[3]);
+        for (Link link : db.getLinkInteger().keySet())
+            qt.put(link.getCoord().getX(), link.getCoord().getY(), link);
+        this.taxiTrail = taxiTrail;
+        this.qt = qt;
+        this.db = db;
+    }
+    
+    public void setTaxiTrail(TaxiTrail taxiTrail) {
+        this.taxiTrail = taxiTrail;
+    }
+    
     public double getLinkSpeed(int now) {
         if (Objects.nonNull(taxiTrail.getLastEntry(now))) {
             Coord nowXY = taxiTrail.interp(now).getValue().gps;
@@ -38,14 +55,19 @@ public class LinkSpeedUtils {
         return 0;
     }
 
-    public int getLinkfromCoord(Coord xy) {
+    public int getLinkfromCoord(Coord gps) {
+        // System.out.println("getting Link from Coord x: " + gps.getX() + " / y: " + gps.getY());
+        // System.out.println(this.taxiTrail.toString());
+        // System.out.println(this.qt.toString());
+        // System.out.println(this.db.toString());
         int linkIndex;
-        xy = db.referenceFrame.coords_fromWGS84.transform(xy);
+        Coord xy = db.referenceFrame.coords_fromWGS84.transform(gps);
         linkIndex = db.getLinkIndex(qt.getClosest(xy.getX(), xy.getY()));
         return linkIndex;
     }
 
-    // TODO Andy: cite reference for geodesic formula
+    // Reference for haversine formula not covering elevation (accurate enough for short distances like just in CH)
+    // https://stackoverflow.com/questions/837872/calculate-distance-in-meters-when-you-know-longitude-and-latitude-in-java
     public static double getGPSDistance(double latitude1, double longitude1, double latitude2, double longitude2) {
         double R = 6371000; // in meters
         double dLat = Math.toRadians(latitude2 - latitude1);
@@ -55,5 +77,4 @@ public class LinkSpeedUtils {
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
     }
-
 }

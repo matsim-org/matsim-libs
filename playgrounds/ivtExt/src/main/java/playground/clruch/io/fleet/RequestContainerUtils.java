@@ -4,6 +4,7 @@ package playground.clruch.io.fleet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
@@ -49,13 +50,13 @@ public class RequestContainerUtils {
         return submissionTime;
     }
 
-    public List<String> dumpRequestTrail(int now) {
-        List<String> requestTrail = new ArrayList<String>();
+    public List<RequestStatus> dumpRequestTrail(int now) {
+        List<RequestStatus> requestTrail = new ArrayList<RequestStatus>();
         int requestStart = findSubmissionTime(now);
         int requestEnd = propagateTo(now, now, RequestStatus.DROPOFF);
         now = requestStart;
         while (now <= requestEnd) {
-            requestTrail.add(taxiTrail.interp(now).getValue().requestStatus.tag());
+            requestTrail.add(taxiTrail.interp(now).getValue().requestStatus);
             if (Objects.nonNull(taxiTrail.getNextEntry(now)))
                 now = taxiTrail.getNextEntry(now).getKey();
             else
@@ -64,23 +65,21 @@ public class RequestContainerUtils {
         return requestTrail;
     }
 
-    private Coord getCoordAt(int now, RequestStatus requestedStatus) {
+    private Optional<Coord> getCoordAt(int now, RequestStatus requestedStatus) {
         // Check requestStatus and propagate to TaxiStamp with desired values
+        Optional<Coord> coord = Optional.empty();
         int requestedTime = propagateTo(now, now, requestedStatus);
         if (requestedTime > 0) {
             // System.out.println("INFO Found gps data for requested Status: " + requestedStatus.toString());
-            return taxiTrail.interp(requestedTime).getValue().gps;
-            // } else if (requestedTime == 0) {
-            // return null;
+            coord = Optional.ofNullable(taxiTrail.interp(requestedTime).getValue().gps);
         }
-        // TODO Andy: look into returning type Optional<Coord>, and instead of null simply "return Optional.empty();"
-        // this can prevent certain mistakes in the application layer
-        return null;
+        return coord;
     }
 
     private int propagateTo(int now, int lastTimeStep, RequestStatus requestedStatus) {
         // Check requestStatus and propagate to TaxiStamp with desired values
         RequestStatus requestStatus = taxiTrail.interp(now).getValue().requestStatus;
+
         // System.out.println("Trying to find: " + requestedStatus.toString() + " from " + requestStatus.toString());
         if (requestStatus != RequestStatus.EMPTY && requestStatus != RequestStatus.CANCELLED) {
             if (requestedStatus.compareTo(requestStatus) > 0) {
@@ -91,7 +90,6 @@ public class RequestContainerUtils {
                         return propagateTo(nextTimeStep, lastTimeStep, requestedStatus);
                     }
                 }
-                // System.err.println("WARN getNextEntry is null");
                 return -1;
             } else if (requestedStatus.compareTo(requestStatus) < 0) {
                 if (Objects.nonNull(taxiTrail.getLastEntry(now))) {
@@ -101,29 +99,29 @@ public class RequestContainerUtils {
                         return propagateTo(nextTimeStep, lastTimeStep, requestedStatus);
                     }
                 }
-                // System.err.println("WARN getLastEntry is null");
                 return -1;
             } else if (requestedStatus == requestStatus)
-                // System.out.println("INFO Found requestStatus: " + requestedStatus.toString());
                 return now;
         } else if (requestStatus == RequestStatus.CANCELLED)
             return 0;
-        // System.err.println("WARN Couldn't find requested Status, returning -1");
         return -1;
 
     }
 
-    public RequestContainer populate(int now, int requestIndex, QuadTree<Link> qt, MatsimStaticDatabase db) {
+    public RequestContainer populate(int now, int requestIndex, boolean newRequest, QuadTree<Link> qt, MatsimStaticDatabase db) {
         // Handle requestIndex & submissionTime
         int submissionTime = -1;
 
         RequestStatus nowRequest = taxiTrail.interp(now).getValue().requestStatus;
         RequestStatus lastRequest = taxiTrail.getLastEntry(now).getValue().requestStatus;
 
-        if (RequestStatusParser.isNewSubmission(nowRequest, lastRequest)) {
+        if (newRequest) {
+            // requestIndex++;
+            System.out.println("Adding new Request: " + requestIndex + " [ " + lastRequest.name() + " / " + nowRequest.name() + " ]");
             taxiTrail.setRequestIndex(now, requestIndex);
             // System.out.println("Processing requestIndex: " + requestIndex);
             submissionTime = taxiTrail.interp(now).getKey();
+            // System.out.println("Submission time is: " + submissionTime);
         } else {
             taxiTrail.setRequestIndex(now, taxiTrail.getLastEntry(now).getValue().requestIndex);
             submissionTime = findSubmissionTime(now);
@@ -132,13 +130,13 @@ public class RequestContainerUtils {
         // Populate RequestContainer
         RequestContainer rc = new RequestContainer();
         try {
-            Coord from = getCoordAt(now, RequestStatus.PICKUP);
-            if (Objects.nonNull(from)) {
-                rc.fromLinkIndex = lsUtils.getLinkfromCoord(from);
+            Optional<Coord> from = getCoordAt(now, RequestStatus.PICKUP);
+            if (from.isPresent()) {
+                rc.fromLinkIndex = lsUtils.getLinkfromCoord(from.get());
             }
-            Coord to = getCoordAt(now, RequestStatus.DROPOFF);
-            if (Objects.nonNull(to)) {
-                rc.toLinkIndex = lsUtils.getLinkfromCoord(to);
+            Optional<Coord> to = getCoordAt(now, RequestStatus.DROPOFF);
+            if (to.isPresent()) {
+                rc.toLinkIndex = lsUtils.getLinkfromCoord(to.get());
             }
         } catch (Exception exception) {
             System.err.println("WARN failed to get from/to Coords at time: " + now);
