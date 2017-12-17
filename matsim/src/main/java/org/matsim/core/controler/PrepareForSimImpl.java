@@ -1,7 +1,6 @@
 package org.matsim.core.controler;
 
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,10 +12,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
@@ -24,7 +26,6 @@ import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.population.algorithms.PersonPrepareForSim;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.Lockable;
@@ -130,7 +131,12 @@ class PrepareForSimImpl implements PrepareForSim {
 		}
 
 		// create vehicles and add to scenario if using mode choice. Amit July'17
-		createVehiclesInAdvance(modeVehicleTypes);
+		// creating vehicles for every network mode. Amit Dec'17
+		if (! qSimConfigGroup.getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.fromVehiclesData)
+			&& qSimConfigGroup.isCreatingVehiclesForAllNetworkModes()
+				) {
+			createVehiclesForEveyNetworkMode(modeVehicleTypes);
+		}
 
 		if (scenario instanceof Lockable) {
 			((Lockable)scenario).setLocked();
@@ -149,32 +155,32 @@ class PrepareForSimImpl implements PrepareForSim {
 
 	}
 
-	private void createVehiclesInAdvance(final Map<String, VehicleType> modeVehicleTypes) {
+	private void createVehiclesForEveyNetworkMode(final Map<String, VehicleType> modeVehicleTypes) {
 		// yyyy maybe better just take the modes from qsim.mainMode???  kai, dec'17
 		
-		boolean isModeChoicePresent = false;
-		Collection<StrategyConfigGroup.StrategySettings> strategySettings = scenario.getConfig().strategy().getStrategySettings();
-		for (StrategyConfigGroup.StrategySettings strategySetting : strategySettings) {
-			String name = strategySetting.getStrategyName();
-			if ( name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name())
-					|| name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeTripMode.name())
-					) {
-				isModeChoicePresent = true;
-			} else if (name.equals(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name())) {
-				isModeChoicePresent = true;
-				log.warn("Creating one vehicle corresponding to each network mode for every agent and parking it to the departure link. \n" +
-						"If this is undesirable, then write a new PrepareForSim +" +
-						"or, somehow get vehicles generation in your plan strategy.");
-			} else if ( ! Arrays.stream( DefaultPlanStrategiesModule.DefaultStrategy.values() ).anyMatch( e -> e.name().equals(strategySetting.getStrategyName()))
-					&&
-					! Arrays.stream( DefaultPlanStrategiesModule.DefaultSelector.class.getFields() ).anyMatch( e -> e.getName().equals(strategySetting.getStrategyName()))
-					){
-				log.warn("Vehicles are created internally for all re-planning strategies. However, "+strategySetting.getStrategyName()+" is not one of the recognized strategy." +
-						" \n Simulation should run without a problem if it does not include mode choice. Please provide vehicles file is this is not the case.");
-			}
-		}
+//		boolean isModeChoicePresent = false;
+//		Collection<StrategyConfigGroup.StrategySettings> strategySettings = scenario.getConfig().strategy().getStrategySettings();
+//		for (StrategyConfigGroup.StrategySettings strategySetting : strategySettings) {
+//			String name = strategySetting.getStrategyName();
+//			if ( name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeSingleTripMode.name())
+//					|| name.equals(DefaultPlanStrategiesModule.DefaultStrategy.ChangeTripMode.name())
+//					) {
+//				isModeChoicePresent = true;
+//			} else if (name.equals(DefaultPlanStrategiesModule.DefaultStrategy.SubtourModeChoice.name())) {
+//				isModeChoicePresent = true;
+//				log.warn("Creating one vehicle corresponding to each network mode for every agent and parking it to the departure link. \n" +
+//						"If this is undesirable, then write a new PrepareForSim +" +
+//						"or, somehow get vehicles generation in your plan strategy.");
+//			} else if ( ! Arrays.stream( DefaultPlanStrategiesModule.DefaultStrategy.values() ).anyMatch( e -> e.name().equals(strategySetting.getStrategyName()))
+//					&&
+//					! Arrays.stream( DefaultPlanStrategiesModule.DefaultSelector.class.getFields() ).anyMatch( e -> e.getName().equals(strategySetting.getStrategyName()))
+//					){
+//				log.warn("Vehicles are created internally for all re-planning strategies. However, "+strategySetting.getStrategyName()+" is not one of the recognized strategy." +
+//						" \n Simulation should run without a problem if it does not include mode choice. Please provide vehicles file is this is not the case.");
+//			}
+//		}
 
-		if (isModeChoicePresent) {
+//		if (isModeChoicePresent) {
 			Collection<String> networkModes = scenario.getConfig().plansCalcRoute().getNetworkModes();
 			for (Id<Person> personId : scenario.getPopulation().getPersons().keySet()) {
 				for (String mode : networkModes) {
@@ -182,7 +188,7 @@ class PrepareForSimImpl implements PrepareForSim {
 					createAndAddVehicleIfNotPresent(vehicleId, modeVehicleTypes.get(mode));
 				}
 			}
-		}
+//		}
 	}
 
 	private  Map<String, VehicleType> getMode2VehicleType(){
