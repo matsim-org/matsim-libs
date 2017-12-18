@@ -105,7 +105,7 @@ class PrepareForSimImpl implements PrepareForSim {
 								vehicleId = route.getVehicleId(); // may be null!
 							} else {
 								throw new RuntimeException("Route not found.  Possible reason: leg did not have "
-										+ "activites with locations at both ends (e.g. plan ends with leg).");
+										+ "activities with locations at both ends (e.g. plan ends with leg).");
 							}
 
 							if (!seenModes.keySet().contains(leg.getMode())) { // create one vehicle per simulated mode, put it on the home location
@@ -141,7 +141,7 @@ class PrepareForSimImpl implements PrepareForSim {
 			log.warn("Creating one vehicle corresponding to each network mode for every agent is disabled and " +
 					"vehicleSource is not " + QSimConfigGroup.VehiclesSource.fromVehiclesData.toString() + ". " +
 					"\n Simulation should run without a problem if it does not include mode choice. " +
-					"Please provide vehicles file or set 'creatingVehiclesForAllNetworkModes' to true if this is not the case."):
+					"Please provide vehicles file or set 'creatingVehiclesForAllNetworkModes' to true if this is not the case.");
 			}
 		}
 
