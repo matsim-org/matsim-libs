@@ -132,10 +132,17 @@ class PrepareForSimImpl implements PrepareForSim {
 
 		// create vehicles and add to scenario if using mode choice. Amit July'17
 		// creating vehicles for every network mode. Amit Dec'17
-		if (! qSimConfigGroup.getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.fromVehiclesData)
-			&& qSimConfigGroup.isCreatingVehiclesForAllNetworkModes()
-				) {
-			createVehiclesForEveyNetworkMode(modeVehicleTypes);
+		if (qSimConfigGroup.isCreatingVehiclesForAllNetworkModes()) {
+			if (! qSimConfigGroup.getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.fromVehiclesData)){
+				createVehiclesForEveyNetworkMode(modeVehicleTypes);
+			} // don't create vehicle if vehicles are provided in vehicles file.
+		} else {
+			if (! qSimConfigGroup.getVehiclesSource().equals(QSimConfigGroup.VehiclesSource.fromVehiclesData)){
+			log.warn("Creating one vehicle corresponding to each network mode for every agent is disabled and " +
+					"vehicleSource is not " + QSimConfigGroup.VehiclesSource.fromVehiclesData.toString() + ". " +
+					"\n Simulation should run without a problem if it does not include mode choice. " +
+					"Please provide vehicles file or set 'creatingVehiclesForAllNetworkModes' to true if this is not the case."):
+			}
 		}
 
 		if (scenario instanceof Lockable) {
