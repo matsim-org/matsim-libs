@@ -136,7 +136,7 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	// ---
 
 	private static final String CREATING_VEHICLES_FOR_ALL_NETWORK_MODES = "creatingVehiclesForAllNetworkModes";
-	private boolean creatingVehiclesForAllNetworkModes = false;
+	private boolean creatingVehiclesForAllNetworkModes = true;
 	// ---
 	private static final String IS_SEEP_MODE_STORAGE_FREE = "isSeepModeStorageFree";
 	
