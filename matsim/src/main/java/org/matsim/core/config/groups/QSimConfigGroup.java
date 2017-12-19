@@ -134,6 +134,10 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	public enum VehiclesSource { defaultVehicle, modeVehicleTypesFromVehiclesData, fromVehiclesData} ;
 	private VehiclesSource vehiclesSource = VehiclesSource.defaultVehicle ;
 	// ---
+
+	private static final String CREATING_VEHICLES_FOR_ALL_NETWORK_MODES = "creatingVehiclesForAllNetworkModes";
+	private boolean creatingVehiclesForAllNetworkModes = true;
+	// ---
 	private static final String IS_SEEP_MODE_STORAGE_FREE = "isSeepModeStorageFree";
 	
 	private boolean isSeepModeStorageFree = false;
@@ -273,6 +277,8 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 		map.put(SEEP_MODE, "If link dynamics is set as "+ LinkDynamics.SeepageQ+", set a seep mode. Default is bike.");
 		map.put(IS_SEEP_MODE_STORAGE_FREE, "If link dynamics is set as "+ LinkDynamics.SeepageQ+", set to true if seep mode do not consumes any space on the link. Default is false.");
 		map.put(IS_RESTRICTING_SEEPAGE, "If link dynamics is set as "+ LinkDynamics.SeepageQ+", set to false if all seep modes should perform seepage. Default is true (better option).");
+		map.put(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES, "If set to true, creates a vehicle for each person corresponding to every network mode. However, " +
+				"this will be overridden if vehicle source is "+ VehiclesSource.fromVehiclesData+".");
 		return map;
 	}
 
@@ -580,5 +586,15 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	 */
 	public void setPcuThresholdForFlowCapacityEasing(double pcuThresholdForFlowCapacityEasing) {
 		this.pcuThresholdForFlowCapacityEasing = pcuThresholdForFlowCapacityEasing;
+	}
+
+	@StringGetter(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES)
+	public boolean isCreatingVehiclesForAllNetworkModes() {
+		return creatingVehiclesForAllNetworkModes;
+	}
+
+	@StringSetter(CREATING_VEHICLES_FOR_ALL_NETWORK_MODES)
+	public void setCreatingVehiclesForAllNetworkModes(boolean creatingVehiclesForAllNetworkModes) {
+		this.creatingVehiclesForAllNetworkModes = creatingVehiclesForAllNetworkModes;
 	}
 }
