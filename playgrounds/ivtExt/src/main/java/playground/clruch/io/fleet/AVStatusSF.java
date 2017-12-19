@@ -18,7 +18,7 @@ public class AVStatusSF {
 			if (isOccupied(occup, s) == true)
 				array[s] = "DRIVEWITHCOSTUMER";
 			else {
-				if (moving(timing, space1, space2, x) == true) {
+				if (isMoving(timing, space1, space2, x) == true) {
 					array[s] = "REBALANCE";
 				} else {
 					if (stayLongTime(timing) == true)
@@ -39,7 +39,7 @@ public class AVStatusSF {
 			return false;
 	}
 
-	private static boolean moving(Long timing, double space1, double space2, int x) {
+	private static boolean isMoving(Long timing, double space1, double space2, int x) {
 		if (space1 > 0.0001 && space2 > 0.0001 && timing < 100)
 			return true;
 		else
