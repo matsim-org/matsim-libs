@@ -57,6 +57,6 @@ public class BicycleTest {
 		log.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
-		assertEquals("Different event files.", EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew), 0);
+		assertEquals("Different event files.", EventsFileComparator.compareAndReturnInt(eventsFilenameReference, eventsFilenameNew), 0);
 	}
 }

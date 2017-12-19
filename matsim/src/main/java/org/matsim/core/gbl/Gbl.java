@@ -203,6 +203,9 @@ public abstract class Gbl {
 			throw new RuntimeException( "Object is null; follow stack trace" ) ;
 		}
 	}
+	public static void fail() {
+		throw new RuntimeException("failure; follow stack trace") ;
+	}
 
 	public final static String RUN_MOB_SIM_NO_LONGER_POSSIBLE = "overriding runMobSim() no longer possible.  use the following syntax instead:\n"
 	+ "controler.addOverridingModule(new AbstractModule(){\n"

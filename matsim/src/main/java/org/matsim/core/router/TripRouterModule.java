@@ -64,7 +64,7 @@ public class TripRouterModule extends AbstractModule {
         }
         for (String mode : routeConfigGroup.getNetworkModes()) {
             addRoutingModuleBinding(mode).toProvider(linkToLinkRouting ? //
-                    new LinkToLinkRouting(mode) : new NetworkRouting(mode));
+                    new LinkToLinkRouting(mode) : new NetworkRoutingProvider(mode));
         }
         if (getConfig().transit().isUseTransit()) {
             for (String mode : getConfig().transit().getTransitModes()) {

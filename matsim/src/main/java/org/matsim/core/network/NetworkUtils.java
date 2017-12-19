@@ -20,14 +20,7 @@
 
 package org.matsim.core.network;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -439,7 +432,8 @@ public final class NetworkUtils {
         Link nearestLink = null;
         Node nearestNode = NetworkUtils.getNearestNode((network),coord);
         if ( nearestNode == null ) {
-            log.warn("[nearestNode not found.  Will probably crash eventually ...  Maybe run NetworkCleaner?]" + network) ;
+            log.warn("[nearestNode not found.  Will probably crash eventually. Maybe run NetworkCleaner?  " +
+							 "Also may mean that network for mode is not defined.]" + network) ;
             return null ;
         }
 
@@ -734,7 +728,7 @@ public final class NetworkUtils {
 	}
 
 
-	public static Collection<NetworkChangeEvent> getNetworkChangeEvents( Network network ) {
+	public static Queue<NetworkChangeEvent> getNetworkChangeEvents(Network network ) {
 		if ( network instanceof TimeDependentNetwork ) {
 			return ((TimeDependentNetwork) network).getNetworkChangeEvents() ;
 		} else {
@@ -787,5 +781,14 @@ public final class NetworkUtils {
 	}
 	public static void writeNetwork(Network network, String string) {
 		new NetworkWriter(network).write(string) ;
+	}
+	
+	public static Link findLinkInOppositeDirection(Link link) {
+		for ( Link candidateLink : link.getToNode().getOutLinks().values() ) {
+			if ( candidateLink.getToNode().equals( link.getFromNode() ) ) {
+				return candidateLink ;
+			}
+		}
+		return null ;
 	}
 }

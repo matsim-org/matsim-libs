@@ -25,6 +25,10 @@ import org.matsim.core.router.util.TravelTime;
 
 
 public class Time {
+	// yy there is now java.time, which integrates joda.time into the standard
+	// jdk.  should we consider looking into this?  kai, dec'17
+	
+	
 	private Time() {} // namespace only, do not instantiate
 
 	/** 

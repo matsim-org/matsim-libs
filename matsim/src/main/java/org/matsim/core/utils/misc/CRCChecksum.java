@@ -66,6 +66,7 @@ public class CRCChecksum {
 	 * @return CRC32-Checksum of the file's content.
 	 */
 	public static long getCRCFromFile(final String filename) {
+		log.info("filename=" + filename ) ;
 		if (new File(filename).exists()) {
 			log.info( "file exists");
 			if (filename.endsWith(".gz")) {
