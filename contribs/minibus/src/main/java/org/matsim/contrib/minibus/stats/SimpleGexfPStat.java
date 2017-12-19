@@ -85,6 +85,7 @@ final class SimpleGexfPStat extends MatsimJaxbXmlWriter implements IterationEnds
 
 			this.gexfFactory = new ObjectFactory();
 			this.gexfContainer = this.gexfFactory.createXMLGexfContent();
+			this.gexfContainer.setVersion("1.2");
 		
 			XMLGraphContent graph = this.gexfFactory.createXMLGraphContent();
 			graph.setDefaultedgetype(XMLDefaultedgetypeType.DIRECTED);
