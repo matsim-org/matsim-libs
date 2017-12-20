@@ -53,7 +53,7 @@ enum StandaloneFleetConverterSF {
 
 		// extract data from file and put into dayTaxiRecord
 		DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
-		CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);
+		CsvFleetReaderSF reader = new CsvFleetReaderSF(dayTaxiRecord);
 
 		for (int num = 1; num <= trailFilesComplete.size(); num++) {
 			System.out.println("Now processing: " + trailFilesComplete.get(num - 1).getName());

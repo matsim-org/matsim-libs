@@ -7,14 +7,12 @@ public class AVStatusSF {
 
 	public static List<Object> status(List<String> coord1, List<String> coord2, List<String> occup, List<String> time,
 			int x) {
-		System.out.println("x= " + x);
 		Object[] array = new Object[x];
-
 		for (int s = 1; s < x; s++) {
 			Long timing = Long.parseLong(time.get(s)) - Long.parseLong(time.get(s - 1));
 			double space1 = Math.abs((Double.parseDouble(coord1.get(s)) - Double.parseDouble(coord1.get(s - 1))));
 			double space2 = Math.abs(Double.parseDouble(coord2.get(s)) - Double.parseDouble(coord2.get(s - 1)));
-
+			
 			if (isOccupied(occup, s) == true)
 				array[s] = "DRIVEWITHCOSTUMER";
 			else {

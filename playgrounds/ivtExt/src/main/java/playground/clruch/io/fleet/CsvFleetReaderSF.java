@@ -17,11 +17,11 @@ import java.util.Scanner;
 
 import ch.ethz.idsc.queuey.datalys.csv.CSVUtils;
 
-public class CsvFleetReader {
+public class CsvFleetReaderSF {
 
 	private final DayTaxiRecord dayTaxiRecord;
 
-	public CsvFleetReader(DayTaxiRecord dayTaxiRecord) {
+	public CsvFleetReaderSF(DayTaxiRecord dayTaxiRecord) {
 		this.dayTaxiRecord = dayTaxiRecord;
 	}
 

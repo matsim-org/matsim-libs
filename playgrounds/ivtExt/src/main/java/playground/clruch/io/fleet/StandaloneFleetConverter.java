@@ -70,7 +70,7 @@ enum StandaloneFleetConverter {
             
             DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
             // extract data from file and put into dayTaxiRecord
-            CsvFleetReader reader = new CsvFleetReader(dayTaxiRecord);
+            CsvFleetReaderSF reader = new CsvFleetReaderSF(dayTaxiRecord);
        //     reader.populateFrom(file);
             dayTaxiRecords.add(dayTaxiRecord);
             
