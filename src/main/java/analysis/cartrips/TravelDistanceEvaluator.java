@@ -53,7 +53,7 @@ import org.matsim.pt.router.TransitActsRemover;
  */
 public class TravelDistanceEvaluator {
 	public static void main(String[] args) {
-		new TravelDistanceEvaluator().run("output/vw202.0.01/vw202.0.01.output_plans.xml.gz");
+		new TravelDistanceEvaluator().run("D:/runs-svn/vw_rufbus/vw205.1.0/vw205.1.0.output_plans.xml.gz");
 	}
 	
 	
@@ -111,7 +111,21 @@ public class TravelDistanceEvaluator {
 	
 	
 	private boolean isValidPerson(Id<Person> id) {
-		return true;
+		//all
+//		return true;
+		
+		
+		//Wolfsburg
+		if ((id.toString().startsWith("3"))&&(id.toString().split("_")[0].length()==3)) 
+			return true;
+		else return false;
+		
+
+//		//Braunschweig
+//		if ((id.toString().startsWith("1"))&&(id.toString().split("_")[0].length()==3)) 
+//			return true;
+//		else return false;
+		
 	}
 	
 	class TravelDistanceActivity{
