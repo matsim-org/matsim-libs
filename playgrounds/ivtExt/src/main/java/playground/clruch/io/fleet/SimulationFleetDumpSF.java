@@ -16,17 +16,17 @@ import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.dispatcher.core.RequestStatus;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.RequestContainer;
-import playground.clruch.net.RequestContainerUtils;
+import playground.clruch.net.RequestContainerUtilsSF;
 import playground.clruch.net.SimulationObject;
 import playground.clruch.net.SimulationObjects;
 import playground.clruch.net.StorageSubscriber;
 import playground.clruch.net.StorageUtils;
 import playground.clruch.net.VehicleContainer;
 
-enum SimulationFleetDump {
+enum SimulationFleetDumpSF {
     ;
 
-    public static void of(DayTaxiRecord dayTaxiRecord, Network network, MatsimStaticDatabase db, //
+    public static void of(DayTaxiRecordSF dayTaxiRecord, Network network, MatsimStaticDatabase db, //
             StorageUtils storageUtils) {
 
         // final int MAXTIME = 180000; // TODO magic const take this end time from the last info in the file...
@@ -61,7 +61,7 @@ enum SimulationFleetDump {
                 // dayTaxiRecord.get(vehicleIndex).check_offservice(now);
 
                 // Get corresponding dayTaxiRecord entry according to time now
-                TaxiTrail taxiTrail = dayTaxiRecord.get(vehicleIndex);
+                TaxiTrailSF taxiTrail = dayTaxiRecord.get(vehicleIndex);
                 Entry<Integer, TaxiStamp> dayTaxiRecordEntry = taxiTrail.interp(now);
                 TaxiStamp taxiStamp = dayTaxiRecordEntry.getValue();
                 try {
@@ -78,7 +78,7 @@ enum SimulationFleetDump {
                     vc.avStatus = taxiStamp.avStatus;
 
                     // Parse requests
-                    RequestContainerUtils rcParser = new RequestContainerUtils(taxiTrail);
+                    RequestContainerUtilsSF rcParser = new RequestContainerUtilsSF(taxiTrail);
                     RequestStatus requestStatus = RequestStatusParser.parseRequestStatus(now, taxiTrail);
                     // System.out.println("Parsing RequestStatus for vehicle " + vehicleIndex + ": " + requestStatus.toString());
                     taxiTrail.setRequestStatus(now, requestStatus);

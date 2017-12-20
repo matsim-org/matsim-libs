@@ -7,14 +7,14 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.clruch.dispatcher.core.RequestStatus;
-import playground.clruch.io.fleet.TaxiTrail;
+import playground.clruch.io.fleet.TaxiTrailSF;
 
 /** @author Andreas Aumiller */
-public class RequestContainerUtils {
+public class RequestContainerUtilsSF {
 
-    private TaxiTrail taxiTrail;
+    private TaxiTrailSF taxiTrail;
 
-    public RequestContainerUtils(TaxiTrail taxiTrail) {
+    public RequestContainerUtilsSF(TaxiTrailSF taxiTrail) {
         this.taxiTrail = taxiTrail;
     }
 

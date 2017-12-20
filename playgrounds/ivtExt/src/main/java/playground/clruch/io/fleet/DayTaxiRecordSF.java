@@ -8,9 +8,9 @@ import java.util.Set;
 
 import playground.clruch.net.IdIntegerDatabase;
 
-public class DayTaxiRecord {
+public class DayTaxiRecordSF {
     private final IdIntegerDatabase vehicleIdIntegerDatabase = new IdIntegerDatabase();
-    private final List<TaxiTrail> trails = new ArrayList<>();
+    private final List<TaxiTrailSF> trails = new ArrayList<>();
     private Long midnight = null;
     public String lastTimeStamp = null;
     public final Set<String> status = new HashSet<>();
@@ -32,7 +32,7 @@ public class DayTaxiRecord {
 
         final int taxiStamp_id = vehicleIdIntegerDatabase.getId(Integer.toString(taxiStampID));
         if (taxiStamp_id == trails.size())
-            trails.add(new TaxiTrail());
+            trails.add(new TaxiTrailSF());
         trails.get(taxiStamp_id).insert(getNow(timeStamp), list,status);
     }
 
@@ -47,7 +47,7 @@ public class DayTaxiRecord {
         return trails.size();
     }
 
-    public TaxiTrail get(int vehicleIndex) {
+    public TaxiTrailSF get(int vehicleIndex) {
         return trails.get(vehicleIndex);
         }
     }

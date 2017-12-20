@@ -15,7 +15,7 @@ import ch.ethz.idsc.queuey.util.GlobalAssert;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RequestStatus;
 
-public class TaxiTrail {
+public class TaxiTrailSF {
     @SuppressWarnings("unused")
     private int override = 0;
 	private final NavigableMap<Integer, TaxiStamp> sortedMap = new TreeMap<>();

@@ -52,7 +52,7 @@ enum StandaloneFleetConverterSF {
 		System.out.println("NUMBER of data files = " + trailFilesComplete.size());
 
 		// extract data from file and put into dayTaxiRecord
-		DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
+		DayTaxiRecordSF dayTaxiRecord = new DayTaxiRecordSF();
 		CsvFleetReaderSF reader = new CsvFleetReaderSF(dayTaxiRecord);
 
 		for (int num = 1; num <= trailFilesComplete.size(); num++) {
@@ -66,7 +66,7 @@ enum StandaloneFleetConverterSF {
 		
 		 // generate sim objects and store
 		 StorageUtils storageUtils = new StorageUtils(outputDirectory);
-		 SimulationFleetDump.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE,
+		 SimulationFleetDumpSF.of(dayTaxiRecord, network, MatsimStaticDatabase.INSTANCE,
 		 storageUtils);
 		 dir.delete();
 	}

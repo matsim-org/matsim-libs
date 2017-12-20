@@ -19,13 +19,13 @@ import ch.ethz.idsc.queuey.datalys.csv.CSVUtils;
 
 public class CsvFleetReaderSF {
 
-	private final DayTaxiRecord dayTaxiRecord;
+	private final DayTaxiRecordSF dayTaxiRecord;
 
-	public CsvFleetReaderSF(DayTaxiRecord dayTaxiRecord) {
+	public CsvFleetReaderSF(DayTaxiRecordSF dayTaxiRecord) {
 		this.dayTaxiRecord = dayTaxiRecord;
 	}
 
-	public DayTaxiRecord populateFrom(File file, File dataDirectory, int taxiStampID) throws Exception {
+	public DayTaxiRecordSF populateFrom(File file, File dataDirectory, int taxiStampID) throws Exception {
 		dayTaxiRecord.lastTimeStamp = null;
 		if (file.isFile()) {
 			File fin = new File(File.separator + file.getAbsolutePath());
@@ -134,7 +134,7 @@ public class CsvFleetReaderSF {
 				// if (now % 10000 == 0)
 				// System.out.println("now=" + now);
 				for (int vehicleIndex = 0; vehicleIndex < dayTaxiRecord.size(); ++vehicleIndex) {
-					TaxiTrail taxiTrail = dayTaxiRecord.get(vehicleIndex);
+					TaxiTrailSF taxiTrail = dayTaxiRecord.get(vehicleIndex);
 
 					// Check and propagate offservice status
 					taxiTrail.checkOffService(now);

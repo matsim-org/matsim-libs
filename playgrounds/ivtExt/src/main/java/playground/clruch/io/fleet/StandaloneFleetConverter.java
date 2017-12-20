@@ -45,7 +45,7 @@ enum StandaloneFleetConverter {
         System.out.println("INFO network file: " + networkFile.getAbsolutePath());
         ReferenceFrame referenceFrame = ReferenceFrame.SWITZERLAND;
         List<File> trailFiles = (new MultiFileReader(simulationDirectory, "Fahrtstrecken")).getFolderFiles();
-        List<DayTaxiRecord> dayTaxiRecords = new ArrayList<>();
+        List<DayTaxiRecordSF> dayTaxiRecords = new ArrayList<>();
         List<File> outputFolders = new ArrayList<>();
         File outputFolder = new File(simulationDirectory, "output/");
         
@@ -68,7 +68,7 @@ enum StandaloneFleetConverter {
         for (File file : trailFiles) {
             System.out.println(file.getAbsolutePath());
             
-            DayTaxiRecord dayTaxiRecord = new DayTaxiRecord();
+            DayTaxiRecordSF dayTaxiRecord = new DayTaxiRecordSF();
             // extract data from file and put into dayTaxiRecord
             CsvFleetReaderSF reader = new CsvFleetReaderSF(dayTaxiRecord);
        //     reader.populateFrom(file);

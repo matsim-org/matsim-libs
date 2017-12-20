@@ -9,7 +9,7 @@ import playground.clruch.dispatcher.core.RequestStatus;
 public enum RequestStatusParser {
     ;
 
-    public static RequestStatus parseRequestStatus(int now, TaxiTrail taxiTrail) {
+    public static RequestStatus parseRequestStatus(int now, TaxiTrailSF taxiTrail) {
         if (now != 0) {
             Entry<Integer, TaxiStamp> nowEntry = taxiTrail.interp(now);
             Entry<Integer, TaxiStamp> lastEntry = taxiTrail.getLastEntry(now);
