@@ -22,6 +22,7 @@ import playground.clruch.net.VehicleContainer;
 /**
  * Created by Joel on 05.04.2017.
  */
+@Deprecated
 class CoreAnalysis {
     StorageSupplier storageSupplier;
     int size;

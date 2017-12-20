@@ -4,9 +4,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -20,8 +19,8 @@ public enum EasyDijkstra {
     ;
 
     public static LeastCostPathCalculator prepDijkstra(Network network) {
-        PreProcessDijkstra preProcessData = new PreProcessDijkstra();
-        preProcessData.run(network);
+        //PreProcessDijkstra preProcessData = new PreProcessDijkstra();
+        //preProcessData.run(network);
 
         TravelDisutility travelMinCost =  new TravelDisutility() {
 
@@ -43,7 +42,8 @@ public enum EasyDijkstra {
             }
         };
 
-        return new FastDijkstraFactory(preProcessData).createPathCalculator(network, travelMinCost, travelTime);
+        //return new FastDijkstraFactory(preProcessData).createPathCalculator(network, travelMinCost, travelTime);
+        return new FastDijkstraFactory(true).createPathCalculator(network, travelMinCost, travelTime);
     }
 
     public static LeastCostPathCalculator.Path executeDijkstra(LeastCostPathCalculator dijkstra, Node from, Node to) {

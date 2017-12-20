@@ -14,19 +14,21 @@ import org.matsim.api.core.v01.network.Network;
 import ch.ethz.idsc.queuey.datalys.MultiFileReader;
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.ScenarioOptions;
+
 import playground.clruch.data.ReferenceFrame;
 import playground.clruch.net.MatsimStaticDatabase;
 import playground.clruch.net.StorageUtils;
+import playground.clruch.options.ScenarioOptions;
 import playground.clruch.utils.NetworkLoader;
-import playground.clruch.utils.PropertiesExt;
+
 
 /** @author Claudio Ruch */
 enum StandaloneFleetConverterSF {
 	;
 	public static void main(String[] args) throws Exception {
 		File workingDirectory = MultiFileTools.getWorkingDirectory();
-		PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);		
+
 		File configFile = new File(workingDirectory, simOptions.getString("simuConfig"));
 		GlobalAssert.that(configFile.exists());
 

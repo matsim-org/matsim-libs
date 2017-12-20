@@ -15,13 +15,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GZHandler;
-import playground.clruch.ScenarioOptions;
+import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.idsc.tensor.Tensors;
 import playground.clruch.prep.PopulationTools;
-import playground.clruch.prep.TheApocalypse;
-import playground.clruch.utils.PropertiesExt;
 
 /** @author Claudio Ruch */
-public class DemoInvariantPop {
+enum DemoInvariantPop {
+    ;
 
     /** Takes the full config population in the working directory and creates a population only in the interval
      * or the interval population resampled during the entire day.
@@ -29,24 +30,23 @@ public class DemoInvariantPop {
      * @param args
      * @throws IOException */
     public static void main(String[] args) throws IOException {
-        final Interval interval = new Interval(new double[] { 27900.0, 27900.0 + 3600.0 });
+        Tensor start = Tensors.vector(27900.0);
+        Tensor end = Tensors.vector(27900.0 + 3600.0);
+        final Interval interval = new Interval(start, end);
         final String POPULATIONUPDATEDNAME = "populationMorning";
 
         // demo
         File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
-        File configFile = new File(workingDirectory, simOptions.getString("fullConfig"));
+        File configFile = new File(workingDirectory, "astra_config_fullBeforeMorning.xml");
+        GlobalAssert.that(configFile.exists());
         Config config = ConfigUtils.loadConfig(configFile.toString());
         Scenario scenario = ScenarioUtils.loadScenario(config);
         Population population = scenario.getPopulation();
 
-        int numPeople = population.getPersons().size();
-//        TheApocalypse.decimatesThe(population).toNoMoreThan(500);
+        System.out.println(population.getPersons().size());
         PopulationTools.changeModesOfTransportToAV(population);
-        // Population populationInvariant = TimeInvariantPopulation.at(interval, population);
-        Population populationInvariant = TimeInvariantPopulation.from(interval, population);
-        // TheApocalypse.decimatesThe(population).toNoMoreThan(2000);
-        int numPeopleUpd = population.getPersons().size();
+        Population populationInvariant = TimeInvariantPopulation.from(interval, population, config, scenario.getNetwork());
+        System.out.println(population.getPersons().size());
 
         // write the modified population to file
         final File fileExportGz = new File(workingDirectory, POPULATIONUPDATEDNAME + ".xml.gz");

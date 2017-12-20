@@ -1,5 +1,6 @@
 package playground.clruch.dispatcher.selfishdispatcher;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -19,6 +20,10 @@ import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.math.utils.Max;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
 import ch.ethz.idsc.tensor.Tensor;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
@@ -29,18 +34,12 @@ import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.traveldata.TravelData;
 import playground.clruch.traveldata.TravelDataGet;
 import playground.clruch.utils.SafeConfig;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /** Dispatcher used to create datasets to verify the theory of selfish fleet performance.
  * 
  * @author Claudio Ruch */
 public class SelfishDispatcher extends PartitionedDispatcher {
     private final int dispatchPeriod;
-    private final Network network;
     private final AbstractRoboTaxiRequestMatcher roboTaxiRequestMatcher;
     private Set<RoboTaxi> waitingTaxis = new HashSet<>();
     private final TravelData travelData;
@@ -52,12 +51,11 @@ public class SelfishDispatcher extends PartitionedDispatcher {
             TravelTime travelTime, //
             ParallelLeastCostPathCalculator router, //
             EventsManager eventsManager, //
-            Network network, VirtualNetwork<Link> virtualNetwork, //
+            VirtualNetwork<Link> virtualNetwork, //
             TravelData travelData) {
         super(config, avconfig, travelTime, router, eventsManager, virtualNetwork);
         SafeConfig safeConfig = SafeConfig.wrap(avconfig);
         dispatchPeriod = safeConfig.getInteger("dispatchPeriod", 30);
-        this.network = network;
         roboTaxiRequestMatcher = new RequestCloseRoboTaxiMatcher();
         GlobalAssert.that(travelData != null);
         this.travelData = travelData;
@@ -165,18 +163,25 @@ public class SelfishDispatcher extends PartitionedDispatcher {
 
         @Inject
         private Network network;
+        
+        @Inject
+        private Config config;
 
         public static VirtualNetwork<Link> virtualNetwork;
         public static TravelData travelData;
 
         @Override
-        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
-            virtualNetwork = VirtualNetworkGet.readDefault(network);
-            GlobalAssert.that(virtualNetwork!=null);
-            travelData = TravelDataGet.readDefault(virtualNetwork);
-            GlobalAssert.that(virtualNetwork != null);
+        public AVDispatcher createDispatcher(AVDispatcherConfig avconfig) {
+            try {
+                virtualNetwork = VirtualNetworkGet.readDefault(network);
+                travelData = TravelDataGet.readDefault(virtualNetwork);
+            } catch (IOException e) {
+                e.printStackTrace();
+                GlobalAssert.that(false);
+            }
+
             GlobalAssert.that(travelData != null);
-            return new SelfishDispatcher(config, avconfig, travelTime, router, eventsManager, network, virtualNetwork, travelData);
+            return new SelfishDispatcher(config, avconfig, travelTime, router, eventsManager, virtualNetwork, travelData);
         }
     }
 

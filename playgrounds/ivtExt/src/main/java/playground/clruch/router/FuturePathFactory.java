@@ -4,8 +4,8 @@ package playground.clruch.router;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.sebhoerl.plcpc.LeastCostPathFuture;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
+import ch.ethz.matsim.av.plcpc.LeastCostPathFuture;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 
 /**
  * factory that emits {@link FuturePathContainer}

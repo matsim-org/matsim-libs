@@ -5,18 +5,12 @@
 # IntelliJ Files
 *.iml
 .idea
-matsimExamples
-playgrounds/jjoubert/data
 **/target
-/playgrounds/vaadin-example/src/main/webapp/VAADIN/themes/mytheme/addons.scss
-/playgrounds/southAfrica/src/main/java/playground/southafrica/tmp/TryLinkDistance.java
-/playgrounds/southAfrica/src/main/java/playground/southafrica/tmp/CheckAccessibilityConfig.java
-/playgrounds/southAfrica/test/input/playground/southafrica/freight/digicore/extract/TurnkeyExtractorTest/test.csv
-/playgrounds/jjoubert/src/main/java/playground/jjoubert/TemporaryCode/NetworkV2toV1.java
 /playgrounds/ivtExt/src/main/java/playground/clruch/TestBed.java
 IDSCOptions.properties
 
 # jan and claudio  added:
+**/.classpath
 tutorial/output/
 tutorial/pop.xml.gz
 /playgrounds/ivtExt/src/main/java/playground/clruch/dispatcher/TestStrategiesDispatcher.java
@@ -24,4 +18,3 @@ tutorial/pop.xml.gz
 /playgrounds/ivtExt/src/main/java/playground/clruch/dispatcher/GBMDEuclideanRealistic.java
 key
 key.pub
-

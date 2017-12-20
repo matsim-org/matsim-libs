@@ -20,25 +20,24 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import ch.ethz.idsc.queuey.datalys.MultiFileTools;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
-import playground.clruch.ScenarioOptions;
-import playground.clruch.utils.PropertiesExt;
-import playground.sebhoerl.avtaxi.framework.AVConfigGroup;
+import ch.ethz.matsim.av.framework.AVConfigGroup;
+import playground.clruch.options.ScenarioOptions;
 
-/**
- * @author Claudio Ruch
- *
- */
+/** @author Claudio Ruch */
 public class ActTypeFinder {
 
+    public static void main(String[] args) throws IOException {
+        File workingDirectory = MultiFileTools.getWorkingDirectory();
+        run(workingDirectory);
+    }
 
     /** execute in working directory of simulation, finds all activities of puplation and creates source
      * code to include it
-     * @throws IOException 
-     */
-    public static void main(String[] args) throws IOException {
+     * 
+     * @throws IOException */
+    public static void run(File workingDirectory) throws IOException {
 
-        File workingDirectory = MultiFileTools.getWorkingDirectory();
-        PropertiesExt simOptions = PropertiesExt.wrap(ScenarioOptions.load(workingDirectory));
+        ScenarioOptions simOptions = ScenarioOptions.load(workingDirectory);
         File configFile = new File(workingDirectory, simOptions.getString("fullConfig"));
         System.out.println("loading config file " + configFile.getAbsoluteFile());
         GlobalAssert.that(configFile.exists()); // Test wheather the config file directory exists
@@ -60,9 +59,9 @@ public class ActTypeFinder {
                 }
             }
         }
-        
-        activities.stream().forEach(//                
-                a-> System.out.println("config.planCalcScore().addActivityParams(new ActivityParams(\""   +a+"\"));"))  ;
+
+        activities.stream().forEach(//
+                a -> System.out.println("config.planCalcScore().addActivityParams(new ActivityParams(\"" + a + "\"));"));
 
     }
 

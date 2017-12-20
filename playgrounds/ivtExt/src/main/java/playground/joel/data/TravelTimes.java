@@ -16,9 +16,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 import playground.clruch.utils.HelperPredicates;
-/**
- * Created by Joel on 28.02.2017.
- */
+
+/** Created by Joel on 28.02.2017. */
 class TravelTimes extends AbstractData {
 
     NavigableMap<String, NavigableMap<Double, Double>> travelTimes = new TreeMap<>();
@@ -31,33 +30,33 @@ class TravelTimes extends AbstractData {
     // cut the total time ratio
     DecimalFormat ratioForm = new DecimalFormat("#.####");
 
-
     void calculateTimeRatio() {
-       if(!(numAVs == 0)) {
+        if (!(numAVs == 0)) {
             totalTimeRatio = Double.parseDouble(ratioForm.format(totalTimeWithCust / (numAVs * 108000)));
-        } else System.out.println("no AVs found while calculating the time ratio");
+        } else
+            System.out.println("no AVs found while calculating the time ratio");
 
     }
 
-    private void setStartTime(PersonEntersVehicleEvent event){
+    private void setStartTime(PersonEntersVehicleEvent event) {
         avTripStart.put(event.getVehicleId().toString(), event.getTime());
     }
 
-    private double getStartTime(PersonLeavesVehicleEvent event){
+    private double getStartTime(PersonLeavesVehicleEvent event) {
         return avTripStart.get(event.getVehicleId().toString());
     }
 
     private void put(String vehicle, double startTime, double endTime) {
         if (!travelTimes.containsKey(vehicle))
             travelTimes.put(vehicle, new TreeMap<>());
-        //travelTimes.get(vehicle).put(startTime, avStatus);
+        // travelTimes.get(vehicle).put(startTime, avStatus);
         travelTimes.get(vehicle).put(startTime, endTime);
         if (endTime <= 108000) {
             totalTimeWithCust += endTime - startTime;
-        } else{
+        } else {
             totalTimeWithCust += 108000 - startTime;
         }
-        //System.out.println("time with customer: " + totalTimeWithCust);
+        // System.out.println("time with customer: " + totalTimeWithCust);
     }
 
     @Override
@@ -71,7 +70,7 @@ class TravelTimes extends AbstractData {
                 // <event time="21589.0" type="PersonEntersVehicle" person="av_av_op1_174" vehicle="av_av_op1_174" />
                 @Override
                 public void handleEvent(PersonEntersVehicleEvent event) {
-                    final String vehicle = event.getVehicleId().toString();
+                    // final String vehicle = event.getVehicleId().toString();
                     final Id<Person> person = event.getPersonId();
                     if (HelperPredicates.isHuman(person))
                         setStartTime(event); // remember startTime

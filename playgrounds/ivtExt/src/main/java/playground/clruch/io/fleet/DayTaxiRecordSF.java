@@ -26,8 +26,10 @@ public class DayTaxiRecordSF {
                 // throw new RuntimeException();
             }
             cmp = DateParser.from(timeStamp);
+
             // if (cmp % 600000 == 0)
             // System.out.println("INFO reading " + timeStamp);
+
         }
 
         final int taxiStamp_id = vehicleIdIntegerDatabase.getId(Integer.toString(taxiStampID));

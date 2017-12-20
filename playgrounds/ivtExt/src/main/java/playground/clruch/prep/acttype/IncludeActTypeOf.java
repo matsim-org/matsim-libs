@@ -18,21 +18,22 @@ public enum IncludeActTypeOf {
     }
     
 
-    public static void AstraZurich(Config config){
+    public static void zurichConsensus(Config config){
         config.planCalcScore().addActivityParams(new ActivityParams("home_6_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("home_8_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("education_3_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("education_1_1"));
-        config.planCalcScore().addActivityParams(new ActivityParams("remote_work_4_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("escort_kids_2_1"));
+        config.planCalcScore().addActivityParams(new ActivityParams("remote_work_4_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("home_2_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("remote_work_6_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("escort_kids_4_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("home_4_1"));
+        config.planCalcScore().addActivityParams(new ActivityParams("shop_7_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("remote_work_2_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("remote_home_1_1"));
-        config.planCalcScore().addActivityParams(new ActivityParams("work_2_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("leisure_3_1"));
+        config.planCalcScore().addActivityParams(new ActivityParams("work_2_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("leisure_1_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("leisure_5_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("escort_other_2_1"));
@@ -42,6 +43,8 @@ public enum IncludeActTypeOf {
         config.planCalcScore().addActivityParams(new ActivityParams("shop_5_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("shop_3_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("shop_1_1"));
+        config.planCalcScore().addActivityParams(new ActivityParams("outside interaction_10"));
+        config.planCalcScore().addActivityParams(new ActivityParams("outside interaction_11"));
         config.planCalcScore().addActivityParams(new ActivityParams("home_7_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("escort_kids_5_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("home_9_1"));
@@ -50,8 +53,8 @@ public enum IncludeActTypeOf {
         config.planCalcScore().addActivityParams(new ActivityParams("home_1_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("home_3_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("remote_work_5_1"));
-        config.planCalcScore().addActivityParams(new ActivityParams("remote_work_3_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("escort_kids_1_1"));
+        config.planCalcScore().addActivityParams(new ActivityParams("remote_work_3_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("home_5_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("escort_kids_3_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("home_10_1"));
@@ -62,17 +65,31 @@ public enum IncludeActTypeOf {
         config.planCalcScore().addActivityParams(new ActivityParams("work_1_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("leisure_6_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("leisure_4_1"));
+        config.planCalcScore().addActivityParams(new ActivityParams("outside interaction_6"));
         config.planCalcScore().addActivityParams(new ActivityParams("escort_other_1_1"));
+        config.planCalcScore().addActivityParams(new ActivityParams("outside interaction_7"));
+        config.planCalcScore().addActivityParams(new ActivityParams("outside interaction_4"));
         config.planCalcScore().addActivityParams(new ActivityParams("escort_other_3_1"));
+        config.planCalcScore().addActivityParams(new ActivityParams("outside interaction_5"));
+        config.planCalcScore().addActivityParams(new ActivityParams("outside interaction_2"));
         config.planCalcScore().addActivityParams(new ActivityParams("work_7_1"));
+        config.planCalcScore().addActivityParams(new ActivityParams("outside interaction_3"));
         config.planCalcScore().addActivityParams(new ActivityParams("work_5_1"));
+        config.planCalcScore().addActivityParams(new ActivityParams("outside interaction_1"));
+        config.planCalcScore().addActivityParams(new ActivityParams("shop_6_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("shop_4_1"));
         config.planCalcScore().addActivityParams(new ActivityParams("shop_2_1"));
-        config.planCalcScore().addActivityParams(new ActivityParams("shop_6_1"));        
+        config.planCalcScore().addActivityParams(new ActivityParams("outside interaction_8"));
+        config.planCalcScore().addActivityParams(new ActivityParams("outside interaction_9"));
+
+        
+        for(ActivityParams activityParams : config.planCalcScore().getActivityParams()){
+            activityParams.setTypicalDuration(3600.0); //TODO fix this to meaningful values            
+        }
     }
     
     
-    public static void BaselineCH(Config config){
+    public static void baselineCH(Config config){
         config.planCalcScore().addActivityParams(new ActivityParams("shop_4"));
         config.planCalcScore().addActivityParams(new ActivityParams("shop_3"));
         config.planCalcScore().addActivityParams(new ActivityParams("shop_2"));
@@ -127,6 +144,15 @@ public enum IncludeActTypeOf {
         config.planCalcScore().addActivityParams(new ActivityParams("remote_work_5"));
         config.planCalcScore().addActivityParams(new ActivityParams("remote_work_6"));
     }
+    
+    public static void artificial(Config config){
+        config.planCalcScore().addActivityParams(new ActivityParams("activity"));
+        
+        for(ActivityParams activityParams : config.planCalcScore().getActivityParams()){
+            activityParams.setTypicalDuration(3600.0); //TODO fix this to meaningful values            
+        }
+    }
+
     
     
 }

@@ -15,8 +15,8 @@ import org.matsim.api.core.v01.network.Link;
 
 import ch.ethz.idsc.queuey.math.HungarianAlgorithm;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.matsim.av.passenger.AVRequest;
 import playground.clruch.dispatcher.utils.NetworkDistanceFunction;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
 
 /**
  * @author Nicolo Ormezzano
@@ -35,7 +35,8 @@ public class StackerCraneTour {
 	
 	// External
 	// Calculate Stacker crane tour
-	public List<AVRequest> calculate(Collection<AVRequest> requests) {
+	@SuppressWarnings("unused")
+    public List<AVRequest> calculate(Collection<AVRequest> requests) {
 
 		// since Collection::iterator does not make guarantees about the order we store
 		// the pairs in a list
@@ -47,7 +48,6 @@ public class StackerCraneTour {
 		final int m = ordered_requests.size(); // jobs
 
 		final double[][] requestsDistMatrix = new double[n][m];
-		@SuppressWarnings("unused")
         double lengthAvReq=0.0; // 
 		int i = -1;
 		for (AVRequest avRequest : ordered_requests) {

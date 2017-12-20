@@ -1,5 +1,6 @@
 package playground.clruch.dispatcher;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -18,16 +19,16 @@ import com.google.inject.name.Named;
 import ch.ethz.idsc.queuey.core.networks.VirtualNetwork;
 import ch.ethz.idsc.queuey.core.networks.VirtualNode;
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.config.AVGeneratorConfig;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /** Upon arrival, a demand is assigned to the depot closest to its pick-up location. The RoboTaxi services its demands in FIFO order
  * returning to the depot after each delivery */
@@ -93,6 +94,7 @@ public class KMedianDispatcher extends PartitionedDispatcher {
         Map<VirtualNode<Link>, Link> waitLocations = new HashMap<>();
         for (VirtualNode<Link> vn : virtualNetwork.getVirtualNodes()) {
             // select some link in virtualNode, if possible with high enough capacity
+            @SuppressWarnings("unused")
             Link link = null;
             Optional<Link> optLink = vn.getLinks().stream().filter(v -> v.getCapacity() > carsPerVNode).filter(v -> v.getAllowedModes().contains("car"))
                     .findAny();
@@ -118,10 +120,20 @@ public class KMedianDispatcher extends PartitionedDispatcher {
         @Inject
         private Network network;
         public static VirtualNetwork<Link> virtualNetwork;
+        
+        @Inject
+        private Config config;
 
         @Override
-        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
-            virtualNetwork = VirtualNetworkGet.readDefault(network);
+        public AVDispatcher createDispatcher(AVDispatcherConfig avconfig) {
+        	AVGeneratorConfig generatorConfig = avconfig.getParent().getGeneratorConfig();
+        	
+            try {
+                virtualNetwork = VirtualNetworkGet.readDefault(network);
+            } catch (IOException e) {
+                e.printStackTrace();
+                GlobalAssert.that(false);
+            }
             return new KMedianDispatcher(config, avconfig, travelTime, generatorConfig, router, eventsManager, network, //
                     virtualNetwork);
         }

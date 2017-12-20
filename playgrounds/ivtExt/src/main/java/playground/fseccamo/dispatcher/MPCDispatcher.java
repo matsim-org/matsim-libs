@@ -1,6 +1,7 @@
 // code by francesco, jph, clruch
 package playground.fseccamo.dispatcher;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,15 +38,15 @@ import ch.ethz.idsc.tensor.io.Pretty;
 import ch.ethz.idsc.tensor.red.Min;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.config.AVGeneratorConfig;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 import playground.clruch.dispatcher.core.AVStatus;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.netdata.VirtualNetworkGet;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 /** MPC Dispatcher 1 contains the implementation that generated the results
  * in Francesco's Master thesis.
@@ -301,11 +302,20 @@ public class MPCDispatcher extends BaseMpcDispatcher {
 
         public static VirtualNetwork<Link> virtualNetwork;
         public static Map<VirtualLink<Link>, Double> travelTimes;
+        
+        @Inject
+        private Config config;
 
         @Override
-        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig avconfig) {
+        	AVGeneratorConfig generatorConfig = avconfig.getParent().getGeneratorConfig();
 
-            virtualNetwork = VirtualNetworkGet.readDefault(network);
+            try {
+                virtualNetwork = VirtualNetworkGet.readDefault(network);
+            } catch (IOException e) {                
+                e.printStackTrace();
+                GlobalAssert.that(false);
+            }
 
             return new MPCDispatcher(config, avconfig, generatorConfig, travelTime, router, eventsManager, virtualNetwork, network, travelTimes);
         }

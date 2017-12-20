@@ -6,6 +6,7 @@
 
 package playground.clruch.dispatcher;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,12 @@ import ch.ethz.idsc.tensor.Tensors;
 import ch.ethz.idsc.tensor.alg.Array;
 import ch.ethz.idsc.tensor.red.Total;
 import ch.ethz.idsc.tensor.sca.Round;
+import ch.ethz.matsim.av.config.AVDispatcherConfig;
+import ch.ethz.matsim.av.config.AVGeneratorConfig;
+import ch.ethz.matsim.av.dispatcher.AVDispatcher;
+import ch.ethz.matsim.av.framework.AVModule;
+import ch.ethz.matsim.av.passenger.AVRequest;
+import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 import playground.clruch.dispatcher.core.PartitionedDispatcher;
 import playground.clruch.dispatcher.core.RoboTaxi;
 import playground.clruch.dispatcher.utils.AbstractVehicleDestMatcher;
@@ -44,12 +51,6 @@ import playground.clruch.dispatcher.utils.virtualnodedestselector.AbstractVirtua
 import playground.clruch.dispatcher.utils.virtualnodedestselector.RandomVirtualNodeDest;
 import playground.clruch.netdata.VirtualNetworkGet;
 import playground.clruch.utils.SafeConfig;
-import playground.sebhoerl.avtaxi.config.AVDispatcherConfig;
-import playground.sebhoerl.avtaxi.config.AVGeneratorConfig;
-import playground.sebhoerl.avtaxi.dispatcher.AVDispatcher;
-import playground.sebhoerl.avtaxi.framework.AVModule;
-import playground.sebhoerl.avtaxi.passenger.AVRequest;
-import playground.sebhoerl.plcpc.ParallelLeastCostPathCalculator;
 
 public class LPFBDispatcher extends PartitionedDispatcher {
     private final int rebalancingPeriod;
@@ -201,13 +202,22 @@ public class LPFBDispatcher extends PartitionedDispatcher {
         private Network network;
 
         public static VirtualNetwork<Link> virtualNetwork;
+        
+        @Inject
+        private Config config;
 
         @Override
-        public AVDispatcher createDispatcher(Config config, AVDispatcherConfig avconfig, AVGeneratorConfig generatorConfig) {
+        public AVDispatcher createDispatcher(AVDispatcherConfig avconfig) {
+        	AVGeneratorConfig generatorConfig = avconfig.getParent().getGeneratorConfig();
 
             AbstractVirtualNodeDest abstractVirtualNodeDest = new RandomVirtualNodeDest();
             AbstractVehicleDestMatcher abstractVehicleDestMatcher = new HungarBiPartVehicleDestMatcher(new EuclideanDistanceFunction());
-            virtualNetwork = VirtualNetworkGet.readDefault(network);
+            try {
+                virtualNetwork = VirtualNetworkGet.readDefault(network);
+            } catch (IOException e) {
+                e.printStackTrace();
+                GlobalAssert.that(false);
+            }
 
             return new LPFBDispatcher(config, avconfig, generatorConfig, travelTime, router, eventsManager, network, virtualNetwork, abstractVirtualNodeDest,
                     abstractVehicleDestMatcher);

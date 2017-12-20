@@ -79,7 +79,7 @@ enum SimulationFleetDumpSF {
 
                     // Parse requests
                     RequestContainerUtilsSF rcParser = new RequestContainerUtilsSF(taxiTrail);
-                    RequestStatus requestStatus = RequestStatusParser.parseRequestStatus(now, taxiTrail);
+                    RequestStatus requestStatus = RequestStatusParserSF.parseRequestStatus(now, taxiTrail);
                     // System.out.println("Parsing RequestStatus for vehicle " + vehicleIndex + ": " + requestStatus.toString());
                     taxiTrail.setRequestStatus(now, requestStatus);
 

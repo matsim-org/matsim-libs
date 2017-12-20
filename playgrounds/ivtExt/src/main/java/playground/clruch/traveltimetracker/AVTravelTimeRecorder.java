@@ -10,23 +10,21 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class AVTravelTimeRecorder implements MobsimBeforeSimStepListener {
-    
+
     @Inject
     AVTravelTimeTracker travelTimeTracker;
-    
+
     @Override
-    public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+    public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
         double now = e.getSimulationTime();
-        if(now % 60 == 0){
+        if (now % 60 == 0) {
             String theLinkToTrack = "9908557_0_rL2";
-            Id<Link> linkToTrackID = Id.create(theLinkToTrack,Link.class);
-                    
+            Id<Link> linkToTrackID = Id.create(theLinkToTrack, Link.class);
 
             double travelTime = travelTimeTracker.getLinkTravelTime(linkToTrackID).travelTime;
-            
-            // System.out.println("juhui");
             // System.out.println(travelTime);
-            // System.out.println("================================================");
+            // TODO did not continue work here.
+
         }
     }
 }

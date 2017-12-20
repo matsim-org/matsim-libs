@@ -1,6 +1,8 @@
 // code by jph
 package playground.clruch.utils;
 
+import java.util.Objects;
+
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
@@ -9,6 +11,8 @@ public class SafeConfig {
     final ReflectiveConfigGroup reflectiveConfigGroup;
 
     private SafeConfig(ReflectiveConfigGroup reflectiveConfigGroup) {
+        if (Objects.isNull(reflectiveConfigGroup))
+            throw new NullPointerException("reflective group == null");
         this.reflectiveConfigGroup = reflectiveConfigGroup;
     }
 
@@ -45,13 +49,13 @@ public class SafeConfig {
         GlobalAssert.that(string != null);
         return Double.parseDouble(string);
     }
-    
+
     public boolean getBoolStrict(String key) {
         String string = reflectiveConfigGroup.getParams().get(key);
         GlobalAssert.that(string != null);
         return Boolean.parseBoolean(string);
     }
-    
+
     public String getStringStrict(String key) {
         String string = reflectiveConfigGroup.getParams().get(key);
         GlobalAssert.that(string != null);

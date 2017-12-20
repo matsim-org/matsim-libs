@@ -12,10 +12,10 @@ public enum LocationSpec {
             ReferenceFrame.SWITZERLAND, //
             new Coord(2683600.0, 1251400.0), //
             10000.0), //
-    ZURICH_CITY_ASTRA_Spenrich_Clruch( //
+    ZURICH_CITY_MICROCENSUS( //
             ReferenceFrame.SWITZERLAND, //
             new Coord(2683600.0, 1251400.0), //
-            10000.0), //
+            6000.0), //
     ZURICH_NOCUT(ReferenceFrame.SWITZERLAND, //
             new Coord(2683600.0, 1251400.0), //
             null), BASEL_CITY( //
@@ -29,7 +29,7 @@ public enum LocationSpec {
     HOMBURGERTAL( //
             ReferenceFrame.SWITZERLAND, //
             new Coord(2630647.0, 1251120.0), //
-            10000.0), // radius of 10000
+            2000.0), // radius of 10000
     SAN_FRANCISCO( //
             ReferenceFrame.IDENTITY, //
             new Coord(-122.4363005, 37.7511686), //

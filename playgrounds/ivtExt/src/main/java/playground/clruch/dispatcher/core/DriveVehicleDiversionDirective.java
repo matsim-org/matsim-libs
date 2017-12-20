@@ -6,14 +6,14 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
-import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTrackerImpl;
 import org.matsim.contrib.dvrp.tracker.TaskTracker;
 
 import ch.ethz.idsc.queuey.util.GlobalAssert;
+import ch.ethz.matsim.av.schedule.AVDriveTask;
+import ch.ethz.matsim.av.schedule.AVStayTask;
 import playground.clruch.router.FuturePathContainer;
 import playground.clruch.utils.VrpPathUtils;
-import playground.sebhoerl.avtaxi.schedule.AVDriveTask;
-import playground.sebhoerl.avtaxi.schedule.AVStayTask;
+import playground.matsim_decoupling.IDSCDriveTaskTracker;
 
 /**
  * for vehicles that are currently driving, but should go to a new destination:
@@ -35,7 +35,7 @@ final class DriveVehicleDiversionDirective extends VehicleDiversionDirective {
         final double scheduleEndTime = avStayTask.getEndTime();
 
         TaskTracker taskTracker = avDriveTask.getTaskTracker();
-        OnlineDriveTaskTrackerImpl onlineDriveTaskTrackerImpl = (OnlineDriveTaskTrackerImpl) taskTracker;
+        IDSCDriveTaskTracker onlineDriveTaskTrackerImpl = (IDSCDriveTaskTracker) taskTracker;
         final int diversionLinkIndex = onlineDriveTaskTrackerImpl.getDiversionLinkIndex();
         final int lengthOfDiversion = vrpPathWithTravelData.getLinkCount();
         OnlineDriveTaskTracker onlineDriveTaskTracker = (OnlineDriveTaskTracker) taskTracker;
