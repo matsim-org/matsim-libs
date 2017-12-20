@@ -82,7 +82,8 @@ public class ScenarioServer {
         dvrpConfigGroup.setTravelTimeEstimationAlpha(0.05);
         Config config = ConfigUtils.loadConfig(configFile.toString(), new AVConfigGroup(), dvrpConfigGroup);
 
-
+        IncludeActTypeOf.zurichConsensus(config);
+        IncludeActTypeOf.artificial(config);
 
         String outputdirectory = config.controler().getOutputDirectory();
         System.out.println("outputdirectory = " + outputdirectory);
@@ -145,3 +146,4 @@ public class ScenarioServer {
 
     }
 }
+ 	
