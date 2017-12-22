@@ -26,59 +26,59 @@ public class ParkingSearchConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "parkingSearch";
 	
 	public static final String UNPARKDURATION = "unparkDuration";
-	private static double unparkDuration = 60;
+	private double unparkDuration = 60;
 	
 	private static final String PARKDURATION = "parkDuration";
-	private static double parkDuration = 60;
+	private double parkDuration = 60;
 	
 	private static final String AVGPARKINGSLOTLENGTH = "avgParkingSlotLength"; 
-	private static double avgParkingSlotLength = 10.00;
+	private double avgParkingSlotLength = 10.00;
 
 	private static final String PARKINGSEARCH_STRATEGY = "parkingSearchStrategy";
-	private static ParkingSearchStrategy parkingSearchStrategy = ParkingSearchStrategy.Random;
+	private ParkingSearchStrategy parkingSearchStrategy = ParkingSearchStrategy.Random;
 	
 	public ParkingSearchConfigGroup() {
 		super(GROUP_NAME);
 	}
 
 	@StringGetter(UNPARKDURATION)
-	public static double getUnparkduration() {
+	public double getUnparkduration() {
 		return unparkDuration;
 	}
 
 	@StringGetter(PARKDURATION)
-	public static double getParkduration() {
+	public double getParkduration() {
 		return parkDuration;
 	}
 
 	@StringGetter(AVGPARKINGSLOTLENGTH)
-	public static double getAvgparkingslotlength() {
+	public double getAvgparkingslotlength() {
 		return avgParkingSlotLength;
 	}
 
 	@StringGetter(PARKINGSEARCH_STRATEGY)
-	public static ParkingSearchStrategy getParkingSearchStrategy() {
+	public ParkingSearchStrategy getParkingSearchStrategy() {
 		return parkingSearchStrategy;
 	}
 	
 	@StringSetter(UNPARKDURATION)
-	public static void setUnparkDuration(double unparkDuration) {
-		ParkingSearchConfigGroup.unparkDuration = unparkDuration;
+	public void setUnparkDuration(double unparkDuration) {
+		this.unparkDuration = unparkDuration;
 	}
 
 	@StringSetter(PARKDURATION)
-	public static void setParkDuration(double parkDuration) {
-		ParkingSearchConfigGroup.parkDuration = parkDuration;
+	public void setParkDuration(double parkDuration) {
+		this.parkDuration = parkDuration;
 	}
 
 	@StringSetter(AVGPARKINGSLOTLENGTH)
-	public static void setAvgParkingSlotLength(double avgParkingSlotLength) {
-		ParkingSearchConfigGroup.avgParkingSlotLength = avgParkingSlotLength;
+	public void setAvgParkingSlotLength(double avgParkingSlotLength) {
+		this.avgParkingSlotLength = avgParkingSlotLength;
 	}
 
 	@StringSetter(PARKINGSEARCH_STRATEGY)
-	public static void setParkingSearchStrategy(ParkingSearchStrategy parkingSearchStrategy) {
-		ParkingSearchConfigGroup.parkingSearchStrategy = parkingSearchStrategy;
+	public void setParkingSearchStrategy(ParkingSearchStrategy parkingSearchStrategy) {
+		this.parkingSearchStrategy = parkingSearchStrategy;
 	}
 	
 	

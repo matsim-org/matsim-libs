@@ -20,6 +20,10 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author tschlenther
  *
+ *Agents drive to destination first. Knowledge about surrounding streets is assumed. If no parking slot is available, they always look
+ *for a slot on the one outgoing link that has the shortest distance to their destination and is unknown to them so far. If every outlink
+ *is known they choose the next link to search on randomly.
+ *
  */
 public class DistanceMemoryParkingSearchLogic implements ParkingSearchLogic {
 

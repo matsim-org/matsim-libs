@@ -23,6 +23,9 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author schlenther
  *
+ *the matsim version of the parking strategy used in PARKAGENT. see the following paper for more information:
+ *doi: 10.1016/j.compenvurbsys.2008.09.011
+ *
  */
 public class BenensonParkingSearchLogic implements ParkingSearchLogic {
 	private static final Logger logger = Logger.getLogger(BenensonDynLeg.class);
