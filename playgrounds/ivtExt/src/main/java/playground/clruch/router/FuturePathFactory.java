@@ -1,10 +1,12 @@
 // code by jph
 package playground.clruch.router;
 
+import java.util.concurrent.Future;
+
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelTime;
 
-import ch.ethz.matsim.av.plcpc.LeastCostPathFuture;
 import ch.ethz.matsim.av.plcpc.ParallelLeastCostPathCalculator;
 
 /**
@@ -22,7 +24,7 @@ public class FuturePathFactory {
     }
 
     public FuturePathContainer createFuturePathContainer(Link startLink, Link destLink, double startTime) {
-        LeastCostPathFuture leastCostPathFuture = parallelLeastCostPathCalculator.calcLeastCostPath( // <- non-blocking call
+        Future<Path> leastCostPathFuture = parallelLeastCostPathCalculator.calcLeastCostPath( // <- non-blocking call
                 startLink.getToNode(), destLink.getFromNode(), startTime, null, null);
         return new FuturePathContainer(startLink, destLink, startTime, leastCostPathFuture, travelTime);
     }
