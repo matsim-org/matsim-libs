@@ -45,7 +45,6 @@ public final class PModule extends AbstractModule {
 		bind(PTransitRouterFactory.class).toInstance(pTransitRouterFactory);
 
 		addControlerListenerBinding().to(PControlerListener.class) ;
-		addControlerListenerBinding().toInstance( pTransitRouterFactory ) ;
 		// (needs to be injected _after_ PControlerListener, so that it is executed _before_ PControlerListener.
 		// yyyy injecting the TransitRouterFactory besides the TransitRouter is a fix to re-configure the factory in every iteration.
 		// A more general solution suggested by MZ would be to define an iteration scope.  Then the factory could be forced
