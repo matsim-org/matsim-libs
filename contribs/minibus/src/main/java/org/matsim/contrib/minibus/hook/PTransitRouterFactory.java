@@ -43,7 +43,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author aneumann
  *
  */
-class PTransitRouterFactory implements Provider<TransitRouter>, StartupListener, IterationStartsListener {
+class PTransitRouterFactory implements Provider<TransitRouter> {
 	// How is this working if nothing is injected?  But presumably it uses "Provider" only as a syntax clarifier, but the class
 	// is not injectable. kai, jun'16
 	
@@ -75,7 +75,7 @@ class PTransitRouterFactory implements Provider<TransitRouter>, StartupListener,
 		this.transitRouterConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 	}
 	
-	void updateTransitSchedule() {
+	private void updateTransitSchedule() {
 		this.needToUpdateRouter = true;
 //		this.schedule = PTransitLineMerger.mergeSimilarRoutes(schedule);
 		
@@ -141,13 +141,11 @@ class PTransitRouterFactory implements Provider<TransitRouter>, StartupListener,
         return null;
 	}
 
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-//		this.updateTransitSchedule();
+	void notifyIterationStarts(IterationStartsEvent event) {
+		this.updateTransitSchedule();
 	}
 
-	@Override
-	public void notifyStartup(StartupEvent event) {
+	void notifyStartup(StartupEvent event) {
 		this.updateTransitSchedule();
 	}
 }

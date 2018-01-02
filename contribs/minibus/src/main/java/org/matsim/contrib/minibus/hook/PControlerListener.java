@@ -86,6 +86,8 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 		//		this.pTransitRouterFactory.createTransitRouterConfig(event.getServices().getConfig());
 		//		this.pTransitRouterFactory.updateTransitSchedule();
 
+		router.notifyStartup(event);
+		
 		if(this.agentsStuckHandler != null){
 			event.getServices().getEvents().addHandler(this.agentsStuckHandler);
 		}
@@ -119,7 +121,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 			}
 		}
 		this.dumpTransitScheduleAndVehicles(event.getServices(), event.getIteration());
-		router.updateTransitSchedule();
+		router.notifyIterationStarts(event);
 	}
 
 	@Override
