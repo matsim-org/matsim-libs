@@ -122,6 +122,9 @@ class PTransitRouterFactory implements Provider<TransitRouter>, StartupListener,
 	}
 	
 	private TransitRouter createRaptorRouter() {
+		if (this.transitRouterQuadTree == null || this.raptorDisutility == null) {
+			updateTransitSchedule();
+		}
 		return new Raptor(this.transitRouterQuadTree, this.raptorDisutility, this.transitRouterConfig);
 	}
 
