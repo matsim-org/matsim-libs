@@ -36,6 +36,7 @@ import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.scenario.MutableScenario;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -61,6 +62,8 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 	private final static Logger log = Logger.getLogger(PControlerListener.class);
 
 	private final PVehiclesFactory pVehiclesFactory;
+	
+	@Inject PTransitRouterFactory router;
 
 	@Inject(optional=true) private AgentsStuckHandlerImpl agentsStuckHandler;
 	private final POperators operators ;
@@ -116,6 +119,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 			}
 		}
 		this.dumpTransitScheduleAndVehicles(event.getServices(), event.getIteration());
+		router.updateTransitSchedule();
 	}
 
 	@Override

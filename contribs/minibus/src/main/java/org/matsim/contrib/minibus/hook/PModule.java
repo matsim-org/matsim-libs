@@ -42,6 +42,7 @@ public final class PModule extends AbstractModule {
 	@Override public void install() {
 		final PTransitRouterFactory pTransitRouterFactory = new PTransitRouterFactory(this.getConfig());
 		bind(TransitRouter.class).toProvider(pTransitRouterFactory);
+		bind(PTransitRouterFactory.class).toInstance(pTransitRouterFactory);
 
 		addControlerListenerBinding().to(PControlerListener.class) ;
 		addControlerListenerBinding().toInstance( pTransitRouterFactory ) ;

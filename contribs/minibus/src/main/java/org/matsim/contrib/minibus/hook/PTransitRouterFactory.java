@@ -75,7 +75,7 @@ class PTransitRouterFactory implements Provider<TransitRouter>, StartupListener,
 		this.transitRouterConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 	}
 	
-	private void updateTransitSchedule() {
+	void updateTransitSchedule() {
 		this.needToUpdateRouter = true;
 //		this.schedule = PTransitLineMerger.mergeSimilarRoutes(schedule);
 		
@@ -143,7 +143,7 @@ class PTransitRouterFactory implements Provider<TransitRouter>, StartupListener,
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		this.updateTransitSchedule();
+//		this.updateTransitSchedule();
 	}
 
 	@Override
