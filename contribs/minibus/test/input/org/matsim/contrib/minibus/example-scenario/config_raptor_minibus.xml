@@ -8,6 +8,95 @@
   ]
 >
 <config>
+
+<!-- ====================================================================== -->
+
+	<module name="p" >
+		<param name="pIdentifier" value="para_" />
+		<param name="operatorType" value="CarefulMultiPlanOperator" />
+		<param name="numberOfOperators" value="10" />
+		<param name="numberOfIterationsForProspecting" value="10" />
+		<param name="initialBudget" value="2001.0" />
+		<param name="paxPerVehicle" value="10" />
+		<param name="passengerCarEquivalents" value="1.0" />
+		<param name="vehicleMaximumVelocity" value="6.0" />
+		<param name="delayPerBoardingPassenger" value="2.0" />
+		<param name="delayPerAlightingPassenger" value="1.0" />
+		<param name="doorOperationMode" value="parallel" />
+		<param name="costPerVehicleAndDay" value="100.00" />
+		<param name="costPerKilometer" value="0.30" />
+		<param name="costPerHour" value="10.00" />
+		<param name="earningsPerBoardingPassenger" value="1.0" />
+		<param name="earningsPerKilometerAndPassenger" value="0.0" />
+		<param name="pricePerVehicleBought" value="500.0" />
+		<param name="pricePerVehicleSold" value="500.0" />
+		<param name="startWith24Hours" value="false" />
+		<param name="minOperationTime" value="0.0" />
+		
+		<param name="minX" value="0.0" />
+		<param name="maxX" value="5000.0" />
+		<param name="minY" value="0.0" />
+		<param name="maxY" value="5000.0" />
+		
+		<param name="useFranchise" value="true" />
+		<param name="writeStatsInterval" value="1" />
+		<param name="logOperators" value="true" />
+		<param name="writeGexfStatsInterval" value="20" />
+		<param name="routeProvider" value="TimeAwareComplexCircleScheduleProvider" />
+		<param name="speedLimitForStops" value="10.0" />
+		<param name="planningSpeedFactor" value="1.0" />
+		<param name="gridSize" value="500.0" />
+		<param name="timeSlotSize" value="900.0" /> 
+		<param name="useAdaptiveNumberOfOperators" value="true" />
+		<param name="shareOfOperatorsWithProfit" value="0.90" />
+		<param name="disableCreationOfNewOperatorsInIteration" value="250" />
+		<param name="reRouteAgentsStuck" value="false" />
+		<param name="ptRouter" value="raptor" />
+        
+		<!-- will calculate common performance metrics if set to true, default is false -->
+        <!--<param name="writeMetrics" value="true" />-->
+		
+		<!--<param name="Module_1" value="MaxRandomStartTimeAllocator" />
+		<param name="ModuleProbability_1" value="0.10" />
+		<param name="ModuleDisableInIteration_1" value="300" />
+		<param name="ModuleParameter_1" value="1800,900,false" />
+		
+		<param name="Module_2" value="MaxRandomEndTimeAllocator" />
+		<param name="ModuleProbability_2" value="0.10" />
+		<param name="ModuleDisableInIteration_2" value="300" />
+		<param name="ModuleParameter_2" value="1800,900,false" /> -->
+		
+		<param name="Module_1" value="WeightedStartTimeExtension" />
+		<param name="ModuleProbability_1" value="0.10" />
+		<param name="ModuleDisableInIteration_1" value="300" />
+		<param name="ModuleParameter_1" value="" />
+		
+		<param name="Module_2" value="WeightedEndTimeExtension" />
+		<param name="ModuleProbability_2" value="0.10" />
+		<param name="ModuleDisableInIteration_2" value="300" />
+		<param name="ModuleParameter_2" value="" />
+		
+		<param name="Module_3" value="ReduceTimeServedRFare" />
+		<param name="ModuleProbability_3" value="0.30" />
+		<param name="ModuleDisableInIteration_3" value="300" />
+		<param name="ModuleParameter_3" value="1.0,900,true,true" />
+		
+		<param name="Module_4" value="EndRouteExtension" />
+		<param name="ModuleProbability_4" value="0.10" />
+		<param name="ModuleDisableInIteration_4" value="300" />
+		<param name="ModuleParameter_4" value="1500.0,0.2" />
+		
+		<param name="Module_5" value="SidewaysRouteExtension" />
+		<param name="ModuleProbability_5" value="0.10" />
+		<param name="ModuleDisableInIteration_5" value="300" />
+		<param name="ModuleParameter_5" value="1500.0,0.2,true" />
+		
+		<param name="Module_6" value="ReduceStopsToBeServedRFare" />
+		<param name="ModuleProbability_6" value="0.30" />
+		<param name="ModuleDisableInIteration_6" value="300" />
+		<param name="ModuleParameter_6" value="1.0,true" />
+	</module> 
+
 <!-- ====================================================================== -->
 	
 	<module name="controler" >
@@ -153,7 +242,7 @@
 
 	<module name="transit" >
 		<param name="useTransit" value="true" />
-		<param name="transitScheduleFile" value="&INPUTBASE;/grid10min_0.13.transitSchedule.xml" />
+		<param name="transitScheduleFile" value="&INPUTBASE;/transitSchedule_10min.xml" />
 		<param name="vehiclesFile" value="&INPUTBASE;/transitVehicles.xml" />
 		<param name="transitModes" value="pt" />
 	</module>

@@ -1,0 +1,1847 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+
+<transitSchedule>
+	<transitStops>
+		<stopFacility id="1" x="1000.0" y="1000.0" linkRefId="11" isBlocking="false"/>
+		<stopFacility id="2a" x="2050.0" y="2950.0" linkRefId="12" isBlocking="false"/>
+		<stopFacility id="2b" x="2050.0" y="2950.0" linkRefId="32" isBlocking="false"/>
+		<stopFacility id="3" x="3950.0" y="1050.0" linkRefId="33" isBlocking="false"/>
+		<stopFacility id="para_1112" x="1000.0" y="2000.0" linkRefId="1112" isBlocking="false"/>
+		<stopFacility id="para_1121" x="2000.0" y="1000.0" linkRefId="1121" isBlocking="false"/>
+		<stopFacility id="para_1211" x="1000.0" y="1000.0" linkRefId="1211" isBlocking="false"/>
+		<stopFacility id="para_1213" x="1000.0" y="3000.0" linkRefId="1213" isBlocking="false"/>
+		<stopFacility id="para_1222" x="2000.0" y="2000.0" linkRefId="1222" isBlocking="false"/>
+		<stopFacility id="para_1312" x="1000.0" y="2000.0" linkRefId="1312" isBlocking="false"/>
+		<stopFacility id="para_1314" x="1000.0" y="4000.0" linkRefId="1314" isBlocking="false"/>
+		<stopFacility id="para_1323" x="2000.0" y="3000.0" linkRefId="1323" isBlocking="false"/>
+		<stopFacility id="para_1413" x="1000.0" y="3000.0" linkRefId="1413" isBlocking="false"/>
+		<stopFacility id="para_1424" x="2000.0" y="4000.0" linkRefId="1424" isBlocking="false"/>
+		<stopFacility id="para_2111" x="1000.0" y="1000.0" linkRefId="2111" isBlocking="false"/>
+		<stopFacility id="para_2122" x="2000.0" y="2000.0" linkRefId="2122" isBlocking="false"/>
+		<stopFacility id="para_2131" x="3000.0" y="1000.0" linkRefId="2131" isBlocking="false"/>
+		<stopFacility id="para_2212" x="1000.0" y="2000.0" linkRefId="2212" isBlocking="false"/>
+		<stopFacility id="para_2221" x="2000.0" y="1000.0" linkRefId="2221" isBlocking="false"/>
+		<stopFacility id="para_2223" x="2000.0" y="3000.0" linkRefId="2223" isBlocking="false"/>
+		<stopFacility id="para_2232" x="3000.0" y="2000.0" linkRefId="2232" isBlocking="false"/>
+		<stopFacility id="para_2313" x="1000.0" y="3000.0" linkRefId="2313" isBlocking="false"/>
+		<stopFacility id="para_2322" x="2000.0" y="2000.0" linkRefId="2322" isBlocking="false"/>
+		<stopFacility id="para_2324" x="2000.0" y="4000.0" linkRefId="2324" isBlocking="false"/>
+		<stopFacility id="para_2333" x="3000.0" y="3000.0" linkRefId="2333" isBlocking="false"/>
+		<stopFacility id="para_2414" x="1000.0" y="4000.0" linkRefId="2414" isBlocking="false"/>
+		<stopFacility id="para_2423" x="2000.0" y="3000.0" linkRefId="2423" isBlocking="false"/>
+		<stopFacility id="para_2434" x="3000.0" y="4000.0" linkRefId="2434" isBlocking="false"/>
+		<stopFacility id="para_3121" x="2000.0" y="1000.0" linkRefId="3121" isBlocking="false"/>
+		<stopFacility id="para_3132" x="3000.0" y="2000.0" linkRefId="3132" isBlocking="false"/>
+		<stopFacility id="para_3141" x="4000.0" y="1000.0" linkRefId="3141" isBlocking="false"/>
+		<stopFacility id="para_3222" x="2000.0" y="2000.0" linkRefId="3222" isBlocking="false"/>
+		<stopFacility id="para_3231" x="3000.0" y="1000.0" linkRefId="3231" isBlocking="false"/>
+		<stopFacility id="para_3233" x="3000.0" y="3000.0" linkRefId="3233" isBlocking="false"/>
+		<stopFacility id="para_3242" x="4000.0" y="2000.0" linkRefId="3242" isBlocking="false"/>
+		<stopFacility id="para_3323" x="2000.0" y="3000.0" linkRefId="3323" isBlocking="false"/>
+		<stopFacility id="para_3332" x="3000.0" y="2000.0" linkRefId="3332" isBlocking="false"/>
+		<stopFacility id="para_3334" x="3000.0" y="4000.0" linkRefId="3334" isBlocking="false"/>
+		<stopFacility id="para_3343" x="4000.0" y="3000.0" linkRefId="3343" isBlocking="false"/>
+		<stopFacility id="para_3424" x="2000.0" y="4000.0" linkRefId="3424" isBlocking="false"/>
+		<stopFacility id="para_3433" x="3000.0" y="3000.0" linkRefId="3433" isBlocking="false"/>
+		<stopFacility id="para_3444" x="4000.0" y="4000.0" linkRefId="3444" isBlocking="false"/>
+		<stopFacility id="para_4131" x="3000.0" y="1000.0" linkRefId="4131" isBlocking="false"/>
+		<stopFacility id="para_4142" x="4000.0" y="2000.0" linkRefId="4142" isBlocking="false"/>
+		<stopFacility id="para_4232" x="3000.0" y="2000.0" linkRefId="4232" isBlocking="false"/>
+		<stopFacility id="para_4241" x="4000.0" y="1000.0" linkRefId="4241" isBlocking="false"/>
+		<stopFacility id="para_4243" x="4000.0" y="3000.0" linkRefId="4243" isBlocking="false"/>
+		<stopFacility id="para_4333" x="3000.0" y="3000.0" linkRefId="4333" isBlocking="false"/>
+		<stopFacility id="para_4342" x="4000.0" y="2000.0" linkRefId="4342" isBlocking="false"/>
+		<stopFacility id="para_4344" x="4000.0" y="4000.0" linkRefId="4344" isBlocking="false"/>
+		<stopFacility id="para_4434" x="3000.0" y="4000.0" linkRefId="4434" isBlocking="false"/>
+		<stopFacility id="para_4443" x="4000.0" y="3000.0" linkRefId="4443" isBlocking="false"/>
+	</transitStops>
+	<transitLine id="Blue Line">
+		<transitRoute id="1to3to1">
+			<transportMode>train</transportMode>
+			<routeProfile>
+				<stop refId="1" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="2a" arrivalOffset="00:03:05" departureOffset="00:03:20" awaitDeparture="false"/>
+				<stop refId="3" arrivalOffset="00:07:05" departureOffset="00:07:20" awaitDeparture="false"/>
+				<stop refId="2b" arrivalOffset="00:11:05" departureOffset="00:11:20" awaitDeparture="false"/>
+				<stop refId="1" arrivalOffset="00:14:25" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="11"/>
+				<link refId="12"/>
+				<link refId="23"/>
+				<link refId="33"/>
+				<link refId="32"/>
+				<link refId="21"/>
+				<link refId="11"/>
+			</route>
+			<departures>
+				<departure id="10001" departureTime="05:00:00" vehicleRefId="tr_0"/>
+				<departure id="10002" departureTime="05:20:00" vehicleRefId="tr_0"/>
+				<departure id="10003" departureTime="05:40:00" vehicleRefId="tr_0"/>
+				<departure id="10004" departureTime="06:00:00" vehicleRefId="tr_0"/>
+				<departure id="10005" departureTime="06:20:00" vehicleRefId="tr_0"/>
+				<departure id="10006" departureTime="06:40:00" vehicleRefId="tr_0"/>
+				<departure id="10007" departureTime="07:00:00" vehicleRefId="tr_0"/>
+				<departure id="10008" departureTime="07:20:00" vehicleRefId="tr_0"/>
+				<departure id="10009" departureTime="07:40:00" vehicleRefId="tr_0"/>
+				<departure id="10010" departureTime="08:00:00" vehicleRefId="tr_0"/>
+				<departure id="10011" departureTime="08:20:00" vehicleRefId="tr_0"/>
+				<departure id="10012" departureTime="08:40:00" vehicleRefId="tr_0"/>
+				<departure id="10013" departureTime="09:00:00" vehicleRefId="tr_0"/>
+				<departure id="10014" departureTime="09:20:00" vehicleRefId="tr_0"/>
+				<departure id="10015" departureTime="09:40:00" vehicleRefId="tr_0"/>
+				<departure id="10016" departureTime="10:00:00" vehicleRefId="tr_0"/>
+				<departure id="10017" departureTime="10:20:00" vehicleRefId="tr_0"/>
+				<departure id="10018" departureTime="10:40:00" vehicleRefId="tr_0"/>
+				<departure id="10019" departureTime="11:00:00" vehicleRefId="tr_0"/>
+				<departure id="10020" departureTime="11:20:00" vehicleRefId="tr_0"/>
+				<departure id="10021" departureTime="11:40:00" vehicleRefId="tr_0"/>
+				<departure id="10022" departureTime="12:00:00" vehicleRefId="tr_0"/>
+				<departure id="10023" departureTime="12:20:00" vehicleRefId="tr_0"/>
+				<departure id="10024" departureTime="12:40:00" vehicleRefId="tr_0"/>
+				<departure id="11001" departureTime="05:10:00" vehicleRefId="tr_10"/>
+				<departure id="11002" departureTime="05:30:00" vehicleRefId="tr_10"/>
+				<departure id="11003" departureTime="05:50:00" vehicleRefId="tr_10"/>
+				<departure id="11004" departureTime="06:10:00" vehicleRefId="tr_10"/>
+				<departure id="11005" departureTime="06:30:00" vehicleRefId="tr_10"/>
+				<departure id="11006" departureTime="06:50:00" vehicleRefId="tr_10"/>
+				<departure id="11007" departureTime="07:10:00" vehicleRefId="tr_10"/>
+				<departure id="11008" departureTime="07:30:00" vehicleRefId="tr_10"/>
+				<departure id="11009" departureTime="07:50:00" vehicleRefId="tr_10"/>
+				<departure id="11010" departureTime="08:10:00" vehicleRefId="tr_10"/>
+				<departure id="11011" departureTime="08:30:00" vehicleRefId="tr_10"/>
+				<departure id="11012" departureTime="08:50:00" vehicleRefId="tr_10"/>
+				<departure id="11013" departureTime="09:10:00" vehicleRefId="tr_10"/>
+				<departure id="11014" departureTime="09:30:00" vehicleRefId="tr_10"/>
+				<departure id="11015" departureTime="09:50:00" vehicleRefId="tr_10"/>
+				<departure id="11016" departureTime="10:10:00" vehicleRefId="tr_10"/>
+				<departure id="11017" departureTime="10:30:00" vehicleRefId="tr_10"/>
+				<departure id="11018" departureTime="10:50:00" vehicleRefId="tr_10"/>
+				<departure id="11019" departureTime="11:10:00" vehicleRefId="tr_10"/>
+				<departure id="11020" departureTime="11:30:00" vehicleRefId="tr_10"/>
+				<departure id="11021" departureTime="11:50:00" vehicleRefId="tr_10"/>
+				<departure id="11022" departureTime="12:10:00" vehicleRefId="tr_10"/>
+				<departure id="11023" departureTime="12:30:00" vehicleRefId="tr_10"/>
+				<departure id="11024" departureTime="12:50:00" vehicleRefId="tr_10"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="para_0_10">
+		<transitRoute id="para_0_10-9_4">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_2414" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:03:45" departureOffset="00:03:45" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:07:06" departureOffset="00:07:06" awaitDeparture="false"/>
+				<stop refId="para_1211" arrivalOffset="00:10:27" departureOffset="00:10:27" awaitDeparture="false"/>
+				<stop refId="para_1121" arrivalOffset="00:14:01" departureOffset="00:14:01" awaitDeparture="false"/>
+				<stop refId="para_2111" arrivalOffset="00:17:22" departureOffset="00:17:22" awaitDeparture="false"/>
+				<stop refId="para_1112" arrivalOffset="00:21:07" departureOffset="00:21:07" awaitDeparture="false"/>
+				<stop refId="para_1213" arrivalOffset="00:24:28" departureOffset="00:24:28" awaitDeparture="false"/>
+				<stop refId="para_1314" arrivalOffset="00:27:49" departureOffset="00:27:49" awaitDeparture="false"/>
+				<stop refId="para_1424" arrivalOffset="00:31:23" departureOffset="00:31:23" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:34:44" departureOffset="00:34:44" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="2414"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1211"/>
+				<link refId="1121"/>
+				<link refId="2111"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+				<link refId="1424"/>
+				<link refId="2414"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="07:30:00" vehicleRefId="para_0_10-9_4-0"/>
+				<departure id="1" departureTime="08:05:44" vehicleRefId="para_0_10-9_4-0"/>
+				<departure id="10" departureTime="13:27:20" vehicleRefId="para_0_10-9_4-0"/>
+				<departure id="11" departureTime="07:47:22" vehicleRefId="para_0_10-9_4-1"/>
+				<departure id="12" departureTime="08:23:06" vehicleRefId="para_0_10-9_4-1"/>
+				<departure id="13" departureTime="08:58:50" vehicleRefId="para_0_10-9_4-1"/>
+				<departure id="14" departureTime="09:34:34" vehicleRefId="para_0_10-9_4-1"/>
+				<departure id="15" departureTime="10:10:18" vehicleRefId="para_0_10-9_4-1"/>
+				<departure id="16" departureTime="10:46:02" vehicleRefId="para_0_10-9_4-1"/>
+				<departure id="17" departureTime="11:21:46" vehicleRefId="para_0_10-9_4-1"/>
+				<departure id="18" departureTime="11:57:30" vehicleRefId="para_0_10-9_4-1"/>
+				<departure id="19" departureTime="12:33:14" vehicleRefId="para_0_10-9_4-1"/>
+				<departure id="2" departureTime="08:41:28" vehicleRefId="para_0_10-9_4-0"/>
+				<departure id="20" departureTime="13:08:58" vehicleRefId="para_0_10-9_4-1"/>
+				<departure id="21" departureTime="13:44:42" vehicleRefId="para_0_10-9_4-1"/>
+				<departure id="3" departureTime="09:17:12" vehicleRefId="para_0_10-9_4-0"/>
+				<departure id="4" departureTime="09:52:56" vehicleRefId="para_0_10-9_4-0"/>
+				<departure id="5" departureTime="10:28:40" vehicleRefId="para_0_10-9_4-0"/>
+				<departure id="6" departureTime="11:04:24" vehicleRefId="para_0_10-9_4-0"/>
+				<departure id="7" departureTime="11:40:08" vehicleRefId="para_0_10-9_4-0"/>
+				<departure id="8" departureTime="12:15:52" vehicleRefId="para_0_10-9_4-0"/>
+				<departure id="9" departureTime="12:51:36" vehicleRefId="para_0_10-9_4-0"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="para_0_10-12_5">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_2414" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:03:45" departureOffset="00:03:45" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:07:06" departureOffset="00:07:06" awaitDeparture="false"/>
+				<stop refId="para_1211" arrivalOffset="00:10:27" departureOffset="00:10:27" awaitDeparture="false"/>
+				<stop refId="para_1121" arrivalOffset="00:14:01" departureOffset="00:14:01" awaitDeparture="false"/>
+				<stop refId="para_2111" arrivalOffset="00:17:22" departureOffset="00:17:22" awaitDeparture="false"/>
+				<stop refId="para_1112" arrivalOffset="00:21:06" departureOffset="00:21:06" awaitDeparture="false"/>
+				<stop refId="para_1213" arrivalOffset="00:24:27" departureOffset="00:24:27" awaitDeparture="false"/>
+				<stop refId="para_1314" arrivalOffset="00:27:48" departureOffset="00:27:48" awaitDeparture="false"/>
+				<stop refId="para_1424" arrivalOffset="00:31:22" departureOffset="00:31:22" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:34:43" departureOffset="00:34:43" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="2414"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1211"/>
+				<link refId="1121"/>
+				<link refId="2111"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+				<link refId="1424"/>
+				<link refId="2414"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="07:30:00" vehicleRefId="para_0_10-12_5-0"/>
+				<departure id="1" departureTime="08:05:43" vehicleRefId="para_0_10-12_5-0"/>
+				<departure id="10" departureTime="13:27:15" vehicleRefId="para_0_10-12_5-0"/>
+				<departure id="2" departureTime="08:41:27" vehicleRefId="para_0_10-12_5-0"/>
+				<departure id="3" departureTime="09:17:10" vehicleRefId="para_0_10-12_5-0"/>
+				<departure id="4" departureTime="09:52:54" vehicleRefId="para_0_10-12_5-0"/>
+				<departure id="5" departureTime="10:28:37" vehicleRefId="para_0_10-12_5-0"/>
+				<departure id="6" departureTime="11:04:21" vehicleRefId="para_0_10-12_5-0"/>
+				<departure id="7" departureTime="11:40:05" vehicleRefId="para_0_10-12_5-0"/>
+				<departure id="8" departureTime="12:15:48" vehicleRefId="para_0_10-12_5-0"/>
+				<departure id="9" departureTime="12:51:32" vehicleRefId="para_0_10-12_5-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="para_0_2">
+		<transitRoute id="para_0_2-13_10">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_1314" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:03:20" departureOffset="00:03:20" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:06:40" departureOffset="00:06:40" awaitDeparture="false"/>
+				<stop refId="para_1222" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="false"/>
+				<stop refId="para_2232" arrivalOffset="00:13:20" departureOffset="00:13:20" awaitDeparture="false"/>
+				<stop refId="para_3242" arrivalOffset="00:16:40" departureOffset="00:16:40" awaitDeparture="false"/>
+				<stop refId="para_4241" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="false"/>
+				<stop refId="para_4131" arrivalOffset="00:23:20" departureOffset="00:23:20" awaitDeparture="false"/>
+				<stop refId="para_3121" arrivalOffset="00:26:40" departureOffset="00:26:40" awaitDeparture="false"/>
+				<stop refId="para_2111" arrivalOffset="00:30:00" departureOffset="00:30:00" awaitDeparture="false"/>
+				<stop refId="para_1112" arrivalOffset="00:33:20" departureOffset="00:33:20" awaitDeparture="false"/>
+				<stop refId="para_1213" arrivalOffset="00:36:40" departureOffset="00:36:40" awaitDeparture="false"/>
+				<stop refId="para_1314" arrivalOffset="00:40:00" departureOffset="00:40:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="1314"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1222"/>
+				<link refId="2232"/>
+				<link refId="3242"/>
+				<link refId="4241"/>
+				<link refId="4131"/>
+				<link refId="3121"/>
+				<link refId="2111"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="12:30:00" vehicleRefId="para_0_2-13_10-0"/>
+				<departure id="1" departureTime="13:11:00" vehicleRefId="para_0_2-13_10-0"/>
+				<departure id="2" departureTime="13:52:00" vehicleRefId="para_0_2-13_10-0"/>
+				<departure id="3" departureTime="14:33:00" vehicleRefId="para_0_2-13_10-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="para_0_3">
+		<transitRoute id="para_0_3-8_6">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_1314" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:03:27" departureOffset="00:03:27" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:06:48" departureOffset="00:06:48" awaitDeparture="false"/>
+				<stop refId="para_1211" arrivalOffset="00:10:09" departureOffset="00:10:09" awaitDeparture="false"/>
+				<stop refId="para_1121" arrivalOffset="00:13:36" departureOffset="00:13:36" awaitDeparture="false"/>
+				<stop refId="para_2111" arrivalOffset="00:16:57" departureOffset="00:16:57" awaitDeparture="false"/>
+				<stop refId="para_1112" arrivalOffset="00:20:30" departureOffset="00:20:30" awaitDeparture="false"/>
+				<stop refId="para_1213" arrivalOffset="00:23:51" departureOffset="00:23:51" awaitDeparture="false"/>
+				<stop refId="para_1314" arrivalOffset="00:27:12" departureOffset="00:27:12" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="1314"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1211"/>
+				<link refId="1121"/>
+				<link refId="2111"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="10:30:00" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="1" departureTime="10:58:12" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="10" departureTime="15:12:03" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="11" departureTime="15:40:15" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="12" departureTime="16:08:27" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="13" departureTime="16:36:40" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="14" departureTime="17:04:52" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="15" departureTime="17:33:04" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="16" departureTime="18:01:17" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="2" departureTime="11:26:24" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="3" departureTime="11:54:36" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="4" departureTime="12:22:49" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="5" departureTime="12:51:01" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="6" departureTime="13:19:13" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="7" departureTime="13:47:26" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="8" departureTime="14:15:38" vehicleRefId="para_0_3-8_6-0"/>
+				<departure id="9" departureTime="14:43:50" vehicleRefId="para_0_3-8_6-0"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="para_0_3-13_9">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_1314" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:03:20" departureOffset="00:03:20" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:06:40" departureOffset="00:06:40" awaitDeparture="false"/>
+				<stop refId="para_1211" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="false"/>
+				<stop refId="para_1121" arrivalOffset="00:13:20" departureOffset="00:13:20" awaitDeparture="false"/>
+				<stop refId="para_2111" arrivalOffset="00:16:40" departureOffset="00:16:40" awaitDeparture="false"/>
+				<stop refId="para_1112" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="false"/>
+				<stop refId="para_1213" arrivalOffset="00:23:20" departureOffset="00:23:20" awaitDeparture="false"/>
+				<stop refId="para_1314" arrivalOffset="00:26:40" departureOffset="00:26:40" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="1314"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1211"/>
+				<link refId="1121"/>
+				<link refId="2111"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="07:30:00" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="1" departureTime="07:57:40" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="10" departureTime="12:06:40" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="11" departureTime="12:34:20" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="12" departureTime="13:02:00" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="13" departureTime="13:29:40" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="14" departureTime="13:57:20" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="15" departureTime="14:25:00" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="16" departureTime="14:52:40" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="17" departureTime="15:20:20" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="18" departureTime="15:48:00" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="19" departureTime="16:15:40" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="2" departureTime="08:25:20" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="20" departureTime="16:43:20" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="21" departureTime="17:11:00" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="22" departureTime="17:38:40" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="23" departureTime="18:06:20" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="3" departureTime="08:53:00" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="4" departureTime="09:20:40" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="5" departureTime="09:48:20" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="6" departureTime="10:16:00" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="7" departureTime="10:43:40" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="8" departureTime="11:11:20" vehicleRefId="para_0_3-13_9-0"/>
+				<departure id="9" departureTime="11:39:00" vehicleRefId="para_0_3-13_9-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="para_0_4">
+		<transitRoute id="para_0_4-0_0">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_3444" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_4434" arrivalOffset="00:03:21" departureOffset="00:03:21" awaitDeparture="false"/>
+				<stop refId="para_3433" arrivalOffset="00:06:51" departureOffset="00:06:51" awaitDeparture="false"/>
+				<stop refId="para_3332" arrivalOffset="00:10:12" departureOffset="00:10:12" awaitDeparture="false"/>
+				<stop refId="para_3231" arrivalOffset="00:13:33" departureOffset="00:13:33" awaitDeparture="false"/>
+				<stop refId="para_3141" arrivalOffset="00:16:54" departureOffset="00:16:54" awaitDeparture="false"/>
+				<stop refId="para_4131" arrivalOffset="00:20:29" departureOffset="00:20:29" awaitDeparture="false"/>
+				<stop refId="para_3132" arrivalOffset="00:23:51" departureOffset="00:23:51" awaitDeparture="false"/>
+				<stop refId="para_3233" arrivalOffset="00:27:15" departureOffset="00:27:15" awaitDeparture="false"/>
+				<stop refId="para_3334" arrivalOffset="00:30:36" departureOffset="00:30:36" awaitDeparture="false"/>
+				<stop refId="para_3444" arrivalOffset="00:33:57" departureOffset="00:33:57" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="3444"/>
+				<link refId="4434"/>
+				<link refId="3433"/>
+				<link refId="3332"/>
+				<link refId="3231"/>
+				<link refId="3141"/>
+				<link refId="4131"/>
+				<link refId="3132"/>
+				<link refId="3233"/>
+				<link refId="3334"/>
+				<link refId="3444"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="06:15:00" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="1" departureTime="06:49:57" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="10" departureTime="12:04:30" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="11" departureTime="12:39:27" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="12" departureTime="13:14:24" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="13" departureTime="13:49:21" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="14" departureTime="14:24:18" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="15" departureTime="14:59:15" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="16" departureTime="15:34:12" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="17" departureTime="16:09:09" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="18" departureTime="16:44:06" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="19" departureTime="17:19:04" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="2" departureTime="07:24:54" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="20" departureTime="17:54:01" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="21" departureTime="18:28:58" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="22" departureTime="19:03:55" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="23" departureTime="19:38:52" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="24" departureTime="20:13:49" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="25" departureTime="20:48:46" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="26" departureTime="21:23:43" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="27" departureTime="21:58:40" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="3" departureTime="07:59:51" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="4" departureTime="08:34:48" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="5" departureTime="09:09:45" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="6" departureTime="09:44:42" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="7" departureTime="10:19:39" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="8" departureTime="10:54:36" vehicleRefId="para_0_4-0_0-0"/>
+				<departure id="9" departureTime="11:29:33" vehicleRefId="para_0_4-0_0-0"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="para_0_4-2_1">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_4434" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_3433" arrivalOffset="00:03:29" departureOffset="00:03:29" awaitDeparture="false"/>
+				<stop refId="para_3332" arrivalOffset="00:06:50" departureOffset="00:06:50" awaitDeparture="false"/>
+				<stop refId="para_3231" arrivalOffset="00:10:11" departureOffset="00:10:11" awaitDeparture="false"/>
+				<stop refId="para_3141" arrivalOffset="00:13:33" departureOffset="00:13:33" awaitDeparture="false"/>
+				<stop refId="para_4142" arrivalOffset="00:17:06" departureOffset="00:17:06" awaitDeparture="false"/>
+				<stop refId="para_4243" arrivalOffset="00:20:29" departureOffset="00:20:29" awaitDeparture="false"/>
+				<stop refId="para_4344" arrivalOffset="00:23:50" departureOffset="00:23:50" awaitDeparture="false"/>
+				<stop refId="para_4434" arrivalOffset="00:27:20" departureOffset="00:27:20" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="4434"/>
+				<link refId="3433"/>
+				<link refId="3332"/>
+				<link refId="3231"/>
+				<link refId="3141"/>
+				<link refId="4142"/>
+				<link refId="4243"/>
+				<link refId="4344"/>
+				<link refId="4434"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="06:30:00" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="1" departureTime="06:58:20" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="10" departureTime="11:13:28" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="100" departureTime="19:48:42" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="101" departureTime="20:17:03" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="102" departureTime="20:45:23" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="103" departureTime="21:13:44" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="104" departureTime="21:42:05" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="105" departureTime="22:10:26" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="106" departureTime="22:38:47" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="107" departureTime="23:07:08" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="108" departureTime="06:37:27" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="109" departureTime="07:05:47" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="11" departureTime="11:41:49" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="110" departureTime="07:34:08" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="111" departureTime="08:02:29" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="112" departureTime="08:30:50" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="113" departureTime="08:59:11" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="114" departureTime="09:27:32" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="115" departureTime="09:55:53" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="116" departureTime="10:24:13" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="117" departureTime="10:52:34" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="118" departureTime="11:20:55" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="119" departureTime="11:49:16" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="12" departureTime="12:10:10" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="120" departureTime="12:17:37" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="121" departureTime="12:45:58" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="122" departureTime="13:14:19" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="123" departureTime="13:42:39" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="124" departureTime="14:11:00" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="125" departureTime="14:39:21" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="126" departureTime="15:07:42" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="127" departureTime="15:36:03" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="128" departureTime="16:04:24" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="129" departureTime="16:32:45" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="13" departureTime="12:38:31" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="130" departureTime="17:01:06" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="131" departureTime="17:29:26" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="132" departureTime="17:57:47" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="133" departureTime="18:26:08" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="134" departureTime="18:54:29" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="135" departureTime="19:22:50" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="136" departureTime="19:51:11" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="137" departureTime="20:19:32" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="138" departureTime="20:47:52" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="139" departureTime="21:16:13" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="14" departureTime="13:06:52" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="140" departureTime="21:44:34" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="141" departureTime="22:12:55" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="142" departureTime="22:41:16" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="143" departureTime="23:09:37" vehicleRefId="para_0_4-2_1-3"/>
+				<departure id="144" departureTime="06:39:56" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="145" departureTime="07:08:16" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="146" departureTime="07:36:37" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="147" departureTime="08:04:58" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="148" departureTime="08:33:19" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="149" departureTime="09:01:40" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="15" departureTime="13:35:12" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="150" departureTime="09:30:01" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="151" departureTime="09:58:22" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="152" departureTime="10:26:42" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="153" departureTime="10:55:03" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="154" departureTime="11:23:24" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="155" departureTime="11:51:45" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="156" departureTime="12:20:06" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="157" departureTime="12:48:27" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="158" departureTime="13:16:48" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="159" departureTime="13:45:08" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="16" departureTime="14:03:33" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="160" departureTime="14:13:29" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="161" departureTime="14:41:50" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="162" departureTime="15:10:11" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="163" departureTime="15:38:32" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="164" departureTime="16:06:53" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="165" departureTime="16:35:14" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="166" departureTime="17:03:35" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="167" departureTime="17:31:55" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="168" departureTime="18:00:16" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="169" departureTime="18:28:37" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="17" departureTime="14:31:54" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="170" departureTime="18:56:58" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="171" departureTime="19:25:19" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="172" departureTime="19:53:40" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="173" departureTime="20:22:01" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="174" departureTime="20:50:21" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="175" departureTime="21:18:42" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="176" departureTime="21:47:03" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="177" departureTime="22:15:24" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="178" departureTime="22:43:45" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="179" departureTime="23:12:06" vehicleRefId="para_0_4-2_1-4"/>
+				<departure id="18" departureTime="15:00:15" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="180" departureTime="06:42:25" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="181" departureTime="07:10:45" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="182" departureTime="07:39:06" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="183" departureTime="08:07:27" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="184" departureTime="08:35:48" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="185" departureTime="09:04:09" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="186" departureTime="09:32:30" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="187" departureTime="10:00:51" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="188" departureTime="10:29:11" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="189" departureTime="10:57:32" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="19" departureTime="15:28:36" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="190" departureTime="11:25:53" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="191" departureTime="11:54:14" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="192" departureTime="12:22:35" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="193" departureTime="12:50:56" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="194" departureTime="13:19:17" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="195" departureTime="13:47:37" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="196" departureTime="14:15:58" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="197" departureTime="14:44:19" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="198" departureTime="15:12:40" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="199" departureTime="15:41:01" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="2" departureTime="07:26:41" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="20" departureTime="15:56:57" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="200" departureTime="16:09:22" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="201" departureTime="16:37:43" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="202" departureTime="17:06:04" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="203" departureTime="17:34:24" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="204" departureTime="18:02:45" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="205" departureTime="18:31:06" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="206" departureTime="18:59:27" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="207" departureTime="19:27:48" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="208" departureTime="19:56:09" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="209" departureTime="20:24:30" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="21" departureTime="16:25:18" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="210" departureTime="20:52:50" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="211" departureTime="21:21:11" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="212" departureTime="21:49:32" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="213" departureTime="22:17:53" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="214" departureTime="22:46:14" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="215" departureTime="23:14:35" vehicleRefId="para_0_4-2_1-5"/>
+				<departure id="216" departureTime="06:44:54" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="217" departureTime="07:13:14" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="218" departureTime="07:41:35" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="219" departureTime="08:09:56" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="22" departureTime="16:53:39" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="220" departureTime="08:38:17" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="221" departureTime="09:06:38" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="222" departureTime="09:34:59" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="223" departureTime="10:03:20" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="224" departureTime="10:31:40" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="225" departureTime="11:00:01" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="226" departureTime="11:28:22" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="227" departureTime="11:56:43" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="228" departureTime="12:25:04" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="229" departureTime="12:53:25" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="23" departureTime="17:21:59" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="230" departureTime="13:21:46" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="231" departureTime="13:50:06" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="232" departureTime="14:18:27" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="233" departureTime="14:46:48" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="234" departureTime="15:15:09" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="235" departureTime="15:43:30" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="236" departureTime="16:11:51" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="237" departureTime="16:40:12" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="238" departureTime="17:08:33" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="239" departureTime="17:36:53" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="24" departureTime="17:50:20" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="240" departureTime="18:05:14" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="241" departureTime="18:33:35" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="242" departureTime="19:01:56" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="243" departureTime="19:30:17" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="244" departureTime="19:58:38" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="245" departureTime="20:26:59" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="246" departureTime="20:55:19" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="247" departureTime="21:23:40" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="248" departureTime="21:52:01" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="249" departureTime="22:20:22" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="25" departureTime="18:18:41" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="250" departureTime="22:48:43" vehicleRefId="para_0_4-2_1-6"/>
+				<departure id="251" departureTime="06:47:23" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="252" departureTime="07:15:43" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="253" departureTime="07:44:04" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="254" departureTime="08:12:25" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="255" departureTime="08:40:46" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="256" departureTime="09:09:07" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="257" departureTime="09:37:28" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="258" departureTime="10:05:49" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="259" departureTime="10:34:09" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="26" departureTime="18:47:02" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="260" departureTime="11:02:30" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="261" departureTime="11:30:51" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="262" departureTime="11:59:12" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="263" departureTime="12:27:33" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="264" departureTime="12:55:54" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="265" departureTime="13:24:15" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="266" departureTime="13:52:35" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="267" departureTime="14:20:56" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="268" departureTime="14:49:17" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="269" departureTime="15:17:38" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="27" departureTime="19:15:23" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="270" departureTime="15:45:59" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="271" departureTime="16:14:20" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="272" departureTime="16:42:41" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="273" departureTime="17:11:02" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="274" departureTime="17:39:22" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="275" departureTime="18:07:43" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="276" departureTime="18:36:04" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="277" departureTime="19:04:25" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="278" departureTime="19:32:46" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="279" departureTime="20:01:07" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="28" departureTime="19:43:44" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="280" departureTime="20:29:28" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="281" departureTime="20:57:48" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="282" departureTime="21:26:09" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="283" departureTime="21:54:30" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="284" departureTime="22:22:51" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="285" departureTime="22:51:12" vehicleRefId="para_0_4-2_1-7"/>
+				<departure id="286" departureTime="06:49:52" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="287" departureTime="07:18:12" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="288" departureTime="07:46:33" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="289" departureTime="08:14:54" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="29" departureTime="20:12:05" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="290" departureTime="08:43:15" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="291" departureTime="09:11:36" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="292" departureTime="09:39:57" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="293" departureTime="10:08:18" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="294" departureTime="10:36:38" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="295" departureTime="11:04:59" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="296" departureTime="11:33:20" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="297" departureTime="12:01:41" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="298" departureTime="12:30:02" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="299" departureTime="12:58:23" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="3" departureTime="07:55:02" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="30" departureTime="20:40:25" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="300" departureTime="13:26:44" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="301" departureTime="13:55:04" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="302" departureTime="14:23:25" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="303" departureTime="14:51:46" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="304" departureTime="15:20:07" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="305" departureTime="15:48:28" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="306" departureTime="16:16:49" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="307" departureTime="16:45:10" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="308" departureTime="17:13:31" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="309" departureTime="17:41:51" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="31" departureTime="21:08:46" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="310" departureTime="18:10:12" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="311" departureTime="18:38:33" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="312" departureTime="19:06:54" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="313" departureTime="19:35:15" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="314" departureTime="20:03:36" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="315" departureTime="20:31:57" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="316" departureTime="21:00:17" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="317" departureTime="21:28:38" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="318" departureTime="21:56:59" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="319" departureTime="22:25:20" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="32" departureTime="21:37:07" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="320" departureTime="22:53:41" vehicleRefId="para_0_4-2_1-8"/>
+				<departure id="321" departureTime="06:52:21" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="322" departureTime="07:20:41" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="323" departureTime="07:49:02" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="324" departureTime="08:17:23" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="325" departureTime="08:45:44" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="326" departureTime="09:14:05" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="327" departureTime="09:42:26" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="328" departureTime="10:10:47" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="329" departureTime="10:39:07" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="33" departureTime="22:05:28" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="330" departureTime="11:07:28" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="331" departureTime="11:35:49" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="332" departureTime="12:04:10" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="333" departureTime="12:32:31" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="334" departureTime="13:00:52" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="335" departureTime="13:29:13" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="336" departureTime="13:57:33" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="337" departureTime="14:25:54" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="338" departureTime="14:54:15" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="339" departureTime="15:22:36" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="34" departureTime="22:33:49" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="340" departureTime="15:50:57" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="341" departureTime="16:19:18" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="342" departureTime="16:47:39" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="343" departureTime="17:16:00" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="344" departureTime="17:44:20" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="345" departureTime="18:12:41" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="346" departureTime="18:41:02" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="347" departureTime="19:09:23" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="348" departureTime="19:37:44" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="349" departureTime="20:06:05" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="35" departureTime="23:02:10" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="350" departureTime="20:34:26" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="351" departureTime="21:02:46" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="352" departureTime="21:31:07" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="353" departureTime="21:59:28" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="354" departureTime="22:27:49" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="355" departureTime="22:56:10" vehicleRefId="para_0_4-2_1-9"/>
+				<departure id="356" departureTime="06:54:50" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="357" departureTime="07:23:10" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="358" departureTime="07:51:31" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="359" departureTime="08:19:52" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="36" departureTime="06:32:29" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="360" departureTime="08:48:13" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="361" departureTime="09:16:34" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="362" departureTime="09:44:55" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="363" departureTime="10:13:16" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="364" departureTime="10:41:36" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="365" departureTime="11:09:57" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="366" departureTime="11:38:18" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="367" departureTime="12:06:39" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="368" departureTime="12:35:00" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="369" departureTime="13:03:21" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="37" departureTime="07:00:49" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="370" departureTime="13:31:42" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="371" departureTime="14:00:02" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="372" departureTime="14:28:23" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="373" departureTime="14:56:44" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="374" departureTime="15:25:05" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="375" departureTime="15:53:26" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="376" departureTime="16:21:47" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="377" departureTime="16:50:08" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="378" departureTime="17:18:29" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="379" departureTime="17:46:49" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="38" departureTime="07:29:10" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="380" departureTime="18:15:10" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="381" departureTime="18:43:31" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="382" departureTime="19:11:52" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="383" departureTime="19:40:13" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="384" departureTime="20:08:34" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="385" departureTime="20:36:55" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="386" departureTime="21:05:15" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="387" departureTime="21:33:36" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="388" departureTime="22:01:57" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="389" departureTime="22:30:18" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="39" departureTime="07:57:31" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="390" departureTime="22:58:39" vehicleRefId="para_0_4-2_1-10"/>
+				<departure id="4" departureTime="08:23:23" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="40" departureTime="08:25:52" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="41" departureTime="08:54:13" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="42" departureTime="09:22:34" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="43" departureTime="09:50:55" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="44" departureTime="10:19:15" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="45" departureTime="10:47:36" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="46" departureTime="11:15:57" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="47" departureTime="11:44:18" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="48" departureTime="12:12:39" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="49" departureTime="12:41:00" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="5" departureTime="08:51:44" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="50" departureTime="13:09:21" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="51" departureTime="13:37:41" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="52" departureTime="14:06:02" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="53" departureTime="14:34:23" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="54" departureTime="15:02:44" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="55" departureTime="15:31:05" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="56" departureTime="15:59:26" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="57" departureTime="16:27:47" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="58" departureTime="16:56:08" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="59" departureTime="17:24:28" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="6" departureTime="09:20:05" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="60" departureTime="17:52:49" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="61" departureTime="18:21:10" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="62" departureTime="18:49:31" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="63" departureTime="19:17:52" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="64" departureTime="19:46:13" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="65" departureTime="20:14:34" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="66" departureTime="20:42:54" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="67" departureTime="21:11:15" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="68" departureTime="21:39:36" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="69" departureTime="22:07:57" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="7" departureTime="09:48:26" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="70" departureTime="22:36:18" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="71" departureTime="23:04:39" vehicleRefId="para_0_4-2_1-1"/>
+				<departure id="72" departureTime="06:34:58" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="73" departureTime="07:03:18" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="74" departureTime="07:31:39" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="75" departureTime="08:00:00" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="76" departureTime="08:28:21" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="77" departureTime="08:56:42" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="78" departureTime="09:25:03" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="79" departureTime="09:53:24" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="8" departureTime="10:16:46" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="80" departureTime="10:21:44" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="81" departureTime="10:50:05" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="82" departureTime="11:18:26" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="83" departureTime="11:46:47" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="84" departureTime="12:15:08" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="85" departureTime="12:43:29" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="86" departureTime="13:11:50" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="87" departureTime="13:40:10" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="88" departureTime="14:08:31" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="89" departureTime="14:36:52" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="9" departureTime="10:45:07" vehicleRefId="para_0_4-2_1-0"/>
+				<departure id="90" departureTime="15:05:13" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="91" departureTime="15:33:34" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="92" departureTime="16:01:55" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="93" departureTime="16:30:16" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="94" departureTime="16:58:37" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="95" departureTime="17:26:57" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="96" departureTime="17:55:18" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="97" departureTime="18:23:39" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="98" departureTime="18:52:00" vehicleRefId="para_0_4-2_1-2"/>
+				<departure id="99" departureTime="19:20:21" vehicleRefId="para_0_4-2_1-2"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="para_0_4-10_10">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_4434" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_3433" arrivalOffset="00:03:29" departureOffset="00:03:29" awaitDeparture="false"/>
+				<stop refId="para_3332" arrivalOffset="00:06:50" departureOffset="00:06:50" awaitDeparture="false"/>
+				<stop refId="para_3231" arrivalOffset="00:10:11" departureOffset="00:10:11" awaitDeparture="false"/>
+				<stop refId="para_3141" arrivalOffset="00:13:33" departureOffset="00:13:33" awaitDeparture="false"/>
+				<stop refId="para_4142" arrivalOffset="00:17:06" departureOffset="00:17:06" awaitDeparture="false"/>
+				<stop refId="para_4243" arrivalOffset="00:20:29" departureOffset="00:20:29" awaitDeparture="false"/>
+				<stop refId="para_4344" arrivalOffset="00:23:50" departureOffset="00:23:50" awaitDeparture="false"/>
+				<stop refId="para_4434" arrivalOffset="00:27:19" departureOffset="00:27:19" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="4434"/>
+				<link refId="3433"/>
+				<link refId="3332"/>
+				<link refId="3231"/>
+				<link refId="3141"/>
+				<link refId="4142"/>
+				<link refId="4243"/>
+				<link refId="4344"/>
+				<link refId="4434"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="06:00:00" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="1" departureTime="06:28:19" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="10" departureTime="10:43:16" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="100" departureTime="18:34:43" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="101" departureTime="19:03:02" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="102" departureTime="19:31:22" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="103" departureTime="19:59:42" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="104" departureTime="20:28:01" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="105" departureTime="20:56:21" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="106" departureTime="21:24:41" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="107" departureTime="21:53:01" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="108" departureTime="22:21:20" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="109" departureTime="22:49:40" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="11" departureTime="11:11:36" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="12" departureTime="11:39:55" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="13" departureTime="12:08:15" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="14" departureTime="12:36:35" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="15" departureTime="13:04:54" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="16" departureTime="13:33:14" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="17" departureTime="14:01:34" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="18" departureTime="14:29:53" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="19" departureTime="14:58:13" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="2" departureTime="06:56:39" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="20" departureTime="15:26:33" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="21" departureTime="15:54:52" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="22" departureTime="16:23:12" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="23" departureTime="16:51:32" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="24" departureTime="17:19:51" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="25" departureTime="17:48:11" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="26" departureTime="18:16:31" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="27" departureTime="18:44:50" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="28" departureTime="19:13:10" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="29" departureTime="19:41:30" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="3" departureTime="07:24:59" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="30" departureTime="20:09:49" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="31" departureTime="20:38:09" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="32" departureTime="21:06:29" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="33" departureTime="21:34:49" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="34" departureTime="22:03:08" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="35" departureTime="22:31:28" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="36" departureTime="22:59:48" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="37" departureTime="06:09:06" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="38" departureTime="06:37:25" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="39" departureTime="07:05:45" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="4" departureTime="07:53:18" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="40" departureTime="07:34:05" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="41" departureTime="08:02:24" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="42" departureTime="08:30:44" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="43" departureTime="08:59:04" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="44" departureTime="09:27:23" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="45" departureTime="09:55:43" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="46" departureTime="10:24:03" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="47" departureTime="10:52:22" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="48" departureTime="11:20:42" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="49" departureTime="11:49:01" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="5" departureTime="08:21:38" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="50" departureTime="12:17:21" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="51" departureTime="12:45:41" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="52" departureTime="13:14:00" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="53" departureTime="13:42:20" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="54" departureTime="14:10:40" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="55" departureTime="14:38:59" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="56" departureTime="15:07:19" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="57" departureTime="15:35:39" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="58" departureTime="16:03:58" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="59" departureTime="16:32:18" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="6" departureTime="08:49:58" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="60" departureTime="17:00:38" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="61" departureTime="17:28:57" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="62" departureTime="17:57:17" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="63" departureTime="18:25:37" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="64" departureTime="18:53:56" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="65" departureTime="19:22:16" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="66" departureTime="19:50:36" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="67" departureTime="20:18:55" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="68" departureTime="20:47:15" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="69" departureTime="21:15:35" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="7" departureTime="09:18:17" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="70" departureTime="21:43:55" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="71" departureTime="22:12:14" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="72" departureTime="22:40:34" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="73" departureTime="23:08:54" vehicleRefId="para_0_4-10_10-1"/>
+				<departure id="74" departureTime="06:18:12" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="75" departureTime="06:46:31" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="76" departureTime="07:14:51" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="77" departureTime="07:43:11" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="78" departureTime="08:11:30" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="79" departureTime="08:39:50" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="8" departureTime="09:46:37" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="80" departureTime="09:08:10" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="81" departureTime="09:36:29" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="82" departureTime="10:04:49" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="83" departureTime="10:33:09" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="84" departureTime="11:01:28" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="85" departureTime="11:29:48" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="86" departureTime="11:58:07" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="87" departureTime="12:26:27" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="88" departureTime="12:54:47" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="89" departureTime="13:23:06" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="9" departureTime="10:14:57" vehicleRefId="para_0_4-10_10-0"/>
+				<departure id="90" departureTime="13:51:26" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="91" departureTime="14:19:46" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="92" departureTime="14:48:05" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="93" departureTime="15:16:25" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="94" departureTime="15:44:45" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="95" departureTime="16:13:04" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="96" departureTime="16:41:24" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="97" departureTime="17:09:44" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="98" departureTime="17:38:03" vehicleRefId="para_0_4-10_10-2"/>
+				<departure id="99" departureTime="18:06:23" vehicleRefId="para_0_4-10_10-2"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="para_0_4-10_11">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_1424" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_2434" arrivalOffset="00:03:21" departureOffset="00:03:21" awaitDeparture="false"/>
+				<stop refId="para_3444" arrivalOffset="00:06:46" departureOffset="00:06:46" awaitDeparture="false"/>
+				<stop refId="para_4434" arrivalOffset="00:10:07" departureOffset="00:10:07" awaitDeparture="false"/>
+				<stop refId="para_3433" arrivalOffset="00:13:33" departureOffset="00:13:33" awaitDeparture="false"/>
+				<stop refId="para_3332" arrivalOffset="00:16:54" departureOffset="00:16:54" awaitDeparture="false"/>
+				<stop refId="para_3231" arrivalOffset="00:20:15" departureOffset="00:20:15" awaitDeparture="false"/>
+				<stop refId="para_3141" arrivalOffset="00:23:37" departureOffset="00:23:37" awaitDeparture="false"/>
+				<stop refId="para_4142" arrivalOffset="00:27:08" departureOffset="00:27:08" awaitDeparture="false"/>
+				<stop refId="para_4243" arrivalOffset="00:30:32" departureOffset="00:30:32" awaitDeparture="false"/>
+				<stop refId="para_4344" arrivalOffset="00:33:53" departureOffset="00:33:53" awaitDeparture="false"/>
+				<stop refId="para_4434" arrivalOffset="00:37:36" departureOffset="00:37:36" awaitDeparture="false"/>
+				<stop refId="para_3424" arrivalOffset="00:40:57" departureOffset="00:40:57" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:44:18" departureOffset="00:44:18" awaitDeparture="false"/>
+				<stop refId="para_1424" arrivalOffset="00:47:52" departureOffset="00:47:52" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="1424"/>
+				<link refId="2434"/>
+				<link refId="3444"/>
+				<link refId="4434"/>
+				<link refId="3433"/>
+				<link refId="3332"/>
+				<link refId="3231"/>
+				<link refId="3141"/>
+				<link refId="4142"/>
+				<link refId="4243"/>
+				<link refId="4344"/>
+				<link refId="4434"/>
+				<link refId="3424"/>
+				<link refId="2414"/>
+				<link refId="1424"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="06:30:00" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="1" departureTime="07:18:52" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="10" departureTime="14:38:43" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="11" departureTime="15:27:36" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="12" departureTime="16:16:28" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="13" departureTime="17:05:20" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="14" departureTime="17:54:13" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="15" departureTime="18:43:05" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="16" departureTime="19:31:58" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="17" departureTime="20:20:50" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="18" departureTime="21:09:42" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="19" departureTime="21:58:35" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="2" departureTime="08:07:44" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="20" departureTime="22:47:27" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="21" departureTime="23:36:19" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="22" departureTime="06:53:56" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="23" departureTime="07:42:48" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="24" departureTime="08:31:40" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="25" departureTime="09:20:33" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="26" departureTime="10:09:25" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="27" departureTime="10:58:17" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="28" departureTime="11:47:10" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="29" departureTime="12:36:02" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="3" departureTime="08:56:37" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="30" departureTime="13:24:55" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="31" departureTime="14:13:47" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="32" departureTime="15:02:39" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="33" departureTime="15:51:32" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="34" departureTime="16:40:24" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="35" departureTime="17:29:16" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="36" departureTime="18:18:09" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="37" departureTime="19:07:01" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="38" departureTime="19:55:54" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="39" departureTime="20:44:46" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="4" departureTime="09:45:29" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="40" departureTime="21:33:38" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="41" departureTime="22:22:31" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="42" departureTime="23:11:23" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="5" departureTime="10:34:21" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="6" departureTime="11:23:14" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="7" departureTime="12:12:06" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="8" departureTime="13:00:59" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="9" departureTime="13:49:51" vehicleRefId="para_0_4-10_11-0"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="para_0_4-13_13">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_1424" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_2434" arrivalOffset="00:03:20" departureOffset="00:03:20" awaitDeparture="false"/>
+				<stop refId="para_3444" arrivalOffset="00:06:40" departureOffset="00:06:40" awaitDeparture="false"/>
+				<stop refId="para_4434" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="false"/>
+				<stop refId="para_3433" arrivalOffset="00:13:20" departureOffset="00:13:20" awaitDeparture="false"/>
+				<stop refId="para_3332" arrivalOffset="00:16:40" departureOffset="00:16:40" awaitDeparture="false"/>
+				<stop refId="para_3231" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="false"/>
+				<stop refId="para_3141" arrivalOffset="00:23:20" departureOffset="00:23:20" awaitDeparture="false"/>
+				<stop refId="para_4142" arrivalOffset="00:26:40" departureOffset="00:26:40" awaitDeparture="false"/>
+				<stop refId="para_4243" arrivalOffset="00:30:00" departureOffset="00:30:00" awaitDeparture="false"/>
+				<stop refId="para_4344" arrivalOffset="00:33:20" departureOffset="00:33:20" awaitDeparture="false"/>
+				<stop refId="para_4434" arrivalOffset="00:36:40" departureOffset="00:36:40" awaitDeparture="false"/>
+				<stop refId="para_3424" arrivalOffset="00:40:00" departureOffset="00:40:00" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:43:20" departureOffset="00:43:20" awaitDeparture="false"/>
+				<stop refId="para_1424" arrivalOffset="00:46:40" departureOffset="00:46:40" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="1424"/>
+				<link refId="2434"/>
+				<link refId="3444"/>
+				<link refId="4434"/>
+				<link refId="3433"/>
+				<link refId="3332"/>
+				<link refId="3231"/>
+				<link refId="3141"/>
+				<link refId="4142"/>
+				<link refId="4243"/>
+				<link refId="4344"/>
+				<link refId="4434"/>
+				<link refId="3424"/>
+				<link refId="2414"/>
+				<link refId="1424"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="06:30:00" vehicleRefId="para_0_4-13_13-0"/>
+				<departure id="1" departureTime="07:17:40" vehicleRefId="para_0_4-13_13-0"/>
+				<departure id="2" departureTime="08:05:20" vehicleRefId="para_0_4-13_13-0"/>
+				<departure id="3" departureTime="08:53:00" vehicleRefId="para_0_4-13_13-0"/>
+				<departure id="4" departureTime="09:40:40" vehicleRefId="para_0_4-13_13-0"/>
+				<departure id="5" departureTime="10:28:20" vehicleRefId="para_0_4-13_13-0"/>
+				<departure id="6" departureTime="11:16:00" vehicleRefId="para_0_4-13_13-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="para_0_6">
+		<transitRoute id="para_0_6-0_0">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_4241" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_4131" arrivalOffset="00:03:35" departureOffset="00:03:35" awaitDeparture="false"/>
+				<stop refId="para_3121" arrivalOffset="00:06:59" departureOffset="00:06:59" awaitDeparture="false"/>
+				<stop refId="para_2111" arrivalOffset="00:10:20" departureOffset="00:10:20" awaitDeparture="false"/>
+				<stop refId="para_1112" arrivalOffset="00:13:49" departureOffset="00:13:49" awaitDeparture="false"/>
+				<stop refId="para_1213" arrivalOffset="00:17:10" departureOffset="00:17:10" awaitDeparture="false"/>
+				<stop refId="para_1314" arrivalOffset="00:20:31" departureOffset="00:20:31" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:24:07" departureOffset="00:24:07" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:27:28" departureOffset="00:27:28" awaitDeparture="false"/>
+				<stop refId="para_1222" arrivalOffset="00:30:49" departureOffset="00:30:49" awaitDeparture="false"/>
+				<stop refId="para_2232" arrivalOffset="00:34:10" departureOffset="00:34:10" awaitDeparture="false"/>
+				<stop refId="para_3242" arrivalOffset="00:37:32" departureOffset="00:37:32" awaitDeparture="false"/>
+				<stop refId="para_4241" arrivalOffset="00:40:56" departureOffset="00:40:56" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="4241"/>
+				<link refId="4131"/>
+				<link refId="3121"/>
+				<link refId="2111"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1222"/>
+				<link refId="2232"/>
+				<link refId="3242"/>
+				<link refId="4241"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="06:30:00" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="1" departureTime="07:11:56" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="10" departureTime="13:29:24" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="100" departureTime="13:47:32" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="101" departureTime="14:29:29" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="102" departureTime="15:11:25" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="103" departureTime="15:53:22" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="104" departureTime="16:35:18" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="105" departureTime="17:17:15" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="106" departureTime="17:59:11" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="107" departureTime="18:41:08" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="108" departureTime="19:23:04" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="109" departureTime="20:05:01" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="11" departureTime="14:11:21" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="110" departureTime="20:46:57" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="111" departureTime="21:28:54" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="112" departureTime="06:52:40" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="113" departureTime="07:34:36" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="114" departureTime="08:16:32" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="115" departureTime="08:58:29" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="116" departureTime="09:40:25" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="117" departureTime="10:22:22" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="118" departureTime="11:04:18" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="119" departureTime="11:46:15" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="12" departureTime="14:53:17" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="120" departureTime="12:28:11" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="121" departureTime="13:10:08" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="122" departureTime="13:52:04" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="123" departureTime="14:34:01" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="124" departureTime="15:15:57" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="125" departureTime="15:57:54" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="126" departureTime="16:39:50" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="127" departureTime="17:21:47" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="128" departureTime="18:03:43" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="129" departureTime="18:45:40" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="13" departureTime="15:35:14" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="130" departureTime="19:27:36" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="131" departureTime="20:09:33" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="132" departureTime="20:51:29" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="133" departureTime="21:33:26" vehicleRefId="para_0_6-0_0-5"/>
+				<departure id="134" departureTime="06:57:12" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="135" departureTime="07:39:08" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="136" departureTime="08:21:04" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="137" departureTime="09:03:01" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="138" departureTime="09:44:57" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="139" departureTime="10:26:54" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="14" departureTime="16:17:10" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="140" departureTime="11:08:50" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="141" departureTime="11:50:47" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="142" departureTime="12:32:43" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="143" departureTime="13:14:40" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="144" departureTime="13:56:36" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="145" departureTime="14:38:33" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="146" departureTime="15:20:29" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="147" departureTime="16:02:26" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="148" departureTime="16:44:22" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="149" departureTime="17:26:19" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="15" departureTime="16:59:07" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="150" departureTime="18:08:15" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="151" departureTime="18:50:12" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="152" departureTime="19:32:08" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="153" departureTime="20:14:05" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="154" departureTime="20:56:01" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="155" departureTime="21:37:58" vehicleRefId="para_0_6-0_0-6"/>
+				<departure id="156" departureTime="07:01:44" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="157" departureTime="07:43:40" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="158" departureTime="08:25:36" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="159" departureTime="09:07:33" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="16" departureTime="17:41:03" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="160" departureTime="09:49:29" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="161" departureTime="10:31:26" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="162" departureTime="11:13:22" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="163" departureTime="11:55:19" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="164" departureTime="12:37:15" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="165" departureTime="13:19:12" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="166" departureTime="14:01:08" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="167" departureTime="14:43:05" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="168" departureTime="15:25:01" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="169" departureTime="16:06:58" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="17" departureTime="18:23:00" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="170" departureTime="16:48:54" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="171" departureTime="17:30:51" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="172" departureTime="18:12:47" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="173" departureTime="18:54:44" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="174" departureTime="19:36:40" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="175" departureTime="20:18:37" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="176" departureTime="21:00:33" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="177" departureTime="21:42:30" vehicleRefId="para_0_6-0_0-7"/>
+				<departure id="178" departureTime="07:06:16" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="179" departureTime="07:48:12" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="18" departureTime="19:04:56" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="180" departureTime="08:30:08" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="181" departureTime="09:12:05" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="182" departureTime="09:54:01" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="183" departureTime="10:35:58" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="184" departureTime="11:17:54" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="185" departureTime="11:59:51" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="186" departureTime="12:41:47" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="187" departureTime="13:23:44" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="188" departureTime="14:05:40" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="189" departureTime="14:47:37" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="19" departureTime="19:46:53" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="190" departureTime="15:29:33" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="191" departureTime="16:11:30" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="192" departureTime="16:53:26" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="193" departureTime="17:35:23" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="194" departureTime="18:17:19" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="195" departureTime="18:59:16" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="196" departureTime="19:41:12" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="197" departureTime="20:23:09" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="198" departureTime="21:05:05" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="199" departureTime="21:47:02" vehicleRefId="para_0_6-0_0-8"/>
+				<departure id="2" departureTime="07:53:52" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="20" departureTime="20:28:49" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="21" departureTime="21:10:46" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="22" departureTime="21:52:42" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="23" departureTime="06:34:32" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="24" departureTime="07:16:28" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="25" departureTime="07:58:24" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="26" departureTime="08:40:21" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="27" departureTime="09:22:17" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="28" departureTime="10:04:14" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="29" departureTime="10:46:10" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="3" departureTime="08:35:49" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="30" departureTime="11:28:07" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="31" departureTime="12:10:03" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="32" departureTime="12:52:00" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="33" departureTime="13:33:56" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="34" departureTime="14:15:53" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="35" departureTime="14:57:49" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="36" departureTime="15:39:46" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="37" departureTime="16:21:42" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="38" departureTime="17:03:39" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="39" departureTime="17:45:35" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="4" departureTime="09:17:45" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="40" departureTime="18:27:32" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="41" departureTime="19:09:28" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="42" departureTime="19:51:25" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="43" departureTime="20:33:21" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="44" departureTime="21:15:18" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="45" departureTime="21:57:14" vehicleRefId="para_0_6-0_0-1"/>
+				<departure id="46" departureTime="06:39:04" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="47" departureTime="07:21:00" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="48" departureTime="08:02:56" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="49" departureTime="08:44:53" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="5" departureTime="09:59:42" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="50" departureTime="09:26:49" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="51" departureTime="10:08:46" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="52" departureTime="10:50:42" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="53" departureTime="11:32:39" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="54" departureTime="12:14:35" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="55" departureTime="12:56:32" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="56" departureTime="13:38:28" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="57" departureTime="14:20:25" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="58" departureTime="15:02:21" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="59" departureTime="15:44:18" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="6" departureTime="10:41:38" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="60" departureTime="16:26:14" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="61" departureTime="17:08:11" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="62" departureTime="17:50:07" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="63" departureTime="18:32:04" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="64" departureTime="19:14:00" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="65" departureTime="19:55:57" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="66" departureTime="20:37:53" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="67" departureTime="21:19:50" vehicleRefId="para_0_6-0_0-2"/>
+				<departure id="68" departureTime="06:43:36" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="69" departureTime="07:25:32" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="7" departureTime="11:23:35" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="70" departureTime="08:07:28" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="71" departureTime="08:49:25" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="72" departureTime="09:31:21" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="73" departureTime="10:13:18" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="74" departureTime="10:55:14" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="75" departureTime="11:37:11" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="76" departureTime="12:19:07" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="77" departureTime="13:01:04" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="78" departureTime="13:43:00" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="79" departureTime="14:24:57" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="8" departureTime="12:05:31" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="80" departureTime="15:06:53" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="81" departureTime="15:48:50" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="82" departureTime="16:30:46" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="83" departureTime="17:12:43" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="84" departureTime="17:54:39" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="85" departureTime="18:36:36" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="86" departureTime="19:18:32" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="87" departureTime="20:00:29" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="88" departureTime="20:42:25" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="89" departureTime="21:24:22" vehicleRefId="para_0_6-0_0-3"/>
+				<departure id="9" departureTime="12:47:28" vehicleRefId="para_0_6-0_0-0"/>
+				<departure id="90" departureTime="06:48:08" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="91" departureTime="07:30:04" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="92" departureTime="08:12:00" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="93" departureTime="08:53:57" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="94" departureTime="09:35:53" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="95" departureTime="10:17:50" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="96" departureTime="10:59:46" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="97" departureTime="11:41:43" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="98" departureTime="12:23:39" vehicleRefId="para_0_6-0_0-4"/>
+				<departure id="99" departureTime="13:05:36" vehicleRefId="para_0_6-0_0-4"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="para_0_6-3_2">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_4241" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_4131" arrivalOffset="00:03:23" departureOffset="00:03:23" awaitDeparture="false"/>
+				<stop refId="para_3141" arrivalOffset="00:06:45" departureOffset="00:06:45" awaitDeparture="false"/>
+				<stop refId="para_4131" arrivalOffset="00:10:23" departureOffset="00:10:23" awaitDeparture="false"/>
+				<stop refId="para_3121" arrivalOffset="00:13:44" departureOffset="00:13:44" awaitDeparture="false"/>
+				<stop refId="para_2111" arrivalOffset="00:17:05" departureOffset="00:17:05" awaitDeparture="false"/>
+				<stop refId="para_1112" arrivalOffset="00:20:31" departureOffset="00:20:31" awaitDeparture="false"/>
+				<stop refId="para_1213" arrivalOffset="00:23:52" departureOffset="00:23:52" awaitDeparture="false"/>
+				<stop refId="para_1314" arrivalOffset="00:27:13" departureOffset="00:27:13" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:30:52" departureOffset="00:30:52" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:34:13" departureOffset="00:34:13" awaitDeparture="false"/>
+				<stop refId="para_1211" arrivalOffset="00:37:34" departureOffset="00:37:34" awaitDeparture="false"/>
+				<stop refId="para_1121" arrivalOffset="00:41:05" departureOffset="00:41:05" awaitDeparture="false"/>
+				<stop refId="para_2131" arrivalOffset="00:44:26" departureOffset="00:44:26" awaitDeparture="false"/>
+				<stop refId="para_3141" arrivalOffset="00:47:47" departureOffset="00:47:47" awaitDeparture="false"/>
+				<stop refId="para_4142" arrivalOffset="00:51:19" departureOffset="00:51:19" awaitDeparture="false"/>
+				<stop refId="para_4241" arrivalOffset="00:54:40" departureOffset="00:54:40" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="4241"/>
+				<link refId="4131"/>
+				<link refId="3141"/>
+				<link refId="4131"/>
+				<link refId="3121"/>
+				<link refId="2111"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1211"/>
+				<link refId="1121"/>
+				<link refId="2131"/>
+				<link refId="3141"/>
+				<link refId="4142"/>
+				<link refId="4241"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="06:30:00" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="1" departureTime="07:25:40" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="10" departureTime="15:46:42" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="11" departureTime="16:42:23" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="12" departureTime="17:38:03" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="13" departureTime="18:33:43" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="14" departureTime="19:29:24" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="15" departureTime="20:25:04" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="16" departureTime="21:20:44" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="17" departureTime="06:48:13" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="18" departureTime="07:43:53" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="19" departureTime="08:39:33" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="2" departureTime="08:21:20" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="20" departureTime="09:35:13" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="21" departureTime="10:30:54" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="22" departureTime="11:26:34" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="23" departureTime="12:22:14" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="24" departureTime="13:17:55" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="25" departureTime="14:13:35" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="26" departureTime="15:09:15" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="27" departureTime="16:04:55" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="28" departureTime="17:00:36" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="29" departureTime="17:56:16" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="3" departureTime="09:17:00" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="30" departureTime="18:51:56" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="31" departureTime="19:47:37" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="32" departureTime="20:43:17" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="33" departureTime="21:38:57" vehicleRefId="para_0_6-3_2-1"/>
+				<departure id="34" departureTime="07:06:26" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="35" departureTime="08:02:06" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="36" departureTime="08:57:46" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="37" departureTime="09:53:26" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="38" departureTime="10:49:07" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="39" departureTime="11:44:47" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="4" departureTime="10:12:41" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="40" departureTime="12:40:27" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="41" departureTime="13:36:08" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="42" departureTime="14:31:48" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="43" departureTime="15:27:28" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="44" departureTime="16:23:08" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="45" departureTime="17:18:49" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="46" departureTime="18:14:29" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="47" departureTime="19:10:09" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="48" departureTime="20:05:50" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="49" departureTime="21:01:30" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="5" departureTime="11:08:21" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="50" departureTime="21:57:10" vehicleRefId="para_0_6-3_2-2"/>
+				<departure id="6" departureTime="12:04:01" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="7" departureTime="12:59:42" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="8" departureTime="13:55:22" vehicleRefId="para_0_6-3_2-0"/>
+				<departure id="9" departureTime="14:51:02" vehicleRefId="para_0_6-3_2-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="para_0_8">
+		<transitRoute id="para_0_8-13_10">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_2414" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_1424" arrivalOffset="00:03:20" departureOffset="00:03:20" awaitDeparture="false"/>
+				<stop refId="para_2434" arrivalOffset="00:06:40" departureOffset="00:06:40" awaitDeparture="false"/>
+				<stop refId="para_3444" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="false"/>
+				<stop refId="para_4434" arrivalOffset="00:13:20" departureOffset="00:13:20" awaitDeparture="false"/>
+				<stop refId="para_3424" arrivalOffset="00:16:40" departureOffset="00:16:40" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:23:20" departureOffset="00:23:20" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:26:40" departureOffset="00:26:40" awaitDeparture="false"/>
+				<stop refId="para_1211" arrivalOffset="00:30:00" departureOffset="00:30:00" awaitDeparture="false"/>
+				<stop refId="para_1112" arrivalOffset="00:33:20" departureOffset="00:33:20" awaitDeparture="false"/>
+				<stop refId="para_1213" arrivalOffset="00:36:40" departureOffset="00:36:40" awaitDeparture="false"/>
+				<stop refId="para_1314" arrivalOffset="00:40:00" departureOffset="00:40:00" awaitDeparture="false"/>
+				<stop refId="para_1424" arrivalOffset="00:43:20" departureOffset="00:43:20" awaitDeparture="false"/>
+				<stop refId="para_2434" arrivalOffset="00:46:40" departureOffset="00:46:40" awaitDeparture="false"/>
+				<stop refId="para_3444" arrivalOffset="00:50:00" departureOffset="00:50:00" awaitDeparture="false"/>
+				<stop refId="para_4434" arrivalOffset="00:53:20" departureOffset="00:53:20" awaitDeparture="false"/>
+				<stop refId="para_3424" arrivalOffset="00:56:40" departureOffset="00:56:40" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="01:00:00" departureOffset="01:00:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="2414"/>
+				<link refId="1424"/>
+				<link refId="2434"/>
+				<link refId="3444"/>
+				<link refId="4434"/>
+				<link refId="3424"/>
+				<link refId="2414"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1211"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+				<link refId="1424"/>
+				<link refId="2434"/>
+				<link refId="3444"/>
+				<link refId="4434"/>
+				<link refId="3424"/>
+				<link refId="2414"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="09:15:00" vehicleRefId="para_0_8-13_10-0"/>
+				<departure id="1" departureTime="10:16:00" vehicleRefId="para_0_8-13_10-0"/>
+				<departure id="2" departureTime="11:17:00" vehicleRefId="para_0_8-13_10-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="para_0_9">
+		<transitRoute id="para_0_9-0_0">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_2414" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:03:45" departureOffset="00:03:45" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:07:06" departureOffset="00:07:06" awaitDeparture="false"/>
+				<stop refId="para_1211" arrivalOffset="00:10:27" departureOffset="00:10:27" awaitDeparture="false"/>
+				<stop refId="para_1112" arrivalOffset="00:14:06" departureOffset="00:14:06" awaitDeparture="false"/>
+				<stop refId="para_1213" arrivalOffset="00:17:27" departureOffset="00:17:27" awaitDeparture="false"/>
+				<stop refId="para_1314" arrivalOffset="00:20:48" departureOffset="00:20:48" awaitDeparture="false"/>
+				<stop refId="para_1424" arrivalOffset="00:24:15" departureOffset="00:24:15" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:27:36" departureOffset="00:27:36" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="2414"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1211"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+				<link refId="1424"/>
+				<link refId="2414"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:15:00" vehicleRefId="para_0_9-0_0-0"/>
+				<departure id="1" departureTime="08:43:36" vehicleRefId="para_0_9-0_0-0"/>
+				<departure id="10" departureTime="13:01:07" vehicleRefId="para_0_9-0_0-0"/>
+				<departure id="11" departureTime="13:29:44" vehicleRefId="para_0_9-0_0-0"/>
+				<departure id="12" departureTime="08:28:48" vehicleRefId="para_0_9-0_0-1"/>
+				<departure id="13" departureTime="08:57:24" vehicleRefId="para_0_9-0_0-1"/>
+				<departure id="14" departureTime="09:26:01" vehicleRefId="para_0_9-0_0-1"/>
+				<departure id="15" departureTime="09:54:38" vehicleRefId="para_0_9-0_0-1"/>
+				<departure id="16" departureTime="10:23:15" vehicleRefId="para_0_9-0_0-1"/>
+				<departure id="17" departureTime="10:51:51" vehicleRefId="para_0_9-0_0-1"/>
+				<departure id="18" departureTime="11:20:28" vehicleRefId="para_0_9-0_0-1"/>
+				<departure id="19" departureTime="11:49:05" vehicleRefId="para_0_9-0_0-1"/>
+				<departure id="2" departureTime="09:12:13" vehicleRefId="para_0_9-0_0-0"/>
+				<departure id="20" departureTime="12:17:42" vehicleRefId="para_0_9-0_0-1"/>
+				<departure id="21" departureTime="12:46:19" vehicleRefId="para_0_9-0_0-1"/>
+				<departure id="22" departureTime="13:14:55" vehicleRefId="para_0_9-0_0-1"/>
+				<departure id="23" departureTime="13:43:32" vehicleRefId="para_0_9-0_0-1"/>
+				<departure id="3" departureTime="09:40:50" vehicleRefId="para_0_9-0_0-0"/>
+				<departure id="4" departureTime="10:09:27" vehicleRefId="para_0_9-0_0-0"/>
+				<departure id="5" departureTime="10:38:03" vehicleRefId="para_0_9-0_0-0"/>
+				<departure id="6" departureTime="11:06:40" vehicleRefId="para_0_9-0_0-0"/>
+				<departure id="7" departureTime="11:35:17" vehicleRefId="para_0_9-0_0-0"/>
+				<departure id="8" departureTime="12:03:54" vehicleRefId="para_0_9-0_0-0"/>
+				<departure id="9" departureTime="12:32:31" vehicleRefId="para_0_9-0_0-0"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="para_0_9-2_1">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_2414" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:03:43" departureOffset="00:03:43" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:07:04" departureOffset="00:07:04" awaitDeparture="false"/>
+				<stop refId="para_1211" arrivalOffset="00:10:25" departureOffset="00:10:25" awaitDeparture="false"/>
+				<stop refId="para_1112" arrivalOffset="00:14:01" departureOffset="00:14:01" awaitDeparture="false"/>
+				<stop refId="para_1213" arrivalOffset="00:17:22" departureOffset="00:17:22" awaitDeparture="false"/>
+				<stop refId="para_1314" arrivalOffset="00:20:43" departureOffset="00:20:43" awaitDeparture="false"/>
+				<stop refId="para_1424" arrivalOffset="00:24:08" departureOffset="00:24:08" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:27:29" departureOffset="00:27:29" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="2414"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1211"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+				<link refId="1424"/>
+				<link refId="2414"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:15:00" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="1" departureTime="08:43:29" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="10" departureTime="12:59:54" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="11" departureTime="13:28:23" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="12" departureTime="13:56:53" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="13" departureTime="14:25:22" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="14" departureTime="14:53:52" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="15" departureTime="15:22:21" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="16" departureTime="15:50:51" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="17" departureTime="16:19:20" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="18" departureTime="16:47:50" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="19" departureTime="17:16:19" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="2" departureTime="09:11:58" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="20" departureTime="17:44:48" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="21" departureTime="18:13:18" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="22" departureTime="18:41:47" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="23" departureTime="19:10:17" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="24" departureTime="19:38:46" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="25" departureTime="20:07:16" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="26" departureTime="20:35:45" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="27" departureTime="21:04:15" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="28" departureTime="21:32:44" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="29" departureTime="22:01:14" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="3" departureTime="09:40:28" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="30" departureTime="08:28:44" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="31" departureTime="08:57:13" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="32" departureTime="09:25:42" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="33" departureTime="09:54:12" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="34" departureTime="10:22:41" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="35" departureTime="10:51:11" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="36" departureTime="11:19:40" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="37" departureTime="11:48:10" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="38" departureTime="12:16:39" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="39" departureTime="12:45:09" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="4" departureTime="10:08:57" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="40" departureTime="13:13:38" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="41" departureTime="13:42:07" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="42" departureTime="14:10:37" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="43" departureTime="14:39:06" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="44" departureTime="15:07:36" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="45" departureTime="15:36:05" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="46" departureTime="16:04:35" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="47" departureTime="16:33:04" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="48" departureTime="17:01:34" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="49" departureTime="17:30:03" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="5" departureTime="10:37:27" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="50" departureTime="17:58:32" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="51" departureTime="18:27:02" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="52" departureTime="18:55:31" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="53" departureTime="19:24:01" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="54" departureTime="19:52:30" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="55" departureTime="20:21:00" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="56" departureTime="20:49:29" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="57" departureTime="21:17:59" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="58" departureTime="21:46:28" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="59" departureTime="22:14:58" vehicleRefId="para_0_9-2_1-1"/>
+				<departure id="6" departureTime="11:05:56" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="7" departureTime="11:34:26" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="8" departureTime="12:02:55" vehicleRefId="para_0_9-2_1-0"/>
+				<departure id="9" departureTime="12:31:25" vehicleRefId="para_0_9-2_1-0"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="para_0_9-13_3">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_2414" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:03:20" departureOffset="00:03:20" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:06:40" departureOffset="00:06:40" awaitDeparture="false"/>
+				<stop refId="para_1211" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="false"/>
+				<stop refId="para_1112" arrivalOffset="00:13:20" departureOffset="00:13:20" awaitDeparture="false"/>
+				<stop refId="para_1213" arrivalOffset="00:16:40" departureOffset="00:16:40" awaitDeparture="false"/>
+				<stop refId="para_1314" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="false"/>
+				<stop refId="para_1424" arrivalOffset="00:23:20" departureOffset="00:23:20" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:26:40" departureOffset="00:26:40" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="2414"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1211"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+				<link refId="1424"/>
+				<link refId="2414"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:15:00" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="1" departureTime="08:42:40" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="10" departureTime="12:51:40" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="11" departureTime="13:19:20" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="12" departureTime="13:47:00" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="13" departureTime="14:14:40" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="14" departureTime="14:42:20" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="15" departureTime="15:10:00" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="16" departureTime="15:37:40" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="17" departureTime="16:05:20" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="18" departureTime="16:33:00" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="19" departureTime="17:00:40" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="2" departureTime="09:10:20" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="20" departureTime="17:28:20" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="21" departureTime="17:56:00" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="22" departureTime="18:23:40" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="23" departureTime="18:51:20" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="24" departureTime="19:19:00" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="25" departureTime="19:46:40" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="26" departureTime="20:14:20" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="27" departureTime="20:42:00" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="28" departureTime="21:09:40" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="29" departureTime="21:37:20" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="3" departureTime="09:38:00" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="30" departureTime="22:05:00" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="31" departureTime="22:32:40" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="32" departureTime="23:00:20" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="4" departureTime="10:05:40" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="5" departureTime="10:33:20" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="6" departureTime="11:01:00" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="7" departureTime="11:28:40" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="8" departureTime="11:56:20" vehicleRefId="para_0_9-13_3-0"/>
+				<departure id="9" departureTime="12:24:00" vehicleRefId="para_0_9-13_3-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="para_11_13">
+		<transitRoute id="para_11_13-11_0">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_1211" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_1112" arrivalOffset="00:03:33" departureOffset="00:03:33" awaitDeparture="false"/>
+				<stop refId="para_1213" arrivalOffset="00:06:54" departureOffset="00:06:54" awaitDeparture="false"/>
+				<stop refId="para_1314" arrivalOffset="00:10:15" departureOffset="00:10:15" awaitDeparture="false"/>
+				<stop refId="para_1424" arrivalOffset="00:14:00" departureOffset="00:14:00" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:17:21" departureOffset="00:17:21" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:20:42" departureOffset="00:20:42" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:24:03" departureOffset="00:24:03" awaitDeparture="false"/>
+				<stop refId="para_1211" arrivalOffset="00:27:24" departureOffset="00:27:24" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="1211"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+				<link refId="1424"/>
+				<link refId="2414"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1211"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:30:00" vehicleRefId="para_11_13-11_0-0"/>
+				<departure id="1" departureTime="08:58:24" vehicleRefId="para_11_13-11_0-0"/>
+				<departure id="10" departureTime="08:48:16" vehicleRefId="para_11_13-11_0-2"/>
+				<departure id="11" departureTime="09:16:40" vehicleRefId="para_11_13-11_0-2"/>
+				<departure id="12" departureTime="09:45:05" vehicleRefId="para_11_13-11_0-2"/>
+				<departure id="13" departureTime="10:13:29" vehicleRefId="para_11_13-11_0-2"/>
+				<departure id="14" departureTime="10:41:54" vehicleRefId="para_11_13-11_0-2"/>
+				<departure id="2" departureTime="09:26:49" vehicleRefId="para_11_13-11_0-0"/>
+				<departure id="3" departureTime="09:55:13" vehicleRefId="para_11_13-11_0-0"/>
+				<departure id="4" departureTime="10:23:38" vehicleRefId="para_11_13-11_0-0"/>
+				<departure id="5" departureTime="08:39:08" vehicleRefId="para_11_13-11_0-1"/>
+				<departure id="6" departureTime="09:07:32" vehicleRefId="para_11_13-11_0-1"/>
+				<departure id="7" departureTime="09:35:57" vehicleRefId="para_11_13-11_0-1"/>
+				<departure id="8" departureTime="10:04:21" vehicleRefId="para_11_13-11_0-1"/>
+				<departure id="9" departureTime="10:32:46" vehicleRefId="para_11_13-11_0-1"/>
+			</departures>
+		</transitRoute>
+		<transitRoute id="para_11_13-13_2">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_1211" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_1112" arrivalOffset="00:03:20" departureOffset="00:03:20" awaitDeparture="false"/>
+				<stop refId="para_1213" arrivalOffset="00:06:40" departureOffset="00:06:40" awaitDeparture="false"/>
+				<stop refId="para_1314" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="false"/>
+				<stop refId="para_1424" arrivalOffset="00:13:20" departureOffset="00:13:20" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:16:40" departureOffset="00:16:40" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:23:20" departureOffset="00:23:20" awaitDeparture="false"/>
+				<stop refId="para_1211" arrivalOffset="00:26:40" departureOffset="00:26:40" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="1211"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+				<link refId="1424"/>
+				<link refId="2414"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1211"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:30:00" vehicleRefId="para_11_13-13_2-0"/>
+				<departure id="1" departureTime="08:57:40" vehicleRefId="para_11_13-13_2-0"/>
+				<departure id="2" departureTime="09:25:20" vehicleRefId="para_11_13-13_2-0"/>
+				<departure id="3" departureTime="09:53:00" vehicleRefId="para_11_13-13_2-0"/>
+				<departure id="4" departureTime="10:20:40" vehicleRefId="para_11_13-13_2-0"/>
+				<departure id="5" departureTime="10:48:20" vehicleRefId="para_11_13-13_2-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="para_13_14">
+		<transitRoute id="para_13_14-13_0">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_4241" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_4131" arrivalOffset="00:03:20" departureOffset="00:03:20" awaitDeparture="false"/>
+				<stop refId="para_3121" arrivalOffset="00:06:40" departureOffset="00:06:40" awaitDeparture="false"/>
+				<stop refId="para_2122" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="false"/>
+				<stop refId="para_2223" arrivalOffset="00:13:20" departureOffset="00:13:20" awaitDeparture="false"/>
+				<stop refId="para_2324" arrivalOffset="00:16:40" departureOffset="00:16:40" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:23:20" departureOffset="00:23:20" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:26:40" departureOffset="00:26:40" awaitDeparture="false"/>
+				<stop refId="para_1222" arrivalOffset="00:30:00" departureOffset="00:30:00" awaitDeparture="false"/>
+				<stop refId="para_2232" arrivalOffset="00:33:20" departureOffset="00:33:20" awaitDeparture="false"/>
+				<stop refId="para_3242" arrivalOffset="00:36:40" departureOffset="00:36:40" awaitDeparture="false"/>
+				<stop refId="para_4241" arrivalOffset="00:40:00" departureOffset="00:40:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="4241"/>
+				<link refId="4131"/>
+				<link refId="3121"/>
+				<link refId="2122"/>
+				<link refId="2223"/>
+				<link refId="2324"/>
+				<link refId="2414"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1222"/>
+				<link refId="2232"/>
+				<link refId="3242"/>
+				<link refId="4241"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:30:00" vehicleRefId="para_13_14-13_0-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="para_8_12">
+		<transitRoute id="para_8_12-13_3">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_3444" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_4443" arrivalOffset="00:03:20" departureOffset="00:03:20" awaitDeparture="false"/>
+				<stop refId="para_4342" arrivalOffset="00:06:40" departureOffset="00:06:40" awaitDeparture="false"/>
+				<stop refId="para_4232" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="false"/>
+				<stop refId="para_3231" arrivalOffset="00:13:20" departureOffset="00:13:20" awaitDeparture="false"/>
+				<stop refId="para_3141" arrivalOffset="00:16:40" departureOffset="00:16:40" awaitDeparture="false"/>
+				<stop refId="para_4142" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="false"/>
+				<stop refId="para_4243" arrivalOffset="00:23:20" departureOffset="00:23:20" awaitDeparture="false"/>
+				<stop refId="para_4342" arrivalOffset="00:26:40" departureOffset="00:26:40" awaitDeparture="false"/>
+				<stop refId="para_4232" arrivalOffset="00:30:00" departureOffset="00:30:00" awaitDeparture="false"/>
+				<stop refId="para_3233" arrivalOffset="00:33:20" departureOffset="00:33:20" awaitDeparture="false"/>
+				<stop refId="para_3334" arrivalOffset="00:36:40" departureOffset="00:36:40" awaitDeparture="false"/>
+				<stop refId="para_3444" arrivalOffset="00:40:00" departureOffset="00:40:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="3444"/>
+				<link refId="4443"/>
+				<link refId="4342"/>
+				<link refId="4232"/>
+				<link refId="3231"/>
+				<link refId="3141"/>
+				<link refId="4142"/>
+				<link refId="4243"/>
+				<link refId="4342"/>
+				<link refId="4232"/>
+				<link refId="3233"/>
+				<link refId="3334"/>
+				<link refId="3444"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="09:15:00" vehicleRefId="para_8_12-13_3-0"/>
+				<departure id="1" departureTime="09:56:00" vehicleRefId="para_8_12-13_3-0"/>
+				<departure id="2" departureTime="10:37:00" vehicleRefId="para_8_12-13_3-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>
