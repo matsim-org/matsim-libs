@@ -3,6 +3,7 @@
  */
 package playground.clruch.prep.timeinvariant;
 
+import ch.ethz.idsc.queuey.math.Entrywise;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
 
@@ -16,18 +17,15 @@ enum IntervalWrap {
 
         lbWrap = intervals[0].getLb();
         for (int i = 0; i < intervals.length; ++i) {
-            lbWrap = Min.of(lbWrap, intervals[i].getLb());
+            lbWrap = Entrywise.min().of(lbWrap, intervals[i].getLb());
         }
 
         ubWrap = intervals[0].getUb();
         for (int i = 0; i < intervals.length; ++i) {
-            ubWrap = Max.of(ubWrap, intervals[i].getUb());
+            ubWrap = Entrywise.max().of(ubWrap, intervals[i].getUb());
         }
 
         return new Interval(lbWrap, ubWrap);
     }
-    
-    
-
 
 }
