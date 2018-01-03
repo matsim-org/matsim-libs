@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+
+<transitSchedule>
+	<transitStops>
+		<stopFacility id="para_1112" x="1000.0" y="2000.0" linkRefId="1112" isBlocking="false"/>
+		<stopFacility id="para_1211" x="1000.0" y="1000.0" linkRefId="1211" isBlocking="false"/>
+		<stopFacility id="para_1213" x="1000.0" y="3000.0" linkRefId="1213" isBlocking="false"/>
+		<stopFacility id="para_1222" x="2000.0" y="2000.0" linkRefId="1222" isBlocking="false"/>
+		<stopFacility id="para_1312" x="1000.0" y="2000.0" linkRefId="1312" isBlocking="false"/>
+		<stopFacility id="para_1314" x="1000.0" y="4000.0" linkRefId="1314" isBlocking="false"/>
+		<stopFacility id="para_1413" x="1000.0" y="3000.0" linkRefId="1413" isBlocking="false"/>
+		<stopFacility id="para_1424" x="2000.0" y="4000.0" linkRefId="1424" isBlocking="false"/>
+		<stopFacility id="para_2122" x="2000.0" y="2000.0" linkRefId="2122" isBlocking="false"/>
+		<stopFacility id="para_2223" x="2000.0" y="3000.0" linkRefId="2223" isBlocking="false"/>
+		<stopFacility id="para_2232" x="3000.0" y="2000.0" linkRefId="2232" isBlocking="false"/>
+		<stopFacility id="para_2324" x="2000.0" y="4000.0" linkRefId="2324" isBlocking="false"/>
+		<stopFacility id="para_2414" x="1000.0" y="4000.0" linkRefId="2414" isBlocking="false"/>
+		<stopFacility id="para_2434" x="3000.0" y="4000.0" linkRefId="2434" isBlocking="false"/>
+		<stopFacility id="para_3121" x="2000.0" y="1000.0" linkRefId="3121" isBlocking="false"/>
+		<stopFacility id="para_3141" x="4000.0" y="1000.0" linkRefId="3141" isBlocking="false"/>
+		<stopFacility id="para_3231" x="3000.0" y="1000.0" linkRefId="3231" isBlocking="false"/>
+		<stopFacility id="para_3242" x="4000.0" y="2000.0" linkRefId="3242" isBlocking="false"/>
+		<stopFacility id="para_3332" x="3000.0" y="2000.0" linkRefId="3332" isBlocking="false"/>
+		<stopFacility id="para_3424" x="2000.0" y="4000.0" linkRefId="3424" isBlocking="false"/>
+		<stopFacility id="para_3433" x="3000.0" y="3000.0" linkRefId="3433" isBlocking="false"/>
+		<stopFacility id="para_3444" x="4000.0" y="4000.0" linkRefId="3444" isBlocking="false"/>
+		<stopFacility id="para_4131" x="3000.0" y="1000.0" linkRefId="4131" isBlocking="false"/>
+		<stopFacility id="para_4142" x="4000.0" y="2000.0" linkRefId="4142" isBlocking="false"/>
+		<stopFacility id="para_4241" x="4000.0" y="1000.0" linkRefId="4241" isBlocking="false"/>
+		<stopFacility id="para_4243" x="4000.0" y="3000.0" linkRefId="4243" isBlocking="false"/>
+		<stopFacility id="para_4344" x="4000.0" y="4000.0" linkRefId="4344" isBlocking="false"/>
+		<stopFacility id="para_4434" x="3000.0" y="4000.0" linkRefId="4434" isBlocking="false"/>
+	</transitStops>
+	<transitLine id="para_0_4">
+		<transitRoute id="para_0_4-10_11">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_1424" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_2434" arrivalOffset="00:03:21" departureOffset="00:03:21" awaitDeparture="false"/>
+				<stop refId="para_3444" arrivalOffset="00:06:46" departureOffset="00:06:46" awaitDeparture="false"/>
+				<stop refId="para_4434" arrivalOffset="00:10:07" departureOffset="00:10:07" awaitDeparture="false"/>
+				<stop refId="para_3433" arrivalOffset="00:13:33" departureOffset="00:13:33" awaitDeparture="false"/>
+				<stop refId="para_3332" arrivalOffset="00:16:54" departureOffset="00:16:54" awaitDeparture="false"/>
+				<stop refId="para_3231" arrivalOffset="00:20:15" departureOffset="00:20:15" awaitDeparture="false"/>
+				<stop refId="para_3141" arrivalOffset="00:23:37" departureOffset="00:23:37" awaitDeparture="false"/>
+				<stop refId="para_4142" arrivalOffset="00:27:08" departureOffset="00:27:08" awaitDeparture="false"/>
+				<stop refId="para_4243" arrivalOffset="00:30:32" departureOffset="00:30:32" awaitDeparture="false"/>
+				<stop refId="para_4344" arrivalOffset="00:33:53" departureOffset="00:33:53" awaitDeparture="false"/>
+				<stop refId="para_4434" arrivalOffset="00:37:36" departureOffset="00:37:36" awaitDeparture="false"/>
+				<stop refId="para_3424" arrivalOffset="00:40:57" departureOffset="00:40:57" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:44:18" departureOffset="00:44:18" awaitDeparture="false"/>
+				<stop refId="para_1424" arrivalOffset="00:47:52" departureOffset="00:47:52" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="1424"/>
+				<link refId="2434"/>
+				<link refId="3444"/>
+				<link refId="4434"/>
+				<link refId="3433"/>
+				<link refId="3332"/>
+				<link refId="3231"/>
+				<link refId="3141"/>
+				<link refId="4142"/>
+				<link refId="4243"/>
+				<link refId="4344"/>
+				<link refId="4434"/>
+				<link refId="3424"/>
+				<link refId="2414"/>
+				<link refId="1424"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="06:30:00" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="1" departureTime="07:18:52" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="10" departureTime="14:38:43" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="11" departureTime="15:27:36" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="12" departureTime="16:16:28" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="13" departureTime="17:05:20" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="14" departureTime="17:54:13" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="15" departureTime="18:43:05" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="16" departureTime="19:31:58" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="17" departureTime="20:20:50" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="18" departureTime="21:09:42" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="19" departureTime="21:58:35" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="2" departureTime="08:07:44" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="20" departureTime="22:47:27" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="21" departureTime="23:36:19" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="22" departureTime="06:53:56" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="23" departureTime="07:42:48" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="24" departureTime="08:31:40" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="25" departureTime="09:20:33" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="26" departureTime="10:09:25" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="27" departureTime="10:58:17" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="28" departureTime="11:47:10" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="29" departureTime="12:36:02" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="3" departureTime="08:56:37" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="30" departureTime="13:24:55" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="31" departureTime="14:13:47" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="32" departureTime="15:02:39" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="33" departureTime="15:51:32" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="34" departureTime="16:40:24" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="35" departureTime="17:29:16" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="36" departureTime="18:18:09" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="37" departureTime="19:07:01" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="38" departureTime="19:55:54" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="39" departureTime="20:44:46" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="4" departureTime="09:45:29" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="40" departureTime="21:33:38" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="41" departureTime="22:22:31" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="42" departureTime="23:11:23" vehicleRefId="para_0_4-10_11-1"/>
+				<departure id="5" departureTime="10:34:21" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="6" departureTime="11:23:14" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="7" departureTime="12:12:06" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="8" departureTime="13:00:59" vehicleRefId="para_0_4-10_11-0"/>
+				<departure id="9" departureTime="13:49:51" vehicleRefId="para_0_4-10_11-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="para_11_13">
+		<transitRoute id="para_11_13-13_2">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_1211" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_1112" arrivalOffset="00:03:20" departureOffset="00:03:20" awaitDeparture="false"/>
+				<stop refId="para_1213" arrivalOffset="00:06:40" departureOffset="00:06:40" awaitDeparture="false"/>
+				<stop refId="para_1314" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="false"/>
+				<stop refId="para_1424" arrivalOffset="00:13:20" departureOffset="00:13:20" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:16:40" departureOffset="00:16:40" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:23:20" departureOffset="00:23:20" awaitDeparture="false"/>
+				<stop refId="para_1211" arrivalOffset="00:26:40" departureOffset="00:26:40" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="1211"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+				<link refId="1424"/>
+				<link refId="2414"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1211"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:30:00" vehicleRefId="para_11_13-13_2-0"/>
+				<departure id="1" departureTime="08:57:40" vehicleRefId="para_11_13-13_2-0"/>
+				<departure id="2" departureTime="09:25:20" vehicleRefId="para_11_13-13_2-0"/>
+				<departure id="3" departureTime="09:53:00" vehicleRefId="para_11_13-13_2-0"/>
+				<departure id="4" departureTime="10:20:40" vehicleRefId="para_11_13-13_2-0"/>
+				<departure id="5" departureTime="10:48:20" vehicleRefId="para_11_13-13_2-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="para_13_14">
+		<transitRoute id="para_13_14-13_0">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_4241" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_4131" arrivalOffset="00:03:20" departureOffset="00:03:20" awaitDeparture="false"/>
+				<stop refId="para_3121" arrivalOffset="00:06:40" departureOffset="00:06:40" awaitDeparture="false"/>
+				<stop refId="para_2122" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="false"/>
+				<stop refId="para_2223" arrivalOffset="00:13:20" departureOffset="00:13:20" awaitDeparture="false"/>
+				<stop refId="para_2324" arrivalOffset="00:16:40" departureOffset="00:16:40" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="false"/>
+				<stop refId="para_1413" arrivalOffset="00:23:20" departureOffset="00:23:20" awaitDeparture="false"/>
+				<stop refId="para_1312" arrivalOffset="00:26:40" departureOffset="00:26:40" awaitDeparture="false"/>
+				<stop refId="para_1222" arrivalOffset="00:30:00" departureOffset="00:30:00" awaitDeparture="false"/>
+				<stop refId="para_2232" arrivalOffset="00:33:20" departureOffset="00:33:20" awaitDeparture="false"/>
+				<stop refId="para_3242" arrivalOffset="00:36:40" departureOffset="00:36:40" awaitDeparture="false"/>
+				<stop refId="para_4241" arrivalOffset="00:40:00" departureOffset="00:40:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="4241"/>
+				<link refId="4131"/>
+				<link refId="3121"/>
+				<link refId="2122"/>
+				<link refId="2223"/>
+				<link refId="2324"/>
+				<link refId="2414"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1222"/>
+				<link refId="2232"/>
+				<link refId="3242"/>
+				<link refId="4241"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:30:00" vehicleRefId="para_13_14-13_0-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

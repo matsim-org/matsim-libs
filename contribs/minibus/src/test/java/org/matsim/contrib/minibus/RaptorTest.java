@@ -27,7 +27,7 @@ public class RaptorTest {
 	
 	@Test
 	public void test() {
-		String config = "test/input/org/matsim/contrib/minibus/example-scenario/config_raptor.xml";
+		String config = "test/input/org/matsim/contrib/minibus/example-scenario/raptorFixMinimalExample/config_raptor.xml";
 		
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(config));
 		scenario.getConfig().controler().setOutputDirectory(helper.getOutputDirectory());
