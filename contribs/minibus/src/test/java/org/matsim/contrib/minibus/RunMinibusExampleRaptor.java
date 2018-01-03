@@ -11,7 +11,7 @@ public class RunMinibusExampleRaptor {
 	@Test
     public final void testRunScenarioWithRaptor() {
 		String[] args = {"test/input/org/matsim/contrib/minibus/example-scenario/config_raptor.xml"};
-		RunMinibus.main(args);
+//		RunMinibus.main(args);
 	}
 
 }
