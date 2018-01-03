@@ -1,5 +1,7 @@
 package org.matsim.contrib.minibus;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -16,17 +18,17 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.testcases.MatsimTestUtils;
 
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-
-public class RaptorTest {
+public class SameOriginDestinationRaptorTest {
 	
 	
 	@Rule
 	public MatsimTestUtils helper = new MatsimTestUtils();
-	
+
+	/**
+	 * Currently (Jan'18) raptor throws an exception if from and to transit stops are same.
+	 */
 	@Test
-	public void test() {
+	public void sameFromAndToTransitStopTest() {
 		String config = "test/input/org/matsim/contrib/minibus/example-scenario/raptorFixMinimalExample/config_raptor.xml";
 		
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(config));
@@ -34,7 +36,7 @@ public class RaptorTest {
 		
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new AbstractModule() {
-			
+
 			@Override
 			public void install() {
 				bind(TransitRouter.class).toProvider(RaptorTransitRouterProvider.class);
