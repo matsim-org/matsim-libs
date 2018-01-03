@@ -19,6 +19,9 @@
 
 package org.matsim.contrib.minibus.hook;
 
+import java.util.HashSet;
+import java.util.Set;
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
@@ -36,7 +39,6 @@ import org.matsim.core.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.core.population.algorithms.ParallelPersonAlgorithmUtils;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.scenario.MutableScenario;
-import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -45,11 +47,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
-
-import com.google.inject.Inject;
-
-import java.util.HashSet;
-import java.util.Set;
 
 
 /**
@@ -63,7 +60,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 
 	private final PVehiclesFactory pVehiclesFactory;
 	
-	@Inject PTransitRouterFactory router;
+	@Inject private PTransitRouterFactory pTransitRouterFactory;
 
 	@Inject(optional=true) private AgentsStuckHandlerImpl agentsStuckHandler;
 	private final POperators operators ;
@@ -84,10 +81,8 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 		addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(pBox.getpTransitSchedule()));
 
 		//		this.pTransitRouterFactory.createTransitRouterConfig(event.getServices().getConfig());
-		//		this.pTransitRouterFactory.updateTransitSchedule();
+		this.pTransitRouterFactory.updateTransitSchedule();
 
-		router.notifyStartup(event);
-		
 		if(this.agentsStuckHandler != null){
 			event.getServices().getEvents().addHandler(this.agentsStuckHandler);
 		}
@@ -106,7 +101,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 			removePreviousPVehiclesFromScenario(event.getServices().getScenario().getTransitVehicles());
 			addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(pBox.getpTransitSchedule()));
 
-			//			this.pTransitRouterFactory.updateTransitSchedule();
+			this.pTransitRouterFactory.updateTransitSchedule();
 
 			if(this.agentsStuckHandler != null){
 				ParallelPersonAlgorithmUtils.run(controler.getScenario().getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {
@@ -121,7 +116,6 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 			}
 		}
 		this.dumpTransitScheduleAndVehicles(event.getServices(), event.getIteration());
-		router.notifyIterationStarts(event);
 	}
 
 	@Override

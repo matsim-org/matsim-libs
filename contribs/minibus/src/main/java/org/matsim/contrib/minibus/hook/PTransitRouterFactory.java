@@ -30,12 +30,13 @@ import org.matsim.contrib.minibus.performance.raptor.RaptorDisutility;
 import org.matsim.contrib.minibus.performance.raptor.TransitRouterQuadTree;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.pt.router.*;
+import org.matsim.pt.router.PreparedTransitSchedule;
+import org.matsim.pt.router.TransitRouter;
+import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterImpl;
+import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 /**
@@ -75,7 +76,7 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 		this.transitRouterConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
 	}
 	
-	private void updateTransitSchedule() {
+	void updateTransitSchedule() {
 		this.needToUpdateRouter = true;
 //		this.schedule = PTransitLineMerger.mergeSimilarRoutes(schedule);
 		
@@ -141,11 +142,12 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
         return null;
 	}
 
-	void notifyIterationStarts(IterationStartsEvent event) {
-		this.updateTransitSchedule();
-	}
-
-	void notifyStartup(StartupEvent event) {
-		this.updateTransitSchedule();
-	}
+	//see MATSim-768
+//	void notifyIterationStarts(IterationStartsEvent event) {
+//		this.updateTransitSchedule();
+//	}
+//
+//	void notifyStartup(StartupEvent event) {
+//		this.updateTransitSchedule();
+//	}
 }
