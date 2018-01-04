@@ -20,7 +20,7 @@
 /**
  * 
  */
-package cemdap4wob.run;
+package vwExamples.cemdapwob.run;
 
 import javax.inject.Inject;
 
