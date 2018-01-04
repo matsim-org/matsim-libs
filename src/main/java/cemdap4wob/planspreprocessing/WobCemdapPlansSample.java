@@ -20,16 +20,19 @@
 /**
  * 
  */
-package robotaxi.run;
+package cemdap4wob.planspreprocessing;
 
-import org.matsim.contrib.av.robotaxi.run.RunRobotaxiExample;
-import org.matsim.contrib.av.robotaxi.scoring.TaxiFareConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.core.config.Config;
+import java.util.Random;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PopulationUtils;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.population.io.PopulationWriter;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * @author  jbischoff
@@ -38,27 +41,20 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 /**
  *
  */
-public class RunTaxiBatchScenario {
+public class WobCemdapPlansSample {
 
 	public static void main(String[] args) {
-		
-		for (int i = 1000; i< 10000; i+=5000){
-			//laedt eine "Basisconfig" inkl. der Nicht-Standard-Config-Gruppen für Taxis etc.
-			Config config = ConfigUtils.loadConfig("config.xml", new TaxiConfigGroup(), new TaxiFareConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
-			
-			
-			//ueberschreibt den Wert für die Flottendatei
-
-			TaxiConfigGroup tcg = (TaxiConfigGroup) config.getModules().get(TaxiConfigGroup.GROUP_NAME);
-			tcg.setTaxisFile("taxis_"+i+".xml");
-			String runId = "run"+i;
-			config.controler().setRunId(runId);
-			config.controler().setOutputDirectory("somewhere/output/"+runId);
-			
-			// erstellt den Controler aus dem Robotaxiexample auf basis der aktuellen Config
-			Controler controler = RunRobotaxiExample.createControler(config, false);
-			
-			controler.run();
+		double scale = 0.01;
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new PopulationReader(scenario).readFile("D:/cemdap-vw/Output/mergedplans_filtered.xml.gz");
+		Random r = MatsimRandom.getRandom();
+		Population exportPop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		for (Person p : scenario.getPopulation().getPersons().values()){
+			if (r.nextDouble()<scale){
+				exportPop.addPerson(p);
+			}
 		}
+		new PopulationWriter(exportPop).write("D:/cemdap-vw/Output/mergedplans_filtered.xml"+scale+".gz");
+		
 	}
-	}
+}

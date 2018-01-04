@@ -22,7 +22,7 @@ package taxibus.run.configuration;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.*;
-import org.matsim.contrib.dvrp.data.file.VehicleReader;
+import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dynagent.run.*;
@@ -59,9 +59,6 @@ public class TaxibusControlerCreator {
 		final Scenario scenario = controler.getScenario();
 		final TaxibusConfigGroup tbcg = (TaxibusConfigGroup)scenario.getConfig().getModules()
 				.get(TaxibusConfigGroup.GROUP_NAME);
-		final FleetImpl fleetData = new FleetImpl();
-		new VehicleReader(scenario.getNetwork(), fleetData)
-				.parse(tbcg.getVehiclesFileUrl(scenario.getConfig().getContext()));
 		
 
 		controler.addOverridingModule(new DvrpTravelTimeModule());
@@ -81,9 +78,8 @@ public class TaxibusControlerCreator {
 					bind(TransitSchedule.class).annotatedWith(Names.named("taxibus")).toInstance(scenario2.getTransitSchedule());;
 					bind(OrderManager.class).to(StopBasedTaxibusPassengerOrderManager.class).asEagerSingleton();
 					addRoutingModuleBinding(TaxibusUtils.TAXIBUS_MODE).to(StopBasedTaxibusRoutingModule.class).asEagerSingleton();
-					
 				}
-				bind(Fleet.class).toInstance(fleetData);
+				bind(Fleet.class).toProvider(new FleetProvider(tbcg.getVehiclesFileUrl(scenario.getConfig().getContext()))).asEagerSingleton();
 				bind(Network.class).annotatedWith(Names.named(DvrpModule.DVRP_ROUTING)).to(Network.class).asEagerSingleton();
 			}
 		});

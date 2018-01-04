@@ -51,15 +51,26 @@ public class RunDrtScenarioBatch {
 	}
 
 	public static void main(String[] args) {
+		
+		//Enable or Disable rebalancing
+		
+		boolean rebalancing = true;
+		
 		//Defines a list of potential demandScenarios which will be iterated.
 		//The demandScenarios need to be already prepared and stored.
 		//This script generates automatically pathnames with the help of demandScenarios
-		List<Double> demandScenarios = Arrays.asList(0.02,0.05,0.1);
-//		List<Double> demandScenarios = Arrays.asList(0.02);
-
-		Integer stoptime;
-
+//		List<Double> demandScenarios = Arrays.asList(0.05,0.1,0.15);
+		List<Double> demandScenarios = Arrays.asList(0.2);
+		//This list stores our runIds that are used to save the simulations
+		//runIds are used for consistent simulation identification. Our runIds are maintained in an excel file: 
+		
+		List<String> runIdList = Arrays.asList("def_5");
+//		List<Integer> stopTimeList = Arrays.asList(15,30,60);
+		List<Integer> stopTimeList = Arrays.asList(15);
+		Integer idx = 0;
 		for (Double demandScenario : demandScenarios){
+			
+			for (Integer stoptime :  stopTimeList){
 			//For each demandScenario we are generating a new config file
 			//Some config parameters will be taken from the provided config file
 			//Other config parameters will be generated or modified dynamically within this loop
@@ -73,10 +84,17 @@ public class RunDrtScenarioBatch {
 			
 			//Overwrite existing configuration parameters
 			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/population/SmallSplits/run124.100.output_plans_DRT"+demandScenario.toString()+".xml.gz");
-			config.controler().setLastIteration(10); //Number of simulation iterations
-			config.controler().setWriteEventsInterval(5); //Write Events file every x-Iterations 
-			config.controler().setWritePlansInterval(5); //Write Plan file every x-Iterations
-
+			config.controler().setLastIteration(5); //Number of simulation iterations
+			config.controler().setWriteEventsInterval(1); //Write Events file every x-Iterations 
+			config.controler().setWritePlansInterval(1); //Write Plan file every x-Iterations
+			//Set runId according to idx
+			String runId = runIdList.get(idx);
+			config.controler().setRunId(runId);
+			//Increment idx
+			idx=idx+1;
+			
+			
+			
 			//This part allows to change dynamically DRT config parameters
 			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 			//DRT optimizer searches only the x-most closed vehicles. 
@@ -88,14 +106,19 @@ public class RunDrtScenarioBatch {
 			drt.setMaxTravelTimeBeta(900);
 			drt.setMaxTravelTimeAlpha(1.3);
 			drt.setMaxWaitTime(900);
-			stoptime=(int) drt.getStopDuration();
+			drt.setStopDuration(stoptime);
 			
-			config.controler().setOutputDirectory("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/results/"+demandScenario.toString()+"_stopDur"+stoptime.toString()+"/"); //Define dynamically the the output path
+			config.controler().setOutputDirectory("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/results/"+runId+"_"+demandScenario.toString()+"_stopDur"+stoptime.toString()+"_reloc_"+rebalancing+"/"); //Define dynamically the the output path
 			
 			//Every x-seconds the simulation calls a re-balancing process.
 			//Re-balancing has the task to move vehicles into cells or zones that fits typically with the demand situation
-			//The technically used re-balancing strategy is then installed/binded within the initialized controler  
+			//The technically used re-balancing strategy is then installed/binded within the initialized controler
+			
+			if (rebalancing==true)
+			{
+			System.out.println("Rebalancing Online");
 			drt.setRebalancingInterval(600);
+			}
 			
 			//For each demand scenario we are using a predefined drt vehicle fleet size 
 			
@@ -114,6 +137,16 @@ public class RunDrtScenarioBatch {
 				drt.setVehiclesFile("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/taxifleets/fleet_300.xml");	
 			}
 			
+			else if ( (double) demandScenario == 0.15)
+			{
+				drt.setVehiclesFile("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/taxifleets/fleet_400.xml");	
+			}
+			
+			else if ( (double) demandScenario == 0.2)
+			{
+				drt.setVehiclesFile("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/taxifleets/fleet_500.xml");	
+			}
+			
 			else 
 			{
 				System.out.println("Demand scenario not explicitly defined");
@@ -126,6 +159,13 @@ public class RunDrtScenarioBatch {
 			//Define the MATSim Controler
 			//Based on the prepared configuration this part creates a controller that runs
 			Controler controler = createControler(config, otfvis);
+			
+			
+			if (rebalancing==true)
+			{
+			drt.setRebalancingInterval(600);
+			
+			
 			
 			//Our re-balancing requires a DrtZonalSystem
 			//DrtZonalSystem splits the network into squares with x=1000m 
@@ -143,6 +183,7 @@ public class RunDrtScenarioBatch {
 				}
 			});
 			
+			}
 			
 			//Change the routing module in this way, that agents are forced to go to their closest bus stop.
 			//If we would remove this part, agents are searching a bus stop which lies in the direction of their destination but is maybe far away.
@@ -161,8 +202,9 @@ public class RunDrtScenarioBatch {
 			
 			//We finally run the controller to start MATSim
 			controler.run();
-
-	}
+			
+			}
+		}
 	}
 }
 
