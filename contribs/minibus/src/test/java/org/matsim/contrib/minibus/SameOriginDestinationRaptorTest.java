@@ -17,14 +17,13 @@ public class SameOriginDestinationRaptorTest {
 	@Rule
 	public MatsimTestUtils helper = new MatsimTestUtils();
 
-	/**
-	 * Currently (Jan'18) raptor throws an exception if from and to transit stops are same.
-	 */
+
 	@Test
 	public void sameFromAndToTransitStopTest() {
 		String config = "test/input/org/matsim/contrib/minibus/example-scenario/raptorFixMinimalExample/config_raptor.xml";
 		
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(config));
+		scenario.getConfig().controler().setLastIteration(1); // more iterations are not required to check this.
 		scenario.getConfig().controler().setOutputDirectory(helper.getOutputDirectory());
 		
 		Controler controler = new Controler(scenario);

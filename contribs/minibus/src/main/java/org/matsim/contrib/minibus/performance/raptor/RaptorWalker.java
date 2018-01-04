@@ -271,7 +271,7 @@ public class RaptorWalker {
 								sourcePointerRouteStop[routeStopToCheck.indexOfRouteStop] = source;
 								earliestArrivalTimeAtRouteStop[routeStopToCheck.indexOfRouteStop] = arrivalTimeAtTheFollowingRouteStop;
 
-								// is it also a earlier arrival time at the transit stop
+								// is it also an earlier arrival time at the transit stop
 								if (arrivalTimeAtTheFollowingRouteStop < earliestArrivalTimeAtTransitStop[routeStopToCheck.indexOfStopFacility]) {
 									earliestArrivalTimeAtTransitStop[routeStopToCheck.indexOfStopFacility] = arrivalTimeAtTheFollowingRouteStop;
 									sourcePointerTransitStops[routeStopToCheck.indexOfStopFacility] = source;
@@ -340,14 +340,7 @@ public class RaptorWalker {
 			int indexOfToTransitStop = this.getIndexForTransitStop(toTransitStop);
 					
 			SourcePointer source = sourcePointerTransitStops[indexOfToTransitStop];
-			if (source.source != null
-					&&
-					// following additional condition is required to exclude the case in which origin and destination are same transit stop. This can be verified by
-					// "this.raptorSearchData.routeStops[source.indexOfTargetRouteStop].indexOfStopFacility != indexOfToTransitStop"
-					// however, if above condition is used instead of "source.source.indexOfTargetRouteStop >= 0", most of the tests fail.
-					// Probably, because, same stop can serve two different routes and former condition does not allow that. Amit Jan'18
-					source.source.indexOfTargetRouteStop >= 0
-					) {
+			if (source.source != null) {
 				// something found - backtrace
 				List<RouteSegment> route = this.returnBacktracedRouteFromSourcePointer(source);
 				if (!route.isEmpty()) {
@@ -424,7 +417,14 @@ public class RaptorWalker {
 		SourcePointer currentSourcePointer = sourcePointer;
 		RouteSegment lastRouteSegment = null;
 		
-		while (currentSourcePointer.source != null) {
+		while (currentSourcePointer.source != null
+				&&
+				// following additional condition is required to exclude the case in which origin and destination are same transit stop (source.source.indexOfTargetRouteStop=-1).
+				// This can be verified by something like "this.raptorSearchData.routeStops[source.indexOfTargetRouteStop].indexOfStopFacility != indexOfToTransitStop"
+				// in getBestRouteFoundSoFar(...) method. However, if above condition is used in "getBestRouteFoundSoFar",
+				// it still throws exception here, so, excluding such situations here. Amit Jan'18
+				currentSourcePointer.source.indexOfTargetRouteStop >= 0
+				) {
 			RouteStopEntry fromRouteStopEntry = this.raptorSearchData.routeStops[currentSourcePointer.source.indexOfTargetRouteStop];
 			TransitStopFacility fromTransitStop = this.raptorSearchData.stops[fromRouteStopEntry.indexOfStopFacility].transitStopFacility;
 
