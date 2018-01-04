@@ -340,7 +340,14 @@ public class RaptorWalker {
 			int indexOfToTransitStop = this.getIndexForTransitStop(toTransitStop);
 					
 			SourcePointer source = sourcePointerTransitStops[indexOfToTransitStop];
-			if (source.source != null) {
+			if (source.source != null
+					&&
+					// following additional condition is required to exclude the case in which origin and destination are same transit stop. This can be verified by
+					// "this.raptorSearchData.routeStops[source.indexOfTargetRouteStop].indexOfStopFacility != indexOfToTransitStop"
+					// however, if above condition is used instead of "source.source.indexOfTargetRouteStop >= 0", most of the tests fail.
+					// Probably, because, same stop can serve two different routes and former condition does not allow that. Amit Jan'18
+					source.source.indexOfTargetRouteStop >= 0
+					) {
 				// something found - backtrace
 				List<RouteSegment> route = this.returnBacktracedRouteFromSourcePointer(source);
 				if (!route.isEmpty()) {
