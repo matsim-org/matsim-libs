@@ -37,15 +37,13 @@ public class RaptorTransitRouterProvider implements Provider<TransitRouter> {
     private final TransitRouterQuadTree transitRouterQuadTree;
     private final RaptorDisutility raptorDisutility;
     private final TransitRouterConfig transitRouterConfig;
-    private final TransitSchedule schedule;
 
     @Inject
     RaptorTransitRouterProvider(final TransitSchedule schedule, final Config config) {
-        //TODO configure these magic numbers. They are in PConfigGroup.
+        //TODO : These numbers are set in PConfigGroup. Need to provide a way to set these numbers if someone does not want to use PConfigGroup?
         double costPerMeterTraveled = 0.;
         double costPerBoarding = 0.;
 
-        this.schedule = schedule;
         this.transitRouterConfig = new TransitRouterConfig(
                 config.planCalcScore(),
                 config.plansCalcRoute(),
