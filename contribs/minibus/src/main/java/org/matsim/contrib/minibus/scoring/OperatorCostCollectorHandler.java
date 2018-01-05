@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 import java.util.HashMap;
@@ -126,6 +127,9 @@ public final class OperatorCostCollectorHandler implements TransitDriverStartsEv
 	public void handleEvent(VehicleAbortsEvent event) {
 		if (event.getVehicleId().toString().startsWith(this.pIdentifier)) {
 			// it's a paratransit vehicle
+			log.info("Paratransit vehicle " + event.getVehicleId() + " got stuck at "
+					+ Time.writeTime(event.getTime())
+					+ ". Operation cost is calculated until the stuck time.");
 			OperatorCostContainer operatorCostContainer = this.vehId2OperatorCostContainer.remove(event.getVehicleId());
 			operatorCostContainer.handleVehicleAborts(event);
 
