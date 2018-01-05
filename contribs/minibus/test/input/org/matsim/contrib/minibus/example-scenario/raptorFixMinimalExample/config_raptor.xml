@@ -157,7 +157,7 @@
 	<module name="transit" >
 		<param name="useTransit" value="true" />
 		<param name="transitScheduleFile" value="grid10min_0.13.transitSchedule_reduced.xml" />
-		<param name="vehiclesFile" value="../&INPUTBASE;/grid10min_0.13.vehicles.xml.gz" />
+		<param name="vehiclesFile" value="grid10min_0.13.vehicles.xml.gz" />
 		<param name="transitModes" value="pt" />
 	</module>
 
