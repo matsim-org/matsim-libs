@@ -24,9 +24,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleAbortsEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -43,7 +45,7 @@ import java.util.List;
  * @author aneumann
  *
  */
-public final class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener {
+public final class OperatorCostCollectorHandler implements TransitDriverStartsEventHandler, LinkEnterEventHandler, PersonLeavesVehicleEventHandler, AfterMobsimListener, VehicleAbortsEventHandler {
 	
 	private final static Logger log = Logger.getLogger(OperatorCostCollectorHandler.class);
 	
@@ -112,6 +114,27 @@ public final class OperatorCostCollectorHandler implements TransitDriverStartsEv
 				
 				// Note the operatorCostContainer is dropped at this point.
 			}
+		}
+	}
+	
+	/**
+	 * If the driver agent stucks, no PersonLeavesVehicleEvent will be thrown. Use the 
+	 * PersonStuckEvent instead as a replacement to avoid NullPointerExceptions and
+	 * calculate an approximate running time cost.
+	 */
+	@Override
+	public void handleEvent(VehicleAbortsEvent event) {
+		if (event.getVehicleId().toString().startsWith(this.pIdentifier)) {
+			// it's a paratransit vehicle
+			OperatorCostContainer operatorCostContainer = this.vehId2OperatorCostContainer.remove(event.getVehicleId());
+			operatorCostContainer.handleVehicleAborts(event);
+
+			// call all OperatorCostContainerHandler
+			for (OperatorCostContainerHandler operatorCostContainerHandler : this.operatorCostContainerHandlerList) {
+				operatorCostContainerHandler.handleOperatorCostContainer(operatorCostContainer);
+			}
+
+			// Note the operatorCostContainer is dropped at this point.
 		}
 	}
 

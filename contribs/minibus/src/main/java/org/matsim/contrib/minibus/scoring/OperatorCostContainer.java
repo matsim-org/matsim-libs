@@ -19,9 +19,12 @@
 
 package org.matsim.contrib.minibus.scoring;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -38,11 +41,15 @@ import org.matsim.vehicles.Vehicle;
  */
 final class OperatorCostContainer {
 	
+	@SuppressWarnings("unused")
+	private final static Logger log = Logger.getLogger(OperatorCostContainer.class);
+	
 	private final double costPerVehicleAndDay;
 	private final double expensesPerMeter;
 	private final double expensesPerSecond;
 	private TransitDriverStartsEvent transitDriverStartsE;
 	private PersonLeavesVehicleEvent transitDriverAlightsE;
+	private VehicleAbortsEvent vehicleAbortE;
 	
 	private double meterTravelled = 0.0;
 	
@@ -70,6 +77,15 @@ final class OperatorCostContainer {
 		this.transitDriverAlightsE = event;
 	}
 	
+	/**
+	 * This terminates the stage if the driver is stuck. If the driver stucks there should not be 
+	 * any PersonLeavesVehicleEvent since the last TransitDriverStartsEvent, so there is either
+	 * a PersonLeavesVehicleEvent or a PersonStuckEvent.
+	 */
+	public void handleVehicleAborts (VehicleAbortsEvent event) {
+		this.vehicleAbortE = event;
+	}
+	
 	public double getFixedCostPerDay(){
 		return this.costPerVehicleAndDay;
 	}
@@ -78,8 +94,19 @@ final class OperatorCostContainer {
 		return this.expensesPerMeter * this.meterTravelled;
 	}
 	
-	public double getRunningCostTime(){
-		double timeInService = this.transitDriverAlightsE.getTime() - this.transitDriverStartsE.getTime();
+	public double getRunningCostTime() {
+		double timeInService = 0;
+		if (transitDriverAlightsE != null) {
+			timeInService = this.transitDriverAlightsE.getTime() - this.transitDriverStartsE.getTime();
+		} else if (vehicleAbortE != null) {
+			timeInService = this.vehicleAbortE.getTime() - this.transitDriverStartsE.getTime();
+			log.info("Paratransit minibus driver " + transitDriverStartsE.getDriverId() + " got stuck at "
+					+ Time.writeTime(this.vehicleAbortE.getTime())
+					+ ". This stuck time is used to calculate running time cost.");
+		} else {
+			log.warn("Neither PersonLeavesVehicleEvent nor PersonStuckEvent found for TransitDriver "
+					+ transitDriverStartsE.getDriverId() + " after ");
+		}
 		return this.expensesPerSecond * timeInService;
 	}
 	
