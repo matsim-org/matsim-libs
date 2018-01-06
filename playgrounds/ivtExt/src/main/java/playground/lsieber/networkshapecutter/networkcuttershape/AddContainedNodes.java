@@ -3,7 +3,7 @@
  */
 package playground.lsieber.networkshapecutter.networkcuttershape;
 
-import java.util.HashSet;
+import java.util.Set;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -13,10 +13,11 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 /** @author Claudio Ruch */
+// TODO issues regarding class design, for instance polygons could be final and immutable to prevent errors
 public class AddContainedNodes {
 
     private final Network originalNetwork;
-    private HashSet<MultiPolygon> polygons;
+    private Set<MultiPolygon> polygons;
 
     /* package */ static AddContainedNodes of(Network originalNetwork) {
         return new AddContainedNodes(originalNetwork);
@@ -26,10 +27,8 @@ public class AddContainedNodes {
         this.originalNetwork = originalNetwork;
 
     }
-    
-    
 
-    /* package */ AddContainedNodes in(HashSet<MultiPolygon> polygons) {
+    /* package */ AddContainedNodes in(Set<MultiPolygon> polygons) {
         this.polygons = polygons;
         return this;
     }
