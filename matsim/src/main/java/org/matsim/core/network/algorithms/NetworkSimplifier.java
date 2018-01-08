@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * Simplifies a given network, by merging links. All other criteria met, no 
@@ -61,6 +62,8 @@ public final class NetworkSimplifier {
 	private Collection<Integer> nodeTopoToMerge = Arrays.asList( NetworkCalcTopoType.PASS1WAY , NetworkCalcTopoType.PASS2WAY );
 
 	private Set<Id<Node>> nodesNotToMerge = new HashSet<Id<Node>>();
+
+	private List<Id<Link>> linksWithDashes;
 	
 	
 	/**
@@ -81,8 +84,14 @@ public final class NetworkSimplifier {
 	public void run(final Network network, double thresholdLength){
 		run(network, thresholdLength, thresholdExceeded.BOTH);
 		run(network, thresholdLength, thresholdExceeded.EITHER);
+
+		extractLinksWithDashes(network);
 	}
-	
+
+	private void extractLinksWithDashes(Network network){
+		linksWithDashes = network.getLinks().keySet().stream().filter(id -> id.toString().contains("-")).collect(Collectors.toList());
+	}
+
 	
 	/**
 	 * Specifies a set of nodes of which all outgoing and ingoing links should not be merged.
