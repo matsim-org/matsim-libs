@@ -3,9 +3,9 @@
  */
 package playground.clruch.prep.timeinvariant;
 
-import ch.ethz.idsc.queuey.math.Entrywise;
 import ch.ethz.idsc.tensor.Tensor;
 import ch.ethz.idsc.tensor.Tensors;
+import ch.ethz.idsc.tensor.red.Entrywise;
 
 /** @author Claudio Ruch */
 enum IntervalWrap {

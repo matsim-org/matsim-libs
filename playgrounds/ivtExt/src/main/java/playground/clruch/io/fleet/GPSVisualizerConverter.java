@@ -23,7 +23,7 @@ public class GPSVisualizerConverter {
     public static void main(String[] args) throws Exception {
 
 
-        List<SFTableEntry> entriesList = new ArrayList();
+        List<SFTableEntry> entriesList = new ArrayList<>();
         
         /* GPS file conversion and sorting example */
         File inputFile = new File("/home/clruch/Downloads/SanFrancisco/new_abboip.txt");
@@ -49,7 +49,7 @@ public class GPSVisualizerConverter {
 
         bw.write("hello does it work");
         bw.close();
-        
+        br.close();
         
         
         // sorting
