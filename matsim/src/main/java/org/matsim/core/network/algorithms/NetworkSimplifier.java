@@ -126,7 +126,7 @@ public final class NetworkSimplifier {
 
 						if(inLink != null && outLink != null){
 //							if(!outLink.getToNode().equals(inLink.getFromNode())){
-							if(  additionalCheckForMergedLinks(inLink, outLink) ){
+							if(  areLinksMergeable(inLink, outLink) ){
 								if(this.mergeLinkStats){
 
 									// Only merge if threshold criteria is met.  
@@ -217,7 +217,7 @@ public final class NetworkSimplifier {
 		nodeTopo.run(network);
 	}
 
-	private boolean additionalCheckForMergedLinks(Link inLink, Link outLink) {
+	private boolean areLinksMergeable(Link inLink, Link outLink) {
 		List<Node> fromNodes = this.mergedLinksToIntermediateNodes.get(inLink.getId());
 		if (fromNodes==null) fromNodes = new ArrayList<>();
 		fromNodes.add(inLink.getFromNode());
