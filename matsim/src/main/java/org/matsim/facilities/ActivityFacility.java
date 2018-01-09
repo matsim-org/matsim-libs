@@ -22,10 +22,8 @@ package org.matsim.facilities;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.utils.objectattributes.attributable.Attributable;
 
-
-public interface ActivityFacility extends Facility<ActivityFacility>, Attributable {
+public interface ActivityFacility extends Facility<ActivityFacility> {
 
 	public Map<String, ActivityOption> getActivityOptions();
 

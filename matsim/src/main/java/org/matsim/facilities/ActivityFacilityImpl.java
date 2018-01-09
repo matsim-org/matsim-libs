@@ -32,11 +32,12 @@ import org.matsim.core.scenario.CustomizableUtils;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.objectattributes.attributable.Attributes;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * maintainer: mrieser / Senozon AG
  */
-public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassImplMarkerInterface, Lockable {
+public class ActivityFacilityImpl implements ActivityFacility, MatsimDataClassImplMarkerInterface, Lockable, Attributable {
 	// After some thinking, we think that this design is ok:
 	// * all methods are final (reduce maintenance for upstream maintainers)
 	// * the class itself is not final
