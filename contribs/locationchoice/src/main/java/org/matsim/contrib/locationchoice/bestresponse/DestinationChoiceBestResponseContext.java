@@ -54,6 +54,7 @@ import org.matsim.facilities.ActivityFacilityImpl;
 import org.matsim.facilities.ActivityOption;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author nagel
@@ -370,6 +371,11 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		public void setCoord(Coord coord) {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
+		}
+
+		@Override
+		public Attributes getAttributes() {
+			return new Attributes();
 		}
 	}
 }
