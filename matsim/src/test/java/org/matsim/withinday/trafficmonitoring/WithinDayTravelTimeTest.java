@@ -28,6 +28,7 @@ import org.junit.runner.RunWith;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -36,14 +37,16 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.framework.listeners.*;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -56,13 +59,15 @@ import junitparams.Parameters;
  * @author cdobler
  */
 @RunWith(JUnitParamsRunner.class)
-public class TravelTimeCollectorTest extends MatsimTestCase {
+public class WithinDayTravelTimeTest extends MatsimTestCase {
 
 	@Rule
 	public MatsimTestUtils helper = new MatsimTestUtils();
 	
 	Random random = MatsimRandom.getRandom();
-		 
+	private static Link link22;
+	private static double originalFreeSpeed22;
+	
 	@Test
 	@Parameters({"false", "true"})
 	public void testGetLinkTravelTime(boolean isUsingFastCapacityUpdate) {
@@ -73,11 +78,48 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
 		qSimConfig.setUsingFastCapacityUpdate(isUsingFastCapacityUpdate);
-		config.controler().setLastIteration(0);
 
+		config.controler().setLastIteration(0);
+		
+		config.controler().setCreateGraphs(false);
+		config.controler().setDumpDataAtEnd(false);
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
+		
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		
+		config.network().setTimeVariantNetwork(true);
+		
+		// ---
+		
 		final Scenario scenario = ScenarioUtils.loadScenario(config);
-		final TravelTimeCollector travelTime = new TravelTimeCollector(scenario, null);
-		MobsimListenerForTests listener = new MobsimListenerForTests(scenario, travelTime);
+		
+		// ---
+		
+		// I in particular want to test if change events from before simulation start
+		// are picked up (which they originally were not).  kai, dec'17
+		Network network = scenario.getNetwork() ;
+		
+		link22 = network.getLinks().get(Id.createLinkId(22));
+		originalFreeSpeed22 = link22.getFreespeed() ;
+		Gbl.assertNotNull(link22);
+		{
+			NetworkChangeEvent event = new NetworkChangeEvent(5. * 3600.);
+			ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, 0.);
+			event.setFreespeedChange(freespeedChange);
+			NetworkUtils.addNetworkChangeEvent(network, event);
+			event.addLink(link22);
+		}
+		{
+			NetworkChangeEvent event = new NetworkChangeEvent(6. * 3600.);
+			ChangeValue freespeedChange = new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, originalFreeSpeed22);
+			event.setFreespeedChange(freespeedChange);
+			NetworkUtils.addNetworkChangeEvent(network, event);
+			event.addLink(link22);
+		}
+		
+		final WithinDayTravelTime travelTime = new WithinDayTravelTime(scenario, null);
+		final MobsimListener listener = new MobsimListenerForTests(scenario, travelTime);
 		final FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 		fosl.addSimulationListener(travelTime);
 		fosl.addSimulationListener(listener);
@@ -107,12 +149,6 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 				addMobsimListenerBinding().toInstance(fosl);
 			}
 		});
-        controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setDumpDataAtEnd(false);
-		controler.getConfig().controler().setWriteEventsInterval(0);
-		controler.getConfig().controler().setWritePlansInterval(0);
-		
-		controler.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		
 		controler.run();
 	}
@@ -126,7 +162,7 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 		MobsimAfterSimStepListener {
 		
 		private TravelTime travelTime;
-		private Link link = null;
+		private final Link link ;
 		private boolean isUsingFastCapacityUpdate;
 		private int t1 = 6*3600;
 		private int t2 = 6*3600 + 5*60;
@@ -185,6 +221,11 @@ public class TravelTimeCollectorTest extends MatsimTestCase {
 	        } else if (time == t8) {
 	            assertEquals(359.9712023038157, travelTime.getLinkTravelTime(link, t8, null, null));
 	        }
+	        if ( time== 6*3600-1 ) {
+				assertEquals( Double.POSITIVE_INFINITY, travelTime.getLinkTravelTime(link22,6*3600-1, null, null ) ) ;
+			} else if ( time==6*3600+1 ) {
+				assertEquals(link22.getLength()/originalFreeSpeed22, travelTime.getLinkTravelTime(link22, 6 * 3600 - 1, null, null));
+			}
 	    }
 	}	
 }

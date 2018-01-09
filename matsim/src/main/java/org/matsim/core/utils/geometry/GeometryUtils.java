@@ -9,12 +9,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.vividsolutions.jts.geom.*;
+import org.geotools.geometry.jts.GeometryBuilder;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
 
 /**
  * @author kainagel
@@ -77,6 +76,25 @@ public class GeometryUtils {
 		Coordinate toCoord = CoordUtils.createGeotoolsCoordinate( link.getToNode().getCoord() ) ;
 		LineString theSegment = new GeometryFactory().createLineString(new Coordinate[]{ fromCoord, toCoord });
 		return theSegment;
+	}
+	
+	public static Point createGeotoolsPoint(Coord coord ) {
+		Coordinate coordinate = CoordUtils.createGeotoolsCoordinate(coord) ;
+		Point point = new GeometryFactory().createPoint( coordinate ) ;
+		return point ;
+	}
+	
+	public static Polygon createGeotoolsPolygon(List<Coord> coords ) {
+		// better way to do this is welcome.  kai, dec'17
+		double [] flatArray = new double[coords.size()*2] ;
+		int ii=0 ;
+		for ( Coord coord : coords ) {
+			flatArray[ii] = coord.getX() ;
+			ii++ ;
+			flatArray[ii] = coord.getY() ;
+			ii++ ;
+		}
+		return new GeometryBuilder().polygon( flatArray ) ;
 	}
 	
 }

@@ -120,7 +120,7 @@ public class CreateEmissionConfig {
 	        ecg.setDetailedWarmEmissionFactorsFile(detailedWarmEmissionFactorsFile);
 	        ecg.setDetailedColdEmissionFactorsFile(detailedColdEmissionFactorsFile);
 
-	        ecg.setIgnoringEmissionsFromEventsFile(false);
+	        ecg.setWritingEmissionsEvents(false);
 	        ecg.setEmissionCostMultiplicationFactor(1.0);
 	        ecg.setConsideringCO2Costs(true);
 	        ecg.setEmissionEfficiencyFactor(1.0);

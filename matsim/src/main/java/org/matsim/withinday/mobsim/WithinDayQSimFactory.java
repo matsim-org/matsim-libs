@@ -28,7 +28,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
+import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
 import javax.inject.Inject;
 
@@ -40,10 +40,10 @@ public class WithinDayQSimFactory implements Provider<Mobsim> {
 	private final EventsManager eventsManager;
 	private final WithinDayEngine withinDayEngine;
 	private final FixedOrderSimulationListener fixedOrderSimulationListener;
-	private final TravelTimeCollector travelTimeCollector;
+	private final WithinDayTravelTime travelTimeCollector;
 
 	@Inject
-	WithinDayQSimFactory(Scenario scenario, EventsManager eventsManager, WithinDayEngine withinDayEngine, FixedOrderSimulationListener fixedOrderSimulationListener, TravelTimeCollector travelTimeCollector) {
+	WithinDayQSimFactory(Scenario scenario, EventsManager eventsManager, WithinDayEngine withinDayEngine, FixedOrderSimulationListener fixedOrderSimulationListener, WithinDayTravelTime travelTimeCollector) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.withinDayEngine = withinDayEngine;

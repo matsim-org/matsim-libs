@@ -131,7 +131,7 @@ public class Grid {
 					
 					if (!activity.getType().equalsIgnoreCase(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
 						
-						if (this.consideredActivitiesForSpatialFunctionality.contains(activity.getType())) {
+						if (this.consideredActivitiesForSpatialFunctionality.contains(activity.getType()) || consideredActivityPrefix(activity.getType(), this.consideredActivitiesForSpatialFunctionality)) {
 							List<Coord> activityCoordinates = new ArrayList<Coord>();
 							
 							if (personId2consideredActivityCoords.containsKey(person.getId())) {
@@ -144,7 +144,7 @@ public class Grid {
 							consideredActivityCoordsForSpatialFunctionality.add(activity.getCoord());
 						}
 						
-						if (this.consideredActivitiesForReceiverPointGrid.contains(activity.getType())) {
+						if (this.consideredActivitiesForReceiverPointGrid.contains(activity.getType()) || consideredActivityPrefix(activity.getType(), consideredActivitiesForReceiverPointGrid)) {
 							consideredActivityCoordsForReceiverPointGrid.add(activity.getCoord());
 						}
 					}
@@ -153,6 +153,17 @@ public class Grid {
 		}
 	}
 	
+	private boolean consideredActivityPrefix(String type, List<String> list) {
+		for (String consideredActivity : list) {
+			if (consideredActivity.endsWith("*")) {
+				if (type.startsWith(consideredActivity.substring(0, consideredActivity.length() - 1))) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	private void loadGrid() {
 				
 		String gridCSVFile = this.noiseParams.getReceiverPointsCSVFile();

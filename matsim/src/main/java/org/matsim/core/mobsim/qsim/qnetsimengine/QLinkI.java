@@ -42,7 +42,7 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  *
  */
-interface QLinkI extends NetsimLink, TimeVariantLink {
+public interface QLinkI extends NetsimLink, TimeVariantLink {
 	// yyyy might make make sense to also pass the "isAccepting/addFromUpstream" through something like 
 	// "getFromNodeQueueLanes". kai, feb'16
 	

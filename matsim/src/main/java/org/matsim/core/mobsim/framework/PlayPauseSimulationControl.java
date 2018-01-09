@@ -16,7 +16,10 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.vis.otfvis;
+package org.matsim.core.mobsim.framework;
+
+import java.util.concurrent.Phaser;
+import java.util.concurrent.Semaphore;
 
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
@@ -24,11 +27,6 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.vis.otfvis.interfaces.PlayPauseSimulationControlI;
-import org.matsim.vis.snapshotwriters.VisMobsim;
-
-import java.util.concurrent.Phaser;
-import java.util.concurrent.Semaphore;
 
 /**
  * Extracted the play/pause functionality from otfvis to make it available for other purposes (specifically, RMITs 
@@ -44,13 +42,13 @@ public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 
 	private volatile Status status = Status.PLAY;
 
-	private final Semaphore accessToQNetwork = new Semaphore(1, true);
+	private final Semaphore access = new Semaphore(1, true);
 
 	private volatile double localTime = -1;
 
 	private final Phaser stepDone = new Phaser(1);
 
-	public PlayPauseSimulationControl(VisMobsim qSim) {
+	public PlayPauseSimulationControl(ObservableMobsim qSim) {
 		PlayPauseMobsimListener playPauseMobsimListener = new PlayPauseMobsimListener();
 		qSim.addQueueSimulationListeners(playPauseMobsimListener);
 	}
@@ -59,15 +57,16 @@ public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 		@Override
 		public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent event) {
 			try {
-				accessToQNetwork.acquire();
+				access.acquire();
 			} catch (InterruptedException e) {
 				throw new RuntimeException(e);
 			}
 		}
 		@Override
 		public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent event) {
-			accessToQNetwork.release();
+			access.release();
 			localTime = (int) event.getSimulationTime();
+			// yy I am not so sure about the "int".  kai, nov'17
 			stepDone.arriveAndAwaitAdvance();
 		}
 		@Override
@@ -103,19 +102,15 @@ public class PlayPauseSimulationControl implements PlayPauseSimulationControlI {
 		}
 	}
 
-	// for everything below here, I am not yet sure which of these need to be there. kai, mar'15
-
-	Semaphore getAccessToQNetwork() {
-		return accessToQNetwork;
+	public final Semaphore getAccess() {
+		return access;
 	}
 
-	// purely observational only below this line (probably not a problem)
-	
-	boolean isFinished() {
+	public final boolean isFinished() {
 		return ( localTime == Double.MAX_VALUE ) ;
 	}
 
-	public double getLocalTime() {
+	public final double getLocalTime() {
 		return localTime;
 	}
 

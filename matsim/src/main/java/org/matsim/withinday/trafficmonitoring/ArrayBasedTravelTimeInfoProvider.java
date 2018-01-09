@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.priorityqueue.HasIndex;
-import org.matsim.withinday.trafficmonitoring.TravelTimeCollector.TravelTimeInfo;
+import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime.TravelTimeInfo;
 
 public class ArrayBasedTravelTimeInfoProvider implements TravelTimeInfoProvider {
 
@@ -43,8 +43,8 @@ public class ArrayBasedTravelTimeInfoProvider implements TravelTimeInfoProvider 
 	 * There, only link ids are available. We cannot optimize this. 
 	 */
 	@Override
-	public TravelTimeInfo getTravelTimeData(final Id<Link> linkId) {
-		return this.delegate.getTravelTimeData(linkId);
+	public TravelTimeInfo getTravelTimeInfo(final Id<Link> linkId) {
+		return this.delegate.getTravelTimeInfo(linkId);
 	}
 	
 	/*
@@ -52,17 +52,17 @@ public class ArrayBasedTravelTimeInfoProvider implements TravelTimeInfoProvider 
 	 * There, link are available. we can optimize this by using an array instead of a map.
 	 */
 	@Override
-	public TravelTimeInfo getTravelTimeData(Link link) {
+	public TravelTimeInfo getTravelTimeInfo(Link link) {
 		if (link instanceof HasIndex) {
 			int index = ((HasIndex) link).getArrayIndex();
 			TravelTimeInfo data = this.arrayLinkData[index];
 			if (data == null) {
-				data = this.delegate.getTravelTimeData(link);
+				data = this.delegate.getTravelTimeInfo(link);
 				this.arrayLinkData[index] = data;
 			}
 			return data;
 		} else {
-			return this.delegate.getTravelTimeData(link);
+			return this.delegate.getTravelTimeInfo(link);
 		}
 	}
 	

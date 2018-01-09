@@ -63,13 +63,13 @@ import java.util.concurrent.CyclicBarrier;
  * @author cdobler
  */
 @Singleton
-public class TravelTimeCollector implements TravelTime,
+public class WithinDayTravelTime implements TravelTime,
 		LinkEnterEventHandler, LinkLeaveEventHandler, PersonStuckEventHandler,
 		VehicleLeavesTrafficEventHandler, VehicleEntersTrafficEventHandler,
 		MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener,
 		MobsimBeforeCleanupListener {
 
-	private static final Logger log = Logger.getLogger(TravelTimeCollector.class);
+	private static final Logger log = Logger.getLogger(WithinDayTravelTime.class);
 
 	private Network network;
 
@@ -80,7 +80,8 @@ public class TravelTimeCollector implements TravelTime,
 	private TravelTimeInfoProvider travelTimeInfoProvider;
 
 	// Links that are changed by network change events
-	private Map<Double, Collection<Link>> changedLinks;
+	private TreeMap<Double, Map<Link,Double>> changedLinks;
+	// yy better a priority queue.  kai, dec'17
 	
 	/*
 	 * For parallel Execution
@@ -97,14 +98,19 @@ public class TravelTimeCollector implements TravelTime,
 	private final Set<String> analyzedModes;
 	private final boolean filterModes;
 
-	boolean problem = true ;
-
+	private boolean problem = true ;
+	private int resetCnt = 0;
+	
+	private double now = Double.NEGATIVE_INFINITY ;
+	
 	@Inject
-	TravelTimeCollector(Scenario scenario) {
+	WithinDayTravelTime(Scenario scenario) {
 		this(scenario, null);
 	}
 
-	public TravelTimeCollector(Scenario scenario, Set<String> analyzedModes) {
+	public WithinDayTravelTime(Scenario scenario, Set<String> analyzedModes) {
+//		log.setLevel(Level.DEBUG);
+		
 		/*
 		 * The parallelization should scale almost linear, therefore we do use
 		 * the number of available threads according to the config file.
@@ -126,7 +132,7 @@ public class TravelTimeCollector implements TravelTime,
 	private void init() {
 		this.regularActiveTrips = new HashMap<>();
 		this.travelTimeInfos = new ConcurrentHashMap<>();
-		this.changedLinks = new HashMap<>();
+		this.changedLinks = new TreeMap<>();
 		this.vehiclesToFilter = new HashSet<>();
 		
 		// one TravelTimeInfo per link:
@@ -147,40 +153,77 @@ public class TravelTimeCollector implements TravelTime,
 		 * If the network is time variant, we have to update the link parameters
 		 * according to the network change events.
 		 */
-		if (this.network instanceof Network) {
-			Collection<NetworkChangeEvent> networkChangeEvents = NetworkUtils.getNetworkChangeEvents(((Network) this.network));
-			if (networkChangeEvents != null) {
-				for (NetworkChangeEvent networkChangeEvent : networkChangeEvents) {
-					ChangeValue freespeedChange = networkChangeEvent.getFreespeedChange();
-					if (freespeedChange != null) {
-						double startTime = networkChangeEvent.getStartTime();
-						Collection<Link> links = changedLinks.get(startTime);
-						if (links == null) {
-							links = new HashSet<>();
-							changedLinks.put(startTime, links);
+		Queue<NetworkChangeEvent> networkChangeEvents = NetworkUtils.getNetworkChangeEvents(this.network);
+		
+		// I just changed the return type of the network change events from Collection to Queue.
+		// This should, in a first step, allow to remove the separate changedLinks data structure.
+		// In a second step, this should allow to insert link change events after everything
+		// has started.  kai, dec'17
+		// Well, but maybe I don't even want this, and I want this class here recognize changes
+		// only when someone observes them??? (bushfire evacuation use case). kai, dec'17
+		
+		// If one looks at transport telematics, then we need to also be able to set expected
+		// speeds for the future!  Which would indeed justify its own data model.  kai, dec'17
+		// (in contrast, watch out: the NetworkChangeEventsEngine also keeps its own
+		// copy for the mobsim)
+		
+		if (networkChangeEvents != null) {
+			for (NetworkChangeEvent networkChangeEvent : networkChangeEvents) {
+				ChangeValue freespeedChange = networkChangeEvent.getFreespeedChange();
+				if (freespeedChange != null) {
+					double startTime = networkChangeEvent.getStartTime();
+					Map<Link,Double> links = changedLinks.computeIfAbsent(startTime, k -> new HashMap<>());
+					for ( Link link : networkChangeEvent.getLinks() ) {
+						// yy seems that the following should be available centrally. kai, dec'17
+						double newSpeed ;
+						switch ( freespeedChange.getType() ) {
+							case ABSOLUTE_IN_SI_UNITS:
+								newSpeed = freespeedChange.getValue() ;
+								break;
+							case FACTOR:
+								newSpeed = link.getFreespeed() * freespeedChange.getValue() ;
+								break;
+							case OFFSET_IN_SI_UNITS:
+								newSpeed = link.getFreespeed() + freespeedChange.getValue() ;
+								break;
+							default:
+								throw new RuntimeException("change event type not implemented") ;
 						}
-						links.addAll(networkChangeEvent.getLinks());
+						if ( startTime > 0. ) {
+							log.debug( "registering a change event for time=" + startTime
+							+ "; linkId=" + link.getId() ) ;
+						}
+						links.put( link, newSpeed ) ;
 					}
-				}				
+				}
 			}
-		}		
+		}
+	}
+	
+	public void changeSpeedMetersPerSecond( Link link, double speed ) {
+		// yy note that this method should allow to set expectations for the future (transport telematics).
+		// But the implementation actually does not.  Since this class is the one that enforces
+		// the behavior that agents cannot look ahead.  Which also is not true: they can speculate
+		// about the future. kai, dec'17
+		
+		Map<Link,Double> links = changedLinks.computeIfAbsent(this.now, k -> new HashMap<>());
+		links.put( link, speed ) ;
 	}
 
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		return this.travelTimeInfoProvider.getTravelTimeData(link).travelTime;
+		final double travelTime = this.travelTimeInfoProvider.getTravelTimeInfo(link).travelTime;
+		return travelTime;
 	}
-
+	
 	@Override
 	public void reset(int iteration) {
 		init();
-		int resetCnt = 0;
-		if ( resetCnt >=1 ) {
-			// yyyy this can never be reached, or can it?  kai, may'17
+		resetCnt++ ;
+		if ( resetCnt >1 ) {
 			if ( problem ) {
 				throw new RuntimeException("using TravelTimeCollector, but mobsim notifications not called between two resets.  "
 						+ "Did you really add this as a mobsim listener?") ;
-				// in practice, it seems to fail even earlier with some null pointer exception. kai, may'15
 			}
 		}
 	}
@@ -214,7 +257,7 @@ public class TravelTimeCollector implements TravelTime,
 
 			double tripTime = tripBin.leaveTime - tripBin.enterTime;
 
-			TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeData(linkId);
+			TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeInfo(linkId);
 			travelTimeInfo.tripBins.add(tripBin);
 			travelTimeInfo.addedTravelTimes += tripTime;
 			travelTimeInfo.addedTrips++;
@@ -279,7 +322,7 @@ public class TravelTimeCollector implements TravelTime,
 		for (Link link : this.network.getLinks().values()) {
 			double freeSpeedTravelTime = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
 
-			TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeData(link);
+			TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeInfo(link);
 			travelTimeInfo.travelTime = freeSpeedTravelTime;
 			travelTimeInfo.init(freeSpeedTravelTime);
 		}
@@ -293,22 +336,52 @@ public class TravelTimeCollector implements TravelTime,
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		problem = false ;
 		
-		Collection<Link> links = changedLinks.remove(e.getSimulationTime());
+		// yyyy In terms of "bushfire evacuation" design (and maybe even in terms of more general transport telematics)
+		// one would need some settable TimeDependentNetworkUpdater class.  kai, dec'17
 		
-		if (links != null) {
-			for (Link link : links) {
-				double freeSpeedTravelTime = link.getLength() / link.getFreespeed(e.getSimulationTime());
-				TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeData(link);
+//		Collection<Link> links = changedLinks.remove(e.getSimulationTime());
+		// yyyyyy I find it quite optimistic to do this with doubles. What
+		// if someone adds a link change event in between two integer
+		// time steps?  kai, dec'17
+		
+		while( !changedLinks.isEmpty() && changedLinks.firstKey() <= e.getSimulationTime() ) {
+			Map<Link, Double> map = changedLinks.pollFirstEntry().getValue();
+			for ( Map.Entry<Link,Double> link2speed : map.entrySet() ) {
+				Link link = link2speed.getKey() ;
+				double freeSpeedTravelTime = link.getLength() / link2speed.getValue() ;
+				if ( e.getSimulationTime() > ((QSim)e.getQueueSimulation()).getSimTimer().getSimStartTime() ) {
+					// (otherwise, in some simulations one gets a lot of change events at time 0. kai, dec'17)
+					log.debug("time=" + e.getSimulationTime() +
+									  "; network change event for link=" + link.getId() +
+									  "; new ttime="+ freeSpeedTravelTime );
+				}
+				TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeInfo(link);
 				travelTimeInfo.init(freeSpeedTravelTime);
 				travelTimeInfo.checkActiveState();	// ensure that the estimated link travel time is updated
 			}
 		}
+		
+//		if (links != null) {
+//			for (Link link : links) {
+//				double freeSpeedTravelTime = link.getLength() / link.getFreespeed(e.getSimulationTime());
+//				if ( e.getSimulationTime() > 0 ) {
+//					log.debug("time=" + e.getSimulationTime() +
+//									  ";\tnetwork change event for link=" + link.getId() +
+//									  ";\tnew ttime="+ freeSpeedTravelTime );
+//				}
+//				TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeInfo(link);
+//				travelTimeInfo.init(freeSpeedTravelTime);
+//				travelTimeInfo.checkActiveState();	// ensure that the estimated link travel time is updated
+//			}
+//		}
 	}
 
 	// Update Link TravelTimes
 	@Override
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		problem = false ;
+		
+		now = e.getSimulationTime() ;
 
 		// parallel Execution
 		this.run(e.getSimulationTime());

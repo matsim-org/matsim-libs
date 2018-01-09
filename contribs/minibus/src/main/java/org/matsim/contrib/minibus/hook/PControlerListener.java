@@ -19,6 +19,9 @@
 
 package org.matsim.contrib.minibus.hook;
 
+import java.util.HashSet;
+import java.util.Set;
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.minibus.PConfigGroup;
@@ -45,11 +48,6 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 
-import com.google.inject.Inject;
-
-import java.util.HashSet;
-import java.util.Set;
-
 
 /**
  * Hook to register paratransit black box with MATSim
@@ -61,6 +59,8 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 	private final static Logger log = Logger.getLogger(PControlerListener.class);
 
 	private final PVehiclesFactory pVehiclesFactory;
+	
+	@Inject private PTransitRouterFactory pTransitRouterFactory;
 
 	@Inject(optional=true) private AgentsStuckHandlerImpl agentsStuckHandler;
 	private final POperators operators ;
@@ -81,7 +81,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 		addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(pBox.getpTransitSchedule()));
 
 		//		this.pTransitRouterFactory.createTransitRouterConfig(event.getServices().getConfig());
-		//		this.pTransitRouterFactory.updateTransitSchedule();
+		this.pTransitRouterFactory.updateTransitSchedule();
 
 		if(this.agentsStuckHandler != null){
 			event.getServices().getEvents().addHandler(this.agentsStuckHandler);
@@ -101,7 +101,7 @@ final class PControlerListener implements IterationStartsListener, StartupListen
 			removePreviousPVehiclesFromScenario(event.getServices().getScenario().getTransitVehicles());
 			addPVehiclesToOriginalOnes(event.getServices().getScenario().getTransitVehicles(), this.pVehiclesFactory.createVehicles(pBox.getpTransitSchedule()));
 
-			//			this.pTransitRouterFactory.updateTransitSchedule();
+			this.pTransitRouterFactory.updateTransitSchedule();
 
 			if(this.agentsStuckHandler != null){
 				ParallelPersonAlgorithmUtils.run(controler.getScenario().getPopulation(), controler.getConfig().global().getNumberOfThreads(), new ParallelPersonAlgorithmUtils.PersonAlgorithmProvider() {

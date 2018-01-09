@@ -36,7 +36,7 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
  * @author nagel
  *
  */
-interface QLaneI extends Identifiable<Lane> {
+public interface QLaneI extends Identifiable<Lane> {
 	
 	void addFromWait( final QVehicle veh);
 

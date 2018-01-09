@@ -1,5 +1,7 @@
 package org.matsim.core.router;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -16,8 +18,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class NetworkRouting implements Provider<RoutingModule> {
-
+public class NetworkRoutingProvider implements Provider<RoutingModule> {
+	private static final Logger log = Logger.getLogger( NetworkRoutingProvider.class ) ;
+	
+	private final String routingMode;
 	@Inject
     Map<String, TravelTime> travelTimes;
 
@@ -38,15 +42,25 @@ public class NetworkRouting implements Provider<RoutingModule> {
 
 	@Inject
     LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-
-	public NetworkRouting(String mode) {
+	
+	public NetworkRoutingProvider(String mode) {
+		this( mode, mode ) ;
+	}
+	public NetworkRoutingProvider(String mode, String routingMode ) {
+		log.setLevel(Level.DEBUG);
+		
 		this.mode = mode;
+		this.routingMode = routingMode ;
 	}
 
 	private final String mode;
 
 	@Override
 	public RoutingModule get() {
+		log.debug( "requesting network routing module with routingMode="
+						   + routingMode + ";\tmode=" + mode) ;
+		
+		// the network refers to the (transport)mode:
 		Network filteredNetwork = null;
 
 		// Ensure this is not performed concurrently by multiple threads!
@@ -62,13 +76,14 @@ public class NetworkRouting implements Provider<RoutingModule> {
 			}
 		}
 
-		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactories.get(mode);
+		// the travel time & disutility refer to the routing mode:
+		TravelDisutilityFactory travelDisutilityFactory = this.travelDisutilityFactories.get(routingMode);
 		if (travelDisutilityFactory == null) {
-			throw new RuntimeException("No TravelDisutilityFactory bound for mode "+mode+".");
+			throw new RuntimeException("No TravelDisutilityFactory bound for mode "+routingMode+".");
 		}
-		TravelTime travelTime = travelTimes.get(mode);
+		TravelTime travelTime = travelTimes.get(routingMode);
 		if (travelTime == null) {
-			throw new RuntimeException("No TravelTime bound for mode "+mode+".");
+			throw new RuntimeException("No TravelTime bound for mode "+routingMode+".");
 		}
 		LeastCostPathCalculator routeAlgo =
 				leastCostPathCalculatorFactory.createPathCalculator(
@@ -76,6 +91,7 @@ public class NetworkRouting implements Provider<RoutingModule> {
 						travelDisutilityFactory.createTravelDisutility(travelTime),
 						travelTime);
 
+		// the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
 		if ( plansCalcRouteConfigGroup.isInsertingAccessEgressWalk() ) {
 			return DefaultRoutingModules.createAccessEgressNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo,
 					plansCalcRouteConfigGroup) ;

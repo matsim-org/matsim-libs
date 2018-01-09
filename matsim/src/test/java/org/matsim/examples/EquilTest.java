@@ -94,6 +94,6 @@ public class EquilTest extends MatsimTestCase {
 
 		writer.closeFile();
 
-		assertEquals("different event files.", EventsFileComparator.compare(referenceFileName, eventsFileName), 0);
+		assertEquals("different event files.", EventsFileComparator.compareAndReturnInt(referenceFileName, eventsFileName), 0);
 	}
 }
