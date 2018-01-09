@@ -149,10 +149,8 @@ import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegat
         if (facility.getDesc() != null) {
             out.write(" desc=\"" + facility.getDesc() + "\"");
         }
-        out.write(">\n\n");
-        //this.attributesWriter.writeAttributes("\t", out, facility.getAttributes());
-        this.attributesWriter.writeAttributes("\t\t", this.writer, facility.getAttributes());
-        out.write("\n");
+        out.write(">\n");
+        this.attributesWriter.writeAttributes("\t\t", out, facility.getAttributes());
     }
 
     public void endFacility(final BufferedWriter out) throws IOException {
