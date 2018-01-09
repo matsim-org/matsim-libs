@@ -62,8 +62,8 @@ public class AccessibilityComputationNairobiTest {
 	
 	@Test
 	public void runAccessibilityComputation() {
-		Double cellSize = 2000.;
-		boolean push2Geoserver = false; // Set true for run on server
+		Double cellSize = 500.;
+		boolean push2Geoserver = true; // Set true for run on server
 		boolean createQGisOutput = true; // Set false for run on server
 
 		final Config config = ConfigUtils.createConfig(new AccessibilityConfigGroup());
@@ -128,7 +128,7 @@ public class AccessibilityComputationNairobiTest {
 		acg.setCellSizeCellBasedAccessibility(cellSize.intValue());
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.freespeed, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.walk, true);
-		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, false);
+		acg.setComputingAccessibilityForMode(Modes4Accessibility.bike, true);
 		acg.setComputingAccessibilityForMode(Modes4Accessibility.pt, false );
 		acg.setOutputCrs(scenarioCRS);
 		
@@ -172,15 +172,8 @@ public class AccessibilityComputationNairobiTest {
 //		scenario.setTransitVehicles(vehicles);
 		
 		// Activity types
-//		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING, FacilityTypes.EDUCATION});
-//		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING});
-		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.WORK});
-//		activityTypes.add("Commercial"); // land-use file version
-//		activityTypes.add("Industrial"); // land-use file version
-//		activityTypes.add("Public Purpose"); // land-use file version
-//		activityTypes.add("Recreational"); // land-use file version
-		log.info("Using activity types: " + activityTypes);
-
+		final List<String> activityTypes = Arrays.asList(new String[]{FacilityTypes.SHOPPING, FacilityTypes.EDUCATION, FacilityTypes.LEISURE});
+		
 		// Network density points (as proxy for population density)
 		final ActivityFacilities densityFacilities = AccessibilityUtils.createFacilityForEachLink(scenario.getNetwork());
 		// will be aggregated in downstream code!

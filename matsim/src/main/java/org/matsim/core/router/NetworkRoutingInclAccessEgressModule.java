@@ -89,6 +89,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final Network network,
 			final LeastCostPathCalculator routeAlgo,
 			PlansCalcRouteConfigGroup calcRouteConfig) {
+		Gbl.assertNotNull(network);
+		Gbl.assertIf( network.getLinks().size()>0 ) ; // otherwise network for mode probably not defined
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.mode = mode;
@@ -101,11 +103,13 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(
+	public synchronized List<? extends PlanElement> calcRoute(
 			final Facility fromFacility,
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
+		// I need this "synchronized" since I want mobsim agents to be able to call this during the mobsim.  So when the
+		// mobsim is multi-threaded, multiple agents might call this here at the same time.  kai, nov'17
 		
 		Gbl.assertNotNull(fromFacility);
 		Gbl.assertNotNull(toFacility);
@@ -129,7 +133,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 				Leg accessLeg = this.populationFactory.createLeg( TransportMode.access_walk ) ;
 				accessLeg.setDepartureTime( now );
-				now += routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), accessActCoord, now, accessActLink.getId(), accessActLink.getId() ) ;
+				now += routeBushwhackingLeg(person, accessLeg, fromFacility.getCoord(), accessActCoord, now, accessActLink.getId(), 
+						accessActLink.getId(), this.populationFactory ) ;
 				// yyyy might be possible to set the link ids to null. kai & dominik, may'16
 				
 				result.add( accessLeg ) ;
@@ -164,7 +169,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 
 				Leg egressLeg = this.populationFactory.createLeg( TransportMode.egress_walk ) ;
 				egressLeg.setDepartureTime( now );
-				now += routeBushwhackingLeg(person, egressLeg, egressActCoord, toFacility.getCoord(), now, egressActLink.getId(), egressActLink.getId() ) ;
+				now += routeBushwhackingLeg(person, egressLeg, egressActCoord, toFacility.getCoord(), now, egressActLink.getId(), 
+						egressActLink.getId(), this.populationFactory ) ;
 				result.add( egressLeg ) ;
 //				log.warn( egressLeg );
 			}
@@ -214,7 +220,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	}
 
 
-	private double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime, Id<Link> dpLinkId, Id<Link> arLinkId) {
+	private static double routeBushwhackingLeg(Person person, Leg leg, Coord fromCoord, Coord toCoord, double depTime, 
+			Id<Link> dpLinkId, Id<Link> arLinkId, PopulationFactory pf) {
 		// I don't think that it makes sense to use a RoutingModule for this, since that again makes assumptions about how to
 		// map facilities, and if you follow through to the teleportation routers one even finds activity wrappers, which is yet another
 		// complication which I certainly don't want here.  kai, dec'15
@@ -226,7 +233,7 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 		double dist = CoordUtils.calcEuclideanDistance(fromCoord,toCoord);
 
 		// create an empty route, but with realistic travel time
-		Route route = this.populationFactory.getRouteFactories().createRoute(Route.class, dpLinkId, arLinkId ); 
+		Route route =pf.getRouteFactories().createRoute(Route.class, dpLinkId, arLinkId ); 
 
 		double beelineDistanceFactor = 1.3 ;
 		double networkTravelSpeed = 2.0 ;

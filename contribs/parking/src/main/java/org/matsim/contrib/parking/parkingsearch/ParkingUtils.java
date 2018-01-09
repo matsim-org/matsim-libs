@@ -31,16 +31,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 
 /**
- * @author  jbischoff
+ * @author  jbischoff, tschlenther
  *
  */
 public class ParkingUtils {
 	
 	static public final String PARKACTIVITYTYPE = "car interaction";
-	static public final double UNPARKDURATION = 60;
-	static public final double PARKDURATION = 60;
 	static public final int NO_OF_LINKS_TO_GET_ON_ROUTE = 5;
-	
+
 	
 	public ParkingUtils() {
 		// TODO Auto-generated constructor stub
@@ -91,15 +89,15 @@ public class ParkingUtils {
 				return points;
 		}
 		else{
-			// Funktion aufstellen f(x) = mx + b
+			// f(x) = mx + b
 			
 			// m = y2-y1/x2-x1
 			double m = (tY-fY)/(tX-fX);
 			
-			//b ausrechnen:	b = y-mx
+			//b = y-mx
 			double b = fY - m*(fX);
 			
-			//versetzen
+			//displace
 			if(m>0){
 				if(tY>fY)	b -= 10;
 				if(tY<fY)	b += 10;
@@ -115,7 +113,7 @@ public class ParkingUtils {
 			
 			double xDistance = tX-fX;
 			
-			//Coords berechnen
+			//calc Coords
 			List<Coord> points = new ArrayList<Coord>();
 			if(numberOfCoords == 1){
 				double x = (fX + 0.5*xDistance);
@@ -123,7 +121,7 @@ public class ParkingUtils {
 				return points;
 			}
 			
-			//Abstand zu den Knoten
+			//distance to nodes
 			if(Math.abs(xDistance) > (nrSlots+10) ){
 				if(xDistance < -5 ) xDistance += 10;
 				if(xDistance > 5) xDistance -= 10;

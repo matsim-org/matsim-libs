@@ -20,6 +20,9 @@
 
 package org.matsim.contrib.eventsBasedPTRouter.waitTimes;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -28,6 +31,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.config.Config;
@@ -46,7 +50,8 @@ import java.util.Map;
  * @author sergioo
  */
 
-public class WaitTimeCalculator implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler {
+@Singleton
+public class WaitTimeCalculator implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, Provider<WaitTime> {
 
 	//Attributes
 	private final double timeSlot;
@@ -57,8 +62,10 @@ public class WaitTimeCalculator implements PersonDepartureEventHandler, PersonEn
 	private Map<Id<Vehicle>, Id<TransitStopFacility>> stopOfVehicle = new HashMap<Id<Vehicle>, Id<TransitStopFacility>>();
 	
 	//Constructors
-	public WaitTimeCalculator(final TransitSchedule transitSchedule, final Config config) {
+	@Inject
+	public WaitTimeCalculator(final TransitSchedule transitSchedule, final Config config, EventsManager eventsManager) {
 		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
+		eventsManager.addHandler(this);
 	}
 	public WaitTimeCalculator(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
 		this.timeSlot = timeSlot;
@@ -99,10 +106,11 @@ public class WaitTimeCalculator implements PersonDepartureEventHandler, PersonEn
 	}
 
 	//Methods
-	public WaitTime getWaitTimes() {
+	@Override
+	public WaitTime get() {
 		return new WaitTime() {
 			/**
-			 * 
+			 *
 			 */
 			private static final long serialVersionUID = 1L;
 

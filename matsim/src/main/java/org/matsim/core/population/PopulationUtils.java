@@ -81,28 +81,28 @@ public final class PopulationUtils {
 	 */
 	private PopulationUtils() {}
 
-    /**
-     *
-     * Creates a new Population container. Population instances need a Config, because they need to know
-     * about the modes of transport.
-     *
-     * @param config the configuration which is used to create the Population.
-     * @return the new Population instance
-     */
+	/**
+	 *
+	 * Creates a new Population container. Population instances need a Config, because they need to know
+	 * about the modes of transport.
+	 *
+	 * @param config the configuration which is used to create the Population.
+	 * @return the new Population instance
+	 */
 	public static Population createPopulation(Config config) {
 		return createPopulation(config, null);
 	}
 
-    /**
-     *
-     * Creates a new Population container which, depending on
-     * configuration, may make use of the specified Network instance to store routes
-     * more efficiently.
-     *
-     * @param config the configuration which is used to create the Population.
-     * @param network the Network to which Plans in this Population will refer.
-     * @return the new Population instance
-     */
+	/**
+	 *
+	 * Creates a new Population container which, depending on
+	 * configuration, may make use of the specified Network instance to store routes
+	 * more efficiently.
+	 *
+	 * @param config the configuration which is used to create the Population.
+	 * @param network the Network to which Plans in this Population will refer.
+	 * @return the new Population instance
+	 */
 	public static Population createPopulation(Config config, Network network) {
 		return createPopulation(config.plans(), network);
 	}
@@ -122,22 +122,22 @@ public final class PopulationUtils {
 		routeFactory.setRouteFactory(NetworkRoute.class, factory);
 		return new PopulationImpl(new PopulationFactoryImpl(routeFactory));
 	}
-	
-//	public static Population createStreamingPopulation(PlansConfigGroup plansConfigGroup, Network network) {
-//		// yyyy my intuition would be to rather get this out of a standard scenario. kai, jun'16
-//		RouteFactories routeFactory = new RouteFactories();
-//		String networkRouteType = plansConfigGroup.getNetworkRouteType();
-//		RouteFactory factory;
-//		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
-//			factory = new LinkNetworkRouteFactory();
-//		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType) && network != null) {
-//			factory = new CompressedNetworkRouteFactory(network);
-//		} else {
-//			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
-//		}
-//		routeFactory.setRouteFactory(NetworkRoute.class, factory);
-//		return new Population(new PopulationFactoryImpl(routeFactory));
-//	}
+
+	//	public static Population createStreamingPopulation(PlansConfigGroup plansConfigGroup, Network network) {
+	//		// yyyy my intuition would be to rather get this out of a standard scenario. kai, jun'16
+	//		RouteFactories routeFactory = new RouteFactories();
+	//		String networkRouteType = plansConfigGroup.getNetworkRouteType();
+	//		RouteFactory factory;
+	//		if (PlansConfigGroup.NetworkRouteType.LinkNetworkRoute.equals(networkRouteType)) {
+	//			factory = new LinkNetworkRouteFactory();
+	//		} else if (PlansConfigGroup.NetworkRouteType.CompressedNetworkRoute.equals(networkRouteType) && network != null) {
+	//			factory = new CompressedNetworkRouteFactory(network);
+	//		} else {
+	//			throw new IllegalArgumentException("The type \"" + networkRouteType + "\" is not a supported type for network routes.");
+	//		}
+	//		routeFactory.setRouteFactory(NetworkRoute.class, factory);
+	//		return new Population(new PopulationFactoryImpl(routeFactory));
+	//	}
 
 	public static Leg unmodifiableLeg( Leg leg ) {
 		return new UnmodifiableLeg( leg ) ;
@@ -199,7 +199,7 @@ public final class PopulationUtils {
 			return delegate.getAttributes();
 		}
 	}
-	
+
 	public static Activity unmodifiableActivity( Activity act ) {
 		return new UnmodifiableActivity( act ) ;
 	}
@@ -303,14 +303,14 @@ public final class PopulationUtils {
 	static class UnmodifiablePlan implements Plan {
 		private final Plan delegate;
 		private final List<PlanElement> unmodifiablePlanElements;
-		
+
 		public UnmodifiablePlan( Plan plan ) {
 			this.delegate = plan;
 			List<PlanElement> tmp = new ArrayList<>() ;
 			for ( PlanElement pe : plan.getPlanElements() ) {
 				if (pe instanceof Activity) {
-                    tmp.add(unmodifiableActivity((Activity) pe));
-                } else if (pe instanceof Leg) {
+					tmp.add(unmodifiableActivity((Activity) pe));
+				} else if (pe instanceof Leg) {
 					tmp.add(unmodifiableLeg((Leg) pe));
 				}
 			}
@@ -322,17 +322,17 @@ public final class PopulationUtils {
 			throw new UnsupportedOperationException() ;
 		}
 
-        @Override
-        public String getType() {
-            return delegate.getType();
-        }
+		@Override
+		public String getType() {
+			return delegate.getType();
+		}
 
-        @Override
-        public void setType(String type) {
-            throw new UnsupportedOperationException();
-        }
+		@Override
+		public void setType(String type) {
+			throw new UnsupportedOperationException();
+		}
 
-        @Override
+		@Override
 		public void addLeg(Leg leg) {
 			throw new UnsupportedOperationException() ;
 		}
@@ -380,16 +380,16 @@ public final class PopulationUtils {
 	public static SortedMap<Id<Person>, Person> getSortedPersons(final Population population) {
 		return new TreeMap<>(population.getPersons());
 	}
-	
+
 	/**
 	 * Sorts the persons in the given population.
 	 */
 	@SuppressWarnings("unchecked")
 	public static void sortPersons(final Population population) {
 		Map<Id<Person>, Person> map = (Map<Id<Person>, Person>) population.getPersons();
-		
+
 		if (map instanceof SortedMap) return;
-		
+
 		Map<Id<Person>, Person> treeMap = new TreeMap<>(map);
 		map.clear();
 		map.putAll(treeMap);
@@ -464,7 +464,7 @@ public final class PopulationUtils {
 			return facility.getCoord() ;
 		}
 	}
-	
+
 	/**
 	 * A pointer to material in TripStructureUtils
 	 *
@@ -543,7 +543,7 @@ public final class PopulationUtils {
 		//		und 
 		//  Joh, Chang-Hyeon, Theo A. Arentze and Harry J. P. Timmermans (2001). 
 		// A Position-Sensitive Sequence Alignment Method Illustrated for Space-Time Activity-Diary Data¹, Environment and Planning A 33(2): 313­338.
-		
+
 		// Mahdieh Allahviranloo has some work on activity pattern similarity (iatbr'15)
 
 		double simil = 0. ;
@@ -552,34 +552,34 @@ public final class PopulationUtils {
 		for ( ; it1.hasNext() && it2.hasNext() ; ) {
 			Activity act1 = it1.next() ;
 			Activity act2 = it2.next() ;
-			
+
 			// activity type
 			if ( act1.getType().equals(act2.getType() ) ) {
 				simil += sameActivityTypePenalty ;
 			}
-			
+
 			// activity location
 			if ( act1.getCoord().equals( act2.getCoord() ) ){ 
 				simil += sameActivityLocationPenalty ;
 			}
-			
+
 			// activity end times
 			if ( Double.isInfinite( act1.getEndTime() ) && Double.isInfinite( act2.getEndTime() ) ){
 				// both activities have no end time, no need to compute a similarity penalty
 			} else {
 				// both activities have an end time, comparing the end times
-				
+
 				// 300/ln(2) means a penalty of 0.5 for 300 sec difference
 				double delta = Math.abs(act1.getEndTime() - act2.getEndTime()) ;
 				simil += actTimeParameter * Math.exp( - delta/(300/Math.log(2)) ) ;
 			}
-			
+
 		}
-		
+
 		// a positive value is interpreted as a penalty
 		return simil ;
 	}
-	
+
 	/**
 	 * Compares two Populations by serializing them to XML with the current writer
 	 * and comparing their XML form byte by byte.
@@ -646,15 +646,15 @@ public final class PopulationUtils {
 		for (int i=planElements.size()-1;i>=0;i--){
 			if (planElements.get(i) instanceof Leg){
 				Leg leg = (Leg) planElements.get(i);
-	
+
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
 					indexOfLastCarLegOfDay=i;
 					break;
 				}
-	
+
 			}
 		}
-	
+
 		for (int i=indexOfLastCarLegOfDay+1;i<planElements.size();i++){
 			if (planElements.get(i) instanceof Activity){
 				return (Activity) planElements.get(i);
@@ -669,12 +669,12 @@ public final class PopulationUtils {
 		for (int i=0;i<planElements.size();i++){
 			if (planElements.get(i) instanceof Leg){
 				Leg leg= (Leg) planElements.get(i);
-	
+
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
 					indexOfFirstCarLegOfDay=i;
 					break;
 				}
-	
+
 			}
 		}
 		for (int i=indexOfFirstCarLegOfDay-1;i>=0;i--){
@@ -690,11 +690,11 @@ public final class PopulationUtils {
 		for (int i=0;i<planElements.size();i++){
 			if (planElements.get(i) instanceof Leg){
 				Leg Leg= (Leg) planElements.get(i);
-	
+
 				if (Leg.getMode().equalsIgnoreCase(TransportMode.car)){
 					return true;
 				}
-	
+
 			}
 		}
 		return false;
@@ -703,15 +703,15 @@ public final class PopulationUtils {
 		// to make this private, would have to get rid of things like getFactory().createPerson(..) .
 		// But I am not sure if this really makes a lot of sense, because this static default factory is easier to change into
 		// pop.getFactory() than anothing else.  kai, jun'16
-		
-//		Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() ) ;
-//		return scenario.getPopulation().getFactory() ;
+
+		//		Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() ) ;
+		//		return scenario.getPopulation().getFactory() ;
 		// the above is too slow. kai, jun'16
-		
-//		return new PopulationFactoryImpl( new RouteFactoryImpl() ) ;
+
+		//		return new PopulationFactoryImpl( new RouteFactoryImpl() ) ;
 		return populationFactory ;
 	}
-	
+
 	// --- plain factories: 
 
 	public static Plan createPlan(Person person) {
@@ -737,13 +737,13 @@ public final class PopulationUtils {
 		act.setLinkId(linkId);
 		return act ;
 	}
-	
+
 	public static Leg createLeg(String transportMode) {
 		return getFactory().createLeg(transportMode) ;
 	}
 
 	// createAndAdd methods:
-	
+
 	public static Activity createAndAddActivityFromCoord( Plan plan, String type, Coord coord ) {
 		Activity act = getFactory().createActivityFromCoord(type, coord) ;
 		plan.addActivity(act);
@@ -775,7 +775,7 @@ public final class PopulationUtils {
 		plan.addActivity(act);
 		return act ;
 	}
-	
+
 
 	// --- static copy methods:
 
@@ -809,7 +809,7 @@ public final class PopulationUtils {
 		}
 		AttributesUtils.copyAttributesFromTo( in , out );
 	}
-	
+
 	public static void copyFromTo(Activity act, Activity newAct) {
 		Coord coord = act.getCoord() == null ? null : new Coord(act.getCoord().getX(), act.getCoord().getY());
 		// (we don't want to copy the coord ref, but rather the contents!)
@@ -823,15 +823,15 @@ public final class PopulationUtils {
 
 		AttributesUtils.copyAttributesFromTo( act , newAct );
 	}
-	
+
 	// --- copy factories:
 
 	public static Activity createActivity(Activity act) {
 		Activity newAct = getFactory().createActivityFromLinkId(act.getType(), act.getLinkId()) ;
-		
+
 		copyFromTo(act, newAct);
 		// (this ends up setting type and linkId again)
-		
+
 		return newAct ;
 	}
 
@@ -853,7 +853,7 @@ public final class PopulationUtils {
 
 		return newLeg ;
 	}
-	
+
 	// --- positional methods:
 
 	public static Activity getFirstActivity(Plan plan) {
@@ -901,7 +901,7 @@ public final class PopulationUtils {
 		}
 		return null;
 	}
-	
+
 	// --- remove methods:
 
 	/**
@@ -956,9 +956,9 @@ public final class PopulationUtils {
 			}
 		}
 	}
-	
+
 	// --- insert method(s):
-	
+
 	/**
 	 * Inserts a leg and a following act at position <code>pos</code> into the plan.
 	 * @param pos the position where to insert the leg-act-combo. acts and legs are both counted from the beginning starting at 0.
@@ -980,19 +980,23 @@ public final class PopulationUtils {
 		plan.getPlanElements().add(pos, leg);
 	}
 
-		public static void changePersonId( Person person, Id<Person> id ) {
-			if ( person instanceof PersonImpl ) {
-				((PersonImpl) person).changeId(id);
-			} else {
-				throw new RuntimeException("wrong implementation of interface Person") ;
-			}
+	public static void changePersonId( Person person, Id<Person> id ) {
+		if ( person instanceof PersonImpl ) {
+			((PersonImpl) person).changeId(id);
+		} else {
+			throw new RuntimeException("wrong implementation of interface Person") ;
 		}
+	}
 
-		public static void printPlansCount( Population population ) {
-			log.info(" person # " + population.getPersons().size() );
-		}
+	public static void printPlansCount( Population population ) {
+		log.info(" person # " + population.getPersons().size() );
+	}
 
-		public static void printPlansCount(StreamingPopulationReader reader) {
-			reader.printPlansCount() ;
-		}
+	public static void printPlansCount(StreamingPopulationReader reader) {
+		reader.printPlansCount() ;
+	}
+	
+	public static void writePopulation( Population population, String filename ) {
+		new PopulationWriter( population).write( filename ); 
+	}
 }

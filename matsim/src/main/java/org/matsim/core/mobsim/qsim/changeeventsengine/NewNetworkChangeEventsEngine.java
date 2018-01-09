@@ -13,6 +13,7 @@ import org.matsim.core.network.NetworkUtils;
 
 import javax.inject.Inject;
 import java.util.Collection;
+import java.util.Queue;
 
 class NewNetworkChangeEventsEngine implements MobsimEngine {
 
@@ -28,7 +29,7 @@ class NewNetworkChangeEventsEngine implements MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		Collection<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(((Network) network));
+		Queue<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(((Network) network));
 		for (final NetworkChangeEvent changeEvent : changeEvents) {
 			Message m = new Message() {
 				@Override

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE transitSchedule SYSTEM "http://www.matsim.org/files/dtd/transitSchedule_v1.dtd">
+
+<transitSchedule>
+	<transitStops>
+		<stopFacility id="para_1314" x="1000.0" y="4000.0" linkRefId="1314" isBlocking="false"/>
+		<stopFacility id="para_1424" x="2000.0" y="4000.0" linkRefId="1424" isBlocking="false"/>
+		<stopFacility id="para_2324" x="2000.0" y="4000.0" linkRefId="2324" isBlocking="false"/>
+		<stopFacility id="para_2414" x="1000.0" y="4000.0" linkRefId="2414" isBlocking="false"/>
+	</transitStops>
+	<transitLine id="para_0_4">
+		<transitRoute id="para_0_4-10_11">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_1424" arrivalOffset="00:00:00" departureOffset="00:00:00" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:44:18" departureOffset="00:44:18" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="1424"/>
+				<link refId="2434"/>
+				<link refId="3444"/>
+				<link refId="4434"/>
+				<link refId="3433"/>
+				<link refId="3332"/>
+				<link refId="3231"/>
+				<link refId="3141"/>
+				<link refId="4142"/>
+				<link refId="4243"/>
+				<link refId="4344"/>
+				<link refId="4434"/>
+				<link refId="3424"/>
+				<link refId="2414"/>
+				<link refId="1424"/>
+			</route>
+			<departures>
+				<departure id="5" departureTime="10:34:21" vehicleRefId="para_0_4-10_11-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="para_11_13">
+		<transitRoute id="para_11_13-13_2">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_1314" arrivalOffset="00:10:00" departureOffset="00:10:00" awaitDeparture="false"/>
+				<stop refId="para_1424" arrivalOffset="00:13:20" departureOffset="00:13:20" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:16:40" departureOffset="00:16:40" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="1211"/>
+				<link refId="1112"/>
+				<link refId="1213"/>
+				<link refId="1314"/>
+				<link refId="1424"/>
+				<link refId="2414"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1211"/>
+			</route>
+			<departures>
+				<departure id="5" departureTime="10:48:20" vehicleRefId="para_11_13-13_2-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+	<transitLine id="para_13_14">
+		<transitRoute id="para_13_14-13_0">
+			<transportMode>pt</transportMode>
+			<routeProfile>
+				<stop refId="para_2324" arrivalOffset="00:16:40" departureOffset="00:16:40" awaitDeparture="false"/>
+				<stop refId="para_2414" arrivalOffset="00:20:00" departureOffset="00:20:00" awaitDeparture="false"/>
+			</routeProfile>
+			<route>
+				<link refId="4241"/>
+				<link refId="4131"/>
+				<link refId="3121"/>
+				<link refId="2122"/>
+				<link refId="2223"/>
+				<link refId="2324"/>
+				<link refId="2414"/>
+				<link refId="1413"/>
+				<link refId="1312"/>
+				<link refId="1222"/>
+				<link refId="2232"/>
+				<link refId="3242"/>
+				<link refId="4241"/>
+			</route>
+			<departures>
+				<departure id="0" departureTime="08:30:00" vehicleRefId="para_13_14-13_0-0"/>
+			</departures>
+		</transitRoute>
+	</transitLine>
+</transitSchedule>

@@ -105,7 +105,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		this.checkNumberOfLanesSemantics();
 		if (this.from.equals(this.to) && (loopWarnCnt < maxLoopWarnCnt)) {
 			loopWarnCnt++ ;
-			log.warn("[from=to=" + this.to + " link is a loop]");
+			log.warn("fromNode=toNode=" + this.to + ": link is a loop");
 			if ( loopWarnCnt == maxLoopWarnCnt )
 				log.warn(Gbl.FUTURE_SUPPRESSED ) ;
 		}
@@ -120,7 +120,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 		 */
 		if ((this.capacity <= 0.0) && (cpWarnCnt < maxCpWarnCnt) ) {
 			cpWarnCnt++ ;
-			log.warn("[capacity=" + this.capacity + " of link id " + this.getId() + " may cause problems]");
+			log.warn("capacity=" + this.capacity + " of link id " + this.getId() + " may cause problems");
 			log.warn( Gbl.FUTURE_SUPPRESSED ) ;
 		}
 	}
@@ -128,7 +128,6 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private void checkFreespeedSemantics() {
 		if ((this.freespeed <= 0.0) && (fsWarnCnt < maxFsWarnCnt) ) {
 			fsWarnCnt++ ;
-			log.warn("[freespeed=" + this.freespeed + " of link id " + this.getId() + " may cause problems]");
 			if ( fsWarnCnt == maxFsWarnCnt )
 				log.warn( Gbl.FUTURE_SUPPRESSED) ;
 		}
@@ -137,7 +136,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private void checkNumberOfLanesSemantics(){
 		if ((this.nofLanes < 1) && (plWarnCnt < maxPlWarnCnt) ) {
 			plWarnCnt++ ;
-			log.warn("[permlanes=" + this.nofLanes + " of link id " + this.getId() +" may cause problems]");
+			log.warn("permlanes=" + this.nofLanes + " of link id " + this.getId() +" may cause problems");
 			if ( plWarnCnt == maxPlWarnCnt )
 				log.warn( Gbl.FUTURE_SUPPRESSED ) ;
 		}
@@ -146,7 +145,7 @@ import org.matsim.utils.objectattributes.attributable.Attributes;
 	private void checkLengthSemantics(){
 		if ((this.getLength() <= 0.0) && (lengthWarnCnt < maxLengthWarnCnt)) {
 			lengthWarnCnt++;
-			log.warn("[length=" + this.length + " of link id " + this.getId() + " may cause problems]");
+			log.warn("length=" + this.length + " of link id " + this.getId() + " may cause problems");
 			if ( lengthWarnCnt == maxLengthWarnCnt )
 				log.warn(Gbl.FUTURE_SUPPRESSED) ;
 		}

@@ -7,8 +7,8 @@ import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public class TransitEnginePlugin extends AbstractQSimPlugin {
 
@@ -18,36 +18,27 @@ public class TransitEnginePlugin extends AbstractQSimPlugin {
 
 	@Override
 	public Collection<? extends Module> modules() {
-		Collection<Module> result = new ArrayList<>();
-		result.add(new com.google.inject.AbstractModule() {
+		return Collections.singletonList(new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
 				bind(TransitQSimEngine.class).asEagerSingleton();
-				bind(TransitStopHandlerFactory.class).to(ComplexTransitStopHandlerFactory.class).asEagerSingleton();
+//				bind(TransitStopHandlerFactory.class).to(ComplexTransitStopHandlerFactory.class).asEagerSingleton();
 			}
 		});
-		return result;
 	}
 
 	@Override
 	public Collection<Class<? extends DepartureHandler>> departureHandlers() {
-		Collection<Class<? extends DepartureHandler>> result = new ArrayList<>();
-		result.add(TransitQSimEngine.class);
-		return result;
+		return Collections.singletonList(TransitQSimEngine.class);
 	}
 
 	@Override
 	public Collection<Class<? extends AgentSource>> agentSources() {
-		Collection<Class<? extends AgentSource>> result = new ArrayList<>();
-		result.add(TransitQSimEngine.class);
-		return result;
+		return Collections.singletonList(TransitQSimEngine.class);
 	}
 
 	@Override
 	public Collection<Class<? extends MobsimEngine>> engines() {
-		Collection<Class<? extends MobsimEngine>> result = new ArrayList<>();
-		result.add(TransitQSimEngine.class);
-		return result;
+		return Collections.singletonList(TransitQSimEngine.class);
 	}
-
 }

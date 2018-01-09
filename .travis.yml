@@ -1,14 +1,90 @@
+# Status: Somehow, a stage does not seem to pick up the result of the
+# previous stage.  For example, even after "mvn package", it attempts to
+# download matsim snapshots from the internet.  My next attempt would now be along the lines of
+#
+# mvn -o -f ~/git/matsim/pom.xml --projects contribs/otfvis --also-make install -DskipTests
+# mvn -o -f ~/git/matsim/contribs/otfvis/pom.xml exec:java -Dexec.mainClass="org.matsim.contrib.otfvis.OTFVis" -Dexec.vmargs="-Xmx2000m" -Dexec.args="$*"
+#
+# Well, since the commit of this note will trigger another build, I am giving it a first shot, see below. kai
+
 language: java
 jdk: oraclejdk8
 addons:
   apt:
     packages:
       - oracle-java8-installer  # https://github.com/travis-ci/travis-ci/issues/3259
-script:
-  - mvn package -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
-env:
-  global:
-    - MAVEN_OPTS="-Xmx2g"
+
+# This skips the mvn install that is otherwise run
+# https://docs.travis-ci.com/user/customizing-the-build/#Skipping-the-Installation-Step
+install: true
+
+
+# For the following, see
+# https://blog.travis-ci.com/2017-09-12-build-stages-order-and-conditions.
+# Note that you cannot get rid of the "test" stage, and it is the only
+# stage that does get matrix-expanded.  So the IT tests need to be run
+# in stage called "test".  kai, dec'17
+
+# define the order of the stages:
+stages:
+  - package
+  - test
+
+# this is the script run in the "test" stage:
+script: mvn install --also-make --projects ${MODULE} -DskipTests && cd ${TRAVIS_BUILD_DIR}/${MODULE} && mvn failsafe:integration-test --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+
+# this defines all other stages.
+jobs:
+  include:
+    - stage: package
+      script: mvn package --batch-mode -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+
+# (would be nice to run this also in parallel with the others.  But it
+# is either the matrix thing and then exactly the same command for
+# each module.  Or hand-written entries (see .travis.yml.nomatrix),
+# which in particular has the disadvantage that one cannot see the
+# failing module at the travis toplevel.)
+
 cache:
   directories:
   - $HOME/.m2
+env:
+  global:
+    - MAVEN_OPTS="-Xmx2g"
+  matrix:
+    - MODULE=matsim                        
+    - MODULE=contribs/accessibility        
+    - MODULE=contribs/av                   
+    - MODULE=contribs/analysis             
+    - MODULE=contribs/cadytsIntegration    
+    - MODULE=contribs/carsharing           
+    - MODULE=contribs/drt                  
+    - MODULE=contribs/dvrp                 
+    - MODULE=contribs/taxi                 
+    - MODULE=contribs/emissions            
+    - MODULE=contribs/freight              
+    - MODULE=contribs/signals              
+    - MODULE=contribs/locationchoice       
+    - MODULE=contribs/matsim4urbansim      
+    - MODULE=contribs/minibus              
+    - MODULE=contribs/networkEditor        
+    - MODULE=contribs/otfvis               
+    - MODULE=contribs/matrixbasedptrouter  
+    - MODULE=contribs/parking              
+    - MODULE=contribs/socnetsim            
+    - MODULE=contribs/socnetgen            
+    - MODULE=contribs/transEnergySim       
+    - MODULE=contribs/roadpricing          
+    - MODULE=contribs/opdytsIntegration    
+    - MODULE=contribs/multimodal           
+    - MODULE=contribs/integration          
+    - MODULE=contribs/wagonSim             
+    - MODULE=contribs/pseudosimulation     
+    - MODULE=contribs/common               
+    - MODULE=contribs/eventsBasedPTRouter  
+    - MODULE=contribs/travelsummary        
+    - MODULE=contribs/deprecated           
+    - MODULE=contribs/protobuf             
+    - MODULE=contribs/hybridsim            
+    - MODULE=contribs/noise                
+    - MODULE=contribs/bicycle              

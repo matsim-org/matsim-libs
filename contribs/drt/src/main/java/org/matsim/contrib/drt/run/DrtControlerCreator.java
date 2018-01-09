@@ -65,6 +65,32 @@ import com.google.inject.name.Named;
 public final class DrtControlerCreator {
 
 	public static Controler createControler(Config config, boolean otfvis) {
+		adjustConfig(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		return adjustControler(otfvis, scenario);
+	}
+
+	public static Controler createControler(Scenario scenario, boolean otfvis) {
+		// yy I know that this one breaks the sequential loading of the building blocks, but I would like to be able
+		// to modify the scenario before I pass it to the controler.  kai, oct'17
+		adjustConfig(scenario.getConfig());
+		return adjustControler(otfvis, scenario);
+	}
+
+	private static Controler adjustControler(boolean otfvis, Scenario scenario) {
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new DvrpModule(DrtControlerCreator.createModuleForQSimPlugin(),
+				DrtOptimizer.class, DefaultUnplannedRequestInserter.class));
+		controler.addOverridingModule(new DrtModule());
+		controler.addOverridingModule(new DrtAnalysisModule());
+		if (otfvis) {
+			controler.addOverridingModule(new OTFVisLiveModule());
+		}
+
+		return controler;
+	}
+
+	private static void adjustConfig(Config config) {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
 		config.checkConsistency();
@@ -79,17 +105,6 @@ public final class DrtControlerCreator {
 						"drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 			}
 		}
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule(DrtControlerCreator.createModuleForQSimPlugin(),
-				DrtOptimizer.class, DefaultUnplannedRequestInserter.class));
-		controler.addOverridingModule(new DrtModule());
-		controler.addOverridingModule(new DrtAnalysisModule());
-		if (otfvis) {
-			controler.addOverridingModule(new OTFVisLiveModule());
-		}
-
-		return controler;
 	}
 
 	public static com.google.inject.AbstractModule createModuleForQSimPlugin() {

@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.matsim.core.config.ConfigWriter.Verbosity;
 import org.matsim.core.config.groups.ChangeLegModeConfigGroup;
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -42,6 +43,13 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 
 	private String newline = "\n";
 
+	private final Config comparisonConfig = ConfigUtils.createConfig() ;
+
+	private final Verbosity verbosity;
+	
+	ConfigWriterHandlerImplV2( Verbosity verbosity ) {
+		this.verbosity = verbosity ;
+	}
 
 	private void writeModule(
 			final BufferedWriter writer,
@@ -54,7 +62,7 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 		Map<String, String> comments = module.getComments();
 
 		try {
-			writer.write( this.newline );
+//			writer.write( this.newline );
 			writer.write( indent );
 			writer.write("\t<"+moduleTag);
 			writer.write(" "+moduleNameAtt+"=\"" + moduleName + "\" >");
@@ -63,20 +71,32 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 			boolean lastHadComment = false;
 
 			for (Map.Entry<String, String> entry : params.entrySet()) {
+				
+				final String actual = entry.getValue();
+				if ( verbosity==Verbosity.minimal ) {
+					final String defaultValue = comparisonConfig.findParam(moduleName, entry.getKey());
+					if ( actual.equals( defaultValue ) ) {
+						continue ;
+					}
+//					if ( actual==null && defaultValue.equals("null") ) {
+//						continue ;
+//					}
+				}
+				
 				if (comments.get(entry.getKey()) != null) {
-					writer.write( this.newline );
+//					writer.write( this.newline );
 					writer.write( indent );
 					writer.write( "\t\t<!-- " + comments.get(entry.getKey()) + " -->");
 					writer.write( this.newline );
 					lastHadComment = true;
 				} else {
 					if (lastHadComment) {
-						writer.write( this.newline );
+//						writer.write( this.newline );
 					}
 					lastHadComment = false;
 				}
 				writer.write( indent );
-				writer.write("\t\t<"+PARAMETER+" name=\"" + entry.getKey() + "\" value=\"" + entry.getValue() + "\" />");
+				writer.write("\t\t<"+PARAMETER+" name=\"" + entry.getKey() + "\" value=\"" + actual + "\" />");
 				writer.write( this.newline );
 			}
 
@@ -147,7 +167,7 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 	@Override
 	public void writeSeparator(final BufferedWriter out) {
 		try {
-			out.write( this.newline );
+//			out.write( this.newline );
 			out.write("<!-- ====================================================================== -->");
 			out.write( this.newline );
 		} catch (IOException e) {

@@ -23,28 +23,22 @@ public class PassengerEnginePlugin extends AbstractQSimPlugin {
 
 	@Override
 	public Collection<? extends Module> modules() {
-		Collection<Module> result = new ArrayList<>();
-		result.add(new AbstractModule() {
+		return Collections.singletonList(new AbstractModule() {
 			@Override
 			public void configure() {
 				bind(PassengerEngine.class).toProvider(new PassengerEngineProvider(mode)).asEagerSingleton();
 			}
 		});
-		return result;
 	}
 
 	@Override
 	public Collection<Class<? extends DepartureHandler>> departureHandlers() {
-		Collection<Class<? extends DepartureHandler>> result = new ArrayList<>();
-		result.add(PassengerEngine.class);
-		return result;
+		return Collections.singletonList(PassengerEngine.class);
 	}
 
 	@Override
 	public Collection<Class<? extends MobsimEngine>> engines() {
-		Collection<Class<? extends MobsimEngine>> result = new ArrayList<>();
-		result.add(PassengerEngine.class);
-		return result;
+		return Collections.singletonList(PassengerEngine.class);
 	}
 
 	public static class PassengerEngineProvider implements Provider<PassengerEngine> {

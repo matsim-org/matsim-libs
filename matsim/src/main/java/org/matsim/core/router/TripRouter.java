@@ -22,10 +22,12 @@ package org.matsim.core.router;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -34,7 +36,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
+import org.matsim.core.config.Config;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.facilities.Facility;
 
@@ -64,6 +68,30 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 	private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
 
+	private Config config;
+	// (I need the config in the PlanRouter to figure out activity end times. And since the PlanRouter is not
+	// injected, I cannot get it there directly.  kai, oct'17)
+	
+	public static final class Builder {
+		private final Config config;
+		private MainModeIdentifier mainModeIdentifier = new MainModeIdentifierImpl();
+		private Map<String, Provider<RoutingModule>> routingModules = new LinkedHashMap<>() ;
+		public Builder( Config config ) {
+			this.config = config ;
+		}
+		public Builder setMainModeIdentifier( MainModeIdentifier identifier ) {
+			this.mainModeIdentifier = identifier ;
+			return this ;
+		}
+		public Builder putRoutingModule( String mainMode, Provider<RoutingModule> routingModuleProvider ) {
+			this.routingModules.put( mainMode, routingModuleProvider ) ;
+			return this ;
+		}
+		TripRouter builder() {
+			return new TripRouter( routingModules, mainModeIdentifier, config ) ;
+		}
+	}
+	@Deprecated // use the Builder instead.  kai, oct'17
 	public TripRouter() {}
 	// yyyyyy I guess this is meant as a way to create the trip router without injection, and to set its internals afterwards.  But
 	// is it so sensible to have this in this way?  The injection stuff states that the material is immutable after injection; here we introduce a
@@ -72,11 +100,13 @@ public final class TripRouter implements MatsimExtensionPoint {
 	// kai, sep'16
 
 	@Inject
-	TripRouter(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier) {
+	TripRouter(Map<String, Provider<RoutingModule>> routingModules, MainModeIdentifier mainModeIdentifier,
+			Config config ) {
 		for (Map.Entry<String, Provider<RoutingModule>> entry : routingModules.entrySet()) {
 			setRoutingModule(entry.getKey(), entry.getValue().get());
 		}
 		setMainModeIdentifier(mainModeIdentifier);
+		this.config = config ;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -92,6 +122,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * @param module the module to use with this mode
 	 * @return the previously registered {@link RoutingModule} for this mode if any, null otherwise.
 	 */
+	@Deprecated // use the Builder instead.  kai, oct'17
 	public RoutingModule setRoutingModule(
 			final String mainMode,
 			final RoutingModule module) {
@@ -140,6 +171,7 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * @param newIdentifier the instance to register
 	 * @return the previous registered instance
 	 */
+	@Deprecated // use the Builder instead.  kai, oct'17
 	public MainModeIdentifier setMainModeIdentifier(final MainModeIdentifier newIdentifier) {
 		final MainModeIdentifier old = this.mainModeIdentifier;
 		this.mainModeIdentifier = newIdentifier;
@@ -166,12 +198,14 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * @throws UnknownModeException if no RoutingModule is registered for the
 	 * given mode.
 	 */
-	public List<? extends PlanElement> calcRoute(
+	public synchronized List<? extends PlanElement> calcRoute(
 			final String mainMode,
 			final Facility fromFacility,
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
+		// I need this "synchronized" since I want mobsim agents to be able to call this during the mobsim.  So when the
+		// mobsim is multi-threaded, multiple agents might call this here at the same time.  kai, nov'17
 		
 		Gbl.assertNotNull( fromFacility );
 		Gbl.assertNotNull( toFacility );
@@ -211,34 +245,39 @@ public final class TripRouter implements MatsimExtensionPoint {
 	 * (it is also used internally).
 	 * It is provided here, because such an operation is mainly useful for routing,
 	 * but it may be externalized in a "util" class...
+	 * @param config TODO
 	 */
 	public static double calcEndOfPlanElement(
 			final double now,
-			final PlanElement pe) {
+			final PlanElement pe, Config config) {
+		// yyyy see similar method in PlanRouter. kai, oct'17
+		
 		if (now == Time.UNDEFINED_TIME) {
 			throw new RuntimeException("got undefined now to update with plan element" + pe);
 		}
 
 		if (pe instanceof Activity) {
 			Activity act = (Activity) pe;
-			double endTime = act.getEndTime();
-			double startTime = act.getStartTime();
-			double dur = act.getMaximumDuration();
-			if (endTime != Time.UNDEFINED_TIME) {
-				// use fromAct.endTime as time for routing
-				return endTime;
-			}
-			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
-				// use fromAct.startTime + fromAct.duration as time for routing
-				return startTime + dur;
-			}
-			else if (dur != Time.UNDEFINED_TIME) {
-				// use last used time + fromAct.duration as time for routing
-				return now + dur;
-			}
-			else {
-				return Time.UNDEFINED_TIME;
-			}
+			return PopulationUtils.getActivityEndTime(act, now, config) ;
+			
+//			double endTime = act.getEndTime();
+//			double startTime = act.getStartTime();
+//			double dur = act.getMaximumDuration();
+//			if (endTime != Time.UNDEFINED_TIME) {
+//				// use fromAct.endTime as time for routing
+//				return endTime;
+//			}
+//			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
+//				// use fromAct.startTime + fromAct.duration as time for routing
+//				return startTime + dur;
+//			}
+//			else if (dur != Time.UNDEFINED_TIME) {
+//				// use last used time + fromAct.duration as time for routing
+//				return now + dur;
+//			}
+//			else {
+//				return Time.UNDEFINED_TIME;
+//			}
 		}
 		else {
 			Route route = ((Leg) pe).getRoute();
@@ -329,5 +368,10 @@ public final class TripRouter implements MatsimExtensionPoint {
 
 		return oldTrip;
 	}
+
+	public Config getConfig() {
+		return config;
+	}
+
 }
 

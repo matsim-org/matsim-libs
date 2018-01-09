@@ -42,6 +42,7 @@ import org.matsim.contrib.parking.parkingsearch.manager.WalkLegFactory;
 import org.matsim.contrib.parking.parkingsearch.manager.vehicleteleportationlogic.VehicleTeleportationLogic;
 import org.matsim.contrib.parking.parkingsearch.routing.ParkingRouter;
 import org.matsim.contrib.parking.parkingsearch.search.ParkingSearchLogic;
+import org.matsim.contrib.parking.parkingsearch.sim.ParkingSearchConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -81,12 +82,13 @@ public class ParkingAgentLogic implements DynAgentLogic {
 	protected boolean isinitialLocation = true;
 	protected Id<Vehicle> currentlyAssignedVehicleId = null;
 	protected String stageInteractionType = null;
+	private ParkingSearchConfigGroup configGroup;
 
 	/**
 	 * @param plan
 	 *            (always starts with Activity)
 	 */
-	public ParkingAgentLogic(Plan plan, ParkingSearchManager parkingManager, WalkLegFactory walkLegFactory, ParkingRouter parkingRouter, EventsManager events, ParkingSearchLogic parkingLogic, MobsimTimer timer, VehicleTeleportationLogic teleportationLogic) {
+	public ParkingAgentLogic(Plan plan, ParkingSearchManager parkingManager, WalkLegFactory walkLegFactory, ParkingRouter parkingRouter, EventsManager events, ParkingSearchLogic parkingLogic, MobsimTimer timer, VehicleTeleportationLogic teleportationLogic, ParkingSearchConfigGroup configGroup) {
 		planElemIter = plan.getPlanElements().iterator();
 		this.parkingManager = parkingManager;
 		this.walkLegFactory = walkLegFactory;
@@ -95,6 +97,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		this.events = events;
 		this.parkingLogic = parkingLogic;
 		this.teleportationLogic = teleportationLogic;
+		this.configGroup = configGroup;
 		
 		
 	}
@@ -173,7 +176,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 	protected DynAction nextStateAfterWalkToPark(DynAction oldAction, double now) {
 		//walk2park is complete, we can unpark.
 		this.lastParkActionState = LastParkActionState.UNPARKACTIVITY;
-		return new StaticDynActivity(this.stageInteractionType, now + ParkingUtils.UNPARKDURATION);
+		return new StaticDynActivity(this.stageInteractionType, now + configGroup.getUnparkduration());
 	}
 
 	protected DynAction nextStateAfterWalkFromPark(DynAction oldAction, double now) {
@@ -211,7 +214,7 @@ public class ParkingAgentLogic implements DynAgentLogic {
 		this.lastParkActionState = LastParkActionState.PARKACTIVITY;
 		this.currentlyAssignedVehicleId = null;
 		this.parkingLogic.reset();
-		return new StaticDynActivity(this.stageInteractionType,now + ParkingUtils.PARKDURATION);}
+		return new StaticDynActivity(this.stageInteractionType,now + configGroup.getParkduration());}
 		else throw new RuntimeException ("No parking possible");
 	}
 
