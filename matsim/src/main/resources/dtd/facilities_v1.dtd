@@ -15,7 +15,7 @@
                 aggregation_layer CDATA   #IMPLIED
                 xml:lang          NMTOKEN "de-CH">
 
-        <!ELEMENT facility   (attributes?,activity*)>
+        <!ELEMENT facility   (activity*,attributes?)>
         <!ATTLIST facility
                 id         CDATA #REQUIRED
                 x          CDATA #REQUIRED
