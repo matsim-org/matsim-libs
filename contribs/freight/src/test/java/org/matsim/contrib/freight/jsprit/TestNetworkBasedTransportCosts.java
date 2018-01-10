@@ -5,10 +5,10 @@ import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
-import jsprit.core.problem.Location;
-import jsprit.core.problem.driver.Driver;
-import jsprit.core.problem.vehicle.Vehicle;
-import jsprit.core.problem.vehicle.VehicleType;
+import com.graphhopper.jsprit.core.problem.Location;
+import com.graphhopper.jsprit.core.problem.driver.Driver;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;

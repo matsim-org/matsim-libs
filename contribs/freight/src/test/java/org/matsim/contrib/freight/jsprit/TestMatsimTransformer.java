@@ -11,16 +11,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import jsprit.core.problem.Location;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.job.Job;
-import jsprit.core.problem.job.Service;
-import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
-import jsprit.core.problem.solution.route.VehicleRoute;
-import jsprit.core.problem.vehicle.Vehicle;
-import jsprit.core.problem.vehicle.VehicleImpl;
-import jsprit.core.problem.vehicle.VehicleType;
-import jsprit.core.problem.vehicle.VehicleTypeImpl;
+import com.graphhopper.jsprit.core.problem.Location;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.job.Job;
+import com.graphhopper.jsprit.core.problem.job.Service;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.core.problem.solution.route.VehicleRoute;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleType;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
