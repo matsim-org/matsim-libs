@@ -60,6 +60,13 @@ public class VehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
                 double service = act.getOperationTime() * vehicle.getType().getVehicleCostParams().perTimeUnit;
                 return penalty4missedTws * tooLate + vehicle.getType().getVehicleCostParams().perTimeUnit * waiting + service;
             }
+
+			@Override
+			public double getActivityDuration(TourActivity tourAct, double arrivalTime, Driver driver,
+					Vehicle vehicle) {
+				// TODO Auto-generated method stub
+				return 0;
+			}
         };
         vrpAlgorithmConfig = vrpAlgoConfigFile;
     }

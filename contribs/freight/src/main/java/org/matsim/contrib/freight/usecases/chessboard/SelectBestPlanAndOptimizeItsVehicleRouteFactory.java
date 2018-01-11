@@ -89,6 +89,13 @@ public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 //						return penalty4missedTws*tooLate;
 						return 0.0;
 					}
+
+					@Override
+					public double getActivityDuration(TourActivity tourAct, double arrivalTime, Driver driver,
+							Vehicle vehicle) {
+						// TODO Auto-generated method stub
+						return 0;
+					}
 					
 				};
 				vrpBuilder.setActivityCosts(activitycosts);
