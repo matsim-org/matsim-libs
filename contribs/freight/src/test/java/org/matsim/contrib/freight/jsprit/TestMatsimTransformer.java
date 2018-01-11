@@ -214,7 +214,7 @@ public class TestMatsimTransformer {
 		ScheduledTour sTour = getMatsimServiceTour();
         VehicleRoutingProblem vehicleRoutingProblem = getVehicleRoutingProblem(sTour);
 		VehicleRoute route = MatsimJspritFactory.createRoute(sTour, vehicleRoutingProblem);
-		assertEquals("to1",route.getTourActivities().getActivities().get(0).getLocationId());
+		assertEquals("to1",route.getTourActivities().getActivities().get(0).getLocation().getId());
 	}
 
 	@Test
@@ -222,7 +222,7 @@ public class TestMatsimTransformer {
 		ScheduledTour sTour = getMatsimServiceTour();
         VehicleRoutingProblem vehicleRoutingProblem = getVehicleRoutingProblem(sTour);
 		VehicleRoute route = MatsimJspritFactory.createRoute(sTour, vehicleRoutingProblem);
-		assertEquals("to2",route.getTourActivities().getActivities().get(1).getLocationId());
+		assertEquals("to2",route.getTourActivities().getActivities().get(1).getLocation().getId());
 	}
 
 	@Test
