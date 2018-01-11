@@ -3,7 +3,6 @@ package org.matsim.contrib.freight.usecases.chessboard;
 import java.util.Collection;
 
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithmBuilder;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
@@ -13,6 +12,9 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.util.Solutions;
+import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
+import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
+import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -99,17 +101,20 @@ public class InitialCarrierPlanCreator {
         //build the problem
         VehicleRoutingProblem vrp = vrpBuilder.build();
 
-        VehicleRoutingAlgorithmBuilder vraBuilder = new VehicleRoutingAlgorithmBuilder(vrp, "input/usecases/chessboard/vrpalgo/ini_algorithm_v2.xml");
-        vraBuilder.addDefaultCostCalculators();
+        //configure the algorithm
+        AlgorithmConfig algorithmConfig = new AlgorithmConfig();
+        AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
+        xmlReader.read("input/usecases/chessboard/vrpalgo/ini_algorithm_v2.xml");
 
         StateManager stateManager = new StateManager(vrp);
         stateManager.updateLoadStates();
 
         ConstraintManager constraintManager = new ConstraintManager(vrp,stateManager);
         constraintManager.addLoadConstraint();
-        vraBuilder.setStateAndConstraintManager(stateManager, constraintManager);
-
-        VehicleRoutingAlgorithm vra = vraBuilder.build();
+        
+        Boolean addDefaultCostCalculators = true;
+        
+        VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmConfig, 0, null, stateManager, constraintManager, addDefaultCostCalculators);
 
         //get configures algorithm
         //				VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, vrpAlgorithmConfig);

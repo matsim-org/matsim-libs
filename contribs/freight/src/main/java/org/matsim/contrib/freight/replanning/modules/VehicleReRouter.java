@@ -5,8 +5,6 @@ import java.util.Collection;
 
 import com.graphhopper.jsprit.analysis.toolbox.AlgorithmSearchProgressChartListener;
 import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithm;
-import com.graphhopper.jsprit.core.algorithm.VehicleRoutingAlgorithmBuilder;
-import com.graphhopper.jsprit.core.algorithm.io.VehicleRoutingAlgorithms;
 import com.graphhopper.jsprit.core.algorithm.state.StateManager;
 import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
 import com.graphhopper.jsprit.core.problem.constraint.ConstraintManager;
@@ -17,6 +15,9 @@ import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolutio
 import com.graphhopper.jsprit.core.problem.solution.route.activity.TourActivity;
 import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
 import com.graphhopper.jsprit.core.util.Solutions;
+import com.graphhopper.jsprit.io.algorithm.AlgorithmConfig;
+import com.graphhopper.jsprit.io.algorithm.AlgorithmConfigXmlReader;
+import com.graphhopper.jsprit.io.algorithm.VehicleRoutingAlgorithms;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
@@ -85,25 +86,27 @@ public class VehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
         //build the problem
         VehicleRoutingProblem vrp = vrpBuilder.build();
 
-        VehicleRoutingAlgorithmBuilder vraBuilder = new VehicleRoutingAlgorithmBuilder(vrp, vrpAlgorithmConfig);
-        vraBuilder.addDefaultCostCalculators();
+        //configure the algorithm
+        AlgorithmConfig algorithmConfig = new AlgorithmConfig();
+        AlgorithmConfigXmlReader xmlReader = new AlgorithmConfigXmlReader(algorithmConfig);
+        xmlReader.read(vrpAlgorithmConfig);
 
         StateManager stateManager = new StateManager(vrp);
         stateManager.updateLoadStates();
 
         ConstraintManager constraintManager = new ConstraintManager(vrp,stateManager);
         constraintManager.addLoadConstraint();
-        vraBuilder.setStateAndConstraintManager(stateManager, constraintManager);
-
-        VehicleRoutingAlgorithm vra = vraBuilder.build();
+        
+        Boolean addDefaultCostCalculators = true;
+         
+        VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, algorithmConfig, 0, null, stateManager, constraintManager, addDefaultCostCalculators);
 
         //get configures algorithm
 //		VehicleRoutingAlgorithm vra = VehicleRoutingAlgorithms.readAndCreateAlgorithm(vrp, vrpAlgorithmConfig);
 //		vra.addListener(new AlgorithmSearchProgressChartListener("output/"+carrierPlan.getCarrier().getId() + "_" + carrierPlan.hashCode() + ".png"));
+        
         //add initial-solution - which is the initialSolution for the vehicle-routing-algo
         vra.addInitialSolution(MatsimJspritFactory.createSolution(carrierPlan, vrp));
-
-
 
         //solve problem
         Collection<VehicleRoutingProblemSolution> solutions = vra.searchSolutions();
