@@ -98,8 +98,8 @@ public class InitialCarrierPlanCreator {
 			@Override
 			public double getActivityDuration(TourActivity tourAct, double arrivalTime, Driver driver,
 					Vehicle vehicle) {
-				// TODO Auto-generated method stub
-				return 0;
+				double activityDuration = Math.max(0, tourAct.getEndTime() - tourAct.getArrTime()); //including waiting times
+				return activityDuration;
 			}
 
         };
