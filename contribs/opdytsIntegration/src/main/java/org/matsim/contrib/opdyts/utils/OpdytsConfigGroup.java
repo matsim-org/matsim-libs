@@ -35,8 +35,8 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String GROUP_NAME = "opdyts";
 
-	private static final String VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE = "variationSizeOfRandomizeDecisionVariable";
-	private double variationSizeOfRandomizeDecisionVariable = 0.1;
+	private static final String DECISION_VARIABLE_STEP_SIZE = "decisionVariableStepSize";
+	private double decisionVariableStepSize = 0.1;
 
 	private static final String RANDOM_SEED_TO_RANDOMIZE_DECISION_VARIABLE = "randomSeedToRandomizeDecisionVariable";
 	private int randomSeedToRandomizeDecisionVariable = 4711;
@@ -74,7 +74,7 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 	private static final String NUMBER_OF_ITERATION_TO_AVERAGE = "numberOfIterationsForAveraging";
 	private int numberOfIterationsForAveraging = 20;
 
-	private static final String NUMER_OF_ITERATION_FOR_CONVERGENCE = "numberOfIterationsForConvergence";
+	private static final String NUMBER_OF_ITERATION_FOR_CONVERGENCE = "numberOfIterationsForConvergence";
 	private int numberOfIterationsForConvergence = 600;
 
 	// self tuner
@@ -147,14 +147,14 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 		this.useAllWarmUpIterations = useAllWarmUpIterations;
 	}
 
-	@StringGetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
-	public double getVariationSizeOfRandomizeDecisionVariable() {
-		return variationSizeOfRandomizeDecisionVariable;
+	@StringGetter(DECISION_VARIABLE_STEP_SIZE)
+	public double getDecisionVariableStepSize() {
+		return decisionVariableStepSize;
 	}
 
-	@StringSetter(VARIATION_SIZE_OF_RANDOMIZE_DECISION_VARIABLE)
-	public void setVariationSizeOfRandomizeDecisionVariable(double variationSizeOfRandomizeDecisionVariable) {
-		this.variationSizeOfRandomizeDecisionVariable = variationSizeOfRandomizeDecisionVariable;
+	@StringSetter(DECISION_VARIABLE_STEP_SIZE)
+	public void setDecisionVariableStepSize(double decisionVariableStepSize) {
+		this.decisionVariableStepSize = decisionVariableStepSize;
 	}
 
 	@StringGetter(RANDOM_SEED_TO_RANDOMIZE_DECISION_VARIABLE)
@@ -267,12 +267,12 @@ public class OpdytsConfigGroup extends ReflectiveConfigGroup {
 		this.numberOfIterationsForAveraging = numberOfIterationsForAveraging;
 	}
 
-	@StringGetter(NUMER_OF_ITERATION_FOR_CONVERGENCE)
+	@StringGetter(NUMBER_OF_ITERATION_FOR_CONVERGENCE)
 	public int getNumberOfIterationsForConvergence() {
 		return numberOfIterationsForConvergence;
 	}
 
-	@StringSetter(NUMER_OF_ITERATION_FOR_CONVERGENCE)
+	@StringSetter(NUMBER_OF_ITERATION_FOR_CONVERGENCE)
 	public void setNumberOfIterationsForConvergence(int numberOfIterationsForConvergence) {
 		this.numberOfIterationsForConvergence = numberOfIterationsForConvergence;
 	}
