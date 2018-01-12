@@ -82,15 +82,22 @@ class PrepareForSimImpl implements PrepareForSim {
 		}
 
 		//matsim-724
-		if ( activityFacilities.getFacilities().isEmpty() && // skip if facilities already exists
-				facilitiesConfigGroup.isCreatingFacilities()) {
+		switch(this.facilitiesConfigGroup.getFacilitiesSource()){
+			case none: // no facilities
+				break;
+			case fromFile:
+				break;
+			case onePerActivityLocationInPlansFile:
+
 			FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(activityFacilities);
 			facilitiesFromPopulation.setIdPrefix(facilitiesConfigGroup.getIdPrefix());
 			facilitiesFromPopulation.setOneFacilityPerLink(facilitiesConfigGroup.isOneFacilityPerLink());
 			facilitiesFromPopulation.setRemoveLinksAndCoordinates(facilitiesConfigGroup.isRemovingLinksAndCoordinates());
 			facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(facilitiesConfigGroup.isAssigningLinksToFacilitiesIfMissing(), network);
-			facilitiesFromPopulation.assignOpeningTimes(facilitiesConfigGroup.isAssigningOpeningTime(),scenario.getConfig().planCalcScore());
+			facilitiesFromPopulation.assignOpeningTimes(facilitiesConfigGroup.isAssigningOpeningTime(), scenario.getConfig().planCalcScore());
 			facilitiesFromPopulation.run(population);
+				break;
+			default: throw new RuntimeException("Facilities source "+this.facilitiesConfigGroup.getFacilitiesSource()+" is not implemented yet.");
 		}
 
 		// make sure all routes are calculated.

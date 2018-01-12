@@ -49,7 +49,9 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 	private boolean assigningOpeningTime = false;
 	private boolean assigningLinksToFacilitiesIfMissing = false;
 
-	private static final String CREATING_FACILITIES = "creatingFacilities";
+	private static final String FACILITIES_SOURCE = "facilitiesSource";
+	public enum FacilitiesSource {none, fromFile, onePerActivityLocationInPlansFile};
+	private FacilitiesSource facilitiesSource = FacilitiesSource.none;
 
 	private static final String ID_PREFIX="idPrefix";
 	private static final String ONE_FACILITY_PER_LINK="oneFacilityPerLink";
@@ -69,7 +71,13 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 				" At import, the coordinates will be converted to the coordinate system defined in \"global\", and will" +
 				"be converted back at export. If not specified, no conversion happens." );
 
-		comments.put(CREATING_FACILITIES, "If set to 'true' (which is default), activity facilities will be created automatically.");
+		{
+			String options = "" ;
+			for ( FacilitiesSource source : FacilitiesSource.values() ) {
+				options += source + " " ;
+			}
+			comments.put(FACILITIES_SOURCE, "This defines how facilities should be created. Possible values: "+options);
+		}
 
 		comments.put( ID_PREFIX, "A prefix to be used in activityFacility id.");
 
@@ -172,13 +180,13 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 		this.assigningLinksToFacilitiesIfMissing = assigningLinksToFacilitiesIfMissing;
 	}
 
-	@StringGetter(CREATING_FACILITIES)
-	public boolean isCreatingFacilities() {
-		return creatingFacilities;
+	@StringGetter(FACILITIES_SOURCE)
+	public FacilitiesSource getFacilitiesSource() {
+		return this.facilitiesSource;
 	}
 
-	@StringSetter(CREATING_FACILITIES)
-	public void setCreatingFacilities(boolean creatingFacilities) {
-		this.creatingFacilities = creatingFacilities;
+	@StringSetter(FACILITIES_SOURCE)
+	public void setFacilitiesSource(FacilitiesSource facilitiesSource) {
+		this.facilitiesSource = facilitiesSource;
 	}
 }
