@@ -173,7 +173,7 @@ public class MatsimJspritFactory {
 		VehicleTypeImpl.Builder typeBuilder = VehicleTypeImpl.Builder.newInstance(carrierVehicleType.getId().toString());
 		typeBuilder.addCapacityDimension(0, carrierVehicleType.getCarrierVehicleCapacity());
 		typeBuilder.setCostPerDistance(carrierVehicleType.getVehicleCostInformation().perDistanceUnit);
-		typeBuilder.setCostPerTime(carrierVehicleType.getVehicleCostInformation().perTimeUnit);
+		typeBuilder.setCostPerTransportTime(carrierVehicleType.getVehicleCostInformation().perTimeUnit);
 		typeBuilder.setFixedCost(carrierVehicleType.getVehicleCostInformation().fix);
 		typeBuilder.setMaxVelocity(carrierVehicleType.getMaximumVelocity());
 		return typeBuilder.build();

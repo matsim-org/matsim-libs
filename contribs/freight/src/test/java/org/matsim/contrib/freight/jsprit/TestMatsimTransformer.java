@@ -41,7 +41,7 @@ public class TestMatsimTransformer {
 	
 	@Test
 	public void whenTransforming_jSpritType2matsimType_itIsMadeCorrectly(){
-		VehicleType jspritType = VehicleTypeImpl.Builder.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTime(5.0).setFixedCost(100.0).build();
+		VehicleType jspritType = VehicleTypeImpl.Builder.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTransportTime(5.0).setFixedCost(100.0).build();
 		CarrierVehicleType matsimType = MatsimJspritFactory.createCarrierVehicleType(jspritType);
 		assertNotNull(matsimType);
 		assertEquals("myType",matsimType.getId().toString());
@@ -53,7 +53,7 @@ public class TestMatsimTransformer {
 	
 	@Test
 	public void whenTransforming_jSpritType2matsimType_withCaching_itIsNotCached(){
-		VehicleType jspritType = VehicleTypeImpl.Builder.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTime(5.0).setFixedCost(100.0).build();
+		VehicleType jspritType = VehicleTypeImpl.Builder.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTransportTime(5.0).setFixedCost(100.0).build();
 		CarrierVehicleType matsimType = MatsimJspritFactory.createCarrierVehicleType(jspritType);
 		assertThat(matsimType, is(not(MatsimJspritFactory.createCarrierVehicleType(jspritType))));
 	}
@@ -72,7 +72,7 @@ public class TestMatsimTransformer {
 	
 	@Test
 	public void whenTransforming_jspritVehicle2matsimVehicle_itIsMadeCorrectly(){
-		VehicleType jspritType = VehicleTypeImpl.Builder.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTime(5.0).setFixedCost(100.0).build();
+		VehicleType jspritType = VehicleTypeImpl.Builder.newInstance("myType").addCapacityDimension(0, 50).setCostPerDistance(10.0).setCostPerTransportTime(5.0).setFixedCost(100.0).build();
 		Vehicle jspritVehicle = VehicleImpl.Builder.newInstance("myVehicle").setEarliestStart(10.0).setLatestArrival(20.0).setStartLocation(Location.newInstance("loc")).setType(jspritType).build();
 		CarrierVehicle matsimVehicle = MatsimJspritFactory.createCarrierVehicle(jspritVehicle);
 		assertNotNull(matsimVehicle);
