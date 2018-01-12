@@ -115,7 +115,7 @@ public class TestMatsimTransformer {
 	@Test
 	public void whenTransforming_jspritService2matsimService_isMadeCorrectly(){
 		Service carrierService = Service.Builder.newInstance("serviceId").addSizeDimension(0, 50).setLocation(Location.newInstance("locationId"))
-				.setServiceTime(30.0).setTimeWindow(jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(10.0, 20.0)).build();
+				.setServiceTime(30.0).setTimeWindow(com.graphhopper.jsprit.core.problem.solution.route.activity.TimeWindow.newInstance(10.0, 20.0)).build();
 		
 		CarrierService service = MatsimJspritFactory.createCarrierService(carrierService);
 		assertNotNull(service);
