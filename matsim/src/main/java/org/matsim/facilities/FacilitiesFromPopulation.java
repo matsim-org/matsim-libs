@@ -204,4 +204,8 @@ public class FacilitiesFromPopulation {
 			}
 		}
 	}
+
+	public void setAddEmptyActivityOptions(boolean addEmptyActivityOptions) {
+		this.addEmptyActivityOptions = addEmptyActivityOptions;
+	}
 }
