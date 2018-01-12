@@ -172,7 +172,7 @@ public class ParkingSlotVisualiser implements PersonEntersVehicleEventHandler, P
 				this.parkings.add(manager.getLinkId() + ";" + parkingTuple.getSecond() + ";" + endOfDay + ";" +
 						parkingTuple.getFirst().getX() + ";" + parkingTuple.getFirst().getY() + ";" + "veh" + e.getKey());
 				
-				// zurück auf 0 setzen
+				// set back to 0
 			}
 			
 			List<Tuple<Coord,Double>> freeSlots = manager.getFreeSlots();
