@@ -80,6 +80,7 @@ public class SelectBestPlanAndOptimizeItsVehicleRouteFactory {
 
 					private double penalty4missedTws = 0.008; 
 					
+					//TODO: Why is here always returned 0.0? KMT jan/2018
 					@Override
 					public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {	
 						double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
