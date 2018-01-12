@@ -66,7 +66,7 @@ public class TestMatsimTransformer {
 		assertNotNull(jspritType);
 		assertEquals(50,jspritType.getCapacityDimensions().get(0));
 		assertEquals(10.0, jspritType.getVehicleCostParams().perDistanceUnit,0.01);
-		assertEquals(5.0, jspritType.getVehicleCostParams().perTimeUnit,0.01);
+		assertEquals(5.0, jspritType.getVehicleCostParams().perTransportTimeUnit,0.01);
 		assertEquals(100.0, jspritType.getVehicleCostParams().fix,0.01);
 	}
 	
