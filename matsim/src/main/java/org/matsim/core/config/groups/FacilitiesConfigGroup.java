@@ -41,8 +41,7 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 	private String inputFacilitiesAttributesFile = null;
 	private String inputCRS = null;
 
-	private boolean creatingFacilities = true;
-
+	// following params are required only if activitiesFactilities are generated internally (e.g., FacilitiesSource.onePerActivityLocationInPlansFile). Amit Jan'18
 	private String idPrefix = "";
 	private boolean oneFacilityPerLink = true;
 	private boolean removingLinksAndCoordinates = true;
@@ -52,7 +51,9 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 	private static final String FACILITIES_SOURCE = "facilitiesSource";
 	public enum FacilitiesSource {none, fromFile, onePerActivityLocationInPlansFile};
 	private FacilitiesSource facilitiesSource = FacilitiesSource.none;
+	private boolean addEmptyActivityOption = false;
 
+	private static final String ADD_EMPTY_ACTIVITY_OPTIONS = "addEmptyActivityOption";
 	private static final String ID_PREFIX="idPrefix";
 	private static final String ONE_FACILITY_PER_LINK="oneFacilityPerLink";
 	private static final String REMOVING_LINKS_AND_COORDINATES = "removingLinksAndCoordinates";
@@ -85,9 +86,11 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 				" Default is 'true'. If set to 'false', for each coordinate found in the population's activities a separate ActivityFacility will be created.");
 
 		comments.put(REMOVING_LINKS_AND_COORDINATES, "If set to 'true' (which is the default), the link and coordinate attributes " +
-				"are nulled in the activities, as this information is now available via the facility.");
+				"are replaced by null reference in the activities, as this information is now available via the facility.");
 
-		comments.put(ASSIGNING_OPENING_TIME, "If set to 'true', opening time will be assigned to activity facilities from ActivityParams. Default is false.");
+		comments.put(ADD_EMPTY_ACTIVITY_OPTIONS, "If set to 'true', empty activity option will be created.");
+
+		comments.put(ASSIGNING_OPENING_TIME, "If set to 'true', opening time will be assigned to activity facilities from ActivityParams. Default is false. This will NOT override option 'addEmptyActivityOption'.");
 
 		comments.put(ASSIGNING_LINKS_TO_FACILITIES_IF_MISSING, "In the case that a facility has no link assigned, the ActivityFacility can be assigned to the closest link." +
 				" If there should be only one ActivityFacility per link and if no link-assignment should be done, " +
@@ -188,5 +191,15 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(FACILITIES_SOURCE)
 	public void setFacilitiesSource(FacilitiesSource facilitiesSource) {
 		this.facilitiesSource = facilitiesSource;
+	}
+
+	@StringGetter(ADD_EMPTY_ACTIVITY_OPTIONS)
+	public boolean isAddEmptyActivityOption() {
+		return addEmptyActivityOption;
+	}
+
+	@StringSetter(ADD_EMPTY_ACTIVITY_OPTIONS)
+	public void setAddEmptyActivityOption(boolean addEmptyActivityOption) {
+		this.addEmptyActivityOption = addEmptyActivityOption;
 	}
 }

@@ -88,16 +88,13 @@ class PrepareForSimImpl implements PrepareForSim {
 			case fromFile:
 				break;
 			case onePerActivityLocationInPlansFile:
-
-			FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(activityFacilities);
-			facilitiesFromPopulation.setIdPrefix(facilitiesConfigGroup.getIdPrefix());
-			facilitiesFromPopulation.setOneFacilityPerLink(facilitiesConfigGroup.isOneFacilityPerLink());
-			facilitiesFromPopulation.setRemoveLinksAndCoordinates(facilitiesConfigGroup.isRemovingLinksAndCoordinates());
-			facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(facilitiesConfigGroup.isAssigningLinksToFacilitiesIfMissing(), network);
-			facilitiesFromPopulation.assignOpeningTimes(facilitiesConfigGroup.isAssigningOpeningTime(), scenario.getConfig().planCalcScore());
-			facilitiesFromPopulation.run(population);
+				FacilitiesFromPopulation facilitiesFromPopulation = new FacilitiesFromPopulation(activityFacilities, facilitiesConfigGroup);
+				facilitiesFromPopulation.setAssignLinksToFacilitiesIfMissing(facilitiesConfigGroup.isAssigningLinksToFacilitiesIfMissing(), network);
+				facilitiesFromPopulation.assignOpeningTimes(facilitiesConfigGroup.isAssigningOpeningTime(), scenario.getConfig().planCalcScore());
+				facilitiesFromPopulation.run(population);
 				break;
-			default: throw new RuntimeException("Facilities source "+this.facilitiesConfigGroup.getFacilitiesSource()+" is not implemented yet.");
+			default:
+				throw new RuntimeException("Facilities source "+this.facilitiesConfigGroup.getFacilitiesSource()+" is not implemented yet.");
 		}
 
 		// make sure all routes are calculated.
