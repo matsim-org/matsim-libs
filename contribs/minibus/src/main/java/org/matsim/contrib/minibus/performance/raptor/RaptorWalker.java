@@ -490,6 +490,9 @@ public class RaptorWalker {
 		}
 		
 		// add cost for getting to the first and last stop
+		log.debug(route.get(0));
+		log.debug(route.get(0).fromStop);
+		log.debug(fromStops.get(route.get(0).fromStop));
 		cost += fromStops.get(route.get(0).fromStop).initialCost;
 		cost += toStops.get(route.get(route.size() - 1).toStop).initialCost;
 		
