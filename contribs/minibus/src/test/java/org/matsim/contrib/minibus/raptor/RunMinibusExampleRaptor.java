@@ -17,11 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus;
+package org.matsim.contrib.minibus.raptor;
 
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.minibus.RunMinibus;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class RunMinibusExampleRaptor {
