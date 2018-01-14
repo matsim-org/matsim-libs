@@ -100,6 +100,7 @@ final class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListene
 
 			this.gexfFactory = new ObjectFactory();
 			this.gexfContainer = this.gexfFactory.createXMLGexfContent();
+			this.gexfContainer.setVersion("1.2");
 		
 			XMLGraphContent graph = this.gexfFactory.createXMLGraphContent();
 			graph.setDefaultedgetype(XMLDefaultedgetypeType.DIRECTED);
@@ -186,6 +187,7 @@ final class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListene
 			attValue.setFor("weight");
 			attValue.setValue(Integer.toString(countForLink));
 			attValue.setStart(Double.toString(iteration));
+			attValue.setEnd(Double.toString(iteration));
 
 			linkEntry.getValue().getAttvalue().add(attValue);
 			this.linkId2TotalCountsFromLastIteration.put(linkEntry.getKey(), countForLink);
@@ -207,6 +209,7 @@ final class GexfPStatLight extends MatsimJaxbXmlWriter implements StartupListene
 			attValue.setFor("nVeh");
 			attValue.setValue(Integer.toString(countForLink));
 			attValue.setStart(Double.toString(iteration));
+			attValue.setEnd(Double.toString(iteration));
 
 			linkEntry.getValue().getAttvalue().add(attValue);
 			this.linkId2VehCountsFromLastIteration.put(linkEntry.getKey(), countForLink);

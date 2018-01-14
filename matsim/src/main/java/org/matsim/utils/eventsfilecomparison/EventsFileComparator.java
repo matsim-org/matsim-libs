@@ -132,13 +132,13 @@ public final class EventsFileComparator {
 		@Override
 		public void run() {
 			if (this.worker1.getCurrentTime() != this.worker2.getCurrentTime()) {
-				log.warn("Differnt time steps in event files! Aborting!");
+				log.warn("Differnt time steps in event files!");
 				setExitCode(Result.DIFFERENT_TIMESTEPS);
 				return;
 			}
 
 			if (this.worker1.isFinished() != this.worker2.isFinished()) {
-				log.warn("Events files have different number of time steps! Aborting!");
+				log.warn("Events files have different number of time steps!");
 				setExitCode(Result.DIFFERENT_NUMBER_OF_TIMESTEPS);
 				return;
 			}
