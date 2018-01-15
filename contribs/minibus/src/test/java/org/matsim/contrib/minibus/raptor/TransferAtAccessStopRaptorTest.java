@@ -30,16 +30,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class CapetownNPERaptorTest {
-	
-	
+public class TransferAtAccessStopRaptorTest {
+
 	@Rule
 	public MatsimTestUtils helper = new MatsimTestUtils();
 
 
 	@Test
 	public void NPETest() {
-		String config = "test/input/org/matsim/contrib/minibus/capetownNPE/config-in-original-coords-minibus-w-transit.xml";
+		String config = helper.getInputDirectory()+"/config-in-original-coords-minibus-w-transit.xml";
 		
 		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(config));
 		scenario.getConfig().controler().setLastIteration(1); // more iterations are not required to check this.
