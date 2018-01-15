@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example21tutorialTUBclass.leastCostPath;
+package tutorial.programming.leastCostPath;
 
 import java.util.ArrayList;
 import java.util.Comparator;

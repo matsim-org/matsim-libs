@@ -1,10 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
- * RunEmissionToolOffline.java
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,30 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example21tutorialTUBclass.run;
+package tutorial.facilities.facilitiesAndOpenTimes;
+
+import java.util.Map;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.api.core.v01.population.Person;
+
 /**
- * @author jbischoff
- * How to run a MATSim scenario directly out of eclipse. This script can be extended to your own needs.
+ * @author nagel
+ *
  */
-public class RunSimulation {
+public class RunWithFacilitiesExampleTest {
+	private static final double EPS=0.001 ;
 
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig("input/config.xml");
-
-		//this will overwrite any output files that already exist. 
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		
-		Controler controler = new Controler(scenario);
-		controler.run();
-	
+	/**
+	 * Test method for {@link tutorial.facilities.facilitiesAndOpenTimes.RunWithFacilitiesExample#run()}.
+	 */
+	@SuppressWarnings({ "static-method", "javadoc" })
+	@Test
+	public final void testRun() {
+		RunWithFacilitiesExample example = new RunWithFacilitiesExample() ;
+		example.run();
+		Scenario scenario = example.getScenario() ;
+		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons() ;
+		Assert.assertEquals( 124.84230476216275, persons.get(Id.createPersonId(1)).getSelectedPlan().getScore() , EPS ) ;
+		Assert.assertEquals( 112.84230476216275, persons.get(Id.createPersonId(2)).getSelectedPlan().getScore() , EPS ) ;
 	}
-
 }

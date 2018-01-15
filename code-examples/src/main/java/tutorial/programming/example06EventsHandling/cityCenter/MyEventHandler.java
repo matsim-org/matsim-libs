@@ -17,47 +17,54 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example21tutorialTUBclass.events;
+package tutorial.programming.example06EventsHandling.cityCenter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.vehicles.Vehicle;
-
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.population.Person;
 /**
- * An event handler to determine if a vehicle has driven over a certain set of links.
- * 
  * @author jbischoff
+ * A basic event handler used in the MATSim class at TU Berlin.
  */
-public class CityCenterEventEnterHandler implements LinkEnterEventHandler {
-
+public class MyEventHandler implements ActivityEndEventHandler,
+		ActivityStartEventHandler {
 	
-	List<Id<Vehicle>> agentsInCityCenter = new ArrayList<>();
-	List<Id<Link>> cityCenterLinks = new ArrayList<>();
-	
+	private Map<Id<Person>,Double> startTimes = new HashMap<>();
+	private Id<Person> personWithHighestWorkDuration;
+	private double highestWorkDuration = 0;
+		
 	@Override
 	public void reset(int iteration) {
-		this.agentsInCityCenter.clear();
+		
 	}
 
 	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		if (this.cityCenterLinks.contains(event.getLinkId()))
-		{
-		this.agentsInCityCenter.add(event.getVehicleId());
+	public void handleEvent(ActivityStartEvent event) {
+		if (event.getActType().equals("work")){
+			this.startTimes.put(event.getPersonId(), event.getTime());
 		}
 	}
-	public void addLinkId(Id<Link> linkId){
-		this.cityCenterLinks.add(linkId);
-	}
 
-	public List<Id<Vehicle>> getVehiclesInCityCenter() {
-		return agentsInCityCenter;
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		if (event.getActType().equals("work")){
+			double workingTime = event.getTime() - this.startTimes.get(event.getPersonId());
+			if (workingTime> this.highestWorkDuration)
+			{
+				this.highestWorkDuration = workingTime;
+				this.personWithHighestWorkDuration = event.getPersonId();
+			}
+		}
 	}
-
 	
+	public void printPersonWithHighestWorkingTime(){
+		System.out.println(this.personWithHighestWorkDuration.toString() + ": "+this.highestWorkDuration);
+	}
+
 }

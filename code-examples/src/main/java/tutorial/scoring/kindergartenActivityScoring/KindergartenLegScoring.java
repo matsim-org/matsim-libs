@@ -16,8 +16,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-/**
- * @author nagel
- *
- */
-package tutorial.programming.facilitiesAndOpenTimes;
+package tutorial.scoring.kindergartenActivityScoring;
+
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.ScoringParameters;
+
+public class KindergartenLegScoring extends CharyparNagelLegScoring {
+
+	public KindergartenLegScoring(ScoringParameters params, Network network) {
+		super(params, network);
+		// TODO Auto-generated constructor stub
+	}
+
+	
+	@Override
+	public void finish() {
+
+	}
+
+	@Override
+	public double getScore() {
+		return this.score;
+	}
+
+	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
+		double legScore = super.calcLegScore(departureTime, arrivalTime, leg);
+		return legScore;
+	}
+
+	@Override
+	public void handleLeg(Leg leg) {
+		double legScore = calcLegScore(leg.getDepartureTime(), leg.getDepartureTime() + leg.getTravelTime(), leg);
+		this.score += legScore;
+
+	}
+
+}

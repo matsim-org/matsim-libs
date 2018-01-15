@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.facilitiesAndOpenTimes;
+package tutorial.facilities.facilitiesAndOpenTimes;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

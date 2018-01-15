@@ -24,8 +24,7 @@ import java.io.File;
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 
-import tutorial.programming.example06EventsHandling.RunEventsHandlingWithControlerExample;
-import tutorial.programming.example21tutorialTUBclass.leastCostPath.RunLeastCostPathCalculatorExample;
+import tutorial.programming.leastCostPath.RunLeastCostPathCalculatorExample;
 
 /**
  * @author  jbischoff

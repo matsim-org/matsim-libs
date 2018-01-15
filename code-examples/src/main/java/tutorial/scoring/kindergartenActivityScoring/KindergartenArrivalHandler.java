@@ -16,41 +16,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example21tutorialTUBclass.class2016.scoring;
+package tutorial.scoring.kindergartenActivityScoring;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.ScoringParameters;
+import java.util.HashSet;
+import java.util.Set;
 
-public class KindergartenLegScoring extends CharyparNagelLegScoring {
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
-	public KindergartenLegScoring(ScoringParameters params, Network network) {
-		super(params, network);
-		// TODO Auto-generated constructor stub
+public class KindergartenArrivalHandler  implements PersonArrivalEventHandler, ActivityStartEventHandler {
+
+	Id<Link> kindergartenLink = Id.createLinkId(8142);
+	Set<Id<Person>> arrivedOnLinkByCar = new HashSet<>();
+	int kinder = 0;
+
+	@Override
+	public void reset(int iteration) {
+		arrivedOnLinkByCar = new HashSet<>();
+		kinder = 0;
 	}
 
+	@Override
+	public void handleEvent(PersonArrivalEvent event) {
+		if (event.getLinkId().equals(kindergartenLink)){
+			if (event.getLegMode().equals(TransportMode.car)){
+				this.arrivedOnLinkByCar.add(event.getPersonId());
+			}
+		}
+	}
+
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		
+		if (event.getLinkId().equals(kindergartenLink)){
+			if (event.getActType().equals("kindergarten1"))
+			kinder++;
+		}
+	}
 	
-	@Override
-	public void finish() {
-
-	}
-
-	@Override
-	public double getScore() {
-		return this.score;
-	}
-
-	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
-		double legScore = super.calcLegScore(departureTime, arrivalTime, leg);
-		return legScore;
-	}
-
-	@Override
-	public void handleLeg(Leg leg) {
-		double legScore = calcLegScore(leg.getDepartureTime(), leg.getDepartureTime() + leg.getTravelTime(), leg);
-		this.score += legScore;
-
-	}
-
+	
 }

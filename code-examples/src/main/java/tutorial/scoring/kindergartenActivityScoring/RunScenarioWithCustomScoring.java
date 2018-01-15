@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example21tutorialTUBclass.class2016.scoring;
+package tutorial.scoring.kindergartenActivityScoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;

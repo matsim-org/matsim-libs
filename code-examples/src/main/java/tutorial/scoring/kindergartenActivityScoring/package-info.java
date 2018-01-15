@@ -3,4 +3,4 @@
  * 
  */
 
-package tutorial.programming.example21tutorialTUBclass.class2016.scoring;
+package tutorial.scoring.kindergartenActivityScoring;

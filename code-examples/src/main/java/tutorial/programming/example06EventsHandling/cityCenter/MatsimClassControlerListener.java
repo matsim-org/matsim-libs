@@ -17,39 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example21tutorialTUBclass.leastCostPath;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.examples.ExamplesUtils;
-
+package tutorial.programming.example06EventsHandling.cityCenter;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.StartupListener;
 /**
  * @author jbischoff
- *
- *
+ * A basic Controler Listener used in the MATSim class at TU Berlin.
  */
-public class RunLeastCostPathCalculatorExample {
-	public static final String outputDirectory = "output/leastCostPathCalculatorExample" ;
+public class MatsimClassControlerListener implements StartupListener, IterationEndsListener {
 
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
-		config.controler().setOutputDirectory(outputDirectory);
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-		config.controler().setLastIteration(1);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
-				bindLeastCostPathCalculatorFactory().to(MatsimClassLeastCostPathCalculatorFactory.class);	
-			}
-		});
-		controler.run();
+	MyEventHandler myEventHandler;
+	 
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		myEventHandler = new MyEventHandler(); 
+		event.getServices().getEvents().addHandler(myEventHandler);
 	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		myEventHandler.printPersonWithHighestWorkingTime();
+	}
+
 }

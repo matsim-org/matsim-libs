@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
+ * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,34 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.facilitiesAndOpenTimes;
+package tutorial.programming.leastCostPath;
 
-import java.util.Map;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 /**
- * @author nagel
+ * @author jbischoff
  *
  */
-public class RunWithFacilitiesExampleTest {
-	private static final double EPS=0.001 ;
+public class MatsimClassLeastCostPathCalculatorFactory implements LeastCostPathCalculatorFactory {
 
-	/**
-	 * Test method for {@link tutorial.programming.facilitiesAndOpenTimes.RunWithFacilitiesExample#run()}.
-	 */
-	@SuppressWarnings({ "static-method", "javadoc" })
-	@Test
-	public final void testRun() {
-		RunWithFacilitiesExample example = new RunWithFacilitiesExample() ;
-		example.run();
-		Scenario scenario = example.getScenario() ;
-		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons() ;
-		Assert.assertEquals( 124.84230476216275, persons.get(Id.createPersonId(1)).getSelectedPlan().getScore() , EPS ) ;
-		Assert.assertEquals( 112.84230476216275, persons.get(Id.createPersonId(2)).getSelectedPlan().getScore() , EPS ) ;
+	@Override
+	public LeastCostPathCalculator createPathCalculator(Network network,
+			TravelDisutility travelCosts, TravelTime travelTimes) {
+		return new MatsimClassDijkstra(network,null,null);
 	}
+
 }

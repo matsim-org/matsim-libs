@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example21tutorialTUBclass.class2016.events;
+package tutorial.programming.example06EventsHandling.carTravelDist;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

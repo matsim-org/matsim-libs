@@ -17,28 +17,47 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.example21tutorialTUBclass.events;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.StartupListener;
+package tutorial.programming.example06EventsHandling.cityCenter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.vehicles.Vehicle;
+
 /**
+ * An event handler to determine if a vehicle has driven over a certain set of links.
+ * 
  * @author jbischoff
- * A basic Controler Listener used in the MATSim class at TU Berlin.
  */
-public class MatsimClassControlerListener implements StartupListener, IterationEndsListener {
+public class CityCenterEventEnterHandler implements LinkEnterEventHandler {
 
-	MyEventHandler myEventHandler;
-	 
+	
+	List<Id<Vehicle>> agentsInCityCenter = new ArrayList<>();
+	List<Id<Link>> cityCenterLinks = new ArrayList<>();
+	
 	@Override
-	public void notifyStartup(StartupEvent event) {
-		myEventHandler = new MyEventHandler(); 
-		event.getServices().getEvents().addHandler(myEventHandler);
+	public void reset(int iteration) {
+		this.agentsInCityCenter.clear();
 	}
 
 	@Override
-	public void notifyIterationEnds(IterationEndsEvent event) {
-		myEventHandler.printPersonWithHighestWorkingTime();
+	public void handleEvent(LinkEnterEvent event) {
+		if (this.cityCenterLinks.contains(event.getLinkId()))
+		{
+		this.agentsInCityCenter.add(event.getVehicleId());
+		}
+	}
+	public void addLinkId(Id<Link> linkId){
+		this.cityCenterLinks.add(linkId);
 	}
 
+	public List<Id<Vehicle>> getVehiclesInCityCenter() {
+		return agentsInCityCenter;
+	}
+
+	
 }
