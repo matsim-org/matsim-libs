@@ -135,6 +135,12 @@ public final class GridBasedAccessibilityShutdownListenerV3 implements ShutdownL
 		for (String mode : accessibilityCalculator.getModes() ) {
 			spatialGridAggregator.getAccessibilityGrids().put(mode, new SpatialGrid(xMin, yMin, xMax, yMax, cellSize, Double.NaN));
 		}
+		
+		// always put the free speed grid (yyyy may not be necessary in the long run)
+		// this is required; otherwise the not-null assertion in linke 221 will fail
+		log.warn("Spatial grid for freespeed added (again) to make sure it exists in any case.");
+		spatialGridAggregator.getAccessibilityGrids().put(Modes4Accessibility.freespeed.name(),
+				new SpatialGrid(xMin, yMin, xMax, yMax, cellSize, Double.NaN));
 
 		lockedForAdditionalFacilityData  = true ;
 		for ( ActivityFacilities facilities : this.additionalFacilityData ) {
