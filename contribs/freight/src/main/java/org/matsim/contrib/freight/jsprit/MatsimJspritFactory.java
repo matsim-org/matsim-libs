@@ -234,7 +234,7 @@ public class MatsimJspritFactory {
 		CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 		double depTime = scheduledTour.getDeparture();
 		Tour tour = scheduledTour.getTour();
-        Id vehicleId = carrierVehicle.getVehicleId();
+        Id<org.matsim.vehicles.Vehicle> vehicleId = carrierVehicle.getVehicleId();
         Vehicle jspritVehicle = getVehicle(vehicleId.toString(),vehicleRoutingProblem);
 		if(jspritVehicle == null) throw new IllegalStateException("jsprit-vehicle to id=" + vehicleId.toString() + " is missing");
 
