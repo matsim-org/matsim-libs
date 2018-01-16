@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.pt.router.MultiNodeDijkstra.InitialNode;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -423,17 +424,19 @@ public class RaptorWalker {
 			TransitStopEntry transitStopEntry = this.raptorSearchData.stops[toRouteStopEntry.indexOfStopFacility];
 			TransitStopFacility toTransitStop = transitStopEntry.transitStopFacility;
 
-			if (currentSourcePointer.source.indexOfTargetRouteStop==-1 ){
+			if (currentSourcePointer.source.indexOfTargetRouteStop == -1 ){
 				if (currentSourcePointer.transfer) {
 					// access_stop and transfer
 					TransitStopFacility fromTransitStop = null;
-					for (int indexOfTransferToCheck = transitStopEntry.indexOfFirstTransfer; indexOfTransferToCheck < transitStopEntry.indexOfFirstTransfer + transitStopEntry.numberOfTransfers; indexOfTransferToCheck++) {
-						TransitStopFacility transitStopFacility = this.raptorSearchData.stops[this.raptorSearchData.transfers[indexOfTransferToCheck].indexOfRouteStop].transitStopFacility;
-						if (fromTransitStops.keySet().contains(transitStopFacility)){ // probably, just take the from transit stop which is closest to _toTransitStop_ Amit Jan'18
-							fromTransitStop = transitStopFacility;
-							break;
+					double dist = Double.POSITIVE_INFINITY;
+					for (TransitStopFacility possibleFromStop : fromTransitStops.keySet()){ // an alternative would be to get the transfer stops at _toTransitStop_ and match with fromStops. Amit Jan'18
+						double tempDist = NetworkUtils.getEuclideanDistance(possibleFromStop.getCoord().getX(), possibleFromStop.getCoord().getY(), toTransitStop.getCoord().getX(), toTransitStop.getCoord().getY());
+						if (tempDist < dist) {
+							dist = tempDist;
+							fromTransitStop = possibleFromStop;
 						}
 					}
+
 					if (fromTransitStop!=null) {
 						RouteSegment routeSegment = new RouteSegment(fromTransitStop,
 								toTransitStop,
