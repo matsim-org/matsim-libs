@@ -22,8 +22,6 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.SumScoringFunction;
 
-import java.io.File;
-
 public class RunPassengerAlongWithCarriers {
 
     public static void main(String[] args) {
@@ -53,15 +51,6 @@ public class RunPassengerAlongWithCarriers {
 
     }
 
-    private static void createOutputDir() {
-        File dir = new File("output");
-        // if the directory does not exist, create it
-        if (!dir.exists()) {
-            System.out.println("creating directory ./output");
-            boolean result = dir.mkdir();
-            if (result) System.out.println("./output created");
-        }
-    }
 
     private static void prepareFreightOutputDataAndStats(Scenario scenario, EventsManager eventsManager, MatsimServices controler, final Carriers carriers) {
         final LegHistogram freightOnly = new LegHistogram(900);
