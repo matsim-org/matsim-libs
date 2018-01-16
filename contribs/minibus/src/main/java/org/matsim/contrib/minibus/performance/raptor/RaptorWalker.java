@@ -189,10 +189,11 @@ public class RaptorWalker {
 
 			// increase the transfers and proceed
 			if(nTransfers < this.maxTransfers){
-				nTransfers++;
+//				nTransfers++;
 
 				// yyyy to me, this looks like in the end we are now going 0, 2, 4, 6, since we are incrementing both here and in
 				// the for loop.  ????  kai, jun'16
+				//right, there is no reason to increase the counter twice. Commenting one. Amit Jan'18
 
 				this.checkTransferTransitStops();
 			}
