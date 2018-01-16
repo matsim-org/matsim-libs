@@ -53,12 +53,13 @@ public class VehicleReRouter implements GenericPlanStrategyModule<CarrierPlan>{
 
             private double penalty4missedTws = 0.01;
 
+            //TODO: KMT/jan18 Replace per TimeUnit to per Transport/Servie/WaitingTimeUnit ... but make sure that this were set correctly. 
             @Override
             public double getActivityCost(TourActivity act, double arrivalTime, Driver arg2, Vehicle vehicle) {
                 double tooLate = Math.max(0, arrivalTime - act.getTheoreticalLatestOperationStartTime());
                 double waiting = Math.max(0, act.getTheoreticalEarliestOperationStartTime() - arrivalTime);
                 double service = act.getOperationTime() * vehicle.getType().getVehicleCostParams().perTimeUnit;
-                return penalty4missedTws * tooLate + vehicle.getType().getVehicleCostParams().perTimeUnit * waiting + service;
+                return penalty4missedTws * tooLate + vehicle.getType().getVehicleCostParams().perTimeUnit * waiting + service;		//TODO: KMT/jan 18 It is a bit confusing to me why there are some values already multiplied with costParams and others not.
             }
 
 			@Override
