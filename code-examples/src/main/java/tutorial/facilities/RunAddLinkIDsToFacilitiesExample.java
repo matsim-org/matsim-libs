@@ -7,10 +7,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.SearchableNetwork;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
-import org.matsim.facilities.FacilitiesUtils;
+import org.matsim.facilities.ActivityFacilityImpl;
 
 public class RunAddLinkIDsToFacilitiesExample {
 	
@@ -26,7 +25,7 @@ public class RunAddLinkIDsToFacilitiesExample {
 				Gbl.assertNotNull(coord);
 				Link link = NetworkUtils.getNearestLink( scenario.getNetwork(), coord) ;
 				Gbl.assertNotNull(link);
-				FacilitiesUtils.setLinkID(fac, link.getId() );
+				((ActivityFacilityImpl)fac).setLinkId( link.getId() );
 			}
 		}
 		

@@ -18,17 +18,17 @@
  * *********************************************************************** */
 package tutorial.programming.rideAsTeleportedCongestedMode;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.NetworkRoutingProvider;
+import org.matsim.core.router.NetworkRouting;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Uses the congested car router also for the routing of the ride mode.  By <i>not</i> making ride a mobsim main mode, 
@@ -55,7 +55,7 @@ public class RunRideAsTeleportedCongestedModeExample {
 		// tell the system to use the congested car router for the ride mode:
 		controler.addOverridingModule(new AbstractModule(){
 			@Override public void install() {
-				this.addRoutingModuleBinding( TransportMode.ride ).toProvider(new NetworkRoutingProvider( TransportMode.car ))  ;
+				this.addRoutingModuleBinding( TransportMode.ride ).toProvider(new NetworkRouting( TransportMode.car ))  ;
 			}
 		});
 		

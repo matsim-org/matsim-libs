@@ -1,6 +1,5 @@
 package tutorial.mobsim.mobsimPassingVehicleQ;
 
-import javax.inject.Inject;
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -13,7 +12,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -21,6 +20,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import javax.inject.Inject;
 
 /**
  * Example to show how the standard queue can be replaced by something else.  Search for PassingVehicleQ in the code below.
@@ -110,7 +111,7 @@ class RunMobsimWithMultipleModeVehiclesExample {
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
-			DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager);
+			TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
 			qSim.addMobsimEngine(teleportationEngine);
 
 			AgentFactory agentFactory = new DefaultAgentFactory(qSim);
