@@ -55,10 +55,10 @@ public class DistanceFilter implements DrtVehicleFilter {
 	 * @see org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter#applyFilter(org.matsim.contrib.drt.data.DrtRequest, org.matsim.contrib.drt.optimizer.VehicleData)
 	 */
 	@Override
-	public List<Entry> applyFilter(DrtRequest drtRequest, VehicleData vData) {
+	public List<Entry> applyFilter(DrtRequest drtRequest, List<VehicleData.Entry> vData) {
 		
 		List<Entry> filtered = new ArrayList<>();
-		for (Entry e : vData.getEntries()){
+		for (Entry e : vData){
 			if (DistanceUtils.calculateSquaredDistance(e.start.link.getCoord(), drtRequest.getFromLink().getCoord())<=maxDistance_m_squared){
 				filtered.add(e);
 			}

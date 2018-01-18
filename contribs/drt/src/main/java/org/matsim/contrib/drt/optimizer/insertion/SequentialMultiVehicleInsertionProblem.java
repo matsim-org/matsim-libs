@@ -17,26 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package org.matsim.contrib.drt.optimizer.insertion.filter;
+package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.List;
 
 import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
+import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 
 /**
- * @author  jbischoff
- * An interface to pre-filter vehicles.
+ * @author michalm
  */
+public class SequentialMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
+	private final SingleVehicleInsertionProblem insertionProblem;
 
-public interface DrtVehicleFilter {
+	public SequentialMultiVehicleInsertionProblem(SingleVehicleInsertionProblem insertionProblem) {
+		this.insertionProblem = insertionProblem;
+	}
 
-	/**
-	 *  applies a prefiltering to Vehicle Data set based on a certain request.
-	 */
-	List<Entry>  applyFilter(DrtRequest drtRequest, List<VehicleData.Entry> vData);
+	// TODO run Dijkstra once for all vehicles instead of running it separately for each one
+	@Override
+	public BestInsertion findBestInsertion(DrtRequest drtRequest, List<Entry> vEntries) {
+		double minCost = Double.MAX_VALUE;
+		BestInsertion fleetBestInsertion = null;
+		for (Entry vEntry : vEntries) {
+			BestInsertion bestInsertion = insertionProblem.findBestInsertion(drtRequest, vEntry);
+			if (bestInsertion.cost < minCost) {
+				fleetBestInsertion = bestInsertion;
+				minCost = bestInsertion.cost;
+			}
+		}
+		return fleetBestInsertion;
+	}
 }

@@ -29,21 +29,13 @@ import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 
 /**
- * @author  jbischoff
+ * A pseudo filter, returning the whole list.
  *
- */
-/**
- * A pseudo filter, returning the whole set.
+ * @author jbischoff
  */
 public class NoFilter implements DrtVehicleFilter {
-
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter#applyFilter(org.matsim.contrib.drt.data.DrtRequest, org.matsim.contrib.drt.optimizer.VehicleData)
-	 */
 	@Override
-	public List<Entry> applyFilter(DrtRequest drtRequest, VehicleData vData) {
-
-		return vData.getEntries();
+	public List<Entry> applyFilter(DrtRequest drtRequest, List<VehicleData.Entry> vData) {
+		return vData;
 	}
-
 }

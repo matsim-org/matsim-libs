@@ -31,13 +31,13 @@ import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
 /**
  * @author michalm
  */
-public class ParallelMultiVehicleInsertionProblem {
+public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
 	private static class TaskGroup {
 		private final List<Entry> vEntries = new ArrayList<>();
-		private final MultiVehicleInsertionProblem multiInsertionProblem;
+		private final SequentialMultiVehicleInsertionProblem multiInsertionProblem;
 
 		private TaskGroup(SingleVehicleInsertionProblem singleInsertionProblem) {
-			this.multiInsertionProblem = new MultiVehicleInsertionProblem(singleInsertionProblem);
+			this.multiInsertionProblem = new SequentialMultiVehicleInsertionProblem(singleInsertionProblem);
 		}
 
 		private BestInsertion findBestInsertion(DrtRequest drtRequest) {
@@ -63,8 +63,9 @@ public class ParallelMultiVehicleInsertionProblem {
 		executorService = Executors.newFixedThreadPool(threads);
 	}
 
-	public BestInsertion findBestInsertion(DrtRequest drtRequest, VehicleData vData) {
-		List<Entry> filteredVehicles = filter.applyFilter(drtRequest, vData);
+	@Override
+	public BestInsertion findBestInsertion(DrtRequest drtRequest, List<Entry> vEntries) {
+		List<Entry> filteredVehicles = filter.applyFilter(drtRequest, vEntries);
 		divideTasksIntoGroups(filteredVehicles);
 		return findBestInsertion(submitTasks(drtRequest));
 	}

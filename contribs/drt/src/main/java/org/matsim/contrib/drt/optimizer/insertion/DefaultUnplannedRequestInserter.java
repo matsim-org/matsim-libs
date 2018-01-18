@@ -106,7 +106,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		while (reqIter.hasNext()) {
 
 			DrtRequest req = reqIter.next();
-			BestInsertion best = insertionProblem.findBestInsertion(req, vData);
+			BestInsertion best = insertionProblem.findBestInsertion(req, vData.getEntries());
 			if (best == null) {
 				eventsManager.processEvent(new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), req.getId()));
 				if (drtCfg.isPrintDetailedWarnings()) {
