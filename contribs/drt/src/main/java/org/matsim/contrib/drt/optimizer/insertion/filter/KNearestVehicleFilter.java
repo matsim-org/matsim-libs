@@ -54,11 +54,11 @@ public class KNearestVehicleFilter implements DrtVehicleFilter {
 	 * @see org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter#applyFilter(org.matsim.contrib.drt.data.DrtRequest, org.matsim.contrib.drt.optimizer.VehicleData)
 	 */
 	@Override
-	public List<Entry> applyFilter(DrtRequest drtRequest, VehicleData vData) {
+	public List<Entry> applyFilter(DrtRequest drtRequest, List<VehicleData.Entry> vData) {
 		Link toLink = drtRequest.getFromLink();
         PartialSort<VehicleData.Entry> nearestVehicleSort = new PartialSort<VehicleData.Entry>(k);
 
-        for (VehicleData.Entry veh : vData.getEntries()) {
+        for (VehicleData.Entry veh : vData) {
             double squaredDistance = DistanceUtils.calculateSquaredDistance(veh.start.link, toLink);
             nearestVehicleSort.add(veh, squaredDistance);
         }
