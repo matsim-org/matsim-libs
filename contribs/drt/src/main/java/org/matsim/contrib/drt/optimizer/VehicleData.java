@@ -96,6 +96,11 @@ public class VehicleData {
 			}
 			return maxTime;
 		}
+		
+		@Override
+		public String toString() {
+			return "VehicleData.Stop for: " + task.toString();
+		}
 	}
 
 	private final Map<Id<Vehicle>, Entry> entries = new HashMap<>();
@@ -177,7 +182,7 @@ public class VehicleData {
 		Stop[] stops = new Stop[stopTasks.size()];
 		int outputOccupancy = 0;
 		for (int i = stops.length - 1; i >= 0; i--) {
-			Stop s = new Stop(stopTasks.get(i), outputOccupancy);
+			Stop s = stops[i] = new Stop(stopTasks.get(i), outputOccupancy);
 			outputOccupancy -= s.occupancyChange;
 		}
 
