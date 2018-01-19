@@ -22,13 +22,11 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
-import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
+import org.matsim.contrib.drt.optimizer.insertion.PathDataProvider.PathDataSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelDisutility;
@@ -74,10 +72,8 @@ public class SingleVehicleInsertionProblem {
 		}
 	}
 
-	private final OneToManyPathSearch forwardPathSearch;
-	private final OneToManyPathSearch backwardPathSearch;
-	private final double stopDuration;
 	private final MobsimTimer timer;
+	private final SequentialPathDataProvider pathDataProvider;
 	private final InsertionCostCalculator costCalculator;
 
 	///
@@ -105,12 +101,9 @@ public class SingleVehicleInsertionProblem {
 
 	public SingleVehicleInsertionProblem(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg, MobsimTimer timer) {
-		forwardPathSearch = OneToManyPathSearch.createForwardSearch(network, travelTime, travelDisutility);
-		backwardPathSearch = OneToManyPathSearch.createBackwardSearch(network, travelTime, travelDisutility);
-
-		this.stopDuration = drtCfg.getStopDuration();
 		this.timer = timer;
-		costCalculator = new InsertionCostCalculator(stopDuration, drtCfg.getMaxWaitTime());
+		pathDataProvider = new SequentialPathDataProvider(network, travelTime, travelDisutility, drtCfg);
+		costCalculator = new InsertionCostCalculator(drtCfg.getStopDuration(), drtCfg.getMaxWaitTime());
 	}
 
 	public BestInsertion findBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry) {
@@ -121,38 +114,11 @@ public class SingleVehicleInsertionProblem {
 	}
 
 	private void initPathData(DrtRequest drtRequest, VehicleData.Entry vEntry) {
-		ArrayList<Link> links = new ArrayList<>(stopCount + 1);
-		links.add(null);// special link
-		for (Stop s : vEntry.stops) {
-			links.add(s.task.getLink());
-		}
-
-		double earliestPickupTime = drtRequest.getEarliestStartTime();// over-optimistic
-
-		// calc backward dijkstra from pickup to ends of all stop + start
-		// TODO exclude inserting pickup after fully occupied stops
-		links.set(0, vEntry.start.link);
-		pathsToPickup = backwardPathSearch.calcPaths(drtRequest.getFromLink(), links, earliestPickupTime);
-
-		// calc forward dijkstra from pickup to beginnings of all stops + dropoff
-		// TODO exclude inserting before fully occupied stops (unless the new request's dropoff is located there)
-		links.set(0, drtRequest.getToLink());
-		pathsFromPickup = forwardPathSearch.calcPaths(drtRequest.getFromLink(), links, earliestPickupTime);
-
-		PathData pickupToDropoffPath = pathsFromPickup[0];// only if no other passengers on board (optimistic)
-		double minTravelTime = pickupToDropoffPath.path.travelTime + pickupToDropoffPath.firstAndLastLinkTT;
-		double earliestDropoffTime = earliestPickupTime + minTravelTime + stopDuration; // over-optimistic
-
-		// calc backward dijkstra from dropoff to ends of all stops
-		// TODO exclude inserting dropoff after fully occupied stops (unless the new request's dropoff is located there)
-		links.set(0, drtRequest.getToLink());//TODO change to null (after nulls are supported by OneToManyPathSearch)
-		pathsToDropoff = backwardPathSearch.calcPaths(drtRequest.getToLink(), links, earliestDropoffTime);
-		pathsToDropoff[0] = null;
-
-		// calc forward dijkstra from dropoff to beginnings of all stops
-		// TODO exclude inserting dropoff before fully occupied stops
-		pathsFromDropoff = forwardPathSearch.calcPaths(drtRequest.getToLink(), links, earliestDropoffTime);
-		pathsFromDropoff[0] = null;
+		PathDataSet set = pathDataProvider.getPathDataSet(drtRequest, vEntry);
+		pathsToPickup = set.pathsToPickup;
+		pathsFromPickup = set.pathsFromPickup;
+		pathsToDropoff = set.pathsToDropoff;
+		pathsFromDropoff = set.pathsFromDropoff;
 	}
 
 	private void findPickupDropoffInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry) {
