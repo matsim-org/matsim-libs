@@ -145,14 +145,14 @@ public class SingleVehicleInsertionProblem {
 
 		// calc backward dijkstra from dropoff to ends of all stops
 		// TODO exclude inserting dropoff after fully occupied stops (unless the new request's dropoff is located there)
-		links.set(0, drtRequest.getFromLink());
-		// TODO change the above line into the following one (after nulls are supported by OneToManyPathSearch)
-		// links.set(0, null);
+		links.set(0, drtRequest.getToLink());//TODO change to null (after nulls are supported by OneToManyPathSearch)
 		pathsToDropoff = backwardPathSearch.calcPaths(drtRequest.getToLink(), links, earliestDropoffTime);
+		pathsToDropoff[0] = null;
 
 		// calc forward dijkstra from dropoff to beginnings of all stops
 		// TODO exclude inserting dropoff before fully occupied stops
 		pathsFromDropoff = forwardPathSearch.calcPaths(drtRequest.getToLink(), links, earliestDropoffTime);
+		pathsFromDropoff[0] = null;
 	}
 
 	private void findPickupDropoffInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry) {
