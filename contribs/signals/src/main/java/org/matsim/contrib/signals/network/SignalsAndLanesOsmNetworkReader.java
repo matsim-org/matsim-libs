@@ -119,6 +119,8 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	private String usedLanesEstimation;
 
+	// TODO enum: externalLanes: very restrictive, restrictive, free
+	// middleLanes: stvo, realistic
 	private int modeMidLanes = 1;
 	private int modeOutLanes = 1;
 
@@ -130,8 +132,14 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 	private BoundingBox bbox = null;
 
 	public static void main(String[] args) {
-		String inputOSM = "../../../shared-svn/studies/countries/de/cottbus-osmSignalsLanes/input/osm/brandenburg.osm";
-		String outputDir = "../../../shared-svn/studies/countries/de/cottbus-osmSignalsLanes/input/matsim/";
+//		String inputOSM = "../../../shared-svn/studies/countries/de/cottbus-osmSignalsLanes/input/osm/brandenburg.osm";
+//		String outputDir = "../../../shared-svn/studies/countries/de/cottbus-osmSignalsLanes/input/matsim/";
+//		String inputOSM = "../../../shared-svn/studies/tthunig/osmData/brandenburg-latest.osm";
+//		String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/brandenburg/";
+//		String inputOSM = "../../../shared-svn/studies/tthunig/osmData/berlin-latest.osm";
+//		String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/berlin/";
+		String inputOSM = "../../../shared-svn/studies/tthunig/osmData/interpreter.osm";
+		String outputDir = "../../../shared-svn/studies/tthunig/osmData/signalsAndLanesReader/cottbusCity/";
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84,
 				TransformationFactory.WGS84_UTM33N);
 
@@ -208,7 +216,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		LOG.info("MATSim: # signals created: " + this.systems.getSignalSystemData().size());
 	}
 
-	// TODO rename 'mode' as it is to similiar to 'transport mode'
+	// TODO rename 'mode' as it is to similiar to 'transport mode' (s.o.)
 	/**
 	 * @param modeOutLanes
 	 *            The mode in which ToLinks are determined in case of missing lane
@@ -267,17 +275,19 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		setModesForDefaultLanes(lanesEstimation);
 	}
 
+	/**
+	 * Extends the super class method: Signal data (which is often located at
+	 * upstream nodes) is pushed into intersection nodes, such that it won't get
+	 * removed during network simplification
+	 */
 	@Override
-	protected boolean isNodeNecessary(OsmNode node) {
-		return super.isNodeNecessary(node) || signalizedOsmNodes.contains(node.id);
-	}
-
-	@Override
-	protected void preprocessingOsmData() {
+	protected void preprocessOsmData() {
+		super.preprocessOsmData();
+		
 		// simplify signals data: push them into main junctions
 		// this needs to be done before network simplification such that no signalized
 		// junctions are simplified
-
+		
 		simplifiyRoundaboutSignals();
 		pushingSingnalsIntoCloseJunctions();
 		pushingSingnalsIntoEndpoints();
@@ -286,10 +296,15 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		// TODO check and clean this methods
 	}
 
+	/**
+	 * Extends the super class method: Intersections with more than two ways (i.e.
+	 * more than one intersection node) are simplified into one intersection node.
+	 */
 	@Override
-	protected void furtherSimplificationOfOsmData() {
-		// TODO try to merge this with preprocessingOsmData()
-		// and/or move this into the general osm network reader (with a flag)
+	protected void simplifyOsmData() {
+		super.simplifyOsmData();
+		
+		// TODO move this into the general osm network reader (with a flag)
 		// (afterwards, make nodes private again)
 
 		// Trying to simplify four-node- and two-node-junctions to one-node-junctions
@@ -313,14 +328,25 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 		addingNodes.clear();
 		checkedNodes.clear();
+		// TODO check and clean this methods
+	}
+	
+	/**
+	 * Extends the super class method: Only unsignalized nodes can be removed.
+	 */
+	@Override
+	protected boolean canNodeBeRemoved(OsmNode node) {
+		return super.canNodeBeRemoved(node) && !signalizedOsmNodes.contains(node.id);
 	}
 
+	/**
+	 * Extends the super class method: Creates signals and lanes based on OSM data.
+	 */
 	@Override
-	protected void createAdditionalMatsimDataFromOsm(Network network,
-			Map<Long, OsmNode> nodes, Map<Long, OsmWay> ways) {
+	protected void createMatsimData() {
+		super.createMatsimData();
+		
 		// TODO check and clean this method!
-
-		// create signals and lanes:
 
 		// lanes were already created but without toLinks. add toLinks now:
 		for (Link link : network.getLinks().values()) {
@@ -1935,7 +1961,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 
 		// create Lanes only if more than one Lane detected
-		Node toNode = this.network.getNodes().get(l.getToNode());
+		Node toNode = this.network.getNodes().get(l.getToNode().getId());
 		if (l.getNumberOfLanes() > 1 && (bbox == null || bbox.contains(toNode.getCoord()))) {
 			createLanes(l, lanes, l.getNumberOfLanes());
 			if (turnLanesOfThisLink != null) {

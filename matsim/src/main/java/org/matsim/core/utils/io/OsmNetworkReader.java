@@ -360,6 +360,26 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			((Network) this.network).setCapacityPeriod(3600);
 		}
 
+		preprocessOsmData();
+		
+		simplifyOsmData();
+		
+		createMatsimData();
+
+		// free up memory
+		this.nodes.clear();
+		this.ways.clear();
+	}
+
+	/**
+	 * This method is called before the network (still based on osm data) gets simplified and before the matsim network is created.
+	 * 
+	 * It cleans the OSM data (removes ways with nodes that does not exist) 
+	 * and prepares data for simplification (collects information about all ways a node is located on; marks end nodes of ways).
+	 * 
+	 * Override/Extend this method to add additional preprocessing of OSM data (see e.g. the signals and lanes reader).
+	 */
+	protected void preprocessOsmData() {
 		log.info("Remove ways that have at least one node that was not read previously ...");
 		// yy I _think_ this is what it does.  kai, may'16
 		Iterator<Entry<Long, OsmWay>> it = this.ways.entrySet().iterator();
@@ -374,86 +394,119 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			}
 		}
 		log.info("... done removing " + counter + "ways that have at least one node that was not read previously.");
-
-		log.info("Filter OSM nodes and collect all ways per node...");
+		
+		log.info("Fill ways and nodes with additional information: the hierarchy layer for ways, end points of ways...");
 		for (OsmWay way : this.ways.values()) {
 			String highway = way.tags.get(TAG_HIGHWAY);
 			if ((highway != null) && (this.highwayDefaults.containsKey(highway))) {
 				// check to which level a way belongs
 				way.hierarchy = this.highwayDefaults.get(highway).hierarchy;
 
-				// first and last node are saved as endpoints, so they are kept in all cases
+				// first and last node are marked as endpoints, so they are kept in all cases
 				this.nodes.get(way.nodes.get(0)).endPoint = true;
 				this.nodes.get(way.nodes.get(way.nodes.size() - 1)).endPoint = true;
 
+				// save all ways a node is located on in a special map
 				for (Long nodeId : way.nodes) {
-					OsmNode node = this.nodes.get(nodeId);
+					this.nodes.get(nodeId).ways.put(way.id, way);
+				}
+			}
+		}
+		log.info("... done filling ways and nodes with additional information.");
+	}
+
+	/**
+	 * This method marks node that should be kept based on the highway type, the
+	 * number of ways they are located at, whether they are endpoints of ways, and
+	 * whether they belong to a certain group of nodes that should be kept anyway
+	 * (e.g. counting stations).
+	 * 
+	 * Override/Extend this method when further simplification of OSM data is
+	 * necessary in your reader.
+	 */
+	protected void simplifyOsmData() {
+		log.info("Mark OSM nodes that shoud be kept...");
+		for (OsmNode node : this.nodes.values()) {
+			// check whether the node belongs to a way that fulfills the hierarchyLayers (i.e. is 'big' enough)
+			wayLoop: for (OsmWay way : node.ways.values()) {
+				String highway = way.tags.get(TAG_HIGHWAY);
+				if ((highway != null) && (this.highwayDefaults.containsKey(highway))) {
 					if (this.hierarchyLayers.isEmpty()) {
 						node.used = true;
-						node.ways.put(way.id, way);
+						break;
 					} else {
 						for (OsmFilter osmFilter : this.hierarchyLayers) {
-							if(osmFilter.coordInFilter(node.coord, way.hierarchy)){
+							if (osmFilter.coordInFilter(node.coord, way.hierarchy)) {
 								node.used = true;
-								node.ways.put(way.id, way);
-								break;
+								break wayLoop;
 							}
 						}
 					}
 				}
+			}
+			
+			// mark nodes that can be removed/simplified (no endpoint, no intersections)
+			if (canNodeBeRemoved(node)) {
+				node.used = false;
+			}
+			
+			// keep special nodes (e.g. nodes with counts data), also when they don't fulfill hierarchyLayers (e.g. are located on smaller ways)
+			if ((nodeIDsToKeep != null) && nodeIDsToKeep.contains(node.id)) {
+				node.used = true;
 			}
 		}
 		log.info("... done marking OSM nodes that shoud be kept.");
 		
-		preprocessingOsmData();
+		log.info("Verify we did not mark nodes that build a loop ...");
+		for (OsmWay way : this.ways.values()) {
+			String highway = way.tags.get(TAG_HIGHWAY);
+			if ((highway != null) && (this.highwayDefaults.containsKey(highway))) {
+				int prevRealNodeIndex = 0;
+				OsmNode prevRealNode = this.nodes.get(way.nodes.get(prevRealNodeIndex));
 
-		if (!this.keepPaths) {
-
-			log.info("Mark nodes as unused that can be simplified ...") ;
-			for (OsmNode node : this.nodes.values()) {
-				node.used = isNodeNecessary(node);
-			}
-			log.info("... done marking nodes as unused that can be simplified.") ;
-
-			log.info("Verify we did not mark nodes that build a loop ...") ;
-			for (OsmWay way : this.ways.values()) {
-				String highway = way.tags.get(TAG_HIGHWAY);
-				if ((highway != null) && (this.highwayDefaults.containsKey(highway))) {
-					int prevRealNodeIndex = 0;
-					OsmNode prevRealNode = this.nodes.get(way.nodes.get(prevRealNodeIndex));
-
-					for (int i = 1; i < way.nodes.size(); i++) {
-						OsmNode node = this.nodes.get(way.nodes.get(i));
-						if (node.used) {
-							if (prevRealNode == node) {
-								/* We detected a loop between two "real" nodes.
-								 * Set some nodes between the start/end-loop-node to "used" again.
-								 * But don't set all of them to "used", as we still want to do some network-thinning.
-								 * I decided to use sqrt(.)-many nodes in between...
-								 */
-								double increment = Math.sqrt(i - prevRealNodeIndex);
-								double nextNodeToKeep = prevRealNodeIndex + increment;
-								for (double j = nextNodeToKeep; j < i; j += increment) {
-									int index = (int) Math.floor(j);
-									OsmNode intermediaryNode = this.nodes.get(way.nodes.get(index));
-									intermediaryNode.used = true;
-								}
+				for (int i = 1; i < way.nodes.size(); i++) {
+					OsmNode node = this.nodes.get(way.nodes.get(i));
+					if (node.used) {
+						if (prevRealNode == node) {
+							/* We detected a loop between two "real" nodes.
+							 * Set some nodes between the start/end-loop-node to "used" again.
+							 * But don't set all of them to "used", as we still want to do some network-thinning.
+							 * I decided to use sqrt(.)-many nodes in between...
+							 */
+							double increment = Math.sqrt(i - prevRealNodeIndex);
+							double nextNodeToKeep = prevRealNodeIndex + increment;
+							for (double j = nextNodeToKeep; j < i; j += increment) {
+								int index = (int) Math.floor(j);
+								OsmNode intermediaryNode = this.nodes.get(way.nodes.get(index));
+								intermediaryNode.used = true;
 							}
-							prevRealNodeIndex = i;
-							prevRealNode = node;
 						}
+						prevRealNodeIndex = i;
+						prevRealNode = node;
 					}
 				}
 			}
-			log.info("... done verifying that we did not mark nodes that build a loop.") ;
-
 		}
-		
-		furtherSimplificationOfOsmData();
-		
+		log.info("... done verifying that we did not mark nodes that build a loop.");
+	}
+
+	/**
+	 * This method checks whether the node is an intersection node or an end node of a way and, therefore, can not be removed/simplified.
+	 * Override/extend this when you want to keep more or other nodes, e.g. signalized nodes.
+	 * 
+	 * @return whether the node can be simplified (true) or not (false)
+	 */
+	protected boolean canNodeBeRemoved(OsmNode node) {
+		return !this.keepPaths && node.ways.size()<=1 && !node.endPoint;
+	}
+
+	/**
+	 * This method creates nodes and links for a MATSim scenario.
+	 * Override/extend this when additional data, e.g. signals, should be created.
+	 */
+	protected void createMatsimData() {
 		log.info("Create the required nodes ...") ;
 		for (OsmNode node : this.nodes.values()) {
-			// TODO check and simplify junction simplification. otherwise check here for simplificated node
 			if (node.used) {
 				Node nn = this.network.getFactory().createNode(Id.create(node.id, Node.class), node.coord);
 				setOrModifyNodeAttributes(nn, node);
@@ -461,7 +514,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			}
 		}
 		log.info("... done creating the required nodes.");
-
+	
 		log.info( "Create the links ...") ;
 		this.id = 1;
 		for (OsmWay way : this.ways.values()) {
@@ -471,13 +524,12 @@ public class OsmNetworkReader implements MatsimSomeReader {
 				double length = 0.0;
 				OsmNode lastToNode = fromNode;
 				if (fromNode.used) {
-					// TODO check and simplify junction simplification. otherwise check here for simplificated node
 					for (int i = 1, n = way.nodes.size(); i < n; i++) {
 						OsmNode toNode = this.nodes.get(way.nodes.get(i));
 						if (toNode != lastToNode) {
 							length += CoordUtils.calcEuclideanDistance(lastToNode.coord, toNode.coord);
 							if (toNode.used) {
-
+	
 								if(this.hierarchyLayers.isEmpty()) {
 									createLink(this.network, way, fromNode, toNode, length);
 								} else {
@@ -492,7 +544,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 										}
 									}
 								}
-
+	
 								fromNode = toNode;
 								length = 0.0;
 							}
@@ -503,50 +555,6 @@ public class OsmNetworkReader implements MatsimSomeReader {
 			}
 		}
 		log.info("... done creating the links.");
-		
-		createAdditionalMatsimDataFromOsm(this.network, this.nodes, this.ways);
-
-		// free up memory
-		this.nodes.clear();
-		this.ways.clear();
-	}
-
-	/**
-	 * Override this when additional data, e.g. signals, should be created from the osm data.
-	 */
-	protected void createAdditionalMatsimDataFromOsm(Network network, Map<Long, OsmNode> nodes, Map<Long, OsmWay> ways) {
-	}
-
-	/**
-	 * Override this when additionally preprocessing of OSM data is necessary in your reader.
-	 * It is called before the network (still based on osm data) gets simplified and before the matsim network is created.
-	 */
-	protected void preprocessingOsmData() {
-	}
-
-	/**
-	 * Override this when you want to change the definition of 'unused' nodes, e.g. to add a check for signals.
-	 * 
-	 * @return whether the node can be simplified (false) or not (true)
-	 */
-	protected boolean isNodeNecessary(OsmNode node) {
-		return (node.ways.size() != 1) || node.endPoint 
-				// or (i.e. when it's still 'false'): check if node has to be kept e.g. because of counts data
-				|| ((nodeIDsToKeep != null) && nodeIDsToKeep.contains(node.id));
-		/* note: checking here for counting stations changes the priority of filters and
-		 * counting stations: before, nodes with counting stations were kept also when
-		 * they are e.g. outside a bounding box (or not belonging to other filters). now
-		 * they are only kept inside the filtered nodes. This is only relevant when
-		 * 'keepPaths' is set to true.
-		 * tthunig, oct'17
-		 */
-	}
-
-	/** 
-	 * Override this when further simplification of OSM data is necessary in your reader.
-	 */
-	protected void furtherSimplificationOfOsmData() {
-		// TODO try to merge this with preprocessingOsmData().
 	}
 
 	private void createLink(final Network network, final OsmWay way, final OsmNode fromNode, final OsmNode toNode, 
