@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
@@ -60,6 +61,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final MobsimTimer mobsimTimer;
 	private final EventsManager eventsManager;
 	private final DrtScheduler scheduler;
+	private final DrtVehicleFilter vehicleFilter;
 
 	private final ParallelMultiVehicleInsertionProblem insertionProblem;
 
@@ -73,6 +75,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		this.mobsimTimer = mobsimTimer;
 		this.eventsManager = eventsManager;
 		this.scheduler = scheduler;
+		this.vehicleFilter = vehicleFilter;
 
 		SingleVehicleInsertionProblem[] singleVehicleInsertionProblems = new SingleVehicleInsertionProblem[drtCfg
 				.getNumberOfThreads()];
@@ -85,7 +88,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 					drtCfg.getStopDuration(), drtCfg.getMaxWaitTime(), mobsimTimer);
 		}
 
-		insertionProblem = new ParallelMultiVehicleInsertionProblem(singleVehicleInsertionProblems, vehicleFilter);
+		insertionProblem = new ParallelMultiVehicleInsertionProblem(singleVehicleInsertionProblems);
 	}
 
 	@Override
@@ -103,9 +106,9 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 
 		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {
-
 			DrtRequest req = reqIter.next();
-			BestInsertion best = insertionProblem.findBestInsertion(req, vData.getEntries());
+			Collection<Entry> filteredVehicles = vehicleFilter.applyFilter(req, vData.getEntries());
+			BestInsertion best = insertionProblem.findBestInsertion(req, filteredVehicles);
 			if (best == null) {
 				eventsManager.processEvent(new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), req.getId()));
 				if (drtCfg.isPrintDetailedWarnings()) {

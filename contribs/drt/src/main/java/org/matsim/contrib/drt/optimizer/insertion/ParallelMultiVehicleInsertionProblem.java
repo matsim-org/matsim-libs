@@ -32,7 +32,6 @@ import java.util.concurrent.Future;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
-import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
 
 /**
  * @author michalm
@@ -56,12 +55,9 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	private final int threads;
 	private final TaskGroup[] taskGroups;
 	private final ExecutorService executorService;
-	private final DrtVehicleFilter filter;
 
-	public ParallelMultiVehicleInsertionProblem(SingleVehicleInsertionProblem[] singleInsertionProblems,
-			DrtVehicleFilter filter) {
+	public ParallelMultiVehicleInsertionProblem(SingleVehicleInsertionProblem[] singleInsertionProblems) {
 		threads = singleInsertionProblems.length;
-		this.filter = filter;
 		this.taskGroups = new TaskGroup[threads];
 		for (int i = 0; i < threads; i++) {
 			taskGroups[i] = new TaskGroup(singleInsertionProblems[i]);
@@ -71,8 +67,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 
 	@Override
 	public BestInsertion findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
-		Collection<Entry> filteredVehicles = filter.applyFilter(drtRequest, vEntries);
-		divideTasksIntoGroups(filteredVehicles);
+		divideTasksIntoGroups(vEntries);
 		return findBestInsertion(submitTasks(drtRequest));
 	}
 
