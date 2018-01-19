@@ -78,7 +78,7 @@ public class ReassignZonesByAttractiveness {
 			
 			@Override
 			public void run(Person person) {
-				Plan plan = person.getSelectedPlan();
+				for (Plan plan : person.getPlans()){
 				int counter = 0;
 				for (PlanElement pe : plan.getPlanElements()){
 					
@@ -98,6 +98,7 @@ public class ReassignZonesByAttractiveness {
 						}
 					}
 					counter++;
+				}
 				}
 			}
 
