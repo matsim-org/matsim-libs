@@ -76,8 +76,8 @@ public class VehicleAssignmentProblem<D> {
 		this.travelTime = travelTime;
 		this.router = router;
 
-		forwardPathSearch = OneToManyPathSearch.createForwardSearch(multiNodeRouter);
-		backwardPathSearch = OneToManyPathSearch.createBackwardSearch(backwardMultiNodeRouter);
+		forwardPathSearch = OneToManyPathSearch.create(multiNodeRouter);
+		backwardPathSearch = OneToManyPathSearch.create(backwardMultiNodeRouter);
 
 		// TODO this kNN is slow
 		LinkProvider<DestEntry<D>> linkProvider = LinkProviders.createDestEntryToLink();

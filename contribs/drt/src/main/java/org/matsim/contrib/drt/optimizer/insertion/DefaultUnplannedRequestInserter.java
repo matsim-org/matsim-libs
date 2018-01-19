@@ -37,14 +37,10 @@ import org.matsim.contrib.drt.scheduler.DrtScheduler;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-import org.matsim.core.router.FastMultiNodeDijkstra;
-import org.matsim.core.router.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
@@ -77,18 +73,8 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		this.scheduler = scheduler;
 		this.vehicleFilter = vehicleFilter;
 
-		SingleVehicleInsertionProblem[] singleVehicleInsertionProblems = new SingleVehicleInsertionProblem[drtCfg
-				.getNumberOfThreads()];
-		for (int i = 0; i < singleVehicleInsertionProblems.length; i++) {
-			FastMultiNodeDijkstra router = (FastMultiNodeDijkstra)new FastMultiNodeDijkstraFactory(true)
-					.createPathCalculator(network, travelDisutility, travelTime);
-			BackwardFastMultiNodeDijkstra backwardRouter = (BackwardFastMultiNodeDijkstra)new BackwardFastMultiNodeDijkstraFactory(
-					true).createPathCalculator(network, travelDisutility, travelTime);
-			singleVehicleInsertionProblems[i] = new SingleVehicleInsertionProblem(router, backwardRouter,
-					drtCfg.getStopDuration(), drtCfg.getMaxWaitTime(), mobsimTimer);
-		}
-
-		insertionProblem = new ParallelMultiVehicleInsertionProblem(singleVehicleInsertionProblems);
+		insertionProblem = ParallelMultiVehicleInsertionProblem.create(network, travelTime, travelDisutility, drtCfg,
+				mobsimTimer);
 	}
 
 	@Override

@@ -29,14 +29,30 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author michalm
  */
 public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
+	public static ParallelMultiVehicleInsertionProblem create(Network network, TravelTime travelTime,
+			TravelDisutility travelDisutility, DrtConfigGroup drtCfg, MobsimTimer mobsimTimer) {
+		SingleVehicleInsertionProblem[] singleVehicleInsertionProblems = new SingleVehicleInsertionProblem[drtCfg
+				.getNumberOfThreads()];
+		for (int i = 0; i < singleVehicleInsertionProblems.length; i++) {
+			singleVehicleInsertionProblems[i] = new SingleVehicleInsertionProblem(network, travelTime, travelDisutility,
+					drtCfg, mobsimTimer);
+		}
+		return new ParallelMultiVehicleInsertionProblem(singleVehicleInsertionProblems);
+	}
+
 	private static class TaskGroup {
 		private final List<Entry> vEntries = new ArrayList<>();
 		private final SequentialMultiVehicleInsertionProblem multiInsertionProblem;
@@ -56,7 +72,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	private final TaskGroup[] taskGroups;
 	private final ExecutorService executorService;
 
-	public ParallelMultiVehicleInsertionProblem(SingleVehicleInsertionProblem[] singleInsertionProblems) {
+	private ParallelMultiVehicleInsertionProblem(SingleVehicleInsertionProblem[] singleInsertionProblems) {
 		threads = singleInsertionProblems.length;
 		this.taskGroups = new TaskGroup[threads];
 		for (int i = 0; i < threads; i++) {

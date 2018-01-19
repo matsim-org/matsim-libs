@@ -19,23 +19,42 @@
 
 package org.matsim.contrib.dvrp.path;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
+import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
 import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
-import org.matsim.core.router.*;
+import org.matsim.core.router.FastMultiNodeDijkstraFactory;
+import org.matsim.core.router.InitialNode;
+import org.matsim.core.router.MultiNodePathCalculator;
+import org.matsim.core.router.RoutingNetworkImaginaryNode;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.collect.Maps;
 
 public class OneToManyPathSearch {
-	public static OneToManyPathSearch createForwardSearch(MultiNodePathCalculator forwardMultiNodeDijkstra) {
-		return new OneToManyPathSearch(forwardMultiNodeDijkstra, true);
+	public static OneToManyPathSearch createForwardSearch(Network network, TravelTime travelTime,
+			TravelDisutility travelDisutility) {
+		return create((MultiNodePathCalculator)new FastMultiNodeDijkstraFactory(true).createPathCalculator(network,
+				travelDisutility, travelTime));
 	}
 
-	public static OneToManyPathSearch createBackwardSearch(BackwardMultiNodePathCalculator backwardMultiNodeDijkstra) {
-		return new OneToManyPathSearch(backwardMultiNodeDijkstra, false);
+	public static OneToManyPathSearch createBackwardSearch(Network network, TravelTime travelTime,
+			TravelDisutility travelDisutility) {
+		return create((BackwardMultiNodePathCalculator)new BackwardFastMultiNodeDijkstraFactory(true)
+				.createPathCalculator(network, travelDisutility, travelTime));
+	}
+
+	public static OneToManyPathSearch create(MultiNodePathCalculator multiNodeDijkstra) {
+		return new OneToManyPathSearch(multiNodeDijkstra);
 	}
 
 	public static class PathData {
@@ -59,9 +78,9 @@ public class OneToManyPathSearch {
 	private final MultiNodePathCalculator multiNodeDijkstra;// forward or backward
 	private final boolean forward;
 
-	private OneToManyPathSearch(MultiNodePathCalculator multiNodeDijkstra, boolean forward) {
+	private OneToManyPathSearch(MultiNodePathCalculator multiNodeDijkstra) {
 		this.multiNodeDijkstra = multiNodeDijkstra;
-		this.forward = forward;
+		this.forward = !(multiNodeDijkstra instanceof BackwardFastMultiNodeDijkstra);
 	}
 
 	public PathData[] calcPaths(Link fromLink, List<Link> toLinks, double startTime) {
