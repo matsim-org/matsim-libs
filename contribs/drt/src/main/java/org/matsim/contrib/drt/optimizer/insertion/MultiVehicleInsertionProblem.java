@@ -18,7 +18,7 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
@@ -28,5 +28,5 @@ import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.
  * @author michalm
  */
 public interface MultiVehicleInsertionProblem {
-	BestInsertion findBestInsertion(DrtRequest drtRequest, List<VehicleData.Entry> vData);
+	BestInsertion findBestInsertion(DrtRequest drtRequest, Collection<VehicleData.Entry> vData);
 }

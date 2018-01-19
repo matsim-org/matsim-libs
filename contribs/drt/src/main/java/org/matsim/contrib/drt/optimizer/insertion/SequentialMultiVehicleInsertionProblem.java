@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
@@ -37,7 +37,7 @@ public class SequentialMultiVehicleInsertionProblem implements MultiVehicleInser
 
 	// TODO run Dijkstra once for all vehicles instead of running it separately for each one
 	@Override
-	public BestInsertion findBestInsertion(DrtRequest drtRequest, List<Entry> vEntries) {
+	public BestInsertion findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
 		double minCost = Double.MAX_VALUE;
 		BestInsertion fleetBestInsertion = null;
 		for (Entry vEntry : vEntries) {

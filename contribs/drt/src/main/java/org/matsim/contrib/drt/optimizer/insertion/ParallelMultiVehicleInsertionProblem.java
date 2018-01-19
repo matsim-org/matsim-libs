@@ -19,11 +19,17 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
@@ -64,13 +70,13 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	}
 
 	@Override
-	public BestInsertion findBestInsertion(DrtRequest drtRequest, List<Entry> vEntries) {
-		List<Entry> filteredVehicles = filter.applyFilter(drtRequest, vEntries);
+	public BestInsertion findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
+		Collection<Entry> filteredVehicles = filter.applyFilter(drtRequest, vEntries);
 		divideTasksIntoGroups(filteredVehicles);
 		return findBestInsertion(submitTasks(drtRequest));
 	}
 
-	private void divideTasksIntoGroups(List<Entry> filteredVehicles) {
+	private void divideTasksIntoGroups(Collection<Entry> filteredVehicles) {
 		Iterator<Entry> vEntryIter = filteredVehicles.iterator();
 		int div = filteredVehicles.size() / threads;
 		int mod = filteredVehicles.size() % threads;

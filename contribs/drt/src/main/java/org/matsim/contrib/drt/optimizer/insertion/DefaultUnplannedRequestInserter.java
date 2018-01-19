@@ -66,9 +66,8 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	@Inject
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
 			Fleet fleet, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility,
-			MobsimTimer mobsimTimer, DrtVehicleFilter vehicleFilter, EventsManager eventsManager,
-			DrtScheduler scheduler) {
+			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility, MobsimTimer mobsimTimer,
+			DrtVehicleFilter vehicleFilter, EventsManager eventsManager, DrtScheduler scheduler) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
@@ -117,7 +116,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				}
 			} else {
 				scheduler.insertRequest(best.vehicleEntry, req, best.insertion);
-				vData.updateEntry(best.vehicleEntry);
+				vData.updateEntry(best.vehicleEntry.vehicle);
 				eventsManager.processEvent(new DrtRequestScheduledEvent(mobsimTimer.getTimeOfDay(), req.getId(),
 						best.vehicleEntry.vehicle.getId(), req.getPickupTask().getEndTime(),
 						req.getDropoffTask().getBeginTime()));

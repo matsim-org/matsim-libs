@@ -22,7 +22,7 @@
  */
 package org.matsim.contrib.drt.optimizer.insertion.filter;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
@@ -35,7 +35,7 @@ import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
  */
 public class NoFilter implements DrtVehicleFilter {
 	@Override
-	public List<Entry> applyFilter(DrtRequest drtRequest, List<VehicleData.Entry> vData) {
+	public Collection<Entry> applyFilter(DrtRequest drtRequest, Collection<VehicleData.Entry> vData) {
 		return vData;
 	}
 }
