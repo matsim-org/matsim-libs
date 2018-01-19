@@ -23,7 +23,8 @@ import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.Insertion;
-import org.matsim.contrib.drt.schedule.*;
+import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.schedule.Schedules;
 
