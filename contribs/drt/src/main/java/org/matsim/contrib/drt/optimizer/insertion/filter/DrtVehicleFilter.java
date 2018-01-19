@@ -34,7 +34,8 @@ import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 public interface DrtVehicleFilter {
 
 	/**
-	 * applies a prefiltering to Vehicle Data set based on a certain request.
+	 * applies a prefiltering to VehicleData.Entry collection based on a certain request before request insertion
+	 * procedure is called.
 	 */
 	Collection<Entry> applyFilter(DrtRequest drtRequest, Collection<VehicleData.Entry> vData);
 }
