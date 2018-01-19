@@ -92,17 +92,12 @@ public class OneToManyPathSearch {
 
 	private Map<Id<Node>, ToNode> createToNodes(Link fromLink, List<Link> toLinks) {
 		Map<Id<Node>, ToNode> toNodes = Maps.newHashMapWithExpectedSize(toLinks.size());
-
-		for (int i = 0; i < toLinks.size(); i++) {
-			Link toLink = toLinks.get(i);
+		for (Link toLink : toLinks) {
 			if (toLink != fromLink) {
 				Node toNode = getToNode(toLink);
-				if (!toNodes.containsKey(toNode.getId())) {
-					toNodes.put(toNode.getId(), new ToNode(toNode, 0, 0));
-				}
+				toNodes.putIfAbsent(toNode.getId(), new ToNode(toNode, 0, 0));
 			}
 		}
-
 		return toNodes;
 	}
 
