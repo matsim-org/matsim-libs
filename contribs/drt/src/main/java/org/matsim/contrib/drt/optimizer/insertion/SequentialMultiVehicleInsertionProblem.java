@@ -24,6 +24,8 @@ import java.util.Collection;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
@@ -31,8 +33,9 @@ import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.
 public class SequentialMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
 	private final SingleVehicleInsertionProblem insertionProblem;
 
-	public SequentialMultiVehicleInsertionProblem(SingleVehicleInsertionProblem insertionProblem) {
-		this.insertionProblem = insertionProblem;
+	public SequentialMultiVehicleInsertionProblem(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
+			MobsimTimer timer) {
+		this.insertionProblem = new SingleVehicleInsertionProblem(pathDataProvider, drtCfg, timer);
 	}
 
 	// TODO run Dijkstra once for all vehicles instead of running it separately for each one

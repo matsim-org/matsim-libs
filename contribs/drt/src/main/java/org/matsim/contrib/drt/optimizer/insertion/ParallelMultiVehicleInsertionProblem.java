@@ -44,21 +44,19 @@ import org.matsim.core.router.util.TravelTime;
 public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
 	public static ParallelMultiVehicleInsertionProblem create(Network network, TravelTime travelTime,
 			TravelDisutility travelDisutility, DrtConfigGroup drtCfg, MobsimTimer mobsimTimer) {
-		SingleVehicleInsertionProblem[] singleVehicleInsertionProblems = new SingleVehicleInsertionProblem[drtCfg
-				.getNumberOfThreads()];
-		for (int i = 0; i < singleVehicleInsertionProblems.length; i++) {
-			singleVehicleInsertionProblems[i] = new SingleVehicleInsertionProblem(network, travelTime, travelDisutility,
-					drtCfg, mobsimTimer);
+		PathDataProvider[] pathDataProviders = new PathDataProvider[drtCfg.getNumberOfThreads()];
+		for (int i = 0; i < pathDataProviders.length; i++) {
+			pathDataProviders[i] = new SequentialPathDataProvider(network, travelTime, travelDisutility, drtCfg);
 		}
-		return new ParallelMultiVehicleInsertionProblem(singleVehicleInsertionProblems);
+		return new ParallelMultiVehicleInsertionProblem(pathDataProviders, drtCfg, mobsimTimer);
 	}
 
 	private static class TaskGroup {
 		private final List<Entry> vEntries = new ArrayList<>();
 		private final SequentialMultiVehicleInsertionProblem multiInsertionProblem;
 
-		private TaskGroup(SingleVehicleInsertionProblem singleInsertionProblem) {
-			this.multiInsertionProblem = new SequentialMultiVehicleInsertionProblem(singleInsertionProblem);
+		private TaskGroup(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg, MobsimTimer timer) {
+			this.multiInsertionProblem = new SequentialMultiVehicleInsertionProblem(pathDataProvider, drtCfg, timer);
 		}
 
 		private BestInsertion findBestInsertion(DrtRequest drtRequest) {
@@ -72,11 +70,12 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	private final TaskGroup[] taskGroups;
 	private final ExecutorService executorService;
 
-	private ParallelMultiVehicleInsertionProblem(SingleVehicleInsertionProblem[] singleInsertionProblems) {
-		threads = singleInsertionProblems.length;
+	private ParallelMultiVehicleInsertionProblem(PathDataProvider[] pathDataProviders, DrtConfigGroup drtCfg,
+			MobsimTimer timer) {
+		threads = pathDataProviders.length;
 		this.taskGroups = new TaskGroup[threads];
 		for (int i = 0; i < threads; i++) {
-			taskGroups[i] = new TaskGroup(singleInsertionProblems[i]);
+			taskGroups[i] = new TaskGroup(pathDataProviders[i], drtCfg, timer);
 		}
 		executorService = Executors.newFixedThreadPool(threads);
 	}

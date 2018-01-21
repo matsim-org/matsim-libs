@@ -20,18 +20,14 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.PathDataProvider.PathDataSet;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author michalm
@@ -74,7 +70,7 @@ public class SingleVehicleInsertionProblem {
 	}
 
 	private final MobsimTimer timer;
-	private final ParallelPathDataProvider pathDataProvider;
+	private final PathDataProvider pathDataProvider;
 	private final InsertionCostCalculator costCalculator;
 
 	///
@@ -100,10 +96,9 @@ public class SingleVehicleInsertionProblem {
 	// private boolean[] considerPickupInsertion;
 	// private boolean[] considerDropoffInsertion;
 
-	public SingleVehicleInsertionProblem(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
-			DrtConfigGroup drtCfg, MobsimTimer timer) {
+	public SingleVehicleInsertionProblem(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg, MobsimTimer timer) {
 		this.timer = timer;
-		pathDataProvider = new ParallelPathDataProvider(network, travelTime, travelDisutility, drtCfg);
+		this.pathDataProvider = pathDataProvider;
 		costCalculator = new InsertionCostCalculator(drtCfg.getStopDuration(), drtCfg.getMaxWaitTime());
 	}
 
@@ -115,7 +110,6 @@ public class SingleVehicleInsertionProblem {
 	}
 
 	private void initPathData(DrtRequest drtRequest, VehicleData.Entry vEntry) {
-		pathDataProvider.calcPathData(drtRequest, Collections.singleton(vEntry));
 		PathDataSet set = pathDataProvider.getPathDataSet(drtRequest, vEntry);
 		pathsToPickup = set.pathsToPickup;
 		pathsFromPickup = set.pathsFromPickup;
