@@ -59,12 +59,14 @@ public class SequentialPathDataProvider implements PathDataProvider {
 		// calc backward dijkstra from pickup to ends of all stop + start
 		// TODO exclude inserting pickup after fully occupied stops
 		links.set(0, vEntry.start.link);
-		PathData[] pathsToPickup = backwardPathSearch.calcPaths(drtRequest.getFromLink(), links, earliestPickupTime);
+		PathData[] pathsToPickup = backwardPathSearch.calcPathDataArray(drtRequest.getFromLink(), links,
+				earliestPickupTime);
 
 		// calc forward dijkstra from pickup to beginnings of all stops + dropoff
 		// TODO exclude inserting before fully occupied stops (unless the new request's dropoff is located there)
 		links.set(0, drtRequest.getToLink());
-		PathData[] pathsFromPickup = forwardPathSearch.calcPaths(drtRequest.getFromLink(), links, earliestPickupTime);
+		PathData[] pathsFromPickup = forwardPathSearch.calcPathDataArray(drtRequest.getFromLink(), links,
+				earliestPickupTime);
 
 		PathData pickupToDropoffPath = pathsFromPickup[0];// only if no other passengers on board (optimistic)
 		double minTravelTime = pickupToDropoffPath.path.travelTime + pickupToDropoffPath.firstAndLastLinkTT;
@@ -73,12 +75,14 @@ public class SequentialPathDataProvider implements PathDataProvider {
 		// calc backward dijkstra from dropoff to ends of all stops
 		// TODO exclude inserting dropoff after fully occupied stops (unless the new request's dropoff is located there)
 		links.set(0, drtRequest.getToLink());// TODO change to null (after nulls are supported by OneToManyPathSearch)
-		PathData[] pathsToDropoff = backwardPathSearch.calcPaths(drtRequest.getToLink(), links, earliestDropoffTime);
+		PathData[] pathsToDropoff = backwardPathSearch.calcPathDataArray(drtRequest.getToLink(), links,
+				earliestDropoffTime);
 		pathsToDropoff[0] = null;
 
 		// calc forward dijkstra from dropoff to beginnings of all stops
 		// TODO exclude inserting dropoff before fully occupied stops
-		PathData[] pathsFromDropoff = forwardPathSearch.calcPaths(drtRequest.getToLink(), links, earliestDropoffTime);
+		PathData[] pathsFromDropoff = forwardPathSearch.calcPathDataArray(drtRequest.getToLink(), links,
+				earliestDropoffTime);
 		pathsFromDropoff[0] = null;
 
 		return new PathDataSet(pathsToPickup, pathsFromPickup, pathsToDropoff, pathsFromDropoff);
