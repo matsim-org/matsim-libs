@@ -43,7 +43,7 @@ public class SequentialPathDataProvider implements PathDataProvider {
 			DrtConfigGroup drtCfg) {
 		forwardPathSearch = OneToManyPathSearch.createForwardSearch(network, travelTime, travelDisutility);
 		backwardPathSearch = OneToManyPathSearch.createBackwardSearch(network, travelTime, travelDisutility);
-		this.stopDuration = drtCfg.getStopDuration();
+		stopDuration = drtCfg.getStopDuration();
 	}
 
 	@Override
