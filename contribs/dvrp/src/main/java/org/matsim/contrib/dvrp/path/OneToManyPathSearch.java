@@ -84,11 +84,18 @@ public class OneToManyPathSearch {
 		this.forward = !(multiNodeDijkstra instanceof BackwardFastMultiNodeDijkstra);
 	}
 
-	public PathData[] calcPaths(Link fromLink, List<Link> toLinks, double startTime) {
+	public PathData[] calcPathDataArray(Link fromLink, List<Link> toLinks, double startTime) {
 		Node fromNode = getFromNode(fromLink);
 		Map<Id<Node>, ToNode> toNodes = createToNodes(fromLink, toLinks);
 		calculatePaths(fromNode, toNodes, startTime);
 		return createPathDataArray(fromLink, toLinks, startTime, toNodes);
+	}
+
+	public Map<Id<Link>, PathData> calcPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime) {
+		Node fromNode = getFromNode(fromLink);
+		Map<Id<Node>, ToNode> toNodes = createToNodes(fromLink, toLinks);
+		calculatePaths(fromNode, toNodes, startTime);
+		return createPathDataMap(fromLink, toLinks, startTime, toNodes);
 	}
 
 	private Map<Id<Node>, ToNode> createToNodes(Link fromLink, Collection<Link> toLinks) {
@@ -116,7 +123,6 @@ public class OneToManyPathSearch {
 	private PathData[] createPathDataArray(Link fromLink, List<Link> toLinks, double startTime,
 			Map<Id<Node>, ToNode> toNodes) {
 		PathData[] pathDataArray = new PathData[toLinks.size()];
-
 		for (int i = 0; i < pathDataArray.length; i++) {
 			Link toLink = toLinks.get(i);
 			if (toLink == fromLink) {
@@ -127,8 +133,22 @@ public class OneToManyPathSearch {
 						getFirstAndLastLinkTT(fromLink, toLink, toNode.path, startTime));
 			}
 		}
-
 		return pathDataArray;
+	}
+
+	private Map<Id<Link>, PathData> createPathDataMap(Link fromLink, Collection<Link> toLinks, double startTime,
+			Map<Id<Node>, ToNode> toNodes) {
+		Map<Id<Link>, PathData> pathDataMap = Maps.newHashMapWithExpectedSize(toLinks.size());
+		for (Link toLink : toLinks) {
+			if (toLink == fromLink) {
+				pathDataMap.put(toLink.getId(), createZeroPath(fromLink));
+			} else {
+				ToNode toNode = toNodes.get(getToNode(toLink).getId());
+				pathDataMap.put(toLink.getId(),
+						new PathData(toNode.path, getFirstAndLastLinkTT(fromLink, toLink, toNode.path, startTime)));
+			}
+		}
+		return pathDataMap;
 	}
 
 	private PathData createZeroPath(Link fromLink) {

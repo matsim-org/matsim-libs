@@ -20,7 +20,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -42,7 +41,6 @@ import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 
 /**
  * @author michalm
@@ -100,7 +98,8 @@ public class ParallelPathDataProvider implements PathDataProvider {
 					.copyOf(Iterables.concat(startLinks.values(), stopLinkList));
 			// calc backward dijkstra from pickup to ends of all stop + start
 			// TODO exclude inserting pickup after fully occupied stops
-			return calcPaths(toPickupPathSearch, drtRequest.getFromLink(), startAndStopLinkList, earliestPickupTime);
+			return toPickupPathSearch.calcPathDataMap(drtRequest.getFromLink(), startAndStopLinkList,
+					earliestPickupTime);
 		});
 
 		Future<Map<Id<Link>, PathData>> pathsFromPickupFuture = executorService.submit(() -> {
@@ -109,7 +108,7 @@ public class ParallelPathDataProvider implements PathDataProvider {
 					.addAll(stopLinkList).build();
 			// calc forward dijkstra from pickup to beginnings of all stops + dropoff
 			// TODO exclude inserting before fully occupied stops (unless the new request's dropoff is located there)
-			return calcPaths(fromPickupPathSearch, drtRequest.getFromLink(), dropoffAndStopLinkList,
+			return fromPickupPathSearch.calcPathDataMap(drtRequest.getFromLink(), dropoffAndStopLinkList,
 					earliestPickupTime);
 		});
 
@@ -117,13 +116,13 @@ public class ParallelPathDataProvider implements PathDataProvider {
 			// calc backward dijkstra from dropoff to ends of all stops
 			// TODO exclude inserting dropoff after fully occupied stops (unless the new request's dropoff is located
 			// there)
-			return calcPaths(toDropoffPathSearch, drtRequest.getToLink(), stopLinkList, earliestDropoffTime);
+			return toDropoffPathSearch.calcPathDataMap(drtRequest.getToLink(), stopLinkList, earliestDropoffTime);
 		});
 
 		Future<Map<Id<Link>, PathData>> pathsFromDropoffFuture = executorService.submit(() -> {
 			// calc forward dijkstra from dropoff to beginnings of all stops
 			// TODO exclude inserting dropoff before fully occupied stops
-			return calcPaths(fromDropoffPathSearch, drtRequest.getToLink(), stopLinkList, earliestDropoffTime);
+			return fromDropoffPathSearch.calcPathDataMap(drtRequest.getToLink(), stopLinkList, earliestDropoffTime);
 		});
 
 		try {
@@ -134,16 +133,6 @@ public class ParallelPathDataProvider implements PathDataProvider {
 		} catch (InterruptedException | ExecutionException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	private Map<Id<Link>, PathData> calcPaths(OneToManyPathSearch pathSearch, Link fromLink, List<Link> toLinks,
-			double startTime) {
-		PathData[] pathData = pathSearch.calcPaths(fromLink, toLinks, startTime);
-		Map<Id<Link>, PathData> map = Maps.newHashMapWithExpectedSize(toLinks.size());
-		for (int i = 0; i < pathData.length; i++) {
-			map.put(toLinks.get(i).getId(), pathData[i]);
-		}
-		return map;
 	}
 
 	@Override
