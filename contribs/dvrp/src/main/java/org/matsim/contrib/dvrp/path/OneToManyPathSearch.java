@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.dvrp.path;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +91,7 @@ public class OneToManyPathSearch {
 		return createPathDataArray(fromLink, toLinks, startTime, toNodes);
 	}
 
-	private Map<Id<Node>, ToNode> createToNodes(Link fromLink, List<Link> toLinks) {
+	private Map<Id<Node>, ToNode> createToNodes(Link fromLink, Collection<Link> toLinks) {
 		Map<Id<Node>, ToNode> toNodes = Maps.newHashMapWithExpectedSize(toLinks.size());
 		for (Link toLink : toLinks) {
 			if (toLink != fromLink) {

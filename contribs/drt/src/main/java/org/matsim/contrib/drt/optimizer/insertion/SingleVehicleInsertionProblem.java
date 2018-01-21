@@ -20,6 +20,7 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.network.Network;
@@ -73,7 +74,7 @@ public class SingleVehicleInsertionProblem {
 	}
 
 	private final MobsimTimer timer;
-	private final SequentialPathDataProvider pathDataProvider;
+	private final ParallelPathDataProvider pathDataProvider;
 	private final InsertionCostCalculator costCalculator;
 
 	///
@@ -102,7 +103,7 @@ public class SingleVehicleInsertionProblem {
 	public SingleVehicleInsertionProblem(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
 			DrtConfigGroup drtCfg, MobsimTimer timer) {
 		this.timer = timer;
-		pathDataProvider = new SequentialPathDataProvider(network, travelTime, travelDisutility, drtCfg);
+		pathDataProvider = new ParallelPathDataProvider(network, travelTime, travelDisutility, drtCfg);
 		costCalculator = new InsertionCostCalculator(drtCfg.getStopDuration(), drtCfg.getMaxWaitTime());
 	}
 
@@ -114,6 +115,7 @@ public class SingleVehicleInsertionProblem {
 	}
 
 	private void initPathData(DrtRequest drtRequest, VehicleData.Entry vEntry) {
+		pathDataProvider.calcPathData(drtRequest, Collections.singleton(vEntry));
 		PathDataSet set = pathDataProvider.getPathDataSet(drtRequest, vEntry);
 		pathsToPickup = set.pathsToPickup;
 		pathsFromPickup = set.pathsFromPickup;
