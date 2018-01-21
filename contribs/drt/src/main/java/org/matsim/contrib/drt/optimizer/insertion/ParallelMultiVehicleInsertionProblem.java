@@ -44,11 +44,9 @@ import org.matsim.core.router.util.TravelTime;
 public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
 	public static ParallelMultiVehicleInsertionProblem create(Network network, TravelTime travelTime,
 			TravelDisutility travelDisutility, DrtConfigGroup drtCfg, MobsimTimer mobsimTimer) {
-		PathDataProvider[] pathDataProviders = new PathDataProvider[drtCfg.getNumberOfThreads()];
-		for (int i = 0; i < pathDataProviders.length; i++) {
-			pathDataProviders[i] = new SequentialPathDataProvider(network, travelTime, travelDisutility, drtCfg);
-		}
-		return new ParallelMultiVehicleInsertionProblem(pathDataProviders, drtCfg, mobsimTimer);
+		ParallelPathDataProvider pathDataProvider = new ParallelPathDataProvider(network, travelTime, travelDisutility,
+				drtCfg);
+		return new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer);
 	}
 
 	private static class TaskGroup {
@@ -66,22 +64,27 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 		}
 	}
 
+	private final ParallelPathDataProvider pathDataProvider;
+
 	private final int threads;
 	private final TaskGroup[] taskGroups;
 	private final ExecutorService executorService;
 
-	private ParallelMultiVehicleInsertionProblem(PathDataProvider[] pathDataProviders, DrtConfigGroup drtCfg,
+	private ParallelMultiVehicleInsertionProblem(ParallelPathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
 			MobsimTimer timer) {
-		threads = pathDataProviders.length;
+		this.pathDataProvider = pathDataProvider;
+
+		threads = drtCfg.getNumberOfThreads();
 		this.taskGroups = new TaskGroup[threads];
 		for (int i = 0; i < threads; i++) {
-			taskGroups[i] = new TaskGroup(pathDataProviders[i], drtCfg, timer);
+			taskGroups[i] = new TaskGroup(pathDataProvider, drtCfg, timer);
 		}
 		executorService = Executors.newFixedThreadPool(threads);
 	}
 
 	@Override
 	public BestInsertion findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
+		pathDataProvider.calcPathData(drtRequest, vEntries);
 		divideTasksIntoGroups(vEntries);
 		return findBestInsertion(submitTasks(drtRequest));
 	}
@@ -135,6 +138,7 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	}
 
 	public void shutdown() {
+		pathDataProvider.shutdown();
 		executorService.shutdown();
 	}
 }

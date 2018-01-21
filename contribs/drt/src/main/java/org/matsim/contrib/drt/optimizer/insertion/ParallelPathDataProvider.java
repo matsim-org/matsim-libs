@@ -46,7 +46,7 @@ import com.google.common.collect.Iterables;
  * @author michalm
  */
 public class ParallelPathDataProvider implements PathDataProvider {
-	private static final int THREADS = 1;
+	private static final int THREADS = 4;
 
 	private final OneToManyPathSearch toPickupPathSearch;
 	private final OneToManyPathSearch fromPickupPathSearch;
@@ -157,5 +157,9 @@ public class ParallelPathDataProvider implements PathDataProvider {
 		}
 
 		return new PathDataSet(pathsToPickup, pathsFromPickup, pathsToDropoff, pathsFromDropoff);
+	}
+
+	public void shutdown() {
+		executorService.shutdown();
 	}
 }
