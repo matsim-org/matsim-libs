@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.junit.Ignore;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -19,6 +20,7 @@ import org.matsim.deprecated.scoring.ScoringFunctionAccumulator;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.ActivityScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.deprecated.scoring.ScoringFunctionAccumulator.LegScoring;
+import org.matsim.vehicles.Vehicle;
 
 @Ignore
 public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFactory{
@@ -75,7 +77,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 			public void endLeg(double time) {
 				if(currentLeg.getRoute() instanceof NetworkRoute){
 					NetworkRoute nRoute = (NetworkRoute) currentLeg.getRoute();
-					Id vehicleId = nRoute.getVehicleId();
+					Id<Vehicle> vehicleId = nRoute.getVehicleId();
 					CarrierVehicle vehicle = getVehicle(vehicleId);
 					assert vehicle != null : "cannot find vehicle with id=" + vehicleId;
 					if(!employedVehicles.contains(vehicle)){
@@ -84,7 +86,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 					double distance = 0.0;
 					if(currentLeg.getRoute() instanceof NetworkRoute){
 						distance += network.getLinks().get(currentLeg.getRoute().getStartLinkId()).getLength();
-						for(Id linkId : ((NetworkRoute) currentLeg.getRoute()).getLinkIds()){
+						for(Id<Link> linkId : ((NetworkRoute) currentLeg.getRoute()).getLinkIds()){
 							distance += network.getLinks().get(linkId).getLength();
 						}
 						distance += network.getLinks().get(currentLeg.getRoute().getEndLinkId()).getLength();
@@ -98,7 +100,7 @@ public class ScoringFunctionFactoryForTests implements CarrierScoringFunctionFac
 				return vehicle.getVehicleType().getVehicleCostInformation().perDistanceUnit;
 			}
 
-			private CarrierVehicle getVehicle(Id vehicleId) {
+			private CarrierVehicle getVehicle(Id<Vehicle> vehicleId) {
 				for(CarrierVehicle cv : carrier.getCarrierCapabilities().getCarrierVehicles()){
 					if(cv.getVehicleId().equals(vehicleId)){
 						return cv;
