@@ -51,15 +51,10 @@ public class TaxiRequest implements PassengerRequest {
 
 	private final MobsimPassengerAgent passenger;
 	private final Link fromLink;
-	private Link toLink;// toLink may be provided during the pickup
+	private final Link toLink;
 
 	private TaxiPickupTask pickupTask;
 	private TaxiDropoffTask dropoffTask;
-
-	public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, double startTime,
-			double submissionTime) {
-		this(id, passenger, fromLink, null, startTime, submissionTime);
-	}
 
 	public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
 			double earliestStartTime, double submissionTime) {
@@ -94,10 +89,6 @@ public class TaxiRequest implements PassengerRequest {
 	@Override
 	public Link getToLink() {
 		return toLink;
-	}
-
-	public void setToLink(Link toLink) {
-		this.toLink = toLink;
 	}
 
 	@Override
@@ -149,10 +140,9 @@ public class TaxiRequest implements PassengerRequest {
 
 		throw new IllegalStateException("Unreachable code");
 	}
-	
-	
+
 	@Override
 	public String toString() {
-		return super.toString();
+		return Request.toString(this);
 	}
 }
