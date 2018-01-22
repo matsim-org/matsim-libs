@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,45 +16,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.vsp.demandde.cemdap.input;
+
+import org.apache.log4j.Logger;
 
 /**
- * 
+ * @author dziemke
  */
-package vwExamples.cemdapwob.planspreprocessing;
-
-import java.util.Random;
-
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PopulationUtils;
-import org.matsim.core.population.io.PopulationReader;
-import org.matsim.core.population.io.PopulationWriter;
-import org.matsim.core.scenario.ScenarioUtils;
-
-/**
- * @author  jbischoff
- *
- */
-/**
- *
- */
-public class WobCemdapPlansSample {
+public class CommuterFileReaderV2Starter {
+	private static final Logger LOG = Logger.getLogger(CommuterFileReaderV2Starter.class);
 
 	public static void main(String[] args) {
-		double scale = 0.01;
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new PopulationReader(scenario).readFile("D:/cemdap-vw/Output/mergedplans_filtered.xml.gz");
-		Random r = MatsimRandom.getRandom();
-		Population exportPop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
-		for (Person p : scenario.getPopulation().getPersons().values()){
-			if (r.nextDouble()<scale){
-				exportPop.addPerson(p);
-			}
-		}
-		new PopulationWriter(exportPop).write("D:/cemdap-vw/Output/mergedplans_filtered.xml"+scale+".gz");
+		String commuterFileOutgoing = "../../../shared-svn/studies/countries/de/berlin_scenario_2016/input/pendlerstatistik_2009/Brandenburg_2009/Teil1BR2009Ga.txt";
+		String delimiter = "\t";
 		
+		CommuterFileReaderV2 commuterFileReader = new CommuterFileReaderV2(commuterFileOutgoing, delimiter);
+		
+		int origin = 12051000; // "Brandenburg an der Havel, St."
+		int destination = 11000000; // "Berlin, Stadt"
+		LOG.info("Test: 1513 = " + commuterFileReader.getRelationsMap().get(origin).get(destination).getTrips());
 	}
 }

@@ -1,3 +1,4 @@
+
 /* *********************************************************************** *
  * project: org.matsim.*
  *                                                                         *
@@ -20,7 +21,7 @@
 /**
  * 
  */
-package vwExamples.cemdapwob.planspreprocessing;
+package vwExamples.cemdap4wob.planspreprocessing;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -54,6 +55,15 @@ public class ActivityTypeTimeConverter {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		final String inputPopulation = "D:/cemdap-vw/Output/mergedplans.xml.gz";
+		final String outputPopulation = "D:/cemdap-vw/Output/mergedplans_dur.xml.gz";
+		final String outputConfig = "D:/cemdap-vw/Output/activityConfig.xml";
+		
+		new ActivityTypeTimeConverter().run(inputPopulation, outputPopulation, outputConfig);
+	}
+	
+	public void run (String inputPopulation, String outputPopulation, String outputConfig)
+	{
 
 		Config config = ConfigUtils.createConfig();
 		ActivityParams work = new ActivityParams();
@@ -95,7 +105,7 @@ public class ActivityTypeTimeConverter {
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		Set<String> types = new HashSet<>();
-		new PopulationReader(scenario).readFile("D:/cemdap-vw/Output/mergedplans.xml.gz");
+		new PopulationReader(scenario).readFile(inputPopulation);
 		
 		for (Person p : scenario.getPopulation().getPersons().values()){
 			for (Plan plan : p.getPlans()){
@@ -112,9 +122,8 @@ public class ActivityTypeTimeConverter {
 								
 							if (lastActivityCoord!=null){
 									double traveltime = CoordUtils.calcEuclideanDistance(lastActivityCoord, ((Activity) pe).getCoord())/8.33;
-									@SuppressWarnings("null")
 									double actStartTime = lastActivityEndtime + traveltime;
-									if (((Activity) pe).getEndTime() != Time.UNDEFINED_TIME){
+									if (!Time.isUndefinedTime(((Activity) pe).getEndTime())){
 									int duration = (int) Math.round((((Activity) pe).getEndTime() - actStartTime)/3600);
 									if (duration <= 0) duration = 1;
 									String type = ((Activity) pe).getType()+"_"+duration;
@@ -145,7 +154,9 @@ public class ActivityTypeTimeConverter {
 				}
 			}
 		
-		new PopulationWriter(scenario.getPopulation()).write("D:/cemdap-vw/Output/mergedplans_dur.xml.gz");
+	
+
+		new PopulationWriter(scenario.getPopulation()).write(outputPopulation);
 		for (String type : types){
 			String baseType = type.split("_")[0];
 			double duration = Integer.parseInt(type.split("_")[1])*3600;
@@ -156,7 +167,7 @@ public class ActivityTypeTimeConverter {
 			t.setClosingTime(config.planCalcScore().getActivityParams(baseType).getClosingTime());
 			config.planCalcScore().addActivityParams(t);
 		}
-		new ConfigWriter(config).write("D:/cemdap-vw/Output/activityConfig.xml");
+		new ConfigWriter(config).write(outputConfig);
 		}
 	
 		

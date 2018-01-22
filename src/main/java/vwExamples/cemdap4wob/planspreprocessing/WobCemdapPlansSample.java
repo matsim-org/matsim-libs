@@ -1,3 +1,4 @@
+
 /* *********************************************************************** *
  * project: org.matsim.*
  *                                                                         *
@@ -20,19 +21,15 @@
 /**
  * 
  */
-package vwExamples.cemdapwob.planspreprocessing;
+package vwExamples.cemdap4wob.planspreprocessing;
+
+import java.util.Random;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkUtils;
-import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.PopulationWriter;
@@ -45,37 +42,26 @@ import org.matsim.core.scenario.ScenarioUtils;
 /**
  *
  */
-public class FilterAgentsnotinNetwork {
-
-	public static void main(String[] args) {
+public class WobCemdapPlansSample {
 	
-		double threshold = 2000;
+	public static void main(String[] args) {
+		final String fullSamplePlansFile = "D:/cemdap-vw/Output/mergedplans_filtered.xml.gz";
+		double scale = 0.01;
+		new WobCemdapPlansSample().run(fullSamplePlansFile, scale);
+	}		
+
+	public void run(String fullSamplePlansFile, double scale) {
+		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(scenario.getNetwork()).readFile("D:/cemdap-vw/input/networkcar-jun17.xml.gz");
-		new PopulationReader(scenario).readFile("D:/cemdap-vw/Output/mergedplans_dur.xml.gz");
-		Population pop2 = PopulationUtils.createPopulation(ConfigUtils.createConfig());
+		new PopulationReader(scenario).readFile(fullSamplePlansFile);
+		Random r = MatsimRandom.getRandom();
+		Population exportPop = PopulationUtils.createPopulation(ConfigUtils.createConfig());
 		for (Person p : scenario.getPopulation().getPersons().values()){
-			Person p2 = pop2.getFactory().createPerson(p.getId());
-			for (Plan plan : p.getPlans()){
-				boolean copyPlan = true;
-				for (PlanElement pe : plan.getPlanElements()){
-					if (pe instanceof Activity){
-						Link l = NetworkUtils.getNearestLink(scenario.getNetwork(), ((Activity) pe).getCoord());
-						if (DistanceUtils.calculateSquaredDistance(l.getCoord(), ((Activity) pe).getCoord())>(threshold*threshold)){
-							copyPlan = false;
-							break;
-						}
-					}
-				}
-			if (copyPlan){
-				p2.addPlan(plan);
-			}
-			}
-			if (p2.getPlans().size()>0){
-				pop2.addPerson(p2);
+			if (r.nextDouble()<scale){
+				exportPop.addPerson(p);
 			}
 		}
-		new PopulationWriter(pop2).write("D:/cemdap-vw/Output/mergedplans_filtered.xml.gz");
+		new PopulationWriter(exportPop).write(fullSamplePlansFile.replace(".xml.gz", "_"+scale+".xml.gz"));
+		
 	}
-	
 }
