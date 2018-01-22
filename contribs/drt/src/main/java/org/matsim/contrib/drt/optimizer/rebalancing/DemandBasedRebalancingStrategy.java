@@ -57,9 +57,6 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author  jbischoff
  *
  */
-/**
- *
- */
 public class DemandBasedRebalancingStrategy implements RebalancingStrategy {
 
 	private ZonalIdleVehicleCollector idleVehicles;
