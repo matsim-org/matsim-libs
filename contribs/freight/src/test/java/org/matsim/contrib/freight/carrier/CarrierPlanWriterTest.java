@@ -30,7 +30,6 @@ package org.matsim.contrib.freight.carrier;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**

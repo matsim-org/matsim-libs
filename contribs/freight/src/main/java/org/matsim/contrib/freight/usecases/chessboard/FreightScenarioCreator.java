@@ -82,7 +82,7 @@ public class FreightScenarioCreator {
 //        CarrierVehicleTypes types = CarrierVehicleTypes.getVehicleTypes(carriers);
 //        new CarrierVehicleTypeWriter(types).write("input/usecases/chessboard/freight/vehicleTypes.xml");
         
-        new CarrierPlanXmlWriterV2(carriers).write("input/usecases/chessboard/freight/scenarios/multipleCarriers_withoutTW_withDepots_withoutPlan.xml");
+        new CarrierPlanXmlWriterV2(carriers).write("input/usecases/chessboard/freight/multipleCarriers_withoutTW_withDepots_withoutPlan.xml");
     }
 
     private static void createCustomers(Carrier carrier, Network network) {

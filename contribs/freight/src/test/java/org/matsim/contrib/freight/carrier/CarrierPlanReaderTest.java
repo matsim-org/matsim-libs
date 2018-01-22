@@ -44,7 +44,7 @@ public class CarrierPlanReaderTest extends MatsimTestCase {
 		Carriers carriers = new Carriers();
 		CarrierPlanReader carrierPlanReader = new CarrierPlanReader(carriers);
 		carrierPlanReader.readFile(getInputDirectory() + "carrierPlansEquils.xml");
-		junit.framework.Assert.assertEquals(1, carriers.getCarriers().size());
+		assertEquals(1, carriers.getCarriers().size());
 	}
 
 	@Test
