@@ -41,12 +41,12 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 	private String inputFacilitiesAttributesFile = null;
 	private String inputCRS = null;
 
-	// following params are required only if activitiesFactilities are generated internally (e.g., FacilitiesSource.onePerActivityLocationInPlansFile). Amit Jan'18
+	// following params are required only if activitiesFacilities are generated internally (e.g., FacilitiesSource.onePerActivityLocationInPlansFile). Amit Jan'18
 	private String idPrefix = "";
 	private boolean oneFacilityPerLink = true;
 	private boolean removingLinksAndCoordinates = true;
 	private boolean assigningOpeningTime = false;
-	private boolean assigningLinksToFacilitiesIfMissing = false;
+	private boolean assigningLinksToFacilitiesIfMissing = true;
 
 	private static final String FACILITIES_SOURCE = "facilitiesSource";
 	public enum FacilitiesSource {none, fromFile, onePerActivityLocationInPlansFile};
@@ -92,9 +92,9 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 
 		comments.put(ASSIGNING_OPENING_TIME, "If set to 'true', opening time will be assigned to activity facilities from ActivityParams. Default is false. This will NOT override option 'addEmptyActivityOption'.");
 
-		comments.put(ASSIGNING_LINKS_TO_FACILITIES_IF_MISSING, "In the case that a facility has no link assigned, the ActivityFacility can be assigned to the closest link." +
-				" If there should be only one ActivityFacility per link and if no link-assignment should be done, " +
-				"then a new ActivityFacility will be created at that coordinate and the facility will not be assigned to a link.");
+		comments.put(ASSIGNING_LINKS_TO_FACILITIES_IF_MISSING, "Default is 'true'. In the case that a facility has no link assigned, the ActivityFacility can be assigned to the closest link." +
+				" If there should be only one ActivityFacility per link and if no link-assignment should be done, set to 'false'." +
+				"This will create a new ActivityFacility at the coordinate and the facility will not be assigned to a link.");
 		return comments;
 	}
 
