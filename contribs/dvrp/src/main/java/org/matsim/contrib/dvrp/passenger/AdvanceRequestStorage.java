@@ -35,7 +35,7 @@ class AdvanceRequestStorage {
 		Queue<PassengerRequest> passengerAdvReqs = advanceRequests.get(passengerId);
 
 		if (passengerAdvReqs == null) {
-			passengerAdvReqs = new PriorityQueue<>(3, Requests.T0_COMPARATOR);
+			passengerAdvReqs = new PriorityQueue<>(3, Requests.EARLIEST_START_TIME_COMPARATOR);
 			advanceRequests.put(passengerId, passengerAdvReqs);
 		}
 

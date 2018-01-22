@@ -10,10 +10,10 @@ import com.google.common.collect.Iterables;
  * @author michalm
  */
 public class Requests {
-	public static final Comparator<Request> T0_COMPARATOR = (Request r1, Request r2) -> Double
+	public static final Comparator<Request> EARLIEST_START_TIME_COMPARATOR = (Request r1, Request r2) -> Double
 			.compare(r1.getEarliestStartTime(), r2.getEarliestStartTime());
 
-	public static final Comparator<Request> T1_COMPARATOR = (Request r1, Request r2) -> Double
+	public static final Comparator<Request> LATEST_START_TIME_COMPARATOR = (Request r1, Request r2) -> Double
 			.compare(r1.getLatestStartTime(), r2.getLatestStartTime());
 
 	public static final Comparator<Request> SUBMISSION_TIME_COMPARATOR = (Request r1, Request r2) -> Double
