@@ -39,13 +39,6 @@ import org.matsim.api.core.v01.Identifiable;
 public interface Request extends Identifiable<Request> {
 
 	/**
-	 * @return the amount of people/goods to serve/transport (see: {@link Vehicle#getCapacity()})
-	 */
-	default double getQuantity() {
-		return 1;
-	}
-
-	/**
 	 * @return beginning of the time window (inclusive) - earliest time when the request can be served
 	 */
 	double getEarliestStartTime();
