@@ -76,8 +76,8 @@ public class VehicleAssignmentProblem<D> {
 		this.travelTime = travelTime;
 		this.router = router;
 
-		forwardPathSearch = OneToManyPathSearch.createForwardSearch(multiNodeRouter);
-		backwardPathSearch = OneToManyPathSearch.createBackwardSearch(backwardMultiNodeRouter);
+		forwardPathSearch = OneToManyPathSearch.create(multiNodeRouter);
+		backwardPathSearch = OneToManyPathSearch.create(backwardMultiNodeRouter);
 
 		// TODO this kNN is slow
 		LinkProvider<DestEntry<D>> linkProvider = LinkProviders.createDestEntryToLink();
@@ -130,7 +130,7 @@ public class VehicleAssignmentProblem<D> {
 			List<DestEntry<D>> filteredDests = destinationFinder == null ? dData.getEntries()
 					: destinationFinder.findNearest(departure, dData.getEntries());
 			List<Link> toLinks = Lists.transform(filteredDests, destLinkProvider);
-			PathData[] paths = forwardPathSearch.calcPaths(departure.link, toLinks, departure.time);
+			PathData[] paths = forwardPathSearch.calcPathDataArray(departure.link, toLinks, departure.time);
 
 			for (int i = 0; i < filteredDests.size(); i++) {
 				int d = filteredDests.get(i).idx;
@@ -147,7 +147,7 @@ public class VehicleAssignmentProblem<D> {
 			List<VehicleData.Entry> filteredVehs = vehicleFinder == null ? vData.getEntries()
 					: vehicleFinder.findNearest(dest, vData.getEntries());
 			List<Link> toLinks = Lists.transform(filteredVehs, LinkProviders.VEHICLE_ENTRY_TO_LINK);
-			PathData[] paths = backwardPathSearch.calcPaths(dest.link, toLinks, dest.time);
+			PathData[] paths = backwardPathSearch.calcPathDataArray(dest.link, toLinks, dest.time);
 
 			for (int i = 0; i < filteredVehs.size(); i++) {
 				int v = filteredVehs.get(i).idx;

@@ -20,6 +20,7 @@
 package org.matsim.contrib.dvrp.schedule;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
@@ -45,6 +46,11 @@ public class ScheduleImpl implements Schedule {
 	@Override
 	public List<? extends Task> getTasks() {
 		return unmodifiableTasks;
+	}
+	
+	@Override
+	public Stream<? extends Task> taskStream() {
+		return tasks.stream();
 	}
 
 	@Override

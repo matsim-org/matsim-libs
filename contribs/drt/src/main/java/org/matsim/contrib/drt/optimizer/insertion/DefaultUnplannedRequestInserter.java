@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
@@ -36,14 +37,10 @@ import org.matsim.contrib.drt.scheduler.DrtScheduler;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstra;
-import org.matsim.contrib.locationchoice.router.BackwardFastMultiNodeDijkstraFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-import org.matsim.core.router.FastMultiNodeDijkstra;
-import org.matsim.core.router.FastMultiNodeDijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Time;
@@ -60,33 +57,24 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final MobsimTimer mobsimTimer;
 	private final EventsManager eventsManager;
 	private final DrtScheduler scheduler;
+	private final DrtVehicleFilter vehicleFilter;
 
 	private final ParallelMultiVehicleInsertionProblem insertionProblem;
 
 	@Inject
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
 			Fleet fleet, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility,
-			MobsimTimer mobsimTimer, DrtVehicleFilter vehicleFilter, EventsManager eventsManager,
-			DrtScheduler scheduler) {
+			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility, MobsimTimer mobsimTimer,
+			DrtVehicleFilter vehicleFilter, EventsManager eventsManager, DrtScheduler scheduler) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
 		this.eventsManager = eventsManager;
 		this.scheduler = scheduler;
+		this.vehicleFilter = vehicleFilter;
 
-		SingleVehicleInsertionProblem[] singleVehicleInsertionProblems = new SingleVehicleInsertionProblem[drtCfg
-				.getNumberOfThreads()];
-		for (int i = 0; i < singleVehicleInsertionProblems.length; i++) {
-			FastMultiNodeDijkstra router = (FastMultiNodeDijkstra)new FastMultiNodeDijkstraFactory(true)
-					.createPathCalculator(network, travelDisutility, travelTime);
-			BackwardFastMultiNodeDijkstra backwardRouter = (BackwardFastMultiNodeDijkstra)new BackwardFastMultiNodeDijkstraFactory(
-					true).createPathCalculator(network, travelDisutility, travelTime);
-			singleVehicleInsertionProblems[i] = new SingleVehicleInsertionProblem(router, backwardRouter,
-					drtCfg.getStopDuration(), drtCfg.getMaxWaitTime(), mobsimTimer);
-		}
-
-		insertionProblem = new ParallelMultiVehicleInsertionProblem(singleVehicleInsertionProblems, vehicleFilter);
+		insertionProblem = ParallelMultiVehicleInsertionProblem.create(network, travelTime, travelDisutility, drtCfg,
+				mobsimTimer);
 	}
 
 	@Override
@@ -104,9 +92,9 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 
 		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {
-
 			DrtRequest req = reqIter.next();
-			BestInsertion best = insertionProblem.findBestInsertion(req, vData);
+			Collection<Entry> filteredVehicles = vehicleFilter.applyFilter(req, vData.getEntries());
+			BestInsertion best = insertionProblem.findBestInsertion(req, filteredVehicles);
 			if (best == null) {
 				eventsManager.processEvent(new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), req.getId()));
 				if (drtCfg.isPrintDetailedWarnings()) {
@@ -117,7 +105,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				}
 			} else {
 				scheduler.insertRequest(best.vehicleEntry, req, best.insertion);
-				vData.updateEntry(best.vehicleEntry);
+				vData.updateEntry(best.vehicleEntry.vehicle);
 				eventsManager.processEvent(new DrtRequestScheduledEvent(mobsimTimer.getTimeOfDay(), req.getId(),
 						best.vehicleEntry.vehicle.getId(), req.getPickupTask().getEndTime(),
 						req.getDropoffTask().getBeginTime()));
