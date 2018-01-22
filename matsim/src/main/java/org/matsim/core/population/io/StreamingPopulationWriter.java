@@ -79,7 +79,7 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 			final CoordinateTransformation coordinateTransformation,
 			final double fraction) {
 		this.write_person_fraction = fraction;
-		this.handler = new PopulationWriterHandlerImplV5(coordinateTransformation);
+		this.handler = new PopulationWriterHandlerImplV6(coordinateTransformation);
 	}
 
 	/**
