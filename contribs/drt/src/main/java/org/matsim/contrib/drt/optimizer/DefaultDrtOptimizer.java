@@ -81,7 +81,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		if (requiresReoptimization) {
 			for (Vehicle v : fleet.getVehicles().values()) {
-				scheduler.updateTimeline(v);
+				scheduler.updateTimings(v);
 			}
 
 			requestInserter.scheduleUnplannedRequests(unplannedRequests);

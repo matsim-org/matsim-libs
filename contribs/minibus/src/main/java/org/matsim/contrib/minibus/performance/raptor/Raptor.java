@@ -137,7 +137,7 @@ public class Raptor implements TransitRouter {
 		// access leg
 		Leg accessLeg;
 		// check if first leg extends walking distance
-		if (p.getRoute().get(0).routeTaken == null) {
+		if (p.getRoute().get(0).routeTaken == null) {//TODO: what if first leg extends the walking distance to more than first routeSegment i.e., (accessLeg, transfer, transfer ...). Amit Jan'18
 			// route starts with transfer - extend initial walk to that stop
 			accessLeg = createTransitWalkLeg(fromCoord, p.getRoute().get(0).toStop.getCoord());
 			p.getRoute().remove(0);
