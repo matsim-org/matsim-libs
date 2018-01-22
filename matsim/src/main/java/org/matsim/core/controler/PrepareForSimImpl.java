@@ -98,7 +98,7 @@ class PrepareForSimImpl implements PrepareForSim {
 					throw new RuntimeException("Facilities source "+this.facilitiesConfigGroup.getFacilitiesSource()+" is not implemented yet.");
 			}
 		} else {
-			// skip if facilities already exists
+			// skip if facilities already exists; for instance, same scenario is used for another controler.run(scenario) (mainly in tests). Amit Jan'18
 		}
 
 		// make sure all routes are calculated.
