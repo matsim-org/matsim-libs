@@ -24,15 +24,9 @@ import org.matsim.api.core.v01.Identifiable;
 /**
  * Represents a request in DVRP.
  * 
- * Default methods are typical to MATSim scenarios: a single agent (quantity = 1) wants to depart immediately
- * (earliestStartTime = submissionTime), and will wait until the vehicle arrives (latestStartTime =
- * {@link Double#MAX_VALUE})
+ * For advance requests - adapt getLatestStartTime()
  * 
- * For a capacitated VRP - adapt getQuantity()
- * 
- * For a VRP with time windows - adapt both getEarliestStartTime() and getLatestStartTime()
- * 
- * For a VRP with rejections - implement isRejected()
+ * For request rejection - adapt isRejected()
  * 
  * @author michalm
  */
