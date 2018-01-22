@@ -50,7 +50,7 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 
 	private static final String FACILITIES_SOURCE = "facilitiesSource";
 	public enum FacilitiesSource {none, fromFile, onePerActivityLocationInPlansFile};
-	private FacilitiesSource facilitiesSource = FacilitiesSource.onePerActivityLocationInPlansFile;
+	private FacilitiesSource facilitiesSource = FacilitiesSource.none;
 	private boolean addEmptyActivityOption = false;
 
 	private static final String ADD_EMPTY_ACTIVITY_OPTIONS = "addEmptyActivityOption";
@@ -107,7 +107,6 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter( INPUT_FILE )
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;
-		this.facilitiesSource = FacilitiesSource.fromFile;
 	}
 
 	public URL getInputFileURL(URL context) {
