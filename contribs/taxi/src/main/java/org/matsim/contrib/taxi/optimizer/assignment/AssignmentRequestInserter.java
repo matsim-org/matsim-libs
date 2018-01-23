@@ -39,8 +39,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
-import com.google.common.collect.Iterables;
-
 /**
  * @author michalm
  */
@@ -100,7 +98,7 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 	}
 
 	private VehicleData initVehicleData(AssignmentRequestData rData) {
-		int idleVehs = Iterables.size(Iterables.filter(fleet.getVehicles().values(), scheduler::isIdle));
+		long idleVehs = fleet.getVehicles().values().stream().filter(scheduler::isIdle).count();
 		double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ? //
 				params.vehPlanningHorizonUndersupply : params.vehPlanningHorizonOversupply;
 		return new VehicleData(timer.getTimeOfDay(), scheduler, fleet.getVehicles().values(), vehPlanningHorizon);

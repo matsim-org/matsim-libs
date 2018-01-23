@@ -19,29 +19,20 @@
 
 package org.matsim.contrib.taxi.optimizer;
 
+import java.util.stream.Stream;
+
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.data.TaxiRequests;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 
-import com.google.common.collect.Iterables;
-
 public class TaxiOptimizationValidation {
 	public static void assertNoUnplannedRequestsWhenIdleVehicles(TaxiScheduler taxiScheduler, Fleet fleet,
-			Iterable<? extends Request> requests) {
-		int vehCount = Iterables
-				.size(Iterables.filter(fleet.getVehicles().values(), vehicle -> taxiScheduler.isIdle(vehicle)));
-
-		if (vehCount == 0) {
-			return;// OK
+			Stream<? extends Request> requests) {
+		if (fleet.getVehicles().values().stream().filter(taxiScheduler::isIdle).count() > 0
+				&& TaxiRequests.countRequestsWithStatus(requests, TaxiRequestStatus.UNPLANNED) > 0) {
+			throw new IllegalStateException("idle vehicles and unplanned requests");
 		}
-
-		if (TaxiRequests.countRequestsWithStatus(requests, TaxiRequestStatus.UNPLANNED) == 0) {
-			return; // OK
-		}
-
-		// idle vehicles and unplanned requests
-		throw new IllegalStateException();
 	}
 }

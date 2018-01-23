@@ -19,6 +19,8 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
+import java.util.stream.Stream;
+
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -31,14 +33,12 @@ import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.LongEnumAdder;
 
-import com.google.common.collect.Iterables;
-
 public class TaxiTimeProfiles {
 	public static ProfileCalculator createIdleVehicleCounter(final Fleet fleet, final ScheduleInquiry scheduleInquiry) {
 		return new TimeProfiles.SingleValueProfileCalculator("Idle") {
 			@Override
-			public Integer calcValue() {
-				return Iterables.size(Iterables.filter(fleet.getVehicles().values(), scheduleInquiry::isIdle));
+			public Long calcValue() {
+				return fleet.getVehicles().values().stream().filter(scheduleInquiry::isIdle).count();
 			}
 		};
 	}
@@ -66,11 +66,11 @@ public class TaxiTimeProfiles {
 		};
 	}
 
-	public static ProfileCalculator createRequestsWithStatusCounter(final Iterable<? extends Request> requests,
+	public static ProfileCalculator createRequestsWithStatusCounter(final Stream<? extends Request> requests,
 			final TaxiRequestStatus requestStatus) {
 		return new TimeProfiles.SingleValueProfileCalculator(requestStatus.name()) {
 			@Override
-			public Integer calcValue() {
+			public Long calcValue() {
 				return TaxiRequests.countRequestsWithStatus(requests, requestStatus);
 			}
 		};
