@@ -22,6 +22,7 @@ package org.matsim.contrib.drt.optimizer;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.data.DrtRequest;
@@ -44,7 +45,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
-import com.google.common.collect.Iterables;
 import com.google.inject.Inject;
 
 /**
@@ -102,8 +102,9 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	private void rebalanceFleet() {
 		// right now we relocate only idle vehicles (vehicles that are being relocated cannot be relocated)
-		Iterable<? extends Vehicle> rebalancableVehicles = Iterables.filter(fleet.getVehicles().values(),
-				scheduler::isIdle);
+		Stream<? extends Vehicle> rebalancableVehicles = fleet.getVehicles().values().stream()
+				.filter(scheduler::isIdle);
+
 		List<Relocation> relocations = rebalancingStrategy.calcRelocations(rebalancableVehicles,
 				mobsimTimer.getTimeOfDay());
 
