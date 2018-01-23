@@ -24,8 +24,8 @@ import java.util.List;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder;
 import org.matsim.contrib.taxi.optimizer.UnplannedRequestInserter;
@@ -89,8 +89,8 @@ public class RuleBasedRequestInserter implements UnplannedRequestInserter {
 
 			case DEMAND_SUPPLY_EQUIL:
 				double now = timer.getTimeOfDay();
-				int awaitingReqCount = Requests.countRequests(unplannedRequests, req -> Requests.isUrgent(req, now));
-
+				long awaitingReqCount = unplannedRequests.stream().filter(r -> PassengerRequests.isUrgent(r, now))
+						.count();
 				return awaitingReqCount > idleTaxiRegistry.getVehicleCount();
 
 			default:

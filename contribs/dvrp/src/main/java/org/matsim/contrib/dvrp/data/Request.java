@@ -22,27 +22,13 @@ package org.matsim.contrib.dvrp.data;
 import org.matsim.api.core.v01.Identifiable;
 
 /**
- * Represents a request in DVRP.
- * 
- * For advance requests - adapt getLatestStartTime()
+ * Represents a general request in DVRP.
  * 
  * For request rejection - adapt isRejected()
  * 
  * @author michalm
  */
 public interface Request extends Identifiable<Request> {
-
-	/**
-	 * @return beginning of the time window (inclusive) - earliest time when the request can be served
-	 */
-	double getEarliestStartTime();
-
-	/**
-	 * @return end of the time window (exclusive) - time by which the request should be served
-	 */
-	default double getLatestStartTime() {
-		return Double.MAX_VALUE;
-	}
 
 	/**
 	 * @return time at which the request was submitted
@@ -57,7 +43,6 @@ public interface Request extends Identifiable<Request> {
 	}
 
 	public static String toString(Request request) {
-		return "[id=" + request.getId() + "][submissionTime=" + request.getSubmissionTime() + "][earliestStartTime="
-				+ request.getEarliestStartTime() + "]";
+		return "[id=" + request.getId() + "][submissionTime=" + request.getSubmissionTime() + "]";
 	}
 }
