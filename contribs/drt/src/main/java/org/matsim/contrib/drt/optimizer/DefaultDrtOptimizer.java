@@ -19,20 +19,27 @@
 
 package org.matsim.contrib.drt.optimizer;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
-import org.matsim.contrib.drt.optimizer.depot.*;
+import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
+import org.matsim.contrib.drt.optimizer.depot.Depots;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
-import org.matsim.contrib.drt.scheduler.*;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.drt.scheduler.DrtScheduler;
+import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
+import org.matsim.contrib.dvrp.data.Fleet;
+import org.matsim.contrib.dvrp.data.Request;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -57,14 +64,14 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final EmptyVehicleRelocator relocator;
 	private final UnplannedRequestInserter requestInserter;
 
-	private final Collection<DrtRequest> unplannedRequests = new TreeSet<DrtRequest>(Requests.ABSOLUTE_COMPARATOR);
+	private final Collection<DrtRequest> unplannedRequests = new TreeSet<DrtRequest>(
+			PassengerRequests.ABSOLUTE_COMPARATOR);
 	private boolean requiresReoptimization = false;
 
 	@Inject
-	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
-			EventsManager eventsManager, DrtRequestValidator requestValidator, DepotFinder depotFinder,
-			RebalancingStrategy rebalancingStrategy, DrtScheduler scheduler,
-			EmptyVehicleRelocator relocator, UnplannedRequestInserter requestInserter) {
+	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, EventsManager eventsManager,
+			DrtRequestValidator requestValidator, DepotFinder depotFinder, RebalancingStrategy rebalancingStrategy,
+			DrtScheduler scheduler, EmptyVehicleRelocator relocator, UnplannedRequestInserter requestInserter) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
