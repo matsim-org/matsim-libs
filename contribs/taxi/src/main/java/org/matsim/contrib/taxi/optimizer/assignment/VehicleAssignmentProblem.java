@@ -30,10 +30,8 @@ import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.locationchoice.router.BackwardMultiNodePathCalculator;
 import org.matsim.contrib.taxi.optimizer.BestDispatchFinder.Dispatch;
-import org.matsim.contrib.taxi.optimizer.LinkProviders;
 import org.matsim.contrib.taxi.optimizer.VehicleData;
 import org.matsim.contrib.taxi.optimizer.assignment.AssignmentDestinationData.DestEntry;
-import org.matsim.contrib.util.LinkProvider;
 import org.matsim.contrib.util.StraightLineKnnFinder;
 import org.matsim.core.router.MultiNodePathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -54,8 +52,6 @@ public class VehicleAssignmentProblem<D> {
 
 	private final OneToManyPathSearch forwardPathSearch;
 	private final OneToManyPathSearch backwardPathSearch;
-
-	private final LinkProvider<DestEntry<D>> destLinkProvider = LinkProviders.createDestEntryToLink();
 
 	private final StraightLineKnnFinder<VehicleData.Entry, DestEntry<D>> destinationFinder;
 	private final StraightLineKnnFinder<DestEntry<D>, VehicleData.Entry> vehicleFinder;
@@ -80,11 +76,10 @@ public class VehicleAssignmentProblem<D> {
 		backwardPathSearch = OneToManyPathSearch.create(backwardMultiNodeRouter);
 
 		// TODO this kNN is slow
-		LinkProvider<DestEntry<D>> linkProvider = LinkProviders.createDestEntryToLink();
-		destinationFinder = nearestDestinationLimit < 0 ? null : new StraightLineKnnFinder<>(nearestDestinationLimit,
-				LinkProviders.VEHICLE_ENTRY_TO_LINK, linkProvider);
+		destinationFinder = nearestDestinationLimit < 0 ? null
+				: new StraightLineKnnFinder<>(nearestDestinationLimit, veh -> veh.link, dest -> dest.link);
 		vehicleFinder = nearestVehicleLimit < 0 ? null
-				: new StraightLineKnnFinder<>(nearestVehicleLimit, linkProvider, LinkProviders.VEHICLE_ENTRY_TO_LINK);
+				: new StraightLineKnnFinder<>(nearestVehicleLimit, dest -> dest.link, veh -> veh.link);
 	}
 
 	public List<Dispatch<D>> findAssignments(VehicleData vData, AssignmentDestinationData<D> dData,
@@ -129,7 +124,7 @@ public class VehicleAssignmentProblem<D> {
 
 			List<DestEntry<D>> filteredDests = destinationFinder == null ? dData.getEntries()
 					: destinationFinder.findNearest(departure, dData.getEntries());
-			List<Link> toLinks = Lists.transform(filteredDests, destLinkProvider);
+			List<Link> toLinks = Lists.transform(filteredDests, dest -> dest.link);
 			PathData[] paths = forwardPathSearch.calcPathDataArray(departure.link, toLinks, departure.time);
 
 			for (int i = 0; i < filteredDests.size(); i++) {
@@ -146,7 +141,7 @@ public class VehicleAssignmentProblem<D> {
 
 			List<VehicleData.Entry> filteredVehs = vehicleFinder == null ? vData.getEntries()
 					: vehicleFinder.findNearest(dest, vData.getEntries());
-			List<Link> toLinks = Lists.transform(filteredVehs, LinkProviders.VEHICLE_ENTRY_TO_LINK);
+			List<Link> toLinks = Lists.transform(filteredVehs, veh -> veh.link);
 			PathData[] paths = backwardPathSearch.calcPathDataArray(dest.link, toLinks, dest.time);
 
 			for (int i = 0; i < filteredVehs.size(); i++) {

@@ -1,13 +1,12 @@
 package org.matsim.contrib.dvrp.data.file;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
-
-import com.google.common.collect.Lists;
 
 /**
  * @author michalm
@@ -30,7 +29,7 @@ public class VehicleWriter extends MatsimXmlWriter {
 
 	private void writeVehicles() {
 		for (Vehicle veh : vehicles) {
-			List<Tuple<String, String>> atts = Lists.newArrayList(
+			List<Tuple<String, String>> atts = Arrays.asList(
 					new Tuple<>("id", veh.getId().toString()),
 					new Tuple<>("start_link", veh.getStartLink().getId().toString()),
 					new Tuple<>("t_0", veh.getServiceBeginTime() + ""),
