@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.taxi.util.stats;
 
+import java.util.Collection;
 import java.util.stream.Stream;
 
 import org.matsim.contrib.dvrp.data.Fleet;
@@ -66,12 +67,12 @@ public class TaxiTimeProfiles {
 		};
 	}
 
-	public static ProfileCalculator createRequestsWithStatusCounter(final Stream<? extends Request> requests,
+	public static ProfileCalculator createRequestsWithStatusCounter(final Collection<? extends Request> requests,
 			final TaxiRequestStatus requestStatus) {
 		return new TimeProfiles.SingleValueProfileCalculator(requestStatus.name()) {
 			@Override
 			public Long calcValue() {
-				return TaxiRequests.countRequestsWithStatus(requests, requestStatus);
+				return TaxiRequests.countRequestsWithStatus(requests.stream(), requestStatus);
 			}
 		};
 	}
