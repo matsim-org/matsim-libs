@@ -20,8 +20,13 @@
 package org.matsim.contrib.drt.optimizer;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -34,6 +39,8 @@ import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
+import com.google.common.collect.ImmutableList;
+
 /**
  * @author michalm
  */
@@ -41,12 +48,14 @@ public class VehicleData {
 	public static class Entry {
 		public final Vehicle vehicle;
 		public final LinkTimePair start;
-		public int startOccupancy;
-		public final List<Stop> stops = new ArrayList<>();
+		public final int startOccupancy;
+		public final ImmutableList<Stop> stops;
 
-		public Entry(Vehicle vehicle, LinkTimePair start) {
+		public Entry(Vehicle vehicle, LinkTimePair start, int startOccupancy, ImmutableList<Stop> stops) {
 			this.vehicle = vehicle;
 			this.start = start;
+			this.startOccupancy = startOccupancy;
+			this.stops = stops;
 		}
 	}
 
@@ -55,10 +64,12 @@ public class VehicleData {
 		public final double maxArrivalTime;// relating to max pass drive time (for dropoff requests)
 		public final double maxDepartureTime;// relating to pass max wait time (for pickup requests)
 		public final int occupancyChange;// diff in pickups and dropoffs
-		public int outputOccupancy;
+		public final int outputOccupancy;
 
-		public Stop(DrtStopTask task) {
+		public Stop(DrtStopTask task, int outputOccupancy) {
 			this.task = task;
+			this.outputOccupancy = outputOccupancy;
+
 			maxArrivalTime = calcMaxArrivalTime();
 			maxDepartureTime = calcMaxDepartureTime();
 			occupancyChange = task.getPickupRequests().size() - task.getDropoffRequests().size();
@@ -85,10 +96,14 @@ public class VehicleData {
 			}
 			return maxTime;
 		}
-
+		
+		@Override
+		public String toString() {
+			return "VehicleData.Stop for: " + task.toString();
+		}
 	}
 
-	private final List<Entry> entries = new ArrayList<>();
+	private final Map<Id<Vehicle>, Entry> entries = new HashMap<>();
 	private final double currentTime;
 
 	public VehicleData(double currentTime, Iterable<? extends Vehicle> vehicles) {
@@ -97,18 +112,17 @@ public class VehicleData {
 		for (Vehicle v : vehicles) {
 			Entry e = createVehicleData(v);
 			if (e != null) {
-				entries.add(e);
+				entries.put(v.getId(), e);
 			}
 		}
 	}
 
-	public void updateEntry(Entry vEntry) {
-		int idx = entries.indexOf(vEntry);// TODO inefficient! ==> use map instead of list for storing entries...
-		Entry e = createVehicleData(vEntry.vehicle);
+	public void updateEntry(Vehicle vehicle) {
+		Entry e = createVehicleData(vehicle);
 		if (e != null) {
-			entries.set(idx, e);
+			entries.put(vehicle.getId(), e);
 		} else {
-			entries.remove(idx);
+			entries.remove(vehicle.getId());
 		}
 	}
 
@@ -158,35 +172,28 @@ public class VehicleData {
 			nextTaskIdx = 0;
 		}
 
-		Entry data = new Entry(vehicle, start);
-		for (int i = nextTaskIdx; i < tasks.size(); i++) {
-			DrtTask task = tasks.get(i);
+		List<DrtStopTask> stopTasks = new ArrayList<>();
+		for (DrtTask task : tasks.subList(nextTaskIdx, tasks.size())) {
 			if (task.getDrtTaskType() == DrtTaskType.STOP) {
-				Stop stop = new Stop((DrtStopTask)task);
-				data.stops.add(stop);
+				stopTasks.add((DrtStopTask)task);
 			}
 		}
 
+		Stop[] stops = new Stop[stopTasks.size()];
 		int outputOccupancy = 0;
-		for (int i = data.stops.size() - 1; i >= 0; i--) {
-			Stop s = data.stops.get(i);
-			s.outputOccupancy = outputOccupancy;
+		for (int i = stops.length - 1; i >= 0; i--) {
+			Stop s = stops[i] = new Stop(stopTasks.get(i), outputOccupancy);
 			outputOccupancy -= s.occupancyChange;
 		}
-		data.startOccupancy = outputOccupancy;
 
-		return data;
+		return new Entry(vehicle, start, outputOccupancy, ImmutableList.copyOf(stops));
 	}
 
 	public int getSize() {
 		return entries.size();
 	}
 
-	public Entry getEntry(int idx) {
-		return entries.get(idx);
-	}
-
-	public List<Entry> getEntries() {
-		return entries;
+	public Collection<Entry> getEntries() {
+		return Collections.unmodifiableCollection(entries.values());
 	}
 }

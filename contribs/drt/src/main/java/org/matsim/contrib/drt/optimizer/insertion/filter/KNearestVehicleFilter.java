@@ -22,7 +22,7 @@
  */
 package org.matsim.contrib.drt.optimizer.insertion.filter;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.data.DrtRequest;
@@ -32,39 +32,27 @@ import org.matsim.contrib.util.PartialSort;
 import org.matsim.contrib.util.distance.DistanceUtils;
 
 /**
- * @author  jbischoff
+ * filters out the k nearest vehicles to a request.
  *
- */
-
-/**
- *	filters out the k nearest vehicles to a request.
+ * @author jbischoff
  */
 public class KNearestVehicleFilter implements DrtVehicleFilter {
+	private final int k;
 
-	
-	final int k;
-	
-	
 	public KNearestVehicleFilter(int k) {
 		this.k = k;
 	}
 
-
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter#applyFilter(org.matsim.contrib.drt.data.DrtRequest, org.matsim.contrib.drt.optimizer.VehicleData)
-	 */
 	@Override
-	public List<Entry> applyFilter(DrtRequest drtRequest, VehicleData vData) {
+	public Collection<Entry> applyFilter(DrtRequest drtRequest, Collection<VehicleData.Entry> vData) {
 		Link toLink = drtRequest.getFromLink();
-        PartialSort<VehicleData.Entry> nearestVehicleSort = new PartialSort<VehicleData.Entry>(k);
+		PartialSort<VehicleData.Entry> nearestVehicleSort = new PartialSort<VehicleData.Entry>(k);
 
-        for (VehicleData.Entry veh : vData.getEntries()) {
-            double squaredDistance = DistanceUtils.calculateSquaredDistance(veh.start.link, toLink);
-            nearestVehicleSort.add(veh, squaredDistance);
-        }
+		for (VehicleData.Entry veh : vData) {
+			double squaredDistance = DistanceUtils.calculateSquaredDistance(veh.start.link, toLink);
+			nearestVehicleSort.add(veh, squaredDistance);
+		}
 
-        return nearestVehicleSort.retriveKSmallestElements();
-		
+		return nearestVehicleSort.retriveKSmallestElements();
 	}
-
 }

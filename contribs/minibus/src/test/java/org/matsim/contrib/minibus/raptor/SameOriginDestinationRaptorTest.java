@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package org.matsim.contrib.drt.run;
+package org.matsim.contrib.minibus.raptor;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.minibus.performance.raptor.RaptorTransitRouterProvider;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.router.TransitRouter;
 import org.matsim.testcases.MatsimTestUtils;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
-/**
- * @author  jbischoff
- */
-public class RunDrtExampleIT {
+public class SameOriginDestinationRaptorTest {
+	
+	
 	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+	public MatsimTestUtils helper = new MatsimTestUtils();
+
 
 	@Test
-	public void testRunDrtExample() {
-		String configFile = "./src/main/resources/drt_example/drtconfig.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		RunDrtExample.run(config, false);
+	public void sameFromAndToTransitStopTest() {
+		String config = "test/input/org/matsim/contrib/minibus/example-scenario/raptorFixMinimalExample/config_raptor.xml";
+		
+		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(config));
+		scenario.getConfig().controler().setLastIteration(1); // more iterations are not required to check this.
+		scenario.getConfig().controler().setOutputDirectory(helper.getOutputDirectory());
+		
+		Controler controler = new Controler(scenario);
+		controler.addOverridingModule(new AbstractModule() {
+
+			@Override
+			public void install() {
+				bind(TransitRouter.class).toProvider(RaptorTransitRouterProvider.class);
+			}
+		});
+		controler.run();
 	}
 }
