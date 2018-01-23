@@ -53,7 +53,7 @@ public class TaxiStatusTimeProfileCollectorProvider implements Provider<MobsimLi
 	public MobsimListener get() {
 		ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
 				TaxiTimeProfiles.createCurrentTaxiTaskOfTypeCounter(fleet), //
-				TaxiTimeProfiles.createRequestsWithStatusCounter(requestCollector.getRequests().values().stream(),
+				TaxiTimeProfiles.createRequestsWithStatusCounter(requestCollector.getRequests().values(),
 						TaxiRequestStatus.UNPLANNED));
 
 		TimeProfileCollector collector = new TimeProfileCollector(calc, 300, "taxi_status_time_profiles",
