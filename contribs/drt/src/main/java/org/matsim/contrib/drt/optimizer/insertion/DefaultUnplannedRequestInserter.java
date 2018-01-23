@@ -88,7 +88,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			return;
 		}
 
-		VehicleData vData = new VehicleData(mobsimTimer.getTimeOfDay(), fleet.getVehicles().values());
+		VehicleData vData = new VehicleData(mobsimTimer.getTimeOfDay(), fleet.getVehicles().values().stream());
 
 		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {
