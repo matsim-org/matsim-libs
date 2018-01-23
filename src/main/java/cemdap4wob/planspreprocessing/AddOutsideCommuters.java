@@ -25,9 +25,16 @@ public class AddOutsideCommuters {
 		Set<String> ids = new HashSet<>();
 		ids.add("BR_WB");
 		ids.add("BR_BS");
-		ids.add("AS_WB");
+
 		ids.add("AS_WB");
 		ids.add("AS_BS");
+		
+		ids.add("SG_WB");
+		ids.add("SG_BS");
+		
+		ids.add("HH_WB");
+		ids.add("HH_BS");
+		
 		ids.add("RH_WB");
 		ids.add("RH_BS");
 	
@@ -36,6 +43,9 @@ public class AddOutsideCommuters {
 		
 		ids.add("SD_WB");
 		ids.add("SD_BS");
+		
+		ids.add("MB_WB");
+		ids.add("MB_BS");
 		
 		ids.add("HZ_WB");
 		ids.add("HZ_BS");
