@@ -63,7 +63,7 @@ public class ReassignZonesByAttractiveness {
 	
 	
 	public static void main(String[] args) {
-		new ReassignZonesByAttractiveness().run("D:/cemdap-vw/add_data/shp/wvi-zones.shp", "D:/cemdap-vw/add_data/wvi/wobattractivities.txt", "D:/cemdap-vw/add_data/wvi/bsattractivities.txt", "D:/cemdap-vw/cemdap_output/mergedPlans_filtered_1.0.xml.gz", "D:/cemdap-vw/cemdap_output/mergedPlans_filtered_1.0_attr.xml.gz");
+		new ReassignZonesByAttractiveness().run("/Volumes/Volume/cemdap-vw/add_data/shp/wvi-zones.shp", "/Volumes/Volume/cemdap-vw/add_data/wvi/wobattractivities.txt", "/Volumes/Volume/cemdap-vw/add_data/wvi/bsattractivities.txt", "/Volumes/Volume/cemdap-vw/cemdap_output/mergedPlans_filtered_0.1.xml.gz", "/Users/jb/Desktop/mergedPlans_filtered_1.0_attr.xml.gz");
 	}
 	
 	

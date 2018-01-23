@@ -25,6 +25,7 @@ package cemdap4wob.planspreprocessing;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -162,6 +163,7 @@ public class ActivityTypeTimeConverter {
 			ActivityParams t = new ActivityParams();
 			t.setActivityType(type);
 			t.setTypicalDuration(duration);
+			Logger.getLogger(getClass()).info(baseType);
 			t.setOpeningTime(config.planCalcScore().getActivityParams(baseType).getOpeningTime());
 			t.setClosingTime(config.planCalcScore().getActivityParams(baseType).getClosingTime());
 			config.planCalcScore().addActivityParams(t);

@@ -34,14 +34,17 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 public class BatchPlansPreprocessor {
 	
 	public static void main(String[] args) {
-		final String baseFolder = "D:/cemdap-vw/";
+		final String baseFolder = "/Users/jb/Desktop/cemdap-vw/";
 		final String cemdapOutputFolder = baseFolder +"/cemdap_output/";
 	
 		//1. Schritt: Pläne mergen (Cemdap generiert i.d.R. fünf MATSim-Pläne pro Person)
-		new PlansMerger().run(cemdapOutputFolder);
+//		new PlansMerger().run(cemdapOutputFolder);
+		// weitere Pendler hinzufügen
+		new AddOutsideCommuters().run(cemdapOutputFolder+"mergedPlans.xml.gz", baseFolder+"/add_data/initial_plans1.0.xml.gz", cemdapOutputFolder+"mergedPlansadd.xml.gz");
+		
 		//2. Schritt: Activity Dauern anpassen, um sinnvolle Aktivitätendauern aus dem Modell zu gewinnen und eine Sensitivität ggü. zeitlichen Änderungen zu erhalten. Dazu wird eine grundlegende Config-Datei erstellt
 
-		new ActivityTypeTimeConverter().run(cemdapOutputFolder+"mergedPlans.xml.gz", cemdapOutputFolder+"mergedPlans_dur.xml.gz", cemdapOutputFolder+"activityConfig.xml");
+		new ActivityTypeTimeConverter().run(cemdapOutputFolder+"mergedPlansadd.xml.gz", cemdapOutputFolder+"mergedPlans_dur.xml.gz", cemdapOutputFolder+"activityConfig.xml");
 		
 		//Agenten herausfiltern, deren Aktivitäten nicht im Umkreis von 2000m einer Kante stattfinden. Verhindert Artefakte am Rande des Netzes,
 		new FilterAgentsnotinNetwork().run(baseFolder+"/input/networkpt-av-nov17_cleaned.xml.gz",cemdapOutputFolder+"mergedPlans_dur.xml.gz" , cemdapOutputFolder+"mergedPlans_filtered.xml.gz",2000);
