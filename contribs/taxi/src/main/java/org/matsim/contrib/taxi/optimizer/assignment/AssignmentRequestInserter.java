@@ -78,7 +78,7 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 	@Override
 	public void scheduleUnplannedRequests(Collection<TaxiRequest> unplannedRequests) {
 		// advance request not considered => horizon==0
-		AssignmentRequestData rData = new AssignmentRequestData(timer.getTimeOfDay(), 0, unplannedRequests);
+		AssignmentRequestData rData = AssignmentRequestData.create(timer.getTimeOfDay(), 0, unplannedRequests);
 		if (rData.getSize() == 0) {
 			return;
 		}

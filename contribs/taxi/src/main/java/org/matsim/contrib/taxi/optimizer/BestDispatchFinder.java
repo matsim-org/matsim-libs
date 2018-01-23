@@ -62,7 +62,7 @@ public class BestDispatchFinder {
 	// for immediate requests only
 	// minimize TW
 	public Dispatch<TaxiRequest> findBestVehicleForRequest(TaxiRequest req, Stream<? extends Vehicle> vehicles) {
-		return findBestVehicle(req, vehicles, LinkProviders.REQUEST_TO_FROM_LINK);
+		return findBestVehicle(req, vehicles, r -> r.getFromLink());
 	}
 
 	// We use many-to-one forward search. Therefore, we cannot assess all vehicles.
@@ -123,7 +123,7 @@ public class BestDispatchFinder {
 	// for immediate requests only
 	// minimize TP
 	public Dispatch<TaxiRequest> findBestRequestForVehicle(Vehicle veh, Stream<TaxiRequest> unplannedRequests) {
-		return findBestDestination(veh, unplannedRequests, LinkProviders.REQUEST_TO_FROM_LINK);
+		return findBestDestination(veh, unplannedRequests, r -> r.getFromLink());
 	}
 
 	public <D> Dispatch<D> findBestDestination(Vehicle veh, Stream<D> destinations,
