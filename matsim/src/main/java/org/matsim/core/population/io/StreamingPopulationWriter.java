@@ -148,7 +148,8 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 			}
 			@Override
 			public Attributes getAttributes() {
-				throw new RuntimeException( "not implemented" );
+				//A stream written Population cannot contain Population Attributes, only Person Attributes.
+				return new Attributes();
 			}
 
 		} ;
