@@ -19,8 +19,6 @@
 
 package org.matsim.contrib.taxi.optimizer.assignment;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.network.Link;
 
 import com.google.common.collect.ImmutableList;

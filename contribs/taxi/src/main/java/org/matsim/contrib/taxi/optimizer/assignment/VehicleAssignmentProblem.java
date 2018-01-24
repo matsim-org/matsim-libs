@@ -123,7 +123,7 @@ public class VehicleAssignmentProblem<D> {
 			VehicleData.Entry departure = vData.getEntry(v);
 
 			List<DestEntry<D>> filteredDests = destinationFinder == null ? dData.getEntries()
-					: destinationFinder.findNearest(departure, dData.getEntries());
+					: destinationFinder.findNearest(departure, dData.getEntries().stream());
 			List<Link> toLinks = Lists.transform(filteredDests, dest -> dest.link);
 			PathData[] paths = forwardPathSearch.calcPathDataArray(departure.link, toLinks, departure.time);
 
@@ -140,7 +140,7 @@ public class VehicleAssignmentProblem<D> {
 			DestEntry<D> dest = dData.getEntry(d);
 
 			List<VehicleData.Entry> filteredVehs = vehicleFinder == null ? vData.getEntries()
-					: vehicleFinder.findNearest(dest, vData.getEntries());
+					: vehicleFinder.findNearest(dest, vData.getEntries().stream());
 			List<Link> toLinks = Lists.transform(filteredVehs, veh -> veh.link);
 			PathData[] paths = backwardPathSearch.calcPathDataArray(dest.link, toLinks, dest.time);
 
