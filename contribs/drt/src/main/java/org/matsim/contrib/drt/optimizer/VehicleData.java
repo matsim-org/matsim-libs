@@ -22,9 +22,11 @@ package org.matsim.contrib.drt.optimizer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.data.DrtRequest;
@@ -96,25 +98,20 @@ public class VehicleData {
 			}
 			return maxTime;
 		}
-		
+
 		@Override
 		public String toString() {
 			return "VehicleData.Stop for: " + task.toString();
 		}
 	}
 
-	private final Map<Id<Vehicle>, Entry> entries = new HashMap<>();
+	private final Map<Id<Vehicle>, Entry> entries;
 	private final double currentTime;
 
-	public VehicleData(double currentTime, Iterable<? extends Vehicle> vehicles) {
+	public VehicleData(double currentTime, Stream<? extends Vehicle> vehicles) {
 		this.currentTime = currentTime;
-
-		for (Vehicle v : vehicles) {
-			Entry e = createVehicleData(v);
-			if (e != null) {
-				entries.put(v.getId(), e);
-			}
-		}
+		entries = vehicles.map(this::createVehicleData).filter(Objects::nonNull)
+				.collect(Collectors.toMap(e -> e.vehicle.getId(), e -> e));
 	}
 
 	public void updateEntry(Vehicle vehicle) {
