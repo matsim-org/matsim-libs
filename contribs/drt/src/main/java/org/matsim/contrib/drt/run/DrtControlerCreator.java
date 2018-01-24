@@ -29,9 +29,6 @@ import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
-import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
-import org.matsim.contrib.drt.optimizer.insertion.filter.KNearestVehicleFilter;
-import org.matsim.contrib.drt.optimizer.insertion.filter.NoFilter;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.contrib.drt.scheduler.DrtScheduler;
@@ -72,7 +69,7 @@ public final class DrtControlerCreator {
 
 	public static Controler createControler(Scenario scenario, boolean otfvis) {
 		// yy I know that this one breaks the sequential loading of the building blocks, but I would like to be able
-		// to modify the scenario before I pass it to the controler.  kai, oct'17
+		// to modify the scenario before I pass it to the controler. kai, oct'17
 		adjustConfig(scenario.getConfig());
 		return adjustControler(otfvis, scenario);
 	}
@@ -119,13 +116,6 @@ public final class DrtControlerCreator {
 				bind(DrtScheduler.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(DrtActionCreator.class).asEagerSingleton();
 				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
-			}
-
-			@Provides
-			@Singleton
-			private DrtVehicleFilter provideFilter(DrtConfigGroup drtCfg) {
-				return drtCfg.getKNearestVehicles() > 0 ? new KNearestVehicleFilter(drtCfg.getKNearestVehicles())
-						: new NoFilter();
 			}
 
 			@Provides
