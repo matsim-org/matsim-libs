@@ -32,7 +32,7 @@ import org.matsim.contrib.parking.parkingchoice.lib.obj.DoubleValueHashMap;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-public final class ParkingScoreManager {
+public final class ParkingScoreManager implements ParkingScore {
 	
 	private Double beelineDistanceFactor = 1.3 ;
 
@@ -49,6 +49,7 @@ public final class ParkingScoreManager {
 		this.scenario = scenario;
 	}
 
+	@Override
 	public double calcWalkScore(Coord destCoord, PC2Parking parking, Id<Person> personId, double parkingDurationInSeconds) {
 		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons();
 		Person person = persons.get(personId);
@@ -75,6 +76,7 @@ public final class ParkingScoreManager {
 		return (parkingWalkBeta * walkingTimeTotalInMinutes) * parkingScoreScalingFactor;
 	}
 
+	@Override
 	public double calcCostScore(double arrivalTime, double parkingDurationInSeconds, PC2Parking parking, Id<Person> personId) {
 		Person person = scenario.getPopulation().getPersons().get(personId);
 		double parkingCostBeta = getParkingBetas().getParkingCostBeta(person);
@@ -83,6 +85,7 @@ public final class ParkingScoreManager {
 	}
 	
 	
+	@Override
 	public double calcScore(Coord destCoord, double arrivalTime, double parkingDurationInSeconds, PC2Parking parking, Id<Person> personId, int legIndex, boolean setCostToZero) {
 		double walkScore = calcWalkScore(destCoord, parking, personId, parkingDurationInSeconds);
 		double costScore = calcCostScore(arrivalTime, parkingDurationInSeconds, parking, personId);
@@ -99,42 +102,52 @@ public final class ParkingScoreManager {
 		return costScore + walkScore + randomError;
 	}
 
+	@Override
 	public double getScore(Id<Person> id) {
 		return scores.get(id);
 	}
 
+	@Override
 	public synchronized void addScore(Id<Person> id, double incValue) {
 		scores.incrementBy(id, incValue);
 	}
 
+	@Override
 	public synchronized void prepareForNewIteration() {
 		scores = new DoubleValueHashMap<>();
 	}
 
+	@Override
 	public double getParkingScoreScalingFactor() {
 		return parkingScoreScalingFactor;
 	}
 
+	@Override
 	public void setParkingScoreScalingFactor(double parkingScoreScalingFactor) {
 		this.parkingScoreScalingFactor = parkingScoreScalingFactor;
 	}
 
+	@Override
 	public double getRandomErrorTermScalingFactor() {
 		return randomErrorTermScalingFactor;
 	}
 
+	@Override
 	public void setRandomErrorTermScalingFactor(double randomErrorTermScalingFactor) {
 		this.randomErrorTermScalingFactor = randomErrorTermScalingFactor;
 	}
 
+	@Override
 	public AbstractParkingBetas getParkingBetas() {
 		return parkingBetas;
 	}
 
+	@Override
 	public void setParkingBetas(AbstractParkingBetas parkingBetas) {
 		this.parkingBetas = parkingBetas;
 	}
 
+	@Override
 	public void setRandomErrorTermManger(RandomErrorTermManager randomErrorTermManager) {
 		this.randomErrorTermManager = randomErrorTermManager;
 	}
