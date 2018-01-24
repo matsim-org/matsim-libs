@@ -53,6 +53,6 @@ public class KNearestVehicleFilter implements DrtVehicleFilter {
 			nearestVehicleSort.add(veh, squaredDistance);
 		}
 
-		return nearestVehicleSort.retriveKSmallestElements();
+		return nearestVehicleSort.kSmallestElements();
 	}
 }

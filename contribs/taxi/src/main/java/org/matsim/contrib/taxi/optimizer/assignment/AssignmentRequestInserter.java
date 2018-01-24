@@ -82,7 +82,6 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 		if (rData.getSize() == 0) {
 			return;
 		}
-
 		VehicleData vData = initVehicleData(rData);
 		if (vData.getSize() == 0) {
 			return;
@@ -101,6 +100,7 @@ public class AssignmentRequestInserter implements UnplannedRequestInserter {
 		long idleVehs = fleet.getVehicles().values().stream().filter(scheduler::isIdle).count();
 		double vehPlanningHorizon = idleVehs < rData.getUrgentReqCount() ? //
 				params.vehPlanningHorizonUndersupply : params.vehPlanningHorizonOversupply;
-		return new VehicleData(timer.getTimeOfDay(), scheduler, fleet.getVehicles().values(), vehPlanningHorizon);
+		return new VehicleData(timer.getTimeOfDay(), scheduler, fleet.getVehicles().values().stream(),
+				vehPlanningHorizon);
 	}
 }
