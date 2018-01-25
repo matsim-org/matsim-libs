@@ -46,12 +46,11 @@ public interface Schedule {
 	 * Tasks in the schedule.
 	 */
 	List<? extends Task> getTasks();// unmodifiableList
-	
-	
+
 	/**
 	 * Stream of tasks in the schedule.
 	 */
-	Stream<? extends Task> taskStream();
+	Stream<? extends Task> tasks();
 
 	/**
 	 * Shortcut to getTasks().size()

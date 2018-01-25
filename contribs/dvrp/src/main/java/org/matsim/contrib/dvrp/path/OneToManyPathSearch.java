@@ -124,14 +124,7 @@ public class OneToManyPathSearch {
 			Map<Id<Node>, ToNode> toNodes) {
 		PathData[] pathDataArray = new PathData[toLinks.size()];
 		for (int i = 0; i < pathDataArray.length; i++) {
-			Link toLink = toLinks.get(i);
-			if (toLink == fromLink) {
-				pathDataArray[i] = createZeroPath(fromLink);
-			} else {
-				ToNode toNode = toNodes.get(getToNode(toLink).getId());
-				pathDataArray[i] = new PathData(toNode.path,
-						getFirstAndLastLinkTT(fromLink, toLink, toNode.path, startTime));
-			}
+			pathDataArray[i] = createPathData(fromLink, toLinks.get(i), startTime, toNodes);
 		}
 		return pathDataArray;
 	}
@@ -140,18 +133,21 @@ public class OneToManyPathSearch {
 			Map<Id<Node>, ToNode> toNodes) {
 		Map<Id<Link>, PathData> pathDataMap = Maps.newHashMapWithExpectedSize(toLinks.size());
 		for (Link toLink : toLinks) {
-			if (toLink == fromLink) {
-				pathDataMap.put(toLink.getId(), createZeroPath(fromLink));
-			} else {
-				ToNode toNode = toNodes.get(getToNode(toLink).getId());
-				pathDataMap.put(toLink.getId(),
-						new PathData(toNode.path, getFirstAndLastLinkTT(fromLink, toLink, toNode.path, startTime)));
-			}
+			pathDataMap.put(toLink.getId(), createPathData(fromLink, toLink, startTime, toNodes));
 		}
 		return pathDataMap;
 	}
 
-	private PathData createZeroPath(Link fromLink) {
+	private PathData createPathData(Link fromLink, Link toLink, double startTime, Map<Id<Node>, ToNode> toNodes) {
+		if (toLink == fromLink) {
+			return createZeroPathData(fromLink);
+		} else {
+			ToNode toNode = toNodes.get(getToNode(toLink).getId());
+			return new PathData(toNode.path, getFirstAndLastLinkTT(fromLink, toLink, toNode.path, startTime));
+		}
+	}
+
+	private PathData createZeroPathData(Link fromLink) {
 		List<Node> singleNodeList = Collections.singletonList(getFromNode(fromLink));
 		List<Link> emptyLinkList = Collections.emptyList();
 		return new PathData(new Path(singleNodeList, emptyLinkList, 0, 0), 0);

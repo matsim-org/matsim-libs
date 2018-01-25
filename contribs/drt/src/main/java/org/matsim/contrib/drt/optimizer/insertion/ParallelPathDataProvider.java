@@ -79,7 +79,6 @@ public class ParallelPathDataProvider implements PathDataProvider {
 
 		for (VehicleData.Entry vEntry : vEntries) {
 			startLinks.put(vEntry.start.link.getId(), vEntry.start.link);
-
 			for (Stop s : vEntry.stops) {
 				// TODO consider a stop filter (replacement for/addition to DrtVehicleFilter)
 				// the filtering could distinguish between pickup/dropoff...
@@ -95,7 +94,8 @@ public class ParallelPathDataProvider implements PathDataProvider {
 
 		Future<Map<Id<Link>, PathData>> pathsToPickupFuture = executorService.submit(() -> {
 			ImmutableList<Link> startAndStopLinkList = ImmutableList
-					.copyOf(Iterables.concat(startLinks.values(), stopLinkList));
+					.<Link> builderWithExpectedSize(startLinks.values().size() + stopLinkList.size())
+					.addAll(startLinks.values()).addAll(stopLinkList).build();
 			// calc backward dijkstra from pickup to ends of all stop + start
 			// TODO exclude inserting pickup after fully occupied stops
 			return toPickupPathSearch.calcPathDataMap(drtRequest.getFromLink(), startAndStopLinkList,

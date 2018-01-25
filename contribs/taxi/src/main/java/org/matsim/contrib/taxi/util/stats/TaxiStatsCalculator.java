@@ -25,6 +25,7 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.matsim.contrib.dvrp.data.*;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.schedule.*;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 import org.matsim.contrib.util.LongEnumAdder;
@@ -76,7 +77,7 @@ public class TaxiStatsCalculator {
 			}
 
 			if (tt.getTaxiTaskType() == TaxiTaskType.PICKUP) {
-				Request req = ((TaxiPickupTask)t).getRequest();
+				TaxiRequest req = ((TaxiPickupTask)t).getRequest();
 				double waitTime = Math.max(t.getBeginTime() - req.getEarliestStartTime(), 0);
 				int hour = TaxiStatsCalculators.getHour(req.getEarliestStartTime());
 				hourlyStats[hour].passengerWaitTime.addValue(waitTime);

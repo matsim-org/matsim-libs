@@ -27,9 +27,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.VehicleData;
-import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
-import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -57,7 +55,6 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final MobsimTimer mobsimTimer;
 	private final EventsManager eventsManager;
 	private final DrtScheduler scheduler;
-	private final DrtVehicleFilter vehicleFilter;
 
 	private final ParallelMultiVehicleInsertionProblem insertionProblem;
 
@@ -65,13 +62,12 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, @Named(DvrpModule.DVRP_ROUTING) Network network,
 			Fleet fleet, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility, MobsimTimer mobsimTimer,
-			DrtVehicleFilter vehicleFilter, EventsManager eventsManager, DrtScheduler scheduler) {
+			EventsManager eventsManager, DrtScheduler scheduler) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
 		this.eventsManager = eventsManager;
 		this.scheduler = scheduler;
-		this.vehicleFilter = vehicleFilter;
 
 		insertionProblem = ParallelMultiVehicleInsertionProblem.create(network, travelTime, travelDisutility, drtCfg,
 				mobsimTimer);
@@ -88,13 +84,12 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			return;
 		}
 
-		VehicleData vData = new VehicleData(mobsimTimer.getTimeOfDay(), fleet.getVehicles().values());
+		VehicleData vData = new VehicleData(mobsimTimer.getTimeOfDay(), fleet.getVehicles().values().stream());
 
 		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {
 			DrtRequest req = reqIter.next();
-			Collection<Entry> filteredVehicles = vehicleFilter.applyFilter(req, vData.getEntries());
-			BestInsertion best = insertionProblem.findBestInsertion(req, filteredVehicles);
+			BestInsertion best = insertionProblem.findBestInsertion(req, vData.getEntries());
 			if (best == null) {
 				eventsManager.processEvent(new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), req.getId()));
 				if (drtCfg.isPrintDetailedWarnings()) {

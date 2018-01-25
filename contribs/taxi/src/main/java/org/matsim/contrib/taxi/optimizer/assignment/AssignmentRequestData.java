@@ -21,27 +21,39 @@ package org.matsim.contrib.taxi.optimizer.assignment;
 
 import org.matsim.contrib.taxi.data.TaxiRequest;
 
-class AssignmentRequestData extends AssignmentDestinationData<TaxiRequest> {
-	private int urgentReqCount = 0;
+import com.google.common.collect.ImmutableList;
 
-	AssignmentRequestData(double currentTime, double planningHorizon, Iterable<TaxiRequest> unplannedRequests) {
-		double maxT0 = currentTime + planningHorizon;
+class AssignmentRequestData extends AssignmentDestinationData<TaxiRequest> {
+
+	static AssignmentRequestData create(double currentTime, double planningHorizon,
+			Iterable<TaxiRequest> unplannedRequests) {
+		double maxEarliestStart = currentTime + planningHorizon;
+		ImmutableList.Builder<DestEntry<TaxiRequest>> builder = ImmutableList.builder();
 
 		int idx = 0;
+		int urgentReqCount = 0;
 		for (TaxiRequest r : unplannedRequests) {
-			double t0 = r.getEarliestStartTime();
-			if (t0 > maxT0) {// beyond the planning horizon
+			double earliestStart = r.getEarliestStartTime();
+			if (earliestStart > maxEarliestStart) {// beyond the planning horizon
 				continue;
 			}
-
-			if (t0 <= currentTime) {
+			if (earliestStart <= currentTime) {
 				urgentReqCount++;
 			}
-			entries.add(new DestEntry<TaxiRequest>(idx++, r, r.getFromLink(), t0));
+			builder.add(new DestEntry<TaxiRequest>(idx++, r, r.getFromLink(), earliestStart));
 		}
+
+		return new AssignmentRequestData(builder.build(), urgentReqCount);
 	}
 
-	public int getUrgentReqCount() {
+	private final int urgentReqCount;
+
+	private AssignmentRequestData(ImmutableList<DestEntry<TaxiRequest>> entries, int urgentReqCount) {
+		super(entries);
+		this.urgentReqCount = urgentReqCount;
+	}
+
+	int getUrgentReqCount() {
 		return urgentReqCount;
 	}
 }
