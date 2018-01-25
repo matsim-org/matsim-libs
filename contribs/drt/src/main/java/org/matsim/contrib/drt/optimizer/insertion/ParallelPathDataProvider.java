@@ -45,7 +45,7 @@ import com.google.common.collect.ImmutableList;
  * @author michalm
  */
 public class ParallelPathDataProvider implements PathDataProvider {
-	private static final int THREADS = 4;
+	private static final int MAX_THREADS = 4;
 
 	private final OneToManyPathSearch toPickupPathSearch;
 	private final OneToManyPathSearch fromPickupPathSearch;
@@ -69,7 +69,7 @@ public class ParallelPathDataProvider implements PathDataProvider {
 		toDropoffPathSearch = OneToManyPathSearch.createBackwardSearch(network, travelTime, travelDisutility);
 		fromDropoffPathSearch = OneToManyPathSearch.createForwardSearch(network, travelTime, travelDisutility);
 		stopDuration = drtCfg.getStopDuration();
-		executorService = Executors.newFixedThreadPool(THREADS);
+		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
 	}
 
 	public void calcPathData(DrtRequest drtRequest, Collection<VehicleData.Entry> vEntries) {
