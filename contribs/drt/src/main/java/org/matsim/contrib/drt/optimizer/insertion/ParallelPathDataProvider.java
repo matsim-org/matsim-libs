@@ -40,7 +40,6 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 
 /**
  * @author michalm

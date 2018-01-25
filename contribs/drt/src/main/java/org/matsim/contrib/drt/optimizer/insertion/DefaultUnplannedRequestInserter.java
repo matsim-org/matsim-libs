@@ -21,6 +21,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
@@ -69,7 +70,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		this.eventsManager = eventsManager;
 		this.scheduler = scheduler;
 
-		insertionProblem = ParallelMultiVehicleInsertionProblem.create(network, travelTime, travelDisutility, drtCfg,
+		insertionProblem = new ParallelMultiVehicleInsertionProblem(network, travelTime, travelDisutility, drtCfg,
 				mobsimTimer);
 	}
 
@@ -89,8 +90,8 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {
 			DrtRequest req = reqIter.next();
-			BestInsertion best = insertionProblem.findBestInsertion(req, vData.getEntries());
-			if (best == null) {
+			Optional<BestInsertion> best = insertionProblem.findBestInsertion(req, vData.getEntries());
+			if (!best.isPresent()) {
 				eventsManager.processEvent(new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), req.getId()));
 				if (drtCfg.isPrintDetailedWarnings()) {
 					Logger.getLogger(getClass())
@@ -99,10 +100,11 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 									+ req.getFromLink().getId());
 				}
 			} else {
-				scheduler.insertRequest(best.vehicleEntry, req, best.insertion);
-				vData.updateEntry(best.vehicleEntry.vehicle);
+				BestInsertion bestInsertion = best.get();
+				scheduler.insertRequest(bestInsertion.vehicleEntry, req, bestInsertion.insertion);
+				vData.updateEntry(bestInsertion.vehicleEntry.vehicle);
 				eventsManager.processEvent(new DrtRequestScheduledEvent(mobsimTimer.getTimeOfDay(), req.getId(),
-						best.vehicleEntry.vehicle.getId(), req.getPickupTask().getEndTime(),
+						bestInsertion.vehicleEntry.vehicle.getId(), req.getPickupTask().getEndTime(),
 						req.getDropoffTask().getBeginTime()));
 			}
 			reqIter.remove();
