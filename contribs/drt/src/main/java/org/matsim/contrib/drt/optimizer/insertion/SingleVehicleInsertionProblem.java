@@ -25,9 +25,7 @@ import java.util.List;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.insertion.PathDataProvider.PathDataSet;
-import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
@@ -69,12 +67,10 @@ public class SingleVehicleInsertionProblem {
 		}
 	}
 
-	private final MobsimTimer timer;
 	private final PathDataProvider pathDataProvider;
 	private final InsertionCostCalculator costCalculator;
 
-	///
-
+	/// variables changed by findBestInsertion()
 	private List<Insertion> insertions;
 	private int stopCount;
 
@@ -96,10 +92,9 @@ public class SingleVehicleInsertionProblem {
 	// private boolean[] considerPickupInsertion;
 	// private boolean[] considerDropoffInsertion;
 
-	public SingleVehicleInsertionProblem(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg, MobsimTimer timer) {
-		this.timer = timer;
+	public SingleVehicleInsertionProblem(PathDataProvider pathDataProvider, InsertionCostCalculator costCalculator) {
 		this.pathDataProvider = pathDataProvider;
-		costCalculator = new InsertionCostCalculator(drtCfg.getStopDuration(), drtCfg.getMaxWaitTime());
+		this.costCalculator = costCalculator;
 	}
 
 	public BestInsertion findBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry) {
@@ -189,7 +184,7 @@ public class SingleVehicleInsertionProblem {
 		double minCost = Double.MAX_VALUE;
 		Insertion bestInsertion = null;
 		for (Insertion insertion : insertions) {
-			double cost = costCalculator.calculate(drtRequest, vEntry, insertion, timer.getTimeOfDay());
+			double cost = costCalculator.calculate(drtRequest, vEntry, insertion);
 			if (cost < minCost) {
 				bestInsertion = insertion;
 				minCost = cost;
