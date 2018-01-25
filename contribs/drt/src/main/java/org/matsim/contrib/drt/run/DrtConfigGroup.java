@@ -42,18 +42,18 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String REBALANCING_INTERVAL = "rebalancingInterval";
 	public static final String IDLE_VEHICLES_RETURN_TO_DEPOTS = "idleVehiclesReturnToDepots";
-	private static final String OPERATIONAL_SCHEME = "operationalScheme";
+	public static final String OPERATIONAL_SCHEME = "operationalScheme";
 
-	private static final String MAX_WALK_DISTANCE = "maxWalkDistance";
-	private static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
-	private static final String ESTIMATED_BEELINE_DISTANCE_FACTOR = "estimatedBeelineDistanceFactor";
+	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
+	public static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
+	public static final String ESTIMATED_BEELINE_DISTANCE_FACTOR = "estimatedBeelineDistanceFactor";
 
 	public static final String VEHICLES_FILE = "vehiclesFile";
-	private static final String TRANSIT_STOP_FILE = "transitStopFile";
-	private static final String PLOT_CUST_STATS = "writeDetailedCustomerStats";
-	private static final String PLOT_VEH_STATS = "writeDetailedVehicleStats";
-	private static final String PRINT_WARNINGS = "plotDetailedWarnings";
-	private static final String NUMBER_OF_THREADS = "numberOfThreads";
+	public static final String TRANSIT_STOP_FILE = "transitStopFile";
+	public static final String PLOT_CUST_STATS = "writeDetailedCustomerStats";
+	public static final String PLOT_VEH_STATS = "writeDetailedVehicleStats";
+	public static final String PRINT_WARNINGS = "plotDetailedWarnings";
+	public static final String NUMBER_OF_THREADS = "numberOfThreads";
 
 	private double stopDuration = Double.NaN;// seconds
 	private double maxWaitTime = Double.NaN;// seconds
