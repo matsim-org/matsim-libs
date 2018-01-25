@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
 import taxibus.TaxibusRequest;
@@ -106,7 +107,7 @@ public class TaxibusDispatch {
 	}
 
 	public TreeSet<TaxibusRequest> getPickUpsForLink(Link link) {
-		TreeSet<TaxibusRequest> beginningRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);
+		TreeSet<TaxibusRequest> beginningRequests = new TreeSet<>(PassengerRequests.ABSOLUTE_COMPARATOR);
 		for (TaxibusRequest req : this.requests) {
 			if (req.getFromLink().equals(link)) {
 
@@ -120,7 +121,7 @@ public class TaxibusDispatch {
 	}
 
 	public TreeSet<TaxibusRequest> getDropOffsForLink(Link link) {
-		TreeSet<TaxibusRequest> endingRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);
+		TreeSet<TaxibusRequest> endingRequests = new TreeSet<>(PassengerRequests.ABSOLUTE_COMPARATOR);
 		for (TaxibusRequest req : this.requests) {
 			if (req.getToLink().equals(link)) {
 
