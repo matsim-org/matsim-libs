@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.matsim.api.core.v01.Id;
@@ -58,6 +59,7 @@ public class StopBasedPathDataProvider implements PrecalculatablePathDataProvide
 	private Map<Id<Link>, PathData> pathsToDropoffMap;
 	private Map<Id<Link>, PathData> pathsFromDropoffMap;
 
+	@Inject
 	public StopBasedPathDataProvider(@Named(DvrpModule.DVRP_ROUTING) Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility,
@@ -65,9 +67,11 @@ public class StopBasedPathDataProvider implements PrecalculatablePathDataProvide
 			DrtConfigGroup drtCfg) {
 		stopDuration = drtCfg.getStopDuration();
 
-		List<Link> links = schedule.getFacilities().values().stream().map(tsf -> network.getLinks().get(tsf.getId()))
+		List<Link> stopLinks = schedule.getFacilities().values().stream()
+				.map(tsf -> network.getLinks().get(tsf.getLinkId()))//
+				.distinct()// more than one stop can be located on a link
 				.collect(ImmutableList.toImmutableList());
-		manyToManyPathData = new ManyToManyPathData(network, travelTime, travelDisutility, links,
+		manyToManyPathData = new ManyToManyPathData(network, travelTime, travelDisutility, stopLinks,
 				new TimeDiscretizer(ttcConfig), drtCfg.getNumberOfThreads());
 	}
 
