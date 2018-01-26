@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -42,6 +43,8 @@ import com.google.common.collect.Table;
  * @author michalm
  */
 public class ManyToManyPathData {
+	private static final Logger log = Logger.getLogger(ManyToManyPathData.class);
+
 	private final Table<Id<Link>, Id<Link>, PathData>[] tables;
 	private final TimeDiscretizer discretizer;
 
@@ -64,6 +67,7 @@ public class ManyToManyPathData {
 	}
 
 	private void updateTable(List<Link> links, int threads, Supplier<OneToManyPathSearch> oneToManyPathSearchProvider) {
+		log.info("Matrix calculation started");
 		ExecutorServiceWithResource<OneToManyPathSearch> executorService = new ExecutorServiceWithResource<>(//
 				IntStream.range(0, threads)//
 						.mapToObj(i -> oneToManyPathSearchProvider.get())//
@@ -73,7 +77,9 @@ public class ManyToManyPathData {
 				IntStream.range(0, tables.length).boxed() // in each table (i)
 						.flatMap(i -> links.stream() // for each link (fromLink)
 								.map(fromLink -> (search -> updateRow(search, fromLink, links, i)))));
+
 		executorService.shutdown();
+		log.info("Matrix calculation finished");
 	}
 
 	private void updateRow(OneToManyPathSearch search, Link fromLink, Collection<Link> toLinks, int timeIdx) {
@@ -82,6 +88,7 @@ public class ManyToManyPathData {
 		for (Map.Entry<Id<Link>, PathData> e : pathData.entrySet()) {
 			tables[timeIdx].put(fromLink.getId(), e.getKey(), e.getValue());// TODO replace Path with ThinPath ???
 		}
+//		System.err.println("timeIdx=" + timeIdx + "   fromLink=" + fromLink.getId());
 	}
 
 	public PathData getPathData(Id<Link> fromLink, Id<Link> toLink, double startTime) {
