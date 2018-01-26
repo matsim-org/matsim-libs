@@ -19,11 +19,17 @@
 
 package org.matsim.contrib.dvrp.router;
 
-import java.util.*;
+import java.util.LinkedList;
 
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.Dijkstra;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.PreProcessDijkstra;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
+
+import com.google.common.collect.ImmutableList;
 
 public class DijkstraWithThinPath extends Dijkstra {
 	public DijkstraWithThinPath(Network network, TravelDisutility costFunction, TravelTime timeFunction) {
@@ -37,26 +43,18 @@ public class DijkstraWithThinPath extends Dijkstra {
 
 	@Override
 	protected Path constructPath(Node fromNode, Node toNode, double startTime, double arrivalTime) {
-		// ArrayList<Node> nodes = new ArrayList<>();
-		ArrayList<Link> links = new ArrayList<>();
+		LinkedList<Link> links = new LinkedList<>();
 
-		// nodes.add(0, toNode);
 		Link tmpLink = getData(toNode).getPrevLink();
 		if (tmpLink != null) {
 			while (tmpLink.getFromNode() != fromNode) {
 				links.add(tmpLink);
-				// nodes.add(0, tmpLink.getFromNode());
 				tmpLink = getData(tmpLink.getFromNode()).getPrevLink();
 			}
 			links.add(tmpLink);
-			// nodes.add(0, tmpLink.getFromNode());
 		}
 
-		Collections.reverse(links);
-
-		DijkstraNodeData toNodeData = getData(toNode);
-		Path path = new Path(null, links, arrivalTime - startTime, toNodeData.getCost());
-
-		return path;
+		return new Path(null, ImmutableList.copyOf(links.descendingIterator()), arrivalTime - startTime,
+				getData(toNode).getCost());
 	}
 }
