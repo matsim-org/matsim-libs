@@ -86,9 +86,8 @@ public class ManyToManyPathData {
 		int startTime = timeIdx * discretizer.getTimeInterval();
 		Map<Id<Link>, PathData> pathData = search.calcPathDataMap(fromLink, toLinks, startTime);
 		for (Map.Entry<Id<Link>, PathData> e : pathData.entrySet()) {
-			tables[timeIdx].put(fromLink.getId(), e.getKey(), e.getValue());// TODO replace Path with ThinPath ???
+			tables[timeIdx].put(fromLink.getId(), e.getKey(), e.getValue());
 		}
-//		System.err.println("timeIdx=" + timeIdx + "   fromLink=" + fromLink.getId());
 	}
 
 	public PathData getPathData(Id<Link> fromLink, Id<Link> toLink, double startTime) {

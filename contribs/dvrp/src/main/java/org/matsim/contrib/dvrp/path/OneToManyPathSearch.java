@@ -39,6 +39,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 public class OneToManyPathSearch {
@@ -63,7 +64,7 @@ public class OneToManyPathSearch {
 		public final double firstAndLastLinkTT;// at both the first and last links
 
 		public PathData(Path path, double firstAndLastLinkTT) {
-			this.path = path;
+			this.path = new Path(null, ImmutableList.copyOf(path.links), path.travelTime, path.travelCost);
 			this.firstAndLastLinkTT = firstAndLastLinkTT;
 		}
 	}
