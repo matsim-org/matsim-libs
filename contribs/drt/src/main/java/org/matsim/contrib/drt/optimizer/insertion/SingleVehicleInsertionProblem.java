@@ -97,6 +97,7 @@ public class SingleVehicleInsertionProblem {
 		this.costCalculator = costCalculator;
 	}
 
+	// TODO consider returning Optional<BestInsertion>
 	public BestInsertion findBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry) {
 		stopCount = vEntry.stops.size();
 		initPathData(drtRequest, vEntry);

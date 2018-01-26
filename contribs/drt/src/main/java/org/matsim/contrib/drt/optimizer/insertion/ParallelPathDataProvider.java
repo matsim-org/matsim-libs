@@ -26,16 +26,22 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
+import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -44,7 +50,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * @author michalm
  */
-public class ParallelPathDataProvider implements PathDataProvider {
+public class ParallelPathDataProvider implements PrecalculatablePathDataProvider {
 	private static final int MAX_THREADS = 4;
 
 	private final OneToManyPathSearch toPickupPathSearch;
@@ -62,8 +68,10 @@ public class ParallelPathDataProvider implements PathDataProvider {
 	private Map<Id<Link>, PathData> pathsToDropoffMap;
 	private Map<Id<Link>, PathData> pathsFromDropoffMap;
 
-	public ParallelPathDataProvider(Network network, TravelTime travelTime, TravelDisutility travelDisutility,
-			DrtConfigGroup drtCfg) {
+	@Inject
+	public ParallelPathDataProvider(@Named(DvrpModule.DVRP_ROUTING) Network network,
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility, DrtConfigGroup drtCfg) {
 		toPickupPathSearch = OneToManyPathSearch.createBackwardSearch(network, travelTime, travelDisutility);
 		fromPickupPathSearch = OneToManyPathSearch.createForwardSearch(network, travelTime, travelDisutility);
 		toDropoffPathSearch = OneToManyPathSearch.createBackwardSearch(network, travelTime, travelDisutility);
@@ -72,7 +80,8 @@ public class ParallelPathDataProvider implements PathDataProvider {
 		executorService = Executors.newFixedThreadPool(Math.min(drtCfg.getNumberOfThreads(), MAX_THREADS));
 	}
 
-	public void calcPathData(DrtRequest drtRequest, Collection<VehicleData.Entry> vEntries) {
+	@Override
+	public void precalculatePathData(DrtRequest drtRequest, Collection<VehicleData.Entry> vEntries) {
 		Map<Id<Link>, Link> startLinks = new HashMap<>();
 		Map<Id<Link>, Link> stopLinks = new HashMap<>();
 
@@ -86,9 +95,13 @@ public class ParallelPathDataProvider implements PathDataProvider {
 			}
 		}
 
-		final double earliestPickupTime = drtRequest.getEarliestStartTime(); // optimistic
-		final double minTravelTime = 15 * 60; // FIXME inaccurate temp solution: fixed 15 min
-		final double earliestDropoffTime = earliestPickupTime + minTravelTime + stopDuration;
+		Link pickup = drtRequest.getFromLink();
+		Link dropoff = drtRequest.getToLink();
+
+		double earliestPickupTime = drtRequest.getEarliestStartTime(); // optimistic
+		double minTravelTime = 15 * 60; // FIXME inaccurate temp solution: fixed 15 min
+		double earliestDropoffTime = earliestPickupTime + minTravelTime + stopDuration;
+
 		ImmutableList<Link> stopLinkList = ImmutableList.copyOf(stopLinks.values());
 
 		Future<Map<Id<Link>, PathData>> pathsToPickupFuture = executorService.submit(() -> {
@@ -97,8 +110,7 @@ public class ParallelPathDataProvider implements PathDataProvider {
 					.addAll(startLinks.values()).addAll(stopLinkList).build();
 			// calc backward dijkstra from pickup to ends of all stop + start
 			// TODO exclude inserting pickup after fully occupied stops
-			return toPickupPathSearch.calcPathDataMap(drtRequest.getFromLink(), startAndStopLinkList,
-					earliestPickupTime);
+			return toPickupPathSearch.calcPathDataMap(pickup, startAndStopLinkList, earliestPickupTime);
 		});
 
 		Future<Map<Id<Link>, PathData>> pathsFromPickupFuture = executorService.submit(() -> {
@@ -107,21 +119,20 @@ public class ParallelPathDataProvider implements PathDataProvider {
 					.addAll(stopLinkList).build();
 			// calc forward dijkstra from pickup to beginnings of all stops + dropoff
 			// TODO exclude inserting before fully occupied stops (unless the new request's dropoff is located there)
-			return fromPickupPathSearch.calcPathDataMap(drtRequest.getFromLink(), dropoffAndStopLinkList,
-					earliestPickupTime);
+			return fromPickupPathSearch.calcPathDataMap(pickup, dropoffAndStopLinkList, earliestPickupTime);
 		});
 
 		Future<Map<Id<Link>, PathData>> pathsToDropoffFuture = executorService.submit(() -> {
 			// calc backward dijkstra from dropoff to ends of all stops
 			// TODO exclude inserting dropoff after fully occupied stops (unless the new request's dropoff is located
 			// there)
-			return toDropoffPathSearch.calcPathDataMap(drtRequest.getToLink(), stopLinkList, earliestDropoffTime);
+			return toDropoffPathSearch.calcPathDataMap(dropoff, stopLinkList, earliestDropoffTime);
 		});
 
 		Future<Map<Id<Link>, PathData>> pathsFromDropoffFuture = executorService.submit(() -> {
 			// calc forward dijkstra from dropoff to beginnings of all stops
 			// TODO exclude inserting dropoff before fully occupied stops
-			return fromDropoffPathSearch.calcPathDataMap(drtRequest.getToLink(), stopLinkList, earliestDropoffTime);
+			return fromDropoffPathSearch.calcPathDataMap(dropoff, stopLinkList, earliestDropoffTime);
 		});
 
 		try {
@@ -136,28 +147,11 @@ public class ParallelPathDataProvider implements PathDataProvider {
 
 	@Override
 	public PathDataSet getPathDataSet(DrtRequest drtRequest, Entry vEntry) {
-		int length = vEntry.stops.size() + 1;
-		PathData[] pathsToPickup = new PathData[length];
-		PathData[] pathsFromPickup = new PathData[length];
-		PathData[] pathsToDropoff = new PathData[length];
-		PathData[] pathsFromDropoff = new PathData[length];
-
-		pathsToPickup[0] = pathsToPickupMap.get(vEntry.start.link.getId());// start->pickup
-		pathsFromPickup[0] = pathsFromPickupMap.get(drtRequest.getToLink().getId());// pickup->dropoff
-
-		int i = 1;
-		for (Stop s : vEntry.stops) {
-			Id<Link> linkId = s.task.getLink().getId();
-			pathsToPickup[i] = pathsToPickupMap.get(linkId);
-			pathsFromPickup[i] = pathsFromPickupMap.get(linkId);
-			pathsToDropoff[i] = pathsToDropoffMap.get(linkId);
-			pathsFromDropoff[i] = pathsFromDropoffMap.get(linkId);
-			i++;
-		}
-
-		return new PathDataSet(pathsToPickup, pathsFromPickup, pathsToDropoff, pathsFromDropoff);
+		return PrecalculatablePathDataProvider.getPathDataSet(drtRequest, vEntry, pathsToPickupMap, pathsFromPickupMap,
+				pathsToDropoffMap, pathsFromDropoffMap);
 	}
 
+	@Override
 	public void shutdown() {
 		executorService.shutdown();
 	}
