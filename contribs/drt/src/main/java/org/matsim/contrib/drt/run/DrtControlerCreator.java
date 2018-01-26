@@ -30,7 +30,6 @@ import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.PrecalculatablePathDataProvider;
-import org.matsim.contrib.drt.optimizer.insertion.StopBasedPathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
@@ -121,7 +120,10 @@ public final class DrtControlerCreator {
 				bind(DynActionCreator.class).to(DrtActionCreator.class).asEagerSingleton();
 				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
 				if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stationbased)) {
-					bind(PrecalculatablePathDataProvider.class).to(StopBasedPathDataProvider.class);
+					// StopBasedPathDataProvider consumes too much memory for larger networks with many stops
+					// still could be valuable for complex optimisers (more than just request insertion) 
+					// bind(PrecalculatablePathDataProvider.class).to(StopBasedPathDataProvider.class);
+					bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
 				} else {
 					bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
 				}
