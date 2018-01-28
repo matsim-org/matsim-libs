@@ -19,25 +19,42 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
-import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author michalm
  */
-public class ParallelMultiVehicleInsertionProblem {
+public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
+	public static ParallelMultiVehicleInsertionProblem create(Network network, TravelTime travelTime,
+			TravelDisutility travelDisutility, DrtConfigGroup drtCfg, MobsimTimer mobsimTimer) {
+		ParallelPathDataProvider pathDataProvider = new ParallelPathDataProvider(network, travelTime, travelDisutility,
+				drtCfg);
+		return new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer);
+	}
+
 	private static class TaskGroup {
 		private final List<Entry> vEntries = new ArrayList<>();
-		private final MultiVehicleInsertionProblem multiInsertionProblem;
+		private final SequentialMultiVehicleInsertionProblem multiInsertionProblem;
 
-		private TaskGroup(SingleVehicleInsertionProblem singleInsertionProblem) {
-			this.multiInsertionProblem = new MultiVehicleInsertionProblem(singleInsertionProblem);
+		private TaskGroup(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg, MobsimTimer timer) {
+			this.multiInsertionProblem = new SequentialMultiVehicleInsertionProblem(pathDataProvider, drtCfg, timer);
 		}
 
 		private BestInsertion findBestInsertion(DrtRequest drtRequest) {
@@ -47,29 +64,32 @@ public class ParallelMultiVehicleInsertionProblem {
 		}
 	}
 
+	private final ParallelPathDataProvider pathDataProvider;
+
 	private final int threads;
 	private final TaskGroup[] taskGroups;
 	private final ExecutorService executorService;
-	private final DrtVehicleFilter filter;
 
-	public ParallelMultiVehicleInsertionProblem(SingleVehicleInsertionProblem[] singleInsertionProblems,
-			DrtVehicleFilter filter) {
-		threads = singleInsertionProblems.length;
-		this.filter = filter;
+	private ParallelMultiVehicleInsertionProblem(ParallelPathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
+			MobsimTimer timer) {
+		this.pathDataProvider = pathDataProvider;
+
+		threads = drtCfg.getNumberOfThreads();
 		this.taskGroups = new TaskGroup[threads];
 		for (int i = 0; i < threads; i++) {
-			taskGroups[i] = new TaskGroup(singleInsertionProblems[i]);
+			taskGroups[i] = new TaskGroup(pathDataProvider, drtCfg, timer);
 		}
 		executorService = Executors.newFixedThreadPool(threads);
 	}
 
-	public BestInsertion findBestInsertion(DrtRequest drtRequest, VehicleData vData) {
-		List<Entry> filteredVehicles = filter.applyFilter(drtRequest, vData);
-		divideTasksIntoGroups(filteredVehicles);
+	@Override
+	public BestInsertion findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
+		pathDataProvider.calcPathData(drtRequest, vEntries);
+		divideTasksIntoGroups(vEntries);
 		return findBestInsertion(submitTasks(drtRequest));
 	}
 
-	private void divideTasksIntoGroups(List<Entry> filteredVehicles) {
+	private void divideTasksIntoGroups(Collection<Entry> filteredVehicles) {
 		Iterator<Entry> vEntryIter = filteredVehicles.iterator();
 		int div = filteredVehicles.size() / threads;
 		int mod = filteredVehicles.size() % threads;
@@ -118,6 +138,7 @@ public class ParallelMultiVehicleInsertionProblem {
 	}
 
 	public void shutdown() {
+		pathDataProvider.shutdown();
 		executorService.shutdown();
 	}
 }

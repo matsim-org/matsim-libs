@@ -35,8 +35,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -61,8 +63,10 @@ public final class NetworkSimplifier {
 	private Collection<Integer> nodeTopoToMerge = Arrays.asList( NetworkCalcTopoType.PASS1WAY , NetworkCalcTopoType.PASS2WAY );
 
 	private Set<Id<Node>> nodesNotToMerge = new HashSet<Id<Node>>();
-	
-	
+
+	private final Map<Id<Link>,List<Node>> mergedLinksToIntermediateNodes = new HashMap<>();
+
+
 	/**
 	 * Merges all qualifying links, ignoring length threshold.
 	 * @param network
@@ -82,8 +86,7 @@ public final class NetworkSimplifier {
 		run(network, thresholdLength, thresholdExceeded.BOTH);
 		run(network, thresholdLength, thresholdExceeded.EITHER);
 	}
-	
-	
+
 	/**
 	 * Specifies a set of nodes of which all outgoing and ingoing links should not be merged.
 	 * Should probably not be used if nodes of type {@link NetworkCalcTopoType.INTERSECTION} are to be merged.
@@ -122,8 +125,8 @@ public final class NetworkSimplifier {
 						Link outLink = (Link) oL;
 
 						if(inLink != null && outLink != null){
-							if(!outLink.getToNode().equals(inLink.getFromNode())){
-
+//							if(!outLink.getToNode().equals(inLink.getFromNode())){
+							if(  areLinksMergeable(inLink, outLink) ){
 								if(this.mergeLinkStats){
 
 									// Only merge if threshold criteria is met.  
@@ -166,7 +169,8 @@ public final class NetworkSimplifier {
 //									inLink.getOrigId() + "-" + outLink.getOrigId(),
 										network.addLink(link);
 										network.removeLink(inLink.getId());
-										(network).removeLink(outLink.getId());
+										network.removeLink(outLink.getId());
+										collectMergedLinkNodeInfo(inLink, outLink, link.getId());
 									}
 								} else {
 
@@ -193,6 +197,7 @@ public final class NetworkSimplifier {
 											
 											network.removeLink(inLink.getId());
 											network.removeLink(outLink.getId());
+											collectMergedLinkNodeInfo(inLink, outLink, newLink.getId());
 										}
 									}
 								}
@@ -210,6 +215,32 @@ public final class NetworkSimplifier {
 		// writes stats as a side effect
 		nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(network);
+	}
+
+	private boolean areLinksMergeable(Link inLink, Link outLink) {
+		List<Node> fromNodes = this.mergedLinksToIntermediateNodes.get(inLink.getId());
+		if (fromNodes==null) fromNodes = new ArrayList<>();
+		fromNodes.add(inLink.getFromNode());
+
+		List<Node> toNodes = this.mergedLinksToIntermediateNodes.get(outLink.getId());
+		if(toNodes==null) toNodes = new ArrayList<>();
+		toNodes.add(outLink.getToNode());
+
+		for(Node n :fromNodes) {
+			if (toNodes.contains(n)) return false;
+		}
+		return true;
+	}
+
+	private void collectMergedLinkNodeInfo(Link inLink, Link outLink, Id<Link> mergedLinkId) {
+		List<Node> nodes = new ArrayList<>();
+		if (this.mergedLinksToIntermediateNodes.containsKey(inLink.getId())) nodes.addAll(this.mergedLinksToIntermediateNodes
+				.remove(inLink.getId()));
+		if (this.mergedLinksToIntermediateNodes.containsKey(outLink.getId())) nodes.addAll(this.mergedLinksToIntermediateNodes
+				.remove(outLink.getId()));
+		nodes.add(inLink.getToNode());
+
+		this.mergedLinksToIntermediateNodes.put(mergedLinkId, nodes);
 	}
 	
 

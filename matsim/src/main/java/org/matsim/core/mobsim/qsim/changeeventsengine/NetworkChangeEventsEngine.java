@@ -33,6 +33,7 @@ import org.matsim.core.network.NetworkUtils;
 
 import java.util.Collection;
 import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * @author dgrether
@@ -54,7 +55,7 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		Collection<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(((Network)this.mobsim.getScenario().getNetwork()));
+		Queue<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(((Network)this.mobsim.getScenario().getNetwork()));
 		if ((changeEvents != null) && (changeEvents.size() > 0)) {
 			this.networkChangeEventsQueue = new PriorityQueue<>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
 			this.networkChangeEventsQueue.addAll(changeEvents);

@@ -23,7 +23,6 @@ import java.util.Map;
 import floetteroed.opdyts.DecisionVariable;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 
 /**
@@ -63,9 +62,9 @@ public class ModeChoiceDecisionVariable implements DecisionVariable {
         StringBuilder strb = new StringBuilder() ;
         for ( PlanCalcScoreConfigGroup.ModeParams modeParams : allModes.values() ) {
             final String mode = modeParams.getMode();
-            if ( TransportMode.car.equals(mode) || TransportMode.pt.equals(mode) ) {
+//            if ( TransportMode.car.equals(mode) || TransportMode.pt.equals(mode)  ) {
                 strb.append( mode + ": " + modeParams.getConstant() + " + " + modeParams.getMarginalUtilityOfTraveling() + " * ttime ; " ) ;
-            }
+//            }
         }
 
         return strb.toString() ;

@@ -20,6 +20,7 @@ package org.matsim.core.network;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * @author nagel
@@ -27,7 +28,7 @@ import java.util.List;
  */
 public interface TimeDependentNetwork {
 
-	Collection<NetworkChangeEvent> getNetworkChangeEvents();
+	Queue<NetworkChangeEvent> getNetworkChangeEvents();
 
 	void addNetworkChangeEvent(NetworkChangeEvent event);
 

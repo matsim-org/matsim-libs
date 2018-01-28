@@ -9,7 +9,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
@@ -37,7 +37,7 @@ public class CarsharingQsimFactoryNew implements Provider<Mobsim>{
 		QNetsimEngine netsimEngine = new QNetsimEngine(qsim);
 		qsim.addMobsimEngine(netsimEngine);
 		qsim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
+		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager);
 		qsim.addMobsimEngine(teleportationEngine);
 		qsim.addDepartureHandler(teleportationEngine) ;
 		AgentFactory agentFactory = new CSAgentFactory(qsim, carsharingManager);

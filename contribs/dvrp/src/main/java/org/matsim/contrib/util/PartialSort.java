@@ -19,7 +19,11 @@
 
 package org.matsim.contrib.util;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.function.ToDoubleFunction;
+import java.util.stream.Stream;
 
 /**
  * Sorts from smallest to largest. If the opposite should be the case then add elements with their values negated:
@@ -31,6 +35,12 @@ import java.util.*;
  * @param <T>
  */
 public class PartialSort<T> {
+	public static <T> List<T> kSmallestElements(int k, Stream<T> elements, ToDoubleFunction<T> evaluator) {
+		PartialSort<T> nearestRequestSort = new PartialSort<T>(k);
+		nearestRequestSort.addAll(elements, evaluator::applyAsDouble);
+		return nearestRequestSort.kSmallestElements();
+	}
+
 	private static class ElementValuePair<T> implements Comparable<ElementValuePair<T>> {
 		private final T element;
 		private final double value;
@@ -46,23 +56,25 @@ public class PartialSort<T> {
 		}
 	}
 
-	private final int size;
+	private final int k;
 	private final PriorityQueue<ElementValuePair<T>> kSmallestElements;// descending order: from k-th to 1-st
 
-	public PartialSort(int size) {
-		this.size = size;
-		kSmallestElements = new PriorityQueue<>(size);
+	public PartialSort(int k) {
+		this.k = k;
+		kSmallestElements = new PriorityQueue<>(k);
 	}
 
 	public void add(T element, double value) {
-		if (kSmallestElements.size() < size) {
+		if (kSmallestElements.size() < k) {
 			kSmallestElements.add(new ElementValuePair<>(element, value));
-		} else {
-			if (Double.compare(value, kSmallestElements.peek().value) < 0) {
-				kSmallestElements.poll();
-				kSmallestElements.add(new ElementValuePair<>(element, value));
-			}
+		} else if (Double.compare(value, kSmallestElements.peek().value) < 0) {
+			kSmallestElements.poll();
+			kSmallestElements.add(new ElementValuePair<>(element, value));
 		}
+	}
+
+	public void addAll(Stream<T> elements, ToDoubleFunction<T> evaluator) {
+		elements.forEach(e -> this.add(e, evaluator.applyAsDouble(e)));
 	}
 
 	/**
@@ -70,7 +82,7 @@ public class PartialSort<T> {
 	 * 
 	 * @return list containing k smallest elements sorted ascending: from the smallest to the k-th smallest
 	 */
-	public List<T> retriveKSmallestElements() {
+	public List<T> kSmallestElements() {
 		@SuppressWarnings("unchecked")
 		T[] array = (T[])new Object[kSmallestElements.size()];
 		for (int i = array.length - 1; i >= 0; i--) {

@@ -63,16 +63,25 @@ implements TimeVariantAttribute
 			for (NetworkChangeEvent event : changeEvents.values()) {
 				ChangeValue value = valueGetter.getChangeValue(event);
 				if (value != null) {
-					if (value.getType() == NetworkChangeEvent.ChangeType.FACTOR) {
+					switch( value.getType() ) {
+					case ABSOLUTE_IN_SI_UNITS:
+						// here, we just need to replace the value:
+						this.aValues[++numEvent] = value.getValue();
+						this.aTimes[numEvent] = event.getStartTime();
+						break;
+					case FACTOR: {
 						// there, the change event multiplies what we have so far:
 						double currentValue = this.aValues[numEvent];
 						this.aValues[++numEvent] = currentValue * value.getValue();
 						this.aTimes[numEvent] = event.getStartTime();
-					}
-					else {
-						// otherwise, we just need to replace the value:
-						this.aValues[++numEvent] = value.getValue();
+						break; }
+					case OFFSET_IN_SI_UNITS: {
+						double currentValue = this.aValues[numEvent];
+						this.aValues[++numEvent] = currentValue + value.getValue();
 						this.aTimes[numEvent] = event.getStartTime();
+						break; }
+					default:
+						throw new RuntimeException( "unknown ChangeType" ) ;
 					}
 				}
 			}

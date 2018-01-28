@@ -72,10 +72,6 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 	
 	static final String VALUE_TAG = "value";
 	
-	static final String ABSOLUTE_VALUE = "absolute";
-	
-	static final String FACTOR_VALUE = "scaleFactor";
-
 	// ========================================================================
 	// private members
 	// ========================================================================
@@ -201,6 +197,11 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 		
 	}
 
+	static final String ABSOLUTE_VALUE = "absolute";
+	static final String FACTOR_VALUE = "scaleFactor";
+	static final String OFFSET_VALUE = "offset" ;
+	// the enum is different from the xml value, since the "in_SI_units" was considered important, but changing it also
+	// in the xml was considered too messy.  kai, nov'17
 	private static ChangeValue newNetworkChangeType(String typeStr, String valueStr) {
 		if(typeStr != null && valueStr != null) {
 			double value = Double.parseDouble(valueStr);
@@ -208,10 +209,12 @@ public final class NetworkChangeEventsParser extends MatsimXmlParser {
 				return new ChangeValue(ChangeType.ABSOLUTE_IN_SI_UNITS, value);
 			else if(typeStr.equalsIgnoreCase(FACTOR_VALUE))
 				return new ChangeValue(ChangeType.FACTOR, value);
+			else if(typeStr.equalsIgnoreCase(OFFSET_VALUE))
+				return new ChangeValue(ChangeType.OFFSET_IN_SI_UNITS, value);
 			else {
 				log.warn(String.format(
-					"The change type %1$s is not allowed. Only \"%2$s\" and \"%3$s\" permitted!",
-					typeStr, ABSOLUTE_VALUE, FACTOR_VALUE));
+					"The change type %1$s is not allowed. Alowed: %2$s %3$s %4$s",
+					typeStr, ABSOLUTE_VALUE, FACTOR_VALUE, OFFSET_VALUE ));
 				return null;
 			}
 		} else {

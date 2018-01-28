@@ -17,35 +17,16 @@
 	</build>
   
   	<dependencies>
-  	
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
-			<version>3.4</version>
+			<version>3.7</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>19.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.freehep</groupId>
-			<artifactId>freehep-graphics2d</artifactId>
-			<version>2.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.freehep</groupId>
-			<artifactId>freehep-graphicsio-emf</artifactId>
-			<version>2.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.freehep</groupId>
-			<artifactId>freehep-graphicsio</artifactId>
-			<version>2.4</version>
+			<version>23.6-jre</version>
 		</dependency>
 
 		<dependency>
@@ -71,7 +52,7 @@
 		<dependency>
 			<groupId>com.opencsv</groupId>
 			<artifactId>opencsv</artifactId>
-			<version>3.7</version>
+			<version>4.0</version>
 		</dependency>
 
 	</dependencies>

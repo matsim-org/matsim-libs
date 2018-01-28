@@ -21,15 +21,16 @@ package org.matsim.contrib.taxi.data;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
-import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
+import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 /**
  * @author michalm
  */
-public class TaxiRequest /*extends RequestImpl*/ implements PassengerRequest {
+public class TaxiRequest implements PassengerRequest {
 	public enum TaxiRequestStatus {
 		// INACTIVE, // invisible to the dispatcher (ARTIFICIAL STATE!)
 		UNPLANNED, // submitted by the CUSTOMER and received by the DISPATCHER
@@ -44,27 +45,40 @@ public class TaxiRequest /*extends RequestImpl*/ implements PassengerRequest {
 		;
 	}
 
+	private final Id<Request> id;
+	private final double submissionTime;
+	private final double earliestStartTime;
+
 	private final MobsimPassengerAgent passenger;
 	private final Link fromLink;
-	private Link toLink;// toLink may be provided during the pickup
+	private final Link toLink;
 
 	private TaxiPickupTask pickupTask;
 	private TaxiDropoffTask dropoffTask;
-	
-	private RequestImpl delegate ;
 
-	public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, double startTime,
-			double submissionTime) {
-		this(id, passenger, fromLink, null, startTime, submissionTime);
-	}
-
-	public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink, double startTime,
-			double submissionTime) {
-//		super(id, 1, startTime, startTime, submissionTime);
-		delegate = new RequestImpl( id, 1, startTime, startTime, submissionTime ) ;
+	public TaxiRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
+			double earliestStartTime, double submissionTime) {
+		this.id = id;
+		this.submissionTime = submissionTime;
+		this.earliestStartTime = earliestStartTime;
 		this.passenger = passenger;
 		this.fromLink = fromLink;
 		this.toLink = toLink;
+	}
+
+	@Override
+	public Id<Request> getId() {
+		return id;
+	}
+
+	@Override
+	public double getSubmissionTime() {
+		return submissionTime;
+	}
+
+	@Override
+	public double getEarliestStartTime() {
+		return earliestStartTime;
 	}
 
 	@Override
@@ -75,10 +89,6 @@ public class TaxiRequest /*extends RequestImpl*/ implements PassengerRequest {
 	@Override
 	public Link getToLink() {
 		return toLink;
-	}
-
-	public void setToLink(Link toLink) {
-		this.toLink = toLink;
 	}
 
 	@Override
@@ -131,84 +141,8 @@ public class TaxiRequest /*extends RequestImpl*/ implements PassengerRequest {
 		throw new IllegalStateException("Unreachable code");
 	}
 
-	/**
-	 * @return
-	 * @see java.lang.Object#hashCode()
-	 */
-	public int hashCode() {
-		return delegate.hashCode();
-	}
-
-	/**
-	 * @return
-	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getId()
-	 */
-	public Id<Request> getId() {
-		return delegate.getId();
-	}
-
-	/**
-	 * @return
-	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getQuantity()
-	 */
-	public double getQuantity() {
-		return delegate.getQuantity();
-	}
-
-	/**
-	 * @return
-	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getEarliestStartTime()
-	 */
-	public double getEarliestStartTime() {
-		return delegate.getEarliestStartTime();
-	}
-
-	/**
-	 * @return
-	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getLatestStartTime()
-	 */
-	public double getLatestStartTime() {
-		return delegate.getLatestStartTime();
-	}
-
-	/**
-	 * @return
-	 * @see org.matsim.contrib.dvrp.data.RequestImpl#getSubmissionTime()
-	 */
-	public double getSubmissionTime() {
-		return delegate.getSubmissionTime();
-	}
-
-	/**
-	 * @return
-	 * @see org.matsim.contrib.dvrp.data.RequestImpl#isRejected()
-	 */
-	public boolean isRejected() {
-		return delegate.isRejected();
-	}
-
-	/**
-	 * @param rejected
-	 * @see org.matsim.contrib.dvrp.data.RequestImpl#setRejected(boolean)
-	 */
-	public void setRejected(boolean rejected) {
-		delegate.setRejected(rejected);
-	}
-
-	/**
-	 * @return
-	 * @see org.matsim.contrib.dvrp.data.RequestImpl#toString()
-	 */
+	@Override
 	public String toString() {
-		return delegate.toString();
-	}
-
-	/**
-	 * @param obj
-	 * @return
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	public boolean equals(Object obj) {
-		return delegate.equals(obj);
+		return Request.toString(this);
 	}
 }

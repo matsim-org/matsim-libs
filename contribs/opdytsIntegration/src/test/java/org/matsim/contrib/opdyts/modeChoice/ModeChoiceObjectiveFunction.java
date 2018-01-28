@@ -20,6 +20,7 @@
 package org.matsim.contrib.opdyts.modeChoice;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -68,16 +69,21 @@ public class ModeChoiceObjectiveFunction implements ObjectiveFunction {
     private DataMap<String> sumsContainer  = null ;
     private Databins<String> refStatsContainer = null ;
 
-     public ModeChoiceObjectiveFunction() {
-            // define the bin boundaries:
-         double[] dataBoundariesTmp = {0.} ;
-         simStatsContainer =  new Databins<>( "simStats", dataBoundariesTmp ) ;
+    ModeChoiceObjectiveFunction(MainModeIdentifier mainModeIdentifier, List<String> modes) {
+        // define the bin boundaries:
+        double[] dataBoundariesTmp = {0.} ;
+        simStatsContainer =  new Databins<>( "simStats", dataBoundariesTmp ) ;
 
-         this.refStatsContainer = new Databins<>( "measuredStats", dataBoundariesTmp ) ;
-         this.refStatsContainer.addValue(TransportMode.car, 0, 1000.0);
-         this.refStatsContainer.addValue(TransportMode.bike, 0, 3000.0);
+        this.refStatsContainer = new Databins<>( "measuredStats", dataBoundariesTmp ) ;
 
-         mainModeIdentifier = new TransportPlanningMainModeIdentifier();
+        this.refStatsContainer.addValue(modes.get(0), 0, 1000.0);
+        this.refStatsContainer.addValue(modes.get(1), 0, 3000.0);
+
+        this.mainModeIdentifier = mainModeIdentifier;
+    }
+
+    public ModeChoiceObjectiveFunction() {
+        this( new TransportPlanningMainModeIdentifier(), Arrays.asList(TransportMode.car, TransportMode.bike) );
     }
 
     @Override

@@ -61,8 +61,14 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 	
 	private KmlType timeKml = null;
 	private DocumentType timeDoc = null;
-	private PlacemarkType timePlacemark = null;
-	private MultiGeometryType timeGeometry = null;
+	
+	private PlacemarkType timePlacemarkRed = null;
+	private PlacemarkType timePlacemarkYellow = null;
+	private PlacemarkType timePlacemarkGreen = null;
+	
+	private MultiGeometryType timeGeometryRed = null;
+	private MultiGeometryType timeGeometryYellow = null;
+	private MultiGeometryType timeGeometryGreen = null;
 	
 	private final KMZWriter writer;
 
@@ -97,25 +103,15 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 			e1.printStackTrace();
 		}
 		{
-			StyleType carStyle = kmlObjectFactory.createStyleType();
-			carStyle.setId("redCarStyle");
-			IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
-			carIconStyle.setIcon(iconLink);
-			carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMRED);
-			carIconStyle.setScale(Double.valueOf(0.5));
-			carStyle.setIconStyle(carIconStyle);
-			
+			StyleType carStyle = createColoredCarStyle(iconLink, MatsimKmlStyleFactory.MATSIMRED, "redCarStyle");
 			carStyles.put( carStyle.getId(), carStyle ) ;
 		}
 		{
-			StyleType carStyle = kmlObjectFactory.createStyleType();
-			carStyle.setId("greenCarStyle");
-			IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
-			carIconStyle.setIcon(iconLink);
-			carIconStyle.setColor(MatsimKmlStyleFactory.MATSIMGREEN);
-			carIconStyle.setScale(Double.valueOf(0.5));
-			carStyle.setIconStyle(carIconStyle);
-			
+			StyleType carStyle = createColoredCarStyle(iconLink, MatsimKmlStyleFactory.MATSIMYELLOW, "yellowCarStyle");
+			carStyles.put( carStyle.getId(), carStyle ) ;
+		}
+		{
+			StyleType carStyle = createColoredCarStyle(iconLink, MatsimKmlStyleFactory.MATSIMGREEN, "greenCarStyle");
 			carStyles.put( carStyle.getId(), carStyle ) ;
 		}
 		
@@ -139,26 +135,74 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 		this.writeThisSnapshot = false ;
 	}
 
+	private StyleType createColoredCarStyle(LinkType iconLink, final byte[] color, final String idString) {
+		StyleType carStyle = kmlObjectFactory.createStyleType();
+		carStyle.setId(idString);
+		IconStyleType carIconStyle = kmlObjectFactory.createIconStyleType();
+		carIconStyle.setIcon(iconLink);
+		carIconStyle.setColor(color);
+		carIconStyle.setScale(Double.valueOf(0.5));
+		carStyle.setIconStyle(carIconStyle);
+		return carStyle;
+	}
+
 	@Override
 	public void beginSnapshot(final double time) {
 		this.time = time;
 		
 		this.timeKml = kmlObjectFactory.createKmlType();
-
-		this.timeGeometry = kmlObjectFactory.createMultiGeometryType();
 		
-		this.timePlacemark = kmlObjectFactory.createPlacemarkType();
-		this.timePlacemark.setAbstractGeometryGroup(kmlObjectFactory.createMultiGeometry(this.timeGeometry));
+		this.timeGeometryRed = kmlObjectFactory.createMultiGeometryType();
+		this.timeGeometryYellow = kmlObjectFactory.createMultiGeometryType();
+		this.timeGeometryGreen = kmlObjectFactory.createMultiGeometryType();
+		
+		this.timePlacemarkRed = kmlObjectFactory.createPlacemarkType();
+		this.timePlacemarkYellow = kmlObjectFactory.createPlacemarkType();
+		this.timePlacemarkGreen = kmlObjectFactory.createPlacemarkType();
+		
+		this.timePlacemarkRed.setAbstractGeometryGroup(kmlObjectFactory.createMultiGeometry(this.timeGeometryRed));
+		this.timePlacemarkYellow.setAbstractGeometryGroup(kmlObjectFactory.createMultiGeometry(this.timeGeometryYellow));
+		this.timePlacemarkGreen.setAbstractGeometryGroup(kmlObjectFactory.createMultiGeometry(this.timeGeometryGreen));
+		
+		this.timePlacemarkRed.setStyleUrl("redCarStyle");
+		this.timePlacemarkYellow.setStyleUrl("yellowCarStyle");
+		this.timePlacemarkGreen.setStyleUrl("greenCarStyle");
 		
 		this.timeDoc = kmlObjectFactory.createDocumentType();
 		for ( StyleType carStyle : carStyles.values() ) {
 			this.timeDoc.getAbstractStyleSelectorGroup().add(kmlObjectFactory.createStyle(carStyle));
 		}
-		this.timeDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(this.timePlacemark));
+		this.timeDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(this.timePlacemarkRed));
+		this.timeDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(this.timePlacemarkYellow));
+		this.timeDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createPlacemark(this.timePlacemarkGreen));
 		
 		this.timeKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(this.timeDoc));
 	}
+	
+	@Override
+	public void addAgent(final AgentSnapshotInfo info) {
+		
+		//drop all parking vehicles
+		if (info.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY) {
+			return;
+		}
+		
+		this.writeThisSnapshot = true ;
+		
+		Coord coord = this.coordTransform.transform(new Coord(info.getEasting(), info.getNorthing()));
+		PointType point = kmlObjectFactory.createPointType();
+		point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
 
+		if ( info.getColorValueBetweenZeroAndOne() < 0.33 ) {
+			this.timeGeometryRed.getAbstractGeometryGroup().add(kmlObjectFactory.createPoint(point));
+		} else if ( info.getColorValueBetweenZeroAndOne() < 0.66 ) {
+			this.timeGeometryYellow.getAbstractGeometryGroup().add(kmlObjectFactory.createPoint(point));
+		} else {
+			this.timeGeometryGreen.getAbstractGeometryGroup().add(kmlObjectFactory.createPoint(point));
+		}
+		
+	}
+	
 	@Override
 	public void endSnapshot() {
 		if ( this.writeThisSnapshot ) {
@@ -185,24 +229,6 @@ public class KmlSnapshotWriter implements SnapshotWriter {
 		this.timeDoc = null;
 		
 		this.writeThisSnapshot = false ;
-	}
-
-	@Override
-	public void addAgent(final AgentSnapshotInfo position) {
-
-		//drop all parking vehicles
-		if (position.getAgentState() == AgentSnapshotInfo.AgentState.PERSON_AT_ACTIVITY) {
-			return;
-		}
-		
-		this.writeThisSnapshot = true ;
-		
-		this.timePlacemark.setStyleUrl("greenCarStyle");
-
-		Coord coord = this.coordTransform.transform(new Coord(position.getEasting(), position.getNorthing()));
-		PointType point = kmlObjectFactory.createPointType();
-		point.getCoordinates().add(Double.toString(coord.getX()) + "," + Double.toString(coord.getY()) + ",0.0");
-		this.timeGeometry.getAbstractGeometryGroup().add(kmlObjectFactory.createPoint(point));
 	}
 
 	@Override

@@ -89,6 +89,8 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 			final Network network,
 			final LeastCostPathCalculator routeAlgo,
 			PlansCalcRouteConfigGroup calcRouteConfig) {
+		Gbl.assertNotNull(network);
+		Gbl.assertIf( network.getLinks().size()>0 ) ; // otherwise network for mode probably not defined
 		this.network = network;
 		this.routeAlgo = routeAlgo;
 		this.mode = mode;
@@ -101,11 +103,13 @@ public final class NetworkRoutingInclAccessEgressModule implements RoutingModule
 	}
 
 	@Override
-	public List<? extends PlanElement> calcRoute(
+	public synchronized List<? extends PlanElement> calcRoute(
 			final Facility fromFacility,
 			final Facility toFacility,
 			final double departureTime,
 			final Person person) {
+		// I need this "synchronized" since I want mobsim agents to be able to call this during the mobsim.  So when the
+		// mobsim is multi-threaded, multiple agents might call this here at the same time.  kai, nov'17
 		
 		Gbl.assertNotNull(fromFacility);
 		Gbl.assertNotNull(toFacility);

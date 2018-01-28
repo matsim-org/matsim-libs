@@ -471,6 +471,14 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	@Override
 	protected final void checkConsistency( final Config config ) {
 		super.checkConsistency(config);
+
+		for ( ActivityParams params : this.getActivityParams() ) {
+			if ( params.isScoringThisActivityAtAll() && Time.isUndefinedTime( params.getTypicalDuration() ) ) {
+				throw new RuntimeException( "In activity type=" + params.getActivityType() + 
+						", the typical duration is undefined.  This will lead to errors that are difficult to debug, "
+						+ "so rather aborting here." ) ; 
+			}
+		}
 		
 	}
 
@@ -1224,12 +1232,12 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 				}
 			}
 			if (!hasOpeningAndClosingTime && !hasOpeningTimeAndLatePenalty) {
-				log.info("NO OPENING OR CLOSING TIMES DEFINED!\n\n\n"
+				log.info("NO OPENING OR CLOSING TIMES DEFINED!\n\n"
 						+"There is no activity type that has an opening *and* closing time (or opening time and late penalty) defined.\n"
 						+"This usually means that the activity chains can be shifted by an arbitrary\n"
 						+"number of hours without having an effect on the score of the plans, and thus\n"
 						+"resulting in wrong results / traffic patterns.\n"
-						+"If you are using MATSim without time adaptation, you can ignore this warning.\n\n\n");
+						+"If you are using MATSim without time adaptation, you can ignore this warning.\n\n");
 			}
 			if ( this.getMarginalUtlOfWaiting_utils_hr() != 0.0 ) {
 				log.warn( "marginal utl of wait set to: " + this.getMarginalUtlOfWaiting_utils_hr() + ". Setting this different from zero is " +

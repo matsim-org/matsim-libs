@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.network.Link;
  * @author kainagel
  *
  */
-final class DefaultTurnAcceptanceLogic implements TurnAcceptanceLogic {
+public final class DefaultTurnAcceptanceLogic implements TurnAcceptanceLogic {
 	private static final Logger log = Logger.getLogger( DefaultTurnAcceptanceLogic.class) ;
 	
 	@Override

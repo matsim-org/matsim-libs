@@ -29,7 +29,8 @@
 		<param name="maxWalkDistance" value="500.0" />
 
 		<!-- Number of threads used for parallel evaluation of request insertion into existing schedules. If unset, the number of threads is equal to the number of logical cores available to JVM. -->
-		<param name="numberOfThreads" value="7" />
+		<!-- Commenting it out to make use of all available cores -->
+		<!--param name="numberOfThreads" value="7" /-->
 
 		<!-- Operational Scheme, either door2door or stationbased. door2door by default -->
 		<param name="operationalScheme" value="door2door" />

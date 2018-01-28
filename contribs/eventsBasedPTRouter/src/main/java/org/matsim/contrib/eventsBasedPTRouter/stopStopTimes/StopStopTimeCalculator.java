@@ -1,8 +1,12 @@
 package org.matsim.contrib.eventsBasedPTRouter.stopStopTimes;
 
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Singleton;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.config.Config;
@@ -19,8 +23,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler {
+@Singleton
+public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler, Provider<StopStopTime> {
 	
 	private final Map<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, StopStopTimeData>> stopStopTimes = new HashMap<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, StopStopTimeData>>(5000);
 	private final Map<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, Double>> scheduledStopStopTimes = new HashMap<Id<TransitStopFacility>, Map<Id<TransitStopFacility>, Double>>(5000);
@@ -30,8 +34,10 @@ public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHand
 	private boolean useVehicleIds = true;
 	
 	//Constructors
-	public StopStopTimeCalculator(final TransitSchedule transitSchedule, final Config config) {
+	@Inject
+	public StopStopTimeCalculator(final TransitSchedule transitSchedule, final Config config, EventsManager eventsManager) {
 		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
+		eventsManager.addHandler(this);
 	}
 	public StopStopTimeCalculator(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
 		this.timeSlot = timeSlot;
@@ -77,22 +83,6 @@ public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHand
 	}
 		
 	//Methods
-	public StopStopTime getStopStopTimes() {
-		return new StopStopTime() {
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-			@Override
-			public double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
-				return StopStopTimeCalculator.this.getStopStopTime(stopOId, stopDId, time);
-			}
-			@Override
-			public double getStopStopTimeVariance(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
-				return StopStopTimeCalculator.this.getStopStopTimeVariance(stopOId, stopDId, time);
-			}
-		};
-	}
 	private double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
 		StopStopTimeData stopStopTimeData = stopStopTimes.get(stopOId).get(stopDId);
 		if(stopStopTimeData.getNumData((int) (time/timeSlot))==0)
@@ -130,5 +120,23 @@ public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHand
 	}
 	public void setUseVehicleIds(boolean useVehicleIds) {
 		this.useVehicleIds = useVehicleIds;
+	}
+
+	@Override
+	public StopStopTime get() {
+		return new StopStopTime() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+			@Override
+			public double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+				return StopStopTimeCalculator.this.getStopStopTime(stopOId, stopDId, time);
+			}
+			@Override
+			public double getStopStopTimeVariance(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+				return StopStopTimeCalculator.this.getStopStopTimeVariance(stopOId, stopDId, time);
+			}
+		};
 	}
 }
