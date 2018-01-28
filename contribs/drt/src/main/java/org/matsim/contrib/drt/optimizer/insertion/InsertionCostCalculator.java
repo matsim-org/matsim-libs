@@ -22,7 +22,7 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
-import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
@@ -34,7 +34,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
  * @author michalm
  */
 public class InsertionCostCalculator {
-	private static final double INFEASIBLE_SOLUTION_COST = Double.MAX_VALUE;
+	public static final double INFEASIBLE_SOLUTION_COST = Double.MAX_VALUE;
 
 	private final double stopDuration;
 	private final double maxWaitTime;
