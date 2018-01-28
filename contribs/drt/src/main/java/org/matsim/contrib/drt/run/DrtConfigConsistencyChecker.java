@@ -46,5 +46,8 @@ public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
 			throw new RuntimeException(
 					DrtConfigGroup.NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
 		}
+		if (config.qsim().getNumberOfThreads() != 1) {
+			throw new RuntimeException("Only a single-threaded QSim allowed");
+		}
 	}
 }
