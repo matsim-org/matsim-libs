@@ -49,14 +49,12 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
 		pathDataProvider.precalculatePathData(drtRequest, vEntries);
 		return forkJoinPool.submit(() -> vEntries.parallelStream()//
-				.map(v -> findBestInsertionImpl(drtRequest, v))//
+				.map(v -> new SingleVehicleInsertionProblem(pathDataProvider, insertionCostCalculator)
+						.findBestInsertion(drtRequest, v))//
+				.filter(Optional::isPresent)//
+				.map(Optional::get)//
 				.min(Comparator.comparing(i -> i.cost)))//
 				.join();
-	}
-
-	private BestInsertion findBestInsertionImpl(DrtRequest drtRequest, Entry vEntry) {
-		return new SingleVehicleInsertionProblem(pathDataProvider, insertionCostCalculator)
-				.findBestInsertion(drtRequest, vEntry);
 	}
 
 	public void shutdown() {

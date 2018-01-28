@@ -51,7 +51,10 @@ public class SequentialMultiVehicleInsertionProblem implements MultiVehicleInser
 
 	@Override
 	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
-		return vEntries.stream().map(v -> insertionProblem.findBestInsertion(drtRequest, v))
+		return vEntries.stream()//
+				.map(v -> insertionProblem.findBestInsertion(drtRequest, v))//
+				.filter(Optional::isPresent)//
+				.map(Optional::get)//
 				.min(Comparator.comparing(i -> i.cost));
 	}
 }
