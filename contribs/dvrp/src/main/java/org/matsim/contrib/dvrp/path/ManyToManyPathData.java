@@ -19,6 +19,7 @@
 package org.matsim.contrib.dvrp.path;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -95,10 +96,13 @@ public class ManyToManyPathData {
 	}
 
 	public Map<Id<Link>, PathData> getOutgoingPathData(Id<Link> fromLink, double startTime) {
-		return tables[discretizer.getIdx(startTime)].row(fromLink);
+		// to avoid delegation via Collections.unmodifiableMap(), one could change ArrayTable to ImmutableTable
+		// (guava would likely choose DenseImmutableTable instead of SparseImmutableTable -- though no explicit choice)
+		// same for getIncomingPathData
+		return Collections.unmodifiableMap(tables[discretizer.getIdx(startTime)].row(fromLink));
 	}
 
 	public Map<Id<Link>, PathData> getIncomingPathData(Id<Link> toLink, double startTime) {
-		return tables[discretizer.getIdx(startTime)].column(toLink);
+		return Collections.unmodifiableMap(tables[discretizer.getIdx(startTime)].column(toLink));
 	}
 }
