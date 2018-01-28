@@ -21,12 +21,11 @@ package org.matsim.contrib.bicycle.run;
 import static org.junit.Assert.assertEquals;
 
 import org.apache.log4j.Logger;
-import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
@@ -34,27 +33,117 @@ import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
  * @author dziemke
  */
 public class BicycleTest {
-	private static final Logger log = Logger.getLogger(BicycleTest.class);
+	private static final Logger LOG = Logger.getLogger(BicycleTest.class);
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
-
-	@Ignore
-	// After several alterations in bicycle code, this test needs to be redone
+	
 	@Test
-	public final void test() {
-		
-		// This works when the data is stored under "/matsim/contribs/bicycle/src/main/resources/bicycle_example"
-		Config config = ConfigUtils.loadConfig("bicycle_example/config.xml", new BicycleConfigGroup());
+	public void testA() {
+		String configFile = "./src/main/resources/bicycle_example/config-a.xml";
+		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setLastIteration(0);
 		
-		try {
-			new RunBicycleExample().run(config);
-		} catch (Exception e) {
-			e.printStackTrace();
-			Assert.fail("Something did not work") ;
-		}
+		new RunBicycleExample().run(config);
 
-		log.info("Checking MATSim events file ...");
+		LOG.info("Checking MATSim events file ...");
+		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+		assertEquals("Different event files.", EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew), 0);
+	}
+	
+	@Test
+	public void testB() {
+		String configFile = "./src/main/resources/bicycle_example/config-b.xml";
+		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setLastIteration(0);
+		
+		new RunBicycleExample().run(config);
+
+		LOG.info("Checking MATSim events file ...");
+		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+		assertEquals("Different event files.", EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew), 0);
+	}
+	
+	@Test
+	public void testC() {
+		String configFile = "./src/main/resources/bicycle_example/config-c.xml";
+		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setLastIteration(0);
+		
+		new RunBicycleExample().run(config);
+
+		LOG.info("Checking MATSim events file ...");
+		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+		assertEquals("Different event files.", EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew), 0);
+	}
+	
+	@Test
+	public void testD() {
+		String configFile = "./src/main/resources/bicycle_example/config-d.xml";
+		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setLastIteration(0);
+		
+		new RunBicycleExample().run(config);
+
+		LOG.info("Checking MATSim events file ...");
+		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+		assertEquals("Different event files.", EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew), 0);
+	}
+	
+	@Test
+	public void testE() {
+		String configFile = "./src/main/resources/bicycle_example/config-e.xml";
+		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setLastIteration(0);
+		
+		new RunBicycleExample().run(config);
+
+		LOG.info("Checking MATSim events file ...");
+		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+		assertEquals("Different event files.", EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew), 0);
+	}
+	
+	@Test
+	public void testF() {
+		String configFile = "./src/main/resources/bicycle_example/config-f.xml";
+		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setLastIteration(0);
+		
+		new RunBicycleExample().run(config);
+
+		LOG.info("Checking MATSim events file ...");
+		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
+		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
+		assertEquals("Different event files.", EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew), 0);
+	}
+	
+	@Test
+	public void testA10It() {
+		String configFile = "./src/main/resources/bicycle_example/config-a-10it.xml";
+		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setLastIteration(10);
+		
+		new RunBicycleExample().run(config);
+
+		LOG.info("Checking MATSim events file ...");
 		final String eventsFilenameReference = utils.getInputDirectory() + "output_events.xml.gz";
 		final String eventsFilenameNew = utils.getOutputDirectory() + "output_events.xml.gz";
 		assertEquals("Different event files.", EventsFileComparator.compare(eventsFilenameReference, eventsFilenameNew), 0);

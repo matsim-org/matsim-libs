@@ -36,8 +36,8 @@ import org.matsim.vehicles.VehicleUtils;
 public class RunBicycleExample {
 
 	public static void main(String[] args) {
-		// This works when the data is stored under "/matsim/contribs/bicycle/src/main/resurces/bicycle_example"
-		Config config = ConfigUtils.loadConfig("bicycle_example/config.xml", new BicycleConfigGroup());
+		// This works when the data is stored under "/matsim/contribs/bicycle/src/main/resources/bicycle_example"
+		Config config = ConfigUtils.loadConfig("bicycle_example/config-a-10it.xml", new BicycleConfigGroup());
 		new RunBicycleExample().run(config);
 	}
 
@@ -45,7 +45,6 @@ public class RunBicycleExample {
 //		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 		config.global().setNumberOfThreads(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(0);
 		
 		// New, yet to be applied
 		config.plansCalcRoute().setRoutingRandomness(0.2);
@@ -60,7 +59,8 @@ public class RunBicycleExample {
 
 		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
 		bicycle.setMaximumVelocity(30.0/3.6);
-		bicycle.setPcuEquivalents(0.0);
+//		bicycle.setPcuEquivalents(0.0);
+		bicycle.setPcuEquivalents(0.25);
 		scenario.getVehicles().addVehicleType(bicycle);
 
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);

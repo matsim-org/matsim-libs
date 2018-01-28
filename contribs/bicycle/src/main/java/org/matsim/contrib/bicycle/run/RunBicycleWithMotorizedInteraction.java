@@ -33,19 +33,19 @@ import org.matsim.vehicles.VehicleUtils;
 /**
  * @author dziemke
  */
-public class BicycleEquil {
+public class RunBicycleWithMotorizedInteraction {
 
 	public static void main(String[] args) {
 		// This works when the data is stored under "/matsim/contribs/bicycle/src/main/resurces/bicycle_example"
-		Config config = ConfigUtils.loadConfig("../../../shared-svn/studies/countries/de/berlin-bike/equil/config-a-motor.xml", new BicycleConfigGroup());
-		new BicycleEquil().run(config);
+		Config config = ConfigUtils.loadConfig("bicycle_example/config-a-motor.xml", new BicycleConfigGroup());
+		config.controler().setLastIteration(10);
+		new RunBicycleWithMotorizedInteraction().run(config);
 	}
 
 	public void run(Config config) {
 //		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 		config.global().setNumberOfThreads(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setLastIteration(10);
 		
 		// New, yet to be applied
 		config.plansCalcRoute().setRoutingRandomness(0.2);
@@ -60,6 +60,7 @@ public class BicycleEquil {
 
 		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
 		bicycle.setMaximumVelocity(30.0/3.6);
+//		bicycle.setPcuEquivalents(0.0);
 		bicycle.setPcuEquivalents(0.25);
 		scenario.getVehicles().addVehicleType(bicycle);
 
