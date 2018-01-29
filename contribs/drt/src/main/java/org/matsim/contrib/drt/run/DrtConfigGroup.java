@@ -42,19 +42,18 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	public static final String REBALANCING_INTERVAL = "rebalancingInterval";
 	public static final String IDLE_VEHICLES_RETURN_TO_DEPOTS = "idleVehiclesReturnToDepots";
-	private static final String OPERATIONAL_SCHEME = "operationalScheme";
+	public static final String OPERATIONAL_SCHEME = "operationalScheme";
 
-	private static final String MAX_WALK_DISTANCE = "maxWalkDistance";
-	private static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
-	private static final String ESTIMATED_BEELINE_DISTANCE_FACTOR = "estimatedBeelineDistanceFactor";
+	public static final String MAX_WALK_DISTANCE = "maxWalkDistance";
+	public static final String ESTIMATED_DRT_SPEED = "estimatedDrtSpeed";
+	public static final String ESTIMATED_BEELINE_DISTANCE_FACTOR = "estimatedBeelineDistanceFactor";
 
 	public static final String VEHICLES_FILE = "vehiclesFile";
-	private static final String TRANSIT_STOP_FILE = "transitStopFile";
-	private static final String PLOT_CUST_STATS = "writeDetailedCustomerStats";
-	private static final String PLOT_VEH_STATS = "writeDetailedVehicleStats";
-	private static final String PRINT_WARNINGS = "plotDetailedWarnings";
-	private static final String NUMBER_OF_THREADS = "numberOfThreads";
-	private static final String K_NEAREST_VEHICLES = "kNearestVehiclesToFilter";
+	public static final String TRANSIT_STOP_FILE = "transitStopFile";
+	public static final String PLOT_CUST_STATS = "writeDetailedCustomerStats";
+	public static final String PLOT_VEH_STATS = "writeDetailedVehicleStats";
+	public static final String PRINT_WARNINGS = "plotDetailedWarnings";
+	public static final String NUMBER_OF_THREADS = "numberOfThreads";
 
 	private double stopDuration = Double.NaN;// seconds
 	private double maxWaitTime = Double.NaN;// seconds
@@ -83,8 +82,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private boolean plotDetailedVehicleStats = false;
 	private boolean printDetailedWarnings = false;
 	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
-
-	private int kNearestVehicles = 0;
 
 	public enum OperationalScheme {
 		stationbased, door2door
@@ -137,8 +134,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 						+ "If unset, the number of threads is equal to the number of logical cores available to JVM.");
 		map.put(PRINT_WARNINGS,
 				"Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.");
-		map.put(K_NEAREST_VEHICLES,
-				"Filters the k nearest vehicles to the request. Speeds up simulation with big fleets, but could lead to a worse solution. Default: k==0 (no filtering used)");
 		return map;
 	}
 
@@ -195,23 +190,6 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	@StringGetter(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE)
 	public boolean isChangeStartLinkToLastLinkInSchedule() {
 		return changeStartLinkToLastLinkInSchedule;
-	}
-
-	/**
-	 * @return the kNearestVehicles
-	 */
-	@StringGetter(K_NEAREST_VEHICLES)
-	public int getKNearestVehicles() {
-		return kNearestVehicles;
-	}
-
-	/**
-	 * @param kNearestVehicles
-	 *            the kNearestVehicles to set
-	 */
-	@StringSetter(K_NEAREST_VEHICLES)
-	public void setkNearestVehicles(int kNearestVehicles) {
-		this.kNearestVehicles = kNearestVehicles;
 	}
 
 	@StringSetter(CHANGE_START_LINK_TO_LAST_LINK_IN_SCHEDULE)

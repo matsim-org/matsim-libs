@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus;
+package org.matsim.contrib.minibus.raptor;
 
 import java.util.Arrays;
 import java.util.Collection;

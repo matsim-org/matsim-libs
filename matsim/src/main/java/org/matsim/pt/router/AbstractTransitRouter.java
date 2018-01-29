@@ -100,6 +100,7 @@ public class AbstractTransitRouter {
 		// check if first leg extends walking distance
 		if (p.getRoute().get(0).getRouteTaken() == null) {
 			// route starts with transfer - extend initial walk to that stop
+			//TODO: what if first leg extends the walking distance to more than first routeSegment i.e., (accessLeg, transfer, transfer ...). Amit Jan'18
 			accessLeg = createTransitWalkLeg(fromCoord, p.getRoute().get(0).getToStop().getCoord());
 			p.getRoute().remove(0);
 		} else {

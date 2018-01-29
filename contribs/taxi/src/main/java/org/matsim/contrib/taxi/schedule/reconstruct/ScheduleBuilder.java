@@ -22,10 +22,16 @@ package org.matsim.contrib.taxi.schedule.reconstruct;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.data.FleetImpl;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.data.VehicleImpl;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.taxi.data.TaxiRequest;
-import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
+import org.matsim.contrib.taxi.schedule.TaxiEmptyDriveTask;
+import org.matsim.contrib.taxi.schedule.TaxiOccupiedDriveTask;
+import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
+import org.matsim.contrib.taxi.schedule.TaxiStayTask;
 import org.matsim.contrib.taxi.schedule.reconstruct.StayRecorder.Stay;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 
@@ -60,8 +66,8 @@ public class ScheduleBuilder {
 
 			case TaxiActionCreator.DROPOFF_ACTIVITY_TYPE:
 			case "PassengerDropoff":// old naming (TODO to be removed soon)
-				currentRequest.setToLink(stay.link);// TODO this should be moved to RequestRecorder once the events are
-													// re-ordered
+				// TODO setting 'toLink' should be moved to RequestRecorder once the events are re-ordered
+				((TaxiRequestWithModifiableToLink)currentRequest).toLink = stay.link;
 				vehicle.getSchedule().addTask(new TaxiDropoffTask(stay.startTime, stay.endTime, currentRequest));
 
 				currentRequest = null;

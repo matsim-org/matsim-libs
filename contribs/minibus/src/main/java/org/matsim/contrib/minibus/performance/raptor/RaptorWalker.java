@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.apache.log4j.Logger;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.router.InitialNode;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitPassengerRoute;
@@ -190,10 +191,11 @@ public class RaptorWalker {
 
 			// increase the transfers and proceed
 			if(nTransfers < this.maxTransfers){
-				nTransfers++;
+//				nTransfers++;
 
 				// yyyy to me, this looks like in the end we are now going 0, 2, 4, 6, since we are incrementing both here and in
 				// the for loop.  ????  kai, jun'16
+				//right, there is no reason to increase the counter twice. Commenting one. Amit Jan'18
 
 				this.checkTransferTransitStops();
 			}
@@ -344,7 +346,7 @@ public class RaptorWalker {
 			SourcePointer source = sourcePointerTransitStops[indexOfToTransitStop];
 			if (source.source != null) {
 				// something found - backtrace
-				List<RouteSegment> route = this.returnBacktracedRouteFromSourcePointer(source);
+				List<RouteSegment> route = this.returnBacktracedRouteFromSourcePointer(source, fromTransitStops);
 				if (!route.isEmpty()) {
 					// there is a route with this number of transfers to that stop
 					routesFound.add(route);
@@ -413,49 +415,72 @@ public class RaptorWalker {
 		return this.raptorSearchData.transitStopFacility2Index.get(fromTransitStop);
 	}
 
-	private List<RouteSegment> returnBacktracedRouteFromSourcePointer(SourcePointer sourcePointer) {
+	private List<RouteSegment> returnBacktracedRouteFromSourcePointer(SourcePointer sourcePointer, Map<TransitStopFacility, InitialNode> fromTransitStops) {
 		List<RouteSegment> route = new LinkedList<>();
 		
 		SourcePointer currentSourcePointer = sourcePointer;
 		RouteSegment lastRouteSegment = null;
 		
-		while (currentSourcePointer.source != null
-				&&
-				// following additional condition is required to exclude the case in which origin and destination are same transit stop (source.source.indexOfTargetRouteStop=-1).
-				// This can be verified by something like "this.raptorSearchData.routeStops[source.indexOfTargetRouteStop].indexOfStopFacility != indexOfToTransitStop"
-				// in getBestRouteFoundSoFar(...) method. However, if above condition is used in "getBestRouteFoundSoFar",
-				// it still throws exception here, so, excluding such situations here. Amit Jan'18
-				currentSourcePointer.source.indexOfTargetRouteStop >= 0
-				) {
-			RouteStopEntry fromRouteStopEntry = this.raptorSearchData.routeStops[currentSourcePointer.source.indexOfTargetRouteStop];
-			TransitStopFacility fromTransitStop = this.raptorSearchData.stops[fromRouteStopEntry.indexOfStopFacility].transitStopFacility;
+		while (currentSourcePointer.source != null) {
 
 			RouteStopEntry toRouteStopEntry = this.raptorSearchData.routeStops[currentSourcePointer.indexOfTargetRouteStop];
-			TransitStopFacility toTransitStop = this.raptorSearchData.stops[toRouteStopEntry.indexOfStopFacility].transitStopFacility;
+			TransitStopEntry transitStopEntry = this.raptorSearchData.stops[toRouteStopEntry.indexOfStopFacility];
+			TransitStopFacility toTransitStop = transitStopEntry.transitStopFacility;
 
-			double travelTime = currentSourcePointer.earliestArrivalTime - currentSourcePointer.source.earliestArrivalTime;
-
-			RouteSegment routeSegment;
-			if (currentSourcePointer.transfer) {
-				if (lastRouteSegment != null) {
-					if (lastRouteSegment.getRouteTaken() == null) {
-						// had been a transfer, too - merge both
-						toTransitStop = lastRouteSegment.getToStop();
-						travelTime += lastRouteSegment.getTravelTime();
-						route.remove(0);
+			if (currentSourcePointer.source.indexOfTargetRouteStop == -1 ){
+				if (currentSourcePointer.transfer) {
+					// access_stop and transfer
+					TransitStopFacility fromTransitStop = null;
+					double dist = Double.POSITIVE_INFINITY;
+					for (TransitStopFacility possibleFromStop : fromTransitStops.keySet()){ // an alternative would be to get the transfer stops at _toTransitStop_ and match with fromStops. Amit Jan'18
+						double tempDist = NetworkUtils.getEuclideanDistance(possibleFromStop.getCoord().getX(), possibleFromStop.getCoord().getY(), toTransitStop.getCoord().getX(), toTransitStop.getCoord().getY());
+						if (tempDist < dist) {
+							dist = tempDist;
+							fromTransitStop = possibleFromStop;
+						}
 					}
-				}
-				routeSegment = new RouteSegment(fromTransitStop, toTransitStop, travelTime, null, null);
-			} else {
-				RouteStopEntry routeStopEntry = this.raptorSearchData.routeStops[currentSourcePointer.indexOfTargetRouteStop];
-				RouteEntry routeEntry = this.raptorSearchData.routes[routeStopEntry.indexOfRoute];
-				routeSegment = new RouteSegment(fromTransitStop, toTransitStop, travelTime, routeEntry.lineId, routeEntry.routeId);
-			}
-			route.add(0, routeSegment);
 
+					if (fromTransitStop!=null) {
+						RouteSegment routeSegment = new RouteSegment(fromTransitStop,
+								toTransitStop,
+								this.raptorSearchData.transfers[getIndexForTransitStop(fromTransitStop)].transferTime,
+								null,
+								null);
+						route.add(0,routeSegment);
+					}
+				} else {
+					// this additional condition is required to exclude the case in which origin and destination are same transit stop (source.source.indexOfTargetRouteStop=-1).
+					// This can be verified by something like "this.raptorSearchData.routeStops[source.indexOfTargetRouteStop].indexOfStopFacility != indexOfToTransitStop"
+					// in getBestRouteFoundSoFar(...) method. However, if above condition is used in "getBestRouteFoundSoFar",
+					// it still throws exception here, so, excluding such situations here. Amit Jan'18
+				}
+			} else {
+				RouteStopEntry fromRouteStopEntry = this.raptorSearchData.routeStops[currentSourcePointer.source.indexOfTargetRouteStop];
+				TransitStopFacility fromTransitStop = this.raptorSearchData.stops[fromRouteStopEntry.indexOfStopFacility].transitStopFacility;
+
+				double travelTime = currentSourcePointer.earliestArrivalTime - currentSourcePointer.source.earliestArrivalTime;
+
+				RouteSegment routeSegment;
+				if (currentSourcePointer.transfer) {
+					if (lastRouteSegment != null) {
+						if (lastRouteSegment.getRouteTaken() == null) {
+							// had been a transfer, too - merge both
+							toTransitStop = lastRouteSegment.getToStop();
+							travelTime += lastRouteSegment.getTravelTime();
+							route.remove(0);
+						}
+					}
+					routeSegment = new RouteSegment(fromTransitStop, toTransitStop, travelTime, null, null);
+				} else {
+					RouteStopEntry routeStopEntry = this.raptorSearchData.routeStops[currentSourcePointer.indexOfTargetRouteStop];
+					RouteEntry routeEntry = this.raptorSearchData.routes[routeStopEntry.indexOfRoute];
+					routeSegment = new RouteSegment(fromTransitStop, toTransitStop, travelTime, routeEntry.lineId, routeEntry.routeId);
+				}
+				route.add(0, routeSegment);
+				lastRouteSegment = routeSegment;
+			}
 			// set pointer to next alighting stop, skip transfers
 			currentSourcePointer = currentSourcePointer.source;
-			lastRouteSegment = routeSegment;
 		}
 		
 		return route;

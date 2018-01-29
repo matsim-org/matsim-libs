@@ -78,7 +78,7 @@ public final class GridUtils {
 
 		GeometryFactory factory = new GeometryFactory();
 
-		ActivityFacilitiesImpl measuringPoints = new ActivityFacilitiesImpl("accessibility measuring points");
+		ActivityFacilitiesImpl measuringPoints = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities("Accessibility measuring points");
 		Envelope env = boundary.getEnvelopeInternal();
 
 		// goes step by step from the min x and y coordinate to max x and y coordinate

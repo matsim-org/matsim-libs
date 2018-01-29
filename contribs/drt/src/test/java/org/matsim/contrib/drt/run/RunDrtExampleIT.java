@@ -33,10 +33,6 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
  * @author  jbischoff
- *
- */
-/**
- *
  */
 public class RunDrtExampleIT {
 	@Rule

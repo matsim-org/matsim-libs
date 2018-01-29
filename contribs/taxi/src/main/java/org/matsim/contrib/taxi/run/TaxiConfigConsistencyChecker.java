@@ -32,5 +32,8 @@ public class TaxiConfigConsistencyChecker implements ConfigConsistencyChecker {
 		if (taxiCfg.isVehicleDiversion() && !taxiCfg.isOnlineVehicleTracker()) {
 			throw new RuntimeException("Diversion requires online tracking");
 		}
+		if (config.qsim().getNumberOfThreads() != 1) {
+			throw new RuntimeException("Only a single-threaded QSim allowed");
+		}
 	}
 }
