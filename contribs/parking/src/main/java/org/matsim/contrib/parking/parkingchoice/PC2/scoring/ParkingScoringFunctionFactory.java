@@ -38,10 +38,10 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 public class ParkingScoringFunctionFactory implements ScoringFunctionFactory {
 
 	private ScoringFunctionFactory orginalScoringFunctionFactory;
-	private ParkingScoreManager parkingScoreManager;
+	private ParkingScore parkingScoreManager;
 
 	public ParkingScoringFunctionFactory(
-			ScoringFunctionFactory orginalScoringFunction, ParkingScoreManager parkingScoreManager) {
+			ScoringFunctionFactory orginalScoringFunction, ParkingScore parkingScoreManager) {
 		this.orginalScoringFunctionFactory = orginalScoringFunction;
 		this.parkingScoreManager = parkingScoreManager;
 	}

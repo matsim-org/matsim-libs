@@ -19,105 +19,46 @@
 
 package org.matsim.contrib.drt.optimizer.insertion;
 
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.concurrent.ForkJoinPool;
 
 import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
-import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
  */
-public class ParallelMultiVehicleInsertionProblem {
-	private static class TaskGroup {
-		private final List<Entry> vEntries = new ArrayList<>();
-		private final MultiVehicleInsertionProblem multiInsertionProblem;
+public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
+	private final PrecalculatablePathDataProvider pathDataProvider;
+	private final InsertionCostCalculator insertionCostCalculator;
+	private final ForkJoinPool forkJoinPool;
 
-		private TaskGroup(SingleVehicleInsertionProblem singleInsertionProblem) {
-			this.multiInsertionProblem = new MultiVehicleInsertionProblem(singleInsertionProblem);
-		}
-
-		private BestInsertion findBestInsertion(DrtRequest drtRequest) {
-			BestInsertion bestInsertion = multiInsertionProblem.findBestInsertion(drtRequest, vEntries);
-			vEntries.clear();
-			return bestInsertion;
-		}
+	public ParallelMultiVehicleInsertionProblem(PrecalculatablePathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
+			MobsimTimer timer) {
+		this.pathDataProvider = pathDataProvider;
+		insertionCostCalculator = new InsertionCostCalculator(drtCfg, timer);
+		forkJoinPool = new ForkJoinPool(drtCfg.getNumberOfThreads());
 	}
 
-	private final int threads;
-	private final TaskGroup[] taskGroups;
-	private final ExecutorService executorService;
-	private final DrtVehicleFilter filter;
-
-	public ParallelMultiVehicleInsertionProblem(SingleVehicleInsertionProblem[] singleInsertionProblems,
-			DrtVehicleFilter filter) {
-		threads = singleInsertionProblems.length;
-		this.filter = filter;
-		this.taskGroups = new TaskGroup[threads];
-		for (int i = 0; i < threads; i++) {
-			taskGroups[i] = new TaskGroup(singleInsertionProblems[i]);
-		}
-		executorService = Executors.newFixedThreadPool(threads);
-	}
-
-	public BestInsertion findBestInsertion(DrtRequest drtRequest, VehicleData vData) {
-		List<Entry> filteredVehicles = filter.applyFilter(drtRequest, vData);
-		divideTasksIntoGroups(filteredVehicles);
-		return findBestInsertion(submitTasks(drtRequest));
-	}
-
-	private void divideTasksIntoGroups(List<Entry> filteredVehicles) {
-		Iterator<Entry> vEntryIter = filteredVehicles.iterator();
-		int div = filteredVehicles.size() / threads;
-		int mod = filteredVehicles.size() % threads;
-
-		for (int i = 0; i < threads; i++) {
-			int count = div + (i < mod ? 1 : 0);
-			for (int j = 0; j < count; j++) {
-				taskGroups[i].vEntries.add(vEntryIter.next());
-			}
-		}
-
-		if (vEntryIter.hasNext()) {
-			throw new RuntimeException();
-		}
-	}
-
-	private List<Future<BestInsertion>> submitTasks(final DrtRequest drtRequest) {
-		List<Future<BestInsertion>> bestInsertionFutures = new ArrayList<>();
-		for (int i = 0; i < threads; i++) {
-			final TaskGroup taskGroup = taskGroups[i];
-			bestInsertionFutures.add(executorService.submit(new Callable<BestInsertion>() {
-				public BestInsertion call() {
-					return taskGroup.findBestInsertion(drtRequest);
-				}
-			}));
-		}
-
-		return bestInsertionFutures;
-	}
-
-	private BestInsertion findBestInsertion(List<Future<BestInsertion>> bestInsertionFutures) {
-		double minCost = Double.MAX_VALUE;
-		BestInsertion fleetBestInsertion = null;
-		for (Future<BestInsertion> bestInsertionFuture : bestInsertionFutures) {
-			try {
-				BestInsertion bestInsertion = bestInsertionFuture.get();
-				if (bestInsertion != null && bestInsertion.cost < minCost) {
-					fleetBestInsertion = bestInsertion;
-					minCost = bestInsertion.cost;
-				}
-			} catch (InterruptedException | ExecutionException e) {
-				throw new RuntimeException(e);
-			}
-		}
-		return fleetBestInsertion;
+	@Override
+	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
+		pathDataProvider.precalculatePathData(drtRequest, vEntries);
+		return forkJoinPool.submit(() -> vEntries.parallelStream()//
+				.map(v -> new SingleVehicleInsertionProblem(pathDataProvider, insertionCostCalculator)
+						.findBestInsertion(drtRequest, v))//
+				.filter(Optional::isPresent)//
+				.map(Optional::get)//
+				.min(Comparator.comparing(i -> i.cost)))//
+				.join();
 	}
 
 	public void shutdown() {
-		executorService.shutdown();
+		pathDataProvider.shutdown();
+		forkJoinPool.shutdown();
 	}
 }

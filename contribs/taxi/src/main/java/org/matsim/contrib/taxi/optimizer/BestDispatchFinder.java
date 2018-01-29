@@ -1,6 +1,7 @@
 package org.matsim.contrib.taxi.optimizer;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -60,15 +61,15 @@ public class BestDispatchFinder {
 
 	// for immediate requests only
 	// minimize TW
-	public Dispatch<TaxiRequest> findBestVehicleForRequest(TaxiRequest req, Iterable<? extends Vehicle> vehicles) {
-		return findBestVehicle(req, vehicles, LinkProviders.REQUEST_TO_FROM_LINK);
+	public Dispatch<TaxiRequest> findBestVehicleForRequest(TaxiRequest req, Stream<? extends Vehicle> vehicles) {
+		return findBestVehicle(req, vehicles, r -> r.getFromLink());
 	}
 
 	// We use many-to-one forward search. Therefore, we cannot assess all vehicles.
 	// However, that would be possible if one-to-many backward search were used instead.
 	// TODO intuitively, many-to-one is slower, some performance tests needed before switching to
 	// one-to-many
-	public <D> Dispatch<D> findBestVehicle(D destination, Iterable<? extends Vehicle> vehicles,
+	public <D> Dispatch<D> findBestVehicle(D destination, Stream<? extends Vehicle> vehicles,
 			LinkProvider<D> destinationToLink) {
 		double currTime = timer.getTimeOfDay();
 		Link toLink = destinationToLink.apply(destination);
@@ -76,10 +77,9 @@ public class BestDispatchFinder {
 
 		Map<Id<Node>, Vehicle> nodeToVehicle = Maps.newHashMapWithExpectedSize(EXPECTED_NEIGHBOURHOOD_SIZE);
 		Map<Id<Node>, InitialNode> initialNodes = Maps.newHashMapWithExpectedSize(EXPECTED_NEIGHBOURHOOD_SIZE);
-		for (Vehicle veh : vehicles) {
+		vehicles.forEach(veh -> {
 			LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh);
 			if (departure != null) {
-
 				Node vehNode;
 				double delay = departure.time - currTime;
 				if (departure.link == toLink) {
@@ -99,7 +99,7 @@ public class BestDispatchFinder {
 					nodeToVehicle.put(vehNode.getId(), veh);
 				}
 			}
-		}
+		});
 
 		if (initialNodes.isEmpty()) {
 			return null;
@@ -122,18 +122,18 @@ public class BestDispatchFinder {
 
 	// for immediate requests only
 	// minimize TP
-	public Dispatch<TaxiRequest> findBestRequestForVehicle(Vehicle veh, Iterable<TaxiRequest> unplannedRequests) {
-		return findBestDestination(veh, unplannedRequests, LinkProviders.REQUEST_TO_FROM_LINK);
+	public Dispatch<TaxiRequest> findBestRequestForVehicle(Vehicle veh, Stream<TaxiRequest> unplannedRequests) {
+		return findBestDestination(veh, unplannedRequests, r -> r.getFromLink());
 	}
 
-	public <D> Dispatch<D> findBestDestination(Vehicle veh, Iterable<D> destinations,
+	public <D> Dispatch<D> findBestDestination(Vehicle veh, Stream<D> destinations,
 			LinkProvider<D> destinationToLink) {
 		LinkTimePair departure = scheduleInquiry.getImmediateDiversionOrEarliestIdleness(veh);
 		Node fromNode = departure.link.getToNode();
 
 		Map<Id<Node>, D> nodeToDestination = Maps.newHashMapWithExpectedSize(EXPECTED_NEIGHBOURHOOD_SIZE);
 		Map<Id<Node>, InitialNode> initialNodes = Maps.newHashMapWithExpectedSize(EXPECTED_NEIGHBOURHOOD_SIZE);
-		for (D loc : destinations) {
+		for (D loc : (Iterable<D>)destinations::iterator) {
 			Link link = destinationToLink.apply(loc);
 
 			if (departure.link == link) {

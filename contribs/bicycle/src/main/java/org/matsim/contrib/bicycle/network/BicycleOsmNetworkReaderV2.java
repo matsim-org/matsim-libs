@@ -89,8 +89,7 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 	public BicycleOsmNetworkReaderV2(final Network network, final CoordinateTransformation transformation, ElevationDataParser elevationDataParser) {
 		this(network, transformation, elevationDataParser, true);
 	}
-
-	public BicycleOsmNetworkReaderV2(final Network network, final CoordinateTransformation transformation, ElevationDataParser elevationDataParser,
+		public BicycleOsmNetworkReaderV2(final Network network, final CoordinateTransformation transformation, ElevationDataParser elevationDataParser,
 			final boolean useHighwayDefaults) {
 		// If "useHighwayDefaults" is set to true, super sets defaults for all "roads" ("motorway" to "residential", except "service")
 		// and all "link roads" and "living_street" (part of "special road types"). Hierachies 1 to 6 are used.
