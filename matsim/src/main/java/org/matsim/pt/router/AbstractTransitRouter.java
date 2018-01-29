@@ -7,6 +7,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.util.TravelTime;
@@ -86,6 +87,7 @@ public class AbstractTransitRouter {
 		// transit walk leg should include additional transfer time; Amit, Aug'17
 		leg.setTravelTime( getTransferTime(null, routeSegement.getFromStop().getCoord(), routeSegement.getToStop().getCoord()) );
 		walkRoute.setTravelTime(getTransferTime(null, routeSegement.getFromStop().getCoord(), routeSegement.getToStop().getCoord()) );
+		walkRoute.setDistance(trConfig.getBeelineDistanceFactor() * NetworkUtils.getEuclideanDistance(routeSegement.fromStop.getCoord(), routeSegement.toStop.getCoord()));
 		leg.setRoute(walkRoute);
 
 		return leg;
