@@ -23,6 +23,7 @@ import java.util.*;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.*;
+import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.contrib.dvrp.schedule.*;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 
@@ -42,7 +43,7 @@ public abstract class AbstractTaxibusOptimizer implements TaxibusOptimizer {
 
 	public AbstractTaxibusOptimizer(TaxibusOptimizerContext optimContext, boolean doUnscheduleAwaitingRequests) {
 		this.optimContext = optimContext;
-		this.unplannedRequests = new TreeSet<>(Requests.ABSOLUTE_COMPARATOR);
+		this.unplannedRequests = new TreeSet<>(PassengerRequests.ABSOLUTE_COMPARATOR);
 		this.doUnscheduleAwaitingRequests = doUnscheduleAwaitingRequests;
 
 		destinationKnown = optimContext.scheduler.getParams().destinationKnown;
