@@ -19,7 +19,9 @@
 
 package org.matsim.contrib.dvrp.schedule;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.apache.log4j.Logger;
@@ -47,9 +49,9 @@ public class ScheduleImpl implements Schedule {
 	public List<? extends Task> getTasks() {
 		return unmodifiableTasks;
 	}
-	
+
 	@Override
-	public Stream<? extends Task> taskStream() {
+	public Stream<? extends Task> tasks() {
 		return tasks.stream();
 	}
 
@@ -118,17 +120,17 @@ public class ScheduleImpl implements Schedule {
 			}
 		}
 
-//		if (taskIdx < taskCount) {
-//			Task nextTask = tasks.get(taskIdx);// currently at taskIdx, but soon at taskIdx+1
-//
-//			if (nextTask.getBeginTime() != endTime) {
-//				throw new IllegalArgumentException();
-//			}
-//
-//			if (Tasks.getBeginLink(nextTask) != endLink) {
-//				throw new IllegalArgumentException();
-//			}
-//		}
+		// if (taskIdx < taskCount) {
+		// Task nextTask = tasks.get(taskIdx);// currently at taskIdx, but soon at taskIdx+1
+		//
+		// if (nextTask.getBeginTime() != endTime) {
+		// throw new IllegalArgumentException();
+		// }
+		//
+		// if (Tasks.getBeginLink(nextTask) != endLink) {
+		// throw new IllegalArgumentException();
+		// }
+		// }
 	}
 
 	@Override

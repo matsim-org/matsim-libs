@@ -19,20 +19,15 @@
 
 package org.matsim.contrib.taxi.schedule;
 
-import java.util.*;
+import java.util.stream.Stream;
 
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.schedule.TaxiTask.TaxiTaskType;
 
 public class TaxiSchedules {
-	public static Iterable<TaxiRequest> getTaxiRequests(Schedule schedule) {
-		List<TaxiRequest> taxiRequests = new ArrayList<>();
-		for (Task t : schedule.getTasks()) {
-			if (((TaxiTask)t).getTaxiTaskType() == TaxiTaskType.PICKUP) {
-				taxiRequests.add(((TaxiPickupTask)t).getRequest());
-			}
-		}
-		return taxiRequests;
+	public static Stream<TaxiRequest> getTaxiRequests(Schedule schedule) {
+		return schedule.tasks().filter(t -> ((TaxiTask)t).getTaxiTaskType() == TaxiTaskType.PICKUP)
+				.map(t -> ((TaxiPickupTask)t).getRequest());
 	}
 }

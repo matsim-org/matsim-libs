@@ -49,13 +49,13 @@ public final class ParkingChoiceSimulation
 
 	
 	
-	private ParkingInfrastructureManager parkingInfrastructureManager;
+	private ParkingInfrastructure parkingInfrastructureManager;
 	private Scenario scenario;
 	private IntegerValueHashMap<Id<Person>> currentPlanElementIndex;
 	private HashMap<Id<Person>, ParkingOperationRequestAttributes> parkingOperationRequestAttributes;
 	private DoubleValueHashMap<Id<Person>> firstDepartureTimeOfDay;
 
-	public ParkingChoiceSimulation(Scenario scenario, ParkingInfrastructureManager parkingInfrastructureManager) {
+	public ParkingChoiceSimulation(Scenario scenario, ParkingInfrastructure parkingInfrastructureManager) {
 		this.scenario = scenario;
 		this.parkingInfrastructureManager = parkingInfrastructureManager;
 	}
