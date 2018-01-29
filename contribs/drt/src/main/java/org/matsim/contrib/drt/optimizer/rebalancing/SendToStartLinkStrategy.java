@@ -19,7 +19,9 @@
 
 package org.matsim.contrib.drt.optimizer.rebalancing;
 
-import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 
@@ -30,11 +32,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
  */
 public class SendToStartLinkStrategy implements RebalancingStrategy {
 	@Override
-	public List<Relocation> calcRelocations(Iterable<? extends Vehicle> rebalancableVehicles, double time) {
-		List<Relocation> relocations = new ArrayList<>();
-		for (Vehicle v : rebalancableVehicles) {
-			relocations.add(new Relocation(v, v.getStartLink()));
-		}
-		return relocations;
+	public List<Relocation> calcRelocations(Stream<? extends Vehicle> rebalancableVehicles, double time) {
+		return rebalancableVehicles.map(v -> new Relocation(v, v.getStartLink())).collect(Collectors.toList());
 	}
 }

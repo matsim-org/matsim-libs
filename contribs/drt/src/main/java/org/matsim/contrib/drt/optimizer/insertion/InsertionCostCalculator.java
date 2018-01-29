@@ -22,24 +22,32 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
-import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.schedule.Schedules;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
  * @author michalm
  */
 public class InsertionCostCalculator {
-	private static final double INFEASIBLE_SOLUTION_COST = Double.MAX_VALUE;
+	public static final double INFEASIBLE_SOLUTION_COST = Double.MAX_VALUE;
 
 	private final double stopDuration;
 	private final double maxWaitTime;
+	private final MobsimTimer timer;
 
-	public InsertionCostCalculator(double stopDuration, double maxWaitTime) {
+	public InsertionCostCalculator(DrtConfigGroup drtConfig, MobsimTimer timer) {
+		this(drtConfig.getStopDuration(), drtConfig.getMaxWaitTime(), timer);
+	}
+
+	public InsertionCostCalculator(double stopDuration, double maxWaitTime, MobsimTimer timer) {
 		this.stopDuration = stopDuration;
 		this.maxWaitTime = maxWaitTime;
+		this.timer = timer;
 	}
 
 	// the main goal - minimise bus operation time
@@ -48,7 +56,7 @@ public class InsertionCostCalculator {
 	// the insertion is invalid if some maxTravel/Wait constraints are not fulfilled
 	// ==> checks if all the constraints are satisfied for all passengers/requests ==> if not ==>
 	// INFEASIBLE_SOLUTION_COST is returned
-	public double calculate(DrtRequest drtRequest, VehicleData.Entry vEntry, Insertion insertion, double currentTime) {
+	public double calculate(DrtRequest drtRequest, VehicleData.Entry vEntry, Insertion insertion) {
 		double pickupDetourTimeLoss = calculatePickupDetourTimeLoss(drtRequest, vEntry, insertion);
 		double dropoffDetourTimeLoss = calculateDropoffDetourTimeLoss(drtRequest, vEntry, insertion);
 
@@ -56,7 +64,7 @@ public class InsertionCostCalculator {
 		double totalTimeLoss = pickupDetourTimeLoss + dropoffDetourTimeLoss;
 
 		boolean constraintsSatisfied = areConstraintsSatisfied(drtRequest, vEntry, insertion, pickupDetourTimeLoss,
-				totalTimeLoss, currentTime);
+				totalTimeLoss);
 		return constraintsSatisfied ? totalTimeLoss : INFEASIBLE_SOLUTION_COST;
 	}
 
@@ -116,7 +124,7 @@ public class InsertionCostCalculator {
 	}
 
 	private boolean areConstraintsSatisfied(DrtRequest drtRequest, VehicleData.Entry vEntry, Insertion insertion,
-			double pickupDetourTimeLoss, double totalTimeLoss, double currentTime) {
+			double pickupDetourTimeLoss, double totalTimeLoss) {
 		// this is what we cannot violate
 		for (int s = insertion.pickupIdx; s < insertion.dropoffIdx; s++) {
 			Stop stop = vEntry.stops.get(s);
@@ -160,7 +168,8 @@ public class InsertionCostCalculator {
 
 		// vehicle's time window cannot be violated
 		DrtStayTask lastTask = (DrtStayTask)Schedules.getLastTask(vEntry.vehicle.getSchedule());
-		double timeSlack = vEntry.vehicle.getServiceEndTime() - 600 - Math.max(lastTask.getBeginTime(), currentTime);
+		double timeSlack = vEntry.vehicle.getServiceEndTime() - 600
+				- Math.max(lastTask.getBeginTime(), timer.getTimeOfDay());
 		if (timeSlack < totalTimeLoss) {
 			return false;
 		}
