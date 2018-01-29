@@ -79,7 +79,7 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 			final CoordinateTransformation coordinateTransformation,
 			final double fraction) {
 		this.write_person_fraction = fraction;
-		this.handler = new PopulationWriterHandlerImplV5(coordinateTransformation);
+		this.handler = new PopulationWriterHandlerImplV6(coordinateTransformation);
 	}
 
 	/**
@@ -148,7 +148,8 @@ public final class StreamingPopulationWriter implements PersonAlgorithm {
 			}
 			@Override
 			public Attributes getAttributes() {
-				throw new RuntimeException( "not implemented" );
+				//A stream written Population cannot contain Population Attributes, only Person Attributes.
+				return new Attributes();
 			}
 
 		} ;

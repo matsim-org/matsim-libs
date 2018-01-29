@@ -50,7 +50,7 @@ import org.matsim.facilities.ActivityFacility;
 public final class AccessibilityCalculator {
 	private static final Logger LOG = Logger.getLogger(AccessibilityCalculator.class);
 
-	private final ActivityFacilitiesImpl measuringPoints;
+	private final ActivityFacilities measuringPoints;
 	private final Map<String, AccessibilityContributionCalculator> calculators = new LinkedHashMap<>();
 	// (test may depend on that this is a "Linked" Hash Map. kai, dec'16)
 	
@@ -62,7 +62,7 @@ public final class AccessibilityCalculator {
 	private final ArrayList<FacilityDataExchangeInterface> zoneDataExchangeListeners = new ArrayList<>();
 	
 
-	public AccessibilityCalculator(Scenario scenario, ActivityFacilitiesImpl measuringPoints) {
+	public AccessibilityCalculator(Scenario scenario, ActivityFacilities measuringPoints) {
 		this.network = scenario.getNetwork();
 		this.measuringPoints = measuringPoints;
 		this.acg = ConfigUtils.addOrGetModule(scenario.getConfig(), AccessibilityConfigGroup.GROUP_NAME, AccessibilityConfigGroup.class);
@@ -83,7 +83,6 @@ public final class AccessibilityCalculator {
 
 		this.walkSpeed_m_h = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
 	}
-	
 	
 	public final void computeAccessibilities(Double departureTime, ActivityFacilities opportunities) {
 		AggregationObject[] aggregatedOpportunities = aggregateOpportunities(opportunities, network);
@@ -162,7 +161,6 @@ public final class AccessibilityCalculator {
 		}
 	}
 	
-	
 	/**
 	 * Aggregates disutilities Vjk to get from node j to all k that are attached to j and assign sum(Vjk) is to node j.
 	 * 
@@ -223,7 +221,6 @@ public final class AccessibilityCalculator {
 		return opportunityClusterMap.values().toArray(new AggregationObject[opportunityClusterMap.size()]);
 	}
 
-
 	private Map<Id<Node>, ArrayList<ActivityFacility>> aggregateMeasurePointsWithSameNearestNode() {
 		Map<Id<Node>,ArrayList<ActivityFacility>> aggregatedOrigins = new ConcurrentHashMap<>();
 
@@ -247,18 +244,15 @@ public final class AccessibilityCalculator {
 		return aggregatedOrigins;
 	}
 
-
-	public final void putAccessibilityContributionCalculator(String mode, AccessibilityContributionCalculator calc) {
-		LOG.info("Adding accessibility calculator for " + mode ) ;
-		Gbl.assertNotNull(calc);
-		this.calculators.put(mode , calc) ;
+	public final void putAccessibilityContributionCalculator(String mode, AccessibilityContributionCalculator calculator) {
+		LOG.info("Adding accessibility contribution calculator for " + mode + ".");
+		Gbl.assertNotNull(calculator);
+		this.calculators.put(mode , calculator) ;
 	}
 
-	
 	public Set<String> getModes() {
 		return this.calculators.keySet() ;
 	}
-	
 	
 	public void addFacilityDataExchangeListener(FacilityDataExchangeInterface listener){
 		this.zoneDataExchangeListeners.add(listener);
