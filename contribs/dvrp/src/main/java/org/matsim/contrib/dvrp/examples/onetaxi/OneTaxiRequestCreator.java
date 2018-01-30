@@ -32,6 +32,6 @@ final class OneTaxiRequestCreator implements PassengerRequestCreator {
 	@Override
 	public OneTaxiRequest createRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
 			double departureTime, double submissionTime) {
-		return new OneTaxiRequest(id, passenger, fromLink, toLink, submissionTime);
+		return new OneTaxiRequest(id, passenger, fromLink, toLink, departureTime, submissionTime);
 	}
 }

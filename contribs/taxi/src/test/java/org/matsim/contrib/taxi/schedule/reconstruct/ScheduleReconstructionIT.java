@@ -139,7 +139,6 @@ public class ScheduleReconstructionIT {
 			// introduced
 			Assert.assertEquals(o.getFromLink(), r.getFromLink());
 			Assert.assertEquals(o.getToLink(), r.getToLink());
-			Assert.assertEquals(o.getQuantity(), r.getQuantity(), 0);
 			Assert.assertEquals(o.getSubmissionTime(), r.getSubmissionTime(), 0);
 			Assert.assertEquals(o.getEarliestStartTime(), r.getEarliestStartTime(), 0);
 			Assert.assertEquals(o.getLatestStartTime(), r.getLatestStartTime(), 0);

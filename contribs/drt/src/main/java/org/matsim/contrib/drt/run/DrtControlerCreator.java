@@ -28,10 +28,9 @@ import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
+import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
+import org.matsim.contrib.drt.optimizer.insertion.PrecalculatablePathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
-import org.matsim.contrib.drt.optimizer.insertion.filter.DrtVehicleFilter;
-import org.matsim.contrib.drt.optimizer.insertion.filter.KNearestVehicleFilter;
-import org.matsim.contrib.drt.optimizer.insertion.filter.NoFilter;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.contrib.drt.scheduler.DrtScheduler;
@@ -72,14 +71,15 @@ public final class DrtControlerCreator {
 
 	public static Controler createControler(Scenario scenario, boolean otfvis) {
 		// yy I know that this one breaks the sequential loading of the building blocks, but I would like to be able
-		// to modify the scenario before I pass it to the controler.  kai, oct'17
+		// to modify the scenario before I pass it to the controler. kai, oct'17
 		adjustConfig(scenario.getConfig());
 		return adjustControler(otfvis, scenario);
 	}
 
 	private static Controler adjustControler(boolean otfvis, Scenario scenario) {
+		DrtConfigGroup drtCfg = DrtConfigGroup.get(scenario.getConfig());
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule(DrtControlerCreator.createModuleForQSimPlugin(),
+		controler.addOverridingModule(new DvrpModule(DrtControlerCreator.createModuleForQSimPlugin(drtCfg),
 				DrtOptimizer.class, DefaultUnplannedRequestInserter.class));
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
@@ -107,7 +107,7 @@ public final class DrtControlerCreator {
 		}
 	}
 
-	public static com.google.inject.AbstractModule createModuleForQSimPlugin() {
+	public static com.google.inject.AbstractModule createModuleForQSimPlugin(DrtConfigGroup drtCfg) {
 		return new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
@@ -119,13 +119,14 @@ public final class DrtControlerCreator {
 				bind(DrtScheduler.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(DrtActionCreator.class).asEagerSingleton();
 				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
-			}
-
-			@Provides
-			@Singleton
-			private DrtVehicleFilter provideFilter(DrtConfigGroup drtCfg) {
-				return drtCfg.getKNearestVehicles() > 0 ? new KNearestVehicleFilter(drtCfg.getKNearestVehicles())
-						: new NoFilter();
+				if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stationbased)) {
+					// StopBasedPathDataProvider consumes too much memory for larger networks with many stops
+					// still could be valuable for complex optimisers (more than just request insertion) 
+					// bind(PrecalculatablePathDataProvider.class).to(StopBasedPathDataProvider.class);
+					bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
+				} else {
+					bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
+				}
 			}
 
 			@Provides

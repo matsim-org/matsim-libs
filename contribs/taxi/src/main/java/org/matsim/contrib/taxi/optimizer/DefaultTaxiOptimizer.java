@@ -26,8 +26,8 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.data.Requests;
 import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.passenger.PassengerRequests;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.taxi.data.TaxiRequest;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -43,7 +43,8 @@ public class DefaultTaxiOptimizer implements TaxiOptimizer {
 	private final Fleet fleet;
 	private final TaxiScheduler scheduler;
 
-	private final Collection<TaxiRequest> unplannedRequests = new TreeSet<TaxiRequest>(Requests.ABSOLUTE_COMPARATOR);
+	private final Collection<TaxiRequest> unplannedRequests = new TreeSet<TaxiRequest>(
+			PassengerRequests.ABSOLUTE_COMPARATOR);
 	private final UnplannedRequestInserter requestInserter;
 
 	private final boolean destinationKnown;
