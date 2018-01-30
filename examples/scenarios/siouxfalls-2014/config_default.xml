@@ -13,6 +13,7 @@
 	
 	<module name="facilities" >
 		<param name="inputFacilitiesFile" value="Siouxfalls_facilities.xml.gz" />
+		<param name="facilitiesSource" value="fromFile"/>
 	</module>
 	
 	<module name="controler">
