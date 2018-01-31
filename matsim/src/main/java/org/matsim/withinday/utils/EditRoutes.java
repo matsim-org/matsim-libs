@@ -107,7 +107,7 @@ public final class EditRoutes {
 	 * 
 	 */
 	@Deprecated // not consistent with access/egress approach; can only be used if you know exactly what you are doing.  
-	// Maybe replanXxx is already sufficient?  Otherwise use EditTrips or EditPlans.  kai, nov'17
+	// Maybe replanXxx (which does not have these problems) is already sufficient?  Otherwise use EditTrips or EditPlans.  kai, nov'17
 	public boolean relocateFutureLegRoute(Leg leg, Id<Link> fromLinkId, Id<Link> toLinkId, Person person ) {
 
 		Link fromLink = network.getLinks().get(fromLinkId);
@@ -350,7 +350,11 @@ public final class EditRoutes {
 		
 		return relocateCurrentLegRoute(leg, person, currentLinkIndex, route.getEndLinkId(), time );
 	}
-
+	
+	public final LeastCostPathCalculator getPathCalculator() {
+		return pathCalculator;
+	}
+	
 	// #########################################################################################
 	// helper methods below
 
