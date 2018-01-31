@@ -1,8 +1,8 @@
 package org.matsim.contrib.freight.usecases.chessboard;
 
-import jsprit.analysis.toolbox.Plotter;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.solution.VehicleRoutingProblemSolution;
+import com.graphhopper.jsprit.analysis.toolbox.Plotter;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.solution.VehicleRoutingProblemSolution;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
