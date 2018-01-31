@@ -20,9 +20,6 @@
 
 package org.matsim.core.config.consistency;
 
-import java.util.Collection;
-import java.util.Set;
-
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
@@ -37,6 +34,9 @@ import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspDefaultsCheckingLevel;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule.DefaultStrategy;
 import org.matsim.pt.PtConstants;
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author nagel
@@ -73,7 +73,15 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		
 		boolean problem = false ; // ini
 		
-		// sort the config groups alphabetically
+		// yy: sort the config groups alphabetically
+		
+		// === global:
+		
+		if ( config.global().isInsistingOnDeprecatedConfigVersion() ) {
+			problem = true ;
+			System.out.flush();
+			log.log( lvl, "you are insisting on config v1.  vsp default is using v2." ) ;
+		}
 		
 		// === controler:
 		

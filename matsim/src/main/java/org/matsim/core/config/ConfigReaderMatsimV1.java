@@ -20,17 +20,13 @@
 
 package org.matsim.core.config;
 
-import java.io.File;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
-import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ExternalMobimConfigGroup;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
-import org.xml.sax.InputSource;
+
+import java.util.Stack;
 
 /**
  * A reader for config-files of MATSim according to <code>config_v1.dtd</code>.
@@ -52,6 +48,14 @@ import org.xml.sax.InputSource;
 
 	public ConfigReaderMatsimV1(final Config config) {
 		this.config = config;
+		final String msg = "using deprecated config version; please switch to config v2; your output_config.xml " +
+									   "will be in the correct version; v1 will fail eventually, since we want to reduce the " +
+									   "workload on keeping everything between v1 and v2 consistent (look into " +
+									   "PlanCalcScoreConfigGroup or PlanCalcRouteConfigGroup if you want to know what we mean).";
+		log.warn(msg) ;
+		if( !config.global().isInsistingOnDeprecatedConfigVersion() ) {
+			throw new RuntimeException(msg);
+		}
 	}
 
 	@Override
