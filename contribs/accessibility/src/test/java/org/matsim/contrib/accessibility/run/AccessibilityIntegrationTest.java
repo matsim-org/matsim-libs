@@ -21,7 +21,6 @@ package org.matsim.contrib.accessibility.run;
 
 import java.io.File;
 import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -45,6 +44,7 @@ import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.BoundingBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -100,6 +100,8 @@ public class AccessibilityIntegrationTest {
 			}
 			opportunities.addActivityFacility(facility);
 		}
+
+		sc.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile); // it is not really 'fromFile'. Amit Jan'18
 
 		org.matsim.contrib.accessibility.run.RunAccessibilityExample.run(sc);
 	}
@@ -344,6 +346,7 @@ public class AccessibilityIntegrationTest {
 			ActivityFacility facility = opportunities.getFactory().createActivityFacility(Id.create(link.getId(), ActivityFacility.class), link.getCoord());
 			opportunities.addActivityFacility(facility);
 		}
+		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile); // it is not really 'fromFile'. Amit Jan'18
 		return scenario;
 	}
 	
@@ -358,6 +361,7 @@ public class AccessibilityIntegrationTest {
 			facility.getCustomAttributes().put("weight", 2.);
 			opportunities.addActivityFacility(facility);
 		}
+		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile); // it is not really 'fromFile'. Amit Jan'18
 		return scenario;
 	}
 

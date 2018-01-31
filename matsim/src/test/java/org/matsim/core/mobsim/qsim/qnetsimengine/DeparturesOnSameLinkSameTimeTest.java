@@ -145,6 +145,14 @@ public class DeparturesOnSameLinkSameTimeTest {
 			config=ConfigUtils.createConfig();
 			this.scenario = ScenarioUtils.loadScenario(config);
 			config.qsim().setMainModes(Arrays.asList(travelMode));
+
+			//following is necessary for mixed traffic, providing a route was obstructing
+			// the requirement of these which might be all right in some cases. Amit Jan'18
+			config.plansCalcRoute().setNetworkModes(Arrays.asList(travelMode));
+			config.travelTimeCalculator().setAnalyzedModes(travelMode);
+			config.travelTimeCalculator().setSeparateModes(true);
+			config.planCalcScore().getOrCreateModeParams(travelMode);
+
 			network =  (Network) this.scenario.getNetwork();
 			population = this.scenario.getPopulation();
 		}
