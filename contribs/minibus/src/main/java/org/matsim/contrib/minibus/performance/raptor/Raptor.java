@@ -25,12 +25,12 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -201,6 +201,7 @@ public class Raptor implements TransitRouter {
 		// transit walk leg should include additional transfer time; Amit, Aug'17
 		leg.setTravelTime( this.raptorDisutility.getTransferTime(routeSegement.fromStop.getCoord(), routeSegement.toStop.getCoord()) );
 		walkRoute.setTravelTime(this.raptorDisutility.getTransferTime(routeSegement.fromStop.getCoord(), routeSegement.toStop.getCoord()) );
+		walkRoute.setDistance(config.getBeelineDistanceFactor() * NetworkUtils.getEuclideanDistance(routeSegement.fromStop.getCoord(), routeSegement.toStop.getCoord()));
 		leg.setRoute(walkRoute);
 
 		return leg;
