@@ -30,7 +30,6 @@ package org.matsim.contrib.freight.carrier;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -44,7 +43,7 @@ public class CarrierPlanWriterTest {
 	public void testCarrierPlanWriterWrites() {
 		Carriers carriers = new Carriers();
 		CarrierPlanReader carrierPlanReader = new CarrierPlanReader(carriers);
-		carrierPlanReader.readFile(testUtils.getInputDirectory() + "carrierPlansEquils.xml");
+		carrierPlanReader.readFile(testUtils.getClassInputDirectory() + "carrierPlansEquils.xml");
 		CarrierPlanWriter planWriter = new CarrierPlanWriter(carriers.getCarriers().values());
 		planWriter.write(testUtils.getOutputDirectory() + "carrierPlansEquilsWritten.xml");
 	}

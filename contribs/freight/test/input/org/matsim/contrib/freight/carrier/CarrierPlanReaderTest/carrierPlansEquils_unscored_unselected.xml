@@ -30,7 +30,7 @@
 <carriers>
 		<carrier id="carrier1" linkId="1">
 			<vehicles>
-				<vehicle id="vehicle_c1" linkId="23" cap="30" earliestStart="21900" latestEnd="23:59:59"/>
+				<vehicle id="vehicle_c1" linkId="23" typeId="default" cap="30" earliestStart="21900" latestEnd="23:59:59"/>
 			</vehicles>
 			
 			<shipments>

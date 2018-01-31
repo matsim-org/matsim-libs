@@ -15,13 +15,13 @@ package org.matsim.contrib.freight.jsprit;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import jsprit.core.problem.Location;
-import jsprit.core.problem.VehicleRoutingProblem;
-import jsprit.core.problem.cost.VehicleRoutingTransportCosts;
-import jsprit.core.problem.driver.Driver;
-import jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.problem.Location;
+import com.graphhopper.jsprit.core.problem.VehicleRoutingProblem;
+import com.graphhopper.jsprit.core.problem.cost.VehicleRoutingTransportCosts;
+import com.graphhopper.jsprit.core.problem.driver.Driver;
+import com.graphhopper.jsprit.core.problem.vehicle.Vehicle;
+import com.graphhopper.jsprit.core.problem.vehicle.VehicleImpl;
 
-import jsprit.core.problem.vehicle.VehicleImpl;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -82,7 +82,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 		
 		private VehicleType type;
 
-		public MatsimVehicleWrapper(jsprit.core.problem.vehicle.Vehicle vehicle) {
+		public MatsimVehicleWrapper(com.graphhopper.jsprit.core.problem.vehicle.Vehicle vehicle) {
 			this.id = Id.create(vehicle.getId(), org.matsim.vehicles.Vehicle.class);
 			this.type = makeType(vehicle.getType().getTypeId(),vehicle.getType().getMaxVelocity());
 		}
@@ -581,7 +581,7 @@ public class NetworkBasedTransportCosts implements VehicleRoutingTransportCosts{
 
 	private VehicleImpl getDefaultVehicle(Location fromId) {
 		return VehicleImpl.Builder.newInstance("default")
-				.setType(jsprit.core.problem.vehicle.VehicleTypeImpl.Builder.newInstance(defaultTypeId).build())
+				.setType(com.graphhopper.jsprit.core.problem.vehicle.VehicleTypeImpl.Builder.newInstance(defaultTypeId).build())
 				.setStartLocation(fromId).build();
 	}
 

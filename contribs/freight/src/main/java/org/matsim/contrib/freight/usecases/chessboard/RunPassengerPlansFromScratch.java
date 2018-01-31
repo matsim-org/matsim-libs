@@ -1,6 +1,5 @@
 package org.matsim.contrib.freight.usecases.chessboard;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
@@ -27,11 +26,11 @@ public class RunPassengerPlansFromScratch {
 		config.network().setInputFile(NETWORK_FILENAME);
 		config.plans().setInputFile(PLANS_FILENAME);
 		
-		StrategySettings bestScore = new StrategySettings(Id.create("1", StrategySettings.class));
+		StrategySettings bestScore = new StrategySettings();
 		bestScore.setStrategyName("BestScore");
 		bestScore.setWeight(0.5);
 		
-		StrategySettings reRoute = new StrategySettings(Id.create("2", StrategySettings.class));
+		StrategySettings reRoute = new StrategySettings();
 		reRoute.setStrategyName("ReRoute");
 		reRoute.setWeight(0.5);
 //		reRoute.setDisableAfter(300);
@@ -43,10 +42,9 @@ public class RunPassengerPlansFromScratch {
 		Controler controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(1);
         controler.getConfig().controler().setCreateGraphs(false);
-		controler.getConfig().controler().setOverwriteFileSetting(
-				true ?
-						OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles :
-						OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists );
+        	//Select how to react of not empty output directory
+        controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
+//		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.failIfDirectoryExists);
 
 		controler.run();
 
