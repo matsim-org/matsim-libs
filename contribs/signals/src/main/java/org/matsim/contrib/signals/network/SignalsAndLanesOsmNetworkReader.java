@@ -277,22 +277,18 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 	/**
 	 * Extends the super class method: Signal data (which is often located at
-	 * upstream nodes) is pushed into intersection nodes, such that it won't get
-	 * removed during network simplification
+	 * upstream nodes) is pushed into intersection nodes, such that signalized 
+	 * intersections can more easily be simplified during network simplification
 	 */
 	@Override
 	protected void preprocessOsmData() {
 		super.preprocessOsmData();
 		
-		// simplify signals data: push them into main junctions
-		// this needs to be done before network simplification such that no signalized
-		// junctions are simplified
-		
-		simplifiyRoundaboutSignals();
-		pushingSingnalsIntoCloseJunctions();
+//		simplifiyRoundaboutSignals();
+		pushSignalsIntoNearbyJunctions();
 		pushingSingnalsIntoEndpoints();
-		pushingSignalsOverLittleWays();
-		pushingSignalsIntoRoundabouts();
+		pushSignalsOverShortWays();
+		removeSignalsAtDeadEnds();
 		// TODO check and clean this methods
 	}
 
@@ -813,18 +809,20 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 	}
 
-	private void pushingSignalsIntoRoundabouts() {
+//	private void pushingSignalsIntoRoundabouts() {
+	private void removeSignalsAtDeadEnds() {
 		for (OsmWay way : this.ways.values()) {
-			String oneway = way.tags.get(TAG_ONEWAY);
-			if (oneway != null && !oneway.equals("-1")) {
-				OsmNode signalNode = null;
-				for (int i = 0; i < way.nodes.size(); i++) {
-					signalNode = this.nodes.get(way.nodes.get(i));
-					if (signalizedOsmNodes.contains(signalNode.id) && !isNodeAtJunction(signalNode)
-							&& !tryTofindRoundabout(signalNode, way, i))
-						signalizedOsmNodes.remove(signalNode.id);
-				}
-			}
+			/* I think, signals infront of roundabouts should be kept. theresa,jan'17*/
+//			String oneway = way.tags.get(TAG_ONEWAY);
+//			if (oneway != null && !oneway.equals("-1")) {
+//				OsmNode signalNode = null;
+//				for (int i = 0; i < way.nodes.size(); i++) {
+//					signalNode = this.nodes.get(way.nodes.get(i));
+//					if (signalizedOsmNodes.contains(signalNode.id) && !isNodeAtJunction(signalNode)
+//							&& isInfrontOfRoundabout(signalNode, way, i))
+//						signalizedOsmNodes.remove(signalNode.id);
+//				}
+//			}
 			OsmNode node = this.nodes.get(way.nodes.get(0));
 			if (node.endPoint && node.ways.size() == 1) {
 				signalizedOsmNodes.remove(node.id);
@@ -836,32 +834,27 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 	}
 
-	private void pushingSignalsOverLittleWays() {
+	private void pushSignalsOverShortWays() {
 		for (OsmWay way : this.ways.values()) {
 			String oneway = way.tags.get(TAG_ONEWAY);
-			if (oneway != null && !oneway.equals("-1")) {
-				OsmNode firstNode = this.nodes.get(way.nodes.get(0));
-				OsmNode lastNode = this.nodes.get(way.nodes.get(1));
-				if (way.nodes.size() == 2 && calcNode2NodeDistance(firstNode, lastNode) < SIGNAL_MERGE_DISTANCE) {
-					if (firstNode.ways.size() == 2 && lastNode.ways.size() > 2
-							&& signalizedOsmNodes.contains(firstNode.id) && !signalizedOsmNodes.contains(lastNode.id)) {
-						signalizedOsmNodes.remove(firstNode.id);
-						signalizedOsmNodes.add(lastNode.id);
-					}
-				}
+			if (oneway != null && !oneway.equals("-1") && !oneway.equals("no")) {
+				// oneway in positive direction
+				pushSignalOverShortWay(way, this.nodes.get(way.nodes.get(0)), this.nodes.get(way.nodes.get(1)));
+			} else if (oneway != null && oneway.equals("-1")) {
+				// oneway in negative direction
+				pushSignalOverShortWay(way, this.nodes.get(way.nodes.get(1)), this.nodes.get(way.nodes.get(0)));
 			}
+			// TODO what happens for ways that are no oneway??
+		}
+	}
 
-			if (oneway != null && !oneway.equals("yes") && !oneway.equals("true") && !oneway.equals("1")) {
-				OsmNode firstNode = this.nodes.get(way.nodes.get(1));
-				OsmNode lastNode = this.nodes.get(way.nodes.get(0));
-				if (way.nodes.size() == 2 && calcNode2NodeDistance(firstNode, lastNode) < SIGNAL_MERGE_DISTANCE) {
-					if (firstNode.ways.size() == 2 && lastNode.ways.size() > 2
-							&& signalizedOsmNodes.contains(firstNode.id) && !signalizedOsmNodes.contains(lastNode.id)) {
-						signalizedOsmNodes.remove(firstNode.id);
-						signalizedOsmNodes.add(lastNode.id);
-						LOG.info("signal pushed over little way @ Node " + lastNode.id);
-					}
-				}
+	private void pushSignalOverShortWay(OsmWay shortWay, OsmNode fromNode, OsmNode toNode) {
+		if (shortWay.nodes.size() == 2 && calcNode2NodeDistance(fromNode, toNode) < SIGNAL_MERGE_DISTANCE) {
+			if (fromNode.ways.size() == 2 && toNode.ways.size() > 2
+					&& signalizedOsmNodes.contains(fromNode.id) && !signalizedOsmNodes.contains(toNode.id)) {
+				signalizedOsmNodes.remove(fromNode.id);
+				signalizedOsmNodes.add(toNode.id);
+				LOG.info("signal pushed over short way @ Node " + toNode.id);
 			}
 		}
 	}
@@ -873,7 +866,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				OsmNode endPoint = null;
 				String oneway = way.tags.get(TAG_ONEWAY);
 
-				if (signalizedOsmNodes.contains(signalNode) && !isNodeAtJunction(signalNode)) {
+				if (signalizedOsmNodes.contains(signalNode.id) && !isNodeAtJunction(signalNode)) {
 					if ((oneway != null && !oneway.equals("-1") && !oneway.equals("no")) || oneway == null) {
 						endPoint = this.nodes.get(way.nodes.get(way.nodes.size() - 1));
 						if (signalizedOsmNodes.contains(endPoint.id) && isNodeAtJunction(endPoint)
@@ -892,8 +885,11 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 		}
 	}
 
-	private void pushingSingnalsIntoCloseJunctions() {
+	// TODO this method already moves signals over crossings to endpoints of ways. do we still need pushingSingnalsIntoEndpoints? 
+	// or, if we need it because it does additional stuff, can we remove the case for crossings/endpoints here in this method??
+	private void pushSignalsIntoNearbyJunctions() {
 		for (OsmWay way : this.ways.values()) {
+			// go through all nodes, except the first and the last
 			for (int i = 1; i < way.nodes.size() - 1; i++) {
 				OsmNode signalNode = this.nodes.get(way.nodes.get(i));
 				OsmNode junctionNode = null;
@@ -901,130 +897,127 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 
 				if (signalizedOsmNodes.contains(signalNode.id) && !isNodeAtJunction(signalNode)) {
 					if ((oneway != null && !oneway.equals("-1")) || oneway == null) {
-						if (this.nodes.get(way.nodes.get(i + 1)).ways.size() > 1) {
-							junctionNode = this.nodes.get(way.nodes.get(i + 1));
+						// positive oneway or no oneway
+						OsmNode nextNode = this.nodes.get(way.nodes.get(i + 1));
+						if (nextNode.ways.size() > 1) {
+							// either a junction or the end point of this way where a new way starts
+							junctionNode = nextNode;
 						}
 						if (i < way.nodes.size() - 2) {
-							if (crossingOsmNodes.contains(way.nodes.get(i + 1))
-									&& this.nodes.get(way.nodes.get(i + 2)).ways.size() > 1) {
+							OsmNode secondNextNode = this.nodes.get(way.nodes.get(i + 2));
+							if (crossingOsmNodes.contains(nextNode.id) && secondNextNode.ways.size() > 1) {
+								// next node = pedestrian crossing. and the second next node is either a junction or the end of the way
 								junctionNode = this.nodes.get(way.nodes.get(i + 2));
 							}
 						}
 					}
-					if (junctionNode != null
-							&& calcNode2NodeDistance(signalNode, junctionNode) < SIGNAL_MERGE_DISTANCE) {
+					if (junctionNode != null && calcNode2NodeDistance(signalNode, junctionNode) < SIGNAL_MERGE_DISTANCE) {
 						signalizedOsmNodes.remove(signalNode.id);
 						signalizedOsmNodes.add(junctionNode.id);
-					}
-
-					if ((oneway != null && !oneway.equals("yes") && !oneway.equals("true") && !oneway.equals("1"))
-							|| oneway == null) {
-						if (this.nodes.get(way.nodes.get(i - 1)).ways.size() > 1) {
-							junctionNode = this.nodes.get(way.nodes.get(i - 1));
+					} else if ((oneway != null && oneway.equals("-1")) || oneway == null) {
+						// "else" = no nearby junction found in positive direction. try reverse direction:
+						// "if" = reverse oneway or no oneway (check opposite direction)
+						OsmNode prevNode = this.nodes.get(way.nodes.get(i - 1));
+						if (prevNode.ways.size() > 1) {
+							// either a junction or the start point of this way where another way ends
+							junctionNode = prevNode;
 						}
 						if (i > 1) {
-							if (crossingOsmNodes.contains(way.nodes.get(i - 1))
-									&& this.nodes.get(way.nodes.get(i - 2)).ways.size() > 1) {
-								junctionNode = this.nodes.get(way.nodes.get(i - 2));
+							OsmNode secondPrevNode = this.nodes.get(way.nodes.get(i - 2));
+							if (crossingOsmNodes.contains(prevNode.id) && secondPrevNode.ways.size() > 1) {
+								// previous node = pedestrian crossing. and the second previous node is either a junction or the start of the way
+								junctionNode = secondPrevNode;
 							}
 						}
-					}
-					if (junctionNode != null
-							&& calcNode2NodeDistance(signalNode, junctionNode) < SIGNAL_MERGE_DISTANCE) {
-						signalizedOsmNodes.remove(signalNode.id);
-						signalizedOsmNodes.add(junctionNode.id);
-					}
-				}
-			}
-		}
-	}
-
-	private void simplifiyRoundaboutSignals() {
-		for (OsmWay way : this.ways.values()) {
-			String junction = way.tags.get(TAG_JUNCTION);
-			if (junction != null && junction.equals("roundabout")) {
-				for (int i = 1; i < way.nodes.size() - 1; i++) {
-					OsmNode junctionNode = this.nodes.get(way.nodes.get(i));
-					OsmNode otherNode = null;
-					if (signalizedOsmNodes.contains(junctionNode.id))
-						otherNode = findRoundaboutSignalNode(junctionNode, way, i);
-					if (otherNode != null) {
-						signalizedOsmNodes.remove(junctionNode.id);
-						signalizedOsmNodes.add(otherNode.id);
-						LOG.info("signal push around roundabout");
-						roundaboutNodes.put(otherNode.id, otherNode);
+						if (junctionNode != null && calcNode2NodeDistance(signalNode, junctionNode) < SIGNAL_MERGE_DISTANCE) {
+							signalizedOsmNodes.remove(signalNode.id);
+							signalizedOsmNodes.add(junctionNode.id);
+						}
 					}
 				}
 			}
 		}
 	}
 
-	// private boolean linksCanBeSimplified(Link inLink, Link outLink) {
-	// if(inLink.getNumberOfLanes() != outLink.getNumberOfLanes())
-	// return false;
-	// if(inLink.getAttributes().getAttribute(TYPE) !=
-	// outLink.getAttributes().getAttribute(TYPE))
-	// return false;
-	// if(inLink.getFreespeed() != outLink.getFreespeed())
-	// return false;
-	// if(inLink.getLength() > 100 || outLink.getLength() > 100)
-	// return false;
-	// Id<SignalSystem> systemId = Id.create("System" +
-	// Long.valueOf(inLink.getToNode().getId().toString()), SignalSystem.class);
-	// if(this.systems.getSignalSystemData().containsKey(systemId))
-	// return false;
-	// return true;
-	// }
+//	private void simplifiyRoundaboutSignals() {
+//		for (OsmWay way : this.ways.values()) {
+//			String junction = way.tags.get(TAG_JUNCTION);
+//			if (junction != null && junction.equals("roundabout")) {
+//				for (int i = 1; i < way.nodes.size() - 1; i++) {
+//					OsmNode junctionNode = this.nodes.get(way.nodes.get(i));
+//					OsmNode otherNode = null;
+//					if (signalizedOsmNodes.contains(junctionNode.id))
+//						otherNode = findRoundaboutSignalNode(junctionNode, way, i);
+//					if (otherNode != null) {
+//						signalizedOsmNodes.remove(junctionNode.id);
+//						signalizedOsmNodes.add(otherNode.id);
+//						LOG.info("signal push around roundabout");
+//						roundaboutNodes.put(otherNode.id, otherNode);
+//					}
+//				}
+//			}
+//		}
+//	}
 
-	private boolean tryTofindRoundabout(OsmNode signalNode, OsmWay way, int index) {
-		OsmNode endPoint = this.nodes.get(way.nodes.get(way.nodes.size() - 1));
-		if (endPoint.ways.size() == 2) {
-			for (OsmWay tempWay : endPoint.ways.values()) {
-				if (!tempWay.equals(way))
-					way = tempWay;
-				break;
-			}
-			endPoint = this.nodes.get(way.nodes.get(way.nodes.size() - 1));
-			if (endPoint.ways.size() == 2)
-				return true;
-			else {
-				if (roundaboutNodes.containsKey(endPoint.id)) {
-					LOG.info("Roundabout found @ " + endPoint.id);
-					return false;
-				}
-			}
-		} else {
-			if (roundaboutNodes.containsKey(endPoint.id)) {
-				LOG.info("Roundabout found @ " + endPoint.id);
-				return false;
-			}
-		}
-		return true;
-	}
+//	// TODO was macht diese methode?? signalNode und index wird gar nicht verwendet
+//	private boolean isInfrontOfRoundabout(OsmNode signalNode, OsmWay way, int index) {
+//		OsmNode endPoint = this.nodes.get(way.nodes.get(way.nodes.size() - 1));
+//		if (endPoint.ways.size() == 2) { // TODO ist hier > 1 gemeint?
+//			for (OsmWay tempWay : endPoint.ways.values()) {
+//				if (!tempWay.equals(way))
+//					// hier wechseln wir auf einen (den?) anderen way des endPoints -- warum?
+//					way = tempWay;
+//				// TODO das break soll doch bestimmt ins if...
+//				break;
+//			}
+//			// endPoint vom neuen way
+//			endPoint = this.nodes.get(way.nodes.get(way.nodes.size() - 1));
+//			if (endPoint.ways.size() == 2) // TODO ist hier > 1 gemeint?
+//				// wenn der auch an intersection endet, sind wir aus irgendeinem grund fertig
+//				return false;
+//			else {
+//				if (roundaboutNodes.containsKey(endPoint.id)) {
+//					LOG.info("Roundabout found @ " + endPoint.id);
+//					return true;
+//				}
+//			}
+//		} else {
+//			if (roundaboutNodes.containsKey(endPoint.id)) {
+//				LOG.info("Roundabout found @ " + endPoint.id);
+//				return true;
+//			}
+//		}
+//		return false;
+//	}
 
-	private OsmNode findRoundaboutSignalNode(OsmNode junctionNode, OsmWay way, int index) {
-		OsmNode otherNode = null;
-		for (int i = index + 1; i < way.nodes.size(); i++) {
-			otherNode = this.nodes.get(way.nodes.get(i));
-			if ((otherNode.ways.size() > 1 && !otherNode.endPoint) || (otherNode.ways.size() > 2 && otherNode.endPoint))
-				return otherNode;
-		}
-		for (OsmWay tempWay : otherNode.ways.values()) {
-			if (!tempWay.equals(way))
-				way = tempWay;
-			break;
-		}
-		String junction = way.tags.get(TAG_JUNCTION);
-		if (junction != null && junction.equals("roundabout")) {
-			for (int i = 0; i < way.nodes.size(); i++) {
-				otherNode = this.nodes.get(way.nodes.get(i));
-				if ((otherNode.ways.size() > 1 && !otherNode.endPoint)
-						|| (otherNode.ways.size() > 2 && otherNode.endPoint))
-					return otherNode;
-			}
-		}
-		return null;
-	}
+	// TODO keine ahnung, warum das hier noetig ist. probiere es deshalb erstmal ohne
+//	private OsmNode findRoundaboutSignalNode(OsmNode junctionNode, OsmWay way, int index) {
+//		OsmNode otherNode = null;
+//		for (int i = index + 1; i < way.nodes.size(); i++) {
+//			otherNode = this.nodes.get(way.nodes.get(i));
+//			if ((otherNode.ways.size() > 1 && !otherNode.endPoint) || (otherNode.ways.size() > 2 && otherNode.endPoint))
+//				return otherNode;
+//		}
+//		// hier wird ein anderer way des endpoints gewaehlt
+//		for (OsmWay tempWay : otherNode.ways.values()) {
+//			if (!tempWay.equals(way))
+//				way = tempWay;
+//			// TODO das break soll doch bestimmt ins if...?!
+//			break;
+//		}
+//		// alle nodes des anderen ways (wenn er auch roundabout ist) werden geprueft...
+//		// TODO wenn er nicht roundabout ist, wird nicht der naechste way gewaehlt sondern einfach aufgehoert
+//		String junction = way.tags.get(TAG_JUNCTION);
+//		if (junction != null && junction.equals("roundabout")) {
+//			for (int i = 0; i < way.nodes.size(); i++) {
+//				otherNode = this.nodes.get(way.nodes.get(i));
+//				if ((otherNode.ways.size() > 1 && !otherNode.endPoint)
+//						|| (otherNode.ways.size() > 2 && otherNode.endPoint))
+//					return otherNode;
+//			}
+//		}
+//		return null;
+//	}
 
 	private void createPlansForFourWayJunction(Node node, SignalSystemData signalSystem,
 			Tuple<LinkVector, LinkVector> firstPair, Tuple<LinkVector, LinkVector> secondPair) {
@@ -1980,6 +1973,7 @@ public class SignalsAndLanesOsmNetworkReader extends OsmNetworkReader {
 				for (int i = 0; i < way.nodes.size(); i++) {
 					if (node.id == (way.nodes.get(i))) {
 						if (i != 0 && i != way.nodes.size() - 1)
+							// the node is an endpoint of one way and no endpoint of the other way -> three arm intersection
 							return true;
 					}
 				}
