@@ -20,12 +20,17 @@
 package org.matsim.contrib.drt.optimizer.insertion;
 
 import java.util.Collection;
+import java.util.Comparator;
+import java.util.Optional;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author michalm
@@ -33,23 +38,23 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 public class SequentialMultiVehicleInsertionProblem implements MultiVehicleInsertionProblem {
 	private final SingleVehicleInsertionProblem insertionProblem;
 
-	public SequentialMultiVehicleInsertionProblem(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
-			MobsimTimer timer) {
-		this.insertionProblem = new SingleVehicleInsertionProblem(pathDataProvider, drtCfg, timer);
+	public SequentialMultiVehicleInsertionProblem(Network network, TravelTime travelTime,
+			TravelDisutility travelDisutility, DrtConfigGroup drtCfg, MobsimTimer timer) {
+		this(new SequentialPathDataProvider(network, travelTime, travelDisutility, drtCfg), drtCfg, timer);
 	}
 
-	// TODO run Dijkstra once for all vehicles instead of running it separately for each one
+	public SequentialMultiVehicleInsertionProblem(PathDataProvider pathDataProvider, DrtConfigGroup drtCfg,
+			MobsimTimer timer) {
+		this.insertionProblem = new SingleVehicleInsertionProblem(pathDataProvider,
+				new InsertionCostCalculator(drtCfg, timer));
+	}
+
 	@Override
-	public BestInsertion findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
-		double minCost = Double.MAX_VALUE;
-		BestInsertion fleetBestInsertion = null;
-		for (Entry vEntry : vEntries) {
-			BestInsertion bestInsertion = insertionProblem.findBestInsertion(drtRequest, vEntry);
-			if (bestInsertion.cost < minCost) {
-				fleetBestInsertion = bestInsertion;
-				minCost = bestInsertion.cost;
-			}
-		}
-		return fleetBestInsertion;
+	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, Collection<Entry> vEntries) {
+		return vEntries.stream()//
+				.map(v -> insertionProblem.findBestInsertion(drtRequest, v))//
+				.filter(Optional::isPresent)//
+				.map(Optional::get)//
+				.min(Comparator.comparing(i -> i.cost));
 	}
 }
