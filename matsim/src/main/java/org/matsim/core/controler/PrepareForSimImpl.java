@@ -87,6 +87,7 @@ class PrepareForSimImpl implements PrepareForSim {
 				Gbl.assertIf( this.activityFacilities.getFacilities().isEmpty() );
 				break;
 			case fromFile:
+			case setInScenario:
 				Gbl.assertIf(! this.activityFacilities.getFacilities().isEmpty() );
 				break;
 			case onePerActivityLocationInPlansFile:
@@ -96,7 +97,7 @@ class PrepareForSimImpl implements PrepareForSim {
 				facilitiesFromPopulation.run(population);
 				break;
 			default:
-				throw new RuntimeException("Facilities source "+this.facilitiesConfigGroup.getFacilitiesSource()+" is not implemented yet.");
+				throw new RuntimeException("Facilities source '"+this.facilitiesConfigGroup.getFacilitiesSource()+"' is not implemented yet.");
 		}
 
 		// make sure all routes are calculated.
