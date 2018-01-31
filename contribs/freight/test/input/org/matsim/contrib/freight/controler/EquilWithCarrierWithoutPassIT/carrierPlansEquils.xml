@@ -31,8 +31,8 @@
 		<carrier id="carrier1" linkId="1">
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
-					<vehicle id="vehicle_c1" depotLinkId="1" typeId="foo" earliestStart="06:00:00" latestEnd="23:59:59"/>
-					<vehicle id="vehicle_c2" depotLinkId="1" typeId="foo" earliestStart="06:00:00" latestEnd="23:59:59"/>
+					<vehicle id="vehicle_c1" depotLinkId="1" typeId="default" earliestStart="06:00:00" latestEnd="23:59:59"/>
+					<vehicle id="vehicle_c2" depotLinkId="1" typeId="default" earliestStart="06:00:00" latestEnd="23:59:59"/>
 				</vehicles>
 			</capabilities>
 			
@@ -80,7 +80,7 @@
 		<carrier id="carrier2" linkId="1">
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
-					<vehicle id="c2_vehicle_c1" depotLinkId="1" typeId="foo" earliestStart="06:00:00" latestEnd="23:59:59"/>
+					<vehicle id="c2_vehicle_c1" depotLinkId="1" typeId="default" earliestStart="06:00:00" latestEnd="23:59:59"/>
 				</vehicles>
 			</capabilities>
 			
@@ -110,7 +110,7 @@
 		<carrier id="carrier3" linkId="1">
 			<capabilities fleetSize="INFINITE">
 				<vehicles>
-					<vehicle id="c3_vehicle_c1" depotLinkId="1" typeId="foo" earliestStart="06:00:00" latestEnd="23:59:59"/>
+					<vehicle id="c3_vehicle_c1" depotLinkId="1" typeId="default" earliestStart="06:00:00" latestEnd="23:59:59"/>
 				</vehicles>
 			</capabilities>
 			

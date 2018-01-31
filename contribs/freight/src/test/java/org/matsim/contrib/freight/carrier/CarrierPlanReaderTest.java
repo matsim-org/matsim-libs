@@ -43,15 +43,15 @@ public class CarrierPlanReaderTest extends MatsimTestCase {
 	public void testCarrierPlanReaderDoesSomething() {
 		Carriers carriers = new Carriers();
 		CarrierPlanReader carrierPlanReader = new CarrierPlanReader(carriers);
-		carrierPlanReader.readFile(getInputDirectory() + "carrierPlansEquils.xml");
-		junit.framework.Assert.assertEquals(1, carriers.getCarriers().size());
+		carrierPlanReader.readFile(getClassInputDirectory() + "carrierPlansEquils.xml");
+		assertEquals(1, carriers.getCarriers().size());
 	}
 
 	@Test
 	public void testReaderReadsCorrectly() {
 		Carriers carriers = new Carriers();
 		CarrierPlanReader carrierPlanReader = new CarrierPlanReader(carriers);
-		carrierPlanReader.readFile(getInputDirectory() + "carrierPlansEquils.xml");
+		carrierPlanReader.readFile(getClassInputDirectory() + "carrierPlansEquils.xml");
 		assertEquals(1, carriers.getCarriers().size());
 		Carrier carrier = carriers.getCarriers().values().iterator().next();
 		assertEquals(1, carrier.getSelectedPlan().getScheduledTours().size());
@@ -69,7 +69,7 @@ public class CarrierPlanReaderTest extends MatsimTestCase {
 	public void testReaderReadsScoreAndSelectedPlanCorrectly() {
 		Carriers carriers = new Carriers();
 		CarrierPlanReader carrierPlanReader = new CarrierPlanReader(carriers);
-		carrierPlanReader.readFile(getInputDirectory() + "carrierPlansEquils.xml");
+		carrierPlanReader.readFile(getClassInputDirectory() + "carrierPlansEquils.xml");
 		Carrier carrier = carriers.getCarriers().values().iterator().next();
 		assertNotNull(carrier.getSelectedPlan());
 		assertEquals(-100.0, carrier.getSelectedPlan().getScore());
@@ -79,7 +79,7 @@ public class CarrierPlanReaderTest extends MatsimTestCase {
 	public void testReaderReadsUnScoredAndUnselectedPlanCorrectly() {
 		Carriers carriers = new Carriers();
 		CarrierPlanReader carrierPlanReader = new CarrierPlanReader(carriers);
-		carrierPlanReader.readFile(getInputDirectory() + "carrierPlansEquils.xml");
+		carrierPlanReader.readFile(getClassInputDirectory() + "carrierPlansEquils_unscored_unselected.xml");
 		Carrier carrier = carriers.getCarriers().values().iterator().next();
 		assertNull(carrier.getSelectedPlan());
 		assertEquals(2,carrier.getPlans().size());
