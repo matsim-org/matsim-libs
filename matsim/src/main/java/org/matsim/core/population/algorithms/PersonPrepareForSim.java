@@ -35,6 +35,7 @@ import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.facilities.ActivityFacilities;
+import org.matsim.facilities.ActivityFacility;
 
 /**
  * Performs several checks that persons are ready for a mobility simulation.
@@ -107,13 +108,16 @@ public final class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					Activity act = (Activity) pe;
-					if ( // no link in activity
-						act.getLinkId() == null &&
-						// however, is using auto-generation of facility, link might be available in facility.
-						!( act.getFacilityId()!=null && this.activityFacilities.getFacilities().containsKey(act.getFacilityId())) ) {
-						needsXY2Links = true;
-						needsReRoute = true;
-						break;
+					if ( act.getLinkId() == null ) {
+						// check if there is a facility available for the activity AND a link for the facility is available. Amit Jan'18
+						ActivityFacility activityFacility = act.getFacilityId() == null ? null : this.activityFacilities.getFacilities().get( act.getFacilityId() );
+						if ( activityFacility!=null && activityFacility.getLinkId()!=null ) {
+							break;
+						} else {
+							needsXY2Links = true;
+							needsReRoute = true;
+							break;
+						}
 					}
 				} else if (pe instanceof Leg) {
 					Leg leg = (Leg) pe;
