@@ -101,7 +101,7 @@ public class AccessibilityIntegrationTest {
 			opportunities.addActivityFacility(facility);
 		}
 
-		sc.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile); // it is not really 'fromFile'. Amit Jan'18
+		sc.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.setInScenario);
 
 		org.matsim.contrib.accessibility.run.RunAccessibilityExample.run(sc);
 	}
@@ -346,7 +346,7 @@ public class AccessibilityIntegrationTest {
 			ActivityFacility facility = opportunities.getFactory().createActivityFacility(Id.create(link.getId(), ActivityFacility.class), link.getCoord());
 			opportunities.addActivityFacility(facility);
 		}
-		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile); // it is not really 'fromFile'. Amit Jan'18
+		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.setInScenario);
 		return scenario;
 	}
 	
@@ -361,7 +361,7 @@ public class AccessibilityIntegrationTest {
 			facility.getCustomAttributes().put("weight", 2.);
 			opportunities.addActivityFacility(facility);
 		}
-		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.fromFile); // it is not really 'fromFile'. Amit Jan'18
+		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.setInScenario);
 		return scenario;
 	}
 
