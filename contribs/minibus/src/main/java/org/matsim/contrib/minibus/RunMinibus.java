@@ -51,7 +51,6 @@ public final class RunMinibus {
 
 
 		Controler controler = new Controler(scenario);
-		controler.getConfig().controler().setCreateGraphs(false);
 
 		controler.addOverridingModule(new PModule()) ;
 

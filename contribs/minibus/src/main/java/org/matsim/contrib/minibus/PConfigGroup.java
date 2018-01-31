@@ -97,6 +97,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private static final String PT_ROUTER = "ptRouter";
 	private static final String OPERATIONMODE = "OperationMode";
 	private static final String TOPOTYPESFORSTOPS = "TopoTypesForStops";
+	private static final String MIN_CAPACITY_FOR_STOPS = "minCapacityForStops";
 	
 	private static final String PMODULE = "Module_";
 	private static final String PMODULE_PROBABILITY = "ModuleProbability_";
@@ -154,6 +155,7 @@ public final class PConfigGroup extends ConfigGroup{
 	private String ptRouter = "none set";
 	private String operationMode = TransportMode.pt;
 	private String topoTypesForStops = null;
+	private double minCapacityForStops = 0.0;
 	private String subsidyApproach = null;
 
 	// Strategies
@@ -273,6 +275,8 @@ public final class PConfigGroup extends ConfigGroup{
 			this.operationMode = value;
 		} else if(TOPOTYPESFORSTOPS.equals(key)){
 			this.topoTypesForStops = value;
+		} else if(MIN_CAPACITY_FOR_STOPS.equals(key)){
+			this.minCapacityForStops = Double.parseDouble(value);
 		}else if (key != null && key.startsWith(PMODULE)) {
 			PStrategySettings settings = getStrategySettings(Id.create(key.substring(PMODULE.length()), PStrategySettings.class), true);
 			settings.setModuleName(value);
@@ -345,6 +349,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(PT_ROUTER, this.ptRouter);
 		map.put(OPERATIONMODE, this.operationMode);
 		map.put(TOPOTYPESFORSTOPS, this.topoTypesForStops);
+		map.put(MIN_CAPACITY_FOR_STOPS, Double.toString(this.minCapacityForStops));
 		map.put(SUBSIDY_APPROACH, this.subsidyApproach);
 		
 		for (Entry<Id<PStrategySettings>, PStrategySettings> entry : this.strategies.entrySet()) {
@@ -408,6 +413,7 @@ public final class PConfigGroup extends ConfigGroup{
 		map.put(PT_ROUTER, "Uses a experimental connection scan algorithm for routing if set to 'raptor'. Defaults to MATSim standard router.");
 		map.put(OPERATIONMODE, "the mode of transport in which the paratransit operates");
 		map.put(TOPOTYPESFORSTOPS, "comma separated integer-values, as used in NetworkCalcTopoTypes");
+		map.put(MIN_CAPACITY_FOR_STOPS, "Link cannot serve as paratransit stop, if its capacity is lower than the limit set here. Default is 0.");
 		map.put(SUBSIDY_APPROACH, "Optional: add a subsidy to the operators' scores. Currently implemented: 'null': no subsidy; 'perPassenger': a subsidy of 100000 monetary units per passenger");
 		
 		for (Entry<Id<PStrategySettings>, PStrategySettings>  entry : this.strategies.entrySet()) {
@@ -624,6 +630,10 @@ public final class PConfigGroup extends ConfigGroup{
 			list.add(Integer.parseInt(s.trim()));
 		}
 		return list;
+	}
+	
+	public double getMinCapacityForStops(){
+		return this.minCapacityForStops;
 	}
 
 	public Collection<PStrategySettings> getStrategySettings() {
