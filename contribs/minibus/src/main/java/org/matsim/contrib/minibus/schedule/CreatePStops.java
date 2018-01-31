@@ -283,6 +283,10 @@ public final class CreatePStops{
 			return 0;
 		}
 		
+		if (link.getCapacity() < this.pConfigGroup.getMinCapacityForStops()) {
+			return 0;
+		}
+
 		if (this.linkId2StopFacilityMap.get(link.getId()) != null) {
 			log.warn("Link " + link.getId() + " has already a stop. This should not happen. Check code.");
 			return 0;
