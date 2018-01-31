@@ -21,6 +21,7 @@ package org.matsim.contrib.drt.run;
 
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.*;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
@@ -40,6 +41,8 @@ public class RunDrtExample {
 	public static void main(String[] args) {
 		
 		Config config = ConfigUtils.loadConfig("drt_example/drtconfig.xml", new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.kinematicWaves);
 		run(config,true);
 
 	}

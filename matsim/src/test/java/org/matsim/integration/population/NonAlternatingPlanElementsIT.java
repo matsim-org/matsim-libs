@@ -19,6 +19,8 @@
 
 package org.matsim.integration.population;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,21 +28,28 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.io.MatsimNetworkReader;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.pt.utils.CreateVehiclesForSchedule;
 import org.matsim.testcases.MatsimTestUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Tests that a simple simulation can be run with plans where
@@ -61,6 +70,9 @@ public class NonAlternatingPlanElementsIT {
 		config.strategy().addParam("ModuleProbability_2", "1.0");		
 		config.transit().setUseTransit(true);
 
+		// a scenario is created to take only network from config file; rest inputs are ignored;
+		// facility file is provided in config and facilitySource is 'fromFile', the facilitySource must be changed. Amit Jan'18
+		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.none);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
@@ -88,6 +100,10 @@ public class NonAlternatingPlanElementsIT {
 		config.strategy().addParam("Module_2", "ReRoute");
 		config.strategy().addParam("ModuleProbability_2", "1.0");
 		config.transit().setUseTransit(true);
+
+		// a scenario is created to take only network from config file; rest inputs are ignored;
+		// facility file is provided in config and facilitySource is 'fromFile', the facilitySource must be changed. Amit Jan'18
+		config.facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.none);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario.getNetwork()).readFile("test/scenarios/equil/network.xml");
