@@ -39,7 +39,7 @@ public class ArrayBasedTravelTimeInfoProvider implements TravelTimeInfoProvider 
 	}
 	
 	/*
-	 * This method is called from the EventHandler part of the TravelTimeCollector.
+	 * This method is called from the EventHandler part of the WithinDayTravelTime.
 	 * There, only link ids are available. We cannot optimize this. 
 	 */
 	@Override
@@ -48,7 +48,7 @@ public class ArrayBasedTravelTimeInfoProvider implements TravelTimeInfoProvider 
 	}
 	
 	/*
-	 * This method is called from the TravelTime part of the TravelTimeCollector.
+	 * This method is called from the TravelTime part of the WithinDayTravelTime.
 	 * There, link are available. we can optimize this by using an array instead of a map.
 	 */
 	@Override
