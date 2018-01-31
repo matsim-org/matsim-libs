@@ -30,7 +30,6 @@ import org.matsim.core.scoring.ScoringFunctionsForPopulation;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 
@@ -44,19 +43,17 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 
 	@Inject ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 	
-	
 	@Inject Scenario scenario;
 	@Inject BicycleTravelTime bicycleTravelTime;
 	@Inject BicycleTravelDisutilityFactory bicycleTravelDisutilityFactory;
 	
 	@Inject EventsManager eventsManager;
 	
-	SumScoringFunction delegate ;
-
+	SumScoringFunction delegate; // Put here in preparation by Kai
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Person person) {
-		// Needs to be reorganized by based on delegation
+		// TODO Needs to be reorganized based on delegation
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 
 		final ScoringParameters params = parameters.getScoringParameters(person);

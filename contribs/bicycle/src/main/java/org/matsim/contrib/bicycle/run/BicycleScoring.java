@@ -103,8 +103,7 @@ public class BicycleScoring implements SumScoringFunction.ArbitraryEventScoring,
 			carCountOnLink = 0;
 			previousLinkRelativePosition = 0.;
 			previousLinkEnterTime = linkEnterEvent.getTime();
-
-		}	
+		}
 	}
 	
 	private void calculateScoreForPreviousLink(Id<Link> linkId, Double enterTime, Id<Vehicle> vehId, double travelTime, double relativeLinkEnterPosition) {
