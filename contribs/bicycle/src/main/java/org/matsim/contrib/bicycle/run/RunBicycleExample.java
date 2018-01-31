@@ -37,7 +37,8 @@ public class RunBicycleExample {
 
 	public static void main(String[] args) {
 		// This works when the data is stored under "/matsim/contribs/bicycle/src/main/resources/bicycle_example"
-		Config config = ConfigUtils.loadConfig("bicycle_example/config-a-10it.xml", new BicycleConfigGroup());
+		Config config = ConfigUtils.loadConfig("bicycle_example/config-a.xml", new BicycleConfigGroup());
+		config.controler().setLastIteration(0);
 		new RunBicycleExample().run(config);
 	}
 
