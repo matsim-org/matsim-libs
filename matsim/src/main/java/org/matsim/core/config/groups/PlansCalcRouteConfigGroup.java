@@ -515,6 +515,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	}
 
 	@Override protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
 //		if ( this.insertingAccessEgressWalk ) {
 //			// we need scoring parameters for each resulting interaction activity
 //			for ( String mode : this.getNetworkModes() ) {

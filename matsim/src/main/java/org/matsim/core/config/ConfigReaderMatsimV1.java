@@ -22,7 +22,9 @@ package org.matsim.core.config;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.ExternalMobimConfigGroup;
+import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -40,7 +42,13 @@ import java.util.Stack;
 	private final static String MODULE = "module";
 	private final static String INCLUDE = "include";
 	private final static String PARAM = "param";
-
+	
+	private static final String msg = "using deprecated config version; please switch to config v2; your output_config.xml " +
+							   "will be in the correct version; v1 will fail eventually, since we want to reduce the " +
+							   "workload on keeping everything between v1 and v2 consistent (look into " +
+							   "PlanCalcScoreConfigGroup or PlanCalcRouteConfigGroup if you want to know what we mean).";
+	
+	
 	private final Config config;
 	private ConfigGroup currmodule = null;
 
@@ -48,14 +56,7 @@ import java.util.Stack;
 
 	public ConfigReaderMatsimV1(final Config config) {
 		this.config = config;
-		final String msg = "using deprecated config version; please switch to config v2; your output_config.xml " +
-									   "will be in the correct version; v1 will fail eventually, since we want to reduce the " +
-									   "workload on keeping everything between v1 and v2 consistent (look into " +
-									   "PlanCalcScoreConfigGroup or PlanCalcRouteConfigGroup if you want to know what we mean).";
-		log.warn(msg) ;
-		if( !config.global().isInsistingOnDeprecatedConfigVersion() ) {
-			throw new RuntimeException(msg);
-		}
+		log.warn(msg);
 	}
 
 	@Override
@@ -72,6 +73,11 @@ import java.util.Stack;
 	@Override
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (MODULE.equals(name)) {
+			if (GlobalConfigGroup.GROUP_NAME.equals(name) ) {
+				if (!config.global().isInsistingOnDeprecatedConfigVersion()) {
+					throw new RuntimeException(msg);
+				}
+			}
 			this.currmodule = null;
 		}
 	}
