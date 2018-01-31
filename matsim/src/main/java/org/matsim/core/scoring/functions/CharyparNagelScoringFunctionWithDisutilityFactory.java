@@ -22,15 +22,17 @@ package org.matsim.core.scoring.functions;
 
 import java.util.Map;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
 
+import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.ScoringFunctionsForPopulation;
 import org.matsim.core.scoring.SumScoringFunction;
 
 /**
@@ -45,21 +47,13 @@ import org.matsim.core.scoring.SumScoringFunction;
  * @author rashid_waraich
  */
 public final class CharyparNagelScoringFunctionWithDisutilityFactory implements ScoringFunctionFactory {
+	private static final Logger LOG = Logger.getLogger(CharyparNagelScoringFunctionWithDisutilityFactory.class);
 
-	private Network network;
-
-	private final ScoringParametersForPerson params;
-	
+	@Inject ScoringParametersForPerson params;
+	@Inject ScoringFunctionsForPopulation scoringFunctionsForPopulation;
 	@Inject Scenario scenario;
 	@Inject Map<String,TravelTime> travelTimes ;
 	@Inject Map<String,TravelDisutilityFactory> travelDisutilityFactories ;
-
-
-	@Inject
-	CharyparNagelScoringFunctionWithDisutilityFactory(final ScoringParametersForPerson params, Network network) {
-		this.params = params;
-		this.network = network;
-	}
 
 	/**
      *
@@ -83,11 +77,14 @@ public final class CharyparNagelScoringFunctionWithDisutilityFactory implements 
 	public ScoringFunction createNewScoringFunction(Person person) {
 
 		final ScoringParameters parameters = params.getScoringParameters( person );
+		
+		scoringFunctionsForPopulation.setPassLinkEventsToPerson(true);
 
 		SumScoringFunction sumScoringFunction = new SumScoringFunction();
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring( parameters ));
 //		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring( parameters , this.network));
-		sumScoringFunction.addScoringFunction( new TravelScoringBasedOnTravelDisutilities(scenario, travelDisutilityFactories)); 
+		LOG.warn("Adding a TravelScoringBasedOnTravelDisutilities with travelDisutilityFactories = " + travelDisutilityFactories);
+		sumScoringFunction.addScoringFunction(new TravelScoringBasedOnTravelDisutilities(scenario, travelDisutilityFactories)); 
 		sumScoringFunction.addScoringFunction(new CharyparNagelMoneyScoring( parameters ));
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring( parameters ));
 		return sumScoringFunction;
