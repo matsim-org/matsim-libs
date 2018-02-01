@@ -20,8 +20,16 @@ public class BestReplyIT {
 
 	@Test
 	public void testRunControler() {
-        Config config = utils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "config.xml"), new DestinationChoiceConfigGroup());
+		// load chessboard scenario config:
+        Config config = utils.loadConfig(
+        		IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("chessboard"), "config.xml"),
+				new DestinationChoiceConfigGroup()
+		);
+  
+        // override or add some material:
 		ConfigUtils.loadConfig(config, utils.getPackageInputDirectory() + "/config.xml");
+		
+		
         Scenario scenario = ScenarioUtils.loadScenario(config);
 		RunLocationChoiceBestResponse.run(scenario);
 	}

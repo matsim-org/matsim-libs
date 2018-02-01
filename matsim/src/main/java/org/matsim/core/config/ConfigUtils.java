@@ -110,7 +110,7 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 			// while the gui takes it from the config file root.  The following syntax should
 			// now also take it from the config file root when it is called from the command line
 			// (same as in other places: we are making the command line behavior
-			// consistent with what the GUI is doing, maybe more or less by accident).
+			// and GUI behavior consistent).
 			// kai, jan'18
 			URL url = ConfigGroup.getInputFileURL(config.getContext(), filename);;
 			new ConfigReader(config).parse(url) ;
