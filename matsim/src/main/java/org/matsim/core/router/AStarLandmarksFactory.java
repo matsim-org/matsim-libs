@@ -47,7 +47,7 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 	@Inject
 	public AStarLandmarksFactory() {
 	}
-
+	
 	@Override
 	public synchronized LeastCostPathCalculator createPathCalculator(final Network network, final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		PreProcessLandmarks preProcessLandmarks = this.preProcessData.get(network);
