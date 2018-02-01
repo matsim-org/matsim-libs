@@ -20,14 +20,11 @@
 
 package org.matsim.core.router;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.util.AStarNodeData;
-import org.matsim.core.router.util.DijkstraNodeData;
-import org.matsim.core.router.util.PreProcessEuclidean;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -75,6 +72,7 @@ import org.matsim.core.utils.geometry.CoordUtils;
  * @author lnicolas
  */
 public class AStarEuclidean extends Dijkstra {
+	private static final Logger log = Logger.getLogger( AStarEuclidean.class ) ;
 
 	protected final double overdoFactor;
 
@@ -168,6 +166,13 @@ public class AStarEuclidean extends Dijkstra {
 		} else if (totalCost == nCost) {
 			// Special case: a node can be reached from two links with exactly the same costs.
 			// Decide based on the linkId which one to take... just have to common criteria to be deterministic.
+			
+			if ( totalCost==0. ) {
+				log.warn( "finding totalCost=" + totalCost + "; this will often (or always?) lead to a null " +
+								  "pointer exception later.  In my own case, it was related to a network " +
+								  "having freespeed infinity at places.  kai, jan'18") ;
+			}
+			
 			if (data.getPrevLink().getId().compareTo(l.getId()) > 0) {
 				revisitNode(n, data, pendingNodes, currTime + travelTime, totalCost, l);
 				return true;

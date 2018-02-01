@@ -71,6 +71,7 @@ import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWriterListener;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.MatsimServices;
@@ -200,6 +201,8 @@ class MATSim4UrbanSimParcel{
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		//		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("urbansim parcels") ;
 		ActivityFacilitiesImpl parcels = (ActivityFacilitiesImpl) scenario.getActivityFacilities() ;
+		// adding facilities --> a facility source is required.
+		scenario.getConfig().facilities().setFacilitiesSource(FacilitiesConfigGroup.FacilitiesSource.setInScenario);
 
 		ActivityFacilitiesImpl zones = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities("urbansim zones");
 		ActivityFacilitiesImpl opportunities = (ActivityFacilitiesImpl) FacilitiesUtils.createActivityFacilities("opportunity locations (e.g. workplaces) for zones or parcels");

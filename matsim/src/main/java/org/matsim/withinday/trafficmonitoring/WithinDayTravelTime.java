@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TravelTimeCollector.java
+ * WithinDayTravelTime.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -222,7 +222,7 @@ public class WithinDayTravelTime implements TravelTime,
 		resetCnt++ ;
 		if ( resetCnt >1 ) {
 			if ( problem ) {
-				throw new RuntimeException("using TravelTimeCollector, but mobsim notifications not called between two resets.  "
+				throw new RuntimeException("using WithinDayTravelTime, but mobsim notifications not called between two resets.  "
 						+ "Did you really add this as a mobsim listener?") ;
 			}
 		}
@@ -421,7 +421,7 @@ public class WithinDayTravelTime implements TravelTime,
 				activeLinks += runnable.getActiveLinksCount();
 			}
 
-			log.info("TravelTimeCollector at " + Time.writeTime(time) + " #links=" + activeLinks);
+			log.info("WithinDayTravelTime at " + Time.writeTime(time) + " #links=" + activeLinks);
 
 			this.nextInfoTime += this.infoTimeStep;
 		}
@@ -448,8 +448,8 @@ public class WithinDayTravelTime implements TravelTime,
 
 		double dynamicBinSize = 0.0; // size of the time window that is taken into account
 
-		static Counter enlarge = new Counter("TravelTimeCollector: enlarged time bin size: ");
-		static Counter shrink = new Counter("TravelTimeCollector: shrunk time bin size: ");
+		static Counter enlarge = new Counter("WithinDayTravelTime: enlarged time bin size: ");
+		static Counter shrink = new Counter("WithinDayTravelTime: shrunk time bin size: ");
 
 		/*package*/ void init(double freeSpeedTravelTime) {
 			this.freeSpeedTravelTime = freeSpeedTravelTime;
