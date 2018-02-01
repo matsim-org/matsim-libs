@@ -29,6 +29,7 @@ import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.matsim.core.api.internal.MatsimSomeReader;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Counter;
 import org.opengis.feature.Feature;
@@ -67,6 +68,8 @@ public class ShapeFileReader implements MatsimSomeReader {
 	public static Collection<SimpleFeature> getAllFeatures(final String filename) {
 		try {
 			File dataFile = new File(filename);
+			log.info( "will try to read from " + dataFile.getAbsolutePath() ) ;
+			Gbl.assertIf( dataFile.exists() );
 			FileDataStore store = FileDataStoreFinder.getDataStore(dataFile);
 			SimpleFeatureSource featureSource = store.getFeatureSource();
 
