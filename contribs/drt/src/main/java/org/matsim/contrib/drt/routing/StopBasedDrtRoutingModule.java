@@ -140,7 +140,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 		for (PlanElement pE : legList) {
 			if (pE instanceof Leg) {
 				if (((Leg) pE).getMode().equals(TransportMode.walk)) {
-					((Leg) pE).setMode(TransportMode.transit_walk);
+					((Leg) pE).setMode(DrtStageActivityType.DRT_WALK);
 				}
 			}
 		}
