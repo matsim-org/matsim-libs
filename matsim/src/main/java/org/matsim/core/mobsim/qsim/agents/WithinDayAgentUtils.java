@@ -74,14 +74,14 @@ public class WithinDayAgentUtils {
 					" which does not support getCurrentPlanElementIndex(...). Aborting!");
 		}
 	}
-
+	
+	/** NOTES:
+	 * () The current link index does not point to where the agent is, but one ahead.
+	 * () It does that even if there is nothing there in the underlying list.  I keep forgetting the convention, but I think that the
+	 *     arrival link is not in the list, and so for the arrival link special treatment is necessary.
+	 * () Routes may have loops, in which case the "indexOf" approach does not work.
+	 */
 	public static final Integer getCurrentRouteLinkIdIndex(MobsimAgent agent) {
-		/* NOTES:
-		 * () The current link index does not point to where the agent is, but one ahead.
-		 * () It does that even if there is nothing there in the underlying list.  I keep forgetting the convention, but I think that the
-		 *     arrival link is not in the list, and so for the arrival link special treatment is necessary.
-		 * () Routes may have loops, in which case the "indexOf" approach does not work.
-		 */
 
 		if (agent instanceof HasModifiablePlan) {
 

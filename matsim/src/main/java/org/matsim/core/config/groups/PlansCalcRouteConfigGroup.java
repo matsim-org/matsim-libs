@@ -19,11 +19,7 @@
  * *********************************************************************** */
 package org.matsim.core.config.groups;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
@@ -32,6 +28,11 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup.StringGetter;
 import org.matsim.core.config.ReflectiveConfigGroup.StringSetter;
 import org.matsim.core.utils.collections.CollectionUtils;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Config Module for PlansCalcRoute class.
@@ -45,9 +46,8 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	// yy There is a certain degree of messiness in this class because of retrofitting, e.g. making beelineDistance mode-specific while
 	// being backwards compatible.  This could eventually be cleaned up, maybe about a year after introducing it.  kai, jun'15
 	
-	
 	public static final String GROUP_NAME = "planscalcroute";
-
+	
 	private static final String BEELINE_DISTANCE_FACTOR = "beelineDistanceFactor";
 	private static final String NETWORK_MODES = "networkModes";
 	private static final String TELEPORTED_MODE_SPEEDS = "teleportedModeSpeed_";
@@ -63,6 +63,8 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	private static final String BIKE_SPEED = "bikeSpeed";
 	private static final String UNDEFINED_MODE_SPEED = "undefinedModeSpeed";
 	
+	private static final Logger log = Logger.getLogger(PlansCalcRouteConfigGroup.class) ;
+	
 	private Collection<String> networkModes = Arrays.asList(TransportMode.car);
 
 	private boolean acceptModeParamsWithoutClearing = false;
@@ -75,7 +77,7 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 	
 	private static final String RANDOMNESS = "routingRandomness" ;
 	private double routingRandomness = 3. ;
-
+	
 	// ---
 
 	public static class ModeRoutingParams extends ReflectiveConfigGroup implements MatsimParameters {
@@ -512,4 +514,22 @@ public final class PlansCalcRouteConfigGroup extends ConfigGroup {
 		this.routingRandomness = routingRandomness;
 	}
 
+	@Override protected void checkConsistency(Config config) {
+		super.checkConsistency(config);
+//		if ( this.insertingAccessEgressWalk ) {
+//			// we need scoring parameters for each resulting interaction activity
+//			for ( String mode : this.getNetworkModes() ) {
+//				String interactionActivityType = mode + " interaction" ;
+//				PlanCalcScoreConfigGroup.ActivityParams actParams = config.planCalcScore().getActivityParams(interactionActivityType);
+//				if ( actParams==null ) {
+//					final String msg = "You have specified to insert access and egress walk, but there are no scoring parameters to " +
+//												   "score the resulting interaction activity for mode = " + mode;
+//					throw new RuntimeException(msg) ;
+//				}
+//			}
+//		}
+		// these are now added in the config consistency checker of PlanCalcScoreConfigGroup,
+		// so there is no point in checking here since the checker here might be called
+		// earlier. kai, jan'18
+	}
 }

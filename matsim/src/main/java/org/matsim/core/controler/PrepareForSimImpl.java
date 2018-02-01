@@ -84,7 +84,12 @@ class PrepareForSimImpl implements PrepareForSim {
 		//matsim-724
 		switch(this.facilitiesConfigGroup.getFacilitiesSource()){
 			case none:
-				Gbl.assertIf( this.activityFacilities.getFacilities().isEmpty() );
+//				Gbl.assertIf( this.activityFacilities.getFacilities().isEmpty() );
+				// I have at least one use case where people use the facilities as some kind
+				// of database for stuff, but don't run the activities off them.  I have thus
+				// disabled the above check.  We need to think about what we want to
+				// do in such cases; might want to auto-generate our facilities as below
+				// and _add_ them to the existing facilities.  kai, feb'18
 				break;
 			case fromFile:
 			case setInScenario:

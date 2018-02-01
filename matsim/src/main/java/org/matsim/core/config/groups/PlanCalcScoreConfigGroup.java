@@ -20,8 +20,6 @@
 
 package org.matsim.core.config.groups;
 
-import java.util.*;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
@@ -31,6 +29,8 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
+
+import java.util.*;
 
 /**Design decisions:<ul>
  * <li> I have decided to modify those setters/getters that do not use SI units such that the units are attached.
@@ -413,7 +413,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		final ScoringParameterSet previous = this.getScoringParameters(params.getSubpopulation());
 
 		if ( previous != null ) {
-			log.info("scoring parameters for subpopulation " + previous.getSubpopulation() + " were just overwritten.") ;
+			log.info("scoring parameters for subpopulation " + previous.getSubpopulation() + " were just replaced.") ;
 
 			final boolean removed = removeParameterSet( previous );
 			if ( !removed ) throw new RuntimeException( "problem replacing scoring params " );
@@ -469,6 +469,24 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	@Override
 	protected final void checkConsistency( final Config config ) {
 		super.checkConsistency(config);
+
+		if ( config.plansCalcRoute().isInsertingAccessEgressWalk() ) {
+			// adding the interaction activities that result from access/egress routing.  this is strictly speaking
+			// not a consistency check, but I don't know a better place where to add this. kai, jan'18
+			for (ScoringParameterSet scoringParameterSet : this.getScoringParametersPerSubpopulation().values()) {
+				for (String mode : config.plansCalcRoute().getNetworkModes()) {
+					String interactionActivityType = mode + " interaction" ;
+					ActivityParams set = scoringParameterSet.getActivityParamsPerType().get(interactionActivityType);
+					if ( set==null ) {
+						ActivityParams params = new ActivityParams() ;
+						params.setActivityType( interactionActivityType );
+						params.setScoringThisActivityAtAll(false);
+						scoringParameterSet.addActivityParams(params);
+					}
+				}
+				
+			}
+		}
 
 		for ( ActivityParams params : this.getActivityParams() ) {
 			if ( params.isScoringThisActivityAtAll() && Time.isUndefinedTime( params.getTypicalDuration() ) ) {
