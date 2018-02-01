@@ -112,8 +112,13 @@ public abstract class ConfigUtils implements MatsimExtensionPoint {
 			// (same as in other places: we are making the command line behavior
 			// and GUI behavior consistent).
 			// kai, jan'18
-			URL url = ConfigGroup.getInputFileURL(config.getContext(), filename);;
-			new ConfigReader(config).parse(url) ;
+//			URL url = ConfigGroup.getInputFileURL(config.getContext(), filename);;
+//			new ConfigReader(config).parse(url) ;
+			// yyyyyy the above probably works, but has ramifications across many test
+			// cases.  Need to discuss first (and then find some time again).
+			// See MATSIM-776 and MATSIM-777.  kai, feb'18
+			
+			new ConfigReader(config).readFile(filename);
 		}
 	}
 
