@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
 <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -38,8 +38,8 @@
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
 			<version>0.10.0-SNAPSHOT</version>
-
 		</dependency>
+		
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -56,6 +56,24 @@
 			<artifactId>otfvis</artifactId>
 			<version>0.10.0-SNAPSHOT</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>matsim-gtfs</artifactId>
+			<version>0.9.0-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>accessibility</artifactId>
+			<version>0.10.0-SNAPSHOT</version>
+		</dependency>
+		
+		<dependency>	
+   	 		<groupId>org.matsim</groupId>
+    		<artifactId>pt2matsim</artifactId>
+    		<version>18.1-SNAPSHOT</version>
+    	</dependency>
 
 		<!-- An example on how to add a contribution using the 0.9.0-SNAPSHOT -->
 		<dependency>
@@ -109,7 +127,20 @@
     <artifactId>jcommander</artifactId>
     <version>1.48</version>
 </dependency>
+
 		
+
+
+		<dependency>
+			<groupId>com.conveyal</groupId>
+			<artifactId>gtfs-lib</artifactId>
+			<version>3.4.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.conveyal</groupId>
+			<artifactId>jackson2-geojson</artifactId>
+			<version>0.8</version>
+		</dependency>
 	</dependencies>
 
 	<build>

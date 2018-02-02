@@ -28,6 +28,128 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+<<<<<<< HEAD
+
+import javax.inject.Inject;
+
+import org.apache.commons.lang3.mutable.MutableInt;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+//import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
+import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleCollector;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.schedule.DrtTask;
+import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.util.distance.DistanceUtils;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.utils.geometry.geotools.MGC;
+
+import com.google.inject.name.Named;
+import com.vividsolutions.jts.geom.Geometry;
+
+/**
+ * @author  axer
+ *
+ */
+/**
+ *
+ */
+public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
+
+	private ZonalIdleVehicleCollector idleVehicles;
+	private ZonalDemandAggregatorMy demandAggregator;
+	private DrtZonalSystem zonalSystem;
+	private Network network;
+	
+
+	/**
+	 * 
+	 */
+	@Inject
+	public DemandBasedRebalancingStrategyMy(ZonalIdleVehicleCollector idleVehicles, ZonalDemandAggregatorMy demandAggregator, DrtZonalSystem zonalSystem, @Named(DvrpModule.DVRP_ROUTING) Network network) {
+		this.idleVehicles = idleVehicles;
+		this.demandAggregator = demandAggregator;
+		this.zonalSystem = zonalSystem;
+		this.network = network;
+		
+	}
+	
+	
+	//Wir schreiben eine neue Methode, die die bisherige calcRelocations Methode ueberschreibt. Der Methodenaufruf muss dabei natuerlich kompatibel bleiben 
+	/* (non-Javadoc)
+	 * @see org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy#calcRelocations(java.lang.Iterable)
+	 */
+	@Override
+	public List<Relocation> calcRelocations(Iterable<? extends Vehicle> rebalancableVehicles, double time) {
+		
+	//WO KOMMT rebalancableVehicles her?
+	
+		//Erstellt eine Liste bestehenden aus mehreren Relocation Eintraegen. Name der Liste ist relocations.
+		List<Relocation> relocations = new ArrayList<>();
+ 		Map <Id<Vehicle>,Vehicle> idleVehiclesMap = new HashMap<>();
+		
+		//Wir pruefen welche der rebalancableVehicles fuer die naechsten 600 Sekunden noch im Einsatz sind. 
+		for (Vehicle v : rebalancableVehicles){
+			if (v.getServiceEndTime()>time+300){
+				idleVehiclesMap.put(v.getId(),v);
+			}
+		}
+		
+		
+		
+		//FAHRZEUGBEDARF JE ZELLE
+		//Wir berechnen die Fahrzeugnachfrage je Zelle. Als Input uebergeben wir eine Liste mit Idle Fahrzeugen
+		Map<String, Integer> requiredAdditionalVehiclesPerZone = calculateZonalVehicleRequirements(idleVehiclesMap, time);
+		//FAHRZEUGBEDARF JE ZELLE
+		
+		
+		
+		//Erstellen einer Zonen String Liste, ueber die iteriert wird. 
+		List<String> zones = new ArrayList<>(requiredAdditionalVehiclesPerZone.keySet());
+		
+		
+		
+		//Nun versuchen wir den Fahrzeugbedarf je Zone aufzuloesen
+		//Dabei iterieren wir ueber jeder einzelne Zone
+		for (String zone : zones){
+			
+			//Fahrzeugbedarf in Zone wird aus requiredAdditionalVehiclesPerZone extrahiert
+			int requiredVehicles = requiredAdditionalVehiclesPerZone.get(zone);
+			
+			//Es gibt in der Zone ein Fahrzeugbedarf
+			if (requiredVehicles>0){
+				
+				
+				//Fuer jedes angeforderte Fahrzeug wird das nachstgelegene Fahrzeug gesucht
+				for (int i = 0; i< requiredVehicles; i++){
+					Geometry z = zonalSystem.getZone(zone);
+					if (z==null) {throw new RuntimeException();	};
+					Coord zoneCentroid = MGC.point2Coord(z.getCentroid());
+					Vehicle v = findClosestVehicle(idleVehiclesMap,zoneCentroid, time);
+					
+					
+					//Wenn ein Fahrzeug gefunden wurde, muss dieses natuerlich von der Liste der idleVehiclesMap entfernt werden
+					if (v!=null){
+						idleVehiclesMap.remove(v.getId());
+						//Hinzufuegen eines neuen Relocation Objekts, bestehend aus v und link
+						relocations.add(new Relocation(v, NetworkUtils.getNearestLink(network, zonalSystem.getZoneCentroid(zone))));
+					}
+				}
+			}
+		}
+//		relocations.forEach(l->Logger.getLogger(getClass()).info(l.vehicle.getId().toString()+"-->"+l.link.getId().toString()));
+		
+		return relocations;
+	}
+=======
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -121,6 +243,7 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 
 		return relocations;
 }
+>>>>>>> branch 'saxer' of https://falco.thiel@gitlab.tubit.tu-berlin.de/vsp/vw-projects.git
 
 	/**
 	 * @param idleVehicles2
