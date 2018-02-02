@@ -53,7 +53,7 @@ import org.matsim.pt.router.TransitActsRemover;
  */
 public class TravelDistanceEvaluator {
 	public static void main(String[] args) {
-		new TravelDistanceEvaluator().run("D:/runs-svn/vw_rufbus/vw205.1.0/vw205.1.0.output_plans.xml.gz");
+		new TravelDistanceEvaluator().run("/Users/jb/Desktop/vw208/vw208.1.0.output_plans.xml.gz");
 	}
 	
 	
@@ -72,6 +72,24 @@ public class TravelDistanceEvaluator {
 			public void run(Person person) {
 				if (isValidPerson(person.getId())){
 					Plan plan = person.getSelectedPlan();
+					
+					Leg prevLeg = null;
+					Activity prevAct = null;
+					for (PlanElement pe : plan.getPlanElements()) {
+						//convert pure transit_walks to walk
+						if (pe instanceof Activity) {
+						if (prevLeg!=null && prevAct!=null) {
+							if (!((Activity) pe).getType().equals("pt interaction") &&!prevAct.getType().equals("pt interaction")&&prevLeg.getMode().equals(TransportMode.transit_walk)) {
+								prevLeg.setMode("walk");
+							}
+						}
+						prevAct = (Activity) pe;
+						} else if (pe instanceof Leg) {
+							prevLeg = (Leg) pe;
+						}  
+						
+					}
+					
 					new TransitActsRemover().run(plan);
 					Activity lastAct = null;
 					Leg lastLeg = null;
@@ -112,13 +130,13 @@ public class TravelDistanceEvaluator {
 	
 	private boolean isValidPerson(Id<Person> id) {
 		//all
-//		return true;
+		return true;
 		
 		
 		//Wolfsburg
-		if ((id.toString().startsWith("3"))&&(id.toString().split("_")[0].length()==3)) 
-			return true;
-		else return false;
+//		if ((id.toString().startsWith("3"))&&(id.toString().split("_")[0].length()==3)) 
+//			return true;
+//		else return false;
 		
 
 //		//Braunschweig
@@ -154,7 +172,14 @@ public class TravelDistanceEvaluator {
 				bw.newLine();
 				bw.write("distance");
 				for (String s : activityDistanceBins.keySet()){
-					bw.write(";"+s);
+					if (s.equals("other")) bw.write(";"+"4 - private Erledigung");
+					else if (s.equals("home")) bw.write(";"+"1 - Wohnung");
+					else if (s.equals("work")) bw.write(";"+"2 - Arbeit");
+					else if (s.equals("shopping")) bw.write(";"+"3 - Einkauf");
+					else if (s.equals("education")) bw.write(";"+"6 - Ausbildung");
+					else if (s.equals("leisure")) bw.write(";"+"6 - Freizeit");
+
+					
 				}
 				for (int i = 0; i<51;i++){
 					bw.newLine();
