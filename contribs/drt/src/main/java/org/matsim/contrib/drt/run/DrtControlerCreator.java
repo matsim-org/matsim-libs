@@ -24,6 +24,7 @@ package org.matsim.contrib.drt.run;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
@@ -45,6 +46,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -103,6 +105,16 @@ public final class DrtControlerCreator {
 				config.planCalcScore().addActivityParams(params);
 				Logger.getLogger(DrtControlerCreator.class).info(
 						"drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
+			}
+			if (!config.planCalcScore().getModes().containsKey(DrtStageActivityType.DRT_WALK)){
+				ModeParams drtWalk = new ModeParams(DrtStageActivityType.DRT_WALK);
+				ModeParams walk  = config.planCalcScore().getModes().get(TransportMode.walk);
+				drtWalk.setConstant(walk.getConstant());
+				drtWalk.setMarginalUtilityOfDistance(walk.getMarginalUtilityOfDistance());
+				drtWalk.setMarginalUtilityOfTraveling(walk.getMarginalUtilityOfTraveling());
+				drtWalk.setMonetaryDistanceRate(walk.getMonetaryDistanceRate());
+				Logger.getLogger(DrtControlerCreator.class).info(
+						"drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
 			}
 		}
 	}
