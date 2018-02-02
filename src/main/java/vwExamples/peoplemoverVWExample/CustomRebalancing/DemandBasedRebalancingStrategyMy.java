@@ -28,6 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -87,67 +89,38 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 	 * @see org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy#calcRelocations(java.lang.Iterable)
 	 */
 	@Override
-	public List<Relocation> calcRelocations(Iterable<? extends Vehicle> rebalancableVehicles, double time) {
-		
-	//WO KOMMT rebalancableVehicles her?
-	
-		//Erstellt eine Liste bestehenden aus mehreren Relocation Eintraegen. Name der Liste ist relocations.
+	public List<Relocation> calcRelocations(Stream<? extends Vehicle> rebalancableVehicles, double time) {
+
+		Map<Id<Vehicle>, Vehicle> idleVehiclesMap = rebalancableVehicles
+				.filter(v -> v.getServiceEndTime() > time + 3600).collect(Collectors.toMap(v -> v.getId(), v -> v));
+
 		List<Relocation> relocations = new ArrayList<>();
- 		Map <Id<Vehicle>,Vehicle> idleVehiclesMap = new HashMap<>();
-		
-		//Wir pruefen welche der rebalancableVehicles fuer die naechsten 600 Sekunden noch im Einsatz sind. 
-		for (Vehicle v : rebalancableVehicles){
-			if (v.getServiceEndTime()>time+300){
-				idleVehiclesMap.put(v.getId(),v);
-			}
-		}
-		
-		
-		
-		//FAHRZEUGBEDARF JE ZELLE
-		//Wir berechnen die Fahrzeugnachfrage je Zelle. Als Input uebergeben wir eine Liste mit Idle Fahrzeugen
-		Map<String, Integer> requiredAdditionalVehiclesPerZone = calculateZonalVehicleRequirements(idleVehiclesMap, time);
-		//FAHRZEUGBEDARF JE ZELLE
-		
-		
-		
-		//Erstellen einer Zonen String Liste, ueber die iteriert wird. 
+		Map<String, Integer> requiredAdditionalVehiclesPerZone = calculateZonalVehicleRequirements(idleVehiclesMap,
+				time);
 		List<String> zones = new ArrayList<>(requiredAdditionalVehiclesPerZone.keySet());
-		
-		
-		
-		//Nun versuchen wir den Fahrzeugbedarf je Zone aufzuloesen
-		//Dabei iterieren wir ueber jeder einzelne Zone
-		for (String zone : zones){
-			
-			//Fahrzeugbedarf in Zone wird aus requiredAdditionalVehiclesPerZone extrahiert
+		for (String zone : zones) {
 			int requiredVehicles = requiredAdditionalVehiclesPerZone.get(zone);
-			
-			//Es gibt in der Zone ein Fahrzeugbedarf
-			if (requiredVehicles>0){
-				
-				
-				//Fuer jedes angeforderte Fahrzeug wird das nachstgelegene Fahrzeug gesucht
-				for (int i = 0; i< requiredVehicles; i++){
+			if (requiredVehicles > 0) {
+				for (int i = 0; i < requiredVehicles; i++) {
 					Geometry z = zonalSystem.getZone(zone);
-					if (z==null) {throw new RuntimeException();	};
+					if (z == null) {
+						throw new RuntimeException();
+					} ;
 					Coord zoneCentroid = MGC.point2Coord(z.getCentroid());
-					Vehicle v = findClosestVehicle(idleVehiclesMap,zoneCentroid, time);
-					
-					
-					//Wenn ein Fahrzeug gefunden wurde, muss dieses natuerlich von der Liste der idleVehiclesMap entfernt werden
-					if (v!=null){
+					Vehicle v = findClosestVehicle(idleVehiclesMap, zoneCentroid, time);
+
+					if (v != null) {
 						idleVehiclesMap.remove(v.getId());
-						//Hinzufuegen eines neuen Relocation Objekts, bestehend aus v und link
-						relocations.add(new Relocation(v, NetworkUtils.getNearestLink(network, zonalSystem.getZoneCentroid(zone))));
+						relocations.add(new Relocation(v,
+								NetworkUtils.getNearestLink(network, zonalSystem.getZoneCentroid(zone))));
 					}
 				}
 			}
 		}
-//		relocations.forEach(l->Logger.getLogger(getClass()).info(l.vehicle.getId().toString()+"-->"+l.link.getId().toString()));
-		
+		// relocations.forEach(l->Logger.getLogger(getClass()).info(l.vehicle.getId().toString()+"-->"+l.link.getId().toString()));
+
 		return relocations;
-	}
+}
 
 	/**
 	 * @param idleVehicles2

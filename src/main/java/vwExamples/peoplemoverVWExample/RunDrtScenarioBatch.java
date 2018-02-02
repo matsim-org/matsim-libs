@@ -64,7 +64,7 @@ public class RunDrtScenarioBatch {
 		//This list stores our runIds that are used to save the simulations
 		//runIds are used for consistent simulation identification. Our runIds are maintained in an excel file: 
 		
-		List<String> runIdList = Arrays.asList("def_5");
+		List<String> runIdList = Arrays.asList("def_5_1");
 //		List<Integer> stopTimeList = Arrays.asList(15,30,60);
 		List<Integer> stopTimeList = Arrays.asList(15);
 		Integer idx = 0;
@@ -99,7 +99,7 @@ public class RunDrtScenarioBatch {
 			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
 			//DRT optimizer searches only the x-most closed vehicles. 
 			//Handling more vehicles cost more time and will induce more empty trip mileage, because faraway vehicles are also considered to service the customer request 	
-			drt.setkNearestVehicles(90);
+			//drt.setkNearestVehicles(90);
 			
 			//Use custom stop duration
 			drt.setStopDuration(15);
