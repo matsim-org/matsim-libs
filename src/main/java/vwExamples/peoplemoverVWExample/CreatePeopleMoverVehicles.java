@@ -17,7 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package robotaxi.preparation;
+/**
+ * 
+ */
+package vwExamples.peoplemoverVWExample;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +28,6 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.VehicleImpl;
@@ -40,19 +42,19 @@ import org.matsim.core.scenario.ScenarioUtils;
  * This is an example script to create (robo)taxi vehicle files. The vehicles are distributed randomly in the network.
  *
  */
-public class CreateTaxiVehicles {
+public class CreatePeopleMoverVehicles {
 
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		int numberofVehicles = 5000;
+		int numberofVehicles = 3000;
 		double operationStartTime = 0.; //t0
-		double operationEndTime = 24*3600.;	//t1
-		int seats = 4;
-		String networkfile = "cottbus_robotaxi/network.xml.gz";
-		String taxisFile = "./src/main/resources/cottbus_robotaxi/taxis_"+numberofVehicles+".xml";
+		double operationEndTime = 36*3600.;	//t1
+		int seats = 8;
+		String networkfile = "D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/network/June2017/run124.10.output_network.xml.gz";
+		String taxisFile = "D:/Axer/MatsimDataStore/WOB_PM_ServiceQuality/taxifleets/pm_"+numberofVehicles+".xml";
 		List<Vehicle> vehicles = new ArrayList<>();
 		Random random = MatsimRandom.getLocalInstance();
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(networkfile);
@@ -64,9 +66,9 @@ public class CreateTaxiVehicles {
 			Id<Link> linkId = allLinks.get(random.nextInt(allLinks.size()));
 			startLink =  scenario.getNetwork().getLinks().get(linkId);
 			}
-			while (!startLink.getAllowedModes().contains(TransportMode.car));
+			while (!startLink.getAllowedModes().contains("av"));
 			//for multi-modal networks: Only links where cars can ride should be used.
-			Vehicle v = new VehicleImpl(Id.create("taxi"+i, Vehicle.class), startLink, seats, operationStartTime, operationEndTime);
+			Vehicle v = new VehicleImpl(Id.create("tr"+i, Vehicle.class), startLink, seats, operationStartTime, operationEndTime);
 		    vehicles.add(v);    
 			
 		}

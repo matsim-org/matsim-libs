@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package cemdap4wob.cemdapPreProcessing;
+package vwExamples.cemdap4wob.cemdapPreProcessing;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -105,7 +105,7 @@ public class WOBDemandGeneratorCensus {
 
 	public static void main(String[] args) {
 		
-		String inbase = "D:/cemdap-vw/"; 
+		String inbase = "D:/Axer/CEMDAP/cemdap-vw/"; 
 		String commuterFileOutgoing1 = inbase +"add_data/commuters/031NS2009Ga_adjustedZonesAndSelectedAreas.txt";
 		String[] commuterFilesOutgoing = {commuterFileOutgoing1};
 		String shapeFile1 = inbase + "add_data/shp/nssa.shp";
@@ -313,9 +313,9 @@ public class WOBDemandGeneratorCensus {
 		
 		// Write output files
 		writeHouseholdsFile(this.households, this.outputBase + "households.dat");
-		writePersonsFile(this.population, this.outputBase + "persons.dat");
+		writePersonsFile(this.population, this.outputBase + "persons1.dat");
 		if (this.writeMatsimPlanFiles) {
-			writeMatsimPlansFile(this.population, this.outputBase + "plans.xml.gz");
+			writeMatsimPlansFile(this.population, this.outputBase + "plans1.xml.gz");
 		}
 
 		// Create copies of population, but with different work locations

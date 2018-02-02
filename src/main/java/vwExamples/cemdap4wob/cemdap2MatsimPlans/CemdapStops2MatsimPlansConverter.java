@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package cemdap4wob.cemdap2MatsimPlans;
+package vwExamples.cemdap4wob.cemdap2MatsimPlans;
 
 import java.io.File;
 import java.io.IOException;

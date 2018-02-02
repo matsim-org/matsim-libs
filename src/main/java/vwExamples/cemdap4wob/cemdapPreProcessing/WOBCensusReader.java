@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package cemdap4wob.cemdapPreProcessing;
+package vwExamples.cemdap4wob.cemdapPreProcessing;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;

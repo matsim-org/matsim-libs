@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package cemdap4wob.cemdap2MatsimPlans;
+package vwExamples.cemdap4wob.cemdap2MatsimPlans;
 
 import java.util.Map;
 
