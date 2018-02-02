@@ -134,6 +134,13 @@ public class ClosestStopBasedDrtRoutingModule implements RoutingModule {
 		legList.add(drtInt2);
 		legList.addAll(walkRouter.calcRoute(egressFacility, toFacility,
 				drtLeg.getDepartureTime() + drtLeg.getTravelTime() + 1, person));
+		for (PlanElement pE : legList) {
+			if (pE instanceof Leg) {
+				if (((Leg) pE).getMode().equals(TransportMode.walk)) {
+					((Leg) pE).setMode(DrtStageActivityType.DRT_WALK);
+				}
+			}
+		}
 		return legList;
 	}
 

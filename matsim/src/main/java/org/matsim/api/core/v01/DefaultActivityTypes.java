@@ -54,5 +54,5 @@ public final class DefaultActivityTypes {
 	 * Most trip diary surveys are trip oriented.  In consequence, the start with the first trip, which has a purpose,
 	 * which is the activity it is going to.  In consequence, the activity type it is coming from is missing.
 	 */
-	public static final String unknownStartingActivityType = "unknown starting activity type" ;
+	public static final String unknownFirstActivityType = "unknown first activity type" ;
 }
