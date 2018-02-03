@@ -68,11 +68,7 @@ public class RunDrtExampleSimulation {
         //Add config parameter to DrtConfigGroup
         DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
         //Take only the kNearestVehicles within the DRT dispatching
-<<<<<<< HEAD
-        drt.setkNearestVehicles(90);
-=======
-        //drt.setkNearestVehicles(90);
->>>>>>> branch 'saxer' of https://falco.thiel@gitlab.tubit.tu-berlin.de/vsp/vw-projects.git
+
         
         //Initialize the controller
         Controler controler = createControler(config, otfvis);

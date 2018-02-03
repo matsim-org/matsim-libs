@@ -64,44 +64,7 @@ public class RunDrtScenarioBatch {
 		//This list stores our runIds that are used to save the simulations
 		//runIds are used for consistent simulation identification. Our runIds are maintained in an excel file: 
 		
-<<<<<<< HEAD
-		List<String> runIdList = Arrays.asList("def_5");
-//		List<Integer> stopTimeList = Arrays.asList(15,30,60);
-		List<Integer> stopTimeList = Arrays.asList(15);
-		Integer idx = 0;
-		for (Double demandScenario : demandScenarios){
-			
-			for (Integer stoptime :  stopTimeList){
-			//For each demandScenario we are generating a new config file
-			//Some config parameters will be taken from the provided config file
-			//Other config parameters will be generated or modified dynamically within this loop
-			//Define the path to the config file and enable / disable otfvis
-			final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
-			
 
-			//OTFVis is an open source, OpenGL-based visualizer for looking at MATSim scenarios and output.
-			//With this switch we could disable/enable the visualization.
-			boolean otfvis = false;
-			
-			//Overwrite existing configuration parameters
-			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/population/SmallSplits/run124.100.output_plans_DRT"+demandScenario.toString()+".xml.gz");
-			config.controler().setLastIteration(5); //Number of simulation iterations
-			config.controler().setWriteEventsInterval(1); //Write Events file every x-Iterations 
-			config.controler().setWritePlansInterval(1); //Write Plan file every x-Iterations
-			//Set runId according to idx
-			String runId = runIdList.get(idx);
-			config.controler().setRunId(runId);
-			//Increment idx
-			idx=idx+1;
-			
-			
-			
-			//This part allows to change dynamically DRT config parameters
-			DrtConfigGroup drt = (DrtConfigGroup) config.getModules().get(DrtConfigGroup.GROUP_NAME);
-			//DRT optimizer searches only the x-most closed vehicles. 
-			//Handling more vehicles cost more time and will induce more empty trip mileage, because faraway vehicles are also considered to service the customer request 	
-			drt.setkNearestVehicles(90);
-=======
 		List<String> runIdList = Arrays.asList("def_5_1");
 //		List<Integer> stopTimeList = Arrays.asList(15,30,60);
 		List<Integer> stopTimeList = Arrays.asList(15);
@@ -138,7 +101,7 @@ public class RunDrtScenarioBatch {
 			//DRT optimizer searches only the x-most closed vehicles. 
 			//Handling more vehicles cost more time and will induce more empty trip mileage, because faraway vehicles are also considered to service the customer request 	
 			//drt.setkNearestVehicles(90);
->>>>>>> branch 'saxer' of https://falco.thiel@gitlab.tubit.tu-berlin.de/vsp/vw-projects.git
+
 			
 			//Use custom stop duration
 			drt.setStopDuration(15);
