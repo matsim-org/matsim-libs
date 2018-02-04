@@ -285,7 +285,11 @@ public class TransitLeastCostPathTree {
 
 			if (isTransferLeg) {
 				// transfer cost
-				//TODO : following will not work if travelDisutility is other than Default. Amit Sep'17
+				if ( ! (this.costFunction instanceof  TransitRouterNetworkTravelTimeAndDisutility) ) {
+					throw new RuntimeException("TransitTravelDisutility is not instance of "+TransitRouterNetworkTravelTimeAndDisutility.class.getSimpleName()
+					+". An acc ");
+				}
+
 				transferCost += ((TransitRouterNetworkTravelTimeAndDisutility) this.costFunction).defaultTransferCost(link,
 						Time.UNDEFINED_TIME,null,null);
 
