@@ -23,6 +23,7 @@ package org.matsim.analysis;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -96,7 +97,8 @@ ShutdownListener {
 		this.modeOut = IOUtils.getBufferedWriter(this.modeFileName + ".txt");
 		try {
 			this.modeOut.write("Iteration");
-			this.modes = scoreConfig.getModes().keySet();
+			this.modes = new HashSet<>();
+			this.modes.addAll(scoreConfig.getAllModes());
 			for ( String mode : modes ) {
 				this.modeOut.write("\t" + mode);
 			}
