@@ -171,7 +171,14 @@ public class TravelDistanceEvaluator {
 				bw.newLine();
 				bw.write("distance");
 				for (String s : activityDistanceBins.keySet()){
-					bw.write(";"+s);
+					if (s.equals("other")) bw.write(";"+"4 - private Erledigung");
+					else if (s.equals("home")) bw.write(";"+"1 - Wohnung");
+					else if (s.equals("work")) bw.write(";"+"2 - Arbeit");
+					else if (s.equals("shopping")) bw.write(";"+"3 - Einkauf");
+					else if (s.equals("education")) bw.write(";"+"6 - Ausbildung");
+					else if (s.equals("leisure")) bw.write(";"+"6 - Freizeit");
+
+					
 				}
 				for (int i = 0; i<51;i++){
 					bw.newLine();
