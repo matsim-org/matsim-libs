@@ -172,7 +172,7 @@ public class EquilOpdytsIT {
                     line = reader.readLine();
                 } else {
                     String parts[] = line.split("\t");
-                    share = Double.valueOf(parts[3]);
+                    share = Double.valueOf(parts[1]);
                     line = reader.readLine();
                 }
             }
