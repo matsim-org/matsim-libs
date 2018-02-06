@@ -21,7 +21,6 @@ package org.matsim.facilities;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.matsim.api.core.v01.Coord;
@@ -39,7 +38,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
-import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * Created by amit on 05.02.18.
@@ -48,18 +46,17 @@ import org.matsim.testcases.MatsimTestUtils;
 @RunWith(JUnitParamsRunner.class)
 public class ActivityFacilitiesSourceTest {
 
-    @Rule
-    public MatsimTestUtils utils = new MatsimTestUtils();
     private final String mode = TransportMode.car;
+    private static final String outDir = "test/output/"+ActivityFacilitiesSourceTest.class.getCanonicalName().replace('.','/')+"/";
 
     @Test
     @Parameters
     public void facilitiesSourceTest(FacilitiesConfigGroup.FacilitiesSource facilitiesSource, boolean facilitiesWithCoordOnly) {
+
         Scenario scenario = prepareScenario(facilitiesSource, facilitiesWithCoordOnly);
         scenario.getConfig()
                 .controler()
-                .setOutputDirectory(IOUtils.getUrlFromFileOrResource(utils.getOutputDirectory())
-                                           .getPath() + "/" + facilitiesSource.toString() + "/facilitiesWithCoordOnly_" + String
+                .setOutputDirectory(outDir + "/" + facilitiesSource.toString() + "/facilitiesWithCoordOnly_" + String
                         .valueOf(facilitiesWithCoordOnly) + "/");
         new Controler(scenario).run();
     }
