@@ -36,8 +36,6 @@ public final class EditPlans {
 	}
 	public boolean addActivityAtEnd(MobsimAgent agent, Activity activity, String routingMode) {
 		log.debug("entering addActivityAtEnd with routingMode=" + routingMode) ;
-		Link link = mobsim.getScenario().getNetwork().getLinks().get(Id.createLinkId(51825));;
-		log.debug( "link 51825 free speed=" + link.getFreespeed( mobsim.getSimTimer().getTimeOfDay()) );
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		List<PlanElement> planElements = plan.getPlanElements();
