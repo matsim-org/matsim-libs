@@ -73,7 +73,7 @@ public class ActivityFacilitiesSourceTest {
     }
 
     @Test
-    public void noFacilitiesTest() {
+    public void test() {
         Scenario scenario = prepareScenario();
         new Controler(scenario).run();
     }
