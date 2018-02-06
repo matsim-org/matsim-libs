@@ -36,6 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.FacilitiesConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -58,9 +59,8 @@ public class ActivityFacilitiesSourceTest {
         new File(testOutDir).mkdirs();
 
         Scenario scenario = prepareScenario(facilitiesSource, facilitiesWithCoordOnly);
-        scenario.getConfig()
-                .controler()
-                .setOutputDirectory(testOutDir);
+        scenario.getConfig().controler().setOutputDirectory(testOutDir);
+        scenario.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.overwriteExistingFiles);
         new Controler(scenario).run();
     }
 
