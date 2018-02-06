@@ -75,7 +75,7 @@ public class ActivityFacilitiesSourceTest {
     @Test
     public void test() {
         Scenario scenario = prepareScenario();
-        scenario.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
+        scenario.getConfig().controler().setOutputDirectory(IOUtils.getUrlFromFileOrResource(utils.getOutputDirectory()).getPath());
         new Controler(scenario).run();
     }
 
