@@ -22,6 +22,7 @@ package org.matsim.pt.transitSchedule;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.vehicles.Vehicle;
 
 
@@ -35,6 +36,7 @@ public class DepartureImpl implements Departure {
 	private final Id<Departure> id;
 	private final double departureTime;
 	private Id<Vehicle> vehicleId = null;
+	private final Attributes attributes = new Attributes();
 	
 	protected DepartureImpl(final Id<Departure> id, final double departureTime) {
 		this.id = id;
@@ -59,6 +61,11 @@ public class DepartureImpl implements Departure {
 	@Override
 	public Id<Vehicle> getVehicleId() {
 		return this.vehicleId;
+	}
+
+	@Override
+	public Attributes getAttributes() {
+		return this.attributes;
 	}
 
 	@Override

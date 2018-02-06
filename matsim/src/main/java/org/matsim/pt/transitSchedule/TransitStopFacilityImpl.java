@@ -27,7 +27,9 @@ import org.matsim.api.core.v01.Customizable;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.scenario.CustomizableUtils;
+import org.matsim.pt.transitSchedule.api.TransitStopArea;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * A facility (infrastructure) describing a public transport stop.
@@ -37,18 +39,18 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 public class TransitStopFacilityImpl implements TransitStopFacility {
 	
 	private final Id<TransitStopFacility> id;
-	private String stopPostAreaId;
+	private Id<TransitStopArea> stopAreaId;
 	private Coord coord;
 	private Id<Link> linkId = null;
 	private final boolean isBlockingLane;
 	private String name = null;
 	private Customizable customizableDelegate;
+	private final Attributes attributes = new Attributes();
 
 	protected TransitStopFacilityImpl(final Id<TransitStopFacility> id, final Coord coord, final boolean isBlockingLane) {
 		this.id = id;
 		this.coord = coord;
 		this.isBlockingLane = isBlockingLane;
-		this.stopPostAreaId = id.toString();
 	}
 
 	@Override
@@ -97,13 +99,13 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 	}
 
 	@Override
-	public String getStopPostAreaId() {
-		return stopPostAreaId;
+	public Id<TransitStopArea> getStopAreaId() {
+		return this.stopAreaId;
 	}
 
 	@Override
-	public void setStopPostAreaId(String stopPostAreaId) {
-		this.stopPostAreaId = stopPostAreaId;
+	public void setStopAreaId(Id<TransitStopArea> stopAreaId) {
+		this.stopAreaId = stopAreaId;
 	}
 	
 	@Override
@@ -114,5 +116,8 @@ public class TransitStopFacilityImpl implements TransitStopFacility {
 		return this.customizableDelegate.getCustomAttributes();
 	}
 
-
+	@Override
+	public Attributes getAttributes() {
+		return this.attributes;
+	}
 }

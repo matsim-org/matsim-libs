@@ -20,15 +20,19 @@
 
 package org.matsim.pt.transitSchedule.api;
 
+import java.io.InputStream;
 import java.net.URL;
+import java.util.Stack;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimReader;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.core.utils.io.MatsimFileTypeGuesser;
+import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
+import org.matsim.pt.transitSchedule.TransitScheduleReaderV2;
+import org.xml.sax.Attributes;
 
 /**
  * Reads {@link TransitSchedule}s from file as long as the files are in one of the
@@ -49,23 +53,55 @@ public class TransitScheduleReader implements MatsimReader {
 	}
 
 	public TransitScheduleReader(final Scenario scenario) {
-		this( new IdentityTransformation() , scenario );
+		this(new IdentityTransformation(), scenario);
 	}
 
 	@Override
 	public void readFile(final String filename) throws UncheckedIOException {
-		MatsimFileTypeGuesser guesser = new MatsimFileTypeGuesser(filename);
-		String systemId = guesser.getSystemId();
-		if (systemId.endsWith("transitSchedule_v1.dtd")) {
-			new TransitScheduleReaderV1( transformation , this.scenario).readFile(filename);
-		} else {
-			throw new UncheckedIOException("Unsupported file format: " + systemId);
-		}
-
+		new XmlScheduleReader(this.transformation, this.scenario).readFile(filename);
 	}
 
 	public void readURL(final URL url) throws UncheckedIOException {
-		new TransitScheduleReaderV1( transformation , this.scenario).parse(url);
+		new XmlScheduleReader(this.transformation, this.scenario).parse(url);
+	}
+
+	public void readStream(final InputStream stream) throws UncheckedIOException {
+		new XmlScheduleReader(this.transformation, this.scenario).parse(stream);
+	}
+
+	private static class XmlScheduleReader extends MatsimXmlParser {
+
+		private MatsimXmlParser delegate = null;
+		private final CoordinateTransformation transformation;
+		private final Scenario scenario;
+
+		public XmlScheduleReader(CoordinateTransformation transformation, Scenario scenario) {
+			this.transformation = transformation;
+			this.scenario = scenario;
+		}
+
+		@Override
+		public void startTag(String name, Attributes atts, Stack<String> context) {
+			this.delegate.startTag(name, atts, context);
+		}
+
+		@Override
+		public void endTag(String name, String content, Stack<String> context) {
+			this.delegate.endTag(name, content, context);
+		}
+
+		@Override
+		protected void setDoctype(String doctype) {
+			super.setDoctype(doctype);
+
+			if ("transitSchedule_v2.dtd".equals(doctype)) {
+				this.delegate = new TransitScheduleReaderV2(this.transformation, this.scenario);
+			} else if ("transitSchedule_v1.dtd".equals(doctype)) {
+				this.delegate = new TransitScheduleReaderV1(this.transformation, this.scenario);
+			} else {
+				throw new IllegalArgumentException("Unsupported doctype: " + doctype);
+			}
+		}
 	}
 
 }
