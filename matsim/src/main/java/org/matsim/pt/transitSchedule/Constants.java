@@ -56,6 +56,9 @@ abstract class Constants {
 	static final String STOP_AREA_ID = "stopAreaId";
 	static final String ATTRIBUTES = "attributes";
 	static final String ATTRIBUTE = "attribute";
-	static final String CLASS = "class";
-
+	static final String MINIMAL_TRANSFER_TIMES = "minimalTransferTimes";
+	static final String RELATION = "relation";
+	static final String FROM_STOP = "fromStop";
+	static final String TO_STOP = "toStop";
+	static final String TRANSFER_TIME = "transferTime";
 }

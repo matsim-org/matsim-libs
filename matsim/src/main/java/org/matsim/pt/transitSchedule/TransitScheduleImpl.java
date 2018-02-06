@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
@@ -48,6 +49,7 @@ public class TransitScheduleImpl implements TransitSchedule {
 	private final ObjectAttributes transitLinesAttributes = new ObjectAttributes();
 	private final ObjectAttributes transitStopsAttributes = new ObjectAttributes();
 	private final Attributes attributes = new Attributes();
+	private final MinimalTransferTimes minimalTransferTimes = new MinimalTransferTimesImpl();
 
 	protected TransitScheduleImpl(final TransitScheduleFactory builder) {
 		this.factory = builder;
@@ -125,5 +127,10 @@ public class TransitScheduleImpl implements TransitSchedule {
 	@Override
 	public Attributes getAttributes() {
 		return this.attributes;
+	}
+
+	@Override
+	public MinimalTransferTimes getMinimalTransferTimes() {
+		return this.minimalTransferTimes;
 	}
 }

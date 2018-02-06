@@ -65,6 +65,9 @@ public class TransitScheduleIOTest {
 			schedule.addStopFacility(stop1);
 			schedule.addStopFacility(stop2);
 
+			schedule.getMinimalTransferTimes().set(stop1.getId(), stop2.getId(), 300.0);
+			schedule.getMinimalTransferTimes().set(stop2.getId(), stop1.getId(), 360.0);
+;
 			TransitLine line1 = f.createTransitLine(Id.create("blue", TransitLine.class));
 			line1.getAttributes().putAttribute("color", "like the sky");
 			line1.getAttributes().putAttribute("operator", "higher being");
@@ -97,8 +100,9 @@ public class TransitScheduleIOTest {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		new TransitScheduleWriterV2(schedule).write(outputStream);
 
-		String dataWritten = new String(outputStream.toByteArray());
-		System.out.println(dataWritten);
+		// to see the actual XML written:
+//		String dataWritten = new String(outputStream.toByteArray());
+//		System.out.println(dataWritten);
 
 		// read data
 		ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
@@ -110,12 +114,18 @@ public class TransitScheduleIOTest {
 		Assert.assertEquals("myImagination", schedule2.getAttributes().getAttribute("source"));
 
 		// assert stop facilities
-		Assert.assertTrue(AttributesUtils.isEmpty(schedule2.getFacilities().get(Id.create(1, TransitStopFacility.class)).getAttributes()));
+		TransitStopFacility stop1 = schedule2.getFacilities().get(Id.create(1, TransitStopFacility.class));
+		Assert.assertTrue(AttributesUtils.isEmpty(stop1.getAttributes()));
 		TransitStopFacility stop2 = schedule2.getFacilities().get(Id.create(2, TransitStopFacility.class));
 		Assert.assertFalse(AttributesUtils.isEmpty(stop2.getAttributes()));
 		Assert.assertEquals("thin", stop2.getAttributes().getAttribute("air"));
 		Assert.assertTrue(stop2.getCoord().hasZ());
 		Assert.assertEquals(98765.0, stop2.getCoord().getZ(), 0.0);
+
+		// assert minmal transfer times
+		Assert.assertEquals(300, schedule2.getMinimalTransferTimes().get(stop1.getId(), stop2.getId()), 0.0);
+		Assert.assertEquals(360, schedule2.getMinimalTransferTimes().get(stop2.getId(), stop1.getId()), 0.0);
+		Assert.assertEquals(Double.NaN, schedule2.getMinimalTransferTimes().get(stop1.getId(), stop1.getId()), 0.0);
 
 		// assert transit lines
 		TransitLine line1 = schedule2.getTransitLines().get(Id.create("blue", TransitLine.class));

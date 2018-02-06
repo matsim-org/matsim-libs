@@ -169,6 +169,11 @@ public class TransitScheduleReaderV2 extends MatsimXmlParser {
 			}
 			stop.awaitDeparture = Boolean.parseBoolean(atts.getValue(Constants.AWAIT_DEPARTURE));
 			this.currentTransitRoute.stops.add(stop);
+		} else if (Constants.RELATION.equals(name)) {
+			Id<TransitStopFacility> fromStop = Id.create(atts.getValue(Constants.FROM_STOP), TransitStopFacility.class);
+			Id<TransitStopFacility> toStop = Id.create(atts.getValue(Constants.TO_STOP), TransitStopFacility.class);
+			double transferTime = Time.parseTime(atts.getValue(Constants.TRANSFER_TIME));
+			this.schedule.getMinimalTransferTimes().set(fromStop, toStop, transferTime);
 		} else if (Constants.ATTRIBUTE.equals(name)) {
 			this.attributesDelegate.startTag(name, atts, context, this.currentAttributes);
 		} else if (Constants.ATTRIBUTES.equals(name)) {

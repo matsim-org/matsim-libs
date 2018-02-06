@@ -62,4 +62,5 @@ public interface TransitSchedule extends MatsimToplevelContainer, Attributable {
 	
 	ObjectAttributes getTransitStopsAttributes();
 
+	MinimalTransferTimes getMinimalTransferTimes();
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<!ELEMENT transitSchedule  (attributes?,transitStops?,transitLine*)>
+<!ELEMENT transitSchedule  (attributes?,transitStops?,minimalTransferTimes?,transitLine*)>
 
 
 <!ELEMENT attributes    (attribute*)>
@@ -22,6 +22,15 @@
           name             CDATA   #IMPLIED
           stopAreaId       CDATA   #IMPLIED
           isBlocking       (true|false)  "false">
+
+<!ELEMENT minimalTransferTimes    (relation*)>
+
+<!ELEMENT relation         EMPTY>
+<!ATTLIST relation
+          fromStop         CDATA   #REQUIRED
+          toStop           CDATA   #REQUIRED
+          transferTime     CDATA   #REQUIRED>
+<!-- relations specify the transferTime in seconds between two stop facilities in the specified direction -->
 
 <!ELEMENT transitLine      (attributes?,transitRoute*)>
 <!ATTLIST transitLine

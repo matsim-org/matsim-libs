@@ -37,6 +37,7 @@ import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -93,6 +94,7 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 		this.attributesWriter.writeAttributes( "\t" , this.writer , this.schedule.getAttributes() );
 
 		this.writeTransitStops();
+		this.writeMinimalTransferTimes();
 		for (TransitLine line : this.schedule.getTransitLines().values()) {
 			writeTransitLine(line);
 		}
@@ -137,6 +139,23 @@ public class TransitScheduleWriterV2 extends MatsimXmlWriter implements MatsimSo
 		}
 
 		this.writeEndTag(Constants.TRANSIT_STOPS);
+	}
+
+	private void writeMinimalTransferTimes() {
+		List<Tuple<String, String>> attributes = new ArrayList<>(5);
+		MinimalTransferTimes.MinimalTransferTimesIterator iter = this.schedule.getMinimalTransferTimes().iterator();
+		if (iter.hasNext()) {
+			this.writeStartTag(Constants.MINIMAL_TRANSFER_TIMES, attributes);
+			while (iter.hasNext()) {
+				iter.next();
+				attributes.clear();
+				attributes.add(createTuple(Constants.FROM_STOP, iter.getFromStopId().toString()));
+				attributes.add(createTuple(Constants.TO_STOP, iter.getToStopId().toString()));
+				attributes.add(createTuple(Constants.TRANSFER_TIME, iter.getSeconds()));
+				this.writeStartTag(Constants.RELATION, attributes, true);
+			}
+			this.writeEndTag(Constants.MINIMAL_TRANSFER_TIMES);
+		}
 	}
 
 	private void writeTransitLine(final TransitLine line) throws IOException,  UncheckedIOException {
