@@ -75,6 +75,7 @@ public class ActivityFacilitiesSourceTest {
     @Test
     public void test() {
         Scenario scenario = prepareScenario();
+        scenario.getConfig().controler().setOutputDirectory(utils.getOutputDirectory());
         new Controler(scenario).run();
     }
 
@@ -82,7 +83,6 @@ public class ActivityFacilitiesSourceTest {
     private Scenario prepareScenario() {
         Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml"));
         config.plans().setInputFile(null);
-        config.controler().setOutputDirectory(utils.getOutputDirectory());
         config.controler().setLastIteration(0);
 
         switch (this.facilitiesSource){
