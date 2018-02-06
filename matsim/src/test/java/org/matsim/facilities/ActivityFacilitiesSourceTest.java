@@ -56,18 +56,23 @@ public class ActivityFacilitiesSourceTest {
     @Parameters
     public void facilitiesSourceTest(FacilitiesConfigGroup.FacilitiesSource facilitiesSource, boolean facilitiesWithCoordOnly) {
         Scenario scenario = prepareScenario(facilitiesSource, facilitiesWithCoordOnly);
-        scenario.getConfig().controler().setOutputDirectory(IOUtils.getUrlFromFileOrResource(utils.getOutputDirectory()).getPath());
+        scenario.getConfig()
+                .controler()
+                .setOutputDirectory(IOUtils.getUrlFromFileOrResource(utils.getOutputDirectory())
+                                           .getPath() + "/" + facilitiesSource.toString() + "/facilitiesWithCoordOnly_" + String
+                        .valueOf(facilitiesWithCoordOnly) + "/");
         new Controler(scenario).run();
     }
+
     private Object[] parametersForFacilitiesSourceTest() {
-                return new Object[]{
-                        new Object[]{FacilitiesConfigGroup.FacilitiesSource.none, true}, // true/false doen't matter with 'none'
-                        new Object[]{FacilitiesConfigGroup.FacilitiesSource.fromFile, true},// true/false doen't matter with 'fromFile'
-                        new Object[]{FacilitiesConfigGroup.FacilitiesSource.setInScenario, true},
-                        new Object[]{FacilitiesConfigGroup.FacilitiesSource.setInScenario, false},
-                        new Object[]{FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile, true},
-                        new Object[]{FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile, false}
-                };
+        return new Object[]{
+                new Object[]{FacilitiesConfigGroup.FacilitiesSource.none, true}, // true/false doen't matter with 'none'
+                new Object[]{FacilitiesConfigGroup.FacilitiesSource.fromFile, true},// true/false doen't matter with 'fromFile'
+                new Object[]{FacilitiesConfigGroup.FacilitiesSource.setInScenario, true},
+                new Object[]{FacilitiesConfigGroup.FacilitiesSource.setInScenario, false},
+                new Object[]{FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile, true},
+                new Object[]{FacilitiesConfigGroup.FacilitiesSource.onePerActivityLocationInPlansFile, false}
+        };
     }
 
     // create basic scenario
@@ -76,7 +81,7 @@ public class ActivityFacilitiesSourceTest {
         config.plans().setInputFile(null);
         config.controler().setLastIteration(0);
 
-        switch (facilitiesSource){
+        switch (facilitiesSource) {
             case fromFile:
                 break;
             case none:
@@ -93,15 +98,23 @@ public class ActivityFacilitiesSourceTest {
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
 
-        if (facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.setInScenario)){
+        if (facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.setInScenario)) {
             ActivityFacilities facilities = scenario.getActivityFacilities();
             ActivityFacilitiesFactory factory = facilities.getFactory();
             if (facilitiesWithCoordOnly) {
-                facilities.addActivityFacility(factory.createActivityFacility(Id.create("1", ActivityFacility.class),new Coord(-25000.0,0.), null));
-                facilities.addActivityFacility(factory.createActivityFacility(Id.create("2", ActivityFacility.class),new Coord (10000.0, 0.0), null));
+                facilities.addActivityFacility(factory.createActivityFacility(Id.create("1", ActivityFacility.class),
+                        new Coord(-25000.0, 0.),
+                        null));
+                facilities.addActivityFacility(factory.createActivityFacility(Id.create("2", ActivityFacility.class),
+                        new Coord(10000.0, 0.0),
+                        null));
             } else {
-                facilities.addActivityFacility(factory.createActivityFacility(Id.create("1", ActivityFacility.class),null, Id.createLinkId("1")));
-                facilities.addActivityFacility(factory.createActivityFacility(Id.create("2", ActivityFacility.class),null, Id.createLinkId("20")));
+                facilities.addActivityFacility(factory.createActivityFacility(Id.create("1", ActivityFacility.class),
+                        null,
+                        Id.createLinkId("1")));
+                facilities.addActivityFacility(factory.createActivityFacility(Id.create("2", ActivityFacility.class),
+                        null,
+                        Id.createLinkId("20")));
             }
         }
 
@@ -113,20 +126,20 @@ public class ActivityFacilitiesSourceTest {
             Activity home = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
             home.setEndTime(7 * 3600.0);
             if (assignFacilityIdToActivity(facilitiesSource)) {
-                home.setFacilityId(Id.create("1",ActivityFacility.class));
+                home.setFacilityId(Id.create("1", ActivityFacility.class));
             }
             plan.addActivity(home);
             plan.addLeg(populationFactory.createLeg(mode));
             Activity work = populationFactory.createActivityFromCoord("w", new Coord(10000.0, 0.0));
             work.setEndTime(16 * 3600.0);
             if (assignFacilityIdToActivity(facilitiesSource)) {
-                work.setFacilityId(Id.create("2",ActivityFacility.class));
+                work.setFacilityId(Id.create("2", ActivityFacility.class));
             }
             plan.addActivity(work);
             plan.addLeg(populationFactory.createLeg(mode));
             Activity lastAct = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
             if (assignFacilityIdToActivity(facilitiesSource)) {
-                lastAct.setFacilityId(Id.create("1",ActivityFacility.class));
+                lastAct.setFacilityId(Id.create("1", ActivityFacility.class));
             }
             plan.addActivity(lastAct);
             person.addPlan(plan);
@@ -138,20 +151,20 @@ public class ActivityFacilitiesSourceTest {
             Activity home = populationFactory.createActivityFromLinkId("h", Id.createLinkId("1"));
             home.setEndTime(8 * 3600.0);
             if (assignFacilityIdToActivity(facilitiesSource)) {
-                home.setFacilityId(Id.create("1",ActivityFacility.class));
+                home.setFacilityId(Id.create("1", ActivityFacility.class));
             }
             plan.addActivity(home);
             plan.addLeg(populationFactory.createLeg(mode));
             Activity work = populationFactory.createActivityFromLinkId("w", Id.createLinkId("20"));
             if (assignFacilityIdToActivity(facilitiesSource)) {
-                work.setFacilityId(Id.create("2",ActivityFacility.class));
+                work.setFacilityId(Id.create("2", ActivityFacility.class));
             }
             work.setEndTime(17.5 * 3600.0);
             plan.addActivity(work);
             plan.addLeg(populationFactory.createLeg(mode));
             Activity lastAct = populationFactory.createActivityFromLinkId("h", Id.createLinkId("1"));
             if (assignFacilityIdToActivity(facilitiesSource)) {
-                lastAct.setFacilityId(Id.create("1",ActivityFacility.class));
+                lastAct.setFacilityId(Id.create("1", ActivityFacility.class));
             }
             plan.addActivity(lastAct);
             person.addPlan(plan);
@@ -162,21 +175,21 @@ public class ActivityFacilitiesSourceTest {
             Plan plan = populationFactory.createPlan();
             Activity home = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
             if (assignFacilityIdToActivity(facilitiesSource)) {
-                home.setFacilityId(Id.create("1",ActivityFacility.class));
+                home.setFacilityId(Id.create("1", ActivityFacility.class));
             }
             home.setEndTime(7.8 * 3600.0);
             plan.addActivity(home);
             plan.addLeg(populationFactory.createLeg(mode));
             Activity work = populationFactory.createActivityFromCoord("w", new Coord(10000.0, 0.0));
             if (assignFacilityIdToActivity(facilitiesSource)) {
-                work.setFacilityId(Id.create("2",ActivityFacility.class));
+                work.setFacilityId(Id.create("2", ActivityFacility.class));
             }
             work.setEndTime(18 * 3600.0);
             plan.addActivity(work);
             plan.addLeg(populationFactory.createLeg(mode));
             Activity lastAct = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
             if (assignFacilityIdToActivity(facilitiesSource)) {
-                lastAct.setFacilityId(Id.create("1",ActivityFacility.class));
+                lastAct.setFacilityId(Id.create("1", ActivityFacility.class));
             }
             plan.addActivity(lastAct);
             person.addPlan(plan);
@@ -187,7 +200,7 @@ public class ActivityFacilitiesSourceTest {
             Plan plan = populationFactory.createPlan();
             Activity home = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
             if (assignFacilityIdToActivity(facilitiesSource)) {
-                home.setFacilityId(Id.create("1",ActivityFacility.class));
+                home.setFacilityId(Id.create("1", ActivityFacility.class));
             }
             home.setEndTime(9 * 3600.0);
             home.setLinkId(Id.createLinkId("1"));
@@ -195,7 +208,7 @@ public class ActivityFacilitiesSourceTest {
             plan.addLeg(populationFactory.createLeg(mode));
             Activity work = populationFactory.createActivityFromCoord("w", new Coord(10000.0, 0.0));
             if (assignFacilityIdToActivity(facilitiesSource)) {
-                work.setFacilityId(Id.create("2",ActivityFacility.class));
+                work.setFacilityId(Id.create("2", ActivityFacility.class));
             }
             work.setEndTime(18.5 * 3600.0);
             work.setLinkId(Id.createLinkId("20"));
@@ -203,7 +216,7 @@ public class ActivityFacilitiesSourceTest {
             plan.addLeg(populationFactory.createLeg(mode));
             Activity lastAct = populationFactory.createActivityFromCoord("h", new Coord(-25000.0, 0.0));
             if (assignFacilityIdToActivity(facilitiesSource)) {
-                lastAct.setFacilityId(Id.create("1",ActivityFacility.class));
+                lastAct.setFacilityId(Id.create("1", ActivityFacility.class));
             }
             plan.addActivity(lastAct);
             person.addPlan(plan);
@@ -213,6 +226,7 @@ public class ActivityFacilitiesSourceTest {
     }
 
     private boolean assignFacilityIdToActivity(FacilitiesConfigGroup.FacilitiesSource facilitiesSource) {
-        return facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.setInScenario) || facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.fromFile);
+        return facilitiesSource.equals(FacilitiesConfigGroup.FacilitiesSource.setInScenario) || facilitiesSource.equals(
+                FacilitiesConfigGroup.FacilitiesSource.fromFile);
     }
 }
