@@ -19,6 +19,7 @@
 
 package org.matsim.facilities;
 
+import java.io.File;
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
 import org.junit.Test;
@@ -52,12 +53,14 @@ public class ActivityFacilitiesSourceTest {
     @Test
     @Parameters
     public void facilitiesSourceTest(FacilitiesConfigGroup.FacilitiesSource facilitiesSource, boolean facilitiesWithCoordOnly) {
+        String testOutDir = outDir + "/" + facilitiesSource.toString() + "_facilitiesWithCoordOnly_" + String
+                .valueOf(facilitiesWithCoordOnly) + "/";
+        new File(testOutDir).mkdirs();
 
         Scenario scenario = prepareScenario(facilitiesSource, facilitiesWithCoordOnly);
         scenario.getConfig()
                 .controler()
-                .setOutputDirectory(outDir + "/" + facilitiesSource.toString() + "/facilitiesWithCoordOnly_" + String
-                        .valueOf(facilitiesWithCoordOnly) + "/");
+                .setOutputDirectory(testOutDir);
         new Controler(scenario).run();
     }
 
