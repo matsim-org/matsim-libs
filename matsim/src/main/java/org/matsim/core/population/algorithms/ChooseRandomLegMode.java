@@ -121,6 +121,8 @@ public final class ChooseRandomLegMode implements PlanAlgorithm {
 				/* if the new Mode is after the currentMode in the list of possible
 				 * modes, go one further, as we have to ignore the current mode in
 				 * the list of possible modes. */
+				// yyyyyy This gives the mode after the current mode twice the weight.
+				// Not good.  kai, feb'18
 				newModeIdx++;
 				break;
 			}
