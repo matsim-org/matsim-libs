@@ -56,8 +56,7 @@ public class AbstractTransitRouter {
 	private Leg createAccessTransitWalkLeg(Coord fromCoord, RouteSegment routeSegement) {
 		Leg leg = this.createTransitWalkLeg(fromCoord, routeSegement.fromStop.getCoord());
 		Route walkRoute = RouteUtils.createGenericRouteImpl(null, routeSegement.fromStop.getLinkId());
-		leg.setTravelTime( getTransferTime(null,fromCoord, routeSegement.fromStop.getCoord()) );
-		walkRoute.setTravelTime(getTransferTime(null,fromCoord, routeSegement.fromStop.getCoord()) );
+		walkRoute.setTravelTime(leg.getTravelTime() );
 		walkRoute.setDistance(trConfig.getBeelineDistanceFactor() * NetworkUtils.getEuclideanDistance(fromCoord, routeSegement.fromStop.getCoord()));
 		leg.setRoute(walkRoute);
 		return leg;
@@ -66,8 +65,7 @@ public class AbstractTransitRouter {
 	private Leg createEgressTransitWalkLeg(RouteSegment routeSegement, Coord toCoord) {
 		Leg leg = this.createTransitWalkLeg(routeSegement.toStop.getCoord(), toCoord);
 		Route walkRoute = RouteUtils.createGenericRouteImpl(routeSegement.toStop.getLinkId(), null);
-		leg.setTravelTime( getTransferTime(null,routeSegement.toStop.getCoord(), toCoord) );
-		walkRoute.setTravelTime(getTransferTime(null,routeSegement.toStop.getCoord(), toCoord) );
+		walkRoute.setTravelTime(leg.getTravelTime() );
 		walkRoute.setDistance(trConfig.getBeelineDistanceFactor() * NetworkUtils.getEuclideanDistance(routeSegement.toStop.getCoord(), toCoord));
 		leg.setRoute(walkRoute);
 		return leg;
