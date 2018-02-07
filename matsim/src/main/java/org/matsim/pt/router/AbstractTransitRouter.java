@@ -53,6 +53,26 @@ public class AbstractTransitRouter {
 		return legs;
 	}
 
+	private Leg createAccessTransitWalkLeg(Coord fromCoord, RouteSegment routeSegement) {
+		Leg leg = this.createTransitWalkLeg(fromCoord, routeSegement.fromStop.getCoord());
+		Route walkRoute = RouteUtils.createGenericRouteImpl(null, routeSegement.fromStop.getLinkId());
+		leg.setTravelTime( getTransferTime(null,fromCoord, routeSegement.fromStop.getCoord()) );
+		walkRoute.setTravelTime(getTransferTime(null,fromCoord, routeSegement.fromStop.getCoord()) );
+		walkRoute.setDistance(trConfig.getBeelineDistanceFactor() * NetworkUtils.getEuclideanDistance(fromCoord, routeSegement.fromStop.getCoord()));
+		leg.setRoute(walkRoute);
+		return leg;
+	}
+
+	private Leg createEgressTransitWalkLeg(RouteSegment routeSegement, Coord toCoord) {
+		Leg leg = this.createTransitWalkLeg(routeSegement.toStop.getCoord(), toCoord);
+		Route walkRoute = RouteUtils.createGenericRouteImpl(routeSegement.toStop.getLinkId(), null);
+		leg.setTravelTime( getTransferTime(null,routeSegement.toStop.getCoord(), toCoord) );
+		walkRoute.setTravelTime(getTransferTime(null,routeSegement.toStop.getCoord(), toCoord) );
+		walkRoute.setDistance(trConfig.getBeelineDistanceFactor() * NetworkUtils.getEuclideanDistance(routeSegement.toStop.getCoord(), toCoord));
+		leg.setRoute(walkRoute);
+		return leg;
+	}
+
 	private Leg createTransferTransitWalkLeg(RouteSegment routeSegement) {
 		Leg leg = this.createTransitWalkLeg(routeSegement.getFromStop().getCoord(), routeSegement.getToStop().getCoord());
 		Route walkRoute = RouteUtils.createGenericRouteImpl(routeSegement.getFromStop().getLinkId(), routeSegement.getToStop().getLinkId());
@@ -76,12 +96,14 @@ public class AbstractTransitRouter {
 		if (p.getRoute().get(0).getRouteTaken() == null) {
 			// route starts with transfer - extend initial walk to that stop
 			//TODO: what if first leg extends the walking distance to more than first routeSegment i.e., (accessLeg, transfer, transfer ...). Amit Jan'18
-			accessLeg = createTransitWalkLeg(fromCoord, p.getRoute().get(0).getToStop().getCoord());
+//			accessLeg = createTransitWalkLeg(fromCoord, p.getRoute().get(0).getToStop().getCoord());
+			accessLeg = createAccessTransitWalkLeg(fromCoord, p.getRoute().get(0));
 			p.getRoute().remove(0);
 		} else {
 			// do not extend it - add a regular walk leg
 			//
-			accessLeg = createTransitWalkLeg(fromCoord, p.getRoute().get(0).getFromStop().getCoord());
+//			accessLeg = createTransitWalkLeg(fromCoord, p.getRoute().get(0).getFromStop().getCoord());
+			accessLeg = createAccessTransitWalkLeg(fromCoord, p.getRoute().get(0));
 		}
 
 		// egress leg
@@ -89,12 +111,14 @@ public class AbstractTransitRouter {
 		// check if first leg extends walking distance
 		if (p.getRoute().get(p.getRoute().size() - 1).getRouteTaken() == null) {
 			// route starts with transfer - extend initial walk to that stop
-			egressLeg = createTransitWalkLeg(p.getRoute().get(p.getRoute().size() - 1).getFromStop().getCoord(), toCoord);
+//			egressLeg = createTransitWalkLeg(p.getRoute().get(p.getRoute().size() - 1).getFromStop().getCoord(), toCoord);
+			egressLeg = createEgressTransitWalkLeg(p.getRoute().get(p.getRoute().size() - 1), toCoord);
 			p.getRoute().remove(p.getRoute().size() - 1);
 		} else {
 			// do not extend it - add a regular walk leg
 			// access leg
-			egressLeg = createTransitWalkLeg(p.getRoute().get(p.getRoute().size() - 1).getToStop().getCoord(), toCoord);
+//			egressLeg = createTransitWalkLeg(p.getRoute().get(p.getRoute().size() - 1).getToStop().getCoord(), toCoord);
+			egressLeg = createEgressTransitWalkLeg(p.getRoute().get(p.getRoute().size() - 1), toCoord);
 		}
 
 
@@ -125,6 +149,7 @@ public class AbstractTransitRouter {
 		TransitStopFacility egressStop = routeSegment.getToStop();
 
 		ExperimentalTransitRoute ptRoute = new ExperimentalTransitRoute(accessStop, egressStop, routeSegment.getLineTaken(), routeSegment.getRouteTaken());
+		ptRoute.setTravelTime(routeSegment.travelTime);
 		leg.setRoute(ptRoute);
 
 		leg.setTravelTime(routeSegment.getTravelTime());
