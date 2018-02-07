@@ -40,15 +40,15 @@ public class WithinDayQSimFactory implements Provider<Mobsim> {
 	private final EventsManager eventsManager;
 	private final WithinDayEngine withinDayEngine;
 	private final FixedOrderSimulationListener fixedOrderSimulationListener;
-	private final WithinDayTravelTime travelTimeCollector;
+	private final WithinDayTravelTime WithinDayTravelTime;
 
 	@Inject
-	WithinDayQSimFactory(Scenario scenario, EventsManager eventsManager, WithinDayEngine withinDayEngine, FixedOrderSimulationListener fixedOrderSimulationListener, WithinDayTravelTime travelTimeCollector) {
+	WithinDayQSimFactory(Scenario scenario, EventsManager eventsManager, WithinDayEngine withinDayEngine, FixedOrderSimulationListener fixedOrderSimulationListener, WithinDayTravelTime WithinDayTravelTime) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.withinDayEngine = withinDayEngine;
 		this.fixedOrderSimulationListener = fixedOrderSimulationListener;
-		this.travelTimeCollector = travelTimeCollector;
+		this.WithinDayTravelTime = WithinDayTravelTime;
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class WithinDayQSimFactory implements Provider<Mobsim> {
 		log.info("Adding WithinDayEngine to Mobsim.");
 		mobsim.addMobsimEngine(withinDayEngine);
 		mobsim.addQueueSimulationListeners(fixedOrderSimulationListener);
-		mobsim.addQueueSimulationListeners(travelTimeCollector);
+		mobsim.addQueueSimulationListeners(WithinDayTravelTime);
 		return mobsim;
 	}
 }

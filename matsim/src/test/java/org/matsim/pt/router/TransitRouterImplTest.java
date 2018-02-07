@@ -22,12 +22,10 @@ package org.matsim.pt.router;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -47,7 +45,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.router.DefaultRoutingModules;
@@ -241,6 +238,28 @@ public class TransitRouterImplTest {
 		double expectedTravelTime = 31.0 * 60 + // agent takes the *:06 course, arriving in C at *:18, departing at *:21, arriving in K at*:31
 				CoordUtils.calcEuclideanDistance(f.schedule.getFacilities().get(Id.create("19", TransitStopFacility.class)).getCoord(), toCoord) / trConfig.getBeelineWalkSpeed();
 		assertEquals(expectedTravelTime, actualTravelTime, MatsimTestCase.EPSILON);
+	}
+
+	@Test
+	public void testTransferWalkDistance(){
+		Fixture f = new Fixture();
+		f.init();
+		TransitRouterConfig config = new TransitRouterConfig(f.scenario.getConfig().planCalcScore(),
+				f.scenario.getConfig().plansCalcRoute(), f.scenario.getConfig().transitRouter(),
+				f.scenario.getConfig().vspExperimental());
+		TransitRouter router = createTransitRouter(f.schedule, config, routerType);
+		Coord fromCoord = new Coord((double) 3800, (double) 5100);
+		Coord toCoord = new Coord((double) 16100, (double) 10050);
+		List<Leg> legs = router.calcRoute(new FakeFacility(fromCoord), new FakeFacility(toCoord), 6.0*3600, null);
+		Leg leg1 = legs.get(1);
+		ExperimentalTransitRoute route1 = (ExperimentalTransitRoute) leg1.getRoute();
+		Coord coord1 = f.schedule.getFacilities().get(route1.getEgressStopId()).getCoord();
+		Leg leg3 = legs.get(3);
+		ExperimentalTransitRoute route3 = (ExperimentalTransitRoute) leg3.getRoute();
+		Coord coord3 = f.schedule.getFacilities().get(route3.getAccessStopId()).getCoord();
+		double beelineFactor = f.scenario.getConfig().plansCalcRoute().getModeRoutingParams().get(TransportMode.walk).getBeelineDistanceFactor();
+		assertEquals(CoordUtils.calcEuclideanDistance(coord1, coord3) * beelineFactor,
+				legs.get(2).getRoute().getDistance(), MatsimTestCase.EPSILON);
 	}
 
 	@Test@Ignore

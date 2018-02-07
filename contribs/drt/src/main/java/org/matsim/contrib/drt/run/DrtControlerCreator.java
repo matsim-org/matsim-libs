@@ -24,10 +24,13 @@ package org.matsim.contrib.drt.run;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
+import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
+import org.matsim.contrib.drt.optimizer.insertion.PrecalculatablePathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
@@ -43,6 +46,7 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -75,8 +79,9 @@ public final class DrtControlerCreator {
 	}
 
 	private static Controler adjustControler(boolean otfvis, Scenario scenario) {
+		DrtConfigGroup drtCfg = DrtConfigGroup.get(scenario.getConfig());
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule(DrtControlerCreator.createModuleForQSimPlugin(),
+		controler.addOverridingModule(new DvrpModule(DrtControlerCreator.createModuleForQSimPlugin(drtCfg),
 				DrtOptimizer.class, DefaultUnplannedRequestInserter.class));
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
@@ -101,10 +106,20 @@ public final class DrtControlerCreator {
 				Logger.getLogger(DrtControlerCreator.class).info(
 						"drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 			}
+			if (!config.planCalcScore().getModes().containsKey(DrtStageActivityType.DRT_WALK)){
+				ModeParams drtWalk = new ModeParams(DrtStageActivityType.DRT_WALK);
+				ModeParams walk  = config.planCalcScore().getModes().get(TransportMode.walk);
+				drtWalk.setConstant(walk.getConstant());
+				drtWalk.setMarginalUtilityOfDistance(walk.getMarginalUtilityOfDistance());
+				drtWalk.setMarginalUtilityOfTraveling(walk.getMarginalUtilityOfTraveling());
+				drtWalk.setMonetaryDistanceRate(walk.getMonetaryDistanceRate());
+				Logger.getLogger(DrtControlerCreator.class).info(
+						"drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
+			}
 		}
 	}
 
-	public static com.google.inject.AbstractModule createModuleForQSimPlugin() {
+	public static com.google.inject.AbstractModule createModuleForQSimPlugin(DrtConfigGroup drtCfg) {
 		return new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
@@ -116,6 +131,14 @@ public final class DrtControlerCreator {
 				bind(DrtScheduler.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(DrtActionCreator.class).asEagerSingleton();
 				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
+				if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stationbased)) {
+					// StopBasedPathDataProvider consumes too much memory for larger networks with many stops
+					// still could be valuable for complex optimisers (more than just request insertion) 
+					// bind(PrecalculatablePathDataProvider.class).to(StopBasedPathDataProvider.class);
+					bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
+				} else {
+					bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
+				}
 			}
 
 			@Provides

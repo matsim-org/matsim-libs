@@ -278,7 +278,9 @@ public class EditRoutesTest extends MatsimTestCase {
 
 		activityW1 = (Activity) plan.getPlanElements().get(2);
 		activityW1.setLinkId(Id.create("l2", Link.class));	// move Activity location		
-		assertEquals(true, ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(), 0, 8.0*3600 )); // HW, start Link
+		final boolean result = ed.replanCurrentLegRoute((Leg) plan.getPlanElements().get(firstCarLeg), plan.getPerson(),
+				0, 8.0 * 3600);
+		assertEquals(true, result); // HW, start Link
 
 		final NetworkRoute route = (NetworkRoute)((Leg)plan.getPlanElements().get(firstCarLeg)).getRoute();
 		log.warn( route );

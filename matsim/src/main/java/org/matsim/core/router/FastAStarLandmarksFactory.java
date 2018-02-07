@@ -44,7 +44,7 @@ import org.matsim.core.router.util.TravelTime;
  */
 @Singleton
 public class FastAStarLandmarksFactory implements LeastCostPathCalculatorFactory {
-
+	
 	private final RoutingNetworkFactory routingNetworkFactory;
 	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
 	private final Map<Network, PreProcessLandmarks> preProcessData = new HashMap<>();

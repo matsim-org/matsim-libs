@@ -26,6 +26,9 @@ public class MatsimFacilitiesReaderTest {
 "			<capacity value=\"201.0\" />\n" +
 "			<opentime start_time=\"00:00:00\" end_time=\"24:00:00\" />\n" +
 "		</activity>\n" +
+"		<attributes>" +
+"			<attribute name=\"population\" class=\"java.lang.Integer\">1000</attribute>" +
+"		</attributes>" +
 "	</facility>\n" +
 "\n" +
 "	<facility id=\"10\" x=\"110.0\" y=\"270.0\" linkId=\"Bb\">\n" +
