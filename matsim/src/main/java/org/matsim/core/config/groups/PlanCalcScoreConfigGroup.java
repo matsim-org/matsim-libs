@@ -265,14 +265,10 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 	}
 
 	/* for the backward compatibility nonsense */
-<<<<<<< HEAD
-	private final Map<String, ActivityParams> activityTypesByNumber = new HashMap< >();
-
-	private boolean usingTravelDisutilityForScoring = false ;
-=======
 	private final Map<String, ActivityParams> activityTypesByNumber = new HashMap<>();
 
->>>>>>> refs/remotes/origin/master
+	private boolean usingTravelDisutilityForScoring = false ;
+
 	private ActivityParams getActivityTypeByNumber(final String number) {
 		ActivityParams actType = this.activityTypesByNumber.get(number);
 		if ((actType == null)) {
