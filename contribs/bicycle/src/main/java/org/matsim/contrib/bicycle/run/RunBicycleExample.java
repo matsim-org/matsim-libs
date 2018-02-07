@@ -37,12 +37,13 @@ public class RunBicycleExample {
 
 	public static void main(String[] args) {
 		// This works when the data is stored under "/matsim/contribs/bicycle/src/main/resources/bicycle_example"
+		boolean considerMotorizedInteraction = false;
 		Config config = ConfigUtils.loadConfig("bicycle_example/config-a.xml", new BicycleConfigGroup());
 		config.controler().setLastIteration(0);
-		new RunBicycleExample().run(config);
+		new RunBicycleExample().run(config, considerMotorizedInteraction);
 	}
 
-	public void run(Config config) {
+	public void run(Config config, boolean considerMotorizedInteraction) {
 //		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 		config.global().setNumberOfThreads(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
@@ -54,20 +55,21 @@ public class RunBicycleExample {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		VehicleType car = VehicleUtils.getFactory().createVehicleType(Id.create(TransportMode.car, VehicleType.class));
-		car.setMaximumVelocity(60.0/3.6);
-		car.setPcuEquivalents(1.0);
 		scenario.getVehicles().addVehicleType(car);
 
 		VehicleType bicycle = VehicleUtils.getFactory().createVehicleType(Id.create("bicycle", VehicleType.class));
-		bicycle.setMaximumVelocity(30.0/3.6);
-//		bicycle.setPcuEquivalents(0.0);
+		bicycle.setMaximumVelocity(15.0/3.6);
 		bicycle.setPcuEquivalents(0.25);
 		scenario.getVehicles().addVehicleType(bicycle);
 
 		scenario.getConfig().qsim().setVehiclesSource(QSimConfigGroup.VehiclesSource.modeVehicleTypesFromVehiclesData);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new BicycleModule());
+		BicycleModule bicycleModule = new BicycleModule();
+		if (considerMotorizedInteraction) {
+			bicycleModule.setConsiderMotorizedInteraction(true);
+		}
+		controler.addOverridingModule(bicycleModule);
 		
 		controler.run();
 	}
