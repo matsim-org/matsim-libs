@@ -64,17 +64,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 	private TempRoute currentRouteProfile = null;
 
 	private final CoordinateTransformation coordinateTransformation;
-	private final StringCache cache = new StringCache(); 
-
-	/**
-	 * @param schedule
-	 * @param network
-	 * @deprecated use {@link #TransitScheduleReaderV1(TransitSchedule, RouteFactories)}
-	 */
-	@Deprecated
-	public TransitScheduleReaderV1(final TransitSchedule schedule, final Network network) {
-		this(schedule, new RouteFactories());
-	}
+	private final StringCache cache = new StringCache();
 
 	public TransitScheduleReaderV1(final TransitSchedule schedule, final RouteFactories routeFactory) {
 		this( new IdentityTransformation() , schedule , routeFactory );
@@ -82,7 +72,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 
 	public TransitScheduleReaderV1(final Scenario scenario) {
 		this( scenario.getTransitSchedule(),
-				((PopulationFactory) (scenario.getPopulation().getFactory())).getRouteFactories() );
+				scenario.getPopulation().getFactory().getRouteFactories() );
 	}
 
 	public TransitScheduleReaderV1(
@@ -90,7 +80,7 @@ public class TransitScheduleReaderV1 extends MatsimXmlParser {
 			final Scenario scenario) {
 		this( coordinateTransformation,
 				scenario.getTransitSchedule(),
-				((PopulationFactory) (scenario.getPopulation().getFactory())).getRouteFactories() );
+				scenario.getPopulation().getFactory().getRouteFactories() );
 	}
 
 	public TransitScheduleReaderV1(
