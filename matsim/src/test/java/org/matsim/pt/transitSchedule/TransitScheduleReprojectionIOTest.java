@@ -34,10 +34,10 @@ public class TransitScheduleReprojectionIOTest {
 	public void testInput() {
 		URL transitSchedule = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReaderV1( originalScenario ).parse(transitSchedule);
+		new TransitScheduleReader( originalScenario ).readURL(transitSchedule);
 
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReaderV1( new Transformation() , reprojectedScenario ).parse(transitSchedule);
+		new TransitScheduleReader(new Transformation(), reprojectedScenario).readURL(transitSchedule);
 
 		assertCorrectlyReprojected( originalScenario.getTransitSchedule() , reprojectedScenario.getTransitSchedule() );
 	}
@@ -46,13 +46,13 @@ public class TransitScheduleReprojectionIOTest {
 	public void testOutput() {
 		URL transitSchedule = IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"), "transitschedule.xml");
 		final Scenario originalScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReaderV1( originalScenario ).parse(transitSchedule);
+		new TransitScheduleReader(originalScenario).readURL(transitSchedule);
 
 		final String file = utils.getOutputDirectory()+"/schedule.xml";
 		new TransitScheduleWriterV1( new Transformation() , originalScenario.getTransitSchedule() ).write( file );
 
 		final Scenario reprojectedScenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReaderV1( reprojectedScenario ).readFile( file );
+		new TransitScheduleReader(reprojectedScenario).readFile(file);
 
 		assertCorrectlyReprojected( originalScenario.getTransitSchedule() , reprojectedScenario.getTransitSchedule() );
 	}
