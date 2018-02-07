@@ -40,7 +40,10 @@ public class BicycleTravelTime implements TravelTime {
 		double cyclingInfrastructureSpeed = computeMinimumCyclingInfrastructureSpeed(type,
 				cycleway, minimumSpeedForDedicatedCyclingInfrastructure);
 		double infrastructureSpeed = Math.max(link.getFreespeed(), cyclingInfrastructureSpeed);
-
+		
+		// This is not yet available, but might be at some point, see https://matsim.atlassian.net/browse/MATSIM-700
+		// double bicycleVelocity = vehicle.getType().getMaximumVelocity()
+		// ... until then, use this workaround:
 		double vehicleLinkSpeed = Math.min(infrastructureSpeed, BicycleUtils.getSpeed("bicycle"));
 
 		double gradientSpeed = computeGradientSpeed(link, vehicleLinkSpeed);
