@@ -125,9 +125,10 @@ public class AbstractTransitRouter {
 
 		// route segments are now in pt-walk-pt sequence
 		for (RouteSegment routeSegement : p.getRoute()) {
-			if (routeSegement.getRouteTaken() == null) {
-				// transfer
-				legs.add(createTransferTransitWalkLeg(routeSegement));
+			if (routeSegement.getRouteTaken() == null) {// transfer
+				if (!routeSegement.fromStop.equals(routeSegement.toStop)) { // same to/from stop => no transfer. Amit Feb'18
+					legs.add(createTransferTransitWalkLeg(routeSegement));
+				}
 			} else {
 				// pt leg
 				legs.add(createTransitLeg(routeSegement));
