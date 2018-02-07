@@ -21,6 +21,7 @@ package org.matsim.contrib.bicycle.run;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.bicycle.BicycleLegScoring;
 import org.matsim.contrib.bicycle.MotorizedInteractionEvent;
 import org.matsim.contrib.bicycle.MotorizedInteractionEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -71,9 +72,12 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 		
 		CarCounter carCounter = new CarCounter(bicycleScoring);
 		eventsManager.addHandler(carCounter);
+		
+//		sumScoringFunction.addScoringFunction(new BicycleLegScoring(params, scenario.getNetwork(), (BicycleConfigGroup) scenario.getConfig().getModule("bicycle")));
 
 		return sumScoringFunction;
 	}
+
 	
 	private class CarCounter implements MotorizedInteractionEventHandler {
 		private BicycleScoring bicycleScoring;
