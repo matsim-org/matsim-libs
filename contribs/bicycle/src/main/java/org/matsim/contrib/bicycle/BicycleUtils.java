@@ -19,15 +19,20 @@
 package org.matsim.contrib.bicycle;
 
 /**
- * @author amit, dziemke
+ * This is just an intermediate solution until 
+ * <a href="https://matsim.atlassian.net/browse/MATSIM-700">https://matsim.atlassian.net/browse/MATSIM-700</a>
+ * is fixed.
+ * 
+ * @author dziemke based on amit
  */
+@Deprecated
 public class BicycleUtils {
-
 	public static double getSpeed(final String travelMode){
 		double speed;
-		switch (travelMode) {
-		case "bicycle": speed = 4.17; break;
-		default: throw new RuntimeException("No speed is set for travel mode "+travelMode+ ".");
+		if (travelMode == "bicycle") {
+			speed = 15.0/3.6;
+		} else {
+			throw new RuntimeException("No speed is set for travel mode " + travelMode + ".");
 		}
 		return speed;
 	}

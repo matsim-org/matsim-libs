@@ -40,8 +40,9 @@ public class BicycleTest {
 	
 	@Test
 	public void testNormal() {
-		String configFile = "./src/main/resources/bicycle_example/config-a.xml";
+		String configFile = "./src/main/resources/bicycle_example/config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		config.network().setInputFile("network_normal.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -56,8 +57,10 @@ public class BicycleTest {
 	
 	@Test
 	public void testCobblestone() {
-		String configFile = "./src/main/resources/bicycle_example/config-b.xml";
+		String configFile = "./src/main/resources/bicycle_example/config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		// Links 4-8 and 13-17 have cobblestones
+		config.network().setInputFile("network_cobblestone.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -72,8 +75,10 @@ public class BicycleTest {
 	
 	@Test
 	public void testPedestrian() {
-		String configFile = "./src/main/resources/bicycle_example/config-c.xml";
+		String configFile = "./src/main/resources/bicycle_example/config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		// Links 4-8 and 13-17 are pedestrian zones
+		config.network().setInputFile("network_pedestrian.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -88,8 +93,10 @@ public class BicycleTest {
 	
 	@Test
 	public void testLane() {
-		String configFile = "./src/main/resources/bicycle_example/config-d.xml";
+		String configFile = "./src/main/resources/bicycle_example/config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		// Links 2-4/8-10 and 11-13/17-19 have cycle lanes (cycleway=lane)
+		config.network().setInputFile("network_lane.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -104,8 +111,10 @@ public class BicycleTest {
 	
 	@Test
 	public void testGradient() {
-		String configFile = "./src/main/resources/bicycle_example/config-e.xml";
+		String configFile = "./src/main/resources/bicycle_example/config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		// Nodes 5-9 have a z-coordinate > 0, i.e. the links leading to those nodes have a slope
+		config.network().setInputFile("network_gradient.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -120,8 +129,11 @@ public class BicycleTest {
 	
 	@Test
 	public void testGradientLane() {
-		String configFile = "./src/main/resources/bicycle_example/config-f.xml";
+		String configFile = "./src/main/resources/bicycle_example/config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		// Nodes 5-9 have a z-coordinate > 0, i.e. the links leading to those nodes have a slope
+		// and links 4-5 and 13-14 have cycle lanes
+		config.network().setInputFile("network_gradient_lane.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -134,13 +146,15 @@ public class BicycleTest {
 		assertEquals("Different event files.", EventsFileComparator.compareAndReturnInt(eventsFilenameReference, eventsFilenameNew), 0);
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void testNormal10It() {
-		String configFile = "./src/main/resources/bicycle_example/config-a-10it.xml";
+		String configFile = "./src/main/resources/bicycle_example/config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		config.network().setInputFile("network_normal.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		// 10 iterations
 		config.controler().setLastIteration(10);
 		
 		new RunBicycleExample().run(config, false);
@@ -151,15 +165,17 @@ public class BicycleTest {
 		assertEquals("Different event files.", EventsFileComparator.compareAndReturnInt(eventsFilenameReference, eventsFilenameNew), 0);
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void testMotorizedInteraction() {
-		String configFile = "./src/main/resources/bicycle_example/config-a-motor.xml";
+		String configFile = "./src/main/resources/bicycle_example/config.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		config.network().setInputFile("network_normal.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(10);
 		
+		// interaction with motor vehicles
 		new RunBicycleExample().run(config, true);
 
 		LOG.info("Checking MATSim events file ...");
