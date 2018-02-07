@@ -37,6 +37,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitStopArea;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
@@ -61,6 +62,7 @@ public class TransitScheduleIOTest {
 			TransitStopFacility stop1 = f.createTransitStopFacility(Id.create(1, TransitStopFacility.class), new Coord(123, 234), true);
 			TransitStopFacility stop2 = f.createTransitStopFacility(Id.create(2, TransitStopFacility.class), new Coord(987, 876, 98765), false);
 			stop2.getAttributes().putAttribute("air", "thin");
+			stop2.setStopAreaId(Id.create("GZ", TransitStopArea.class));
 
 			schedule.addStopFacility(stop1);
 			schedule.addStopFacility(stop2);
@@ -121,6 +123,7 @@ public class TransitScheduleIOTest {
 		Assert.assertEquals("thin", stop2.getAttributes().getAttribute("air"));
 		Assert.assertTrue(stop2.getCoord().hasZ());
 		Assert.assertEquals(98765.0, stop2.getCoord().getZ(), 0.0);
+		Assert.assertEquals("GZ", stop2.getStopAreaId().toString());
 
 		// assert minmal transfer times
 		Assert.assertEquals(300, schedule2.getMinimalTransferTimes().get(stop1.getId(), stop2.getId()), 0.0);
