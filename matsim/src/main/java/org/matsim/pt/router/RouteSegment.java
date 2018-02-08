@@ -17,36 +17,57 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.performance.raptor;
+package org.matsim.pt.router;
 
-import java.util.List;
+import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * 
  * @author aneumann
  *
  */
-public class RaptorRoute {
-
-	private final double cost;
-	private final List<RouteSegment> route;
-
-	public RaptorRoute(double cost, List<RouteSegment> leastCostRoute) {
-		this.cost = cost;
-		this.route = leastCostRoute;
-		
-	}
-
-	public double getTravelCost() {
-		return this.cost;
+public class RouteSegment {
+	
+	final TransitStopFacility fromStop;
+	final TransitStopFacility toStop;
+	final double travelTime;
+	final Id<TransitLine> lineTaken;
+	final Id<TransitRoute> routeTaken;
+	
+	public RouteSegment(TransitStopFacility fromStop, TransitStopFacility toStop, double travelTime, Id<TransitLine> lineTaken, Id<TransitRoute> routeTaken) {
+		this.fromStop = fromStop;
+		this.toStop = toStop;
+		this.travelTime = travelTime;
+		this.lineTaken = lineTaken;
+		this.routeTaken = routeTaken;
 	}
 	
-	public List<RouteSegment> getRoute() {
-		return this.route;
-	}
-
 	@Override
 	public String toString() {
-		return "Cost: " + this.cost + " via " + this.route;
+		return "From: " + fromStop.getId() + " to " + toStop.getId() + " in " + travelTime + "s via " + routeTaken;
+	}
+
+	public double getTravelTime() {
+		return travelTime;
+	}
+
+	public TransitStopFacility getFromStop() {
+		return fromStop;
+	}
+
+	public TransitStopFacility getToStop() {
+		return toStop;
+	}
+
+	public Id<TransitLine> getLineTaken() {
+		return lineTaken;
+	}
+
+	public Id<TransitRoute> getRouteTaken() {
+		return routeTaken;
 	}
 }
+

@@ -27,7 +27,6 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.minibus.PConfigGroup;
 import org.matsim.contrib.minibus.performance.raptor.Raptor;
 import org.matsim.contrib.minibus.performance.raptor.RaptorDisutility;
-import org.matsim.contrib.minibus.performance.raptor.TransitRouterQuadTree;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
@@ -60,8 +59,7 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 	private Provider<TransitRouter> routerFactory = null;
 	@Inject private TransitSchedule schedule;
 	private RaptorDisutility raptorDisutility;
-	private TransitRouterQuadTree transitRouterQuadTree;
-	
+
 	public PTransitRouterFactory(Config config){
 		PConfigGroup pConfig = ConfigUtils.addOrGetModule(config, PConfigGroup.class) ;
 		this.ptEnabler = pConfig.getPtEnabler() ;
@@ -83,9 +81,6 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 		if (this.ptRouter.equalsIgnoreCase("raptor")) {
 			// this could also hold updated prices
 			this.raptorDisutility = new RaptorDisutility(this.transitRouterConfig, this.costPerBoarding, this.costPerMeterTraveled);
-			
-			this.transitRouterQuadTree = new TransitRouterQuadTree(this.raptorDisutility);
-			this.transitRouterQuadTree.initializeFromSchedule(this.schedule, this.transitRouterConfig.getBeelineWalkConnectionDistance());
 		}
 	}
 
@@ -123,10 +118,10 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 	}
 	
 	private TransitRouter createRaptorRouter() {
-		if (this.transitRouterQuadTree == null || this.raptorDisutility == null) {
+		if ( this.raptorDisutility == null) {
 			updateTransitSchedule();
 		}
-		return new Raptor(this.transitRouterQuadTree, this.raptorDisutility, this.transitRouterConfig);
+        return new Raptor(this.transitRouterConfig, this.schedule, this.raptorDisutility);
 	}
 
 	private Provider<TransitRouter> createSpeedyRouter() {
