@@ -150,14 +150,11 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 
 		Double freeVelocity = link.getFreespeed();
 		String roadTypeString = NetworkUtils.getType(link);
-		Integer roadType;
 
-		try{
-			roadType = Integer.parseInt(roadTypeString);
-		}
-		catch(NumberFormatException e){
+
+		if (roadTypeString.isEmpty()){
 			logger.error("Roadtype missing in network information!");
-			throw new RuntimeException(e);
+			throw new RuntimeException("Roadtype missing in network information for link " + linkId);
 		}
 
 		if(!this.linkenter.containsKey(vehicleId)){
@@ -203,7 +200,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 
 			Map<WarmPollutant, Double> warmEmissions = warmEmissionAnalysisModule.checkVehicleInfoAndCalculateWarmEmissions(
 					vehicle,
-					roadType,
+					roadTypeString,
 					freeVelocity,
 					linkLength,
 					travelTime);
