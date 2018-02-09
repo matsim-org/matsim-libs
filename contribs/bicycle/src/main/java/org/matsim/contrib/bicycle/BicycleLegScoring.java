@@ -65,9 +65,9 @@ public class BicycleLegScoring implements org.matsim.core.scoring.SumScoringFunc
 	private double lastActivityEndTime = Time.UNDEFINED_TIME ;
 	
 	//
-	private final double marginalCostOfInfrastructure_m;
-	private final double marginalCostOfComfort_m;
-	private final double marginalCostOfGradient_m_100m;
+	private final double marginalUtilityOfInfrastructure_m;
+	private final double marginalUtilityOfComfort_m;
+	private final double marginalUtilityOfGradient_m_100m;
 	//
 	
 //	public BicycleLegScoring(final ScoringParameters params, Network network) {
@@ -79,9 +79,9 @@ public class BicycleLegScoring implements org.matsim.core.scoring.SumScoringFunc
 		this.currentLegIsPtLeg = false;
 		
 		//
-		this.marginalCostOfInfrastructure_m = -(bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m());
-		this.marginalCostOfComfort_m = -(bicycleConfigGroup.getMarginalUtilityOfComfort_m());
-		this.marginalCostOfGradient_m_100m = -(bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m());
+		this.marginalUtilityOfInfrastructure_m = bicycleConfigGroup.getMarginalUtilityOfInfrastructure_m();
+		this.marginalUtilityOfComfort_m = bicycleConfigGroup.getMarginalUtilityOfComfort_m();
+		this.marginalUtilityOfGradient_m_100m = bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m();
 		//
 	}
 
@@ -141,7 +141,6 @@ public class BicycleLegScoring implements org.matsim.core.scoring.SumScoringFunc
 	private double addBicycleScoringComponent(Route route) {
 		NetworkRoute networkRoute = (NetworkRoute) route;
 		List<Id<Link>> linkIds = new ArrayList<>();
-		linkIds.add(networkRoute.getStartLinkId());
 		linkIds.addAll(networkRoute.getLinkIds());
 		linkIds.add(networkRoute.getEndLinkId());
 		
@@ -149,10 +148,11 @@ public class BicycleLegScoring implements org.matsim.core.scoring.SumScoringFunc
 		
 		for (Id<Link> linkId : linkIds) {
 			Link link = network.getLinks().get(linkId);
-			
-			score += getTravelDisutilityBasedOnTTime(link);
+			double scoreOnLink = getTravelDisutilityBasedOnTTime(link);
+			LOG.info("Bicycle score on link " + linkId + " is = " + scoreOnLink + ".");
+			score += scoreOnLink;
 		}
-		LOG.info("------------------ Whohooooo.... Bicycle leg score component is = " + score + " (on links " + linkIds + ").");
+		LOG.info("Bicycle leg score component is = " + score + " (on links " + linkIds + ").");
 		return score;
 	}
 	
@@ -169,13 +169,13 @@ public class BicycleLegScoring implements org.matsim.core.scoring.SumScoringFunc
 //		double distanceDisutility = marginalCostOfDistance_m * distance;
 		
 		double comfortFactor = getComfortFactor(surface, type);
-		double comfortDisutility = marginalCostOfComfort_m * (1. - comfortFactor) * distance;
+		double comfortDisutility = marginalUtilityOfComfort_m * (1. - comfortFactor) * distance;
 		
 		double infrastructureFactor = getInfrastructureFactor(type, cyclewaytype);
-		double infrastructureDisutility = marginalCostOfInfrastructure_m * (1. - infrastructureFactor) * distance;
+		double infrastructureDisutility = marginalUtilityOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 		
 		double gradientFactor = getGradientFactor(link);
-		double gradientDisutility = marginalCostOfGradient_m_100m * gradientFactor * distance;
+		double gradientDisutility = marginalUtilityOfGradient_m_100m * gradientFactor * distance;
 		
 //		LOG.warn("link = " + link.getId() + "-- travelTime = " + travelTime + " -- distance = " + distance + " -- comfortFactor = "
 //				+ comfortFactor	+ " -- infraFactor = "+ infrastructureFactor + " -- gradient = " + gradientFactor);
