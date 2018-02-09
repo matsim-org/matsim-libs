@@ -25,6 +25,13 @@
 			<version>0.10.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
+		
+	<dependency>
+    	<groupId>com.google.guava</groupId>
+    	<artifactId>guava</artifactId>
+    	<version>24.0-jre</version>
+	</dependency>
+		
 
 	</dependencies>
 
