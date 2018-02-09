@@ -43,7 +43,13 @@ public final class RoadPricingSchemeUsingTollFactor implements RoadPricingScheme
 
 	private RoadPricingScheme delegate = null ;
 	private final TollFactor tollFactor ;
-	
+
+	public RoadPricingSchemeUsingTollFactor(RoadPricingScheme scheme, TollFactor tollFactor ) {
+		this.delegate = scheme;
+		this.tollFactor = tollFactor;
+
+	}
+
 	public RoadPricingSchemeUsingTollFactor( String pricingSchemeFileName, TollFactor tollFactor ) {
 		
 		// read the road pricing scheme from file
