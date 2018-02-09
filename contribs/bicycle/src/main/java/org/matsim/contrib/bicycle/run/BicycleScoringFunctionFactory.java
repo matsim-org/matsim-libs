@@ -31,6 +31,7 @@ import org.matsim.core.scoring.ScoringFunctionsForPopulation;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 
@@ -63,32 +64,33 @@ public class BicycleScoringFunctionFactory implements ScoringFunctionFactory {
 		sumScoringFunction.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 		sumScoringFunction.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-		scoringFunctionsForPopulation.setPassLinkEventsToPerson(true);
+//		scoringFunctionsForPopulation.setPassLinkEventsToPerson(true);
 		// yyyyyy this is the ONLY place where we need to make ScoringFunctionsForPopulation public.  Somehow,
 		// this would imply to me that we should attach this switch to something else. kai, sep'17
 		
-		BicycleScoring bicycleScoring = new BicycleScoring(scenario, bicycleTravelTime, bicycleTravelDisutilityFactory);
-		sumScoringFunction.addScoringFunction(bicycleScoring);
+//		BicycleScoring bicycleScoring = new BicycleScoring(scenario, bicycleTravelTime, bicycleTravelDisutilityFactory);
+//		sumScoringFunction.addScoringFunction(bicycleScoring);
+//		
+//		CarCounter carCounter = new CarCounter(bicycleScoring);
+//		eventsManager.addHandler(carCounter);
 		
-		CarCounter carCounter = new CarCounter(bicycleScoring);
-		eventsManager.addHandler(carCounter);
-		
-//		sumScoringFunction.addScoringFunction(new BicycleLegScoring(params, scenario.getNetwork(), (BicycleConfigGroup) scenario.getConfig().getModule("bicycle")));
+//		sumScoringFunction.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
+		sumScoringFunction.addScoringFunction(new BicycleLegScoring(params, scenario.getNetwork(), (BicycleConfigGroup) scenario.getConfig().getModule("bicycle")));
 
 		return sumScoringFunction;
 	}
 
 	
-	private class CarCounter implements MotorizedInteractionEventHandler {
-		private BicycleScoring bicycleScoring;
-
-		public CarCounter(BicycleScoring bicycleScoring) {
-			this.bicycleScoring = bicycleScoring;
-		}
-
-		@Override
-		public void handleEvent(MotorizedInteractionEvent event) {
-			bicycleScoring.handleEvent(event);
-		}
-	}
+//	private class CarCounter implements MotorizedInteractionEventHandler {
+//		private BicycleScoring bicycleScoring;
+//
+//		public CarCounter(BicycleScoring bicycleScoring) {
+//			this.bicycleScoring = bicycleScoring;
+//		}
+//
+//		@Override
+//		public void handleEvent(MotorizedInteractionEvent event) {
+//			bicycleScoring.handleEvent(event);
+//		}
+//	}
 }
