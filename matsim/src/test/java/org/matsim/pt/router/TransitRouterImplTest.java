@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -262,7 +261,7 @@ public class TransitRouterImplTest {
 				legs.get(2).getRoute().getDistance(), MatsimTestCase.EPSILON);
 	}
 
-	@Test@Ignore
+	@Test
 	public void testFasterAlternative() {
 		Fixture f = new Fixture();
 		f.init();

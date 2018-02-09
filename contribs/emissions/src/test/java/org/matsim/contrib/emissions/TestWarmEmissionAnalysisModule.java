@@ -42,6 +42,7 @@ import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
 import junit.framework.Assert;
+import roadTypeMapping.VisumHbefaRoadTypeMapping;
 
 
 /**
@@ -78,12 +79,12 @@ public class TestWarmEmissionAnalysisModule {
 	
 	private final int numberOfWarmPollutants= WarmPollutant.values().length;
 	private final String hbefaRoadCategory = "URB";
-    private final int roadType =0;
+    private final String roadType = "0";
 	private final int leaveTime = 0;
 	private boolean excep =false;
 	private final String passengercar= "PASSENGER_CAR";
 
-    private Map<Integer, String> roadTypeMapping;
+    private VisumHbefaRoadTypeMapping roadTypeMapping;
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable;
     private WarmEmissionAnalysisModule weam;
@@ -442,7 +443,7 @@ public class TestWarmEmissionAnalysisModule {
 		 */
 		 
 		Id<Vehicle> vehicleId = Id.create("vehicle 1", Vehicle.class);
-		int roadType = 0;
+		String roadType = "0";
 		double linkLength = 2*1000.; //in meter
 		Id<VehicleType> vehicleTypeId = Id.create(passengercar+ ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept, VehicleType.class);
 		VehiclesFactory vehFac = VehicleUtils.getFactory();
@@ -703,7 +704,7 @@ public class TestWarmEmissionAnalysisModule {
 		
 		// case 1 - data in both tables -> use detailed
 		Id<Vehicle> vehicleId = Id.create("vehicle 1", Vehicle.class);
-		int roadType = 0;
+		String roadType = "0";
 		double linkLength = 2*1000.; //in meter
 		Id<VehicleType> vehicleTypeId = Id.create(passengercar+ ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept, VehicleType.class);
 		double travelTime = linkLength/petrolSpeedSg*1.2;
@@ -742,7 +743,7 @@ public class TestWarmEmissionAnalysisModule {
 		// setup ----
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<>();
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<>();
-		Map<Integer, String> roadTypeMapping = new HashMap<>();
+		VisumHbefaRoadTypeMapping roadTypeMapping = VisumHbefaRoadTypeMapping.emptyMapping();
 		fillAverageTable(avgHbefaWarmTable);
 		fillDetailedTable(detailedHbefaWarmTable);
 		fillRoadTypeMapping(roadTypeMapping);
@@ -781,7 +782,7 @@ public class TestWarmEmissionAnalysisModule {
 	}
 	
 	private void setUp() {
-		roadTypeMapping = new HashMap<>();
+		roadTypeMapping = new VisumHbefaRoadTypeMapping();
 		avgHbefaWarmTable = new HashMap<>();
 		detailedHbefaWarmTable = new HashMap<>();
 		
@@ -1214,8 +1215,8 @@ public class TestWarmEmissionAnalysisModule {
 		
 	}
 
-	private void fillRoadTypeMapping(Map<Integer, String> roadTypeMapping) {
-		roadTypeMapping.put(0, hbefaRoadCategory);
+	private void fillRoadTypeMapping(VisumHbefaRoadTypeMapping roadTypeMapping) {
+		roadTypeMapping.put("0", hbefaRoadCategory);
 		
 	}
 
