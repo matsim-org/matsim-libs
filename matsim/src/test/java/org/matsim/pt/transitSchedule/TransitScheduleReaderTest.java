@@ -63,7 +63,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 
 		TransitScheduleFactory builder = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = builder.createTransitSchedule();
-		new TransitScheduleReaderV1(schedule, network).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
+		new TransitScheduleReaderV1(schedule, scenario.getPopulation().getFactory().getRouteFactories()).readFile(inputDir + INPUT_TEST_FILE_TRANSITSCHEDULE);
 
 		assertEquals("wrong number of transit lines.", 1, schedule.getTransitLines().size());
 		assertEquals("wrong line id.", Id.create("T1", TransitLine.class), schedule.getTransitLines().keySet().iterator().next());

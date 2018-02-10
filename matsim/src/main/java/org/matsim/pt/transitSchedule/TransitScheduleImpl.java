@@ -25,11 +25,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.MinimalTransferTimes;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 
 /**
@@ -41,12 +43,14 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  */
 public class TransitScheduleImpl implements TransitSchedule {
 
-	private final Map<Id<TransitLine>, TransitLine> transitLines = new TreeMap<Id<TransitLine>, TransitLine>();
-	private final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<Id<TransitStopFacility>, TransitStopFacility>();
+	private final Map<Id<TransitLine>, TransitLine> transitLines = new TreeMap<>();
+	private final Map<Id<TransitStopFacility>, TransitStopFacility> stopFacilities = new TreeMap<>();
 	private final TransitScheduleFactory factory;
 	private final ObjectAttributes transitLinesAttributes = new ObjectAttributes();
 	private final ObjectAttributes transitStopsAttributes = new ObjectAttributes();
-	
+	private final Attributes attributes = new Attributes();
+	private final MinimalTransferTimes minimalTransferTimes = new MinimalTransferTimesImpl();
+
 	protected TransitScheduleImpl(final TransitScheduleFactory builder) {
 		this.factory = builder;
 	}
@@ -119,5 +123,14 @@ public class TransitScheduleImpl implements TransitSchedule {
 	public ObjectAttributes getTransitStopsAttributes() {
 		return this.transitStopsAttributes;
 	}
-	
+
+	@Override
+	public Attributes getAttributes() {
+		return this.attributes;
+	}
+
+	@Override
+	public MinimalTransferTimes getMinimalTransferTimes() {
+		return this.minimalTransferTimes;
+	}
 }

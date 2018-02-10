@@ -28,7 +28,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
-import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.VehicleReaderV1;
 
@@ -167,7 +166,7 @@ public class PTransitLineMerger {
 		
 		VehicleReaderV1 vehicleReader = new VehicleReaderV1(scenario.getTransitVehicles());
 		vehicleReader.readFile(vehicleFile);
-		TransitScheduleReaderV1 scheduleReader = new TransitScheduleReaderV1(scenario);
+		TransitScheduleReader scheduleReader = new TransitScheduleReader(scenario);
 		scheduleReader.readFile(transitScheduleInFile);
 		
 		PTransitLineMerger.mergeSimilarRoutes(scenario.getTransitSchedule());

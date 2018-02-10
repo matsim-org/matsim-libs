@@ -25,4 +25,12 @@ public class AttributesUtils {
 	public static <T extends Attributable> void copyAttributesFromTo( T from , T to ) {
 		copyTo( from.getAttributes() , to.getAttributes() );
 	}
+
+	/**
+	 * @param attributes collection of attributes
+	 * @return <code>true</code> if the attributes collection does not contain any attribute
+	 */
+	public static boolean isEmpty(Attributes attributes) {
+		return attributes.size() == 0;
+	}
 }

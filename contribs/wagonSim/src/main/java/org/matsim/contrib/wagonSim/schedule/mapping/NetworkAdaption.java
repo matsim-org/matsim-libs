@@ -23,12 +23,12 @@ import org.matsim.core.scenario.MutableScenario;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleWriterV1;
@@ -260,7 +260,7 @@ public class NetworkAdaption {
 		sc.getConfig().transit().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
 		new MatsimNetworkReader(sc.getNetwork()).readFile(networkFile);
-		new TransitScheduleReaderV1(sc).readFile(transitScheduleFile);
+		new TransitScheduleReader(sc).readFile(transitScheduleFile);
 		new VehicleReaderV1(sc.getTransitVehicles()).readFile(transitVehiclesFile);
 		log.info("done. (parsing)");
 

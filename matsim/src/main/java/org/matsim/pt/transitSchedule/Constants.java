@@ -26,31 +26,39 @@ package org.matsim.pt.transitSchedule;
  *
  * @author mrieser
  */
-/*package*/ abstract class Constants {
-	/*package*/ static final String TRANSIT_STOPS = "transitStops";
-	/*package*/ static final String STOP_FACILITY = "stopFacility";
-	/*package*/ static final String TRANSIT_SCHEDULE = "transitSchedule";
-	/*package*/ static final String TRANSIT_LINE = "transitLine";
-	/*package*/ static final String TRANSIT_ROUTE = "transitRoute";
-	/*package*/ static final String DESCRIPTION = "description";
-	/*package*/ static final String ROUTE_PROFILE = "routeProfile";
-	/*package*/ static final String STOP = "stop";
-	/*package*/ static final String ROUTE = "route";
-	/*package*/ static final String LINK = "link";
-	/*package*/ static final String DEPARTURES = "departures";
-	/*package*/ static final String DEPARTURE = "departure";
-	/*package*/ static final String ID = "id";
-	/*package*/ static final String X = "x";
-	/*package*/ static final String Y = "y";
-	/*package*/ static final String NAME = "name";
-	/*package*/ static final String REF_ID = "refId";
-	/*package*/ static final String LINK_REF_ID = "linkRefId";
-	/*package*/ static final String TRANSPORT_MODE = "transportMode";
-	/*package*/ static final String DEPARTURE_TIME = "departureTime";
-	/*package*/ static final String VEHICLE_REF_ID = "vehicleRefId";
-	/*package*/ static final String DEPARTURE_OFFSET = "departureOffset";
-	/*package*/ static final String ARRIVAL_OFFSET = "arrivalOffset";
-	/*package*/ static final String AWAIT_DEPARTURE = "awaitDeparture";
-	/*package*/ static final String IS_BLOCKING = "isBlocking";
-
+abstract class Constants {
+	static final String TRANSIT_STOPS = "transitStops";
+	static final String STOP_FACILITY = "stopFacility";
+	static final String TRANSIT_SCHEDULE = "transitSchedule";
+	static final String TRANSIT_LINE = "transitLine";
+	static final String TRANSIT_ROUTE = "transitRoute";
+	static final String DESCRIPTION = "description";
+	static final String ROUTE_PROFILE = "routeProfile";
+	static final String STOP = "stop";
+	static final String ROUTE = "route";
+	static final String LINK = "link";
+	static final String DEPARTURES = "departures";
+	static final String DEPARTURE = "departure";
+	static final String ID = "id";
+	static final String X = "x";
+	static final String Y = "y";
+	static final String Z = "z";
+	static final String NAME = "name";
+	static final String REF_ID = "refId";
+	static final String LINK_REF_ID = "linkRefId";
+	static final String TRANSPORT_MODE = "transportMode";
+	static final String DEPARTURE_TIME = "departureTime";
+	static final String VEHICLE_REF_ID = "vehicleRefId";
+	static final String DEPARTURE_OFFSET = "departureOffset";
+	static final String ARRIVAL_OFFSET = "arrivalOffset";
+	static final String AWAIT_DEPARTURE = "awaitDeparture";
+	static final String IS_BLOCKING = "isBlocking";
+	static final String STOP_AREA_ID = "stopAreaId";
+	static final String ATTRIBUTES = "attributes";
+	static final String ATTRIBUTE = "attribute";
+	static final String MINIMAL_TRANSFER_TIMES = "minimalTransferTimes";
+	static final String RELATION = "relation";
+	static final String FROM_STOP = "fromStop";
+	static final String TO_STOP = "toStop";
+	static final String TRANSFER_TIME = "transferTime";
 }
