@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
@@ -648,4 +649,13 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	public Injector getChildInjector() {
 		return this.childInjector  ;
 	}
+	
+	public void rereadNetworkChangeEvents() {
+		for ( MobsimEngine engine : this.mobsimEngines ) {
+			if ( engine instanceof NetworkChangeEventsEngine ) {
+				((NetworkChangeEventsEngine) engine).rereadNetworkChangeEvents();
+			}
+		}
+	}
+	
 }

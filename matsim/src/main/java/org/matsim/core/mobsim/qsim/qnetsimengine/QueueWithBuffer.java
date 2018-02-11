@@ -41,6 +41,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.VisVehicle;
 
 /**
  * Separating out the "lane" functionality from the "link" functionality.
@@ -159,7 +160,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private double unscaledFlowCapacity_s = Double.NaN ;
 	private double effectiveNumberOfLanes = Double.NaN ;
 
-	private final VisDataImpl visData = new VisDataImpl() ;
+	private final VisData visData = new VisDataImpl() ;
 	private final LinkSpeedCalculator linkSpeedCalculator;
 	private final NetsimEngineContext context;
 
@@ -239,7 +240,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		return this.hasFlowCapacityLeft(veh) ;
 	}
 
-	private boolean hasFlowCapacityLeft(QVehicle veh) {
+	private boolean hasFlowCapacityLeft(VisVehicle veh) {
 		if(context.qsimConfig.isUsingFastCapacityUpdate() ){
 			updateFastFlowAccumulation();
 		}
@@ -247,7 +248,6 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		return flowcap_accumulate.getValue() > 0.0 || veh.getVehicle().getType()
 				.getPcuEquivalents() <= context.qsimConfig.getPcuThresholdForFlowCapacityEasing();
 	}
-
 
 	private void updateFastFlowAccumulation(){
 		double now = context.getSimTimer().getTimeOfDay() ;
@@ -265,7 +265,6 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			flowcap_accumulate.setTimeStep( now );
 		}
 	}
-
 
 	private void updateSlowFlowAccumulation(){
 		if (this.thisTimeStepGreen
@@ -285,6 +284,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	}
 
 	private void calculateFlowCapacity() {
+		// the following is not looking at time because it simply assumes that the lookups are "now". kai, feb'18
+		
 		flowCapacityPerTimeStep = this.unscaledFlowCapacity_s ;
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
 		flowCapacityPerTimeStep = flowCapacityPerTimeStep * context.qsimConfig.getTimeStepSize() * context.qsimConfig.getFlowCapFactor() ;
@@ -308,8 +309,9 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	}
 
 	private void calculateStorageCapacity() {
-		// yyyyyy the following is not adjusted for time-dependence!! kai, apr'16
-
+		// The following is not adjusted for time-dependence!! kai, apr'16
+		// No, I think that it simply assumes that the lookups are "now". kai, feb'18
+		
 		// first guess at storageCapacity:
 		storageCapacity = this.length * this.effectiveNumberOfLanes / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
 
@@ -338,7 +340,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			storageCapacity = tempStorageCapacity;
 		}
 
-		/* About minStorCapForHoles: 
+		/* About minStorCapForHoles:
 		 * () uncongested branch is q(rho) = rho * v_max
 		 * () congested branch is q(rho) = (rho - rho_jam) * v_holes
 		 * () rho_maxflow is where these two meet, resulting in rho_maxflow = v_holes * rho_jam / ( v_holes + v_max )
@@ -346,7 +348,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		 * () Since everything else is given, rho_jam needs to be large enough so that q(rho_maxflow) can reach capacity, resulting in
 		 *    rho_jam >= capacity * (v_holes + v_max) / (v_max * v_holes) ;
 		 * () In consequence, storage capacity needs to be larger than curved_length * rho_jam .
-		 * 
+		 *
 		 */
 
 		switch (context.qsimConfig.getTrafficDynamics()) {
@@ -379,9 +381,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		}
 	}
 
-
-	private double getBufferStorageCapacity()
-	{
+	private double getBufferStorageCapacity() {
 		return flowCapacityPerTimeStep;//this assumes that vehicles have the flowEfficiencyFactor of 1.0 
 	}
 
@@ -429,7 +429,9 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			MobsimDriverAgent driver = veh.getDriver();
 
 			if (driver instanceof TransitDriverAgent) {
-				HandleTransitStopResult handleTransitStop = qLink.getTransitQLink().handleTransitStop(now, veh, (TransitDriverAgent) driver, this.qLink.getLink().getId());
+				HandleTransitStopResult handleTransitStop = qLink.getTransitQLink().handleTransitStop(
+						now, veh, (TransitDriverAgent) driver, this.qLink.getLink().getId()
+				);
 				if (handleTransitStop == HandleTransitStopResult.accepted) {
 					// vehicle has been accepted into the transit vehicle queue of the link.
 					removeVehicleFromQueue(veh) ;

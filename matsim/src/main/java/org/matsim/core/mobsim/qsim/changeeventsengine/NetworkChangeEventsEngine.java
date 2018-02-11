@@ -20,8 +20,8 @@
 
 package org.matsim.core.mobsim.qsim.changeeventsengine;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -31,7 +31,6 @@ import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
 
-import java.util.Collection;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
@@ -39,6 +38,7 @@ import java.util.Queue;
  * @author dgrether
  */
 public class NetworkChangeEventsEngine implements MobsimEngine {
+	private static final Logger log = Logger.getLogger(NetworkChangeEventsEngine.class) ;
 	
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
 	private Netsim mobsim;
@@ -55,7 +55,7 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		Queue<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(((Network)this.mobsim.getScenario().getNetwork()));
+		Queue<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(this.mobsim.getScenario().getNetwork());
 		if ((changeEvents != null) && (changeEvents.size() > 0)) {
 			this.networkChangeEventsQueue = new PriorityQueue<>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
 			this.networkChangeEventsQueue.addAll(changeEvents);
@@ -72,15 +72,24 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 	private void handleNetworkChangeEvents(final double time) {
 		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)) {
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
-			for (Link link : event.getLinks()) {
-				final NetsimLink netsimLink = this.mobsim.getNetsimNetwork().getNetsimLink(link.getId());
-				if ( netsimLink instanceof TimeVariantLink ) {
-					((TimeVariantLink) netsimLink).recalcTimeVariantAttributes();
-				} else {
-					throw new RuntimeException("link not time variant") ;
-				}
+			handleNetworkChangeEvent(event);
+		}
+	}
+	
+	public final void handleExternalNetworkChangeEvent( NetworkChangeEvent event ) {
+		log.warn("handling change event coming from external (i.e. not in network change events data structure):" + event);
+		handleNetworkChangeEvent(event);
+	}
+	
+	private void handleNetworkChangeEvent(NetworkChangeEvent event) {
+		for (Link link : event.getLinks()) {
+			final NetsimLink netsimLink = this.mobsim.getNetsimNetwork().getNetsimLink(link.getId());
+			if ( netsimLink instanceof TimeVariantLink) {
+				((TimeVariantLink) netsimLink).recalcTimeVariantAttributes();
+			} else {
+				throw new RuntimeException("link not time variant") ;
 			}
 		}
 	}
-
+	
 }
