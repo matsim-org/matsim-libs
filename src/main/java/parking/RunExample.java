@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -50,7 +51,12 @@ public class RunExample {
 
         config.controler().setOutputDirectory(outputDir);
 
-        config.plansCalcRoute().setInsertingAccessEgressWalk(true);// <- must
+        //parking related settings
+        config.plansCalcRoute().setInsertingAccessEgressWalk(true);
+        PlanCalcScoreConfigGroup.ActivityParams carParking = new PlanCalcScoreConfigGroup.ActivityParams("car parkingSearch");
+        carParking.setScoringThisActivityAtAll(false);
+        config.planCalcScore().addActivityParams(carParking);
+        //
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
         ZoneToLinks zoneToLinks =  new ZoneToLinks( shapeFile, "NO", scenario.getNetwork() );

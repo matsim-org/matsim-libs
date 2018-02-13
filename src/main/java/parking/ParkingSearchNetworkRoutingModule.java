@@ -111,7 +111,7 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
         this.mode = mode;
         this.populationFactory = populationFactory;
         this.stageActivityType = this.mode + " interaction";
-        this.parkingStageActivityType = this.mode + " interaction"; //TODO should we name it something like : car parkingSearch
+        this.parkingStageActivityType = this.mode + " parkingSearch";
         if (!calcRouteConfig.isInsertingAccessEgressWalk()) {
             throw new RuntimeException("trying to use access/egress but not switched on in config.  "
                     + "currently not supported; there are too many other problems");
