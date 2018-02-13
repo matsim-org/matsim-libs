@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * MyPlansSelector.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,32 +17,38 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package tutorial.strategies.example11PluggablePlanStrategyInCode;
 
-package tutorial.programming.planStrategyForRemoval;
-
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-import tutorial.strategies.planStrategyForRemoval.RunPlanSelectorForRemovalExample;
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.replanning.selectors.PlanSelector;
 
 /**
-* @author ikaddoura
-*/
+ * @author nagel
+ */
+class MyPlanSelector implements PlanSelector<Plan, Person>, ActivityEndEventHandler
+{
+	private static final Logger log = Logger.getLogger(MyPlanSelector.class);
 
-public class RunPlanStrategyForRemovalExampleTest {
+	@Override
+	public Plan selectPlan(HasPlansAndId<Plan, Person> person) {
+		log.error("calling selectPlan: PesonId: " + person.getId() + " Returning first Plan") ;
+		//returning first plan available. In real live the selection will be more sophisticated
+		return person.getPlans().get(0);
+	}
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		//log.error("calling handleEvent for an ActivityEndEvent") ;
+	}
 
-	@Test
-	public final void testMain() {
-		
-		try {
-			RunPlanSelectorForRemovalExample.main(null);
-		} catch(Exception e) {
-			Assert.fail(e.toString());
-		}
+	@Override
+	public void reset(int iteration) {
+		log.error("calling reset") ;
 	}
 
 }
-

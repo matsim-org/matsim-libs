@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.programming.planStrategyForRemoval;
+package tutorial.strategies.example10PluggablePlanStrategyFromFile;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-import tutorial.strategies.planStrategyForRemoval.RunPlanSelectorForRemovalExample;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.ControlerUtils;
 
-/**
-* @author ikaddoura
-*/
+public class RunPluggablePlanStrategyFromFileExample {
 
-public class RunPlanStrategyForRemovalExampleTest {
-
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
-
-	@Test
-	public final void testMain() {
+	public static void main(final String[] args) {
+		ControlerUtils.initializeOutputLogging();
 		
-		try {
-			RunPlanSelectorForRemovalExample.main(null);
-		} catch(Exception e) {
-			Assert.fail(e.toString());
+
+		Config config;
+		if ( args.length==0 ) {
+			config = ConfigUtils.loadConfig( "scenarios/equil/pluggablePlanStrategy-config.xml" ) ;
+		} else {
+			config = ConfigUtils.loadConfig(args[0]);
 		}
+
+		final Controler controler = new Controler(config);
+		controler.run();
+
 	}
 
 }
-

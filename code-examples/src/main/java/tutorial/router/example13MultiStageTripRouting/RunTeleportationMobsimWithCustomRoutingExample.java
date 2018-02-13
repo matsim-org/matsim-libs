@@ -41,6 +41,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.ActivityFacility;
 import org.matsim.facilities.ActivityOption;
+import org.matsim.utils.objectattributes.attributable.Attributes;
 
 /**
  * @author thibautd
@@ -109,6 +110,12 @@ public class RunTeleportationMobsimWithCustomRoutingExample {
 		if ( link == null ) throw new IllegalArgumentException( "link == null");
 		
 		return new ActivityFacility() {
+			@Override
+			public Attributes getAttributes() {
+				// TODO Auto-generated method stub
+				throw new RuntimeException("not implemented") ;
+			}
+			
 			@Override
 			public Coord getCoord() {
 				return link.getFromNode().getCoord();

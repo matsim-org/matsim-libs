@@ -7,7 +7,7 @@ import java.io.File;
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;
 
-import tutorial.programming.example06EventsHandling.RunEventsHandlingWithControlerExample;
+import tutorial.events.example06EventsHandling.RunEventsHandlingWithControlerExample;
 
 public class IntegrationTest {
     

@@ -17,30 +17,43 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.programming.planStrategyForRemoval;
+package tutorial.strategies.planStrategyForRemoval;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-import tutorial.strategies.planStrategyForRemoval.RunPlanSelectorForRemovalExample;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 /**
 * @author ikaddoura
 */
+public class RunPlanSelectorForRemovalExample {
 
-public class RunPlanStrategyForRemovalExampleTest {
+	private static final String SELECTOR_NAME = "selectorName";
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
-
-	@Test
-	public final void testMain() {
+	public static void main(String[] args) {
 		
-		try {
-			RunPlanSelectorForRemovalExample.main(null);
-		} catch(Exception e) {
-			Assert.fail(e.toString());
-		}
+		Config config = ConfigUtils.createConfig();	
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setLastIteration(1);
+		
+		config.strategy().setPlanSelectorForRemoval( SELECTOR_NAME );
+		
+		Controler controler = new Controler(config);
+
+		controler.addOverridingModule(new AbstractModule(){
+			
+			@Override
+			public void install() {
+				if (getConfig().strategy().getPlanSelectorForRemoval().equals(SELECTOR_NAME)) {
+					bindPlanSelectorForRemoval().toProvider(MyExpBetaPlanChangerForRemovalProvider.class);
+				}
+			}
+		});
+		
+		controler.run();
+		
 	}
 
 }
