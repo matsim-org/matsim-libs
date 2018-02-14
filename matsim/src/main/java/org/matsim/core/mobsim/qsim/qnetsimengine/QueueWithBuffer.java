@@ -21,6 +21,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.*;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.events.*;
@@ -157,8 +158,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	final static double HOLE_SPEED_KM_H = 15.0;
 
 	private final double length ;
-	private double unscaledFlowCapacity_s = Double.NaN ;
-	private double effectiveNumberOfLanes = Double.NaN ;
+//	private double unscaledFlowCapacity_s = Double.NaN ;
+//	private double effectiveNumberOfLanes = Double.NaN ;
 
 	private final VisData visData = new VisDataImpl() ;
 	private final LinkSpeedCalculator linkSpeedCalculator;
@@ -173,6 +174,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			LinkSpeedCalculator linkSpeedCalculator) {
 		// the general idea is to give this object no longer access to "everything".  Objects get back pointers (here qlink), but they
 		// do not present the back pointer to the outside.  In consequence, this object can go up to qlink, but not any further. kai, mar'16
+		
+//		log.setLevel(Level.DEBUG);
 
 		this.qLink = qlink;
 		this.id = laneId ;
@@ -180,8 +183,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		this.linkSpeedCalculator = linkSpeedCalculator;
 		this.vehQueue = vehicleQueue ;
 		this.length = length;
-		this.unscaledFlowCapacity_s = flowCapacity_s ;
-		this.effectiveNumberOfLanes = effectiveNumberOfLanes;
+//		this.unscaledFlowCapacity_s = flowCapacity_s ;
+//		this.effectiveNumberOfLanes = effectiveNumberOfLanes;
 
 //		freespeedTravelTime = this.length / qlink.getLink().getFreespeed();
 //		if (Double.isNaN(freespeedTravelTime)) {
@@ -287,11 +290,14 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		// the following is not looking at time because it simply assumes that the lookups are "now". kai, feb'18
 		// I am currently not sure if this statement is correct. kai, feb'18
 		
-		flowCapacityPerTimeStep = this.unscaledFlowCapacity_s ;
+		double now = context.getSimTimer().getTimeOfDay() ;
+		
+//		flowCapacityPerTimeStep = this.unscaledFlowCapacity_s ;
+		flowCapacityPerTimeStep = this.qLink.getLink().getFlowCapacityPerSec(now) ;
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
 		flowCapacityPerTimeStep = flowCapacityPerTimeStep * context.qsimConfig.getTimeStepSize() * context.qsimConfig.getFlowCapFactor() ;
 		inverseFlowCapacityPerTimeStep = 1.0 / flowCapacityPerTimeStep;
-
+		
 		switch (context.qsimConfig.getTrafficDynamics()) {
 			case queue:
 			case withHoles:
@@ -307,14 +313,19 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				break;
 			default: throw new RuntimeException("The traffic dynmics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
 		}
+//		log.debug( "linkId=" + this.qLink.getLink().getId() + "; flowCapPerTimeStep=" + flowCapacityPerTimeStep +
+//						   "; invFlowCapPerTimeStep=" + inverseFlowCapacityPerTimeStep + "; maxFlowFromFdiag=" + maxFlowFromFdiag ) ;
+		
 	}
 
 	private void calculateStorageCapacity() {
 		// The following is not adjusted for time-dependence!! kai, apr'16
 		// No, I think that it simply assumes that the lookups are "now". kai, feb'18
+		double now = context.getSimTimer().getTimeOfDay() ;
 		
 		// first guess at storageCapacity:
-		storageCapacity = this.length * this.effectiveNumberOfLanes / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
+//		storageCapacity = this.length * this.effectiveNumberOfLanes / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
+		storageCapacity = this.length * this.qLink.getLink().getNumberOfLanes(now) / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
 		storageCapacity = Math.max(storageCapacity, getBufferStorageCapacity());
@@ -590,6 +601,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		// not speed, since that is looked up anyways.
 		// yy might also make flow and storage self-detecting changes (not really that
 		// much more expensive). kai, feb'18
+		
+//		log.debug("just entered recalcTimeVariantAttributes; now=" + this.context.getSimTimer().getTimeOfDay() ) ;
 		
 		calculateFlowCapacity();
 		calculateStorageCapacity();
