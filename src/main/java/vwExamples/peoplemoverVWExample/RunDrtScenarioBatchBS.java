@@ -41,7 +41,7 @@ import vwExamples.peoplemoverVWExample.CustomRebalancing.ZonalDemandAggregatorMy
 
 /** * @author axer */
 
-public class RunDrtScenarioBatch {
+public class RunDrtScenarioBatchBS {
 	
 	//Class to create the controller
 	public static Controler createControler(Config config, boolean otfvis) {
@@ -60,12 +60,12 @@ public class RunDrtScenarioBatch {
 		//The demandScenarios need to be already prepared and stored.
 		//This script generates automatically pathnames with the help of demandScenarios
 //		List<Double> demandScenarios = Arrays.asList(0.05,0.1,0.15);
-		List<Double> demandScenarios = Arrays.asList(0.2);
+		List<Double> demandScenarios = Arrays.asList(0.1);
 		//This list stores our runIds that are used to save the simulations
 		//runIds are used for consistent simulation identification. Our runIds are maintained in an excel file: 
 		
 
-		List<String> runIdList = Arrays.asList("def_5_1");
+		List<String> runIdList = Arrays.asList("pt_drt_0.1");
 //		List<Integer> stopTimeList = Arrays.asList(15,30,60);
 		List<Integer> stopTimeList = Arrays.asList(15);
 		Integer idx = 0;
@@ -76,7 +76,7 @@ public class RunDrtScenarioBatch {
 			//Some config parameters will be taken from the provided config file
 			//Other config parameters will be generated or modified dynamically within this loop
 			//Define the path to the config file and enable / disable otfvis
-			final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+			final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/WOB_BS_DRT/BS/input/config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 			
 
 			//OTFVis is an open source, OpenGL-based visualizer for looking at MATSim scenarios and output.
@@ -84,14 +84,14 @@ public class RunDrtScenarioBatch {
 			boolean otfvis = false;
 			
 			//Overwrite existing configuration parameters
-			config.plans().setInputFile("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/population/SmallSplits/run124.100.output_plans_DRT"+demandScenario.toString()+".xml.gz");
-			
+			config.plans().setInputFile("population/vw208_sampleRate0.1replaceRate_0.5_pt_drt.xml.gz");
 			config.controler().setLastIteration(5); //Number of simulation iterations
 			config.controler().setWriteEventsInterval(1); //Write Events file every x-Iterations 
 			config.controler().setWritePlansInterval(1); //Write Plan file every x-Iterations
 			//Set runId according to idx
 			String runId = runIdList.get(idx);
 			config.controler().setRunId(runId);
+			config.network().setInputFile("network/network_area_bs_withDRT_links.xml.gz");
 			//Increment idx
 			idx=idx+1;
 			
@@ -108,18 +108,15 @@ public class RunDrtScenarioBatch {
 			drt.setStopDuration(15);
 			drt.setMaxTravelTimeBeta(300);
 			drt.setMaxTravelTimeAlpha(1.3);
-			drt.setMaxWaitTime(600);
+			drt.setMaxWaitTime(300);
 			drt.setStopDuration(stoptime);
+			drt.setTransitStopFile("../input/virtualstops/stopsGrid_400m.xml");
 			
-			config.controler().setOutputDirectory("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/results/"+runId+"_"+demandScenario.toString()+"_stopDur"+stoptime.toString()+"_reloc_"+rebalancing+"/"); //Define dynamically the the output path
-			
+			config.controler().setOutputDirectory("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\output\\"+runId); //Define dynamically the the output path
 			
 			
 			//For each demand scenario we are using a predefined drt vehicle fleet size 
-			
-			drt.setVehiclesFile("D:/Axer/MatsimDataStore/WOB_DRT_Relocating/taxifleets/fleet_200.xml");	
-			
-			
+			drt.setVehiclesFile("fleets/fleet_50.xml.gz");
 			
 			
 			//Define the MATSim Controler
@@ -136,13 +133,13 @@ public class RunDrtScenarioBatch {
 			
 
 			System.out.println("Rebalancing Online");
-			drt.setRebalancingInterval(600);
+			drt.setRebalancingInterval(1800);
 			
 			
 			
 			//Our re-balancing requires a DrtZonalSystem
-			//DrtZonalSystem splits the network into squares with x=1000m 
-			DrtZonalSystem zones = new DrtZonalSystem(controler.getScenario().getNetwork(), 1000);
+			//DrtZonalSystem splits the network into squares with x=2000m 
+			DrtZonalSystem zones = new DrtZonalSystem(controler.getScenario().getNetwork(), 2000);
 
 			//In this stages we are adding new modules to the MATSim controler
 			controler.addOverridingModule(new DrtZonalModule());
