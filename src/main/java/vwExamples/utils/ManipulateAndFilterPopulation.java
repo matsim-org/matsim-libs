@@ -71,8 +71,8 @@ public class ManipulateAndFilterPopulation {
 	static String serachMode = "pt";
 	static String newMode = "drt";
 	String shapeFeature = "NO";
-	static double samplePct = 0.01; //Global sample ratio
-	static double replancementPct = 1.0; //Ratio of mode substitution 
+	static double samplePct = 0.1; //Global sample ratio
+	static double replancementPct = 0.5; //Ratio of mode substitution 
 	String searchedActivityName = "home";
 	
 	//Constructor which reads the shape file for later use!
@@ -88,7 +88,7 @@ public static void main(String[] args) {
 	//Fill this Scenario with a population.
 	new PopulationReader(scenario).readFile("D:\\Axer\\MatsimDataStore\\BaseCases\\vw208\\vw208.1.0.output_plans.xml.gz");
 	new TransitScheduleReader(scenario).readFile("D:\\Axer\\MatsimDataStore\\BaseCases\\vw208\\vw208.1.0.output_transitSchedule.xml.gz");
-	String filteredPopDesination = ("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\input\\population\\vw208_1.0_PT_DRT.xml.gz");
+	String filteredPopDesination = ("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\input\\population\\vw208_sampleRate"+samplePct+"replaceRate_"+replancementPct+"_"+serachMode+"_"+newMode+".xml.gz");
 	StreamingPopulationWriter filteredPop = new StreamingPopulationWriter();
 	filteredPop.startStreaming(filteredPopDesination);
 	
@@ -103,11 +103,12 @@ public static void main(String[] args) {
 //	System.out.println(id.toString() + "Dies ist die ID");
 //	
 //	}
+	
 
 	for (Person p : scenario.getPopulation().getPersons().values())
 	{
 		Plan plan = p.getSelectedPlan();
-		
+
 
 		//Sample a certain percentage of the hole population
 		if (MatsimRandom.getRandom().nextDouble() < samplePct) 
@@ -122,9 +123,8 @@ public static void main(String[] args) {
 					//Modify only a certain percentage of relevant Agents
 					if (MatsimRandom.getRandom().nextDouble() < replancementPct) 
 					{
+						new TransitActsRemover().run(plan);
 				
-//						//Remove TransitActs
-//						new TransitActsRemover().run(p.getSelectedPlan());
 				
 						//If it is a relevant person, we assign certain legs with person's selected plans to a new mode
 						for (PlanElement pe : plan.getPlanElements())
@@ -139,20 +139,27 @@ public static void main(String[] args) {
 									if (checkAgentLegWithinZone(plan, leg,manipulateAndFilterPopulation.zoneMap,manipulateAndFilterPopulation.zonePrefix)) 
 									{
 									
-									if (getPtTransportMode(leg,transitLines).equals("bus"))
-										{
+//									if (getPtTransportMode(leg,transitLines).equals("bus"))
+//										{
+											System.out.println("Replaced pt leg with " + newMode);
 											//Write newMode into Leg
 											leg.setMode(newMode);
 											//Remove route from leg
-											leg.setRoute(null);
-											leg.getAttributes().removeAttribute("trav_time");
+											//leg.setRoute(null);
+											//leg.getAttributes().removeAttribute("trav_time");
 											//System.out.println(leg);
-										}
+											
+//										}
+										
 									}
 								}
 							}
 							
+						
+							
+							
 						}
+						
 						
 					}
 				//}
@@ -218,7 +225,7 @@ public static boolean checkAgentLegWithinZone(Plan plan, Leg leg, Map<String, Ge
 	
 	
 	if ((prevActInZone == true) && (nextActInZone == true) ) {
-		System.out.println("Relavent Agent: "+plan.getPerson().getId().toString());
+		System.out.println("Leg in Zone: "+plan.getPerson().getId().toString());
 		return true;
 	}
 	else return false;
