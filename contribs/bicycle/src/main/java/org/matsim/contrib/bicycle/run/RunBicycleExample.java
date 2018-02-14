@@ -18,12 +18,20 @@
  * *********************************************************************** */
 package org.matsim.contrib.bicycle.run;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.bicycle.BicycleConfigGroup;
+import org.matsim.contrib.bicycle.BicycleModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ModeParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -38,19 +46,17 @@ public class RunBicycleExample {
 	public static void main(String[] args) {
 		// This works when the data is stored under "/matsim/contribs/bicycle/src/main/resources/bicycle_example"
 		boolean considerMotorizedInteraction = false;
-		Config config = ConfigUtils.loadConfig("bicycle_example/config.xml", new BicycleConfigGroup());
+//		Config config = ConfigUtils.loadConfig("bicycle_example/config.xml", new BicycleConfigGroup());
+		Config config = createStandardBicycleConfig();
 		config.controler().setLastIteration(0);
 		new RunBicycleExample().run(config, considerMotorizedInteraction);
 	}
 
 	public void run(Config config, boolean considerMotorizedInteraction) {
-//		config.plansCalcRoute().setInsertingAccessEgressWalk(true);
 		config.global().setNumberOfThreads(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
-		// New, yet to be applied
-		config.plansCalcRoute().setRoutingRandomness(0.2);
-		//
+		config.plansCalcRoute().setRoutingRandomness(1.);
 				
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -72,5 +78,58 @@ public class RunBicycleExample {
 		controler.addOverridingModule(bicycleModule);
 		
 		controler.run();
+	}
+	
+	private static Config createStandardBicycleConfig() {
+		Config config = ConfigUtils.createConfig();
+		
+		config.addModule(new BicycleConfigGroup());
+		
+		config.controler().setOutputDirectory("./output");
+		config.controler().setWriteEventsInterval(1);
+		
+		config.plans().setInputFile("population_1200.xml");
+		
+		config.network().setInputFile("network_normal.xml");
+		
+		config.getModules().get("bicycle").getParams().put("marginalUtilityOfInfrastructure_m", "-0.0002");
+		config.getModules().get("bicycle").getParams().put("marginalUtilityOfComfort_m", "-0.0002");
+		config.getModules().get("bicycle").getParams().put("marginalUtilityOfGradient_m_100m", "-0.02");
+		
+		List<String> mainModeList = new ArrayList<>();
+		mainModeList.add("bibycle");
+		mainModeList.add(TransportMode.car);
+		config.qsim().setMainModes(mainModeList);
+		
+		config.strategy().setMaxAgentPlanMemorySize(5);
+		{
+			StrategySettings strategySettings = new StrategySettings();
+			strategySettings.setStrategyName("ChangeExpBeta");
+			strategySettings.setWeight(0.8);
+			config.strategy().addStrategySettings(strategySettings);
+		}{
+			StrategySettings strategySettings = new StrategySettings();
+			strategySettings.setStrategyName("ReRoute");
+			strategySettings.setWeight(0.2);
+			config.strategy().addStrategySettings(strategySettings);
+		}
+		
+		ActivityParams homeActivity = new ActivityParams("home");
+		homeActivity.setTypicalDuration(12*60*60);
+		config.planCalcScore().addActivityParams(homeActivity);
+		
+		ActivityParams workActivity = new ActivityParams("work");
+		workActivity.setTypicalDuration(8*60*60);
+		config.planCalcScore().addActivityParams(workActivity);
+		
+		ModeParams bicycle = new ModeParams("bicycle");
+		bicycle.setConstant(0.);
+		bicycle.setMarginalUtilityOfDistance(-0.0004); // util/m
+		bicycle.setMarginalUtilityOfTraveling(-6.0); // util/h
+		bicycle.setMonetaryDistanceRate(0.);
+		
+		config.plansCalcRoute().setNetworkModes(mainModeList);
+		
+		return config;
 	}
 }
