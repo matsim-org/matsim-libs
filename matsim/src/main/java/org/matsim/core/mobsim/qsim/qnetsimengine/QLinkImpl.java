@@ -165,9 +165,10 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	@Override public void recalcTimeVariantAttributes() {
 		double now = context.getSimTimer().getTimeOfDay() ;
-		qlane.changeUnscaledFlowCapacityPerSecond( ((Link) this.getLink()).getFlowCapacityPerSec(now) );
-		qlane.changeEffectiveNumberOfLanes(this.getLink().getNumberOfLanes(now));
-		qlane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ;
+//		qlane.changeUnscaledFlowCapacityPerSecond( ((Link) this.getLink()).getFlowCapacityPerSec(now) );
+//		qlane.changeEffectiveNumberOfLanes(this.getLink().getNumberOfLanes(now));
+//		qlane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ;
+		qlane.recalcTimeVariantAttributes();
 	}
 
 	@Override

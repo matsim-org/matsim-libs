@@ -132,7 +132,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 	private final Queue<QueueWithBuffer.Hole> holes = new LinkedList<>();
 
-	private double freespeedTravelTime = Double.NaN;
+//	private double freespeedTravelTime = Double.NaN;
 	/** the last time-step the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
 	private double bufferLastMovedTime = Time.UNDEFINED_TIME ;
 	/**
@@ -183,10 +183,10 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		this.unscaledFlowCapacity_s = flowCapacity_s ;
 		this.effectiveNumberOfLanes = effectiveNumberOfLanes;
 
-		freespeedTravelTime = this.length / qlink.getLink().getFreespeed();
-		if (Double.isNaN(freespeedTravelTime)) {
-			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
-		}
+//		freespeedTravelTime = this.length / qlink.getLink().getFreespeed();
+//		if (Double.isNaN(freespeedTravelTime)) {
+//			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
+//		}
 		this.calculateFlowCapacity();
 		this.calculateStorageCapacity();
 
@@ -285,6 +285,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 	private void calculateFlowCapacity() {
 		// the following is not looking at time because it simply assumes that the lookups are "now". kai, feb'18
+		// I am currently not sure if this statement is correct. kai, feb'18
 		
 		flowCapacityPerTimeStep = this.unscaledFlowCapacity_s ;
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
@@ -319,11 +320,17 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		storageCapacity = Math.max(storageCapacity, getBufferStorageCapacity());
 
 		/*
-		 * If speed on link is relatively slow, then we need MORE cells than the
-		 * above spaceCap to handle the flowCap. Example: Assume freeSpeedTravelTime
-		 * (aka freeTravelDuration) is 2 seconds. Than I need the spaceCap = TWO times
-		 * the flowCap to handle the flowCap.
+		 * If speed on link is relatively slow, then we need MORE cells than the above spaceCap to handle the flowCap.
+		 * Example: Assume freeSpeedTravelTime (aka freeTravelDuration) is 2 seconds. Than we need the spaceCap = TWO
+		 * times the flowCap to handle the flowCap.
+		 *
+		 * Will base these computations (for the time being) on the standard free speed; i.e. reductions in free speed
+		 * will also reduce the maximum flow.
 		 */
+		double freespeedTravelTime = this.length / qLink.getLink().getFreespeed();
+		if (Double.isNaN(freespeedTravelTime)) {
+			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
+		}
 		double tempStorageCapacity = freespeedTravelTime * flowCapacityPerTimeStep;
 		// yy note: freespeedTravelTime may be Inf.  In this case, storageCapacity will also be set to Inf.  This can still be
 		// interpreted, but it means that the link will act as an infinite sink.  kai, nov'10
@@ -578,19 +585,24 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 	}
 
-	private void recalcTimeVariantAttributes() {
+	@Override
+	public void recalcTimeVariantAttributes() {
+		// not speed, since that is looked up anyways.
+		// yy might also make flow and storage self-detecting changes (not really that
+		// much more expensive). kai, feb'18
+		
 		calculateFlowCapacity();
 		calculateStorageCapacity();
 		flowcap_accumulate.setValue(flowCapacityPerTimeStep);
 	}
 
-	@Override
-	public final void changeSpeedMetersPerSecond( final double val ) {
-		this.freespeedTravelTime = this.length / val ;
-		if (Double.isNaN(freespeedTravelTime)) {
-			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
-		}
-	}
+//	@Override
+//	public final void changeSpeedMetersPerSecond( final double val ) {
+//		this.freespeedTravelTime = this.length / val ;
+//		if (Double.isNaN(freespeedTravelTime)) {
+//			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
+//		}
+//	}
 
 	@Override
 	public final QVehicle getVehicle(final Id<Vehicle> vehicleId) {
@@ -791,19 +803,19 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		qSignalizedItem  = new DefaultSignalizeableItem(qLink.getLink().getToNode().getOutLinks().keySet());
 	}
 
-	@Override
-	public final void changeUnscaledFlowCapacityPerSecond( final double val ) {
-		this.unscaledFlowCapacity_s = val ;
-		// be defensive (might now be called twice):
-		this.recalcTimeVariantAttributes();
-	}
+//	@Override
+//	public final void changeUnscaledFlowCapacityPerSecond( final double val ) {
+//		this.unscaledFlowCapacity_s = val ;
+//		// be defensive (might now be called twice):
+//		this.recalcTimeVariantAttributes();
+//	}
 
-	@Override
-	public final void changeEffectiveNumberOfLanes( final double val ) {
-		this.effectiveNumberOfLanes = val ;
-		// be defensive (might now be called twice):
-		this.recalcTimeVariantAttributes();
-	}
+//	@Override
+//	public final void changeEffectiveNumberOfLanes( final double val ) {
+//		this.effectiveNumberOfLanes = val ;
+//		// be defensive (might now be called twice):
+//		this.recalcTimeVariantAttributes();
+//	}
 
 	@Override public Id<Lane> getId() { 
 		return this.id;

@@ -76,10 +76,10 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 		}
 	}
 	
-	public final void handleExternalNetworkChangeEvent( NetworkChangeEvent event ) {
-		log.warn("handling change event coming from external (i.e. not in network change events data structure):" + event);
-		handleNetworkChangeEvent(event);
-	}
+//	public final void handleExternalNetworkChangeEvent( NetworkChangeEvent event ) {
+//		log.warn("handling change event coming from external (i.e. not in network change events data structure):" + event);
+//		handleNetworkChangeEvent(event);
+//	}
 	
 	private void handleNetworkChangeEvent(NetworkChangeEvent event) {
 		for (Link link : event.getLinks()) {
@@ -92,4 +92,6 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 		}
 	}
 	
+	public void rereadNetworkChangeEvents() {
+	}
 }

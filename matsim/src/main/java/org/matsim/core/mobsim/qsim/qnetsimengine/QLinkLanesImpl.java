@@ -215,7 +215,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 					}
 				}
 			}
-			queue.changeSpeedMetersPerSecond( this.getLink().getFreespeed() );
+//			queue.changeSpeedMetersPerSecond( this.getLink().getFreespeed() );
 			
 		}
 		// reverse the order in the linked map, i.e. upstream to downstream
@@ -420,9 +420,10 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		double now = context.getSimTimer().getTimeOfDay() ;
 
 		for (QLaneI lane : this.laneQueues.values()) {
-			lane.changeEffectiveNumberOfLanes( getLink().getNumberOfLanes( now ) ) ;
-			lane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ;
-			lane.changeUnscaledFlowCapacityPerSecond( ((Link)getLink()).getFlowCapacityPerSec(now) );
+//			lane.changeEffectiveNumberOfLanes( getLink().getNumberOfLanes( now ) ) ;
+//			lane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ;
+//			lane.changeUnscaledFlowCapacityPerSecond( ((Link)getLink()).getFlowCapacityPerSec(now) );
+			lane.recalcTimeVariantAttributes();
 		}
 	}
 

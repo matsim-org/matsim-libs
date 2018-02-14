@@ -45,8 +45,10 @@ public interface QLaneI extends Identifiable<Lane> {
 	boolean isActive();
 
 	double getSimulatedFlowCapacityPerTimeStep();
-
-	QVehicle getVehicle( final Id<Vehicle> vehicleId);
+	
+	void recalcTimeVariantAttributes();
+	
+	QVehicle getVehicle(final Id<Vehicle> vehicleId);
 
 	double getStorageCapacity();
 	
@@ -65,9 +67,9 @@ public interface QLaneI extends Identifiable<Lane> {
 	 */
 	void addTransitSlightlyUpstreamOfStop(final QVehicle veh);
 	
-	void changeUnscaledFlowCapacityPerSecond( final double val ) ;
-
-	void changeEffectiveNumberOfLanes( final double val ) ;
+//	void changeUnscaledFlowCapacityPerSecond( final double val ) ;
+//
+//	void changeEffectiveNumberOfLanes( final double val ) ;
 
 	boolean doSimStep();
 
@@ -87,7 +89,7 @@ public interface QLaneI extends Identifiable<Lane> {
 
 	boolean isAcceptingFromUpstream();
 
-	void changeSpeedMetersPerSecond(double val) ;
+//	void changeSpeedMetersPerSecond(double val) ;
 
 	/**
 	 * When multiple lanes lead to the same next link, the QLinkLanesImpl needs to decide which lane to use.  It uses

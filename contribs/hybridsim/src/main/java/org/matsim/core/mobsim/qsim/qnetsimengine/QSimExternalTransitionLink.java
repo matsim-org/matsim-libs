@@ -125,11 +125,11 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 		public double getLoadIndicator() {
 			return 0. ;
 		}
-		@Override
-		public void changeSpeedMetersPerSecond( double spd ) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
+//		@Override
+//		public void changeSpeedMetersPerSecond( double spd ) {
+//			// TODO Auto-generated method stub
+//			throw new RuntimeException("not implemented") ;
+//		}
 
 		@Override
 		public void addFromWait(QVehicle arg0) {
@@ -143,17 +143,17 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 			throw new RuntimeException("not implemented") ;
 		}
 
-		@Override
-		public void changeEffectiveNumberOfLanes(double arg0) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
-
-		@Override
-		public void changeUnscaledFlowCapacityPerSecond(double arg0) {
-			// TODO Auto-generated method stub
-			throw new RuntimeException("not implemented") ;
-		}
+//		@Override
+//		public void changeEffectiveNumberOfLanes(double arg0) {
+//			// TODO Auto-generated method stub
+//			throw new RuntimeException("not implemented") ;
+//		}
+//
+//		@Override
+//		public void changeUnscaledFlowCapacityPerSecond(double arg0) {
+//			// TODO Auto-generated method stub
+//			throw new RuntimeException("not implemented") ;
+//		}
 
 		@Override
 		public void clearVehicles() {
@@ -193,7 +193,12 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
-
+		
+		@Override
+		public void recalcTimeVariantAttributes() {
+			throw new RuntimeException("not implemented");
+		}
+		
 		@Override
 		public double getStorageCapacity() {
 			// TODO Auto-generated method stub
