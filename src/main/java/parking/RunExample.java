@@ -50,6 +50,7 @@ public class RunExample {
         config.transit().setVehiclesFile("../example_scenario/vw202.0.01/vw202.0.01.output_transitVehicles.xml.gz");
 
         config.controler().setOutputDirectory(outputDir);
+//        config.controler().setWriteEventsInterval(5);
 
         //parking related settings
         config.plansCalcRoute().setInsertingAccessEgressWalk(true);

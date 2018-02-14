@@ -20,7 +20,9 @@
 package parking;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -97,6 +99,8 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
 
     private ZoneToLinks zoneToLinks;
 
+    private final Map<Id<Person>,Link> personToParkLink = new HashMap<>();
+
     public ParkingSearchNetworkRoutingModule(
             final String mode,
             final PopulationFactory populationFactory,
@@ -132,6 +136,11 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
         Gbl.assertNotNull(toFacility);
 
         Link accessActLink = decideOnLink(fromFacility);
+        // so that agent walk back to where car is parked.
+        if (personToParkLink.containsKey(person.getId())) {
+            accessActLink = personToParkLink.remove(person.getId());
+            log.warn("Person "+person.getId()+" is walking to "+accessActLink.getId()+ " to get the car.");
+        }
 
         Link egressActLink = decideOnLink(toFacility);
 
@@ -180,12 +189,6 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
         }
         // === compute another network leg (from destination of above link to another nearest link
         {
-            final Activity interactionActivity =  PopulationUtils.createActivityFromCoordAndLinkId(this.parkingStageActivityType,
-                    egressActLink.getToNode().getCoord(),
-                egressActLink.getId());
-            interactionActivity.setMaximumDuration(0.0);
-            result.add(interactionActivity);
-
             Leg newLeg = this.populationFactory.createLeg(this.mode);
             newLeg.setDepartureTime(now);
             // get egressActLink from zone and avg park time from Zone
@@ -193,8 +196,18 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
             if (parkEndLink.getId().equals(egressActLink.getId())) {
                 // vehicle is outside the study area
             } else {
+                log.warn("Person "+person.getId()+" started looking for parking on link "+egressActLink.getId()+ " and found parking on link "+ parkEndLink.getId());
                 now += routeLeg(person, newLeg, egressActLink, parkEndLink, now);
+
+                // an activity will help in identifying the start of the parking search
+                final Activity interactionActivity =  PopulationUtils.createActivityFromCoordAndLinkId(this.parkingStageActivityType,
+                        egressActLink.getToNode().getCoord(),
+                        egressActLink.getId());
+                interactionActivity.setMaximumDuration(0.0);
+                result.add(interactionActivity);
                 result.add(newLeg);
+
+                this.personToParkLink.put(person.getId(), parkEndLink);
                 egressActLink = parkEndLink; // <- this is new egressActLink. Amit Feb'18
 //                log.warn( newLeg );
             }
