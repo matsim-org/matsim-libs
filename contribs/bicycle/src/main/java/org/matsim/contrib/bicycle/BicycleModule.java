@@ -16,9 +16,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.bicycle.run;
+package org.matsim.contrib.bicycle;
 
-import org.matsim.contrib.bicycle.MotorizedInteractionEngine;
 import org.matsim.core.controler.AbstractModule;
 
 /**
