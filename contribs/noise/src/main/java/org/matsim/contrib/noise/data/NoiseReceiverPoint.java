@@ -25,6 +25,7 @@ package org.matsim.contrib.noise.data;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
@@ -45,7 +46,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		super(id, coord);
 	}
 
-	private Map<Id<Person>, ArrayList<PersonActivityInfo>> personId2actInfos = new HashMap<>(0);
+	private Map<Id<Person>, List<PersonActivityInfo>> personId2actInfos = new HashMap<>(0);
 	
 	// initialization
 	private Map<Id<Link>, Double> linkId2distanceCorrection = new HashMap<>(0);
@@ -60,37 +61,41 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	private double damageCosts;
 	private double damageCostsPerAffectedAgentUnit;
 
-	public Map<Id<Person>, ArrayList<PersonActivityInfo>> getPersonId2actInfos() {
-		return personId2actInfos;
+	public Map<Id<Person>, List<PersonActivityInfo>> getPersonId2actInfos() {
+		return Collections.unmodifiableMap(personId2actInfos);
 	}
 
-	public void setPersonId2actInfos(Map<Id<Person>, ArrayList<PersonActivityInfo>> personId2actInfos) {
-		this.personId2actInfos = personId2actInfos;
+	public void addPersonActInfo(Id<Person> person, PersonActivityInfo info) {
+		List<PersonActivityInfo> infos = this.personId2actInfos.get(person);
+		if(infos == null) {
+			infos = new ArrayList<>();
+			this.personId2actInfos.put(person, infos);
+		}
+		infos.add(info);
 	}
 	
 	public Map<Id<Link>, Double> getLinkId2distanceCorrection() {
 		return Collections.unmodifiableMap(linkId2distanceCorrection);
 	}
 
-	public void setLinkId2distanceCorrection(
-			Map<Id<Link>, Double> linkId2distanceCorrection) {
-		this.linkId2distanceCorrection = linkId2distanceCorrection;
+	public void setLinkId2distanceCorrection(Id<Link> linkId,  Double distanceCorrection) {
+		this.linkId2distanceCorrection.put(linkId, distanceCorrection);
 	}
 
 	public Map<Id<Link>, Double> getLinkId2angleCorrection() {
 		return Collections.unmodifiableMap(linkId2angleCorrection);
 	}
 
-	public void setLinkId2angleCorrection(Map<Id<Link>, Double> linkId2angleCorrection) {
-		this.linkId2angleCorrection = linkId2angleCorrection;
+	public void setLinkId2angleCorrection(Id<Link> linkId, Double angleCorrection) {
+		this.linkId2angleCorrection.put(linkId, angleCorrection);
 	}
 
 	public Map<Id<Link>, Double> getLinkId2IsolatedImmission() {
 		return Collections.unmodifiableMap(linkId2IsolatedImmission);
 	}
 
-	public void setLinkId2IsolatedImmission(Map<Id<Link>, Double> linkId2IsolatedImmission) {
-		this.linkId2IsolatedImmission = linkId2IsolatedImmission;
+	public void setLinkId2IsolatedImmission(Id<Link> linkId, Double isolatedImmission) {
+		this.linkId2IsolatedImmission.put(linkId, isolatedImmission);
 	}
 
 	public double getFinalImmission() {

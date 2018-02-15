@@ -655,13 +655,13 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 		
 		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
 					
-			Map<Id<Link>, Double> linkId2isolatedImmission = new HashMap<Id<Link>, Double>();
+//			Map<Id<Link>, Double> linkId2isolatedImmission = new HashMap<Id<Link>, Double>();
 			Map<Id<Link>, Double> linkId2isolatedImmissionPlusOneCar = new HashMap<Id<Link>, Double>();
 			Map<Id<Link>, Double> linkId2isolatedImmissionPlusOneHGV = new HashMap<Id<Link>, Double>();
 			
 			for(Id<Link> linkId : rp.getLinkId2distanceCorrection().keySet()) {
 				if (this.noiseContext.getNoiseParams().getTunnelLinkIDsSet().contains(linkId)) {
-					linkId2isolatedImmission.put(linkId, 0.);
+					rp.setLinkId2IsolatedImmission(linkId, 0.);
 					linkId2isolatedImmissionPlusOneCar.put(linkId, 0.);
 					linkId2isolatedImmissionPlusOneHGV.put(linkId, 0.);
 								 			
@@ -711,19 +711,19 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 						throw new RuntimeException("noise immission: " + noiseImmission + " - noise immission plus one car: " + noiseImmissionPlusOneCar + " - noise immission plus one hgv: " + noiseImmissionPlusOneHGV + ". This should not happen. Aborting..."); 
 					}
 			 		
-					linkId2isolatedImmission.put(linkId, noiseImmission);
+			 		rp.setLinkId2IsolatedImmission(linkId, noiseImmission);
 					linkId2isolatedImmissionPlusOneCar.put(linkId, noiseImmissionPlusOneCar);
 					linkId2isolatedImmissionPlusOneHGV.put(linkId, noiseImmissionPlusOneHGV);
 			 	}
 			}
 			
 			double finalNoiseImmission = 0.;
-			if (!linkId2isolatedImmission.isEmpty()) {
+			Map<Id<Link>, Double> linkId2isolatedImmission = rp.getLinkId2IsolatedImmission();
+			if (linkId2isolatedImmission != null && !linkId2isolatedImmission.isEmpty()) {
 				finalNoiseImmission = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmission.values());
 			}
 			
 			rp.setFinalImmission(finalNoiseImmission);
-			rp.setLinkId2IsolatedImmission(linkId2isolatedImmission);
 			rp.setLinkId2IsolatedImmissionPlusOneCar(linkId2isolatedImmissionPlusOneCar);
 			rp.setLinkId2IsolatedImmissionPlusOneHGV(linkId2isolatedImmissionPlusOneHGV);
 		}

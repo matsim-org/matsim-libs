@@ -171,9 +171,6 @@ public class NoiseContext {
 			
 			NoiseReceiverPoint nrp = new NoiseReceiverPoint(rp.getId(), rp.getCoord());
 
-			Map<Id<Link>,Double> relevantLinkIds2Ds = new HashMap<>();
-			Map<Id<Link>,Double> relevantLinkIds2angleImmissionCorrection = new HashMap<>();
-		
 			// get the zone grid cell around the receiver point
 			Set<Id<Link>> potentialLinks = new HashSet<>();
 			Tuple<Integer,Integer>[] zoneTuples = getZoneTuplesForLinks(nrp.getCoord());
@@ -205,14 +202,12 @@ public class NoiseContext {
 						double correctionTermDs = NoiseEquations.calculateDistanceCorrection(distance);
 						double correctionTermAngle = calculateAngleImmissionCorrection(nrp.getCoord(), scenario.getNetwork().getLinks().get(linkId));
 						
-						relevantLinkIds2Ds.put(linkId, correctionTermDs);
-						relevantLinkIds2angleImmissionCorrection.put(linkId, correctionTermAngle);
+						nrp.setLinkId2distanceCorrection(linkId, correctionTermDs);
+						nrp.setLinkId2angleCorrection(linkId, correctionTermAngle);
 					}
 				}
 			}
 			
-			nrp.setLinkId2distanceCorrection(relevantLinkIds2Ds);
-			nrp.setLinkId2angleCorrection(relevantLinkIds2angleImmissionCorrection);
 			this.noiseReceiverPoints.put(nrp.getId(), nrp);
 			cnt.incCounter();
 		}
