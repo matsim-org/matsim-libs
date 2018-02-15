@@ -147,12 +147,7 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 		this.noiseContext.getVehicleId2PersonId().clear();
 
 		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-			rp.getLinkId2IsolatedImmission().clear();
-			rp.setFinalImmission(0.);
-			rp.setAffectedAgentUnits(0.);
-			rp.getPersonId2actInfos().clear();
-			rp.setDamageCosts(0.);
-			rp.setDamageCostsPerAffectedAgentUnit(0.);
+			rp.reset();
 		}
 		
 	}
@@ -162,11 +157,7 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 		this.noiseContext.getNoiseLinks().clear();
 		
 		for (NoiseReceiverPoint rp : this.noiseContext.getReceiverPoints().values()) {
-			rp.getLinkId2IsolatedImmission().clear();
-			rp.setFinalImmission(0.);
-			rp.setAffectedAgentUnits(0.);
-			rp.setDamageCosts(0.);
-			rp.setDamageCostsPerAffectedAgentUnit(0.);
+			rp.resetTimeInterval();
 		}
 	}
 	

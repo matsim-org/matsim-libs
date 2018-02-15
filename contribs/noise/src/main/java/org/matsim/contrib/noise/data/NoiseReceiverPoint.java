@@ -23,6 +23,7 @@
 package org.matsim.contrib.noise.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,16 +45,16 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		super(id, coord);
 	}
 
-	private Map<Id<Person>, ArrayList<PersonActivityInfo>> personId2actInfos = new HashMap<Id<Person>, ArrayList<PersonActivityInfo>>();
+	private Map<Id<Person>, ArrayList<PersonActivityInfo>> personId2actInfos = new HashMap<>(0);
 	
 	// initialization
-	private Map<Id<Link>, Double> linkId2distanceCorrection = new HashMap<Id<Link>, Double>();
-	private Map<Id<Link>, Double> linkId2angleCorrection = new HashMap<Id<Link>, Double>();
+	private Map<Id<Link>, Double> linkId2distanceCorrection = new HashMap<>(0);
+	private Map<Id<Link>, Double> linkId2angleCorrection = new HashMap<>(0);
 			
 	// time-specific information
-	private Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<Id<Link>, Double>();
-	private Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneCar = new HashMap<Id<Link>, Double>();
-	private Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneHGV = new HashMap<Id<Link>, Double>(); 
+	private Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<>(0);
+	private Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneCar = new HashMap<>(0);
+	private Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneHGV = new HashMap<>(0); 
 	private double finalImmission = 0.;
 	private double affectedAgentUnits = 0.;
 	private double damageCosts;
@@ -68,7 +69,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	}
 	
 	public Map<Id<Link>, Double> getLinkId2distanceCorrection() {
-		return linkId2distanceCorrection;
+		return Collections.unmodifiableMap(linkId2distanceCorrection);
 	}
 
 	public void setLinkId2distanceCorrection(
@@ -77,7 +78,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	}
 
 	public Map<Id<Link>, Double> getLinkId2angleCorrection() {
-		return linkId2angleCorrection;
+		return Collections.unmodifiableMap(linkId2angleCorrection);
 	}
 
 	public void setLinkId2angleCorrection(Map<Id<Link>, Double> linkId2angleCorrection) {
@@ -85,7 +86,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	}
 
 	public Map<Id<Link>, Double> getLinkId2IsolatedImmission() {
-		return linkId2IsolatedImmission;
+		return Collections.unmodifiableMap(linkId2IsolatedImmission);
 	}
 
 	public void setLinkId2IsolatedImmission(Map<Id<Link>, Double> linkId2IsolatedImmission) {
@@ -126,7 +127,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	}
 
 	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionPlusOneCar() {
-		return linkId2IsolatedImmissionPlusOneCar;
+		return Collections.unmodifiableMap(linkId2IsolatedImmissionPlusOneCar);
 	}
 
 	public void setLinkId2IsolatedImmissionPlusOneCar(
@@ -135,7 +136,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	}
 
 	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionPlusOneHGV() {
-		return linkId2IsolatedImmissionPlusOneHGV;
+		return Collections.unmodifiableMap(linkId2IsolatedImmissionPlusOneHGV);
 	}
 
 	public void setLinkId2IsolatedImmissionPlusOneHGV(
@@ -156,5 +157,18 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 				+ finalImmission + ", affectedAgentUnits=" + affectedAgentUnits
 				+ ", damageCosts=" + damageCosts + ", damageCostsPerAffectedAgentUnit="
 				+ damageCostsPerAffectedAgentUnit + "]";
+	}
+
+	public void reset() {
+		resetTimeInterval();
+		this.personId2actInfos.clear();
+	}
+	
+	public void resetTimeInterval() {
+		linkId2IsolatedImmission.clear();
+		this.setFinalImmission(0.);
+		this.setAffectedAgentUnits(0.);
+		this.setDamageCosts(0.);
+		this.setDamageCostsPerAffectedAgentUnit(0.);
 	}
 }
