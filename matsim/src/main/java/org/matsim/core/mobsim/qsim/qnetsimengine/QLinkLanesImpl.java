@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
@@ -145,11 +146,13 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 * Initializes a QueueLink with one QueueLane.
 	 * @param context TODO
 	 * @param netsimEngine TODO
+	 * @param linkSpeedCalculator
 	 */
-	QLinkLanesImpl(final Link link2, final QNodeI queueNode, List<ModelLane> lanes, NetsimEngineContext context, NetsimInternalInterface netsimEngine) {
-		super(link2, queueNode, context, netsimEngine);
+	QLinkLanesImpl(final Link link, final QNodeI toNodeQ, List<ModelLane> lanes, NetsimEngineContext context,
+				   NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator) {
+		super(link, toNodeQ, context, netsimEngine, linkSpeedCalculator);
 		this.context = context ;
-		this.toQueueNode = queueNode;
+		this.toQueueNode = toNodeQ;
 		this.laneQueues = new LinkedHashMap<>();
 		this.toNodeLaneQueues = new ArrayList<>();
 		this.lanes = lanes;

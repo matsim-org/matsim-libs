@@ -19,30 +19,38 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.*;
-
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.*;
-import org.matsim.api.core.v01.events.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.*;
+import org.matsim.core.api.experimental.events.LaneEnterEvent;
+import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.QSimConfigGroup.*;
-import org.matsim.core.gbl.*;
+import org.matsim.core.config.groups.QSimConfigGroup.LinkDynamics;
+import org.matsim.core.config.groups.QSimConfigGroup.TrafficDynamics;
+import org.matsim.core.gbl.Gbl;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.interfaces.*;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
+import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.AbstractQLink.HandleTransitStopResult;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.LaneFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.*;
-import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.*;
-import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.PassingVehicleQ;
+import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.Lane;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisVehicle;
+
+import java.util.*;
 
 /**
  * Separating out the "lane" functionality from the "link" functionality.
@@ -70,31 +78,29 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		private Double length = null ;
 		private Double effectiveNumberOfLanes = null ;
 		private Double flowCapacity_s = null ;
-		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
-		private final NetsimEngineContext context;
+ 		private final NetsimEngineContext context;
 		Builder( final NetsimEngineContext context ) {
 			this.context = context ;
-			if (context.qsimConfig.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ || context.qsimConfig.getLinkDynamics() == QSimConfigGroup.LinkDynamics.SeepageQ) {
+			if (context.qsimConfig.getLinkDynamics() == QSimConfigGroup.LinkDynamics.PassingQ ||
+						context.qsimConfig.getLinkDynamics() == QSimConfigGroup.LinkDynamics.SeepageQ) {
 				this.vehicleQueue = new PassingVehicleQ() ;
 			}
-		}
-		@Override public QueueWithBuffer createLane( AbstractQLink qLink ) {
-			// a number of things I cannot configure before I have the qlink:
-			if ( id==null ) { id = Id.create( qLink.getLink().getId() , Lane.class ) ; }
-			if ( length==null ) { length = qLink.getLink().getLength() ; }
-			if ( effectiveNumberOfLanes==null ) { effectiveNumberOfLanes = qLink.getLink().getNumberOfLanes() ; }
-			if ( flowCapacity_s==null ) { flowCapacity_s = ((Link)qLink.getLink()).getFlowCapacityPerSec() ; }
-			return new QueueWithBuffer( qLink, vehicleQueue, id, length, effectiveNumberOfLanes, flowCapacity_s, context, linkSpeedCalculator ) ;
 		}
 		void setVehicleQueue(VehicleQ<QVehicle> vehicleQueue) { this.vehicleQueue = vehicleQueue; }
 		void setLaneId(Id<Lane> id) { this.id = id; }
 		void setLength(Double length) { this.length = length; }
 		void setEffectiveNumberOfLanes(Double effectiveNumberOfLanes) { this.effectiveNumberOfLanes = effectiveNumberOfLanes; }
 		void setFlowCapacity_s(Double flowCapacity_s) { this.flowCapacity_s = flowCapacity_s; }
-		void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) { this.linkSpeedCalculator = linkSpeedCalculator; }
+		@Override public QueueWithBuffer createLane( AbstractQLink qLink ) {
+			// a number of things I cannot configure before I have the qlink:
+			if ( id==null ) { id = Id.create( qLink.getLink().getId() , Lane.class ) ; }
+			if ( length==null ) { length = qLink.getLink().getLength() ; }
+			if ( effectiveNumberOfLanes==null ) { effectiveNumberOfLanes = qLink.getLink().getNumberOfLanes() ; }
+			if ( flowCapacity_s==null ) { flowCapacity_s = ((Link)qLink.getLink()).getFlowCapacityPerSec() ; }
+			return new QueueWithBuffer( qLink.getInternalInterface(), vehicleQueue, id, length, effectiveNumberOfLanes, flowCapacity_s, context ) ;
+		}
 	}
-
-
+	
 	/**
 	 * Stores the accumulated fractional parts of the flow capacity. See also
 	 * flowCapFraction.
@@ -139,9 +145,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 	private final Queue<QueueWithBuffer.Hole> holes = new LinkedList<>();
 
-//	private double freespeedTravelTime = Double.NaN;
 	/** the last time-step the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
-	private double bufferLastMovedTime = Time.UNDEFINED_TIME ;
+	private double bufferLastMovedTime = Time.getUndefinedTime() ;
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
@@ -158,7 +163,12 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	 * null if the link is not signalized
 	 */
 	private DefaultSignalizeableItem qSignalizedItem = null ;
-	private final AbstractQLink qLink;
+	/**
+	 * I think that it would be good to get rid of the qLink backpointer.  Instead keep a reduced QLinkInternalInterface back
+	 * pointer, and give access only to reduced number of methods (in particular not the full Link information). kai, feb'18
+	 * This is now done with the {@link AbstractQLink.QLinkInternalInterface}.  kai, feb'18
+	 */
+	private final AbstractQLink.QLinkInternalInterface qLink;
 	private final Id<Lane> id;
 	private static int spaceCapWarningCount = 0;
 	final static double HOLE_SPEED_KM_H = 15.0;
@@ -168,25 +178,23 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	private double effectiveNumberOfLanes = Double.NaN ;
 
 	private final VisData visData = new VisDataImpl() ;
-	private final LinkSpeedCalculator linkSpeedCalculator;
 	private final NetsimEngineContext context;
 
 	private double maxFlowFromFdiag = Double.POSITIVE_INFINITY ;
 
 	private double accumulatedInflowCap = 1. ;
 
-	private QueueWithBuffer(AbstractQLink qlink,  final VehicleQ<QVehicle> vehicleQueue, Id<Lane> laneId, 
-			double length, double effectiveNumberOfLanes, double flowCapacity_s, final NetsimEngineContext context, 
-			LinkSpeedCalculator linkSpeedCalculator) {
+	private QueueWithBuffer(AbstractQLink.QLinkInternalInterface qlink, final VehicleQ<QVehicle> vehicleQueue, Id<Lane> laneId,
+							double length, double effectiveNumberOfLanes, double flowCapacity_s, final NetsimEngineContext context) {
 		// the general idea is to give this object no longer access to "everything".  Objects get back pointers (here qlink), but they
 		// do not present the back pointer to the outside.  In consequence, this object can go up to qlink, but not any further. kai, mar'16
+		// Now I am even trying to get rid of the full qLink back pointer (since it allows, e.g., going back to Link). kai, feb'18
 		
 //		log.setLevel(Level.DEBUG);
 
 		this.qLink = qlink;
 		this.id = laneId ;
 		this.context = context ;
-		this.linkSpeedCalculator = linkSpeedCalculator;
 		this.vehQueue = vehicleQueue ;
 		this.length = length;
 		this.unscaledFlowCapacity_s = flowCapacity_s ;
@@ -236,7 +244,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			// need to reset the lastMovedTime.  If, in contrast, there was already a vehicle in the buffer before, we can
 			// use the lastMovedTime that was (somehow) computed for that vehicle.)
 		}
-		final QNodeI toNode = qLink.getToNode();
+		final QNodeI toNode = qLink.getToNodeQ();
 		if ( toNode instanceof QNodeImpl ) {
 			((QNodeImpl) toNode).activateNode();
 			// yy for an "upstream" QLane, this activates the toNode too early.  Yet I think I founds this
@@ -314,12 +322,12 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				// equal: rho * (vmax + vhole) = vhole * rhojam
 				// rho(qmax) = vhole * rhojam / (vmax + vhole)
 				// qmax = vmax * rho(qmax) = rhojam / (1/vhole + 1/vmax) ;
-				this.maxFlowFromFdiag = (1/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getLink().getFreespeed() ) ;
+				this.maxFlowFromFdiag = (1/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getFreespeed() ) ;
 				// yyyyyy this should possibly be getFreespeed(now). But if that's the case, then maxFlowFromFdiag would
 				// also have to be re-computed with each freespeed change. kai, feb'18
 				if ( this.maxFlowFromFdiag < flowCapacityPerTimeStep && wrnCnt<10 ) {
 					wrnCnt++ ;
-					log.warn( "max flow from fdiag < requested flow cap; linkId=" + qLink.getLink().getId() +
+					log.warn( "max flow from fdiag < requested flow cap; linkId=" + qLink.getId() +
 									  "; req flow cap/h=" + 3600.*flowCapacityPerTimeStep/context.qsimConfig.getTimeStepSize() +
 									  "; max flow from fdiag/h=" + 3600*maxFlowFromFdiag/context.qsimConfig.getTimeStepSize() ) ;
 					if ( wrnCnt==10 ) {
@@ -354,7 +362,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		 * Will base these computations (for the time being) on the standard free speed; i.e. reductions in free speed
 		 * will also reduce the maximum flow.
 		 */
-		double freespeedTravelTime = this.length / qLink.getLink().getFreespeed();
+		double freespeedTravelTime = this.length / qLink.getFreespeed();
 		// yyyyyy this should possibly be getFreespeed(now). But if that's the case, then storageCap would
 		// also have to be re-computed with each freespeed change. kai, feb'18
 		if (Double.isNaN(freespeedTravelTime)) {
@@ -393,7 +401,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			case withHoles:
 			case kinematicWaves:
 				//			final double minStorCapForHoles = 2. * flowCapacityPerTimeStep * context.getSimTimer().getSimTimestepSize();
-				final double freeSpeed = qLink.getLink().getFreespeed() ;
+				final double freeSpeed = qLink.getFreespeed() ; // yyyyyy not clear why this is not time-dep. kai, feb'18
 				final double holeSpeed = HOLE_SPEED_KM_H/3.6;
 				final double minStorCapForHoles = length * flowCapacityPerTimeStep * (freeSpeed + holeSpeed) / freeSpeed / holeSpeed ;
 				//			final double minStorCapForHoles = 2.* length * flowCapacityPerTimeStep * (freeSpeed + holeSpeed) / freeSpeed / holeSpeed ;
@@ -465,8 +473,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			MobsimDriverAgent driver = veh.getDriver();
 
 			if (driver instanceof TransitDriverAgent) {
-				HandleTransitStopResult handleTransitStop = qLink.getTransitQLink().handleTransitStop(
-						now, veh, (TransitDriverAgent) driver, this.qLink.getLink().getId()
+				HandleTransitStopResult handleTransitStop = qLink.handleTransitStop(
+						now, veh, (TransitDriverAgent) driver, this.qLink.getId()
 				);
 				if (handleTransitStop == HandleTransitStopResult.accepted) {
 					// vehicle has been accepted into the transit vehicle queue of the link.
@@ -495,8 +503,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 			addToBuffer(veh);
 			removeVehicleFromQueue(veh);
-			if(context.qsimConfig.isRestrictingSeepage() 
-					&& context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ 
+			if(context.qsimConfig.isRestrictingSeepage()
+					&& context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ
 					&& context.qsimConfig.getSeepModes().contains(veh.getDriver().getMode()) ) {
 				noOfSeepModeBringFwd++;
 			}
@@ -510,10 +518,10 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		//		QVehicle veh = vehQueue.poll();
 		//		usedStorageCapacity -= veh.getSizeInEquivalents();
 
-		QVehicle veh = pollFromVehQueue(veh2Remove); 
+		QVehicle veh = pollFromVehQueue(veh2Remove);
 
-		if(context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ 
-				&& context.qsimConfig.isSeepModeStorageFree() 
+		if(context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ
+				&& context.qsimConfig.isSeepModeStorageFree()
 				&& context.qsimConfig.getSeepModes().contains(veh.getVehicle().getType().getId().toString()) ){
 			// do nothing
 		} else {
@@ -567,7 +575,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 					|| ( !this.holes.isEmpty() ) ;
 		} else {
 			return (this.flowcap_accumulate.getValue() < flowCapacityPerTimeStep) // still accumulating, thus active
-					|| (!this.vehQueue.isEmpty()) // vehicles are on link, thus active 
+					|| (!this.vehQueue.isEmpty()) // vehicles are on link, thus active
 					|| (!this.isNotOfferingVehicle() && context.qsimConfig.isUseLanes()) // if lanes, the buffer needs to be active in order to move vehicles over an internal node
 					|| ( !this.holes.isEmpty() ); // need to process arrival of holes
 		}
@@ -596,10 +604,10 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		// (continue only if HOLES and/or inflow constraint)
 
 		if ( context.qsimConfig.getTrafficDynamics() != TrafficDynamics.queue
-				&& remainingHolesStorageCapacity <= 0. ) { 
+				&& remainingHolesStorageCapacity <= 0. ) {
 			// check the holes storage capacity if using holes only (amit, Aug 2016)
 			return false ;
-		} 
+		}
 		// remainingHolesStorageCapacity is:
 		// * initialized at linkStorageCapacity
 		// * reduced by entering vehicles
@@ -664,7 +672,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		QVehicle veh = removeFirstVehicle();
 		if (this.context.qsimConfig.isUseLanes() ) {
 			if (  hasMoreThanOneLane() ) {
-				this.context.getEventsManager().processEvent(new LaneLeaveEvent( now, veh.getId(), this.qLink.getLink().getId(), this.getId() ));
+				this.context.getEventsManager().processEvent(new LaneLeaveEvent( now, veh.getId(), this.qLink.getId(), this.getId() ));
 			}
 		}
 		return veh;
@@ -682,7 +690,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 	@Override
 	public final void setSignalStateForTurningMove( final SignalGroupState state, final Id<Link> toLinkId) {
-		if (!qLink.getLink().getToNode().getOutLinks().containsKey(toLinkId)){
+		if (!qLink.getToNode().getOutLinks().containsKey(toLinkId)){
 			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLink Id " +  this.id );
 		}
 		qSignalizedItem.setSignalStateForTurningMove(state, toLinkId);
@@ -752,7 +760,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 
 		if (this.context.qsimConfig.isUseLanes() ) {
 			if (  hasMoreThanOneLane() ) {
-				this.context.getEventsManager().processEvent(new LaneEnterEvent( now, veh.getId(), this.qLink.getLink().getId(), this.getId() ));
+				this.context.getEventsManager().processEvent(new LaneEnterEvent( now, veh.getId(), this.qLink.getId(), this.getId() ));
 			}
 		}
 
@@ -766,7 +774,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		}
 
 		// compute and set earliest link exit time:
-		double linkTravelTime = this.length / this.linkSpeedCalculator.getMaximumVelocity(veh, qLink.getLink(), now);
+//		double linkTravelTime = this.length / this.linkSpeedCalculator.getMaximumVelocity(veh, qLink.getLink(), now);
+		double linkTravelTime = this.length / this.qLink.getMaximumVelocityFromLinkSpeedCalculator( veh, now ) ;
 		linkTravelTime = context.qsimConfig.getTimeStepSize() * Math.floor( linkTravelTime / context.qsimConfig.getTimeStepSize() );
 
 		veh.setEarliestLinkExitTime(now + linkTravelTime);
@@ -780,7 +789,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		// Also, it could happen that vehicles with an earlier link exit time could be 
 		// inserted and thus end up after vehicles with a later link exit time.  theresa & kai, jun'14
 
-		veh.setCurrentLink(qLink.getLink());
+//		veh.setCurrentLink(qLink.getLink());
+		this.qLink.setCurrentLinkToVehicle( veh ) ;
 		vehQueue.add(veh);
 
 		switch (context.qsimConfig.getTrafficDynamics()) {
@@ -830,7 +840,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	
 	@Override
 	public final void setSignalized( final boolean isSignalized) {
-		qSignalizedItem  = new DefaultSignalizeableItem(qLink.getLink().getToNode().getOutLinks().keySet());
+		qSignalizedItem  = new DefaultSignalizeableItem(qLink.getToNode().getOutLinks().keySet());
 	}
 
 	@Override
@@ -900,23 +910,24 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				Gbl.assertNotNull(positions);
 				Gbl.assertNotNull( context.snapshotInfoBuilder );
 				if ( this.upstreamCoord==null ) {
-					this.upstreamCoord = qLink.getLink().getFromNode().getCoord() ;
+					this.upstreamCoord = qLink.getFromNode().getCoord() ;
 				}
 				if ( this.downstreamCoord==null ) {
-					this.downstreamCoord = qLink.getLink().getToNode().getCoord() ;
+					this.downstreamCoord = qLink.getToNode().getCoord() ;
 				}
 				// vehicle positions are computed in snapshotInfoBuilder as a service:
 				positions = context.snapshotInfoBuilder.positionVehiclesAlongLine(
-						positions, 
-						now, 
-						getAllVehicles(), 
-						length, 
-						storageCapacity + getBufferStorageCapacity(), 
+						positions,
+						now,
+						getAllVehicles(),
+						length,
+						storageCapacity + getBufferStorageCapacity(),
 						this.upstreamCoord,
 						this.downstreamCoord,
-						inverseFlowCapacityPerTimeStep, 
-						qLink.getLink().getFreespeed(now), 
-						NetworkUtils.getNumberOfLanesAsInt(now, qLink.getLink()), 
+						inverseFlowCapacityPerTimeStep,
+						qLink.getFreespeed(now),
+//						NetworkUtils.getNumberOfLanesAsInt(now, qLink.getLink()),
+						qLink.getNumberOfLanesAsInt(now) ,
 						holes
 						);
 			}
@@ -950,7 +961,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			Iterator<QVehicle> it = newVehQueue.iterator();
 
 			while(it.hasNext()){
-				QVehicle veh = newVehQueue.poll(); 
+				QVehicle veh = newVehQueue.poll();
 				if( veh.getEarliestLinkExitTime()<=now && context.qsimConfig.getSeepModes().contains(veh.getDriver().getMode()) ) {
 					returnVeh = veh;
 					break;

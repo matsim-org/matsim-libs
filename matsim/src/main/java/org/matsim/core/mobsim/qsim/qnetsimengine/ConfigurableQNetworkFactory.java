@@ -71,10 +71,10 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 	@Override
 	QLinkI createNetsimLink(final Link link, final QNodeI toQueueNode) {
 		QueueWithBuffer.Builder laneFactory = new QueueWithBuffer.Builder(context) ;
-		laneFactory.setLinkSpeedCalculator( linkSpeedCalculator );
 
 		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
 		linkBuilder.setLaneFactory(laneFactory);
+		linkBuilder.setLinkSpeedCalculator( linkSpeedCalculator ) ;
 
 		return linkBuilder.build(link, toQueueNode) ;
 	}
