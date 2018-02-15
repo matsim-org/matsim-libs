@@ -202,8 +202,8 @@ public class NoiseContext {
 						double correctionTermDs = NoiseEquations.calculateDistanceCorrection(distance);
 						double correctionTermAngle = calculateAngleImmissionCorrection(nrp.getCoord(), scenario.getNetwork().getLinks().get(linkId));
 						
-						nrp.setDistanceCorrection(linkId, correctionTermDs);
-						nrp.setAngleCorrection(linkId, correctionTermAngle);
+						nrp.setLinkId2distanceCorrection(linkId, correctionTermDs);
+						nrp.setLinkId2angleCorrection(linkId, correctionTermAngle);
 					}
 				}
 			}

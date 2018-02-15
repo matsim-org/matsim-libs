@@ -54,9 +54,6 @@ import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
 
-import gnu.trove.TDoubleCollection;
-import gnu.trove.procedure.TDoubleProcedure;
-
 /**
  * A handler which computes noise emissions, immisions, affected agent units and damages for each receiver point and time interval.
  * Throws noise damage events for each affected and causing agent.
@@ -664,7 +661,7 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 			
 			for(Id<Link> linkId : rp.getLinkId2distanceCorrection().keySet()) {
 				if (this.noiseContext.getNoiseParams().getTunnelLinkIDsSet().contains(linkId)) {
-					rp.setIsolatedImmission(linkId, 0.);
+					rp.setLinkId2IsolatedImmission(linkId, 0.);
 					linkId2isolatedImmissionPlusOneCar.put(linkId, 0.);
 					linkId2isolatedImmissionPlusOneHGV.put(linkId, 0.);
 								 			
@@ -714,26 +711,21 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 						throw new RuntimeException("noise immission: " + noiseImmission + " - noise immission plus one car: " + noiseImmissionPlusOneCar + " - noise immission plus one hgv: " + noiseImmissionPlusOneHGV + ". This should not happen. Aborting..."); 
 					}
 			 		
-			 		rp.setIsolatedImmission(linkId, noiseImmission);
-			 		rp.setIsolatedImmissionPlusOneCar(linkId, noiseImmissionPlusOneCar);
-			 		rp.setIsolatedImmissionPlusOneHGV(linkId, noiseImmissionPlusOneHGV);
+			 		rp.setLinkId2IsolatedImmission(linkId, noiseImmission);
+					linkId2isolatedImmissionPlusOneCar.put(linkId, noiseImmissionPlusOneCar);
+					linkId2isolatedImmissionPlusOneHGV.put(linkId, noiseImmissionPlusOneHGV);
 			 	}
 			}
 			
 			double finalNoiseImmission = 0.;
-			List<Double> values = new ArrayList<>();
-			rp.getLinkId2IsolatedImmission().forEachValue(new TDoubleProcedure() {
-				@Override
-				public boolean execute(double value) {
-					values.add(value);
-					return true;
-				}
-			});
-			if (!values.isEmpty()) {
-				finalNoiseImmission = NoiseEquations.calculateResultingNoiseImmission(values);
+			Map<Id<Link>, Double> linkId2isolatedImmission = rp.getLinkId2IsolatedImmission();
+			if (linkId2isolatedImmission != null && !linkId2isolatedImmission.isEmpty()) {
+				finalNoiseImmission = NoiseEquations.calculateResultingNoiseImmission(linkId2isolatedImmission.values());
 			}
 			
 			rp.setFinalImmission(finalNoiseImmission);
+			rp.setLinkId2IsolatedImmissionPlusOneCar(linkId2isolatedImmissionPlusOneCar);
+			rp.setLinkId2IsolatedImmissionPlusOneHGV(linkId2isolatedImmissionPlusOneHGV);
 		}
 	}
 	
