@@ -76,8 +76,7 @@ public class Grid {
 	private double yCoordMax = Double.MIN_VALUE;
 	
 	private final Map<Coord,Id<ReceiverPoint>> activityCoord2receiverPointId = new HashMap<Coord, Id<ReceiverPoint>>();
-	
-	private final Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
+	private Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
 	
 	public Grid(Scenario scenario) {
 		this.scenario = scenario;	
@@ -331,9 +330,12 @@ public class Grid {
 		return activityCoord2receiverPointId;
 	}
 	
-	public Map<Id<ReceiverPoint>, ReceiverPoint> getReceiverPoints() {
+	Map<Id<ReceiverPoint>, ReceiverPoint> getAndClearReceiverPoints() {
+		Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints = this.receiverPoints;
+		this.receiverPoints = null;
 		return receiverPoints;
 	}
+	
 	
 	public NoiseConfigGroup getGridParams() {
 		return noiseParams;

@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -39,7 +40,6 @@ import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.handler.NoiseEquations;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.vehicles.Vehicle;
 
@@ -164,7 +164,10 @@ public class NoiseContext {
 	private void setRelevantLinkInfo() {
 
 		Counter cnt = new Counter("set relevant link-info # ");
-		for (ReceiverPoint rp : this.grid.getReceiverPoints().values()) {
+		// go through all rp's and throw them away. We need noise-rps from here on.
+		ConcurrentLinkedQueue<ReceiverPoint> rps = new ConcurrentLinkedQueue<>(this.grid.getAndClearReceiverPoints().values());
+		ReceiverPoint rp = null;
+		while((rp = rps.poll()) != null){
 			
 			NoiseReceiverPoint nrp = new NoiseReceiverPoint(rp.getId(), rp.getCoord());
 
@@ -210,7 +213,6 @@ public class NoiseContext {
 			
 			nrp.setLinkId2distanceCorrection(relevantLinkIds2Ds);
 			nrp.setLinkId2angleCorrection(relevantLinkIds2angleImmissionCorrection);
-			
 			this.noiseReceiverPoints.put(nrp.getId(), nrp);
 			cnt.incCounter();
 		}
