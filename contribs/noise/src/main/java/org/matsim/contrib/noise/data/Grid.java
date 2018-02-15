@@ -241,12 +241,15 @@ public class Grid {
 	
 	private void setActivityCoord2NearestReceiverPointId () {
 		double gap = noiseParams.getReceiverPointGap();
+		Counter counter = new Counter("fill quadtree #") ;
 		QuadTree<ReceiverPoint> qTree = new QuadTree<>(xCoordMin - 4*gap, yCoordMin - 4* gap, xCoordMax + 4*gap, yCoordMax + 4*gap);
 		for(ReceiverPoint p: receiverPoints.values()) {
 			qTree.put(p.getCoord().getX(), p.getCoord().getY(), p);
+			counter.incCounter();
 		}
+		counter.printCounter();
 		
-		Counter counter = new Counter("compute nearest receiver-points #");
+		counter = new Counter("compute nearest receiver-points #");
 		for (Coord coord : consideredActivityCoordsForSpatialFunctionality) {
 			
 			// TODO maybe add a check here so we consider only the rp in the 9 surrounding cells?
