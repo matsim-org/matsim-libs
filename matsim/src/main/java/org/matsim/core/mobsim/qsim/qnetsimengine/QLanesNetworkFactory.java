@@ -91,9 +91,11 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 		LanesToLinkAssignment l2l = this.laneDefinitions.getLanesToLinkAssignments().get(link.getId());
 		if (l2l != null){
 			List<ModelLane> lanes = LanesUtils.createLanes(link, l2l);
-			LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
-			// yyyyyy I don't think that this was set correctly for this execution path before I refactored this.  kai, feb'18
-			ql = new QLinkLanesImpl(link, queueNode, lanes, context, netsimEngine, linkSpeedCalculator);
+//			LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+//			// yyyyyy I don't think that this was set correctly for this execution path before I refactored this.  kai, feb'18
+//			ql = new QLinkLanesImpl(link, queueNode, lanes, context, netsimEngine, linkSpeedCalculator);
+			QLinkLanesImpl.Builder builder = new QLinkLanesImpl.Builder(context, netsimEngine) ;
+			ql = builder.build( link, queueNode, lanes ) ;
 		}
 		else {
 			ql = this.delegate.createNetsimLink(link, queueNode);

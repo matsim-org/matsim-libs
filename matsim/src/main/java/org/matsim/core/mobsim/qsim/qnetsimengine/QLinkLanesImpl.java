@@ -36,6 +36,7 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -112,8 +113,28 @@ import org.matsim.vis.snapshotwriters.VisData;
  *         </ul>
  */
 public final class QLinkLanesImpl extends AbstractQLink {
-
 	private static final Logger log = Logger.getLogger(QLinkLanesImpl.class);
+	
+	/* public? */ static final class Builder {
+		private final NetsimEngineContext context;
+		private final NetsimInternalInterface netsimEngine;
+		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+
+		public Builder(NetsimEngineContext context, NetsimInternalInterface netsimEngine ) {
+			this.context = context;
+			this.netsimEngine = netsimEngine;
+		}
+
+		public final void setLinkSpeedCalculator( LinkSpeedCalculator linkSpeedCalculator ) {
+			this.linkSpeedCalculator = linkSpeedCalculator ;
+		}
+
+		AbstractQLink build(Link link, QNodeI toNodeQ, List<ModelLane> lanes ) {
+			return new QLinkLanesImpl(link, toNodeQ, lanes, context, netsimEngine, linkSpeedCalculator ) ;
+		}
+
+	}
+	
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
 	 */
@@ -148,7 +169,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 * @param netsimEngine TODO
 	 * @param linkSpeedCalculator
 	 */
-	QLinkLanesImpl(final Link link, final QNodeI toNodeQ, List<ModelLane> lanes, NetsimEngineContext context,
+	private QLinkLanesImpl(final Link link, final QNodeI toNodeQ, List<ModelLane> lanes, NetsimEngineContext context,
 				   NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator) {
 		super(link, toNodeQ, context, netsimEngine, linkSpeedCalculator);
 		this.context = context ;
