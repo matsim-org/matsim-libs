@@ -51,6 +51,12 @@ import org.matsim.vis.snapshotwriters.VisVehicle;
  * <li> In fast capacity update, the flows are not accumulated in every time step, 
  * rather updated only if an agent wants to enter the link or an agent is added to buffer. 
  * Improvement of 15-20% in the computational performance is observed. amit feb'16
+ * (I seem to recall that in the end that statement was not consistently correct.  kai, feb'18)</li>
+ * <li>Currently (feb'18), the design is such that (possibly time-dep) flowCap and nEffectiveLanes are "pushed" into the
+ * class, while freeSpeed is "pulled" from the class.  This is an attempt to bridge the diverging design requirements,
+ * where flowCap and nEffectiveLanes may, in the multiple lanes implementation, vary by lane (for the same link), while
+ * speed uses {@link LinkSpeedCalculator}, which does not have the link freeSpeed as a parameter and thus is a "pull"
+ * method.</li>
  * </ul>
  *
  * @author nagel
@@ -74,7 +80,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		}
 		@Override public QueueWithBuffer createLane( AbstractQLink qLink ) {
 			// a number of things I cannot configure before I have the qlink:
-			if ( id==null ) { id = Id.create( qLink.getLink().getId() , Lane.class ) ; } 
+			if ( id==null ) { id = Id.create( qLink.getLink().getId() , Lane.class ) ; }
 			if ( length==null ) { length = qLink.getLink().getLength() ; }
 			if ( effectiveNumberOfLanes==null ) { effectiveNumberOfLanes = qLink.getLink().getNumberOfLanes() ; }
 			if ( flowCapacity_s==null ) { flowCapacity_s = ((Link)qLink.getLink()).getFlowCapacityPerSec() ; }
@@ -158,8 +164,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	final static double HOLE_SPEED_KM_H = 15.0;
 
 	private final double length ;
-//	private double unscaledFlowCapacity_s = Double.NaN ;
-//	private double effectiveNumberOfLanes = Double.NaN ;
+	private double unscaledFlowCapacity_s = Double.NaN ;
+	private double effectiveNumberOfLanes = Double.NaN ;
 
 	private final VisData visData = new VisDataImpl() ;
 	private final LinkSpeedCalculator linkSpeedCalculator;
@@ -183,8 +189,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		this.linkSpeedCalculator = linkSpeedCalculator;
 		this.vehQueue = vehicleQueue ;
 		this.length = length;
-//		this.unscaledFlowCapacity_s = flowCapacity_s ;
-//		this.effectiveNumberOfLanes = effectiveNumberOfLanes;
+		this.unscaledFlowCapacity_s = flowCapacity_s ;
+		this.effectiveNumberOfLanes = effectiveNumberOfLanes;
 
 //		freespeedTravelTime = this.length / qlink.getLink().getFreespeed();
 //		if (Double.isNaN(freespeedTravelTime)) {
@@ -285,15 +291,15 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			updateSlowFlowAccumulation();
 		}
 	}
-
+	private static int wrnCnt=0 ;
 	private void calculateFlowCapacity() {
 		// the following is not looking at time because it simply assumes that the lookups are "now". kai, feb'18
 		// I am currently not sure if this statement is correct. kai, feb'18
 		
 		double now = context.getSimTimer().getTimeOfDay() ;
 		
-//		flowCapacityPerTimeStep = this.unscaledFlowCapacity_s ;
-		flowCapacityPerTimeStep = this.qLink.getLink().getFlowCapacityPerSec(now) ;
+		flowCapacityPerTimeStep = this.unscaledFlowCapacity_s ;
+//		flowCapacityPerTimeStep = this.qLink.getLink().getFlowCapacityPerSec(now) ;
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
 		flowCapacityPerTimeStep = flowCapacityPerTimeStep * context.qsimConfig.getTimeStepSize() * context.qsimConfig.getFlowCapFactor() ;
 		inverseFlowCapacityPerTimeStep = 1.0 / flowCapacityPerTimeStep;
@@ -309,9 +315,19 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				// rho(qmax) = vhole * rhojam / (vmax + vhole)
 				// qmax = vmax * rho(qmax) = rhojam / (1/vhole + 1/vmax) ;
 				this.maxFlowFromFdiag = (1/context.effectiveCellSize) / ( 1./(HOLE_SPEED_KM_H/3.6) + 1/this.qLink.getLink().getFreespeed() ) ;
-				//			log.warn("linkID=" + this.qLink.getLink().getId() + "; setting maxFlowFromFdiag to: " + this.maxFlowFromFdiag ) ;
+				// yyyyyy this should possibly be getFreespeed(now). But if that's the case, then maxFlowFromFdiag would
+				// also have to be re-computed with each freespeed change. kai, feb'18
+				if ( this.maxFlowFromFdiag < flowCapacityPerTimeStep && wrnCnt<10 ) {
+					wrnCnt++ ;
+					log.warn( "max flow from fdiag < requested flow cap; linkId=" + qLink.getLink().getId() +
+									  "; req flow cap/h=" + 3600.*flowCapacityPerTimeStep/context.qsimConfig.getTimeStepSize() +
+									  "; max flow from fdiag/h=" + 3600*maxFlowFromFdiag/context.qsimConfig.getTimeStepSize() ) ;
+					if ( wrnCnt==10 ) {
+						log.warn( Gbl.FUTURE_SUPPRESSED ) ;
+					}
+				}
 				break;
-			default: throw new RuntimeException("The traffic dynmics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
+			default: throw new RuntimeException("The traffic dynamics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
 		}
 //		log.debug( "linkId=" + this.qLink.getLink().getId() + "; flowCapPerTimeStep=" + flowCapacityPerTimeStep +
 //						   "; invFlowCapPerTimeStep=" + inverseFlowCapacityPerTimeStep + "; maxFlowFromFdiag=" + maxFlowFromFdiag ) ;
@@ -324,8 +340,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		double now = context.getSimTimer().getTimeOfDay() ;
 		
 		// first guess at storageCapacity:
-//		storageCapacity = this.length * this.effectiveNumberOfLanes / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
-		storageCapacity = this.length * this.qLink.getLink().getNumberOfLanes(now) / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
+		storageCapacity = this.length * this.effectiveNumberOfLanes / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
+//		storageCapacity = this.length * this.qLink.getLink().getNumberOfLanes(now) / context.effectiveCellSize * context.qsimConfig.getStorageCapFactor() ;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
 		storageCapacity = Math.max(storageCapacity, getBufferStorageCapacity());
@@ -339,6 +355,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		 * will also reduce the maximum flow.
 		 */
 		double freespeedTravelTime = this.length / qLink.getLink().getFreespeed();
+		// yyyyyy this should possibly be getFreespeed(now). But if that's the case, then storageCap would
+		// also have to be re-computed with each freespeed change. kai, feb'18
 		if (Double.isNaN(freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
 		}
@@ -434,7 +452,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	 * departure time of vehicle. Also removes vehicles from lane if the vehicle
 	 * arrived at its destination.
 	 */
-	private final void moveQueueToBuffer() {
+	private void moveQueueToBuffer() {
 		double now = context.getSimTimer().getTimeOfDay() ;
 
 		QVehicle veh;
@@ -485,7 +503,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		} // end while
 	}
 
-	private QVehicle removeVehicleFromQueue(final QVehicle veh2Remove) {
+	private void removeVehicleFromQueue(final QVehicle veh2Remove) {
 		double now = context.getSimTimer().getTimeOfDay() ;
 
 
@@ -530,7 +548,6 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 				break;
 			default: throw new RuntimeException("The traffic dynmics "+context.qsimConfig.getTrafficDynamics()+" is not implemented yet.");
 		}
-		return veh ;
 	}
 
 	private void letVehicleArrive(QVehicle veh) {
@@ -810,27 +827,27 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 	public final void addTransitSlightlyUpstreamOfStop( final QVehicle veh) {
 		this.vehQueue.addFirst(veh) ;
 	}
-
+	
 	@Override
 	public final void setSignalized( final boolean isSignalized) {
 		qSignalizedItem  = new DefaultSignalizeableItem(qLink.getLink().getToNode().getOutLinks().keySet());
 	}
 
-//	@Override
-//	public final void changeUnscaledFlowCapacityPerSecond( final double val ) {
-//		this.unscaledFlowCapacity_s = val ;
-//		// be defensive (might now be called twice):
-//		this.recalcTimeVariantAttributes();
-//	}
+	@Override
+	public final void changeUnscaledFlowCapacityPerSecond( final double val ) {
+		this.unscaledFlowCapacity_s = val ;
+		// be defensive (might now be called twice):
+		this.recalcTimeVariantAttributes();
+	}
 
-//	@Override
-//	public final void changeEffectiveNumberOfLanes( final double val ) {
-//		this.effectiveNumberOfLanes = val ;
-//		// be defensive (might now be called twice):
-//		this.recalcTimeVariantAttributes();
-//	}
+	@Override
+	public final void changeEffectiveNumberOfLanes( final double val ) {
+		this.effectiveNumberOfLanes = val ;
+		// be defensive (might now be called twice):
+		this.recalcTimeVariantAttributes();
+	}
 
-	@Override public Id<Lane> getId() { 
+	@Override public Id<Lane> getId() {
 		return this.id;
 	}
 
@@ -911,8 +928,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 			this.downstreamCoord = downstreamCoord;
 		}
 	}
-
-	private int maxSeepModeAllowed = 4;
+	
 	private int noOfSeepModeBringFwd = 0;
 
 	private QVehicle peekFromVehQueue(){
@@ -921,7 +937,8 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 		QVehicle returnVeh = vehQueue.peek();
 
 		if( context.qsimConfig.getLinkDynamics()==LinkDynamics.SeepageQ ) {
-
+			
+			int maxSeepModeAllowed = 4;
 			if( context.qsimConfig.isRestrictingSeepage() && noOfSeepModeBringFwd == maxSeepModeAllowed) {
 				noOfSeepModeBringFwd = 0;
 				return returnVeh;

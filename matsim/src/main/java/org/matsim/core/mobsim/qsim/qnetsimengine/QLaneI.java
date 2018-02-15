@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.lanes.data.Lane;
 import org.matsim.vehicles.Vehicle;
@@ -67,9 +66,9 @@ public interface QLaneI extends Identifiable<Lane> {
 	 */
 	void addTransitSlightlyUpstreamOfStop(final QVehicle veh);
 	
-//	void changeUnscaledFlowCapacityPerSecond( final double val ) ;
-//
-//	void changeEffectiveNumberOfLanes( final double val ) ;
+	void changeUnscaledFlowCapacityPerSecond( final double val ) ;
+
+	void changeEffectiveNumberOfLanes( final double val ) ;
 
 	boolean doSimStep();
 
@@ -90,6 +89,7 @@ public interface QLaneI extends Identifiable<Lane> {
 	boolean isAcceptingFromUpstream();
 
 //	void changeSpeedMetersPerSecond(double val) ;
+	// cannot be consistently implemented with current design, since it is not a parameter of the LinkSpeedCalculator.  kai, feb'18
 
 	/**
 	 * When multiple lanes lead to the same next link, the QLinkLanesImpl needs to decide which lane to use.  It uses

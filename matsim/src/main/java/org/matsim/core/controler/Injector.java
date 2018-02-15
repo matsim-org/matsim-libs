@@ -76,8 +76,9 @@ public final class Injector {
 	}
 
 	public static void printInjector(com.google.inject.Injector injector, Logger log) {
+		Level level = Level.INFO ;
+		log.log(level,"=== printInjector start ===") ;
 		for (Map.Entry<Key<?>, Binding<?>> entry : injector.getBindings().entrySet()) {
-			Level level = Level.INFO ;
 			if ( entry.getKey().toString().contains("type=org.matsim") ) {
 				Annotation annotation = entry.getKey().getAnnotation();
 				log.log( level, entry.getKey().getTypeLiteral() + " " + (annotation != null ? annotation.toString() : ""));
@@ -91,6 +92,7 @@ public final class Injector {
 				log.log(level,  "" );
 			}
 		}
+		log.log(level,"=== printInjector end ===") ;
 	}
 
 	private static Module insertMapBindings(List<Module> guiceModules) {

@@ -142,6 +142,16 @@ public class QSimExternalTransitionLink extends AbstractQLink {
 			// TODO Auto-generated method stub
 			throw new RuntimeException("not implemented") ;
 		}
+		
+		@Override
+		public void changeUnscaledFlowCapacityPerSecond(double val) {
+			throw new RuntimeException("not implemented");
+		}
+		
+		@Override
+		public void changeEffectiveNumberOfLanes(double val) {
+			throw new RuntimeException("not implemented");
+		}
 
 //		@Override
 //		public void changeEffectiveNumberOfLanes(double arg0) {

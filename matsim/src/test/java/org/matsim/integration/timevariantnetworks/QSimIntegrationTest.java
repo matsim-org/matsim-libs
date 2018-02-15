@@ -209,7 +209,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		change1.addLink(link2);
 		change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacityFactor));
 		final NetworkChangeEvent event1 = change1;
-		NetworkUtils.addNetworkChangeEvent(((Network)network),event1);
+		NetworkUtils.addNetworkChangeEvent(network,event1);
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
@@ -263,8 +263,6 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	 * Creates a network with three links of length 100 m, capacity 3600 veh/h
 	 * and freespeed 10 m/s.
 	 *
-	 * @param world the world the network should belong to
-	 * @return a network.
 	 * @author illenberger
 	 */
 	private static Network createNetwork(Scenario scenario) {

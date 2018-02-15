@@ -167,7 +167,6 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		Map<Id<Lane>, Set<Id<Link>>> laneIdToLinksMap = new HashMap<>();
 		for (ModelLane lane : lanes) { // lanes is sorted downstream to upstream
 			Id<Lane> laneId = lane.getLaneData().getId();
-			double noEffectiveLanes = lane.getLaneData().getNumberOfRepresentedLanes();
 			// --
 			// QLaneI queue = new QueueWithBuffer(this, new FIFOVehicleQ(), laneId,
 			// lane.getLength(), noEffectiveLanes,
@@ -177,7 +176,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 			builder.setVehicleQueue(new FIFOVehicleQ());
 			builder.setLaneId(laneId);
 			builder.setLength(lane.getLength());
-			builder.setEffectiveNumberOfLanes(noEffectiveLanes);
+			builder.setEffectiveNumberOfLanes(lane.getLaneData().getNumberOfRepresentedLanes());
 			builder.setFlowCapacity_s(lane.getLaneData().getCapacityVehiclesPerHour() / 3600.);
 			QLaneI queue = builder.createLane(this);
 			// --
@@ -463,7 +462,9 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		// (only for tests)
 		double total = 0.0;
 		for (QLaneI lane : this.laneQueues.values()) {
-			total += lane.getStorageCapacity();
+			final double storageCapacity = lane.getStorageCapacity();
+			log.warn("storageCapacity=" + storageCapacity) ;
+			total += storageCapacity;
 		}
 		return total;
 	}
