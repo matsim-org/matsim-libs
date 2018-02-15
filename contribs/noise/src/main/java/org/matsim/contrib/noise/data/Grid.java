@@ -37,13 +37,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
@@ -77,7 +75,6 @@ public class Grid {
 	private double yCoordMin = Double.MAX_VALUE;
 	private double yCoordMax = Double.MIN_VALUE;
 	
-//	private final Map<Tuple<Integer,Integer>,List<Id<ReceiverPoint>>> zoneTuple2listOfReceiverPointIds = new HashMap<Tuple<Integer, Integer>, List<Id<ReceiverPoint>>>();
 	private final Map<Coord,Id<ReceiverPoint>> activityCoord2receiverPointId = new HashMap<Coord, Id<ReceiverPoint>>();
 	
 	private final Map<Id<ReceiverPoint>, ReceiverPoint> receiverPoints;
@@ -123,7 +120,6 @@ public class Grid {
 		setActivityCoord2NearestReceiverPointId();
 		
 		// delete unnecessary information
-//		this.zoneTuple2listOfReceiverPointIds.clear();
 		this.consideredActivityCoordsForReceiverPointGrid.clear();
 		this.consideredActivityCoordsForSpatialFunctionality.clear();
 	}
@@ -184,14 +180,6 @@ public class Grid {
 			
 			ReceiverPoint rp = new ReceiverPoint(id, transformedCoord);			
 			receiverPoints.put(id, rp);
-								
-//			Tuple<Integer,Integer> zoneTuple = getZoneTuple(gridPoints.get(id));
-//			List<Id<ReceiverPoint>> listOfReceiverPointIDs = new ArrayList<Id<ReceiverPoint>>();
-//			if (zoneTuple2listOfReceiverPointIds.containsKey(zoneTuple)) {
-//				listOfReceiverPointIDs = zoneTuple2listOfReceiverPointIds.get(zoneTuple);
-//			}
-//			listOfReceiverPointIDs.add(id);
-//			zoneTuple2listOfReceiverPointIds.put(zoneTuple, listOfReceiverPointIDs);
 		}
 		
 		log.info("Total number of receiver points: " + receiverPoints.size());
@@ -242,19 +230,8 @@ public class Grid {
 				
 				Id<ReceiverPoint> id = Id.create(counter.getCounter(), ReceiverPoint.class);
 				Coord coord = new Coord(x, y);
-				
 				ReceiverPoint rp = new ReceiverPoint(id, coord);
-								
 				receiverPoints.put(id, rp);
-				
-//						
-//				Tuple<Integer,Integer> zoneTuple = getZoneTuple(coord);
-//				List<Id<ReceiverPoint>> listOfReceiverPointIDs = zoneTuple2listOfReceiverPointIds.get(zoneTuple);// new ArrayList<Id<ReceiverPoint>>();
-//				if (listOfReceiverPointIDs == null) {
-//					listOfReceiverPointIDs = new ArrayList<>(1);
-//					zoneTuple2listOfReceiverPointIds.put(zoneTuple, listOfReceiverPointIDs);
-//				}
-//				listOfReceiverPointIDs.add(id);
 				counter.incCounter();
 			}
 		}
@@ -284,19 +261,7 @@ public class Grid {
 		}
 		counter.printCounter();
 	}
-	
-	private Tuple<Integer, Integer> getZoneTuple(Coord coord) {
-		 
-		double xCoord = coord.getX();
-		double yCoord = coord.getY();
-		
-		int xDirection = (int) ((xCoord - xCoordMin) / (noiseParams.getReceiverPointGap() / 1.));	
-		int yDirection = (int) ((yCoordMax - yCoord) / noiseParams.getReceiverPointGap() / 1.);
-		
-		Tuple<Integer, Integer> zoneDefinition = new Tuple<Integer, Integer>(xDirection, yDirection);
-		return zoneDefinition;
-	}
-	
+
 	private Map<Id<ReceiverPoint>, Coord> readCSVFile(String file, String separator, int idColumn, int xCoordColumn, int yCoordColumn) throws IOException {
 		
 		Map<Id<ReceiverPoint>, Coord> id2Coord = new HashMap<>();
@@ -354,60 +319,6 @@ public class Grid {
 		
 		return id2Coord;
 	}
-	
-//	private Id<ReceiverPoint> identifyNearestReceiverPoint (Coord coord) {
-//		Id<ReceiverPoint> nearestReceiverPointId = null;
-//		
-//		List<Tuple<Integer,Integer>> tuples = new ArrayList<Tuple<Integer,Integer>>();
-//		Tuple<Integer,Integer> centralTuple = getZoneTuple(coord);
-//		tuples.add(centralTuple);
-//		int x = centralTuple.getFirst();
-//		int y = centralTuple.getSecond();
-//		Tuple<Integer,Integer> TupleNW = new Tuple<Integer, Integer>(x-1, y-1);
-//		tuples.add(TupleNW);
-//		Tuple<Integer,Integer> TupleN = new Tuple<Integer, Integer>(x, y-1);
-//		tuples.add(TupleN);
-//		Tuple<Integer,Integer> TupleNO = new Tuple<Integer, Integer>(x+1, y-1);
-//		tuples.add(TupleNO);
-//		Tuple<Integer,Integer> TupleW = new Tuple<Integer, Integer>(x-1, y);
-//		tuples.add(TupleW);
-//		Tuple<Integer,Integer> TupleO = new Tuple<Integer, Integer>(x+1, y);
-//		tuples.add(TupleO);
-//		Tuple<Integer,Integer> TupleSW = new Tuple<Integer, Integer>(x-1, y+1);
-//		tuples.add(TupleSW);
-//		Tuple<Integer,Integer> TupleS = new Tuple<Integer, Integer>(x, y+1);
-//		tuples.add(TupleS);
-//		Tuple<Integer,Integer> TupleSO = new Tuple<Integer, Integer>(x+1, y+1);
-//		tuples.add(TupleSO);
-//		
-//		List<Id<ReceiverPoint>> relevantReceiverPointIds = new ArrayList<Id<ReceiverPoint>>();
-//		
-//		for (Tuple<Integer,Integer> tuple : tuples) {
-//			if (zoneTuple2listOfReceiverPointIds.containsKey(tuple)) {
-//				for (Id<ReceiverPoint> id : zoneTuple2listOfReceiverPointIds.get(tuple)) {
-//					relevantReceiverPointIds.add(id);
-//				}
-//			}
-//		}
-//		
-//		double minDistance = Double.MAX_VALUE;
-//
-//		for (Id<ReceiverPoint> receiverPointId : relevantReceiverPointIds) {
-//			double xValue = this.receiverPoints.get(receiverPointId).getCoord().getX();
-//			double yValue = this.receiverPoints.get(receiverPointId).getCoord().getY();
-//			
-//			double a = coord.getX() - xValue;
-//			double b = coord.getY() - yValue;
-//			
-//			double distance = Math.sqrt((Math.pow(a, 2))+(Math.pow(b, 2)));
-//			if (distance < minDistance) {
-//				minDistance = distance;
-//				nearestReceiverPointId = receiverPointId;
-//			}
-//		}
-//
-//		return nearestReceiverPointId;
-//	}
 	
 	public Map<Id<Person>, List<Coord>> getPersonId2listOfConsideredActivityCoords() {
 		return personId2consideredActivityCoords;
