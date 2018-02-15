@@ -33,6 +33,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 
+import gnu.trove.impl.unmodifiable.TUnmodifiableObjectDoubleMap;
+import gnu.trove.map.TObjectDoubleMap;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
+
 /**
  * 
  * Extends the basic information of a receiver point towards data required for the computation of noise.
@@ -53,9 +57,9 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	private Map<Id<Link>, Double> linkId2angleCorrection = new HashMap<>(0);
 			
 	// time-specific information
-	private Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<>(0);
-	private Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneCar = new HashMap<>(0);
-	private Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneHGV = new HashMap<>(0); 
+	private TObjectDoubleMap<Id<Link>> linkId2IsolatedImmission = new TObjectDoubleHashMap<>(8, 0.95f, 0);
+	private TObjectDoubleMap<Id<Link>> linkId2IsolatedImmissionPlusOneCar = new TObjectDoubleHashMap<>(8, 0.95f, 0);
+	private TObjectDoubleMap<Id<Link>> linkId2IsolatedImmissionPlusOneHGV = new TObjectDoubleHashMap<>(8, 0.95f, 0);
 	private double finalImmission = 0.;
 	private double affectedAgentUnits = 0.;
 	private double damageCosts;
@@ -78,7 +82,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		return Collections.unmodifiableMap(linkId2distanceCorrection);
 	}
 
-	public void setLinkId2distanceCorrection(Id<Link> linkId,  Double distanceCorrection) {
+	public void setDistanceCorrection(Id<Link> linkId,  Double distanceCorrection) {
 		this.linkId2distanceCorrection.put(linkId, distanceCorrection);
 	}
 
@@ -86,15 +90,15 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		return Collections.unmodifiableMap(linkId2angleCorrection);
 	}
 
-	public void setLinkId2angleCorrection(Id<Link> linkId, Double angleCorrection) {
+	public void setAngleCorrection(Id<Link> linkId, Double angleCorrection) {
 		this.linkId2angleCorrection.put(linkId, angleCorrection);
 	}
 
-	public Map<Id<Link>, Double> getLinkId2IsolatedImmission() {
-		return Collections.unmodifiableMap(linkId2IsolatedImmission);
+	public TObjectDoubleMap<Id<Link>>  getLinkId2IsolatedImmission() {
+		return new TUnmodifiableObjectDoubleMap<>(linkId2IsolatedImmission);
 	}
 
-	public void setLinkId2IsolatedImmission(Id<Link> linkId, Double isolatedImmission) {
+	public void setIsolatedImmission(Id<Link> linkId, Double isolatedImmission) {
 		this.linkId2IsolatedImmission.put(linkId, isolatedImmission);
 	}
 
@@ -131,22 +135,20 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		this.affectedAgentUnits = affectedAgentsUnits;
 	}
 
-	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionPlusOneCar() {
-		return Collections.unmodifiableMap(linkId2IsolatedImmissionPlusOneCar);
+	public TObjectDoubleMap<Id<Link>> getLinkId2IsolatedImmissionPlusOneCar() {
+		return new TUnmodifiableObjectDoubleMap<>(linkId2IsolatedImmissionPlusOneCar);
 	}
 
-	public void setLinkId2IsolatedImmissionPlusOneCar(
-			Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneCar) {
-		this.linkId2IsolatedImmissionPlusOneCar = linkId2IsolatedImmissionPlusOneCar;
+	public void setIsolatedImmissionPlusOneCar(Id<Link> linkId, Double isolatedImmissionPlusOneCar) {
+		this.linkId2IsolatedImmissionPlusOneCar.put(linkId, isolatedImmissionPlusOneCar);
 	}
 
-	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionPlusOneHGV() {
-		return Collections.unmodifiableMap(linkId2IsolatedImmissionPlusOneHGV);
+	public TObjectDoubleMap<Id<Link>> getLinkId2IsolatedImmissionPlusOneHGV() {
+		return new TUnmodifiableObjectDoubleMap<>(linkId2IsolatedImmissionPlusOneHGV);
 	}
 
-	public void setLinkId2IsolatedImmissionPlusOneHGV(
-			Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneHGV) {
-		this.linkId2IsolatedImmissionPlusOneHGV = linkId2IsolatedImmissionPlusOneHGV;
+	public void setIsolatedImmissionPlusOneHGV(Id<Link> linkId, Double isolatedImmissionPlusOneHGV) {
+		this.linkId2IsolatedImmissionPlusOneHGV.put(linkId, isolatedImmissionPlusOneHGV);
 	}
 
 	@Override
