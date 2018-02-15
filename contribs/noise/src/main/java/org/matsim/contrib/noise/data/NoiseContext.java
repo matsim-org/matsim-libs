@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.handler.NoiseEquations;
+import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 
@@ -312,21 +313,11 @@ public class NoiseContext {
 	}
 	
 	private void setLinksMinMax() {
-		
-		for (Id<Link> linkId : scenario.getNetwork().getLinks().keySet()){
-			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX()) < xCoordMinLinkNode) {
-				xCoordMinLinkNode = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
-			}
-			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY()) < yCoordMinLinkNode) {
-				yCoordMinLinkNode = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY();
-			}
-			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX()) > xCoordMaxLinkNode) {
-				xCoordMaxLinkNode = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getX();
-			}
-			if ((scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY()) > yCoordMaxLinkNode) {
-				yCoordMaxLinkNode = scenario.getNetwork().getLinks().get(linkId).getFromNode().getCoord().getY();
-			}
-		}		
+		double[] bb = NetworkUtils.getBoundingBox(scenario.getNetwork().getNodes().values());
+		xCoordMinLinkNode = bb[0];
+		yCoordMinLinkNode = bb[1];
+		xCoordMaxLinkNode = bb[2];
+		yCoordMaxLinkNode = bb[3];
 	}
 	
 	private void setLinksToZones() {
