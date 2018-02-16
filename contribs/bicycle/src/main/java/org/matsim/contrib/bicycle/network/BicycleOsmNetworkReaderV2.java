@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.bicycle.BicycleLabels;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -58,6 +59,8 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 
 	private final String bicycleAsTransportModeName;
 	private final List<String> bicycleWayTags = Arrays.asList(BicycleLabels.CYCLEWAY, BicycleLabels.SURFACE, BicycleLabels.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE);
+	private final int maxWarnCount = 5;
+	private int warnCount = 0;
 	
 	public static void main(String[] args) throws Exception {
 		String inputCRS = "EPSG:4326"; // WGS84
@@ -216,10 +219,18 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 					l.getAttributes().putAttribute(BicycleLabels.SURFACE, "asphalt");
 					this.countSurfaceInferred++;
 				} else {
-					LOG.warn("Link did not get a surface.");
+					if (warnCount <= maxWarnCount){
+						LOG.warn("Link did not get a surface.");
+						LOG.warn(Gbl.FUTURE_SUPPRESSED);
+						warnCount++;
+					}
 				}
 			} else {
-				LOG.warn("Link did not get a surface.");
+				if (warnCount <= maxWarnCount ){
+					LOG.warn("Link did not get a surface.");
+					LOG.warn(Gbl.FUTURE_SUPPRESSED);
+					warnCount++;
+				}
 			}
 		}
 
