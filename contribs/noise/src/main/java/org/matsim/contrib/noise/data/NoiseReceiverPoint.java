@@ -46,11 +46,11 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		super(id, coord);
 	}
 
-	private Map<Id<Person>, List<PersonActivityInfo>> personId2actInfos = new HashMap<>(0);
+	private Map<Id<Person>, List<PersonActivityInfo>> personId2actInfos = null;//new HashMap<>(0);
 	
 	// initialization
-	private Map<Id<Link>, Double> linkId2distanceCorrection = new HashMap<>(0);
-	private Map<Id<Link>, Double> linkId2angleCorrection = new HashMap<>(0);
+	private Map<Id<Link>, Double> linkId2distanceCorrection = null;//new HashMap<>(0);
+	private Map<Id<Link>, Double> linkId2angleCorrection = null;//new HashMap<>(0);
 			
 	// time-specific information
 	private double finalImmission = 0.;
@@ -59,10 +59,16 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	private double damageCostsPerAffectedAgentUnit;
 
 	public Map<Id<Person>, List<PersonActivityInfo>> getPersonId2actInfos() {
+		if(personId2actInfos == null) {
+			personId2actInfos = new HashMap<>(4);
+		}
 		return Collections.unmodifiableMap(personId2actInfos);
 	}
 
 	public void addPersonActInfo(Id<Person> person, PersonActivityInfo info) {
+		if(personId2actInfos == null) {
+			personId2actInfos = new HashMap<>(4);
+		}
 		List<PersonActivityInfo> infos = this.personId2actInfos.get(person);
 		if(infos == null) {
 			infos = new ArrayList<>();
@@ -72,18 +78,30 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	}
 	
 	public Map<Id<Link>, Double> getLinkId2distanceCorrection() {
+		if(linkId2distanceCorrection == null) {
+			linkId2distanceCorrection = new HashMap<>();
+		}
 		return Collections.unmodifiableMap(linkId2distanceCorrection);
 	}
 
 	public void setLinkId2distanceCorrection(Id<Link> linkId,  Double distanceCorrection) {
+		if(linkId2distanceCorrection == null) {
+			linkId2distanceCorrection = new HashMap<>();
+		}
 		this.linkId2distanceCorrection.put(linkId, distanceCorrection);
 	}
 
 	public Map<Id<Link>, Double> getLinkId2angleCorrection() {
+		if(linkId2angleCorrection== null) {
+			linkId2angleCorrection = new HashMap<>();
+		}
 		return Collections.unmodifiableMap(linkId2angleCorrection);
 	}
 
 	public void setLinkId2angleCorrection(Id<Link> linkId, Double angleCorrection) {
+		if(linkId2angleCorrection== null) {
+			linkId2angleCorrection = new HashMap<>();
+		}
 		this.linkId2angleCorrection.put(linkId, angleCorrection);
 	}
 
