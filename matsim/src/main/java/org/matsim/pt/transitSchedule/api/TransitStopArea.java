@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.minibus.performance.raptor;
-
-import java.util.List;
+package org.matsim.pt.transitSchedule.api;
 
 /**
- * 
- * @author aneumann
+ * This interface is currently only used to provided a typed Id: <code>Id&lt;TransitStopArea&gt;</code>
  *
- */
-public class RaptorRoute {
-
-	private final double cost;
-	private final List<RouteSegment> route;
-
-	public RaptorRoute(double cost, List<RouteSegment> leastCostRoute) {
-		this.cost = cost;
-		this.route = leastCostRoute;
-		
-	}
-
-	public double getTravelCost() {
-		return this.cost;
-	}
-	
-	public List<RouteSegment> getRoute() {
-		return this.route;
-	}
-
-	@Override
-	public String toString() {
-		return "Cost: " + this.cost + " via " + this.route;
-	}
+ * @author mrieser / SBB
+ **/
+public interface TransitStopArea {
 }

@@ -157,7 +157,7 @@ public class EquilOpdytsIT {
 
         double bicycleShare = getBicycleShareFromModeStatsFile(outputDir+"/_"+String.valueOf(opdytsTransitions-1)+"/modestats.txt");
 //        Assert.assertTrue("Resulting bicycle share is wrong.", bicycleShare > 0.70 && bicycleShare < 0.80 ); // (for opdyts transitions =5/6)
-        Assert.assertTrue("Resulting bicycle share is wrong.", bicycleShare > 0.60 && bicycleShare < 0.70 );
+        Assert.assertTrue("Resulting bicycle share is wrong. Share =="+ bicycleShare, bicycleShare > 0.60 && bicycleShare < 0.70 );
     }
 
     private double getBicycleShareFromModeStatsFile(String file){
@@ -172,7 +172,7 @@ public class EquilOpdytsIT {
                     line = reader.readLine();
                 } else {
                     String parts[] = line.split("\t");
-                    share = Double.valueOf(parts[7]);
+                    share = Double.valueOf(parts[1]);
                     line = reader.readLine();
                 }
             }

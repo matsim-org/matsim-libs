@@ -38,6 +38,8 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
+import roadTypeMapping.HbefaRoadTypeMapping;
+import roadTypeMapping.VisumHbefaRoadTypeMapping;
 
 
 /**
@@ -64,7 +66,7 @@ public class EmissionModule {
 	private static String detailedColdEmissionFactorsFile;
 	
 	//===
-    private Map<Integer, String> roadTypeMapping;
+    private HbefaRoadTypeMapping roadTypeMapping;
 	private Vehicles vehicles;
 	
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable;
@@ -99,7 +101,7 @@ public class EmissionModule {
 		
 		getInputFiles();
 		
-		roadTypeMapping = createRoadTypeMapping(roadTypeMappingFile);
+		roadTypeMapping = createVisumRoadTypeMapping(roadTypeMappingFile);
 
 		vehicles = scenario.getVehicles();
 
@@ -163,10 +165,10 @@ public class EmissionModule {
 		logger.info("leaving createEmissionHandler");
 	}
 
-	private Map<Integer, String> createRoadTypeMapping(String filename){
+	private HbefaRoadTypeMapping createVisumRoadTypeMapping(String filename){
 		logger.info("entering createRoadTypeMapping ...") ;
 		
-		Map<Integer, String> mapping = new HashMap<>();
+		VisumHbefaRoadTypeMapping mapping = new VisumHbefaRoadTypeMapping();
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
@@ -176,7 +178,7 @@ public class EmissionModule {
 				if ( strLine.contains("\"")) throw new RuntimeException("cannot handle this character in parsing") ;
 				
 				String[] inputArray = strLine.split(";");
-				Integer visumRtNr = Integer.parseInt(inputArray[indexFromKey.get("VISUM_RT_NR")]);
+				String visumRtNr = inputArray[indexFromKey.get("VISUM_RT_NR")];
 				String hbefaRtName = (inputArray[indexFromKey.get("HBEFA_RT_NAME")]);
 				
 				mapping.put(visumRtNr, hbefaRtName);

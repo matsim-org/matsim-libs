@@ -20,6 +20,7 @@
 
 package org.matsim.pt.router;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
@@ -103,6 +104,12 @@ public class TransitRouterConfig implements MatsimParameters {
 			final TransitRouterConfigGroup trConfig, final VspExperimentalConfigGroup vspConfig ) 
 	{
 		pcsConfig.setLocked(); pcrConfig.setLocked() ; trConfig.setLocked() ; vspConfig.setLocked() ;
+		
+		if (pcsConfig.getScoringParametersPerSubpopulation().size()>1){
+			Logger.getLogger(getClass()).warn("More than one subpopulation is used in plansCalcScore. "
+					+ "This is not currently implemented in the TransitRouter (but should work for scoring),"
+					+ " so the values for the \"default\" subpopulation will be used. (jb, Feb 2018)");
+		}
 		
 		// walk:
 		this.beelineDistanceFactor = pcrConfig.getModeRoutingParams().get( TransportMode.walk ).getBeelineDistanceFactor();

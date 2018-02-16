@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InitialNode.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2015 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,46 +17,57 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router;
+package org.matsim.pt.router;
 
-import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.Id;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
- * Used by the MultiNodeDijkstra to store initial time and cost. 
  * 
- * @see org.matsim.core.router.MultiNodeDijkstra
- * @author cdobler
+ * @author aneumann
+ *
  */
-public class InitialNode {
-	//cant make final, extended by OneToManyPathSearch.ToNode
-	//need a decision. Amit Sep'17
+public class RouteSegment {
 	
-	public Node node;
-	public final double initialCost;
-	public final double initialTime;
+	final TransitStopFacility fromStop;
+	final TransitStopFacility toStop;
+	final double travelTime;
+	final Id<TransitLine> lineTaken;
+	final Id<TransitRoute> routeTaken;
 	
-	public InitialNode(final Node node, final double initialCost, final double initialTime) {
-		this.node = node;
-		this.initialCost = initialCost;
-		this.initialTime = initialTime;
-	}
-
-	// allowing node as null; many duplicates of InitialNode does not require node thus removing such duplicate classes by setting node as null. Amit Sep'17
-	public InitialNode(final double initialCost, final double initialTime) {
-		this(null, initialCost, initialTime);
+	public RouteSegment(TransitStopFacility fromStop, TransitStopFacility toStop, double travelTime, Id<TransitLine> lineTaken, Id<TransitRoute> routeTaken) {
+		this.fromStop = fromStop;
+		this.toStop = toStop;
+		this.travelTime = travelTime;
+		this.lineTaken = lineTaken;
+		this.routeTaken = routeTaken;
 	}
 	
 	@Override
 	public String toString() {
-		if (node == null) {
-			return "[id=" + " null " + "]" +
-					"[initialCost=" + this.initialCost + "]" +
-					"[initialTime=" + this.initialTime + "]";
-		} else {
-			return "[id=" + this.node.getId() + "]" +
-					"[initialCost=" + this.initialCost + "]" +
-					"[initialTime=" + this.initialTime + "]";
-		}
+		return "From: " + fromStop.getId() + " to " + toStop.getId() + " in " + travelTime + "s via " + routeTaken;
+	}
 
+	public double getTravelTime() {
+		return travelTime;
+	}
+
+	public TransitStopFacility getFromStop() {
+		return fromStop;
+	}
+
+	public TransitStopFacility getToStop() {
+		return toStop;
+	}
+
+	public Id<TransitLine> getLineTaken() {
+		return lineTaken;
+	}
+
+	public Id<TransitRoute> getRouteTaken() {
+		return routeTaken;
 	}
 }
+

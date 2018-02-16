@@ -34,9 +34,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 @Singleton
 public class RaptorTransitRouterProvider implements Provider<TransitRouter> {
 
-    private final TransitRouterQuadTree transitRouterQuadTree;
     private final RaptorDisutility raptorDisutility;
     private final TransitRouterConfig transitRouterConfig;
+    private final TransitSchedule schedule;
 
     @Inject
     RaptorTransitRouterProvider(final TransitSchedule schedule, final Config config) {
@@ -51,13 +51,11 @@ public class RaptorTransitRouterProvider implements Provider<TransitRouter> {
                 config.vspExperimental());
         this.raptorDisutility = new RaptorDisutility(this.transitRouterConfig,
                 costPerBoarding, costPerMeterTraveled);
-
-        this.transitRouterQuadTree = new TransitRouterQuadTree(raptorDisutility);
-        transitRouterQuadTree.initializeFromSchedule(schedule, transitRouterConfig.getBeelineWalkConnectionDistance());
+        this.schedule = schedule;
     }
 
     @Override
     public TransitRouter get() {
-        return new Raptor(transitRouterQuadTree, raptorDisutility, transitRouterConfig);
+        return new Raptor(transitRouterConfig, this.schedule, this.raptorDisutility );
     }
 }
