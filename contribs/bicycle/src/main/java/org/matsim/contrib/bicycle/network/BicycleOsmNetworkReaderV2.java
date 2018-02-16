@@ -57,6 +57,7 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 	private int countBicycle = 0;
 
 	private final String bicycleAsTransportModeName;
+	private final List<String> bicycleWayTags = Arrays.asList(BicycleLabels.CYCLEWAY, BicycleLabels.SURFACE, BicycleLabels.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE);
 	
 	public static void main(String[] args) throws Exception {
 		String inputCRS = "EPSG:4326"; // WGS84
@@ -66,9 +67,10 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		String tiffFile = "../../../shared-svn/studies/countries/de/berlin-bike/input/eu-dem/BerlinEUDEM.tif"; // Berlin EU-DEM
 //		String outputXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/2017-08-29_mitte.xml";
 		String outputXML = "../../../shared-svn/studies/countries/de/berlin-bike/input/network/berlin-latest.xml";
-		
-		List<String> bicycleWayTags = Arrays.asList(
-				new String[]{BicycleLabels.CYCLEWAY, BicycleLabels.SURFACE, BicycleLabels.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE});
+
+		// adding bicycle way tags by default: Amit Feb'18
+//		List<String> bicycleWayTags = Arrays.asList(
+//				new String[]{BicycleLabels.CYCLEWAY, BicycleLabels.SURFACE, BicycleLabels.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE});
 
 		Network network = NetworkUtils.createNetwork();
 		CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(inputCRS, outputCRS);
@@ -77,7 +79,7 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 
 		BicycleOsmNetworkReaderV2 bicycleNetworkReader = new BicycleOsmNetworkReaderV2(network, ct, elevationDataParser);
 		bicycleNetworkReader.setKeepPaths(true);
-		bicycleNetworkReader.addWayTags(bicycleWayTags);
+//		bicycleNetworkReader.addWayTags(bicycleWayTags);
 		
 		bicycleNetworkReader.parse(inputOSM);
 		
@@ -100,6 +102,7 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		// If "useHighwayDefaults" is set to true, super sets defaults for all "roads" ("motorway" to "residential", except "service")
 		// and all "link roads" and "living_street" (part of "special road types"). Hierachies 1 to 6 are used.
 		super(network, transformation, useHighwayDefaults);
+		super.addWayTags(bicycleWayTags);
 		
 //		double bicyclePCU = 0.2; // Use the same in your run
 			this.bicycleAsTransportModeName = bicycleAsTransportModeName;
