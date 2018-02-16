@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
@@ -56,6 +55,8 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 	private int countSurfaceInferred = 0;
 	private int countCyclewayType = 0;
 	private int countBicycle = 0;
+
+	private final String bicycleAsTransportModeName;
 	
 	public static void main(String[] args) throws Exception {
 		String inputCRS = "EPSG:4326"; // WGS84
@@ -86,16 +87,22 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		new NetworkWriter(network).write(outputXML);
 	}
 
+	public BicycleOsmNetworkReaderV2(final Network network, final CoordinateTransformation transformation, ElevationDataParser elevationDataParser,
+									 final boolean useHighwayDefaults) {
+		this(network, transformation, elevationDataParser, useHighwayDefaults, "bicycle",0.2);
+	}
+
 	public BicycleOsmNetworkReaderV2(final Network network, final CoordinateTransformation transformation, ElevationDataParser elevationDataParser) {
-		this(network, transformation, elevationDataParser, true);
+		this(network, transformation, elevationDataParser, true, "bicycle",0.2);
 	}
 		public BicycleOsmNetworkReaderV2(final Network network, final CoordinateTransformation transformation, ElevationDataParser elevationDataParser,
-			final boolean useHighwayDefaults) {
+			final boolean useHighwayDefaults, String bicycleAsTransportModeName, double bicyclePCU) {
 		// If "useHighwayDefaults" is set to true, super sets defaults for all "roads" ("motorway" to "residential", except "service")
 		// and all "link roads" and "living_street" (part of "special road types"). Hierachies 1 to 6 are used.
 		super(network, transformation, useHighwayDefaults);
 		
-		double bicyclePCU = 0.2; // Use the same in your run
+//		double bicyclePCU = 0.2; // Use the same in your run
+			this.bicycleAsTransportModeName = bicycleAsTransportModeName;
 		
 		if (useHighwayDefaults) {
 			LOG.info("Also falling back to bicycle-specific default values.");
@@ -129,8 +136,12 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 			LOG.error("The way this is written assumes that highway defaults are used! This is, however, not done here."
 					+ "Reconsider this. It will likely lead to awkward resuklts otherwise.");
 		}
-		
-		this.elevationDataParser = elevationDataParser;
+
+		if (elevationDataParser==null){
+			LOG.warn("Elevation parser is not provided, thus, elevation can not be computed.");
+		} else {
+			this.elevationDataParser = elevationDataParser;
+		}
 	}
 	
 	private void stats(Network network) {
@@ -144,6 +155,7 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 	
 	@Override
 	protected void setOrModifyNodeAttributes(Node n, OsmNode node) {
+		if (this.elevationDataParser==null) return;
 		Coord coord = n.getCoord();
 		double elevation = elevationDataParser.getElevation(n.getCoord());
 		Coord elevationCoord = CoordUtils.createCoord(coord.getX(), coord.getY(), elevation);
@@ -160,7 +172,7 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		// Allow bicycles on all infrastructures except motorways (hierarchy 1) and trunk roads (hierarchy 2)
 		if (defaults.hierarchy == 3 || defaults.hierarchy == 4 || defaults.hierarchy == 5 || defaults.hierarchy == 6
 				|| defaults.hierarchy == 7 || defaults.hierarchy == 8 || defaults.hierarchy == 9) {
-			modes.add("bicycle"); // TODO add TRansportMode "bicycle"
+			modes.add(this.bicycleAsTransportModeName); // TODO add TransportMode "bicycle"
 		}
 		
 		// Allow cars if the direction under consideration is open to cars and if we are not on an infrastructure mainly intended
@@ -171,22 +183,24 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 			}
 		}
 		l.setAllowedModes(modes);
-		
-		// Gradient
+
+		if (  this.elevationDataParser!=null ){
+			// Gradient
 //		double gradient = (l.getToNode().getCoord().getZ() - l.getFromNode().getCoord().getZ()) / l.getLength();
 //		l.getAttributes().putAttribute(BicycleLabels.GRADIENT, gradient);
-		
-		// Elevation
-		double averageElevation = (l.getToNode().getCoord().getZ() + l.getFromNode().getCoord().getZ()) / 2;
-		l.getAttributes().putAttribute(BicycleLabels.AVERAGE_ELEVATION, averageElevation);
-		
+
+			// Elevation
+			double averageElevation = (l.getToNode().getCoord().getZ() + l.getFromNode().getCoord().getZ()) / 2;
+			l.getAttributes().putAttribute(BicycleLabels.AVERAGE_ELEVATION, averageElevation);
+		}
+
 		// Smoothness
 		String smoothness = way.tags.get(BicycleLabels.SMOOTHNESS);
 		if (smoothness != null) {
 			l.getAttributes().putAttribute(BicycleLabels.SMOOTHNESS, smoothness);
 			this.countSmoothness++;
 		}
-		
+
 		// Surface
 		String surface = way.tags.get(BicycleLabels.SURFACE);
 		if (surface != null) {
@@ -194,7 +208,8 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 			this.countSurfaceDirect++;
 		} else {
 			if (highwayType != null) {
-				if (defaults.hierarchy == 3 && defaults.hierarchy == 4) { // 3 = primary, 4 = secondary
+				// it used to be '&&' instead of '||' which will always be false. Most likely, it must be '||'. Amit Feb'18
+				if (defaults.hierarchy == 3 || defaults.hierarchy == 4) { // 3 = primary, 4 = secondary
 					l.getAttributes().putAttribute(BicycleLabels.SURFACE, "asphalt");
 					this.countSurfaceInferred++;
 				} else {
