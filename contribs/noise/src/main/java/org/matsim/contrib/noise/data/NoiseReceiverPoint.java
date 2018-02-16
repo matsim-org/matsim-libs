@@ -53,9 +53,6 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	private Map<Id<Link>, Double> linkId2angleCorrection = new HashMap<>(0);
 			
 	// time-specific information
-	private Map<Id<Link>, Double> linkId2IsolatedImmission = new HashMap<>(0);
-	private Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneCar = new HashMap<>(0);
-	private Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneHGV = new HashMap<>(0); 
 	private double finalImmission = 0.;
 	private double affectedAgentUnits = 0.;
 	private double damageCosts;
@@ -88,14 +85,6 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 
 	public void setLinkId2angleCorrection(Id<Link> linkId, Double angleCorrection) {
 		this.linkId2angleCorrection.put(linkId, angleCorrection);
-	}
-
-	public Map<Id<Link>, Double> getLinkId2IsolatedImmission() {
-		return Collections.unmodifiableMap(linkId2IsolatedImmission);
-	}
-
-	public void setLinkId2IsolatedImmission(Id<Link> linkId, Double isolatedImmission) {
-		this.linkId2IsolatedImmission.put(linkId, isolatedImmission);
 	}
 
 	public double getFinalImmission() {
@@ -131,37 +120,18 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 		this.affectedAgentUnits = affectedAgentsUnits;
 	}
 
-	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionPlusOneCar() {
-		return Collections.unmodifiableMap(linkId2IsolatedImmissionPlusOneCar);
-	}
-
-	public void setLinkId2IsolatedImmissionPlusOneCar(
-			Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneCar) {
-		this.linkId2IsolatedImmissionPlusOneCar = linkId2IsolatedImmissionPlusOneCar;
-	}
-
-	public Map<Id<Link>, Double> getLinkId2IsolatedImmissionPlusOneHGV() {
-		return Collections.unmodifiableMap(linkId2IsolatedImmissionPlusOneHGV);
-	}
-
-	public void setLinkId2IsolatedImmissionPlusOneHGV(
-			Map<Id<Link>, Double> linkId2IsolatedImmissionPlusOneHGV) {
-		this.linkId2IsolatedImmissionPlusOneHGV = linkId2IsolatedImmissionPlusOneHGV;
-	}
-
 	@Override
 	public String toString() {
 		return "NoiseReceiverPoint [personId2actInfos=" + personId2actInfos
 				+ ", linkId2distanceCorrection=" + linkId2distanceCorrection
 				+ ", linkId2angleCorrection=" + linkId2angleCorrection
-				+ ", linkId2IsolatedImmission=" + linkId2IsolatedImmission
-				+ ", linkId2IsolatedImmissionPlusOneCar="
-				+ linkId2IsolatedImmissionPlusOneCar
-				+ ", linkId2IsolatedImmissionPlusOneHGV="
-				+ linkId2IsolatedImmissionPlusOneHGV + ", finalImmission="
-				+ finalImmission + ", affectedAgentUnits=" + affectedAgentUnits
-				+ ", damageCosts=" + damageCosts + ", damageCostsPerAffectedAgentUnit="
-				+ damageCostsPerAffectedAgentUnit + "]";
+//				+ ", linkId2IsolatedImmission=" + linkId2IsolatedImmission
+//				+ ", linkId2IsolatedImmissionPlusOneCar=" + linkId2IsolatedImmissionPlusOneCar
+//				+ ", linkId2IsolatedImmissionPlusOneHGV=" + linkId2IsolatedImmissionPlusOneHGV 
+				+ ", finalImmission=" + finalImmission 
+				+ ", affectedAgentUnits=" + affectedAgentUnits
+				+ ", damageCosts=" + damageCosts 
+				+ ", damageCostsPerAffectedAgentUnit=" + damageCostsPerAffectedAgentUnit + "]";
 	}
 
 	public void reset() {
@@ -170,7 +140,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 	}
 	
 	public void resetTimeInterval() {
-		linkId2IsolatedImmission.clear();
+//		linkId2IsolatedImmission.clear();
 		this.setFinalImmission(0.);
 		this.setAffectedAgentUnits(0.);
 		this.setDamageCosts(0.);
