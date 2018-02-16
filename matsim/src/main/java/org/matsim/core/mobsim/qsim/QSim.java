@@ -43,6 +43,7 @@ import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
@@ -642,18 +643,17 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	public Collection<AgentTracker> getAgentTrackers() {
 		return Collections.unmodifiableCollection(agentTrackers) ;
 	}
-
-//	public void setChildInjector(Injector qSimLocalInjector) {
-//		this.childInjector  = qSimLocalInjector ;
-//	}
+	
 	public Injector getChildInjector() {
 		return this.childInjector  ;
 	}
 	
-	public void rereadNetworkChangeEvents() {
+	public final void addNetworkChangeEvent( NetworkChangeEvent event ) {
+		// used (and thus implicitly tested) by bdi-abm-integration project.  A separate core test would be good. kai, feb'18
+		
 		for ( MobsimEngine engine : this.mobsimEngines ) {
 			if ( engine instanceof NetworkChangeEventsEngine ) {
-				((NetworkChangeEventsEngine) engine).rereadNetworkChangeEvents();
+				((NetworkChangeEventsEngine) engine).addNetworkChangeEvent( event );
 			}
 		}
 	}
