@@ -154,7 +154,7 @@ public class NoiseReceiverPoint extends ReceiverPoint {
 
 	public void reset() {
 		resetTimeInterval();
-		this.personId2actInfos.clear();
+		this.personId2actInfos = null;
 	}
 	
 	public void resetTimeInterval() {

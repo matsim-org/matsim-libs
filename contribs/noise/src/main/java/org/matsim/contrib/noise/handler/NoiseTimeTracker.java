@@ -50,6 +50,7 @@ import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.contrib.noise.events.NoiseEventAffected;
 import org.matsim.contrib.noise.events.NoiseEventCaused;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -232,6 +233,7 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 				}
 			}
 		}
+		calculateCostsPerVehiclePerLinkPerTimeInterval();
 		
 		finishNoiseDamageCosts();
 		
@@ -353,6 +355,7 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 		}
 		
 		if (this.noiseContext.getNoiseParams().isComputeCausingAgents()) {
+			calculateCostsPerVehiclePerLinkPerTimeInterval();
 			if (writeOutput()) NoiseWriter.writeLinkDamageInfoPerHour(noiseContext, outputDirectory);
 			if (writeOutput()) NoiseWriter.writeLinkAvgCarDamageInfoPerHour(noiseContext, outputDirectory);
 			if (writeOutput()) NoiseWriter.writeLinkAvgHgvDamageInfoPerHour(noiseContext, outputDirectory);
@@ -427,7 +430,7 @@ public class NoiseTimeTracker implements PersonEntersVehicleEventHandler, LinkEn
 	 */
 	private void computeAverageDamageCost(NoiseReceiverPoint rp, NoiseReceiverPointImmision immisions) {
 		calculateCostSharesPerLinkPerTimeInterval(rp, immisions);
-		calculateCostsPerVehiclePerLinkPerTimeInterval();
+//		calculateCostsPerVehiclePerLinkPerTimeInterval();
 	}
 
 	/*
