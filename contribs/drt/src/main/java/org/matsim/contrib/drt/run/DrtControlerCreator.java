@@ -22,6 +22,8 @@
  */
 package org.matsim.contrib.drt.run;
 
+import java.util.function.Function;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -79,9 +81,8 @@ public final class DrtControlerCreator {
 	}
 
 	private static Controler adjustControler(boolean otfvis, Scenario scenario) {
-		DrtConfigGroup drtCfg = DrtConfigGroup.get(scenario.getConfig());
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule(createModuleForQSimPlugin(drtCfg), DrtOptimizer.class,
+		controler.addOverridingModule(new DvrpModule(createModuleCreatorForQSimPlugin(), DrtOptimizer.class,
 				DefaultUnplannedRequestInserter.class, ParallelPathDataProvider.class));
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
@@ -119,8 +120,8 @@ public final class DrtControlerCreator {
 		}
 	}
 
-	public static com.google.inject.AbstractModule createModuleForQSimPlugin(DrtConfigGroup drtCfg) {
-		return new com.google.inject.AbstractModule() {
+	public static Function<Config, com.google.inject.Module> createModuleCreatorForQSimPlugin() {
+		return config -> new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
 				bind(DrtOptimizer.class).to(DefaultDrtOptimizer.class).asEagerSingleton();
