@@ -61,6 +61,11 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 	private final List<String> bicycleWayTags = Arrays.asList(BicycleLabels.CYCLEWAY, BicycleLabels.SURFACE, BicycleLabels.SMOOTHNESS, TAG_BICYCLE, TAG_ONEWAYBICYCLE);
 	private final int maxWarnCount = 5;
 	private int warnCount = 0;
+
+	// OSM Reader is using hierarchy until 8, why following hierarchies are not starting with 9? Amit Feb'18
+	private static final int BICYCLE_TRACK_HIERARCHY = 9;
+	private static final int FOOTPATH_TRACK_HIERARCHY = 10;
+	private static final int STEPS_TRACK_HIERARCHY = 11;
 	
 	public static void main(String[] args) throws Exception {
 		String inputCRS = "EPSG:4326"; // WGS84
@@ -118,26 +123,26 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 			
 			// Capacity of a track for bicycles analogous to that of a primary road for cars, dz, aug'18
 			// this.setHighwayDefaults(7, "track",	1, 10.0/3.6, 1.0, 50); // Simon's values
-			this.setHighwayDefaults(7, "track", 1, 30.0/3.6, 1.0, 1500 * bicyclePCU);
+			this.setHighwayDefaults(BICYCLE_TRACK_HIERARCHY, "track", 1, 30.0/3.6, 1.0, 1500 * bicyclePCU);
 			
 			//this.setHighwayDefaults(7, "cycleway", 1, 10.0/3.6, 1.0, 50); // Simon's values
-			this.setHighwayDefaults(7, "cycleway", 1, 30.0/3.6, 1.0, 1500 * bicyclePCU);
+			this.setHighwayDefaults(BICYCLE_TRACK_HIERARCHY, "cycleway", 1, 30.0/3.6, 1.0, 1500 * bicyclePCU);
 			
 			// this.setHighwayDefaults(8, "service", 1, 10.0/3.6, 1.0, 50); // Simon's values
-			this.setHighwayDefaults(7, "service", 1, 10.0/3.6, 1.0, 1000 * bicyclePCU);
+			this.setHighwayDefaults(BICYCLE_TRACK_HIERARCHY, "service", 1, 10.0/3.6, 1.0, 1000 * bicyclePCU);
 			
 			// Capacity of a footway/pedestrian/path zone for bicycles analogous to that of a residential road for cars, dz, aug'18
 			// this.setHighwayDefaults(8, "footway", 1, 10.0/3.6, 1.0, 50); // Simon's values
-			this.setHighwayDefaults(8, "footway", 1, 10.0/3.6, 1.0, 600 * bicyclePCU); // Simon's values
+			this.setHighwayDefaults(FOOTPATH_TRACK_HIERARCHY, "footway", 1, 10.0/3.6, 1.0, 600 * bicyclePCU); // Simon's values
 			// this.setHighwayDefaults(8, "pedestrian", 1, 10.0/3.6, 1.0, 50); // Simon's values
-			this.setHighwayDefaults(8, "pedestrian", 1, 10.0/3.6, 1.0, 600 * bicyclePCU); // Simon's values
+			this.setHighwayDefaults(FOOTPATH_TRACK_HIERARCHY, "pedestrian", 1, 10.0/3.6, 1.0, 600 * bicyclePCU); // Simon's values
 			// this.setHighwayDefaults(8, "path", 1, 10.0/3.6, 1.0, 50); // Simon's values
-			this.setHighwayDefaults(8, "path", 1, 20.0/3.6, 1.0, 600 * bicyclePCU);
+			this.setHighwayDefaults(FOOTPATH_TRACK_HIERARCHY, "path", 1, 20.0/3.6, 1.0, 600 * bicyclePCU);
 			
 			// "bridleway" is exclusively for equestrians; if others are allowed to use it, it should not be classified as bridleway
 			
 			// this.setHighwayDefaults(10, "steps", 1, 2.0/3.6, 1.0, 50); // Simon's values
-			this.setHighwayDefaults(9, "steps", 1, 1.0/3.6, 1.0, 50);
+			this.setHighwayDefaults(STEPS_TRACK_HIERARCHY, "steps", 1, 1.0/3.6, 1.0, 50);
 		} else {
 			LOG.error("The way this is written assumes that highway defaults are used! This is, however, not done here."
 					+ "Reconsider this. It will likely lead to awkward resuklts otherwise.");
@@ -176,15 +181,21 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		OsmHighwayDefaults defaults = this.highwayDefaults.get(way.tags.get(TAG_HIGHWAY));
 		
 		// Allow bicycles on all infrastructures except motorways (hierarchy 1) and trunk roads (hierarchy 2)
-		if (defaults.hierarchy == 3 || defaults.hierarchy == 4 || defaults.hierarchy == 5 || defaults.hierarchy == 6
-				|| defaults.hierarchy == 7 || defaults.hierarchy == 8 || defaults.hierarchy == 9) {
+//		if (defaults.hierarchy == 3 || defaults.hierarchy == 4 || defaults.hierarchy == 5 || defaults.hierarchy == 6
+//			|| defaults.hierarchy == 7 || defaults.hierarchy == 8 || defaults.hierarchy == 9) {
+		if (! (defaults.hierarchy == 1 || defaults.hierarchy == 2) ) {
 			modes.add(this.bicycleAsTransportModeName); // TODO add TransportMode "bicycle"
 		}
-		
+
 		// Allow cars if the direction under consideration is open to cars and if we are not on an infrastructure mainly intended
 		// for bicyclists (hierarchy 7) or pedestrians (hierarchy 8)
+		/* use of following condition (direction/oneway) will set different allowed modes on links which are continuous (continuous hierarchy)
+		 * this mean, a continuous routes will not be available and router may throw an exception. Amit Feb'18
+		  */
 		if ( (forwardDirection && !isOnewayReverse(way)) || (!forwardDirection && !isOneway(way)) ) {
-			if (defaults.hierarchy != 7 && defaults.hierarchy != 8) {
+			if (defaults.hierarchy != BICYCLE_TRACK_HIERARCHY
+					&& defaults.hierarchy != FOOTPATH_TRACK_HIERARCHY
+					&& defaults.hierarchy != STEPS_TRACK_HIERARCHY) {
 				modes.add(TransportMode.car);
 			}
 		}
@@ -244,7 +255,7 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		// Bicycle restrictions
 		String bicycle = way.tags.get(TAG_BICYCLE);
 		if (bicycle != null) {
-			l.getAttributes().putAttribute("bicycle", bicycle);
+			l.getAttributes().putAttribute(this.bicycleAsTransportModeName, bicycle);
 			countBicycle++;
 		}
 	}
