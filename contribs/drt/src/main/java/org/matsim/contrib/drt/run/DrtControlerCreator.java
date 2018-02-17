@@ -81,8 +81,8 @@ public final class DrtControlerCreator {
 	private static Controler adjustControler(boolean otfvis, Scenario scenario) {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(scenario.getConfig());
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule(DrtControlerCreator.createModuleForQSimPlugin(drtCfg),
-				DrtOptimizer.class, DefaultUnplannedRequestInserter.class));
+		controler.addOverridingModule(new DvrpModule(createModuleForQSimPlugin(drtCfg), DrtOptimizer.class,
+				DefaultUnplannedRequestInserter.class, ParallelPathDataProvider.class));
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
 		if (otfvis) {
@@ -106,15 +106,15 @@ public final class DrtControlerCreator {
 				Logger.getLogger(DrtControlerCreator.class).info(
 						"drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 			}
-			if (!config.planCalcScore().getModes().containsKey(DrtStageActivityType.DRT_WALK)){
+			if (!config.planCalcScore().getModes().containsKey(DrtStageActivityType.DRT_WALK)) {
 				ModeParams drtWalk = new ModeParams(DrtStageActivityType.DRT_WALK);
-				ModeParams walk  = config.planCalcScore().getModes().get(TransportMode.walk);
+				ModeParams walk = config.planCalcScore().getModes().get(TransportMode.walk);
 				drtWalk.setConstant(walk.getConstant());
 				drtWalk.setMarginalUtilityOfDistance(walk.getMarginalUtilityOfDistance());
 				drtWalk.setMarginalUtilityOfTraveling(walk.getMarginalUtilityOfTraveling());
 				drtWalk.setMonetaryDistanceRate(walk.getMonetaryDistanceRate());
-				Logger.getLogger(DrtControlerCreator.class).info(
-						"drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
+				Logger.getLogger(DrtControlerCreator.class)
+						.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
 			}
 		}
 	}
@@ -131,14 +131,8 @@ public final class DrtControlerCreator {
 				bind(DrtScheduler.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(DrtActionCreator.class).asEagerSingleton();
 				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
-				if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stationbased)) {
-					// StopBasedPathDataProvider consumes too much memory for larger networks with many stops
-					// still could be valuable for complex optimisers (more than just request insertion) 
-					// bind(PrecalculatablePathDataProvider.class).to(StopBasedPathDataProvider.class);
-					bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
-				} else {
-					bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
-				}
+				bind(ParallelPathDataProvider.class).asEagerSingleton();
+				bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
 			}
 
 			@Provides

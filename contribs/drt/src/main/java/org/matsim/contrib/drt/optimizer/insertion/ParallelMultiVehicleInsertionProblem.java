@@ -58,7 +58,6 @@ public class ParallelMultiVehicleInsertionProblem implements MultiVehicleInserti
 	}
 
 	public void shutdown() {
-		pathDataProvider.shutdown();
 		forkJoinPool.shutdown();
 	}
 }
