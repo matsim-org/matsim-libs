@@ -2,7 +2,7 @@ package tutorial.dvrptc;
 
 import org.junit.Test;
 
-import tutorial.dvrpetc.RunTaxiExample;
+import tutorial.extensions.dvrpetc.RunTaxiExample;
 
 public class RunTaxiExampleTest {
 
