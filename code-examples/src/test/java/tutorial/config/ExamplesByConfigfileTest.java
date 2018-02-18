@@ -45,17 +45,17 @@ public class ExamplesByConfigfileTest {
 	public static Collection<Object[]> createTests() {
 		Collection<Object[]> filesToRun = new ArrayList<>();
 
-//		filesToRun.add(new Object [] {"scenarios/equil/config.xml"});
-//		filesToRun.add(new Object [] {"scenarios/equil/example1-config.xml"});
-//		filesToRun.add(new Object [] {"scenarios/equil/example2-config.xml"});
-//		filesToRun.add(new Object [] {"scenarios/equil/example5-config.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil/config.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil/example1-config.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil/example2-config.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil/example5-config.xml"});
 
 		filesToRun.add(new Object [] {"scenarios/equil-extended/example5trips-config.xml"});
-//		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-network-change-events.xml"});
-//		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-subpopulation.xml"});
-//
-//		filesToRun.add(new Object [] {"scenarios/equil-mixedTraffic/config-with-mode-vehicles.xml"});
-//		filesToRun.add(new Object [] {"scenarios/equil-mixedTraffic/config-with-all-vehicles-from-file.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-network-change-events.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-subpopulation.xml"});
+
+		filesToRun.add(new Object [] {"scenarios/equil-mixedTraffic/config-with-mode-vehicles.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil-mixedTraffic/config-with-all-vehicles-from-file.xml"});
 		
 		return filesToRun;
 		
