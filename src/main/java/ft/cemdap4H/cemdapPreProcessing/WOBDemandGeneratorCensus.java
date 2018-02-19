@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package vwExamples.cemdap4wob.cemdapPreProcessing;
+package ft.cemdap4H.cemdapPreProcessing;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -86,7 +86,7 @@ public class WOBDemandGeneratorCensus {
 	private int numberOfPlansPerPerson;
 	private double defaultAdultsToEmployeesRatio;
 	private double defaultEmployeesToCommutersRatio;
-	boolean includeChildren = false;
+	boolean includeChildren = true;
 	boolean writeMatsimPlanFiles = false;
 	
 	// Optionally used parameters
@@ -105,11 +105,11 @@ public class WOBDemandGeneratorCensus {
 
 	public static void main(String[] args) {
 		
-		String inbase = "C:\\Users\\VW7N5TD\\Desktop\\Programme\\MatSim\\CEMDAP\\InputOutput\\cemdap-vw\\"; 
-		String commuterFileOutgoing1 = inbase +"add_data\\commuters\\031NS2009Ga_adjustedZonesAndSelectedAreas.txt";
+		String inbase = "C:\\Users\\VW7N5TD\\Desktop\\Programme\\MatSim\\00_HannoverModel_1.0\\Input\\Cemdap\\"; 
+		String commuterFileOutgoing1 = inbase +"add_data\\commuters\\H\\032NS2009GA_Hannover_adjusted.txt";
 		String[] commuterFilesOutgoing = {commuterFileOutgoing1};
 		String shapeFile1 = inbase + "add_data\\shp\\nssa.shp";
-		String shapeFile2 = inbase + "add_data\\shp\\wvi-zones.shp";
+		String shapeFile2 = inbase + "add_data\\shp\\Hannover_Stadtteile.shp";
 		
 		String outputBase = inbase + "\\cemdap_input\\";
 
@@ -120,7 +120,7 @@ public class WOBDemandGeneratorCensus {
 		// Input and output files
 	
 		
-		String censusFile = inbase +"add_data\\zensus\\Zensus11_Datensatz_Bevoelkerung_Niedersachsen_selected.csv";
+		String censusFile = inbase +"add_data\\zensus\\Zensus11_Datensatz_Bevoelkerung_Niedersachsen_selected_hannover.csv";
 		
 		// Parameters
 		int numberOfPlansPerPerson = 5;
@@ -136,6 +136,7 @@ public class WOBDemandGeneratorCensus {
 		
 		demandGeneratorCensus.setWriteMatsimPlanFiles(true);
 		
+		demandGeneratorCensus.addZoneForRefinementHome("032410001001",inbase +"add_data/wvi/hzones.txt"); //hannover Region
 		demandGeneratorCensus.addZoneForRefinementHome("031030000000",inbase +"add_data/wvi/wobzones.txt"); //Wolfsburg Stadt
 		demandGeneratorCensus.addZoneForRefinementHome("031010000000",inbase +"add_data/wvi/bszones.txt"); //Braunschweig Stadt
 
