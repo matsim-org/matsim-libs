@@ -22,6 +22,7 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -42,6 +43,8 @@ public class BicycleTravelDisutility implements TravelDisutility {
 	private final double marginalCostOfComfort_m;
 	private final double marginalCostOfGradient_m_100m;
 	
+	private final Network network;
+	
 	private final double normalization;
 	private final double sigma;
 	
@@ -54,7 +57,7 @@ public class BicycleTravelDisutility implements TravelDisutility {
 	private Person prevPerson;
 
 	
-	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup,
+	BicycleTravelDisutility(Network network, BicycleConfigGroup bicycleConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup,
 			PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, TravelTime timeCalculator, double normalization) {
 		final PlanCalcScoreConfigGroup.ModeParams bicycleParams = cnScoringGroup.getModes().get("bicycle");
 		if (bicycleParams == null) {
@@ -71,6 +74,9 @@ public class BicycleTravelDisutility implements TravelDisutility {
 
 		this.timeCalculator = timeCalculator;
 		
+		// TODO only needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
+		this.network = network;
+		
 		this.normalization = normalization;
 		this.sigma = plansCalcRouteConfigGroup.getRoutingRandomness();
 		this.random = sigma != 0 ? MatsimRandom.getLocalInstance() : null;
@@ -84,11 +90,14 @@ public class BicycleTravelDisutility implements TravelDisutility {
 
 	
 	public double getTravelDisutilityBasedOnTTime(Link link, double enterTime, Person person, Vehicle vehicle, double travelTime) {
-		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
-		String type = (String) link.getAttributes().getAttribute("type");
-		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
+		// TODO only needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
+		Link linkWithAttributes = network.getLinks().get(link.getId());
+		
+		String surface = (String) linkWithAttributes.getAttributes().getAttribute(BicycleLabels.SURFACE);
+		String type = (String) linkWithAttributes.getAttributes().getAttribute("type");
+		String cyclewaytype = (String) linkWithAttributes.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
 
-		double distance = link.getLength();
+		double distance = linkWithAttributes.getLength();
 		
 		double travelTimeDisutility = marginalCostOfTime_s * travelTime;
 		double distanceDisutility = marginalCostOfDistance_m * distance;
@@ -99,7 +108,7 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		double infrastructureFactor = BicycleUtilityUtils.getInfrastructureFactor(type, cyclewaytype);
 		double infrastructureDisutility = marginalCostOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 		
-		double gradientFactor = BicycleUtilityUtils.getGradientFactor(link);
+		double gradientFactor = BicycleUtilityUtils.getGradientFactor(linkWithAttributes);
 		double gradientDisutility = marginalCostOfGradient_m_100m * gradientFactor * distance;
 		
 //		LOG.warn("link = " + link.getId() + "-- travelTime = " + travelTime + " -- distance = " + distance + " -- comfortFactor = "
@@ -134,15 +143,16 @@ public class BicycleTravelDisutility implements TravelDisutility {
 			// do not use custom attributes in core??  but what would be a better solution here?? kai, mar'15
 			// Is this actually used anywhere? As far as I can see, this is at least no used in this class... td, Oct'15
 			person.getCustomAttributes().put("logNormalRnd", logNormalRnd ) ;
+			person.getAttributes().putAttribute("logNormalRnd", logNormalRnd);
 		} else {
 			logNormalRnd = 1. ;
 		}
 
-		LOG.warn("link = " + link.getId() + " -- travelTimeDisutility = " + travelTimeDisutility + " -- distanceDisutility = "+ distanceDisutility
-				+ " -- infrastructureDisutility = " + infrastructureDisutility + " -- comfortDisutility = "
-				+ comfortDisutility + " -- gradientDisutility = " + gradientDisutility + " -- randomfactor = " + logNormalRnd);
-//		double disutility = travelTimeDisutility + logNormalRnd * (distanceDisutility + infrastructureDisutility + comfortDisutility + gradientDisutility);
-		double disutility = travelTimeDisutility + logNormalRnd * distanceDisutility + (infrastructureDisutility + comfortDisutility + gradientDisutility);
+		LOG.warn("person = " + person.getId() + " / link = " + linkWithAttributes.getId() + " / travelTimeDisutility = " + travelTimeDisutility
+				+ " / distanceDisutility = "+ distanceDisutility + " / infrastructureDisutility = " + infrastructureDisutility + " / comfortDisutility = "
+				+ comfortDisutility + " / gradientDisutility = " + gradientDisutility + " / randomfactor = " + logNormalRnd);
+		double disutility = travelTimeDisutility + logNormalRnd * (distanceDisutility + infrastructureDisutility + comfortDisutility + gradientDisutility);
+//		double disutility = travelTimeDisutility + logNormalRnd * distanceDisutility + (infrastructureDisutility + comfortDisutility + gradientDisutility);
 		LOG.warn("---------- disutility = " + disutility);
 		return disutility;
 	}

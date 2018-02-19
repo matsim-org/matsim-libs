@@ -19,6 +19,7 @@
 package org.matsim.contrib.bicycle;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
@@ -38,29 +39,32 @@ public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
 	@Inject	PlanCalcScoreConfigGroup cnScoringGroup;
 	@Inject	PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	
+	// TODO only needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
+	@Inject Scenario scenario;
+	
 	private static int normalisationWrnCnt = 0;
 	
 	@Override
 	public TravelDisutility createTravelDisutility(TravelTime timeCalculator) {
 		// V1 -- Own re-implementation
-		double sigma = plansCalcRouteConfigGroup.getRoutingRandomness();
-		
-		double normalization = 1;
-		if ( sigma != 0. ) {
-			normalization = 1. / Math.exp(sigma * sigma / 2);
-			if (normalisationWrnCnt < 10) {
-				normalisationWrnCnt++;
-				LOG.info(" sigma: " + sigma + "; resulting normalization: " + normalization);
-			}
-		}
-		return new BicycleTravelDisutility(bicycleConfigGroup, cnScoringGroup, plansCalcRouteConfigGroup, timeCalculator, normalization);
+//		double sigma = plansCalcRouteConfigGroup.getRoutingRandomness();
+//		
+//		double normalization = 1;
+//		if ( sigma != 0. ) {
+//			normalization = 1. / Math.exp(sigma * sigma / 2);
+//			if (normalisationWrnCnt < 10) {
+//				normalisationWrnCnt++;
+//				LOG.info(" sigma: " + sigma + "; resulting normalization: " + normalization);
+//			}
+//		}
+//		return new BicycleTravelDisutility(scenario.getNetwork(), bicycleConfigGroup, cnScoringGroup, plansCalcRouteConfigGroup, timeCalculator, normalization);
 		//
 		
 		// V2 -- Delegation to RandomizingTimeDistanceTravelDisutilityFactory
-//		RandomizingTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new RandomizingTimeDistanceTravelDisutilityFactory("bicycle", cnScoringGroup);
-//		travelDisutilityFactory.setSigma(plansCalcRouteConfigGroup.getRoutingRandomness());
-//		TravelDisutility timeDistanceDisutility = travelDisutilityFactory.createTravelDisutility(timeCalculator);
-//		return new BicycleTravelDisutilityV2(timeDistanceDisutility, bicycleConfigGroup, cnScoringGroup);
+		RandomizingTimeDistanceTravelDisutilityFactory travelDisutilityFactory = new RandomizingTimeDistanceTravelDisutilityFactory("bicycle", cnScoringGroup);
+		travelDisutilityFactory.setSigma(plansCalcRouteConfigGroup.getRoutingRandomness());
+		TravelDisutility timeDistanceDisutility = travelDisutilityFactory.createTravelDisutility(timeCalculator);
+		return new BicycleTravelDisutilityV2(scenario.getNetwork(), timeDistanceDisutility, bicycleConfigGroup, cnScoringGroup);
 		//
 	}
 }
