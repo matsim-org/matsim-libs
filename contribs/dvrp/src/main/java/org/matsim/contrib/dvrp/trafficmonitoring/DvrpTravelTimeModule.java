@@ -19,13 +19,8 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-
-import com.google.inject.*;
-import com.google.inject.name.*;
 
 /**
  * Travel times recorded during the previous iteration. They are always updated after the mobsim ends. This is the
@@ -37,17 +32,11 @@ public class DvrpTravelTimeModule extends AbstractModule {
 	public static final String DVRP_ESTIMATED = "dvrp_estimated";
 
 	public void install() {
-		bind(TravelTime.class).annotatedWith(Names.named(DvrpTravelTimeModule.DVRP_INITIAL))
-				.toInstance(new FreeSpeedTravelTime());
+		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_INITIAL).toInstance(new FreeSpeedTravelTime());
+		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_OBSERVED).to(networkTravelTime());
+
 		bind(DvrpTravelTimeEstimator.class).to(DvrpTravelTimeEstimatorImpl.class).asEagerSingleton();
 		addTravelTimeBinding(DVRP_ESTIMATED).to(DvrpTravelTimeEstimator.class);
 		addMobsimListenerBinding().to(DvrpTravelTimeEstimator.class);
-	}
-
-	@Provides
-	@Named(DvrpTravelTimeModule.DVRP_OBSERVED)
-	@Singleton
-	TravelTime provideTravelTime(@Named(TransportMode.car) TravelTime observedTT) {
-		return observedTT;
 	}
 }
