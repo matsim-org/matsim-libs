@@ -47,6 +47,7 @@ public class BicycleTest {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
+	@Ignore
 	@Test
 	public void testNormal() {
 		String configFile = "./src/main/resources/bicycle_example/config.xml";
@@ -75,7 +76,7 @@ public class BicycleTest {
 		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 	
-	@Ignore
+	//@Ignore
 	@Test
 	public void testCobblestone() {
 		String configFile = "./src/main/resources/bicycle_example/config.xml";
