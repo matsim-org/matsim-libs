@@ -82,6 +82,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			DrtRequest req = reqIter.next();
 			Optional<BestInsertion> best = insertionProblem.findBestInsertion(req, vData.getEntries());
 			if (!best.isPresent()) {
+				req.setRejected(true);
 				eventsManager.processEvent(new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), req.getId()));
 				if (drtCfg.isPrintDetailedWarnings()) {
 					Logger.getLogger(getClass())

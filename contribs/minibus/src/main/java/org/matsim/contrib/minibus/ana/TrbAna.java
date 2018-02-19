@@ -40,8 +40,8 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.Vehicle;
 
@@ -124,7 +124,7 @@ final class TrbAna implements PersonEntersVehicleEventHandler, PersonLeavesVehic
 		
 		Scenario sc = ScenarioUtils.createScenario(c);
 		new MatsimNetworkReader(sc.getNetwork()).readFile("F:/p_runs/txl/network.final.xml.gz");
-		new TransitScheduleReaderV1(sc).readFile(transitSchedule);
+		new TransitScheduleReader(sc).readFile(transitSchedule);
 		
 		TrbAna ana = new TrbAna("para_", "tr_", sc.getNetwork(), sc.getTransitSchedule(), c);
 		EventsManager manager = EventsUtils.createEventsManager();
