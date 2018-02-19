@@ -105,13 +105,13 @@ public class WOBDemandGeneratorCensus {
 
 	public static void main(String[] args) {
 		
-		String inbase = "D:/Axer/CEMDAP2/cemdap-vw/"; 
-		String commuterFileOutgoing1 = inbase +"add_data/commuters/031NS2009Ga_adjustedZonesAndSelectedAreas.txt";
+		String inbase = "C:\\Users\\VW7N5TD\\Desktop\\Programme\\MatSim\\CEMDAP\\InputOutput\\cemdap-vw\\"; 
+		String commuterFileOutgoing1 = inbase +"add_data\\commuters\\031NS2009Ga_adjustedZonesAndSelectedAreas.txt";
 		String[] commuterFilesOutgoing = {commuterFileOutgoing1};
-		String shapeFile1 = inbase + "add_data/shp/nssa.shp";
-		String shapeFile2 = inbase + "add_data/shp/wvi-zones.shp";
+		String shapeFile1 = inbase + "add_data\\shp\\nssa.shp";
+		String shapeFile2 = inbase + "add_data\\shp\\wvi-zones.shp";
 		
-		String outputBase = inbase + "/cemdap_input/";
+		String outputBase = inbase + "\\cemdap_input\\";
 
 		
 		WOBZoneAndLOSGeneratorV2 zoneAndLOSGeneratorV2 = new WOBZoneAndLOSGeneratorV2(commuterFilesOutgoing, shapeFile1, shapeFile2, outputBase);
@@ -120,7 +120,7 @@ public class WOBDemandGeneratorCensus {
 		// Input and output files
 	
 		
-		String censusFile = inbase +"add_data/zensus/Zensus11_Datensatz_Bevoelkerung_Niedersachsen_selected.csv";
+		String censusFile = inbase +"add_data\\zensus\\Zensus11_Datensatz_Bevoelkerung_Niedersachsen_selected.csv";
 		
 		// Parameters
 		int numberOfPlansPerPerson = 5;
