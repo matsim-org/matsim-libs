@@ -71,8 +71,8 @@ public class ManipulateAndFilterPopulation {
 	static String serachMode = "pt";
 	static String newMode = "drt";
 	String shapeFeature = "NO";
-	static double samplePct = 0.1; //Global sample ratio
-	static double replancementPct = 0.5; //Ratio of mode substitution 
+	static double samplePct = 0.01; //Global sample ratio
+	static double replancementPct = 1.0; //Ratio of mode substitution 
 	String searchedActivityName = "home";
 	
 	//Constructor which reads the shape file for later use!

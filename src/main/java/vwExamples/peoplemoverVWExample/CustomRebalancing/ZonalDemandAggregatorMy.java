@@ -19,59 +19,41 @@
 
 package vwExamples.peoplemoverVWExample.CustomRebalancing;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
-
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.dvrp.data.Request;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.contrib.drt.passenger.events.*;
-import org.matsim.contrib.drt.data.DrtRequest;
 
 
 
-/**
- * @author  axer
- *
- */
-/**
- *
- */
+
 public class ZonalDemandAggregatorMy implements DrtRequestSubmittedEventHandler, DrtRequestRejectedEventHandler  {
 	private final DrtZonalSystem zonalSystem;
 	private final int binsize = 600; //Time resolution to store demand (departures)
-	private Map<Double,Map<String,MutableInt>> departures = new HashMap<>();
-	private Map<Double,Map<String,MutableInt>> previousIterationDepartures = new HashMap<>();
+	private Map<Double,Map<String,MutableInt>> rejections = new HashMap<>();
+	private Map<Double,Map<String,MutableInt>> previousIterationRejections = new HashMap<>();
 	
 	private Map<Id<Request>,DrtRequestSubmittedEvent> submittedRequestsMap = new HashMap<>();
 	private Map<Id<Request>,DrtRequestRejectedEvent> rejectedRequestsMap = new HashMap<>();
 	
+	
+	
 	private int nOfIterStarts;
 	//private final String mode;
+	
+	public Map<Id<Vehicle>,Integer> vehicleBlackListMap = new HashMap<>();
 
-	
-	
+
 	
 	/**
 	 * 
@@ -85,35 +67,39 @@ public class ZonalDemandAggregatorMy implements DrtRequestSubmittedEventHandler,
 		
 	}
 	
+	
+	
 	@Override
 	public void reset(int iteration){
+		double alpha = 0.15;
 		nOfIterStarts = iteration;
 		
 		//Clear this every iteration:
 		submittedRequestsMap.clear();
 		rejectedRequestsMap.clear(); //Each reject is looked up in submittedRequestsMap in order to get it's coordinates. 
+		vehicleBlackListMap.clear(); //Clear vehicleBlackListMap at each iteration!
 		
-		//Clear all previousIterationDepartures
-		//previousIterationDepartures is needed in order to get an estimate of the rejectedRequests in the simulation
+		//Clear all previousIterationRejections
+		//previousIterationRejections is needed in order to get an estimate of the rejectedRequests in the simulation
 		
 		//At iteration 0 (iteration 1 for this class), the simulation needs to learn traffic conditions
 		//At iteration 1 (iteration 2 for this class), the simulation learns the first time where we have rejected trips
 		if (nOfIterStarts > 1 && nOfIterStarts <= 2 ) 
 			{
-			previousIterationDepartures.clear(); //Clean previousIterationDepartures
-			previousIterationDepartures.putAll(departures); //Fill previousIterationDepartures with knowledge of current iteration
+			previousIterationRejections.clear(); //Clean previousIterationRejections
+			previousIterationRejections.putAll(rejections); //Fill previousIterationRejections with knowledge of current iteration
 			}
 		
 		//At iteration 2 (iteration 3 for this class) or higher, we keep the knowledge of rejected trips over each iteration,
 		//Otherwise the results would oscillate between a good iteration with small rejects and a iteration with high 
 		if (nOfIterStarts >= 3)  {
 		
-			//Update previousIterationDepartures by comparing current departures and previousIterationDepartures
-			//previousIterationDepartures is current (remaining departures) + previousIterationDepartures
+			//Update previousIterationRejections --> Expectation for next iteration
+			//previousIterationRejections = currentRejections + previousIterationRejections
 			
-			
+			//rejections contains the information of all rejections measured within last iteration
 			//Loop over all bins
-			for (Entry<Double, Map<String, MutableInt>> bin : departures.entrySet())
+			for (Entry<Double, Map<String, MutableInt>> bin : rejections.entrySet())
 			{
 				Double binKey = bin.getKey();
 				
@@ -125,34 +111,23 @@ public class ZonalDemandAggregatorMy implements DrtRequestSubmittedEventHandler,
 						String zoneKey = zone.getKey();
 						
 						//Get currentDeparture in this iteration
-						MutableInt currentDeparture = zone.getValue();
+						double currentRejections = zone.getValue().doubleValue();
 						
 						//Get previousIterationDepartures
-						MutableInt prevDeparture = previousIterationDepartures.get(binKey).get(zoneKey);
+						double prevRejects = previousIterationRejections.get(binKey).get(zoneKey).doubleValue();
 						
-						int predictedDemand = (prevDeparture.getValue()+currentDeparture.getValue());
-						
-						
-//						if ((currentDeparture != null) && (prevDeparture != null))
-//						{
-//							if (currentDeparture.getValue() != 0)
-//							{
-//							factor = predictedDemand/currentDeparture.getValue();
-//							}
-//
-//							
-//						}
-//						
+						//Exponential smoothing of predictedRejects
+						double predictedRejects = (currentRejections*alpha + prevRejects * (1.0-alpha));
+								
 						//Set departures that are used predict the number of rejected trips per zone
-						previousIterationDepartures.get(binKey).get(zoneKey).setValue(predictedDemand);
+						previousIterationRejections.get(binKey).get(zoneKey).setValue(Math.ceil(predictedRejects));
 					}
-				
-				
+
 			}
 			
 		}
 		
-		departures.clear(); //Clear departures to store new rejectedRequests of current iteration
+		rejections.clear(); //Clear rejections to store new rejectedRequests of current iteration
 		prepareZones(); //Initialize zones again in order to store new rejectedRequests of current iteration
 
 	}
@@ -166,7 +141,7 @@ public class ZonalDemandAggregatorMy implements DrtRequestSubmittedEventHandler,
 			for (String zone : zonalSystem.getZones().keySet()){
 				zonesPerSlot.put(zone, new MutableInt());
 			}
-			departures.put(Double.valueOf(i),zonesPerSlot);
+			rejections.put(Double.valueOf(i),zonesPerSlot);
 
 		}
 	}
@@ -176,9 +151,9 @@ public class ZonalDemandAggregatorMy implements DrtRequestSubmittedEventHandler,
 		return Math.floor(time/binsize); 
 	}
 	
-	public Map<String,MutableInt> getExpectedDemandForTimeBin(double time){
+	public Map<String,MutableInt> getExpectedRejectsForTimeBin(double time){
 		Double bin = getBinForTime(time);
-		return previousIterationDepartures.get(bin);
+		return previousIterationRejections.get(bin);
 		
 	}
 	
@@ -209,8 +184,8 @@ public class ZonalDemandAggregatorMy implements DrtRequestSubmittedEventHandler,
 			Logger.getLogger(getClass()).error("No zone found for linkId "+ originaleRquest.getFromLinkId().toString());
 			return;
 		}
-		if (departures.containsKey(bin)){
-			this.departures.get(bin).get(zoneId).increment();
+		if (rejections.containsKey(bin)){
+			this.rejections.get(bin).get(zoneId).increment();
 			}
 	
 		
@@ -225,6 +200,12 @@ public class ZonalDemandAggregatorMy implements DrtRequestSubmittedEventHandler,
 	public int getnOfIterStarts() {
 		return nOfIterStarts;
 	}
+
+
+
+	
+	
+
 
 
 	

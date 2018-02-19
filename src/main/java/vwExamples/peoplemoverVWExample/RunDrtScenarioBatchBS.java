@@ -37,7 +37,10 @@ import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import peoplemover.ClosestStopBasedDrtRoutingModule;
 import vwExamples.peoplemoverVWExample.CustomRebalancing.DemandBasedRebalancingStrategyMy;
+import vwExamples.peoplemoverVWExample.CustomRebalancing.RelocationWriter;
 import vwExamples.peoplemoverVWExample.CustomRebalancing.ZonalDemandAggregatorMy;
+import vwExamples.peoplemoverVWExample.CustomRebalancing.ZonalIdleVehicleCollectorMy;
+import vwExamples.peoplemoverVWExample.CustomRebalancing.ZonalRelocationAggregatorMy;
 
 /** * @author axer */
 
@@ -65,7 +68,7 @@ public class RunDrtScenarioBatchBS {
 		//runIds are used for consistent simulation identification. Our runIds are maintained in an excel file: 
 		
 
-		List<String> runIdList = Arrays.asList("pt_drt_0.1");
+		List<String> runIdList = Arrays.asList("pt_drt_0.01");
 //		List<Integer> stopTimeList = Arrays.asList(15,30,60);
 		List<Integer> stopTimeList = Arrays.asList(15);
 		Integer idx = 0;
@@ -84,7 +87,7 @@ public class RunDrtScenarioBatchBS {
 			boolean otfvis = false;
 			
 			//Overwrite existing configuration parameters
-			config.plans().setInputFile("population/vw208_sampleRate0.1replaceRate_0.5_pt_drt.xml.gz");
+			config.plans().setInputFile("population/vw208_sampleRate0.01replaceRate_1.0_pt_drt.xml.gz");
 			config.controler().setLastIteration(5); //Number of simulation iterations
 			config.controler().setWriteEventsInterval(1); //Write Events file every x-Iterations 
 			config.controler().setWritePlansInterval(1); //Write Plan file every x-Iterations
@@ -105,6 +108,7 @@ public class RunDrtScenarioBatchBS {
 
 			
 			//Use custom stop duration
+			//drt.setEstimatedSpeed(5.0);
 			drt.setStopDuration(15);
 			drt.setMaxTravelTimeBeta(300);
 			drt.setMaxTravelTimeAlpha(1.3);
@@ -133,7 +137,7 @@ public class RunDrtScenarioBatchBS {
 			
 
 			System.out.println("Rebalancing Online");
-			drt.setRebalancingInterval(1800);
+			drt.setRebalancingInterval(600);
 			
 			
 			
@@ -150,6 +154,8 @@ public class RunDrtScenarioBatchBS {
 					bind(DrtZonalSystem.class).toInstance(zones);
 					bind(RebalancingStrategy.class).to(DemandBasedRebalancingStrategyMy.class).asEagerSingleton();
 					bind(ZonalDemandAggregatorMy.class).asEagerSingleton();
+					bind(ZonalIdleVehicleCollectorMy.class).asEagerSingleton();
+					bind(ZonalRelocationAggregatorMy.class).asEagerSingleton();
 				}
 			});
 			
@@ -166,8 +172,10 @@ public class RunDrtScenarioBatchBS {
 					// tt[i] = alpha * experiencedTT + (1 - alpha) * oldEstimatedTT;
 					// Remark: Small alpha leads to more smoothing and longer lags in reaction. Default alpha is 0.05. Which means i.e. 0.3 is not smooth in comparison to 0.05
 					DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.15); 
+					addControlerListenerBinding().to(RelocationWriter.class).asEagerSingleton();
 				}
 			});
+			
 			
 			
 			//We finally run the controller to start MATSim
