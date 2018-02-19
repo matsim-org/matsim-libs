@@ -56,7 +56,7 @@ public class RunBicycleExample {
 		config.global().setNumberOfThreads(1);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		
-		config.plansCalcRoute().setRoutingRandomness(1.);
+		config.plansCalcRoute().setRoutingRandomness(3.);
 				
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
@@ -127,6 +127,7 @@ public class RunBicycleExample {
 		bicycle.setMarginalUtilityOfDistance(-0.0004); // util/m
 		bicycle.setMarginalUtilityOfTraveling(-6.0); // util/h
 		bicycle.setMonetaryDistanceRate(0.);
+		config.planCalcScore().addModeParams(bicycle);
 		
 		config.plansCalcRoute().setNetworkModes(mainModeList);
 		
