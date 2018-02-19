@@ -34,9 +34,6 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 public interface PrecalculatablePathDataProvider extends PathDataProvider {
 	void precalculatePathData(DrtRequest drtRequest, Collection<Entry> vEntries);
 
-	default void shutdown() {
-	}
-
 	static PathDataSet getPathDataSet(DrtRequest drtRequest, Entry vEntry, Map<Id<Link>, PathData> pathsToPickupMap,
 			Map<Id<Link>, PathData> pathsFromPickupMap, Map<Id<Link>, PathData> pathsToDropoffMap,
 			Map<Id<Link>, PathData> pathsFromDropoffMap) {
