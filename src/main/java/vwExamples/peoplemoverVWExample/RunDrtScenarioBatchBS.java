@@ -171,8 +171,9 @@ public class RunDrtScenarioBatchBS {
 					// Link travel times are iterativly updated between iteration
 					// tt[i] = alpha * experiencedTT + (1 - alpha) * oldEstimatedTT;
 					// Remark: Small alpha leads to more smoothing and longer lags in reaction. Default alpha is 0.05. Which means i.e. 0.3 is not smooth in comparison to 0.05
-					DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.15); 
-					addControlerListenerBinding().to(RelocationWriter.class).asEagerSingleton();
+					DvrpConfigGroup.get(config).setTravelTimeEstimationAlpha(0.15);
+					bind(RelocationWriter.class).asEagerSingleton();
+					addControlerListenerBinding().to(RelocationWriter.class);
 				}
 			});
 			

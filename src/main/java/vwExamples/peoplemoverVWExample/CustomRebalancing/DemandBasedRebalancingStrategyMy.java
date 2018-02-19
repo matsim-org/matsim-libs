@@ -72,18 +72,20 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 	private DrtZonalSystem zonalSystem;
 	private Network network;
 	private ZonalRelocationAggregatorMy reloacatedVehicles;
-	private RelocationWriter relocationWriter = new RelocationWriter();
+	private RelocationWriter relocationWriter;
 	
 
 
 	@Inject
-	public DemandBasedRebalancingStrategyMy(ZonalIdleVehicleCollectorMy idleVehicles, ZonalDemandAggregatorMy demandAggregator, DrtZonalSystem zonalSystem, @Named(DvrpModule.DVRP_ROUTING) Network network, ZonalRelocationAggregatorMy reloacatedVehicles) {
+	public DemandBasedRebalancingStrategyMy(ZonalIdleVehicleCollectorMy idleVehicles, ZonalDemandAggregatorMy demandAggregator,
+			DrtZonalSystem zonalSystem, @Named(DvrpModule.DVRP_ROUTING) Network network, ZonalRelocationAggregatorMy reloacatedVehicles,
+			RelocationWriter relocationWriter) {
 		this.reloacatedVehicles = reloacatedVehicles;
 		this.idleVehicles = idleVehicles;
 		this.demandAggregator = demandAggregator;
 		this.zonalSystem = zonalSystem;
 		this.network = network;
-//		this.relocationWriter = new RelocationWriter();
+		this.relocationWriter = relocationWriter;
 		
 	}
 	
