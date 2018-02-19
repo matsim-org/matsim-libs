@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.bicycle.run;
+package org.matsim.contrib.bicycle;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -27,8 +27,6 @@ import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.bicycle.MotorizedInteractionEvent;
-import org.matsim.contrib.bicycle.MotorizedInteractionEventHandler;
 import org.matsim.core.events.algorithms.Vehicle2DriverEventHandler;
 import org.matsim.core.scoring.SumScoringFunction;
 import org.matsim.vehicles.Vehicle;
@@ -36,8 +34,8 @@ import org.matsim.vehicles.Vehicle;
 /**
  * @author dziemke
  */
-public class BicycleScoring implements SumScoringFunction.ArbitraryEventScoring, MotorizedInteractionEventHandler {
-	private static final Logger LOG = Logger.getLogger(BicycleScoring.class);
+public class BicycleLinkScoring implements SumScoringFunction.ArbitraryEventScoring, MotorizedInteractionEventHandler {
+	private static final Logger LOG = Logger.getLogger(BicycleLinkScoring.class);
 	
 	private Scenario scenario;
 	private BicycleTravelDisutility bicycleTravelDisutility;
@@ -48,7 +46,7 @@ public class BicycleScoring implements SumScoringFunction.ArbitraryEventScoring,
 	private double score;
 	private int carCountOnLink;
 	
-	public BicycleScoring(Scenario scenario, BicycleTravelTime bicycleTravelTime, BicycleTravelDisutilityFactory bicycleTravelDisutilityFactory) {
+	public BicycleLinkScoring(Scenario scenario, BicycleTravelTime bicycleTravelTime, BicycleTravelDisutilityFactory bicycleTravelDisutilityFactory) {
 				this.scenario = scenario;
 		this.bicycleTravelDisutility = (BicycleTravelDisutility) bicycleTravelDisutilityFactory.createTravelDisutility(bicycleTravelTime);
 	}
@@ -116,7 +114,8 @@ public class BicycleScoring implements SumScoringFunction.ArbitraryEventScoring,
 			this.score += carScoreOffset;
 			LOG.warn("----- link = " + linkId + " -- car score offset = " + carScoreOffset);
 			
-			this.score += bicycleTravelDisutility.getTravelDisutilityBasedOnTTime(link, enterTime, person, vehicle, travelTime);
+//			this.score += bicycleTravelDisutility.getTravelDisutilityBasedOnTTime(link, enterTime, person, vehicle, travelTime);
+			this.score += bicycleTravelDisutility.getLinkTravelDisutility(link, enterTime, person, vehicle);
 //			LOG.warn("score = " + score + " -- linkId = " + link.getId() + " -- enterTime = " + enterTime + " -- personId = " + person.getId() + " -- travelTime = " + travelTime);
 		}
 		else {
