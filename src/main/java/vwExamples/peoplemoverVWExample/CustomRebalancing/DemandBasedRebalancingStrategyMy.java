@@ -54,7 +54,10 @@ import org.matsim.contrib.util.distance.DistanceUtils;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import com.google.inject.name.Named;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 
 
 
@@ -176,7 +179,14 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 		{
 			System.out.println("Moving vehicle = "+ reloc.vehicle.getId().toString() + " from Link = " + getLastLink(reloc.vehicle,time).getId().toString() +" --> " + reloc.link.getId().toString());
 			
-			relocationWriter.setRelocation("Test");
+			double x1=getLastLink(reloc.vehicle,time).getCoord().getX();
+			double y1=getLastLink(reloc.vehicle,time).getCoord().getY();
+			double x2=reloc.link.getCoord().getX();
+			double y2=reloc.link.getCoord().getY();
+			
+			LineString lineSegment = new GeometryFactory().createLineString(new Coordinate[]{new Coordinate(x1,y1),new Coordinate(x2,y2)}) ;
+			
+			relocationWriter.setRelocation(reloc.vehicle.getId().toString()+";"+ time +";"+lineSegment.toString());
 			//Store relocation in relocations
 			Double bin = reloacatedVehicles.getBinForTime(time);
 			String zoneId = zonalSystem.getZoneForLinkId(reloc.link.getId());

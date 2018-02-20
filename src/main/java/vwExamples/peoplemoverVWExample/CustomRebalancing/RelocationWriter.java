@@ -40,7 +40,7 @@ public void notifyIterationEnds(IterationEndsEvent event) {
 }
 
 private void writeRelocations(int iteration) {
-	collection2Text(relocationsLog,matsimServices.getControlerIO().getIterationFilename(iteration, "drt_relocations.csv"),"TestHeader1;TestHeader2");
+	collection2Text(relocationsLog,matsimServices.getControlerIO().getIterationFilename(iteration, "drt_relocations.csv"),"vehicleID;time;beeline");
 	relocationsLog.clear();
 }
 

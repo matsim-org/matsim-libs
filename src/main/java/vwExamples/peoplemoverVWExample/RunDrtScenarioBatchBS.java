@@ -68,7 +68,7 @@ public class RunDrtScenarioBatchBS {
 		//runIds are used for consistent simulation identification. Our runIds are maintained in an excel file: 
 		
 
-		List<String> runIdList = Arrays.asList("pt_drt_0.01");
+		List<String> runIdList = Arrays.asList("pt_drt_0.1_100veh");
 //		List<Integer> stopTimeList = Arrays.asList(15,30,60);
 		List<Integer> stopTimeList = Arrays.asList(15);
 		Integer idx = 0;
@@ -79,7 +79,7 @@ public class RunDrtScenarioBatchBS {
 			//Some config parameters will be taken from the provided config file
 			//Other config parameters will be generated or modified dynamically within this loop
 			//Define the path to the config file and enable / disable otfvis
-			final Config config = ConfigUtils.loadConfig("D:/Axer/MatsimDataStore/WOB_BS_DRT/BS/input/config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+			final Config config = ConfigUtils.loadConfig("C:\\Temp\\input\\config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 			
 
 			//OTFVis is an open source, OpenGL-based visualizer for looking at MATSim scenarios and output.
@@ -87,7 +87,7 @@ public class RunDrtScenarioBatchBS {
 			boolean otfvis = false;
 			
 			//Overwrite existing configuration parameters
-			config.plans().setInputFile("population/vw208_sampleRate0.01replaceRate_1.0_pt_drt.xml.gz");
+			config.plans().setInputFile("population/vw208_sampleRate0.1replaceRate_0.5_pt_drt.xml.gz");
 			config.controler().setLastIteration(5); //Number of simulation iterations
 			config.controler().setWriteEventsInterval(1); //Write Events file every x-Iterations 
 			config.controler().setWritePlansInterval(1); //Write Plan file every x-Iterations
@@ -116,11 +116,11 @@ public class RunDrtScenarioBatchBS {
 			drt.setStopDuration(stoptime);
 			drt.setTransitStopFile("../input/virtualstops/stopsGrid_400m.xml");
 			
-			config.controler().setOutputDirectory("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\output\\"+runId); //Define dynamically the the output path
+			config.controler().setOutputDirectory("C:\\Temp\\output\\"+runId); //Define dynamically the the output path
 			
 			
 			//For each demand scenario we are using a predefined drt vehicle fleet size 
-			drt.setVehiclesFile("fleets/fleet_50.xml.gz");
+			drt.setVehiclesFile("fleets/fleet_100.xml.gz");
 			
 			
 			//Define the MATSim Controler
