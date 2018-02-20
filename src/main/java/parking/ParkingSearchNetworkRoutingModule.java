@@ -256,14 +256,13 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
         ParkingZone parkingZone = this.zoneToLinks.getParkingZone(egressActLink);
         if (parkingZone==null) return null;
 
-        Link parkingLink = parkingZone.getLinkParkingProbabilities()
-                                      .entrySet()
-                                      .stream()
-                                      .filter(e -> e.getKey() <= randNr)
-                                      .findFirst()
-                                      .get()
-                                      .getValue();
-        return parkingLink;
+        double cumSum =0.;
+        for(Map.Entry<Double,Link> prob : parkingZone.getLinkParkingProbabilities().entrySet()) {
+            cumSum += prob.getKey();
+            if (randNr <= cumSum) return prob.getValue();
+        }
+        // following exception may be replaced by warning and null, however must be checked first.
+        throw new RuntimeException("No parking link is found. The cumulative sum of the probabilities is "+ cumSum);
     }
 
     private Link decideOnLink(final Facility fromFacility) {

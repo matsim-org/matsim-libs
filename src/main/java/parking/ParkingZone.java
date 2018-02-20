@@ -70,11 +70,11 @@ public class ParkingZone implements Identifiable<ParkingZone> {
 //    }
 
     public SortedMap<Double, Link> getLinkParkingProbabilities() { // this must be recalculated whenever required.
-        SortedMap<Double, Link> linkToPakringProbs = new TreeMap<>();
+        SortedMap<Double, Link> linkToParkingProbs = new TreeMap<>();
         for (Map.Entry<Link,Double> entry : this.LinkToParkingCapacity.entrySet()){
-            linkToPakringProbs.put(entry.getValue() / this.zoneParkingCapacity, entry.getKey());
+            linkToParkingProbs.put(entry.getValue() / this.zoneParkingCapacity, entry.getKey());
         }
-        return linkToPakringProbs;
+        return linkToParkingProbs;
     }
 
     @Override
