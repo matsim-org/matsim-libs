@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -97,9 +96,9 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
     private String stageActivityType;
     private String parkingStageActivityType;
 
-    private ZoneToLinks zoneToLinks;
+    private ZonalLinkParkingInfo zoneToLinks;
 
-    private final Map<Id<Person>,Link> personToParkLink = new HashMap<>();
+    private final Map<Id<Person>, Link> personToParkLink = new HashMap<>();
 
     public ParkingSearchNetworkRoutingModule(
             final String mode,
@@ -107,7 +106,7 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
             final Network network,
             final LeastCostPathCalculator routeAlgo,
             PlansCalcRouteConfigGroup calcRouteConfig,
-            ZoneToLinks zoneToLinks) {
+            ZonalLinkParkingInfo zoneToLinks) {
         Gbl.assertNotNull(network);
         Gbl.assertIf(network.getLinks().size() > 0); // otherwise network for mode probably not defined
         this.network = network;
@@ -139,7 +138,10 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
         // so that agent walk back to where car is parked.
         if (personToParkLink.containsKey(person.getId())) {
             accessActLink = personToParkLink.remove(person.getId());
-            log.warn("Person "+person.getId()+" is walking to "+accessActLink.getId()+ " to get the car.");
+            log.warn("Person " + person.getId() + " is walking to " + accessActLink.getId() + " to get the car.");
+            // increase the parking capacity counter
+            this.zoneToLinks.getParkingZone(accessActLink)
+                            .updateLinkParkingCapacity(accessActLink, +1);// can be dependent on PCU of the vehicle
         }
 
         Link egressActLink = decideOnLink(toFacility);
@@ -192,15 +194,16 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
             Leg newLeg = this.populationFactory.createLeg(this.mode);
             newLeg.setDepartureTime(now);
             // get egressActLink from zone and avg park time from Zone
-            Link parkEndLink =  getParkLink( egressActLink ) ;
-            if (parkEndLink.getId().equals(egressActLink.getId())) {
+            Link parkEndLink = getParkLink(egressActLink);
+            if (parkEndLink == null ) {
                 // vehicle is outside the study area
             } else {
-                log.warn("Person "+person.getId()+" started looking for parking on link "+egressActLink.getId()+ " and found parking on link "+ parkEndLink.getId());
+                log.warn("Person " + person.getId() + " started looking for parking on link " + egressActLink.getId() + " and found parking on link " + parkEndLink
+                        .getId());
                 now += routeLeg(person, newLeg, egressActLink, parkEndLink, now);
 
                 // an activity will help in identifying the start of the parking search
-                final Activity interactionActivity =  PopulationUtils.createActivityFromCoordAndLinkId(this.parkingStageActivityType,
+                final Activity interactionActivity = PopulationUtils.createActivityFromCoordAndLinkId(this.parkingStageActivityType,
                         egressActLink.getToNode().getCoord(),
                         egressActLink.getId());
                 interactionActivity.setMaximumDuration(0.0);
@@ -210,6 +213,10 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
                 this.personToParkLink.put(person.getId(), parkEndLink);
                 egressActLink = parkEndLink; // <- this is new egressActLink. Amit Feb'18
 //                log.warn( newLeg );
+                // decrease the parking capacity counter
+                this.zoneToLinks.getParkingZone(parkEndLink)
+                                .updateLinkParkingCapacity(parkEndLink,
+                                        -1);// can be dependent on PCU of the vehicle type
             }
         }
 
@@ -244,24 +251,19 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
     }
 
     private Link getParkLink(Link egressActLink) {
-        Optional<List<Id<Link>>> first = this.zoneToLinks.getZoneToLinks()
-                                                     .values()
-                                                     .stream()
-                                                     .filter(list -> list.contains(egressActLink.getId()))
-                                                     .findFirst();
+        double randNr = MatsimRandom.getRandom().nextDouble();
 
-        List<Id<Link>> links;
-        if (first.isPresent()) links = first.get();
-        else return egressActLink;
+        ParkingZone parkingZone = this.zoneToLinks.getParkingZone(egressActLink);
+        if (parkingZone==null) return null;
 
-        int numberOfLinks = links.size();
-        Id<Link> outLink;
-        int randomIndex;
-        do {
-            randomIndex = MatsimRandom.getRandom().nextInt(numberOfLinks);
-            outLink = links.get(randomIndex);
-        } while ( outLink.equals(egressActLink.getId()) );
-        return this.network.getLinks().get(outLink);
+        Link parkingLink = parkingZone.getLinkParkingProbabilities()
+                                      .entrySet()
+                                      .stream()
+                                      .filter(e -> e.getKey() <= randNr)
+                                      .findFirst()
+                                      .get()
+                                      .getValue();
+        return parkingLink;
     }
 
     private Link decideOnLink(final Facility fromFacility) {

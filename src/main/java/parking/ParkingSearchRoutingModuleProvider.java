@@ -68,7 +68,7 @@ public class ParkingSearchRoutingModuleProvider implements Provider<RoutingModul
     LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 
     @Inject
-    ZoneToLinks zoneToLinks;
+    ZonalLinkParkingInfo zoneToLinks;
 
     ParkingSearchRoutingModuleProvider(String mode) {
        this(mode, mode);

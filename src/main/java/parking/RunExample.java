@@ -60,13 +60,13 @@ public class RunExample {
         //
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        ZoneToLinks zoneToLinks =  new ZoneToLinks( shapeFile, "NO", scenario.getNetwork() );
+        ZonalLinkParkingInfo zoneToLinks =  new ZonalLinkParkingInfo( shapeFile, "NO", scenario.getNetwork() );
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                bind(ZoneToLinks.class).toInstance(zoneToLinks);
+                bind(ZonalLinkParkingInfo.class).toInstance(zoneToLinks);
                 addRoutingModuleBinding(TransportMode.car).toProvider(new ParkingSearchRoutingModuleProvider(TransportMode.car));
             }
         });
