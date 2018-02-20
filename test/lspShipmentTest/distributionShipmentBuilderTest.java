@@ -50,12 +50,12 @@ public class distributionShipmentBuilderTest {
         	while(true) {
         		Collections.shuffle(linkList);
         		Link pendingToLink = linkList.get(0);
-        		if((pendingToLink.getFromNode().getCoord().getX() <= 18 &&
-        			pendingToLink.getFromNode().getCoord().getY() <= 4 &&
-        			pendingToLink.getFromNode().getCoord().getX() >= 14 &&       			
-        			pendingToLink.getToNode().getCoord().getX() <= 18 &&
-        			pendingToLink.getToNode().getCoord().getY() <= 4  &&
-        			pendingToLink.getToNode().getCoord().getX() >= 14	)) {
+        		if((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
+        			pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
+        			pendingToLink.getFromNode().getCoord().getX() >= 14000 &&       			
+        			pendingToLink.getToNode().getCoord().getX() <= 18000 &&
+        			pendingToLink.getToNode().getCoord().getY() <= 4000  &&
+        			pendingToLink.getToNode().getCoord().getX() >= 14000	)) {
         		   builder.setToLinkId(pendingToLink.getId());
         		   break;	
         		}

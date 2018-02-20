@@ -120,7 +120,7 @@ public class CompleteLSPSchedulingTest {
         firstReloadingPointBuilder.setReloadingScheduler(firstReloadingSchedulerBuilder.build());
         Resource firstReloadingPointAdapter = firstReloadingPointBuilder.build();
         
-        Id<LogisticsSolutionElement> firstReloadingElementId = Id.create("FiretReloadElement", LogisticsSolutionElement.class);
+        Id<LogisticsSolutionElement> firstReloadingElementId = Id.create("FirstReloadElement", LogisticsSolutionElement.class);
 		LogisticsSolutionElementImpl.Builder firstReloadingElementBuilder = LogisticsSolutionElementImpl.Builder.newInstance(firstReloadingElementId);
 		firstReloadingElementBuilder.setResource(firstReloadingPointAdapter);
 		LogisticsSolutionElement firstReloadElement = firstReloadingElementBuilder.build();
@@ -269,12 +269,12 @@ public class CompleteLSPSchedulingTest {
 	        	while(true) {
 	        		Collections.shuffle(linkList, rand);
 	        		Link pendingToLink = linkList.get(0);
-	        		if((pendingToLink.getFromNode().getCoord().getX() <= 18 &&
-	        			pendingToLink.getFromNode().getCoord().getY() <= 4 &&
-	        			pendingToLink.getFromNode().getCoord().getX() >= 14 &&       			
-	        			pendingToLink.getToNode().getCoord().getX() <= 18 &&
-	        			pendingToLink.getToNode().getCoord().getY() <= 4  &&
-	        			pendingToLink.getToNode().getCoord().getX() >= 14	)) {
+	        		if((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
+	        			pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
+	        			pendingToLink.getFromNode().getCoord().getX() >= 14000 &&       			
+	        			pendingToLink.getToNode().getCoord().getX() <= 18000 &&
+	        			pendingToLink.getToNode().getCoord().getY() <= 4000  &&
+	        			pendingToLink.getToNode().getCoord().getX() >= 14000	)) {
 	        		   builder.setToLinkId(pendingToLink.getId());
 	        		   break;	
 	        		}
@@ -284,10 +284,10 @@ public class CompleteLSPSchedulingTest {
 	        	while(true) {
 	        		Collections.shuffle(linkList, rand);
 	        		Link pendingFromLink = linkList.get(0);
-	        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4 &&
-	        		   pendingFromLink.getFromNode().getCoord().getY() <= 4 &&
-	        		   pendingFromLink.getToNode().getCoord().getX() <= 4 &&
-	        		   pendingFromLink.getToNode().getCoord().getY() <= 4    ) {
+	        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
+	        		   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
+	        		   pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
+	        		   pendingFromLink.getToNode().getCoord().getY() <= 4000    ) {
 	        		   builder.setFromLinkId(pendingFromLink.getId());
 	        		   break;	
 	        		}
@@ -314,7 +314,7 @@ public class CompleteLSPSchedulingTest {
 			Collections.sort(elementList, new AbstractShipmentPlanElementComparator());
 			System.out.println();
 			for(AbstractShipmentPlanElement element : elementList) {
-				System.out.println(element.getSolutionElement().getId() + " " + element.getResourceId() + " " + element.getElementType() + " " + element.getStartTime() + " " + element.getEndTime());	
+				System.out.println(element.getSolutionElement().getId() + "\t\t" + element.getResourceId() + "\t\t" + element.getElementType() + "\t\t" + element.getStartTime() + "\t\t" + element.getEndTime());	
 			}			
 			System.out.println();
 		}

@@ -151,10 +151,10 @@ public class CollectionLSPReplanningTest {
         	while(true) {
         		Collections.shuffle(linkList, random);
         		Link pendingFromLink = linkList.get(0);
-        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4 &&
-        		   pendingFromLink.getFromNode().getCoord().getY() <= 4 &&
-        		   pendingFromLink.getToNode().getCoord().getX() <= 4 &&
-        		   pendingFromLink.getToNode().getCoord().getY() <= 4) {
+        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
+        		   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
+        		   pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
+        		   pendingFromLink.getToNode().getCoord().getY() <= 4000) {
         		   builder.setFromLinkId(pendingFromLink.getId());
         		   break;	
         		}	

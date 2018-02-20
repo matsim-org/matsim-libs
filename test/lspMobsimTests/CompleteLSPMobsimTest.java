@@ -281,12 +281,12 @@ public class CompleteLSPMobsimTest {
 	        	while(true) {
 	        		Collections.shuffle(linkList);
 	        		Link pendingToLink = linkList.get(0);
-	        		if((pendingToLink.getFromNode().getCoord().getX() <= 18 &&
-	        			pendingToLink.getFromNode().getCoord().getY() <= 4 &&
-	        			pendingToLink.getFromNode().getCoord().getX() >= 14 &&       			
-	        			pendingToLink.getToNode().getCoord().getX() <= 18 &&
-	        			pendingToLink.getToNode().getCoord().getY() <= 4  &&
-	        			pendingToLink.getToNode().getCoord().getX() >= 14	)) {
+	        		if((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
+	        			pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
+	        			pendingToLink.getFromNode().getCoord().getX() >= 14000 &&       			
+	        			pendingToLink.getToNode().getCoord().getX() <= 18000 &&
+	        			pendingToLink.getToNode().getCoord().getY() <= 4000  &&
+	        			pendingToLink.getToNode().getCoord().getX() >= 14000	)) {
 	        		   builder.setToLinkId(pendingToLink.getId());
 	        		   break;	
 	        		}
@@ -296,10 +296,10 @@ public class CompleteLSPMobsimTest {
 	        	while(true) {
 	        		Collections.shuffle(linkList);
 	        		Link pendingFromLink = linkList.get(0);
-	        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4 &&
-	        		   pendingFromLink.getFromNode().getCoord().getY() <= 4 &&
-	        		   pendingFromLink.getToNode().getCoord().getX() <= 4 &&
-	        		   pendingFromLink.getToNode().getCoord().getY() <= 4    ) {
+	        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
+	        		   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
+	        		   pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
+	        		   pendingFromLink.getToNode().getCoord().getY() <= 4000    ) {
 	        		   builder.setFromLinkId(pendingFromLink.getId());
 	        		   break;	
 	        		}
@@ -343,11 +343,11 @@ public class CompleteLSPMobsimTest {
 			Collections.sort(logElements, new AbstractShipmentPlanElementComparator());
 			System.out.println();
 			for(int i = 0; i < shipment.getSchedule().getPlanElements().size(); i++) {
-				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "  " + scheduleElements.get(i).getResourceId() +"  "+ scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + " End: " + scheduleElements.get(i).getEndTime());
+				System.out.println("Scheduled: " + scheduleElements.get(i).getSolutionElement().getId() + "\t" + scheduleElements.get(i).getResourceId() +"\t"+ scheduleElements.get(i).getElementType() + " Start: " + scheduleElements.get(i).getStartTime() + "\t End: " + scheduleElements.get(i).getEndTime());
 			}
 			System.out.println();
 			for(int i = 0; i < shipment.getLog().getPlanElements().size(); i++) {
-				System.out.println("Logged: " + logElements.get(i).getSolutionElement().getId() + "  " + logElements.get(i).getResourceId() +"  " + logElements.get(i).getElementType() + " Start: " + logElements.get(i).getStartTime() + " End: " + logElements.get(i).getEndTime());
+				System.out.println("Logged: " + logElements.get(i).getSolutionElement().getId() + "\t" + logElements.get(i).getResourceId() +"\t" + logElements.get(i).getElementType() + " Start: " + logElements.get(i).getStartTime() + "\t End: " + logElements.get(i).getEndTime());
 			}
 		
 		}

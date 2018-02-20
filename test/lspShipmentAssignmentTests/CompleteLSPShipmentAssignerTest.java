@@ -265,12 +265,12 @@ public class CompleteLSPShipmentAssignerTest {
 	        	while(true) {
 	        		Collections.shuffle(linkList);
 	        		Link pendingToLink = linkList.get(0);
-	        		if((pendingToLink.getFromNode().getCoord().getX() <= 18 &&
-	        			pendingToLink.getFromNode().getCoord().getY() <= 4 &&
-	        			pendingToLink.getFromNode().getCoord().getX() >= 14 &&       			
-	        			pendingToLink.getToNode().getCoord().getX() <= 18 &&
-	        			pendingToLink.getToNode().getCoord().getY() <= 4  &&
-	        			pendingToLink.getToNode().getCoord().getX() >= 14	)) {
+	        		if((pendingToLink.getFromNode().getCoord().getX() <= 18000 &&
+	        			pendingToLink.getFromNode().getCoord().getY() <= 4000 &&
+	        			pendingToLink.getFromNode().getCoord().getX() >= 14000 &&       			
+	        			pendingToLink.getToNode().getCoord().getX() <= 18000 &&
+	        			pendingToLink.getToNode().getCoord().getY() <= 4000 &&
+	        			pendingToLink.getToNode().getCoord().getX() >= 14000	)) {
 	        		   builder.setToLinkId(pendingToLink.getId());
 	        		   break;	
 	        		}
@@ -280,10 +280,10 @@ public class CompleteLSPShipmentAssignerTest {
 	        	while(true) {
 	        		Collections.shuffle(linkList);
 	        		Link pendingFromLink = linkList.get(0);
-	        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4 &&
-	        		   pendingFromLink.getFromNode().getCoord().getY() <= 4 &&
-	        		   pendingFromLink.getToNode().getCoord().getX() <= 4 &&
-	        		   pendingFromLink.getToNode().getCoord().getY() <= 4    ) {
+	        		if(pendingFromLink.getFromNode().getCoord().getX() <= 4000 &&
+	        		   pendingFromLink.getFromNode().getCoord().getY() <= 4000 &&
+	        		   pendingFromLink.getToNode().getCoord().getX() <= 4000 &&
+	        		   pendingFromLink.getToNode().getCoord().getY() <= 4000    ) {
 	        		   builder.setFromLinkId(pendingFromLink.getId());
 	        		   break;	
 	        		}
