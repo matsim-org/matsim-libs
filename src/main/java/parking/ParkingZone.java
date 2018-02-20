@@ -25,13 +25,14 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 
 /**
  * Created by amit on 20.02.18.
  */
 
-public class ParkingZone {
+public class ParkingZone implements Identifiable<ParkingZone> {
 
     private final Id<ParkingZone> parkingZoneId;
 
@@ -76,7 +77,8 @@ public class ParkingZone {
         return linkToPakringProbs;
     }
 
-    public Id<ParkingZone> getId(){
+    @Override
+    public Id<ParkingZone> getId() {
         return this.parkingZoneId;
     }
 }
