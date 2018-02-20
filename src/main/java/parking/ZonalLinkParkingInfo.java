@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.SortedMap;
 import com.vividsolutions.jts.geom.Geometry;
 import org.matsim.api.core.v01.Id;
@@ -112,6 +113,18 @@ public class ZonalLinkParkingInfo {
             parkingProbs.entrySet()
                         .forEach(e -> System.out.println("Parking probability for link " + e.getValue().getId() + " in parking zone id " + parkingZone
                                 .getId() + " is " + e.getKey()));
+        }
+        //
+        double randNr = new Random().nextDouble(); //MatsimRandom.getRandom().nextDouble();
+
+        double cumSum =0.;
+        for(Map.Entry<Double,Link> prob : parkingZone.getLinkParkingProbabilities().entrySet()) {
+            cumSum += prob.getKey();
+            if (randNr <= cumSum) {
+                System.out.println("\n\nFor the given probability of "+randNr+", the chosen parking link is "+prob.getValue().getId());
+                break;
+            }
+            System.out.println("Cumulative sum of the probabilities: "+cumSum);
         }
     }
 }
