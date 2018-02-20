@@ -36,7 +36,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-public class DvrpTravelTimeEstimatorImpl implements DvrpTravelTimeEstimator, MobsimBeforeCleanupListener {
+public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, MobsimBeforeCleanupListener {
 	private final TravelTime observedTT;
 	private final Network network;
 
@@ -46,21 +46,21 @@ public class DvrpTravelTimeEstimatorImpl implements DvrpTravelTimeEstimator, Mob
 	private final double alpha;
 
 	@Inject
-	public DvrpTravelTimeEstimatorImpl(@Named(DvrpTravelTimeModule.DVRP_INITIAL) TravelTime initialTT,
+	public DvrpOfflineTravelTimeEstimator(@Named(DvrpTravelTimeModule.DVRP_INITIAL) TravelTime initialTT,
 			@Named(DvrpTravelTimeModule.DVRP_OBSERVED) TravelTime observedTT,
 			@Named(DvrpModule.DVRP_ROUTING) Network network, TravelTimeCalculatorConfigGroup ttCalcConfig,
 			DvrpConfigGroup dvrpConfig) {
 		this(initialTT, observedTT, network, ttCalcConfig, dvrpConfig.getTravelTimeEstimationAlpha());
 	}
 
-	public DvrpTravelTimeEstimatorImpl(TravelTime initialTT, TravelTime observedTT, Network network,
+	public DvrpOfflineTravelTimeEstimator(TravelTime initialTT, TravelTime observedTT, Network network,
 			TravelTimeCalculatorConfigGroup ttCalcConfig, double travelTimeEstimationAlpha) {
 		this.observedTT = observedTT;
 		this.network = network;
 
 		alpha = travelTimeEstimationAlpha;
 		if (alpha > 1 || alpha <= 0) {
-			throw new RuntimeException("travelTimeEstimationAlpha must be in (0,1]");
+			throw new IllegalArgumentException("travelTimeEstimationAlpha must be in (0,1]");
 		}
 
 		interval = ttCalcConfig.getTraveltimeBinSize();

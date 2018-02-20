@@ -51,5 +51,9 @@ public class DvrpConfigConsistencyChecker implements ConfigConsistencyChecker {
 		if (alpha > 1 || alpha <= 0) {
 			throw new RuntimeException("travelTimeEstimationAlpha must be in (0,1]");
 		}
+
+		if (dvrpCfg.getTravelTimeEstimationBeta() < 0) {
+			throw new RuntimeException("travelTimeEstimationBeta must be zero or positive");
+		}
 	}
 }
