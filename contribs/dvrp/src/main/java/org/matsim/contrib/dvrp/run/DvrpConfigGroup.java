@@ -22,7 +22,8 @@ package org.matsim.contrib.dvrp.run;
 import java.util.Map;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.config.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "dvrp";
@@ -35,11 +36,13 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	public static final String MODE = "mode";
 	public static final String NETWORK_MODE = "networkMode";
 	public static final String TRAVEL_TIME_ESTIMATION_ALPHA = "travelTimeEstimationAlpha";
+	public static final String TRAVEL_TIME_ESTIMATION_BETA = "travelTimeEstimationBeta";
 
 	private String mode = null; // travel mode (passengers'/customers' perspective)
 	private String networkMode = TransportMode.car; // used for building routes, calculating travel times, etc.
-										// (dispatcher's perspective)
-	private double travelTimeEstimationAlpha = 0.05; // between 0 and 1; 0=> no averaging, only the initial time is used
+	// (dispatcher's perspective)
+	private double travelTimeEstimationAlpha = 0.05; // in (0, 1]; 1 => TTs from the last iteration only
+	private double travelTimeEstimationBeta = 0; // in [s], in [0, +oo); 0 => only offline TT estimation
 
 	public DvrpConfigGroup() {
 		super(GROUP_NAME);
@@ -50,17 +53,37 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 		Map<String, String> map = super.getComments();
 		map.put(MODE, "Mode which will be handled by PassengerEngine and VrpOptimizer "
 				+ "(passengers'/customers' perspective)");
-		map.put(NETWORK_MODE,
-				"Mode of which the network will be used for routing vehicles, calculating trave times, "
-						+ "etc. (fleet operator's perspective). "
-						+ "Default is car.");
-		map.put(TRAVEL_TIME_ESTIMATION_ALPHA,
-				"Used for estimation of travel times for VrpOptimizer by means of the exponential moving average."
+		map.put(NETWORK_MODE, "Mode of which the network will be used for routing vehicles, calculating trave times, "
+				+ "etc. (fleet operator's perspective). " + "Default is car.");
+		map.put(TRAVEL_TIME_ESTIMATION_ALPHA, //
+				"Used for OFFLINE estimation of travel times for VrpOptimizer"
+						+ " by means of the exponential moving average."
 						+ " The weighting decrease, alpha, must be in (0,1]."
 						+ " We suggest small values of alpha, e.g. 0.05."
 						+ " The averaging starts from the initial travel time estimates. If not provided,"
-						+ " the free-speed TTs is used as the initial estimates"
-						+ " For more info see comments in: VrpTravelTimeEstimator, VrpTravelTimeModules, DvrpModule.");
+						+ " the free-speed TTs is used as the initial estimates");
+		map.put(TRAVEL_TIME_ESTIMATION_BETA,
+				"Used for ONLINE estimation of travel times for VrpOptimizer"
+						+ " by combining WithinDayTravelTime and DvrpOfflineTravelTimeEstimator."
+						+ " The beta coefficient is provided in seconds and should be either 0 (no online estimation)"
+						+ " or positive (mixed online-offline estimation)."
+						/////
+						+ " For 'beta = 0', only the offline estimate is used:" + " 'onlineTT(t) = offlineTT(t)',"
+						+ " where 'offlineTT(t)' in the offline estimate for TT at time 't',"
+						/////
+						+ " For 'beta > 0', estimating future TTs at time 't',"
+						+ " uses the currently observed TT to correct the offline estimates is made:"
+						+ " where 'currentTT' is the currently observed TT,"
+						+ " and 'correction = min(1, max(0, 1 - (time - currentTime) / beta))'"
+						////
+						+ " The rule is that correction decreases linearly from 1 (when 'time = currentTime')"
+						+ " to 0 (when 'time = currentTime + beta'"
+						+ " For 'time > currentTime + beta' correction is 0,"
+						+ " whereas if 'time < currentTime' it is 1."
+						////
+						+ " If beta is sufficinelty large, 'beta >> 0', only the currently observed TT is used.");
+		// In DVRP 'time < currentTime' may only happen for backward path search, a adding proper search termination
+		// criterion should prevent this from happening
 		return map;
 	}
 
@@ -92,5 +115,15 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(TRAVEL_TIME_ESTIMATION_ALPHA)
 	public void setTravelTimeEstimationAlpha(double travelTimeEstimationAlpha) {
 		this.travelTimeEstimationAlpha = travelTimeEstimationAlpha;
+	}
+
+	@StringGetter(TRAVEL_TIME_ESTIMATION_BETA)
+	public double getTravelTimeEstimationBeta() {
+		return travelTimeEstimationBeta;
+	}
+
+	@StringSetter(TRAVEL_TIME_ESTIMATION_BETA)
+	public void setTravelTimeEstimationBeta(double travelTimeEstimationBeta) {
+		this.travelTimeEstimationBeta = travelTimeEstimationBeta;
 	}
 }

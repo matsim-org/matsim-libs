@@ -19,11 +19,10 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.router.util.TravelTime;
 
 /**
  * @author michalm
  */
-public interface DvrpTravelTimeEstimator extends TravelTime, MobsimListener {
+public interface DvrpTravelTimeEstimator extends TravelTime {
 }

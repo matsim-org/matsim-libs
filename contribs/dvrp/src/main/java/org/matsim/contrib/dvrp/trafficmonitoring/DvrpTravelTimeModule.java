@@ -19,8 +19,10 @@
 
 package org.matsim.contrib.dvrp.trafficmonitoring;
 
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
 /**
  * Travel times recorded during the previous iteration. They are always updated after the mobsim ends. This is the
@@ -34,9 +36,22 @@ public class DvrpTravelTimeModule extends AbstractModule {
 	public void install() {
 		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_INITIAL).toInstance(new FreeSpeedTravelTime());
 		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_OBSERVED).to(networkTravelTime());
-
-		bind(DvrpTravelTimeEstimator.class).to(DvrpTravelTimeEstimatorImpl.class).asEagerSingleton();
 		addTravelTimeBinding(DVRP_ESTIMATED).to(DvrpTravelTimeEstimator.class);
-		addMobsimListenerBinding().to(DvrpTravelTimeEstimator.class);
+
+		bind(DvrpOfflineTravelTimeEstimator.class).asEagerSingleton();
+		addMobsimListenerBinding().to(DvrpOfflineTravelTimeEstimator.class);
+
+		if (DvrpConfigGroup.get(getConfig()).getTravelTimeEstimationBeta() > 0) {// online estimation
+			bind(DvrpOnlineTravelTimeEstimator.class).asEagerSingleton();
+			addMobsimListenerBinding().to(DvrpOnlineTravelTimeEstimator.class);
+			bind(DvrpTravelTimeEstimator.class).to(DvrpOnlineTravelTimeEstimator.class);
+
+			bind(WithinDayTravelTime.class).asEagerSingleton();
+			addEventHandlerBinding().to(WithinDayTravelTime.class);
+			addMobsimListenerBinding().to(WithinDayTravelTime.class);
+
+		} else { // offline estimation
+			bind(DvrpTravelTimeEstimator.class).to(DvrpOfflineTravelTimeEstimator.class);
+		}
 	}
 }
