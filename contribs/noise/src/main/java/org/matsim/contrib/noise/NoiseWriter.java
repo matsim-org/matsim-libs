@@ -106,7 +106,7 @@ public class NoiseWriter {
 		
 		String file2 = fileName + "receiverPoints.csv" ;
 		if ( useCompression ) {
-			fileName += ".gz" ;
+			file2 += ".gz" ;
 		}
 			
 		// For all maps, the number of keys should be the same
