@@ -31,6 +31,11 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
 /**
+ * Online estimation of travel times for VrpOptimizer by combining WithinDayTravelTime and
+ * DvrpOfflineTravelTimeEstimator. The beta coefficient is provided in seconds and should be either 0 (no online
+ * estimation) or positive (mixed online-offline estimation). If beta is sufficiently large, 'beta >> 0', only the
+ * currently observed TT is used
+ * 
  * @author michalm
  */
 public class DvrpOnlineTravelTimeEstimator implements DvrpTravelTimeEstimator, MobsimInitializedListener {

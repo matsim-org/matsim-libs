@@ -25,8 +25,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
 /**
- * Travel times recorded during the previous iteration. They are always updated after the mobsim ends. This is the
- * standard approach for running DVRP
+ * @author michalm
  */
 public class DvrpTravelTimeModule extends AbstractModule {
 	public static final String DVRP_INITIAL = "dvrp_initial";
