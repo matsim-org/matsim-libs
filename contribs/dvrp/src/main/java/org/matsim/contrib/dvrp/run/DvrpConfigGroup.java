@@ -81,7 +81,7 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 						+ " For 'time > currentTime + beta' correction is 0,"
 						+ " whereas if 'time < currentTime' it is 1."
 						////
-						+ " If beta is sufficinelty large, 'beta >> 0', only the currently observed TT is used.");
+						+ " If beta is sufficiently large, 'beta >> 0', only the currently observed TT is used.");
 		// In DVRP 'time < currentTime' may only happen for backward path search, a adding proper search termination
 		// criterion should prevent this from happening
 		return map;
