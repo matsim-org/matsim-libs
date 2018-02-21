@@ -29,7 +29,6 @@ import org.matsim.contrib.dvrp.data.*;
  * @author michalm
  */
 public class DrtRequestScheduledEvent extends Event {
-
 	public static final String EVENT_TYPE = "DrtRequest scheduled";
 
 	public static final String ATTRIBUTE_REQUEST = "request";
@@ -55,28 +54,30 @@ public class DrtRequestScheduledEvent extends Event {
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
+
 	/**
 	 * the ID of the request
 	 */
 	public Id<Request> getRequestId() {
 		return requestId;
 	}
+
 	/**
-	 *  the vehicle scheduled to the request
+	 * the vehicle scheduled to the request
 	 */
 	public Id<Vehicle> getVehicleId() {
 		return vehicleId;
 	}
 
 	/**
-	 *  the <b>estimated</b> pickup time of the request
+	 * the <b>estimated</b> pickup time of the request
 	 */
 	public double getPickupTime() {
 		return pickupTime;
 	}
 
 	/**
-	 *  the <b>estimated</b> arrival time of the request
+	 * the <b>estimated</b> arrival time of the request
 	 */
 	public double getDropoffTime() {
 		return dropoffTime;
