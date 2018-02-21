@@ -39,6 +39,7 @@ public class DrtRoutingModule implements RoutingModule {
 	private final DrtConfigGroup drtconfig;
 	private StageActivityTypes stageActivityTypes;
 	private final Network network;
+
 	@Inject
 	public DrtRoutingModule(Config config, Network network) {
 		this.drtconfig = DrtConfigGroup.get(config);
