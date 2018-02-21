@@ -88,7 +88,7 @@ public class TaxiToRequestAssignmentCostProvider {
 			PathData pathData) {
 		double travelTime = pathData == null ? //
 				params.nullPathCost : // no path (too far away)
-				pathData.firstAndLastLinkTT + pathData.path.travelTime;
+				pathData.getTravelTime();
 		return Math.max(reqEntry.destination.getEarliestStartTime(), departure.time + travelTime);
 	}
 }
