@@ -19,10 +19,13 @@
 
 package org.matsim.contrib.zone;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.util.distance.DistanceCalculators;
+import org.matsim.contrib.util.distance.DistanceUtils;
 
 import com.google.common.collect.Maps;
 
@@ -31,33 +34,14 @@ public class ZonalSystems {
 		double calcDistance(Zone z1, Zone z2);
 	}
 
-	public static final ZonalDistanceCalculator BEELINE_DISTANCE_CALCULATOR = new ZonalDistanceCalculator() {
-		@Override
-		public double calcDistance(Zone z1, Zone z2) {
-			return DistanceCalculators.BEELINE_DISTANCE_CALCULATOR.calcDistance(z1.getCoord(), z2.getCoord());
-		}
-	};
-
 	public static Map<Id<Zone>, List<Zone>> initZonesByDistance(Map<Id<Zone>, Zone> zones) {
-		return initZonesByDistance(zones, BEELINE_DISTANCE_CALCULATOR);
-	}
-
-	public static Map<Id<Zone>, List<Zone>> initZonesByDistance(Map<Id<Zone>, Zone> zones,
-			final ZonalDistanceCalculator distCalc) {
 		Map<Id<Zone>, List<Zone>> zonesByDistance = Maps.newHashMapWithExpectedSize(zones.size());
-		List<Zone> sortedList = new ArrayList<>(zones.values());
-
 		for (final Zone currentZone : zones.values()) {
-			Collections.sort(sortedList, new Comparator<Zone>() {
-				public int compare(Zone z1, Zone z2) {
-					return Double.compare(distCalc.calcDistance(currentZone, z1),
-							distCalc.calcDistance(currentZone, z2));
-				}
-			});
-
-			zonesByDistance.put(currentZone.getId(), new ArrayList<>(sortedList));
+			List<Zone> sortedZones = zones.values().stream()//
+					.sorted(Comparator.comparing(z -> DistanceUtils.calculateSquaredDistance(currentZone, z)))//
+					.collect(Collectors.toList());
+			zonesByDistance.put(currentZone.getId(), sortedZones);
 		}
-
 		return zonesByDistance;
 	}
 }
