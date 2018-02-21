@@ -22,13 +22,6 @@
  */
 package org.matsim.contrib.noise.data;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -37,8 +30,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.noise.NoiseConfigGroup;
 import org.matsim.contrib.noise.handler.NoiseEquations;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
+
+import java.util.*;
 
 /**
  * Contains the grid and further noise-specific information.
@@ -80,15 +76,17 @@ public class NoiseContext {
 	
 	public NoiseContext(Scenario scenario) {
 		this.scenario = scenario;
-				
-		if ((NoiseConfigGroup) this.scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME) == null) {
+
+//		if ((NoiseConfigGroup) this.scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME) == null) {
+		noiseParams = ConfigUtils.addOrGetModule(this.scenario.getConfig(), NoiseConfigGroup.class);
+		if (noiseParams == null) {
 			throw new RuntimeException("Could not find a noise config group. "
 					+ "Check if the custom module is loaded, e.g. 'ConfigUtils.loadConfig(configFile, new NoiseConfigGroup())'"
 					+ " Aborting...");
 		}
 		
-		this.noiseParams = (NoiseConfigGroup) this.scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
-		this.noiseParams.checkNoiseParametersForConsistency();
+//		this.noiseParams = (NoiseConfigGroup) this.scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
+//		this.noiseParams.checkNoiseParametersForConsistency();
 		
 		this.grid = new Grid(scenario);
 				

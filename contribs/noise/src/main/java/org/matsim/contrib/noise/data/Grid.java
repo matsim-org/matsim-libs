@@ -22,13 +22,6 @@
  */
 package org.matsim.contrib.noise.data;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -42,6 +35,13 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.PtConstants;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Computes a grid of receiver points and provides some basic spatial functionality,
@@ -98,7 +98,7 @@ public class Grid {
 			this.consideredActivitiesForReceiverPointGrid.add(consideredActTypesForReceiverPointGridArray[i]);
 		}
 
-		this.noiseParams.checkGridParametersForConsistency();
+//		this.noiseParams.checkGridParametersForConsistency();
 		initialize();
 	}
 
