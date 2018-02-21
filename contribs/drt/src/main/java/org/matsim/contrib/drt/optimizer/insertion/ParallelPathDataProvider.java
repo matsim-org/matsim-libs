@@ -42,6 +42,8 @@ import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
@@ -50,7 +52,7 @@ import com.google.common.collect.ImmutableList;
 /**
  * @author michalm
  */
-public class ParallelPathDataProvider implements PrecalculatablePathDataProvider {
+public class ParallelPathDataProvider implements PrecalculatablePathDataProvider, MobsimBeforeCleanupListener {
 	private static final int MAX_THREADS = 4;
 
 	private final OneToManyPathSearch toPickupPathSearch;
@@ -152,7 +154,7 @@ public class ParallelPathDataProvider implements PrecalculatablePathDataProvider
 	}
 
 	@Override
-	public void shutdown() {
+	public void notifyMobsimBeforeCleanup(@SuppressWarnings("rawtypes") MobsimBeforeCleanupEvent e) {
 		executorService.shutdown();
 	}
 }
