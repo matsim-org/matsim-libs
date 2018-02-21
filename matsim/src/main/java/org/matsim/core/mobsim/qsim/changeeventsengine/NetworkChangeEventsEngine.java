@@ -38,7 +38,7 @@ import java.util.Queue;
 /**
  * @author dgrether
  */
-public class NetworkChangeEventsEngine implements MobsimEngine {
+class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 	private static final Logger log = Logger.getLogger(NetworkChangeEventsEngine.class) ;
 	
 	private Queue<NetworkChangeEvent> networkChangeEventsQueue = null;

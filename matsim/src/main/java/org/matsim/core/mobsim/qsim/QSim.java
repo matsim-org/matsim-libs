@@ -36,7 +36,7 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngineI;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
@@ -414,7 +414,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 			// NOTE: in the same way as one can register departure handler or activity handler, we could allow to
 			// register abort handlers.  If someone ever comes to this place here and needs this.  kai, nov'17
 			
-			this.agents.remove(agent) ;
+			this.agents.remove(agent.getId()) ;
 			this.agentCounter.decLiving();
 			this.agentCounter.incLost();
 			break ;
@@ -651,10 +651,16 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	public final void addNetworkChangeEvent( NetworkChangeEvent event ) {
 		// used (and thus implicitly tested) by bdi-abm-integration project.  A separate core test would be good. kai, feb'18
 		
+		boolean processed = false ;
 		for ( MobsimEngine engine : this.mobsimEngines ) {
-			if ( engine instanceof NetworkChangeEventsEngine ) {
-				((NetworkChangeEventsEngine) engine).addNetworkChangeEvent( event );
+			if ( engine instanceof NetworkChangeEventsEngineI ) {
+				((NetworkChangeEventsEngineI) engine).addNetworkChangeEvent( event );
+				processed = true ;
 			}
+		}
+		if ( !processed ) {
+			throw new RuntimeException("received a network change event, but did not process it.  Maybe " +
+											   "the network change events engine was not set up for the qsim?  Aborting ...") ;
 		}
 	}
 	
