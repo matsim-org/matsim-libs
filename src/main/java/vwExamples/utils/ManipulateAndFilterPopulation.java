@@ -146,7 +146,7 @@ public static void main(String[] args) {
 											leg.setMode(newMode);
 											//Remove route from leg
 											//leg.setRoute(null);
-											//leg.getAttributes().removeAttribute("trav_time");
+											leg.getAttributes().removeAttribute("trav_time");
 											//System.out.println(leg);
 											
 //										}
