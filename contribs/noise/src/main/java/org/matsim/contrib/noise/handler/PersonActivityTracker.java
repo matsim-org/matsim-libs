@@ -39,6 +39,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.noise.data.NoiseContext;
+import org.matsim.contrib.noise.data.NoiseReceiverPoint;
 import org.matsim.contrib.noise.data.PersonActivityInfo;
 import org.matsim.contrib.noise.data.ReceiverPoint;
 import org.matsim.pt.PtConstants;
@@ -112,13 +113,7 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 							countWarn++;
 						}
 					} else {
-						if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(person.getId()) != null) {
-							this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(person.getId()).add(actInfo);
-						} else {
-							ArrayList<PersonActivityInfo> personActivityInfos = new ArrayList<PersonActivityInfo>();
-							personActivityInfos.add(actInfo);
-							this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().put(person.getId(), personActivityInfos);
-						}
+						this.noiseContext.getReceiverPoints().get(rpId).addPersonActInfo(person.getId(), actInfo);
 					}
 				}
 			}
@@ -167,17 +162,9 @@ public class PersonActivityTracker implements ActivityEndEventHandler , Activity
 					actInfo.setStartTime(event.getTime());
 					actInfo.setEndTime(30 * 3600.); // assuming this activity to be the last one in the agents' plan, will be overwritten if it is not the last activity
 					actInfo.setActivityType(event.getActType());
-					
-					if (this.noiseContext.getReceiverPoints().get(rpId) != null) {
-						
-						if (this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(event.getPersonId()) != null) {
-							this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().get(event.getPersonId()).add(actInfo);
-						
-						} else {
-							ArrayList<PersonActivityInfo> personActivityInfos = new ArrayList<PersonActivityInfo>();
-							personActivityInfos.add(actInfo);
-							this.noiseContext.getReceiverPoints().get(rpId).getPersonId2actInfos().put(event.getPersonId(), personActivityInfos);
-						}
+					NoiseReceiverPoint nrp = null;
+					if ((nrp = this.noiseContext.getReceiverPoints().get(rpId) )!= null) {
+						nrp.addPersonActInfo(event.getPersonId(), actInfo);
 					}
 				}
 			}
