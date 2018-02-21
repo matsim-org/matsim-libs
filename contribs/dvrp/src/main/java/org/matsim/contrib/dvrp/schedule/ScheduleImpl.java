@@ -91,7 +91,7 @@ public class ScheduleImpl implements Schedule {
 		double beginTime = task.getBeginTime();
 		double endTime = task.getEndTime();
 		Link beginLink = Tasks.getBeginLink(task);
-		Link endLink = Tasks.getEndLink(task);
+		// Link endLink = Tasks.getEndLink(task);
 		int taskCount = tasks.size();
 
 		if (taskIdx < 0 || taskIdx > taskCount) {

@@ -20,7 +20,6 @@
 package org.matsim.contrib.taxi.util.stats;
 
 import java.util.Collection;
-import java.util.stream.Stream;
 
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.Request;

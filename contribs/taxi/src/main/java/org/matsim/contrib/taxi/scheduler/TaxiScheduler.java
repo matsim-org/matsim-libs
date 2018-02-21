@@ -385,7 +385,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 			TaxiTask task = (TaxiTask)tasks.get(i);
 			double calcEndTime = calcNewEndTime(vehicle, task, newBeginTime);
 
-			if (calcEndTime == Time.UNDEFINED_TIME) {
+			if (Time.isUndefinedTime(calcEndTime)) {
 				schedule.removeTask(task);
 				i--;
 			} else if (calcEndTime < newBeginTime) {// 0 s is fine (e.g. last 'wait')

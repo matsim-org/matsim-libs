@@ -98,7 +98,7 @@ public class DrtVehicleOccupancyEvaluator implements PersonEntersVehicleEventHan
 		if (startTime < 0)
 			startTime = 0;
 		double endTime;
-		if (config.qsim().getEndTime() == Time.UNDEFINED_TIME) {
+		if (Time.isUndefinedTime(config.qsim().getEndTime())) {
 			endTime = 36 * 3600;
 		} else
 			endTime = config.qsim().getEndTime();
