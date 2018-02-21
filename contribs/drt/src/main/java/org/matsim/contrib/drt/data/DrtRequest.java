@@ -24,7 +24,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.contrib.dvrp.passenger.PassengerRequest;
-import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 /**
@@ -56,11 +55,9 @@ public class DrtRequest implements PassengerRequest {
 
 	private DrtStopTask pickupTask = null;
 	private DrtStopTask dropoffTask = null;
-	private final VrpPathWithTravelData unsharedRidePath;
 
 	public DrtRequest(Id<Request> id, MobsimPassengerAgent passenger, Link fromLink, Link toLink,
-			double earliestStartTime, double latestStartTime, double latestArrivalTime, double submissionTime,
-			VrpPathWithTravelData unsharedRidePath) {
+			double earliestStartTime, double latestStartTime, double latestArrivalTime, double submissionTime) {
 		this.id = id;
 		this.submissionTime = submissionTime;
 		this.earliestStartTime = earliestStartTime;
@@ -70,7 +67,6 @@ public class DrtRequest implements PassengerRequest {
 		this.passenger = passenger;
 		this.fromLink = fromLink;
 		this.toLink = toLink;
-		this.unsharedRidePath = unsharedRidePath;
 	}
 
 	@Override
@@ -135,10 +131,6 @@ public class DrtRequest implements PassengerRequest {
 
 	public void setDropoffTask(DrtStopTask dropoffTask) {
 		this.dropoffTask = dropoffTask;
-	}
-
-	public VrpPathWithTravelData getUnsharedRidePath() {
-		return unsharedRidePath;
 	}
 
 	public DrtRequestStatus getStatus() {

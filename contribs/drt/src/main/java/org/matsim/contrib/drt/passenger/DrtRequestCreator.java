@@ -84,6 +84,6 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 				fromLink.getId(), toLink.getId(), unsharedRidePath.getTravelTime(), unsharedDistance));
 
 		return new DrtRequest(id, passenger, fromLink, toLink, departureTime, latestDepartureTime, latestArrivalTime,
-				submissionTime, unsharedRidePath);
+				submissionTime);
 	}
 }

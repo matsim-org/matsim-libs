@@ -53,11 +53,9 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
-import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -117,17 +115,18 @@ public class DynModeTripsAnalyser {
 			waitStats.addValue(trip.getWaitTime());
 			rideStats.addValue(trip.getInVehicleTravelTime());
 			distanceStats.addValue(trip.getTravelDistance());
-			directDistanceStats.addValue(trip.getTravelDistanceEstimate_m());
+			directDistanceStats.addValue(trip.getUnsharedDistanceEstimate_m());
 			traveltimes.addValue(trip.getInVehicleTravelTime() + trip.getWaitTime());
 		}
 		String value = format.format(waitStats.getValues().length) + delimiter + format.format(waitStats.getMean())
-				+ delimiter + format.format(waitStats.getMax()) + delimiter + format.format(waitStats.getPercentile(95)) 
-				+ delimiter+ format.format(waitStats.getPercentile(75))+ delimiter+ format.format(waitStats.getPercentile(50))
-				+ delimiter + format.format(rideStats.getMean()) + delimiter + format.format(distanceStats.getMean())+ delimiter + format.format(directDistanceStats.getMean())
-				+ delimiter + format.format(traveltimes.getMean());
+				+ delimiter + format.format(waitStats.getMax()) + delimiter + format.format(waitStats.getPercentile(95))
+				+ delimiter + format.format(waitStats.getPercentile(75)) + delimiter
+				+ format.format(waitStats.getPercentile(50)) + delimiter + format.format(rideStats.getMean())
+				+ delimiter + format.format(distanceStats.getMean()) + delimiter
+				+ format.format(directDistanceStats.getMean()) + delimiter + format.format(traveltimes.getMean());
 		return value;
 	}
-	
+
 	public static double getDirectDistanceMean(List<DynModeTrip> trips) {
 
 		DescriptiveStatistics directDistanceStats = new DescriptiveStatistics();
@@ -136,13 +135,11 @@ public class DynModeTripsAnalyser {
 			if (trip.getToLinkId() == null) {
 				continue;
 			}
-			
-			directDistanceStats.addValue(trip.getTravelDistanceEstimate_m());
+
+			directDistanceStats.addValue(trip.getUnsharedDistanceEstimate_m());
 		}
 		return directDistanceStats.getMean();
 	}
-	
-	
 
 	public static void analyseDetours(Network network, List<DynModeTrip> trips, double beelineDistanceFactor,
 			double freeSpeedModeFactor, String fileName) {
@@ -157,31 +154,24 @@ public class DynModeTripsAnalyser {
 		times.addSeries(timess);
 		distances.addSeries(dist);
 		for (DynModeTrip trip : trips) {
-			Coord fromCoord = network.getLinks().get(trip.getFromLinkId()).getCoord();
 			if (trip.getToLinkId() == null) {
-				continue;
+				continue; // unfinished trip (simulation stopped before arrival)
 			}
-			Coord toCoord = network.getLinks().get(trip.getToLinkId()).getCoord();
-			double distance = beelineDistanceFactor * CoordUtils.calcEuclideanDistance(fromCoord, toCoord);
-			double time = distance / freeSpeedModeFactor;
 
-			dist.add(trip.getTravelDistance(), distance);
-			timess.add((trip.getInVehicleTravelTime() + trip.getWaitTime()), time);
+			dist.add(trip.getTravelDistance(), trip.getUnsharedDistanceEstimate_m());
+			double travelTime = trip.getInVehicleTravelTime() + trip.getWaitTime();
+			timess.add(travelTime, trip.getUnsharedTimeEstimate_m());
 
-			double distanceDetour = trip.getTravelDistance() / distance;
-			if (distanceDetour < 1)
-				distanceDetour = 1;
-			double timeDetour = (trip.getInVehicleTravelTime() + trip.getWaitTime()) / time;
-			if (timeDetour < 1)
-				timeDetour = 1;
-			detours.add(trip.getTravelDistance() + ";" + distance + ";" + distanceDetour + ";"
-					+ (trip.getArrivalTime() - trip.getDepartureTime()) + ";" + time + ";" + timeDetour);
+			double distanceDetour = trip.getTravelDistance() / trip.getUnsharedDistanceEstimate_m();
+			double timeDetour = travelTime / trip.getUnsharedTimeEstimate_m();
+			detours.add(trip.getTravelDistance() + ";" + trip.getUnsharedDistanceEstimate_m() + ";" + distanceDetour
+					+ ";" + travelTime + ";" + trip.getUnsharedTimeEstimate_m() + ";" + timeDetour);
 		}
 		collection2Text(detours, fileName + ".csv",
-				"travelDistance;directDistance;DistanceDetour;TravelTime;estimatedTime;timeDetour");
+				"distance;unsharedDistance;distanceDetour;time;unsharedTime;timeDetour");
 		{
-			final JFreeChart chart = ChartFactory.createScatterPlot("Travel Distances", "travelled Distance [m]",
-					"estimated Distances [m]", distances);
+			final JFreeChart chart = ChartFactory.createScatterPlot("Travel Distances", "travelled distance [m]",
+					"unshared ride distance [m]", distances);
 
 			NumberAxis yAxis = (NumberAxis)((XYPlot)chart.getPlot()).getRangeAxis();
 			NumberAxis xAxis = (NumberAxis)((XYPlot)chart.getPlot()).getDomainAxis();
@@ -189,7 +179,7 @@ public class DynModeTripsAnalyser {
 			ChartSaveUtils.saveAsPNG(chart, fileName + "_distancePlot", 1500, 1500);
 		}
 		final JFreeChart chart2 = ChartFactory.createScatterPlot("Travel Times", "travelled time [s]",
-				"estimated Time [s]", times);
+				"unshared ride time [s]", times);
 		NumberAxis yAxis = (NumberAxis)((XYPlot)chart2.getPlot()).getRangeAxis();
 		NumberAxis xAxis = (NumberAxis)((XYPlot)chart2.getPlot()).getDomainAxis();
 		yAxis.setUpperBound(xAxis.getUpperBound());
@@ -256,7 +246,7 @@ public class DynModeTripsAnalyser {
 				averageWaitC.addOrUpdate(h, Double.valueOf(averageWait));
 				p_5Wait.addOrUpdate(h, Double.valueOf(p_5));
 				p_95Wait.addOrUpdate(h, Double.valueOf(p_95));
-				requests.addOrUpdate(h, rides * 3600. / binsize_s);//normalised [req/h]
+				requests.addOrUpdate(h, rides * 3600. / binsize_s);// normalised [req/h]
 				bw.newLine();
 				bw.write(Time.writeTime(e.getKey()) + ";" + rides + ";" + format.format(averageWait) + ";"
 						+ format.format(min) + ";" + format.format(p_5) + ";" + format.format(p_25) + ";"
@@ -272,7 +262,8 @@ public class DynModeTripsAnalyser {
 			dataset.addSeries(p_95Wait);
 			datasetrequ.addSeries(requests);
 			JFreeChart chart = chartProfile(splitTrips.size(), dataset, "Waiting times", "Wait time (s)");
-			JFreeChart chart2 = chartProfile(splitTrips.size(), datasetrequ, "Ride requests per hour", "Requests per hour (req/h)");
+			JFreeChart chart2 = chartProfile(splitTrips.size(), datasetrequ, "Ride requests per hour",
+					"Requests per hour (req/h)");
 			ChartSaveUtils.saveAsPNG(chart, fileName, 1500, 1000);
 			ChartSaveUtils.saveAsPNG(chart2, fileName + "_requests", 1500, 1000);
 
@@ -382,15 +373,16 @@ public class DynModeTripsAnalyser {
 			double emptyD = dist[0] - dist[2];
 			empty.addValue(emptyD);
 		}
-		double d_r_d_t = revenue.getSum()/driven.getSum();
+		double d_r_d_t = revenue.getSum() / driven.getSum();
 		// bw.write("iteration;vehicles;totalDistance;totalEmptyDistance;emptyRatio;totalRevenueDistance;averageDrivenDistance;averageEmptyDistance;averageRevenueDistance");
 		String result = vehicleDistances.size() + del + format.format(driven.getSum()) + del
 				+ format.format(empty.getSum()) + del + format.format(empty.getSum() / driven.getSum()) + del
 				+ format.format(revenue.getSum()) + del + format.format(driven.getMean()) + del
-				+ format.format(empty.getMean()) + del + format.format(revenue.getMean()) + del + format.format(d_r_d_t);
+				+ format.format(empty.getMean()) + del + format.format(revenue.getMean()) + del
+				+ format.format(d_r_d_t);
 		return result;
 	}
-	
+
 	public static double getTotalDistance(Map<Id<Vehicle>, double[]> vehicleDistances) {
 		DescriptiveStatistics driven = new DescriptiveStatistics();
 		for (double[] dist : vehicleDistances.values()) {

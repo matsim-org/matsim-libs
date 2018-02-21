@@ -40,7 +40,8 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 	private final double waitTime;
 	private double travelTime = Double.NaN;
 	private double travelDistance_m = Double.NaN;
-	private double travelDistanceEstimate_m = Double.NaN;
+	private double unsharedDistanceEstimate_m = Double.NaN;
+	private double unsharedTimeEstimate_m = Double.NaN;
 	private Id<Link> toLink = null;
 	private double arrivalTime = Double.NaN;
 	private final Coord fromCoord;
@@ -79,8 +80,12 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 	}
 	
 
-	public void setTravelDistanceEstimate_m(double travelDistanceEstimate_m) {
-		this.travelDistanceEstimate_m = travelDistanceEstimate_m;
+	public void setUnsharedDistanceEstimate_m(double unsharedDistanceEstimate_m) {
+		this.unsharedDistanceEstimate_m = unsharedDistanceEstimate_m;
+	}
+
+	public void setUnsharedTimeEstimate_m(double unsharedTimeEstimate_m) {
+		this.unsharedTimeEstimate_m = unsharedTimeEstimate_m;
 	}
 
 	public Id<Vehicle> getVehicle() {
@@ -108,8 +113,12 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 	}
 	
 
-	public double getTravelDistanceEstimate_m() {
-		return travelDistanceEstimate_m;
+	public double getUnsharedDistanceEstimate_m() {
+		return unsharedDistanceEstimate_m;
+	}
+	
+	public double getUnsharedTimeEstimate_m() {
+		return unsharedTimeEstimate_m;
 	}
 
 	public void setTravelDistance(double travelDistance_m) {
@@ -177,7 +186,7 @@ public class DynModeTrip implements Comparable<DynModeTrip> {
 		return getDepartureTime() + demitter + getPerson() + demitter + getVehicle() + demitter + getFromLinkId()
 				+ demitter + format.format(fromCoordX) + demitter + format.format(fromCoordY) + demitter + getToLinkId() + demitter + format.format(toCoordX)
 				+ demitter + format.format(toCoordY) + demitter + getWaitTime() + demitter + getArrivalTime() + demitter
-				+ getInVehicleTravelTime() + demitter + format.format(getTravelDistance())+ demitter+ format.format(travelDistanceEstimate_m);
+				+ getInVehicleTravelTime() + demitter + format.format(getTravelDistance())+ demitter+ format.format(unsharedDistanceEstimate_m);
 	}
 
 }

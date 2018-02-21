@@ -66,7 +66,8 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 	final private Map<Id<Vehicle>, Map<Id<Person>, MutableDouble>> inVehicleDistance = new HashMap<>();
 	final private Map<Id<Vehicle>, double[]> vehicleDistances = new HashMap<>();
 	final private Map<Id<Person>, DynModeTrip> currentTrips = new HashMap<>();
-	final private Map<Id<Person>, Double> directDistanceEstimates = new HashMap<>();
+	final private Map<Id<Person>, Double> unsharedDistances = new HashMap<>();
+	final private Map<Id<Person>, Double> unsharedTimes = new HashMap<>();
 	final String mode;
 
 	final private Network network;
@@ -93,12 +94,14 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 
 	@Override
 	public void reset(int iteration) {
-		this.drtTrips.clear();
+		drtTrips.clear();
 		departureTimes.clear();
 		departureLinks.clear();
 		inVehicleDistance.clear();
 		currentTrips.clear();
 		vehicleDistances.clear();
+		unsharedDistances.clear();
+		unsharedTimes.clear();
 	}
 
 	/*
@@ -192,11 +195,13 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 			double departureTime = this.departureTimes.remove(event.getPersonId());
 			double waitTime = event.getTime() - departureTime;
 			Id<Link> departureLink = this.departureLinks.remove(event.getPersonId());
-			double directDistance = this.directDistanceEstimates.remove(event.getPersonId());
+			double unsharedDistance = this.unsharedDistances.remove(event.getPersonId());
+			double unsharedTime = this.unsharedTimes.remove(event.getPersonId());
 			Coord departureCoord = this.network.getLinks().get(departureLink).getCoord();
 			DynModeTrip trip = new DynModeTrip(departureTime, event.getPersonId(), event.getVehicleId(), departureLink,
 					departureCoord, waitTime);
-			trip.setTravelDistanceEstimate_m(directDistance);
+			trip.setUnsharedDistanceEstimate_m(unsharedDistance);
+			trip.setUnsharedTimeEstimate_m(unsharedTime);
 			this.drtTrips.add(trip);
 			this.currentTrips.put(event.getPersonId(), trip);
 			this.inVehicleDistance.get(event.getVehicleId()).put(event.getPersonId(), new MutableDouble());
@@ -217,11 +222,15 @@ public class DynModePassengerStats implements PersonEntersVehicleEventHandler, P
 		return vehicleDistances;
 	}
 
-	/* (non-Javadoc)
-	 * @see org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler#handleEvent(org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler#handleEvent(org.matsim.contrib.drt.
+	 * passenger.events.DrtRequestScheduledEvent)
 	 */
 	@Override
 	public void handleEvent(DrtRequestSubmittedEvent event) {
-		this.directDistanceEstimates.put(event.getPersonId(), event.getUnsharedRideDistance());
+		this.unsharedDistances.put(event.getPersonId(), event.getUnsharedRideDistance());
+		this.unsharedTimes.put(event.getPersonId(), event.getUnsharedRideTime());
 	}
 }
