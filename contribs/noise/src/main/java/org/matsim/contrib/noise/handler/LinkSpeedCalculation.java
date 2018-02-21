@@ -68,16 +68,17 @@ public class LinkSpeedCalculation implements LinkEnterEventHandler, LinkLeaveEve
 				}
 			}
 			
+			NoiseLink noiseLink = this.noiseContext.getNoiseLinks().get(event.getLinkId());
 			if (isHGV || this.noiseContext.getBusVehicleIDs().contains(event.getVehicleId())) {
 				// HGV or Bus
-				if (this.noiseContext.getNoiseLinks().get(event.getLinkId()) != null) {
-					double travelTimeSum = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getTravelTimeHGV_sec() + traveltime;
-					this.noiseContext.getNoiseLinks().get(event.getLinkId()).setTravelTimeHGV_Sec(travelTimeSum);
-					int hgvAgents = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getHgvAgentsLeaving() + 1;
-					this.noiseContext.getNoiseLinks().get(event.getLinkId()).setHgvAgentsLeaving(hgvAgents);
+				if (noiseLink != null) {
+					double travelTimeSum = noiseLink.getTravelTimeHGV_sec() + traveltime;
+					noiseLink.setTravelTimeHGV_Sec(travelTimeSum);
+					int hgvAgents = noiseLink.getHgvAgentsLeaving() + 1;
+					noiseLink.setHgvAgentsLeaving(hgvAgents);
 					
 				} else {
-					NoiseLink noiseLink = new NoiseLink(event.getLinkId());
+					noiseLink = new NoiseLink(event.getLinkId());
 					noiseLink.setTravelTimeHGV_Sec(traveltime);
 					noiseLink.setHgvAgentsLeaving(1);
 					this.noiseContext.getNoiseLinks().put(event.getLinkId(), noiseLink);
@@ -85,14 +86,14 @@ public class LinkSpeedCalculation implements LinkEnterEventHandler, LinkLeaveEve
 							
 			} else {
 				// Car
-				if (this.noiseContext.getNoiseLinks().get(event.getLinkId()) != null) {
-					double travelTimeSum = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getTravelTimeCar_sec() + traveltime;
-					this.noiseContext.getNoiseLinks().get(event.getLinkId()).setTravelTimeCar_Sec(travelTimeSum);
-					int carAgents = this.noiseContext.getNoiseLinks().get(event.getLinkId()).getCarAgentsLeaving() + 1;
-					this.noiseContext.getNoiseLinks().get(event.getLinkId()).setCarAgentsLeaving(carAgents);
+				if (noiseLink != null) {
+					double travelTimeSum = noiseLink.getTravelTimeCar_sec() + traveltime;
+					noiseLink.setTravelTimeCar_Sec(travelTimeSum);
+					int carAgents = noiseLink.getCarAgentsLeaving() + 1;
+					noiseLink.setCarAgentsLeaving(carAgents);
 					
 				} else {
-					NoiseLink noiseLink = new NoiseLink(event.getLinkId());
+					noiseLink = new NoiseLink(event.getLinkId());
 					noiseLink.setTravelTimeCar_Sec(traveltime);
 					noiseLink.setCarAgentsLeaving(1);
 					this.noiseContext.getNoiseLinks().put(event.getLinkId(), noiseLink);
