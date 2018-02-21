@@ -42,12 +42,18 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 	private final RoutingNetworkFactory routingNetworkFactory;
 	private final Map<Network, RoutingNetwork> routingNetworks = new HashMap<>();
 	private final Map<Network, PreProcessEuclidean> preProcessData = new HashMap<>();
+	private final double overdoFactor;
 
 	public FastAStarEuclideanFactory() {
-		this(FastRouterType.ARRAY);		
+		this(1);		
+	}
+	
+	public FastAStarEuclideanFactory(double overdoFactor) {
+		this(FastRouterType.ARRAY, overdoFactor);
 	}
 
-	private FastAStarEuclideanFactory(final FastRouterType fastRouterType) {
+	private FastAStarEuclideanFactory(final FastRouterType fastRouterType, double overdoFactor) {
+		this.overdoFactor = overdoFactor;
 		switch (fastRouterType) {
 		case ARRAY:
 			this.routingNetworkFactory = new ArrayRoutingNetworkFactory();
@@ -81,7 +87,6 @@ public class FastAStarEuclideanFactory implements LeastCostPathCalculatorFactory
 		}
 		FastRouterDelegateFactory fastRouterFactory = new ArrayFastRouterDelegateFactory();
 		
-		final double overdoFactor = 1.0;
 		return new FastAStarEuclidean(routingNetwork, preProcessEuclidean, travelCosts, travelTimes, overdoFactor, fastRouterFactory);
 	}
 }

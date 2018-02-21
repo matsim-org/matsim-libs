@@ -79,7 +79,8 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		this.timer = timer;
 		this.travelTime = travelTime;
 
-		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
+		router = new FastAStarEuclideanFactory(taxiCfg.getAStarEuclideanOverdoFactor()).createPathCalculator(network,
+				travelDisutility, travelTime);
 		initFleet(taxiCfg);
 	}
 
@@ -385,7 +386,7 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 			TaxiTask task = (TaxiTask)tasks.get(i);
 			double calcEndTime = calcNewEndTime(vehicle, task, newBeginTime);
 
-			if (Time.isUndefinedTime(calcEndTime)) {
+			if (calcEndTime == Time.UNDEFINED_TIME) {
 				schedule.removeTask(task);
 				i--;
 			} else if (calcEndTime < newBeginTime) {// 0 s is fine (e.g. last 'wait')
