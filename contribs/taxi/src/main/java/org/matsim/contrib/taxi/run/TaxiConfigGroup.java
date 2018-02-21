@@ -55,8 +55,8 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 
 	private boolean destinationKnown = false;
 	private boolean vehicleDiversion = false;
-	private double pickupDuration = Double.NaN;// seconds
-	private double dropoffDuration = Double.NaN;// seconds
+	private Double pickupDuration = null;// seconds
+	private Double dropoffDuration = null;// seconds
 	private double AStarEuclideanOverdoFactor = 1.;
 	private boolean onlineVehicleTracker = false;
 	private boolean changeStartLinkToLastLinkInSchedule = false;

@@ -55,15 +55,15 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public static final String PRINT_WARNINGS = "plotDetailedWarnings";
 	public static final String NUMBER_OF_THREADS = "numberOfThreads";
 
-	private double stopDuration = Double.NaN;// seconds
-	private double maxWaitTime = Double.NaN;// seconds
+	private Double stopDuration = null;// seconds
+	private Double maxWaitTime = null;// seconds
 
 	// max arrival time defined as:
 	// maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta,
 	// where unshared_ride_travel_time(fromLink, toLink) is calculated with FastAStarEuclidean
 	// (hence AStarEuclideanOverdoFactor needs to be specified)
-	private double maxTravelTimeAlpha = Double.NaN;// [-], >= 1.0
-	private double maxTravelTimeBeta = Double.NaN;// [s], >= 0.0
+	private Double maxTravelTimeAlpha = null;// [-], >= 1.0
+	private Double maxTravelTimeBeta = null;// [s], >= 0.0
 	private double AStarEuclideanOverdoFactor = 1.;// >= 1.0
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
@@ -71,7 +71,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private boolean idleVehiclesReturnToDepots = false;
 	private OperationalScheme operationalScheme = OperationalScheme.door2door;
 
-	private double maxWalkDistance = Double.NaN;// [m]; only for stationbased DRT scheme
+	private Double maxWalkDistance = null;// [m]; only for stationbased DRT scheme
 	private double estimatedDrtSpeed = 25. / 3.6;// [m/s]
 	private double estimatedBeelineDistanceFactor = 1.3;// [-]
 
