@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -72,12 +73,17 @@ public final class DvrpModule extends AbstractModule {
 	@Inject
 	private DvrpConfigGroup dvrpCfg;
 
-	private final Module module;
+	private final Function<Config, Module> moduleCreator;
 	private final List<Class<? extends MobsimListener>> listeners;
 
 	@SafeVarargs
 	public DvrpModule(Module module, Class<? extends MobsimListener>... listeners) {
-		this.module = module;
+		this(cfg -> module, listeners);
+	}
+
+	@SafeVarargs
+	public DvrpModule(Function<Config, Module> moduleCreator, Class<? extends MobsimListener>... listeners) {
+		this.moduleCreator = moduleCreator;
 		this.listeners = Arrays.asList(listeners);
 	}
 
@@ -122,7 +128,7 @@ public final class DvrpModule extends AbstractModule {
 
 		@Override
 		public Collection<? extends Module> modules() {
-			return Collections.singletonList(module);
+			return Collections.singletonList(moduleCreator.apply(getConfig()));
 		}
 
 		@Override
