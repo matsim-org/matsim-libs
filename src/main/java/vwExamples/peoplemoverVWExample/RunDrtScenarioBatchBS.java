@@ -79,7 +79,7 @@ public class RunDrtScenarioBatchBS {
 			//Some config parameters will be taken from the provided config file
 			//Other config parameters will be generated or modified dynamically within this loop
 			//Define the path to the config file and enable / disable otfvis
-			final Config config = ConfigUtils.loadConfig("C:\\Temp\\input\\config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+			final Config config = ConfigUtils.loadConfig("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\input\\config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 			
 
 			//OTFVis is an open source, OpenGL-based visualizer for looking at MATSim scenarios and output.
@@ -116,7 +116,7 @@ public class RunDrtScenarioBatchBS {
 			drt.setStopDuration(stoptime);
 			drt.setTransitStopFile("../input/virtualstops/stopsGrid_400m.xml");
 			
-			config.controler().setOutputDirectory("C:\\Temp\\output\\"+runId); //Define dynamically the the output path
+			config.controler().setOutputDirectory("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\output\\"+runId); //Define dynamically the the output path
 			
 			
 			//For each demand scenario we are using a predefined drt vehicle fleet size 
@@ -166,8 +166,8 @@ public class RunDrtScenarioBatchBS {
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
 				public void install() {
-//					addRoutingModuleBinding(DvrpConfigGroup.get(config).getMode())
-//					        .to(ClosestStopBasedDrtRoutingModule.class);
+					addRoutingModuleBinding(DvrpConfigGroup.get(config).getMode())
+					        .to(ClosestStopBasedDrtRoutingModule.class);
 					// Link travel times are iterativly updated between iteration
 					// tt[i] = alpha * experiencedTT + (1 - alpha) * oldEstimatedTT;
 					// Remark: Small alpha leads to more smoothing and longer lags in reaction. Default alpha is 0.05. Which means i.e. 0.3 is not smooth in comparison to 0.05

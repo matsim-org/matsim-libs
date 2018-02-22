@@ -59,26 +59,26 @@ public class AdjustNetworkCapacities {
 			//Critical intersection areas within Braunschweig
 			//Links at Hans-Sommer-Straße
 			if ((coord.getY()>5792755&&coord.getY()<5792892)&&(coord.getX()>604705&&coord.getX()<604823)){
-				link.setCapacity(1500);
-				//Hist: 2100,2000,
+				link.setCapacity(1100);
+				//Hist: 2100,2000,1500
 			}
 			
 			//Links at Lenohardstraße
-			if ((coord.getY()>5790948&&coord.getY()<5791044)&&(coord.getX()>605093&&coord.getX()<605230)){
-				link.setCapacity(1500);
-				//Hist: 1600
+			if ((coord.getY()>5790948+100&&coord.getY()<5791044+100)&&(coord.getX()>605093+100&&coord.getX()<605230+100)){
+				link.setCapacity(1200);
+				//Hist: 1600,1500
 			}
 			
 			//Links at HamburgerStraße/Neustadtring: Done
 			if ((coord.getY()>5792670&&coord.getY()<5792828)&&(coord.getX()>603743&&coord.getX()<603886)){
-				link.setCapacity(1600);
-				//Hist: 2100
+				link.setCapacity(1200);
+				//Hist: 2100,1600,
 			}
 			
 			//Links at Rudolfsplatz: Done
 			if ((coord.getY()>5792060&&coord.getY()<5792298)&&(coord.getX()>602301&&coord.getX()<602501)){
-				link.setCapacity(1630);
-				//Hist: 1700,
+				link.setCapacity(1000);
+				//Hist: 1700,1630,1200
 			}
 			
 			//Links at Cellerstraße/Neustadtring
@@ -89,30 +89,33 @@ public class AdjustNetworkCapacities {
 
 			//Links at Rebenring/Mühlenpfordstraße/Mittelweg
 			if ((coord.getY()>5792683&&coord.getY()<5792844)&&(coord.getX()>603964&&coord.getX()<604169)){
-				link.setCapacity(2100);
+				link.setCapacity(1200);
+				//Hist: 2100
 			}
 			
 			//Links at HamburgerStraße/A392
 			if ((coord.getY()>5793379+20&&coord.getY()<5793558+20)&&(coord.getX()>603479+20&&coord.getX()<603637+20)){
-				link.setCapacity(1300);
+				link.setCapacity(1000);
+				//Hist: 1300
 			}
 			
 			//Links at Hagenring/Jasper
 			if ((coord.getY()>5791881&&coord.getY()<5792054)&&(coord.getX()>605021&&coord.getX()<605134)){
-				link.setCapacity(1500);
-				//Hist: 1600,
+				link.setCapacity(1000);
+				//Hist: 1600,1500
 			}
 			
 			//Links at Hagenring/Kastanien
 			if ((coord.getY()>5791354&&coord.getY()<5791495)&&(coord.getX()>605257&&coord.getX()<605375)){
-				link.setCapacity(1450);
-				//Hist: 1550,
+				link.setCapacity(1100);
+				//Hist: 1550,1450,
 			}
 			
 			//Links at Hagenring/Gließmaroderstr
 			if ((coord.getY()>5792419&&coord.getY()<5792598)&&(coord.getX()>604817&&coord.getX()<604948)){
-				link.setCapacity(1300);
+				link.setCapacity(1100);
 			}
+			//Hist: 1300
 						
 			//Links at Georgwestermann-Allee/Helmstedter
 			if ((coord.getY()>5790910&&coord.getY()<5791027)&&(coord.getX()>605291&&coord.getX()<605478)){
@@ -134,13 +137,13 @@ public class AdjustNetworkCapacities {
 			
 			//Hagenmarkt
 			if ((coord.getY()>5791814&&coord.getY()<5792027)&&(coord.getX()>603957&&coord.getX()<604111)){
-				link.setCapacity(1100);
+				link.setCapacity(1000);
 			}
 			
 			//Radeklint
 			if ((coord.getY()>5791753&&coord.getY()<5791878)&&(coord.getX()>603240&&coord.getX()<603497)){
-				link.setCapacity(1600);
-				//Hist: 1500,1600,
+				link.setCapacity(1100);
+				//Hist: 1500,1600,1500
 			}
 			
 			//Europaplatz/Frankfurtstraße Süd
@@ -174,7 +177,7 @@ public class AdjustNetworkCapacities {
 			//Bahnhof Süd/B4
 			if ((coord.getY()>5789925&&coord.getY()<5790217)&&(coord.getX()>604338&&coord.getX()<604593)){
 				link.setCapacity(1350);
-				//Hist: 1250
+				//Hist: 1250,1500
 			}
 			
 						
@@ -187,15 +190,20 @@ public class AdjustNetworkCapacities {
 			//Zufahrt auf B1
 			String[] fieldsToInclude = { "43270","58966","15849","69854","4669","4672","69858","48655","48656","43268"};
 			if ( Arrays.asList(fieldsToInclude).contains( link.getId().toString()) )  {
-				link.setCapacity(8000);
+				link.setCapacity(1900);
 			}
 			
 			//Zufahrt von B1
 			String[] fieldsToInclude2 = { "13111","43269","43271","43273"};
 			if ( Arrays.asList(fieldsToInclude2).contains( link.getId().toString()) )  {
-				link.setCapacity(2750);
+				link.setCapacity(1750);
 			}
 			
+			String[] fieldsToInclude91 = { "66904","17587"};
+			if ( Arrays.asList(fieldsToInclude91).contains( link.getId().toString()) )  {
+				link.setCapacity(1000);
+			}
+						
 			
 			
 			
@@ -255,7 +263,7 @@ public class AdjustNetworkCapacities {
 //			link.setCapacity(1400);
 //		}
 		
-		//Intersections in Meine
+		///Intersections in Meine///
 		String[] fieldsToInclude3 = { "49379","22517"};
 		if ( Arrays.asList(fieldsToInclude3).contains( link.getId().toString()) )  {
 			link.setCapacity(900);
@@ -275,26 +283,25 @@ public class AdjustNetworkCapacities {
 		if ( Arrays.asList(fieldsToInclude6).contains( link.getId().toString()) )  {
 			link.setCapacity(500);
 		}
-		
-		//Intersections in Meine
+		///Intersections in Meine//
 		
 
 		//Berliner Heer Straße/Friedrich Voigländer	
-		if ((coord.getY()>5793076&&coord.getY()<5793456)&&(coord.getX()>606820&&coord.getX()<607110)){
-			link.setCapacity(1600);
-			//Hist: 1400
+		if ((coord.getY()>5793076+100&&coord.getY()<5793456+100)&&(coord.getX()>606820+100&&coord.getX()<607110+100)){
+			link.setCapacity(1100);
+			//Hist: 1400,1600
 		}
 		
 		//Berliner Heer Straße/Hordorfer
 		if ((coord.getY()>5793598&&coord.getY()<5794014)&&(coord.getX()>607881&&coord.getX()<608182)){
-			link.setCapacity(1300);
+			link.setCapacity(1100);
 			//Hist: 1200
 		}
 		
 		//Lehre
 		if ((coord.getY()>5798644+200&&coord.getY()<5798845+200)&&(coord.getX()>613373+200&&coord.getX()<613849+200)){
-			link.setCapacity(800);
-			//Hist: 750
+			link.setCapacity(700);
+			//Hist: 750, 800
 		}
 		
 		
@@ -305,7 +312,7 @@ public class AdjustNetworkCapacities {
 		}
 		
 		
-		String[] fieldsToInclude8 = { "28521"};
+		String[] fieldsToInclude8 = { "28521","65600","36133","65588" };
 		if ( Arrays.asList(fieldsToInclude8).contains( link.getId().toString()) )  {
 			link.setCapacity(1900);
 			//Hist: 2100,1900
@@ -313,28 +320,24 @@ public class AdjustNetworkCapacities {
 		
 		String[] fieldsToInclude9 = { "63688"};
 		if ( Arrays.asList(fieldsToInclude9).contains( link.getId().toString()) )  {
-			link.setCapacity(4100);
+			link.setCapacity(3400);
+			//Hist: 4100
 		}
 		
 		//Berliner Ring, Richtung BS
 		String[] fieldsToInclude10 = { "366"};
 		if ( Arrays.asList(fieldsToInclude10).contains( link.getId().toString()) )  {
-			link.setCapacity(2500);
+			link.setCapacity(2400);
+		//Hist: 2500
 		}
 		
-
-		
-
-		
-
-		
-
-		
-
-		
-		
-		
-
+		//Berliner Ring, Richtung Autostadt
+			String[] fieldsToInclude11 = { "42600"};
+			if ( Arrays.asList(fieldsToInclude11).contains( link.getId().toString()) )  {
+				link.setCapacity(1900);
+			//Hist: 2500
+		}
+			
 
 		//Intersections in Wolfsburg	
 		//K5 und B188
@@ -396,10 +399,15 @@ public class AdjustNetworkCapacities {
 			link.setCapacity(1750);
 			//Hist: 1500,1650
 		}
-
+		
+		//K28 and K114
+		if ((coord.getY()>5810686&&coord.getY()<5810994)&&(coord.getX()>616468&&coord.getX()<616808)){
+			link.setCapacity(900);
+		}
+		
 		
 	}
-	new NetworkWriter(scenario.getNetwork()).write(basedir+"vw205.1.0.output_network_mod.xml.gz");
+	new NetworkWriter(scenario.getNetwork()).write(basedir+"vw212.1.0.output_network_mod.xml.gz");
 	
 	}
 
