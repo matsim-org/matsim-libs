@@ -21,6 +21,12 @@ package org.matsim.contrib.dvrp.run;
 
 import java.util.Map;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -38,11 +44,19 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	public static final String TRAVEL_TIME_ESTIMATION_ALPHA = "travelTimeEstimationAlpha";
 	public static final String TRAVEL_TIME_ESTIMATION_BETA = "travelTimeEstimationBeta";
 
+	@NotNull
 	private String mode = null; // travel mode (passengers'/customers' perspective)
+
+	@Nullable
 	private String networkMode = TransportMode.car; // used for building routes, calculating travel times, etc.
-	// (dispatcher's perspective)
-	private double travelTimeEstimationAlpha = 0.05; // in (0, 1]; 1 => TTs from the last iteration only
-	private double travelTimeEstimationBeta = 0; // in [s], in [0, +oo); 0 => only offline TT estimation
+	// (dispatcher's perspective); null ==> no filtering (routing network equals scenario.network)
+
+	@Positive
+	@Max(1)
+	private double travelTimeEstimationAlpha = 0.05; // [-], 1 ==> TTs from the last iteration only
+
+	@PositiveOrZero
+	private double travelTimeEstimationBeta = 0; // [s], 0 ==> only offline TT estimation
 
 	public DvrpConfigGroup() {
 		super(GROUP_NAME);

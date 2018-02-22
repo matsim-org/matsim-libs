@@ -47,14 +47,5 @@ public class DvrpConfigConsistencyChecker implements ConfigConsistencyChecker {
 		if (config.qsim().isRemoveStuckVehicles()) {
 			throw new RuntimeException("Stuck DynAgents cannot be removed from simulation");
 		}
-
-		DvrpConfigGroup dvrpCfg = DvrpConfigGroup.get(config);
-		double alpha = dvrpCfg.getTravelTimeEstimationAlpha();
-		if (alpha > 1 || alpha <= 0) {
-			throw new RuntimeException(DvrpConfigGroup.TRAVEL_TIME_ESTIMATION_ALPHA + " must be in (0,1]");
-		}
-		if (dvrpCfg.getTravelTimeEstimationBeta() < 0) {
-			throw new RuntimeException(DvrpConfigGroup.TRAVEL_TIME_ESTIMATION_BETA + " must be zero or positive");
-		}
 	}
 }

@@ -22,7 +22,14 @@ package org.matsim.contrib.drt.run;
 import java.net.URL;
 import java.util.Map;
 
-import org.matsim.core.config.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "drt";
@@ -55,32 +62,55 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	public static final String PRINT_WARNINGS = "plotDetailedWarnings";
 	public static final String NUMBER_OF_THREADS = "numberOfThreads";
 
-	private Double stopDuration = null;// seconds
-	private Double maxWaitTime = null;// seconds
+	@PositiveOrZero
+	private double stopDuration = Double.NaN;// seconds
+
+	@PositiveOrZero
+	private double maxWaitTime = Double.NaN;// seconds
 
 	// max arrival time defined as:
 	// maxTravelTimeAlpha * unshared_ride_travel_time(fromLink, toLink) + maxTravelTimeBeta,
 	// where unshared_ride_travel_time(fromLink, toLink) is calculated with FastAStarEuclidean
 	// (hence AStarEuclideanOverdoFactor needs to be specified)
-	private Double maxTravelTimeAlpha = null;// [-], >= 1.0
-	private Double maxTravelTimeBeta = null;// [s], >= 0.0
-	private double AStarEuclideanOverdoFactor = 1.;// >= 1.0
+	@Min(1)
+	private double maxTravelTimeAlpha = Double.NaN;// [-]
+
+	@PositiveOrZero
+	private double maxTravelTimeBeta = Double.NaN;// [s]
+
+	@Min(1)
+	private double AStarEuclideanOverdoFactor = 1.;
+
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
+	@PositiveOrZero
 	private int rebalancingInterval = 0;// [s], if 0 then no rebalancing
+
 	private boolean idleVehiclesReturnToDepots = false;
+
+	@NotNull
 	private OperationalScheme operationalScheme = OperationalScheme.door2door;
 
-	private Double maxWalkDistance = null;// [m]; only for stationbased DRT scheme
+	@PositiveOrZero // used only for stationbased DRT scheme
+	private double maxWalkDistance = 0;// [m];
+
+	@PositiveOrZero
 	private double estimatedDrtSpeed = 25. / 3.6;// [m/s]
+
+	@Min(1)
 	private double estimatedBeelineDistanceFactor = 1.3;// [-]
 
+	@NotNull
 	private String vehiclesFile = null;
+
+	// used only for stationbased DRT scheme
 	private String transitStopFile = null; // only for stationbased DRT scheme
 
 	private boolean plotDetailedCustomerStats = true;
 	private boolean plotDetailedVehicleStats = false;
 	private boolean printDetailedWarnings = false;
+
+	@Positive
 	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
 
 	public enum OperationalScheme {
