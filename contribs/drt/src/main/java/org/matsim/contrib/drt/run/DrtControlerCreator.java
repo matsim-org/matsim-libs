@@ -41,7 +41,6 @@ import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
@@ -95,7 +94,7 @@ public final class DrtControlerCreator {
 
 	private static void adjustConfig(Config config) {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
-		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
+		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
 		config.checkConsistency();
 		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stationbased)) {
 			ActivityParams params = config.planCalcScore().getActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY);

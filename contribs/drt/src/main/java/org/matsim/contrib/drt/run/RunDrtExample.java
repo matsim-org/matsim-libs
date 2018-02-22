@@ -31,8 +31,6 @@ public class RunDrtExample {
 	
 	
 	public static void run(Config config, boolean otfvis) {
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
 		DrtControlerCreator.createControler(config, otfvis).run();;
 	}
 
