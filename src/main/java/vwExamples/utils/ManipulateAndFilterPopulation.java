@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
@@ -71,9 +72,9 @@ public class ManipulateAndFilterPopulation {
 	static String serachMode = "pt";
 	static String newMode = "drt";
 	String shapeFeature = "NO";
-	static double samplePct = 0.1; //Global sample ratio
-	static double replancementPct = 0.5; //Ratio of mode substitution 
-	//String searchedActivityName = "home";
+	static double samplePct = 0.01; //Global sample ratio
+	static double replancementPct = 1.0; //Ratio of mode substitution 
+	String searchedActivityName = "home";
 	
 	//Constructor which reads the shape file for later use!
 	public ManipulateAndFilterPopulation() {
@@ -91,7 +92,7 @@ public static void main(String[] args) {
 	String filteredPopDesination = ("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\input\\population\\vw208_sampleRate"+samplePct+"replaceRate_"+replancementPct+"_"+serachMode+"_"+newMode+".xml.gz");
 	StreamingPopulationWriter filteredPop = new StreamingPopulationWriter();
 	filteredPop.startStreaming(filteredPopDesination);
-	int drtTrips = 0;
+	
 
 
 	
@@ -107,12 +108,13 @@ public static void main(String[] args) {
 
 	for (Person p : scenario.getPopulation().getPersons().values())
 	{
-		Plan plan = p.getSelectedPlan();
 
 
 		//Sample a certain percentage of the hole population
 		if (MatsimRandom.getRandom().nextDouble() < samplePct) 
 		{
+
+				Plan plan = p.getSelectedPlan();
 			
 				//Check whether this person's home location is located within a relevant zone, whereas the zone needs to fit with the zonePrefix
 				//Otherwise, we do not touch this person
@@ -123,10 +125,12 @@ public static void main(String[] args) {
 					//Modify only a certain percentage of relevant Agents
 					if (MatsimRandom.getRandom().nextDouble() < replancementPct) 
 					{
+						
 						new TransitActsRemover().run(plan);
 				
 				
 						//If it is a relevant person, we assign certain legs with person's selected plans to a new mode
+						
 						for (PlanElement pe : plan.getPlanElements())
 						{
 				
@@ -145,10 +149,10 @@ public static void main(String[] args) {
 											//Write newMode into Leg
 											leg.setMode(newMode);
 											//Remove route from leg
-											leg.setTravelTime(0.0);
+											//leg.setRoute(null);
+											leg.getAttributes().removeAttribute("trav_time");
 											//System.out.println(leg);
 											
-											drtTrips++;
 //										}
 										
 									}
@@ -159,19 +163,17 @@ public static void main(String[] args) {
 							
 							
 						}
-						
+						PersonUtils.removeUnselectedPlans(p);
 						
 					}
 				//}
 
 			
 			
-			filteredPop.writePerson(p);
 		}
 	}
 
 	filteredPop.closeStreaming();
-	System.out.println("Modified trips:" + drtTrips);
 }
 
 public void readShape(String shapeFile, String featureKeyInShapeFile) {
