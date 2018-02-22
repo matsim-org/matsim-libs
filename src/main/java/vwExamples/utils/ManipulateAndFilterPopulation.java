@@ -41,6 +41,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.PersonUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.io.PopulationReader;
 import org.matsim.core.population.io.StreamingPopulationWriter;
@@ -107,12 +108,13 @@ public static void main(String[] args) {
 
 	for (Person p : scenario.getPopulation().getPersons().values())
 	{
-		Plan plan = p.getSelectedPlan();
 
 
 		//Sample a certain percentage of the hole population
 		if (MatsimRandom.getRandom().nextDouble() < samplePct) 
 		{
+
+				Plan plan = p.getSelectedPlan();
 			
 				//Check whether this person's home location is located within a relevant zone, whereas the zone needs to fit with the zonePrefix
 				//Otherwise, we do not touch this person
@@ -123,10 +125,12 @@ public static void main(String[] args) {
 					//Modify only a certain percentage of relevant Agents
 					if (MatsimRandom.getRandom().nextDouble() < replancementPct) 
 					{
+						
 						new TransitActsRemover().run(plan);
 				
 				
 						//If it is a relevant person, we assign certain legs with person's selected plans to a new mode
+						
 						for (PlanElement pe : plan.getPlanElements())
 						{
 				
@@ -159,14 +163,13 @@ public static void main(String[] args) {
 							
 							
 						}
-						
+						PersonUtils.removeUnselectedPlans(p);
 						
 					}
 				//}
 
 			
 			
-			filteredPop.writePerson(p);
 		}
 	}
 
