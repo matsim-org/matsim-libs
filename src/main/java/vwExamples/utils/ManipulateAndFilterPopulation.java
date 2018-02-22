@@ -71,9 +71,9 @@ public class ManipulateAndFilterPopulation {
 	static String serachMode = "pt";
 	static String newMode = "drt";
 	String shapeFeature = "NO";
-	static double samplePct = 0.01; //Global sample ratio
-	static double replancementPct = 1.0; //Ratio of mode substitution 
-	String searchedActivityName = "home";
+	static double samplePct = 0.1; //Global sample ratio
+	static double replancementPct = 0.5; //Ratio of mode substitution 
+	//String searchedActivityName = "home";
 	
 	//Constructor which reads the shape file for later use!
 	public ManipulateAndFilterPopulation() {
@@ -91,7 +91,7 @@ public static void main(String[] args) {
 	String filteredPopDesination = ("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\input\\population\\vw208_sampleRate"+samplePct+"replaceRate_"+replancementPct+"_"+serachMode+"_"+newMode+".xml.gz");
 	StreamingPopulationWriter filteredPop = new StreamingPopulationWriter();
 	filteredPop.startStreaming(filteredPopDesination);
-	
+	int drtTrips = 0;
 
 
 	
@@ -145,10 +145,10 @@ public static void main(String[] args) {
 											//Write newMode into Leg
 											leg.setMode(newMode);
 											//Remove route from leg
-											//leg.setRoute(null);
-											leg.getAttributes().removeAttribute("trav_time");
+											leg.setTravelTime(0.0);
 											//System.out.println(leg);
 											
+											drtTrips++;
 //										}
 										
 									}
@@ -171,6 +171,7 @@ public static void main(String[] args) {
 	}
 
 	filteredPop.closeStreaming();
+	System.out.println("Modified trips:" + drtTrips);
 }
 
 public void readShape(String shapeFile, String featureKeyInShapeFile) {
