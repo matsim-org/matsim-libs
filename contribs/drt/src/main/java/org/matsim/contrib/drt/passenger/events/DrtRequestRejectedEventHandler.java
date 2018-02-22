@@ -25,13 +25,9 @@ package org.matsim.contrib.drt.passenger.events;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
- * @author  jbischoff
- *
- */
-/**
+ * @author jbischoff
  *
  */
 public interface DrtRequestRejectedEventHandler extends EventHandler {
 	public void handleEvent(final DrtRequestRejectedEvent event);
-
 }

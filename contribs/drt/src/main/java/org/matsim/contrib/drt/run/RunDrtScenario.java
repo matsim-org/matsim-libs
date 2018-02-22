@@ -35,8 +35,6 @@ public class RunDrtScenario {
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
 		return DrtControlerCreator.createControler(config, otfvis);
 	}
 

@@ -22,9 +22,11 @@ package org.matsim.contrib.dvrp.trafficmonitoring;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.dvrp.run.*;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
@@ -36,7 +38,16 @@ import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
-public class DvrpTravelTimeEstimatorImpl implements DvrpTravelTimeEstimator, MobsimBeforeCleanupListener {
+/**
+ * Used for offline estimation of travel times for VrpOptimizer by means of the exponential moving average. The
+ * weighting decrease, alpha, must be in (0,1]. We suggest small values of alpha, e.g. 0.05.
+ * 
+ * The averaging starts from the initial travel time estimates. If not provided, the free-speed TTs is used as the
+ * initial estimates
+ * 
+ * @author michalm
+ */
+public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, MobsimBeforeCleanupListener {
 	private final TravelTime observedTT;
 	private final Network network;
 
@@ -46,21 +57,21 @@ public class DvrpTravelTimeEstimatorImpl implements DvrpTravelTimeEstimator, Mob
 	private final double alpha;
 
 	@Inject
-	public DvrpTravelTimeEstimatorImpl(@Named(DvrpTravelTimeModule.DVRP_INITIAL) TravelTime initialTT,
+	public DvrpOfflineTravelTimeEstimator(@Named(DvrpTravelTimeModule.DVRP_INITIAL) TravelTime initialTT,
 			@Named(DvrpTravelTimeModule.DVRP_OBSERVED) TravelTime observedTT,
 			@Named(DvrpModule.DVRP_ROUTING) Network network, TravelTimeCalculatorConfigGroup ttCalcConfig,
 			DvrpConfigGroup dvrpConfig) {
 		this(initialTT, observedTT, network, ttCalcConfig, dvrpConfig.getTravelTimeEstimationAlpha());
 	}
 
-	public DvrpTravelTimeEstimatorImpl(TravelTime initialTT, TravelTime observedTT, Network network,
+	public DvrpOfflineTravelTimeEstimator(TravelTime initialTT, TravelTime observedTT, Network network,
 			TravelTimeCalculatorConfigGroup ttCalcConfig, double travelTimeEstimationAlpha) {
 		this.observedTT = observedTT;
 		this.network = network;
 
 		alpha = travelTimeEstimationAlpha;
 		if (alpha > 1 || alpha <= 0) {
-			throw new RuntimeException("travelTimeEstimationAlpha must be in (0,1]");
+			throw new IllegalArgumentException("travelTimeEstimationAlpha must be in (0,1]");
 		}
 
 		interval = ttCalcConfig.getTraveltimeBinSize();

@@ -64,7 +64,7 @@ public class ParallelPathDataProvider implements PrecalculatablePathDataProvider
 
 	private final ExecutorService executorService;
 
-	// ==== recalculated by calcPathData()
+	// ==== recalculated by precalculatePathData()
 	private Map<Id<Link>, PathData> pathsToPickupMap;
 	private Map<Id<Link>, PathData> pathsFromPickupMap;
 	private Map<Id<Link>, PathData> pathsToDropoffMap;
