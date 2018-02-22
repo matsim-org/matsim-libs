@@ -141,8 +141,7 @@ public class DynModeTripsAnalyser {
 		return directDistanceStats.getMean();
 	}
 
-	public static void analyseDetours(Network network, List<DynModeTrip> trips, double beelineDistanceFactor,
-			double freeSpeedModeFactor, String fileName) {
+	public static void analyseDetours(Network network, List<DynModeTrip> trips, String fileName) {
 		if (trips == null)
 			return;
 
