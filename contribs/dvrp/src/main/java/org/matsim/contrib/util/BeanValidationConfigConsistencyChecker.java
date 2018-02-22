@@ -17,30 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.run;
+package org.matsim.contrib.util;
 
-import org.matsim.contrib.drt.run.DrtConfigGroup.OperationalScheme;
-import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.Validation;
+import javax.validation.Validator;
+
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
-public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
+public class BeanValidationConfigConsistencyChecker implements ConfigConsistencyChecker {
+	private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
 	@Override
 	public void checkConsistency(Config config) {
-		new DvrpConfigConsistencyChecker().checkConsistency(config);
+		Set<ConstraintViolation<ConfigGroup>> violations = new HashSet<>();
+		List<String> messages = new ArrayList<>();
 
-		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
-		if (drtCfg.getOperationalScheme() == OperationalScheme.stationbased && drtCfg.getTransitStopFile() == null) {
-			throw new RuntimeException(DrtConfigGroup.TRANSIT_STOP_FILE + " must not be null when "
-					+ DrtConfigGroup.OPERATIONAL_SCHEME + " is " + DrtConfigGroup.OperationalScheme.stationbased);
+		for (ConfigGroup group : config.getModules().values()) {
+			Set<ConstraintViolation<ConfigGroup>> groupViolations = validator.validate(group);
+			violations.addAll(groupViolations);
+			for (ConstraintViolation<ConfigGroup> v : groupViolations) {
+				messages.add(group.getName() + "." + v.getPropertyPath() + ": " + v.getMessage());
+			}
 		}
-		if (drtCfg.getNumberOfThreads() > Runtime.getRuntime().availableProcessors()) {
-			throw new RuntimeException(
-					DrtConfigGroup.NUMBER_OF_THREADS + " is higher than the number of logical cores available to JVM");
-		}
-		if (config.qsim().getNumberOfThreads() != 1) {
-			throw new RuntimeException("Only a single-threaded QSim allowed");
+
+		if (!violations.isEmpty()) {
+			String message = "Errors in config:\n" + messages.stream().collect(Collectors.joining("\n"));
+			throw new ConstraintViolationException(message, violations);
 		}
 	}
 }
