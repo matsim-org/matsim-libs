@@ -48,7 +48,7 @@ import java.util.*;
  */
 public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	
-	private static final String GROUP_NAME = "noise";
+	public static final String GROUP_NAME = "noise";
 	private static final String RECEIVER_POINT_GAP = "receiverPointGap";
 	private static final String TRANSFORMATION_FACTORY = "transformationFactory";
 	private static final String CONSIDERED_ACTIVITIES_FOR_DAMAGE_CALCULATION = "consideredActivitiesForDamageCalculation";
