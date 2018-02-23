@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data;
+package org.matsim.contrib.drt.run.examples;
 
-import org.matsim.api.core.v01.Identifiable;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtControlerCreator;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
- * Represents a general request in DVRP.
- * 
- * For request rejection - adapt isRejected()
- * 
  * @author michalm
  */
-public interface Request extends Identifiable<Request> {
+public class RunOneSharedTaxiExample {
+	private static final String CONFIG_FILE = "one_shared_taxi/one_shared_taxi_config.xml";
 
-	/**
-	 * @return time at which the request was submitted
-	 */
-	double getSubmissionTime();
-
-	/**
-	 * @return indicates whether the request has been rejected by the service provider (optimizer/dispatcher)
-	 */
-	default boolean isRejected() {
-		return false;
+	public static void run(boolean otfvis, int lastIteration) {
+		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new DrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+		config.controler().setLastIteration(lastIteration);
+		DrtControlerCreator.createControler(config, otfvis).run();
 	}
 
-	static String toString(Request request) {
-		return "[id=" + request.getId() + "][submissionTime=" + request.getSubmissionTime() + "][rejected="
-				+ request.isRejected() + "]";
+	public static void main(String[] args) {
+		run(false, 0); // switch to 'true' to turn on visualisation
 	}
 }
