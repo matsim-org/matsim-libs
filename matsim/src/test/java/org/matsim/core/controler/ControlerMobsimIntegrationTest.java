@@ -29,6 +29,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -59,6 +62,9 @@ public class ControlerMobsimIntegrationTest {
 							return mf.createMobsim(c.getScenario(), c.getEvents());
 						}
 					});
+					
+					bind(MobsimTimer.class);
+					bind(AgentCounter.class).to(AgentCounterImpl.class);
 				}
 			}
 		});

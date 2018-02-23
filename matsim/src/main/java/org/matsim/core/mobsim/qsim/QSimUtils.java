@@ -25,11 +25,13 @@ package org.matsim.core.mobsim.qsim;
 import java.util.Collection;
 import java.util.Collections;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
+import com.google.inject.util.Modules;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.ReplayEvents.Module;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
@@ -55,10 +57,19 @@ public class QSimUtils {
 	
 	public static QSim createDefaultQSimWithOverrides( final Scenario scenario, final EventsManager eventsManager, 
 			Collection<AbstractModule> overrides ) {
-		final StandaloneQSimModule module = new StandaloneQSimModule(scenario, eventsManager);
+		/*
+		 * Not sure what happened here. This should work now but it doesn't seem that the 
+		 * previous version was actually doing what it was supposed to.
+		 * 
+		 * shoerl, feb18
+		 */
+		
+		AbstractModule module = new StandaloneQSimModule(scenario, eventsManager);
+		
 		for ( AbstractModule override : overrides ) {
-			org.matsim.core.controler.AbstractModule.override(Collections.singleton(module), override) ;
+			module = org.matsim.core.controler.AbstractModule.override(Collections.singleton(module), override) ;
 		}
+		
 		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), module );
 		return (QSim) injector.getInstance(Mobsim.class);
 	}
