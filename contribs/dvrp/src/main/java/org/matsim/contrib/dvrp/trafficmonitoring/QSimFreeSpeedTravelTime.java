@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +16,34 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.benchmark;
+package org.matsim.contrib.dvrp.trafficmonitoring;
 
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.core.controler.AbstractModule;
+import javax.inject.Inject;
+
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.vehicles.Vehicle;
 
 /**
- * This module overrides the bindings set up by DvrpTravelTimeModule
+ * Precise version of FreeSpeedTravelTime that takes into account the way QSim moves vehicles along links and over
+ * nodes. Useful for simulations with congestion-free (i.e. via super high flow/storage capacity factors) QSim.
  * 
  * @author michalm
  */
-public class DvrpBenchmarkTravelTimeModule extends AbstractModule {
-	private final TravelTime travelTime;
+public class QSimFreeSpeedTravelTime implements TravelTime {
+	private final double timeStepSize;
 
-	public DvrpBenchmarkTravelTimeModule() {
-		this(new FreeSpeedTravelTime());
+	@Inject
+	public QSimFreeSpeedTravelTime(QSimConfigGroup qsimCfg) {
+		this.timeStepSize = qsimCfg.getTimeStepSize();
 	}
 
-	public DvrpBenchmarkTravelTimeModule(final TravelTime travelTime) {
-		this.travelTime = travelTime;
-	}
-
-	public void install() {
-		// Because TravelTimeCalculatorModule is not installed for benchmarking, we need to add a binding
-		// for the car mode
-		bindNetworkTravelTime().toInstance(travelTime);
-		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).toInstance(travelTime);
+	@Override
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+		double freeSpeedTT = link.getLength() / link.getFreespeed(time); // equiv. to FreeSpeedTravelTime
+		double linkTravelTime = timeStepSize * Math.floor(freeSpeedTT / timeStepSize); // used in QSim for TT at link
+		return linkTravelTime + 1;// adds 1 extra second for moving over nodes
 	}
 }

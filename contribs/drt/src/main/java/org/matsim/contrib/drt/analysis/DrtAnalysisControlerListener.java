@@ -111,7 +111,7 @@ public class DrtAnalysisControlerListener implements IterationEndsListener {
 		}
 		DynModeTripsAnalyser.writeVehicleDistances(drtPassengerStats.getVehicleDistances(),
 				matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "vehicleDistanceStats.csv"));
-		DynModeTripsAnalyser.analyseDetours(network, trips,
+		DynModeTripsAnalyser.analyseDetours(network, trips, drtgroup,
 				matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "drt_detours"));
 		DynModeTripsAnalyser.analyseWaitTimes(
 				matsimServices.getControlerIO().getIterationFilename(event.getIteration(), "waitStats"), trips, 1800);
