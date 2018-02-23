@@ -33,13 +33,10 @@ import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
-import org.jfree.chart.ChartFactory;
+import org.apache.commons.lang3.tuple.Pair;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -52,6 +49,7 @@ import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEventHandler;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestSubmittedEventHandler;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.data.Request;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.utils.collections.Tuple;
@@ -73,11 +71,13 @@ public class DrtRequestAnalyzer implements DrtRequestRejectedEventHandler, DrtRe
 	private final Map<Id<Person>,DrtRequestScheduledEvent> scheduledRequests = new HashMap<>();
 	private final List<String> rejections = new ArrayList<>();
 	private final Network network;
+	private final DrtConfigGroup drtCfg;
 	
 	@Inject
-	public DrtRequestAnalyzer(EventsManager events, Network network) {
+	public DrtRequestAnalyzer(EventsManager events, Network network, DrtConfigGroup drtCfg) {
 		events.addHandler(this);
 		this.network = network;
+		this.drtCfg = drtCfg;
 	}
 	
 	
@@ -154,10 +154,8 @@ public class DrtRequestAnalyzer implements DrtRequestRejectedEventHandler, DrtRe
 	
 	public void writeAndPlotWaitTimeEstimateComparison(String plotFileName, String textFileName) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(textFileName);
-		XYSeriesCollection times = new XYSeriesCollection();
 
-		XYSeries timess = new XYSeries("waittimes", true, true);
-		times.addSeries(timess);
+		XYSeries times = new XYSeries("waittimes", true, true);
 
 		try {
 			bw.append("RequestId;actualWaitTime;estimatedWaitTime;deviate");
@@ -166,17 +164,16 @@ public class DrtRequestAnalyzer implements DrtRequestRejectedEventHandler, DrtRe
 				double first = e.getValue().getFirst();
 				double second = e.getValue().getSecond();
 				bw.append(e.getKey().toString()+";"+first+";"+second+";"+(first-second));
-				timess.add(first, second);
+				times.add(first, second);
 			}
 			bw.flush();
 			bw.close();
-			final JFreeChart chart2 = ChartFactory.createScatterPlot("Wait time", "Actual wait time [s]",
-					"Estimated wait time [s]", times);
-			NumberAxis yAxis = (NumberAxis)((XYPlot)chart2.getPlot()).getRangeAxis();
-			NumberAxis xAxis = (NumberAxis)((XYPlot)chart2.getPlot()).getDomainAxis();
-			yAxis.setUpperBound(xAxis.getUpperBound());
-			xAxis.setLowerBound(0);
-			yAxis.setLowerBound(0);
+			
+			
+			final JFreeChart chart2 = DensityScatterPlots.createPlot("Wait times", "Actual wait time [s]",
+					"Initially planned wait time [s]", times, Pair.of(0., drtCfg.getMaxWaitTime()));
+//			xAxis.setLowerBound(0);
+//			yAxis.setLowerBound(0);
 			ChartUtilities.writeChartAsPNG(new FileOutputStream(plotFileName), chart2, 1500, 1500);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
