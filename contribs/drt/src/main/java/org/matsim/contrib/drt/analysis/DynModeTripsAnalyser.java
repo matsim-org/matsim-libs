@@ -147,17 +147,19 @@ public class DynModeTripsAnalyser {
 			return;
 
 		List<String> detours = new ArrayList<String>();
-		XYSeries distances = new XYSeries("distances", true, true);
-		XYSeries times = new XYSeries("times", true, true);
+		XYSeries distances = new XYSeries("distances");
+		XYSeries travelTimes = new XYSeries("travel times");
+		XYSeries rideTimes = new XYSeries("ride times");
 
 		for (DynModeTrip trip : trips) {
 			if (trip.getToLinkId() == null) {
 				continue; // unfinished trip (simulation stopped before arrival)
 			}
 
-			distances.add(trip.getTravelDistance(), trip.getUnsharedDistanceEstimate_m());
 			double travelTime = trip.getInVehicleTravelTime() + trip.getWaitTime();
-			times.add(travelTime, trip.getUnsharedTimeEstimate_m());
+			distances.add(trip.getTravelDistance(), trip.getUnsharedDistanceEstimate_m());
+			travelTimes.add(travelTime, trip.getUnsharedTimeEstimate_m());
+			rideTimes.add(trip.getInVehicleTravelTime(), trip.getUnsharedTimeEstimate_m());
 
 			double distanceDetour = trip.getTravelDistance() / trip.getUnsharedDistanceEstimate_m();
 			double timeDetour = travelTime / trip.getUnsharedTimeEstimate_m();
@@ -168,13 +170,19 @@ public class DynModeTripsAnalyser {
 		collection2Text(detours, fileName + ".csv",
 				"distance;unsharedDistance;distanceDetour;time;unsharedTime;timeDetour");
 
-		final JFreeChart chart = DensityScatterPlots.createPlot("Travel Distances", "travelled distance [m]",
+		final JFreeChart chart = DensityScatterPlots.createPlot("Travelled Distances", "travelled distance [m]",
 				"unshared ride distance [m]", distances);
 		ChartSaveUtils.saveAsPNG(chart, fileName + "_distancePlot", 1500, 1500);
 
-		final JFreeChart chart2 = DensityScatterPlots.createPlot("Travel Times", "travelled time [s]",
-				"unshared ride time [s]", times, Pair.of(drtCfg.getMaxTravelTimeAlpha(), drtCfg.getMaxTravelTimeBeta()));
-		ChartSaveUtils.saveAsPNG(chart2, fileName + "_timePlot", 1500, 1500);
+		final JFreeChart chart2 = DensityScatterPlots.createPlot("Travel Times", "travel time [s]",
+				"unshared ride time [s]", travelTimes,
+				Pair.of(drtCfg.getMaxTravelTimeAlpha(), drtCfg.getMaxTravelTimeBeta()));
+		ChartSaveUtils.saveAsPNG(chart2, fileName + "_travelTimePlot", 1500, 1500);
+
+		final JFreeChart chart3 = DensityScatterPlots.createPlot("Ride Times", "ride time [s]",
+				"unshared ride time [s]", rideTimes,
+				Pair.of(drtCfg.getMaxTravelTimeAlpha(), drtCfg.getMaxTravelTimeBeta()));
+		ChartSaveUtils.saveAsPNG(chart3, fileName + "_rideTimePlot", 1500, 1500);
 	}
 
 	public static void analyseWaitTimes(String fileName, List<DynModeTrip> trips, int binsize_s) {
