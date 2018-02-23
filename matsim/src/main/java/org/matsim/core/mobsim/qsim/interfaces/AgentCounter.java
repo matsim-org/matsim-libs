@@ -11,5 +11,7 @@ public interface AgentCounter {
 	void incLost();
 
 	void decLiving();
+	
+	void incLiving();
 
 }

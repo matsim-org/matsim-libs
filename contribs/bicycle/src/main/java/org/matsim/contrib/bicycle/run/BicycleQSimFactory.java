@@ -26,12 +26,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.router.util.TravelTime;
 
@@ -43,6 +45,9 @@ public class BicycleQSimFactory implements Provider<Mobsim> {
 	@Inject Map<String, TravelTime> multiModalTravelTimes;
 	@Inject Scenario scenario;
 	@Inject EventsManager eventsManager;
+	@Inject AgentCounter agentCounter;
+	@Inject MobsimTimer mobsimTimer;
+	
 	@Override
 	public Mobsim get() {
 
@@ -52,10 +57,10 @@ public class BicycleQSimFactory implements Provider<Mobsim> {
 		}
 
 		// construct the QSim:
-		QSim qSim = new QSim(scenario, eventsManager);
+		QSim qSim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer);
 
 		// add the activity engine:
-		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, mobsimTimer, agentCounter);
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 

@@ -22,12 +22,17 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 
 public class QNetsimEngineModule {
 
-    public static void configure(QSim qsim) {
-        QNetsimEngine netsimEngine = new QNetsimEngine(qsim);
+    public static void configure(QSim qsim, Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
+        QNetsimEngine netsimEngine = new QNetsimEngine(config, scenario, eventsManager, mobsimTimer, agentCounter);
         qsim.addMobsimEngine(netsimEngine);
         qsim.addDepartureHandler(netsimEngine.getDepartureHandler());
     }

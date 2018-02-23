@@ -21,6 +21,8 @@ package org.matsim.core.mobsim.qsim;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.inject.Singleton;
+
 
 /**
  * This class is responsible for living/lost agent counting.
@@ -29,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author dgrether
  *
  */
+@Singleton
 class AgentCounter implements org.matsim.core.mobsim.qsim.interfaces.AgentCounter {
 
     /**
@@ -53,7 +56,8 @@ class AgentCounter implements org.matsim.core.mobsim.qsim.interfaces.AgentCounte
     @Override
     public final void incLost() {lost.incrementAndGet(); }
 
-    final void incLiving() {living.incrementAndGet();}
+    @Override
+    final public void incLiving() {living.incrementAndGet();}
 
     @Override
     public final void decLiving() {living.decrementAndGet();}

@@ -23,6 +23,7 @@ import java.util.*;
 import javax.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.*;
@@ -48,16 +49,20 @@ public final class PopulationAgentSource implements AgentSource {
 	private final QSim qsim;
 	private final Collection<String> mainModes;
 	private Map<Id<Vehicle>,Id<Link>> seenVehicleIds = new HashMap<>() ;
+	final private Scenario scenario;
+	final private Config config;
 
 	@Inject
-	public PopulationAgentSource(Population population, AgentFactory agentFactory, QSim qsim ) {
-		Vehicles vehicles = qsim.getScenario().getVehicles() ;
-		QSimConfigGroup qsimConfig = qsim.getScenario().getConfig().qsim() ;
+	public PopulationAgentSource(QSim qsim, Population population, AgentFactory agentFactory, Config config, Scenario scenario ) {
+		Vehicles vehicles = scenario.getVehicles() ;
+		QSimConfigGroup qsimConfig = config.qsim() ;
 		
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
-		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
+		this.mainModes = config.qsim().getMainModes();
+		this.scenario = scenario;
+		this.config = config;
 	}
 
 	@Override
@@ -94,7 +99,7 @@ public final class PopulationAgentSource implements AgentSource {
 						}
 
 						// so here we have a vehicle id, now try to find or create a physical vehicle:
-						Vehicle vehicle = qsim.getScenario().getVehicles().getVehicles().get(vehicleId);
+						Vehicle vehicle = scenario.getVehicles().getVehicles().get(vehicleId);
 						
 						// place the vehicle:
 						Id<Link> vehicleLinkId = findVehicleLink(p);
@@ -140,8 +145,7 @@ public final class PopulationAgentSource implements AgentSource {
 		for (PlanElement planElement : p.getSelectedPlan().getPlanElements()) {
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
-				ActivityFacilities facilities = this.qsim.getScenario().getActivityFacilities() ;
-				Config config = this.qsim.getScenario().getConfig() ;
+				ActivityFacilities facilities = scenario.getActivityFacilities() ;
 				final Id<Link> activityLinkId = PopulationUtils.computeLinkIdFromActivity(activity, facilities, config ) ;
 				if (activityLinkId != null) {
 					return activityLinkId;
@@ -158,8 +162,8 @@ public final class PopulationAgentSource implements AgentSource {
 
 	private Id<Vehicle> createAutomaticVehicleId(Id<Person> personId, String mode) {
 		Id<Vehicle> vehicleId ;
-		if (qsim.getScenario().getConfig().qsim().getUsePersonIdForMissingVehicleId()) {
-			switch (qsim.getScenario().getConfig().qsim().getVehiclesSource()) {
+		if (config.qsim().getUsePersonIdForMissingVehicleId()) {
+			switch (config.qsim().getVehiclesSource()) {
 				case defaultVehicle:
 				case fromVehiclesData:
 					vehicleId = Id.createVehicleId(personId);

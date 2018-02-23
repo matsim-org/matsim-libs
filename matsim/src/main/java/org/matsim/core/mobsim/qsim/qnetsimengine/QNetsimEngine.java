@@ -99,8 +99,6 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 
 	private final Map<Id<Vehicle>, QVehicle> vehicles = new HashMap<>();
 
-	private final QSim qsim;
-
 	private final VehicularDepartureHandler dpHandler;
 
 	private double infoTime = 0;
@@ -126,26 +124,31 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 	public static int numObservedTimeSteps = 24*3600;
 	public static boolean printRunTimesPerTimeStep = false;
 	
+	final private MobsimTimer mobsimTimer;
+	final private EventsManager eventsManager;
+	final private Config config;
+	
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
 	}
 
-	public QNetsimEngine(final QSim sim) {
-		this(sim, null);
+	public QNetsimEngine(Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
+		this(null, config, scenario, eventsManager, mobsimTimer, agentCounter);
 	}
 
 	@Inject
-	public QNetsimEngine(final QSim sim, QNetworkFactory netsimNetworkFactory) {
-		this.qsim = sim;
+	public QNetsimEngine(QNetworkFactory netsimNetworkFactory, Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
+		this.mobsimTimer = mobsimTimer;
+		this.eventsManager = eventsManager;
+		this.config = config;
 
-		final Config config = sim.getScenario().getConfig();
 		final QSimConfigGroup qsimConfigGroup = config.qsim();
 		this.usingThreadpool = qsimConfigGroup.isUsingThreadpool();
 
 
 		// configuring the car departure hander (including the vehicle behavior)
-		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().qsim();
+		QSimConfigGroup qSimConfigGroup = config.qsim();
 
 		VehicleBehavior vehicleBehavior = qSimConfigGroup.getVehicleBehavior();
 		switch(vehicleBehavior) {
@@ -166,21 +169,18 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		}
 		
 		if (netsimNetworkFactory != null){
-			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
+			network = new QNetwork( scenario.getNetwork(), netsimNetworkFactory ) ;
 		} else {
-			Scenario scenario = sim.getScenario();
-			EventsManager events = sim.getEventsManager() ;
-			QSimConfigGroup qsimConfig = sim.getScenario().getConfig().qsim() ;
+			EventsManager events = eventsManager;
+			QSimConfigGroup qsimConfig = config.qsim() ;
 			Network net = scenario.getNetwork() ;
 			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario );
-			MobsimTimer mobsimTimer = sim.getSimTimer() ;
-			AgentCounter agentCounter = sim.getAgentCounter() ;
 			netsimNetworkFactory2.initializeFactory(agentCounter, mobsimTimer, ii );
-			network = new QNetwork(sim.getScenario().getNetwork(), netsimNetworkFactory2 );
+			network = new QNetwork(scenario.getNetwork(), netsimNetworkFactory2 );
 		}
-		network.initialize(this, sim.getAgentCounter(), sim.getSimTimer() );
+		network.initialize(this, agentCounter, mobsimTimer );
 
-		this.numOfThreads = sim.getScenario().getConfig().qsim().getNumberOfThreads();
+		this.numOfThreads = scenario.getConfig().qsim().getNumberOfThreads();
 	}
 
 	private static int wrnCnt = 0;
@@ -224,7 +224,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 	@Override
 	public void onPrepareSim() {
 		this.infoTime = 
-				Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD; 
+				Math.floor(mobsimTimer.getSimStartTime() / INFO_PERIOD) * INFO_PERIOD; 
 		/*
 		 * infoTime may be < simStartTime, this ensures to print out the
 		 * info at the very first timestep already 
@@ -409,9 +409,9 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 	}
 
 	private void letVehicleArrive(QVehicle veh) {
-		double now = this.qsim.getSimTimer().getTimeOfDay();
+		double now = mobsimTimer.getTimeOfDay();
 		MobsimDriverAgent driver = veh.getDriver();
-		this.qsim.getEventsManager().processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));
+		eventsManager.processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));
 		// reset vehicles driver
 		veh.setDriver(null);
 		driver.endLegAndComputeNextState(now);
@@ -491,7 +491,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 				 * step, the link should be activated.
 				 */
 				if (linksToActivateInitially.remove(qLink) 
-						|| qsim.getScenario().getConfig().qsim().getSimStarttimeInterpretation()==StarttimeInterpretation.onlyUseStarttime) {
+						|| config.qsim().getSimStarttimeInterpretation()==StarttimeInterpretation.onlyUseStarttime) {
 					this.engines.get(i).registerLinkAsActive(qLink);
 				}
 

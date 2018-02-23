@@ -27,9 +27,12 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.interfaces.TimeVariantLink;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
+
+import com.google.inject.Inject;
 
 import java.util.Collection;
 import java.util.PriorityQueue;
@@ -41,11 +44,18 @@ import java.util.Queue;
 public class NetworkChangeEventsEngine implements MobsimEngine {
 	
 	private PriorityQueue<NetworkChangeEvent> networkChangeEventsQueue = null;
-	private Netsim mobsim;
+	final private Network network;
+	final private NetsimNetwork netsimNetwork;
+	
+	@Inject
+	public NetworkChangeEventsEngine(Network network, NetsimNetwork netsimNetwork) {
+		this.network = network;
+		this.netsimNetwork = netsimNetwork;
+	}
 
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
-		this.mobsim = (QSim) internalInterface.getMobsim();
+		//this.mobsim = (QSim) internalInterface.getMobsim();
 	}
 
 	@Override
@@ -55,7 +65,7 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		Queue<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(((Network)this.mobsim.getScenario().getNetwork()));
+		Queue<NetworkChangeEvent> changeEvents = NetworkUtils.getNetworkChangeEvents(network);
 		if ((changeEvents != null) && (changeEvents.size() > 0)) {
 			this.networkChangeEventsQueue = new PriorityQueue<>(changeEvents.size(), new NetworkChangeEvent.StartTimeComparator());
 			this.networkChangeEventsQueue.addAll(changeEvents);
@@ -73,7 +83,7 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 		while ((this.networkChangeEventsQueue.size() > 0) && (this.networkChangeEventsQueue.peek().getStartTime() <= time)) {
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
 			for (Link link : event.getLinks()) {
-				final NetsimLink netsimLink = this.mobsim.getNetsimNetwork().getNetsimLink(link.getId());
+				final NetsimLink netsimLink = netsimNetwork.getNetsimLink(link.getId());
 				if ( netsimLink instanceof TimeVariantLink ) {
 					((TimeVariantLink) netsimLink).recalcTimeVariantAttributes();
 				} else {
