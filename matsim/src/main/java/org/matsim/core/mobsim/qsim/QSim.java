@@ -212,6 +212,16 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		this.simTimer = mobsimTimer;
 		this.listenerManager = new MobsimListenerManager(this);
 		
+		
+		// TODO: Since the new injection scheme is not in place yet, AgentCounter and MobsimTimer live in the global scope.
+		// This means we need to reset them for the next iteration. When the cleaner injection scheme
+		// is in place, both objects should be initialized by Guice!
+		
+		while (agentCounter.isLiving()) {
+			agentCounter.decLiving();
+		}
+		
+		simTimer.setTime(0.0);
 	}
 
 	// ============================================================================================================================
