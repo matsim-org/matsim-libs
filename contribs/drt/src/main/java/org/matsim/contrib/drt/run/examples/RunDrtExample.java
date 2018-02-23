@@ -17,33 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package org.matsim.contrib.drt.run;
+package org.matsim.contrib.drt.run.examples;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
- * @author  jbischoff
+ * @author jbischoff
  */
-public class RunDrtExampleIT {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+public class RunDrtExample {
+	public static void run(Config config, boolean otfvis) {
+		DrtControlerCreator.createControler(config, otfvis).run();
+	}
 
-	@Test
-	public void testRunDrtExample() {
-		String configFile = "./src/main/resources/drt_example/drtconfig.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		RunDrtExample.run(config, false);
+	public static void main(String[] args) {
+		Config config = ConfigUtils.loadConfig("drt_example/drtconfig.xml", new DrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.kinematicWaves);
+		run(config, true);
 	}
 }

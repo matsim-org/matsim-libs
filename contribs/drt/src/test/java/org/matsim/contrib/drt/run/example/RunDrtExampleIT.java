@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +17,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data;
+/**
+ * 
+ */
+package org.matsim.contrib.drt.run.example;
 
-import org.matsim.api.core.v01.Identifiable;
+import org.junit.Rule;
+import org.junit.Test;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.examples.RunDrtExample;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
- * Represents a general request in DVRP.
- * 
- * For request rejection - adapt isRejected()
- * 
- * @author michalm
+ * @author jbischoff
  */
-public interface Request extends Identifiable<Request> {
+public class RunDrtExampleIT {
+	@Rule
+	public MatsimTestUtils utils = new MatsimTestUtils();
 
-	/**
-	 * @return time at which the request was submitted
-	 */
-	double getSubmissionTime();
-
-	/**
-	 * @return indicates whether the request has been rejected by the service provider (optimizer/dispatcher)
-	 */
-	default boolean isRejected() {
-		return false;
-	}
-
-	static String toString(Request request) {
-		return "[id=" + request.getId() + "][submissionTime=" + request.getSubmissionTime() + "][rejected="
-				+ request.isRejected() + "]";
+	@Test
+	public void testRunDrtExample() {
+		String configFile = "./src/main/resources/drt_example/drtconfig.xml";
+		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		RunDrtExample.run(config, false);
 	}
 }

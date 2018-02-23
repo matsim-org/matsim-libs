@@ -19,18 +19,29 @@
 
 package org.matsim.contrib.drt.run;
 
+import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.run.DrtConfigGroup.OperationalScheme;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
+import org.matsim.core.config.groups.QSimConfigGroup.EndtimeInterpretation;
+import org.matsim.core.utils.misc.Time;
 
 public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
+	private static final Logger log = Logger.getLogger(DrtConfigConsistencyChecker.class);
 
 	@Override
 	public void checkConsistency(Config config) {
 		new DvrpConfigConsistencyChecker().checkConsistency(config);
 
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
+		if (Time.isUndefinedTime(config.qsim().getEndTime())
+				&& config.qsim().getSimEndtimeInterpretation() != EndtimeInterpretation.onlyUseEndtime) {
+			// Not an issue if all request rejections are immediate (i.e. happen during request submission)
+			log.warn("qsim.endTime should be specified and qsim.simEndtimeInterpretation should be 'onlyUseEndtime'"
+					+ " if postponed request rejection is allowed. Otherwise, rejected passengers"
+					+ " (who are stuck endlessly waiting for a DRT vehicle) will prevent QSim from stopping");
+		}
 		if (drtCfg.getOperationalScheme() == OperationalScheme.stationbased && drtCfg.getTransitStopFile() == null) {
 			throw new RuntimeException(DrtConfigGroup.TRANSIT_STOP_FILE + " must not be null when "
 					+ DrtConfigGroup.OPERATIONAL_SCHEME + " is " + DrtConfigGroup.OperationalScheme.stationbased);

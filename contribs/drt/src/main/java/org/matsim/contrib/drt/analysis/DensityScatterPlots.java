@@ -86,6 +86,8 @@ public class DensityScatterPlots {
 
 		xyPlot.getDomainAxis().setUpperBound(maxValue);
 		xyPlot.getRangeAxis().setUpperBound(maxValue);
+		xyPlot.getDomainAxis().setLowerBound(0);
+		xyPlot.getRangeAxis().setLowerBound(0);
 
 		return chart;
 	}
