@@ -93,7 +93,7 @@ public class FlowCapacityVariationTest {
 		manager.addHandler(new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTimes));
 
 		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario).run();
-		QSim qSim = QSimUtils.createDefaultQSim(net.scenario, manager);
+		QSim qSim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(net.scenario, manager);
 		qSim.run();
 
 		Map<Id<Link>, double[]> times1 = vehicleLinkTravelTimes.get(Id.create("1", Vehicle.class));

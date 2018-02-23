@@ -35,6 +35,9 @@ import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.router.NetworkRoutingProvider;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
@@ -95,6 +98,8 @@ public class MultiModalModule extends AbstractModule {
         }
         addControlerListenerBinding().to(MultiModalControlerListener.class);
         bindMobsim().toProvider(MultimodalQSimFactory.class);
+        bind(MobsimTimer.class);
+        bind(AgentCounter.class).to(AgentCounterImpl.class);
     }
 
     public void setLinkSlopes(Map<Id<Link>, Double> linkSlopes) {

@@ -42,8 +42,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.SimpleTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitStopHandlerFactory;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -205,13 +208,24 @@ public class AccessEgressDemo {
 				bind(TransitStopHandlerFactory.class).to(SimpleTransitStopHandlerFactory.class).asEagerSingleton();
 			}
 		} ) ;
+		
+		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
+		
+		overrides.add(new AbstractModule() {
+			@Override
+			public void install() {
+				bind(MobsimTimer.class).toInstance(mobsimTimer);
+				bind(AgentCounter.class).to(AgentCounterImpl.class);
+			}
+		});
+		
 		final QSim sim = QSimUtils.createDefaultQSimWithOverrides(this.scenario, events, overrides);
 //		QSim sim = QSimUtils.createDefaultQSim(this.scenario, events);
 //		sim.getTransitEngine().setTransitStopHandlerFactory(new SimpleTransitStopHandlerFactory());
 		// ... but I think it is not working anyways because there is some problem to find the relevant part of the network in otfvis ...
 		// kai, nov'17
 		
-		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenario.getConfig(), this.scenario, events, sim);
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(this.scenario.getConfig(), this.scenario, events, sim, mobsimTimer);
 		OTFClientLive.run(this.scenario.getConfig(), server);
 		sim.run();
 

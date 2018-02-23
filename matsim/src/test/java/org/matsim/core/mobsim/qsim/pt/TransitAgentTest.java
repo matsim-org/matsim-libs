@@ -91,7 +91,7 @@ public class TransitAgentTest extends TestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim sim = (QSim) QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		TransitAgent agent = TransitAgent.createTransitAgent(person, scenario, eventsManager, mobsimTimer);
 		sim.insertAgentIntoMobsim(agent);
@@ -137,7 +137,7 @@ public class TransitAgentTest extends TestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim sim = (QSim) QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		TransitAgent agent = TransitAgent.createTransitAgent(person, scenario, eventsManager, mobsimTimer);
 		sim.insertAgentIntoMobsim(agent);

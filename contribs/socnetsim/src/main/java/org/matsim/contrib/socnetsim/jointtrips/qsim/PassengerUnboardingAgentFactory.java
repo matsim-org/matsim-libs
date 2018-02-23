@@ -20,7 +20,9 @@
 package org.matsim.contrib.socnetsim.jointtrips.qsim;
 
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -31,12 +33,18 @@ public class PassengerUnboardingAgentFactory implements AgentFactory, MobsimEngi
 	private final AgentFactory delegate;
 	private final QVehicleProvider vehicleProvider;
 	private InternalInterface internalInterface = null;
+	private final EventsManager eventsManager;
+	private final MobsimTimer mobsimTimer;
 
 	public PassengerUnboardingAgentFactory(
 			final AgentFactory delegate,
-			final QVehicleProvider vehicleProvider) {
+			final QVehicleProvider vehicleProvider,
+			EventsManager eventsManager,
+			MobsimTimer mobsimTimer) {
 		this.delegate = delegate;
 		this.vehicleProvider = vehicleProvider;
+		this.eventsManager = eventsManager;
+		this.mobsimTimer = mobsimTimer;
 	}
 
 	@Override
@@ -45,7 +53,9 @@ public class PassengerUnboardingAgentFactory implements AgentFactory, MobsimEngi
 		return new PassengerUnboardingDriverAgent(
 				delegate.createMobsimAgentFromPerson( p ),
 				vehicleProvider,
-				internalInterface);
+				internalInterface,
+				eventsManager,
+				mobsimTimer);
 	}
 
 	@Override

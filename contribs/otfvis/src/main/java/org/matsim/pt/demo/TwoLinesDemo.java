@@ -37,9 +37,13 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -334,9 +338,12 @@ public class TwoLinesDemo {
 		RouteOccupancy analysis2 = new RouteOccupancy(route2, vehTracker);
 		events.addHandler(analysis1);
 		events.addHandler(analysis2);
+		
+		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
+		AgentCounter agentCounter = new AgentCounterImpl();
 
-		QSim sim = QSimUtils.createDefaultQSim(this.scenario, events);
-		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
+		QSim sim = QSimUtils.createDefaultQSim(this.scenario, events, mobsimTimer, agentCounter);
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim, mobsimTimer);
 		OTFClientLive.run(scenario.getConfig(), server);
 		sim.run();
 

@@ -90,7 +90,7 @@ public class JavaRoundingErrorInQsimTest {
 		manager.addHandler(new VehicleLinkTravelTimeEventHandler(vehicleLinkTravelTime));
 
 		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario).run();
-		QSim qSim = QSimUtils.createDefaultQSim(net.scenario, manager);
+		QSim qSim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(net.scenario, manager);
 		qSim.run();
 
 		//agent 2 is departed first so will have free speed time = 1000/25 +1 = 41 sec

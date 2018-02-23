@@ -27,8 +27,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -58,12 +60,23 @@ class MultiModalSimEngine implements MobsimEngine {
 	private MultiModalSimEngineRunner[] runners;
 	private Phaser startBarrier;
     private Phaser endBarrier;
-	    
-    /*package*/ MultiModalSimEngine(Map<String, TravelTime> multiModalTravelTimes, MultiModalConfigGroup multiModalConfigGroup) {		
+    
+    private final EventsManager eventsManager;
+    private final Scenario scenario;
+    private final AgentCounter agentCounter;
+    private final MobsimTimer mobsimTimer;
+    
+    /*package*/ MultiModalSimEngine(Map<String, TravelTime> multiModalTravelTimes, MultiModalConfigGroup multiModalConfigGroup,
+    		EventsManager eventsManager, Scenario scenario, AgentCounter agentCounter, MobsimTimer mobsimTimer) {		
     	this.multiModalTravelTimes = multiModalTravelTimes;
     	this.numOfThreads = multiModalConfigGroup.getNumberOfThreads();
     	
     	if (this.numOfThreads > 1) log.info("Using " + multiModalConfigGroup.getNumberOfThreads() + " threads for MultiModalSimEngine.");
+    	
+    	this.eventsManager = eventsManager;
+    	this.scenario = scenario;
+    	this.agentCounter = agentCounter;
+    	this.mobsimTimer = mobsimTimer;
     }
     
 	@Override
@@ -71,12 +84,12 @@ class MultiModalSimEngine implements MobsimEngine {
 		this.internalInterface = internalInterface;
 	}
 
-	QSim getMobsim() {
+	/*QSim getMobsim() {
 		return (QSim) this.internalInterface.getMobsim();
-	}
+	}*/
 
 	/*package*/ EventsManager getEventsManager() {
-        return ((QSim) this.internalInterface.getMobsim()).getEventsManager();
+        return eventsManager;
 	}
 	
 	@Override
@@ -88,7 +101,6 @@ class MultiModalSimEngine implements MobsimEngine {
 			log.info("\t" + entry.getKey() + "\t" + entry.getValue().getClass().toString());
 		}
 		
-		Scenario scenario = ((QSim) this.internalInterface.getMobsim()).getScenario();
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
 		Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 		
@@ -126,7 +138,7 @@ class MultiModalSimEngine implements MobsimEngine {
 		
 		for (Link link : simulatedLinks) {
 			Id<Node> toNodeId = link.getToNode().getId();
-			MultiModalQLinkExtension extension = new MultiModalQLinkExtension(link, this, getMultiModalQNodeExtension(toNodeId));
+			MultiModalQLinkExtension extension = new MultiModalQLinkExtension(link, this, getMultiModalQNodeExtension(toNodeId), eventsManager, agentCounter, mobsimTimer);
 			this.links.put(link.getId(), extension);
 		}
 		
@@ -143,7 +155,7 @@ class MultiModalSimEngine implements MobsimEngine {
 		 * InfoTime may be < simStartTime, this ensures to print out the info 
 		 * at the very first timestep already
 		 */
-		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD;
+		this.infoTime = Math.floor(mobsimTimer.getSimStartTime() / INFO_PERIOD) * INFO_PERIOD;
 		
 		initMultiModalSimEngineRunners();
 	}
@@ -265,8 +277,7 @@ class MultiModalSimEngine implements MobsimEngine {
 		int links[] = new int[this.runners.length];
 		
 		int roundRobin = 0;
-		Scenario scenario = ((QSim) this.internalInterface.getMobsim()).getScenario();
-		
+
 		for (Node node : scenario.getNetwork().getNodes().values()) {
 			MultiModalQNodeExtension multiModalQNodeExtension = this.getMultiModalQNodeExtension(node.getId());
 			

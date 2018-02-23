@@ -211,7 +211,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		SimulatedCapacityHandler simulatedCapacity = new SimulatedCapacityHandler();
 		events.addHandler(simulatedCapacity);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim queueSim = QSimUtils.createDefaultQSim(scenario, events);
+		QSim queueSim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
 		queueSim.run();
 		
 		// check simulated capacity values
@@ -238,7 +238,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		events.addHandler(simulatedCapacity);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim queueSim = QSimUtils.createDefaultQSim(scenario, events);
+		QSim queueSim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
 		queueSim.run();
 				
 		// check simulated capacity values
@@ -266,7 +266,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		SimulatedCapacityHandler simulatedCapacity = new SimulatedCapacityHandler();
 		events.addHandler(simulatedCapacity);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim queueSim = QSimUtils.createDefaultQSim(scenario, events);
+		QSim queueSim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
 		queueSim.run();
 		
 		// check simulated capacity values
@@ -296,7 +296,7 @@ public class SimulatedLaneFlowCapacityTest extends MatsimTestCase{
 		SimulatedCapacityHandler simulatedCapacity = new SimulatedCapacityHandler();
 		events.addHandler(simulatedCapacity);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim queueSim = QSimUtils.createDefaultQSim(scenario, events);
+		QSim queueSim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
 		queueSim.run();
 		
 		// check simulated capacity values

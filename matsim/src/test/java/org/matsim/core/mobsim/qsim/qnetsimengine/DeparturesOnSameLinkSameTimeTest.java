@@ -119,7 +119,7 @@ public class DeparturesOnSameLinkSameTimeTest {
 		});
 
 		PrepareForSimUtils.createDefaultPrepareForSim(inputs.scenario).run();
-		QSim qsim = QSimUtils.createDefaultQSim(inputs.scenario,events);
+		QSim qsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(inputs.scenario,events);
 		qsim.run();
 
 		return linkLeaveTimes;

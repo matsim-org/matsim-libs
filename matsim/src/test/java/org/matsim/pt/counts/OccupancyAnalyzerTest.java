@@ -112,7 +112,7 @@ public class OccupancyAnalyzerTest {
 		eventsManager.addHandler(oa);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
-		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
+		QSim sim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(f.scenario, eventsManager);
 		sim.run();
 
 		Set<Id<TransitStopFacility>> enterStops = oa.getBoardStopIds();

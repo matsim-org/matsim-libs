@@ -56,7 +56,10 @@ import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -248,9 +251,12 @@ public class JointTravelingSimulationIntegrationTest {
 					}
 				}
 			});
+			
+			MobsimTimer mobsimTimer = new MobsimTimer(sc.getConfig());
+			AgentCounter agentCounter = new AgentCounterImpl();
 
 			final JointQSimFactory factory = new JointQSimFactory( );
-			final QSim qsim = factory.createMobsim( sc , events );
+			final QSim qsim = factory.createMobsim( sc , events, mobsimTimer, agentCounter );
 			try {
 				qsim.run();
 			}
@@ -332,9 +338,12 @@ public class JointTravelingSimulationIntegrationTest {
 					leaveCount.incrementAndGet();
 				}
 			});
+			
+			MobsimTimer mobsimTimer = new MobsimTimer(sc.getConfig());
+			AgentCounter agentCounter = new AgentCounterImpl();
 
 			final JointQSimFactory factory = new JointQSimFactory( );
-			factory.createMobsim( sc , events ).run();
+			factory.createMobsim( sc , events, mobsimTimer, agentCounter ).run();
 
 			Assert.assertEquals(
 					"not as many leave events as enter events",

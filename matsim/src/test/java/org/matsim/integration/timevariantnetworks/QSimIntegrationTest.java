@@ -100,7 +100,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		events.addHandler(ttcalc);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
+		Mobsim qsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
 		qsim.run();
 
 		// check that we get the expected result
@@ -165,7 +165,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1.getId(), person2.getId(), link2.getId());
 		events.addHandler(ttcalc);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
+		Mobsim qsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
         qsim.run();
 		/*
 		 * The last person of the first wave should have taken 20 s to travel
@@ -252,7 +252,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		});
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Mobsim qsim = QSimUtils.createDefaultQSim(scenario, events);
+		Mobsim qsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
         qsim.run();
 
 	}

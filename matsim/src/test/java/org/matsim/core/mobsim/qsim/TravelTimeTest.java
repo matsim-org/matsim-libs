@@ -62,7 +62,7 @@ public class TravelTimeTest {
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSimUtils.createDefaultQSim(scenario, events).run();
+		QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events).run();
 
 		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
 		Assert.assertEquals(360.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);
@@ -91,7 +91,7 @@ public class TravelTimeTest {
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSimUtils.createDefaultQSim(scenario, events).run();
+		QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events).run();
 
 		Map<Id<Link>, Double> travelTimes = agentTravelTimes.get(Id.create("1", Vehicle.class));
 		Assert.assertEquals(360.0, travelTimes.get(Id.create(6, Link.class)).intValue(), MatsimTestUtils.EPSILON);

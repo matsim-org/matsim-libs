@@ -25,9 +25,11 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
 
 import javax.inject.Inject;
@@ -41,19 +43,23 @@ public class WithinDayQSimFactory implements Provider<Mobsim> {
 	private final WithinDayEngine withinDayEngine;
 	private final FixedOrderSimulationListener fixedOrderSimulationListener;
 	private final WithinDayTravelTime WithinDayTravelTime;
-
+	private MobsimTimer mobsimTimer;
+	private AgentCounter agentCounter;
+	
 	@Inject
-	WithinDayQSimFactory(Scenario scenario, EventsManager eventsManager, WithinDayEngine withinDayEngine, FixedOrderSimulationListener fixedOrderSimulationListener, WithinDayTravelTime WithinDayTravelTime) {
+	WithinDayQSimFactory(Scenario scenario, EventsManager eventsManager, WithinDayEngine withinDayEngine, FixedOrderSimulationListener fixedOrderSimulationListener, WithinDayTravelTime WithinDayTravelTime, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.withinDayEngine = withinDayEngine;
 		this.fixedOrderSimulationListener = fixedOrderSimulationListener;
 		this.WithinDayTravelTime = WithinDayTravelTime;
+		this.mobsimTimer = mobsimTimer;
+		this.agentCounter = agentCounter;
 	}
 
 	@Override
 	public Mobsim get() {
-		QSim mobsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim mobsim = QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter);
 		log.info("Adding WithinDayEngine to Mobsim.");
 		mobsim.addMobsimEngine(withinDayEngine);
 		mobsim.addQueueSimulationListeners(fixedOrderSimulationListener);

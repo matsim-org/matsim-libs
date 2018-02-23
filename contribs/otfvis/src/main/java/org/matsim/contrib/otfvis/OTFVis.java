@@ -33,10 +33,13 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.AgentTracker;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -151,22 +154,25 @@ public class OTFVis {
 	}
 	
 	public static void playScenario(Scenario scenario){
+		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
+		AgentCounter agentCounter = new AgentCounterImpl();
+		
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim = QSimUtils.createDefaultQSim(scenario, events);
+		QSim qSim = QSimUtils.createDefaultQSim(scenario, events, mobsimTimer, agentCounter);
 
-		OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qSim);
+		OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qSim, mobsimTimer);
 		OTFClientLive.run(scenario.getConfig(), server);
 		
 		qSim.run();
 	}
 
-    public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
-        return startServerAndRegisterWithQSim(config, scenario, events, qSim, null);
+    public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim, MobsimTimer mobsimTimer) {
+        return startServerAndRegisterWithQSim(config, scenario, events, qSim, mobsimTimer, null);
     }
 	
     public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim,
-            NonPlanAgentQueryHelper nonPlanAgentQueryHelper) {
-		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events, qSim, nonPlanAgentQueryHelper);
+            MobsimTimer mobsimTimer, NonPlanAgentQueryHelper nonPlanAgentQueryHelper) {
+		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events, qSim, mobsimTimer, nonPlanAgentQueryHelper);
 
 		if (config.transit().isUseTransit()) {
 
@@ -263,7 +269,7 @@ public class OTFVis {
 					}
 				};
 			}
-		});
+		}, new MobsimTimer(config));
 
 		OTFClientLive.run(config, server);
 	}

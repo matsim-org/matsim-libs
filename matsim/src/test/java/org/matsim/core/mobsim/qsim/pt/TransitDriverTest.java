@@ -80,7 +80,7 @@ public class TransitDriverTest {
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(eventsManager);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, eventsManager, mobsimTimer, agentCounterFixture) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -166,7 +166,7 @@ public class TransitDriverTest {
 
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(eventsManager);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
 
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, eventsManager, mobsimTimer, agentCounterFixture) ;
@@ -211,7 +211,7 @@ public class TransitDriverTest {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, eventsManager, mobsimTimer, agentCounterFixture) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -267,7 +267,7 @@ public class TransitDriverTest {
 		eventsManager.initProcessing();
 
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(sc, eventsManager);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, eventsManager);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, eventsManager, mobsimTimer, agentCounterFixture) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -363,7 +363,7 @@ public class TransitDriverTest {
 		Config config = ConfigUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, eventsManager, mobsimTimer, agentCounterFixture) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -429,7 +429,7 @@ public class TransitDriverTest {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim tqsim = (QSim) QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim tqsim = (QSim) QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, eventsManager, mobsimTimer, agentCounterFixture) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -483,7 +483,7 @@ public class TransitDriverTest {
 		Config config = ConfigUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim tqsim = (QSim) QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim tqsim = (QSim) QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, eventsManager, mobsimTimer, agentCounterFixture) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -536,7 +536,7 @@ public class TransitDriverTest {
 		Config config = ConfigUtils.createConfig();
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim tqsim = (QSim) QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim tqsim = (QSim) QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, eventsManager, mobsimTimer, agentCounterFixture) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -598,7 +598,7 @@ public class TransitDriverTest {
 		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, eventsManager, mobsimTimer, agentCounterFixture) ;
 		tqsim.addMobsimEngine(trEngine);

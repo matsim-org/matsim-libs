@@ -48,7 +48,25 @@ public class QSimUtils {
 		return createDefaultQSimWithOverrides(scenario, eventsManager, Collections.singleton(new AuxiliaryQSimModule(agentCounter, mobsimTimer)));
 	}
 	
-	public static QSim createDefaultQSim(final Scenario scenario, final EventsManager eventsManager) {
+	// This has been commented out, because it was often used in test, but it is misleading in terms of what 
+	// need to be injected into the QSim or not. (Before nothing needed to be injected). shoerl, feb18
+	/*public static QSim createDefaultQSim(final Scenario scenario, final EventsManager eventsManager) {
+		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
+		AgentCounter agentCounter = new AgentCounterImpl();
+		
+		return createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter);
+	}*/
+	
+	/**
+	 * This is a convenience factory method! Whenever you construct more complex QSims, 
+	 * especially when you need a consistent MobsimTimer or AgentCounter in multiple classes, 
+	 * use the factory method where you can define them explicitly!
+	 * 
+	 * Another hint: You especially need to avoid this method if you create a Provider<QSim>. 
+	 * Inject the global AgentCounter and MobsimTimer into your Provider and use those with the
+	 * other factory method.
+	 */
+	public static QSim createDefaultQSimWithDefaultTimerAndCounter(final Scenario scenario, final EventsManager eventsManager) {
 		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
 		AgentCounter agentCounter = new AgentCounterImpl();
 		

@@ -89,7 +89,7 @@ public class EquilTest extends MatsimTestCase {
 
 		//		SimulationTimer.setTime(0); // I don't think this is needed. kai, may'10
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		Mobsim sim = QSimUtils.createDefaultQSim(scenario, events);
+		Mobsim sim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
 		sim.run();
 
 		writer.closeFile();

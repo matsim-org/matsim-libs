@@ -31,9 +31,12 @@ import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
@@ -57,11 +60,18 @@ class MultiModalQLinkExtension {
 	private final Queue<Tuple<Double, MobsimAgent>> agents = new PriorityQueue<>(30, new TravelTimeComparator());
 	private final Queue<MobsimAgent> waitingAfterActivityAgents = new LinkedList<>();
 	private final Queue<MobsimAgent> waitingToLeaveAgents = new LinkedList<>();
+	
+	private final EventsManager eventsManager;
+	private final AgentCounter agentCounter;
+	private final MobsimTimer mobsimTimer;
 
-	/*package*/ MultiModalQLinkExtension(Link link, MultiModalSimEngine simEngine, MultiModalQNodeExtension multiModalQNodeExtension) {
+	/*package*/ MultiModalQLinkExtension(Link link, MultiModalSimEngine simEngine, MultiModalQNodeExtension multiModalQNodeExtension, EventsManager eventsManager, AgentCounter agentCounter, MobsimTimer mobsimTimer) {
 		this.link = link;
 		this.simEngine = simEngine;
 		this.toNode = multiModalQNodeExtension;
+		this.eventsManager = eventsManager;
+		this.agentCounter = agentCounter;
+		this.mobsimTimer = mobsimTimer;
 	}
 
 	/*package*/ void setNetworkElementActivator(NetworkElementActivator activator) {
@@ -164,10 +174,10 @@ class MultiModalQLinkExtension {
 				// Christoph, the "isArrivingOnCurrentLink" method is new.  You may decide that this is enough, and getDestinationLinkId
 				// does not need to be queried.  kai, nov'14
 				
-				this.simEngine.getMobsim().getEventsManager().processEvent(
+				eventsManager.processEvent(
 						new VehicleLeavesTrafficEvent(now, driver.getId(), link.getId(), Id.create(driver.getId(), Vehicle.class), driver.getMode(), 1.0));
 				
-				this.simEngine.getMobsim().getEventsManager().processEvent(
+				eventsManager.processEvent(
 						new PersonLeavesVehicleEvent(now, driver.getId(), Id.create(driver.getId(), Vehicle.class)));				
 				
 				driver.endLegAndComputeNextState(now);
@@ -202,34 +212,34 @@ class MultiModalQLinkExtension {
 	}
 
 	public void clearVehicles() {
-		double now = this.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		double now = mobsimTimer.getTimeOfDay();
 
 		for (Tuple<Double, MobsimAgent> tuple : agents) {
 			MobsimAgent mobsimAgent = tuple.getSecond();
-			this.simEngine.getMobsim().getEventsManager().processEvent(
+			eventsManager.processEvent(
 					new VehicleAbortsEvent(now, Id.create(mobsimAgent.getId(), Vehicle.class), link.getId()));
-			this.simEngine.getMobsim().getEventsManager().processEvent(
+			eventsManager.processEvent(
 					new PersonStuckEvent(now, mobsimAgent.getId(), link.getId(), mobsimAgent.getMode()));
-			this.simEngine.getMobsim().getAgentCounter().incLost();
-			this.simEngine.getMobsim().getAgentCounter().decLiving();
+			agentCounter.incLost();
+			agentCounter.decLiving();
 		}
 		
 		for (MobsimAgent mobsimAgent : this.waitingAfterActivityAgents) {
-			this.simEngine.getMobsim().getEventsManager().processEvent(
+			eventsManager.processEvent(
 					new VehicleAbortsEvent(now, Id.create(mobsimAgent.getId(), Vehicle.class), link.getId()));
-			this.simEngine.getMobsim().getEventsManager().processEvent(
+			eventsManager.processEvent(
 					new PersonStuckEvent(now, mobsimAgent.getId(), link.getId(), mobsimAgent.getMode()));
-			this.simEngine.getMobsim().getAgentCounter().incLost();
-			this.simEngine.getMobsim().getAgentCounter().decLiving();
+			agentCounter.incLost();
+			agentCounter.decLiving();
 		}
 		
 		for (MobsimAgent mobsimAgent : this.waitingToLeaveAgents) {
-			this.simEngine.getMobsim().getEventsManager().processEvent(
+			eventsManager.processEvent(
 					new VehicleAbortsEvent(now, Id.create(mobsimAgent.getId(), Vehicle.class), link.getId()));
-			this.simEngine.getMobsim().getEventsManager().processEvent(
+			eventsManager.processEvent(
 					new PersonStuckEvent(now, mobsimAgent.getId(), link.getId(), mobsimAgent.getMode()));
-			this.simEngine.getMobsim().getAgentCounter().incLost();
-			this.simEngine.getMobsim().getAgentCounter().decLiving();
+			agentCounter.incLost();
+			agentCounter.decLiving();
 		}
 		
 		this.agents.clear();

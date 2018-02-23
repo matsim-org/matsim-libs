@@ -41,6 +41,7 @@ import org.matsim.core.controler.NewControlerModule;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.controler.corelisteners.ControlerDefaultCoreListenersModule;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.AgentTracker;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
@@ -73,17 +74,18 @@ public class OTFVisWithSignals {
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		
 		QSim qSim = (QSim) injector.getInstance(Mobsim.class);
+		MobsimTimer mobsimTimer = injector.getInstance(MobsimTimer.class);
 
 		if (startOtfvis) {
-			OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim);
+			OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qSim, mobsimTimer);
 			OTFClientLiveWithSignals.run(scenario.getConfig(), server);
 		}
 
 		qSim.run();
 	}
 
-	public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim) {
-		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events, qSim);
+	public static OnTheFlyServer startServerAndRegisterWithQSim(Config config, Scenario scenario, EventsManager events, QSim qSim, MobsimTimer mobsimTimer) {
+		OnTheFlyServer server = OnTheFlyServer.createInstance(scenario, events, qSim, mobsimTimer);
 		Network network = scenario.getNetwork();
 		TransitSchedule transitSchedule = scenario.getTransitSchedule();
 //			TransitQSimEngine transitEngine = qSim.getTransitEngine();

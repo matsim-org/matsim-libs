@@ -46,6 +46,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 
@@ -75,6 +76,8 @@ public class ParkingAgentFactory implements AgentFactory {
 	QSim qsim;
 	@Inject
 	Config config; 
+	@Inject
+	MobsimTimer mobsimTimer;
 	
 	/**
 	 * 
@@ -94,19 +97,19 @@ public class ParkingAgentFactory implements AgentFactory {
 		case Benenson:
 			parkingLogic  = new BenensonParkingSearchLogic(network,psConfigGroup);
 			agentLogic = new BenensonParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkLegFactory,
-					parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic, psConfigGroup);
+					parkingRouter, events, parkingLogic,  mobsimTimer,teleportationLogic, psConfigGroup);
 			break;
 			
 		case Random:
 			parkingLogic  = new RandomParkingSearchLogic(network);
 			agentLogic = new ParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkLegFactory,
-					parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic, psConfigGroup);
+					parkingRouter, events, parkingLogic,  mobsimTimer,teleportationLogic, psConfigGroup);
 			break;
 		
 		case DistanceMemory:
 			parkingLogic  = new DistanceMemoryParkingSearchLogic(network);
 			agentLogic = new MemoryBasedParkingAgentLogic(p.getSelectedPlan(), parkingManager, walkLegFactory,
-					parkingRouter, events, parkingLogic,  ((QSim) qsim).getSimTimer(),teleportationLogic, psConfigGroup);
+					parkingRouter, events, parkingLogic,  mobsimTimer,teleportationLogic, psConfigGroup);
 			break;
 			
 		}

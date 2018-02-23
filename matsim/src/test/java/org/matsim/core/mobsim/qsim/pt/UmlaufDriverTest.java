@@ -110,7 +110,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, eventsManager, mobsimTimer, agentCounter);
@@ -178,7 +178,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(scenario, events);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, events, mobsimTimer, agentCounter);
@@ -210,7 +210,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Config config = ConfigUtils.createConfig();
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(scenario, events);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, events, mobsimTimer, agentCounter) ;
@@ -259,7 +259,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Config config = ConfigUtils.createConfig();
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(config);
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(sc, events);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter);
@@ -336,7 +336,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Config config = ConfigUtils.createConfig();
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(config);
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(sc, events);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter);
@@ -402,7 +402,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Config config = ConfigUtils.createConfig();
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(config);
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(sc, events);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter);
@@ -446,7 +446,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Config config = ConfigUtils.createConfig();
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(config);
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(sc, events);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter);
@@ -501,7 +501,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Config config = ConfigUtils.createConfig();
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(config);
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(sc, events);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter);
@@ -555,7 +555,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		Config config = ConfigUtils.createConfig();
 		MutableScenario sc = (MutableScenario) ScenarioUtils.createScenario(config);
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
-		QSim tqsim = QSimUtils.createDefaultQSim(sc, events);
+		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter);

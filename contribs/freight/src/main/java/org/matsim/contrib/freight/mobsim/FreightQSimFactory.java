@@ -38,6 +38,7 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -50,14 +51,16 @@ public class FreightQSimFactory implements Provider<Mobsim> {
 	private CarrierAgentTracker carrierAgentTracker;
 	private CarrierConfig carrierConfig;
 	private MobsimTimer mobsimTimer;
+	private AgentCounter agentCounter;
 
 	@Inject
-	public FreightQSimFactory(Scenario scenario, EventsManager eventsManager, CarrierAgentTracker carrierAgentTracker, CarrierConfig carrierConfig, MobsimTimer mobsimTimer) {
+	public FreightQSimFactory(Scenario scenario, EventsManager eventsManager, CarrierAgentTracker carrierAgentTracker, CarrierConfig carrierConfig, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.carrierAgentTracker = carrierAgentTracker;
 		this.carrierConfig = carrierConfig;
 		this.mobsimTimer = mobsimTimer;
+		this.agentCounter = agentCounter;
 	}
 
 	@Override
@@ -67,7 +70,7 @@ public class FreightQSimFactory implements Provider<Mobsim> {
 			throw new NullPointerException(
 					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
-		final QSim sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		final QSim sim = QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter);
 		Collection<MobSimVehicleRoute> vRoutes = carrierAgentTracker.createPlans();
 		FreightAgentSource agentSource = new FreightAgentSource(vRoutes, new DefaultAgentFactory(scenario, eventsManager, mobsimTimer), sim);
 		sim.addAgentSource(agentSource);

@@ -25,11 +25,13 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
@@ -47,32 +49,35 @@ import java.util.List;
 /**
  * @author thibautd
  */
-public class JointQSimFactory implements MobsimFactory, Provider<QSim> {
+public class JointQSimFactory implements Provider<QSim> {
 	private static final Logger log =
 		Logger.getLogger(JointQSimFactory.class);
 	
 	private final Scenario sc;
 	private final EventsManager events;
+	private final MobsimTimer mobsimTimer;
+	private final AgentCounter agentCounter;
 
 	@Inject
-	public JointQSimFactory( final Scenario sc, final EventsManager events ) {
+	public JointQSimFactory( final Scenario sc, final EventsManager events, final MobsimTimer mobsimTimer, final AgentCounter agentCounter ) {
 		this.sc = sc;
 		this.events = events;
+		this.mobsimTimer = mobsimTimer;
+		this.agentCounter = agentCounter;
 	}
 	
 	public JointQSimFactory() {
-		this( null , null );
+		this( null , null, null, null );
 	}
 	
 	@Override
 	public QSim get() {
-		return createMobsim( sc , events );
+		return createMobsim( sc , events, mobsimTimer, agentCounter );
 	}
 
-	@Override
 	public QSim createMobsim(
 			final Scenario sc1,
-			final EventsManager eventsManager) {
+			final EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
         final QSimConfigGroup conf = sc1.getConfig().qsim();
         if (conf == null) {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
@@ -86,13 +91,13 @@ public class JointQSimFactory implements MobsimFactory, Provider<QSim> {
 		}
 
 		// default initialisation
-		final QSim qSim = new QSim( sc1 , eventsManager );
+		final QSim qSim = new QSim( sc1 , eventsManager, agentCounter, mobsimTimer );
 
-		final ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
+		final ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer);
 		qSim.addMobsimEngine( activityEngine );
 		qSim.addActivityHandler( activityEngine );
 
-        final QNetsimEngine netsimEngine = new QNetsimEngine(qSim);
+        final QNetsimEngine netsimEngine = new QNetsimEngine(sc1.getConfig(), sc1, eventsManager, mobsimTimer, agentCounter);
 		qSim.addMobsimEngine( netsimEngine );
 		// DO NOT ADD DEPARTURE HANDLER: it is done by the joint departure handler
 
@@ -100,11 +105,11 @@ public class JointQSimFactory implements MobsimFactory, Provider<QSim> {
 		qSim.addDepartureHandler( jointDepHandler );
 		qSim.addMobsimEngine( jointDepHandler );
 
-		final DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(sc1, eventsManager);
+		final DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(sc1, eventsManager, mobsimTimer);
 		qSim.addMobsimEngine( teleportationEngine );
 
         if (sc1.getConfig().transit().isUseTransit()) {
-            final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+            final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim, sc1.getConfig(), sc1, eventsManager, mobsimTimer, agentCounter);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
             qSim.addDepartureHandler(transitEngine);
             qSim.addAgentSource(transitEngine);
@@ -114,15 +119,15 @@ public class JointQSimFactory implements MobsimFactory, Provider<QSim> {
 		final PassengerUnboardingAgentFactory passAgentFactory =
 					new PassengerUnboardingAgentFactory(
 						sc1.getConfig().transit().isUseTransit() ?
-							new TransitAgentFactory(qSim) :
-							new DefaultAgentFactory(qSim) ,
+							new TransitAgentFactory(sc1, eventsManager, mobsimTimer) :
+							new DefaultAgentFactory(sc1, eventsManager, mobsimTimer) ,
 						new NetsimWrappingQVehicleProvider(
-							netsimEngine) );
+							netsimEngine), eventsManager, mobsimTimer );
         final AgentSource agentSource =
 			new PopulationAgentSourceWithVehicles(
 					sc1.getPopulation(),
 					passAgentFactory,
-					qSim);
+					qSim, sc1);
 		qSim.addMobsimEngine( passAgentFactory );
         qSim.addAgentSource(agentSource);
         return qSim;

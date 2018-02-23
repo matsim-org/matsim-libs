@@ -124,7 +124,7 @@ public class TravelTimeOneWayTestIT {
 		events.addHandler(eventHandler);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSimUtils.createDefaultQSim(scenario, events).run();
+		QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events).run();
 		MeasurementPoint resultsWoSignals = eventHandler.beginningOfLink2;
 		if (resultsWoSignals != null) {
 			log.debug("tF = 60s, " + resultsWoSignals.numberOfVehPassedDuringTimeToMeasure + ", " + resultsWoSignals.numberOfVehPassed + ", "

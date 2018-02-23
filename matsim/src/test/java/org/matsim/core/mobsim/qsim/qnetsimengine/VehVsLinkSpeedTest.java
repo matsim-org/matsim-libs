@@ -111,7 +111,7 @@ public class VehVsLinkSpeedTest {
 		net.scenario.getVehicles().addVehicleType(car);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(net.scenario).run();
-		QSim qSim = QSimUtils.createDefaultQSim(net.scenario, manager);
+		QSim qSim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(net.scenario, manager);
 		qSim.run();
 
 		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTime.get(Id.create("0", Vehicle.class));

@@ -188,7 +188,7 @@ public class TransitQueueSimulationTest {
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        QSim sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+        QSim sim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
         sim.run();
         List<MobsimAgent> agents = new ArrayList<>(sim.getAgents().values());
         Collections.sort(agents, new Comparator<MobsimAgent>() {
@@ -348,7 +348,7 @@ public class TransitQueueSimulationTest {
         // run simulation
         EventsManager events = EventsUtils.createEventsManager();
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        QSim simulation = QSimUtils.createDefaultQSim(scenario, events);
+        QSim simulation = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
         simulation.run();
     }
 
@@ -680,7 +680,7 @@ public class TransitQueueSimulationTest {
 
         // first test without special settings
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        QSim sim = QSimUtils.createDefaultQSim(scenario, events);
+        QSim sim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
         sim.run();
         assertEquals(depTime, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
         assertEquals(depTime + 101.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -691,7 +691,7 @@ public class TransitQueueSimulationTest {
         config.qsim().setEndTime(depTime + 90.0);
 
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        sim = QSimUtils.createDefaultQSim(scenario, events);
+        sim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
         sim.run();
         assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
         assertEquals(depTime + 90.0, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -808,7 +808,7 @@ public class TransitQueueSimulationTest {
         EventsCollector collector = new EventsCollector();
         events.addHandler(collector);
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-        QSimUtils.createDefaultQSim(scenario, events).run();
+        QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events).run();
         List<Event> allEvents = collector.getEvents();
 
         for (Event event : allEvents) {
