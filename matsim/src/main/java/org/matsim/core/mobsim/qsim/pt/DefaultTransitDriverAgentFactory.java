@@ -19,7 +19,9 @@
 
 package org.matsim.core.mobsim.qsim.pt;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.pt.Umlauf;
 
@@ -30,16 +32,21 @@ public class DefaultTransitDriverAgentFactory implements TransitDriverAgentFacto
 
 	private final InternalInterface internalInterface;
 	private final TransitStopAgentTracker transitStopAgentTracker;
+	
+	final private Scenario scenario;
+	final private EventsManager eventsManager;
 
-	public DefaultTransitDriverAgentFactory(InternalInterface internalInterface, TransitStopAgentTracker transitStopAgentTracker) {
+	public DefaultTransitDriverAgentFactory(InternalInterface internalInterface, TransitStopAgentTracker transitStopAgentTracker, Scenario scenario, EventsManager eventsManager) {
 		this.internalInterface = internalInterface;
 		this.transitStopAgentTracker = transitStopAgentTracker;
+		this.scenario = scenario;
+		this.eventsManager = eventsManager;
 	}
 
 
 	@Override
 	public AbstractTransitDriverAgent createTransitDriver(Umlauf umlauf) {
-		return new TransitDriverAgentImpl(umlauf, TransportMode.car, transitStopAgentTracker, internalInterface);
+		return new TransitDriverAgentImpl(umlauf, TransportMode.car, transitStopAgentTracker, internalInterface, scenario, eventsManager);
 	}
 
 }

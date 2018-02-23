@@ -80,16 +80,16 @@ public class BicycleQSimFactory implements Provider<Mobsim> {
 //		});
 //		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, qNetworkFactory ) ;
 
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim ) ;
+		QNetsimEngine netsimEngine = new QNetsimEngine(scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter) ;
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager);
+		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager, mobsimTimer);
 		qSim.addMobsimEngine(teleportationEngine);
 
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
+		AgentFactory agentFactory = new DefaultAgentFactory(scenario, eventsManager, mobsimTimer);
 
-		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, scenario.getConfig(), scenario, qSim);
 		qSim.addAgentSource(agentSource);
 
 		return qSim ;

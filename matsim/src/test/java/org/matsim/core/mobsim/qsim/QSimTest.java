@@ -47,10 +47,12 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
@@ -93,17 +95,20 @@ public class QSimTest {
 	private static QSim createQSim(MutableScenario scenario, EventsManager events) {
 		// vehicles are moved to prepareForSim, thus, this must be explicitly called before qsim. Amit May'17
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
+		
+		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
+		AgentCounter agentCounter = new AgentCounterImpl();		
 
-		QSim qSim1 = new QSim(scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
+		QSim qSim1 = new QSim(scenario, events, agentCounter, mobsimTimer);
+		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim1);
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events);
+		QNetsimEngineModule.configure(qSim1, scenario.getConfig(), scenario, events, mobsimTimer, agentCounter);
+		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events, mobsimTimer);
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+		AgentFactory agentFactory = new DefaultAgentFactory(scenario, events, mobsimTimer);
+		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, scenario.getConfig(), scenario, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;
 	}
@@ -112,17 +117,19 @@ public class QSimTest {
 		// vehicles are moved to prepareForSim, thus, this must be explicitly called before qsim. Amit May'17
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
 
+		AgentCounter agentCounter = new AgentCounterImpl();
+		
 		Scenario sc = f.scenario;
-		QSim qSim1 = new QSim(sc, events);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
+		QSim qSim1 = new QSim(sc, events, agentCounter, f.mobsimTimer);
+		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, f.mobsimTimer);
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim1);
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(sc, events);
+		QNetsimEngineModule.configure(qSim1, f.scenario.getConfig(), f.scenario, events, f.mobsimTimer, agentCounter);
+		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(sc, events, f.mobsimTimer);
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+		AgentFactory agentFactory = new DefaultAgentFactory(f.scenario, events, f.mobsimTimer);
+		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, f.scenario.getConfig(), f.scenario, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;
 	}
@@ -1039,14 +1046,14 @@ public class QSimTest {
 		sim.addParkedVehicle(vehicle1, Id.create(2, Link.class));
 		sim.addParkedVehicle(vehicle2, Id.create(2, Link.class));
 
-		sim.getSimTimer().setTime(100.0);
-		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person.getSelectedPlan(), sim);
+		f.mobsimTimer.setTime(100.0);
+		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(person.getSelectedPlan(), f.scenario, events, f.mobsimTimer);
 		sim.insertAgentIntoMobsim(agent); 
 		agent.endActivityAndComputeNextState(100.0);
 		sim.internalInterface.arrangeNextAgentState(agent);
-		sim.getSimTimer().setTime(101.0);
+		f.mobsimTimer.setTime(101.0);
 		sim.doSimStep(); // agent should be moved to qlink2.buffer
-		sim.getSimTimer().setTime(102.0);
+		f.mobsimTimer.setTime(102.0);
 		sim.doSimStep(); // agent should be moved to qlink3
 
 		Collection<MobsimVehicle> vehicles = qlink3.getAllVehicles();
@@ -1527,9 +1534,12 @@ public class QSimTest {
 		final Population plans;
 		final ArrayList<Id<Link>> linkIdsNone;
 		final ArrayList<Id<Link>> linkIds2;
+		
+		final MobsimTimer mobsimTimer;
 
 		public Fixture(boolean isUsingFastCapacityUpdate) {
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			this.mobsimTimer = new MobsimTimer(scenario.getConfig());
 			this.config = scenario.getConfig();
 			this.config.qsim().setFlowCapFactor(1.0);
 			this.config.qsim().setStorageCapFactor(1.0);

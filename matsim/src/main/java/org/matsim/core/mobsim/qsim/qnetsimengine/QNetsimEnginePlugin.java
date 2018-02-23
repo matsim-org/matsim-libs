@@ -2,10 +2,13 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Module;
+import com.google.inject.Provides;
+
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -23,6 +26,11 @@ public class QNetsimEnginePlugin extends AbstractQSimPlugin {
 			protected void configure() {
 				bind(QNetsimEngine.class).asEagerSingleton();
 				bind(VehicularDepartureHandler.class).toProvider(QNetsimEngineDepartureHandlerProvider.class).asEagerSingleton();
+			}
+			
+			@Provides 
+			NetsimNetwork provideNetsimNetwork(QNetsimEngine netsimEngine) {
+				return netsimEngine.getNetsimNetwork();
 			}
 		});
 	}

@@ -26,10 +26,7 @@ public class QSimModule extends com.google.inject.AbstractModule {
 	@Inject Config config ;
 	
 	@Override
-	protected void configure() {
-		bind(AgentCounter.class).to(org.matsim.core.mobsim.qsim.AgentCounter.class);
-		bind(MobsimTimer.class);
-		
+	protected void configure() {		
 		bind(Mobsim.class).toProvider(QSimProvider.class);
 		if ( config.qsim().isUseLanes() ) { 
 			bind(QNetworkFactory.class).to( QLanesNetworkFactory.class ) ;
@@ -40,6 +37,9 @@ public class QSimModule extends com.google.inject.AbstractModule {
 			bind( TransitStopHandlerFactory.class ).to( ComplexTransitStopHandlerFactory.class ) ;
 		}
 		// yy see MATSIM-756
+		
+		bind(MobsimTimer.class);
+		bind(AgentCounter.class).to(AgentCounterImpl.class);
 	}
 
 	@SuppressWarnings("static-method")

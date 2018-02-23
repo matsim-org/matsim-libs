@@ -87,13 +87,16 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	// package protected to be accessible for test case
 	/*package*/ double simStartTime = Time.UNDEFINED_TIME;
 	/*package*/ double timeStepSize = Time.UNDEFINED_TIME;
+	
+	final private MobsimTimer mobsimTimer;
 
 	@Inject
-	public ActivityReplanningMap(MobsimDataProvider mobsimDataProvider, EventsManager eventsManager) {
+	public ActivityReplanningMap(MobsimDataProvider mobsimDataProvider, EventsManager eventsManager, MobsimTimer mobsimTimer) {
 		eventsManager.addHandler(this);
 		log.info("Note that the ActivityReplanningMap has to be registered as an EventHandler and a SimulationListener!");
 
 		this.mobsimDataProvider = mobsimDataProvider;
+		this.mobsimTimer = mobsimTimer;
 
 		this.startingAgents = new HashMap<>();
 		this.activityEndTimes = new HashMap<>();
@@ -108,7 +111,6 @@ public class ActivityReplanningMap implements PersonStuckEventHandler,
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 
-		MobsimTimer mobsimTimer = ((QSim) e.getQueueSimulation()).getSimTimer();
 		this.simStartTime = mobsimTimer.getSimStartTime();
 		this.timeStepSize = mobsimTimer.getSimTimestepSize();
 

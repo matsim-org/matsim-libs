@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.*;
 import org.matsim.api.core.v01.network.Link;
@@ -45,10 +46,12 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine.TransitAgentTriesToTeleportException;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
@@ -254,24 +257,27 @@ public class TransitQueueSimulationTest {
         plan.addLeg(leg);
         plan.addActivity(workAct);
         population.addPerson(person);
+        
+        AgentCounter agentCounter = new AgentCounterImpl();
+        MobsimTimer mobsimTimer = new MobsimTimer(config);
 
         // run simulation
         EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim1 = new QSim(scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim1.getAgentCounter());
+		QSim qSim1 = new QSim(scenario, events, agentCounter, mobsimTimer);
+		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
-        QNetsimEngineModule.configure(qSim1);
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events);
+        QNetsimEngineModule.configure(qSim1, config, scenario, events, mobsimTimer, agentCounter);
+		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events, mobsimTimer);
 		qSim1.addMobsimEngine(teleportationEngine);
         QSim qSim = qSim1;
-        AgentFactory agentFactory = new TransitAgentFactory(qSim);
-        TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+        AgentFactory agentFactory = new TransitAgentFactory(scenario, events, mobsimTimer);
+        TransitQSimEngine transitEngine = new TransitQSimEngine(qSim, config, scenario, events, mobsimTimer, agentCounter);
         transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
         qSim.addDepartureHandler(transitEngine);
         qSim.addAgentSource(transitEngine);
         qSim.addMobsimEngine(transitEngine);
-        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, config, scenario, qSim);
         qSim.addAgentSource(agentSource);
         qSim.run();
 
@@ -522,23 +528,25 @@ public class TransitQueueSimulationTest {
             this.line = line;
             this.route = route;
             this.departure = departure;
-			QSim qSim2 = new QSim(scenario, events);
-			ActivityEngine activityEngine = new ActivityEngine(events, qSim2.getAgentCounter());
+            MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
+            AgentCounter agentCounter = new AgentCounterImpl();
+			QSim qSim2 = new QSim(scenario, events, agentCounter, mobsimTimer);
+			ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
 			qSim2.addMobsimEngine(activityEngine);
 			qSim2.addActivityHandler(activityEngine);
-            QNetsimEngine netsimEngine = new QNetsimEngine(qSim2);
+            QNetsimEngine netsimEngine = new QNetsimEngine(scenario.getConfig(), scenario, events, mobsimTimer, agentCounter);
 			qSim2.addMobsimEngine(netsimEngine);
 			qSim2.addDepartureHandler(netsimEngine.getDepartureHandler());
-			DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events);
+			DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events, mobsimTimer);
 			qSim2.addMobsimEngine(teleportationEngine);
             QSim qSim1 = qSim2;
-            AgentFactory agentFactory = new TransitAgentFactory(qSim1);
-            final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim1);
+            AgentFactory agentFactory = new TransitAgentFactory(scenario, events, mobsimTimer);
+            final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim1, scenario.getConfig(), scenario, events, mobsimTimer, agentCounter);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
             qSim1.addDepartureHandler(transitEngine);
             qSim1.addAgentSource(transitEngine);
             qSim1.addMobsimEngine(transitEngine);
-            PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim1);
+            PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, scenario.getConfig(), scenario, qSim1);
             qSim1.addAgentSource(agentSource);
             qSim = qSim1;
             qSim.addAgentSource(new AgentSource() {
@@ -546,7 +554,7 @@ public class TransitQueueSimulationTest {
                 public void insertAgentsIntoMobsim() {
                     TestHandleStopSimulation.this.driver = new SpyDriver(TestHandleStopSimulation.this.line, 
                     		TestHandleStopSimulation.this.route, TestHandleStopSimulation.this.departure, 
-                    		transitEngine.getAgentTracker(), transitEngine);
+                    		transitEngine.getAgentTracker(), transitEngine, scenario, events);
 
                     VehicleType vehicleType = new VehicleTypeImpl(Id.create("transitVehicleType", VehicleType.class));
                     VehicleCapacity capacity = new VehicleCapacityImpl();
@@ -587,8 +595,8 @@ public class TransitQueueSimulationTest {
         public final List<SpyHandleStopData> spyData = new ArrayList<>();
 
         public SpyDriver(final TransitLine line, final TransitRoute route, final Departure departure,
-                         final TransitStopAgentTracker agentTracker, final TransitQSimEngine trEngine) {
-            super(new SingletonUmlaufBuilderImpl(Collections.singleton(line)).build().get(0), TransportMode.car, agentTracker, trEngine.getInternalInterface());
+                         final TransitStopAgentTracker agentTracker, final TransitQSimEngine trEngine, Scenario scenario, EventsManager eventsManager) {
+            super(new SingletonUmlaufBuilderImpl(Collections.singleton(line)).build().get(0), TransportMode.car, agentTracker, trEngine.getInternalInterface(), scenario, eventsManager);
         }
 
         @Override

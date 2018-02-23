@@ -32,10 +32,14 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.pt.ReconstructingUmlaufBuilder;
@@ -68,8 +72,6 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private static final Logger log = Logger.getLogger(TransitQSimEngine.class);
 
-	private final QSim qSim;
-
 	private TransitSchedule schedule = null;
 
 	protected final TransitStopAgentTracker agentTracker;
@@ -79,18 +81,35 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	private TransitDriverAgentFactory transitDriverFactory;
 
 	private InternalInterface internalInterface = null ;
+	
+	final private MobsimTimer mobsimTimer;
+	final private AgentCounter agentCounter;
+	final private Config config;
+	final private Scenario scenario;
+	final private EventsManager eventsManager;
+	
+	@Deprecated
+	final private QSim qSim;
 
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.internalInterface = internalInterface ;
-		transitDriverFactory = new DefaultTransitDriverAgentFactory(internalInterface, agentTracker);
+		transitDriverFactory = new DefaultTransitDriverAgentFactory(internalInterface, agentTracker, scenario, eventsManager);
 	}
 
 	@Inject
-	public TransitQSimEngine(QSim queueSimulation) {
-		this.qSim = queueSimulation;
-		this.schedule = queueSimulation.getScenario().getTransitSchedule();
-		this.agentTracker = new TransitStopAgentTracker(this.qSim.getEventsManager());
+	public TransitQSimEngine(QSim qsim, Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
+		this.config = config;
+		this.scenario = scenario;
+		this.schedule = scenario.getTransitSchedule();
+		this.agentTracker = new TransitStopAgentTracker(eventsManager);
+		this.mobsimTimer = mobsimTimer;
+		this.agentCounter = agentCounter;
+		this.eventsManager = eventsManager;
+		
+		
+		// TODO: This cannot be resolved yet due to the structure of the AgentSource!
+		this.qSim = qsim;
 	}
 
 	// For tests (which create an Engine, and externally create Agents as well).
@@ -106,19 +125,18 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	@Override
 	public void afterSim() {
-		double now = this.qSim.getSimTimer().getTimeOfDay();
+		double now = mobsimTimer.getTimeOfDay();
 		for (Entry<Id<TransitStopFacility>, List<PTPassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
 			TransitStopFacility stop = this.schedule.getFacilities().get(agentsAtStop.getKey());
 			for (PTPassengerAgent agent : agentsAtStop.getValue()) {
-				this.qSim.getEventsManager().processEvent(new PersonStuckEvent( now, agent.getId(), stop.getLinkId(), ((MobsimAgent)agent).getMode()));
-				this.qSim.getAgentCounter().decLiving();
-				this.qSim.getAgentCounter().incLost();
+				eventsManager.processEvent(new PersonStuckEvent( now, agent.getId(), stop.getLinkId(), ((MobsimAgent)agent).getMode()));
+				agentCounter.decLiving();
+				agentCounter.incLost();
 			}
 		}
 	}
 
 	private Collection<MobsimAgent> createVehiclesAndDriversWithUmlaeufe() {
-		Scenario scenario = this.qSim.getScenario();
 		Vehicles vehicles = scenario.getTransitVehicles();
 		Collection<MobsimAgent> drivers = new ArrayList<>();
 		UmlaufCache umlaufCache = getOrCreateUmlaufCache( scenario );
@@ -168,13 +186,13 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 			// looks like this agent has a bad transit route, likely no
 			// route could be calculated for it
 			log.error("pt-agent doesn't know to what transit stop to go. Removing agent from simulation. Agent " + planAgent.getId().toString());
-			this.qSim.getAgentCounter().decLiving();
-			this.qSim.getAgentCounter().incLost();
+			agentCounter.decLiving();
+			agentCounter.incLost();
 			return;
 		}
 		TransitStopFacility stop = this.schedule.getFacilities().get(accessStopId);
 		if (stop.getLinkId() == null || stop.getLinkId().equals(linkId)) {
-			double now = this.qSim.getSimTimer().getTimeOfDay();
+			double now = mobsimTimer.getTimeOfDay();
 			this.agentTracker.addAgentToStop(now, (PTPassengerAgent) planAgent, stop.getId());
 			this.internalInterface.registerAdditionalAgentOnLink(planAgent) ;
 		} else {
@@ -186,7 +204,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id<Link> linkId) {
 		String requestedMode = agent.getMode();
-		if (qSim.getScenario().getConfig().transit().getTransitModes().contains(requestedMode)) {
+		if (config.transit().getTransitModes().contains(requestedMode)) {
 			handleAgentPTDeparture(agent, linkId);
 			return true ;
 		}

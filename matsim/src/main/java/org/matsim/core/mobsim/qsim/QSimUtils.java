@@ -29,7 +29,10 @@ import com.google.inject.TypeLiteral;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.ReplayEvents.Module;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 
 /**
@@ -39,9 +42,15 @@ public class QSimUtils {
 	 // should only contain static methods; should thus not be instantiated
 	private QSimUtils() {}
 
+	public static QSim createDefaultQSim(final Scenario scenario, final EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
+		return createDefaultQSimWithOverrides(scenario, eventsManager, Collections.singleton(new AuxiliaryQSimModule(agentCounter, mobsimTimer)));
+	}
+	
 	public static QSim createDefaultQSim(final Scenario scenario, final EventsManager eventsManager) {
-		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(), new StandaloneQSimModule(scenario, eventsManager));
-		return (QSim) injector.getInstance(Mobsim.class);
+		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
+		AgentCounter agentCounter = new AgentCounterImpl();
+		
+		return createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter);
 	}
 	
 	public static QSim createDefaultQSimWithOverrides( final Scenario scenario, final EventsManager eventsManager, 
@@ -54,22 +63,39 @@ public class QSimUtils {
 		return (QSim) injector.getInstance(Mobsim.class);
 	}
 
-	public static QSim createQSim(final Scenario scenario, final EventsManager eventsManager, final Collection<AbstractQSimPlugin> plugins) {
+	public static QSim createQSim(final Scenario scenario, final EventsManager eventsManager, final Collection<AbstractQSimPlugin> plugins, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
 		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(),
 				org.matsim.core.controler.AbstractModule.override(Collections.singleton(new StandaloneQSimModule(scenario, eventsManager)),
 				new org.matsim.core.controler.AbstractModule() {
 					@Override
 					public void install() {
+						install(new AuxiliaryQSimModule(agentCounter, mobsimTimer));
 						bind(new TypeLiteral<Collection<AbstractQSimPlugin>>() {}).toInstance(plugins);
 					}
 				}));
 		return (QSim) injector.getInstance(Mobsim.class);
 	}
+	
+	private static class AuxiliaryQSimModule extends org.matsim.core.controler.AbstractModule {
+		final private AgentCounter agentCounter;
+		final private MobsimTimer mobsimTimer;
+		
+		public AuxiliaryQSimModule(AgentCounter agentCounter, MobsimTimer mobsimTimer) {
+			this.agentCounter = agentCounter;
+			this.mobsimTimer = mobsimTimer;
+		}
+		
+		@Override
+		public void install() {
+			bind(AgentCounter.class).toInstance(agentCounter);
+			bind(MobsimTimer.class).toInstance(mobsimTimer);
+		}
+	}
 
 	private static class StandaloneQSimModule extends org.matsim.core.controler.AbstractModule {
 		private final Scenario scenario;
 		private final EventsManager eventsManager;
-
+		
 		public StandaloneQSimModule(Scenario scenario, EventsManager eventsManager) {
 			this.scenario = scenario;
 			this.eventsManager = eventsManager;

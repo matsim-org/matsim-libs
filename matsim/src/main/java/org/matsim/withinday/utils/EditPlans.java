@@ -6,13 +6,16 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
@@ -24,20 +27,31 @@ public final class EditPlans {
 	private static final Logger log = Logger.getLogger( EditPlans.class ) ;
 	
 	private final TripRouter tripRouter ;
-	private final QSim mobsim;
+	//private final QSim mobsim;
 	private final EditTrips editTrips;
 	private final PopulationFactory pf;
-	public EditPlans( QSim mobsim, TripRouter tripRouter, EditTrips editTrips, PopulationFactory pf ) {
+	
+	final private MobsimTimer mobsimTimer;
+	final private Network network;
+	final private QSim qsim;
+	
+	public EditPlans( QSim qsim, MobsimTimer mobsimTimer, Network network, TripRouter tripRouter, EditTrips editTrips, PopulationFactory pf ) {
 //		log.setLevel(Level.DEBUG);
-		Gbl.assertNotNull( this.mobsim = mobsim );
+		//Gbl.assertNotNull( this.mobsim = mobsim );
 		Gbl.assertNotNull( this.tripRouter = tripRouter );
 		Gbl.assertNotNull( this.editTrips = editTrips ) ;
 		Gbl.assertNotNull( this.pf = pf ) ;
+		
+		this.mobsimTimer = mobsimTimer;
+		this.network = network;
+		
+		// TODO: We cannot remove this dependency yet here
+		this.qsim = qsim;
 	}
 	public boolean addActivityAtEnd(MobsimAgent agent, Activity activity, String routingMode) {
 		log.debug("entering addActivityAtEnd with routingMode=" + routingMode) ;
-		Link link = mobsim.getScenario().getNetwork().getLinks().get(Id.createLinkId(51825));;
-		log.debug( "link 51825 free speed=" + link.getFreespeed( mobsim.getSimTimer().getTimeOfDay()) );
+		Link link = network.getLinks().get(Id.createLinkId(51825));;
+		log.debug( "link 51825 free speed=" + link.getFreespeed( mobsimTimer.getTimeOfDay()) );
 
 		Plan plan = WithinDayAgentUtils.getModifiablePlan(agent);
 		List<PlanElement> planElements = plan.getPlanElements();
@@ -52,12 +66,12 @@ public final class EditPlans {
 		// (need the terminating activity in order to find the current trip. kai, nov'17)
 		
 		if (!isAtRealActivity(agent)) {
-			retVal1 = editTrips.replanCurrentTrip(agent,mobsim.getSimTimer().getTimeOfDay(),routingMode);
+			retVal1 = editTrips.replanCurrentTrip(agent, mobsimTimer.getTimeOfDay(),routingMode);
 		}
 		
 		
 		WithinDayAgentUtils.resetCaches(agent);
-		this.mobsim.rescheduleActivityEnd(agent);
+		this.qsim.rescheduleActivityEnd(agent);
 		return (retVal1 && retVal);
 	}
 	public PlanElement removeActivity(MobsimAgent agent, int index, String mode) {
@@ -79,19 +93,19 @@ public final class EditPlans {
 		}
 		PlanElement pe = planElements.remove(index) ; 
 		if ( checkIfTripHasAlreadyStarted( agent, tripBefore.getTripElements() ) ) {
-			editTrips.replanCurrentTrip(agent, mobsim.getSimTimer().getTimeOfDay() , mode);
+			editTrips.replanCurrentTrip(agent, mobsimTimer.getTimeOfDay() , mode);
 		} else {
 			editTrips.insertEmptyTrip(plan, tripBefore.getOriginActivity(), tripAfter.getDestinationActivity(), mode ) ;
 		}
 		WithinDayAgentUtils.resetCaches(agent);
-		this.mobsim.rescheduleActivityEnd(agent);
+		qsim.rescheduleActivityEnd(agent);
 		return pe ;
 	}
 	public final void rescheduleActivityEndtime( MobsimAgent agent, int index, double newEndTime ) {
 		Activity activity = (Activity) WithinDayAgentUtils.getModifiablePlan(agent).getPlanElements().get(index) ;
 		activity.setEndTime(newEndTime);
 		WithinDayAgentUtils.resetCaches(agent);
-		WithinDayAgentUtils.rescheduleActivityEnd(agent, mobsim);
+		WithinDayAgentUtils.rescheduleActivityEnd(agent, qsim);
 	}
 	public final Activity replaceActivity(MobsimAgent agent, int index, Activity newAct, String upstreamMode, String downstreamMode ) {
 		System.err.println("here310");
@@ -130,7 +144,7 @@ public final class EditPlans {
 			if ( checkIfTripHasAlreadyStarted(agent, currentTripElements) ) {
 				// trip has already started
 				checkIfSameMode(upstreamMode, currentMode);
-				this.editTrips.replanCurrentTrip(agent, this.mobsim.getSimTimer().getTimeOfDay(), currentMode );
+				this.editTrips.replanCurrentTrip(agent, mobsimTimer.getTimeOfDay(), currentMode );
 			} else {
 				// trip has not yet started
 				if ( upstreamMode == null ) {
@@ -151,7 +165,7 @@ public final class EditPlans {
 			}
 		}
 		WithinDayAgentUtils.resetCaches(agent);
-		this.mobsim.rescheduleActivityEnd(agent);
+		qsim.rescheduleActivityEnd(agent);
 		return origAct ;
 	}
 	public void insertActivity(MobsimAgent agent, int index, Activity activity, String upstreamMode, String downstreamMode ) {
@@ -166,7 +180,7 @@ public final class EditPlans {
 			if ( actBefore != null ) {
 				if ( EditPlans.indexOfPlanElement(agent, actBefore) < WithinDayAgentUtils.getCurrentPlanElementIndex(agent) ) {
 					// we are already under way
-					editTrips.replanCurrentTrip(agent, this.mobsim.getSimTimer().getTimeOfDay(), upstreamMode );
+					editTrips.replanCurrentTrip(agent, mobsimTimer.getTimeOfDay(), upstreamMode );
 				} else {
 					// we are not yet under way; inserting empty trip:
 					EditTrips.insertEmptyTrip(plan, actBefore, activity, upstreamMode, pf ) ;
@@ -181,7 +195,7 @@ public final class EditPlans {
 			}
 		}			
 		WithinDayAgentUtils.resetCaches(agent);
-		this.mobsim.rescheduleActivityEnd(agent);
+		qsim.rescheduleActivityEnd(agent);
 	}
 
 	// === search methods: ===
@@ -372,7 +386,7 @@ public final class EditPlans {
 	}
 	public void rescheduleActivityEnd(MobsimAgent agent) {
 		// this is mostly for retrofitting existing code.  but maybe also useful by itself
-		this.mobsim.rescheduleActivityEnd(agent);
+		qsim.rescheduleActivityEnd(agent);
 	}
 	public boolean isAtRealActivity(MobsimAgent agent) {
 		PlanElement pe = WithinDayAgentUtils.getCurrentPlanElement(agent) ;

@@ -142,11 +142,6 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		}
 
 		@Override
-		public Netsim getMobsim() {
-			return QSim.this;
-		}
-
-		@Override
 		public synchronized void registerAdditionalAgentOnLink(final MobsimAgent planAgent) {
 			if (QSim.this.netEngine != null) {
 				QSim.this.netEngine.registerAdditionalAgentOnLink(planAgent);

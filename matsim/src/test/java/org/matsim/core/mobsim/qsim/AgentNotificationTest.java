@@ -22,12 +22,14 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.jdeqsim.Message;
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
@@ -53,7 +55,13 @@ public class AgentNotificationTest {
 	private static class MyAgentFactory implements AgentFactory {
 
 		@Inject
-		Netsim simulation;
+		MobsimTimer mobsimTimer;
+		
+		@Inject
+		EventsManager eventsManager;
+		
+		@Inject
+		Scenario scenario;
 
 		@Inject
 		MessageQueue messageQueue;
@@ -68,7 +76,7 @@ public class AgentNotificationTest {
 			PersonDriverAgentImpl delegate;
 
 			MyAgent(Plan selectedPlan) {
-				delegate = new PersonDriverAgentImpl(selectedPlan, simulation);
+				delegate = new PersonDriverAgentImpl(selectedPlan, scenario, eventsManager, mobsimTimer);
 			}
 
 			@Override
@@ -165,7 +173,7 @@ public class AgentNotificationTest {
 			}
 
 			private void onTenMinutesAfterDeparting() {
-				simulation.getEventsManager().processEvent(new HomesicknessEvent());
+				eventsManager.processEvent(new HomesicknessEvent());
 			}
 
 			@Override
@@ -195,7 +203,7 @@ public class AgentNotificationTest {
 
 			class HomesicknessEvent extends Event {
 				public HomesicknessEvent() {
-					super(simulation.getSimTimer().getTimeOfDay());
+					super(mobsimTimer.getTimeOfDay());
 				}
 
 				@Override
@@ -259,7 +267,10 @@ public class AgentNotificationTest {
 		EventsCollector handler = new EventsCollector();
 		eventsManager.addHandler(handler);
 		
-		QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins);
+		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
+		AgentCounter agentCounter = new AgentCounterImpl();
+		
+		QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins, mobsimTimer, agentCounter);
 
 		qSim.run();
 		// yyyyyy I can comment out the above line and the test still passes (will say: "skipped"). ?????? kai, feb'16

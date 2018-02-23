@@ -39,7 +39,9 @@ public class MobsimTimer {
 	}
 	
 	@Inject
-	MobsimTimer(Config config) {
+	public MobsimTimer(Config config) {
+		// TODO: This has made been public for the test cases. Actually, there should be a 
+		// public interface for this implementation!
 		this(config.qsim().getTimeStepSize());
 	}
 

@@ -23,12 +23,14 @@ package org.matsim.withinday.replanning.identifiers.tools;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -47,7 +49,8 @@ import java.util.Map;
 public class ActivityReplanningMapTest extends MatsimTestCase {
 
 	public void testGetTimeBin() {
-		ActivityReplanningMap arp = new ActivityReplanningMap(null, EventsUtils.createEventsManager());
+		MobsimTimer mobsimTimer = new MobsimTimer();
+		ActivityReplanningMap arp = new ActivityReplanningMap(null, EventsUtils.createEventsManager(), mobsimTimer);
 		
 		// test default setting with start time = 0.0 and time step size = 1.0
 		arp.simStartTime = 0.0;
@@ -129,11 +132,14 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		private static final int t5 = 6*3600 + 60;
 		private static final int t6 = 6*3600 + 120;
 		
+		final private EventsManager eventsManager;
+		
 		@Inject
-		MobsimListenerForTests(final ActivityReplanningMap arp, WithinDayEngine withinDayEngine) {
+		MobsimListenerForTests(final ActivityReplanningMap arp, WithinDayEngine withinDayEngine, EventsManager eventsManager) {
 			this.arp = arp;
 			this.withinDayEngine = withinDayEngine;
 			this.agents = new LinkedHashMap<>();
+			this.eventsManager = eventsManager;
 		}
 
 		@Override
@@ -172,13 +178,13 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 				currentActivity.setEndTime(e.getSimulationTime() + 60);
 				WithinDayAgentUtils.resetCaches(agent);
 				this.withinDayEngine.getActivityRescheduler().rescheduleActivityEnd(agent);
-				((QSim) e.getQueueSimulation()).getEventsManager().processEvent(new ReplanningEvent(e.getSimulationTime(), agent.getId(), "ActivityRescheduler"));
+				eventsManager.processEvent(new ReplanningEvent(e.getSimulationTime(), agent.getId(), "ActivityRescheduler"));
 				
 				// reschedule a second time to check what happens if the agent is replanned multiple times in one time step
 				currentActivity.setEndTime(e.getSimulationTime() + 120);
 				WithinDayAgentUtils.resetCaches(agent);
 				this.withinDayEngine.getActivityRescheduler().rescheduleActivityEnd(agent);
-				((QSim) e.getQueueSimulation()).getEventsManager().processEvent(new ReplanningEvent(e.getSimulationTime(), agent.getId(), "ActivityRescheduler"));
+				eventsManager.processEvent(new ReplanningEvent(e.getSimulationTime(), agent.getId(), "ActivityRescheduler"));
 			}
 			
 			if (e.getSimulationTime() == t5) {

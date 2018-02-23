@@ -22,6 +22,7 @@ package org.matsim.vis.snapshotwriters;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ExternalMobimConfigGroup;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
@@ -43,9 +44,12 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 	private double snapshotTime = 0.0;
 
 	final private int snapshotPeriod;
+	
+	final private MobsimTimer mobsimTimer;
 
-	public SnapshotWriterManager(Config config) {
+	public SnapshotWriterManager(Config config, MobsimTimer mobsimTimer) {
 		snapshotPeriod = findSnapshotPeriod(config);
+		this.mobsimTimer = mobsimTimer;
 	}
 
 	// yuck
@@ -61,11 +65,10 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		Netsim mobsim = (Netsim) e.getQueueSimulation();
-		this.snapshotTime = Math.floor(mobsim.getSimTimer().getSimStartTime()
+		this.snapshotTime = Math.floor(mobsimTimer.getSimStartTime()
 				/ this.snapshotPeriod)
 				* this.snapshotPeriod;
-		if (this.snapshotTime < mobsim.getSimTimer().getSimStartTime()) {
+		if (this.snapshotTime < mobsimTimer.getSimStartTime()) {
 			this.snapshotTime += this.snapshotPeriod;
 		}
 	}
