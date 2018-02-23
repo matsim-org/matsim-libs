@@ -57,8 +57,11 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.NetworkUtils;
@@ -223,9 +226,12 @@ public class CreateAutomatedFDTest {
 			EventsManager events = EventsUtils.createEventsManager();
 			globalFlowDynamicsUpdator = new GlobalFlowDynamicsUpdator(mode2FlowData);
 			events.addHandler(globalFlowDynamicsUpdator);
+			
+			MobsimTimer mobsimTimer = new MobsimTimer(config);
+			AgentCounter agentCounter = new AgentCounterImpl();
 
-			final QSim qSim = new QSim(scenario, events);
-			ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
+			final QSim qSim = new QSim(scenario, events, agentCounter, mobsimTimer);
+			ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
 			QNetsimEngine netsimEngine;
@@ -233,7 +239,7 @@ public class CreateAutomatedFDTest {
 //				QNetworkFactory networkFactory = new AssignmentEmulatingQLaneNetworkFactory(scenario,events) ;
 //				netsimEngine = new QNetsimEngine( qSim, networkFactory ) ;
 //			} else {
-				 netsimEngine = new QNetsimEngine(qSim);
+				 netsimEngine = new QNetsimEngine(config, scenario, events, mobsimTimer, agentCounter);
 //			}
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());

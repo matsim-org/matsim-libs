@@ -38,7 +38,7 @@ import org.matsim.withinday.trafficmonitoring.WithinDayTravelTime;
  * 
  * @author michalm
  */
-public class DvrpOnlineTravelTimeEstimator implements DvrpTravelTimeEstimator, MobsimInitializedListener {
+public class DvrpOnlineTravelTimeEstimator implements DvrpTravelTimeEstimator {
 	private final WithinDayTravelTime withinDayTT;
 	private final DvrpOfflineTravelTimeEstimator offlineTTEstimator;
 	private MobsimTimer mobsimTimer;
@@ -46,9 +46,10 @@ public class DvrpOnlineTravelTimeEstimator implements DvrpTravelTimeEstimator, M
 
 	@Inject
 	public DvrpOnlineTravelTimeEstimator(WithinDayTravelTime withinDayTT,
-			DvrpOfflineTravelTimeEstimator offlineTTEstimator, DvrpConfigGroup dvrpConfig) {
+			DvrpOfflineTravelTimeEstimator offlineTTEstimator, DvrpConfigGroup dvrpConfig, MobsimTimer mobsimTimer) {
 		this.withinDayTT = withinDayTT;
 		this.offlineTTEstimator = offlineTTEstimator;
+		this.mobsimTimer = mobsimTimer;
 
 		beta = dvrpConfig.getTravelTimeEstimationBeta();
 		if (beta < 0) {
@@ -67,10 +68,5 @@ public class DvrpOnlineTravelTimeEstimator implements DvrpTravelTimeEstimator, M
 		// XXX Alternatively:
 		// double currentOfflineTT = offlineTTEstimator.getLinkTravelTime(link, currentTime, person, vehicle);
 		// return correction * currentTT * offlineTT / currentOfflineTT + (1-correction) * offlineTT
-	}
-
-	@Override
-	public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e) {
-		mobsimTimer = ((QSim)e.getQueueSimulation()).getSimTimer();
 	}
 }

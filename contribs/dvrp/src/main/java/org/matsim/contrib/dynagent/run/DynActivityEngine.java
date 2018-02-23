@@ -29,8 +29,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 
 /**
  * It might be nicer to have ActivityEngine as a delegate, not as the superclass. But there is a hardcoded
@@ -47,10 +49,15 @@ public class DynActivityEngine extends ActivityEngine {
 
 	private final List<DynAgent> dynAgents = new LinkedList<>();
 	private final List<DynAgent> newDynAgents = new ArrayList<>();// will to be handled in the next timeStep
+	
+	private final AgentCounter agentCounter;
+	private final MobsimTimer mobsimTimer;
 
 	@Inject
-	public DynActivityEngine(EventsManager eventsManager) {
-		super(eventsManager);
+	public DynActivityEngine(EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
+		super(eventsManager, mobsimTimer, agentCounter);
+		this.agentCounter = agentCounter;
+		this.mobsimTimer = mobsimTimer;
 	}
 
 	// See handleActivity for the reason for this.
@@ -72,7 +79,7 @@ public class DynActivityEngine extends ActivityEngine {
 
 				if (currentEndTime == Double.POSITIVE_INFINITY) { // agent says: stop simulating me
 					unregisterAgentAtActivityLocation(agent);
-					internalInterface.getMobsim().getAgentCounter().decLiving();
+					agentCounter.decLiving();
 					dynAgentIter.remove();
 				} else if (currentEndTime <= time) { // the agent wants to end the activity NOW
 					unregisterAgentAtActivityLocation(agent);
@@ -94,12 +101,12 @@ public class DynActivityEngine extends ActivityEngine {
 		}
 
 		double endTime = agent.getActivityEndTime();
-		double currentTime = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+		double currentTime = mobsimTimer.getTimeOfDay();
 
 		if (endTime == Double.POSITIVE_INFINITY) {
 			// This is the last planned activity.
 			// So the agent goes to sleep.
-			internalInterface.getMobsim().getAgentCounter().decLiving();
+			agentCounter.decLiving();
 		} else if (endTime <= currentTime && !beforeFirstSimStep) {
 			// This activity is already over (planned for 0 duration)
 			// So we proceed immediately.

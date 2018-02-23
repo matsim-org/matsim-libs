@@ -24,9 +24,12 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
@@ -51,13 +54,13 @@ class PTransitAgent extends PersonDriverAgentImpl implements MobsimDriverPasseng
 
 	private final TransitSchedule transitSchedule;
 
-	public static PTransitAgent createTransitAgent(Person p, Netsim simulation) {
-        return new PTransitAgent(p, simulation);
+	public static PTransitAgent createTransitAgent(Person p, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer) {
+        return new PTransitAgent(p, scenario, eventsManager, mobsimTimer);
 	}
 
-	private PTransitAgent(final Person p, final Netsim simulation) {
-		super(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), simulation);
-        this.transitSchedule = simulation.getScenario().getTransitSchedule();
+	private PTransitAgent(final Person p, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer) {
+		super(PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), scenario, eventsManager, mobsimTimer);
+        this.transitSchedule = scenario.getTransitSchedule();
 	}
 
 	@Override

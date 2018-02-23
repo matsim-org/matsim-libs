@@ -83,12 +83,6 @@ public final class TaxiModule extends AbstractModule {
 			}
 
 			@Provides
-			@Singleton
-			private MobsimTimer provideTimer(QSim qSim) {
-				return qSim.getSimTimer();
-			}
-
-			@Provides
 			@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER)
 			private TravelDisutility provideTravelDisutility(
 					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,

@@ -24,7 +24,9 @@ import java.util.Collection;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 
 import com.google.inject.*;
 
@@ -42,8 +44,11 @@ public class RandomDynQSimProvider implements Provider<Mobsim> {
 
 	@Override
 	public Mobsim get() {
-		QSim qSim = QSimUtils.createQSim(scenario, events, plugins);
-		qSim.addAgentSource(new RandomDynAgentSource(qSim, 50));
+		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
+		AgentCounter agentCounter = new AgentCounterImpl();
+		
+		QSim qSim = QSimUtils.createQSim(scenario, events, plugins, mobsimTimer, agentCounter);
+		qSim.addAgentSource(new RandomDynAgentSource(qSim, scenario.getNetwork(), events, 50));
 		return qSim;
 	}
 }

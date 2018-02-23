@@ -20,8 +20,11 @@
 package org.matsim.contrib.wagonSim.mobsim.qsim.agents;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
@@ -34,19 +37,24 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
  */
 @Deprecated
 public class WagonSimAgentFactory implements AgentFactory {
+	final private Scenario scenario;
+	final private EventsManager eventsManager; 
+	final private MobsimTimer mobsimTimer;
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
 			.getLogger(WagonSimAgentFactory.class);
 	private Netsim sim;
 
-	public WagonSimAgentFactory(final Netsim simulation) {
-		this.sim = simulation;
+	public WagonSimAgentFactory(Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer) {
+		this.scenario = scenario;
+		this.eventsManager = eventsManager;
+		this.mobsimTimer = mobsimTimer;
 	}
 
 	@Override
 	public MobsimAgent createMobsimAgentFromPerson(Person p) {
-		return WagonSimAgent.createInstance(p, sim);
+		return WagonSimAgent.createInstance(p, scenario, eventsManager, mobsimTimer);
 	}
 }
 

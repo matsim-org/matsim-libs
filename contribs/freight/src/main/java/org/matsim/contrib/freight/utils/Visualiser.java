@@ -17,6 +17,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.vis.otfvis.OTFClientLive;
@@ -55,7 +56,7 @@ public class Visualiser {
 		CarrierConfig carrierConfig = new CarrierConfig();
 		carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
 
-		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig);
+		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig, new MobsimTimer(config));
 
 		Mobsim mobsim = mobsimFactory.get();
 		
@@ -84,7 +85,7 @@ public class Visualiser {
 		CarrierConfig carrierConfig = new CarrierConfig();
 		carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
 
-		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig);
+		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig, new MobsimTimer(config));
 
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
 		Mobsim mobsim = mobsimFactory.get();
