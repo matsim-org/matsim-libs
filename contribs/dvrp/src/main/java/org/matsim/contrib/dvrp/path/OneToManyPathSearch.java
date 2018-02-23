@@ -120,6 +120,9 @@ public class OneToManyPathSearch {
 		multiNodeDijkstra.calcLeastCostPath(fromNode, imaginaryNode, startTime, null, null);
 
 		// get path for each ToNode
+
+		// XXX in most cases we need costs/times, while paths could be constructed lazily only when needed
+		// TODO add getCost/Time() to MultiNodeDijkstra
 		for (ToNode toNode : toNodes.values()) {
 			toNode.path = multiNodeDijkstra.constructPath(fromNode, toNode.node, startTime);
 		}
