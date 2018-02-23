@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
@@ -52,9 +53,9 @@ import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -141,49 +142,39 @@ public class DynModeTripsAnalyser {
 		return directDistanceStats.getMean();
 	}
 
-	public static void analyseDetours(Network network, List<DynModeTrip> trips, String fileName) {
+	public static void analyseDetours(Network network, List<DynModeTrip> trips, DrtConfigGroup drtCfg, String fileName) {
 		if (trips == null)
 			return;
 
 		List<String> detours = new ArrayList<String>();
-		XYSeriesCollection distances = new XYSeriesCollection();
-		XYSeries dist = new XYSeries("distances", true, true);
-		XYSeriesCollection times = new XYSeriesCollection();
-		XYSeries timess = new XYSeries("times", true, true);
-		times.addSeries(timess);
-		distances.addSeries(dist);
+		XYSeries distances = new XYSeries("distances", true, true);
+		XYSeries times = new XYSeries("times", true, true);
+
 		for (DynModeTrip trip : trips) {
 			if (trip.getToLinkId() == null) {
 				continue; // unfinished trip (simulation stopped before arrival)
 			}
 
-			dist.add(trip.getTravelDistance(), trip.getUnsharedDistanceEstimate_m());
+			distances.add(trip.getTravelDistance(), trip.getUnsharedDistanceEstimate_m());
 			double travelTime = trip.getInVehicleTravelTime() + trip.getWaitTime();
-			timess.add(travelTime, trip.getUnsharedTimeEstimate_m());
+			times.add(travelTime, trip.getUnsharedTimeEstimate_m());
 
 			double distanceDetour = trip.getTravelDistance() / trip.getUnsharedDistanceEstimate_m();
 			double timeDetour = travelTime / trip.getUnsharedTimeEstimate_m();
 			detours.add(trip.getTravelDistance() + ";" + trip.getUnsharedDistanceEstimate_m() + ";" + distanceDetour
 					+ ";" + travelTime + ";" + trip.getUnsharedTimeEstimate_m() + ";" + timeDetour);
 		}
+
 		collection2Text(detours, fileName + ".csv",
 				"distance;unsharedDistance;distanceDetour;time;unsharedTime;timeDetour");
-		{
-			final JFreeChart chart = ChartFactory.createScatterPlot("Travel Distances", "travelled distance [m]",
-					"unshared ride distance [m]", distances);
 
-			NumberAxis yAxis = (NumberAxis)((XYPlot)chart.getPlot()).getRangeAxis();
-			NumberAxis xAxis = (NumberAxis)((XYPlot)chart.getPlot()).getDomainAxis();
-			yAxis.setUpperBound(xAxis.getUpperBound());
-			ChartSaveUtils.saveAsPNG(chart, fileName + "_distancePlot", 1500, 1500);
-		}
-		final JFreeChart chart2 = ChartFactory.createScatterPlot("Travel Times", "travelled time [s]",
-				"unshared ride time [s]", times);
-		NumberAxis yAxis = (NumberAxis)((XYPlot)chart2.getPlot()).getRangeAxis();
-		NumberAxis xAxis = (NumberAxis)((XYPlot)chart2.getPlot()).getDomainAxis();
-		yAxis.setUpperBound(xAxis.getUpperBound());
+		final JFreeChart chart = DensityScatterPlots.createPlot("Travel Distances", "travelled distance [m]",
+				"unshared ride distance [m]", distances);
+		ChartSaveUtils.saveAsPNG(chart, fileName + "_distancePlot", 1500, 1500);
+
+		final JFreeChart chart2 = DensityScatterPlots.createPlot("Travel Times", "travelled time [s]",
+				"unshared ride time [s]", times, Pair.of(drtCfg.getMaxTravelTimeAlpha(), drtCfg.getMaxTravelTimeBeta()));
 		ChartSaveUtils.saveAsPNG(chart2, fileName + "_timePlot", 1500, 1500);
-
 	}
 
 	public static void analyseWaitTimes(String fileName, List<DynModeTrip> trips, int binsize_s) {
