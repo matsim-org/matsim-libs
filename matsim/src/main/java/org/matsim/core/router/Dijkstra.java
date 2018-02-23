@@ -81,7 +81,9 @@ import org.matsim.vehicles.Vehicle;
  * @author lnicolas
  * @author mrieser
  */
-public class Dijkstra implements LeastCostPathCalculator {
+ public class Dijkstra implements LeastCostPathCalculator {
+ 	// yyyy I don't think that we make this class publicly inheritable; as we know, will eventually lead
+	// to problems.  kai, feb'18
 
 	private final static Logger log = Logger.getLogger(Dijkstra.class);
 
@@ -142,7 +144,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *            Determines the travel time on links.
 	 */
 	// please use DijkstraFactory when you want to create an instance of this
-	protected Dijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction) {
+	 Dijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction) {
 		this(network, costFunction, timeFunction, null);
 	}
 
@@ -159,7 +161,7 @@ public class Dijkstra implements LeastCostPathCalculator {
 	 *            The pre processing data used during the routing phase.
 	 */
 	// please use DijkstraFactory when you want to create an instance of this
-	protected Dijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
+	 Dijkstra(final Network network, final TravelDisutility costFunction, final TravelTime timeFunction,
 			final PreProcessDijkstra preProcessData) {
 
 		this.network = network;

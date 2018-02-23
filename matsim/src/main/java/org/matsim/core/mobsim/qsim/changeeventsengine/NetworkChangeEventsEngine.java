@@ -38,12 +38,18 @@ import java.util.Queue;
 /**
  * @author dgrether
  */
-class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
+public final class NetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 	private static final Logger log = Logger.getLogger(NetworkChangeEventsEngine.class) ;
 	
 	private Queue<NetworkChangeEvent> networkChangeEventsQueue = null;
 	private Netsim mobsim;
-
+	
+	private NetworkChangeEventsEngine() {}
+	
+	public static NetworkChangeEventsEngineI createNetworkChangeEventsEngine() {
+		return new NetworkChangeEventsEngine();
+	}
+	
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.mobsim = internalInterface.getMobsim();
