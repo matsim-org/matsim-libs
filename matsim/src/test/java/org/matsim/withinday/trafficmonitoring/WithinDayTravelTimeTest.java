@@ -36,9 +36,11 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -51,6 +53,11 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -118,35 +125,66 @@ public class WithinDayTravelTimeTest extends MatsimTestCase {
 			event.addLink(link22);
 		}
 		
-		final WithinDayTravelTime travelTime = new WithinDayTravelTime(scenario, null);
-		final MobsimListener listener = new MobsimListenerForTests(scenario, travelTime);
-		final FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
-		fosl.addSimulationListener(travelTime);
-		fosl.addSimulationListener(listener);
+
 
 		Controler controler = new Controler(scenario);
-		controler.getEvents().addHandler(travelTime);
-		controler.addControlerListener(new StartupListener() {
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				double t1 = 0.0;
-				double t2 = 8.0;
-				double t3 = 18.0;
+		
+		/*
+		 * I needed to make some excessive changes here, because the WithinDayTravelTime needs to
+		 * obtain the MobsimTimer from Guice now. There is no easy way to do it otherwise, at 
+		 * least not if one tests it in an integrated way like here.
+		 * 
+		 * shoerl, feb18
+		 */
 
-				Id<Link> id = Id.create("6", Link.class);
-				Link link = scenario.getNetwork().getLinks().get(id);
-				link.setCapacity(500.0);	// reduce capacity
-
-				// check free speed travel times - they should not be initialized yet
-				assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t1, null, null));
-				assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t2, null, null));
-				assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t3, null, null));
-			}
-		});
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addMobsimListenerBinding().toInstance(fosl);
+				addMobsimListenerBinding().to(FixedOrderSimulationListener.class);
+				addEventHandlerBinding().to(WithinDayTravelTime.class);
+				
+				addControlerListenerBinding().toProvider(new Provider<ControlerListener>() {
+					@Inject WithinDayTravelTime travelTime;
+					
+					@Override
+					public ControlerListener get() {
+						return new StartupListener() {
+							@Override
+							public void notifyStartup(StartupEvent event) {
+								double t1 = 0.0;
+								double t2 = 8.0;
+								double t3 = 18.0;
+
+								Id<Link> id = Id.create("6", Link.class);
+								Link link = scenario.getNetwork().getLinks().get(id);
+								link.setCapacity(500.0);	// reduce capacity
+
+								// check free speed travel times - they should not be initialized yet
+								assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t1, null, null));
+								assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t2, null, null));
+								assertEquals(Double.MAX_VALUE, travelTime.getLinkTravelTime(link, t3, null, null));
+							}
+						};
+					}
+				});
+			}
+			
+			@Provides @Singleton
+			FixedOrderSimulationListener provideFixedOrderSimulationListener(WithinDayTravelTime travelTime, MobsimListenerForTests listener) {
+				FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
+				fosl.addSimulationListener(travelTime);
+				fosl.addSimulationListener(listener);
+				return fosl;
+			}
+			
+			@Provides @Singleton
+			MobsimListenerForTests provideMobsimListenerForTests(WithinDayTravelTime travelTime) {
+				return new MobsimListenerForTests(scenario, travelTime);
+			}
+			
+			@Provides @Singleton
+			WithinDayTravelTime provideWithinDayTravelTime(MobsimTimer mobsimTimer) {
+				return new WithinDayTravelTime(scenario, null, mobsimTimer);
 			}
 		});
 		

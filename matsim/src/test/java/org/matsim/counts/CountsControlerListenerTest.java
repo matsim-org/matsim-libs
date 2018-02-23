@@ -45,6 +45,9 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
@@ -262,6 +265,8 @@ public class CountsControlerListenerTest {
 			@Override
 			public void install() {
 				bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
+				bind(MobsimTimer.class);
+				bind(AgentCounter.class).to(AgentCounterImpl.class);
 			}
 		});
 		config.controler().setFirstIteration(0);
@@ -300,6 +305,8 @@ public class CountsControlerListenerTest {
 			@Override
 			public void install() {
 				bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
+				bind(MobsimTimer.class);
+				bind(AgentCounter.class).to(AgentCounterImpl.class);
 			}
 		});
 		config.controler().setFirstIteration(0);
@@ -370,6 +377,8 @@ public class CountsControlerListenerTest {
 			@Override
 			public void install() {
 				bind(Mobsim.class).to(DummyMobsim2.class);
+				bind(MobsimTimer.class);
+				bind(AgentCounter.class).to(AgentCounterImpl.class);
 			}
 		});
 		controler.getConfig().controler().setCreateGraphs(false);
