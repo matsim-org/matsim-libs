@@ -36,6 +36,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.router.NetworkRoutingProvider;
@@ -100,6 +101,7 @@ public class MultiModalModule extends AbstractModule {
         bindMobsim().toProvider(MultimodalQSimFactory.class);
         bind(MobsimTimer.class);
         bind(AgentCounter.class).to(AgentCounterImpl.class);
+        bind(ActiveQSimBridge.class);
     }
 
     public void setLinkSlopes(Map<Id<Link>, Double> linkSlopes) {
