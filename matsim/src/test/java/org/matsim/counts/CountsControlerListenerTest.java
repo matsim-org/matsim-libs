@@ -46,6 +46,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -379,6 +380,7 @@ public class CountsControlerListenerTest {
 				bind(Mobsim.class).to(DummyMobsim2.class);
 				bind(MobsimTimer.class);
 				bind(AgentCounter.class).to(AgentCounterImpl.class);
+				bind(ActiveQSimBridge.class);
 			}
 		});
 		controler.getConfig().controler().setCreateGraphs(false);
