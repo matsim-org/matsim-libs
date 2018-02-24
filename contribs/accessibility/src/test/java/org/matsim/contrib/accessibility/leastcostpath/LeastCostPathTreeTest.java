@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -19,7 +20,6 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree;
 import org.matsim.utils.leastcostpathtree.LeastCostPathTree.NodeData;
 
-import junit.framework.Assert;
 
 public class LeastCostPathTreeTest {
 	

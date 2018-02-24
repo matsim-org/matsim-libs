@@ -3,7 +3,7 @@ package org.matsim.core.config.groups;
 import java.util.Map;
 import java.util.Random;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.log4j.Logger;
 import org.junit.Rule;

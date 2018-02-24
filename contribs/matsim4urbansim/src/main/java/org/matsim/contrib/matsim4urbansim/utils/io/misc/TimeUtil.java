@@ -1,6 +1,6 @@
 package org.matsim.contrib.matsim4urbansim.utils.io.misc;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * see also org.matsim.core.utils.misc.Time for time conversion

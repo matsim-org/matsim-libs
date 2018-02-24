@@ -23,7 +23,7 @@
 package org.matsim.core.replanning;
 
 import com.google.inject.*;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
@@ -142,13 +142,13 @@ public class InnovationSwitchOffTest {
 								Assert.assertEquals(0.1, sm.getWeightsOfDefaultSubpopulation().get(ii), 0.000001);
 							}
 							if (event.getIteration() == 12 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains(ReRoute.class.getSimpleName())) {
-								Assert.assertEquals(0., sm.getWeightsOfDefaultSubpopulation().get(ii));
+								Assert.assertEquals(0., sm.getWeightsOfDefaultSubpopulation().get(ii), 0.000001);
 							}
 							if (event.getIteration() == 13 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains(TimeAllocationMutator.class.getSimpleName())) {
 								Assert.assertEquals(0.1, sm.getWeightsOfDefaultSubpopulation().get(ii), 0.000001);
 							}
 							if (event.getIteration() == 14 && sm.getStrategiesOfDefaultSubpopulation().get(ii).toString().contains(TimeAllocationMutator.class.getSimpleName())) {
-								Assert.assertEquals(0.0, sm.getWeightsOfDefaultSubpopulation().get(ii));
+								Assert.assertEquals(0.0, sm.getWeightsOfDefaultSubpopulation().get(ii), 0.000001);
 							}
 						}
 						System.err.flush();

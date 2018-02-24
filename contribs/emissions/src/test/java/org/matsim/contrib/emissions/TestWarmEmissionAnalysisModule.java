@@ -41,7 +41,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import roadTypeMapping.VisumHbefaRoadTypeMapping;
 
 
