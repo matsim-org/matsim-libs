@@ -27,11 +27,14 @@ import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.vehicles.Vehicle;
+
+import com.google.inject.Inject;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -42,7 +45,7 @@ import java.util.Map;
  * 
  * @author cdobler
  */
-public final class MobsimDataProvider implements MobsimInitializedListener {
+public final class MobsimDataProvider {
 	/*
 	Hallo Kai,
 
@@ -80,15 +83,15 @@ public final class MobsimDataProvider implements MobsimInitializedListener {
 	Kai
 	*/
 	
-	private QSim qSim;
-
-	@Override
-	public final void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		qSim = (QSim) e.getQueueSimulation();
+	private ActiveQSimBridge activeQSimBridge;
+	
+	@Inject
+	public MobsimDataProvider(ActiveQSimBridge activeQSimBridge) {
+		this.activeQSimBridge = activeQSimBridge;
 	}
 
 	public final Map<Id<Person>, MobsimAgent> getAgents() {
-		return this.qSim.getAgents() ;
+		return activeQSimBridge.getActiveQSim().getAgents() ;
 	}
 	
 	public final MobsimAgent getAgent(Id<Person> agentId) {
@@ -96,7 +99,7 @@ public final class MobsimDataProvider implements MobsimInitializedListener {
 	}
 	
 	public final Map<Id<Vehicle>, MobsimVehicle> getVehicles() {
-		return this.qSim.getVehicles() ;
+		return activeQSimBridge.getActiveQSim().getVehicles() ;
 	}
 	
 	public final MobsimVehicle getVehicle(Id<Vehicle> vehicleId) {
@@ -104,7 +107,7 @@ public final class MobsimDataProvider implements MobsimInitializedListener {
 	}
 	
 	public final Collection<MobsimVehicle> getEnrouteVehiclesOnLink(Id<Link> linkId) {
-		return this.qSim.getNetsimNetwork().getNetsimLink(linkId).getAllNonParkedVehicles();
+		return activeQSimBridge.getActiveQSim().getNetsimNetwork().getNetsimLink(linkId).getAllNonParkedVehicles();
 	}
 	
 	public final MobsimVehicle getDriversVehicle(Id<Person> driverId) {

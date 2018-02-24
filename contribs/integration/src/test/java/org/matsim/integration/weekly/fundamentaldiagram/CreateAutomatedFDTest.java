@@ -58,6 +58,7 @@ import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -229,8 +230,9 @@ public class CreateAutomatedFDTest {
 			
 			MobsimTimer mobsimTimer = new MobsimTimer(config);
 			AgentCounter agentCounter = new AgentCounterImpl();
+			ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 
-			final QSim qSim = new QSim(scenario, events, agentCounter, mobsimTimer);
+			final QSim qSim = new QSim(scenario, events, agentCounter, mobsimTimer, activeQSimBridge);
 			ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);

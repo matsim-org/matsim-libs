@@ -18,6 +18,7 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
@@ -60,8 +61,9 @@ public class Visualiser {
 		
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 
-		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig, mobsimTimer, agentCounter);
+		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig, mobsimTimer, agentCounter, activeQSimBridge);
 
 		Mobsim mobsim = mobsimFactory.get();
 		
@@ -92,8 +94,9 @@ public class Visualiser {
 
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 		
-		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig, mobsimTimer, agentCounter);
+		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig, mobsimTimer, agentCounter, activeQSimBridge);
 
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
 		Mobsim mobsim = mobsimFactory.get();

@@ -46,7 +46,8 @@ public class QSimEventsIntegrationTest {
 		});
 		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
 		AgentCounter agentCounter = new AgentCounterImpl();
-		QSim qSim = new QSim(scenario, events, agentCounter, mobsimTimer);
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+		QSim qSim = new QSim(scenario, events, agentCounter, mobsimTimer, activeQSimBridge);
 		AgentFactory agentFactory = new DefaultAgentFactory(scenario, events, mobsimTimer);
 		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, scenario.getConfig(), scenario, qSim);
 		qSim.addAgentSource(agentSource);

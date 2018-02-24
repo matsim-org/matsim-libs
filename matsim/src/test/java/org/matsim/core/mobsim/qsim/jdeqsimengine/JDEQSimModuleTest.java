@@ -7,6 +7,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
@@ -26,7 +27,8 @@ public class JDEQSimModuleTest extends MatsimTestCase {
         eventsManager.initProcessing();
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
         MobsimTimer mobsimTimer = new MobsimTimer(config);
-        QSim qsim = new QSim(scenario, eventsManager, agentCounterFixture, mobsimTimer);
+        ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+        QSim qsim = new QSim(scenario, eventsManager, agentCounterFixture, mobsimTimer, activeQSimBridge);
         JDEQSimModule.configure(qsim, config, scenario, eventsManager, agentCounterFixture);
         qsim.run();
     }
@@ -38,7 +40,8 @@ public class JDEQSimModuleTest extends MatsimTestCase {
         eventsManager.initProcessing();
         PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
         MobsimTimer mobsimTimer = new MobsimTimer(config);
-        QSim qsim = new QSim(scenario, eventsManager, agentCounterFixture, mobsimTimer);
+        ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+        QSim qsim = new QSim(scenario, eventsManager, agentCounterFixture, mobsimTimer, activeQSimBridge);
         JDEQSimModule.configure(qsim, config, scenario, eventsManager, agentCounterFixture);
         PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), new DefaultAgentFactory(scenario, eventsManager, mobsimTimer), config, scenario, qsim);
         qsim.addAgentSource(agentSource);

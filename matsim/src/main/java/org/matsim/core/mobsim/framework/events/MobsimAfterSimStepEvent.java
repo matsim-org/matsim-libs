@@ -19,17 +19,16 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.events;
 
-import org.matsim.core.mobsim.framework.Mobsim;
-
 /**
- * @author mrieser
+ * Event is broadcasted when a simulation step in the Mobsim starts.
+ * 
+ * @author mrieser, shoerl
  */
-public class MobsimAfterSimStepEvent<T extends Mobsim> extends AbstractMobsimEvent<T> {
+public class MobsimAfterSimStepEvent implements AbstractMobsimEvent {
 
 	private final double simTime;
-	
-	public MobsimAfterSimStepEvent(final T queuesim, final double simTime) {
-		super(queuesim);
+
+	public MobsimAfterSimStepEvent(final double simTime) {
 		this.simTime = simTime;
 	}
 

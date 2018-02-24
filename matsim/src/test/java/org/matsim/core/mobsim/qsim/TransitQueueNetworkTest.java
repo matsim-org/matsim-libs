@@ -1081,7 +1081,8 @@ public class TransitQueueNetworkTest extends TestCase {
             eventsManager = EventsUtils.createEventsManager();
             mobsimTimer = new MobsimTimer();
             AgentCounter agentCounter = new AgentCounterImpl();
-            QSim qSim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer);
+            ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+            QSim qSim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer, activeQSimBridge);
 			ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer);
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);

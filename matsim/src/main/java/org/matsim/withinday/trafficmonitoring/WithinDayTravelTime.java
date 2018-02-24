@@ -38,6 +38,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -105,13 +106,14 @@ public class WithinDayTravelTime implements TravelTime,
 	private double now = Double.NEGATIVE_INFINITY ;
 	
 	final private MobsimTimer mobsimTimer;
+	private final ActiveQSimBridge activeQSimBridge;
 	
 	@Inject
-	WithinDayTravelTime(Scenario scenario, MobsimTimer mobsimTimer) {
-		this(scenario, null, mobsimTimer);
+	WithinDayTravelTime(Scenario scenario, MobsimTimer mobsimTimer, ActiveQSimBridge activeQSimBridge) {
+		this(scenario, null, mobsimTimer, activeQSimBridge);
 	}
 
-	public WithinDayTravelTime(Scenario scenario, Set<String> analyzedModes, MobsimTimer mobsimTimer) {
+	public WithinDayTravelTime(Scenario scenario, Set<String> analyzedModes, MobsimTimer mobsimTimer, ActiveQSimBridge activeQSimBridge) {
 //		log.setLevel(Level.DEBUG);
 		
 		/*
@@ -121,6 +123,7 @@ public class WithinDayTravelTime implements TravelTime,
 		this.network = scenario.getNetwork();
 		this.mobsimTimer = mobsimTimer;
 		this.numOfThreads = scenario.getConfig().global().getNumberOfThreads();
+		this.activeQSimBridge = activeQSimBridge;
 
 		if (analyzedModes == null || analyzedModes.size() == 0) {
 			this.filterModes = false;
@@ -312,7 +315,7 @@ public class WithinDayTravelTime implements TravelTime,
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		problem = false ;
 
-		if (e.getQueueSimulation() instanceof QSim) {
+		if (activeQSimBridge.hasActiveQSim()) {
 			double simStartTime = mobsimTimer.getSimStartTime();
 
 			/*

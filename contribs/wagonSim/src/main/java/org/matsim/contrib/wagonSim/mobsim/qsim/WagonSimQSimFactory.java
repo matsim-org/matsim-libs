@@ -30,6 +30,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -82,8 +83,9 @@ public class WagonSimQSimFactory implements MobsimFactory {
 		
 		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
 		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 
-		QSim qSim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer);
+		QSim qSim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer, activeQSimBridge);
 		ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer);
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);

@@ -39,6 +39,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -105,8 +106,9 @@ public class PopulationAgentSourceWithVehiclesTest {
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
 		EventsManager eventsManager = EventsUtils.createEventsManager();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 		
-		final QSim qSim = new QSim( scenario , eventsManager, agentCounter, mobsimTimer );
+		final QSim qSim = new QSim( scenario , eventsManager, agentCounter, mobsimTimer, activeQSimBridge );
 		qSim.addMobsimEngine( new QNetsimEngine( config, scenario, eventsManager, mobsimTimer, agentCounter ) );
 		final PopulationAgentSourceWithVehicles testee =
 			new PopulationAgentSourceWithVehicles(
@@ -187,8 +189,9 @@ public class PopulationAgentSourceWithVehiclesTest {
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
 		EventsManager eventsManager = EventsUtils.createEventsManager();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 		
-		final QSim qSim = new QSim( scenario , eventsManager, agentCounter, mobsimTimer );
+		final QSim qSim = new QSim( scenario , eventsManager, agentCounter, mobsimTimer, activeQSimBridge );
 		qSim.addMobsimEngine( new QNetsimEngine( config, scenario, eventsManager, mobsimTimer, agentCounter ) );
 		final PopulationAgentSourceWithVehicles testee =
 			new PopulationAgentSourceWithVehicles(

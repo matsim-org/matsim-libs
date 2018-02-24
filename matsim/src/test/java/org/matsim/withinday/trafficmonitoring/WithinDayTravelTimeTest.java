@@ -45,6 +45,7 @@ import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.*;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -183,8 +184,8 @@ public class WithinDayTravelTimeTest extends MatsimTestCase {
 			}
 			
 			@Provides @Singleton
-			WithinDayTravelTime provideWithinDayTravelTime(MobsimTimer mobsimTimer) {
-				return new WithinDayTravelTime(scenario, null, mobsimTimer);
+			WithinDayTravelTime provideWithinDayTravelTime(MobsimTimer mobsimTimer, ActiveQSimBridge activeQSimBridge) {
+				return new WithinDayTravelTime(scenario, null, mobsimTimer, activeQSimBridge);
 			}
 		});
 		

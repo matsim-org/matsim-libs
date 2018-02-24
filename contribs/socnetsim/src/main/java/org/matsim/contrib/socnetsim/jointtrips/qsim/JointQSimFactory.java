@@ -26,6 +26,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
@@ -57,27 +58,29 @@ public class JointQSimFactory implements Provider<QSim> {
 	private final EventsManager events;
 	private final MobsimTimer mobsimTimer;
 	private final AgentCounter agentCounter;
+	private final ActiveQSimBridge activeQSimBridge;
 
 	@Inject
-	public JointQSimFactory( final Scenario sc, final EventsManager events, final MobsimTimer mobsimTimer, final AgentCounter agentCounter ) {
+	public JointQSimFactory( final Scenario sc, final EventsManager events, final MobsimTimer mobsimTimer, final AgentCounter agentCounter, ActiveQSimBridge activeQSimBridge) {
 		this.sc = sc;
 		this.events = events;
 		this.mobsimTimer = mobsimTimer;
 		this.agentCounter = agentCounter;
+		this.activeQSimBridge = activeQSimBridge;
 	}
 	
 	public JointQSimFactory() {
-		this( null , null, null, null );
+		this( null , null, null, null, null );
 	}
 	
 	@Override
 	public QSim get() {
-		return createMobsim( sc , events, mobsimTimer, agentCounter );
+		return createMobsim( sc , events, mobsimTimer, agentCounter, activeQSimBridge );
 	}
 
 	public QSim createMobsim(
 			final Scenario sc1,
-			final EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
+			final EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter, ActiveQSimBridge activeQSimBridge) {
         final QSimConfigGroup conf = sc1.getConfig().qsim();
         if (conf == null) {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
@@ -91,7 +94,7 @@ public class JointQSimFactory implements Provider<QSim> {
 		}
 
 		// default initialisation
-		final QSim qSim = new QSim( sc1 , eventsManager, agentCounter, mobsimTimer );
+		final QSim qSim = new QSim( sc1 , eventsManager, agentCounter, mobsimTimer, activeQSimBridge );
 
 		final ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer);
 		qSim.addMobsimEngine( activityEngine );

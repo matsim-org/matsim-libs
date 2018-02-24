@@ -199,7 +199,9 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	}*/
 	
 	@Inject
-	public QSim(Scenario scenario, EventsManager events, AgentCounter agentCounter, MobsimTimer mobsimTimer) {
+	public QSim(Scenario scenario, EventsManager events, AgentCounter agentCounter, MobsimTimer mobsimTimer, ActiveQSimBridge bridge) {
+		bridge.setActiveQSim(this);
+		
 		this.scenario = scenario;
 		
 		if (scenario.getConfig().qsim().getNumberOfThreads() > 1) {

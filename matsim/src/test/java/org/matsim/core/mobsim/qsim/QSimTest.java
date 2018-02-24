@@ -98,8 +98,9 @@ public class QSimTest {
 		
 		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
 		AgentCounter agentCounter = new AgentCounterImpl();		
-
-		QSim qSim1 = new QSim(scenario, events, agentCounter, mobsimTimer);
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+		
+		QSim qSim1 = new QSim(scenario, events, agentCounter, mobsimTimer, activeQSimBridge);
 		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
@@ -120,7 +121,7 @@ public class QSimTest {
 		AgentCounter agentCounter = new AgentCounterImpl();
 		
 		Scenario sc = f.scenario;
-		QSim qSim1 = new QSim(sc, events, agentCounter, f.mobsimTimer);
+		QSim qSim1 = new QSim(sc, events, agentCounter, f.mobsimTimer, f.activeQSimBridge);
 		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, f.mobsimTimer);
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
@@ -1536,10 +1537,12 @@ public class QSimTest {
 		final ArrayList<Id<Link>> linkIds2;
 		
 		final MobsimTimer mobsimTimer;
+		final ActiveQSimBridge activeQSimBridge; 
 
 		public Fixture(boolean isUsingFastCapacityUpdate) {
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.mobsimTimer = new MobsimTimer(scenario.getConfig());
+			this.activeQSimBridge = new ActiveQSimBridge();
 			this.config = scenario.getConfig();
 			this.config.qsim().setFlowCapFactor(1.0);
 			this.config.qsim().setStorageCapFactor(1.0);

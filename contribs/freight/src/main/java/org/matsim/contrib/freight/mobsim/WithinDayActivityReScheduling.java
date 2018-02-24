@@ -18,6 +18,7 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -40,16 +41,21 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 
 	private CarrierAgentTracker carrierAgentTracker;
 	
-	WithinDayActivityReScheduling(FreightAgentSource freightAgentSource, CarrierAgentTracker carrierAgentTracker) {
+	private final ActiveQSimBridge activeQSimBridge;
+	
+	WithinDayActivityReScheduling(FreightAgentSource freightAgentSource, CarrierAgentTracker carrierAgentTracker, ActiveQSimBridge activeQSimBridge) {
 		this.freightAgentSource = freightAgentSource;
 		this.carrierAgentTracker = carrierAgentTracker;
+		this.activeQSimBridge = activeQSimBridge;
 	}
 
 	@Override
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		Collection<MobsimAgent> agentsToReplan = freightAgentSource.getMobSimAgents();
 		for (MobsimAgent pa : agentsToReplan) {
-			doReplanning(pa, e.getSimulationTime(), e.getQueueSimulation());
+			doReplanning(pa, e.getSimulationTime(), activeQSimBridge.getActiveQSim());
+			// TODO: This reference to the QSim should be removed in the future.
+			// /shoerl, feb 18
 		}
 	}
 

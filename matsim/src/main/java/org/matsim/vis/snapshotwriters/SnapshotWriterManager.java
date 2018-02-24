@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import java.util.ArrayList;
@@ -46,10 +47,12 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 	final private int snapshotPeriod;
 	
 	final private MobsimTimer mobsimTimer;
+	private final ActiveQSimBridge activeQSimBridge;
 
-	public SnapshotWriterManager(Config config, MobsimTimer mobsimTimer) {
+	public SnapshotWriterManager(Config config, MobsimTimer mobsimTimer, ActiveQSimBridge activeQSimBridge) {
 		snapshotPeriod = findSnapshotPeriod(config);
 		this.mobsimTimer = mobsimTimer;
+		this.activeQSimBridge = activeQSimBridge;
 	}
 
 	// yuck
@@ -89,7 +92,7 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 		double time = e.getSimulationTime();
 		if (time >= this.snapshotTime) {
 			this.snapshotTime += this.snapshotPeriod;
-			doSnapshot(time, (VisMobsim) e.getQueueSimulation());
+			doSnapshot(time, (VisMobsim) activeQSimBridge.getActiveQSim());
 		}
 	}
 	

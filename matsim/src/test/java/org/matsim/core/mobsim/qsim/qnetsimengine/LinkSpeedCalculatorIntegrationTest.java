@@ -48,6 +48,7 @@ import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -204,7 +205,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 	}
 	
 	private static QSim configureQSim(Fixture f, LinkSpeedCalculator linkSpeedCalculator) {
-		QSim qsim = new QSim(f.scenario, f.events, f.agentCounter, f.mobsimTimer);
+		QSim qsim = new QSim(f.scenario, f.events, f.agentCounter, f.mobsimTimer, f.activeQSimBridge);
 		
 		// handle activities
 		ActivityEngine activityEngine = new ActivityEngine(f.events, f.agentCounter, f.mobsimTimer);
@@ -250,12 +251,14 @@ public class LinkSpeedCalculatorIntegrationTest {
 		Scenario scenario;
 		MobsimTimer mobsimTimer;
 		AgentCounter agentCounter;
+		ActiveQSimBridge activeQSimBridge;
 
 		public Fixture() {
 			this.config = ConfigUtils.createConfig();
 			this.scenario = ScenarioUtils.createScenario(config);
 			this.mobsimTimer = new MobsimTimer(config);
 			this.agentCounter = new AgentCounterImpl();
+			this.activeQSimBridge = new ActiveQSimBridge();
 
 			Id<Node>[] nodeIds = new Id[5];
 			for (int i = 0; i < nodeIds.length; i++) {

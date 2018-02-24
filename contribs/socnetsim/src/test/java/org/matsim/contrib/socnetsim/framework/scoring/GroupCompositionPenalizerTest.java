@@ -43,6 +43,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -234,8 +235,9 @@ public class GroupCompositionPenalizerTest {
 	private QSim createQSim( final Scenario sc, final EventsManager events ) {
 		MobsimTimer mobsimTimer = new MobsimTimer(sc.getConfig());
 		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 		
-		QSim qSim = new QSim(sc, events, agentCounter, mobsimTimer);
+		QSim qSim = new QSim(sc, events, agentCounter, mobsimTimer, activeQSimBridge);
 
 		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
 		qSim.addMobsimEngine(activityEngine);

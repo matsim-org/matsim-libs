@@ -35,6 +35,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -57,16 +58,17 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
     private final IdIntMapper mapper;
     private final MobsimTimer mobsimTimer;
     private final AgentCounter agentCounter;
+    private final ActiveQSimBridge activeQSimBridge;
 
     @Inject
-    HybridMobsimProvider(Scenario sc, EventsManager eventsManager, HybridNetworkFactory netFac, IdIntMapper mapper, AgentCounter agentCounter, MobsimTimer mobsimTimer) {
+    HybridMobsimProvider(Scenario sc, EventsManager eventsManager, HybridNetworkFactory netFac, IdIntMapper mapper, AgentCounter agentCounter, MobsimTimer mobsimTimer, ActiveQSimBridge activeQSimBridge) {
         this.sc = sc;
 		this.em = eventsManager;
 		this.netFac = netFac;
         this.mapper = mapper;
         this.mobsimTimer = mobsimTimer;
         this.agentCounter = agentCounter;
-
+        this.activeQSimBridge = activeQSimBridge;
     }
 
 	@Override
@@ -78,7 +80,7 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 		}
 
 
-		QSim qSim = new QSim(this.sc, this.em, agentCounter, mobsimTimer);
+		QSim qSim = new QSim(this.sc, this.em, agentCounter, mobsimTimer, activeQSimBridge);
 		ActivityEngine activityEngine = new ActivityEngine(this.em, agentCounter, mobsimTimer);
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);

@@ -40,6 +40,7 @@ public class QSimModule extends com.google.inject.AbstractModule {
 		
 		bind(MobsimTimer.class);
 		bind(AgentCounter.class).to(AgentCounterImpl.class);
+		bind(ActiveQSimBridge.class);
 	}
 
 	@SuppressWarnings("static-method")

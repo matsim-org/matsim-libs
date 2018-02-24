@@ -263,7 +263,8 @@ public class TransitQueueSimulationTest {
 
         // run simulation
         EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim1 = new QSim(scenario, events, agentCounter, mobsimTimer);
+        ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+		QSim qSim1 = new QSim(scenario, events, agentCounter, mobsimTimer, activeQSimBridge);
 		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
@@ -530,7 +531,8 @@ public class TransitQueueSimulationTest {
             this.departure = departure;
             MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
             AgentCounter agentCounter = new AgentCounterImpl();
-			QSim qSim2 = new QSim(scenario, events, agentCounter, mobsimTimer);
+            ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+			QSim qSim2 = new QSim(scenario, events, agentCounter, mobsimTimer, activeQSimBridge);
 			ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
 			qSim2.addMobsimEngine(activityEngine);
 			qSim2.addActivityHandler(activityEngine);

@@ -57,6 +57,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
@@ -254,9 +255,10 @@ public class JointTravelingSimulationIntegrationTest {
 			
 			MobsimTimer mobsimTimer = new MobsimTimer(sc.getConfig());
 			AgentCounter agentCounter = new AgentCounterImpl();
+			ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 
 			final JointQSimFactory factory = new JointQSimFactory( );
-			final QSim qsim = factory.createMobsim( sc , events, mobsimTimer, agentCounter );
+			final QSim qsim = factory.createMobsim( sc , events, mobsimTimer, agentCounter, activeQSimBridge );
 			try {
 				qsim.run();
 			}
@@ -341,9 +343,10 @@ public class JointTravelingSimulationIntegrationTest {
 			
 			MobsimTimer mobsimTimer = new MobsimTimer(sc.getConfig());
 			AgentCounter agentCounter = new AgentCounterImpl();
+			ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 
 			final JointQSimFactory factory = new JointQSimFactory( );
-			factory.createMobsim( sc , events, mobsimTimer, agentCounter ).run();
+			factory.createMobsim( sc , events, mobsimTimer, agentCounter, activeQSimBridge ).run();
 
 			Assert.assertEquals(
 					"not as many leave events as enter events",

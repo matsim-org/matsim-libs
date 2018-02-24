@@ -40,10 +40,13 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkLanesImpl;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.inject.Provider;
 
 /**
  * Integration test for lanes and inverted network routing
@@ -73,31 +76,39 @@ public class LanesIT {
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
-				addControlerListenerBinding().to(TestListener.class);
-				addMobsimListenerBinding().toInstance(new MobsimInitializedListener() {
+				addControlerListenerBinding().to(TestListener.class);				
+				addMobsimListenerBinding().toProvider(new Provider<MobsimInitializedListener>() {
+					@Inject 
+					ActiveQSimBridge activeQSimBridge;
+					
 					@Override
-					public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-						Assert.assertTrue(e.getQueueSimulation() instanceof QSim);
-						QSim qsim = (QSim) e.getQueueSimulation();
-						NetsimLink link = qsim.getNetsimNetwork().getNetsimLink(Id.create("23", Link.class));
-						Assert.assertTrue(link instanceof QLinkLanesImpl);
-						QLinkLanesImpl link23 = (QLinkLanesImpl) link;
-						Assert.assertNotNull(link23.getQueueLanes());
-						//			for (QLane lane : link23.getQueueLanes()){
-						//				Assert.assertNotNull(lane);
-						//				log.error("lane " + lane.getId() + " flow " + lane.getSimulatedFlowCapacity());
-						//				if (Id.create("1").equals(lane.getId())){
-						//					log.error("lane 1 " + lane.getSimulatedFlowCapacity());
-						//				}
-						//				else if (Id.create("2").equals(lane.getId())){
-						//					log.error("lane 2  " + lane.getSimulatedFlowCapacity());
-						//				}
-						//				else if (Id.create("3").equals(lane.getId())){
-						//					log.error("lane 3 " + lane.getSimulatedFlowCapacity());
-						//				}
-						//			}
+					public MobsimInitializedListener get() {
+						return new MobsimInitializedListener() {
+							@Override
+							public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+								Assert.assertTrue(activeQSimBridge.getActiveQSim() instanceof QSim);
+								QSim qsim = activeQSimBridge.getActiveQSim();
+								NetsimLink link = qsim.getNetsimNetwork().getNetsimLink(Id.create("23", Link.class));
+								Assert.assertTrue(link instanceof QLinkLanesImpl);
+								QLinkLanesImpl link23 = (QLinkLanesImpl) link;
+								Assert.assertNotNull(link23.getQueueLanes());
+								//			for (QLane lane : link23.getQueueLanes()){
+								//				Assert.assertNotNull(lane);
+								//				log.error("lane " + lane.getId() + " flow " + lane.getSimulatedFlowCapacity());
+								//				if (Id.create("1").equals(lane.getId())){
+								//					log.error("lane 1 " + lane.getSimulatedFlowCapacity());
+								//				}
+								//				else if (Id.create("2").equals(lane.getId())){
+								//					log.error("lane 2  " + lane.getSimulatedFlowCapacity());
+								//				}
+								//				else if (Id.create("3").equals(lane.getId())){
+								//					log.error("lane 3 " + lane.getSimulatedFlowCapacity());
+								//				}
+								//			}
+							}
+						};
 					}
-				});
+				}).asEagerSingleton();
 			}
 		});
 		controler.run();

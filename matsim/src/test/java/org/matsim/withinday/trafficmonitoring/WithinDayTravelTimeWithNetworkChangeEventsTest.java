@@ -47,6 +47,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkUtils;
@@ -129,8 +130,8 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 			}
 			
 			@Provides @Singleton
-			WithinDayTravelTime provideWithinDayTravelTime(Scenario scenario, MobsimTimer mobsimTimer) {
-				return new WithinDayTravelTime(scenario, analyzedModes, mobsimTimer);
+			WithinDayTravelTime provideWithinDayTravelTime(Scenario scenario, MobsimTimer mobsimTimer, ActiveQSimBridge activeQSimBridge) {
+				return new WithinDayTravelTime(scenario, analyzedModes, mobsimTimer, activeQSimBridge);
 			}
 			
 		}) ;

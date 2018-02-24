@@ -35,6 +35,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -52,15 +53,17 @@ public class FreightQSimFactory implements Provider<Mobsim> {
 	private CarrierConfig carrierConfig;
 	private MobsimTimer mobsimTimer;
 	private AgentCounter agentCounter;
+	private ActiveQSimBridge activeQSimBridge;
 
 	@Inject
-	public FreightQSimFactory(Scenario scenario, EventsManager eventsManager, CarrierAgentTracker carrierAgentTracker, CarrierConfig carrierConfig, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
+	public FreightQSimFactory(Scenario scenario, EventsManager eventsManager, CarrierAgentTracker carrierAgentTracker, CarrierConfig carrierConfig, MobsimTimer mobsimTimer, AgentCounter agentCounter, ActiveQSimBridge activeQSimBridge) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.carrierAgentTracker = carrierAgentTracker;
 		this.carrierConfig = carrierConfig;
 		this.mobsimTimer = mobsimTimer;
 		this.agentCounter = agentCounter;
+		this.activeQSimBridge = activeQSimBridge;
 	}
 
 	@Override
@@ -75,7 +78,7 @@ public class FreightQSimFactory implements Provider<Mobsim> {
 		FreightAgentSource agentSource = new FreightAgentSource(vRoutes, new DefaultAgentFactory(scenario, eventsManager, mobsimTimer), sim);
 		sim.addAgentSource(agentSource);
 		if (carrierConfig.getPhysicallyEnforceTimeWindowBeginnings()) {
-			WithinDayActivityReScheduling withinDayActivityRescheduling = new WithinDayActivityReScheduling(agentSource, carrierAgentTracker);
+			WithinDayActivityReScheduling withinDayActivityRescheduling = new WithinDayActivityReScheduling(agentSource, carrierAgentTracker, activeQSimBridge);
 			sim.addQueueSimulationListeners(withinDayActivityRescheduling);
 		}
 		return sim;

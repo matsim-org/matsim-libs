@@ -19,24 +19,10 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.events;
 
-import org.matsim.core.mobsim.framework.Mobsim;
-
 /**
- * An abstract superclass for all classes implementing the
- * QueueSimulationEvent interface.
+ * Interface to tag any events that are produced by a Mobsm.
  *
- * @author dgrether
+ * @author dgrether, shoerl
  */
-abstract class AbstractMobsimEvent<T extends Mobsim> {
-	
-	private final T queuesim;
-
-	AbstractMobsimEvent(T queuesim){
-		this.queuesim = queuesim;
-	}
-
-	public T getQueueSimulation() {
-		return this.queuesim;
-	}
-
+interface AbstractMobsimEvent {
 }

@@ -35,12 +35,15 @@ import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.*;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.controller.WithinDayModule;
 import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.mobsim.WithinDayEngine;
+
+import com.sun.accessibility.internal.resources.accessibility;
 
 import javax.inject.Inject;
 import java.util.LinkedHashMap;
@@ -133,13 +136,15 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		private static final int t6 = 6*3600 + 120;
 		
 		final private EventsManager eventsManager;
+		private final ActiveQSimBridge activeQSimBridge;
 		
 		@Inject
-		MobsimListenerForTests(final ActivityReplanningMap arp, WithinDayEngine withinDayEngine, EventsManager eventsManager) {
+		MobsimListenerForTests(final ActivityReplanningMap arp, WithinDayEngine withinDayEngine, EventsManager eventsManager, ActiveQSimBridge activeQSimBridge) {
 			this.arp = arp;
 			this.withinDayEngine = withinDayEngine;
 			this.agents = new LinkedHashMap<>();
 			this.eventsManager = eventsManager;
+			this.activeQSimBridge = activeQSimBridge;
 		}
 
 		@Override
@@ -147,7 +152,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 			assertEquals(100, this.arp.getActivityPerformingAgents().size());	// all agents perform an activity
 			assertEquals(0, this.arp.getActivityEndingAgents(0.0).size());		// no agent ends an activity
 			
-			QSim sim = (QSim) e.getQueueSimulation();
+			QSim sim = activeQSimBridge.getActiveQSim();
 			for (MobsimAgent agent : sim.getAgents().values()) this.agents.put(agent.getId(), agent);
 		}
 

@@ -8,6 +8,7 @@ import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -29,13 +30,14 @@ public class CarsharingQsimFactoryNew implements Provider<Mobsim>{
 	@Inject EventsManager eventsManager;
 	@Inject CarsharingSupplyInterface carsharingSupply;
 	@Inject private CarsharingManagerInterface carsharingManager;
+	@Inject ActiveQSimBridge activeQSimBridge;
 
 	@Override
 	public Mobsim get() {
 		MobsimTimer mobsimTimer = new MobsimTimer();
 		AgentCounter agentCounter = new AgentCounterImpl();
 		
-		final QSim qsim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer);
+		final QSim qsim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer, activeQSimBridge);
 		//QSimUtils.createDefaultQSim(scenario, eventsManager);
 		ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer);
 		qsim.addMobsimEngine(activityEngine);

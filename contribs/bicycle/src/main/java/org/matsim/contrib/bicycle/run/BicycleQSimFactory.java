@@ -27,6 +27,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
@@ -47,6 +48,7 @@ public class BicycleQSimFactory implements Provider<Mobsim> {
 	@Inject EventsManager eventsManager;
 	@Inject AgentCounter agentCounter;
 	@Inject MobsimTimer mobsimTimer;
+	@Inject ActiveQSimBridge activeQSimBridge;
 	
 	@Override
 	public Mobsim get() {
@@ -57,7 +59,7 @@ public class BicycleQSimFactory implements Provider<Mobsim> {
 		}
 
 		// construct the QSim:
-		QSim qSim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer);
+		QSim qSim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer, activeQSimBridge);
 
 		// add the activity engine:
 		ActivityEngine activityEngine = new ActivityEngine(eventsManager, mobsimTimer, agentCounter);

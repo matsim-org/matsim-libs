@@ -19,17 +19,11 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.events;
 
-import org.matsim.core.mobsim.framework.Mobsim;
-
-
 /**
- * @author dgrether
+ * Events is boradcasted when the Mobsim has finished.
+ * 
+ * @author dgrether, shoerl
  */
-public class MobsimBeforeCleanupEvent<T extends Mobsim> extends
-		AbstractMobsimEvent<T> {
-
-	public MobsimBeforeCleanupEvent(T queuesim) {
-		super(queuesim);
-	}
+public class MobsimBeforeCleanupEvent implements AbstractMobsimEvent {
 
 }
