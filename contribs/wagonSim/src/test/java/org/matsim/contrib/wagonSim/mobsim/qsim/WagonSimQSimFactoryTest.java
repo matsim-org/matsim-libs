@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.wagonSim.mobsim.qsim;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.log4j.Logger;
 import org.junit.Test;

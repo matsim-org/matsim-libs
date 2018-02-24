@@ -30,7 +30,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * @author mrieser / senozon
