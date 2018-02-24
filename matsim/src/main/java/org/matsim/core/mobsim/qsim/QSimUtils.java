@@ -44,8 +44,8 @@ public class QSimUtils {
 	 // should only contain static methods; should thus not be instantiated
 	private QSimUtils() {}
 
-	public static QSim createDefaultQSim(final Scenario scenario, final EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
-		return createDefaultQSimWithOverrides(scenario, eventsManager, Collections.singleton(new AuxiliaryQSimModule(agentCounter, mobsimTimer)));
+	public static QSim createDefaultQSim(final Scenario scenario, final EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter, ActiveQSimBridge activeQSimBridge) {
+		return createDefaultQSimWithOverrides(scenario, eventsManager, Collections.singleton(new AuxiliaryQSimModule(agentCounter, mobsimTimer, activeQSimBridge)));
 	}
 	
 	// This has been commented out, because it was often used in test, but it is misleading in terms of what 
@@ -69,8 +69,9 @@ public class QSimUtils {
 	public static QSim createDefaultQSimWithDefaultTimerAndCounter(final Scenario scenario, final EventsManager eventsManager) {
 		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
 		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimModule = new ActiveQSimBridge();
 		
-		return createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter);
+		return createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter, activeQSimModule);
 	}
 	
 	public static QSim createDefaultQSimWithOverrides( final Scenario scenario, final EventsManager eventsManager, 
@@ -92,13 +93,13 @@ public class QSimUtils {
 		return (QSim) injector.getInstance(Mobsim.class);
 	}
 
-	public static QSim createQSim(final Scenario scenario, final EventsManager eventsManager, final Collection<AbstractQSimPlugin> plugins, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
+	public static QSim createQSim(final Scenario scenario, final EventsManager eventsManager, final Collection<AbstractQSimPlugin> plugins, MobsimTimer mobsimTimer, AgentCounter agentCounter, ActiveQSimBridge activeQSimBridge) {
 		Injector injector = org.matsim.core.controler.Injector.createInjector(scenario.getConfig(),
 				org.matsim.core.controler.AbstractModule.override(Collections.singleton(new StandaloneQSimModule(scenario, eventsManager)),
 				new org.matsim.core.controler.AbstractModule() {
 					@Override
 					public void install() {
-						install(new AuxiliaryQSimModule(agentCounter, mobsimTimer));
+						install(new AuxiliaryQSimModule(agentCounter, mobsimTimer, activeQSimBridge));
 						bind(new TypeLiteral<Collection<AbstractQSimPlugin>>() {}).toInstance(plugins);
 					}
 				}));
@@ -108,16 +109,19 @@ public class QSimUtils {
 	private static class AuxiliaryQSimModule extends org.matsim.core.controler.AbstractModule {
 		final private AgentCounter agentCounter;
 		final private MobsimTimer mobsimTimer;
+		final private ActiveQSimBridge activeQSimBridge;
 		
-		public AuxiliaryQSimModule(AgentCounter agentCounter, MobsimTimer mobsimTimer) {
+		public AuxiliaryQSimModule(AgentCounter agentCounter, MobsimTimer mobsimTimer, ActiveQSimBridge activeQSimBridge) {
 			this.agentCounter = agentCounter;
 			this.mobsimTimer = mobsimTimer;
+			this.activeQSimBridge = activeQSimBridge;
 		}
 		
 		@Override
 		public void install() {
 			bind(AgentCounter.class).toInstance(agentCounter);
 			bind(MobsimTimer.class).toInstance(mobsimTimer);
+			bind(ActiveQSimBridge.class).toInstance(activeQSimBridge);
 		}
 	}
 

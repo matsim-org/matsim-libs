@@ -40,6 +40,7 @@ import org.matsim.core.config.groups.QSimConfigGroup.SnapshotStyle;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -341,8 +342,9 @@ public class TwoLinesDemo {
 		
 		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
 		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 
-		QSim sim = QSimUtils.createDefaultQSim(this.scenario, events, mobsimTimer, agentCounter);
+		QSim sim = QSimUtils.createDefaultQSim(this.scenario, events, mobsimTimer, agentCounter, activeQSimBridge);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim, mobsimTimer);
 		OTFClientLive.run(scenario.getConfig(), server);
 		sim.run();

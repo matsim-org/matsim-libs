@@ -50,6 +50,7 @@ import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
@@ -331,7 +332,8 @@ public final class QLinkTest extends MatsimTestCase {
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
 		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
 		AgentCounter agentCounter = new AgentCounterImpl();
-		QSim qsim = QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter);
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+		QSim qsim = QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter, activeQSimBridge);
 		NetsimNetwork queueNetwork = qsim.getNetsimNetwork();
 		dummify((QNetwork) queueNetwork);
 		QLinkImpl qlink = (QLinkImpl) queueNetwork.getNetsimLink(Id.create("1", Link.class));
@@ -614,6 +616,7 @@ public final class QLinkTest extends MatsimTestCase {
 			
 			this.mobsimTimer = new MobsimTimer(scenario.getConfig());
 			AgentCounter agentCounter = new AgentCounterImpl();
+			ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 			
 			Network network = (Network) this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
@@ -628,7 +631,7 @@ public final class QLinkTest extends MatsimTestCase {
 			this.link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0 );
 			eventsManager = EventsUtils.createEventsManager();
 			PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-			sim = QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter);
+			sim = QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter, activeQSimBridge);
 			this.queueNetwork = (QNetwork) sim.getNetsimNetwork();
 
             this.qlink1 = (QLinkImpl) this.queueNetwork.getNetsimLink(Id.create("1", Link.class));

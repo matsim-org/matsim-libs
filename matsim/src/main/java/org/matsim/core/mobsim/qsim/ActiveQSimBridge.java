@@ -24,6 +24,10 @@ import com.google.inject.Singleton;
 @Singleton
 public class ActiveQSimBridge {
 	private QSim activeQSim;
+	
+	public ActiveQSimBridge() {
+		
+	}
 
 	public void setActiveQSim(QSim activeQSim) {
 		this.activeQSim = activeQSim;

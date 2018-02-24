@@ -35,6 +35,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.AgentTracker;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -156,9 +157,10 @@ public class OTFVis {
 	public static void playScenario(Scenario scenario){
 		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
 		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 		
 		EventsManager events = EventsUtils.createEventsManager();
-		QSim qSim = QSimUtils.createDefaultQSim(scenario, events, mobsimTimer, agentCounter);
+		QSim qSim = QSimUtils.createDefaultQSim(scenario, events, mobsimTimer, agentCounter, activeQSimBridge);
 
 		OnTheFlyServer server = startServerAndRegisterWithQSim(scenario.getConfig(),scenario, events, qSim, mobsimTimer);
 		OTFClientLive.run(scenario.getConfig(), server);

@@ -27,6 +27,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
@@ -43,11 +44,12 @@ public class WithinDayQSimFactory implements Provider<Mobsim> {
 	private final WithinDayEngine withinDayEngine;
 	private final FixedOrderSimulationListener fixedOrderSimulationListener;
 	private final WithinDayTravelTime WithinDayTravelTime;
-	private MobsimTimer mobsimTimer;
-	private AgentCounter agentCounter;
+	private final MobsimTimer mobsimTimer;
+	private final AgentCounter agentCounter;
+	private final ActiveQSimBridge activeQSimBridge;
 	
 	@Inject
-	WithinDayQSimFactory(Scenario scenario, EventsManager eventsManager, WithinDayEngine withinDayEngine, FixedOrderSimulationListener fixedOrderSimulationListener, WithinDayTravelTime WithinDayTravelTime, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
+	WithinDayQSimFactory(Scenario scenario, EventsManager eventsManager, WithinDayEngine withinDayEngine, FixedOrderSimulationListener fixedOrderSimulationListener, WithinDayTravelTime WithinDayTravelTime, MobsimTimer mobsimTimer, AgentCounter agentCounter, ActiveQSimBridge activeQSimBridge) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.withinDayEngine = withinDayEngine;
@@ -55,11 +57,12 @@ public class WithinDayQSimFactory implements Provider<Mobsim> {
 		this.WithinDayTravelTime = WithinDayTravelTime;
 		this.mobsimTimer = mobsimTimer;
 		this.agentCounter = agentCounter;
+		this.activeQSimBridge = activeQSimBridge;
 	}
 
 	@Override
 	public Mobsim get() {
-		QSim mobsim = QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter);
+		QSim mobsim = QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter, activeQSimBridge);
 		log.info("Adding WithinDayEngine to Mobsim.");
 		mobsim.addMobsimEngine(withinDayEngine);
 		mobsim.addQueueSimulationListeners(fixedOrderSimulationListener);

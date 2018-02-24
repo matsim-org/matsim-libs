@@ -32,6 +32,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulation;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 
@@ -45,15 +46,17 @@ public class SwitchingMobsimProvider implements Provider<Mobsim> {
     private RunPSim.MobSimSwitcher mobSimSwitcher;
     private MobsimTimer mobsimTimer;
     private AgentCounter agentCounter;
+    private ActiveQSimBridge activeQSimBridge;
 
     @Inject
-    SwitchingMobsimProvider(Config config, Scenario scenario, EventsManager eventsManager, RunPSim.MobSimSwitcher mobSimSwitcher, AgentCounter agentCounter, MobsimTimer mobsimTimer) {
+    SwitchingMobsimProvider(Config config, Scenario scenario, EventsManager eventsManager, RunPSim.MobSimSwitcher mobSimSwitcher, AgentCounter agentCounter, MobsimTimer mobsimTimer, ActiveQSimBridge activeQSimBridge) {
         this.config = config;
         this.scenario = scenario;
         this.eventsManager = eventsManager;
         this.mobSimSwitcher = mobSimSwitcher;
         this.agentCounter = agentCounter;
         this.mobsimTimer = mobsimTimer;
+        this.activeQSimBridge = activeQSimBridge;
     }
 
     @Override
@@ -63,7 +66,7 @@ public class SwitchingMobsimProvider implements Provider<Mobsim> {
             if (mobsim.equals("jdeqsim")) {
                 return new JDEQSimulation(ConfigUtils.addOrGetModule(scenario.getConfig(), JDEQSimConfigGroup.NAME, JDEQSimConfigGroup.class), scenario, eventsManager);
             } else {
-                return QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter);
+                return QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter, activeQSimBridge);
             }
         } else {
             return mobSimSwitcher.getpSimFactory().get();

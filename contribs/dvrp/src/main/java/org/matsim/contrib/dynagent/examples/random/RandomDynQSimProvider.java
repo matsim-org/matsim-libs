@@ -34,20 +34,23 @@ public class RandomDynQSimProvider implements Provider<Mobsim> {
 	private final Scenario scenario;
 	private final EventsManager events;
 	private final Collection<AbstractQSimPlugin> plugins;
+	private final MobsimTimer mobsimTimer;
+	private final AgentCounter agentCounter;
+	private final ActiveQSimBridge activeQSimBridge;
 
 	@Inject
-	public RandomDynQSimProvider(Scenario scenario, EventsManager events, Collection<AbstractQSimPlugin> plugins) {
+	public RandomDynQSimProvider(Scenario scenario, EventsManager events, Collection<AbstractQSimPlugin> plugins, MobsimTimer mobsimTimer, AgentCounter agentCounter, ActiveQSimBridge activeQSimBridge) {
 		this.scenario = scenario;
 		this.events = events;
 		this.plugins = plugins;
+		this.mobsimTimer = mobsimTimer;
+		this.agentCounter = agentCounter;
+		this.activeQSimBridge = activeQSimBridge;
 	}
 
 	@Override
 	public Mobsim get() {
-		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
-		AgentCounter agentCounter = new AgentCounterImpl();
-		
-		QSim qSim = QSimUtils.createQSim(scenario, events, plugins, mobsimTimer, agentCounter);
+		QSim qSim = QSimUtils.createQSim(scenario, events, plugins, mobsimTimer, agentCounter, activeQSimBridge);
 		qSim.addAgentSource(new RandomDynAgentSource(qSim, scenario.getNetwork(), events, 50));
 		return qSim;
 	}

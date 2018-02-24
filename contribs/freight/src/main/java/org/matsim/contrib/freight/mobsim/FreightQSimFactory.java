@@ -73,7 +73,7 @@ public class FreightQSimFactory implements Provider<Mobsim> {
 			throw new NullPointerException(
 					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
-		final QSim sim = QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter);
+		final QSim sim = QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter, activeQSimBridge);
 		Collection<MobSimVehicleRoute> vRoutes = carrierAgentTracker.createPlans();
 		FreightAgentSource agentSource = new FreightAgentSource(vRoutes, new DefaultAgentFactory(scenario, eventsManager, mobsimTimer), sim);
 		sim.addAgentSource(agentSource);

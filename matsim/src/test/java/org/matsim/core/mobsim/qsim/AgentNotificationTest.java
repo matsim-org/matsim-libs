@@ -269,8 +269,9 @@ public class AgentNotificationTest {
 		
 		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
 		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 		
-		QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins, mobsimTimer, agentCounter);
+		QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins, mobsimTimer, agentCounter, activeQSimBridge);
 
 		qSim.run();
 		// yyyyyy I can comment out the above line and the test still passes (will say: "skipped"). ?????? kai, feb'16
