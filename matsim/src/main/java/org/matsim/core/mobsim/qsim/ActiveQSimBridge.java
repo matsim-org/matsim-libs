@@ -9,7 +9,7 @@ import com.google.inject.Singleton;
  * 
  * The idea is the following: ActiveQSimBridge lives in the outer controller
  * scope. Whenever a new QSim is created, it registers here and any other
- * component of MATSim that needs a handle to the current MATSim can obtain it
+ * component of MATSim that needs a handle to the current QSim can obtain it
  * from here.
  * 
  * This mostly replaces cases where people used e.g. MobsimInitializedEvent to
@@ -30,7 +30,7 @@ public class ActiveQSimBridge {
 	}
 	
 	public boolean hasActiveQSim() {
-		return activeQSim == null;
+		return activeQSim != null;
 	}
 
 	public QSim getActiveQSim() {
