@@ -123,10 +123,10 @@ public class ControlerTest {
 		@Override
 		public void handleEvent(SignalGroupStateChangedEvent e) {
 			if (e.getNewState().equals(SignalGroupState.RED)){
-				Assert.assertEquals(0.0, e.getTime());
+				Assert.assertEquals(0.0, e.getTime(), 1e-7);
 			}
 			else if (e.getNewState().equals(SignalGroupState.GREEN)) {
-				Assert.assertEquals(100.0, e.getTime());
+				Assert.assertEquals(100.0, e.getTime(), 1e-7);
 			}
 		}
 	}

@@ -104,7 +104,7 @@ public class CustomEventTest {
 		Event event = oneEvent.get(0);
 		Assert.assertTrue(event instanceof RainOnPersonEvent);
 		RainOnPersonEvent ropEvent = ((RainOnPersonEvent) event);
-		Assert.assertEquals(0.0, ropEvent.getTime());
+		Assert.assertEquals(0.0, ropEvent.getTime(), 1e-7);
 		Assert.assertEquals(Id.createPersonId("wurst"), ropEvent.getPersonId());
 	}
 

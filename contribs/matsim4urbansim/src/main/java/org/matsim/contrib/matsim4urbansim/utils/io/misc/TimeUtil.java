@@ -28,9 +28,9 @@ public class TimeUtil {
 		double s2 = 93.;
 		double s3 = 7225.;
 		
-		Assert.assertEquals(60., convertSeconds2Minutes(s1));
-		Assert.assertEquals(1.33, convertSeconds2Minutes(s2));
-		Assert.assertEquals(120.25, convertSeconds2Minutes(s3));
+		Assert.assertEquals(60., convertSeconds2Minutes(s1), 1e-7);
+		Assert.assertEquals(1.33, convertSeconds2Minutes(s2), 1e-7);
+		Assert.assertEquals(120.25, convertSeconds2Minutes(s3), 1e-7);
 	}
 
 }
