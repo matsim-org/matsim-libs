@@ -58,7 +58,7 @@ public class EarliestLinkExitTimeFilter implements AgentFilter {
 	@Override
 	public boolean applyAgentFilter(Id<Person> id, double time) {
 		Double earliestLinkExitTime = this.earliestLinkExitTimeProvider.getEarliestLinkExitTime(id);
-		if (earliestLinkExitTime == null) return false;
+		if (Time.isUndefinedTime(earliestLinkExitTime)) return false;
 		else if (earliestLinkExitTime <= time) return false;
 		else return true;
 	}
