@@ -100,10 +100,8 @@ public class JDEQSimConfigGroup extends ReflectiveConfigGroup {
 	@StringSetter(END_TIME)
 	public void setSimulationEndTime(String simulationEndTime) {
 		double parsedTime = Time.parseTime(simulationEndTime);
-		if (parsedTime != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(parsedTime)) {
 			this.simulationEndTime = parsedTime;
-		} else {
-			parsedTime = Double.MAX_VALUE;
 		}
 	}
 
