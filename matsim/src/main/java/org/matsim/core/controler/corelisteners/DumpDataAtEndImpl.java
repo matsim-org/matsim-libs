@@ -148,24 +148,24 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			}
 		} catch ( Exception ee ) {
 			Logger.getLogger(this.getClass()).error("writing output events did not work; probably parameters were such that no events were "
-					+ "generated in the final iteration") ;
+					+ "generated in the final iteration", ee);
 		}
 	}
 
 	private void dumpExperiencedPlans() {
 		if ( config.planCalcScore().isWriteExperiencedPlans() ) {
-		try {
-			File toFile = new File(	controlerIO.getOutputFilename("output_experienced_plans.xml.gz"));
-			File fromFile = new File(controlerIO.getIterationFilename(controlerConfigGroup.getLastIteration(), "experienced_plans.xml.gz"));
 			try {
-				Files.copy(fromFile.toPath(), toFile.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
-			} catch (IOException e) {
-				throw new UncheckedIOException(e);
+				File toFile = new File(	controlerIO.getOutputFilename("output_experienced_plans.xml.gz"));
+				File fromFile = new File(controlerIO.getIterationFilename(controlerConfigGroup.getLastIteration(), "experienced_plans.xml.gz"));
+				try {
+					Files.copy(fromFile.toPath(), toFile.toPath(),StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.COPY_ATTRIBUTES);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			} catch ( Exception ee ) {
+				Logger.getLogger(this.getClass()).error("writing output experienced plans did not work; probably parameters were such that they "
+						+ "were not generated in the final iteration", ee);
 			}
-		} catch ( Exception ee ) {
-			Logger.getLogger(this.getClass()).error("writing output experienced plans did not work; probably parameters were such that they "
-					+ "were not generated in the final iteration") ;
-		}
 		}
 	}
 
@@ -189,25 +189,33 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 					new CountsWriter( transformation , counts).write(controlerIO.getOutputFilename(Controler.FILENAME_COUNTS));
 				}
 			}
-		} catch ( Exception ee ) {}
+		} catch ( Exception ee ) {
+			log.error("Exception writing counts.", ee);
+		}
 	}
 
 	private void dumpLanes() {
 		try {
 			new LanesWriter(lanes).write(controlerIO.getOutputFilename(Controler.FILENAME_LANES));
-		} catch ( Exception ee ) {}
+		} catch ( Exception ee ) {
+			log.error("Exception writing lanes.", ee);
+		}
 	}
 
 	private void dumpHouseholds() {
 		try {
 			new HouseholdsWriterV10(households).writeFile(controlerIO.getOutputFilename(Controler.FILENAME_HOUSEHOLDS));
-		} catch ( Exception ee ) {}
+		} catch ( Exception ee ) {
+			log.error("Exception writing households.", ee);
+		}
 	}
 
 	private void dumpVehicles() {
 		try {
 			new VehicleWriterV1(vehicles).writeFile(controlerIO.getOutputFilename("output_vehicles.xml.gz"));
-		} catch ( Exception ee ) {}
+		} catch ( Exception ee ) {
+			log.error("Exception writing vehicles.", ee);
+		}
 	}
 
 	private void dumpTransitVehicles() {
@@ -215,7 +223,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 			if ( transitVehicles != null ) {
 				new VehicleWriterV1(transitVehicles).writeFile(controlerIO.getOutputFilename("output_transitVehicles.xml.gz"));
 			}
-		} catch ( Exception ee ) {}
+		} catch ( Exception ee ) {
+			log.error("Exception writing transit vehicles.", ee);
+		}
 	}
 
 	private void dumpTransitSchedule() {
@@ -238,7 +248,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 					new TransitScheduleWriter( transformation , transitSchedule ).writeFile(controlerIO.getOutputFilename("output_transitSchedule.xml.gz"));
 				}
 			}
-		} catch ( Exception ee ) { }
+		} catch ( Exception ee ) {
+			log.error("Exception writing transit schedule.", ee);
+		}
 	}
 
 	private void dumpNetworkChangeEvents() {
@@ -267,7 +279,9 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 
 				new FacilitiesWriter( transformation , activityFacilities ).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
 			}
-		} catch ( Exception ee ) {}
+		} catch ( Exception ee ) {
+			log.error("Exception writing facilities.", ee);
+		}
 	}
 
 	private void dumpConfig() {

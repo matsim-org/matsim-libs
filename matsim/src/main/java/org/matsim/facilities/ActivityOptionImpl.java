@@ -29,8 +29,7 @@ public class ActivityOptionImpl implements ActivityOption {
 
 	private final String type;
 	private Double capacity = Double.valueOf(Integer.MAX_VALUE);
-	private ActivityFacility facility = null;
-	private SortedSet<OpeningTime> openingTimes = new TreeSet<OpeningTime>();
+	private SortedSet<OpeningTime> openingTimes = new TreeSet<>();
 
 	public ActivityOptionImpl(final String type) {
 		this.type = type;
@@ -46,7 +45,7 @@ public class ActivityOptionImpl implements ActivityOption {
 			openingTimes.add(opentime);
 			return;
 		}
-		TreeSet<OpeningTime> new_o_set = new TreeSet<OpeningTime>();
+		TreeSet<OpeningTime> new_o_set = new TreeSet<>();
 		Iterator<OpeningTime> o_it = openingTimes.iterator();
 		while (o_it.hasNext()) {
 			OpeningTime o = o_it.next();
@@ -118,7 +117,6 @@ public class ActivityOptionImpl implements ActivityOption {
 	public final String toString() {
 		return "[type=" + this.type + "]" +
 				"[capacity=" + this.capacity + "]" +
-				"[facility_id=" + this.facility.getId() + "]" +
 				"[nof_opentimes=" + this.getOpeningTimes().size() + "]";
 	}
 

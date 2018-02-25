@@ -59,7 +59,7 @@ public class ExecutedPlansServiceImpl implements AfterMobsimListener, ExecutedPl
 	
 	private static final Logger log = Logger.getLogger( ExecutedPlansServiceImpl.class );
 
-	public static String EXECUTEDPLANSFILE = "executedPlans.xml.gz";
+	public static final String EXECUTEDPLANSFILE = "executedPlans.xml.gz";
 
 	private Population experiencedPopulation ;
 

@@ -73,11 +73,12 @@ public final class FacilitiesConfigGroup extends ReflectiveConfigGroup {
 				"be converted back at export. If not specified, no conversion happens." );
 
 		{
-			String options = "" ;
+			StringBuilder options = new StringBuilder();
 			for ( FacilitiesSource source : FacilitiesSource.values() ) {
-				options += source + " " ;
+				options.append(source);
+				options.append(' ');
 			}
-			comments.put(FACILITIES_SOURCE, "This defines how facilities should be created. Possible values: "+options);
+			comments.put(FACILITIES_SOURCE, "This defines how facilities should be created. Possible values: "+options.toString());
 		}
 
 		comments.put( ID_PREFIX, "A prefix to be used in activityFacility id.");
