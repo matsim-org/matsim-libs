@@ -27,7 +27,6 @@ import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.optimizer.rebalancing.DemandBasedRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
 //import org.matsim.contrib.av.robotaxi.run.RunRobotaxiExample;
-import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -44,8 +43,6 @@ import peoplemover.ClosestStopBasedDrtRoutingModule;
 public class RunDrtScenario2Batch {
 	// Class to create the controller
 	public static Controler createControler(Config config, boolean otfvis) {
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
 		return DrtControlerCreator.createControler(config, otfvis);
 	}
 

@@ -23,11 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 
 //import org.matsim.contrib.av.robotaxi.run.RunRobotaxiExample;
-import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -41,8 +39,6 @@ import peoplemover.ClosestStopBasedDrtRoutingModule;
 public class RunDrtScenario2Batch {
 	//Class to create the controller
 	public static Controler createControler(Config config, boolean otfvis) {
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
 		return DrtControlerCreator.createControler(config, otfvis);
 	}
 

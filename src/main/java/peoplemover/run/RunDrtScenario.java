@@ -19,7 +19,6 @@
 
 package peoplemover.run;
 
-import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
@@ -50,8 +49,6 @@ public class RunDrtScenario {
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
 		return DrtControlerCreator.createControler(config, otfvis);
 	}
 
