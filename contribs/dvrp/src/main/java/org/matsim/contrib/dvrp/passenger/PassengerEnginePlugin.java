@@ -8,6 +8,7 @@ import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.*;
 
 import com.google.inject.*;
@@ -53,6 +54,8 @@ public class PassengerEnginePlugin extends AbstractQSimPlugin {
 		@Inject
 		@Named(DvrpModule.DVRP_ROUTING)
 		private Network network;
+		@Inject
+		private InternalInterface internalInterface;
 
 		public PassengerEngineProvider(String mode) {
 			this.mode = mode;
@@ -60,7 +63,7 @@ public class PassengerEnginePlugin extends AbstractQSimPlugin {
 
 		@Override
 		public PassengerEngine get() {
-			return new PassengerEngine(mode, eventsManager, requestCreator, optimizer, network);
+			return new PassengerEngine(mode, eventsManager, requestCreator, optimizer, network, internalInterface);
 		}
 	}
 }

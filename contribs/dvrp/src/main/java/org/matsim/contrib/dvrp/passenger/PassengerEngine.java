@@ -42,7 +42,7 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 	private final String mode;
 
 	private EventsManager eventsManager;
-	private InternalInterface internalInterface;
+	private final InternalInterface internalInterface;
 	private final PassengerRequestCreator requestCreator;
 	private final VrpOptimizer optimizer;
 	private final Network network;
@@ -51,21 +51,22 @@ public class PassengerEngine implements MobsimEngine, DepartureHandler {
 	private final AwaitingPickupStorage awaitingPickupStorage;
 
 	public PassengerEngine(String mode, EventsManager eventsManager, PassengerRequestCreator requestCreator,
-			VrpOptimizer optimizer, Network network) {
+			VrpOptimizer optimizer, Network network, InternalInterface internalInterface) {
 		this.mode = mode;
 		this.eventsManager = eventsManager;
 		this.requestCreator = requestCreator;
 		this.optimizer = optimizer;
 		this.network = network;
+		this.internalInterface = internalInterface;
 
 		advanceRequestStorage = new AdvanceRequestStorage();
 		awaitingPickupStorage = new AwaitingPickupStorage();
 	}
 
-	@Override
+	/*@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-	}
+	}*/
 
 	public String getMode() {
 		return mode;

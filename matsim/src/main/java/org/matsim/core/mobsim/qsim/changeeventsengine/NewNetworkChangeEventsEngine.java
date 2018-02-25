@@ -62,9 +62,9 @@ class NewNetworkChangeEventsEngine implements MobsimEngine {
 
 	}
 
-	@Override
+	/*@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-	}
+	}*/
 
 	@Override
 	public void doSimStep(double time) {

@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
@@ -64,14 +65,16 @@ class MultiModalQLinkExtension {
 	private final EventsManager eventsManager;
 	private final AgentCounter agentCounter;
 	private final MobsimTimer mobsimTimer;
+	private final InternalInterface internalInterface;
 
-	/*package*/ MultiModalQLinkExtension(Link link, MultiModalSimEngine simEngine, MultiModalQNodeExtension multiModalQNodeExtension, EventsManager eventsManager, AgentCounter agentCounter, MobsimTimer mobsimTimer) {
+	/*package*/ MultiModalQLinkExtension(Link link, MultiModalSimEngine simEngine, MultiModalQNodeExtension multiModalQNodeExtension, EventsManager eventsManager, AgentCounter agentCounter, MobsimTimer mobsimTimer, InternalInterface internalInterface) {
 		this.link = link;
 		this.simEngine = simEngine;
 		this.toNode = multiModalQNodeExtension;
 		this.eventsManager = eventsManager;
 		this.agentCounter = agentCounter;
 		this.mobsimTimer = mobsimTimer;
+		this.internalInterface = internalInterface;
 	}
 
 	/*package*/ void setNetworkElementActivator(NetworkElementActivator activator) {
@@ -181,7 +184,7 @@ class MultiModalQLinkExtension {
 						new PersonLeavesVehicleEvent(now, driver.getId(), Id.create(driver.getId(), Vehicle.class)));				
 				
 				driver.endLegAndComputeNextState(now);
-				this.simEngine.internalInterface.arrangeNextAgentState(driver);
+				internalInterface.arrangeNextAgentState(driver);
 			}
 			/*
 			 * The PersonAgent can leave, therefore we move him to the waitingToLeave Queue.

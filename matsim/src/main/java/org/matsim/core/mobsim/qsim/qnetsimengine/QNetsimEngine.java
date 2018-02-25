@@ -73,14 +73,6 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
  */
 public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 
-	public interface NetsimInternalInterface {
-
-	}
-
-	NetsimInternalInterface ii = new NetsimInternalInterface(){
-
-	} ;
-
 	private static final Logger log = Logger.getLogger(QNetsimEngine.class);
 
 	private static final int INFO_PERIOD = 3600;
@@ -102,8 +94,6 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 
 	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
 
-	final private InternalInterface internalInterface;
-
 	private int numOfRunners;
 
 	private ExecutorService pool;
@@ -118,10 +108,10 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 	final private EventsManager eventsManager;
 	final private Config config;
 	
-	@Override
+	/*@Override
 	public void setInternalInterface( InternalInterface internalInterface) {
 		//this.internalInterface = internalInterface;
-	}
+	}*/
 
 	public QNetsimEngine(Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter, InternalInterface internalInterface) {
 		this(null, config, scenario, eventsManager, mobsimTimer, agentCounter, internalInterface);
@@ -132,7 +122,6 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		this.mobsimTimer = mobsimTimer;
 		this.eventsManager = eventsManager;
 		this.config = config;
-		this.internalInterface = internalInterface;
 
 		final QSimConfigGroup qsimConfigGroup = config.qsim();
 		this.usingThreadpool = qsimConfigGroup.isUsingThreadpool();
@@ -160,14 +149,13 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		}
 		
 		if (netsimNetworkFactory != null){
-			network = new QNetwork( scenario.getNetwork(), netsimNetworkFactory ) ;
+			network = new QNetwork( scenario.getNetwork(), netsimNetworkFactory, internalInterface ) ;
 		} else {
 			EventsManager events = eventsManager;
 			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario, mobsimTimer, agentCounter );
-			netsimNetworkFactory2.initializeFactory( this.internalInterface );
-			network = new QNetwork(scenario.getNetwork(), netsimNetworkFactory2 );
+			netsimNetworkFactory2.initializeFactory( internalInterface );
+			network = new QNetwork(scenario.getNetwork(), netsimNetworkFactory2, internalInterface );
 		}
-		network.initialize(this.internalInterface, agentCounter, mobsimTimer );
 
 		this.numOfThreads = scenario.getConfig().qsim().getNumberOfThreads();
 	}

@@ -25,6 +25,8 @@ import org.matsim.contrib.bicycle.BicycleUtils;
 import org.matsim.contrib.bicycle.MotorizedInteractionEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
@@ -55,8 +57,8 @@ public class BicycleModule extends AbstractModule {
 	}
 	
 	@Singleton @Provides
-	QNetworkFactory provideQNetworkFactory(Scenario scenario, EventsManager eventsManager) {
-		ConfigurableQNetworkFactory qNetworkFactory = new ConfigurableQNetworkFactory(eventsManager, scenario) ;
+	QNetworkFactory provideQNetworkFactory(Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
+		ConfigurableQNetworkFactory qNetworkFactory = new ConfigurableQNetworkFactory(eventsManager, scenario, mobsimTimer, agentCounter) ;
 		qNetworkFactory.setLinkSpeedCalculator(new LinkSpeedCalculator(){
 			LinkSpeedCalculator delegate = new DefaultLinkSpeedCalculator() ;
 			@Override public double getMaximumVelocity(QVehicle vehicle, Link link, double time) {

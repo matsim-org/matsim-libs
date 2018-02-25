@@ -141,11 +141,11 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 
 	}
 
-	@Override
+	/*@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		// TODO Auto-generated method stub
 
-	}
+	}*/
 
 	public boolean hasSpace(Id<Node> id) {
 		//TODO: ask external sim if there is space

@@ -39,8 +39,8 @@ public class InitialReplanner extends WithinDayInitialReplanner {
 
 	private final PlanRouter planRouter;
 	
-	/*package*/ InitialReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, PlanRouter planRouter) {
-		super(id, scenario, internalInterface);
+	/*package*/ InitialReplanner(Id<WithinDayReplanner> id, Scenario scenario, PlanRouter planRouter) {
+		super(id, scenario);
 		this.planRouter = planRouter;
 	}
 

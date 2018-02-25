@@ -50,25 +50,17 @@ public class QNetwork implements NetsimNetwork {
 
 	private final Network network;
 
-	private final QNetworkFactory queueNetworkFactory;
-	InternalInterface internalInterface;
-	
-
-	QNetwork(final Network network, final QNetworkFactory netsimNetworkFactory ) {
+	QNetwork(final Network network, final QNetworkFactory netsimNetworkFactory, InternalInterface internalInterface ) {
 		this.network = network;
-		this.queueNetworkFactory = netsimNetworkFactory;
 		this.links = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);
 		this.nodes = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);
-	}
 
-	public void initialize(InternalInterface internalInterface, AgentCounter agentCounter, MobsimTimer simTimer) {
-		this.internalInterface = internalInterface;
-		this.queueNetworkFactory.initializeFactory( internalInterface );
+		netsimNetworkFactory.initializeFactory( internalInterface );
 		for (Node n : network.getNodes().values()) {
-			this.nodes.put(n.getId(), this.queueNetworkFactory.createNetsimNode(n));
+			this.nodes.put(n.getId(), netsimNetworkFactory.createNetsimNode(n));
 		}
 		for (Link l : network.getLinks().values()) {
-			final QLinkI qlink = this.queueNetworkFactory.createNetsimLink(l, this.nodes.get(l.getToNode().getId()));
+			final QLinkI qlink = netsimNetworkFactory.createNetsimLink(l, this.nodes.get(l.getToNode().getId()));
 			this.links.put(l.getId(), qlink);
 		}
 		for (QNodeI n : this.nodes.values()) {

@@ -109,7 +109,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 		
 		final QSim qSim = new QSim( scenario , eventsManager, agentCounter, mobsimTimer, activeQSimBridge );
-		qSim.addMobsimEngine( new QNetsimEngine( config, scenario, eventsManager, mobsimTimer, agentCounter ) );
+		qSim.addMobsimEngine( new QNetsimEngine( config, scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface() ) );
 		final PopulationAgentSourceWithVehicles testee =
 			new PopulationAgentSourceWithVehicles(
 					scenario.getPopulation(),
@@ -192,7 +192,7 @@ public class PopulationAgentSourceWithVehiclesTest {
 		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 		
 		final QSim qSim = new QSim( scenario , eventsManager, agentCounter, mobsimTimer, activeQSimBridge );
-		qSim.addMobsimEngine( new QNetsimEngine( config, scenario, eventsManager, mobsimTimer, agentCounter ) );
+		qSim.addMobsimEngine( new QNetsimEngine( config, scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface() ) );
 		final PopulationAgentSourceWithVehicles testee =
 			new PopulationAgentSourceWithVehicles(
 					scenario.getPopulation(),

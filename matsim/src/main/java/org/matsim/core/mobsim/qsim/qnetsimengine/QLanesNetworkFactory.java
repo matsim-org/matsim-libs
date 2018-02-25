@@ -30,7 +30,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.lanes.data.ModelLane;
 import org.matsim.lanes.data.Lanes;
 import org.matsim.lanes.data.LanesToLinkAssignment;

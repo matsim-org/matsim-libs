@@ -81,7 +81,7 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 
 
 		QSim qSim = new QSim(this.sc, this.em, agentCounter, mobsimTimer, activeQSimBridge);
-		ActivityEngine activityEngine = new ActivityEngine(this.em, agentCounter, mobsimTimer);
+		ActivityEngine activityEngine = new ActivityEngine(this.em, agentCounter, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
@@ -91,7 +91,7 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 //		this.netFac.putNetsimNetworkFactory("2ext", eFac);
 //		this.netFac.putNetsimNetworkFactory("ext2", eFac);
 		
-		QNetsimEngine netsimEngine = new QNetsimEngine(this.netFac, sc.getConfig(), sc, em, mobsimTimer, agentCounter);
+		QNetsimEngine netsimEngine = new QNetsimEngine(this.netFac, sc.getConfig(), sc, em, mobsimTimer, agentCounter, qSim.getInternalInterface());
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
@@ -106,13 +106,13 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 //		qSim.addDepartureHandler(cae.getDepartureHandler());
 
 
-		TeleportationEngine teleportationEngine = new DefaultTeleportationEngine(this.sc, this.em, mobsimTimer);
+		TeleportationEngine teleportationEngine = new DefaultTeleportationEngine(this.sc, this.em, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(teleportationEngine);
 
 		AgentFactory agentFactory;
 		if (this.sc.getConfig().transit().isUseTransit()) {
 			agentFactory = new TransitAgentFactory(sc, em, mobsimTimer);
-			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim, sc.getConfig(), sc, em, mobsimTimer, agentCounter);
+			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim, sc.getConfig(), sc, em, mobsimTimer, agentCounter, qSim.getInternalInterface());
 			transitEngine
 					.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 			qSim.addDepartureHandler(transitEngine);

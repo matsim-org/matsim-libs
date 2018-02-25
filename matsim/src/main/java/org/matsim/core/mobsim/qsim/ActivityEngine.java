@@ -50,16 +50,18 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 
 	private EventsManager eventsManager;
 	@Inject
-	public ActivityEngine(EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
+	public ActivityEngine(EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter, InternalInterface internalInterface) {
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
 		this.agentCounter = agentCounter;
+		this.internalInterface = internalInterface;
 	}
 
-	public ActivityEngine(EventsManager eventsManager, AgentCounter agentCounter, MobsimTimer mobsimTimer) {
+	public ActivityEngine(EventsManager eventsManager, AgentCounter agentCounter, MobsimTimer mobsimTimer, InternalInterface internalInterface) {
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
 		this.agentCounter = agentCounter;
+		this.internalInterface = internalInterface;
 	}
 
 	/**
@@ -80,7 +82,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		final double activityEndTime;
 	}
 
-	private InternalInterface internalInterface;
+	private final InternalInterface internalInterface;
 	
 	/**
 	 * This list needs to be a "blocking" queue since this is needed for
@@ -144,10 +146,10 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		activityEndsList.clear();
 	}
 
-	@Override
+	/*@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-	}
+	}*/
 
 	
 	/**

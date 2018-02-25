@@ -40,7 +40,6 @@ import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.TurnAcceptanceLogic.AcceptTurn;
 
 /**

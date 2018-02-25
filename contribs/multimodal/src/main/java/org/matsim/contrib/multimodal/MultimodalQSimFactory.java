@@ -27,6 +27,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
@@ -57,7 +58,7 @@ public class MultimodalQSimFactory implements Provider<Mobsim> {
 	@Override
 	public Mobsim get() {
 		QSim qSim = QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter, activeQSimBridge);
-		new MultiModalQSimModule(scenario.getConfig(), this.multiModalTravelTimes, eventsManager, scenario, agentCounter, mobsimTimer).configure(qSim);
+		new MultiModalQSimModule(scenario.getConfig(), this.multiModalTravelTimes, eventsManager, scenario, agentCounter, mobsimTimer, qSim.getInternalInterface()).configure(qSim);
 		return qSim;
 	}
 }

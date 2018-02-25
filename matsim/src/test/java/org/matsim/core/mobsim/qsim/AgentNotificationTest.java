@@ -33,6 +33,8 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
@@ -246,6 +248,7 @@ public class AgentNotificationTest {
 		plugins.add(new MessageQueuePlugin(scenario.getConfig()));
 		plugins.add(new ActivityEnginePlugin(scenario.getConfig()));
 		plugins.add(new TeleportationPlugin(scenario.getConfig()));
+		plugins.add(new QNetsimEnginePlugin(scenario.getConfig())); // Added after refactoring to inject InternalInterface
 		plugins.add(new AbstractQSimPlugin(scenario.getConfig()) {
 			@Override
 			public Collection<? extends AbstractModule> modules() {

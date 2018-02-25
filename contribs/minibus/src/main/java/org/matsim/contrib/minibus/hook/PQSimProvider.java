@@ -68,17 +68,17 @@ class PQSimProvider implements Provider<Mobsim> {
 		}
 		
 		QSim qSim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer, activeQSimBridge);
-		ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer);
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim, scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter);
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager, mobsimTimer);
+		QNetsimEngineModule.configure(qSim, scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface());
+		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(teleportationEngine);
 		AgentFactory agentFactory;
 
 		if (scenario.getConfig().transit().isUseTransit()) {
 			agentFactory = new PTransitAgentFactory(eventsManager, scenario, mobsimTimer);
-			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim, scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter);
+			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim, scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface());
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 			qSim.addDepartureHandler(transitEngine);
 			qSim.addAgentSource(transitEngine);

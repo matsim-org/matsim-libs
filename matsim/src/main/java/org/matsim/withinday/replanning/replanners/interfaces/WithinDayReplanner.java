@@ -42,15 +42,13 @@ public abstract class WithinDayReplanner<T extends AgentSelector> {
 	
 	protected final Id<WithinDayReplanner> id;
 	protected final Scenario scenario;
-	protected final ActivityEndRescheduler internalInterface;
 	protected final WithinDayAgentUtils withinDayAgentUtils;
 
 	protected double time = Time.UNDEFINED_TIME;
 
-	public WithinDayReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler activityEndRescheduler) {
+	public WithinDayReplanner(Id<WithinDayReplanner> id, Scenario scenario) {
 		this.id = id;
 		this.scenario = scenario;
-		this.internalInterface = activityEndRescheduler;
 		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 	

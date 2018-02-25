@@ -1083,19 +1083,19 @@ public class TransitQueueNetworkTest extends TestCase {
             AgentCounter agentCounter = new AgentCounterImpl();
             ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
             QSim qSim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer, activeQSimBridge);
-			ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer);
+			ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer, qSim.getInternalInterface());
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
             QNetsimEngine netsimEngine = new QNetsimEngine(scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface());
 		  qSim.addMobsimEngine(netsimEngine);
 		  qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 		  this.simEngine = netsimEngine ;
-			DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager, mobsimTimer);
+			DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager, mobsimTimer, qSim.getInternalInterface());
 			qSim.addMobsimEngine(teleportationEngine);
 
             // setup: simulation
             AgentFactory agentFactory = new TransitAgentFactory(scenario, eventsManager, mobsimTimer);
-            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim, scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter);
+            TransitQSimEngine transitEngine = new TransitQSimEngine(qSim, scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface());
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
             qSim.addDepartureHandler(transitEngine);
             qSim.addAgentSource(transitEngine);

@@ -570,7 +570,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		if (mobsimEngine instanceof WithinDayEngine) {
 			this.withindayEngine = (WithinDayEngine) mobsimEngine;
 		}
-		mobsimEngine.setInternalInterface(this.internalInterface);
+		//mobsimEngine.setInternalInterface(this.internalInterface);
 		this.mobsimEngines.add(mobsimEngine);
 		
 		if (analyzeRunTimes) this.mobsimEngineRunTimes.put(mobsimEngine, new AtomicLong());

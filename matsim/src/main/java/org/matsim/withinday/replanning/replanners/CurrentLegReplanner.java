@@ -56,9 +56,9 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 	private final LeastCostPathCalculator pathCalculator;
 	private final PopulationFactory populationFactory;
 	
-	/*package*/ CurrentLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, 
+	/*package*/ CurrentLegReplanner(Id<WithinDayReplanner> id, Scenario scenario,
 			LeastCostPathCalculator pathCalculator) {
-		super(id, scenario, internalInterface);
+		super(id, scenario);
 		this.pathCalculator = pathCalculator;
 		this.populationFactory = scenario.getPopulation().getFactory() ;
 	}

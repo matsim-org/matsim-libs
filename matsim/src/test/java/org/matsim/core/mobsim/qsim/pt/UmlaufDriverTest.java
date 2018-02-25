@@ -113,7 +113,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, eventsManager, mobsimTimer, agentCounter);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, eventsManager, mobsimTimer, agentCounter, tqsim.getInternalInterface());
 		tqsim.addMobsimEngine(trEngine);
 
 		tRoute.addDeparture(dep);
@@ -181,7 +181,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, events, mobsimTimer, agentCounter);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, events, mobsimTimer, agentCounter, tqsim.getInternalInterface());
 		tqsim.addMobsimEngine(trEngine);
 
 		AbstractTransitDriverAgent driver = new TransitDriverAgentImpl(umlauf, TransportMode.car, tracker, trEngine.getInternalInterface(), scenario, events);
@@ -213,7 +213,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, events, mobsimTimer, agentCounter) ;
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, scenario, events, mobsimTimer, agentCounter, tqsim.getInternalInterface()) ;
 		tqsim.addMobsimEngine(trEngine);
 		tRoute.addDeparture(dep);
 		tLine.addRoute(tRoute);
@@ -262,7 +262,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter, tqsim.getInternalInterface());
 		tqsim.addMobsimEngine(trEngine);
 		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
@@ -339,7 +339,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter, tqsim.getInternalInterface());
 		tqsim.addMobsimEngine(trEngine) ;
 
 
@@ -405,7 +405,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter, tqsim.getInternalInterface());
 		tqsim.addMobsimEngine(trEngine) ;
 
 		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
@@ -449,7 +449,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter, tqsim.getInternalInterface());
 		tqsim.addMobsimEngine(trEngine);
 		
 		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
@@ -504,7 +504,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter, tqsim.getInternalInterface());
 		tqsim.addMobsimEngine(trEngine);
 		
 		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));
@@ -558,7 +558,7 @@ public class UmlaufDriverTest extends MatsimTestCase {
 		QSim tqsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, events);
 		MobsimTimer mobsimTimer = new MobsimTimer(config);
 		AgentCounter agentCounter = new AgentCounterImpl();
-		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter);
+		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim, config, sc, events, mobsimTimer, agentCounter, tqsim.getInternalInterface());
 		tqsim.addMobsimEngine(trEngine);
 		
 		VehicleType vehType = new VehicleTypeImpl(Id.create("busType", VehicleType.class));

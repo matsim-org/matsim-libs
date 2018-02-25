@@ -45,7 +45,7 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
  * called before that of ActivityEngine)
  */
 public class DynActivityEngine extends ActivityEngine {
-	private InternalInterface internalInterface;
+	private final InternalInterface internalInterface;
 
 	private final List<DynAgent> dynAgents = new LinkedList<>();
 	private final List<DynAgent> newDynAgents = new ArrayList<>();// will to be handled in the next timeStep
@@ -54,10 +54,11 @@ public class DynActivityEngine extends ActivityEngine {
 	private final MobsimTimer mobsimTimer;
 
 	@Inject
-	public DynActivityEngine(EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
-		super(eventsManager, mobsimTimer, agentCounter);
+	public DynActivityEngine(EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter, InternalInterface internalInterface) {
+		super(eventsManager, mobsimTimer, agentCounter, internalInterface);
 		this.agentCounter = agentCounter;
 		this.mobsimTimer = mobsimTimer;
+		this.internalInterface = internalInterface;
 	}
 
 	// See handleActivity for the reason for this.
@@ -132,11 +133,11 @@ public class DynActivityEngine extends ActivityEngine {
 		dynAgents.clear();
 	}
 
-	@Override
+	/*@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
 		super.setInternalInterface(internalInterface);
-	}
+	}*/
 
 	private void unregisterAgentAtActivityLocation(final MobsimAgent agent) {
 		Id<Person> agentId = agent.getId();

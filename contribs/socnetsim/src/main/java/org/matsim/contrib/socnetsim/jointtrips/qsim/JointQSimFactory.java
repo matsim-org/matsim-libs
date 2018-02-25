@@ -96,11 +96,11 @@ public class JointQSimFactory implements Provider<QSim> {
 		// default initialisation
 		final QSim qSim = new QSim( sc1 , eventsManager, agentCounter, mobsimTimer, activeQSimBridge );
 
-		final ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer);
+		final ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine( activityEngine );
 		qSim.addActivityHandler( activityEngine );
 
-        final QNetsimEngine netsimEngine = new QNetsimEngine(sc1.getConfig(), sc1, eventsManager, mobsimTimer, agentCounter);
+        final QNetsimEngine netsimEngine = new QNetsimEngine(sc1.getConfig(), sc1, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface());
 		qSim.addMobsimEngine( netsimEngine );
 		// DO NOT ADD DEPARTURE HANDLER: it is done by the joint departure handler
 
@@ -108,11 +108,11 @@ public class JointQSimFactory implements Provider<QSim> {
 		qSim.addDepartureHandler( jointDepHandler );
 		qSim.addMobsimEngine( jointDepHandler );
 
-		final DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(sc1, eventsManager, mobsimTimer);
+		final DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(sc1, eventsManager, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine( teleportationEngine );
 
         if (sc1.getConfig().transit().isUseTransit()) {
-            final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim, sc1.getConfig(), sc1, eventsManager, mobsimTimer, agentCounter);
+            final TransitQSimEngine transitEngine = new TransitQSimEngine(qSim, sc1.getConfig(), sc1, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface());
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
             qSim.addDepartureHandler(transitEngine);
             qSim.addAgentSource(transitEngine);
@@ -125,7 +125,7 @@ public class JointQSimFactory implements Provider<QSim> {
 							new TransitAgentFactory(sc1, eventsManager, mobsimTimer) :
 							new DefaultAgentFactory(sc1, eventsManager, mobsimTimer) ,
 						new NetsimWrappingQVehicleProvider(
-							netsimEngine), eventsManager, mobsimTimer );
+							netsimEngine), eventsManager, mobsimTimer, qSim.getInternalInterface() );
         final AgentSource agentSource =
 			new PopulationAgentSourceWithVehicles(
 					sc1.getPopulation(),

@@ -78,9 +78,9 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 
 	private TransitStopHandlerFactory stopHandlerFactory = new SimpleTransitStopHandlerFactory();
 
-	private TransitDriverAgentFactory transitDriverFactory;
+	private final TransitDriverAgentFactory transitDriverFactory;
 
-	private InternalInterface internalInterface = null ;
+	private final InternalInterface internalInterface;
 	
 	final private MobsimTimer mobsimTimer;
 	final private AgentCounter agentCounter;
@@ -91,14 +91,14 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	@Deprecated
 	final private QSim qSim;
 
-	@Override
+	/*@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		this.internalInterface = internalInterface ;
 		transitDriverFactory = new DefaultTransitDriverAgentFactory(internalInterface, agentTracker, scenario, eventsManager);
-	}
+	}*/
 
 	@Inject
-	public TransitQSimEngine(QSim qsim, Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
+	public TransitQSimEngine(QSim qsim, Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter, InternalInterface internalInterface) {
 		this.config = config;
 		this.scenario = scenario;
 		this.schedule = scenario.getTransitSchedule();
@@ -106,6 +106,9 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		this.mobsimTimer = mobsimTimer;
 		this.agentCounter = agentCounter;
 		this.eventsManager = eventsManager;
+		
+		transitDriverFactory = new DefaultTransitDriverAgentFactory(internalInterface, agentTracker, scenario, eventsManager);
+		this.internalInterface = internalInterface;
 		
 		
 		// TODO: This cannot be resolved yet due to the structure of the AgentSource!
@@ -218,10 +221,6 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 	@Inject
 	public void setTransitStopHandlerFactory(final TransitStopHandlerFactory stopHandlerFactory) {
 		this.stopHandlerFactory = stopHandlerFactory;
-	}
-
-	public void setAbstractTransitDriverFactory(final TransitDriverAgentFactory abstractTransitDriverFactory) {
-		this.transitDriverFactory = abstractTransitDriverFactory;
 	}
 
 	@Override

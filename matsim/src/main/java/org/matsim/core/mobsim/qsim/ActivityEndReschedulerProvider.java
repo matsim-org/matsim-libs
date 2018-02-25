@@ -25,5 +25,5 @@ package org.matsim.core.mobsim.qsim;
  * @author nagel
  */
 public interface ActivityEndReschedulerProvider {
-	public ActivityEndRescheduler getActivityRescheduler() ;
+	//public ActivityEndRescheduler getActivityRescheduler() ;
 }

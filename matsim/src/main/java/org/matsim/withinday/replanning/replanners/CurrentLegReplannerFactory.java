@@ -44,7 +44,6 @@ public class CurrentLegReplannerFactory extends WithinDayDuringLegReplannerFacto
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new CurrentLegReplanner(super.getId(), scenario,
-				this.getWithinDayEngine().getActivityRescheduler(), 
 				this.pathCalculator);
 		return replanner;
 	}

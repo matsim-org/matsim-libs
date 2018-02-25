@@ -239,12 +239,12 @@ public class GroupCompositionPenalizerTest {
 		
 		QSim qSim = new QSim(sc, events, agentCounter, mobsimTimer, activeQSimBridge);
 
-		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
+		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
         //QNetsimEngineModule.configure(qSim);
-		qSim.addMobsimEngine( new DefaultTeleportationEngine(sc, events, mobsimTimer) );
+		qSim.addMobsimEngine( new DefaultTeleportationEngine(sc, events, mobsimTimer, qSim.getInternalInterface()) );
 
 		AgentFactory agentFactory = new DefaultAgentFactory( sc, events, mobsimTimer );
 

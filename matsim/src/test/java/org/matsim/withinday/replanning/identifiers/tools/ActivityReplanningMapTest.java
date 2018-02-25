@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.*;
 import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.testcases.MatsimTestCase;
@@ -182,13 +183,13 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
                 Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(agent);
 				currentActivity.setEndTime(e.getSimulationTime() + 60);
 				WithinDayAgentUtils.resetCaches(agent);
-				this.withinDayEngine.getActivityRescheduler().rescheduleActivityEnd(agent);
+				activeQSimBridge.getActiveQSim().getInternalInterface().rescheduleActivityEnd(agent);
 				eventsManager.processEvent(new ReplanningEvent(e.getSimulationTime(), agent.getId(), "ActivityRescheduler"));
 				
 				// reschedule a second time to check what happens if the agent is replanned multiple times in one time step
 				currentActivity.setEndTime(e.getSimulationTime() + 120);
 				WithinDayAgentUtils.resetCaches(agent);
-				this.withinDayEngine.getActivityRescheduler().rescheduleActivityEnd(agent);
+				activeQSimBridge.getActiveQSim().getInternalInterface().rescheduleActivityEnd(agent);
 				eventsManager.processEvent(new ReplanningEvent(e.getSimulationTime(), agent.getId(), "ActivityRescheduler"));
 			}
 			

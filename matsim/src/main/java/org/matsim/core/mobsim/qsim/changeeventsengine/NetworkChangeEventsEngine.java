@@ -53,10 +53,10 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 		this.netsimNetwork = netsimNetwork;
 	}
 
-	@Override
+	/*@Override
 	public void setInternalInterface( InternalInterface internalInterface ) {
 		//this.mobsim = (QSim) internalInterface.getMobsim();
-	}
+	}*/
 
 	@Override
 	public void afterSim() {

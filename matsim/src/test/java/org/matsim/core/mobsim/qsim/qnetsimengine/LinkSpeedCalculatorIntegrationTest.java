@@ -212,7 +212,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		QSim qsim = new QSim(f.scenario, f.events, f.agentCounter, f.mobsimTimer, f.activeQSimBridge);
 		
 		// handle activities
-		ActivityEngine activityEngine = new ActivityEngine(f.events, f.agentCounter, f.mobsimTimer);
+		ActivityEngine activityEngine = new ActivityEngine(f.events, f.agentCounter, f.mobsimTimer, qsim.getInternalInterface());
 		qsim.addMobsimEngine(activityEngine);
 		qsim.addActivityHandler(activityEngine);
 

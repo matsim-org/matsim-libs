@@ -71,9 +71,9 @@ class JDEQSimEngine implements MobsimEngine, ActivityHandler {
         log.info("Time needed for one iteration (only JDEQSimulation part): " + t.getMeasuredTime() + "[ms]");
     }
 
-    @Override
+    /*@Override
     public void setInternalInterface(InternalInterface internalInterface) {
-    }
+    }*/
 
     @Override
     public void doSimStep(double time) {

@@ -86,23 +86,23 @@ public class WagonSimQSimFactory implements MobsimFactory {
 		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 
 		QSim qSim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer, activeQSimBridge);
-		ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer);
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		//
-		ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( eventsManager, scenario ) ;
+		ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( eventsManager, scenario, mobsimTimer, agentCounter ) ;
 		// add the vehicleLinkSpeedCalculator
 		factory.setLinkSpeedCalculator(new LocomotiveLinkSpeedCalculator(vehicleLinkSpeedAttributes));
-		QNetsimEngine netsimEngine = new QNetsimEngine(factory, scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter);
+		QNetsimEngine netsimEngine = new QNetsimEngine(factory, scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface());
 		//
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager, mobsimTimer);
+		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(teleportationEngine);
 
 		// use an own TransitStopHandlerFactory here
 		AgentFactory agentFactory = new TransitAgentFactory(scenario, eventsManager, mobsimTimer);
-		TransitQSimEngine transitEngine = new TransitQSimEngine(qSim, scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter);
+		TransitQSimEngine transitEngine = new TransitQSimEngine(qSim, scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface());
 		// use an own transitStopHandler.
 		transitEngine.setTransitStopHandlerFactory(new WagonSimTransitStopHandlerFactory(vehicleLoadListener,
 				scenario.getPopulation().getPersonAttributes(),

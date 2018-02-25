@@ -33,7 +33,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 

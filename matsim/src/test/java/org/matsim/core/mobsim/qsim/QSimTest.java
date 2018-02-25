@@ -101,11 +101,11 @@ public class QSimTest {
 		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 		
 		QSim qSim1 = new QSim(scenario, events, agentCounter, mobsimTimer, activeQSimBridge);
-		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
+		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer, qSim1.getInternalInterface());
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
 		QNetsimEngineModule.configure(qSim1, scenario.getConfig(), scenario, events, mobsimTimer, agentCounter, qSim1.getInternalInterface());
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events, mobsimTimer);
+		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events, mobsimTimer, qSim1.getInternalInterface());
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
 		AgentFactory agentFactory = new DefaultAgentFactory(scenario, events, mobsimTimer);
@@ -122,11 +122,11 @@ public class QSimTest {
 		
 		Scenario sc = f.scenario;
 		QSim qSim1 = new QSim(sc, events, agentCounter, f.mobsimTimer, f.activeQSimBridge);
-		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, f.mobsimTimer);
+		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, f.mobsimTimer, qSim1.getInternalInterface());
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
 		QNetsimEngineModule.configure(qSim1, f.scenario.getConfig(), f.scenario, events, f.mobsimTimer, agentCounter, qSim1.getInternalInterface());
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(sc, events, f.mobsimTimer);
+		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(sc, events, f.mobsimTimer, qSim1.getInternalInterface());
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
 		AgentFactory agentFactory = new DefaultAgentFactory(f.scenario, events, f.mobsimTimer);

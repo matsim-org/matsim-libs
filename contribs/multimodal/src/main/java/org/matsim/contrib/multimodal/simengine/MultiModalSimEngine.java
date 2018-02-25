@@ -53,7 +53,7 @@ class MultiModalSimEngine implements MobsimEngine {
 	private final Map<Id<Node>, MultiModalQNodeExtension> nodes = new HashMap<>();
 	private final Map<Id<Link>, MultiModalQLinkExtension> links = new HashMap<>();
 	
-	/*package*/ InternalInterface internalInterface = null;
+	private final InternalInterface internalInterface;
 
 	private final int numOfThreads;
 	
@@ -67,9 +67,10 @@ class MultiModalSimEngine implements MobsimEngine {
     private final MobsimTimer mobsimTimer;
     
     /*package*/ MultiModalSimEngine(Map<String, TravelTime> multiModalTravelTimes, MultiModalConfigGroup multiModalConfigGroup,
-    		EventsManager eventsManager, Scenario scenario, AgentCounter agentCounter, MobsimTimer mobsimTimer) {		
+    		EventsManager eventsManager, Scenario scenario, AgentCounter agentCounter, MobsimTimer mobsimTimer, InternalInterface internalInterface) {		
     	this.multiModalTravelTimes = multiModalTravelTimes;
     	this.numOfThreads = multiModalConfigGroup.getNumberOfThreads();
+    	this.internalInterface = internalInterface;
     	
     	if (this.numOfThreads > 1) log.info("Using " + multiModalConfigGroup.getNumberOfThreads() + " threads for MultiModalSimEngine.");
     	
@@ -79,10 +80,10 @@ class MultiModalSimEngine implements MobsimEngine {
     	this.mobsimTimer = mobsimTimer;
     }
     
-	@Override
+	/*@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-	}
+	}*/
 
 	/*QSim getMobsim() {
 		return (QSim) this.internalInterface.getMobsim();
@@ -132,13 +133,13 @@ class MultiModalSimEngine implements MobsimEngine {
 			for (Link inLink : node.getInLinks().values()) {
 				if (simulatedLinks.contains(inLink)) numInLinks++;
 			}
-			MultiModalQNodeExtension extension = new MultiModalQNodeExtension(this, numInLinks);
+			MultiModalQNodeExtension extension = new MultiModalQNodeExtension(this, numInLinks, internalInterface);
 			this.nodes.put(node.getId(), extension);
 		}
 		
 		for (Link link : simulatedLinks) {
 			Id<Node> toNodeId = link.getToNode().getId();
-			MultiModalQLinkExtension extension = new MultiModalQLinkExtension(link, this, getMultiModalQNodeExtension(toNodeId), eventsManager, agentCounter, mobsimTimer);
+			MultiModalQLinkExtension extension = new MultiModalQLinkExtension(link, this, getMultiModalQNodeExtension(toNodeId), eventsManager, agentCounter, mobsimTimer, internalInterface);
 			this.links.put(link.getId(), extension);
 		}
 		

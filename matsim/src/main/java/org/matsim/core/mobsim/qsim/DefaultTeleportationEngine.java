@@ -44,7 +44,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		}
 	});
 	private final LinkedHashMap<Id<Person>, TeleportationVisData> teleportationData = new LinkedHashMap<>();
-	private InternalInterface internalInterface;
+	private final InternalInterface internalInterface;
 	private Scenario scenario;
 	private EventsManager eventsManager;
 	final private MobsimTimer mobsimTimer;
@@ -52,10 +52,11 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 	private final boolean withTravelTimeCheck ;
 
 	@Inject
-	public DefaultTeleportationEngine(Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer) {
+	public DefaultTeleportationEngine(Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, InternalInterface internalInterface) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
+		this.internalInterface = internalInterface;
 		
 		withTravelTimeCheck = scenario.getConfig().qsim().isUsingTravelTimeCheckInTeleportation() ;
 	}
@@ -141,10 +142,10 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		teleportationList.clear();
 	}
 
-	@Override
+	/*@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-	}
+	}*/
 
 	private static Double travelTimeCheck(Double travelTime, Double speed, Facility<?> dpfac, Facility<?> arfac) {
 		if ( speed==null ) {

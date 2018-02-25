@@ -30,6 +30,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.router.util.TravelTime;
@@ -43,9 +44,10 @@ public class MultiModalQSimModule {
     private final Scenario scenario;
     private final AgentCounter agentCounter;
     private final MobsimTimer mobsimTimer;
+    private final InternalInterface internalInterface;
 
     public MultiModalQSimModule(Config config, Map<String, TravelTime> multiModalTravelTimes,
-    		EventsManager eventsManager, Scenario scenario, AgentCounter agentCounter, MobsimTimer mobsimTimer) {
+    		EventsManager eventsManager, Scenario scenario, AgentCounter agentCounter, MobsimTimer mobsimTimer, InternalInterface internalInterface) {
         this.config = config;
         this.multiModalTravelTimes = multiModalTravelTimes;
         
@@ -53,12 +55,13 @@ public class MultiModalQSimModule {
     	this.scenario = scenario;
     	this.agentCounter = agentCounter;
     	this.mobsimTimer = mobsimTimer;
+    	this.internalInterface = internalInterface;
     }
 
     public void configure(QSim qSim) {
         MultiModalConfigGroup multiModalConfigGroup = ConfigUtils.addOrGetModule(this.config, MultiModalConfigGroup.GROUP_NAME, MultiModalConfigGroup.class);
-        MultiModalSimEngine multiModalEngine = new MultiModalSimEngine(this.multiModalTravelTimes, multiModalConfigGroup, eventsManager, scenario, agentCounter, mobsimTimer);
+        MultiModalSimEngine multiModalEngine = new MultiModalSimEngine(this.multiModalTravelTimes, multiModalConfigGroup, eventsManager, scenario, agentCounter, mobsimTimer, internalInterface);
         qSim.addMobsimEngine(multiModalEngine);
-        qSim.addDepartureHandler(new MultiModalDepartureHandler(multiModalEngine, multiModalConfigGroup));
+        qSim.addDepartureHandler(new MultiModalDepartureHandler(multiModalEngine, multiModalConfigGroup, qSim.getInternalInterface()));
     }
 }

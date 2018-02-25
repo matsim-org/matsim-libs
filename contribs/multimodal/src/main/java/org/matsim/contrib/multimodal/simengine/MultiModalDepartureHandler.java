@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.utils.collections.CollectionUtils;
 
@@ -33,11 +34,13 @@ import java.util.Set;
 class MultiModalDepartureHandler implements DepartureHandler {
 
 	private final MultiModalSimEngine simEngine;
+	private final InternalInterface internalInterface;
 	private Set<String> handledModes = new HashSet<>();
 	
-	public MultiModalDepartureHandler(MultiModalSimEngine simEngine, MultiModalConfigGroup multiModalConfigGroup) {
+	public MultiModalDepartureHandler(MultiModalSimEngine simEngine, MultiModalConfigGroup multiModalConfigGroup, InternalInterface internalInterface) {
 		this.simEngine = simEngine;
 		this.handledModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
+		this.internalInterface = internalInterface;
 	}
 	
 	@Override
@@ -62,7 +65,7 @@ class MultiModalDepartureHandler implements DepartureHandler {
 //		if ((personAgent.getDestinationLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
 		if ((personAgent.getDestinationLinkId().equals(linkId)) && (personAgent.isWantingToArriveOnCurrentLink() )) {
 			personAgent.endLegAndComputeNextState(now);
-			this.simEngine.internalInterface.arrangeNextAgentState(personAgent);
+			internalInterface.arrangeNextAgentState(personAgent);
 			/* yyyy The "non-departure" should be caught in the framework.  kai, dec'11 */  
 		} else {
 			extension.addDepartingAgent(personAgent, now);

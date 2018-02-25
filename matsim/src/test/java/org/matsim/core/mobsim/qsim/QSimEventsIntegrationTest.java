@@ -51,7 +51,7 @@ public class QSimEventsIntegrationTest {
 		AgentFactory agentFactory = new DefaultAgentFactory(scenario, events, mobsimTimer);
 		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, scenario.getConfig(), scenario, qSim);
 		qSim.addAgentSource(agentSource);
-		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
+		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		QNetsimEngineModule.configure(qSim, scenario.getConfig(), scenario, events, mobsimTimer, agentCounter, qSim.getInternalInterface());

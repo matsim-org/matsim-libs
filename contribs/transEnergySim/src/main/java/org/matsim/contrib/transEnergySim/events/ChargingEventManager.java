@@ -88,11 +88,11 @@ public abstract class ChargingEventManager extends EventManager<EVSimEngineEvent
 
 		}
 
-		@Override
+		/*@Override
 		public void setInternalInterface(InternalInterface internalInterface) {
 			// TODO Auto-generated method stub
 
-		}
+		}*/
 
 		@Override
 		public void handleEvent(PersonDepartureEvent event) {

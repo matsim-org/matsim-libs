@@ -39,13 +39,13 @@ public class CarsharingQsimFactoryNew implements Provider<Mobsim>{
 		
 		final QSim qsim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer, activeQSimBridge);
 		//QSimUtils.createDefaultQSim(scenario, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer);
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer, qsim.getInternalInterface());
 		qsim.addMobsimEngine(activityEngine);
 		qsim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = new QNetsimEngine(scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter);
+		QNetsimEngine netsimEngine = new QNetsimEngine(scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter, qsim.getInternalInterface());
 		qsim.addMobsimEngine(netsimEngine);
 		qsim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager, mobsimTimer);
+		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager, mobsimTimer, qsim.getInternalInterface());
 		qsim.addMobsimEngine(teleportationEngine);
 		qsim.addDepartureHandler(teleportationEngine) ;
 		AgentFactory agentFactory = new CSAgentFactory(carsharingManager, scenario, eventsManager, mobsimTimer);

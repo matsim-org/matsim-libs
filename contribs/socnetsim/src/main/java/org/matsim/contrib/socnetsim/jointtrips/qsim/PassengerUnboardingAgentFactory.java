@@ -32,7 +32,7 @@ import org.matsim.contrib.socnetsim.qsim.QVehicleProvider;
 public class PassengerUnboardingAgentFactory implements AgentFactory, MobsimEngine {
 	private final AgentFactory delegate;
 	private final QVehicleProvider vehicleProvider;
-	private InternalInterface internalInterface = null;
+	private final InternalInterface internalInterface;
 	private final EventsManager eventsManager;
 	private final MobsimTimer mobsimTimer;
 
@@ -40,11 +40,13 @@ public class PassengerUnboardingAgentFactory implements AgentFactory, MobsimEngi
 			final AgentFactory delegate,
 			final QVehicleProvider vehicleProvider,
 			EventsManager eventsManager,
-			MobsimTimer mobsimTimer) {
+			MobsimTimer mobsimTimer,
+			InternalInterface internalInterface) {
 		this.delegate = delegate;
 		this.vehicleProvider = vehicleProvider;
 		this.eventsManager = eventsManager;
 		this.mobsimTimer = mobsimTimer;
+		this.internalInterface = internalInterface;
 	}
 
 	@Override
@@ -67,8 +69,8 @@ public class PassengerUnboardingAgentFactory implements AgentFactory, MobsimEngi
 	@Override
 	public void afterSim() {}
 
-	@Override
+	/*@Override
 	public void setInternalInterface(final InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-	}
+	}*/
 }

@@ -62,7 +62,7 @@ public class BicycleQSimFactory implements Provider<Mobsim> {
 		QSim qSim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer, activeQSimBridge);
 
 		// add the activity engine:
-		ActivityEngine activityEngine = new ActivityEngine(eventsManager, mobsimTimer, agentCounter);
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
@@ -82,11 +82,11 @@ public class BicycleQSimFactory implements Provider<Mobsim> {
 //		});
 //		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, qNetworkFactory ) ;
 
-		QNetsimEngine netsimEngine = new QNetsimEngine(scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter) ;
+		QNetsimEngine netsimEngine = new QNetsimEngine(scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface()) ;
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager, mobsimTimer);
+		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(teleportationEngine);
 
 		AgentFactory agentFactory = new DefaultAgentFactory(scenario, eventsManager, mobsimTimer);

@@ -233,7 +233,7 @@ public class CreateAutomatedFDTest {
 			ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 
 			final QSim qSim = new QSim(scenario, events, agentCounter, mobsimTimer, activeQSimBridge);
-			ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
+			ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer, qSim.getInternalInterface());
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
 			QNetsimEngine netsimEngine;
@@ -241,7 +241,7 @@ public class CreateAutomatedFDTest {
 //				QNetworkFactory networkFactory = new AssignmentEmulatingQLaneNetworkFactory(scenario,events) ;
 //				netsimEngine = new QNetsimEngine( qSim, networkFactory ) ;
 //			} else {
-				 netsimEngine = new QNetsimEngine(config, scenario, events, mobsimTimer, agentCounter);
+				 netsimEngine = new QNetsimEngine(config, scenario, events, mobsimTimer, agentCounter, qSim.getInternalInterface());
 //			}
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
