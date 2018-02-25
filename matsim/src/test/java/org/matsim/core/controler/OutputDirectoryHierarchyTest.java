@@ -18,7 +18,7 @@
  * *********************************************************************** */
 package org.matsim.core.controler;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.core.utils.io.IOUtils;

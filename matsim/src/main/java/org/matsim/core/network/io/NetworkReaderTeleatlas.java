@@ -180,9 +180,7 @@ public final class NetworkReaderTeleatlas implements MatsimSomeReader {
 		log.info("done.");
 		// TODO balmermi: adding date and check if you get more info from the input
 		// files to include into the name
-		if (network instanceof Network) {
-			((Network) network).setName("teleatlas");
-		}
+		network.setName("teleatlas");
 	}
 
 	// ////////////////////////////////////////////////////////////////////
@@ -245,7 +243,7 @@ public final class NetworkReaderTeleatlas implements MatsimSomeReader {
 			String type = feattyp + "-" + jncttyp;
 			Node n = network.getFactory().createNode(Id.create(id.toString(), Node.class), c);
 			final String type1 = type;
-			Node r = ((Node) n);
+			Node r = n;
 			NetworkUtils.setType(r,type1);
 			network.addNode(n);
 		}
@@ -430,31 +428,31 @@ public final class NetworkReaderTeleatlas implements MatsimSomeReader {
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
 					l.setNumberOfLanes(lanes);
-					NetworkUtils.setOrigId( ((Link) l), id.toString() ) ;
-					NetworkUtils.setType( ((Link) l), linksType + "-" + featTyp + "-" + ferryType);
+					NetworkUtils.setOrigId(l, id.toString() ) ;
+					NetworkUtils.setType(l, linksType + "-" + featTyp + "-" + ferryType);
 					l = network.getFactory().createLink(Id.create(id.toString() + "TF", Link.class), tNode, fNode);
 					l.setLength(length);
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
 					l.setNumberOfLanes(lanes);
-					NetworkUtils.setOrigId( ((Link) l), id.toString() ) ;
-					NetworkUtils.setType( ((Link) l), linksType + "-" + featTyp + "-" + ferryType);
+					NetworkUtils.setOrigId(l, id.toString() ) ;
+					NetworkUtils.setType(l, linksType + "-" + featTyp + "-" + ferryType);
 				} else if (oneway.equals("FT")) {
 					Link l = network.getFactory().createLink(Id.create(id.toString() + oneway, Link.class), fNode, tNode);
 					l.setLength(length);
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
 					l.setNumberOfLanes(lanes);
-					NetworkUtils.setOrigId( ((Link) l), id.toString() ) ;
-					NetworkUtils.setType( ((Link) l), linksType + "-" + featTyp + "-" + ferryType);
+					NetworkUtils.setOrigId(l, id.toString() ) ;
+					NetworkUtils.setType(l, linksType + "-" + featTyp + "-" + ferryType);
 				} else if (oneway.equals("TF")) {
 					Link l = network.getFactory().createLink(Id.create(id.toString() + oneway, Link.class), tNode, fNode);
 					l.setLength(length);
 					l.setFreespeed(speed / 3.6);
 					l.setCapacity(cap);
 					l.setNumberOfLanes(lanes);
-					NetworkUtils.setOrigId( ((Link) l), id.toString() ) ;
-					NetworkUtils.setType( ((Link) l), linksType + "-" + featTyp + "-" + ferryType);
+					NetworkUtils.setOrigId(l, id.toString() ) ;
+					NetworkUtils.setType(l, linksType + "-" + featTyp + "-" + ferryType);
 				} else {
 					throw new IllegalArgumentException("linkId=" + id.toString() + ": " + LINK_ONEWAY_NAME + "=" + oneway + " not known!");
 				}
@@ -462,7 +460,7 @@ public final class NetworkReaderTeleatlas implements MatsimSomeReader {
 		}
 		fIt.close();
 
-		((Network) network).setCapacityPeriod(3600.0);
+		network.setCapacityPeriod(3600.0);
 
 		lCnt = network.getLinks().size() - lCnt;
 		log.info("  " + lCnt + " links added to the network layer.");

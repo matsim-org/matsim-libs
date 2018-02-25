@@ -29,8 +29,6 @@
 
 	<module name="network">
 		<param name="inputNetworkFile" value="grid_network.xml" />
-		<!-- param name="timeVariantNetwork" value="false" / if timeVariantNetwork -->
-		<!-- param name="inputChangeEventsFile" value=""/ if timeVariantNetwork -->
 	</module>
 
 	<module name="plans">
