@@ -275,7 +275,7 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 
 		driver.endActivityAndComputeNextState(0); 
-		f.queueNetwork.simEngine.ii.arrangeNextAgentState(driver) ; // i.e. driver departs, should now be in wait queue 
+		f.sim.getInternalInterface().arrangeNextAgentState(driver) ; // i.e. driver departs, should now be in wait queue 
 		assertTrue(f.qlink1.isNotOfferingVehicle()); // veh not in buffer
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size()); // veh not on lane
 		assertEquals("vehicle not found in waiting list.", veh, f.qlink1.getVehicle(id1)); // veh _should_ be on link (in waiting list)

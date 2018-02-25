@@ -74,21 +74,11 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 
 	public interface NetsimInternalInterface {
-		QNetwork getNetsimNetwork();
-		void arrangeNextAgentState(MobsimAgent pp);
-		void letVehicleArrive(QVehicle veh);
+
 	}
 
 	NetsimInternalInterface ii = new NetsimInternalInterface(){
-		@Override public QNetwork getNetsimNetwork() {
-			return network ;
-		}
-		@Override public void arrangeNextAgentState(MobsimAgent driver) {
-			QNetsimEngine.this.arrangeNextAgentState(driver);
-		}
-		@Override public void letVehicleArrive(QVehicle veh) {
-			QNetsimEngine.this.letVehicleArrive( veh ) ;
-		}
+
 	} ;
 
 	private static final Logger log = Logger.getLogger(QNetsimEngine.class);
@@ -112,7 +102,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 
 	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
 
-	private InternalInterface internalInterface = null;
+	final private InternalInterface internalInterface;
 
 	private int numOfRunners;
 
@@ -130,18 +120,19 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 	
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface) {
-		this.internalInterface = internalInterface;
+		//this.internalInterface = internalInterface;
 	}
 
-	public QNetsimEngine(Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
-		this(null, config, scenario, eventsManager, mobsimTimer, agentCounter);
+	public QNetsimEngine(Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter, InternalInterface internalInterface) {
+		this(null, config, scenario, eventsManager, mobsimTimer, agentCounter, internalInterface);
 	}
 
 	@Inject
-	public QNetsimEngine(QNetworkFactory netsimNetworkFactory, Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
+	public QNetsimEngine(QNetworkFactory netsimNetworkFactory, Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter, InternalInterface internalInterface) {
 		this.mobsimTimer = mobsimTimer;
 		this.eventsManager = eventsManager;
 		this.config = config;
+		this.internalInterface = internalInterface;
 
 		final QSimConfigGroup qsimConfigGroup = config.qsim();
 		this.usingThreadpool = qsimConfigGroup.isUsingThreadpool();
@@ -172,13 +163,11 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 			network = new QNetwork( scenario.getNetwork(), netsimNetworkFactory ) ;
 		} else {
 			EventsManager events = eventsManager;
-			QSimConfigGroup qsimConfig = config.qsim() ;
-			Network net = scenario.getNetwork() ;
-			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario );
-			netsimNetworkFactory2.initializeFactory(agentCounter, mobsimTimer, ii );
+			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario, mobsimTimer, agentCounter );
+			netsimNetworkFactory2.initializeFactory( this.internalInterface );
 			network = new QNetwork(scenario.getNetwork(), netsimNetworkFactory2 );
 		}
-		network.initialize(this, agentCounter, mobsimTimer );
+		network.initialize(this.internalInterface, agentCounter, mobsimTimer );
 
 		this.numOfThreads = scenario.getConfig().qsim().getNumberOfThreads();
 	}
@@ -408,7 +397,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		return qLink.unregisterAdditionalAgentOnLink(agentId);
 	}
 
-	private void letVehicleArrive(QVehicle veh) {
+	/*private void letVehicleArrive(QVehicle veh) {
 		double now = mobsimTimer.getTimeOfDay();
 		MobsimDriverAgent driver = veh.getDriver();
 		eventsManager.processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));
@@ -416,7 +405,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		veh.setDriver(null);
 		driver.endLegAndComputeNextState(now);
 		this.internalInterface.arrangeNextAgentState(driver);
-	}
+	}*/
 
 	private void initQSimEngineThreads() {
 
@@ -557,9 +546,5 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		public Thread newThread(Runnable r) {
 			return new Thread( r , "QNetsimEngine_PooledThread_" + count++);
 		}
-	}
-
-	private final void arrangeNextAgentState(MobsimAgent pp) {
-		internalInterface.arrangeNextAgentState(pp);
 	}
 }

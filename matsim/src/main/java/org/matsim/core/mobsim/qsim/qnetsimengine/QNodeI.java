@@ -13,6 +13,6 @@ interface QNodeI extends NetsimNode {
 
 	boolean doSimStep(double now) ;
 
-	void init() ;
+	void init(QNetwork network) ;
 
 }

@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
@@ -53,18 +54,18 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	private final static Logger log = Logger.getLogger(QLinkImpl.class);
 	
 	public static class Builder {
-		private NetsimInternalInterface netsimEngine ;
+		private InternalInterface internalInterface ;
 		private final NetsimEngineContext context;
 		private LaneFactory laneFactory;
-		Builder(NetsimEngineContext context, NetsimInternalInterface netsimEngine2) {
+		Builder(NetsimEngineContext context, InternalInterface internalInterface) {
 			this.context = context ;
-			this.netsimEngine = netsimEngine2;
+			this.internalInterface = internalInterface;
 		} 
 		QLinkImpl build( Link link, QNodeI toNode ) {
 			if ( laneFactory == null ) {
 				laneFactory = new QueueWithBuffer.Builder( context ) ;
 			}
-			return new QLinkImpl( link, toNode, laneFactory, context, netsimEngine ) ;
+			return new QLinkImpl( link, toNode, laneFactory, context, internalInterface ) ;
 		}
 		final void setLaneFactory( LaneFactory laneFactory ) {
 			this.laneFactory = laneFactory ;
@@ -88,8 +89,8 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 
 	private NetsimEngineContext context;
 	
-	private QLinkImpl(final Link link2, final QNodeI toNode, final LaneFactory roadFactory, NetsimEngineContext context, NetsimInternalInterface netsimEngine) {
-		super(link2, toNode, context, netsimEngine) ;
+	private QLinkImpl(final Link link2, final QNodeI toNode, final LaneFactory roadFactory, NetsimEngineContext context, InternalInterface internalInterface) {
+		super(link2, toNode, context, internalInterface) ;
 		this.context = context ;
 		// The next line must must by contract stay within the constructor,
 		// so that the caller can use references to the created roads to wire them together,

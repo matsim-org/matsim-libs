@@ -113,8 +113,10 @@ public class LinkSpeedCalculatorIntegrationTest {
 			@Override public void install() {
 				bind( QNetworkFactory.class ).toProvider( new Provider<QNetworkFactory>(){
 					@Inject private EventsManager events ;
+					@Inject private MobsimTimer mobsimTimer;
+					@Inject private AgentCounter agentCounter;
 					@Override public QNetworkFactory get() {
-						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
+						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario, mobsimTimer, agentCounter ) ;
 						factory.setLinkSpeedCalculator(linkSpeedCalculator); 
 						return factory ;
 					}
@@ -168,8 +170,10 @@ public class LinkSpeedCalculatorIntegrationTest {
 			@Override public void install() {
 				bind( QNetworkFactory.class ).toProvider( new Provider<QNetworkFactory>(){
 					@Inject private EventsManager events ;
+					@Inject private MobsimTimer mobsimTimer;
+					@Inject private AgentCounter agentCounter;
 					@Override public QNetworkFactory get() {
-						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
+						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario, mobsimTimer, agentCounter ) ;
 						factory.setLinkSpeedCalculator(linkSpeedCalculator); 
 						return factory ;
 					}
@@ -212,7 +216,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 		qsim.addMobsimEngine(activityEngine);
 		qsim.addActivityHandler(activityEngine);
 
-        QNetsimEngine netsimEngine = new QNetsimEngine(f.scenario.getConfig(), f.scenario, f.events, f.mobsimTimer, f.agentCounter);
+        QNetsimEngine netsimEngine = new QNetsimEngine(f.scenario.getConfig(), f.scenario, f.events, f.mobsimTimer, f.agentCounter, qsim.getInternalInterface());
 		if (linkSpeedCalculator != null) {
 			throw new RuntimeException( "does not work like this any more") ;
 		}

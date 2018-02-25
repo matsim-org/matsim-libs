@@ -534,10 +534,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	// no real functionality beyond this point
 	// ############################################################################################################################
 
-	@Override
+	/*@Override
 	public NetsimNetwork getNetsimNetwork() {
 		return this.netEngine.getNetsimNetwork();
-	}
+	}*/
 
 	@Override
 	public VisNetwork getVisNetwork() {
@@ -639,5 +639,19 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	public Collection<AgentTracker> getAgentTrackers() {
 		return Collections.unmodifiableCollection(agentTrackers) ;
+	}
+	
+	/**
+	 * Used for refactoring. Should be eliminated eventually. /shoerl, feb18
+	 */
+	public InternalInterface getInternalInterface() {
+		return internalInterface;
+	}
+	
+	/**
+	 * Used for refactoring. Should be eliminated eventually. /shoerl, feb18
+	 */
+	public NetsimNetwork getNetsimNetwork() {
+		return netEngine.getNetsimNetwork();
 	}
 }

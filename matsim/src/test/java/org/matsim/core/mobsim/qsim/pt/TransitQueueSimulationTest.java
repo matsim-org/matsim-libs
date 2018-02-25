@@ -268,7 +268,7 @@ public class TransitQueueSimulationTest {
 		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
-        QNetsimEngineModule.configure(qSim1, config, scenario, events, mobsimTimer, agentCounter);
+        QNetsimEngineModule.configure(qSim1, config, scenario, events, mobsimTimer, agentCounter, qSim1.getInternalInterface());
 		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events, mobsimTimer);
 		qSim1.addMobsimEngine(teleportationEngine);
         QSim qSim = qSim1;
@@ -536,7 +536,7 @@ public class TransitQueueSimulationTest {
 			ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
 			qSim2.addMobsimEngine(activityEngine);
 			qSim2.addActivityHandler(activityEngine);
-            QNetsimEngine netsimEngine = new QNetsimEngine(scenario.getConfig(), scenario, events, mobsimTimer, agentCounter);
+            QNetsimEngine netsimEngine = new QNetsimEngine(scenario.getConfig(), scenario, events, mobsimTimer, agentCounter, qSim2.getInternalInterface());
 			qSim2.addMobsimEngine(netsimEngine);
 			qSim2.addDepartureHandler(netsimEngine.getDepartureHandler());
 			DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events, mobsimTimer);

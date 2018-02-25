@@ -104,7 +104,7 @@ public class QSimTest {
 		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim1, scenario.getConfig(), scenario, events, mobsimTimer, agentCounter);
+		QNetsimEngineModule.configure(qSim1, scenario.getConfig(), scenario, events, mobsimTimer, agentCounter, qSim1.getInternalInterface());
 		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, events, mobsimTimer);
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
@@ -125,7 +125,7 @@ public class QSimTest {
 		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, f.mobsimTimer);
 		qSim1.addMobsimEngine(activityEngine);
 		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim1, f.scenario.getConfig(), f.scenario, events, f.mobsimTimer, agentCounter);
+		QNetsimEngineModule.configure(qSim1, f.scenario.getConfig(), f.scenario, events, f.mobsimTimer, agentCounter, qSim1.getInternalInterface());
 		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(sc, events, f.mobsimTimer);
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;

@@ -1086,7 +1086,7 @@ public class TransitQueueNetworkTest extends TestCase {
 			ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer);
 			qSim.addMobsimEngine(activityEngine);
 			qSim.addActivityHandler(activityEngine);
-            QNetsimEngine netsimEngine = new QNetsimEngine(scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter);
+            QNetsimEngine netsimEngine = new QNetsimEngine(scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface());
 		  qSim.addMobsimEngine(netsimEngine);
 		  qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 		  this.simEngine = netsimEngine ;

@@ -6,6 +6,8 @@ import com.google.inject.Provides;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
@@ -31,6 +33,11 @@ public class QNetsimEnginePlugin extends AbstractQSimPlugin {
 			@Provides 
 			NetsimNetwork provideNetsimNetwork(QNetsimEngine netsimEngine) {
 				return netsimEngine.getNetsimNetwork();
+			}
+			
+			@Provides
+			InternalInterface provideInternalInterface(QSim qsim) {
+				return qsim.getInternalInterface();
 			}
 		});
 	}

@@ -31,6 +31,7 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -47,11 +48,13 @@ public class RunFlexibleQNetworkFactoryExample {
 		@Inject private Scenario scenario ; // yyyyyy I would like to get rid of this. kai, mar'16
 		@Inject private Network network ;
 		@Inject private QSimConfigGroup qsimConfig ;
+		@Inject private MobsimTimer mobsimTimer;
+		@Inject private AgentCounter agentCounter;
 
 		private NetsimEngineContext context;
-		private NetsimInternalInterface netsimEngine;
+		private InternalInterface internalInterface;
 
-		@Override void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
+		@Override void initializeFactory(InternalInterface internalInterface) {
 			double effectiveCellSize = ((Network)network).getEffectiveCellSize() ;
 			
 			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -63,17 +66,17 @@ public class RunFlexibleQNetworkFactoryExample {
 			
 			this.context = new NetsimEngineContext(events, effectiveCellSize, agentCounter, snapshotBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;
 			
-			this.netsimEngine = netsimEngine1 ;
+			this.internalInterface = internalInterface ;
 		}
 		@Override QNodeI createNetsimNode(Node node) {
-			QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+			QNodeImpl.Builder builder = new QNodeImpl.Builder( internalInterface, context ) ;
 			return builder.build( node ) ;
 			
 		}
 		@Override QLinkI createNetsimLink(Link link, QNodeI queueNode) {
 			QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder(context) ;
 			
-			QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
+			QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, internalInterface) ;
 			linkBuilder.setLaneFactory(laneBuilder);
 			
 			return linkBuilder.build(link, queueNode) ;

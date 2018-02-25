@@ -84,6 +84,7 @@ public final class MobsimDataProvider {
 	*/
 	
 	private ActiveQSimBridge activeQSimBridge;
+	private NetsimNetwork netsimNetwork;
 	
 	@Inject
 	public MobsimDataProvider(ActiveQSimBridge activeQSimBridge) {
@@ -107,7 +108,7 @@ public final class MobsimDataProvider {
 	}
 	
 	public final Collection<MobsimVehicle> getEnrouteVehiclesOnLink(Id<Link> linkId) {
-		return activeQSimBridge.getActiveQSim().getNetsimNetwork().getNetsimLink(linkId).getAllNonParkedVehicles();
+		return netsimNetwork.getNetsimLink(linkId).getAllNonParkedVehicles();
 	}
 	
 	public final MobsimVehicle getDriversVehicle(Id<Person> driverId) {

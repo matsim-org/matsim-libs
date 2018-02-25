@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
@@ -46,19 +47,23 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 	private Network network ;
 	private Scenario scenario ;
 	private NetsimEngineContext context;
-	private NetsimInternalInterface netsimEngine ;
+	private InternalInterface internalInterface ;
 	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
 	private TurnAcceptanceLogic turnAcceptanceLogic = new DefaultTurnAcceptanceLogic() ;
+	private MobsimTimer mobsimTimer;
+	private AgentCounter agentCounter;
 
-	public ConfigurableQNetworkFactory( EventsManager events, Scenario scenario ) {
+	public ConfigurableQNetworkFactory( EventsManager events, Scenario scenario, MobsimTimer mobsimTimer, AgentCounter agentCounter ) {
 		this.events = events;
 		this.scenario = scenario;
 		this.network = scenario.getNetwork() ;
 		this.qsimConfig = scenario.getConfig().qsim() ;
+		this.mobsimTimer = mobsimTimer;
+		this.agentCounter = agentCounter;
 	}
 	@Override
-	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
-		this.netsimEngine = netsimEngine1;
+	void initializeFactory( InternalInterface internalInterface ) {
+		this.internalInterface = internalInterface;
 		double effectiveCellSize = network.getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
@@ -73,14 +78,14 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 		QueueWithBuffer.Builder laneFactory = new QueueWithBuffer.Builder(context) ;
 		laneFactory.setLinkSpeedCalculator( linkSpeedCalculator );
 
-		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
+		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, internalInterface) ;
 		linkBuilder.setLaneFactory(laneFactory);
 
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override
 	QNodeI createNetsimNode(final Node node) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+		QNodeImpl.Builder builder = new QNodeImpl.Builder( internalInterface, context ) ;
 
 		builder.setTurnAcceptanceLogic( this.turnAcceptanceLogic ) ;
 

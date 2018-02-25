@@ -54,7 +54,7 @@ public class QSimEventsIntegrationTest {
 		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer);
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim, scenario.getConfig(), scenario, events, mobsimTimer, agentCounter);
+		QNetsimEngineModule.configure(qSim, scenario.getConfig(), scenario, events, mobsimTimer, agentCounter, qSim.getInternalInterface());
 		try {
 			qSim.run();
 		} catch (RuntimeException e) {

@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
@@ -146,8 +147,8 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 * @param context TODO
 	 * @param netsimEngine TODO
 	 */
-	QLinkLanesImpl(final Link link2, final QNodeI queueNode, List<ModelLane> lanes, NetsimEngineContext context, NetsimInternalInterface netsimEngine) {
-		super(link2, queueNode, context, netsimEngine);
+	QLinkLanesImpl(final Link link2, final QNodeI queueNode, List<ModelLane> lanes, NetsimEngineContext context, InternalInterface internalInterface) {
+		super(link2, queueNode, context, internalInterface);
 		this.context = context ;
 		this.toQueueNode = queueNode;
 		this.laneQueues = new LinkedHashMap<>();
