@@ -20,12 +20,6 @@
 
 package org.matsim.facilities;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.SortedSet;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -35,12 +29,18 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.attributable.AttributesXmlWriterDelegate;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.SortedSet;
+
 /**
  * @author mrieser / Senozon AG
  */
 /*package*/ class FacilitiesWriterV1 extends MatsimXmlWriter implements MatsimWriter {
 
-    private final String DTD = "http://www.matsim.org/files/dtd/facilities_v1.dtd";
+    private static final String DTD = "http://www.matsim.org/files/dtd/facilities_v1.dtd";
 
     private final ActivityFacilities facilities;
 

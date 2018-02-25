@@ -132,13 +132,10 @@ import java.util.Map;
 			out.write(" selected=\"yes\"");
 		else
 			out.write(" selected=\"no\"");
-		if (plan != null){
-			Plan p = plan;
-			if ((p.getType() != null)) {
-				out.write(" type=\"");
-				out.write(p.getType());
-				out.write("\"");
-			}
+		if ((plan.getType() != null)) {
+			out.write(" type=\"");
+			out.write(plan.getType());
+			out.write("\"");
 		}
 		out.write(">\n");
 		

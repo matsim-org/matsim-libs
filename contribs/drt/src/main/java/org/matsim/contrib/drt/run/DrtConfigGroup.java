@@ -108,7 +108,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 
 	private boolean plotDetailedCustomerStats = true;
 	private boolean plotDetailedVehicleStats = false;
-	private boolean printDetailedWarnings = false;
+	private boolean printDetailedWarnings = true;
 
 	@Positive
 	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
