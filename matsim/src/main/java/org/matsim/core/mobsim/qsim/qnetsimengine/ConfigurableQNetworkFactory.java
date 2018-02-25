@@ -62,7 +62,7 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 		initializeFactory(); // TODO: Just refatoring, draw in here
 	}
 	
-	void initializeFactory() {
+	private void initializeFactory() {
 		double effectiveCellSize = network.getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );

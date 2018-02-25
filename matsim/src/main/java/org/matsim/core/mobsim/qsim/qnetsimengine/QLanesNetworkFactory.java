@@ -75,7 +75,7 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 		initializeFactory(); // TODO: Refactoring artifact. Draw in here.
 	}
 
-	void initializeFactory() {
+	private void initializeFactory() {
 		double effectiveCellSize = network.getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );

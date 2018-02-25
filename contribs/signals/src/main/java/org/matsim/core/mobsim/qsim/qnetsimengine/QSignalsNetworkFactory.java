@@ -65,7 +65,7 @@ public class QSignalsNetworkFactory extends QNetworkFactory{
 		initializeFactory();
 	}
 	
-	void initializeFactory() {
+	private void initializeFactory() {
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( scenario.getConfig().qsim().getLinkWidthForVis() );
 		linkWidthCalculator.setLaneWidth( scenario.getNetwork().getEffectiveLaneWidth() );

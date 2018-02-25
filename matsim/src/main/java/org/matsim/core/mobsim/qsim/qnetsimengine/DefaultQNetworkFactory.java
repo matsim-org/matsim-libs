@@ -80,7 +80,7 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 		initializeFactory(); // TODO: Refactoring artifact. Draw in here.
 	}
 	
-	void initializeFactory() {
+	private void initializeFactory() {
 		double effectiveCellSize = scenario.getNetwork().getEffectiveCellSize() ;
 
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();

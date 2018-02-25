@@ -50,7 +50,7 @@ public class HybridNetworkFactory extends QNetworkFactory {
 		initializeFactory(); // Refactoring artefact. Draw in here.
 	}
 	
-	void initializeFactory() {
+	private void initializeFactory() {
 		double effectiveCellSize = ( network).getEffectiveCellSize() ;
 
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();

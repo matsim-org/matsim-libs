@@ -56,7 +56,7 @@ public class RunFlexibleQNetworkFactoryExample {
 			initializeFactory(); // Refactoring artifact. Draw in here.
 		}
 
-		void initializeFactory() {
+		private void initializeFactory() {
 			double effectiveCellSize = ((Network)network).getEffectiveCellSize() ;
 			
 			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
