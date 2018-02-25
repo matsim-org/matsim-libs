@@ -51,9 +51,12 @@ public class RunFlexibleQNetworkFactoryExample {
 		@Inject private AgentCounter agentCounter;
 
 		private NetsimEngineContext context;
-		private InternalInterface internalInterface;
+		
+		public MyQNetworkFactory() {
+			initializeFactory(); // Refactoring artifact. Draw in here.
+		}
 
-		@Override void initializeFactory(InternalInterface internalInterface) {
+		void initializeFactory() {
 			double effectiveCellSize = ((Network)network).getEffectiveCellSize() ;
 			
 			SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -64,15 +67,13 @@ public class RunFlexibleQNetworkFactoryExample {
 			AbstractAgentSnapshotInfoBuilder snapshotBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 			
 			this.context = new NetsimEngineContext(events, effectiveCellSize, agentCounter, snapshotBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;
-			
-			this.internalInterface = internalInterface ;
 		}
-		@Override QNodeI createNetsimNode(Node node) {
+		@Override QNodeI createNetsimNode(Node node, InternalInterface internalInterface) {
 			QNodeImpl.Builder builder = new QNodeImpl.Builder( internalInterface, context ) ;
 			return builder.build( node ) ;
 			
 		}
-		@Override QLinkI createNetsimLink(Link link, QNodeI queueNode) {
+		@Override QLinkI createNetsimLink(Link link, QNodeI queueNode, InternalInterface internalInterface) {
 			QueueWithBuffer.Builder laneBuilder = new QueueWithBuffer.Builder(context) ;
 			
 			QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, internalInterface) ;

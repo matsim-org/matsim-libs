@@ -57,8 +57,6 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 
 	private Scenario scenario;
 
-	private InternalInterface internalInterface;
-	
 	private AgentCounter agentCounter;
 	private MobsimTimer mobsimTimer;
 	
@@ -73,11 +71,11 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 		
 		this.agentCounter = agentCounter;
 		this.mobsimTimer = mobsimTimer;
+		
+		initializeFactory(); // TODO: Refactoring artifact. Draw in here.
 	}
 
-	@Override
-	void initializeFactory(InternalInterface internalInterface) {
-		this.internalInterface = internalInterface ;
+	void initializeFactory() {
 		double effectiveCellSize = network.getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
@@ -86,11 +84,11 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 		}
 		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
-		delegate.initializeFactory(internalInterface);
+		//delegate.initializeFactory();
 	}
 
 	@Override
-	public QLinkI createNetsimLink(Link link, QNodeI queueNode) {
+	public QLinkI createNetsimLink(Link link, QNodeI queueNode, InternalInterface internalInterface) {
 		QLinkI ql = null;
 		LanesToLinkAssignment l2l = this.laneDefinitions.getLanesToLinkAssignments().get(link.getId());
 		if (l2l != null){
@@ -98,14 +96,14 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 			ql = new QLinkLanesImpl(link, queueNode, lanes, context, internalInterface);
 		}
 		else {
-			ql = this.delegate.createNetsimLink(link, queueNode);
+			ql = this.delegate.createNetsimLink(link, queueNode, internalInterface);
 		}
 		return ql;
 	}
 
 	@Override
-	public QNodeI createNetsimNode(Node node) {
-		return this.delegate.createNetsimNode(node);
+	public QNodeI createNetsimNode(Node node, InternalInterface internalInterface) {
+		return this.delegate.createNetsimNode(node, internalInterface);
 	}
 
 }

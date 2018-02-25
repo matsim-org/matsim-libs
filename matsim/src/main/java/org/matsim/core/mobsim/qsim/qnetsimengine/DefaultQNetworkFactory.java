@@ -67,9 +67,8 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 	private Scenario scenario ;
 	// (vis needs network and may need population attributes and config; in consequence, makes sense to have scenario here. kai, apr'16)
 	private NetsimEngineContext context;
-	private InternalInterface internalInterface ;
-	private MobsimTimer mobsimTimer;
-	private AgentCounter agentCounter;
+	private final MobsimTimer mobsimTimer;
+	private final AgentCounter agentCounter;
 	
 	@Inject
 	DefaultQNetworkFactory( EventsManager events, Scenario scenario, MobsimTimer mobsimTimer, AgentCounter agentCounter ) {
@@ -77,10 +76,11 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 		this.scenario = scenario;
 		this.mobsimTimer = mobsimTimer;
 		this.agentCounter = agentCounter;
+		
+		initializeFactory(); // TODO: Refactoring artifact. Draw in here.
 	}
-	@Override
-	void initializeFactory( InternalInterface internalInterface ) {
-		this.internalInterface = internalInterface;
+	
+	void initializeFactory() {
 		double effectiveCellSize = scenario.getNetwork().getEffectiveCellSize() ;
 
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -93,12 +93,12 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 				mobsimTimer, linkWidthCalculator );
 	}
 	@Override
-	QLinkI createNetsimLink(final Link link, final QNodeI toQueueNode) {
+	QLinkI createNetsimLink(final Link link, final QNodeI toQueueNode, InternalInterface internalInterface) {
 		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, internalInterface) ;
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override
-	QNodeI createNetsimNode(final Node node) {
+	QNodeI createNetsimNode(final Node node, InternalInterface internalInterface) {
 		QNodeImpl.Builder builder = new QNodeImpl.Builder( internalInterface, context ) ;
 		return builder.build( node ) ;
 	}

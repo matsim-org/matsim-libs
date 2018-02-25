@@ -46,7 +46,6 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 	private Network network ;
 	private Scenario scenario ;
 	private NetsimEngineContext context;
-	private InternalInterface internalInterface ;
 	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
 	private TurnAcceptanceLogic turnAcceptanceLogic = new DefaultTurnAcceptanceLogic() ;
 	private MobsimTimer mobsimTimer;
@@ -59,10 +58,11 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 		this.qsimConfig = scenario.getConfig().qsim() ;
 		this.mobsimTimer = mobsimTimer;
 		this.agentCounter = agentCounter;
+		
+		initializeFactory(); // TODO: Just refatoring, draw in here
 	}
-	@Override
-	void initializeFactory( InternalInterface internalInterface ) {
-		this.internalInterface = internalInterface;
+	
+	void initializeFactory() {
 		double effectiveCellSize = network.getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
@@ -73,7 +73,7 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
 	}
 	@Override
-	QLinkI createNetsimLink(final Link link, final QNodeI toQueueNode) {
+	QLinkI createNetsimLink(final Link link, final QNodeI toQueueNode, InternalInterface internalInterface) {
 		QueueWithBuffer.Builder laneFactory = new QueueWithBuffer.Builder(context) ;
 		laneFactory.setLinkSpeedCalculator( linkSpeedCalculator );
 
@@ -83,7 +83,7 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override
-	QNodeI createNetsimNode(final Node node) {
+	QNodeI createNetsimNode(final Node node,  InternalInterface internalInterface) {
 		QNodeImpl.Builder builder = new QNodeImpl.Builder( internalInterface, context ) ;
 
 		builder.setTurnAcceptanceLogic( this.turnAcceptanceLogic ) ;

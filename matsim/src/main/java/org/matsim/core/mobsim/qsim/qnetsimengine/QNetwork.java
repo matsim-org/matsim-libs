@@ -55,12 +55,12 @@ public class QNetwork implements NetsimNetwork {
 		this.links = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);
 		this.nodes = new LinkedHashMap<>((int)(network.getLinks().size()*1.1), 0.95f);
 
-		netsimNetworkFactory.initializeFactory( internalInterface );
+		//netsimNetworkFactory.initializeFactory();
 		for (Node n : network.getNodes().values()) {
-			this.nodes.put(n.getId(), netsimNetworkFactory.createNetsimNode(n));
+			this.nodes.put(n.getId(), netsimNetworkFactory.createNetsimNode(n, internalInterface));
 		}
 		for (Link l : network.getLinks().values()) {
-			final QLinkI qlink = netsimNetworkFactory.createNetsimLink(l, this.nodes.get(l.getToNode().getId()));
+			final QLinkI qlink = netsimNetworkFactory.createNetsimLink(l, this.nodes.get(l.getToNode().getId()), internalInterface);
 			this.links.put(l.getId(), qlink);
 		}
 		for (QNodeI n : this.nodes.values()) {

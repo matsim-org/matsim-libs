@@ -42,15 +42,15 @@ public class HybridNetworkFactory extends QNetworkFactory {
 	@Inject MobsimTimer mobsimTimer;
 
 	private NetsimEngineContext context;
-	private InternalInterface internalInterface ;
 
 
 	private ExternalEngine externalEngine;
 
-	@Override
-	void initializeFactory(InternalInterface internalInterface) {
-		this.internalInterface = internalInterface;
-		
+	public HybridNetworkFactory() {
+		initializeFactory(); // Refactoring artefact. Draw in here.
+	}
+	
+	void initializeFactory() {
 		double effectiveCellSize = ( network).getEffectiveCellSize() ;
 
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -64,14 +64,14 @@ public class HybridNetworkFactory extends QNetworkFactory {
 	}
 
 	@Override
-	public QNodeI createNetsimNode(Node node) {
+	public QNodeI createNetsimNode(Node node, InternalInterface internalInterface) {
 		QNodeImpl.Builder builder = new QNodeImpl.Builder( internalInterface, context ) ;
 		return builder.build( node ) ;
 	}
 
 
 	@Override
-	public QLinkI createNetsimLink(Link link, QNodeI queueNode) {
+	public QLinkI createNetsimLink(Link link, QNodeI queueNode, InternalInterface internalInterface) {
 		if (link.getAllowedModes().contains("2ext")) {
 			return new QSimExternalTransitionLink(link, this.externalEngine, context, internalInterface, queueNode );
 		}

@@ -48,7 +48,6 @@ public class QSignalsNetworkFactory extends QNetworkFactory{
 	
 	private final AgentCounter agentCounter;
 	private final MobsimTimer mobsimTimer;
-	private InternalInterface internalInterface;
 	
 	@Inject
 	public QSignalsNetworkFactory(Scenario scenario, EventsManager events, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
@@ -62,12 +61,11 @@ public class QSignalsNetworkFactory extends QNetworkFactory{
 		} else {
 			delegate = new DefaultQNetworkFactory(events, scenario, mobsimTimer, agentCounter);
 		}
+		
+		initializeFactory();
 	}
 	
-	@Override
-	void initializeFactory( InternalInterface internalInterface ) {
-		this.internalInterface = internalInterface;
-		
+	void initializeFactory() {
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( scenario.getConfig().qsim().getLinkWidthForVis() );
 		linkWidthCalculator.setLaneWidth( scenario.getNetwork().getEffectiveLaneWidth() );
@@ -77,19 +75,19 @@ public class QSignalsNetworkFactory extends QNetworkFactory{
 		this.context = new NetsimEngineContext( events, scenario.getNetwork().getEffectiveCellSize(), agentCounter, agentSnapshotInfoBuilder, 
 				scenario.getConfig().qsim(), mobsimTimer, linkWidthCalculator );
 		
-		delegate.initializeFactory(internalInterface);
+		//delegate.initializeFactory();
 	}
 
 	@Override
-	QNodeI createNetsimNode(Node node) {
+	QNodeI createNetsimNode(Node node, InternalInterface internalInterface) {
 		QNodeImpl.Builder builder = new QNodeImpl.Builder( internalInterface, context ) ;
 		builder.setTurnAcceptanceLogic( new SignalTurnAcceptanceLogic() ) ;
 		return builder.build( node ) ;
 	}
 
 	@Override
-	QLinkI createNetsimLink(Link link, QNodeI queueNode) {
-		return delegate.createNetsimLink(link, queueNode);
+	QLinkI createNetsimLink(Link link, QNodeI queueNode, InternalInterface internalInterface) {
+		return delegate.createNetsimLink(link, queueNode, internalInterface);
 	}
 
 }
