@@ -30,6 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.HashMap;
@@ -72,6 +73,7 @@ public class InductiveChargingController {
 			public void install() {
 				addEventHandlerBinding().toInstance(handlerGroup);
 				bind(MobsimTimer.class);
+				bind(ActiveQSimBridge.class);
 			}
 		});
 	}
