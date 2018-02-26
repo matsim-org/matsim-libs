@@ -32,24 +32,20 @@ public class DvrpConfigConsistencyChecker implements ConfigConsistencyChecker {
 		new DynQSimConfigConsistencyChecker().checkConsistency(config);
 
 		if (!config.qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles()) {
-			log.warn("Typically, vrp paths are calculated from startLink to endLink"
-					+ "(not from startNode to endNode). That requires making some assumptions"
-					+ "on how much time travelling on the first and last links takes. "
-					+ "The current implementation assumes freeflow travelling on the last link, "
-					+ "which is actually the case in QSim, and a 1-second stay on the first link. "
-					+ "The latter expectation is optimistic, and to make it more likely,"
-					+ "departing vehicles must be inserted befor driving ones "
-					+ "(though that still does not guarantee 1-second stay");
+			// Typically, vrp paths are calculated from startLink to endLink
+			// (not from startNode to endNode). That requires making some assumptions
+			// on how much time travelling on the first and last links takes.
+			// The current implementation assumes:
+			// (a) free-flow travelling on the last link, which is actually the case in QSim, and
+			// (b) a 1-second stay on the first link (spent on moving over the first node).
+			// The latter expectation is assumes that departing vehicles must be inserted before driving ones
+			// (though that still does not guarantee 1-second stay since the vehicle may need to wait if the next
+			// link is fully congested)
+			log.warn(" 'QSim.insertingWaitingVehiclesBeforeDrivingVehicles' should be true in order to get"
+					+ " more precise travel time estimates. See comments in DvrpConfigConsistencyChecker");
 		}
-
 		if (config.qsim().isRemoveStuckVehicles()) {
 			throw new RuntimeException("Stuck DynAgents cannot be removed from simulation");
-		}
-
-		DvrpConfigGroup dvrpCfg = DvrpConfigGroup.get(config);
-		double alpha = dvrpCfg.getTravelTimeEstimationAlpha();
-		if (alpha > 1 || alpha <= 0) {
-			throw new RuntimeException("travelTimeEstimationAlpha must be in (0,1]");
 		}
 	}
 }

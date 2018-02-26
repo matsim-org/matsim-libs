@@ -439,7 +439,7 @@ final class QueueWithBuffer implements QLaneI, SignalizeableItem {
 					// is currently only working because qLink.handleTransitStop(...) also increases the
 					// earliestLinkExitTime for the present vehicle.  kai, oct'13
 					// zz From my point of view it is exactly like described above. dg, mar'14
-				} else if (handleTransitStop == HandleTransitStopResult.continue_driving) {
+//				} else if (handleTransitStop == HandleTransitStopResult.continue_driving) {
 					// Do nothing, but go on..
 				}
 			}

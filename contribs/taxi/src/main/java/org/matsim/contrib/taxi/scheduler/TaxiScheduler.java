@@ -79,7 +79,8 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		this.timer = timer;
 		this.travelTime = travelTime;
 
-		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
+		router = new FastAStarEuclideanFactory(taxiCfg.getAStarEuclideanOverdoFactor()).createPathCalculator(network,
+				travelDisutility, travelTime);
 		initFleet(taxiCfg);
 	}
 

@@ -31,7 +31,6 @@ import org.matsim.contrib.dvrp.data.Request;
  * @author michalm
  */
 public class DrtRequestSubmittedEvent extends Event {
-
 	public static final String EVENT_TYPE = "DrtRequest submitted";
 
 	public static final String ATTRIBUTE_REQUEST = "request";
@@ -48,7 +47,6 @@ public class DrtRequestSubmittedEvent extends Event {
 	private final double unsharedRideTime;
 	private final double unsharedRideDistance;
 
-	
 	public DrtRequestSubmittedEvent(double time, Id<Request> requestId, Id<Person> personId, Id<Link> fromLinkId,
 			Id<Link> toLinkId, double unsharedRideTime, double unsharedRideDistance) {
 		super(time);
@@ -64,40 +62,44 @@ public class DrtRequestSubmittedEvent extends Event {
 	public String getEventType() {
 		return EVENT_TYPE;
 	}
+
 	/**
-	 *  the ID of the initial request submitted
+	 * the ID of the initial request submitted
 	 */
 	public Id<Request> getRequestId() {
 		return requestId;
 	}
+
 	/**
-	 *  the Person Id that submitted the request
+	 * the Person Id that submitted the request
 	 */
 	public Id<Person> getPersonId() {
 		return personId;
 	}
 
 	/**
-	 *  the request's origin
+	 * the request's origin
 	 */
 	public Id<Link> getFromLinkId() {
 		return fromLinkId;
 	}
+
 	/**
-	 *  the request's destination
+	 * the request's destination
 	 */
 	public Id<Link> getToLinkId() {
 		return toLinkId;
 	}
 
 	/**
-	 *  the estimated traveltime it would take to ride without any detours
+	 * the estimated traveltime it would take to ride without any detours
 	 */
 	public double getUnsharedRideTime() {
 		return unsharedRideTime;
 	}
+
 	/**
-	 *  the estimated distance it would take to ride without any detours
+	 * the estimated distance it would take to ride without any detours
 	 */
 	public double getUnsharedRideDistance() {
 		return unsharedRideDistance;
@@ -111,7 +113,7 @@ public class DrtRequestSubmittedEvent extends Event {
 		attr.put(ATTRIBUTE_FROM_LINK, fromLinkId + "");
 		attr.put(ATTRIBUTE_TO_LINK, toLinkId + "");
 		attr.put(ATTRIBUTE_UNSHARED_RIDE_TIME, unsharedRideTime + "");
-		attr.put(ATTRIBUTE_UNSHARED_RIDE_DISTANCE, unsharedRideDistance+"");
+		attr.put(ATTRIBUTE_UNSHARED_RIDE_DISTANCE, unsharedRideDistance + "");
 		return attr;
 	}
 }

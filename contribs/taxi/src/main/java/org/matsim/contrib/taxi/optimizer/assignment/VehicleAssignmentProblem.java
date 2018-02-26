@@ -181,7 +181,7 @@ public class VehicleAssignmentProblem<D> {
 			// TODO if null is frequent we may be more efficient by increasing the neighbourhood
 			VrpPathWithTravelData vrpPath = pathData == null ? //
 					VrpPaths.calcAndCreatePath(departure.link, dest.link, departure.time, router, travelTime)
-					: VrpPaths.createPath(departure.link, dest.link, departure.time, pathData.path, travelTime);
+					: VrpPaths.createPath(departure.link, dest.link, departure.time, pathData, travelTime);
 
 			dispatches.add(new Dispatch<>(departure.vehicle, dest.destination, vrpPath));
 		}

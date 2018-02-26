@@ -80,11 +80,12 @@ public final class TravelTimeCalculatorConfigGroup extends ReflectiveConfigGroup
 		map.put(FILTERMODES, "If true, link travel times from legs performed on modes not included in the 'analyzedModes' parameter are ignored.");
 		map.put(SEPARATEMODES, "If true, link travel times are measured and calculated separately for each mode in analyzedModes. Other modes are ignored. If true, filterModes has no effect.");
 		// === 
-		String str = null ;
+		StringBuilder str = new StringBuilder();
 		for ( TravelTimeCalculatorType type : TravelTimeCalculatorType.values() ) {
-			str += type.toString() + " " ;
+			str.append(type.toString());
+			str.append(' ');
 		}
-		map.put( TRAVEL_TIME_CALCULATOR, "possible values: " + str ) ;
+		map.put( TRAVEL_TIME_CALCULATOR, "possible values: " + str.toString());
 		return map;
 	}
 

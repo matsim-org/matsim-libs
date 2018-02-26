@@ -17,33 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package org.matsim.contrib.drt.run;
+package org.matsim.contrib.drt.run.examples;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
+import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
-import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
- * @author  jbischoff
+ * @author michalm
  */
-public class RunDrtExampleIT {
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
+public class RunOneSharedTaxiExample {
+	private static final String CONFIG_FILE = "one_shared_taxi/one_shared_taxi_config.xml";
 
-	@Test
-	public void testRunDrtExample() {
-		String configFile = "./src/main/resources/drt_example/drtconfig.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
-		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
-		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		RunDrtExample.run(config, false);
+	public static void run(boolean otfvis, int lastIteration) {
+		Config config = ConfigUtils.loadConfig(CONFIG_FILE, new DrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+		config.controler().setLastIteration(lastIteration);
+		DrtControlerCreator.createControler(config, otfvis).run();
+	}
+
+	public static void main(String[] args) {
+		run(false, 0); // switch to 'true' to turn on visualisation
 	}
 }

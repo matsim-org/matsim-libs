@@ -19,14 +19,8 @@
 
 package org.matsim.contrib.signals.data.ambertimes.v10;
 
-import java.io.IOException;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-
-import junit.framework.Assert;
-
 import org.apache.log4j.Logger;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -34,6 +28,10 @@ import org.matsim.contrib.signals.model.Signal;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.testcases.MatsimTestUtils;
 import org.xml.sax.SAXException;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 
 /**
  * @author jbischoff
@@ -84,7 +82,7 @@ public class AmberTimesData10ReaderWriterTest {
 	private void checkContent(AmberTimesData ats) {
 		// global defaults
 		Assert.assertNotNull(ats);
-		Assert.assertEquals(0.3, ats.getDefaultAmberTimeGreen());
+		Assert.assertEquals(0.3, ats.getDefaultAmberTimeGreen(), 1e-7);
 		Assert.assertEquals(1, ats.getDefaultRedAmber().intValue());
 		Assert.assertEquals(4, ats.getDefaultAmber().intValue());
 		// system id1 defaults

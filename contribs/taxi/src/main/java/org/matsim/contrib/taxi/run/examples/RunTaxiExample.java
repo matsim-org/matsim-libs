@@ -72,7 +72,7 @@ public class RunTaxiExample {
 	}
 
 	public static void main(String[] args) {
-		RunTaxiExample.run(false, 0); // switch to 'false' to turn off visualisation
+		RunTaxiExample.run(false, 0); // switch to 'true' to turn on visualisation
 	}
 
 	/**

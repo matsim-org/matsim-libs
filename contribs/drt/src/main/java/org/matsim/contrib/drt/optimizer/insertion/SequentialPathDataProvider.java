@@ -69,7 +69,7 @@ public class SequentialPathDataProvider implements PathDataProvider {
 				earliestPickupTime);
 
 		PathData pickupToDropoffPath = pathsFromPickup[0];// only if no other passengers on board (optimistic)
-		double minTravelTime = pickupToDropoffPath.path.travelTime + pickupToDropoffPath.firstAndLastLinkTT;
+		double minTravelTime = pickupToDropoffPath.getTravelTime();
 		double earliestDropoffTime = earliestPickupTime + minTravelTime + stopDuration; // over-optimistic
 
 		// calc backward dijkstra from dropoff to ends of all stops

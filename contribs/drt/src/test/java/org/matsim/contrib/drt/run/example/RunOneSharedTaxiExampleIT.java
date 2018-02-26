@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +16,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.run;
+package org.matsim.contrib.drt.run.example;
 
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.core.config.*;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
+import org.junit.Test;
+import org.matsim.contrib.drt.run.examples.RunOneSharedTaxiExample;
 
 /**
- * @author jbischoff
+ * @author michalm
  */
-public class RunDrtExample {
-	
-	
-	public static void run(Config config, boolean otfvis) {
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
-		DrtControlerCreator.createControler(config, otfvis).run();;
-	}
-
-	
-
-	public static void main(String[] args) {
-		
-		Config config = ConfigUtils.loadConfig("drt_example/drtconfig.xml", new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
-		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
-		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.kinematicWaves);
-		run(config,true);
-
+public class RunOneSharedTaxiExampleIT {
+	@Test
+	public void testRun() {
+		RunOneSharedTaxiExample.run(false, 2);
 	}
 }
