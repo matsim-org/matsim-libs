@@ -658,7 +658,8 @@ public class WithinDayTravelTime implements TravelTime,
 			 * within the current SimStep. The initial FreeSpeedTravelTime has
 			 * to be set correctly via setTravelTime!
 			 */
-			if (removedTravelTimes == 0.0 && travelTimeInfo.addedTravelTimes == 0.0) return;
+//			if (removedTravelTimes == 0.0 && travelTimeInfo.addedTravelTimes == 0.0) return;
+			// yyyyyy does not work when a network change event comes in.  kai, feb'18
 
 			travelTimeInfo.sumTravelTimes = travelTimeInfo.sumTravelTimes - removedTravelTimes + travelTimeInfo.addedTravelTimes;
 
