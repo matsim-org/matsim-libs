@@ -659,23 +659,26 @@ public class WithinDayTravelTime implements TravelTime,
 			 * to be set correctly via setTravelTime!
 			 */
 //			if (removedTravelTimes == 0.0 && travelTimeInfo.addedTravelTimes == 0.0) return;
-			// yyyyyy does not work when a network change event comes in.  kai, feb'18
+			// yyyyyy does not work when a network change event comes in. If the old functionality was intentional, we need to talk:
+			// We are setting speed to zero in the bushfire, and if there is no car on the link already, no car will enter it
+			// (because of special within-day rerouting logic). kai, feb'18
 
 			travelTimeInfo.sumTravelTimes = travelTimeInfo.sumTravelTimes - removedTravelTimes + travelTimeInfo.addedTravelTimes;
 
 			travelTimeInfo.addedTravelTimes = 0.0;
-
 			/*
-			 * Ensure, that we don't allow TravelTimes shorter than the
-			 * FreeSpeedTravelTime.
+			 * Ensure that we don't allow TravelTimes shorter than the FreeSpeedTravelTime.
 			 */
 			double meanTravelTime = travelTimeInfo.freeSpeedTravelTime;
 			if (!tripBins.isEmpty()) meanTravelTime = travelTimeInfo.sumTravelTimes / tripBins.size();
 
 			if (meanTravelTime < travelTimeInfo.freeSpeedTravelTime) {
-				log.warn("Mean TravelTime to short?");
+//				log.warn("Mean TravelTime too short?");
+				// can happen when network change event came in with lower speed. kai, feb'18
 				travelTimeInfo.travelTime = travelTimeInfo.freeSpeedTravelTime;
-			} else travelTimeInfo.travelTime = meanTravelTime;
+			} else {
+				travelTimeInfo.travelTime = meanTravelTime;
+			}
 		}
 
 	} // ReplannerRunnable

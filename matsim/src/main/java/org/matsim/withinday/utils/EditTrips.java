@@ -223,7 +223,7 @@ public final class EditTrips {
 //			newTrip.remove(0) ;
 //		}
 		// yyyyyy do nothing for time being and hope for the best.
-		log.warn("yyyyyy pruneUpToCurrentLeg needs to be fixed.") ;
+		log.warn("yyyyyy pruneUpToCurrentLeg needs to be fixed for multimodal trips & for access/egress routing.") ;
 	}
 
 	// static methods:

@@ -65,7 +65,7 @@ class NewNetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 	public final void addNetworkChangeEvent( NetworkChangeEvent event ) {
 		// used (and thus implicitly tested) by bdi-abm-integration project.  A separate core test would be good. kai, feb'18
 		
-		log.warn("add change event coming from external (i.e. not in network change events data structure):" + event);
+		log.warn("add within-day network change event:" + event);
 		
 		final Queue<NetworkChangeEvent> centralNetworkChangeEvents =
 				NetworkUtils.getNetworkChangeEvents(this.internalInterface.getMobsim().getScenario().getNetwork());
