@@ -22,7 +22,6 @@ package org.matsim.contrib.drt.optimizer.insertion;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
@@ -56,7 +55,7 @@ public class InsertionCostCalculator {
 	// the insertion is invalid if some maxTravel/Wait constraints are not fulfilled
 	// ==> checks if all the constraints are satisfied for all passengers/requests ==> if not ==>
 	// INFEASIBLE_SOLUTION_COST is returned
-	public double calculate(DrtRequest drtRequest, VehicleData.Entry vEntry, Insertion insertion) {
+	public double calculate(DrtRequest drtRequest, VehicleData.Entry vEntry, InsertionWithPathData insertion) {
 		double pickupDetourTimeLoss = calculatePickupDetourTimeLoss(drtRequest, vEntry, insertion);
 		double dropoffDetourTimeLoss = calculateDropoffDetourTimeLoss(drtRequest, vEntry, insertion);
 
@@ -68,7 +67,7 @@ public class InsertionCostCalculator {
 		return constraintsSatisfied ? totalTimeLoss : INFEASIBLE_SOLUTION_COST;
 	}
 
-	private double calculatePickupDetourTimeLoss(DrtRequest drtRequest, VehicleData.Entry vEntry, Insertion insertion) {
+	private double calculatePickupDetourTimeLoss(DrtRequest drtRequest, VehicleData.Entry vEntry, InsertionWithPathData insertion) {
 		// 'no detour' is also possible now for pickupIdx==0 if the currentTask is STOP
 		boolean ongoingStopTask = insertion.pickupIdx == 0
 				&& ((DrtTask)vEntry.vehicle.getSchedule().getCurrentTask()).getDrtTaskType() == DrtTaskType.STOP;
@@ -93,7 +92,7 @@ public class InsertionCostCalculator {
 	}
 
 	private double calculateDropoffDetourTimeLoss(DrtRequest drtRequest, VehicleData.Entry vEntry,
-			Insertion insertion) {
+			InsertionWithPathData insertion) {
 		if (insertion.dropoffIdx > 0
 				&& drtRequest.getToLink() == vEntry.stops.get(insertion.dropoffIdx - 1).task.getLink()) {
 			return 0; // no detour
@@ -122,7 +121,7 @@ public class InsertionCostCalculator {
 		return replacedDriveEndTime - replacedDriveStartTime;
 	}
 
-	private boolean areConstraintsSatisfied(DrtRequest drtRequest, VehicleData.Entry vEntry, Insertion insertion,
+	private boolean areConstraintsSatisfied(DrtRequest drtRequest, VehicleData.Entry vEntry, InsertionWithPathData insertion,
 			double pickupDetourTimeLoss, double totalTimeLoss) {
 		// this is what we cannot violate
 		for (int s = insertion.pickupIdx; s < insertion.dropoffIdx; s++) {
