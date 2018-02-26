@@ -42,35 +42,32 @@ public class InsertionGenerator {
 	public List<Insertion> generateInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry) {
 		int stopCount = vEntry.stops.size();
 		List<Insertion> insertions = new ArrayList<>();
-		for (int i = 0; i <= stopCount; i++) {
+		int occupancy = vEntry.startOccupancy;
+		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
 			// pickup is inserted after node i, where
 			// node 0 is 'start' (current position/immediate diversion point)
 			// node i > 0 is (i-1)th 'stop task'
 			// replacing i -> i+1 with i -> pickup -> i+1 means all following stop tasks are affected
 			// (==> calc delay for tasks i to n ==> calc cost)
 
-			int occupancy = (i == 0) ? vEntry.startOccupancy : vEntry.stops.get(i - 1).outputOccupancy;
-			if (occupancy == vEntry.vehicle.getCapacity()) {
-				continue;// skip fully loaded arcs
-			}
-
-			if (i < stopCount && // has next stop
-					drtRequest.getFromLink() == vEntry.stops.get(i).task.getLink()) {// next stop is at the same link
+			if (occupancy < vEntry.vehicle.getCapacity() // only not fully loaded arcs
+					&& drtRequest.getFromLink() != vEntry.stops.get(i).task.getLink()) {// next stop is at the same link
 				// optimize for cases where the pickup is at the same link as stop i (i.e. node i+1)
 				// in this case inserting the pickup either before and after the stop is equivalent
 				// ==> only evaluate insertion _after_ stop i (node i+1)
-				continue;
+				generateDropoffInsertions(drtRequest, vEntry, i, insertions);
 			}
-
-			iterateDropoffInsertions(drtRequest, vEntry, i, insertions);
+			occupancy = vEntry.stops.get(i).outgoingOccupancy;
 		}
+
+		generateDropoffInsertions(drtRequest, vEntry, stopCount, insertions);// last stop
 		return insertions;
 	}
 
-	private void iterateDropoffInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry, int i,
+	private void generateDropoffInsertions(DrtRequest drtRequest, VehicleData.Entry vEntry, int i,
 			List<Insertion> insertions) {
 		int stopCount = vEntry.stops.size();
-		for (int j = i; j <= stopCount; j++) {
+		for (int j = i; j < stopCount; j++) {// insertions up to before last stop
 			// dropoff is inserted after node j, where
 			// node j=i is 'pickup'
 			// node j>i is (j-1)th 'stop task'
@@ -79,19 +76,18 @@ public class InsertionGenerator {
 
 			// no checking the capacity constraints if i == j
 			if (j > i && // i -> pickup -> i+1 && j -> dropoff -> j+1
-					vEntry.stops.get(j - 1).outputOccupancy == vEntry.vehicle.getCapacity()) {
+					vEntry.stops.get(j - 1).outgoingOccupancy == vEntry.vehicle.getCapacity()) {
 				return;// stop iterating -- cannot insert dropoff after node j
 			}
 
-			if (j < stopCount && // has next stop
-					drtRequest.getToLink() == vEntry.stops.get(j).task.getLink()) {// next stop is at the same link
+			if (drtRequest.getToLink() != vEntry.stops.get(j).task.getLink()) {// next stop is at the same link
 				// optimize for cases where the dropoff is at the same link as stop j-1 (i.e. node j)
 				// in this case inserting the dropoff either before and after the stop is equivalent
 				// ==> only evaluate insertion _after_ stop j (node j+1)
-				continue;
+				insertions.add(new Insertion(i, j));
 			}
-
-			insertions.add(new Insertion(i, j));
 		}
+		
+		insertions.add(new Insertion(i, stopCount));// insertion after last stop
 	}
 }
