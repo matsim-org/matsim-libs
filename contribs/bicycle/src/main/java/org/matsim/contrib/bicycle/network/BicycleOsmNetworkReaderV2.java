@@ -192,13 +192,14 @@ public class BicycleOsmNetworkReaderV2 extends OsmNetworkReader {
 		/* use of following condition (direction/oneway) will set different allowed modes on links which are continuous (continuous hierarchy)
 		 * this mean, a continuous routes will not be available and router may throw an exception. Amit Feb'18
 		  */
-		if ( (forwardDirection && !isOnewayReverse(way)) || (!forwardDirection && !isOneway(way)) ) {
+//		if ( (forwardDirection && !isOnewayReverse(way)) || (!forwardDirection && !isOneway(way)) ) {
+		// above condition is commented but one can discuss it again. AA, DZ. Feb'18
 			if (defaults.hierarchy != BICYCLE_TRACK_HIERARCHY
 					&& defaults.hierarchy != FOOTPATH_TRACK_HIERARCHY
 					&& defaults.hierarchy != STEPS_TRACK_HIERARCHY) {
 				modes.add(TransportMode.car);
 			}
-		}
+//		}
 		l.setAllowedModes(modes);
 
 		if (  this.elevationDataParser!=null ){
