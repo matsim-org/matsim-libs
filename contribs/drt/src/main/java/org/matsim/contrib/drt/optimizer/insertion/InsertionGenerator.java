@@ -26,6 +26,33 @@ import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 
 /**
+ * Generates all possible pickup and dropoff insertion point pairs that do not violate the vehicle capacity. In order to
+ * generate insertion points for a given vehicle, a {@code VehicleData.Entry} must be prepared. It contains the
+ * information about the vehicle current state (location, time and occupancy; additionally, the vehicle can be queried
+ * about the current task etc. ) and the sequence of planned stops (of lenght {@code N}.
+ * <p>
+ * Pickup insertion points are indexed in the following way:
+ * <ul>
+ * <li>{@code pickupIdx = 0} - pickup inserted at/after the current position (e.g. ongoing stop, stay or drive, the
+ * latter resulting in immediate diversion)</li>
+ * <li>{@code 0 < pickupIdx <= N} - pickup inserted at/after stop {@code pickupIdx - 1}</li>
+ * </ul>
+ * <p>
+ * Dropoff insertion points are indexed in the following way:
+ * <ul>
+ * <li>{@code dropoffIdx = pickupIdx} - dropoff inserted directly after pickup</li>
+ * <li>{@code pickupIdx < dropoffIdx <= N} - dropoff inserted at/after stop {@code dropoffIdx - 1}</li>
+ * </ul>
+ * <p>
+ * A pickup/dropoff is inserted at (i.e. included into) a given stop if they are on the same link. Otherwise, it is
+ * inserted after that stop. In the latter case, the sequence of stops is changed from: <br/>
+ * {@code ... --> stop i --> stop i + 1 --> ...} <br/>
+ * to: <br/>
+ * {@code ... --> stop i --> new stop --> stop i + 1 --> ...}.
+ * <p>
+ * If a pickup/dropoff is inserted at stop {@code i} (pickup/dropoff is on the same link as the stop), insertion after
+ * stop {@code i-1} will not be generated (as that would be equivalent to/duplicate of the former one).
+ * 
  * @author michalm
  */
 public class InsertionGenerator {
@@ -44,19 +71,12 @@ public class InsertionGenerator {
 		List<Insertion> insertions = new ArrayList<>();
 		int occupancy = vEntry.startOccupancy;
 		for (int i = 0; i < stopCount; i++) {// insertions up to before last stop
-			// pickup is inserted after node i, where
-			// node 0 is 'start' (current position/immediate diversion point)
-			// node i > 0 is (i-1)th 'stop task'
-			// replacing i -> i+1 with i -> pickup -> i+1 means all following stop tasks are affected
-			// (==> calc delay for tasks i to n ==> calc cost)
-
 			if (occupancy < vEntry.vehicle.getCapacity() // only not fully loaded arcs
-					&& drtRequest.getFromLink() != vEntry.stops.get(i).task.getLink()) {// next stop is at the same link
-				// optimize for cases where the pickup is at the same link as stop i (i.e. node i+1)
-				// in this case inserting the pickup either before and after the stop is equivalent
-				// ==> only evaluate insertion _after_ stop i (node i+1)
+					&& drtRequest.getFromLink() != vEntry.stops.get(i).task.getLink()) {// next stop at different link
 				generateDropoffInsertions(drtRequest, vEntry, i, insertions);
 			}
+			// else: skip this stop and evaluate only insertion _after_ stop i
+
 			occupancy = vEntry.stops.get(i).outgoingOccupancy;
 		}
 
@@ -68,26 +88,18 @@ public class InsertionGenerator {
 			List<Insertion> insertions) {
 		int stopCount = vEntry.stops.size();
 		for (int j = i; j < stopCount; j++) {// insertions up to before last stop
-			// dropoff is inserted after node j, where
-			// node j=i is 'pickup'
-			// node j>i is (j-1)th 'stop task'
-			// replacing j -> j+1 with j -> dropoff -> j+1 ==> all following stop tasks are affected
-			// (==> calc delay for tasks j to n ==> calc cost)
-
-			// no checking the capacity constraints if i == j
+			// no need to check the capacity constraints if i == j
 			if (j > i && // i -> pickup -> i+1 && j -> dropoff -> j+1
 					vEntry.stops.get(j - 1).outgoingOccupancy == vEntry.vehicle.getCapacity()) {
 				return;// stop iterating -- cannot insert dropoff after node j
 			}
 
-			if (drtRequest.getToLink() != vEntry.stops.get(j).task.getLink()) {// next stop is at the same link
-				// optimize for cases where the dropoff is at the same link as stop j-1 (i.e. node j)
-				// in this case inserting the dropoff either before and after the stop is equivalent
-				// ==> only evaluate insertion _after_ stop j (node j+1)
+			if (drtRequest.getToLink() != vEntry.stops.get(j).task.getLink()) {// next stop at different link
 				insertions.add(new Insertion(i, j));
 			}
+			// else: skip this stop and evaluate only insertion _after_ stop i
 		}
-		
+
 		insertions.add(new Insertion(i, stopCount));// insertion after last stop
 	}
 }
