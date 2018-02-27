@@ -212,9 +212,6 @@ import org.xml.sax.Attributes;
 		String x = atts.getValue("x");
 		String y = atts.getValue("y");
 		String freq = atts.getValue("freq");
-		String iP = atts.getValue("isPrimary");
-		if ("yes".equals(iP)) {
-		}
 
 		if (type != null) {
 			log.info("Attribute type in <location> is deprecated!");

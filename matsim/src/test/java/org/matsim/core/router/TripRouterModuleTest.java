@@ -22,7 +22,7 @@
 
 package org.matsim.core.router;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;

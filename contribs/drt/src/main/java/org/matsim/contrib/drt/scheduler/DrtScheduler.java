@@ -143,7 +143,7 @@ public class DrtScheduler implements ScheduleInquiry {
 			DrtTask task = (DrtTask)tasks.get(i);
 			double calcEndTime = calcNewEndTime(vehicle, task, newBeginTime);
 
-			if (calcEndTime == Time.UNDEFINED_TIME) {
+			if (Time.isUndefinedTime(calcEndTime)) {
 				schedule.removeTask(task);
 				i--;
 			} else if (calcEndTime < newBeginTime) {// 0 s is fine (e.g. last 'wait')
@@ -211,12 +211,12 @@ public class DrtScheduler implements ScheduleInquiry {
 			if (diversion != null) { // divert vehicle
 				beforePickupTask = currentTask;
 				VrpPathWithTravelData vrpPath = VrpPaths.createPath(vehicleEntry.start.link, request.getFromLink(),
-						vehicleEntry.start.time, insertion.pathToPickup.path, travelTime);
+						vehicleEntry.start.time, insertion.pathToPickup, travelTime);
 				((OnlineDriveTaskTracker)beforePickupTask.getTaskTracker()).divertPath(vrpPath);
 			} else { // too late for diversion
 				if (request.getFromLink() != vehicleEntry.start.link) { // add a new drive task
 					VrpPathWithTravelData vrpPath = VrpPaths.createPath(vehicleEntry.start.link, request.getFromLink(),
-							vehicleEntry.start.time, insertion.pathToPickup.path, travelTime);
+							vehicleEntry.start.time, insertion.pathToPickup, travelTime);
 					beforePickupTask = new DrtDriveTask(vrpPath);
 					schedule.addTask(currentTask.getTaskIdx() + 1, beforePickupTask);
 				} else { // no need for a new drive task
@@ -266,7 +266,7 @@ public class DrtScheduler implements ScheduleInquiry {
 					Link toLink = request.getToLink(); // pickup->dropoff
 
 					VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getFromLink(), toLink,
-							stopTask.getEndTime(), insertion.pathFromPickup.path, travelTime);
+							stopTask.getEndTime(), insertion.pathFromPickup, travelTime);
 					Task driveFromPickupTask = new DrtDriveTask(vrpPath);
 					schedule.addTask(stopTask.getTaskIdx() + 1, driveFromPickupTask);
 
@@ -303,7 +303,7 @@ public class DrtScheduler implements ScheduleInquiry {
 				} else {// add drive task to pickup location
 					// insert drive i->pickup
 					VrpPathWithTravelData vrpPath = VrpPaths.createPath(stayOrStopTask.getLink(), request.getFromLink(),
-							stayOrStopTask.getEndTime(), insertion.pathToPickup.path, travelTime);
+							stayOrStopTask.getEndTime(), insertion.pathToPickup, travelTime);
 					beforePickupTask = new DrtDriveTask(vrpPath);
 					schedule.addTask(stayOrStopTask.getTaskIdx() + 1, beforePickupTask);
 				}
@@ -323,7 +323,7 @@ public class DrtScheduler implements ScheduleInquiry {
 				: stops.get(insertion.pickupIdx).task.getLink(); // pickup->i+1
 
 		VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getFromLink(), toLink, startTime + stopDuration,
-				insertion.pathFromPickup.path, travelTime);
+				insertion.pathFromPickup, travelTime);
 		Task driveFromPickupTask = new DrtDriveTask(vrpPath);
 		schedule.addTask(taskIdx + 1, driveFromPickupTask);
 
@@ -361,7 +361,7 @@ public class DrtScheduler implements ScheduleInquiry {
 
 				// insert drive i->dropoff
 				VrpPathWithTravelData vrpPath = VrpPaths.createPath(stopTask.getLink(), request.getToLink(),
-						stopTask.getEndTime(), insertion.pathToDropoff.path, travelTime);
+						stopTask.getEndTime(), insertion.pathToDropoff, travelTime);
 				driveToDropoffTask = new DrtDriveTask(vrpPath);
 				schedule.addTask(stopTask.getTaskIdx() + 1, driveToDropoffTask);
 			}
@@ -392,7 +392,7 @@ public class DrtScheduler implements ScheduleInquiry {
 			Link toLink = stops.get(insertion.dropoffIdx).task.getLink(); // dropoff->j+1
 
 			VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getToLink(), toLink, startTime + stopDuration,
-					insertion.pathFromDropoff.path, travelTime);
+					insertion.pathFromDropoff, travelTime);
 			Task driveFromDropoffTask = new DrtDriveTask(vrpPath);
 			schedule.addTask(taskIdx + 1, driveFromDropoffTask);
 

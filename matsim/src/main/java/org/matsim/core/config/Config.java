@@ -20,14 +20,6 @@
 
 package org.matsim.core.config;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.core.api.internal.MatsimExtensionPoint;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
@@ -59,6 +51,14 @@ import org.matsim.core.mobsim.jdeqsim.JDEQSimConfigGroup;
 import org.matsim.pt.config.TransitConfigGroup;
 import org.matsim.pt.config.TransitRouterConfigGroup;
 import org.matsim.run.CreateFullConfig;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Stores all configuration settings specified in a configuration file and
@@ -420,9 +420,7 @@ public final class Config implements MatsimExtensionPoint {
 			m = createModule(moduleName);
 			log.info("module \"" + moduleName + "\" added.");
 		}
-		if (m != null) {
-			m.addParam(paramName, value);
-		}
+		m.addParam(paramName, value);
 	}
 
 	// ////////////////////////////////////////////////////////////////////

@@ -23,9 +23,12 @@ import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.population.routes.*;
-import org.matsim.core.router.util.*;
+import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.population.routes.RouteFactories;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.TravelTime;
 
 public class VrpPaths {
 	/**
@@ -44,6 +47,11 @@ public class VrpPaths {
 
 	public static VrpPathWithTravelData createZeroLengthPath(Link fromTolink, double departureTime) {
 		return new VrpPathWithTravelDataImpl(departureTime, 0, new Link[] { fromTolink }, new double[] { 0 });
+	}
+
+	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, PathData pathData,
+			TravelTime travelTime) {
+		return createPath(fromLink, toLink, departureTime, pathData.path, travelTime);
 	}
 
 	public static VrpPathWithTravelData createPath(Link fromLink, Link toLink, double departureTime, Path path,
@@ -94,9 +102,9 @@ public class VrpPaths {
 		return new VrpPathWithTravelDataImpl(departureTime, totalTT, links, linkTTs);
 	}
 
-	public static final double FIRST_LINK_TT = 1;
+	static final double FIRST_LINK_TT = 1;
 
-	public static double getLastLinkTT(Link lastLink, double time) {
+	static double getLastLinkTT(Link lastLink, double time) {
 		return lastLink.getLength() / lastLink.getFreespeed(time);
 	}
 
@@ -128,12 +136,11 @@ public class VrpPaths {
 	/**
 	 * @return The distance of a VRP path Includes the to link, but not the from link
 	 */
-	public static double calcPathDistance(VrpPath path) {
+	public static double calcDistance(VrpPath path) {
 		double distance = 0.0;
 		for (int i = 1; i < path.getLinkCount(); i++) {
 			distance += path.getLink(i).getLength();
 		}
-
 		return distance;
 	}
 }

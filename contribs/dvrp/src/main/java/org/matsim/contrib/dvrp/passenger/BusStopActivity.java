@@ -22,7 +22,8 @@ package org.matsim.contrib.dvrp.passenger;
 import java.util.Set;
 
 import org.matsim.contrib.dvrp.schedule.StayTask;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.contrib.dynagent.AbstractDynActivity;
+import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
 
 /**
@@ -90,16 +91,15 @@ public class BusStopActivity extends AbstractDynActivity implements PassengerPic
 
 	@Override
 	public void notifyPassengerIsReadyForDeparture(MobsimPassengerAgent passenger, double now) {
-		PassengerRequest request = getRequestForPassenger(passenger);
+		if (now < departureTime) {
+			return;// pick up only at the end of stop activity
+		}
 
+		PassengerRequest request = getRequestForPassenger(passenger);
 		if (passengerEngine.pickUpPassenger(this, driver, request, now)) {
 			passengersAboard++;
 		} else {
 			throw new IllegalStateException("The passenger is not on the link or not available for departure!");
-		}
-
-		if (passengersAboard == pickupRequests.size()) {
-			endTime = now;
 		}
 	}
 
@@ -109,7 +109,6 @@ public class BusStopActivity extends AbstractDynActivity implements PassengerPic
 				return request;
 			}
 		}
-
 		throw new IllegalArgumentException("I am waiting for different passengers!");
 	}
 }

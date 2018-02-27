@@ -19,8 +19,7 @@
 
 package org.matsim.contrib.taxi.benchmark;
 
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.contrib.dvrp.trafficmonitoring.*;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -44,14 +43,7 @@ public class DvrpBenchmarkTravelTimeModule extends AbstractModule {
 	public void install() {
 		// Because TravelTimeCalculatorModule is not installed for benchmarking, we need to add a binding
 		// for the car mode
-		addTravelTimeBinding(TransportMode.car).toInstance(travelTime);
-
+		bindNetworkTravelTime().toInstance(travelTime);
 		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).toInstance(travelTime);
-
-		// since we cannot undo: addMobsimListenerBinding().to(VrpTravelTimeEstimator.class)
-		// that is bound in DvrpModule, we need to bind VrpTravelTimeEstimator.class to this mock instance
-		bind(DvrpTravelTimeEstimator.class).toInstance((link, time, person, vehicle) -> {
-			throw new UnsupportedOperationException();
-		});
 	}
 }

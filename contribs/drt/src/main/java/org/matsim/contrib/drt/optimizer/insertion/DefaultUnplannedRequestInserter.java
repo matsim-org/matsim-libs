@@ -36,7 +36,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-import org.matsim.core.utils.misc.Time;
 
 import com.google.inject.Inject;
 
@@ -44,6 +43,8 @@ import com.google.inject.Inject;
  * @author michalm
  */
 public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter, MobsimBeforeCleanupListener {
+	private static final Logger log = Logger.getLogger(DefaultUnplannedRequestInserter.class);
+
 	private final DrtConfigGroup drtCfg;
 	private final Fleet fleet;
 	private final MobsimTimer mobsimTimer;
@@ -82,12 +83,11 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 			DrtRequest req = reqIter.next();
 			Optional<BestInsertion> best = insertionProblem.findBestInsertion(req, vData.getEntries());
 			if (!best.isPresent()) {
+				req.setRejected(true);
 				eventsManager.processEvent(new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), req.getId()));
 				if (drtCfg.isPrintDetailedWarnings()) {
-					Logger.getLogger(getClass())
-							.warn("No vehicle found for drt request from passenger \t" + req.getPassenger().getId()
-									+ "\tat\t" + Time.writeTime(req.getSubmissionTime()) + "\tfrom Link\t"
-									+ req.getFromLink().getId());
+					log.warn("No vehicle found for drt request " + req + " from passenger id="
+							+ req.getPassenger().getId() + " fromLinkId=" + req.getFromLink().getId());
 				}
 			} else {
 				BestInsertion bestInsertion = best.get();

@@ -81,14 +81,13 @@ public class InsertionCostCalculator {
 			}
 
 			// no extra drive to pickup and stop (==> toPickupTT == 0 and stopDuration == 0)
-			double fromPickupTT = insertion.pathFromPickup.path.travelTime
-					+ insertion.pathFromPickup.firstAndLastLinkTT;
+			double fromPickupTT = insertion.pathFromPickup.getTravelTime();
 			double replacedDriveTT = calculateReplacedDriveDuration(vEntry, insertion.pickupIdx);
 			return fromPickupTT - replacedDriveTT;
 		}
 
-		double toPickupTT = insertion.pathToPickup.path.travelTime + insertion.pathToPickup.firstAndLastLinkTT;
-		double fromPickupTT = insertion.pathFromPickup.path.travelTime + insertion.pathFromPickup.firstAndLastLinkTT;
+		double toPickupTT = insertion.pathToPickup.getTravelTime();
+		double fromPickupTT = insertion.pathFromPickup.getTravelTime();
 		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, insertion.pickupIdx);
 		return toPickupTT + stopDuration + fromPickupTT - replacedDriveTT;
 	}
@@ -102,10 +101,10 @@ public class InsertionCostCalculator {
 
 		double toDropoffTT = insertion.dropoffIdx == insertion.pickupIdx ? // PICKUP->DROPOFF ?
 				0 // PICKUP->DROPOFF taken into account as fromPickupTT
-				: insertion.pathToDropoff.path.travelTime + insertion.pathToDropoff.firstAndLastLinkTT;
+				: insertion.pathToDropoff.getTravelTime();
 		double fromDropoffTT = insertion.dropoffIdx == vEntry.stops.size() ? // DROPOFF->STAY ?
 				0 //
-				: insertion.pathFromDropoff.path.travelTime + insertion.pathFromDropoff.firstAndLastLinkTT;
+				: insertion.pathFromDropoff.getTravelTime();
 		double replacedDriveTT = insertion.dropoffIdx == insertion.pickupIdx ? // PICKUP->DROPOFF ?
 				0 // replacedDriveTT already taken into account in pickupDetourTimeLoss
 				: calculateReplacedDriveDuration(vEntry, insertion.dropoffIdx);
@@ -149,8 +148,7 @@ public class InsertionCostCalculator {
 		double driveToPickupStartTime = (insertion.pickupIdx == 0) ? vEntry.start.time //
 				: vEntry.stops.get(insertion.pickupIdx - 1).task.getEndTime();
 
-		double pickupEndTime = driveToPickupStartTime + insertion.pathToPickup.path.travelTime
-				+ insertion.pathToPickup.firstAndLastLinkTT + stopDuration;
+		double pickupEndTime = driveToPickupStartTime + insertion.pathToPickup.getTravelTime() + stopDuration;
 
 		if (pickupEndTime > drtRequest.getEarliestStartTime() + maxWaitTime) {
 			return false;
@@ -158,9 +156,8 @@ public class InsertionCostCalculator {
 
 		// reject solutions when latestArrivalTime for the new request is violated
 		double dropoffStartTime = insertion.pickupIdx == insertion.dropoffIdx
-				? pickupEndTime + insertion.pathFromPickup.path.travelTime + insertion.pathFromPickup.firstAndLastLinkTT
-				: vEntry.stops.get(insertion.dropoffIdx - 1).task.getEndTime() + insertion.pathToDropoff.path.travelTime
-						+ insertion.pathToDropoff.firstAndLastLinkTT;
+				? pickupEndTime + insertion.pathFromPickup.getTravelTime()
+				: vEntry.stops.get(insertion.dropoffIdx - 1).task.getEndTime() + insertion.pathToDropoff.getTravelTime();
 
 		if (dropoffStartTime > drtRequest.getLatestArrivalTime()) {
 			return false;
