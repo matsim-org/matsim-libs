@@ -19,9 +19,9 @@
 		<!-- Maximum walk distance to next stop location in stationbased system. -->
 		<param name="maxWalkDistance" value="1500.0" />
  
-		<!-- Number of threads used for parallel evaluation of request insertion into existing schedules. Scales well up to 4, using more does not improve performance. Default == 4 (or no. of available threads to JVM if less than 4. -->
+		<!-- Number of threads used for parallel evaluation of request insertion into existing schedules. Scales well up to 4, using more does not improve performance. Default == 4 (or no. of available threads to JVM if less than 4). -->
 		
-		<param name="numberOfThreads" value="4" />
+		<!-- param name="numberOfThreads" value="4" / -->
 
 		<!-- Operational Scheme, either door2door or stopbased. door2door by default -->
 		<param name="operationalScheme" value="stopbased" />
