@@ -94,8 +94,6 @@ public final class DrtControlerCreator {
 
 	private static void adjustConfig(Config config) {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
-		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
-		config.checkConsistency();
 		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased)) {
 			ActivityParams params = config.planCalcScore().getActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY);
 			if (params == null) {
@@ -118,6 +116,9 @@ public final class DrtControlerCreator {
 						.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
 			}
 		}
+
+		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
+		config.checkConsistency();
 	}
 
 	public static Function<Config, com.google.inject.Module> createModuleCreatorForQSimPlugin() {

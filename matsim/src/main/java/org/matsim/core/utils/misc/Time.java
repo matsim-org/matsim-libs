@@ -188,7 +188,7 @@ public class Time {
 		if (strings.length == 1) {
 			seconds = Math.abs(Double.parseDouble(strings[0]));
 		} else if (strings.length == 2) {
-			int h = Integer.parseInt(strings[0]);
+			long h = Long.parseLong(strings[0]);
 			int m = Integer.parseInt(strings[1]);
 
 			if ((m < 0) || (m > 59)) {
@@ -197,7 +197,7 @@ public class Time {
 
 			seconds = Math.abs(h) * 3600 + m * 60;
 		} else if (strings.length == 3) {
-			int h = Integer.parseInt(strings[0]);
+			long h = Long.parseLong(strings[0]);
 			int m = Integer.parseInt(strings[1]);
 			double s = Double.parseDouble(strings[2]);
 

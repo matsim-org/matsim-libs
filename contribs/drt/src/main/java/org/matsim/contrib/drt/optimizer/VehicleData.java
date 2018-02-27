@@ -66,11 +66,11 @@ public class VehicleData {
 		public final double maxArrivalTime;// relating to max pass drive time (for dropoff requests)
 		public final double maxDepartureTime;// relating to pass max wait time (for pickup requests)
 		public final int occupancyChange;// diff in pickups and dropoffs
-		public final int outputOccupancy;
+		public final int outgoingOccupancy;
 
 		public Stop(DrtStopTask task, int outputOccupancy) {
 			this.task = task;
-			this.outputOccupancy = outputOccupancy;
+			this.outgoingOccupancy = outputOccupancy;
 
 			maxArrivalTime = calcMaxArrivalTime();
 			maxDepartureTime = calcMaxDepartureTime();
