@@ -21,7 +21,6 @@ package parking;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
@@ -38,7 +37,7 @@ public class ParkingZone implements Identifiable<ParkingZone> {
 
     private double zoneParkingCapacity = 0.;
 
-    private final Map<Link, Double> LinkToParkingCapacity = new HashMap<>();
+    private final Map<Id<Link>, Double> linkToParkingCapacity = new HashMap<>();
 
     public ParkingZone(String id) {
         this.parkingZoneId = Id.create(id, ParkingZone.class);
@@ -48,31 +47,31 @@ public class ParkingZone implements Identifiable<ParkingZone> {
         return this.zoneParkingCapacity;
     }
 
-    public Set<Link> getLinks() {
-        return this.LinkToParkingCapacity.keySet();
+    public boolean isLinkInsideZone(Link link){
+        return this.linkToParkingCapacity.containsKey(link.getId());
     }
 
     /**
      * @param val positive if a car is out and negative if a car is parked.
      */
     public void updateLinkParkingCapacity(Link link, double val) {
-        double parkingCap = this.LinkToParkingCapacity.getOrDefault(link, 0.);
-        this.LinkToParkingCapacity.put(link, parkingCap + val);
+        double parkingCap = this.linkToParkingCapacity.getOrDefault(link.getId(), 0.);
+        this.linkToParkingCapacity.put(link.getId(), parkingCap + val);
         this.zoneParkingCapacity += val;
     }
 
 //    public Map<Link, Double> getLinkToParkingCapacity() {
-//        return LinkToParkingCapacity;
+//        return linkToParkingCapacity;
 //    }
 //
 //    public Double getParkingCapacityForLink(Link link) {
-//        return LinkToParkingCapacity.get(link);
+//        return linkToParkingCapacity.get(link);
 //    }
 
-    public SortedMap<Double, Link> getLinkParkingProbabilities() { // this must be recalculated whenever required.
-        SortedMap<Double, Link> linkToParkingProbs = new TreeMap<>();
-        for (Map.Entry<Link,Double> entry : this.LinkToParkingCapacity.entrySet()){
-            linkToParkingProbs.put(entry.getValue() / this.zoneParkingCapacity, entry.getKey());
+    public SortedMap<Id<Link>,Double> getLinkParkingProbabilities() { // this must be recalculated whenever required.
+        SortedMap<Id<Link>, Double> linkToParkingProbs = new TreeMap<>();
+        for (Map.Entry<Id<Link>,Double> entry : this.linkToParkingCapacity.entrySet()){ //TODO what about duplicates??
+            linkToParkingProbs.put( entry.getKey(), entry.getValue() / this.zoneParkingCapacity);
         }
         return linkToParkingProbs;
     }

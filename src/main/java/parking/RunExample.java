@@ -21,11 +21,13 @@ package parking;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -33,6 +35,8 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 
 public class RunExample {
+
+    private static final boolean removeRoutes = true;
 
     public static void main(String[] args) {
 
@@ -50,7 +54,8 @@ public class RunExample {
         config.transit().setVehiclesFile("../example_scenario/vw202.0.01/vw202.0.01.output_transitVehicles.xml.gz");
 
         config.controler().setOutputDirectory(outputDir);
-//        config.controler().setWriteEventsInterval(5);
+        config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
+        config.controler().setWriteEventsInterval(2);
 
         //parking related settings
         config.plansCalcRoute().setInsertingAccessEgressWalk(true);
@@ -60,7 +65,19 @@ public class RunExample {
         //
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
-        ZonalLinkParkingInfo zoneToLinks =  new ZonalLinkParkingInfo( shapeFile, "NO", scenario.getNetwork() );
+
+        if (removeRoutes) {
+            scenario.getPopulation()
+                    .getPersons()
+                    .values()
+                    .stream()
+                    .flatMap(p -> p.getPlans().stream())
+                    .flatMap(pl -> pl.getPlanElements().stream())
+                    .filter(Leg.class::isInstance)
+                    .forEach(pe -> ((Leg) pe).setRoute(null));
+        }
+
+        ZonalLinkParkingInfo zoneToLinks =  new ZonalLinkParkingInfo( shapeFile, "NO", scenario.getNetwork(), scenario.getConfig().qsim() );
 
         Controler controler = new Controler(scenario);
         controler.addOverridingModule(new AbstractModule() {
@@ -73,5 +90,4 @@ public class RunExample {
 
         controler.run();
     }
-
 }

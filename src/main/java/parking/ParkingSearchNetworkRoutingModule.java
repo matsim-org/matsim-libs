@@ -251,15 +251,14 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
     }
 
     private Link getParkLink(Link egressActLink) {
-        double randNr = MatsimRandom.getRandom().nextDouble();
-
         ParkingZone parkingZone = this.zoneToLinks.getParkingZone(egressActLink);
         if (parkingZone==null) return null;
 
+        double randNr = MatsimRandom.getRandom().nextDouble();
         double cumSum =0.;
-        for(Map.Entry<Double,Link> prob : parkingZone.getLinkParkingProbabilities().entrySet()) {
-            cumSum += prob.getKey();
-            if (randNr <= cumSum) return prob.getValue();
+        for(Map.Entry<Id<Link>,Double> prob : parkingZone.getLinkParkingProbabilities().entrySet()) {
+            cumSum += prob.getValue();
+            if (randNr <= cumSum) return this.network.getLinks().get(prob.getKey());
         }
         // following exception may be replaced by warning and null, however must be checked first.
         throw new RuntimeException("No parking link is found. The cumulative sum of the probabilities is "+ cumSum);
