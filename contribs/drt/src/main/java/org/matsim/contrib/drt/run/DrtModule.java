@@ -42,7 +42,7 @@ public final class DrtModule extends AbstractModule {
 				addRoutingModuleBinding(DrtConfigGroup.DRT_MODE).to(DrtRoutingModule.class).asEagerSingleton();
 				break;
 
-			case stationbased:
+			case stopbased:
 				final Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 				new TransitScheduleReader(scenario2)
 						.readFile(drtCfg.getTransitStopsFileUrl(getConfig().getContext()).getFile());

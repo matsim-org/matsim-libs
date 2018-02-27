@@ -29,20 +29,25 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
 /**
  * @author jbischoff
+ * An example to run the demand responsive transport contribution in MATSim. Provides three different examples.
+ * All the example files are located in the resource path of the drt contrib jar. If you have trouble locating them, you may also download them directly from github at:
+ * <a href="https://github.com/matsim-org/matsim/tree/master/contribs/drt/src/main/resources">https://github.com/matsim-org/matsim/tree/master/contribs/drt/src/main/resources</a>
  */
 public class RunDrtExample {
+	
+	private static final String COTTBUS_CONFIG_FILE_DOOR2DOOR = "drt_example/drtconfig_door2door.xml";
+	private static final String COTTBUS_CONFIG_FILE_STOPBASED = "drt_example/drtconfig_stationbased.xml";
 	private static final String MIELEC_CONFIG_FILE = "mielec_2014_02/mielec_drt_config.xml";
-	private static final String COTTBUS_CONFIG_FILE = "drt_example/drtconfig.xml";
 
 	public static void run(Config config, boolean otfvis) {
 		DrtControlerCreator.createControler(config, otfvis).run();
 	}
 
 	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(COTTBUS_CONFIG_FILE, new DrtConfigGroup(), new DvrpConfigGroup(),
+		Config config = ConfigUtils.loadConfig(COTTBUS_CONFIG_FILE_STOPBASED, new DrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.qsim().setTrafficDynamics(QSimConfigGroup.TrafficDynamics.kinematicWaves);
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.kinematicWaves);
-		run(config, true);
+		run(config, false);
 	}
 }
