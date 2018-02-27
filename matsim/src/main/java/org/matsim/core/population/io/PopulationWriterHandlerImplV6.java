@@ -52,7 +52,7 @@ import java.util.Map;
 	}
 
 	public void putAttributeConverters( final Map<Class<?>, AttributeConverter<?>> converters ) {
-		attributesWriter.putAttributeConverters( converters );
+		this.attributesWriter.putAttributeConverters( converters );
 	}
 
 	@Override
@@ -69,7 +69,7 @@ import java.util.Map;
 		}
 		out.write(">\n\n");
 
-		attributesWriter.writeAttributes( "\t" , out , plans.getAttributes() );
+		this.attributesWriter.writeAttributes( "\t" , out , plans.getAttributes() );
 
 		out.write("\n\n");
 	}
@@ -114,7 +114,7 @@ import java.util.Map;
 		out.write(person.getId().toString());
 		out.write("\"");
 		out.write(">\n");
-		attributesWriter.writeAttributes( "\t\t" , out , person.getAttributes() );
+		this.attributesWriter.writeAttributes( "\t\t" , out , person.getAttributes() );
 	}
 
 	private static void endPerson(final BufferedWriter out) throws IOException {
@@ -132,17 +132,14 @@ import java.util.Map;
 			out.write(" selected=\"yes\"");
 		else
 			out.write(" selected=\"no\"");
-		if (plan != null){
-			Plan p = plan;
-			if ((p.getType() != null)) {
-				out.write(" type=\"");
-				out.write(p.getType());
-				out.write("\"");
-			}
+		if ((plan.getType() != null)) {
+			out.write(" type=\"");
+			out.write(plan.getType());
+			out.write("\"");
 		}
 		out.write(">\n");
 		
-		attributesWriter.writeAttributes( "\t\t\t\t" , out , plan.getAttributes() );
+		this.attributesWriter.writeAttributes( "\t\t\t\t" , out , plan.getAttributes() );
 
 	}
 
@@ -165,7 +162,7 @@ import java.util.Map;
 			out.write("\"");
 		}
 		if (act.getCoord() != null) {
-			final Coord coord = coordinateTransformation.transform( act.getCoord() );
+			final Coord coord = this.coordinateTransformation.transform( act.getCoord() );
 			out.write(" x=\"");
 			out.write(Double.toString( coord.getX() ));
 			out.write("\" y=\"");
@@ -178,27 +175,24 @@ import java.util.Map;
 				out.write("\"");
 			}
 		}
-		if (act.getStartTime() != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(act.getStartTime())) {
 			out.write(" start_time=\"");
 			out.write(Time.writeTime(act.getStartTime()));
 			out.write("\"");
 		}
-		if (act != null){
-			Activity a = act;
-			if (a.getMaximumDuration() != Time.UNDEFINED_TIME) {
-				out.write(" max_dur=\"");
-				out.write(Time.writeTime(a.getMaximumDuration()));
-				out.write("\"");
-			}
+		if (!Time.isUndefinedTime(act.getMaximumDuration())) {
+			out.write(" max_dur=\"");
+			out.write(Time.writeTime(act.getMaximumDuration()));
+			out.write("\"");
 		}
-		if (act.getEndTime() != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(act.getEndTime())) {
 			out.write(" end_time=\"");
 			out.write(Time.writeTime(act.getEndTime()));
 			out.write("\"");
 		}
 		out.write(" >\n");
 
-		attributesWriter.writeAttributes( "\t\t\t\t" , out , act.getAttributes() );
+		this.attributesWriter.writeAttributes( "\t\t\t\t" , out , act.getAttributes() );
 
 		out.write("\t\t\t</activity>\n");
 	}
@@ -207,12 +201,12 @@ import java.util.Map;
 		out.write("\t\t\t<leg mode=\"");
 		out.write(leg.getMode());
 		out.write("\"");
-		if (leg.getDepartureTime() != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(leg.getDepartureTime())) {
 			out.write(" dep_time=\"");
 			out.write(Time.writeTime(leg.getDepartureTime()));
 			out.write("\"");
 		}
-		if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(leg.getTravelTime())) {
 			out.write(" trav_time=\"");
 			out.write(Time.writeTime(leg.getTravelTime()));
 			out.write("\"");
@@ -229,7 +223,7 @@ import java.util.Map;
 
 		out.write(">\n");
 
-		attributesWriter.writeAttributes( "\t\t\t\t" , out , leg.getAttributes() );
+		this.attributesWriter.writeAttributes( "\t\t\t\t" , out , leg.getAttributes() );
 	}
 
 	private static void endLeg(final BufferedWriter out) throws IOException {

@@ -20,11 +20,6 @@
 
 package org.matsim.core.events.algorithms;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -53,6 +48,11 @@ import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+
 public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler,
 		LinkLeaveEventHandler, VehicleEntersTrafficEventHandler, PersonStuckEventHandler, VehicleLeavesTrafficEventHandler {
 
@@ -63,7 +63,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	private final HashMap<Id<Link>, EventLink> eventLinks;
 	private final ArrayList<EventLink> linkList;
 	private final HashMap<Id<Person>, EventAgent> eventAgents;
-	private final List<SnapshotWriter> snapshotWriters = new ArrayList<SnapshotWriter>();
+	private final List<SnapshotWriter> snapshotWriters = new ArrayList<>();
 	private final double capCorrectionFactor;
 	private final double storageCapFactor;
 	private final SnapshotStyle snapshotStyle;
@@ -77,15 +77,15 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 		this.network = network;
 		int initialCapacity = (int)(network.getLinks().size()*1.1);
 		this.eventLinks = new HashMap<>(initialCapacity, 0.95f);
-		this.linkList = new ArrayList<EventLink>(initialCapacity);
+		this.linkList = new ArrayList<>(initialCapacity);
 		this.eventAgents = new HashMap<>(1000, 0.95f);
 		this.snapshotPeriod = snapshotPeriod;
 		this.capCorrectionFactor = config.getFlowCapFactor() / network.getCapacityPeriod();
 		this.storageCapFactor = config.getStorageCapFactor();
 		this.snapshotStyle = config.getSnapshotStyle();
 		
-		if (config instanceof QSimConfigGroup  && ! Double.isNaN( ((QSimConfigGroup) config ).getLinkWidthForVis() )  ){
-			this.linkWidthCalculator.setLinkWidthForVis( ((QSimConfigGroup) config ).getLinkWidthForVis() );
+		if (! Double.isNaN( config.getLinkWidthForVis() )){
+			this.linkWidthCalculator.setLinkWidthForVis( config.getLinkWidthForVis() );
 		} 
 		if (! Double.isNaN(network.getEffectiveLaneWidth())){
 			this.linkWidthCalculator.setLaneWidth(network.getEffectiveLaneWidth());
@@ -147,11 +147,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 		this.eventLinks.clear();
 		for (Link link : this.network.getLinks().values()) {
 			final double effectiveCellSize;
-			if (this.network instanceof Network) {
-				effectiveCellSize = ((Network)this.network).getEffectiveCellSize();
-			} else {
-				effectiveCellSize = 7.5;
-			}
+			effectiveCellSize = this.network.getEffectiveCellSize();
 			this.eventLinks.put(link.getId(), new EventLink(link, this.capCorrectionFactor, effectiveCellSize, this.storageCapFactor));
 		}
 		this.linkList.clear();
@@ -200,7 +196,7 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 	}
 
 	private Collection<AgentSnapshotInfo> getVehiclePositions(final double time) {
-		Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
+		Collection<AgentSnapshotInfo> positions = new ArrayList<>();
 		if (this.snapshotStyle == SnapshotStyle.queue) {
 			for (EventLink link : this.linkList) {
 				link.getVehiclePositionsQueue(positions, time, this.snapshotInfoFactory);
@@ -254,10 +250,10 @@ public class SnapshotGenerator implements PersonDepartureEventHandler, PersonArr
 
 		private EventLink(final Link link2, final double capCorrectionFactor, final double effectiveCellSize, final double storageCapFactor) {
 			this.link = link2;
-			this.drivingQueue = new ArrayList<EventAgent>();
-			this.parkingQueue = new ArrayList<EventAgent>();
-			this.waitingQueue = new ArrayList<EventAgent>();
-			this.buffer = new ArrayList<EventAgent>();
+			this.drivingQueue = new ArrayList<>();
+			this.parkingQueue = new ArrayList<>();
+			this.waitingQueue = new ArrayList<>();
+			this.buffer = new ArrayList<>();
 			this.euklideanDist = CoordUtils.calcEuclideanDistance(link2.getFromNode().getCoord(), link2.getToNode().getCoord());
 			this.freespeedTravelTime = Math.ceil( this.link.getLength() / this.link.getFreespeed() ) + 1; 
 			this.timeCap = this.link.getCapacity() * capCorrectionFactor;

@@ -24,7 +24,7 @@ package org.matsim.examples.simple;
 
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;

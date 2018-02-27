@@ -20,9 +20,6 @@
 
 package org.matsim.core.population.io;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -39,6 +36,9 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 /*package*/ class PopulationWriterHandlerImplV4 extends AbstractPopulationWriterHandler {
 
@@ -86,37 +86,34 @@ import org.matsim.core.utils.misc.Time;
 	//////////////////////////////////////////////////////////////////////
 
 	@Override
-	public void startPerson(final Person p, final BufferedWriter out) throws IOException {
+	public void startPerson(final Person person, final BufferedWriter out) throws IOException {
 		out.write("\t<person id=\"");
-		out.write(p.getId().toString());
+		out.write(person.getId().toString());
 		out.write("\"");
-		if (p != null){
-			Person person = p;
-			if (PersonUtils.getSex(person) != null) {
-				out.write(" sex=\"");
-				out.write(PersonUtils.getSex(person));
-				out.write("\"");
-			}
-			if (PersonUtils.getAge(person) != null) {
-				out.write(" age=\"");
-				out.write(Integer.toString(PersonUtils.getAge(person)));
-				out.write("\"");
-			}
-			if (PersonUtils.getLicense(person) != null) {
-				out.write(" license=\"");
-				out.write(PersonUtils.getLicense(person));
-				out.write("\"");
-			}
-			if (PersonUtils.getCarAvail(person) != null) {
-				out.write(" car_avail=\"");
-				out.write(PersonUtils.getCarAvail(person));
-				out.write("\"");
-			}
-			if (PersonUtils.isEmployed(person) != null) {
-				out.write(" employed=\"");
-				out.write((PersonUtils.isEmployed(person) ? "yes" : "no"));
-				out.write("\"");
-			}
+		if (PersonUtils.getSex(person) != null) {
+			out.write(" sex=\"");
+			out.write(PersonUtils.getSex(person));
+			out.write("\"");
+		}
+		if (PersonUtils.getAge(person) != null) {
+			out.write(" age=\"");
+			out.write(Integer.toString(PersonUtils.getAge(person)));
+			out.write("\"");
+		}
+		if (PersonUtils.getLicense(person) != null) {
+			out.write(" license=\"");
+			out.write(PersonUtils.getLicense(person));
+			out.write("\"");
+		}
+		if (PersonUtils.getCarAvail(person) != null) {
+			out.write(" car_avail=\"");
+			out.write(PersonUtils.getCarAvail(person));
+			out.write("\"");
+		}
+		if (PersonUtils.isEmployed(person) != null) {
+			out.write(" employed=\"");
+			out.write((PersonUtils.isEmployed(person) ? "yes" : "no"));
+			out.write("\"");
 		}
 		out.write(">\n");
 	}
@@ -157,13 +154,10 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" selected=\"yes\"");
 		else
 			out.write(" selected=\"no\"");
-		if (plan != null){
-			Plan p = plan;
-			if ((p.getType() != null)) {
-				out.write(" type=\"");
-				out.write(p.getType());
-				out.write("\"");
-			}
+		if ((plan.getType() != null)) {
+			out.write(" type=\"");
+			out.write(plan.getType());
+			out.write("\"");
 		}
 		out.write(">\n");
 	}

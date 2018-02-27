@@ -32,7 +32,7 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 
 /**

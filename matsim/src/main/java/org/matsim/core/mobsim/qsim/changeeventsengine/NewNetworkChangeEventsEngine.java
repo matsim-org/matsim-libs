@@ -59,6 +59,7 @@ class NewNetworkChangeEventsEngine implements NetworkChangeEventsEngineI {
 			} else {
 				throw new RuntimeException("link not time variant") ;
 			}
+
 		}
 	}
 	

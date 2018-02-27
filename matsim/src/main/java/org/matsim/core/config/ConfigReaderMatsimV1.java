@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.groups.ExternalMobimConfigGroup;
 import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -102,8 +101,7 @@ import java.util.Stack;
 	}
 
 	private void startParam(final Attributes meta) {
-		String value = meta.getValue("value");
-		this.currmodule.addParam(meta.getValue("name"),meta.getValue("value"));
+		this.currmodule.addParam(meta.getValue("name"), meta.getValue("value"));
 	}
 
 	/**

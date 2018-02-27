@@ -23,13 +23,17 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.population.*;
+import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.ActivityWrapperFacility;
 import org.matsim.facilities.ActivityFacility;
@@ -56,7 +60,7 @@ public class TransitDriverAgentImpl extends AbstractTransitDriverAgent {
 
 		final Plan plan = PopulationUtils.createPlan();
 
-		final String activityType = PtConstants.TRANSIT_ACTIVITY_TYPE;
+		static final String activityType = PtConstants.TRANSIT_ACTIVITY_TYPE;
 
 		public void addTrip(NetworkRoute networkRoute, String transportMode) {
 			Activity lastActivity;
