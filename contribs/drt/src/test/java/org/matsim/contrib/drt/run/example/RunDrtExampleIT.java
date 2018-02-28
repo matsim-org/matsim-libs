@@ -42,9 +42,23 @@ public class RunDrtExampleIT {
 
 	@Test
 	public void testRunDrtExample() {
-		String configFile = "./src/main/resources/drt_example/drtconfig.xml";
+		String configFile = "./src/main/resources/drt_example/drtconfig_door2door.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
+		config.plans().setInputFile("cb-drtplans_test.xml.gz");
+		
+		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		RunDrtExample.run(config, false);
+	}
+	
+	@Test
+	public void testRunDrtStopbasedExample() {
+		String configFile = "./src/main/resources/drt_example/drtconfig_door2door.xml";
+		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
+				new OTFVisConfigGroup());
+		config.plans().setInputFile("cb-drtplans_test.xml.gz");
+		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		RunDrtExample.run(config, false);

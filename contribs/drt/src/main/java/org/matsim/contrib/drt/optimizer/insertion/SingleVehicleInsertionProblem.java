@@ -30,29 +30,33 @@ import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
  */
 public class SingleVehicleInsertionProblem {
 	public static class BestInsertion {
-		public final Insertion insertion;
+		public final InsertionWithPathData insertion;
 		public final VehicleData.Entry vehicleEntry;
 		public final double cost;
 
-		public BestInsertion(Insertion insertion, VehicleData.Entry vehicleEntry, double cost) {
+		public BestInsertion(InsertionWithPathData insertion, VehicleData.Entry vehicleEntry, double cost) {
 			this.insertion = insertion;
 			this.vehicleEntry = vehicleEntry;
 			this.cost = cost;
 		}
 	}
 
-	private final InsertionGenerator insertionGenerator;
+	private final InsertionGenerator insertionGenerator = new InsertionGenerator();
 	private final InsertionCostCalculator costCalculator;
+	private final PathDataProvider pathDataProvider;
 
 	public SingleVehicleInsertionProblem(PathDataProvider pathDataProvider, InsertionCostCalculator costCalculator) {
-		this.insertionGenerator = new InsertionGenerator(pathDataProvider);
+		this.pathDataProvider = pathDataProvider;
 		this.costCalculator = costCalculator;
 	}
 
 	public Optional<BestInsertion> findBestInsertion(DrtRequest drtRequest, VehicleData.Entry vEntry) {
+		InsertionWithPathDataCreator insertionWithPathDataCreator = new InsertionWithPathDataCreator(pathDataProvider,
+				drtRequest, vEntry);
 		double minCost = InsertionCostCalculator.INFEASIBLE_SOLUTION_COST;
-		Insertion bestInsertion = null;
-		for (Insertion insertion : insertionGenerator.generateInsertions(drtRequest, vEntry)) {
+		InsertionWithPathData bestInsertion = null;
+		for (Insertion i : insertionGenerator.generateInsertions(drtRequest, vEntry)) {
+			InsertionWithPathData insertion = insertionWithPathDataCreator.create(i);
 			double cost = costCalculator.calculate(drtRequest, vEntry, insertion);
 			if (cost < minCost) {
 				bestInsertion = insertion;
