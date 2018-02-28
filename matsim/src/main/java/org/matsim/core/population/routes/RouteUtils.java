@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -171,6 +172,14 @@ public class RouteUtils {
 			routeDistance -= network.getLinks().get(networkRoute.getEndLinkId()).getLength() * (1.0 - relPosOnArrivalLink);
 		}
 		return routeDistance;
+	}
+	
+	public static double calcDistance( final LeastCostPathCalculator.Path path ) {
+		double length = 0. ;
+		for ( Link link : path.links ) {
+			length += link.getLength() ;
+		}
+		return length ;
 	}
 
 	public static NetworkRoute createNetworkRoute(List<Id<Link>> routeLinkIds, final Network network) {

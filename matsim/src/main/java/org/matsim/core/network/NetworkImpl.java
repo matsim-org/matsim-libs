@@ -77,12 +77,13 @@ import java.util.Queue;
 //	private final Collection<NetworkChangeEvent> networkChangeEvents = new ArrayList<>();
 	
 	private final Queue<NetworkChangeEvent> networkChangeEvents
-			= new PriorityQueue<>(11, new Comparator<NetworkChangeEvent>() {
-		@Override
-		public int compare(NetworkChangeEvent arg0, NetworkChangeEvent arg1) {
-			return Double.compare(arg0.getStartTime(), arg1.getStartTime()) ;
-		}
-	});
+//			= new PriorityQueue<>(11, new Comparator<NetworkChangeEvent>() {
+//		@Override
+//		public int compare(NetworkChangeEvent arg0, NetworkChangeEvent arg1) {
+//			return Double.compare(arg0.getStartTime(), arg1.getStartTime()) ;
+//		}
+//	});
+			= new PriorityQueue<>(11, new NetworkChangeEvent.StartTimeComparator() ) ;
 	
 	private String name = null;
 

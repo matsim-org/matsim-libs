@@ -109,7 +109,7 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 			agentFactory = new DefaultAgentFactory(qSim);
 		}
 		if (this.sc.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(new NetworkChangeEventsEngine());
+			qSim.addMobsimEngine(NetworkChangeEventsEngine.createNetworkChangeEventsEngine());
 		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(
 				this.sc.getPopulation(), agentFactory, qSim);

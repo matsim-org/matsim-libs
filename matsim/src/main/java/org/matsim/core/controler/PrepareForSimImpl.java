@@ -118,6 +118,11 @@ class PrepareForSimImpl implements PrepareForSim {
 		// though the vehicles should be created before creating a route, however,
 		// as of now, it is not clear how to provide (store) vehicle id to the route afterwards. Amit may'17
 
+		// yyyyyy from a behavioral perspective, the vehicle must be somehow linked to
+		// the person (maybe via the household).  We also have the problem that it
+		// is not possible to switch to a mode that was not in the initial plans ...
+		// since there will be no vehicle for it.  Needs to be fixed somehow.  kai, feb'18
+
 		Map<String, VehicleType> modeVehicleTypes = getMode2VehicleType();
 		for(Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) { // go through with all plans ( when it was in population agent source, then going through only with selected plan was sufficient.) Amit May'17
