@@ -27,10 +27,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import controler.LSPModule;
+import lsp.controler.LSPModule;
 import lsp.LSP;
 import lsp.LSPImpl;
-import lsp.LSPPlan;
+import lsp.LSPPlanImpl;
 import lsp.LSPs;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
@@ -39,14 +39,14 @@ import lsp.LogisticsSolutionImpl;
 import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
 import lsp.resources.Resource;
-import replanning.LSPReplanningModuleImpl;
-import scoring.LSPScoringModuleImpl;
-import shipment.LSPShipment;
-import shipment.LSPShipmentImpl;
-import usecase.CollectionCarrierAdapter;
-import usecase.CollectionCarrierScheduler;
-import usecase.DeterministicShipmentAssigner;
-import usecase.SimpleSolutionScheduler;
+import lsp.replanning.LSPReplanningModuleImpl;
+import lsp.scoring.LSPScoringModuleImpl;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.LSPShipmentImpl;
+import lsp.usecase.CollectionCarrierAdapter;
+import lsp.usecase.CollectionCarrierScheduler;
+import lsp.usecase.DeterministicShipmentAssigner;
+import lsp.usecase.SimpleForwardSolutionScheduler;
 
 
 
@@ -127,7 +127,8 @@ public class CascadingInfoTest {
 		collectionElement.getInfos().add(solutionInfo);
 		
 		ShipmentAssigner assigner = new DeterministicShipmentAssigner();
-		LSPPlan collectionPlan = new LSPPlan(assigner);
+		LSPPlanImpl collectionPlan = new LSPPlanImpl();
+		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
 	
 		LSPImpl.Builder collectionLSPBuilder = LSPImpl.Builder.getInstance();
@@ -137,7 +138,7 @@ public class CascadingInfoTest {
 		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
 		resourcesList.add(collectionAdapter);
 		
-		SolutionScheduler simpleScheduler = new SimpleSolutionScheduler(resourcesList);
+		SolutionScheduler simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	

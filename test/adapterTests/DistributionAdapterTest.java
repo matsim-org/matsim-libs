@@ -25,8 +25,8 @@ import org.matsim.vehicles.VehicleType;
 
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
-import usecase.DistributionCarrierAdapter;
-import usecase.DistributionCarrierScheduler;
+import lsp.usecase.DistributionCarrierAdapter;
+import lsp.usecase.DistributionCarrierScheduler;
 
 
 

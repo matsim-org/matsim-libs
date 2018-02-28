@@ -28,16 +28,16 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import usecase.CollectionCarrierAdapter;
-import usecase.CollectionCarrierScheduler;
-import usecase.DeterministicShipmentAssigner;
-import usecase.ReloadingPoint;
-import usecase.ReloadingPointScheduler;
-import usecase.SimpleSolutionScheduler;
-import controler.LSPModule;
+import lsp.usecase.CollectionCarrierAdapter;
+import lsp.usecase.CollectionCarrierScheduler;
+import lsp.usecase.DeterministicShipmentAssigner;
+import lsp.usecase.ReloadingPoint;
+import lsp.usecase.ReloadingPointScheduler;
+import lsp.usecase.SimpleForwardSolutionScheduler;
+import lsp.controler.LSPModule;
 import lsp.LSP;
 import lsp.LSPImpl;
-import lsp.LSPPlan;
+import lsp.LSPPlanImpl;
 import lsp.LSPs;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
@@ -46,18 +46,18 @@ import lsp.LogisticsSolutionImpl;
 import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
 import lsp.resources.Resource;
-import replanning.LSPReplanningModuleImpl;
-import scoring.LSPScoringModuleImpl;
-import shipment.AbstractShipmentPlanElement;
-import shipment.AbstractShipmentPlanElementComparator;
-import shipment.LSPShipment;
-import shipment.LSPShipmentImpl;
+import lsp.replanning.LSPReplanningModuleImpl;
+import lsp.scoring.LSPScoringModuleImpl;
+import lsp.shipment.AbstractShipmentPlanElement;
+import lsp.shipment.AbstractShipmentPlanElementComparator;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.LSPShipmentImpl;
 
 public class FirstReloadLSPMobsimTest {
 	private Network network;
 	private LogisticsSolution completeSolution;
 	private ShipmentAssigner assigner;
-	private LSPPlan completePlan;
+	private LSPPlanImpl completePlan;
 	private SolutionScheduler simpleScheduler;
 	private LSP lsp;	
 
@@ -136,7 +136,8 @@ public class FirstReloadLSPMobsimTest {
 		completeSolution = completeSolutionBuilder.build();
 		
 		assigner = new DeterministicShipmentAssigner();
-		completePlan = new LSPPlan(assigner);
+		completePlan = new LSPPlanImpl();
+		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);
 		
 		LSPImpl.Builder completeLSPBuilder = LSPImpl.Builder.getInstance();
@@ -148,7 +149,7 @@ public class FirstReloadLSPMobsimTest {
 		resourcesList.add(firstReloadingPointAdapter);
 		
 
-		simpleScheduler = new SimpleSolutionScheduler(resourcesList);
+		simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		lsp = completeLSPBuilder.build();
 	

@@ -27,14 +27,14 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import usecase.CollectionCarrierAdapter;
-import usecase.CollectionCarrierScheduler;
-import usecase.DeterministicShipmentAssigner;
-import usecase.SimpleSolutionScheduler;
-import controler.LSPModule;
+import lsp.usecase.CollectionCarrierAdapter;
+import lsp.usecase.CollectionCarrierScheduler;
+import lsp.usecase.DeterministicShipmentAssigner;
+import lsp.usecase.SimpleForwardSolutionScheduler;
+import lsp.controler.LSPModule;
 import lsp.LSP;
 import lsp.LSPImpl;
-import lsp.LSPPlan;
+import lsp.LSPPlanImpl;
 import lsp.LSPs;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
@@ -43,11 +43,11 @@ import lsp.LogisticsSolutionImpl;
 import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
 import lsp.resources.Resource;
-import replanning.LSPReplanningModuleImpl;
-import scoring.LSPScorer;
-import scoring.LSPScoringModuleImpl;
-import shipment.LSPShipment;
-import shipment.LSPShipmentImpl;
+import lsp.replanning.LSPReplanningModuleImpl;
+import lsp.scoring.LSPScorer;
+import lsp.scoring.LSPScoringModuleImpl;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.LSPShipmentImpl;
 
 
 public class CollectionLSPScoringTest {
@@ -59,6 +59,10 @@ public class CollectionLSPScoringTest {
 	private LogisticsSolutionElement collectionElement;
 	private LSPScorer trinkgeldScorer;
 	private TrinkgeldSimulationTracker trinkgeldTracker;
+	private TrinkgeldInfo info;
+	private TrinkgeldInfoFunction function;
+	private TrinkgeldInfoFunctionValue value;
+	private int numberOfShipments = 25;
 	
 	@Before
 	public void initialize() {
@@ -116,7 +120,8 @@ public class CollectionLSPScoringTest {
 		LogisticsSolution collectionSolution = collectionSolutionBuilder.build();
 		
 		ShipmentAssigner assigner = new DeterministicShipmentAssigner();
-		LSPPlan collectionPlan = new LSPPlan(assigner);
+		LSPPlanImpl collectionPlan = new LSPPlanImpl();
+		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
 	
 		LSPImpl.Builder collectionLSPBuilder = LSPImpl.Builder.getInstance();
@@ -126,15 +131,15 @@ public class CollectionLSPScoringTest {
 		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
 		resourcesList.add(collectionAdapter);
 		
-		SolutionScheduler simpleScheduler = new SimpleSolutionScheduler(resourcesList);
+		SolutionScheduler simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	
 		TrinkgeldEventHandler handler = new TrinkgeldEventHandler();
 		TrinkgeldInfoFunctionValue value = new TrinkgeldInfoFunctionValue();
-		TrinkgeldInfoFunction function = new TrinkgeldInfoFunction();
+		function = new TrinkgeldInfoFunction();
 		function.getValues().add(value);
-		TrinkgeldInfo info = new TrinkgeldInfo(function);
+		info = new TrinkgeldInfo(function);
 		trinkgeldTracker = new TrinkgeldSimulationTracker(handler,info);
 		collectionAdapter.addSimulationTracker(trinkgeldTracker);
 		trinkgeldScorer = new TrinkgeldScorer(collectionLSP, trinkgeldTracker);
@@ -144,7 +149,7 @@ public class CollectionLSPScoringTest {
 	    Id<Link> toLinkId = collectionLinkId;
 	
 	        
-	    for(int i = 1; i < 3; i++) {
+	    for(int i = 1; i < (numberOfShipments + 1); i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
         	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
         	Random random = new Random(1);
@@ -185,7 +190,7 @@ public class CollectionLSPScoringTest {
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(0);
+		config.controler().setLastIteration(25);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
 		controler.run();
@@ -194,8 +199,10 @@ public class CollectionLSPScoringTest {
 	@Test
 	public void testCollectionLSPScoring() {
 		System.out.println(collectionLSP.getSelectedPlan().getScore());
-		assertTrue(collectionLSP.getSelectedPlan().getScore() >=0);
-		assertTrue(collectionLSP.getSelectedPlan().getScore() <=10);
+		assertTrue(collectionLSP.getShipments().size() == numberOfShipments);
+		assertTrue(collectionLSP.getSelectedPlan().getSolutions().iterator().next().getShipments().size() == numberOfShipments);
+		assertTrue(collectionLSP.getSelectedPlan().getScore() >0);
+		assertTrue(collectionLSP.getSelectedPlan().getScore() <=(numberOfShipments*5));
 	}
 
 }

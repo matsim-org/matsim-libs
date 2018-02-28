@@ -3,10 +3,10 @@ package cascadingInfoTest;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import events.ServiceBeginsEvent;
-import events.ServiceBeginsEventHandler;
-import events.TourStartEvent;
-import events.TourStartEventHandler;
+import lsp.events.ServiceBeginsEvent;
+import lsp.events.ServiceBeginsEventHandler;
+import lsp.events.TourStartEvent;
+import lsp.events.TourStartEventHandler;
 
 
 

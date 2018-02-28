@@ -8,7 +8,7 @@ import org.matsim.core.events.handler.EventHandler;
 
 import lsp.functions.Info;
 import lsp.functions.InfoFunctionValue;
-import tracking.SimulationTracker;
+import lsp.tracking.SimulationTracker;
 
 public class TrinkgeldSimulationTracker implements SimulationTracker {
 

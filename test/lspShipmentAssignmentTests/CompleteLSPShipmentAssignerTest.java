@@ -25,19 +25,19 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import usecase.CollectionCarrierAdapter;
-import usecase.CollectionCarrierScheduler;
-import usecase.DeterministicShipmentAssigner;
-import usecase.DistributionCarrierAdapter;
-import usecase.DistributionCarrierScheduler;
-import usecase.MainRunCarrierAdapter;
-import usecase.MainRunCarrierScheduler;
-import usecase.ReloadingPoint;
-import usecase.ReloadingPointScheduler;
-import usecase.SimpleSolutionScheduler;
+import lsp.usecase.CollectionCarrierAdapter;
+import lsp.usecase.CollectionCarrierScheduler;
+import lsp.usecase.DeterministicShipmentAssigner;
+import lsp.usecase.DistributionCarrierAdapter;
+import lsp.usecase.DistributionCarrierScheduler;
+import lsp.usecase.MainRunCarrierAdapter;
+import lsp.usecase.MainRunCarrierScheduler;
+import lsp.usecase.ReloadingPoint;
+import lsp.usecase.ReloadingPointScheduler;
+import lsp.usecase.SimpleForwardSolutionScheduler;
 import lsp.LSP;
 import lsp.LSPImpl;
-import lsp.LSPPlan;
+import lsp.LSPPlanImpl;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
 import lsp.LogisticsSolutionElementImpl;
@@ -45,15 +45,15 @@ import lsp.LogisticsSolutionImpl;
 import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
 import lsp.resources.Resource;
-import shipment.LSPShipment;
-import shipment.LSPShipmentImpl;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.LSPShipmentImpl;
 
 public class CompleteLSPShipmentAssignerTest {
 
 	private Network network;
 	private LogisticsSolution completeSolution;
 	private ShipmentAssigner assigner;
-	private LSPPlan completePlan;
+	private LSPPlanImpl completePlan;
 	private SolutionScheduler simpleScheduler;
 	private LSP completeLSP;	
 	
@@ -235,7 +235,8 @@ public class CompleteLSPShipmentAssignerTest {
 		completeSolution = completeSolutionBuilder.build();
 		
 		assigner = new DeterministicShipmentAssigner();
-		completePlan = new LSPPlan(assigner);
+		completePlan = new LSPPlanImpl();
+		completePlan.setAssigner(assigner);
 		completePlan.addSolution(completeSolution);
 		
 		LSPImpl.Builder completeLSPBuilder = LSPImpl.Builder.getInstance();
@@ -250,7 +251,7 @@ public class CompleteLSPShipmentAssignerTest {
 		resourcesList.add(distributionAdapter);
 
 
-		simpleScheduler = new SimpleSolutionScheduler(resourcesList);
+		simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		completeLSP = completeLSPBuilder.build();
 	

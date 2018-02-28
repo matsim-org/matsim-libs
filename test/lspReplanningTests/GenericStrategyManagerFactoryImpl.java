@@ -4,8 +4,9 @@ import org.matsim.core.replanning.GenericStrategyManager;
 
 import lsp.LSP;
 import lsp.LSPPlan;
+import lsp.LSPPlanImpl;
 import lsp.ShipmentAssigner;
-import replanning.LSPPlanStrategyManagerFactory;
+import lsp.replanning.LSPPlanStrategyManagerFactory;
 
 public class GenericStrategyManagerFactoryImpl implements LSPPlanStrategyManagerFactory {
 

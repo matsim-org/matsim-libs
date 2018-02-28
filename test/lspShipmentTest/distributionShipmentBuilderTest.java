@@ -19,8 +19,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import shipment.LSPShipment;
-import shipment.LSPShipmentImpl;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.LSPShipmentImpl;
 
 public class distributionShipmentBuilderTest {
 

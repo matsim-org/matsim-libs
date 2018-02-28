@@ -20,10 +20,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import usecase.CollectionCarrierAdapter;
-import usecase.CollectionCarrierScheduler;
-import usecase.DeterministicShipmentAssigner;
-import lsp.LSPPlan;
+import lsp.usecase.CollectionCarrierAdapter;
+import lsp.usecase.CollectionCarrierScheduler;
+import lsp.usecase.DeterministicShipmentAssigner;
+import lsp.LSPPlanImpl;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
 import lsp.LogisticsSolutionElementImpl;
@@ -36,7 +36,7 @@ public class CollectionLSPPlanTest {
 	private Network network;
 	private LogisticsSolution collectionSolution;
 	private ShipmentAssigner assigner;
-	private LSPPlan collectionPlan;
+	private LSPPlanImpl collectionPlan;
 	
 	@Before
 	public void initialize() {
@@ -90,7 +90,8 @@ public class CollectionLSPPlanTest {
 		collectionSolution = collectionSolutionBuilder.build();
 		
 		assigner = new DeterministicShipmentAssigner();
-		collectionPlan = new LSPPlan(assigner);
+		collectionPlan = new LSPPlanImpl();
+		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
 	}
 

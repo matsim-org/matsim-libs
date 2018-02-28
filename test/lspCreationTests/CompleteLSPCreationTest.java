@@ -4,9 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Random;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -18,7 +15,6 @@ import org.matsim.contrib.freight.carrier.CarrierCapabilities;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
-import org.matsim.contrib.freight.carrier.TimeWindow;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
@@ -29,6 +25,7 @@ import org.matsim.vehicles.VehicleType;
 import lsp.LSP;
 import lsp.LSPImpl;
 import lsp.LSPPlan;
+import lsp.LSPPlanImpl;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
 import lsp.LogisticsSolutionElementImpl;
@@ -36,16 +33,16 @@ import lsp.LogisticsSolutionImpl;
 import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
 import lsp.resources.Resource;
-import usecase.CollectionCarrierAdapter;
-import usecase.CollectionCarrierScheduler;
-import usecase.DeterministicShipmentAssigner;
-import usecase.DistributionCarrierAdapter;
-import usecase.DistributionCarrierScheduler;
-import usecase.MainRunCarrierAdapter;
-import usecase.MainRunCarrierScheduler;
-import usecase.ReloadingPoint;
-import usecase.ReloadingPointScheduler;
-import usecase.SimpleSolutionScheduler;
+import lsp.usecase.CollectionCarrierAdapter;
+import lsp.usecase.CollectionCarrierScheduler;
+import lsp.usecase.DeterministicShipmentAssigner;
+import lsp.usecase.DistributionCarrierAdapter;
+import lsp.usecase.DistributionCarrierScheduler;
+import lsp.usecase.MainRunCarrierAdapter;
+import lsp.usecase.MainRunCarrierScheduler;
+import lsp.usecase.ReloadingPoint;
+import lsp.usecase.ReloadingPointScheduler;
+import lsp.usecase.SimpleForwardSolutionScheduler;
 
 
 
@@ -231,12 +228,13 @@ public class CompleteLSPCreationTest {
 		completeSolutionBuilder.addSolutionElement(distributionElement);
 		
 		assigner = new DeterministicShipmentAssigner();
-		LSPPlan collectionPlan = new LSPPlan(assigner);
+		LSPPlan completePlan = new LSPPlanImpl();
+		completePlan.setAssigner(assigner);;
 		completeSolution  = completeSolutionBuilder.build();
-		collectionPlan.addSolution(completeSolution);
+		completePlan.addSolution(completeSolution);
 		
 		LSPImpl.Builder completeLSPBuilder = LSPImpl.Builder.getInstance();
-		completeLSPBuilder.setInitialPlan(collectionPlan);
+		completeLSPBuilder.setInitialPlan(completePlan);
 		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
 		completeLSPBuilder.setId(collectionLSPId);
 		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
@@ -247,7 +245,7 @@ public class CompleteLSPCreationTest {
 		resourcesList.add(distributionAdapter);
 
 
-		SolutionScheduler simpleScheduler = new SimpleSolutionScheduler(resourcesList);
+		SolutionScheduler simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
 		completeLSPBuilder.setSolutionScheduler(simpleScheduler);
 		completeLSP = completeLSPBuilder.build();
 	

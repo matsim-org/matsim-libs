@@ -2,8 +2,10 @@ package lspScoringTests;
 
 import java.util.Random;
 
-import events.ServiceCompletedEvent;
-import events.ServiceCompletedEventHandler;
+import lsp.events.ServiceBeginsEvent;
+import lsp.events.ServiceBeginsEventHandler;
+import lsp.events.ServiceCompletedEvent;
+import lsp.events.ServiceCompletedEventHandler;
 
 public class TrinkgeldEventHandler implements ServiceCompletedEventHandler{
 
@@ -23,6 +25,7 @@ public class TrinkgeldEventHandler implements ServiceCompletedEventHandler{
 	@Override
 	public void handleEvent(ServiceCompletedEvent event) {
 		double trinkgeld = trinkgeldRandom.nextDouble() * 5;
+		System.out.println("ServiceEvent " + trinkgeld);
 		trinkgeldSum += trinkgeld;
 	}
 

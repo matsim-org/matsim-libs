@@ -4,7 +4,7 @@ import java.util.Random;
 
 import lsp.LSP;
 import lsp.ShipmentAssigner;
-import shipment.LSPShipment;
+import lsp.shipment.LSPShipment;
 
 public class TomorrowAssigner implements ShipmentAssigner{
 

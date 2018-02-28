@@ -6,7 +6,7 @@ import lsp.LSP;
 import lsp.functions.Info;
 import lsp.functions.InfoFunction;
 import lsp.functions.InfoFunctionValue;
-import scoring.LSPScorer;
+import lsp.scoring.LSPScorer;
 
 public class TrinkgeldScorer implements LSPScorer {
 
@@ -30,9 +30,7 @@ public class TrinkgeldScorer implements LSPScorer {
 							score += trinkgeldValue;
 						}
 					}
-				
 			}
-			
 		}
 		return score;
 	}

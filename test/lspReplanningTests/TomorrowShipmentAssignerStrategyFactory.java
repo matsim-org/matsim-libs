@@ -10,8 +10,9 @@ import org.matsim.core.replanning.selectors.BestPlanSelector;
 
 import lsp.LSP;
 import lsp.LSPPlan;
+import lsp.LSPPlanImpl;
 import lsp.ShipmentAssigner;
-import shipment.LSPShipment;
+import lsp.shipment.LSPShipment;
 
 public class TomorrowShipmentAssignerStrategyFactory  {
 	

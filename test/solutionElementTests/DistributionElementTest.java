@@ -20,8 +20,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import usecase.DistributionCarrierAdapter;
-import usecase.DistributionCarrierScheduler;
+import lsp.usecase.DistributionCarrierAdapter;
+import lsp.usecase.DistributionCarrierScheduler;
 import lsp.LogisticsSolutionElement;
 import lsp.LogisticsSolutionElementImpl;
 import lsp.resources.Resource;

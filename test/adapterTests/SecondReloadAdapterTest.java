@@ -10,8 +10,8 @@ import org.matsim.api.core.v01.network.Link;
 
 import lsp.resources.CarrierResource;
 import lsp.resources.Resource;
-import usecase.ReloadingPoint;
-import usecase.ReloadingPointScheduler;
+import lsp.usecase.ReloadingPoint;
+import lsp.usecase.ReloadingPointScheduler;
 
 
 public class SecondReloadAdapterTest {

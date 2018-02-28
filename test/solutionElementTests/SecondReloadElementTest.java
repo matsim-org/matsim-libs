@@ -7,8 +7,8 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-import usecase.ReloadingPoint;
-import usecase.ReloadingPointScheduler;
+import lsp.usecase.ReloadingPoint;
+import lsp.usecase.ReloadingPointScheduler;
 import lsp.LogisticsSolutionElement;
 import lsp.LogisticsSolutionElementImpl;
 import lsp.resources.Resource;

@@ -28,14 +28,15 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import usecase.CollectionCarrierAdapter;
-import usecase.CollectionCarrierScheduler;
-import usecase.DeterministicShipmentAssigner;
-import usecase.SimpleSolutionScheduler;
-import controler.LSPModule;
+import lsp.usecase.CollectionCarrierAdapter;
+import lsp.usecase.CollectionCarrierScheduler;
+import lsp.usecase.DeterministicShipmentAssigner;
+import lsp.usecase.SimpleForwardSolutionScheduler;
+import lsp.controler.LSPModule;
 import lsp.LSP;
 import lsp.LSPImpl;
 import lsp.LSPPlan;
+import lsp.LSPPlanImpl;
 import lsp.LSPs;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
@@ -44,12 +45,12 @@ import lsp.LogisticsSolutionImpl;
 import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
 import lsp.resources.Resource;
-import replanning.LSPReplannerImpl;
-import replanning.LSPReplanningModuleImpl;
-import scoring.LSPScorer;
-import scoring.LSPScoringModuleImpl;
-import shipment.LSPShipment;
-import shipment.LSPShipmentImpl;
+import lsp.replanning.LSPReplannerImpl;
+import lsp.replanning.LSPReplanningModuleImpl;
+import lsp.scoring.LSPScorer;
+import lsp.scoring.LSPScoringModuleImpl;
+import lsp.shipment.LSPShipment;
+import lsp.shipment.LSPShipmentImpl;
 import lspScoringTests.TrinkgeldEventHandler;
 import lspScoringTests.TrinkgeldInfo;
 import lspScoringTests.TrinkgeldInfoFunction;
@@ -121,7 +122,8 @@ public class CollectionLSPReplanningTest {
 		LogisticsSolution collectionSolution = collectionSolutionBuilder.build();
 		
 		ShipmentAssigner assigner = new DeterministicShipmentAssigner();
-		LSPPlan collectionPlan = new LSPPlan(assigner);
+		LSPPlan collectionPlan = new LSPPlanImpl();
+		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
 	
 		LSPImpl.Builder collectionLSPBuilder = LSPImpl.Builder.getInstance();
@@ -131,7 +133,7 @@ public class CollectionLSPReplanningTest {
 		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
 		resourcesList.add(collectionAdapter);
 		
-		SolutionScheduler simpleScheduler = new SimpleSolutionScheduler(resourcesList);
+		SolutionScheduler simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	
@@ -194,6 +196,7 @@ public class CollectionLSPReplanningTest {
 	
 	@Test
 	public void testCollectionLSPReplanning(){
+		System.out.println(collectionLSP.getSelectedPlan().getSolutions().iterator().next().getShipments().size());
 		assertTrue(collectionLSP.getSelectedPlan().getSolutions().iterator().next().getShipments().size() < 20);
 	}
 

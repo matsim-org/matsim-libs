@@ -25,6 +25,7 @@ import org.matsim.vehicles.VehicleType;
 import lsp.LSP;
 import lsp.LSPImpl;
 import lsp.LSPPlan;
+import lsp.LSPPlanImpl;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
 import lsp.LogisticsSolutionElementImpl;
@@ -32,10 +33,10 @@ import lsp.LogisticsSolutionImpl;
 import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
 import lsp.resources.Resource;
-import usecase.CollectionCarrierAdapter;
-import usecase.CollectionCarrierScheduler;
-import usecase.DeterministicShipmentAssigner;
-import usecase.SimpleSolutionScheduler;
+import lsp.usecase.CollectionCarrierAdapter;
+import lsp.usecase.CollectionCarrierScheduler;
+import lsp.usecase.DeterministicShipmentAssigner;
+import lsp.usecase.SimpleForwardSolutionScheduler;
 
 
 
@@ -100,7 +101,8 @@ public class CollectionLSPCreationTest {
 		collectionSolution = collectionSolutionBuilder.build();
 		
 		assigner = new DeterministicShipmentAssigner();
-		collectionPlan = new LSPPlan(assigner);
+		LSPPlan collectionPlan = new LSPPlanImpl();
+		collectionPlan.setAssigner(assigner);
 		collectionPlan.addSolution(collectionSolution);
 	
 		LSPImpl.Builder collectionLSPBuilder = LSPImpl.Builder.getInstance();
@@ -110,7 +112,7 @@ public class CollectionLSPCreationTest {
 		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
 		resourcesList.add(collectionAdapter);
 		
-		simpleScheduler = new SimpleSolutionScheduler(resourcesList);
+		simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
 		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
 		collectionLSP = collectionLSPBuilder.build();
 	}
