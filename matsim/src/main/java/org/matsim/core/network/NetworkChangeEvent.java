@@ -34,7 +34,11 @@ import java.util.*;
  * 
  */
 public final class NetworkChangeEvent {
-
+	
+//	public void setFreespeedChange() {
+//		// yyyyyy what is this supposed to do?  kai, feb'18
+//	}
+	
 	public enum ChangeType {
 		ABSOLUTE_IN_SI_UNITS, FACTOR, OFFSET_IN_SI_UNITS
 	}

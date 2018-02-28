@@ -133,7 +133,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		change1.addLink(link2);
 		change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacityFactor));
 		final NetworkChangeEvent event = change1;
-		NetworkUtils.addNetworkChangeEvent(((Network)network),event);
+		NetworkUtils.addNetworkChangeEvent(network,event);
 		/*
 		 * Create a network event the restores the capacity to its original value.
 		 */
@@ -141,20 +141,20 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		change2.addLink(link2);
 		change2.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, 1/capacityFactor));
 		final NetworkChangeEvent event1 = change2;
-		NetworkUtils.addNetworkChangeEvent(((Network)network),event1);
+		NetworkUtils.addNetworkChangeEvent(network,event1);
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
-		Population plans = scenario.getPopulation();
+		Population pop = scenario.getPopulation();
 		List<Person> persons1 = createPersons(0, link1, link3, network, personsPerWave);
 		for(Person p : persons1) {
-			plans.addPerson(p);
+			pop.addPerson(p);
 		}
 		Person person1 = persons1.get(personsPerWave - 1);
 
 		List<Person> persons2 = createPersons(3600, link1, link3, network, personsPerWave);
 		for(Person p : persons2) {
-			plans.addPerson(p);
+			pop.addPerson(p);
 		}
 		Person person2 = persons2.get(personsPerWave - 1);
 		/*
@@ -209,7 +209,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		change1.addLink(link2);
 		change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacityFactor));
 		final NetworkChangeEvent event1 = change1;
-		NetworkUtils.addNetworkChangeEvent(((Network)network),event1);
+		NetworkUtils.addNetworkChangeEvent(network,event1);
 		/*
 		 * Create two waves of persons, each counting 10.
 		 */
@@ -263,8 +263,6 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	 * Creates a network with three links of length 100 m, capacity 3600 veh/h
 	 * and freespeed 10 m/s.
 	 *
-	 * @param world the world the network should belong to
-	 * @return a network.
 	 * @author illenberger
 	 */
 	private static Network createNetwork(Scenario scenario) {

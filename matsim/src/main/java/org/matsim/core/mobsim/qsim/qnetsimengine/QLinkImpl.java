@@ -32,6 +32,8 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
@@ -53,21 +55,28 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	private final static Logger log = Logger.getLogger(QLinkImpl.class);
 	
 	public static class Builder {
-		private InternalInterface internalInterface ;
+		private final InternalInterface internalInterface ;
 		private final NetsimEngineContext context;
 		private LaneFactory laneFactory;
+		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator();
+		
 		Builder(NetsimEngineContext context, InternalInterface internalInterface) {
 			this.context = context ;
 			this.internalInterface = internalInterface;
 		} 
+		final void setLaneFactory( LaneFactory laneFactory ) {
+			this.laneFactory = laneFactory ;
+		}
+		
+		public void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
+			this.linkSpeedCalculator = linkSpeedCalculator;
+		}
+		
 		QLinkImpl build( Link link, QNodeI toNode ) {
 			if ( laneFactory == null ) {
 				laneFactory = new QueueWithBuffer.Builder( context ) ;
 			}
-			return new QLinkImpl( link, toNode, laneFactory, context, internalInterface ) ;
-		}
-		final void setLaneFactory( LaneFactory laneFactory ) {
-			this.laneFactory = laneFactory ;
+			return new QLinkImpl( link, toNode, laneFactory, context, internalInterface, linkSpeedCalculator ) ;
 		}
 	}
 
@@ -85,16 +94,16 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	private final VisData visdata;
 
 	private final QLaneI qlane;
-
+	
 	private NetsimEngineContext context;
 	
-	private QLinkImpl(final Link link2, final QNodeI toNode, final LaneFactory roadFactory, NetsimEngineContext context, InternalInterface internalInterface) {
-		super(link2, toNode, context, internalInterface) ;
+	private QLinkImpl(final Link link2, final QNodeI toNode, final LaneFactory roadFactory, NetsimEngineContext context, InternalInterface internalInterface, LinkSpeedCalculator linkSpeedCalculator) {
+		super(link2, toNode, context, internalInterface, linkSpeedCalculator) ;
 		this.context = context ;
 		// The next line must must by contract stay within the constructor,
 		// so that the caller can use references to the created roads to wire them together,
 		// if it must.
-		this.qlane = roadFactory.createLane(this); 
+		this.qlane = roadFactory.createLane(this);
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 		super.setTransitQLink( new TransitQLink(this.qlane) ) ;
 	}
@@ -167,7 +176,12 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		double now = context.getSimTimer().getTimeOfDay() ;
 		qlane.changeUnscaledFlowCapacityPerSecond( ((Link) this.getLink()).getFlowCapacityPerSec(now) );
 		qlane.changeEffectiveNumberOfLanes(this.getLink().getNumberOfLanes(now));
-		qlane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ;
+
+		//		qlane.changeSpeedMetersPerSecond( getLink().getFreespeed(now) ) ; flowCap & nLanes are "push", freeSpeed is
+		//"pull".  This is, however, not completely honest w.r.t. freeSpeed consequences to the fdiag, but also wasn't correctly
+		//thought through/implemented when I found it.  kai, feb'18
+
+		qlane.recalcTimeVariantAttributes();
 	}
 
 	@Override

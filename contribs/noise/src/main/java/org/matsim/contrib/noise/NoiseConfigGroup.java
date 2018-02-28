@@ -23,25 +23,20 @@
 package org.matsim.contrib.noise;
 
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.noise.data.NoiseAllocationApproach;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.StringUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.util.*;
 
 
 /**
@@ -51,9 +46,41 @@ import org.matsim.core.utils.misc.StringUtils;
  * @author ikaddoura
  *
  */
-public class NoiseConfigGroup extends ReflectiveConfigGroup {
+public final class NoiseConfigGroup extends ReflectiveConfigGroup {
 	
 	public static final String GROUP_NAME = "noise";
+	private static final String RECEIVER_POINT_GAP = "receiverPointGap";
+	private static final String TRANSFORMATION_FACTORY = "transformationFactory";
+	private static final String CONSIDERED_ACTIVITIES_FOR_DAMAGE_CALCULATION = "consideredActivitiesForDamageCalculation";
+	private static final String CONSIDERED_ACTIVITIES_FOR_RECEIVER_POINT_GRID = "consideredActivitiesForReceiverPointGrid";
+	private static final String RECEIVER_POINTS_GRID_MIN_X = "receiverPointsGridMinX";
+	private static final String RECEIVER_POINTS_GRID_MAX_X = "receiverPointsGridMaxX";
+	private static final String RECEIVER_POINTS_GRID_MIN_Y = "receiverPointsGridMinY";
+	private static final String RECEIVER_POINTS_GRID_MAX_Y = "receiverPointsGridMaxY";
+	private static final String RECEIVER_POINTS_CSV_FILE = "receiverPointsCSVFile";
+	private static final String RECEIVER_POINTS_CSV_FILE_COORDINATE_SYSTEM = "receiverPointsCSVFileCoordinateSystem";
+	private static final String ANNUAL_COST_RATE = "annualCostRate";
+	private static final String TIME_BIN_SIZE_NOISE_COMPUTATION = "timeBinSizeNoiseComputation";
+	private static final String SCALE_FACTOR = "scaleFactor";
+	private static final String RELEVANT_RADIUS = "relevantRadius";
+	private static final String TUNNEL_LINK_ID_FILE = "tunnelLinkIdFile";
+	private static final String TUNNEL_LINK_IDS = "tunnelLinkIDs";
+	private static final String WRITE_OUTPUT_ITERATION = "writeOutputIteration";
+	private static final String USE_ACTUAL_SPEED_LEVEL = "useActualSpeedLevel";
+	private static final String ALLOW_FOR_SPEEDS_OUTSIDE_THE_VALID_RANGE = "allowForSpeedsOutsideTheValidRange";
+	private static final String THROW_NOISE_EVENTS_AFFECTED = "throwNoiseEventsAffected";
+	private static final String COMPUTE_NOISE_DAMAGES = "computeNoiseDamages";
+	private static final String COMPUTE_CAUSING_AGENTS = "computeCausingAgents";
+	private static final String THROW_NOISE_EVENTS_CAUSED = "throwNoiseEventsCaused";
+	private static final String COMPUTE_POPULATION_UNITS = "computePopulationUnits";
+	private static final String INTERNALIZE_NOISE_DAMAGES = "internalizeNoiseDamages";
+	private static final String COMPUTE_AVG_NOISE_COST_PER_LINK_AND_TIME = "computeAvgNoiseCostPerLinkAndTime";
+	private static final String HGV_ID_PREFIXES = "hgvIdPrefixes";
+	private static final String BUS_ID_IDENTIFIER = "busIdIdentifier";
+	private static final String NOISE_TOLL_FACTOR = "noiseTollFactor";
+	private static final String NOISE_ALLOCATION_APPROACH = "noiseAllocationApproach";
+	public static final String RECEIVER_POINT_GAP_CMT = "horizontal and vertical distance between receiver points in x-/y-coordinate units";
+	public static final String WRITE_OUTPUT_ITERATION_CMT = "Specifies how often the noise-specific output is written out.";
 	
 	public NoiseConfigGroup() {
 		super(GROUP_NAME);
@@ -105,55 +132,61 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
 		
-		comments.put("receiverPointGap", "horizontal and vertical distance between receiver points in x-/y-coordinate units" ) ;
-		comments.put("transformationFactory", "coordinate system; so far only tested for 'TransformationFactory.DHDN_GK4'" ) ;
-		comments.put("consideredActivitiesForDamageCalculation", "Specifies the activity types that are considered when computing noise damages (= the activities at which being exposed to noise results in noise damages). A list of the exact activity types, e.g. 'home,work_8hours,work_4hours', the prefixes 'home*,work*' or both, e.g. 'home,work*'.\"" ) ;
-		comments.put("consideredActivitiesForReceiverPointGrid", "Creates a grid of noise receiver points which contains all agents' activity locations of the specified types. A list of the exact activity types, e.g. 'home,work_8hours,work_4hours', the prefixes 'home*,work*' or both, e.g. 'home,work*'.\"" ) ;
-		comments.put("receiverPointsGridMinX", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
+		comments.put(RECEIVER_POINT_GAP, RECEIVER_POINT_GAP_CMT) ;
+		comments.put(TRANSFORMATION_FACTORY, "coordinate system; so far only tested for 'TransformationFactory.DHDN_GK4'" ) ;
+		comments.put(CONSIDERED_ACTIVITIES_FOR_DAMAGE_CALCULATION, "Specifies the activity types that are considered when computing noise damages (= the activities at which being exposed to noise results in noise damages). A list of the exact activity types, e.g. 'home,work_8hours,work_4hours', the prefixes 'home*,work*' or both, e.g. 'home,work*'.\"" ) ;
+		comments.put(CONSIDERED_ACTIVITIES_FOR_RECEIVER_POINT_GRID, "Creates a grid of noise receiver points which contains all agents' activity locations of the specified types. A list of the exact activity types, e.g. 'home,work_8hours,work_4hours', the prefixes 'home*,work*' or both, e.g. 'home,work*'.\"" ) ;
+		comments.put(RECEIVER_POINTS_GRID_MIN_X, "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
 				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
 				+ "(see parameter 'consideredActivitiesForReceiverPointGrid')." ) ;
-		comments.put("receiverPointsGridMaxX", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
+		comments.put(RECEIVER_POINTS_GRID_MAX_X, "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
 				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
 				+ "(see parameter 'consideredActivitiesForReceiverPointGrid')." ) ;
-		comments.put("receiverPointsGridMinY", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
+		comments.put(RECEIVER_POINTS_GRID_MIN_Y, "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
 				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
 				+ "(see parameter 'consideredActivitiesForReceiverPointGrid')." ) ;
-		comments.put("receiverPointsGridMaxY", "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
+		comments.put(RECEIVER_POINTS_GRID_MAX_Y, "Specifies a boundary coordinate min/max x/y value of the receiver point grid. "
 				+ "0.0 means the boundary coordinates are ignored and the grid is created based on the agents' activity coordinates of the specified activity types "
 				+ "(see parameter 'consideredActivitiesForReceiverPointGrid')." ) ;
-		comments.put("receiverPointCSVFile", "A csv file which provides the ReceiverPoint coordinates (first column: id, second column: x-coordinate, third column: y-coordinate, separator: ',')");
-		comments.put("receiverPointsCSVFileCoordinateSystem", "The coordinate reference system of the provided ReceiverPoint csv file.");
-		comments.put("annualCostRate", "annual noise cost rate [in EUR per exposed pulation unit]; following the German EWS approach" ) ;
-		comments.put("timeBinSizeNoiseComputation", "Specifies the temporal resolution, i.e. the time bin size [in seconds] to compute noise levels." ) ;
-		comments.put("scaleFactor", "Set to '1.' for a 100 percent sample size. Set to '10.' for a 10 percent sample size. Set to '100.' for a 1 percent sample size." ) ;
-		comments.put("relevantRadius", "Specifies the radius [in coordinate units] around each receiver point links are taken into account." ) ;
-		comments.put("tunnelLinkIdFile", "Specifies a csv file which contains all tunnel link IDs." ) ;
-		comments.put("tunnelLinkIDs", "Specifies the tunnel link IDs. Will be ignored in case a the tunnel link IDs are provided as file (see parameter 'tunnelLinkIdFile')." ) ;
+		comments.put(RECEIVER_POINTS_CSV_FILE, "A csv file which provides the ReceiverPoint coordinates (first column: id, second column: x-coordinate, third column: y-coordinate, separator: ',')");
+		comments.put(RECEIVER_POINTS_CSV_FILE_COORDINATE_SYSTEM, "The coordinate reference system of the provided ReceiverPoint csv file.");
+		comments.put(ANNUAL_COST_RATE, "annual noise cost rate [in EUR per exposed pulation unit]; following the German EWS approach" ) ;
+		comments.put(TIME_BIN_SIZE_NOISE_COMPUTATION, "Specifies the temporal resolution, i.e. the time bin size [in seconds] to compute noise levels." ) ;
+		comments.put(SCALE_FACTOR, "Set to '1.' for a 100 percent sample size. Set to '10.' for a 10 percent sample size. Set to '100.' for a 1 percent sample size." ) ;
+		comments.put(RELEVANT_RADIUS, "Specifies the radius [in coordinate units] around each receiver point links are taken into account." ) ;
+		comments.put(TUNNEL_LINK_ID_FILE, "Specifies a csv file which contains all tunnel link IDs." ) ;
+		comments.put(TUNNEL_LINK_IDS, "Specifies the tunnel link IDs. Will be ignored in case a the tunnel link IDs are provided as file (see parameter 'tunnelLinkIdFile')." ) ;
 
-		comments.put("writeOutputIteration", "Specifies how often the noise-specific output is written out." ) ;
-		comments.put("useActualSpeedLevel", "Set to 'true' if the actual speed level should be used to compute noise levels. Set to 'false' if the freespeed level should be used to compute noise levels." ) ;
-		comments.put("allowForSpeedsOutsideTheValidRange", "Set to 'true' if speed levels below 30 km/h or above 80 km/h (HGV) / 130 km/h (car) should be used to compute noise levels. Set to 'false' if speed levels outside of the valid range should not be used to compute noise levels (recommended)." ) ;
+		comments.put(WRITE_OUTPUT_ITERATION, WRITE_OUTPUT_ITERATION_CMT) ;
+		comments.put(USE_ACTUAL_SPEED_LEVEL, "Set to 'true' if the actual speed level should be used to compute noise levels. Set to 'false' if the freespeed level should be used to compute noise levels." ) ;
+		comments.put(ALLOW_FOR_SPEEDS_OUTSIDE_THE_VALID_RANGE, "Set to 'true' if speed levels below 30 km/h or above 80 km/h (HGV) / 130 km/h (car) should be used to compute noise levels. Set to 'false' if speed levels outside of the valid range should not be used to compute noise levels (recommended)." ) ;
 		
-		comments.put("throwNoiseEventsAffected", "Set to 'true' if noise events (providing information about the affected agent) should be thrown. Otherwise set to 'false'." ) ;
-		comments.put("computeNoiseDamages", "Set to 'true' if noise damages should be computed. Otherwise set to 'false'." ) ;
-		comments.put("computeCausingAgents", "Set to 'true' if the noise damages should be traced back and a causing agent should be identified. Otherwise set to 'false'." ) ;
-		comments.put("throwNoiseEventsCaused", "Set to 'true' if noise events (providing information about the causing agent) should be thrown. Otherwise set to 'false'." ) ;
-		comments.put("computePopulationUnits", "Set to 'true' if population densities should be computed. Otherwise set to 'false'." ) ;
-		comments.put("internalizeNoiseDamages", "Set to 'true' if money events should be thrown based on the caused noise damages. Otherwise set to 'false'." ) ;
-		comments.put("computeAvgNoiseCostPerLinkAndTime", "Set to 'true' if average noise cost per link and time bin should be computed (required by the default noise travel distutility uesed for routing)."
+		comments.put(THROW_NOISE_EVENTS_AFFECTED, "Set to 'true' if noise events (providing information about the affected agent) should be thrown. Otherwise set to 'false'." ) ;
+		comments.put(COMPUTE_NOISE_DAMAGES, "Set to 'true' if noise damages should be computed. Otherwise set to 'false'." ) ;
+		comments.put(COMPUTE_CAUSING_AGENTS, "Set to 'true' if the noise damages should be traced back and a causing agent should be identified. Otherwise set to 'false'." ) ;
+		comments.put(THROW_NOISE_EVENTS_CAUSED, "Set to 'true' if noise events (providing information about the causing agent) should be thrown. Otherwise set to 'false'." ) ;
+		comments.put(COMPUTE_POPULATION_UNITS, "Set to 'true' if population densities should be computed. Otherwise set to 'false'." ) ;
+		comments.put(INTERNALIZE_NOISE_DAMAGES, "Set to 'true' if money events should be thrown based on the caused noise damages. Otherwise set to 'false'." ) ;
+		comments.put(COMPUTE_AVG_NOISE_COST_PER_LINK_AND_TIME, "Set to 'true' if average noise cost per link and time bin should be computed (required by the default noise travel distutility uesed for routing)."
 				+ "Set to 'false' if you use your own statistics for your own travel disutility." ) ;
 
-		comments.put("hgvIdPrefixes", "Specifies the HGV (heavy goods vehicles, trucks) ID prefix." ) ;
-		comments.put("busIdIdentifier", "Specifies the public transit vehicle ID identifiers. Buses are treated as HGV, other public transit vehicles are neglected." ) ;
+		comments.put(HGV_ID_PREFIXES, "Specifies the HGV (heavy goods vehicles, trucks) ID prefix." ) ;
+		comments.put(BUS_ID_IDENTIFIER, "Specifies the public transit vehicle ID identifiers. Buses are treated as HGV, other public transit vehicles are neglected." ) ;
 
-		comments.put("noiseTollFactor", "To be used for sensitivity analysis. Default: 1.0 (= the parameter has no effect)" ) ;
+		comments.put(NOISE_TOLL_FACTOR, "To be used for sensitivity analysis. Default: 1.0 (= the parameter has no effect)" ) ;
 
 		return comments;
 	}
 
 	// ########################################################################################################
+	
+	@Override
+	protected void checkConsistency(Config config) {
+		this.checkGridParametersForConsistency();
+		this.checkNoiseParametersForConsistency();
+	}
 			
-	public void checkGridParametersForConsistency() {
+	private void checkGridParametersForConsistency() {
 		
 		List<String> consideredActivitiesForReceiverPointGridList = new ArrayList<String>();
 		List<String> consideredActivitiesForDamagesList = new ArrayList<String>();
@@ -176,7 +209,7 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		}
 	}
 
-	public void checkNoiseParametersForConsistency() {
+	private void checkNoiseParametersForConsistency() {
 		
 		if (this.internalizeNoiseDamages) {
 			
@@ -286,56 +319,59 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 
 	// ########################################################################################################
 
-	@StringGetter( "receiverPointGap" )
+	@StringGetter(RECEIVER_POINT_GAP)
 	public double getReceiverPointGap() {
 		return receiverPointGap;
 	}
 	
-	@StringSetter( "receiverPointGap" )
+	/**
+	 * @param receiverPointGap -- {@value #RECEIVER_POINT_GAP_CMT}
+	 */
+	@StringSetter(RECEIVER_POINT_GAP)
 	public void setReceiverPointGap(double receiverPointGap) {
 		log.info("setting the horizontal/vertical distance between each receiver point to " + receiverPointGap);
 		this.receiverPointGap = receiverPointGap;
 	}
 
-	@StringGetter( "receiverPointsGridMinX" )
+	@StringGetter(RECEIVER_POINTS_GRID_MIN_X)
 	public double getReceiverPointsGridMinX() {
 		return receiverPointsGridMinX;
 	}
 
-	@StringSetter( "receiverPointsGridMinX" )
+	@StringSetter(RECEIVER_POINTS_GRID_MIN_X)
 	public void setReceiverPointsGridMinX(double receiverPointsGridMinX) {
 		log.info("setting receiverPoints grid MinX Coordinate to " + receiverPointsGridMinX);
 		this.receiverPointsGridMinX = receiverPointsGridMinX;
 	}
 
-	@StringGetter( "receiverPointsGridMinY" )
+	@StringGetter(RECEIVER_POINTS_GRID_MIN_Y)
 	public double getReceiverPointsGridMinY() {
 		return receiverPointsGridMinY;
 	}
 
-	@StringSetter( "receiverPointsGridMinY" )
+	@StringSetter(RECEIVER_POINTS_GRID_MIN_Y)
 	public void setReceiverPointsGridMinY(double receiverPointsGridMinY) {
 		log.info("setting receiverPoints grid MinY Coordinate to " + receiverPointsGridMinY);
 		this.receiverPointsGridMinY = receiverPointsGridMinY;
 	}
 
-	@StringGetter( "receiverPointsGridMaxX" )
+	@StringGetter(RECEIVER_POINTS_GRID_MAX_X)
 	public double getReceiverPointsGridMaxX() {
 		return receiverPointsGridMaxX;
 	}
 
-	@StringSetter( "receiverPointsGridMaxX" )
+	@StringSetter(RECEIVER_POINTS_GRID_MAX_X)
 	public void setReceiverPointsGridMaxX(double receiverPointsGridMaxX) {
 		log.info("setting receiverPoints grid MaxX Coordinate to " + receiverPointsGridMaxX);
 		this.receiverPointsGridMaxX = receiverPointsGridMaxX;
 	}
 
-	@StringGetter( "receiverPointsGridMaxY" )
+	@StringGetter(RECEIVER_POINTS_GRID_MAX_Y)
 	public double getReceiverPointsGridMaxY() {
 		return receiverPointsGridMaxY;
 	}
 
-	@StringSetter( "receiverPointsGridMaxY" )
+	@StringSetter(RECEIVER_POINTS_GRID_MAX_Y)
 	public void setReceiverPointsGridMaxY(double receiverPointsGridMaxY) {
 		log.info("setting receiverPoints grid MaxY Coordinate to " + receiverPointsGridMaxY);
 		this.receiverPointsGridMaxY = receiverPointsGridMaxY;
@@ -365,188 +401,191 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		this.consideredActivitiesForDamageCalculation = consideredActivitiesForSpatialFunctionality;
 	}
 
-	@StringGetter( "consideredActivitiesForReceiverPointGrid" )
+	@StringGetter(CONSIDERED_ACTIVITIES_FOR_RECEIVER_POINT_GRID)
 	private String getConsideredActivitiesForReceiverPointGrid() {
 		return CollectionUtils.arrayToString(consideredActivitiesForReceiverPointGrid);
 	}
 
-	@StringSetter( "consideredActivitiesForReceiverPointGrid" )
+	@StringSetter(CONSIDERED_ACTIVITIES_FOR_RECEIVER_POINT_GRID)
 	public void setConsideredActivitiesForReceiverPointGrid(String consideredActivitiesForReceiverPointGridString) {
 		this.setConsideredActivitiesForReceiverPointGridArray(CollectionUtils.stringToArray(consideredActivitiesForReceiverPointGridString));
 	}
 
-	@StringGetter( "consideredActivitiesForDamageCalculation" )
+	@StringGetter( CONSIDERED_ACTIVITIES_FOR_DAMAGE_CALCULATION )
 	public String getConsideredActivitiesForDamageCalculation() {
 		return CollectionUtils.arrayToString(consideredActivitiesForDamageCalculation);
 	}
 
-	@StringSetter( "consideredActivitiesForDamageCalculation" )
+	@StringSetter( CONSIDERED_ACTIVITIES_FOR_DAMAGE_CALCULATION )
 	public void setConsideredActivitiesForDamageCalculation(String consideredActivitiesForSpatialFunctionalityString) {		
 		this.setConsideredActivitiesForDamageCalculationArray(CollectionUtils.stringToArray(consideredActivitiesForSpatialFunctionalityString));
 	}
 	
 	// ###
 	
-	@StringGetter( "throwNoiseEventsAffected" )
+	@StringGetter(THROW_NOISE_EVENTS_AFFECTED)
 	public boolean isThrowNoiseEventsAffected() {
 		return throwNoiseEventsAffected;
 	}
 
-	@StringSetter( "throwNoiseEventsAffected" )
+	@StringSetter(THROW_NOISE_EVENTS_AFFECTED)
 	public void setThrowNoiseEventsAffected(boolean throwNoiseEventsAffected) {
 		log.info("Throwing noise events for the affected agents: " + throwNoiseEventsAffected);
 		this.throwNoiseEventsAffected = throwNoiseEventsAffected;
 	}
 
-	@StringGetter( "throwNoiseEventsCaused" )
+	@StringGetter(THROW_NOISE_EVENTS_CAUSED)
 	public boolean isThrowNoiseEventsCaused() {
 		return throwNoiseEventsCaused;
 	}
 
-	@StringSetter( "throwNoiseEventsCaused" )
+	@StringSetter(THROW_NOISE_EVENTS_CAUSED)
 	public void setThrowNoiseEventsCaused(boolean throwNoiseEventsCaused) {
 		log.info("Throwing noise events for the causing agents: " + throwNoiseEventsCaused);
 		this.throwNoiseEventsCaused = throwNoiseEventsCaused;
 	}
 
-	@StringGetter( "computeCausingAgents" )
+	@StringGetter(COMPUTE_CAUSING_AGENTS)
 	public boolean isComputeCausingAgents() {
 		return computeCausingAgents;
 	}
 	
-	@StringSetter( "computeCausingAgents" )
+	@StringSetter(COMPUTE_CAUSING_AGENTS)
 	public void setComputeCausingAgents(boolean computeCausingAgents) {
 		log.info("Allocating the noise damages to the causing agents: " + computeCausingAgents);
 		this.computeCausingAgents = computeCausingAgents;
 	}
 	
-	@StringSetter( "annualCostRate" )
+	@StringSetter( ANNUAL_COST_RATE )
 	public void setAnnualCostRate(double annualCostRate) {
 		log.info("setting the annual cost rate to " + annualCostRate);
 		this.annualCostRate = annualCostRate;
 	}
 
-	@StringSetter( "timeBinSizeNoiseComputation" )
+	@StringSetter( TIME_BIN_SIZE_NOISE_COMPUTATION )
 	public void setTimeBinSizeNoiseComputation(double timeBinSizeNoiseComputation) {
 		log.info("setting the time bin size for the computation of noise to " + timeBinSizeNoiseComputation);
 		this.timeBinSizeNoiseComputation = timeBinSizeNoiseComputation;
 	}
 
-	@StringSetter( "scaleFactor" )
+	@StringSetter( SCALE_FACTOR )
 	public void setScaleFactor(double scaleFactor) {
 		log.info("setting the scale factor to " + scaleFactor);
 		this.scaleFactor = scaleFactor;
 	}
 
-	@StringSetter( "relevantRadius" )
+	@StringSetter( RELEVANT_RADIUS )
 	public void setRelevantRadius(double relevantRadius) {
 		log.info("setting the radius of relevant links around each receiver point to " + relevantRadius);
 		this.relevantRadius = relevantRadius;
 	}
 	
-	@StringGetter( "annualCostRate" )
+	@StringGetter( ANNUAL_COST_RATE )
 	public double getAnnualCostRate() {
 		return annualCostRate;
 	}
 	
-	@StringGetter( "timeBinSizeNoiseComputation" )
+	@StringGetter( TIME_BIN_SIZE_NOISE_COMPUTATION )
 	public double getTimeBinSizeNoiseComputation() {
 		return timeBinSizeNoiseComputation;
 	}
 	
-	@StringGetter( "scaleFactor" )
+	@StringGetter( SCALE_FACTOR )
 	public double getScaleFactor() {
 		return scaleFactor;
 	}
 	
-	@StringGetter( "relevantRadius" )
+	@StringGetter( RELEVANT_RADIUS )
 	public double getRelevantRadius() {
 		return relevantRadius;
 	}
 
-	@StringGetter( "internalizeNoiseDamages" )
+	@StringGetter(INTERNALIZE_NOISE_DAMAGES)
 	public boolean isInternalizeNoiseDamages() {
 		return internalizeNoiseDamages;
 	}
 
-	@StringSetter( "internalizeNoiseDamages" )
+	@StringSetter(INTERNALIZE_NOISE_DAMAGES)
 	public void setInternalizeNoiseDamages(boolean internalizeNoiseDamages) {
 		log.info("Internalizing noise damages: " + internalizeNoiseDamages);
 		this.internalizeNoiseDamages = internalizeNoiseDamages;
 	}
 
-	@StringGetter( "computeNoiseDamages" )
+	@StringGetter(COMPUTE_NOISE_DAMAGES)
 	public boolean isComputeNoiseDamages() {
 		return computeNoiseDamages;
 	}
 
-	@StringSetter( "computeNoiseDamages" )
+	@StringSetter(COMPUTE_NOISE_DAMAGES)
 	public void setComputeNoiseDamages(boolean computeNoiseDamages) {
 		log.info("Computing noise damages: " + computeNoiseDamages);
 		this.computeNoiseDamages = computeNoiseDamages;
 	}
 
-	@StringGetter( "noiseAllocationApproach" )
+	@StringGetter(NOISE_ALLOCATION_APPROACH)
 	public NoiseAllocationApproach getNoiseAllocationApproach() {
 		return noiseAllocationApproach;
 	}
 
-	@StringSetter( "noiseAllocationApproach" )
+	@StringSetter(NOISE_ALLOCATION_APPROACH)
 	public void setNoiseAllocationApproach(NoiseAllocationApproach noiseAllocationApproach) {
 		log.info("Noise allocation approach: " + noiseAllocationApproach);
 		this.noiseAllocationApproach = noiseAllocationApproach;
 	}
 
-	@StringGetter( "writeOutputIteration" )
+	@StringGetter(WRITE_OUTPUT_ITERATION)
 	public int getWriteOutputIteration() {
 		return writeOutputIteration;
 	}
-
-	@StringSetter( "writeOutputIteration" )
+	
+	/**
+	 * @param writeOutputIteration -- {@value #WRITE_OUTPUT_ITERATION_CMT}
+	 */
+	@StringSetter( WRITE_OUTPUT_ITERATION )
 	public void setWriteOutputIteration(int writeOutputIteration) {
 		log.info("Writing output every " + writeOutputIteration + " iteration.");
 		this.writeOutputIteration = writeOutputIteration;
 	}
 
-	@StringSetter( "tunnelLinkIdFile" )
+	@StringSetter(TUNNEL_LINK_ID_FILE)
 	public void setTunnelLinkIdFile(String tunnelLinkIdFile) {
 		log.info("setting file which contains the tunnel link Ids to " + tunnelLinkIdFile + ".");
 		this.tunnelLinkIdFile = tunnelLinkIdFile;
 	}
 	
-	@StringGetter( "tunnelLinkIdFile" )
+	@StringGetter(TUNNEL_LINK_ID_FILE)
 	private String getTunnelLinkIdFile() {
 		return tunnelLinkIdFile;
 	}
 
-	@StringGetter( "useActualSpeedLevel" )
+	@StringGetter(USE_ACTUAL_SPEED_LEVEL)
 	public boolean isUseActualSpeedLevel() {
 		return useActualSpeedLevel;
 	}
 	
-	@StringSetter( "useActualSpeedLevel" )
+	@StringSetter(USE_ACTUAL_SPEED_LEVEL)
 	public void setUseActualSpeedLevel(boolean useActualSpeedLevel) {
 		log.info("Using the actual speed level for noise calculation: " + useActualSpeedLevel);
 		this.useActualSpeedLevel = useActualSpeedLevel;
 	}
 
-	@StringGetter( "computePopulationUnits" )
+	@StringGetter(COMPUTE_POPULATION_UNITS)
 	public boolean isComputePopulationUnits() {
 		return computePopulationUnits;
 	}
 
-	@StringSetter( "computePopulationUnits" )
+	@StringSetter(COMPUTE_POPULATION_UNITS)
 	public void setComputePopulationUnits(boolean computePopulationUnits) {
 		log.info("Computing population units: " + computePopulationUnits);
 		this.computePopulationUnits = computePopulationUnits;
 	}
 
-	@StringGetter( "allowForSpeedsOutsideTheValidRange" )
+	@StringGetter(ALLOW_FOR_SPEEDS_OUTSIDE_THE_VALID_RANGE)
 	public boolean isAllowForSpeedsOutsideTheValidRange() {
 		return allowForSpeedsOutsideTheValidRange;
 	}
 	
-	@StringSetter( "allowForSpeedsOutsideTheValidRange" )
+	@StringSetter(ALLOW_FOR_SPEEDS_OUTSIDE_THE_VALID_RANGE)
 	public void setAllowForSpeedsOutsideTheValidRange(boolean allowForSpeedsOutsideTheValidRange) {
 		log.info("Allowing for speeds above or below the valid range (cars: 30-130 km/h; HGV: 30-80 km/h): " + allowForSpeedsOutsideTheValidRange);
 		this.allowForSpeedsOutsideTheValidRange = allowForSpeedsOutsideTheValidRange;
@@ -554,52 +593,52 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 
 	// #######
 	
-	@StringGetter( "hgvIdPrefixes" )
+	@StringGetter(HGV_ID_PREFIXES)
 	private String getHgvIdPrefixes() {
 		return CollectionUtils.arrayToString(hgvIdPrefixes);
 	}
 
-	@StringSetter( "hgvIdPrefixes" )
+	@StringSetter(HGV_ID_PREFIXES)
 	public void setHgvIdPrefixes(String hgvIdPrefixes) {		
 		this.setHgvIdPrefixesArray(CollectionUtils.stringToArray(hgvIdPrefixes));
 	}
 
-	@StringGetter( "busIdIdentifier" )
+	@StringGetter(BUS_ID_IDENTIFIER)
 	private String getBusIdPrefixes() {
 		return CollectionUtils.setToString(busIdIdentifier);
 	}
 
-	@StringSetter( "busIdIdentifier" )
+	@StringSetter(BUS_ID_IDENTIFIER)
 	public void setBusIdIdentifiers(String busIdPrefixes) {		
 		this.setBusIdIdentifierSet(CollectionUtils.stringToSet(busIdPrefixes));
 	}
 
-	@StringGetter( "tunnelLinkIDs" )
+	@StringGetter(TUNNEL_LINK_IDS)
 	private String getTunnelLinkIDs() {
 		return this.linkIdSetToString(tunnelLinkIDs);
 	}
 
-	@StringSetter( "tunnelLinkIDs" )
+	@StringSetter(TUNNEL_LINK_IDS)
 	public void setTunnelLinkIDs(String tunnelLinkIDs) {		
 		this.setTunnelLinkIDsSet(stringToLinkIdSet(tunnelLinkIDs));
 	}
 	
-	@StringGetter( "receiverPointsCSVFile" )
+	@StringGetter(RECEIVER_POINTS_CSV_FILE)
 	public String getReceiverPointsCSVFile() {
 		return receiverPointsCSVFile;
 	}
 
-	@StringSetter( "receiverPointsCSVFile" )
+	@StringSetter( RECEIVER_POINTS_CSV_FILE )
 	public void setReceiverPointsCSVFile(String receiverPointsGridCSVFile) {
 		this.receiverPointsCSVFile = receiverPointsGridCSVFile;
 	}
 	
-	@StringGetter( "receiverPointsCSVFileCoordinateSystem" )
+	@StringGetter( RECEIVER_POINTS_CSV_FILE_COORDINATE_SYSTEM )
 	public String getReceiverPointsCSVFileCoordinateSystem() {
 		return receiverPointsCSVFileCoordinateSystem;
 	}
 
-	@StringSetter( "receiverPointsCSVFileCoordinateSystem" )
+	@StringSetter( RECEIVER_POINTS_CSV_FILE_COORDINATE_SYSTEM )
 	public void setReceiverPointsCSVFileCoordinateSystem(String receiverPointsCSVFileCoordinateSystem) {
 		this.receiverPointsCSVFileCoordinateSystem = receiverPointsCSVFileCoordinateSystem;
 	}
@@ -660,22 +699,22 @@ public class NoiseConfigGroup extends ReflectiveConfigGroup {
 		return tmp;
 	}
 
-	@StringGetter( "noiseTollFactor" )
+	@StringGetter(NOISE_TOLL_FACTOR)
 	public double getNoiseTollFactor() {
 		return noiseTollFactor;
 	}
 
-	@StringSetter( "noiseTollFactor" )
+	@StringSetter(NOISE_TOLL_FACTOR)
 	public void setNoiseTollFactor(double noiseTollFactor) {
 		this.noiseTollFactor = noiseTollFactor;
 	}
 
-	@StringGetter( "computeAvgNoiseCostPerLinkAndTime" )
+	@StringGetter(COMPUTE_AVG_NOISE_COST_PER_LINK_AND_TIME)
 	public boolean isComputeAvgNoiseCostPerLinkAndTime() {
 		return computeAvgNoiseCostPerLinkAndTime;
 	}
 
-	@StringSetter( "computeAvgNoiseCostPerLinkAndTime" )
+	@StringSetter(COMPUTE_AVG_NOISE_COST_PER_LINK_AND_TIME)
 	public void setComputeAvgNoiseCostPerLinkAndTime(boolean computeAvgNoiseCostPerLinkAndTime) {
 		this.computeAvgNoiseCostPerLinkAndTime = computeAvgNoiseCostPerLinkAndTime;
 	}

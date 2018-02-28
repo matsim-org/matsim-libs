@@ -27,11 +27,12 @@ import org.matsim.core.api.internal.MatsimFactory;
 /**
  * @author dgrether
  *
+ * @deprecated -- please use inject framework with Provider<Mobsim>. kai, aug'15
+ *
  */
-
-@Deprecated // please use inject framework mit Provider<Mobsim>. kai, aug'15
+@Deprecated // please use inject framework with Provider<Mobsim>. kai, aug'15
 public interface MobsimFactory extends MatsimFactory {
-  
-  Mobsim createMobsim(Scenario sc, EventsManager eventsManager);
+	
+	Mobsim createMobsim(Scenario sc, EventsManager eventsManager);
 
 }

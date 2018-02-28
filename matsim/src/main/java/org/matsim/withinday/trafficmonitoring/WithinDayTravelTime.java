@@ -82,7 +82,7 @@ public class WithinDayTravelTime implements TravelTime,
 	private TravelTimeInfoProvider travelTimeInfoProvider;
 
 	// Links that are changed by network change events
-	private TreeMap<Double, Map<Link,Double>> changedLinks;
+	private TreeMap<Double, Map<Link,Double>> changedLinksByTime;
 	// yy better a priority queue.  kai, dec'17
 	
 	/*
@@ -139,7 +139,7 @@ public class WithinDayTravelTime implements TravelTime,
 	private void init() {
 		this.regularActiveTrips = new HashMap<>();
 		this.travelTimeInfos = new ConcurrentHashMap<>();
-		this.changedLinks = new TreeMap<>();
+		this.changedLinksByTime = new TreeMap<>();
 		this.vehiclesToFilter = new HashSet<>();
 		
 		// one TravelTimeInfo per link:
@@ -163,7 +163,7 @@ public class WithinDayTravelTime implements TravelTime,
 		Queue<NetworkChangeEvent> networkChangeEvents = NetworkUtils.getNetworkChangeEvents(this.network);
 		
 		// I just changed the return type of the network change events from Collection to Queue.
-		// This should, in a first step, allow to remove the separate changedLinks data structure.
+		// This should, in a first step, allow to remove the separate changedLinksByTime data structure.
 		// In a second step, this should allow to insert link change events after everything
 		// has started.  kai, dec'17
 		// Well, but maybe I don't even want this, and I want this class here recognize changes
@@ -176,45 +176,43 @@ public class WithinDayTravelTime implements TravelTime,
 		
 		if (networkChangeEvents != null) {
 			for (NetworkChangeEvent networkChangeEvent : networkChangeEvents) {
-				ChangeValue freespeedChange = networkChangeEvent.getFreespeedChange();
-				if (freespeedChange != null) {
-					double startTime = networkChangeEvent.getStartTime();
-					Map<Link,Double> links = changedLinks.computeIfAbsent(startTime, k -> new HashMap<>());
-					for ( Link link : networkChangeEvent.getLinks() ) {
-						// yy seems that the following should be available centrally. kai, dec'17
-						double newSpeed ;
-						switch ( freespeedChange.getType() ) {
-							case ABSOLUTE_IN_SI_UNITS:
-								newSpeed = freespeedChange.getValue() ;
-								break;
-							case FACTOR:
-								newSpeed = link.getFreespeed() * freespeedChange.getValue() ;
-								break;
-							case OFFSET_IN_SI_UNITS:
-								newSpeed = link.getFreespeed() + freespeedChange.getValue() ;
-								break;
-							default:
-								throw new RuntimeException("change event type not implemented") ;
-						}
-						if ( startTime > 0. ) {
-							log.debug( "registering a change event for time=" + startTime
-							+ "; linkId=" + link.getId() ) ;
-						}
-						links.put( link, newSpeed ) ;
-					}
-				}
+				addNetworkChangeEventToLocalDataStructure(networkChangeEvent);
 			}
 		}
 	}
 	
-	public void changeSpeedMetersPerSecond( Link link, double speed ) {
-		// yy note that this method should allow to set expectations for the future (transport telematics).
-		// But the implementation actually does not.  Since this class is the one that enforces
-		// the behavior that agents cannot look ahead.  Which also is not true: they can speculate
-		// about the future. kai, dec'17
-		
-		Map<Link,Double> links = changedLinks.computeIfAbsent(this.now, k -> new HashMap<>());
-		links.put( link, speed ) ;
+	private void addNetworkChangeEventToLocalDataStructure(NetworkChangeEvent networkChangeEvent) {
+		ChangeValue freespeedChange = networkChangeEvent.getFreespeedChange();
+		if (freespeedChange != null) {
+			double startTime = networkChangeEvent.getStartTime();
+			Map<Link,Double> newLinkSpeedsAtThisTime = changedLinksByTime.computeIfAbsent(startTime, k -> new HashMap<>());
+			for ( Link link : networkChangeEvent.getLinks() ) {
+				// yy seems that the following should be available centrally. kai, dec'17
+				double newSpeed ;
+				switch ( freespeedChange.getType() ) {
+					case ABSOLUTE_IN_SI_UNITS:
+						newSpeed = freespeedChange.getValue() ;
+						break;
+					case FACTOR:
+						newSpeed = link.getFreespeed() * freespeedChange.getValue() ;
+						break;
+					case OFFSET_IN_SI_UNITS:
+						newSpeed = link.getFreespeed() + freespeedChange.getValue() ;
+						break;
+					default:
+						throw new RuntimeException("change event type not implemented") ;
+				}
+				if ( startTime > 0. ) {
+					log.debug( "registering a change event for time=" + startTime
+					+ "; linkId=" + link.getId() ) ;
+				}
+				newLinkSpeedsAtThisTime.put( link, newSpeed ) ;
+			}
+		}
+	}
+	
+	public final void addNetworkChangeEvent(NetworkChangeEvent networkChangeEvent) {
+		this.addNetworkChangeEventToLocalDataStructure(networkChangeEvent);
 	}
 
 	@Override
@@ -346,13 +344,13 @@ public class WithinDayTravelTime implements TravelTime,
 		// yyyy In terms of "bushfire evacuation" design (and maybe even in terms of more general transport telematics)
 		// one would need some settable TimeDependentNetworkUpdater class.  kai, dec'17
 		
-//		Collection<Link> links = changedLinks.remove(e.getSimulationTime());
+//		Collection<Link> links = changedLinksByTime.remove(e.getSimulationTime());
 		// yyyyyy I find it quite optimistic to do this with doubles. What
 		// if someone adds a link change event in between two integer
 		// time steps?  kai, dec'17
 		
-		while( !changedLinks.isEmpty() && changedLinks.firstKey() <= e.getSimulationTime() ) {
-			Map<Link, Double> map = changedLinks.pollFirstEntry().getValue();
+		while( !changedLinksByTime.isEmpty() && changedLinksByTime.firstKey() <= e.getSimulationTime() ) {
+			Map<Link, Double> map = changedLinksByTime.pollFirstEntry().getValue();
 			for ( Map.Entry<Link,Double> link2speed : map.entrySet() ) {
 				Link link = link2speed.getKey() ;
 				double freeSpeedTravelTime = link.getLength() / link2speed.getValue() ;
@@ -667,23 +665,27 @@ public class WithinDayTravelTime implements TravelTime,
 			 * within the current SimStep. The initial FreeSpeedTravelTime has
 			 * to be set correctly via setTravelTime!
 			 */
-			if (removedTravelTimes == 0.0 && travelTimeInfo.addedTravelTimes == 0.0) return;
+//			if (removedTravelTimes == 0.0 && travelTimeInfo.addedTravelTimes == 0.0) return;
+			// yyyyyy does not work when a network change event comes in. If the old functionality was intentional, we need to talk:
+			// We are setting speed to zero in the bushfire, and if there is no car on the link already, no car will enter it
+			// (because of special within-day rerouting logic). kai, feb'18
 
 			travelTimeInfo.sumTravelTimes = travelTimeInfo.sumTravelTimes - removedTravelTimes + travelTimeInfo.addedTravelTimes;
 
 			travelTimeInfo.addedTravelTimes = 0.0;
-
 			/*
-			 * Ensure, that we don't allow TravelTimes shorter than the
-			 * FreeSpeedTravelTime.
+			 * Ensure that we don't allow TravelTimes shorter than the FreeSpeedTravelTime.
 			 */
 			double meanTravelTime = travelTimeInfo.freeSpeedTravelTime;
 			if (!tripBins.isEmpty()) meanTravelTime = travelTimeInfo.sumTravelTimes / tripBins.size();
 
 			if (meanTravelTime < travelTimeInfo.freeSpeedTravelTime) {
-				log.warn("Mean TravelTime to short?");
+//				log.warn("Mean TravelTime too short?");
+				// can happen when network change event came in with lower speed. kai, feb'18
 				travelTimeInfo.travelTime = travelTimeInfo.freeSpeedTravelTime;
-			} else travelTimeInfo.travelTime = meanTravelTime;
+			} else {
+				travelTimeInfo.travelTime = meanTravelTime;
+			}
 		}
 
 	} // ReplannerRunnable

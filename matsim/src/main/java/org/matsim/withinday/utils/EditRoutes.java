@@ -282,7 +282,7 @@ public final class EditRoutes {
 		 * --> I cannot confirm this from the code.  Maybe it was like that in earlier times?  kai, feb'18
 		 */
 		if (currentLinkIndex > 0) {
-			log.warn("oldLinkIds.size = " + oldLinkIds.size() + "; currentLinkIndex = " + currentLinkIndex ) ;
+//			log.warn("oldLinkIds.size = " + oldLinkIds.size() + "; currentLinkIndex = " + currentLinkIndex ) ;
 //			resultingLinkIds.addAll(oldLinkIds.subList(1, currentLinkIndex + 1));
 			resultingLinkIds.addAll(oldLinkIds.subList(0, currentLinkIndex-1));
 			// (1) I cannot confirm the "starting at 1" from the code, as stated above.  Maybe it was like that in earlier code.
@@ -290,7 +290,7 @@ public final class EditRoutes {
 			// This will then be compensated below.
 		}
 		if ( !oldRoute.getStartLinkId().equals( currentLinkId ) ) {
-			// (this happens if the agent is still on the departure link: that is not part of getLinkIds().  Otherwise:)
+			// (this happens if the agent is still on the departure link: that is not part of getLinkIds().  Otherwise:   )
 			resultingLinkIds.add(currentLinkId);
 		}
 		
