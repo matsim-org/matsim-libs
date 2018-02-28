@@ -31,10 +31,10 @@ import java.util.List;
  */
 public final class LinkQuadTree {
 
-	private final Node top;
+	private final QuadTreeNode top;
 
 	public LinkQuadTree(final double minX, final double minY, final double maxX, final double maxY) {
-		this.top = new Node(minX, minY, maxX, maxY);
+		this.top = new QuadTreeNode(minX, minY, maxX, maxY);
 	}
 
 	public void put(final Link link) {
@@ -69,7 +69,7 @@ public final class LinkQuadTree {
 		return this.top.maxY;
 	}
 
-	private static class Node {
+	private static class QuadTreeNode {
 
 //		private final static int NO_CHILD = -1;
 //		private final static int CHILD_NW = 0;
@@ -88,9 +88,9 @@ public final class LinkQuadTree {
 		public final double maxY;
 
 		private final ArrayList<LinkWrapper> links = new ArrayList<>(3);
-		private Node[] children = null;
+		private QuadTreeNode[] children = null;
 
-		public Node(final double minX, final double minY, final double maxX, final double maxY) {
+		public QuadTreeNode(final double minX, final double minY, final double maxX, final double maxY) {
 			this.minX = Math.min(minX, maxX);
 			this.minY = Math.min(minY, maxY);
 			this.maxX = Math.max(minX, maxX);
@@ -170,7 +170,7 @@ public final class LinkQuadTree {
 					// now also go through all _other_ children ...
 					for ( ChildPosition c : ChildPosition.values() ) {
 						if (c != childPos && c != ChildPosition.NO_CHILD ) {
-							Node child = this.children[c.ordinal()];
+							QuadTreeNode child = this.children[c.ordinal()];
 							
 							// For those other children, check if their bounding box is so close that we also need to look at them:
 							if (child.calcDistanceIndicator(x, y) < bestDistanceIndicator.value) {
@@ -192,11 +192,11 @@ public final class LinkQuadTree {
 		private void split() {
 			double centerX = (minX + maxX) / 2;
 			double centerY = (minY + maxY) / 2;
-			this.children = new Node[4];
-			this.children[ChildPosition.CHILD_NW.ordinal()] = new Node(this.minX, centerY, centerX, this.maxY);
-			this.children[ChildPosition.CHILD_NE.ordinal()] = new Node(centerX, centerY, this.maxX, this.maxY);
-			this.children[ChildPosition.CHILD_SE.ordinal()] = new Node(centerX, this.minY, this.maxX, centerY);
-			this.children[ChildPosition.CHILD_SW.ordinal()] = new Node(this.minX, this.minY, centerX, centerY);
+			this.children = new QuadTreeNode[4];
+			this.children[ChildPosition.CHILD_NW.ordinal()] = new QuadTreeNode(this.minX, centerY, centerX, this.maxY);
+			this.children[ChildPosition.CHILD_NE.ordinal()] = new QuadTreeNode(centerX, centerY, this.maxX, this.maxY);
+			this.children[ChildPosition.CHILD_SE.ordinal()] = new QuadTreeNode(centerX, this.minY, this.maxX, centerY);
+			this.children[ChildPosition.CHILD_SW.ordinal()] = new QuadTreeNode(this.minX, this.minY, centerX, centerY);
 
 			List<LinkWrapper> keep = new ArrayList<>(this.links.size() / 2);
 			for (LinkWrapper w : this.links) {
