@@ -32,6 +32,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -42,6 +43,8 @@ import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.examples.ExamplesUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
@@ -49,6 +52,7 @@ import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 
 import javax.inject.Inject;
+import java.net.URL;
 
 public class RunWithinDayReplanningAgentExample {
 
@@ -58,8 +62,12 @@ public class RunWithinDayReplanningAgentExample {
 		Config config = ConfigUtils.createConfig() ;
 
 		// set some config stuff:
-		config.network().setInputFile("../../../matsim/trunk/examples/siouxfalls/network-wo-dummy-node.xml") ;
+		URL scenarioUrl = ExamplesUtils.getTestScenarioURL("siouxfalls");
+		URL networkUrl = IOUtils.newUrl(scenarioUrl, "network-wo-dummy-node.xml");;
+//		config.network().setInputFile("../../../matsim/trunk/examples/siouxfalls/network-wo-dummy-node.xml") ;
+		config.network().setInputFile(networkUrl.toString());
 		config.controler().setLastIteration(0) ;
+		config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
 		config.qsim().setEndTime(26.*3600) ;
 		config.qsim().setSnapshotStyle( QSimConfigGroup.SnapshotStyle.queue ) ;
 
@@ -239,8 +247,7 @@ class MyAgent implements MobsimDriverAgent {
 
 	@Override
 	public boolean isWantingToArriveOnCurrentLink() {
-		// TODO Auto-generated method stub
-		throw new RuntimeException("not implemented") ;
+		return false ;
 	}
 
 	@Override

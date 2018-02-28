@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.facilities.Facility;
 import org.matsim.vehicles.Vehicle;
@@ -16,14 +17,21 @@ import org.matsim.vehicles.Vehicle;
  * @author nagel
  */
 class MyMobsimAgent implements MobsimDriverAgent {
+	private final Id<Vehicle> plannedVehicleId;
+	private final MobsimTimer simTimer;
 	private Id<Person> id;
 	private MyGuidance guidance;
 	private Id<Link> linkId;
 	private MobsimVehicle vehicle;
-
-	MyMobsimAgent(MyGuidance guidance) {
+	private State state = State.LEG ;
+	
+	MyMobsimAgent(MyGuidance guidance, Id<Link> startingLinkId, Id<Vehicle> vehicleId, MobsimTimer simTimer) {
+		plannedVehicleId = vehicleId;
+		this.simTimer = simTimer;
 		this.id = Id.createPersonId( "MyMobsimAgent") ;
 		this.guidance = guidance ;
+		this.linkId = startingLinkId ;
+		
 	}
 
 	@Override
@@ -43,7 +51,7 @@ class MyMobsimAgent implements MobsimDriverAgent {
 
 	@Override
 	public State getState() {
-		return MobsimAgent.State.LEG ;
+		return this.state ;
 	}
 
 	@Override
@@ -58,7 +66,7 @@ class MyMobsimAgent implements MobsimDriverAgent {
 
 	@Override
 	public void endLegAndComputeNextState(double now) {
-		throw new UnsupportedOperationException() ;
+		this.state = State.ACTIVITY ;
 	}
 
 	@Override
@@ -99,7 +107,11 @@ class MyMobsimAgent implements MobsimDriverAgent {
 
 	@Override
 	public boolean isWantingToArriveOnCurrentLink() {
-		return false ;
+		if ( this.simTimer.getTimeOfDay() > 8*3600. ) {
+			return true ;
+		} else {
+			return false ;
+		}
 	}
 
 	@Override
@@ -114,7 +126,7 @@ class MyMobsimAgent implements MobsimDriverAgent {
 
 	@Override
 	public Id<Vehicle> getPlannedVehicleId() {
-		return null ;
+		return this.plannedVehicleId ;
 	}
 
 	@Override
