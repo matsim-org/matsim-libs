@@ -53,7 +53,7 @@ import com.google.common.collect.ImmutableList;
  * @author michalm
  */
 public class ParallelPathDataProvider implements PrecalculatablePathDataProvider, MobsimBeforeCleanupListener {
-	private static final int MAX_THREADS = 4;
+	public static final int MAX_THREADS = 4;
 
 	private final OneToManyPathSearch toPickupPathSearch;
 	private final OneToManyPathSearch fromPickupPathSearch;
