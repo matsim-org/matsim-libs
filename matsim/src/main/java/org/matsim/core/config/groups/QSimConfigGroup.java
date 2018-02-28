@@ -211,11 +211,12 @@ public final class QSimConfigGroup extends ReflectiveConfigGroup {
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		{
-			String options = "" ;
+			StringBuilder options = new StringBuilder();
 			for ( SnapshotStyle style : SnapshotStyle.values() ) {
-				options += style.toString() + " " ;
+				options.append(style.toString());
+				options.append(' ');
 			}
-			map.put(SNAPSHOT_STYLE,"snapshotStyle. One of: " + options ) ; 
+			map.put(SNAPSHOT_STYLE,"snapshotStyle. One of: " + options.toString()) ;
 		}
 		map.put(NUMBER_OF_THREADS, "Number of threads used for the QSim.  "
 				+ "Note that this setting is independent from the \"global\" threads setting.  "

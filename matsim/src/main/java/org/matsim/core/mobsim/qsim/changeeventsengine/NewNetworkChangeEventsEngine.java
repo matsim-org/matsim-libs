@@ -14,7 +14,6 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkUtils;
 
 import javax.inject.Inject;
-import java.util.Collection;
 import java.util.Queue;
 
 class NewNetworkChangeEventsEngine implements MobsimEngine {

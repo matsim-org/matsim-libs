@@ -54,9 +54,6 @@ public final class PopulationAgentSource implements AgentSource {
 
 	@Inject
 	public PopulationAgentSource(Population population, AgentFactory agentFactory, Config config, Scenario scenario, QSim qsim) {
-		Vehicles vehicles = scenario.getVehicles() ;
-		QSimConfigGroup qsimConfig = config.qsim() ;
-		
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  

@@ -42,9 +42,9 @@ public class DrtConfigConsistencyChecker implements ConfigConsistencyChecker {
 					+ " if postponed request rejection is allowed. Otherwise, rejected passengers"
 					+ " (who are stuck endlessly waiting for a DRT vehicle) will prevent QSim from stopping");
 		}
-		if (drtCfg.getOperationalScheme() == OperationalScheme.stationbased && drtCfg.getTransitStopFile() == null) {
+		if (drtCfg.getOperationalScheme() == OperationalScheme.stopbased && drtCfg.getTransitStopFile() == null) {
 			throw new RuntimeException(DrtConfigGroup.TRANSIT_STOP_FILE + " must not be null when "
-					+ DrtConfigGroup.OPERATIONAL_SCHEME + " is " + DrtConfigGroup.OperationalScheme.stationbased);
+					+ DrtConfigGroup.OPERATIONAL_SCHEME + " is " + DrtConfigGroup.OperationalScheme.stopbased);
 		}
 		if (drtCfg.getNumberOfThreads() > Runtime.getRuntime().availableProcessors()) {
 			throw new RuntimeException(

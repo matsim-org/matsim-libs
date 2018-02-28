@@ -25,7 +25,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
-import org.matsim.contrib.drt.optimizer.insertion.InsertionGenerator.Insertion;
+import org.matsim.contrib.drt.optimizer.insertion.InsertionWithPathData;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
@@ -194,12 +194,12 @@ public class DrtScheduler implements ScheduleInquiry {
 
 	// =========================================================================================
 
-	public void insertRequest(VehicleData.Entry vehicleEntry, DrtRequest request, Insertion insertion) {
+	public void insertRequest(VehicleData.Entry vehicleEntry, DrtRequest request, InsertionWithPathData insertion) {
 		insertPickup(vehicleEntry, request, insertion);
 		insertDropoff(vehicleEntry, request, insertion);
 	}
 
-	private void insertPickup(VehicleData.Entry vehicleEntry, DrtRequest request, Insertion insertion) {
+	private void insertPickup(VehicleData.Entry vehicleEntry, DrtRequest request, InsertionWithPathData insertion) {
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Stop> stops = vehicleEntry.stops;
 
@@ -332,7 +332,7 @@ public class DrtScheduler implements ScheduleInquiry {
 		updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle, taskIdx + 2, driveFromPickupTask.getEndTime());
 	}
 
-	private void insertDropoff(VehicleData.Entry vehicleEntry, DrtRequest request, Insertion insertion) {
+	private void insertDropoff(VehicleData.Entry vehicleEntry, DrtRequest request, InsertionWithPathData insertion) {
 		Schedule schedule = vehicleEntry.vehicle.getSchedule();
 		List<Stop> stops = vehicleEntry.stops;
 

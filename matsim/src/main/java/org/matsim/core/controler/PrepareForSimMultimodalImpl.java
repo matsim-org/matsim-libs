@@ -141,7 +141,7 @@ public final class PrepareForSimMultimodalImpl implements PrepareForSim {
 								}
 
 								// so here we have a vehicle id, now try to find or create a physical vehicle:
-								Vehicle vehicle = createAndAddVehicleIfNotPresent( vehicleId, modeVehicleTypes.get(leg.getMode()));
+								createAndAddVehicleIfNotPresent( vehicleId, modeVehicleTypes.get(leg.getMode()));
 								seenModes.put(leg.getMode(), vehicleId);
 							} else {
 								if (vehicleId == null) {

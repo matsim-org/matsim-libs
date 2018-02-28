@@ -111,7 +111,6 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
                 toFacility.getCoord(),
                 departureTime);
 
-        double pathCost = Double.POSITIVE_INFINITY;
         TransitPassengerRoute transitPassengerRoute = null;
 
         TransitLeastCostPathTree tree = new TransitLeastCostPathTree(getTransitRouterNetwork(),
@@ -129,7 +128,7 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
 //				return null; // yyyyyy why not return the direct walk leg?? kai/dz, mar'17
             return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
         }
-        pathCost = transitPassengerRoute.getTravelCost();
+        double pathCost = transitPassengerRoute.getTravelCost();
 
         double directWalkCost = getWalkDisutility(person, fromFacility.getCoord(), toFacility.getCoord());
 
