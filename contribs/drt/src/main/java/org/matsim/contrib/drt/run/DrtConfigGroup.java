@@ -91,7 +91,7 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	@NotNull
 	private OperationalScheme operationalScheme = OperationalScheme.door2door;
 
-	@PositiveOrZero // used only for stationbased DRT scheme
+	@PositiveOrZero // used only for stopbased DRT scheme
 	private double maxWalkDistance = 0;// [m];
 
 	@PositiveOrZero
@@ -103,18 +103,18 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	@NotNull
 	private String vehiclesFile = null;
 
-	// used only for stationbased DRT scheme
-	private String transitStopFile = null; // only for stationbased DRT scheme
+	// used only for stopbased DRT scheme
+	private String transitStopFile = null; // only for stopbased DRT scheme
 
 	private boolean plotDetailedCustomerStats = true;
 	private boolean plotDetailedVehicleStats = false;
 	private boolean printDetailedWarnings = true;
 
 	@Positive
-	private int numberOfThreads = Runtime.getRuntime().availableProcessors();
+	private int numberOfThreads = (Runtime.getRuntime().availableProcessors()<4)?Runtime.getRuntime().availableProcessors():4;
 
 	public enum OperationalScheme {
-		stationbased, door2door
+		stopbased, door2door
 	}
 
 	public DrtConfigGroup() {
@@ -151,17 +151,18 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 				"Specifies how often empty vehicle rebalancing is executed. 0 means no rebalancing (the default).");
 		map.put(IDLE_VEHICLES_RETURN_TO_DEPOTS,
 				"Idle vehicles return to the nearest of all start links. See: Vehicle.getStartLink()");
-		map.put(OPERATIONAL_SCHEME, "Operational Scheme, either door2door or stationbased. door2door by default");
-		map.put(MAX_WALK_DISTANCE, "Maximum walk distance (in meters) to next stop location in stationbased system.");
+		map.put(OPERATIONAL_SCHEME, "Operational Scheme, either door2door or stopbased. door2door by default");
+		map.put(MAX_WALK_DISTANCE, "Maximum walk distance (in meters) to next stop location in stopbased system.");
 		map.put(TRANSIT_STOP_FILE, "Stop locations file (transit schedule format, but without lines) for DRT stops. "
-				+ "Used only for the stationbased mode");
+				+ "Used only for the stopbased mode");
 		map.put(ESTIMATED_DRT_SPEED, "Beeline-speed estimate for DRT. Used in analysis, optimisation constraints "
 				+ "and in plans file, [m/s]. The default value is 25 km/h");
 		map.put(ESTIMATED_BEELINE_DISTANCE_FACTOR,
 				"Beeline distance factor for DRT. Used in analyis and in plans file. The default value is 1.3.");
 		map.put(NUMBER_OF_THREADS,
-				"Number of threads used for parallel evaluation of request insertion into existing schedules. "
-						+ "If unset, the number of threads is equal to the number of logical cores available to JVM.");
+				"Number of threads used for parallel evaluation of request insertion into existing schedules."
+				+ " Scales well up to 4, using more does not improve performance "
+						+ "Default == 4 (or no. of available threads to JVM if less than 4) ");
 		map.put(PRINT_WARNINGS,
 				"Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.");
 		return map;
