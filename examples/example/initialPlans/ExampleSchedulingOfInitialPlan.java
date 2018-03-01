@@ -33,6 +33,7 @@ import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
 import lsp.resources.Resource;
 import lsp.shipment.AbstractShipmentPlanElement;
+import lsp.shipment.AbstractShipmentPlanElementComparator;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
 import lsp.usecase.CollectionCarrierAdapter;
@@ -178,7 +179,12 @@ public class ExampleSchedulingOfInitialPlan {
         //print the schedules for the assigned LSPShipments
         for(LSPShipment shipment : shipments) {
         	System.out.println("Shipment: " + shipment.getId());
-        	for(AbstractShipmentPlanElement element : shipment.getSchedule().getPlanElements().values()) {
+        	ArrayList<AbstractShipmentPlanElement> scheduleElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getSchedule().getPlanElements().values());
+			Collections.sort(scheduleElements, new AbstractShipmentPlanElementComparator());
+			ArrayList<AbstractShipmentPlanElement> logElements = new ArrayList<AbstractShipmentPlanElement>(shipment.getLog().getPlanElements().values());
+			Collections.sort(logElements, new AbstractShipmentPlanElementComparator());
+        	
+			for(AbstractShipmentPlanElement element : shipment.getSchedule().getPlanElements().values()) {
         		System.out.println("Solution Id: " + element.getSolutionElement().getLogisticsSolution().getId() 
         		+ " SolutionElement Id: " + element.getSolutionElement().getId()
         		+ " Resource Id: " + element.getResourceId()

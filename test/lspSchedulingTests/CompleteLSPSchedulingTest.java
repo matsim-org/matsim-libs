@@ -58,7 +58,6 @@ public class CompleteLSPSchedulingTest {
 	private LSPPlanImpl completePlan;
 	private SolutionScheduler simpleScheduler;
 	private LSP completeLSP;	
-	private Carrier carrier;
 	private Resource completeAdapter;
 	private LogisticsSolutionElement completeElement;
 	 
@@ -70,7 +69,6 @@ public class CompleteLSPSchedulingTest {
         new MatsimNetworkReader(scenario.getNetwork()).readFile("input\\lsp\\network\\2regions.xml");
         this.network = scenario.getNetwork();	
 	
-   
 		CollectionCarrierScheduler collectionScheduler = new CollectionCarrierScheduler();
 		Id<Carrier> collectionCarrierId = Id.create("CollectionCarrier", Carrier.class);
 		Id<VehicleType> collectionVehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
@@ -195,7 +193,7 @@ public class CompleteLSPSchedulingTest {
 		CarrierVehicleType distributionType = dsitributionVehicleTypeBuilder.build();
 		
 		Id<Link> distributionLinkId = Id.createLinkId("(4 2) (4 3)");
-		Id<Vehicle> distributionVehicleId = Id.createVehicleId("CollectionVehicle");
+		Id<Vehicle> distributionVehicleId = Id.createVehicleId("DistributionVehicle");
 		CarrierVehicle distributionCarrierVehicle = CarrierVehicle.newInstance(distributionVehicleId, distributionLinkId);
 		distributionCarrierVehicle.setVehicleType(distributionType);
 		
@@ -204,14 +202,14 @@ public class CompleteLSPSchedulingTest {
 		capabilitiesBuilder.addVehicle(distributionCarrierVehicle);
 		capabilitiesBuilder.setFleetSize(FleetSize.INFINITE);
 		CarrierCapabilities distributionCapabilities = capabilitiesBuilder.build();
-		Carrier carrier = CarrierImpl.newInstance(distributionCarrierId);
-		carrier.setCarrierCapabilities(distributionCapabilities);
+		Carrier distributionCarrier = CarrierImpl.newInstance(distributionCarrierId);
+		distributionCarrier.setCarrierCapabilities(distributionCapabilities);
 		
 		
 		Id<Resource> distributionAdapterId = Id.create("DistributionCarrierAdapter", Resource.class);
 		DistributionCarrierAdapter.Builder distributionAdapterBuilder = DistributionCarrierAdapter.Builder.newInstance(distributionAdapterId, network);
 		distributionAdapterBuilder.setDistributionScheduler(distriutionScheduler);
-		distributionAdapterBuilder.setCarrier(carrier);
+		distributionAdapterBuilder.setCarrier(distributionCarrier);
 		distributionAdapterBuilder.setLocationLinkId(distributionLinkId);
 		Resource distributionAdapter = distributionAdapterBuilder.build();
 		
@@ -261,7 +259,7 @@ public class CompleteLSPSchedulingTest {
 	
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
 		Random rand = new Random(1);
-		 for(int i = 1; i < 4; i++) {
+		 for(int i = 1; i < 6; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 	        	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
 	        	int capacityDemand = rand.nextInt(10);
