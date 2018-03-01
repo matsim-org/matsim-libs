@@ -36,16 +36,14 @@ public class InsertionCostCalculator {
 	public static final double INFEASIBLE_SOLUTION_COST = Double.MAX_VALUE;
 
 	private final double stopDuration;
-	private final double maxWaitTime;
 	private final MobsimTimer timer;
 
 	public InsertionCostCalculator(DrtConfigGroup drtConfig, MobsimTimer timer) {
-		this(drtConfig.getStopDuration(), drtConfig.getMaxWaitTime(), timer);
+		this(drtConfig.getStopDuration(), timer);
 	}
 
-	public InsertionCostCalculator(double stopDuration, double maxWaitTime, MobsimTimer timer) {
+	public InsertionCostCalculator(double stopDuration, MobsimTimer timer) {
 		this.stopDuration = stopDuration;
-		this.maxWaitTime = maxWaitTime;
 		this.timer = timer;
 	}
 
@@ -76,10 +74,11 @@ public class InsertionCostCalculator {
 		if ((ongoingStopTask && drtRequest.getFromLink() == vEntry.start.link) //
 				|| (insertion.pickupIdx > 0 //
 						&& drtRequest.getFromLink() == vEntry.stops.get(insertion.pickupIdx - 1).task.getLink())) {
-			if (insertion.pickupIdx != insertion.dropoffIdx) {// PICKUP->DROPOFF
+			if (insertion.pickupIdx != insertion.dropoffIdx) {// not: PICKUP->DROPOFF
 				return 0;// no detour
 			}
 
+			// PICKUP->DROPOFF
 			// no extra drive to pickup and stop (==> toPickupTT == 0 and stopDuration == 0)
 			double fromPickupTT = insertion.pathFromPickup.getTravelTime();
 			double replacedDriveTT = calculateReplacedDriveDuration(vEntry, insertion.pickupIdx);
@@ -88,7 +87,9 @@ public class InsertionCostCalculator {
 
 		double toPickupTT = insertion.pathToPickup.getTravelTime();
 		double fromPickupTT = insertion.pathFromPickup.getTravelTime();
-		double replacedDriveTT = calculateReplacedDriveDuration(vEntry, insertion.pickupIdx);
+		double replacedDriveTT = insertion.pickupIdx == insertion.dropoffIdx // PICKUP->DROPOFF ?
+				? 0 // no drive following the pickup is replaced (only the one following the dropoff)
+				: calculateReplacedDriveDuration(vEntry, insertion.pickupIdx);
 		return toPickupTT + stopDuration + fromPickupTT - replacedDriveTT;
 	}
 
@@ -99,14 +100,14 @@ public class InsertionCostCalculator {
 			return 0; // no detour
 		}
 
-		double toDropoffTT = insertion.dropoffIdx == insertion.pickupIdx ? // PICKUP->DROPOFF ?
-				0 // PICKUP->DROPOFF taken into account as fromPickupTT
+		double toDropoffTT = insertion.dropoffIdx == insertion.pickupIdx // PICKUP->DROPOFF ?
+				? 0 // PICKUP->DROPOFF taken into account as fromPickupTT
 				: insertion.pathToDropoff.getTravelTime();
-		double fromDropoffTT = insertion.dropoffIdx == vEntry.stops.size() ? // DROPOFF->STAY ?
-				0 //
+		double fromDropoffTT = insertion.dropoffIdx == vEntry.stops.size() // DROPOFF->STAY ?
+				? 0 //
 				: insertion.pathFromDropoff.getTravelTime();
-		double replacedDriveTT = insertion.dropoffIdx == insertion.pickupIdx ? // PICKUP->DROPOFF ?
-				0 // replacedDriveTT already taken into account in pickupDetourTimeLoss
+		double replacedDriveTT = insertion.dropoffIdx == insertion.pickupIdx // PICKUP->DROPOFF ?
+				? 0 // replacedDriveTT already taken into account in pickupDetourTimeLoss
 				: calculateReplacedDriveDuration(vEntry, insertion.dropoffIdx);
 		return toDropoffTT + stopDuration + fromDropoffTT - replacedDriveTT;
 	}
@@ -147,14 +148,14 @@ public class InsertionCostCalculator {
 		double driveToPickupStartTime = getDriveToInsertionStartTime(vEntry, insertion.pickupIdx);
 		double pickupEndTime = driveToPickupStartTime + insertion.pathToPickup.getTravelTime() + stopDuration;
 
-		if (pickupEndTime > drtRequest.getEarliestStartTime() + maxWaitTime) {
+		if (pickupEndTime > drtRequest.getLatestStartTime()) {
 			return false;
 		}
 
 		// reject solutions when latestArrivalTime for the new request is violated
 		double dropoffStartTime = insertion.pickupIdx == insertion.dropoffIdx
 				? pickupEndTime + insertion.pathFromPickup.getTravelTime()
-				: vEntry.stops.get(insertion.dropoffIdx - 1).task.getEndTime()
+				: vEntry.stops.get(insertion.dropoffIdx - 1).task.getEndTime() + pickupDetourTimeLoss
 						+ insertion.pathToDropoff.getTravelTime();
 
 		if (dropoffStartTime > drtRequest.getLatestArrivalTime()) {
