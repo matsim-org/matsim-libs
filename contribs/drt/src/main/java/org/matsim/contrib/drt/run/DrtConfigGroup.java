@@ -27,6 +27,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
+import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
 import org.matsim.core.config.ReflectiveConfigGroup;
@@ -111,7 +112,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 	private boolean printDetailedWarnings = true;
 
 	@Positive
-	private int numberOfThreads = (Runtime.getRuntime().availableProcessors()<4)?Runtime.getRuntime().availableProcessors():4;
+	private int numberOfThreads = Math.min(Runtime.getRuntime().availableProcessors(),
+			ParallelPathDataProvider.MAX_THREADS);
 
 	public enum OperationalScheme {
 		stopbased, door2door
@@ -161,8 +163,8 @@ public class DrtConfigGroup extends ReflectiveConfigGroup {
 				"Beeline distance factor for DRT. Used in analyis and in plans file. The default value is 1.3.");
 		map.put(NUMBER_OF_THREADS,
 				"Number of threads used for parallel evaluation of request insertion into existing schedules."
-				+ " Scales well up to 4, using more does not improve performance "
-						+ "Default == 4 (or no. of available threads to JVM if less than 4) ");
+						+ " Scales well up to 4, due to path data provision, the most computationally intensive part,"
+						+ " using up to 4 threads. Default value is 'min(4, no. of cores available to JVM)'");
 		map.put(PRINT_WARNINGS,
 				"Prints detailed warnings for DRT customers that cannot be served or routed. Default is false.");
 		return map;

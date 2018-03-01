@@ -19,9 +19,6 @@
  * *********************************************************************** */
 package org.matsim.contrib.emissions;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
@@ -43,6 +40,9 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -152,7 +152,7 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		String roadTypeString = NetworkUtils.getType(link);
 
 
-		if (roadTypeString.isEmpty()){
+		if (roadTypeString==null || roadTypeString.isEmpty()){
 			logger.error("Roadtype missing in network information!");
 			throw new RuntimeException("Roadtype missing in network information for link " + linkId);
 		}

@@ -50,7 +50,8 @@ public class NoiseOfflineCalculationExample {
 		config.controler().setLastIteration(lastIteration);		
 						
 		// adjust the default noise parameters
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
+//		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) config.getModules().get(NoiseConfigGroup.GROUP_NAME);
+		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(config,NoiseConfigGroup.class) ;
 		noiseParameters.setReceiverPointGap(12345789.);
 		// ...
 		

@@ -142,7 +142,8 @@ public class DynModeTripsAnalyser {
 		return directDistanceStats.getMean();
 	}
 
-	public static void analyseDetours(Network network, List<DynModeTrip> trips, DrtConfigGroup drtCfg, String fileName) {
+	public static void analyseDetours(Network network, List<DynModeTrip> trips, DrtConfigGroup drtCfg,
+			String fileName) {
 		if (trips == null)
 			return;
 
@@ -163,12 +164,13 @@ public class DynModeTripsAnalyser {
 
 			double distanceDetour = trip.getTravelDistance() / trip.getUnsharedDistanceEstimate_m();
 			double timeDetour = travelTime / trip.getUnsharedTimeEstimate_m();
-			detours.add(trip.getTravelDistance() + ";" + trip.getUnsharedDistanceEstimate_m() + ";" + distanceDetour
-					+ ";" + travelTime + ";" + trip.getUnsharedTimeEstimate_m() + ";" + timeDetour);
+			detours.add(trip.getPerson() + ";" + trip.getTravelDistance() + ";" + trip.getUnsharedDistanceEstimate_m()
+					+ ";" + distanceDetour + ";" + travelTime + ";" + trip.getUnsharedTimeEstimate_m() + ";"
+					+ timeDetour);
 		}
 
 		collection2Text(detours, fileName + ".csv",
-				"distance;unsharedDistance;distanceDetour;time;unsharedTime;timeDetour");
+				"person;distance;unsharedDistance;distanceDetour;time;unsharedTime;timeDetour");
 
 		final JFreeChart chart = DensityScatterPlots.createPlot("Travelled Distances", "travelled distance [m]",
 				"unshared ride distance [m]", distances);

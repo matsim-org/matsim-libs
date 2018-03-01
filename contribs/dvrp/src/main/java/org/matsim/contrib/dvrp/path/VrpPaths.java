@@ -97,7 +97,7 @@ public class VrpPaths {
 		links[count + 1] = toLink;
 		linkTT = getLastLinkTT(toLink, currentTime);// as long as we cannot divert from the last link this is okay
 		linkTTs[count + 1] = linkTT;
-		double totalTT = 1 + path.travelTime + linkTT;
+		double totalTT = FIRST_LINK_TT + path.travelTime + linkTT;
 
 		return new VrpPathWithTravelDataImpl(departureTime, totalTT, links, linkTTs);
 	}
@@ -105,7 +105,8 @@ public class VrpPaths {
 	static final double FIRST_LINK_TT = 1;
 
 	static double getLastLinkTT(Link lastLink, double time) {
-		return lastLink.getLength() / lastLink.getFreespeed(time);
+		// XXX imprecise if qsimCfg.timeStepSize != 1
+		return Math.floor(lastLink.getLength() / lastLink.getFreespeed(time));
 	}
 
 	/**
