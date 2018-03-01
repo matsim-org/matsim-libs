@@ -54,14 +54,14 @@ public class RunTaxiExample {
 
 		final boolean ownTaxiOptimizer = false;
 		if (!ownTaxiOptimizer) {
-			controler.addOverridingModule(new TaxiModule());
+			controler.addOverridingModule(TaxiDvrpModules.create());
 			// (default taxi optimizer)
 		} else {
-			controler.addOverridingModule(new TaxiModule(MyTaxiOptimizerProvider.class));
+			controler.addOverridingModule(TaxiDvrpModules.create(MyTaxiOptimizerProvider.class));
 			// (implement your own taxi optimizer)
 		}
 
-		controler.addOverridingModule(new TaxiOutputModule()); // taxi output (can be commented out)
+		controler.addOverridingModule(new TaxiModule()); // taxi output (can be commented out)
 
 		if (otfvis) {
 			controler.addOverridingModule(new OTFVisLiveModule()); // OTFVis visualisation
