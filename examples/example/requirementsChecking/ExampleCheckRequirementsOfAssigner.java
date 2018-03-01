@@ -1,13 +1,10 @@
-package requirementsCheckerTests;
-
-import static org.junit.Assert.assertTrue;
+package example.requirementsChecking;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
 
-import org.junit.Before;
-import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -25,9 +22,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import lsp.functions.Info;
 import lsp.LSP;
 import lsp.LSPImpl;
+import lsp.LSPPlan;
 import lsp.LSPPlanImpl;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
@@ -40,30 +37,21 @@ import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
 import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
-import lsp.usecase.DeterministicShipmentAssigner;
 import lsp.usecase.SimpleForwardSolutionScheduler;
+import requirementsCheckerTests.BlueInfo;
+import requirementsCheckerTests.BlueRequirement;
+import requirementsCheckerTests.RedInfo;
+import requirementsCheckerTests.RedRequirement;
+import requirementsCheckerTests.RequirementsAssigner;
 
-public class assignerRequirementsTest {
-	
-	private Network network;
-	private LogisticsSolution blueSolution;
-	private LogisticsSolution redSolution;
-	private ShipmentAssigner assigner;
-	private LSPPlanImpl collectionPlan;
-	private LSP collectionLSP;	
-	
-	@Before
-	public void initialize() {
+public class ExampleCheckRequirementsOfAssigner {
+
+	public static LSP createLSPWithProperties(Network network) {
 		
-		Config config = new Config();
-        config.addCoreModules();
-        Scenario scenario = ScenarioUtils.createScenario(config);
-        new MatsimNetworkReader(scenario.getNetwork()).readFile("input\\lsp\\network\\2regions.xml");
-        this.network = scenario.getNetwork();
-		
+		//Create red LogisticsSolution which has the corresponding info
 		CollectionCarrierScheduler redScheduler = new CollectionCarrierScheduler();
 		Id<Carrier> redCarrierId = Id.create("RedCarrier", Carrier.class);
-		Id<VehicleType> vehicleTypeId = Id.create("CollectionCarrierVehicleType", VehicleType.class);
+		Id<VehicleType> vehicleTypeId = Id.create("RedCarrierVehicleType", VehicleType.class);
 		CarrierVehicleType.Builder vehicleTypeBuilder = CarrierVehicleType.Builder.newInstance(vehicleTypeId);
 		vehicleTypeBuilder.setCapacity(10);
 		vehicleTypeBuilder.setCostPerDistanceUnit(0.0004);
@@ -90,24 +78,23 @@ public class assignerRequirementsTest {
 		redAdapterBuilder.setCollectionScheduler(redScheduler);
 		redAdapterBuilder.setCarrier(redCarrier);
 		redAdapterBuilder.setLocationLinkId(collectionLinkId);
-		Resource redCollectionAdapter = redAdapterBuilder.build();
+		Resource redAdapter = redAdapterBuilder.build();
 		
-		Id<LogisticsSolutionElement> redElementId = Id.create("RedCollectionElement", LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder redCollectionElementBuilder = LogisticsSolutionElementImpl.Builder.newInstance(redElementId);
-		redCollectionElementBuilder.setResource(redCollectionAdapter);
-		LogisticsSolutionElement redCollectionElement = redCollectionElementBuilder.build();
+		Id<LogisticsSolutionElement> redElementId = Id.create("RedElement", LogisticsSolutionElement.class);
+		LogisticsSolutionElementImpl.Builder redElementBuilder = LogisticsSolutionElementImpl.Builder.newInstance(redElementId);
+		redElementBuilder.setResource(redAdapter);
+		LogisticsSolutionElement redElement = redElementBuilder.build();
 		
-		Id<LogisticsSolution> redCollectionSolutionId = Id.create("RedCollectionSolution", LogisticsSolution.class);
-		LogisticsSolutionImpl.Builder redCollectionSolutionBuilder = LogisticsSolutionImpl.Builder.newInstance(redCollectionSolutionId);
-		redCollectionSolutionBuilder.addSolutionElement(redCollectionElement);
-		redSolution = redCollectionSolutionBuilder.build();
+		Id<LogisticsSolution> redSolutionId = Id.create("RedSolution", LogisticsSolution.class);
+		LogisticsSolutionImpl.Builder redSolutionBuilder = LogisticsSolutionImpl.Builder.newInstance(redSolutionId);
+		redSolutionBuilder.addSolutionElement(redElement);
+		LogisticsSolution redSolution = redSolutionBuilder.build();
+		
+		//Add info that shows the world the color of the solution
 		redSolution.getInfos().add(new RedInfo());
 		
-		assigner = new RequirementsAssigner();
-		collectionPlan = new LSPPlanImpl();
-		collectionPlan.setAssigner(assigner);
-		collectionPlan.addSolution(redSolution);
-	
+		
+		//Create blue LogisticsSolution which has the corresponding info
 		CollectionCarrierScheduler blueScheduler = new CollectionCarrierScheduler();
 		Id<Carrier> blueCarrierId = Id.create("BlueCarrier", Carrier.class);
 		Id<Vehicle> blueVehicleId = Id.createVehicleId("BlueVehicle");
@@ -127,34 +114,48 @@ public class assignerRequirementsTest {
 		blueAdapterBuilder.setCollectionScheduler(blueScheduler);
 		blueAdapterBuilder.setCarrier(blueCarrier);
 		blueAdapterBuilder.setLocationLinkId(collectionLinkId);
-		Resource blueCollectionAdapter = blueAdapterBuilder.build();
+		Resource blueAdapter = blueAdapterBuilder.build();
 		
-		Id<LogisticsSolutionElement> blueElementId = Id.create("BlueCollectionElement", LogisticsSolutionElement.class);
-		LogisticsSolutionElementImpl.Builder blueCollectionElementBuilder = LogisticsSolutionElementImpl.Builder.newInstance(blueElementId);
-		blueCollectionElementBuilder.setResource(blueCollectionAdapter);
-		LogisticsSolutionElement blueCollectionElement = blueCollectionElementBuilder.build();
+		Id<LogisticsSolutionElement> blueElementId = Id.create("BlueCElement", LogisticsSolutionElement.class);
+		LogisticsSolutionElementImpl.Builder blueElementBuilder = LogisticsSolutionElementImpl.Builder.newInstance(blueElementId);
+		blueElementBuilder.setResource(blueAdapter);
+		LogisticsSolutionElement blueElement = blueElementBuilder.build();
 		
-		Id<LogisticsSolution> blueCollectionSolutionId = Id.create("BlueCollectionSolution", LogisticsSolution.class);
-		LogisticsSolutionImpl.Builder blueCollectionSolutionBuilder = LogisticsSolutionImpl.Builder.newInstance(blueCollectionSolutionId);
-		blueCollectionSolutionBuilder.addSolutionElement(blueCollectionElement);
-		blueSolution = blueCollectionSolutionBuilder.build();
+		Id<LogisticsSolution> blueSolutionId = Id.create("BlueSolution", LogisticsSolution.class);
+		LogisticsSolutionImpl.Builder blueSolutionBuilder = LogisticsSolutionImpl.Builder.newInstance(blueSolutionId);
+		blueSolutionBuilder.addSolutionElement(blueElement);
+		LogisticsSolution blueSolution = blueSolutionBuilder.build();
+		
+		//Add info that shows the world the color of the solution
 		blueSolution.getInfos().add(new BlueInfo());
-		collectionPlan.addSolution(blueSolution);
+				
+		//Create the initial plan, add assigner that checks requirements of the shipments when assigning and add both solutions (red and blue) to the 
+		//plan.
+		LSPPlan plan = new LSPPlanImpl();
+		ShipmentAssigner assigner = new RequirementsAssigner();
+		plan.setAssigner(assigner);
+		plan.addSolution(redSolution);
+		plan.addSolution(blueSolution);
 		
-		LSPImpl.Builder collectionLSPBuilder = LSPImpl.Builder.getInstance();
-		collectionLSPBuilder.setInitialPlan(collectionPlan);
-		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
-		collectionLSPBuilder.setId(collectionLSPId);
+		LSPImpl.Builder lspBuilder = LSPImpl.Builder.getInstance();
+		lspBuilder.setInitialPlan(plan);
+		Id<LSP> lspId = Id.create("CollectionLSP", LSP.class);
+		lspBuilder.setId(lspId);
 		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
-		resourcesList.add(redCollectionAdapter);
-		resourcesList.add(blueCollectionAdapter);
+		resourcesList.add(redAdapter);
+		resourcesList.add(blueAdapter);
 			
 		SolutionScheduler simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
-		collectionLSPBuilder.setSolutionScheduler(simpleScheduler);
-		collectionLSP = collectionLSPBuilder.build();
+		lspBuilder.setSolutionScheduler(simpleScheduler);
+		return lspBuilder.build();
+	}
 	
+	public static Collection<LSPShipment> createShipmentsWithRequirements(Network network){
+		//Create ten shipments with either a red or blue requirement, i.e. that they only can be transported in a solution with the matching color
+		ArrayList<LSPShipment> shipmentList = new ArrayList<LSPShipment>();
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
-	    Id<Link> toLinkId = collectionLinkId;
+		Id<Link> collectionLinkId = Id.createLinkId("(4 2) (4 3)");
+		Id<Link> toLinkId = collectionLinkId;
 	
 	    Random rand = new Random(1); 
 	    
@@ -190,19 +191,49 @@ public class assignerRequirementsTest {
         		builder.addRequirement(new RedRequirement());
         	}
         	
-        	LSPShipment shipment = builder.build();
-        	collectionLSP.assignShipmentToLSP(shipment);
-	    }	
+        	shipmentList.add(builder.build());
+	    }
+		
+		return shipmentList;
 	}
 	
-	@Test
-	public void testAssignerRequirements() {
-		for(LSPShipment shipment : blueSolution.getShipments()) {
-			assertTrue(shipment.getRequirements().iterator().next() instanceof BlueRequirement);
-		}
-		for(LSPShipment shipment : redSolution.getShipments()) {
-			assertTrue(shipment.getRequirements().iterator().next() instanceof RedRequirement);
-		}
+	public static void main (String[]args) {
+		
+		//Set up required MATSim classes
+		Config config = new Config();
+		config.addCoreModules();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile("input\\lsp\\network\\2regions.xml");
+		Network network = scenario.getNetwork();
+		
+		//Create LSP and shipments
+        LSP lsp = createLSPWithProperties(network);
+        Collection<LSPShipment> shipments =  createShipmentsWithRequirements(network);
+	
+        //assign the shipments to the LSP
+        for(LSPShipment shipment : shipments) {
+        	lsp.assignShipmentToLSP(shipment);
+        }
+        
+        for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+        	if(solution.getId().toString() == "RedSolution") {
+        		for(LSPShipment shipment : solution.getShipments()) {
+        			if(!(shipment.getRequirements().iterator().next() instanceof RedRequirement)) {
+        				break;
+        			}
+        		}
+        		System.out.println("All shipments in " + solution.getId() + " are red");
+        	}
+        	if(solution.getId().toString() == "BlueSolution") {
+        		for(LSPShipment shipment : solution.getShipments()) {
+        			if(!(shipment.getRequirements().iterator().next() instanceof BlueRequirement)) {
+        				break;
+        			}
+        		}
+        		System.out.println("All shipments in " + solution.getId() + " are blue");
+        	}
+        }
+       
 	}
 	
 }
