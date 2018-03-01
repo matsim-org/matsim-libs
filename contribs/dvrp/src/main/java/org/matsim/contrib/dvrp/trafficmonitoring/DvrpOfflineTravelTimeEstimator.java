@@ -25,8 +25,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
@@ -59,7 +59,7 @@ public class DvrpOfflineTravelTimeEstimator implements DvrpTravelTimeEstimator, 
 	@Inject
 	public DvrpOfflineTravelTimeEstimator(@Named(DvrpTravelTimeModule.DVRP_INITIAL) TravelTime initialTT,
 			@Named(DvrpTravelTimeModule.DVRP_OBSERVED) TravelTime observedTT,
-			@Named(DvrpModule.DVRP_ROUTING) Network network, TravelTimeCalculatorConfigGroup ttCalcConfig,
+			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, TravelTimeCalculatorConfigGroup ttCalcConfig,
 			DvrpConfigGroup dvrpConfig) {
 		this(initialTT, observedTT, network, ttCalcConfig, dvrpConfig.getTravelTimeEstimationAlpha());
 	}

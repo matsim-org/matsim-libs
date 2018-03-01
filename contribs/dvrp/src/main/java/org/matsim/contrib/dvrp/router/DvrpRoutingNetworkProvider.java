@@ -2,7 +2,7 @@
  * project: org.matsim.*
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,47 +16,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.file;
+package org.matsim.contrib.dvrp.router;
 
-import java.net.URL;
+import java.util.Collections;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.core.controler.AbstractModule;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.name.Named;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 
 /**
  * @author michalm
  */
-public class FleetProvider implements Provider<Fleet> {
+public class DvrpRoutingNetworkProvider implements Provider<Network> {
+	public static final String DVRP_ROUTING = "dvrp_routing";
+
+	private final Network network;
+	private final DvrpConfigGroup dvrpCfg;
+
 	@Inject
-	@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-	Network network;
-
-	private final URL url;
-
-	public FleetProvider(URL url) {
-		this.url = url;
+	public DvrpRoutingNetworkProvider(Network network, DvrpConfigGroup dvrpCfg) {
+		this.network = network;
+		this.dvrpCfg = dvrpCfg;
 	}
 
 	@Override
-	public Fleet get() {
-		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(network, fleet).parse(url);
-		return fleet;
-	}
+	public Network get() {
+		if (dvrpCfg.getNetworkMode() == null) { // no mode filtering
+			return network;
+		}
 
-	public static AbstractModule createModule(URL url) {
-		return new AbstractModule() {
-			@Override
-			public void install() {
-				bind(Fleet.class).toProvider(new FleetProvider(url)).asEagerSingleton();
-			}
-		};
+		Network dvrpNetwork = NetworkUtils.createNetwork();
+		new TransportModeNetworkFilter(network).filter(dvrpNetwork, Collections.singleton(dvrpCfg.getNetworkMode()));
+		return dvrpNetwork;
 	}
 }
