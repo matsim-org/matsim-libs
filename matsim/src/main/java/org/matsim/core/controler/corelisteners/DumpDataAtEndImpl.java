@@ -130,7 +130,7 @@ final class DumpDataAtEndImpl implements DumpDataAtEnd, ShutdownListener {
 		dumpLanes();
 		dumpCounts();
 
-		if (!event.isUnexpected() && vspConfig.isWritingOutputEvents()) {
+		if (!event.isUnexpected() && vspConfig.isWritingOutputEvents() && (controlerConfigGroup.getWriteEventsInterval()!=0)) {
 			dumpOutputEvents();
 		}
 		
