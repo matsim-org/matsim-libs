@@ -22,7 +22,9 @@ package org.matsim.contrib.taxi.run;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
-import org.matsim.core.config.*;
+import org.matsim.contrib.taxi.run.examples.TaxiDvrpModules;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -41,7 +43,7 @@ public class RunTaxiScenario {
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new TaxiOutputModule());
+		controler.addOverridingModule(TaxiDvrpModules.create());
 		controler.addOverridingModule(new TaxiModule());
 
 		if (otfvis) {

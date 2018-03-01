@@ -67,17 +67,17 @@ public final class DrtControlerCreator {
 	public static Controler createControler(Config config, boolean otfvis) {
 		adjustConfig(config);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return adjustControler(otfvis, scenario);
+		return createControlerImpl(otfvis, scenario);
 	}
 
 	public static Controler createControler(Scenario scenario, boolean otfvis) {
 		// yy I know that this one breaks the sequential loading of the building blocks, but I would like to be able
 		// to modify the scenario before I pass it to the controler. kai, oct'17
 		adjustConfig(scenario.getConfig());
-		return adjustControler(otfvis, scenario);
+		return createControlerImpl(otfvis, scenario);
 	}
 
-	private static Controler adjustControler(boolean otfvis, Scenario scenario) {
+	private static Controler createControlerImpl(boolean otfvis, Scenario scenario) {
 		Controler controler = new Controler(scenario);
 		controler.addOverridingModule(new DvrpModule(DrtControlerCreator::createModuleForQSimPlugin, DrtOptimizer.class,
 				DefaultUnplannedRequestInserter.class, ParallelPathDataProvider.class));
