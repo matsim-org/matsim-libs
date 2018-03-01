@@ -16,7 +16,9 @@ import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 
 import com.google.inject.Provider;
 
@@ -42,7 +44,8 @@ public class CarsharingQsimFactoryNew implements Provider<Mobsim>{
 		ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer, qsim.getInternalInterface());
 		qsim.addMobsimEngine(activityEngine);
 		qsim.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = new QNetsimEngine(scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter, qsim.getInternalInterface());
+		QNetworkFactory networkFactory = new DefaultQNetworkFactory(eventsManager, scenario, mobsimTimer, agentCounter);
+		QNetsimEngine netsimEngine = new QNetsimEngine(networkFactory, scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter, qsim.getInternalInterface());
 		qsim.addMobsimEngine(netsimEngine);
 		qsim.addDepartureHandler(netsimEngine.getDepartureHandler());
 		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager, mobsimTimer, qsim.getInternalInterface());

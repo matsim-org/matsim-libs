@@ -64,7 +64,9 @@ import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -241,7 +243,8 @@ public class CreateAutomatedFDTest {
 //				QNetworkFactory networkFactory = new AssignmentEmulatingQLaneNetworkFactory(scenario,events) ;
 //				netsimEngine = new QNetsimEngine( qSim, networkFactory ) ;
 //			} else {
-				 netsimEngine = new QNetsimEngine(config, scenario, events, mobsimTimer, agentCounter, qSim.getInternalInterface());
+			QNetworkFactory networkFactory = new DefaultQNetworkFactory(events, scenario, mobsimTimer, agentCounter);
+				 netsimEngine = new QNetsimEngine(networkFactory, config, scenario, events, mobsimTimer, agentCounter, qSim.getInternalInterface());
 //			}
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());

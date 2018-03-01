@@ -44,7 +44,9 @@ import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -109,7 +111,8 @@ public class PopulationAgentSourceWithVehiclesTest {
 		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 		
 		final QSim qSim = new QSim( scenario , eventsManager, agentCounter, mobsimTimer, activeQSimBridge );
-		qSim.addMobsimEngine( new QNetsimEngine( config, scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface() ) );
+		QNetworkFactory networkFactory = new DefaultQNetworkFactory(eventsManager, scenario, mobsimTimer, agentCounter);
+		qSim.addMobsimEngine( new QNetsimEngine( networkFactory, config, scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface() ) );
 		final PopulationAgentSourceWithVehicles testee =
 			new PopulationAgentSourceWithVehicles(
 					scenario.getPopulation(),
@@ -192,7 +195,8 @@ public class PopulationAgentSourceWithVehiclesTest {
 		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 		
 		final QSim qSim = new QSim( scenario , eventsManager, agentCounter, mobsimTimer, activeQSimBridge );
-		qSim.addMobsimEngine( new QNetsimEngine( config, scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface() ) );
+		QNetworkFactory networkFactory = new DefaultQNetworkFactory(eventsManager, scenario, mobsimTimer, agentCounter);
+		qSim.addMobsimEngine( new QNetsimEngine( networkFactory, config, scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface() ) );
 		final PopulationAgentSourceWithVehicles testee =
 			new PopulationAgentSourceWithVehicles(
 					scenario.getPopulation(),

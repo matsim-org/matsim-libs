@@ -35,7 +35,9 @@ import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -100,7 +102,8 @@ public class JointQSimFactory implements Provider<QSim> {
 		qSim.addMobsimEngine( activityEngine );
 		qSim.addActivityHandler( activityEngine );
 
-        final QNetsimEngine netsimEngine = new QNetsimEngine(sc1.getConfig(), sc1, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface());
+		QNetworkFactory networkFactory = new DefaultQNetworkFactory(eventsManager, sc1, mobsimTimer, agentCounter);
+        final QNetsimEngine netsimEngine = new QNetsimEngine(networkFactory, sc1.getConfig(), sc1, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface());
 		qSim.addMobsimEngine( netsimEngine );
 		// DO NOT ADD DEPARTURE HANDLER: it is done by the joint departure handler
 

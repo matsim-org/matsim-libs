@@ -104,7 +104,6 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 	public static boolean printRunTimesPerTimeStep = false;
 	
 	final private MobsimTimer mobsimTimer;
-	final private EventsManager eventsManager;
 	final private Config config;
 	
 	/*@Override
@@ -112,14 +111,9 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		//this.internalInterface = internalInterface;
 	}*/
 
-	public QNetsimEngine(Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter, InternalInterface internalInterface) {
-		this(null, config, scenario, eventsManager, mobsimTimer, agentCounter, internalInterface);
-	}
-
 	@Inject
 	public QNetsimEngine(QNetworkFactory netsimNetworkFactory, Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter, InternalInterface internalInterface) {
 		this.mobsimTimer = mobsimTimer;
-		this.eventsManager = eventsManager;
 		this.config = config;
 
 		final QSimConfigGroup qsimConfigGroup = config.qsim();
@@ -147,14 +141,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 			}
 		}
 		
-		if (netsimNetworkFactory != null){
-			network = new QNetwork( scenario.getNetwork(), netsimNetworkFactory, internalInterface ) ;
-		} else {
-			EventsManager events = eventsManager;
-			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario, mobsimTimer, agentCounter );
-			network = new QNetwork(scenario.getNetwork(), netsimNetworkFactory2, internalInterface );
-		}
-
+		this.network = new QNetwork(scenario.getNetwork(), netsimNetworkFactory, internalInterface);
 		this.numOfThreads = scenario.getConfig().qsim().getNumberOfThreads();
 	}
 

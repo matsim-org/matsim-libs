@@ -32,8 +32,8 @@ import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 
 public class QNetsimEngineModule {
 
-    public static QNetsimEngine configure(QSim qsim, Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter, InternalInterface internalInterface) {
-        QNetsimEngine netsimEngine = new QNetsimEngine(config, scenario, eventsManager, mobsimTimer, agentCounter, internalInterface);
+    public static QNetsimEngine configure(QNetworkFactory networkFactory, QSim qsim, Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter, InternalInterface internalInterface) {
+        QNetsimEngine netsimEngine = new QNetsimEngine(networkFactory, config, scenario, eventsManager, mobsimTimer, agentCounter, internalInterface);
         qsim.addMobsimEngine(netsimEngine);
         qsim.addDepartureHandler(netsimEngine.getDepartureHandler());
         return netsimEngine;

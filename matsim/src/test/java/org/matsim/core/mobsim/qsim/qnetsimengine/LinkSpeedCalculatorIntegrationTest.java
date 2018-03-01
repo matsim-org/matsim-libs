@@ -215,8 +215,10 @@ public class LinkSpeedCalculatorIntegrationTest {
 		ActivityEngine activityEngine = new ActivityEngine(f.events, f.agentCounter, f.mobsimTimer, qsim.getInternalInterface());
 		qsim.addMobsimEngine(activityEngine);
 		qsim.addActivityHandler(activityEngine);
-
-        QNetsimEngine netsimEngine = new QNetsimEngine(f.scenario.getConfig(), f.scenario, f.events, f.mobsimTimer, f.agentCounter, qsim.getInternalInterface());
+		
+		QNetworkFactory netsimNetworkFactory = new DefaultQNetworkFactory(f.events, f.scenario, f.mobsimTimer, f.agentCounter);
+		QNetsimEngine netsimEngine = new QNetsimEngine(netsimNetworkFactory, f.scenario.getConfig(), f.scenario, f.events, f.mobsimTimer, f.agentCounter, qsim.getInternalInterface());
+		
 		if (linkSpeedCalculator != null) {
 			throw new RuntimeException( "does not work like this any more") ;
 		}

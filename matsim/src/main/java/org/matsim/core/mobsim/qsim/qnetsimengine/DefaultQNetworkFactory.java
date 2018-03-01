@@ -71,7 +71,7 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 	private final AgentCounter agentCounter;
 	
 	@Inject
-	DefaultQNetworkFactory( EventsManager events, Scenario scenario, MobsimTimer mobsimTimer, AgentCounter agentCounter ) {
+	public DefaultQNetworkFactory( EventsManager events, Scenario scenario, MobsimTimer mobsimTimer, AgentCounter agentCounter ) {
 		this.events = events;
 		this.scenario = scenario;
 		this.mobsimTimer = mobsimTimer;
