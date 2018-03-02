@@ -4,7 +4,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim-benchmark</artifactId>
 	<packaging>jar</packaging>
-	<version>0.10.0-SNAPSHOT</version>
+	<version>0.10.0</version>
 	<name>MATSim Benchmark</name>
 	<build>
 		<plugins>
@@ -66,12 +66,12 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.10.0-SNAPSHOT</version>
+			<version>0.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim-examples</artifactId>
-			<version>0.10.0-SNAPSHOT</version>
+			<version>0.10.0</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
