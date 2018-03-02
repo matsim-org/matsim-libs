@@ -60,7 +60,7 @@ public class ParkingTripAnalyser {
     }
 
     private static void writeData(Map<Id<Person>, List<ParkingTripEventHandler.ParkingTrip>> person2ParkingTrips, String outFile) {
-        try(BufferedWriter writer = IOUtils.getAppendingBufferedWriter(outFile)){
+        try(BufferedWriter writer = IOUtils.getBufferedWriter(outFile)){
             writer.write("personId\tparkingTripIndex\tparkSearchStartLink\tparkSearchStartTime\tparkSearchEndLink" +
                     "\tparkSearchEndTime\tdistanceTravelledByCarDuringParkSearchInMeter\ttravelTimeByCarDuringParkSearch" +
                     "\tmainActivityStartLink\twalkDistanceToActivityLocation\twalkTimeFromParkToActLocation\n");

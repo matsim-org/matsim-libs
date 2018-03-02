@@ -68,7 +68,7 @@ public class ParkingTripEventHandler implements ActivityStartEventHandler, LinkL
             trips.add(parkingTrip);
             this.person2ParkingTrips.put(event.getPersonId(), trips);
 
-        } else if ( event.getActType().equals(parkSearchStartAct) ) {
+        } else if ( event.getActType().equals(carInteractionAct) ) {
 
             List<ParkingTrip> trips = this.person2ParkingTrips.get(event.getPersonId());
             if (trips==null) return;
