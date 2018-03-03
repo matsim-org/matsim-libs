@@ -201,13 +201,14 @@ public class TransitLeastCostPathTree {
 		//find the best node
 		double minCost = Double.POSITIVE_INFINITY;
 		Node minCostNode = null;
-		for (Node currentNode: toNodes.keySet()) {
+		for (Map.Entry<Node,InitialNode> e : toNodes.entrySet()) {
+			Node currentNode = e.getKey();
 			DijkstraNodeData r = this.nodeData.get(currentNode.getId());
 			if (r == null) {
 				expandNodeData(toNodes);
 			}
 			DijkstraNodeData data = getData(currentNode);
-			InitialNode initData = toNodes.get(currentNode);
+			InitialNode initData = e.getValue();
 			double cost = data.getCost() + initData.initialCost;
 			if (data.getCost() != 0.0 || fromNodes.containsKey(currentNode)) {
 				if (cost < minCost) {
@@ -332,13 +333,14 @@ public class TransitLeastCostPathTree {
 		//find the best node
 		double minCost = Double.POSITIVE_INFINITY;
 		Node minCostNode = null;
-		for (Node currentNode: toNodes.keySet()) {
+		for (Map.Entry<Node, InitialNode> e : toNodes.entrySet()) {
+			Node currentNode = e.getKey();
 			DijkstraNodeData r = this.nodeData.get(currentNode.getId());
 			if (r == null) {
 				expandNodeData(toNodes);
 			}
 			DijkstraNodeData data = getData(currentNode);
-			InitialNode initData = toNodes.get(currentNode);
+			InitialNode initData = e.getValue();
 			double cost = data.getCost() + initData.initialCost;
 			if (data.getCost() != 0.0 || fromNodes.containsKey(currentNode)) {
 				if (cost < minCost) {

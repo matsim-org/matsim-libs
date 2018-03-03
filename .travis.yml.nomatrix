@@ -31,7 +31,6 @@ jobs:
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/socnetgen           && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/transEnergySim      && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/roadpricing         && ${MVN_IT_CMD} 
-    - script: cd ${TRAVIS_BUILD_DIR}/contribs/opdytsIntegration   && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/multimodal          && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/integration         && ${MVN_IT_CMD} 
     - script: cd ${TRAVIS_BUILD_DIR}/contribs/wagonSim            && ${MVN_IT_CMD} 

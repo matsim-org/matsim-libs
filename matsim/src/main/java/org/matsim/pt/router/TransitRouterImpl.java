@@ -20,10 +20,6 @@
 
 package org.matsim.pt.router;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
@@ -33,6 +29,11 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.facilities.Facility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Not thread-safe because MultiNodeDijkstra is not. Does not expect the TransitSchedule to change once constructed! michaz '13
@@ -110,28 +111,24 @@ public class TransitRouterImpl extends AbstractTransitRouter implements TransitR
                 toFacility.getCoord(),
                 departureTime);
 
-        double pathCost = Double.POSITIVE_INFINITY;
         TransitPassengerRoute transitPassengerRoute = null;
 
-        if (wrappedFromNodes != null && wrappedToNodes != null) {
+        TransitLeastCostPathTree tree = new TransitLeastCostPathTree(getTransitRouterNetwork(),
+                getTravelDisutility(),
+                getTravelTime(),
+                wrappedFromNodes,
+                wrappedToNodes,
+                person);
+        // yyyyyy This sounds like it is doing the full tree.  But I think it is not. Kai, nov'16
 
-            TransitLeastCostPathTree tree = new TransitLeastCostPathTree(getTransitRouterNetwork(),
-                    getTravelDisutility(),
-                    getTravelTime(),
-                    wrappedFromNodes,
-                    wrappedToNodes,
-                    person);
-            // yyyyyy This sounds like it is doing the full tree.  But I think it is not. Kai, nov'16
+        // find routes between start and end stop
+        transitPassengerRoute = tree.getTransitPassengerRoute(wrappedToNodes);
 
-            // find routes between start and end stop
-            transitPassengerRoute = tree.getTransitPassengerRoute(wrappedToNodes);
-
-            if (transitPassengerRoute == null) {
+        if (transitPassengerRoute == null) {
 //				return null; // yyyyyy why not return the direct walk leg?? kai/dz, mar'17
-                return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
-            }
-            pathCost = transitPassengerRoute.getTravelCost();
+            return this.createDirectWalkLegList(null, fromFacility.getCoord(), toFacility.getCoord());
         }
+        double pathCost = transitPassengerRoute.getTravelCost();
 
         double directWalkCost = getWalkDisutility(person, fromFacility.getCoord(), toFacility.getCoord());
 

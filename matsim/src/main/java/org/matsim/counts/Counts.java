@@ -20,9 +20,9 @@
 
 package org.matsim.counts;
 
-import java.util.TreeMap;
-
 import org.matsim.api.core.v01.Id;
+
+import java.util.TreeMap;
 
 public class Counts<T> {
 
@@ -41,7 +41,7 @@ public class Counts<T> {
 	public final Count<T> createAndAddCount(final Id<T> linkId, final String stationName) {
 		// check id string for uniqueness
 		if (this.counts.containsKey(linkId)) {
-			throw new RuntimeException();
+			throw new RuntimeException("There is already a counts object for location " + linkId);
 		}
 		Count<T> c = new Count<>(linkId, stationName);
 		this.counts.put(linkId, c);

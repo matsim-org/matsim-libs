@@ -20,9 +20,7 @@
 
 package org.matsim.contrib.emissions;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -40,9 +38,10 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
-
-import junit.framework.Assert;
 import roadTypeMapping.VisumHbefaRoadTypeMapping;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -713,10 +712,10 @@ public class TestWarmEmissionAnalysisModule {
 
 		weam.reset();
 		Assert.assertEquals(0, weam.getFractionOccurences());
-		Assert.assertEquals(0., weam.getFreeFlowKmCounter());
+		Assert.assertEquals(0., weam.getFreeFlowKmCounter(), 1e-7);
 		Assert.assertEquals(0, weam.getFreeFlowOccurences());
-		Assert.assertEquals(0., weam.getKmCounter());
-		Assert.assertEquals(0., weam.getStopGoKmCounter());
+		Assert.assertEquals(0., weam.getKmCounter(), 1e-7);
+		Assert.assertEquals(0., weam.getStopGoKmCounter(), 1e-7);
 		Assert.assertEquals(0, weam.getStopGoOccurences());
 		Assert.assertEquals(0, weam.getWarmEmissionEventCounter());
 	

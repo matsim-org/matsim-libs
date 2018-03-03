@@ -44,7 +44,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class RunEmissionToolOnlineExample {
 
-	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config.xml";
+	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config_v2.xml";
 	
 	private final Config config ;
 	

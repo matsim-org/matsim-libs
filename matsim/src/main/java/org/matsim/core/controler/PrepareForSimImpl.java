@@ -1,12 +1,6 @@
 package org.matsim.core.controler;
 
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -35,6 +29,13 @@ import org.matsim.facilities.FacilitiesFromPopulation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 class PrepareForSimImpl implements PrepareForSim {
 
@@ -117,6 +118,11 @@ class PrepareForSimImpl implements PrepareForSim {
 		// though the vehicles should be created before creating a route, however,
 		// as of now, it is not clear how to provide (store) vehicle id to the route afterwards. Amit may'17
 
+		// yyyyyy from a behavioral perspective, the vehicle must be somehow linked to
+		// the person (maybe via the household).  We also have the problem that it
+		// is not possible to switch to a mode that was not in the initial plans ...
+		// since there will be no vehicle for it.  Needs to be fixed somehow.  kai, feb'18
+
 		Map<String, VehicleType> modeVehicleTypes = getMode2VehicleType();
 		for(Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) { // go through with all plans ( when it was in population agent source, then going through only with selected plan was sufficient.) Amit May'17
@@ -141,10 +147,10 @@ class PrepareForSimImpl implements PrepareForSim {
 								}
 
 								// so here we have a vehicle id, now try to find or create a physical vehicle:
-								Vehicle vehicle = createAndAddVehicleIfNotPresent( vehicleId, modeVehicleTypes.get(leg.getMode()));
+								createAndAddVehicleIfNotPresent( vehicleId, modeVehicleTypes.get(leg.getMode()));
 								seenModes.put(leg.getMode(), vehicleId);
 							} else {
-								if (vehicleId == null && route != null) {
+								if (vehicleId == null) {
 									vehicleId = seenModes.get(leg.getMode());
 									route.setVehicleId(vehicleId);
 								}

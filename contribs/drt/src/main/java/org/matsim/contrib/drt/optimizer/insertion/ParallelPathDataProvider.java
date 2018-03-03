@@ -40,7 +40,7 @@ import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
@@ -53,7 +53,7 @@ import com.google.common.collect.ImmutableList;
  * @author michalm
  */
 public class ParallelPathDataProvider implements PrecalculatablePathDataProvider, MobsimBeforeCleanupListener {
-	private static final int MAX_THREADS = 4;
+	public static final int MAX_THREADS = 4;
 
 	private final OneToManyPathSearch toPickupPathSearch;
 	private final OneToManyPathSearch fromPickupPathSearch;
@@ -64,14 +64,14 @@ public class ParallelPathDataProvider implements PrecalculatablePathDataProvider
 
 	private final ExecutorService executorService;
 
-	// ==== recalculated by calcPathData()
+	// ==== recalculated by precalculatePathData()
 	private Map<Id<Link>, PathData> pathsToPickupMap;
 	private Map<Id<Link>, PathData> pathsFromPickupMap;
 	private Map<Id<Link>, PathData> pathsToDropoffMap;
 	private Map<Id<Link>, PathData> pathsFromDropoffMap;
 
 	@Inject
-	public ParallelPathDataProvider(@Named(DvrpModule.DVRP_ROUTING) Network network,
+	public ParallelPathDataProvider(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility, DrtConfigGroup drtCfg) {
 		toPickupPathSearch = OneToManyPathSearch.createBackwardSearch(network, travelTime, travelDisutility);

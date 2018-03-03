@@ -20,12 +20,6 @@
 
 package org.matsim.analysis;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
@@ -43,6 +37,11 @@ import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
 
 import javax.inject.Inject;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * @author mrieser
@@ -141,12 +140,8 @@ public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalE
 	}
 
 	public void writeStats(final String filename) {
-		BufferedWriter legStatsFile = IOUtils.getBufferedWriter(filename);
-		writeStats(legStatsFile);
-		try {
-			if (legStatsFile != null) {
-				legStatsFile.close();
-			}
+		try (BufferedWriter legStatsFile = IOUtils.getBufferedWriter(filename)) {
+			writeStats(legStatsFile);
 		} catch (IOException e) {
 			log.error(e);
 		}

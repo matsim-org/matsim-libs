@@ -20,20 +20,6 @@
 
 package org.matsim.core.utils.io;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.Stack;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -47,6 +33,20 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Reads in an OSM-File, exported from <a href="http://openstreetmap.org/" target="_blank">OpenStreetMap</a>,
@@ -348,9 +348,7 @@ public class OsmNetworkReader implements MatsimSomeReader {
 	}
 	
 	private void convert() {
-		if (this.network instanceof Network) {
-			((Network) this.network).setCapacityPeriod(3600);
-		}
+		this.network.setCapacityPeriod(3600);
 
 		log.info("Remove ways that have at least one node that was not read previously ...");
 		// yy I _think_ this is what it does.  kai, may'16
