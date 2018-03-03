@@ -66,10 +66,4 @@ public final class ControlerUtils {
 	    log.info("Checking consistency of config done.");
 	}
 
-	public static void initializeOutputLogging() {
-		    OutputDirectoryLogging.catchLogEntries();
-		    Gbl.printSystemInfo();
-		    Gbl.printBuildInfo();
-	    }
-
 }

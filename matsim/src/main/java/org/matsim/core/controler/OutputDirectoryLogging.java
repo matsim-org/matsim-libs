@@ -20,19 +20,16 @@
 
 package org.matsim.core.controler;
 
-import java.io.IOException;
-import java.net.URL;
-
 import org.apache.log4j.Appender;
-import org.apache.log4j.ConsoleAppender;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
-import org.apache.log4j.helpers.Loader;
 import org.apache.log4j.spi.LoggingEvent;
+import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.CollectLogMessagesAppender;
 import org.matsim.core.utils.io.IOUtils;
+
+import java.io.IOException;
 
 /**
  * 
@@ -55,28 +52,6 @@ public final class OutputDirectoryLogging {
 	public static final String WARNLOGFILE = "logfileWarningsErrors.log";
 
 	private static Logger log = Logger.getLogger(OutputDirectoryLogging.class);
-
-	/** initializes Log4J */
-	static {
-		final String logProperties = "log4j.xml";
-		URL url = Loader.getResource(logProperties);
-		if (url != null) {
-			PropertyConfigurator.configure(url);
-		} else {
-			Logger root = Logger.getRootLogger();
-			root.setLevel(Level.INFO);
-			ConsoleAppender consoleAppender = new ConsoleAppender(Controler.DEFAULTLOG4JLAYOUT, "System.out");
-			consoleAppender.setName("A1");
-			root.addAppender(consoleAppender);
-			consoleAppender.setLayout(Controler.DEFAULTLOG4JLAYOUT);
-			log.error("");
-			log.error("Could not find configuration file " + logProperties + " for Log4j in the classpath.");
-			log.error("A default configuration is used, setting log level to INFO with a ConsoleAppender.");
-			log.error("");
-			log.error("");
-		}
-	}
-
 
 	/**
 	 * This variable is used to store the log4j output before it can be written
@@ -156,6 +131,8 @@ public final class OutputDirectoryLogging {
 			collectLogMessagesAppender.close();
 			collectLogMessagesAppender = null;
 		}
+		Gbl.printSystemInfo();
+		Gbl.printBuildInfo();
 	}
 
 	/**
