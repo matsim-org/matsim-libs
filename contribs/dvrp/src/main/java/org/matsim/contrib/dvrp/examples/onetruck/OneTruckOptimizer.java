@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.examples.onetaxi;
+package org.matsim.contrib.dvrp.examples.onetruck;
 
 import java.util.List;
 
@@ -51,7 +51,7 @@ import com.google.inject.name.Named;
 /**
  * @author michalm
  */
-final class OneTaxiOptimizer implements VrpOptimizer {
+final class OneTruckOptimizer implements VrpOptimizer {
 	private final MobsimTimer timer;
 
 	private final TravelTime travelTime;
@@ -63,7 +63,7 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 	public static final double DROPOFF_DURATION = 60;
 
 	@Inject
-	public OneTaxiOptimizer(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, Fleet fleet, QSim qSim) {
+	public OneTruckOptimizer(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, Fleet fleet, QSim qSim) {
 		timer = qSim.getSimTimer();
 		travelTime = new FreeSpeedTravelTime();
 		router = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime), travelTime);
@@ -94,7 +94,7 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 				throw new IllegalStateException();
 		}
 
-		OneTaxiRequest req = (OneTaxiRequest)request;
+		OneTruckRequest req = (OneTruckRequest)request;
 		Link fromLink = req.getFromLink();
 		Link toLink = req.getToLink();
 
@@ -108,14 +108,14 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 
 		double t1 = pathToCustomer.getArrivalTime();
 		double t2 = t1 + PICKUP_DURATION;// 2 minutes for picking up the passenger
-		schedule.addTask(new OneTaxiServeTask(t1, t2, fromLink, true, req));
+		schedule.addTask(new OneTruckServeTask(t1, t2, fromLink, true, req));
 
 		VrpPathWithTravelData pathWithCustomer = VrpPaths.calcAndCreatePath(fromLink, toLink, t2, router, travelTime);
 		schedule.addTask(new DriveTaskImpl(pathWithCustomer));
 
 		double t3 = pathWithCustomer.getArrivalTime();
 		double t4 = t3 + DROPOFF_DURATION;// 1 minute for dropping off the passenger
-		schedule.addTask(new OneTaxiServeTask(t3, t4, toLink, false, req));
+		schedule.addTask(new OneTruckServeTask(t3, t4, toLink, false, req));
 
 		// just wait (and be ready) till the end of the vehicle's time window (T1)
 		double tEnd = Math.max(t4, vehicle.getServiceEndTime());

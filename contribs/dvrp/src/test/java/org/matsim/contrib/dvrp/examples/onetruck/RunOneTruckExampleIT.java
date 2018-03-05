@@ -1,8 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2014 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,47 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.file;
+package org.matsim.contrib.dvrp.examples.onetruck;
 
-import java.net.URL;
+import org.junit.Test;
 
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.core.controler.AbstractModule;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.name.Named;
-
-/**
- * @author michalm
- */
-public class FleetProvider implements Provider<Fleet> {
-	@Inject
-	@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-	Network network;
-
-	private final URL url;
-
-	public FleetProvider(URL url) {
-		this.url = url;
-	}
-
-	@Override
-	public Fleet get() {
-		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(network, fleet).parse(url);
-		return fleet;
-	}
-
-	public static AbstractModule createModule(URL url) {
-		return new AbstractModule() {
-			@Override
-			public void install() {
-				bind(Fleet.class).toProvider(new FleetProvider(url)).asEagerSingleton();
-			}
-		};
+public class RunOneTruckExampleIT {
+	@Test
+	public void testRun() {
+		RunOneTruckExample.run(false, 0);
 	}
 }

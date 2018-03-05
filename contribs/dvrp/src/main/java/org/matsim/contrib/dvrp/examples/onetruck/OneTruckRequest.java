@@ -1,8 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,47 +17,44 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.file;
+package org.matsim.contrib.dvrp.examples.onetruck;
 
-import java.net.URL;
-
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.data.Fleet;
-import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.core.controler.AbstractModule;
-
-import com.google.inject.Inject;
-import com.google.inject.Provider;
-import com.google.inject.name.Named;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Request;
 
 /**
  * @author michalm
  */
-public class FleetProvider implements Provider<Fleet> {
-	@Inject
-	@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
-	Network network;
+public final class OneTruckRequest implements Request {
+	private final Id<Request> id;
+	private final double submissionTime;
 
-	private final URL url;
+	private final Link fromLink;
+	private final Link toLink;
 
-	public FleetProvider(URL url) {
-		this.url = url;
+	public OneTruckRequest(Id<Request> id, Link fromLink, Link toLink, double submissionTime) {
+		this.id = id;
+		this.submissionTime = submissionTime;
+		this.fromLink = fromLink;
+		this.toLink = toLink;
 	}
 
 	@Override
-	public Fleet get() {
-		FleetImpl fleet = new FleetImpl();
-		new VehicleReader(network, fleet).parse(url);
-		return fleet;
+	public Id<Request> getId() {
+		return id;
 	}
 
-	public static AbstractModule createModule(URL url) {
-		return new AbstractModule() {
-			@Override
-			public void install() {
-				bind(Fleet.class).toProvider(new FleetProvider(url)).asEagerSingleton();
-			}
-		};
+	@Override
+	public double getSubmissionTime() {
+		return submissionTime;
+	}
+
+	public Link getFromLink() {
+		return fromLink;
+	}
+
+	public Link getToLink() {
+		return toLink;
 	}
 }

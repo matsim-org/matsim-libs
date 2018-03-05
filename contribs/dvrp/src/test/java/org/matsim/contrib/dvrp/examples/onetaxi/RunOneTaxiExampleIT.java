@@ -24,6 +24,6 @@ import org.junit.Test;
 public class RunOneTaxiExampleIT {
 	@Test
 	public void testRun() {
-		RunOneTaxiExample.run(false, 2);
+		RunOneTaxiExample.run(false, 0);
 	}
 }

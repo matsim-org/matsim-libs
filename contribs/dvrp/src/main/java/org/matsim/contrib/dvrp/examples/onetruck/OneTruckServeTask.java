@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,31 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.run;
+package org.matsim.contrib.dvrp.examples.onetruck;
 
-import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
-import org.matsim.contrib.taxi.util.TaxiSimulationConsistencyChecker;
-import org.matsim.contrib.taxi.util.stats.TaxiStatsDumper;
-import org.matsim.contrib.taxi.util.stats.TaxiStatusTimeProfileCollectorProvider;
-import org.matsim.core.controler.AbstractModule;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.schedule.StayTaskImpl;
 
-import com.google.inject.Inject;
+/**
+ * @author michalm
+ */
+public class OneTruckServeTask extends StayTaskImpl {
+	private final OneTruckRequest request;
+	private final boolean isPickup;// pickup or dropoff
 
-public class TaxiOutputModule extends AbstractModule {
-	@Inject
-	private TaxiConfigGroup taxiCfg;
+	public OneTruckServeTask(double beginTime, double endTime, Link link, boolean isPickup, OneTruckRequest request) {
+		super(beginTime, endTime, link, isPickup ? "pickup" : "dropoff");
+		this.request = request;
+		this.isPickup = isPickup;
+	}
 
-	@Override
-	public void install() {
-		bind(SubmittedTaxiRequestsCollector.class).toInstance(new SubmittedTaxiRequestsCollector());
-		addControlerListenerBinding().to(SubmittedTaxiRequestsCollector.class);
+	public OneTruckRequest getRequest() {
+		return request;
+	}
 
-		addControlerListenerBinding().to(TaxiSimulationConsistencyChecker.class);
-		addControlerListenerBinding().to(TaxiStatsDumper.class);
-
-		if (taxiCfg.getTimeProfiles()) {
-			addMobsimListenerBinding().toProvider(TaxiStatusTimeProfileCollectorProvider.class);
-			// add more time profiles if necessary
-		}
+	public boolean isPickup() {
+		return isPickup;
 	}
 }
