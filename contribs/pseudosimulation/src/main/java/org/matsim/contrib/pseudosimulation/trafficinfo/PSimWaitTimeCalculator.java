@@ -1,6 +1,7 @@
 package org.matsim.contrib.pseudosimulation.trafficinfo;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -17,6 +18,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
  *         Extends Ordonez's {@link WaitTimeStuckCalculator} to only handle
  *         events during QSim iterations.
  */
+@Singleton
 public class PSimWaitTimeCalculator extends WaitTimeCalculatorSerializable {
 	private final MobSimSwitcher switcher;
 

@@ -59,12 +59,16 @@ public class MobSimSwitcher implements IterationEndsListener,
 		} else {
 			Logger.getLogger(this.getClass()).info("Running PSim");
 			plancatcher.init();
+			for (Person person : scenario.getPopulation().getPersons().values()) {
+					plancatcher.addPlansForPsim(person.getSelectedPlan());
+			}
+
 		}
 	}
 
 	private boolean determineIfQSimIter(int iteration) {
 
-		if (iteration == scenario.getConfig().controler().getLastIteration()) {
+		if (iteration == scenario.getConfig().controler().getLastIteration() || iteration == scenario.getConfig().controler().getFirstIteration() ) {
 			isQSimIteration = true;
 			return isQSimIteration;
 		}
@@ -94,6 +98,10 @@ public class MobSimSwitcher implements IterationEndsListener,
 		if (this.isQSimIteration())
 			return;
 
+		for (Person person : scenario.getPopulation().getPersons().values()) {
+				plancatcher.removeExistingPlanOrAddNewPlan(person.getSelectedPlan());
+		}
+
 		selectedPlanScoreMemory = new HashMap<>(scenario.getPopulation().getPersons().size());
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
@@ -104,6 +112,7 @@ public class MobSimSwitcher implements IterationEndsListener,
 		}
 
 	}
+
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {

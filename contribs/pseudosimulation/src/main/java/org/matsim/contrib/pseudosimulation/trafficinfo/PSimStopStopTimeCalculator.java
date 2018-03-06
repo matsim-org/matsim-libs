@@ -1,5 +1,6 @@
 package org.matsim.contrib.pseudosimulation.trafficinfo;
 
+import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -12,7 +13,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import javax.inject.Inject;
 
-
+@Singleton
 public class PSimStopStopTimeCalculator extends StopStopTimeCalculatorSerializable {
 	private final MobSimSwitcher switcher;
 

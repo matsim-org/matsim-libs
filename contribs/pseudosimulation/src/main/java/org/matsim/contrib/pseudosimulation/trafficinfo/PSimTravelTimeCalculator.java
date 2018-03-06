@@ -4,6 +4,7 @@
 package org.matsim.contrib.pseudosimulation.trafficinfo;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Network;
@@ -16,13 +17,14 @@ import org.matsim.contrib.pseudosimulation.RunPSim;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
  * @author fouriep
  */
-public class PSimTravelTimeCalculator extends TravelTimeCalculator {
+public class PSimTravelTimeCalculator extends TravelTimeCalculator implements Provider<TravelTime>{
 	private final MobSimSwitcher switcher;
 
 	@Inject
@@ -80,4 +82,8 @@ public class PSimTravelTimeCalculator extends TravelTimeCalculator {
 			super.handleEvent(event);
 	}
 
+	@Override
+	public TravelTime get() {
+		return super.getLinkTravelTimes();
+	}
 }

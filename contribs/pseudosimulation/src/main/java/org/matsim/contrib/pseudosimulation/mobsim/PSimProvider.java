@@ -25,9 +25,9 @@ import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 public class PSimProvider implements Provider<Mobsim> {
 
     @Inject private PlanCatcher plans;
-    private TravelTime travelTime;
-    private WaitTime waitTime;
-    private StopStopTime stopStopTime;
+    @Inject private TravelTime travelTime;
+    @Inject private WaitTime waitTime;
+    @Inject private StopStopTime stopStopTime;
     private TransitPerformance transitPerformance;
     private final Scenario scenario;
     private final EventsManager eventsManager;
