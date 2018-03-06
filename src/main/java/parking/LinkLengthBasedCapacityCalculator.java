@@ -38,19 +38,23 @@ public class LinkLengthBasedCapacityCalculator implements LinkParkingCapacityCal
           }
           
           if (r <= 0.11) {
-       	   capacity = Math.floor( 0.65 * Math.floor(((link.getLength()-10)/3))) ;
+       	   capacity = Math.floor(0.65 * Math.floor(((link.getLength()-10)/3))) ;
             }
+          //schraeg parken
             
           else if (r > 0.11 && r <= 0.25 ) {
        	   capacity = Math.floor(0.65 * Math.floor(((link.getLength()-10)/2.5))) ;
        	   }
+          //senkrecht parken
         
           else {
        	   capacity =  Math.floor(0.65 * Math.floor(((link.getLength()-10)/5.2))) ;
           }
+          // laengs parken
           if (capacity < 0) {
   		   capacity = 0 ;
 			}
+          
    
     
 		return capacity;

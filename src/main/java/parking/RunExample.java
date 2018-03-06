@@ -36,7 +36,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class RunExample {
 
-    private static final boolean removeRoutes = true;
+   
+
+	private static final boolean removeRoutes = true;
 
     public static void main(String[] args) {
 
@@ -57,11 +59,7 @@ public class RunExample {
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.controler().setWriteEventsInterval(2);
 
-        //parking related settings
-        config.plansCalcRoute().setInsertingAccessEgressWalk(true);
-        PlanCalcScoreConfigGroup.ActivityParams carParking = new PlanCalcScoreConfigGroup.ActivityParams("car parkingSearch");
-        carParking.setScoringThisActivityAtAll(false);
-        config.planCalcScore().addActivityParams(carParking);
+
         //
 
         Scenario scenario = ScenarioUtils.loadScenario(config);
@@ -78,15 +76,9 @@ public class RunExample {
         }
 
         ZonalLinkParkingInfo zoneToLinks =  new ZonalLinkParkingInfo( shapeFile, "NO", scenario.getNetwork(), scenario.getConfig().qsim() );
-
+        
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new AbstractModule() {
-            @Override
-            public void install() {
-                bind(ZonalLinkParkingInfo.class).toInstance(zoneToLinks);
-                addRoutingModuleBinding(TransportMode.car).toProvider(new ParkingSearchRoutingModuleProvider(TransportMode.car));
-            }
-        });
+        controler.addOverridingModule(new ParkingSearchModule(zoneToLinks));
 
         controler.run();
     }
