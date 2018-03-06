@@ -6,6 +6,7 @@ import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
+import org.matsim.contrib.pseudosimulation.MobSimSwitcher;
 import org.matsim.contrib.pseudosimulation.RunPSim;
 import org.matsim.core.config.Config;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -19,10 +20,10 @@ import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeStuckCalculator;
  *         events during QSim iterations.
  */
 public class PSimWaitTimeCalculator extends WaitTimeCalculatorSerializable {
-	private final RunPSim.MobSimSwitcher switcher;
+	private final MobSimSwitcher switcher;
 	public PSimWaitTimeCalculator(
 			TransitSchedule transitSchedule, Config config,
-								  RunPSim.MobSimSwitcher switcher) {
+								  MobSimSwitcher switcher) {
 		super(transitSchedule,config);
 		this.switcher = switcher;
 	}

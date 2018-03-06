@@ -36,7 +36,7 @@ public class ChoiceGenerationControler implements BeforeMobsimListener{
         final WaitTimeStuckCalculator waitTimeCalculator;
         final StopStopTimeCalculator stopStopTimeCalculator;
         final TravelTimeCalculator travelTimeCalculator;
-    private final PSimFactory pSimFactory;
+    private  PSimFactory pSimFactory;
     Config config;
         Controler controler;
         Scenario scenario;
@@ -77,7 +77,6 @@ public ChoiceGenerationControler(String[] args) {
     eventsManager.addHandler(travelTimeCalculator);
     reader.readFile(args[1]);
 
-    pSimFactory = new PSimFactory(scenario, eventsManager);
     controler.addOverridingModule(new AbstractModule() {
         @Override
         public void install() {
@@ -109,6 +108,5 @@ public ChoiceGenerationControler(String[] args) {
         pSimFactory.setWaitTime(waitTimeCalculator.get());
         pSimFactory.setTravelTime(travelTimeCalculator.getLinkTravelTimes());
         pSimFactory.setStopStopTime(stopStopTimeCalculator.get());
-        pSimFactory.setPlans(plans);
     }
 }

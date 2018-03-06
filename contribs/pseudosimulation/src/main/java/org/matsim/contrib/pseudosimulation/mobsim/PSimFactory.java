@@ -5,10 +5,12 @@ package org.matsim.contrib.pseudosimulation.mobsim;
 
 import java.util.Collection;
 
+import com.google.inject.Inject;
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
+import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -22,7 +24,7 @@ import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
  */
 public class PSimFactory implements Provider<Mobsim>, MobsimFactory {
 
-    private Collection<Plan> plans;
+    private PlanCatcher plans;
     private TravelTime travelTime;
     private WaitTime waitTime;
     private StopStopTime stopStopTime;
@@ -30,9 +32,11 @@ public class PSimFactory implements Provider<Mobsim>, MobsimFactory {
     private final Scenario scenario;
     private final EventsManager eventsManager;
 
-    public PSimFactory(Scenario scenario, EventsManager eventsManager) {
+    @Inject
+    PSimFactory(Scenario scenario, EventsManager eventsManager, PlanCatcher planCatcher) {
         this.scenario = scenario;
         this.eventsManager = eventsManager;
+        this.plans = planCatcher;
     }
 
     @Override
@@ -42,15 +46,11 @@ public class PSimFactory implements Provider<Mobsim>, MobsimFactory {
 //		else
 //			iteration++;
         if (waitTime != null) {
-            return new PSim(scenario, eventsManager, plans, travelTime, waitTime, stopStopTime, transitPerformance);
+            return new PSim(scenario, eventsManager, plans.getPlansForPSim(), travelTime, waitTime, stopStopTime, transitPerformance);
 
         } else {
-            return new PSim(scenario, eventsManager, plans, travelTime);
+            return new PSim(scenario, eventsManager, plans.getPlansForPSim(), travelTime);
         }
-    }
-
-    public void setPlans(Collection<Plan> plans) {
-        this.plans = plans;
     }
 
     public void setTravelTime(TravelTime travelTime) {
@@ -77,7 +77,6 @@ public class PSimFactory implements Provider<Mobsim>, MobsimFactory {
 
     @Deprecated
     //will replace where necessary
-
     public Mobsim createMobsim(Scenario scenario, EventsManager events) {
         return get();
     }

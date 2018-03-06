@@ -242,7 +242,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         linkTravelTimes = new FreeSpeedTravelTime();
         travelTime.setTravelTime(linkTravelTimes);
 
-        pSimFactory = new PSimFactory(scenario, matsimControler.getEvents());
         matsimControler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
@@ -598,7 +597,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         }
 
         executedPlanCount += plancatcher.getPlansForPSim().size();
-        pSimFactory.setPlans(plancatcher.getPlansForPSim());
     }
 
     @Override

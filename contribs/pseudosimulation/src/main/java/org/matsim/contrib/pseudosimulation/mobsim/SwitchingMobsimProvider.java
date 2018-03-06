@@ -24,6 +24,7 @@ package org.matsim.contrib.pseudosimulation.mobsim;
 
 import com.google.inject.Provider;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.pseudosimulation.MobSimSwitcher;
 import org.matsim.contrib.pseudosimulation.RunPSim;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -40,10 +41,10 @@ public class SwitchingMobsimProvider implements Provider<Mobsim> {
     private Config config;
     private Scenario scenario;
     private EventsManager eventsManager;
-    private RunPSim.MobSimSwitcher mobSimSwitcher;
+    private MobSimSwitcher mobSimSwitcher;
 
     @Inject
-    SwitchingMobsimProvider(Config config, Scenario scenario, EventsManager eventsManager, RunPSim.MobSimSwitcher mobSimSwitcher) {
+    SwitchingMobsimProvider(Config config, Scenario scenario, EventsManager eventsManager, MobSimSwitcher mobSimSwitcher) {
         this.config = config;
         this.scenario = scenario;
         this.eventsManager = eventsManager;
