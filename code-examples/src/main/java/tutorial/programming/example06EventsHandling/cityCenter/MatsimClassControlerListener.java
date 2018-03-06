@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,32 +17,28 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package tutorial.programming.planStrategyForRemoval;
-
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-import tutorial.strategies.planStrategyForRemoval.RunPlanSelectorForRemovalExample;
-
+package tutorial.programming.example06EventsHandling.cityCenter;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.StartupListener;
 /**
-* @author ikaddoura
-*/
+ * @author jbischoff
+ * A basic Controler Listener used in the MATSim class at TU Berlin.
+ */
+public class MatsimClassControlerListener implements StartupListener, IterationEndsListener {
 
-public class RunPlanStrategyForRemovalExampleTest {
+	MyEventHandler myEventHandler;
+	 
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		myEventHandler = new MyEventHandler(); 
+		event.getServices().getEvents().addHandler(myEventHandler);
+	}
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
-
-	@Test
-	public final void testMain() {
-		
-		try {
-			RunPlanSelectorForRemovalExample.main(null);
-		} catch(Exception e) {
-			Assert.fail(e.toString());
-		}
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		myEventHandler.printPersonWithHighestWorkingTime();
 	}
 
 }
-

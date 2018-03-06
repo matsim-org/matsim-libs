@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunPersonAttributesExample.java
+ * EventsReader
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,24 +17,51 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package tutorial.programming.example06EventsHandling.cityCenter;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+
+
+
 
 /**
+ * This class contains a main method to call 
+ *  event handlers using post-processing
  * 
+ * @author jbischoff
  */
-package tutorial.programming.personAttributes;
+public class RunEventsHandlingExample {
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-import tutorial.population.personAttributes.RunPersonAttributesExample;
-
-public class RunPersonAttributesExampleTest {
-
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
-
-	@Test
-	public void test(){
-		RunPersonAttributesExample.main(null);
-	}
 	
+	
+	public static void main(String[] args) {
+
+		//path to events file
+		String inputFile = "output/nullfall/ITERS/it.50/50.events.xml.gz";
+
+		//create an event object
+		EventsManager events = EventsUtils.createEventsManager();
+
+		//create the handler and add it
+		CityCenterEventEnterHandler cityCenterEventEnterHandler = new CityCenterEventEnterHandler();
+
+		//add the links here that you want to monitor
+		cityCenterEventEnterHandler.addLinkId(Id.createLinkId(28112));
+		
+		
+		events.addHandler(cityCenterEventEnterHandler);
+
+
+        //create the reader and read the file
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		reader.readFile(inputFile);
+		
+		System.out.println(cityCenterEventEnterHandler.getVehiclesInCityCenter());
+		
+		System.out.println("Events file read!");
+	}
+
 }

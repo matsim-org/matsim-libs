@@ -16,45 +16,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package tutorial.programming.withinDayReplanningFromPlans;
+package tutorial.scoring.kindergartenActivityScoring;
 
-import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.core.utils.io.IOUtils;
-import org.matsim.core.utils.io.UncheckedIOException;
-import org.matsim.testcases.MatsimTestUtils;
-import tutorial.withinday.withinDayReplanningFromPlans.RunWithinDayReplanningFromPlansExample;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 
-/**
- * @author nagel
- *
- */
-public class IntegrationTest {
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+public class KindergartenArrivalHandler  implements PersonArrivalEventHandler, ActivityStartEventHandler {
 
-	/**
-	 * Test method for {@link RunWithinDayReplanningFromPlansExample}
-	 */
-	@SuppressWarnings("static-method")
-	@Test
-	public final void testMain() {
-		final String pathname = "./output/within-day";
-		try {
-			IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
-		} catch ( IllegalArgumentException ee ) {
-			// (normally, the directory should NOT be there initially.  It might, however, be there if someone ran the main class in some other way,
-			// and did not remove the directory afterwards.)
-		} catch ( UncheckedIOException ee ) {
-			
-		}
-		RunWithinDayReplanningFromPlansExample.main(null);
+	Id<Link> kindergartenLink = Id.createLinkId(8142);
+	Set<Id<Person>> arrivedOnLinkByCar = new HashSet<>();
+	int kinder = 0;
 
-		IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
-		// (here, the directory should have been there)
+	@Override
+	public void reset(int iteration) {
+		arrivedOnLinkByCar = new HashSet<>();
+		kinder = 0;
 	}
 
+	@Override
+	public void handleEvent(PersonArrivalEvent event) {
+		if (event.getLinkId().equals(kindergartenLink)){
+			if (event.getLegMode().equals(TransportMode.car)){
+				this.arrivedOnLinkByCar.add(event.getPersonId());
+			}
+		}
+	}
+
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		
+		if (event.getLinkId().equals(kindergartenLink)){
+			if (event.getActType().equals("kindergarten1"))
+			kinder++;
+		}
+	}
+	
+	
 }
-
-

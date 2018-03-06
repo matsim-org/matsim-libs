@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,32 +16,41 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package tutorial.scoring.kindergartenActivityScoring;
 
-package tutorial.programming.planStrategyForRemoval;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-import tutorial.strategies.planStrategyForRemoval.RunPlanSelectorForRemovalExample;
+public class KindergartenLegScoring extends CharyparNagelLegScoring {
 
-/**
-* @author ikaddoura
-*/
+	public KindergartenLegScoring(ScoringParameters params, Network network) {
+		super(params, network);
+		// TODO Auto-generated constructor stub
+	}
 
-public class RunPlanStrategyForRemovalExampleTest {
+	
+	@Override
+	public void finish() {
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+	}
 
-	@Test
-	public final void testMain() {
-		
-		try {
-			RunPlanSelectorForRemovalExample.main(null);
-		} catch(Exception e) {
-			Assert.fail(e.toString());
-		}
+	@Override
+	public double getScore() {
+		return this.score;
+	}
+
+	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
+		double legScore = super.calcLegScore(departureTime, arrivalTime, leg);
+		return legScore;
+	}
+
+	@Override
+	public void handleLeg(Leg leg) {
+		double legScore = calcLegScore(leg.getDepartureTime(), leg.getDepartureTime() + leg.getTravelTime(), leg);
+		this.score += legScore;
+
 	}
 
 }
-

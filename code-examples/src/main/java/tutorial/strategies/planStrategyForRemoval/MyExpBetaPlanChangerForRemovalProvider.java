@@ -17,31 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.programming.planStrategyForRemoval;
+package tutorial.strategies.planStrategyForRemoval;
 
-import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-import tutorial.strategies.planStrategyForRemoval.RunPlanSelectorForRemovalExample;
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.Config;
+import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 
 /**
 * @author ikaddoura
 */
+public class MyExpBetaPlanChangerForRemovalProvider implements Provider<ExpBetaPlanChanger<Plan, Person>> {
 
-public class RunPlanStrategyForRemovalExampleTest {
+	private Config config;
 
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+    @Inject
+    MyExpBetaPlanChangerForRemovalProvider(Config config) {
+        this.config = config;
+    }
 
-	@Test
-	public final void testMain() {
-		
-		try {
-			RunPlanSelectorForRemovalExample.main(null);
-		} catch(Exception e) {
-			Assert.fail(e.toString());
-		}
-	}
-
+    @Override
+    public ExpBetaPlanChanger<Plan, Person> get() {
+        return new ExpBetaPlanChanger<>( - config.planCalcScore().getBrainExpBeta());
+    }
+	
 }
 

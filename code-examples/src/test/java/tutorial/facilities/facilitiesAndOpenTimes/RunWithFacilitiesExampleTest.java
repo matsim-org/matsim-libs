@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,32 +16,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package tutorial.facilities.facilitiesAndOpenTimes;
 
-package tutorial.programming.planStrategyForRemoval;
+import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-import tutorial.strategies.planStrategyForRemoval.RunPlanSelectorForRemovalExample;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 
 /**
-* @author ikaddoura
-*/
+ * @author nagel
+ *
+ */
+public class RunWithFacilitiesExampleTest {
+	private static final double EPS=0.001 ;
 
-public class RunPlanStrategyForRemovalExampleTest {
-
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
-
+	/**
+	 * Test method for {@link tutorial.facilities.facilitiesAndOpenTimes.RunWithFacilitiesExample#run()}.
+	 */
+	@SuppressWarnings({ "static-method", "javadoc" })
 	@Test
-	public final void testMain() {
-		
-		try {
-			RunPlanSelectorForRemovalExample.main(null);
-		} catch(Exception e) {
-			Assert.fail(e.toString());
-		}
+	public final void testRun() {
+		RunWithFacilitiesExample example = new RunWithFacilitiesExample() ;
+		example.run();
+		Scenario scenario = example.getScenario() ;
+		Map<Id<Person>, ? extends Person> persons = scenario.getPopulation().getPersons() ;
+		Assert.assertEquals( 124.84230476216275, persons.get(Id.createPersonId(1)).getSelectedPlan().getScore() , EPS ) ;
+		Assert.assertEquals( 112.84230476216275, persons.get(Id.createPersonId(2)).getSelectedPlan().getScore() , EPS ) ;
 	}
-
 }
-

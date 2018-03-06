@@ -17,31 +17,32 @@
  *                                                                         *
  * *********************************************************************** */
 
-package tutorial.programming.planStrategyForRemoval;
+package tutorial.programming.example21TUBclass;
 
-import org.junit.Assert;
-import org.junit.Rule;
+import java.io.File;
+
 import org.junit.Test;
-import org.matsim.testcases.MatsimTestUtils;
-import tutorial.strategies.planStrategyForRemoval.RunPlanSelectorForRemovalExample;
+import org.matsim.core.utils.io.IOUtils;
+
+import tutorial.programming.leastCostPath.RunLeastCostPathCalculatorExample;
 
 /**
-* @author ikaddoura
-*/
-
-public class RunPlanStrategyForRemovalExampleTest {
-
-	@Rule public MatsimTestUtils utils = new MatsimTestUtils() ;
+ * @author  jbischoff
+ *
+ */
+public class RunLeastCostPathCalculatorExampleIT {
 
 	@Test
-	public final void testMain() {
-		
+	public void test() {
 		try {
-			RunPlanSelectorForRemovalExample.main(null);
-		} catch(Exception e) {
-			Assert.fail(e.toString());
+			IOUtils.deleteDirectoryRecursively(new File( RunLeastCostPathCalculatorExample.outputDirectory ).toPath());
+		} catch ( Exception ee ) {
+			// deletion may fail; is ok.
 		}
+			RunLeastCostPathCalculatorExample.main(null);
+			IOUtils.deleteDirectoryRecursively(new File( RunLeastCostPathCalculatorExample.outputDirectory ).toPath());
+			// if this fails, then it is a test failure (since the directory should have been constructed)
+
 	}
 
 }
-
