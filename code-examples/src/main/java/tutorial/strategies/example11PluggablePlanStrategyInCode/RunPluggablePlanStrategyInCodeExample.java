@@ -26,6 +26,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerUtils;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 
@@ -33,9 +34,10 @@ public class RunPluggablePlanStrategyInCodeExample {
 	private static final String STRATEGY_NAME = "doSomethingSpecial";
 
 	public static void main(final String[] args) {
-		ControlerUtils.initializeOutputLogging();
+//		ControlerUtils.initializeOutputLogging();
+		OutputDirectoryLogging.catchLogEntries();
 		
-
+		
 		Config config;
 		if ( args.length==0 ) {
 			config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("equil"), "config.xml")) ;

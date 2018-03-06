@@ -24,6 +24,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.ControlerUtils;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -38,9 +39,10 @@ public class RunEventsHandlingWithControlerExample {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		ControlerUtils.initializeOutputLogging();
+//		ControlerUtils.initializeOutputLogging();
+		OutputDirectoryLogging.catchLogEntries();
 		
-
+		
 		Config config ;
 		if ( args==null || args.length==0 ) {
 			config = ConfigUtils.loadConfig( "scenarios/equil/example7-config.xml" ) ;
