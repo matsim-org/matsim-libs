@@ -61,6 +61,9 @@ public class LSPWithOffersReplanner implements LSPReplanner{
 	public void setLSP(LSP lsp) {
 		try {
 			this.lsp = (LSPWithOffers) lsp;
+			if(this.lsp.getOfferUpdater() != null) {
+				this.offerUpdater = this.lsp.getOfferUpdater();
+			}
 		}
 		catch(ClassCastException e) {
 			System.out.println("The class " + this.toString() + " expects an LSPWithOffers and not any other implementation of LSP");
@@ -70,5 +73,8 @@ public class LSPWithOffersReplanner implements LSPReplanner{
 	
 	public void setLSP(LSPDecorator lsp) {
 		this.lsp = lsp;
+		if(this.lsp.getOfferUpdater() != null) {
+			this.offerUpdater = this.lsp.getOfferUpdater();
+		}
 	}
 }

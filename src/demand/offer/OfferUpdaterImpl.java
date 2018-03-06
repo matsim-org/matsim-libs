@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import demand.decoratedLSP.LSPDecorator;
+import demand.decoratedLSP.LogisticsSolutionDecorator;
 import demand.decoratedLSP.LogisticsSolutionWithOffers;
 import lsp.LogisticsSolution;
 
@@ -20,8 +21,8 @@ public class OfferUpdaterImpl implements OfferUpdater{
 	@Override
 	public void updateOffers() {
 		for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-			if(solution instanceof LogisticsSolutionWithOffers) {
-				LogisticsSolutionWithOffers offerSolution = (LogisticsSolutionWithOffers) solution;
+			if(solution instanceof LogisticsSolutionDecorator) {
+				LogisticsSolutionDecorator offerSolution = (LogisticsSolutionDecorator) solution;
 				for(OfferVisitor visitor : visitors) {
 					if(visitor.getLogisticsSolution() == solution) {
 						for(Offer offer : offerSolution.getOfferFactory().getOffers()) {

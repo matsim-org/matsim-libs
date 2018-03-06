@@ -1,31 +1,37 @@
-package demand.offer;
+package testMutualreplanningWithOfferUpdate;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 import demand.decoratedLSP.LSPDecorator;
 import demand.decoratedLSP.LSPWithOffers;
+import demand.decoratedLSP.LogisticsSolutionDecorator;
 import demand.demandObject.DemandObject;
 import demand.demandObject.OfferRequester;
-import lsp.LogisticsSolution;
+import demand.offer.Offer;
 
-public class RequirementsOfferRequester implements OfferRequester {
+public class AllOffersRequester implements OfferRequester{
 
 	private DemandObject demandObject;
 	
+	public AllOffersRequester() {
+		
+	}
+	
 	@Override
 	public Collection<Offer> requestOffers(Collection<LSPDecorator> lsps) {
-		ArrayList<Offer> offerList = new ArrayList<Offer>();
+		ArrayList<Offer> offers = new ArrayList<Offer>();
 		for(LSPDecorator lsp : lsps) {
-			for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions() ) {
-				offerList.add(lsp.getOffer(demandObject, "linear", solution.getId()));
+			for(LogisticsSolutionDecorator solution : lsp.getSelectedPlan().getSolutionDecorators()) {
+				offers.add(lsp.getOffer(demandObject, "linear", solution.getId()));
 			}
 		}
-		return offerList;
+		return offers;
 	}
 
+	@Override
 	public void setDemandObject(DemandObject demandObject) {
 		this.demandObject = demandObject;
 	}
-	
+
 }
