@@ -1,8 +1,9 @@
 /**
- * 
+ *
  */
 package org.matsim.contrib.pseudosimulation.trafficinfo;
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Network;
@@ -12,22 +13,23 @@ import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.contrib.pseudosimulation.MobSimSwitcher;
 import org.matsim.contrib.pseudosimulation.RunPSim;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 /**
  * @author fouriep
- * 
  */
 public class PSimTravelTimeCalculator extends TravelTimeCalculator {
 	private final MobSimSwitcher switcher;
 
-	public PSimTravelTimeCalculator(Network network,
-			TravelTimeCalculatorConfigGroup ttconfigGroup, int numHrs,  MobSimSwitcher switcher) {
-		super(network, ttconfigGroup.getTraveltimeBinSize(), numHrs,
-				ttconfigGroup);
+	@Inject
+	PSimTravelTimeCalculator(TravelTimeCalculatorConfigGroup ttconfigGroup, EventsManager eventsManager, Network network, MobSimSwitcher switcher) {
+		super(network, ttconfigGroup);
 		this.switcher = switcher;
+		eventsManager.addHandler(this);
 	}
 
 	@Override
@@ -36,7 +38,7 @@ public class PSimTravelTimeCalculator extends TravelTimeCalculator {
 			Logger.getLogger(this.getClass()).error(
 					"Calling reset on traveltimecalc");
 			super.reset(iteration);
-		}else{
+		} else {
 			Logger.getLogger(this.getClass()).error(
 					"Not resetting travel times as this is a PSim iteration");
 		}

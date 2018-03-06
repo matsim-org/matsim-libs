@@ -20,6 +20,8 @@
 
 package org.matsim.contrib.eventsBasedPTRouter.waitTimes;
 
+import com.google.inject.Provider;
+import com.google.inject.Provides;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
@@ -46,7 +48,7 @@ import java.util.Map;
  * @author sergioo
  */
 
-public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, Serializable {
+public class WaitTimeCalculatorSerializable implements WaitTimeCalculator, PersonDepartureEventHandler, PersonEntersVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, Serializable,Provider<WaitTime> {
 
 	/**
 	 * 
@@ -124,7 +126,8 @@ public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandl
 		};
 	}
 
-	private double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
+	@Override
+	public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
 		Tuple<String, String> key = new Tuple<String, String>(lineId.toString(), routeId.toString());
 		waitTimeCalls++;
 		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId.toString());
@@ -175,4 +178,19 @@ public class WaitTimeCalculatorSerializable implements PersonDepartureEventHandl
 		linesRoutesOfVehicle.put(event.getVehicleId().toString(), new Tuple<String, String>(event.getTransitLineId().toString(), event.getTransitRouteId().toString()));
 	}
 
+	@Override
+	@Provides
+	public WaitTime get() {
+		return new WaitTime() {
+			/**
+			 *
+			 */
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
+				return WaitTimeCalculatorSerializable.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
+			}
+		};
+	}
 }

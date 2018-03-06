@@ -22,9 +22,9 @@ import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 /**
  * @author fouriep
  */
-public class PSimFactory implements Provider<Mobsim>, MobsimFactory {
+public class PSimProvider implements Provider<Mobsim> {
 
-    private PlanCatcher plans;
+    @Inject private PlanCatcher plans;
     private TravelTime travelTime;
     private WaitTime waitTime;
     private StopStopTime stopStopTime;
@@ -33,10 +33,9 @@ public class PSimFactory implements Provider<Mobsim>, MobsimFactory {
     private final EventsManager eventsManager;
 
     @Inject
-    PSimFactory(Scenario scenario, EventsManager eventsManager, PlanCatcher planCatcher) {
+	public PSimProvider(Scenario scenario, EventsManager eventsManager) {
         this.scenario = scenario;
         this.eventsManager = eventsManager;
-        this.plans = planCatcher;
     }
 
     @Override

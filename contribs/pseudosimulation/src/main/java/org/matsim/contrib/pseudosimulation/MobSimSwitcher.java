@@ -1,15 +1,14 @@
 package org.matsim.contrib.pseudosimulation;
 
 
+import com.google.inject.Inject;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
+import org.matsim.contrib.pseudosimulation.mobsim.PSimProvider;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -28,19 +27,20 @@ public class MobSimSwitcher implements IterationEndsListener,
 	private final ArrayList<Integer> qsimIters = new ArrayList<>();
 	private final Scenario scenario;
 	private boolean isQSimIteration = true;
-	private int cheapIterCount = 0;
-	private int currentRate = 0;
+	private int psimIterationCount = 0;
+	private int iterationsPerCycle = 0;
 	private Map<Id<Person>, Double> selectedPlanScoreMemory;
-	private PlanCatcher plancatcher;
-	private PSimFactory pSimFactory;
+	@Inject private PlanCatcher plancatcher;
+	@Inject private PSimProvider pSimProvider;
 
-	public MobSimSwitcher(int overridingRate, Scenario scenario) {
-		currentRate = overridingRate;
+	@Inject
+	MobSimSwitcher(PSimConfigGroup pSimConfigGroup, Scenario scenario) {
+		iterationsPerCycle = pSimConfigGroup.getIterationsPerCycle();
 		this.scenario = scenario;
 	}
 
-	public PSimFactory getpSimFactory() {
-		return pSimFactory;
+	public PSimProvider getpSimProvider() {
+		return pSimProvider;
 	}
 
 	public boolean isQSimIteration() {
@@ -68,21 +68,21 @@ public class MobSimSwitcher implements IterationEndsListener,
 			isQSimIteration = true;
 			return isQSimIteration;
 		}
-		if (isQSimIteration && cheapIterCount == 0) {
+		if (isQSimIteration && psimIterationCount == 0) {
 			isQSimIteration = false;
-			cheapIterCount++;
+			psimIterationCount++;
 			return isQSimIteration;
 		}
-		if (cheapIterCount >= currentRate - 1) {
+		if (psimIterationCount >= iterationsPerCycle - 1) {
 			isQSimIteration = true;
 			qsimIters.add(iteration);
-			cheapIterCount = 0;
+			psimIterationCount = 0;
 			return isQSimIteration;
 		}
 		if (isQSimIteration) {
 			qsimIters.add(iteration);
 		} else {
-			cheapIterCount++;
+			psimIterationCount++;
 
 		}
 		return isQSimIteration;

@@ -21,8 +21,8 @@ package org.matsim.contrib.eventsBasedPTRouter;
 
 import com.google.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTime;
-import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
+import org.matsim.contrib.eventsBasedPTRouter.stopStopTimes.StopStopTimeCalculator;
+import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculator;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -41,31 +41,31 @@ public class TransitRouterEventsWSFactory implements Provider<TransitRouter> {
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
 	private final Scenario scenario;
-	private WaitTime waitTime;
+	private WaitTimeCalculator waitTimeCalculator;
 
-    public void setStopStopTime(StopStopTime stopStopTime) {
-        this.stopStopTime = stopStopTime;
+    public void setStopStopTimeCalculator(StopStopTimeCalculator stopStopTimeCalculator) {
+        this.stopStopTimeCalculator = stopStopTimeCalculator;
     }
 
-    public void setWaitTime(WaitTime waitTime) {
-        this.waitTime = waitTime;
+    public void setWaitTimeCalculator(WaitTimeCalculator waitTimeCalculator) {
+        this.waitTimeCalculator = waitTimeCalculator;
     }
 
-    private StopStopTime stopStopTime;
+    private StopStopTimeCalculator stopStopTimeCalculator;
 	
 	@Inject
-    public TransitRouterEventsWSFactory(final Scenario scenario, final WaitTime waitTime, final StopStopTime stopStopTime) {
+    public TransitRouterEventsWSFactory(final Scenario scenario, final WaitTimeCalculator waitTimeCalculator, final StopStopTimeCalculator stopStopTimeCalculator) {
 		this.config = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
 				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
 				scenario.getConfig().vspExperimental());
 		routerNetwork = TransitRouterNetworkWW.createFromSchedule(scenario.getNetwork(), scenario.getTransitSchedule(), this.config.getBeelineWalkConnectionDistance());
 		this.scenario = scenario;
-		this.waitTime = waitTime;
-		this.stopStopTime = stopStopTime;
+		this.waitTimeCalculator = waitTimeCalculator;
+		this.stopStopTimeCalculator = stopStopTimeCalculator;
 	}
 	@Override
 	public TransitRouter get() {
-		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWS(config, routerNetwork, waitTime, stopStopTime, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().qsim(), new PreparedTransitSchedule(scenario.getTransitSchedule())), routerNetwork);
+		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWS(config, routerNetwork, waitTimeCalculator, stopStopTimeCalculator, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().qsim(), new PreparedTransitSchedule(scenario.getTransitSchedule())), routerNetwork);
 	}
 
 }
