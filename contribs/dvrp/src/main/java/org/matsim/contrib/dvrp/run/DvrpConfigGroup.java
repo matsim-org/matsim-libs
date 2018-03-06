@@ -32,17 +32,51 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class DvrpConfigGroup extends ReflectiveConfigGroup {
-	public static final String GROUP_NAME = "dvrp";
 
+	public static final String GROUP_NAME = "dvrp";
 	@SuppressWarnings("deprecation")
 	public static DvrpConfigGroup get(Config config) {
 		return (DvrpConfigGroup)config.getModule(GROUP_NAME);// will fail if not in the config
 	}
 
 	public static final String MODE = "mode";
+	static final String MODE_EXP = "Mode which will be handled by PassengerEngine and VrpOptimizer "
+			+ "(passengers'/customers' perspective)";
+
 	public static final String NETWORK_MODE = "networkMode";
+	static final String NETWORK_MODE_EXP = "Mode of which the network will be used for routing vehicles, calculating trave times, "
+			+ "etc. (fleet operator's perspective). " + "Default is car.";
+
 	public static final String TRAVEL_TIME_ESTIMATION_ALPHA = "travelTimeEstimationAlpha";
+	static final String TRAVEL_TIME_ESTIMATION_ALPHA_EXP = "Used for OFFLINE estimation of travel times for VrpOptimizer"
+			+ " by means of the exponential moving average."
+			+ " The weighting decrease, alpha, must be in (0,1]."
+			+ " We suggest small values of alpha, e.g. 0.05."
+			+ " The averaging starts from the initial travel time estimates. If not provided,"
+			+ " the free-speed TTs is used as the initial estimates";
+
 	public static final String TRAVEL_TIME_ESTIMATION_BETA = "travelTimeEstimationBeta";
+	static final String TRAVEL_TIME_ESTIMATION_BETA_EXP = "Used for ONLINE estimation of travel times for VrpOptimizer"
+			+ " by combining WithinDayTravelTime and DvrpOfflineTravelTimeEstimator."
+			+ " The beta coefficient is provided in seconds and should be either 0 (no online estimation)"
+			+ " or positive (mixed online-offline estimation)."
+			/////
+			+ " For 'beta = 0', only the offline estimate is used:" + " 'onlineTT(t) = offlineTT(t)',"
+			+ " where 'offlineTT(t)' in the offline estimate for TT at time 't',"
+			/////
+			+ " For 'beta > 0', estimating future TTs at time 't',"
+			+ " uses the currently observed TT to correct the offline estimates is made:"
+			+ " where 'currentTT' is the currently observed TT,"
+			+ " and 'correction = min(1, max(0, 1 - (time - currentTime) / beta))'"
+			////
+			+ " The rule is that correction decreases linearly from 1 (when 'time = currentTime')"
+			+ " to 0 (when 'time = currentTime + beta'"
+			+ " For 'time > currentTime + beta' correction is 0,"
+			+ " whereas if 'time < currentTime' it is 1."
+			////
+			+ " If beta is sufficiently large, 'beta >> 0', only the currently observed TT is used.";
+	// In DVRP 'time < currentTime' may only happen for backward path search, a adding proper search termination
+	// criterion should prevent this from happening
 
 	@NotNull
 	private String mode = null; // travel mode (passengers'/customers' perspective)
@@ -65,77 +99,81 @@ public class DvrpConfigGroup extends ReflectiveConfigGroup {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> map = super.getComments();
-		map.put(MODE, "Mode which will be handled by PassengerEngine and VrpOptimizer "
-				+ "(passengers'/customers' perspective)");
-		map.put(NETWORK_MODE, "Mode of which the network will be used for routing vehicles, calculating trave times, "
-				+ "etc. (fleet operator's perspective). " + "Default is car.");
+		map.put(MODE, MODE_EXP);
+		map.put(NETWORK_MODE, NETWORK_MODE_EXP);
 		map.put(TRAVEL_TIME_ESTIMATION_ALPHA, //
-				"Used for OFFLINE estimation of travel times for VrpOptimizer"
-						+ " by means of the exponential moving average."
-						+ " The weighting decrease, alpha, must be in (0,1]."
-						+ " We suggest small values of alpha, e.g. 0.05."
-						+ " The averaging starts from the initial travel time estimates. If not provided,"
-						+ " the free-speed TTs is used as the initial estimates");
+				TRAVEL_TIME_ESTIMATION_ALPHA_EXP);
 		map.put(TRAVEL_TIME_ESTIMATION_BETA,
-				"Used for ONLINE estimation of travel times for VrpOptimizer"
-						+ " by combining WithinDayTravelTime and DvrpOfflineTravelTimeEstimator."
-						+ " The beta coefficient is provided in seconds and should be either 0 (no online estimation)"
-						+ " or positive (mixed online-offline estimation)."
-						/////
-						+ " For 'beta = 0', only the offline estimate is used:" + " 'onlineTT(t) = offlineTT(t)',"
-						+ " where 'offlineTT(t)' in the offline estimate for TT at time 't',"
-						/////
-						+ " For 'beta > 0', estimating future TTs at time 't',"
-						+ " uses the currently observed TT to correct the offline estimates is made:"
-						+ " where 'currentTT' is the currently observed TT,"
-						+ " and 'correction = min(1, max(0, 1 - (time - currentTime) / beta))'"
-						////
-						+ " The rule is that correction decreases linearly from 1 (when 'time = currentTime')"
-						+ " to 0 (when 'time = currentTime + beta'"
-						+ " For 'time > currentTime + beta' correction is 0,"
-						+ " whereas if 'time < currentTime' it is 1."
-						////
-						+ " If beta is sufficiently large, 'beta >> 0', only the currently observed TT is used.");
-		// In DVRP 'time < currentTime' may only happen for backward path search, a adding proper search termination
-		// criterion should prevent this from happening
+				TRAVEL_TIME_ESTIMATION_BETA_EXP);
 		return map;
 	}
 
+	/**
+	 * 
+	 * @return -- {@value #MODE_EXP}}
+	 */
 	@StringGetter(MODE)
 	public String getMode() {
 		return mode;
 	}
 
+	/**
+	 * 
+	 * @param -- {@value #MODE_EXP}
+	 */
 	@StringSetter(MODE)
 	public void setMode(String mode) {
 		this.mode = mode;
 	}
-
+	/**
+	 * 
+	 * @return -- {@value #NETWORK_MODE_EXP}
+	 */
 	@StringGetter(NETWORK_MODE)
 	public String getNetworkMode() {
 		return networkMode;
 	}
 
+	/**
+	 * 
+	 * @param -- {@value #NETWORK_MODE_EXP}
+	 */
 	@StringSetter(NETWORK_MODE)
 	public void setNetworkMode(String routingMode) {
 		this.networkMode = routingMode;
 	}
 
+	/**
+	 * 
+	 * @return -- {@value #TRAVEL_TIME_ESTIMATION_ALPHA_EXP}
+	 */
 	@StringGetter(TRAVEL_TIME_ESTIMATION_ALPHA)
 	public double getTravelTimeEstimationAlpha() {
 		return travelTimeEstimationAlpha;
 	}
 
+	/**
+	 * 
+	 * @value -- {@value #TRAVEL_TIME_ESTIMATION_ALPHA_EXP}
+	 */
 	@StringSetter(TRAVEL_TIME_ESTIMATION_ALPHA)
 	public void setTravelTimeEstimationAlpha(double travelTimeEstimationAlpha) {
 		this.travelTimeEstimationAlpha = travelTimeEstimationAlpha;
 	}
 
+	/**
+	 * 
+	 * @return -- {@value #TRAVEL_TIME_ESTIMATION_BETA_EXP}
+	 */
 	@StringGetter(TRAVEL_TIME_ESTIMATION_BETA)
 	public double getTravelTimeEstimationBeta() {
 		return travelTimeEstimationBeta;
 	}
 
+	/**
+	 * 
+	 * @param -- {@value #TRAVEL_TIME_ESTIMATION_BETA_EXP}
+	 */
 	@StringSetter(TRAVEL_TIME_ESTIMATION_BETA)
 	public void setTravelTimeEstimationBeta(double travelTimeEstimationBeta) {
 		this.travelTimeEstimationBeta = travelTimeEstimationBeta;

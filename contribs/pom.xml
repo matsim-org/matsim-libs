@@ -4,7 +4,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>contrib</artifactId>
 	<packaging>pom</packaging>
-	<version>0.10.0-SNAPSHOT</version>
+	<version>0.11.0-SNAPSHOT</version>
 	<name>MATSim-Contrib</name>
 
 	<scm>
@@ -172,7 +172,6 @@
 		<module>socnetgen</module>
 		<module>transEnergySim</module>
 		<module>roadpricing</module>
-		<module>opdytsIntegration</module>
 		<module>multimodal</module>
 		<module>integration</module>
 		<module>wagonSim</module>
@@ -222,14 +221,14 @@
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.10.0-SNAPSHOT</version>
+			<version>0.11.0-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.matsim</groupId>
 			<artifactId>matsim</artifactId>
-			<version>0.10.0-SNAPSHOT</version>
+			<version>0.11.0-SNAPSHOT</version>
 			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
