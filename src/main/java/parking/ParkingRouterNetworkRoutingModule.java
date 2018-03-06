@@ -57,14 +57,14 @@ import org.matsim.facilities.Facility;
  *
  * @author thibautd, nagel
  */
-public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
-    private static final Logger log = Logger.getLogger(ParkingSearchNetworkRoutingModule.class);
+public final class ParkingRouterNetworkRoutingModule implements RoutingModule {
+    private static final Logger log = Logger.getLogger(ParkingRouterNetworkRoutingModule.class);
 
     private final class AccessEgressStageActivityTypes implements StageActivityTypes {
         @Override
         public boolean isStageActivity(String activityType) {
-            if (ParkingSearchNetworkRoutingModule.this.stageActivityType.equals(activityType) ||
-                    ParkingSearchNetworkRoutingModule.this.parkingStageActivityType.equals(activityType)
+            if (ParkingRouterNetworkRoutingModule.this.stageActivityType.equals(activityType) ||
+                    ParkingRouterNetworkRoutingModule.this.parkingStageActivityType.equals(activityType)
                     ) {
                 return true;
             } else {
@@ -78,12 +78,12 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
                 return false;
             }
             AccessEgressStageActivityTypes other = (AccessEgressStageActivityTypes) obj;
-            return other.isStageActivity(ParkingSearchNetworkRoutingModule.this.stageActivityType);
+            return other.isStageActivity(ParkingRouterNetworkRoutingModule.this.stageActivityType);
         }
 
         @Override
         public int hashCode() {
-            return ParkingSearchNetworkRoutingModule.this.stageActivityType.hashCode();// TODO update this too
+            return ParkingRouterNetworkRoutingModule.this.stageActivityType.hashCode();// TODO update this too
         }
     }
 
@@ -100,7 +100,7 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
 
     private final Map<Id<Person>, Link> personToParkLink = new HashMap<>();
 
-    public ParkingSearchNetworkRoutingModule(
+    public ParkingRouterNetworkRoutingModule(
             final String mode,
             final PopulationFactory populationFactory,
             final Network network,
@@ -138,7 +138,7 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
         // so that agent walk back to where car is parked.
         if (personToParkLink.containsKey(person.getId())) {
             accessActLink = personToParkLink.remove(person.getId());
-            log.warn("Person " + person.getId() + " is walking to " + accessActLink.getId() + " to get the car.");
+//            log.warn("Person " + person.getId() + " is walking to " + accessActLink.getId() + " to get the car.");
             // increase the parking capacity counter
             this.zoneToLinks.getParkingZone(accessActLink)
                             .updateLinkParkingCapacity(accessActLink, +1);// can be dependent on PCU of the vehicle
@@ -198,8 +198,8 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
             if (parkEndLink == null ) {
                 // vehicle is outside the study area
             } else {
-                log.warn("Person " + person.getId() + " started looking for parking on link " + egressActLink.getId() + " and found parking on link " + parkEndLink
-                        .getId());
+//                log.warn("Person " + person.getId() + " started looking for parking on link " + egressActLink.getId() + " and found parking on link " + parkEndLink
+//                        .getId());
                 now += routeLeg(person, newLeg, egressActLink, parkEndLink, now);
 
                 // an activity will help in identifying the start of the parking search
@@ -239,7 +239,7 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
                         toFacility.getCoord(),
                         now,
                         egressActLink.getId(),
-                        egressActLink.getId(),
+                        decideOnLink(toFacility).getId(),
                         this.populationFactory);
                 result.add(egressLeg);
 //				log.warn( egressLeg );
@@ -260,8 +260,9 @@ public final class ParkingSearchNetworkRoutingModule implements RoutingModule {
             cumSum += prob.getValue();
             if (randNr <= cumSum) return this.network.getLinks().get(prob.getKey());
         }
+        return null;
         // following exception may be replaced by warning and null, however must be checked first.
-        throw new RuntimeException("No parking link is found. The cumulative sum of the probabilities is "+ cumSum);
+//        throw new RuntimeException("No parking link is found. The cumulative sum of the probabilities is "+ cumSum);
     }
 
     private Link decideOnLink(final Facility fromFacility) {

@@ -20,12 +20,9 @@
 package parking;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -43,11 +40,15 @@ public class RunExample {
     public static void main(String[] args) {
 
         // removed cadyts config group from config.
-        String configFile = "../../repos/shared-svn/projects/vw_rufbus/projekt2/parking/input/vw202.0.01.output_config.xml";
-        String outputDir = "../../repos/shared-svn/projects/vw_rufbus/projekt2/parking/output/";
-        String shapeFile = "../../repos/shared-svn/projects/vw_rufbus/projekt2/parking/shp/parking-zones.shp";
+        String configFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/parking/input/vw202.0.01.output_config.xml";
+        String outputDir = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/parking/output/";
+        String shapeFile = "../shp/parking-bs.shp";
 
-        Config config = ConfigUtils.loadConfig(configFile);
+        Config config = ConfigUtils.loadConfig(configFile, new ParkingRouterConfigGroup());
+        ParkingRouterConfigGroup prc = ParkingRouterConfigGroup.get(config);
+        prc.setShapeFile(shapeFile);
+        
+        
         config.network().setInputFile("../example_scenario/vw202.0.01/vw202.0.01.output_network.xml.gz");
         config.plans().setInputFile("../example_scenario/vw202.0.01/vw202.0.01.output_plans.xml.gz");
 //        config.plans().setInputFile("1agent.xml");
@@ -58,6 +59,7 @@ public class RunExample {
         config.controler().setOutputDirectory(outputDir);
         config.controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists);
         config.controler().setWriteEventsInterval(2);
+        config.controler().setLastIteration(2);
 
 
         //
@@ -75,10 +77,9 @@ public class RunExample {
                     .forEach(pe -> ((Leg) pe).setRoute(null));
         }
 
-        ZonalLinkParkingInfo zoneToLinks =  new ZonalLinkParkingInfo( shapeFile, "NO", scenario.getNetwork(), scenario.getConfig().qsim() );
         
         Controler controler = new Controler(scenario);
-        controler.addOverridingModule(new ParkingSearchModule(zoneToLinks));
+        controler.addOverridingModule(new ParkingRouterModule());
 
         controler.run();
     }

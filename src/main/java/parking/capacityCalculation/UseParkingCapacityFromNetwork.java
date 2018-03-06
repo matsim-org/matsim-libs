@@ -16,48 +16,22 @@
  *                                                                         *
  * *********************************************************************** */
   
-package parking;
-
-import java.util.Random;
+package parking.capacityCalculation;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.gbl.MatsimRandom;
 
-public class LinkLengthBasedCapacityCalculator implements LinkParkingCapacityCalculator {
+public class UseParkingCapacityFromNetwork implements LinkParkingCapacityCalculator {
 
-	private final Random random = MatsimRandom.getRandom();
+	public static final String CAP_ATT_NAME = "parkingCapacity";
+	
 	@Override
 	public double getLinkCapacity(Link link) {
-
-		  
-          double r =  random.nextDouble();
-          double capacity;
-          if (link.getFreespeed()>13.8889) {
-        	  capacity = 0 ;
-        	  return capacity;
-          }
-          
-          if (r <= 0.11) {
-       	   capacity = Math.floor(0.65 * Math.floor(((link.getLength()-10)/3))) ;
-            }
-          //schraeg parken
-            
-          else if (r > 0.11 && r <= 0.25 ) {
-       	   capacity = Math.floor(0.65 * Math.floor(((link.getLength()-10)/2.5))) ;
-       	   }
-          //senkrecht parken
-        
-          else {
-       	   capacity =  Math.floor(0.65 * Math.floor(((link.getLength()-10)/5.2))) ;
-          }
-          // laengs parken
-          if (capacity < 0) {
-  		   capacity = 0 ;
-			}
-          
-   
-    
-		return capacity;
+		Double d = (Double) link.getAttributes().getAttribute(CAP_ATT_NAME);
+		if (d == null) {
+			throw new NullPointerException("parking capacity not set for link " + link.getId() );
+		}
+		
+		return d;
 	}
 
 }

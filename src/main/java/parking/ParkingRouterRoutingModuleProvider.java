@@ -39,9 +39,9 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
 
-public class ParkingSearchRoutingModuleProvider implements Provider<RoutingModule> {
+public class ParkingRouterRoutingModuleProvider implements Provider<RoutingModule> {
 
-    private static final Logger log = Logger.getLogger( ParkingSearchRoutingModuleProvider.class ) ;
+    private static final Logger log = Logger.getLogger( ParkingRouterRoutingModuleProvider.class ) ;
 
     private final String mode;
     private final String routingMode;
@@ -70,11 +70,11 @@ public class ParkingSearchRoutingModuleProvider implements Provider<RoutingModul
     @Inject
     ZonalLinkParkingInfo zoneToLinks;
 
-    ParkingSearchRoutingModuleProvider(String mode) {
+    ParkingRouterRoutingModuleProvider(String mode) {
        this(mode, mode);
     }
 
-    ParkingSearchRoutingModuleProvider(String mode, String routingMode ) {
+    ParkingRouterRoutingModuleProvider(String mode, String routingMode ) {
 //		log.setLevel(Level.DEBUG);
         this.mode = mode;
         this.routingMode = routingMode ;
@@ -115,7 +115,7 @@ public class ParkingSearchRoutingModuleProvider implements Provider<RoutingModul
 
         // the following again refers to the (transport)mode, since it will determine the mode of the leg on the network:
         if ( plansCalcRouteConfigGroup.isInsertingAccessEgressWalk() ) {
-            return new ParkingSearchNetworkRoutingModule(mode, populationFactory, filteredNetwork, routeAlgo,
+            return new ParkingRouterNetworkRoutingModule(mode, populationFactory, filteredNetwork, routeAlgo,
                     plansCalcRouteConfigGroup, this.zoneToLinks) ;
         } else {
             return DefaultRoutingModules.createPureNetworkRouter(mode, populationFactory, filteredNetwork, routeAlgo);

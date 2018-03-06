@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package parking;
+package parking.capacityCalculation;
 
 import org.matsim.api.core.v01.network.Link;
 
