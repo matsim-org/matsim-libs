@@ -3,16 +3,16 @@ package demand.controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 
-import demand.decoratedLSP.LSPsWithOffers;
+import demand.decoratedLSP.LSPDecorators;
 import lsp.LSP;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
 
 public class SupplyClearer implements IterationEndsListener{
 	
-	private LSPsWithOffers lsps;
+	private LSPDecorators lsps;
 	
-	public SupplyClearer(LSPsWithOffers lsps) {
+	public SupplyClearer(LSPDecorators lsps) {
 		this.lsps = lsps;
 	}
 					

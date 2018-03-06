@@ -94,10 +94,10 @@ public class distributionShipmentBuilderTest {
 			assertEquals(shipment.getSchedule().getShipment(), shipment);
 			assertTrue(shipment.getSchedule().getPlanElements().isEmpty());
 			Link link = network.getLinks().get(shipment.getToLinkId());
-			assertTrue(link.getFromNode().getCoord().getX() <= 18);
-			assertTrue(link.getFromNode().getCoord().getX() >= 14);
-			assertTrue(link.getToNode().getCoord().getX() <= 18);
-			assertTrue(link.getToNode().getCoord().getX() >= 14);
+			assertTrue(link.getFromNode().getCoord().getX() <= 18000);
+			assertTrue(link.getFromNode().getCoord().getX() >= 14000);
+			assertTrue(link.getToNode().getCoord().getX() <= 18000);
+			assertTrue(link.getToNode().getCoord().getX() >= 14000);
 		}
 	}
 }

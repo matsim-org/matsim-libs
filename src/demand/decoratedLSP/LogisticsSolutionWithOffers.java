@@ -118,10 +118,10 @@ public class LogisticsSolutionWithOffers implements LogisticsSolutionDecorator {
 	}
 
 	@Override
-	public LSP getLSP() {
+	public LSPDecorator getLSP() {
 		return lsp;
 	}
-
+		
 	@Override
 	public Collection<LogisticsSolutionElement> getSolutionElements() {
 		return  solutionElements;
@@ -134,8 +134,7 @@ public class LogisticsSolutionWithOffers implements LogisticsSolutionDecorator {
 
 	@Override
 	public void assignShipment(LSPShipment shipment) {
-		shipments.add(shipment);	
-		getFirstElement().getIncomingShipments().addShipment(shipment.getStartTimeWindow().getStart(), shipment);
+		shipments.add(shipment);			
 	}
 	
 	private LogisticsSolutionElement getFirstElement(){

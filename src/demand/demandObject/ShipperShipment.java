@@ -12,7 +12,9 @@ public interface ShipperShipment {
 	public Id<ShipperShipment> getId();
 	public double getShipmentSize();
 	public TimeWindow getStartTimeWindow();
+	public void setStartTimeWindow(TimeWindow timeWindow);
 	public TimeWindow getEndTimeWindow();
+	public void setEndTimeWindow(TimeWindow timeWindow);
 	public double getServiceTime();
 	public void setLSPShipment(LSPShipment lspShipment);
 	public LSPShipment getLSPShipment();

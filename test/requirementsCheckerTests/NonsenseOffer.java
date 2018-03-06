@@ -1,5 +1,7 @@
 package requirementsCheckerTests;
 
+import demand.decoratedLSP.LSPDecorator;
+import demand.decoratedLSP.LogisticsSolutionDecorator;
 import demand.offer.Offer;
 import demand.offer.OfferVisitor;
 import lsp.LSP;
@@ -7,17 +9,17 @@ import lsp.LogisticsSolution;
 
 public class NonsenseOffer implements Offer{
 
-	private LSP lsp;
-	private LogisticsSolution solution;
+	private LSPDecorator lsp;
+	private LogisticsSolutionDecorator solution;
 	
 	
 	@Override
-	public LSP getLsp() {
+	public LSPDecorator getLsp() {
 		return lsp;
 	}
 
 	@Override
-	public LogisticsSolution getSolution() {
+	public LogisticsSolutionDecorator getSolution() {
 		return solution;
 	}
 
@@ -38,13 +40,13 @@ public class NonsenseOffer implements Offer{
 	}
 
 	@Override
-	public void setLSP(LSP lsp) {
+	public void setLSP(LSPDecorator lsp) {
 		this.lsp = lsp;
 		
 	}
 
 	@Override
-	public void setSolution(LogisticsSolution solution) {
+	public void setSolution(LogisticsSolutionDecorator solution) {
 		this.solution = solution;
 		
 	}

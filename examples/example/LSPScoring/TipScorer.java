@@ -1,7 +1,5 @@
 package example.LSPScoring;
 
-import org.matsim.api.core.v01.population.HasPlansAndId;
-
 import lsp.LSP;
 import lsp.functions.Info;
 import lsp.functions.InfoFunction;
@@ -33,6 +31,12 @@ public class TipScorer implements LSPScorer {
 			}
 		}
 		return score;
+	}
+
+	@Override
+	public void setLSP(LSP lsp) {
+		// TODO Auto-generated method stub
+		
 	}
 
 		

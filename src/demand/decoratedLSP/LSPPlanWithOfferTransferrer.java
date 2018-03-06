@@ -14,12 +14,12 @@ public class LSPPlanWithOfferTransferrer implements LSPPlanDecorator{
 
 	private LSPDecorator lsp;
 	private double score;
-	private Collection<LogisticsSolution> solutions;
+	private Collection<LogisticsSolutionDecorator> solutions;
 	private ShipmentAssigner assigner; 
 	private OfferTransferrer transferrer;
 	
 	public LSPPlanWithOfferTransferrer() {
-		this.solutions = new ArrayList<LogisticsSolution>();
+		this.solutions = new ArrayList<LogisticsSolutionDecorator>();
 		this.assigner = new DefaultAssigner(this.lsp);
 	}
 	
@@ -38,7 +38,12 @@ public class LSPPlanWithOfferTransferrer implements LSPPlanDecorator{
 
 	@Override
 	public Collection<LogisticsSolution> getSolutions() {
-		return solutions;
+		Collection<LogisticsSolution> solutionDecorators = new ArrayList<LogisticsSolution>();
+		for(LogisticsSolution  solution : solutions) {
+			LogisticsSolutionDecorator solutionDecorator = (LogisticsSolutionDecorator) solution;
+			solutionDecorators.add(solutionDecorator);
+		}
+		return solutionDecorators;
 	}
 
 	@Override
@@ -63,7 +68,7 @@ public class LSPPlanWithOfferTransferrer implements LSPPlanDecorator{
 	}
 
 	@Override
-	public LSP getLsp() {
+	public LSPDecorator getLsp() {
 		return lsp;
 	}
 
@@ -84,6 +89,26 @@ public class LSPPlanWithOfferTransferrer implements LSPPlanDecorator{
 	public void setOfferTransferrer(OfferTransferrer offerTransferrer) {
 		this.transferrer = offerTransferrer;
 		this.transferrer.setLSP(lsp);
+	}
+
+	@Override
+	public Collection<LogisticsSolutionDecorator> getSolutionDecorators() {
+		Collection<LogisticsSolutionDecorator> solutionDecorators = new ArrayList<LogisticsSolutionDecorator>();
+		for(LogisticsSolution  solution : solutions) {
+			LogisticsSolutionDecorator solutionDecorator = (LogisticsSolutionDecorator) solution;
+			solutionDecorators.add(solutionDecorator);
+		}
+		return solutionDecorators;
+	}
+
+	@Override
+	public void addSolution(LogisticsSolutionDecorator solution) {
+		this.solutions.add(solution);
+	}
+
+	@Override
+	public void setLSP(LSPDecorator lsp) {
+		this.lsp = lsp;
 	}
 	
 }

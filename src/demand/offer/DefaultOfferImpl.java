@@ -1,25 +1,27 @@
 package demand.offer;
 
+import demand.decoratedLSP.LSPDecorator;
+import demand.decoratedLSP.LogisticsSolutionDecorator;
 import lsp.LSP;
 import lsp.LogisticsSolution;
 
 public class DefaultOfferImpl implements Offer {
 
-	private LSP lsp;
-	private LogisticsSolution solution;
+	private LSPDecorator lsp;
+	private LogisticsSolutionDecorator solution;
 	
-	public DefaultOfferImpl(LSP lsp, LogisticsSolution logisticsSolution) {
+	public DefaultOfferImpl(LSPDecorator lsp, LogisticsSolutionDecorator logisticsSolution) {
 		this.lsp = lsp;
 		this.solution = logisticsSolution;
 	}
 	
 	@Override
-	public LSP getLsp() {
+	public LSPDecorator getLsp() {
 		return lsp;
 	}
 
 	@Override
-	public LogisticsSolution getSolution() {
+	public LogisticsSolutionDecorator getSolution() {
 		return solution;
 	}
 
@@ -38,12 +40,12 @@ public class DefaultOfferImpl implements Offer {
 	}
 
 	@Override
-	public void setLSP(LSP lsp) {
+	public void setLSP(LSPDecorator lsp) {
 		this.lsp = lsp;
 	}
 
 	@Override
-	public void setSolution(LogisticsSolution solution) {
+	public void setSolution(LogisticsSolutionDecorator solution) {
 		this.solution = solution;
 	}
 	

@@ -18,7 +18,7 @@ public class DemandAgentImpl implements DemandAgent {
 		private Id<DemandAgent> id;
 		private ArrayList <UtilityFunction> utilityFunctions;
 		
-		public Builder newInstance() {
+		public static Builder newInstance() {
 			return new Builder();
 		}
 		

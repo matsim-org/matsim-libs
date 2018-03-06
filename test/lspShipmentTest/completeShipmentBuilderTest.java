@@ -19,6 +19,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import demand.demandAgent.DemandAgent;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
 
@@ -80,6 +81,7 @@ public class completeShipmentBuilderTest {
         }
 	}
 	
+		
 	@Test
 	public void testShipments() {
 		assertTrue(shipments.size() == 10);
@@ -102,14 +104,14 @@ public class completeShipmentBuilderTest {
 			assertEquals(shipment.getSchedule().getShipment(), shipment);
 			assertTrue(shipment.getSchedule().getPlanElements().isEmpty());
 			Link link = network.getLinks().get(shipment.getToLinkId());
-			assertTrue(link.getFromNode().getCoord().getX() <= 18);
-			assertTrue(link.getFromNode().getCoord().getX() >= 14);
-			assertTrue(link.getToNode().getCoord().getX() <= 18);
-			assertTrue(link.getToNode().getCoord().getX() >= 14);
+			assertTrue(link.getFromNode().getCoord().getX() <= 18000);
+			assertTrue(link.getFromNode().getCoord().getX() >= 14000);
+			assertTrue(link.getToNode().getCoord().getX() <= 18000);
+			assertTrue(link.getToNode().getCoord().getX() >= 14000);
 			
 			link = network.getLinks().get(shipment.getFromLinkId());
-			assertTrue(link.getFromNode().getCoord().getX() <= 4);
-			assertTrue(link.getFromNode().getCoord().getY() <= 4);
+			assertTrue(link.getFromNode().getCoord().getX() <= 4000);
+			assertTrue(link.getFromNode().getCoord().getY() <= 4000);
 		}
 	}
 }

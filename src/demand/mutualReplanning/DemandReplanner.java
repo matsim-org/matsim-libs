@@ -5,11 +5,13 @@ import java.util.Collection;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.replanning.GenericStrategyManager;
 
-import lsp.LSP;
-import lsp.LSPPlanImpl;
+import demand.decoratedLSP.LSPDecorator;
+import demand.demandObject.DemandObject;
+import demand.demandObject.DemandPlan;
 
 public interface DemandReplanner {
-	public void replan(Collection<LSP> lsps, ReplanningEvent event);
-	public GenericStrategyManager<LSPPlanImpl,LSP> getStrategyManager();
-	public void setStrategyManager(GenericStrategyManager<LSPPlanImpl,LSP> manager);
+	public void replan(Collection<LSPDecorator> lsps, ReplanningEvent event);
+	public void addStrategy(DemandPlanStrategyImpl strategy);
+	public void setDemandObject(DemandObject demandObject);
+	public DemandObject getDemandObject();
 }

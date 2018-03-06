@@ -91,8 +91,8 @@ public class collectionShipmentBuilderTest {
 			assertTrue(shipment.getSchedule().getPlanElements().isEmpty());
 			
 			Link link = network.getLinks().get(shipment.getFromLinkId());
-			assertTrue(link.getFromNode().getCoord().getX() <= 4);
-			assertTrue(link.getFromNode().getCoord().getY() <= 4);
+			assertTrue(link.getFromNode().getCoord().getX() <= 4000);
+			assertTrue(link.getFromNode().getCoord().getY() <= 4000);
 
 		}
 	}

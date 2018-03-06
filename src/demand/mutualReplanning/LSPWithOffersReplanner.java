@@ -22,6 +22,10 @@ public class LSPWithOffersReplanner implements LSPReplanner{
 		this.lsp = lsp;
 	}
 	
+	public LSPWithOffersReplanner() {
+
+	}
+	
 	@Override
 	public void replan(ReplanningEvent event) {
 		if(strategyManager != null) {
@@ -51,5 +55,20 @@ public class LSPWithOffersReplanner implements LSPReplanner{
 
 	public OfferUpdater getOfferUpdater() {
 		return offerUpdater;
+	}
+
+	@Override
+	public void setLSP(LSP lsp) {
+		try {
+			this.lsp = (LSPWithOffers) lsp;
+		}
+		catch(ClassCastException e) {
+			System.out.println("The class " + this.toString() + " expects an LSPWithOffers and not any other implementation of LSP");
+			System.exit(1);
+		}
+	}
+	
+	public void setLSP(LSPDecorator lsp) {
+		this.lsp = lsp;
 	}
 }

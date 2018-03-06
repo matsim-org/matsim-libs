@@ -8,6 +8,7 @@ import demand.offer.Offer;
 import demand.offer.OfferTransferrer;
 import demand.offer.OfferUpdater;
 import lsp.LSP;
+import lsp.LSPPlan;
 import lsp.LogisticsSolution;
 import lsp.shipment.LSPShipment;
 
@@ -17,4 +18,5 @@ public interface LSPDecorator extends LSP {
 	public void assignShipmentToSolution(LSPShipment shipment, Id<LogisticsSolution> id);
 	public OfferUpdater getOfferUpdater();
 	public void setOfferUpdater(OfferUpdater offerUpdater);
+	public LSPPlanDecorator getSelectedPlan();
 }

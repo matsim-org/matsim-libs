@@ -153,16 +153,30 @@ public class DemandObjectImpl implements DemandObject{
 		this.fromLinkId = builder.fromLinkId;
 		this.toLinkId = builder.toLinkId;
 		this.selectedPlan=builder.initialPlan;
+		if(this.selectedPlan != null) {
+			this.selectedPlan.setDemandObject(this);
+			this.selectedPlan.getShipment().setDemandObject(this);
+		}
 		this.plans.add(builder.initialPlan);
 		this.utilityFunctions = builder.utilityFunctions;
 		this.scorer = builder.scorer;
+		if(this.scorer != null) {
+			this.scorer.setDemandObject(this);
+		}
 		this.replanner = builder.replanner;
+		if(this.replanner != null) {
+			this.replanner.setDemandObject(this);
+		}
 		this.requirements = builder.requirements;
 		this.offerRequester = builder.offerRequester;
 		if(this.offerRequester != null) {
 			this.offerRequester.setDemandObject(this);
 		}		
 		this.infos = builder.infos;
+		this.generator = builder.generator;
+		if(this.generator != null) {
+			generator.setDemandObject(this);
+		}
 	}
 	
 	
@@ -241,7 +255,7 @@ public class DemandObjectImpl implements DemandObject{
 	}
 
 	private static DemandPlan copyPlan(DemandPlan plan2copy) {
-		DemandPlan.Builder builder = DemandPlan.Builder.getInstance();
+		DemandPlanImpl.Builder builder = DemandPlanImpl.Builder.newInstance();
 		builder.setLogisticsSolutionId(plan2copy.getSolutionId());
 		builder.setLsp(plan2copy.getLsp());
 		builder.setShipperShipment(plan2copy.getShipment());

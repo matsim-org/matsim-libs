@@ -112,7 +112,13 @@ public class LSPWithOffers implements LSPDecorator {
 		this.selectedPlan.getOfferTransferrer().setLSP(this);
 		this.resources = builder.resources;
 		this.scorer = builder.scorer;
+		if(this.scorer != null) {
+			this.scorer.setLSP(this);
+		}
 		this.replanner = builder.replanner;
+		if(this.replanner  != null) {
+			this.replanner .setLSP(this);
+		}
 		this.offerUpdater = builder.offerUpdater;
 		if(offerUpdater != null) {
 			offerUpdater.setLSP(this);
@@ -158,7 +164,7 @@ public class LSPWithOffers implements LSPDecorator {
 	}
 
 	@Override
-	public LSPPlan getSelectedPlan() {
+	public LSPPlanDecorator getSelectedPlan() {
 		selectedPlan.setLSP(this);
 		for(LogisticsSolution solution : selectedPlan.getSolutions()) {
 			if(solution instanceof LogisticsSolutionWithOffers) {
@@ -200,7 +206,7 @@ public class LSPWithOffers implements LSPDecorator {
 
 	@Override
 	public void assignShipmentToLSP(LSPShipment shipment) {
-		//remains empty, as assignment is done via the OfferTransferrer
+		this.shipments.add(shipment);
 	}
 
 	@Override

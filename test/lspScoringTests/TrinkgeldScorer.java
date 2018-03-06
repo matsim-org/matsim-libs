@@ -35,5 +35,11 @@ public class TrinkgeldScorer implements LSPScorer {
 		return score;
 	}
 
+	@Override
+	public void setLSP(LSP lsp) {
+		// TODO Auto-generated method stub
+		
+	}
+
 		
 }
