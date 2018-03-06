@@ -1,3 +1,4 @@
 *.png filter=fat -crlf
 *.jpg filter=fat -crlf
 *.gz  filter=fat -crlf
+*.zip  filter=fat -crlf
