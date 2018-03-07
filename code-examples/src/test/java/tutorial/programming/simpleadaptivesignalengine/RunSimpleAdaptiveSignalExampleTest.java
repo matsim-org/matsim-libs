@@ -47,13 +47,13 @@ public class RunSimpleAdaptiveSignalExampleTest {
 		final String expected = testUtils.getClassInputDirectory() + "output_events.xml.gz";
 		final String actual = testUtils.getOutputDirectory() + "output_events.xml.gz";
 		
-		int result = EventsFileComparator.compare(expected, actual);
-		// matsim-0.10.x returns an enum here, which is more expressive. kai, feb'18
+		EventsFileComparator.Result result = EventsFileComparator.compare(expected, actual);
+		System.out.println("result of events file comparison=" + result.name() ) ;
 		
 //		Assert.assertEquals("different event files",
 //				CRCChecksum.getCRCFromFile(actual),
 //				CRCChecksum.getCRCFromFile(expected));
-		// switching off this assertion; not taks of code examples to regression-test backwards compatibility. kai, feb'18
+		// switching off this assertion; not task of code examples to regression-test backwards compatibility. kai, feb'18
 		
 	}
 	

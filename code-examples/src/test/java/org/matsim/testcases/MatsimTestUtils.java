@@ -297,10 +297,13 @@ public final class MatsimTestUtils extends TestWatchman {
   public static void enableSystemExitCall() {
     System.setSecurityManager(null);
   }
-  
-  public static int compareEventsFiles( String filename1, String filename2 ) {
-	  return EventsFileComparator.compare(filename1, filename2) ;
-  }
+	
+	public static int compareEventsFilesAndReturnInt(String filename1, String filename2 ) {
+		return EventsFileComparator.compareAndReturnInt(filename1, filename2) ;
+	}
+	public static EventsFileComparator.Result compareEventsFiles(String filename1, String filename2 ) {
+		return EventsFileComparator.compare(filename1, filename2) ;
+	}
   public static void compareFilesBasedOnCRC( String filename1, String filename2 ) {
 	  long checksum1 = CRCChecksum.getCRCFromFile(filename1) ;
 	  long checksum2 = CRCChecksum.getCRCFromFile(filename2) ;

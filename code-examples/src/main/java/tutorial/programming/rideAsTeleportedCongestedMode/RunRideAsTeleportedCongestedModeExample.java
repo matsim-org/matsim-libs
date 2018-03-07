@@ -24,7 +24,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.router.NetworkRouting;
+import org.matsim.core.router.NetworkRoutingProvider;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.ArrayList;
@@ -55,7 +55,7 @@ public class RunRideAsTeleportedCongestedModeExample {
 		// tell the system to use the congested car router for the ride mode:
 		controler.addOverridingModule(new AbstractModule(){
 			@Override public void install() {
-				this.addRoutingModuleBinding( TransportMode.ride ).toProvider(new NetworkRouting( TransportMode.car ))  ;
+				this.addRoutingModuleBinding( TransportMode.ride ).toProvider(new NetworkRoutingProvider( TransportMode.car ))  ;
 			}
 		});
 		

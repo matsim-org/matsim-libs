@@ -11,6 +11,7 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
@@ -111,7 +112,7 @@ class RunMobsimWithMultipleModeVehiclesExample {
 			qSim.addMobsimEngine(netsimEngine);
 			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
-			TeleportationEngine teleportationEngine = new TeleportationEngine(scenario, eventsManager);
+			TeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager);
 			qSim.addMobsimEngine(teleportationEngine);
 
 			AgentFactory agentFactory = new DefaultAgentFactory(qSim);
