@@ -48,7 +48,8 @@ import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 
-import parking.ZonalLinkParkingInfo;
+import parking.ParkingRouterConfigGroup;
+import parking.ParkingRouterModule;
 
 /**
  * @author  jbischoff
@@ -58,7 +59,7 @@ import parking.ZonalLinkParkingInfo;
 public class RunCemdapBasecaseWithParking {
 public static void main(String[] args) {
 	
-	Config config = ConfigUtils.loadConfig(args[0], new CadytsConfigGroup());
+	Config config = ConfigUtils.loadConfig(args[0], new CadytsConfigGroup(), new ParkingRouterConfigGroup());
 	Scenario scenario = ScenarioUtils.loadScenario(config);
 	adjustPtNetworkCapacity(scenario.getNetwork(),config.qsim().getFlowCapFactor());
 	
@@ -71,6 +72,8 @@ public static void main(String[] args) {
 			addTravelTimeBinding(TransportMode.ride).to(networkTravelTime());
 			addTravelDisutilityFactoryBinding(TransportMode.ride).to(carTravelDisutilityFactoryKey());		}
 	});
+    controler.addOverridingModule(new ParkingRouterModule());
+
 	
 
 	
