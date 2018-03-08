@@ -48,6 +48,7 @@ import org.matsim.core.scoring.functions.ScoringParameters;
 import org.matsim.core.scoring.functions.ScoringParametersForPerson;
 import org.matsim.core.scoring.functions.SubpopulationScoringParameters;
 
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorModule;
 import parking.ParkingRouterConfigGroup;
 import parking.ParkingRouterModule;
 
@@ -73,7 +74,7 @@ public static void main(String[] args) {
 			addTravelDisutilityFactoryBinding(TransportMode.ride).to(carTravelDisutilityFactoryKey());		}
 	});
     controler.addOverridingModule(new ParkingRouterModule());
-
+    controler.addOverridingModule(new SwissRailRaptorModule());
 	
 
 	

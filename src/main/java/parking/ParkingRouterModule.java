@@ -2,7 +2,9 @@ package parking;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSet;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.scoring.functions.ScoringParameters;
 
 import parking.capacityCalculation.LinkLengthBasedCapacityCalculator;
 import parking.capacityCalculation.LinkParkingCapacityCalculator;
@@ -30,7 +32,10 @@ public class ParkingRouterModule extends AbstractModule {
 	        getConfig().plansCalcRoute().setInsertingAccessEgressWalk(true);
 	        PlanCalcScoreConfigGroup.ActivityParams carParking = new PlanCalcScoreConfigGroup.ActivityParams(CAR_PARKING_SEARCH_ACT);
 	        carParking.setScoringThisActivityAtAll(false);
-	        getConfig().planCalcScore().addActivityParams(carParking);
+	        
+	        for (ScoringParameterSet s : getConfig().planCalcScore().getScoringParametersPerSubpopulation().values()){
+	        	     	s.addActivityParams(carParking);
+	        }
 		    bind(ZonalLinkParkingInfo.class).asEagerSingleton();;
 		    addRoutingModuleBinding(TransportMode.car).toProvider(new ParkingRouterRoutingModuleProvider(TransportMode.car));
 		}
