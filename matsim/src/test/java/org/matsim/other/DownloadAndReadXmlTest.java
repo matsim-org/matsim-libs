@@ -20,6 +20,7 @@
 package org.matsim.other;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -40,6 +41,7 @@ public class DownloadAndReadXmlTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
+	@Ignore
 	@Test
 	public final void testHttpFromSvn() {
 		
