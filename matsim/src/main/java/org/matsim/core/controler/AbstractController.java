@@ -25,7 +25,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.MatsimRandom;
 
-public abstract class AbstractController {
+/*package*/ abstract class AbstractController {
+    // we already had one case where a method of this was removed, causing downstream failures; better just not
+	// offer it at all; framework with injector should now be flexible enough.  kai, mar'18
 
     private static Logger log = Logger.getLogger(AbstractController.class);
 
@@ -33,10 +35,6 @@ public abstract class AbstractController {
 
     private final IterationStopWatch stopwatch;
 
-    /*
-     * Strings used to identify the operations in the IterationStopWatch.
-     */
-    public static final String OPERATION_ITERATION = "iteration";
 
     /**
      * This is deliberately not even protected.  kai, jul'12
