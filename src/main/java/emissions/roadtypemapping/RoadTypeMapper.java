@@ -19,8 +19,6 @@
  * *********************************************************************** */
 package emissions.roadtypemapping;
 
-import java.util.Map.Entry;
-
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
 import org.matsim.core.config.*;

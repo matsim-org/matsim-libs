@@ -60,9 +60,14 @@
 			<artifactId>av</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
-			<dependency>
+		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>drt</artifactId>
+			<version>0.11.0-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>emissions</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
 
@@ -73,7 +78,7 @@
 			<artifactId>dvrp</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
-			<dependency>
+		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>parking</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
@@ -83,7 +88,7 @@
 			<artifactId>cadytsIntegration</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
 			<artifactId>analysis</artifactId>
@@ -100,19 +105,19 @@
 			<artifactId>jsprit-core</artifactId>
 			<version>1.7-RC1</version>
 		</dependency>
-		
-	<dependency>
-		<groupId>com.github.jfbischoff</groupId>
-	    <artifactId>matsim-sbb-extensions</artifactId>
-	    <version>master-SNAPSHOT</version>
-	</dependency>
+
+		<dependency>
+			<groupId>com.github.jfbischoff</groupId>
+			<artifactId>matsim-sbb-extensions</artifactId>
+			<version>master-SNAPSHOT</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.beust/jcommander -->
-<dependency>
-    <groupId>com.beust</groupId>
-    <artifactId>jcommander</artifactId>
-    <version>1.48</version>
-</dependency>
-		
+		<dependency>
+			<groupId>com.beust</groupId>
+			<artifactId>jcommander</artifactId>
+			<version>1.48</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

@@ -46,10 +46,10 @@ public class ParkingTripAnalyser {
     private static final Logger LOG = Logger.getLogger(ParkingTripAnalyser.class);
 
     public static void main(String[] args) {
-        String eventsFle = "../shared-svn/projects/vw_rufbus/projekt2/parking/output/ITERS/it.0/vw202.0.01.0.events.xml.gz";
-        String configFile = "../shared-svn/projects/vw_rufbus/projekt2/parking/example_scenario/vw202.0.01/vw202.0.01.output_config.xml";
-        String networkFile = "../shared-svn/projects/vw_rufbus/projekt2/parking/example_scenario/vw202.0.01/vw202.0.01.output_network.xml.gz";
-        String outFile = "../shared-svn/projects/vw_rufbus/projekt2/parking/output/ITERS/it.0/parkingTripStats.txt";
+        String eventsFle = "D:\\runs-svn\\vw_rufbus\\vw220park10\\vw220park10.output_events.xml.gz";
+        String configFile = "D:\\runs-svn\\vw_rufbus\\vw220park10\\vw220park10.output_config.xml";
+        String networkFile = "D:\\runs-svn\\vw_rufbus\\vw220park10\\vw220park10.output_network.xml.gz";
+        String outFile = "D:\\runs-svn\\vw_rufbus\\vw220park10\\vw220park10.parkingTripStats.txt";
 
         EventsManager eventsManager = EventsUtils.createEventsManager();
         ParkingTripEventHandler handler = new ParkingTripEventHandler(getNetwork(networkFile), getMainActivities(configFile));

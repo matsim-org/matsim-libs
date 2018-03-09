@@ -27,6 +27,7 @@ public class UseParkingCapacityFromNetwork implements LinkParkingCapacityCalcula
 	@Override
 	public double getLinkCapacity(Link link) {
 		Double d = (Double) link.getAttributes().getAttribute(CAP_ATT_NAME);
+	
 		if (d == null) {
 			throw new NullPointerException("parking capacity not set for link " + link.getId() );
 		}

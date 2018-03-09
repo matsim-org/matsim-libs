@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -36,6 +38,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.util.random.WeightedRandomSelection;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -196,7 +199,7 @@ public final class ParkingRouterNetworkRoutingModule implements RoutingModule {
             // get egressActLink from zone and avg park time from Zone
             Link parkEndLink = getParkLink(egressActLink);
             if (parkEndLink == null ) {
-                // vehicle is outside the study area
+                // vehicle is outside the study area or has garage
             } else {
 //                log.warn("Person " + person.getId() + " started looking for parking on link " + egressActLink.getId() + " and found parking on link " + parkEndLink
 //                        .getId());
@@ -252,18 +255,16 @@ public final class ParkingRouterNetworkRoutingModule implements RoutingModule {
 
     private Link getParkLink(Link egressActLink) {
         ParkingZone parkingZone = this.zoneToLinks.getParkingZone(egressActLink);
+        Random r = MatsimRandom.getRandom();
         if (parkingZone==null) return null;
-
-        double randNr = MatsimRandom.getRandom().nextDouble();
-        double cumSum =0.;
-        for(Map.Entry<Id<Link>,Double> prob : parkingZone.getLinkParkingProbabilities().entrySet()) {
-            cumSum += prob.getValue();
-            if (randNr <= cumSum) return this.network.getLinks().get(prob.getKey());
+        if (r.nextDouble()<parkingZone.getGarageProbability()) {
+        	return null;
         }
-        return null;
-        // following exception may be replaced by warning and null, however must be checked first.
-//        throw new RuntimeException("No parking link is found. The cumulative sum of the probabilities is "+ cumSum);
-    }
+        
+        final WeightedRandomSelection<Id<Link>> wrs = new WeightedRandomSelection<>();                                                                         
+        parkingZone.getLinkParkingProbabilities().forEach((k,v)->wrs.add(k, v));
+        return (network.getLinks().get(wrs.select()));
+        }
 
     private Link decideOnLink(final Facility fromFacility) {
         Link accessActLink = null;

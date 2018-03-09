@@ -35,6 +35,8 @@ public class ParkingZone implements Identifiable<ParkingZone> {
 
     private final Id<ParkingZone> parkingZoneId;
 
+    private double garageProbability  = 0.;
+    
     private double zoneParkingCapacity = 0.;
 
     private final Map<Id<Link>, Double> linkToParkingCapacity = new HashMap<>();
@@ -46,6 +48,13 @@ public class ParkingZone implements Identifiable<ParkingZone> {
     public double getZoneParkingCapacity() {
         return this.zoneParkingCapacity;
     }
+    
+    public void setGarageProbability(double garageProbability) {
+		this.garageProbability = garageProbability;
+	}
+    public double getGarageProbability() {
+		return garageProbability;
+	}
 
     public boolean isLinkInsideZone(Link link){
         return this.linkToParkingCapacity.containsKey(link.getId());
@@ -60,13 +69,6 @@ public class ParkingZone implements Identifiable<ParkingZone> {
         this.zoneParkingCapacity += val;
     }
 
-//    public Map<Link, Double> getLinkToParkingCapacity() {
-//        return linkToParkingCapacity;
-//    }
-//
-//    public Double getParkingCapacityForLink(Link link) {
-//        return linkToParkingCapacity.get(link);
-//    }
 
     public SortedMap<Id<Link>,Double> getLinkParkingProbabilities() { // this must be recalculated whenever required.
         SortedMap<Id<Link>, Double> linkToParkingProbs = new TreeMap<>();

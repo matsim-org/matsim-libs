@@ -83,6 +83,11 @@ public class ZonalLinkParkingInfo {
                     //exclude links such as -> bike, pt
                 }
             }
+            String key = String.valueOf(feature.getAttribute(featureKey));
+            Id<ParkingZone> parkingZoneId = Id.create(key, ParkingZone.class);
+            double garageProbability = Double.parseDouble(String.valueOf(feature.getAttribute("pripark_sh")));
+            this.parkingZones.getOrDefault(parkingZoneId,new ParkingZone(key)).setGarageProbability(garageProbability);;
+            
         }
     }
 

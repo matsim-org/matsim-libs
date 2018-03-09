@@ -60,7 +60,7 @@ public class TravelDistanceEvaluator {
 	public static void main(String[] args) {
 		TravelDistanceEvaluator tde = new TravelDistanceEvaluator();
 	
-		tde.run("D:/runs-svn/vw_rufbus/vw211/vw211.output_plans.xml.gz");
+		tde.run("D:/runs-svn/vw_rufbus/vw218/vw218.output_plans.xml.gz");
 	
 	}
 	
