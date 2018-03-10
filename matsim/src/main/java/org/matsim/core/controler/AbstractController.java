@@ -43,9 +43,7 @@ import org.matsim.core.gbl.MatsimRandom;
 
 
     private Integer thisIteration = null;
-
-    private boolean dirtyShutdown = false;
-
+    
     protected AbstractController() {
         this(new ControlerListenerManagerImpl(), new IterationStopWatch(), null);
     }
@@ -112,16 +110,15 @@ import org.matsim.core.gbl.MatsimRandom;
             iteration(config, iteration);
         }
     }
-
-
-    public static final String DIVIDER = "###################################################";
+    
+    
     final String MARKER = "### ";
 
     private void iteration(final Config config, final int iteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
         this.thisIteration = iteration;
         this.getStopwatch().beginIteration(iteration);
 
-        log.info(DIVIDER);
+        log.info(Controler.DIVIDER);
         log.info(MARKER + "ITERATION " + iteration + " BEGINS");
         this.getControlerIO().createIterationDirectory(iteration);
         resetRandomNumbers(config.global().getRandomSeed(), iteration);
@@ -166,7 +163,7 @@ import org.matsim.core.gbl.MatsimRandom;
             this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
         }
         log.info(MARKER + "ITERATION " + iteration + " ENDS");
-        log.info(DIVIDER);
+        log.info(Controler.DIVIDER);
     }
 
     private void mobsim(final Config config, final int iteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
@@ -253,9 +250,5 @@ import org.matsim.core.gbl.MatsimRandom;
     public IterationStopWatch getStopwatch() {
         return stopwatch;
     }
-
-    public void setDirtyShutdown(boolean dirtyShutdown) {
-		this.dirtyShutdown = dirtyShutdown;
-	}
 
 }
