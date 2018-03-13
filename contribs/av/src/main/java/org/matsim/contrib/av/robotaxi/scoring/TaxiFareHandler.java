@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.run.*;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -73,13 +74,15 @@ public class TaxiFareHandler implements LinkEnterEventHandler, PersonEntersVehic
 	Set<Id<Person>> waitingPax = new HashSet<>();
 	Map<Id<Person>, Double> vehicleEnterTime = new HashMap<>();
 	Set<Id<Person>> dailyFeeCharged = new HashSet<>();
+	private String mode;
 	
 	/**
 	 *  @params config: A Matsim config that contains a TaxiFareConfigGroup
 	 */
 	@Inject
 	public TaxiFareHandler(Config config, EventsManager events, Network network) {
-		TaxiFareConfigGroup taxiFareConfigGroup = (TaxiFareConfigGroup) config.getModule(TaxiFareConfigGroup.GROUP_NAME);
+		TaxiFareConfigGroup taxiFareConfigGroup = TaxiFareConfigGroup.get(config);
+		this.mode = DvrpConfigGroup.get(config).getMode();
 		this.events= events;
 		this.network = network;
 		this.distanceFare_Meter = taxiFareConfigGroup.getDistanceFare_m();
@@ -121,7 +124,7 @@ public class TaxiFareHandler implements LinkEnterEventHandler, PersonEntersVehic
 	 */
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		if (event.getLegMode().equals(TaxiModule.TAXI_MODE)){
+		if (event.getLegMode().equals(mode)){
 			waitingPax.add(event.getPersonId());
 			if (!dailyFeeCharged.contains(event.getPersonId())){
 				dailyFeeCharged.add(event.getPersonId());
