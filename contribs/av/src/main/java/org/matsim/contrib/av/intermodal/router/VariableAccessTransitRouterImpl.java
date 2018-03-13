@@ -49,6 +49,54 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
+ * This class is based on the default transit router in MATSim. Instead of always using the mode
+ * walk to access and egress transit stops, it allows for multiple possible access and egress
+ * modes. Apart from this, it is basically a copy of the default transit router
+ * {@link org.matsim.pt.router.TransitRouterImpl}. It does not allow to combine multiple pt legs 
+ * with legs of other modes in-between, such as 
+ * <i>bike leg - train leg - <u>bike leg</u> - bus leg - bike leg</i>.
+ * <p>
+ * 
+ * The access and the egress modes are chosen independently from each other, that means in a trip
+ * an access mode different from the egress mode can be used. This leads to a design issue: When
+ * the router compares the full path cost (access leg + pt legs + egress leg) with a direct, non-pt
+ * trip, it does so assuming mode walk for the non-pt trip. Alternatively it could be changed to
+ * use one of the access and egress modes. However, this would implicitly enable mode choice as
+ * routes only using the access or egress mode without any pt or transit_walk leg would be 
+ * returned. There is no information left which indicates that this was meant to be a pt trip and
+ * the MainModeIdentifier would always consider this a trip of the chosen access or egress mode.
+ * So during replanning the corresponding router for this access/egress mode would be used instead
+ * of any pt router, effectively changing modes without enabling explicitly mode choice as a
+ * replanning strategy. Therefore we keep comparing with a direct <u>walk</u> leg. If mode choice
+ * is enabled as a replanning strategy this makes up for the flawed (assuming always mode walk 
+ * ignoring other possible modes) direct access/egress mode leg cost calculation, as the selection 
+ * of that mode will lead to a direct leg with that mode.
+ * gleich, Mar'18
+ * <p>
+ * 
+ * TODO:
+ * Whereas the default transit router only needs marginal utilities for the modes "pt" and "walk"
+ * which are included in the {@link org.matsim.pt.router.TransitRouterConfig},
+ * this router needs parameters for all the admitted access and egress modes. So either the
+ * TransitRouterConfig would have to be adapted to include marginal utilities for arbitrary access
+ * and egress modes (this change would effect all matsim although only this contrib would need it) 
+ * or these parameters are directly taken from 
+ * {@link org.matsim.core.config.groups.PlanCalcScoreConfigGroup}. 
+ * This class implements the latter way. 
+ * However, this leads to another issue as the TransitRouterConfig can
+ * have other parameters than PlanCalcScoreConfig. By default these parameters are equal, because
+ * they are copied from PlanCalcScoreConfig while creating the TransitRouterConfig. Nevertheless,
+ * the TransitRouterConfig has public setters for the marginal utilities, so these can
+ * be changed later on. In that case the utilities for access and egress legs by mode walk 
+ * (based on PlanCalcScoreConfig) become inconsistent with the utility calculation for 
+ * direct walk legs (based on the TransitRouterConfig parameters and done in
+ * {@link org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility}). 
+ * Scoring will always use PlanCalcScoreConfig values, so changing values in TransitRouterConfig 
+ * and thereby introducing differences between routing and scoring parameters seems a bad idea 
+ * anyway. So this inconsistency issue won't be dealt with right now.
+ * gleich, Mar'18
+ * <p>
+ * 
  * Not thread-safe because MultiNodeDijkstra is not. Does not expect the TransitSchedule to change once constructed! michaz '13
  *
  * @author jbischoff
@@ -111,6 +159,11 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 			double distanceCost = - initialLeg.getRoute().getDistance() * marginalUtilityOfDistance_utl_m ;
 			// (sign: same as above)
 			double initialCost = timeCost + distanceCost;
+			/* note that departureTime is always the departure at the trip origin, so for the 
+			 * egress leg it will return 
+			 * departure time at trip origin + travel time from egress transit stop to the trip destination, 
+			 * omitting the travel time for the access leg and for the pt leg to the egress transit stop
+			 */
 			wrappedNearestNodes.put(node, new InitialNode(initialCost, initialTime + departureTime));
 		}
 		return wrappedNearestNodes;
@@ -156,8 +209,18 @@ public class VariableAccessTransitRouterImpl implements TransitRouter {
 	}
 
 	private List<Leg> createDirectAccessEgressModeLegList(Person person, Coord fromCoord, Coord toCoord, double time) {
+		/* give always mode transit_walk back, otherwise the main mode identifier will not realize 
+		 * this was meant to be a pt in the next iteration. getAccessEgressDisutility(...) 
+		 * calculates the directWalkCost with transit_walk utilitie parameters anyway. Therefore, 
+		 * it would be misleading to return any different mode here. gleich 03-2018
+		 */
 		List<Leg> legs = new ArrayList<>();
-		Leg leg = getAccessEgressLeg(person, fromCoord, toCoord, time);
+		Leg leg = PopulationUtils.createLeg(TransportMode.transit_walk);
+		double walkTime = travelDisutility.getWalkTravelTime(person, fromCoord, toCoord);
+		leg.setTravelTime(walkTime);
+		Route walkRoute = RouteUtils.createGenericRouteImpl(null, null);
+		walkRoute.setTravelTime(walkTime);
+		leg.setRoute(walkRoute);
 		legs.add(leg);
 		return legs;
 	}
