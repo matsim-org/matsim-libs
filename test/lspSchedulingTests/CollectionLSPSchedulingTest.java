@@ -132,7 +132,7 @@ public class CollectionLSPSchedulingTest {
 	    Id<Link> toLinkId = collectionLinkId;
 	
 	        
-	    for(int i = 1; i < 4; i++) {
+	    for(int i = 1; i < 2; i++) {
         	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
         	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
         	Random random = new Random(1);
