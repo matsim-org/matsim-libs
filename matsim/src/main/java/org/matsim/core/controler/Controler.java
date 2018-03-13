@@ -80,7 +80,8 @@ public final class Controler implements ControlerI, MatsimServices {
 	public static final String FILENAME_CONFIG = "output_config.xml";
 	public static final String FILENAME_PERSON_ATTRIBUTES = "output_personAttributes.xml.gz" ; 
 	public static final String FILENAME_COUNTS = "output_counts.xml.gz" ;
-
+	public static final String DIVIDER = "###################################################";
+	
 	private static final Logger log = Logger.getLogger(Controler.class);
 
 	public static final Layout DEFAULTLOG4JLAYOUT = new PatternLayout(

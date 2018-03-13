@@ -93,11 +93,11 @@ public final class DrtControlerCreator {
 	private static void adjustConfig(Config config) {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
 		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased)) {
-			ActivityParams params = config.planCalcScore().getActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY);
-			if (params == null) {
-				params = new ActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY);
+			if (config.planCalcScore().getActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY) == null) {
+				ActivityParams params = new ActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY);
 				params.setTypicalDuration(1);
 				params.setScoringThisActivityAtAll(false);
+				config.planCalcScore().getScoringParametersPerSubpopulation().values().forEach(k->k.addActivityParams(params));
 				config.planCalcScore().addActivityParams(params);
 				Logger.getLogger(DrtControlerCreator.class).info(
 						"drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
@@ -109,7 +109,7 @@ public final class DrtControlerCreator {
 				drtWalk.setMarginalUtilityOfDistance(walk.getMarginalUtilityOfDistance());
 				drtWalk.setMarginalUtilityOfTraveling(walk.getMarginalUtilityOfTraveling());
 				drtWalk.setMonetaryDistanceRate(walk.getMonetaryDistanceRate());
-				config.planCalcScore().addModeParams(drtWalk);
+				config.planCalcScore().getScoringParametersPerSubpopulation().values().forEach(k->k.addModeParams(drtWalk));
 				Logger.getLogger(DrtControlerCreator.class)
 						.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
 			}

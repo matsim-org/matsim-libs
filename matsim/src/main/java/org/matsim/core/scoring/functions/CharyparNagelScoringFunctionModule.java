@@ -29,7 +29,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 public class CharyparNagelScoringFunctionModule extends AbstractModule {
     @Override
     public void install() {
-        bindScoringFunctionFactory().to(CharyparNagelScoringFunctionFactory.class);
+        bind(ScoringFunctionFactory.class).to(CharyparNagelScoringFunctionFactory.class);
         bind(ScoringParametersForPerson.class).to(SubpopulationScoringParameters.class);
     }
 }
