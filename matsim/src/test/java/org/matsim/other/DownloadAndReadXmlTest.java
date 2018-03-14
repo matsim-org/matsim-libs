@@ -41,7 +41,6 @@ public class DownloadAndReadXmlTest {
 	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
-	@Ignore
 	@Test
 	public final void testHttpFromSvn() {
 		
