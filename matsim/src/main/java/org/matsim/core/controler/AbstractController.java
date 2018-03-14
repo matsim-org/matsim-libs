@@ -25,7 +25,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.MatsimRandom;
 
-public abstract class AbstractController {
+/*package*/ abstract class AbstractController {
+    // we already had one case where a method of this was removed, causing downstream failures; better just not
+	// offer it at all; framework with injector should now be flexible enough.  kai, mar'18
 
     private static Logger log = Logger.getLogger(AbstractController.class);
 
@@ -33,10 +35,6 @@ public abstract class AbstractController {
 
     private final IterationStopWatch stopwatch;
 
-    /*
-     * Strings used to identify the operations in the IterationStopWatch.
-     */
-    public static final String OPERATION_ITERATION = "iteration";
 
     /**
      * This is deliberately not even protected.  kai, jul'12
@@ -45,9 +43,7 @@ public abstract class AbstractController {
 
 
     private Integer thisIteration = null;
-
-    private boolean dirtyShutdown = false;
-
+    
     protected AbstractController() {
         this(new ControlerListenerManagerImpl(), new IterationStopWatch(), null);
     }
@@ -114,16 +110,15 @@ public abstract class AbstractController {
             iteration(config, iteration);
         }
     }
-
-
-    public static final String DIVIDER = "###################################################";
+    
+    
     final String MARKER = "### ";
 
     private void iteration(final Config config, final int iteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
         this.thisIteration = iteration;
         this.getStopwatch().beginIteration(iteration);
 
-        log.info(DIVIDER);
+        log.info(Controler.DIVIDER);
         log.info(MARKER + "ITERATION " + iteration + " BEGINS");
         this.getControlerIO().createIterationDirectory(iteration);
         resetRandomNumbers(config.global().getRandomSeed(), iteration);
@@ -168,7 +163,7 @@ public abstract class AbstractController {
             this.getStopwatch().writeGraphFile(this.getControlerIO().getOutputFilename("stopwatch"));
         }
         log.info(MARKER + "ITERATION " + iteration + " ENDS");
-        log.info(DIVIDER);
+        log.info(Controler.DIVIDER);
     }
 
     private void mobsim(final Config config, final int iteration) throws MatsimRuntimeModifications.UnexpectedShutdownException {
@@ -255,9 +250,5 @@ public abstract class AbstractController {
     public IterationStopWatch getStopwatch() {
         return stopwatch;
     }
-
-    public void setDirtyShutdown(boolean dirtyShutdown) {
-		this.dirtyShutdown = dirtyShutdown;
-	}
 
 }
