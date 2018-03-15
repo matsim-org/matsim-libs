@@ -55,7 +55,7 @@ public class RunDrtWithStops {
 		drt.setMaxTravelTimeAlpha(1.5);
 		drt.setMaxTravelTimeBeta(300);
 		drt.setTransitStopFile("network/stopsWRS_300m.xml");
-		drt.setOperationalScheme(OperationalScheme.stationbased.toString());
+		drt.setOperationalScheme(OperationalScheme.stopbased.toString());
 		int threads = Runtime.getRuntime().availableProcessors() - 1;
 		System.out.println(threads + " threads used for drt.");
 		drt.setNumberOfThreads(threads);

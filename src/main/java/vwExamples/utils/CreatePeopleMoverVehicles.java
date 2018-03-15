@@ -20,7 +20,7 @@
 /**
  * 
  */
-package vwExamples.peoplemoverVWExample;
+package vwExamples.utils;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,14 +51,15 @@ public class CreatePeopleMoverVehicles {
 	static double operationStartTime = 0.; //t0
 	static double operationEndTime = 36*3600.;	//t1
 	static int seats = 8;
-	static File networkfile = new File("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\input\\network\\network_area_bs_withDRT_links.xml.gz");
+	static File networkfile = new File("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\input\\network\\network_area_wob_withDRT_links.xml.gz");
 	static String networkfolder = networkfile.getParent();
-	static int increment = 100;
+	static int increment = 10;
 	static String drtTag = "drt";
+	static int numberOfVehicles = 1000;
 
 	public static void main(String[] args) {
 		
-		for (int i = 1; i < 11; i++) {
+		for (int i = 1; i <= Math.ceil(numberOfVehicles/increment) ; i++) {
 			createVehicles(networkfile, i*increment);
 		}
 		

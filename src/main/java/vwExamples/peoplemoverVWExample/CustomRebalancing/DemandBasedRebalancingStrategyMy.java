@@ -107,9 +107,8 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 			vehiclesPerZone.put(z,new LinkedList<Id<Vehicle>>());
 		}
 		
-		int totalRequiredVehicles = 0;
 		int totalReloVehice = 0;
-		
+		int requiredVehiclesAllZones = 0;
 		
 		Map<Id<Vehicle>, Vehicle> idleVehiclesMap = rebalancableVehicles.filter(v -> v.getServiceEndTime() > time + 3600).collect(Collectors.toMap(v -> v.getId(), v -> v));
 
@@ -118,9 +117,8 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 		//cleanVehicleBlackListMap drops vehicles from the idleVehiclesMap because they have already been relocated within the last 600 seconds.
 		idleVehiclesMap = cleanVehicleBlackListMap(time, idleVehiclesMap);
 		
-		//FILTER TO TAKE ONLY VEHICLES THAT ARE ALREADY IDLE FOR A LONG TIME  PERIOD
-		//This filter utilizes a percentile based
-		idleVehiclesMap = getIdleTimeVehicleSubset(idleVehiclesMap, time, 60.0);
+		//FILTER TO TAKE ONLY VEHICLES THAT ARE ALREADY IDLE FOR A LONG TIME PERIOD (Percentile-based)
+		idleVehiclesMap = getIdleTimeVehicleSubset(idleVehiclesMap, time, 30.0);
 		
 		
 		//We create a new map of idle vehicles map based on rebalancableVehicles and we do not use idleVehicles of the demand aggregator
@@ -142,9 +140,7 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 			
 			
 			int requiredVehicles = requiredAdditionalVehiclesPerZone.get(zone);
-			
-			totalRequiredVehicles=totalRequiredVehicles+requiredVehicles;
-			
+			requiredVehiclesAllZones = requiredVehiclesAllZones+requiredVehicles;
 
 			//Required Vehicles per zone
 			if (requiredVehicles > 0) {
@@ -157,6 +153,7 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 					} ;
 					Coord zoneCentroid = MGC.point2Coord(z.getCentroid());
 					Vehicle v = findClosestVehicle(idleVehiclesMap, zoneCentroid, time);
+					//Vehicle v = findLongIdleVehicle(idleVehiclesMap, time);
 
 					if (v != null) {
 						idleVehiclesMap.remove(v.getId());
@@ -172,7 +169,7 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 			
 
 			}
-		System.out.println("Total required vehicles = "+ totalRequiredVehicles + " || Total relocated vehicles = "+totalReloVehice + " || " + "Available idle vehicles = " + initalIdleMapSize);
+		System.out.println("Total required vehicles = "+ requiredVehiclesAllZones + " || Total relocated vehicles = "+totalReloVehice + " || " + "Available idle vehicles = " + initalIdleMapSize);
 //		relocations.forEach(l->Logger.getLogger(getClass()).info(l.vehicle.getId().toString() + "||"  + getLastLink(l.vehicle,time)   +" --> "+l.link.getId().toString()));
 
 		for (Relocation reloc : relocations)
@@ -216,6 +213,30 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 			}
 		}
 		return closestVeh;
+	}
+	
+	
+	private Vehicle findLongIdleVehicle(Map<Id<Vehicle>, Vehicle> idles,double time) {
+		//Assign actual simulation time
+		//We are searching the most long idle vehicle --> min(idleBegin)
+		double earliesIdleBegin = time;
+		Vehicle longestIdleVeh = null;
+				
+		//Iterate over all idle vehicles
+		for (Entry<Id<Vehicle>, Integer> v : idleVehicles.vehicleIdleMap.entrySet()){
+				//Get the start of idle time 
+				double idleBegin = v.getValue();
+				if (idleBegin<earliesIdleBegin){
+					earliesIdleBegin = idleBegin;
+					longestIdleVeh = idles.get(v.getKey());
+				}
+			
+		}
+		if (longestIdleVeh!=null) {
+			idleVehicles.vehicleIdleMap.remove(longestIdleVeh.getId());
+			System.out.println("Took vehicle: " +longestIdleVeh.getId().toString() +" | IdleTime: "+ (time - earliesIdleBegin) );
+		}
+		return longestIdleVeh;
 	}
 	
 	
@@ -298,7 +319,7 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 	private Map<String, Integer> calculateZonalVehicleRequirements(Map <Id<Vehicle>,Vehicle> idleVehiclesMap,Map<String,LinkedList<Id<Vehicle>>>vehiclesPerZone, double time) {
 		
 		//timeShifts defines how far we are looking into the feature demand situation! 
-		double timeShift = 900.0;
+		double timeShift = 300.0;
 		
 		//Get expected demand in network at time+timeShift
 		Map<String, MutableInt> expectedDemand = demandAggregator.getExpectedRejectsForTimeBin(time+timeShift);
@@ -401,7 +422,7 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 		//Define an iterator in order to modify blacklist within a loop		
 		Iterator<Entry<Id<Vehicle>, Integer>> it = demandAggregator.vehicleBlackListMap.entrySet().iterator();
 		
-		double relocationStopTime = 900.0;
+		double relocationStopTime = 300.0;
 		
 		while(it.hasNext())
 		{
@@ -413,11 +434,11 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 			//Keep vehicle in vehicleBlackListMap and remove it from idleVehiclesMap
 			//Drop Vehicle from idleVehiclesMap because it has already been relocated within the last relocationStopTime
 			idleVehiclesMap.remove(vehicleEntry.getKey());
-			//System.out.println("Dropped vehicle from idleMap: "+vehicleEntry.getKey().toString() + " || time since relocation: "+ timeSinceVehicleRelocation);
+			System.out.println("Dropped vehicle from idleMap: "+vehicleEntry.getKey().toString() + " || time since relocation: "+ timeSinceVehicleRelocation);
 			}
 			else {
 				//Remove vehicle from vehicleBlackListMap it is available in idleVehiclesMap and could be relocated again
-				//System.out.println("Dropped vehicle from vehicleBlackListMap: "+vehicleEntry.getKey().toString() + " || time since relocation: "+ timeSinceVehicleRelocation);	
+				System.out.println("Dropped vehicle from vehicleBlackListMap: "+vehicleEntry.getKey().toString() + " || time since relocation: "+ timeSinceVehicleRelocation);	
 				it.remove();
 //				demandAggregator.vehicleBlackListMap.remove(vehicleEntry.getKey());
 			}

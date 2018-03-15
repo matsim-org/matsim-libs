@@ -44,7 +44,7 @@ import vwExamples.peoplemoverVWExample.CustomRebalancing.ZonalRelocationAggregat
 
 /** * @author axer */
 
-public class RunDrtScenarioBatchBS {
+public class RunDrtScenarioBatchWOB {
 	
 	//Class to create the controller
 	public static Controler createControler(Config config, boolean otfvis) {
@@ -78,7 +78,7 @@ public class RunDrtScenarioBatchBS {
 			//Some config parameters will be taken from the provided config file
 			//Other config parameters will be generated or modified dynamically within this loop
 			//Define the path to the config file and enable / disable otfvis
-			final Config config = ConfigUtils.loadConfig("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\input\\config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+			final Config config = ConfigUtils.loadConfig("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\input\\config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 			
 
 			//OTFVis is an open source, OpenGL-based visualizer for looking at MATSim scenarios and output.
@@ -86,12 +86,12 @@ public class RunDrtScenarioBatchBS {
 			boolean otfvis = false;
 			
 			//Overwrite existing configuration parameters
-			config.plans().setInputFile("population/vw208_sampleRate1.0replaceRate_1.0_pt_drt.xml.gz");
+			config.plans().setInputFile("population/vw218_sampleRate0.05replaceRate_1.0_pt_drt.xml.gz");
 			config.controler().setLastIteration(5); //Number of simulation iterations
-			//config.controler().setWriteEventsInterval(1); //Write Events file every x-Iterations 
-			//config.controler().setWritePlansInterval(1); //Write Plan file every x-Iterations
+			config.controler().setWriteEventsInterval(1); //Write Events file every x-Iterations 
+			config.controler().setWritePlansInterval(1); //Write Plan file every x-Iterations
 
-			config.network().setInputFile("network/network_area_bs_withDRT_links.xml.gz");
+			config.network().setInputFile("network/network_area_wob_withDRT_links.xml.gz");
 			
 			
 			//This part allows to change dynamically DRT config parameters
@@ -110,14 +110,14 @@ public class RunDrtScenarioBatchBS {
 			drt.setMaxWalkDistance(500.0);
 			
 			
-			String runId = "pt_drt_1.00_680veh";
+			String runId = "vw218.0.05.pt_drt_1.0_50veh";
 			config.controler().setRunId(runId);
 			
-			config.controler().setOutputDirectory("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\output\\"+runId); //Define dynamically the the output path
+			config.controler().setOutputDirectory("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\output\\"+runId); //Define dynamically the the output path
 			
 			
 			//For each demand scenario we are using a predefined drt vehicle fleet size 
-			drt.setVehiclesFile("fleets/fleet_680.xml.gz");
+			drt.setVehiclesFile("fleets/fleet_50.xml.gz");
 			
 			
 			//Define the MATSim Controler
