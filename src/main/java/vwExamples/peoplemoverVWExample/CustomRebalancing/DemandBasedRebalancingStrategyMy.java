@@ -47,7 +47,8 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+//import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.util.distance.DistanceUtils;
@@ -81,7 +82,7 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 
 	@Inject
 	public DemandBasedRebalancingStrategyMy(ZonalIdleVehicleCollectorMy idleVehicles, ZonalDemandAggregatorMy demandAggregator,
-			DrtZonalSystem zonalSystem, @Named(DvrpModule.DVRP_ROUTING) Network network, ZonalRelocationAggregatorMy reloacatedVehicles,
+			DrtZonalSystem zonalSystem, @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, ZonalRelocationAggregatorMy reloacatedVehicles,
 			RelocationWriter relocationWriter) {
 		this.reloacatedVehicles = reloacatedVehicles;
 		this.idleVehicles = idleVehicles;
@@ -216,28 +217,28 @@ public class DemandBasedRebalancingStrategyMy implements RebalancingStrategy {
 	}
 	
 	
-	private Vehicle findLongIdleVehicle(Map<Id<Vehicle>, Vehicle> idles,double time) {
-		//Assign actual simulation time
-		//We are searching the most long idle vehicle --> min(idleBegin)
-		double earliesIdleBegin = time;
-		Vehicle longestIdleVeh = null;
-				
-		//Iterate over all idle vehicles
-		for (Entry<Id<Vehicle>, Integer> v : idleVehicles.vehicleIdleMap.entrySet()){
-				//Get the start of idle time 
-				double idleBegin = v.getValue();
-				if (idleBegin<earliesIdleBegin){
-					earliesIdleBegin = idleBegin;
-					longestIdleVeh = idles.get(v.getKey());
-				}
-			
-		}
-		if (longestIdleVeh!=null) {
-			idleVehicles.vehicleIdleMap.remove(longestIdleVeh.getId());
-			System.out.println("Took vehicle: " +longestIdleVeh.getId().toString() +" | IdleTime: "+ (time - earliesIdleBegin) );
-		}
-		return longestIdleVeh;
-	}
+//	private Vehicle findLongIdleVehicle(Map<Id<Vehicle>, Vehicle> idles,double time) {
+//		//Assign actual simulation time
+//		//We are searching the most long idle vehicle --> min(idleBegin)
+//		double earliesIdleBegin = time;
+//		Vehicle longestIdleVeh = null;
+//				
+//		//Iterate over all idle vehicles
+//		for (Entry<Id<Vehicle>, Integer> v : idleVehicles.vehicleIdleMap.entrySet()){
+//				//Get the start of idle time 
+//				double idleBegin = v.getValue();
+//				if (idleBegin<earliesIdleBegin){
+//					earliesIdleBegin = idleBegin;
+//					longestIdleVeh = idles.get(v.getKey());
+//				}
+//			
+//		}
+//		if (longestIdleVeh!=null) {
+//			idleVehicles.vehicleIdleMap.remove(longestIdleVeh.getId());
+//			System.out.println("Took vehicle: " +longestIdleVeh.getId().toString() +" | IdleTime: "+ (time - earliesIdleBegin) );
+//		}
+//		return longestIdleVeh;
+//	}
 	
 	
 	private Map<Id<Vehicle>, Vehicle> getIdleTimeVehicleSubset(Map<Id<Vehicle>, Vehicle> idles, double time, double p) {

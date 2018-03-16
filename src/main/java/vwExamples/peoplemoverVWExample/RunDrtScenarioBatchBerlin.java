@@ -44,7 +44,7 @@ import vwExamples.peoplemoverVWExample.CustomRebalancing.ZonalRelocationAggregat
 
 /** * @author axer */
 
-public class RunDrtScenarioBatchWOB {
+public class RunDrtScenarioBatchBerlin {
 	
 	//Class to create the controller
 	public static Controler createControler(Config config, boolean otfvis) {
@@ -78,7 +78,7 @@ public class RunDrtScenarioBatchWOB {
 			//Some config parameters will be taken from the provided config file
 			//Other config parameters will be generated or modified dynamically within this loop
 			//Define the path to the config file and enable / disable otfvis
-			final Config config = ConfigUtils.loadConfig("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\input\\config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
+			final Config config = ConfigUtils.loadConfig("D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 			
 
 			//OTFVis is an open source, OpenGL-based visualizer for looking at MATSim scenarios and output.
@@ -86,12 +86,12 @@ public class RunDrtScenarioBatchWOB {
 			boolean otfvis = false;
 			
 			//Overwrite existing configuration parameters
-			config.plans().setInputFile("population/vw218_it_1_sampleRate0.05replaceRate_1.0_pt_drt.xml.gz");
+			config.plans().setInputFile("population/be_251_it_1_sampleRate1.0replaceRate_0.5_[ptSlow, pt]_drt.xml.gz");
 			config.controler().setLastIteration(5); //Number of simulation iterations
 			config.controler().setWriteEventsInterval(1); //Write Events file every x-Iterations 
 			config.controler().setWritePlansInterval(1); //Write Plan file every x-Iterations
 
-			config.network().setInputFile("network/network_area_wob_withDRT_links.xml.gz");
+			config.network().setInputFile("network/modifiedNetwork.xml.gz");
 			
 			
 			//This part allows to change dynamically DRT config parameters
@@ -106,18 +106,18 @@ public class RunDrtScenarioBatchWOB {
 			drt.setMaxTravelTimeAlpha(1.3);
 			drt.setMaxWaitTime(500);
 			drt.setStopDuration(stoptime);
-			drt.setTransitStopFile("../input/virtualstops/stopsGrid_400m.xml");
+			drt.setTransitStopFile("../input/virtualstops/stopsGrid_600m.xml");
 			drt.setMaxWalkDistance(500.0);
 			
 			
-			String runId = "vw218_it_1_sampleRate0.05replaceRate_1.0_pt_drt_50veh";
+			String runId = "berlinTest";
 			config.controler().setRunId(runId);
 			
-			config.controler().setOutputDirectory("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\output\\"+runId); //Define dynamically the the output path
+			config.controler().setOutputDirectory("D:\\Axer\\MatsimDataStore\\Berlin_DRT\\output\\"+runId); //Define dynamically the the output path
 			
 			
 			//For each demand scenario we are using a predefined drt vehicle fleet size 
-			drt.setVehiclesFile("fleets/fleet_50.xml.gz");
+			drt.setVehiclesFile("fleets/fleet_500.xml.gz");
 			
 			
 			//Define the MATSim Controler

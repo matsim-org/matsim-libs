@@ -44,7 +44,7 @@ import vwExamples.peoplemoverVWExample.CustomRebalancing.ZonalRelocationAggregat
 
 /** * @author axer */
 
-public class RunDrtScenarioBatchWOB {
+public class RunDrtScenarioBatchWOBDetourTest {
 	
 	//Class to create the controller
 	public static Controler createControler(Config config, boolean otfvis) {
@@ -72,8 +72,8 @@ public class RunDrtScenarioBatchWOB {
 //		List<Integer> setMaxTravelTimeBetaList = Arrays.asList(500);
 		
 		//for (Double demandScenario : demandScenarios){
-			
-			for (Integer stoptime :  stopTimeList){
+			int instanceNumber = 5;
+			for (int i = 1; i <= instanceNumber ; i++) {
 			//For each demandScenario we are generating a new config file
 			//Some config parameters will be taken from the provided config file
 			//Other config parameters will be generated or modified dynamically within this loop
@@ -86,7 +86,7 @@ public class RunDrtScenarioBatchWOB {
 			boolean otfvis = false;
 			
 			//Overwrite existing configuration parameters
-			config.plans().setInputFile("population/vw218_it_1_sampleRate0.05replaceRate_1.0_pt_drt.xml.gz");
+			config.plans().setInputFile("population/vw218_it_"+i+"_sampleRate0.1replaceRate_0.5_pt_drt.xml.gz");
 			config.controler().setLastIteration(5); //Number of simulation iterations
 			config.controler().setWriteEventsInterval(1); //Write Events file every x-Iterations 
 			config.controler().setWritePlansInterval(1); //Write Plan file every x-Iterations
@@ -103,21 +103,21 @@ public class RunDrtScenarioBatchWOB {
 			
 			//Use custom stop duration
 			drt.setMaxTravelTimeBeta(500);
-			drt.setMaxTravelTimeAlpha(1.3);
+			drt.setMaxTravelTimeAlpha(1.5);
 			drt.setMaxWaitTime(500);
-			drt.setStopDuration(stoptime);
+			drt.setStopDuration(15);
 			drt.setTransitStopFile("../input/virtualstops/stopsGrid_400m.xml");
 			drt.setMaxWalkDistance(500.0);
 			
 			
-			String runId = "vw218_it_1_sampleRate0.05replaceRate_1.0_pt_drt_50veh";
+			String runId = "it_"+i+"_sampleRate0.1replaceRate_0.5_pt_drt_200veh";
 			config.controler().setRunId(runId);
 			
 			config.controler().setOutputDirectory("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\output\\"+runId); //Define dynamically the the output path
 			
 			
 			//For each demand scenario we are using a predefined drt vehicle fleet size 
-			drt.setVehiclesFile("fleets/fleet_50.xml.gz");
+			drt.setVehiclesFile("fleets/fleet_200.xml.gz");
 			
 			
 			//Define the MATSim Controler

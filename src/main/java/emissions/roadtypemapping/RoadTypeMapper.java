@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * RunEmissionToolOffline.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,46 +17,48 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package emissions.roadtypemapping;
 
-package peoplemover.run;
-
-import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.run.DrtControlerCreator;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.network.*;
 import org.matsim.core.config.*;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.controler.Controler;
-import org.matsim.vis.otfvis.OTFVisConfigGroup;
-
-
-import peoplemover.ClosestStopBasedDrtRoutingModule;
+import org.matsim.core.network.*;
+import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.network.io.NetworkWriter;
+import org.matsim.core.scenario.ScenarioUtils;
 
 /**
- * @author michalm
+ * @author jbischoff
+ *	Maps road type for emissions calculation. Road categories are based solely on freespeed.
  */
-public class RunDrtScenario {
-	public static void run(String configFile, boolean otfvis) {
-	    final Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
-				new OTFVisConfigGroup());
-		Controler controler = createControler(config, otfvis);
-		controler.addOverridingModule(new AbstractModule() {
-		
-			@Override
-			public void install() {
-				addRoutingModuleBinding(DvrpConfigGroup.get(config).getMode()).to(ClosestStopBasedDrtRoutingModule.class);
-			}
-		});
-		controler.run();
-	}
-
-	public static Controler createControler(Config config, boolean otfvis) {
-		return DrtControlerCreator.createControler(config, otfvis);
-	}
+public class RoadTypeMapper {
+	private final static String dir = "D:\\runs-svn\\vw_rufbus\\";
 
 	public static void main(String[] args) {
-		if (args.length != 1) {
-			throw new IllegalArgumentException("RunDrtScenario needs one argument: path to the configuration file");
+
+
+		Config config = ConfigUtils.createConfig();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		new MatsimNetworkReader(scenario.getNetwork()).readFile(dir+"newnet.xml.gz");
+		Network network = scenario.getNetwork();
+		
+		
+		for (Link l : network.getLinks().values()){
+			double freespeed = l.getFreespeed();
+			if (freespeed<9)
+				NetworkUtils.setType( l, (String) "75");
+			else if (freespeed<14)
+				NetworkUtils.setType( l, (String) "43");
+			else if (freespeed<17)
+				NetworkUtils.setType( l, (String) "45");
+			else if (freespeed<23)
+				NetworkUtils.setType( l, (String) "14");
+			else
+				NetworkUtils.setType( l, (String) "11");
 		}
-		RunDrtScenario.run(args[0], false);
+	new NetworkWriter(network).write(dir+"newnet.xml.gz");
 	}
+
+	
+
 }

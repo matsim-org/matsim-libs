@@ -16,3 +16,6 @@ hs_err_pid*
 /target/
 /output/
 /bin/
+
+#intellij file
+*.iml

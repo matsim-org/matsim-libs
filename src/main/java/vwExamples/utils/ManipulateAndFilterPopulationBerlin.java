@@ -19,6 +19,7 @@
 
 package vwExamples.utils;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,38 +52,36 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author  saxer
  *
  */
-public class ManipulateAndFilterPopulation {
+public class ManipulateAndFilterPopulationBerlin {
 
 	//Initialize SubsamplePopulation class
 	Set<String> zones = new HashSet<>();
 	Map<String, Geometry> zoneMap = new HashMap<>();
-	String shapeFile = "D:\\Axer\\CEMDAP\\cemdap-vw\\add_data\\shp\\wvi-zones.shp";
-	int zoneRange[] = {300,400};
-	static String serachMode = "pt";
+	String shapeFile = "D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\shapes\\Prognoseraum_EPSG_31468.shp";
+	String zoneList[] = {"0101"};
+	static String[] serachMode = {"ptSlow","pt"};
 	static String newMode = "drt";
-	String shapeFeature = "NO";
-	static double samplePct = 0.05; //Global sample ratio
-	static double replancementPct = 1.0; //Ratio of mode substitution 
-	static int instanceNumber = 5;
+	String shapeFeature = "SCHLUESSEL";
+	static double samplePct = 1.0; //Global sample ratio
+	static double replancementPct = 0.5; //Ratio of mode substitution 
 	
 	//Constructor which reads the shape file for later use!
-	public ManipulateAndFilterPopulation() {
+	public ManipulateAndFilterPopulationBerlin() {
 	readShape(this.shapeFile,this.shapeFeature);
 	
 	}
 	
 public static void main(String[] args) {
 
-	int instanceNumber = 5;
+	int instanceNumber = 1;
 	for (int i = 1; i <= instanceNumber ; i++) {
 
-		ManipulateAndFilterPopulation manipulateAndFilterPopulation = new ManipulateAndFilterPopulation();
+		ManipulateAndFilterPopulationBerlin manipulateAndFilterPopulation = new ManipulateAndFilterPopulationBerlin();
 		//Create a Scenario
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		//Fill this Scenario with a population.
-		new PopulationReader(scenario).readFile("D:\\Axer\\MatsimDataStore\\BaseCases\\vw218\\vw218.output_plans.xml.gz");
-		new TransitScheduleReader(scenario).readFile("D:\\Axer\\MatsimDataStore\\BaseCases\\vw218\\vw218.output_transitSchedule.xml.gz");
-		String filteredPopDesination = ("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\input\\population\\vw218_it_"+i+"_sampleRate"+samplePct+"replaceRate_"+replancementPct+"_"+serachMode+"_"+newMode+".xml.gz");
+		new PopulationReader(scenario).readFile("D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\population\\be_251.output_plans_selected.xml.gz");
+		String filteredPopDesination = ("D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\population\\be_251_it_"+i+"_sampleRate"+samplePct+"replaceRate_"+replancementPct+"_"+Arrays.toString(serachMode)+"_"+newMode+".xml.gz");
 		StreamingPopulationWriter filteredPop = new StreamingPopulationWriter();
 		filteredPop.startStreaming(filteredPopDesination);
 		int drtTrips = 0;
@@ -115,15 +114,15 @@ public static void main(String[] args) {
 								if (pe instanceof Leg) 
 								{
 									Leg leg = ((Leg)pe);
-									if (leg.getMode().equals(serachMode)) 
+									if (Arrays.asList(serachMode).contains(leg.getMode())) 
 									{
 										
-										if (checkAgentLegWithinZone(plan, leg,manipulateAndFilterPopulation.zoneMap,manipulateAndFilterPopulation.zoneRange)) 
+										if (checkAgentLegWithinZone(plan, leg,manipulateAndFilterPopulation.zoneMap,manipulateAndFilterPopulation.zoneList)) 
 										{
 										
 	//									if (getPtTransportMode(leg,transitLines).equals("bus"))
 	//										{
-												System.out.println("Replaced pt leg with " + newMode);
+												System.out.println("Replaced leg with " + newMode);
 												//Write newMode into Leg
 												leg.setMode(newMode);
 												//Remove route from leg
@@ -167,7 +166,7 @@ public void readShape(String shapeFile, String featureKeyInShapeFile) {
 	}
 }
 
-public static boolean checkAgentLocationAndActivity(Person person,String searchedActivityName, Map<String, Geometry> zoneMap2, int[] zoneRange) {
+public static boolean checkAgentLocationAndActivity(Person person,String searchedActivityName, Map<String, Geometry> zoneMap2, String[] zoneList) {
 	boolean relevantAgent = false;
 	
 	
@@ -177,7 +176,7 @@ public static boolean checkAgentLocationAndActivity(Person person,String searche
 				
 				Activity activity = ((Activity)pe);
 				Coord coord = activity.getCoord();
-				if (isWithinZone(coord,zoneMap2,zoneRange)){
+				if (isWithinZone(coord,zoneMap2,zoneList)){
 					relevantAgent= true;
 					
 					
@@ -196,7 +195,7 @@ public static boolean checkAgentLocationAndActivity(Person person,String searche
 
 
 	
-public static boolean checkAgentLegWithinZone(Plan plan, Leg leg, Map<String, Geometry> zoneMap2, int[] zoneRange) {
+public static boolean checkAgentLegWithinZone(Plan plan, Leg leg, Map<String, Geometry> zoneMap2, String[] zoneList) {
 	boolean prevActInZone = false;
 	boolean nextActInZone = false;
 	
@@ -204,12 +203,12 @@ public static boolean checkAgentLegWithinZone(Plan plan, Leg leg, Map<String, Ge
 	Activity nextAct = PopulationUtils.getNextActivity(plan, leg);
 		
 	
-	if(isWithinZone(prevAct.getCoord(), zoneMap2,zoneRange)) prevActInZone= true;
-	if(isWithinZone(nextAct.getCoord(), zoneMap2,zoneRange)) nextActInZone= true;
+	if(isWithinZone(prevAct.getCoord(), zoneMap2,zoneList)) prevActInZone= true;
+	if(isWithinZone(nextAct.getCoord(), zoneMap2,zoneList)) nextActInZone= true;
 	
 	
 	if ((prevActInZone == true) && (nextActInZone == true) ) {
-		System.out.println("Leg in Zone: "+plan.getPerson().getId().toString());
+//		System.out.println("Leg in Zone: "+plan.getPerson().getId().toString());
 		return true;
 	}
 	else return false;
@@ -248,14 +247,14 @@ public static String getPtTransportMode(Leg leg, Map<Id<TransitLine>,TransitLine
 	
 	}
 
-public static boolean isWithinZone(Coord coord, Map<String, Geometry> zoneMap, int[] zoneRange){
+public static boolean isWithinZone(Coord coord, Map<String, Geometry> zoneMap, String[] zoneList){
 	//Function assumes EPSG:25832
 	
 	boolean relevantCoord = false;
 	for (String zone : zoneMap.keySet()) {
 		
-		//If the zone does not fit to the require zonePrefix
-		if(!(Integer.parseInt(zone)>zoneRange[0] && Integer.parseInt(zone)<zoneRange[1])) continue;
+		//If the zone does  fit to the require zonePrefix
+		if(Arrays.asList(zoneList).contains(zone)) continue;
 		Geometry geometry = zoneMap.get(zone);
 		if(geometry.contains(MGC.coord2Point(coord))) relevantCoord=true;
 
