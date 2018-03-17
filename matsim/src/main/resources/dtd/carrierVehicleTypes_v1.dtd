@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- $Id$ -->
+
+<!-- ============================================================ -->
+<!-- Author: kturner 
+first try to create a dtd-file for freight-contrib-->
+<!-- ============================================================ -->
+
+<!ELEMENT vehicleTypes	(vehicleType)*> 
+<!ELEMENT vehicleType	(description?,allowableWeight?,capacity,engineInformation?,costInformation,maxVelocity?)>
+<!ATTLIST vehicleType 
+		id		ID #REQUIRED	>
+
+<!ELEMENT description    (#PCDATA)>
+
+<!ELEMENT allowableWeight	EMPTY>
+<!ATTLIST allowableWeight
+		weight	CDATA #IMPLIED>
+
+<!ELEMENT capacity	(#PCDATA)> 
+<!ATTLIST capacity
+		unit		CDATA #IMPLIED>
+
+<!ELEMENT engineInformation	EMPTY>
+<!ATTLIST engineInformation	
+		fuelType			CDATA #IMPLIED
+        gasConsumption	CDATA #IMPLIED>
+
+<!ELEMENT costInformation	EMPTY>
+<!ATTLIST costInformation
+		fix			CDATA #REQUIRED
+        perMeter		CDATA #REQUIRED
+        perSecond	CDATA #REQUIRED>
+        
+<!ELEMENT maxVelocity    (#PCDATA)>
+        
+<!-- ============================================================ -->
+         
+<!-- ATTRIBUTE id is required and needs to be unique. They may include:
+     Letters (lower or capital)
+     Numbers 0 to 9
+     Punctuation marks: 
+     	_ (underscore), 
+     	- (single hyphen),
+     	. (Dot) and
+     	: (colon) - however, the colon is reserved for page namespaces
+
+	The first character of a name can not be a number, it must be a letter or one of the 
+	allowed punctuation marks. 
+	In practice, the first character should always be a letter or if needed an underscore.
+	Spaces are NOT allowed. -->     
+	
+<!-- ============================================================ -->	
+<!-- ELEMENT allowableWeight is NOT implemented until now. -> Values are NOT read in anyways!  -->
+
+<!-- ============================================================ -->	
+<!-- Further documentation.. needs to be inserted.	     -->

@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.BasicPlan;
 import org.matsim.api.core.v01.population.HasPlansAndId;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.internal.MatsimManager;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.selectors.PlanSelector;
@@ -203,7 +204,7 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 			if (this.subpopulationAttributeName != null) {
 				subpopName = (String) subPopLookup.getAttribute(person.getId().toString(), this.subpopulationAttributeName);
 			}
-			GenericPlanStrategy<T, I> strategy = this.chooseStrategy(subpopName);
+			GenericPlanStrategy<T, I> strategy = this.chooseStrategy(person, subpopName);
 
 			if (strategy==null) {
 				throw new RuntimeException("No strategy found! Have you defined at least one replanning strategy per subpopulation?");
@@ -268,7 +269,9 @@ public class GenericStrategyManager<T extends BasicPlan, I extends HasPlansAndId
 	 *
 	 * @return the chosen strategy
 	 */
-	protected GenericPlanStrategy<T, I> chooseStrategy(final String subpopulation) {
+	/* deliberately package */ GenericPlanStrategy<T, I> chooseStrategy(HasPlansAndId<T, I> person, final String subpopulation) {
+		// yyyyyy I can see that this would need to be replaceable, but need to find some other way than inheritance.  kai, mar'18
+		
 		final StrategyWeights<T, I> weights = getStrategyWeights(subpopulation);
 
 		double rnd = MatsimRandom.getRandom().nextDouble() * weights.totalWeights;

@@ -21,6 +21,7 @@ package org.matsim.core.scoring.functions;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 public class CharyparNagelScoringFunctionModule extends AbstractModule {
     @Override
@@ -31,7 +32,7 @@ public class CharyparNagelScoringFunctionModule extends AbstractModule {
 	    	bindScoringFunctionFactory().toInstance(new CharyparNagelScoringFunctionWithDisutilityFactory());
 //		    throw new RuntimeException("make sure that linkenter/leave events are passed on") ;
 	    } else {
-		    bindScoringFunctionFactory().to(CharyparNagelScoringFunctionFactory.class);
+		    bind(ScoringFunctionFactory.class).to(CharyparNagelScoringFunctionFactory.class);
 	    }
         bind(ScoringParametersForPerson.class).to(SubpopulationScoringParameters.class);
     }

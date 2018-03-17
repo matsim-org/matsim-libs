@@ -21,7 +21,6 @@
 package org.matsim.analysis;
 
 import org.jfree.chart.axis.CategoryLabelPositions;
-import org.matsim.core.controler.AbstractController;
 import org.matsim.core.utils.charts.StackedBarChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
@@ -41,7 +40,11 @@ import java.util.Map.Entry;
  *
  * @author mrieser
  */
-public class IterationStopWatch {
+public final class IterationStopWatch {
+	/**
+	 * Strings used to identify the operations in the IterationStopWatch.
+	 */
+	public static final String OPERATION_ITERATION = "iteration";
 
 	/*
 	 * Time spent in operations which are not measured in detail.
@@ -120,7 +123,7 @@ public class IterationStopWatch {
 			this.currentIterationChildren = new HashMap<String, List<String>>();
 			this.children.put(this.iteration, this.currentIterationChildren);
 		}
-        this.beginOperation(AbstractController.OPERATION_ITERATION);
+        this.beginOperation(OPERATION_ITERATION);
 	}
 
 	/**
@@ -167,7 +170,7 @@ public class IterationStopWatch {
 	}
 
     public void endIteration() {
-        this.endOperation(AbstractController.OPERATION_ITERATION);
+        this.endOperation(OPERATION_ITERATION);
     }
 
 	/**
@@ -304,7 +307,7 @@ public class IterationStopWatch {
 //		double[] sumData = new double[iterations];
 		for (String operation : this.operations) {
 			double[] data = arrayMap.get(operation);
-			if (operation.equals(AbstractController.OPERATION_ITERATION)) {
+			if (operation.equals(OPERATION_ITERATION)) {
 				iterationData = data;
 				continue;
 			} else {

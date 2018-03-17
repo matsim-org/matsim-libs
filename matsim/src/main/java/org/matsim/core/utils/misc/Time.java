@@ -66,6 +66,10 @@ public class Time {
 		// give the option to change the convention at some point in time.  kai, nov'17
 		return UNDEFINED_TIME ;
 	}
+	public static double getVeryLargeTime() {
+		// give the option to change the convention at some point in time.  kai, nov'17
+		return Long.MAX_VALUE ;
+	}
 
 	static {
 		timeElements = new String[60];
