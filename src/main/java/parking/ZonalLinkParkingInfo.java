@@ -62,6 +62,15 @@ public class ZonalLinkParkingInfo {
         ParkingRouterConfigGroup prc = ParkingRouterConfigGroup.get(config);
         init(prc.getShapeFileUrl(config.getContext()).getFile(), prc.getShapeKey());
     }
+    
+    public ZonalLinkParkingInfo(String shapeFile, String shapeKey, double storageCapacityFactor, Network network, LinkParkingCapacityCalculator linkParkingCapacityCalculator) {
+        this.network = network;
+        this.linkParkingCapacityCalculator = linkParkingCapacityCalculator;
+        this.qSimConfigGroup = new QSimConfigGroup();
+        qSimConfigGroup.setStorageCapFactor(storageCapacityFactor);
+        ParkingRouterConfigGroup prc = null;
+        init(shapeFile, shapeKey);
+    }
 
     
     private void init(String shapeFile, String featureKey) {
@@ -97,6 +106,10 @@ public class ZonalLinkParkingInfo {
         if (first.isPresent()) return first.get().getValue();
         else return null;
     }
+    
+    public Map<Id<ParkingZone>, ParkingZone> getParkingZones() {
+		return parkingZones;
+	}
 
    
 }
