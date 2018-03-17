@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.inject.Inject;
+
 import org.apache.commons.lang.mutable.MutableInt;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -32,6 +34,8 @@ import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
@@ -55,7 +59,29 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 		for (Id<ParkingZone> zone : parkingInfo.getParkingZones().keySet()) {
 			zoneoccupancyPerBin.put(zone,new int[bins]);
 		}
+	}
+	
+	@Inject
+	public ParkingOccupancyEventHandler(ZonalLinkParkingInfo parkingInfo, LinkParkingCapacityCalculator calculator,
+			Network network, Config config, EventsManager events) {
+		events.addHandler(this);
+		this.parkingInfo = parkingInfo;
+		this.calculator = calculator;
+		this.network = network;
+		bins = (int) (config.qsim().getEndTime() / 900);
+		for (Id<ParkingZone> zone : parkingInfo.getParkingZones().keySet()) {
+			zoneoccupancyPerBin.put(zone,new int[bins]);
 		}
+	}
+	
+	@Override
+	public void reset(int iteration) {
+		zoneoccupancyPerBin.clear();
+		for (Id<ParkingZone> zone : parkingInfo.getParkingZones().keySet()) {
+			zoneoccupancyPerBin.put(zone,new int[bins]);
+		}
+
+	}
 
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
