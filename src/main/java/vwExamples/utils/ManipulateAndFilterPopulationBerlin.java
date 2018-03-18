@@ -122,10 +122,11 @@ public static void main(String[] args) {
 										
 	//									if (getPtTransportMode(leg,transitLines).equals("bus"))
 	//										{
-												System.out.println("Replaced leg with " + newMode);
+//												System.out.println("Replaced leg with " + newMode);
 												//Write newMode into Leg
 												leg.setMode(newMode);
 												//Remove route from leg
+												leg.setRoute(null);
 												leg.setTravelTime(0.0);
 												//System.out.println(leg);
 												
