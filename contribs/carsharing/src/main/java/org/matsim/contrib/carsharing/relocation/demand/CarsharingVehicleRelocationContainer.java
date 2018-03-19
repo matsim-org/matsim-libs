@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Point;
 
 public class CarsharingVehicleRelocationContainer {
 	private Scenario scenario;
-
+	private Network network;
 	private PointFeatureFactory pointFeatureFactory;
 
 	public static final String ELEMENT_NAME = "carSharingRelocationZones";
@@ -54,9 +54,10 @@ public class CarsharingVehicleRelocationContainer {
 
 	private Integer demandEstimateIterations = null;
 
-	public CarsharingVehicleRelocationContainer(Scenario sc) {
+	public CarsharingVehicleRelocationContainer(Scenario sc, Network network) {
 		this.scenario = sc;
-		this.relocationAgentFactory = new RelocationAgentFactory(this.scenario);
+		this.network = network;
+		this.relocationAgentFactory = new RelocationAgentFactory(this.scenario, network);
 		this.pointFeatureFactory = new PointFeatureFactory.Builder()
 				.setName("point")
 				.setCrs(DefaultGeographicCRS.WGS84)
@@ -98,7 +99,6 @@ public class CarsharingVehicleRelocationContainer {
 		RelocationAgentsReader reader = new RelocationAgentsReader();
 		reader.readFile(confGroup.getRelocationAgents());
 
-		Network network = this.scenario.getNetwork();
 
 		for (Entry<String, Map<String, Map<String, Double>>> companyEntry : reader.getRelocationAgentBases().entrySet()) {
 			String companyId = companyEntry.getKey();
@@ -289,6 +289,6 @@ public class CarsharingVehicleRelocationContainer {
 	}
 
 	public Network getNetwork() {
-		return this.scenario.getNetwork();
+		return this.network;
 	}
 }

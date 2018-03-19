@@ -8,6 +8,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -16,7 +17,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.carsharing.router.CarsharingRoute;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -24,12 +24,16 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 /** 
  * @author balac
  */
 public class RouteCarsharingTripImpl implements RouteCarsharingTrip {
 
 	@Inject private Scenario scenario;
+	@Inject
+	@Named("carnetwork")
+	private Network network;
 	@Inject private LeastCostPathCalculatorFactory pathCalculatorFactory ;
 	
 	@Inject private Map<String, TravelTime> travelTimes ;
@@ -56,7 +60,7 @@ public class RouteCarsharingTripImpl implements RouteCarsharingTrip {
 		TravelTime travelTime = travelTimes.get( TransportMode.car ) ;
 		
 		TravelDisutility travelDisutility = travelDisutilityFactories.get( TransportMode.car ).createTravelDisutility(travelTime) ;
-		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(scenario.getNetwork(),
+		LeastCostPathCalculator pathCalculator = pathCalculatorFactory.createPathCalculator(network,
 				travelDisutility, travelTime ) ;
 		
 		String mainMode = legToBeRouted.getMode();
@@ -65,8 +69,8 @@ public class RouteCarsharingTripImpl implements RouteCarsharingTrip {
 
 		Person person = plan.getPerson();
 		CarsharingRoute route = (CarsharingRoute) legToBeRouted.getRoute();
-		final Link currentLink = scenario.getNetwork().getLinks().get(route.getStartLinkId());
-		final Link destinationLink = scenario.getNetwork().getLinks().get(route.getEndLinkId());
+		final Link currentLink = network.getLinks().get(route.getStartLinkId());
+		final Link destinationLink = network.getLinks().get(route.getEndLinkId());
 		
 		if (hasVehicle) {
 			//=== car leg			

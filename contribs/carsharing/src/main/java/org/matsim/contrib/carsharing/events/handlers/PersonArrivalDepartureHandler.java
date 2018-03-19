@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
@@ -25,19 +24,27 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
 
 import com.google.inject.Inject;
-/** 
+import com.google.inject.name.Named;
+
+/**
  * 
  * @author balac
  */
-public class PersonArrivalDepartureHandler implements PersonDepartureEventHandler, PersonLeavesVehicleEventHandler, 
-	PersonArrivalEventHandler, PersonEntersVehicleEventHandler {	
+public class PersonArrivalDepartureHandler implements PersonDepartureEventHandler, PersonLeavesVehicleEventHandler,
+		PersonArrivalEventHandler, PersonEntersVehicleEventHandler {
 
-	@Inject	private CarsharingManagerInterface carsharingManager;
-	@Inject private CurrentTotalDemand currentDemand;
-	@Inject private CarsharingSupplyInterface carsharingSupply;
-	@Inject EventsManager eventsManager;
-	@Inject Scenario scenario;
-	
+	@Inject
+	private CarsharingManagerInterface carsharingManager;
+	@Inject
+	private CurrentTotalDemand currentDemand;
+	@Inject
+	private CarsharingSupplyInterface carsharingSupply;
+	@Inject
+	EventsManager eventsManager;
+	@Inject
+	@Named("carnetwork")
+	private Network network;
+
 	Map<Id<Person>, String> personArrivalMode = new HashMap<Id<Person>, String>();
 	Map<Id<Person>, Id<Link>> personArrivalMap = new HashMap<Id<Person>, Id<Link>>();
 	Map<Id<Person>, Id<Link>> personDepartureMap = new HashMap<Id<Person>, Id<Link>>();
@@ -51,103 +58,98 @@ public class PersonArrivalDepartureHandler implements PersonDepartureEventHandle
 		personArrivalMode = new HashMap<Id<Person>, String>();
 		personDepartureMap = new HashMap<Id<Person>, Id<Link>>();
 	}
-	
+
 	@Override
 	public void handleEvent(PersonDepartureEvent event) {
-		Network network = scenario.getNetwork();
 		String legMode = event.getLegMode();
-		
+
 		if (legMode.equals("egress_walk_ff")) {
 			String vehId = personLeavesVehicleMap.get(event.getPersonId()).toString();
 			Id<Link> linkId = personArrivalMap.get(event.getPersonId());
 			carsharingManager.parkVehicle(vehId, linkId);
 			Link link = network.getLinks().get(linkId);
-			this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId), "freefloating");
+			this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId),
+					"freefloating");
 			eventsManager.processEvent(new EndRentalEvent(event.getTime(), linkId, event.getPersonId(), vehId));
 
-		}
-		else if (legMode.equals("egress_walk_ow")) {
+		} else if (legMode.equals("egress_walk_ow")) {
 			String vehId = personLeavesVehicleMap.get(event.getPersonId()).toString();
 			Id<Link> linkId = personArrivalMap.get(event.getPersonId());
 			carsharingManager.parkVehicle(vehId, linkId);
 			Link link = network.getLinks().get(linkId);
-			this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId), "oneway");
+			this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId),
+					"oneway");
 			eventsManager.processEvent(new EndRentalEvent(event.getTime(), linkId, event.getPersonId(), vehId));
 
-		}
-		else if (legMode.equals("egress_walk_tw")) {
+		} else if (legMode.equals("egress_walk_tw")) {
 			String vehId = personLeavesVehicleMap.get(event.getPersonId()).toString();
 			Id<Link> linkId = personArrivalMap.get(event.getPersonId());
 			carsharingManager.parkVehicle(vehId, linkId);
 			Link link = network.getLinks().get(linkId);
-			this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId), "twoway");
+			this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId),
+					"twoway");
 			eventsManager.processEvent(new EndRentalEvent(event.getTime(), linkId, event.getPersonId(), vehId));
 
-		}		
-			
-		personDepartureMap.put(event.getPersonId(), event.getLinkId());	
+		}
+
+		personDepartureMap.put(event.getPersonId(), event.getLinkId());
 	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		personLeavesVehicleMap.put(event.getPersonId(), event.getVehicleId());
-	
-	}	
+
+	}
 
 	@Override
 	public void handleEvent(PersonArrivalEvent event) {
-		Network network = scenario.getNetwork();
 		String mode = event.getLegMode();
 		String[] modeCut = mode.split("_");
 		this.personArrivalMode.put(event.getPersonId(), event.getLegMode());
-		if (mode.startsWith("free") || 
-				mode.startsWith("one") || mode.startsWith("two")) {			
-			
+		if (mode.startsWith("free") || mode.startsWith("one") || mode.startsWith("two")) {
+
 			String vehId = personLeavesVehicleMap.get(event.getPersonId()).toString();
-			
+
 			CSVehicle vehicle = this.carsharingSupply.getAllVehicles().get(vehId);
-			
+
 			Id<Link> linkId = event.getLinkId();
 			Link link = network.getLinks().get(linkId);
 
 			this.currentDemand.addVehicle(event.getPersonId(), link, vehicle, modeCut[0]);
-				
-		}		
+
+		}
 		personArrivalMap.put(event.getPersonId(), event.getLinkId());
-		
+
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		Network network = scenario.getNetwork();
 
 		String vehId = event.getVehicleId().toString();
 		String arrivalMode = this.personArrivalMode.get(event.getPersonId());
 
 		if (arrivalMode != null) {
-			if (vehId.startsWith("OW") &&
-					!arrivalMode.equals("access_walk_ow")) {
+			if (vehId.startsWith("OW") && !arrivalMode.equals("access_walk_ow")) {
 				Id<Link> linkId = this.personDepartureMap.get(event.getPersonId());
 				Link link = network.getLinks().get(linkId);
 				this.carsharingManager.freeParkingSpot(vehId, linkId);
 
-				this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId), "oneway");
-			
-			}		
-			else if (vehId.startsWith("FF") &&
-					!arrivalMode.equals("access_walk_ff")) {
+				this.currentDemand.removeVehicle(event.getPersonId(), link,
+						carsharingSupply.getAllVehicles().get(vehId), "oneway");
+
+			} else if (vehId.startsWith("FF") && !arrivalMode.equals("access_walk_ff")) {
 				Id<Link> linkId = this.personDepartureMap.get(event.getPersonId());
 				Link link = network.getLinks().get(linkId);
 
-				this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId), "freefloating");
-			}
-			else if (vehId.startsWith("TW") &&
-					!arrivalMode.equals("access_walk_tw")) {
+				this.currentDemand.removeVehicle(event.getPersonId(), link,
+						carsharingSupply.getAllVehicles().get(vehId), "freefloating");
+			} else if (vehId.startsWith("TW") && !arrivalMode.equals("access_walk_tw")) {
 				Id<Link> linkId = this.personDepartureMap.get(event.getPersonId());
 				Link link = network.getLinks().get(linkId);
 
-				this.currentDemand.removeVehicle(event.getPersonId(), link, carsharingSupply.getAllVehicles().get(vehId), "twoway");
+				this.currentDemand.removeVehicle(event.getPersonId(), link,
+						carsharingSupply.getAllVehicles().get(vehId), "twoway");
 			}
 		}
-	}	
+	}
 }

@@ -8,12 +8,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.manager.supply.CarsharingSupplyInterface;
 import org.matsim.contrib.carsharing.manager.supply.CompanyContainer;
 import org.matsim.contrib.carsharing.vehicles.CSVehicle;
@@ -43,7 +43,7 @@ public class RelocationAgent implements MobsimDriverAgent {
 	private Guidance guidance;
 	private MobsimTimer mobsimTimer;
 	private Scenario scenario;
-
+	private Network network;
 	private CarsharingSupplyInterface carsharingSupply;
 	// RelocationAgent needs CompanyContainer and Company
 
@@ -60,12 +60,12 @@ public class RelocationAgent implements MobsimDriverAgent {
 
 	private List<Double> relocationTimes = null;
 
-	public RelocationAgent(Id<Person> id, String companyId, Id<Link> homeLinkId, Scenario scenario) {
+	public RelocationAgent(Id<Person> id, String companyId, Id<Link> homeLinkId, Scenario scenario, Network network) {
 		this.id = id;
 		this.companyId = companyId;
 		this.currentLinkId = this.homeLinkId = homeLinkId;
 		this.scenario = scenario;
-
+		this.network = network;
 		this.startActivity();
 	}
 
@@ -291,20 +291,19 @@ public class RelocationAgent implements MobsimDriverAgent {
 
 	@Override
 	public Double getExpectedTravelTime() {
-		return this.guidance.getExpectedTravelTime(
-				this.scenario.getNetwork().getLinks().get(this.getCurrentLinkId()),
-				this.scenario.getNetwork().getLinks().get(this.getDestinationLinkId()),
-				this.getTimeOfDay(),
-				this.transportMode,
-				null
-		);
+		if (this.transportMode.equals("bike"))
+			return 600.0;
+		else
+			return this.guidance.getExpectedTravelTime(this.network.getLinks().get(this.getCurrentLinkId()),
+					this.network.getLinks().get(this.getDestinationLinkId()), this.getTimeOfDay(), this.transportMode,
+					null);
 	}
 
     @Override
     public Double getExpectedTravelDistance() {
 		return this.guidance.getExpectedTravelDistance(
-				this.scenario.getNetwork().getLinks().get(this.getCurrentLinkId()),
-				this.scenario.getNetwork().getLinks().get(this.getDestinationLinkId()),
+				this.network.getLinks().get(this.getCurrentLinkId()),
+				this.network.getLinks().get(this.getDestinationLinkId()),
 				this.getTimeOfDay(),
 				this.transportMode,
 				null
@@ -324,8 +323,8 @@ public class RelocationAgent implements MobsimDriverAgent {
 	@Override
 	public Id<Link> chooseNextLinkId() {
 		return this.guidance.getBestOutgoingLink(
-				this.scenario.getNetwork().getLinks().get(this.getCurrentLinkId()),
-				this.scenario.getNetwork().getLinks().get(this.getDestinationLinkId()),
+				this.network.getLinks().get(this.getCurrentLinkId()),
+				this.network.getLinks().get(this.getDestinationLinkId()),
 				this.getTimeOfDay()
 		);
 	}
@@ -348,7 +347,7 @@ public class RelocationAgent implements MobsimDriverAgent {
 	private void deliverCarSharingVehicle() {
 		CompanyContainer companyContainer = this.carsharingSupply.getCompany(this.companyId);		
 		CSVehicle vehicle = this.carsharingSupply.getVehicleWithId(this.relocations.get(0).getVehicleId());
-		companyContainer.parkVehicle(vehicle, this.scenario.getNetwork().getLinks().get(this.getCurrentLinkId()));
+		companyContainer.parkVehicle(vehicle, this.network.getLinks().get(this.getCurrentLinkId()));
 	}
 
 	@Override
