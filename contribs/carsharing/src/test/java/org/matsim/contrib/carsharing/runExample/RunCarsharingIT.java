@@ -186,7 +186,7 @@ public class RunCarsharingIT {
 						Assert.assertEquals( 10, nOfModeLegs ) ;
 //						Assert.assertEquals( 8, nOfModeLegs ) ;
 					} else if ( TransportMode.car.equals(legMode) ) {
-						Assert.assertEquals( 0, nOfModeLegs ) ;
+						Assert.assertEquals( 2, nOfModeLegs ) ;
 					} else if ( "egress_walk_tw".equals(legMode) ) {
 						Assert.assertEquals( 4, nOfModeLegs ) ;
 					}
