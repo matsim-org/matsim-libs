@@ -14,6 +14,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.carsharing.relocation.demand.CarsharingVehicleRelocationContainer;
@@ -29,8 +30,8 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.GenericPlanStrategy;
 import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.selectors.KeepSelected;
-import org.matsim.core.replanning.strategies.KeepLastSelected;
+import org.matsim.core.utils.collections.QuadTree;
+import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrices;
@@ -38,25 +39,58 @@ import org.matsim.matrices.MatricesWriter;
 import org.matsim.matrices.Matrix;
 
 import com.google.inject.Inject;
+import com.google.inject.name.Named;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 public class AverageDemandRelocationListener implements IterationStartsListener, DispatchRelocationsEventHandler {
 
 	public static final Logger log = Logger.getLogger("dummy");
 
-	@Inject private CarsharingVehicleRelocationContainer carsharingVehicleRelocation;
+	@Inject
+	private CarsharingVehicleRelocationContainer carsharingVehicleRelocation;
 
-	@Inject private CarSharingDemandTracker demandTracker;
-	@Inject StrategyManager strategyManager;
+	@Inject
+	private CarSharingDemandTracker demandTracker;
+	@Inject
+	StrategyManager strategyManager;
 	// temp
-	@Inject private OutputDirectoryHierarchy outputDirectoryHierarchy;
-
+	@Inject
+	private OutputDirectoryHierarchy outputDirectoryHierarchy;
+	@Inject
+	@Named("carnetwork")
+	private Network network;
 	private int iteration;
 
 	protected Map<String, Map<Double, Matrices>> avgODMatrices;
+	private QuadTree<RelocationZone> qtSurplus;
+	private QuadTree<RelocationZone> qtDemand;
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
+
+		double minx = (1.0D / 0.0D);
+		double miny = (1.0D / 0.0D);
+		double maxx = (-1.0D / 0.0D);
+		double maxy = (-1.0D / 0.0D);
+
+		for (Link l : this.network.getLinks().values()) {
+			if (l.getCoord().getX() < minx)
+				minx = l.getCoord().getX();
+			if (l.getCoord().getY() < miny)
+				miny = l.getCoord().getY();
+			if (l.getCoord().getX() > maxx)
+				maxx = l.getCoord().getX();
+			if (l.getCoord().getY() <= maxy)
+				continue;
+			maxy = l.getCoord().getY();
+		}
+		minx -= 1.0D;
+		miny -= 1.0D;
+		maxx += 1.0D;
+		maxy += 1.0D;
+		qtSurplus = new QuadTree<RelocationZone>(minx, miny, maxx, maxy);
+		qtDemand = new QuadTree<RelocationZone>(minx, miny, maxx, maxy);
+
 		this.iteration = event.getIteration();
 
 		if (this.iteration >= this.carsharingVehicleRelocation.moduleEnableAfterIteration()) {
@@ -73,27 +107,11 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 
 			this.avgODMatrices = this.calculateAvgODMAtrices(previousODMatricesList);
 
-			//this.writeAvgODMatrices();
+			// this.writeAvgODMatrices();
 
-			//this.writeAvgODMatricesMap();
-		}	
-		GenericPlanStrategy<Plan, Person> strategy = null;
-		List<GenericPlanStrategy<Plan, Person>> strategies = strategyManager.getStrategies(null);
-		for (GenericPlanStrategy<Plan, Person> str : strategies) {
-			if (str.toString().equals("KeepSelected")) {
-				strategy = str;
-			}
-			
+			// this.writeAvgODMatricesMap();
 		}
-		if (iteration % 2 == 0 && iteration > 0) {
-			strategyManager.changeWeightOfStrategy(strategy, null, 0.0);
-			strategyManager.setMaxPlansPerAgent(5);
-		}
-		else {
-			strategyManager.changeWeightOfStrategy(strategy, null, 0.0);
-			strategyManager.setMaxPlansPerAgent(5);
-
-		}
+		
 
 	}
 
@@ -107,8 +125,8 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 		String companyId = event.getCompanyId();
 		Double start = event.getStart();
 		Double end = event.getEnd();
-		
-		//demand for carsharing
+
+		// demand for carsharing
 		Matrices companyODMatrices = this.getAvgODMatrices(companyId, start);
 		List<RelocationZone> companyRelocationZones = this.carsharingVehicleRelocation.getRelocationZones(companyId);
 
@@ -147,9 +165,10 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 				relocationZone.setNumberOfExpectedReturns(numReturns);
 			}
 
-			for (RelocationInfo info : this.calcOptimizedRelocations(start, end, companyId, companyRelocationZones)) {
+			for (RelocationInfo info : this.calcOptimizedDistanceRelocations(start, end, companyId, companyRelocationZones)) {
 				this.carsharingVehicleRelocation.addRelocation(companyId, info);
-				log.info("AverageDemandRelocationListener suggests we move vehicle " + info.getVehicleId() + " from link " + info.getStartLinkId() + " to " + info.getEndLinkId());
+				log.info("AverageDemandRelocationListener suggests we move vehicle " + info.getVehicleId()
+						+ " from link " + info.getStartLinkId() + " to " + info.getEndLinkId());
 
 				if (this.iteration > this.carsharingVehicleRelocation.moduleEnableAfterIteration()) {
 					RelocationAgent agent = this.getRelocationAgent(companyId);
@@ -163,7 +182,8 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 		}
 	}
 
-	protected ArrayList<RelocationInfo> calculateRelocations(Double start, Double end, String companyId, List<RelocationZone> relocationZones) {
+	protected ArrayList<RelocationInfo> calculateRelocations(Double start, Double end, String companyId,
+			List<RelocationZone> relocationZones) {
 		String timeSlot = Time.writeTime(start) + " - " + Time.writeTime(end);
 		ArrayList<RelocationInfo> relocations = new ArrayList<RelocationInfo>();
 		Map<Integer, Double> vehicleSurplusZones = new HashMap<Integer, Double>();
@@ -173,65 +193,71 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 			double numberOfVehicles = relocationZone.getNumberOfSurplusVehicles();
 
 			if (numberOfVehicles >= 1) {
-				vehicleSurplusZones.put(new Integer(relocationZones.indexOf(relocationZone)), Math.floor(numberOfVehicles));
+				vehicleSurplusZones.put(new Integer(relocationZones.indexOf(relocationZone)),
+						Math.floor(numberOfVehicles));
 			} else if (numberOfVehicles <= -1) {
-				vehicleDemandZones.put(new Integer(relocationZones.indexOf(relocationZone)), Math.floor(Math.abs(numberOfVehicles)));
+				vehicleDemandZones.put(new Integer(relocationZones.indexOf(relocationZone)),
+						Math.floor(Math.abs(numberOfVehicles)));
 			}
 		}
 
-		List<Map.Entry<Integer, Double>> vehicleSurplusList = new LinkedList<Map.Entry<Integer, Double>>(vehicleSurplusZones.entrySet());
-		List<Map.Entry<Integer, Double>> vehicleDemandList = new LinkedList<Map.Entry<Integer, Double>>(vehicleDemandZones.entrySet());
+		List<Map.Entry<Integer, Double>> vehicleSurplusList = new LinkedList<Map.Entry<Integer, Double>>(
+				vehicleSurplusZones.entrySet());
+		List<Map.Entry<Integer, Double>> vehicleDemandList = new LinkedList<Map.Entry<Integer, Double>>(
+				vehicleDemandZones.entrySet());
 
-        Collections.sort(vehicleDemandList, new Comparator<Map.Entry<Integer, Double>>()
-        {
-            public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
-                return o2.getValue().compareTo(o1.getValue());
-            }
-        });
+		Collections.sort(vehicleDemandList, new Comparator<Map.Entry<Integer, Double>>() {
+			public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
+				return o2.getValue().compareTo(o1.getValue());
+			}
+		});
 
-        for (Map.Entry<Integer, Double> vehicleDemandEntry : vehicleDemandList) {
-            while (vehicleDemandEntry.getValue() > 0) {
-                RelocationZone originZone = null;
-                Link originLink = null;
+		for (Map.Entry<Integer, Double> vehicleDemandEntry : vehicleDemandList) {
+			while (vehicleDemandEntry.getValue() > 0) {
+				RelocationZone originZone = null;
+				Link originLink = null;
 
-                RelocationZone destinationZone = relocationZones.get(vehicleDemandEntry.getKey());
-                Link destinationLink = NetworkUtils.getNearestLink(this.carsharingVehicleRelocation.getNetwork(), destinationZone.getCenter());
+				RelocationZone destinationZone = relocationZones.get(vehicleDemandEntry.getKey());
+				Link destinationLink = NetworkUtils.getNearestLink(this.carsharingVehicleRelocation.getNetwork(),
+						destinationZone.getCenter());
 
-                String vehicleId = "";
+				String vehicleId = "";
 
-                Collections.sort(vehicleSurplusList, new Comparator<Map.Entry<Integer, Double>>()
-                {
-                    public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
-                        return o2.getValue().compareTo(o1.getValue());
-                    }
-                });
+				Collections.sort(vehicleSurplusList, new Comparator<Map.Entry<Integer, Double>>() {
+					public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
+						return o2.getValue().compareTo(o1.getValue());
+					}
+				});
 
-                try {
-                    Map.Entry<Integer, Double> surplusVehiclesEntry = vehicleSurplusList.get(0);
-                    originZone = relocationZones.get(surplusVehiclesEntry.getKey());
+				try {
+					Map.Entry<Integer, Double> surplusVehiclesEntry = vehicleSurplusList.get(0);
+					originZone = relocationZones.get(surplusVehiclesEntry.getKey());
 
-                    LinkedList<Map.Entry<Link,ArrayList<String>>> vehiclesList = new LinkedList<Map.Entry<Link, ArrayList<String>>>(originZone.getVehicles().entrySet());
-                    Map.Entry<Link, ArrayList<String>> vehiclesEntry = vehiclesList.get(0);
-                    originLink = vehiclesEntry.getKey();
-                    vehicleId = vehiclesEntry.getValue().get(0);
-                    originZone.removeVehicles(originLink, new ArrayList<String>(Arrays.asList(new String[]{vehicleId})));
+					LinkedList<Map.Entry<Link, ArrayList<String>>> vehiclesList = new LinkedList<Map.Entry<Link, ArrayList<String>>>(
+							originZone.getVehicles().entrySet());
+					Map.Entry<Link, ArrayList<String>> vehiclesEntry = vehiclesList.get(0);
+					originLink = vehiclesEntry.getKey();
+					vehicleId = vehiclesEntry.getValue().get(0);
+					originZone.removeVehicles(originLink,
+							new ArrayList<String>(Arrays.asList(new String[] { vehicleId })));
 
-                    surplusVehiclesEntry.setValue(surplusVehiclesEntry.getValue() - 1);
-                } catch (IndexOutOfBoundsException e) {
-                    break;
-                }
+					surplusVehiclesEntry.setValue(surplusVehiclesEntry.getValue() - 1);
+				} catch (IndexOutOfBoundsException e) {
+					break;
+				}
 
-                relocations.add(new RelocationInfo(timeSlot, companyId, vehicleId, originLink.getId(), destinationLink.getId(), originZone.getId().toString(), destinationZone.getId().toString()));
-                vehicleDemandEntry.setValue(vehicleDemandEntry.getValue() - 1);
-            }
-        }
+				relocations.add(new RelocationInfo(timeSlot, companyId, vehicleId, originLink.getId(),
+						destinationLink.getId(), originZone.getId().toString(), destinationZone.getId().toString()));
+				vehicleDemandEntry.setValue(vehicleDemandEntry.getValue() - 1);
+			}
+		}
 
 		return relocations;
 	}
-	
-	
-	private ArrayList<RelocationInfo> calcOptimizedRelocations(Double start, Double end, String companyId, List<RelocationZone> relocationZones) {
-		
+
+	private ArrayList<RelocationInfo> calcOptimizedRelocations(Double start, Double end, String companyId,
+			List<RelocationZone> relocationZones) {
+
 		ArrayList<RelocationInfo> relocations = new ArrayList<RelocationInfo>();
 
 		String timeSlot = Time.writeTime(start) + " - " + Time.writeTime(end);
@@ -240,80 +266,194 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 
 		for (RelocationZone relocationZone : relocationZones) {
 
-			
 			double numberOfVehicles = relocationZone.getNumberOfSurplusVehicles();
 
 			if (numberOfVehicles >= 1) {
-				
-				if ((relocationZone.getNumberOfVehicles() + relocationZone.getNumberOfExpectedReturns() / 2.0) - relocationZone.getNumberOfExpectedRequests() > 0)				
-					vehicleSurplusZones.put(new Integer(relocationZones.indexOf(relocationZone)), Math.floor((relocationZone.getNumberOfVehicles() + (int)(relocationZone.getNumberOfExpectedReturns() / 2.0)) - relocationZone.getNumberOfExpectedRequests()));
-				
+
+				if ((relocationZone.getNumberOfVehicles() + relocationZone.getNumberOfExpectedReturns() / 2.0)
+						- relocationZone.getNumberOfExpectedRequests() > 0)
+					vehicleSurplusZones.put(new Integer(relocationZones.indexOf(relocationZone)),
+							Math.floor((relocationZone.getNumberOfVehicles()
+									+ (int) (relocationZone.getNumberOfExpectedReturns() / 2.0))
+									- relocationZone.getNumberOfExpectedRequests()));
+
 			} else if (numberOfVehicles <= -1) {
-				vehicleDemandZones.put(new Integer(relocationZones.indexOf(relocationZone)), Math.floor(Math.abs(numberOfVehicles)));
+				vehicleDemandZones.put(new Integer(relocationZones.indexOf(relocationZone)),
+						Math.floor(Math.abs(numberOfVehicles)));
 			}
 		}
 
-		List<Map.Entry<Integer, Double>> vehicleSurplusList = new LinkedList<Map.Entry<Integer, Double>>(vehicleSurplusZones.entrySet());
-		List<Map.Entry<Integer, Double>> vehicleDemandList = new LinkedList<Map.Entry<Integer, Double>>(vehicleDemandZones.entrySet());
+		List<Map.Entry<Integer, Double>> vehicleSurplusList = new LinkedList<Map.Entry<Integer, Double>>(
+				vehicleSurplusZones.entrySet());
+		List<Map.Entry<Integer, Double>> vehicleDemandList = new LinkedList<Map.Entry<Integer, Double>>(
+				vehicleDemandZones.entrySet());
 
-		 Collections.sort(vehicleDemandList, new Comparator<Map.Entry<Integer, Double>>()
-	        {
-	            public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
-	                return o2.getValue().compareTo(o1.getValue());
-	            }
-	        });
-		 
-		 Collections.sort(vehicleSurplusList, new Comparator<Map.Entry<Integer, Double>>()
-	        {
-	            public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
-	                return o2.getValue().compareTo(o1.getValue());
-	            }
-	        });
-		
-		while (!vehicleDemandList.isEmpty() && vehicleDemandList.get(0).getValue() > 0 && !vehicleSurplusList.isEmpty() && vehicleSurplusList.get(0).getValue() > 0) {
-			
+		Collections.sort(vehicleDemandList, new Comparator<Map.Entry<Integer, Double>>() {
+			public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
+				return o2.getValue().compareTo(o1.getValue());
+			}
+		});
+
+		Collections.sort(vehicleSurplusList, new Comparator<Map.Entry<Integer, Double>>() {
+			public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
+				return o2.getValue().compareTo(o1.getValue());
+			}
+		});
+
+		while (!vehicleDemandList.isEmpty() && vehicleDemandList.get(0).getValue() > 0 && !vehicleSurplusList.isEmpty()
+				&& vehicleSurplusList.get(0).getValue() > 0) {
+
 			RelocationZone destinationZone = relocationZones.get(vehicleDemandList.get(0).getKey());
-	        Link destinationLink = NetworkUtils.getNearestLink(this.carsharingVehicleRelocation.getNetwork(), destinationZone.getCenter());
-			
-	        Map.Entry<Integer, Double> surplusVehiclesEntry = vehicleSurplusList.get(0);
-	        RelocationZone originZone = relocationZones.get(surplusVehiclesEntry.getKey());
+			Link destinationLink = NetworkUtils.getNearestLink(this.carsharingVehicleRelocation.getNetwork(),
+					destinationZone.getCenter());
 
-            LinkedList<Map.Entry<Link,ArrayList<String>>> vehiclesList = new LinkedList<Map.Entry<Link, ArrayList<String>>>(originZone.getVehicles().entrySet());
-            if (vehiclesList.isEmpty()) {
-            	
-            	vehicleSurplusList.remove(0);
-            	
-            	continue;
-            }
-            Map.Entry<Link, ArrayList<String>> vehiclesEntry = vehiclesList.get(0);
-            Link originLink = vehiclesEntry.getKey();
-            String vehicleId = vehiclesEntry.getValue().get(0);
-            originZone.removeVehicles(originLink, new ArrayList<String>(Arrays.asList(new String[]{vehicleId})));
+			Map.Entry<Integer, Double> surplusVehiclesEntry = vehicleSurplusList.get(0);
+			RelocationZone originZone = relocationZones.get(surplusVehiclesEntry.getKey());
 
-            surplusVehiclesEntry.setValue(surplusVehiclesEntry.getValue() - 1);       
+			LinkedList<Map.Entry<Link, ArrayList<String>>> vehiclesList = new LinkedList<Map.Entry<Link, ArrayList<String>>>(
+					originZone.getVehicles().entrySet());
+			if (vehiclesList.isEmpty()) {
 
-            relocations.add(new RelocationInfo(timeSlot, companyId, vehicleId, originLink.getId(), destinationLink.getId(), originZone.getId().toString(), destinationZone.getId().toString()));
-            vehicleDemandList.get(0).setValue(vehicleDemandList.get(0).getValue() - 1);
-			
-			 Collections.sort(vehicleDemandList, new Comparator<Map.Entry<Integer, Double>>()
-		        {
-		            public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
-		                return o2.getValue().compareTo(o1.getValue());
-		            }
-		        });
-			 
-			 Collections.sort(vehicleSurplusList, new Comparator<Map.Entry<Integer, Double>>()
-		        {
-		            public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
-		                return o2.getValue().compareTo(o1.getValue());
-		            }
-		        });
+				vehicleSurplusList.remove(0);
+
+				continue;
+			}
+			Map.Entry<Link, ArrayList<String>> vehiclesEntry = vehiclesList.get(0);
+			Link originLink = vehiclesEntry.getKey();
+			String vehicleId = vehiclesEntry.getValue().get(0);
+			originZone.removeVehicles(originLink, new ArrayList<String>(Arrays.asList(new String[] { vehicleId })));
+
+			surplusVehiclesEntry.setValue(surplusVehiclesEntry.getValue() - 1);
+
+			relocations.add(new RelocationInfo(timeSlot, companyId, vehicleId, originLink.getId(),
+					destinationLink.getId(), originZone.getId().toString(), destinationZone.getId().toString()));
+			vehicleDemandList.get(0).setValue(vehicleDemandList.get(0).getValue() - 1);
+
+			Collections.sort(vehicleDemandList, new Comparator<Map.Entry<Integer, Double>>() {
+				public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
+					return o2.getValue().compareTo(o1.getValue());
+				}
+			});
+
+			Collections.sort(vehicleSurplusList, new Comparator<Map.Entry<Integer, Double>>() {
+				public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
+					return o2.getValue().compareTo(o1.getValue());
+				}
+			});
 		}
-		
+
 		return relocations;
 	}
-	
-	
+
+	private ArrayList<RelocationInfo> calcOptimizedDistanceRelocations(Double start, Double end, String companyId,
+			List<RelocationZone> relocationZones) {
+
+		double minx = (1.0D / 0.0D);
+		double miny = (1.0D / 0.0D);
+		double maxx = (-1.0D / 0.0D);
+		double maxy = (-1.0D / 0.0D);
+
+		for (Link l : this.network.getLinks().values()) {
+			if (l.getCoord().getX() < minx)
+				minx = l.getCoord().getX();
+			if (l.getCoord().getY() < miny)
+				miny = l.getCoord().getY();
+			if (l.getCoord().getX() > maxx)
+				maxx = l.getCoord().getX();
+			if (l.getCoord().getY() <= maxy)
+				continue;
+			maxy = l.getCoord().getY();
+		}
+		minx -= 1.0D;
+		miny -= 1.0D;
+		maxx += 1.0D;
+		maxy += 1.0D;
+		qtSurplus = new QuadTree<RelocationZone>(minx, miny, maxx, maxy);
+		qtDemand = new QuadTree<RelocationZone>(minx, miny, maxx, maxy);
+		
+		ArrayList<RelocationInfo> relocations = new ArrayList<RelocationInfo>();
+
+		String timeSlot = Time.writeTime(start) + " - " + Time.writeTime(end);
+		Map<Integer, Double> vehicleSurplusZones = new HashMap<Integer, Double>();
+		Map<Integer, Double> vehicleDemandZones = new HashMap<Integer, Double>();
+
+		for (RelocationZone relocationZone : relocationZones) {
+
+			double numberOfVehicles = relocationZone.getNumberOfSurplusVehicles();
+
+			if (numberOfVehicles >= 1) {
+
+				if (relocationZone.getNumberOfVehicles() > 0 && (relocationZone.getNumberOfVehicles() + relocationZone.getNumberOfExpectedReturns() / 2.0)
+						- relocationZone.getNumberOfExpectedRequests() > 0) {
+					vehicleSurplusZones.put(new Integer(relocationZones.indexOf(relocationZone)),
+							Math.min(numberOfVehicles, relocationZone.getNumberOfVehicles()));
+					qtSurplus.put(relocationZone.getCenter().getX(), relocationZone.getCenter().getY(), relocationZone);
+
+				}
+
+			} else if (numberOfVehicles <= -1) {
+				vehicleDemandZones.put(new Integer(relocationZones.indexOf(relocationZone)),
+						Math.floor(Math.abs(numberOfVehicles)));
+				qtDemand.put(relocationZone.getCenter().getX(), relocationZone.getCenter().getY(), relocationZone);
+
+			}
+		}
+
+		List<Map.Entry<Integer, Double>> vehicleSurplusList = new LinkedList<Map.Entry<Integer, Double>>(
+				vehicleSurplusZones.entrySet());
+		List<Map.Entry<Integer, Double>> vehicleDemandList = new LinkedList<Map.Entry<Integer, Double>>(
+				vehicleDemandZones.entrySet());
+
+		Collections.sort(vehicleDemandList, new Comparator<Map.Entry<Integer, Double>>() {
+			public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
+				return o2.getValue().compareTo(o1.getValue());
+			}
+		});
+
+		Collections.sort(vehicleSurplusList, new Comparator<Map.Entry<Integer, Double>>() {
+			public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
+				return o2.getValue().compareTo(o1.getValue());
+			}
+		});
+
+		while (!vehicleDemandList.isEmpty() && vehicleDemandList.get(0).getValue() > 0 && qtSurplus.size() > 0) {
+
+			RelocationZone destinationZone = relocationZones.get(vehicleDemandList.get(0).getKey());
+			Link destinationLink = NetworkUtils.getNearestLink(this.carsharingVehicleRelocation.getNetwork(),
+					destinationZone.getCenter());
+
+			RelocationZone originZone = qtSurplus.getClosest(destinationZone.getCenter().getX(),
+					destinationZone.getCenter().getY());
+
+			LinkedList<Map.Entry<Link, ArrayList<String>>> vehiclesList = new LinkedList<Map.Entry<Link, ArrayList<String>>>(
+					originZone.getVehicles().entrySet());
+			if (vehiclesList.isEmpty()) {
+
+				throw new RuntimeException("System is in the inconsistent state!");
+			}
+
+			Map.Entry<Link, ArrayList<String>> vehiclesEntry = vehiclesList.get(0);
+			Link originLink = vehiclesEntry.getKey();
+			String vehicleId = vehiclesEntry.getValue().get(0);
+			originZone.removeVehicles(originLink, new ArrayList<String>(Arrays.asList(new String[] { vehicleId })));
+
+			if (originZone.getNumberOfVehicles() == 0.0) {
+				qtSurplus.remove(originZone.getCenter().getX(), originZone.getCenter().getY(), originZone);
+			}
+			//if (CoordUtils.calcEuclideanDistance(originLink.getCoord(), destinationLink.getCoord()) >= 1000.0)
+				relocations.add(new RelocationInfo(timeSlot, companyId, vehicleId, originLink.getId(),
+						destinationLink.getId(), originZone.getId().toString(), destinationZone.getId().toString()));
+			vehicleDemandList.get(0).setValue(vehicleDemandList.get(0).getValue() - 1);
+
+			Collections.sort(vehicleDemandList, new Comparator<Map.Entry<Integer, Double>>() {
+				public int compare(Map.Entry<Integer, Double> o1, Map.Entry<Integer, Double> o2) {
+					return o2.getValue().compareTo(o1.getValue());
+				}
+			});
+		}
+
+		return relocations;
+	}
 
 	public Map<String, Map<Double, Matrices>> getAvgODMatrices() {
 		return this.avgODMatrices;
@@ -349,7 +489,8 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 		return null;
 	}
 
-	protected Map<String, Map<Double, Matrices>> calculateAvgODMAtrices(List<Map<String, Map<Double, Matrices>>> ODMatricesList) {
+	protected Map<String, Map<Double, Matrices>> calculateAvgODMAtrices(
+			List<Map<String, Map<Double, Matrices>>> ODMatricesList) {
 		Map<String, Map<Double, Matrices>> avgODMatrices = new HashMap<String, Map<Double, Matrices>>();
 
 		for (Map<String, Map<Double, Matrices>> ODMatrices : ODMatricesList) {
@@ -383,8 +524,9 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 					if (null != intervalODMatrices2) {
 						Matrix Matrix1rentals = intervalODMatrices1.getMatrix("rentals");
 
-						for (ArrayList<Entry> fromLocEntries : intervalODMatrices2.getMatrix("rentals").getFromLocations().values()) {
-							for (Entry fromLocEntry: fromLocEntries) {
+						for (ArrayList<Entry> fromLocEntries : intervalODMatrices2.getMatrix("rentals")
+								.getFromLocations().values()) {
+							for (Entry fromLocEntry : fromLocEntries) {
 								String originId = fromLocEntry.getFromLocation();
 								String destinationId = fromLocEntry.getToLocation();
 
@@ -402,8 +544,9 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 
 						Matrix Matrix1noVehicle = intervalODMatrices1.getMatrix("no_vehicle");
 
-						for (ArrayList<Entry> fromLocEntries : intervalODMatrices2.getMatrix("no_vehicle").getFromLocations().values()) {
-							for (Entry fromLocEntry: fromLocEntries) {
+						for (ArrayList<Entry> fromLocEntries : intervalODMatrices2.getMatrix("no_vehicle")
+								.getFromLocations().values()) {
+							for (Entry fromLocEntry : fromLocEntries) {
 								String originId = fromLocEntry.getFromLocation();
 								String destinationId = fromLocEntry.getToLocation();
 
@@ -446,7 +589,8 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 	}
 
 	protected RelocationAgent getRelocationAgent(String companyId) {
-		Map<Id<Person>, RelocationAgent> relocationAgents = this.carsharingVehicleRelocation.getRelocationAgents(companyId);
+		Map<Id<Person>, RelocationAgent> relocationAgents = this.carsharingVehicleRelocation
+				.getRelocationAgents(companyId);
 
 		for (RelocationAgent relocationAgent : relocationAgents.values()) {
 			if (relocationAgent.getRelocations().isEmpty()) {
@@ -465,7 +609,8 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 
 			for (java.util.Map.Entry<Double, Matrices> timeEntry : companyODMatrices.entrySet()) {
 				double start = timeEntry.getKey();
-				String filename = this.outputDirectoryHierarchy.getIterationFilename(this.iteration, "CS-OD-AVG." + companyId + "." + start + ".txt");
+				String filename = this.outputDirectoryHierarchy.getIterationFilename(this.iteration,
+						"CS-OD-AVG." + companyId + "." + start + ".txt");
 				final MatricesWriter matricesWriter = new MatricesWriter(timeEntry.getValue());
 				matricesWriter.write(filename);
 			}
@@ -475,20 +620,24 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 	protected void writeAvgODMatricesMap() {
 		RelocationZoneKmlWriter writer = new RelocationZoneKmlWriter();
 
-		for (java.util.Map.Entry<String, List<RelocationZone>> relocationZoneEntry : this.carsharingVehicleRelocation.getRelocationZones().entrySet()) {
+		for (java.util.Map.Entry<String, List<RelocationZone>> relocationZoneEntry : this.carsharingVehicleRelocation
+				.getRelocationZones().entrySet()) {
 			String companyId = relocationZoneEntry.getKey();
 			Map<Id<RelocationZone>, MultiPolygon> polygons = new HashMap<Id<RelocationZone>, MultiPolygon>();
 
 			for (RelocationZone relocationZone : relocationZoneEntry.getValue()) {
-				polygons.put(relocationZone.getId(), (MultiPolygon) relocationZone.getPolygon().getAttribute("the_geom"));
+				polygons.put(relocationZone.getId(),
+						(MultiPolygon) relocationZone.getPolygon().getAttribute("the_geom"));
 			}
 
 			writer.setPolygons(polygons);
 
-			for (java.util.Map.Entry<Double, Matrices> avgODMatricesEntry : this.getAvgODMatrices(companyId).entrySet()) {
+			for (java.util.Map.Entry<Double, Matrices> avgODMatricesEntry : this.getAvgODMatrices(companyId)
+					.entrySet()) {
 				Double time = avgODMatricesEntry.getKey();
 				Matrices avgODMatrices = avgODMatricesEntry.getValue();
-				String filename = this.outputDirectoryHierarchy.getIterationFilename(this.iteration, companyId + "." + time + ".relocation_zones_avg.xml");
+				String filename = this.outputDirectoryHierarchy.getIterationFilename(this.iteration,
+						companyId + "." + time + ".relocation_zones_avg.xml");
 
 				Map<Id<RelocationZone>, Map<String, Object>> relocationZoneStatiData = new TreeMap<Id<RelocationZone>, Map<String, Object>>();
 
@@ -527,8 +676,9 @@ public class AverageDemandRelocationListener implements IterationStartsListener,
 						Double level = (0 - numRequests);
 						relocationZoneContent.put("level", level);
 
-						DecimalFormat decimalFormat = new DecimalFormat( "#,###,###,##0.0" );
-						String content = "ID: " + relocationZoneId.toString() + " requests: " + decimalFormat.format(numRequests) + " returns: " + decimalFormat.format(numReturns);
+						DecimalFormat decimalFormat = new DecimalFormat("#,###,###,##0.0");
+						String content = "ID: " + relocationZoneId.toString() + " requests: "
+								+ decimalFormat.format(numRequests) + " returns: " + decimalFormat.format(numReturns);
 						relocationZoneContent.put("content", content);
 
 						relocationZoneStatiData.put(relocationZoneId, relocationZoneContent);
