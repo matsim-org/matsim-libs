@@ -66,7 +66,7 @@ public class ChooseTheCompanyPriceBased implements ChooseTheCompany {
 			//estimate the rental price for each company
 			
 			CSVehicle vehicle = this.carsharingSupply.findClosestAvailableVehicle(network.getLinks().get(leg.getRoute().getStartLinkId()),
-					mode, vehicleType, companyName, 1000.0);
+					mode, vehicleType, companyName, 750.0);
 			
 			/*if (vehicle != null) {
 				
