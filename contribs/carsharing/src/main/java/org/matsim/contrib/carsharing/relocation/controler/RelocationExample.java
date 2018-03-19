@@ -1,10 +1,12 @@
 package org.matsim.contrib.carsharing.relocation.controler;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.carsharing.config.CarsharingConfigGroup;
 import org.matsim.contrib.carsharing.config.CarsharingVehicleRelocationConfigGroup;
 import org.matsim.contrib.carsharing.control.listeners.CarsharingListener;
@@ -48,6 +50,8 @@ import org.matsim.contrib.carsharing.relocation.utils.ChooseTheCompanyPriceBased
 import org.matsim.contrib.carsharing.relocation.utils.FFVehiclesRentalsWriterListener;
 import org.matsim.contrib.carsharing.replanning.CarsharingSubtourModeChoiceStrategy;
 import org.matsim.contrib.carsharing.replanning.RandomTripToCarsharingStrategy;
+import org.matsim.contrib.carsharing.router.CarsharingRoute;
+import org.matsim.contrib.carsharing.router.CarsharingRouteFactory;
 import org.matsim.contrib.carsharing.runExample.CarsharingUtils;
 import org.matsim.contrib.carsharing.scoring.CarsharingScoringFunctionFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -65,9 +69,12 @@ import org.matsim.core.mobsim.qsim.QSimProvider;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import com.google.inject.Provider;
+import com.google.inject.name.Names;
 
 
 
@@ -85,7 +92,8 @@ public class RelocationExample {
 		config.addModule(carsharingVehicleRelocationConfigGroup);
 		
 		final Scenario sc = ScenarioUtils.loadScenario(config);
-
+		sc.getPopulation().getFactory().getRouteFactories().setRouteFactory(CarsharingRoute.class,
+				new CarsharingRouteFactory());
 		final Controler controler = new Controler(sc);
 
 		installCarSharing(controler);
@@ -95,7 +103,12 @@ public class RelocationExample {
 
 	public static void installCarSharing(final Controler controler) {
 		final Scenario scenario = controler.getScenario();
-		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(scenario.getNetwork());
+		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
+		Set<String> modes = new HashSet<>();
+		modes.add("car");
+		Network networkFF = NetworkUtils.createNetwork();
+		filter.filter(networkFF, modes);
+		CarsharingXmlReaderNew reader = new CarsharingXmlReaderNew(networkFF);
 
 		final CarsharingConfigGroup configGroup = (CarsharingConfigGroup) scenario.getConfig().getModule( CarsharingConfigGroup.GROUP_NAME );
 
@@ -109,15 +122,13 @@ public class RelocationExample {
 
 		final CostsCalculatorContainer costsCalculatorContainer = CarsharingUtils.createCompanyCostsStructure(carsharingCompanies);
 
-		final CarsharingVehicleRelocationContainer carsharingVehicleRelocation = new CarsharingVehicleRelocationContainer(scenario);
+		final CarsharingVehicleRelocationContainer carsharingVehicleRelocation = new CarsharingVehicleRelocationContainer(scenario, networkFF);
 
 		final SetupListener setupListener = new SetupListener();
 		final CarSharingDemandTracker demandTracker = new CarSharingDemandTracker();
 		final CarsharingListener carsharingListener = new CarsharingListener();
 		final KmlWriterListener relocationListener = new KmlWriterListener(configGroup.getStatsWriterFrequency());
 		final FFVehiclesRentalsWriterListener vehicleRentalsWriterListener = new FFVehiclesRentalsWriterListener(configGroup.getStatsWriterFrequency());
-		final CarsharingSupplyInterface carsharingSupplyContainer = new CarsharingSupplyContainer(scenario);
-		carsharingSupplyContainer.populateSupply();
 		final KeepingTheCarModel keepingCarModel = new KeepingTheCarModelExample();
 		final ChooseTheCompany chooseCompany = new ChooseTheCompanyPriceBased();
 		final ChooseVehicleType chooseCehicleType = new ChooseVehicleTypeExample();
@@ -140,7 +151,7 @@ public class RelocationExample {
 				bind(RouteCarsharingTrip.class).toInstance(routeCarsharingTrip);
 				bind(CostsCalculatorContainer.class).toInstance(costsCalculatorContainer);
 				bind(MembershipContainer.class).toInstance(memberships);
-			    bind(CarsharingSupplyInterface.class).toInstance(carsharingSupplyContainer);
+			    bind(CarsharingSupplyInterface.class).to(CarsharingSupplyContainer.class);
 			    bind(CarsharingManagerInterface.class).toInstance(carsharingManager);
 				bind(CarsharingVehicleRelocationContainer.class).toInstance(carsharingVehicleRelocation);
 				bind(CarSharingDemandTracker.class).toInstance(demandTracker);
@@ -148,6 +159,7 @@ public class RelocationExample {
 				bind(DemandDistributionHandler.class).asEagerSingleton();
 			    bind(VehicleChoiceAgent.class).toInstance(vehicleChoiceAgent);
 			    bind(MobismBeforeSimStepRelocationListener.class).asEagerSingleton();
+				bind(Network.class).annotatedWith(Names.named("carnetwork")).toInstance(networkFF);
 
 			}
 		});
