@@ -21,6 +21,8 @@ package org.matsim.contrib.emissions.example;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.emissions.EmissionModule;
+import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
+import org.matsim.contrib.emissions.roadTypeMapping.RoadTypeMappingProvider;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -42,41 +44,37 @@ import org.matsim.core.scenario.ScenarioUtils;
  */
 
 public class RunEmissionToolOnlineExampleV2 {
-	
+
 	private static final String configFile = "./test/input/org/matsim/contrib/emissions/config_v2.xml";
-	
-	public static Config prepareConfig( String[] args ) {
-		Config config;
-		if ( args == null || args.length == 0 ) {
-			config = ConfigUtils.loadConfig( configFile, new EmissionsConfigGroup() );
+
+	private final Config config ;
+
+	public RunEmissionToolOnlineExampleV2(String[] args ) {
+
+		if ( args==null || args.length==0 ) {
+			config = ConfigUtils.loadConfig(configFile, new EmissionsConfigGroup());
 		} else {
-			config = ConfigUtils.loadConfig( args[0], new EmissionsConfigGroup() );
+			config = ConfigUtils.loadConfig( args[0], new EmissionsConfigGroup());
 		}
-		return config;
-	}
-	
-	public static Scenario prepareScenario( Config config ) {
-		Scenario scenario = ScenarioUtils.loadScenario( config );
-		return scenario ;
-	}
-	
-	public static void run( Scenario scenario, AbstractModule... modules ) {
+	}	
+	public final void run() {
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new AbstractModule() {
-			@Override
-			public void install() {
+        controler.addOverridingModule(new AbstractModule() {
+            @Override
+            public void install() {
+				bind(HbefaRoadTypeMapping.class).toProvider(RoadTypeMappingProvider.class);
 				bind(EmissionModule.class).asEagerSingleton();
-			}
-		});
-		for ( AbstractModule module : modules ) {
-			controler.addOverridingModule( module );
-		}
+            }
+        });
+
 		controler.run();
 	}
 	public static void main(String[] args) {
-		Config config = prepareConfig( args ) ;
-		Scenario scenario = prepareScenario( config ) ;
-		run( scenario ) ;
+		new RunEmissionToolOnlineExampleV2(args).run();
+	}
+	public final Config getConfig() {
+		return this.config;
 	}
 
 }

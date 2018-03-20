@@ -30,17 +30,20 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
 import org.matsim.contrib.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
+import org.matsim.contrib.emissions.roadTypeMapping.VisumHbefaRoadTypeMapping;
 import org.matsim.contrib.emissions.types.*;
 import org.matsim.contrib.emissions.utils.EmissionsConfigGroup;
+import org.matsim.contrib.emissions.roadTypeMapping.RoadTypeMappingProvider;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.Vehicles;
-import roadTypeMapping.HbefaRoadTypeMapping;
-import roadTypeMapping.VisumHbefaRoadTypeMapping;
+import org.matsim.contrib.emissions.roadTypeMapping.HbefaRoadTypeMapping;
 
+import static org.matsim.contrib.emissions.utils.EmissionUtils.createIndexFromKey;
 
 /**
  * @author benjamin
@@ -57,7 +60,6 @@ public class EmissionModule {
 	private final EmissionsConfigGroup ecg;
 
 	//===
-	private static String roadTypeMappingFile;
 
 	private static String averageFleetColdEmissionFactorsFile;
 	private static String averageFleetWarmEmissionFactorsFile;
@@ -76,10 +78,9 @@ public class EmissionModule {
 	private Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable;
 
 	@Inject
-	public EmissionModule(final Scenario scenario, final EventsManager eventsManager) {
+	public EmissionModule(final Scenario scenario, final EventsManager eventsManager, HbefaRoadTypeMapping roadTypeMapping) {
 		this.scenario = scenario;
-
-		this.ecg = (EmissionsConfigGroup) scenario.getConfig().getModules().get(EmissionsConfigGroup.GROUP_NAME);
+		this.ecg = (EmissionsConfigGroup) scenario.getConfig().getModule(EmissionsConfigGroup.GROUP_NAME);
 
 		if ( !ecg.isWritingEmissionsEvents() ) {
 			logger.warn("Emission events are excluded from events file. A new events manager is created.");
@@ -88,6 +89,8 @@ public class EmissionModule {
 			this.eventsManager = eventsManager;
 		}
 
+		this.roadTypeMapping = roadTypeMapping;
+
 		createLookupTables();
 		createEmissionHandler();
 
@@ -95,13 +98,17 @@ public class EmissionModule {
 		this.eventsManager.addHandler(warmEmissionHandler);
 		this.eventsManager.addHandler(coldEmissionHandler);
 	}
-	
+
+/*
+	public EmissionModule(final Scenario scenario, final EventsManager eventsManager, final HbefaRoadTypeMapping roadTypeMapping) {
+		this(scenario, eventsManager);
+		this.setRoadTypeMapping(roadTypeMapping);
+	}
+*/
 	private void createLookupTables() {
 		logger.info("entering createLookupTables");
 		
 		getInputFiles();
-		
-		roadTypeMapping = createVisumRoadTypeMapping(roadTypeMappingFile);
 
 		vehicles = scenario.getVehicles();
 
@@ -141,8 +148,6 @@ public class EmissionModule {
 	private void getInputFiles() {
 		URL context = scenario.getConfig().getContext();
 
-		roadTypeMappingFile = ecg.getEmissionRoadTypeMappingFileURL(context).getFile();
-
 		averageFleetWarmEmissionFactorsFile = ecg.getAverageWarmEmissionFactorsFileURL(context).getFile();
 		averageFleetColdEmissionFactorsFile = ecg.getAverageColdEmissionFactorsFileURL(context).getFile();
 		
@@ -154,12 +159,12 @@ public class EmissionModule {
 
 	private void createEmissionHandler() {
 		logger.info("entering createEmissionHandler");
-		
+
 		Network network = scenario.getNetwork() ;
 
 		WarmEmissionAnalysisModuleParameter parameterObject = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable, ecg );
 		ColdEmissionAnalysisModuleParameter parameterObject2 = new ColdEmissionAnalysisModuleParameter(avgHbefaColdTable, detailedHbefaColdTable, ecg);
-		
+
 		warmEmissionHandler = new WarmEmissionHandler(vehicles,	network, parameterObject, eventsManager, ecg.getEmissionEfficiencyFactor());
 		coldEmissionHandler = new ColdEmissionHandler(vehicles, network, parameterObject2, eventsManager, ecg.getEmissionEfficiencyFactor());
 		logger.info("leaving createEmissionHandler");
@@ -167,20 +172,20 @@ public class EmissionModule {
 
 	private HbefaRoadTypeMapping createVisumRoadTypeMapping(String filename){
 		logger.info("entering createRoadTypeMapping ...") ;
-		
-		VisumHbefaRoadTypeMapping mapping = new VisumHbefaRoadTypeMapping();
+
+		VisumHbefaRoadTypeMapping mapping = VisumHbefaRoadTypeMapping.emptyMapping();
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
 			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
-			
+
 			while ((strLine = br.readLine()) != null){
 				if ( strLine.contains("\"")) throw new RuntimeException("cannot handle this character in parsing") ;
-				
+
 				String[] inputArray = strLine.split(";");
 				String visumRtNr = inputArray[indexFromKey.get("VISUM_RT_NR")];
 				String hbefaRtName = (inputArray[indexFromKey.get("HBEFA_RT_NAME")]);
-				
+
 				mapping.put(visumRtNr, hbefaRtName);
 			}
 		} catch (IOException e) {
@@ -189,7 +194,7 @@ public class EmissionModule {
 		logger.info("leaving createRoadTypeMapping ...") ;
 		return mapping;
 	}
-	
+
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
 		logger.info("entering createAvgHbefaWarmTable ...");
 		
@@ -198,7 +203,7 @@ public class EmissionModule {
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
-			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
+			Map<String, Integer> indexFromKey =  createIndexFromKey(strLine);
 			
 			while ((strLine = br.readLine()) != null) {
 				String[] array = strLine.split(";");
@@ -231,7 +236,7 @@ public class EmissionModule {
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
-			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
+			Map<String, Integer> indexFromKey =  createIndexFromKey(strLine);
 			
 			while ((strLine = br.readLine()) != null)   {
 				String[] array = strLine.split(";");
@@ -263,7 +268,7 @@ public class EmissionModule {
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
 
-			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
+			Map<String, Integer> indexFromKey =  createIndexFromKey(strLine);
 
 			while ((strLine = br.readLine()) != null) {
 				String[] array = strLine.split(";");
@@ -299,7 +304,7 @@ public class EmissionModule {
 		try{
 			BufferedReader br = IOUtils.getBufferedReader(filename);
 			String strLine = br.readLine();
-			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
+			Map<String, Integer> indexFromKey =  createIndexFromKey(strLine);
 			
 			while ((strLine = br.readLine()) != null)   {
 				String[] array = strLine.split(";");
@@ -325,16 +330,6 @@ public class EmissionModule {
 		}
 		logger.info("leaving createDetailedHbefaColdTable ...");
 		return hbefaColdTableDetailed;
-	}
-
-	private Map<String, Integer> createIndexFromKey(String strLine) {
-		String[] keys = strLine.split(";") ;
-
-		Map<String, Integer> indexFromKey = new HashMap<>() ;
-		for ( int ii = 0; ii < keys.length; ii++ ) {
-			indexFromKey.put(keys[ii], ii ) ;
-		}
-		return indexFromKey ;
 	}
 
 	private Integer mapAmbientCondPattern2Distance(String string) {
@@ -422,34 +417,35 @@ public class EmissionModule {
 	public void writeEmissionInformation() {
 		logger.info("Warm emissions were not calculated for " + warmEmissionHandler.getLinkLeaveWarnCnt() + " of " +
 				warmEmissionHandler.getLinkLeaveCnt() + " link leave events (no corresponding link enter event).");
-		
+
 		WarmEmissionAnalysisModule wam = warmEmissionHandler.getWarmEmissionAnalysisModule();
 //		ColdEmissionAnalysisModule cam = coldEmissionHandler.getColdEmissionAnalysisModule();
-		
-//		logger.info("Average speed was calculated to 0.0 or a negative value for " + wam.getAverageSpeedNegativeCnt() + " of " + 
+
+//		logger.info("Average speed was calculated to 0.0 or a negative value for " + wam.getAverageSpeedNegativeCnt() + " of " +
 //				wam.getWarmEmissionEventCounter() + " warm emission events.");
 //		logger.info("Average speed was calculated greater than free flow speed for " + wam.getAverageSpeedTooHighCnt() + " of " +
 //				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		
+
 		logger.info("Emission calculation based on `Free flow only' occured for " + wam.getFreeFlowOccurences() + " of " +
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
 		logger.info("Emission calculation based on `Stop&Go only' occured for " + wam.getStopGoOccurences() + " of " +
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
 		logger.info("Emission calculation based on `Fractions' occured for " + wam.getFractionOccurences() + " of " +
 				wam.getWarmEmissionEventCounter() + " warm emission events.");
-		
-		logger.info("Free flow occured on " + wam.getFreeFlowKmCounter() + " km of total " + 
+
+		logger.info("Free flow occured on " + wam.getFreeFlowKmCounter() + " km of total " +
 				wam.getKmCounter() + " km, where emissions were calculated.");
 		logger.info("Stop&Go occured on " + wam.getStopGoKmCounter() + " km of total " +
 				wam.getKmCounter() + " km, where emissions were calculated.");
-		
+
 //		logger.info("Detailed vehicle attributes for warm emission calculation were not specified correctly for "
 //				+ wam.getVehAttributesNotSpecified().size() + " of "
 //				+ wam.getVehicleIdSet().size() + " vehicles.");
 //		logger.info("Detailed vehicle attributes for cold emission calculation were not specified correctly for "
 //				+ cam.getVehAttributesNotSpecified().size() + " of "
 //				+ cam.getVehicleIdSet().size() + " vehicles.");
-		
+
 		logger.info("Emission calculation terminated. Emission events can be found in regular events file.");
 	}
+
 }
