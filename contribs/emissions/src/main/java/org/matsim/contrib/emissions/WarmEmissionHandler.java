@@ -77,6 +77,8 @@ public class WarmEmissionHandler implements LinkEnterEventHandler, LinkLeaveEven
 		this.emissionVehicles = emissionVehicles;
 		this.network = network;
 		this.warmEmissionAnalysisModule = new WarmEmissionAnalysisModule(parameterObject, emissionEventsManager, emissionEfficiencyFactor);
+		// add event handlers here and restrict the access outside the emission Module.  Amit Apr'17.
+		emissionEventsManager.addHandler(this);
 	}
 
 	@Override

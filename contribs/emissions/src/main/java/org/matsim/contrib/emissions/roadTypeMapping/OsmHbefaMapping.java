@@ -1,5 +1,6 @@
 package org.matsim.contrib.emissions.roadTypeMapping;
 
+import com.google.inject.Provides;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,13 +47,14 @@ public class OsmHbefaMapping implements HbefaRoadTypeMapping {
         }
     }
 
-
+    @Provides
     public static OsmHbefaMapping build() {
         OsmHbefaMapping mapping = new OsmHbefaMapping();
         mapping.hbfeaMap.put("motorway-Nat.", new Hbefa("MW-Nat.",80,130));
         mapping.hbfeaMap.put("motorway", new Hbefa("MW-City",60,90));
         mapping.hbfeaMap.put("primary-Nat.", new Hbefa("Trunk-Nat.",80,110));
         mapping.hbfeaMap.put("primary", new Hbefa("Trunk-City",50,80));
+        mapping.hbfeaMap.put("trunk", new Hbefa("Trunk-City",50,80));
         mapping.hbfeaMap.put("secondary", new Hbefa("Distr",50,80));
         mapping.hbfeaMap.put("tertiary", new Hbefa("Local",50,60));
         mapping.hbfeaMap.put("residential", new Hbefa("Access",30,50));

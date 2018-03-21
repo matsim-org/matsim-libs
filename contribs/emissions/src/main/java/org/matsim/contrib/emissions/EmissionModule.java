@@ -94,9 +94,7 @@ public class EmissionModule {
 		createLookupTables();
 		createEmissionHandler();
 
-		// add event handlers here and restrict the access outside the emission Module.  Amit Apr'17.
-		this.eventsManager.addHandler(warmEmissionHandler);
-		this.eventsManager.addHandler(coldEmissionHandler);
+		// Event handlers are now added to the event manager inside the respective Handlers, jm march '18
 	}
 
 /*
@@ -168,31 +166,6 @@ public class EmissionModule {
 		warmEmissionHandler = new WarmEmissionHandler(vehicles,	network, parameterObject, eventsManager, ecg.getEmissionEfficiencyFactor());
 		coldEmissionHandler = new ColdEmissionHandler(vehicles, network, parameterObject2, eventsManager, ecg.getEmissionEfficiencyFactor());
 		logger.info("leaving createEmissionHandler");
-	}
-
-	private HbefaRoadTypeMapping createVisumRoadTypeMapping(String filename){
-		logger.info("entering createRoadTypeMapping ...") ;
-
-		VisumHbefaRoadTypeMapping mapping = VisumHbefaRoadTypeMapping.emptyMapping();
-		try{
-			BufferedReader br = IOUtils.getBufferedReader(filename);
-			String strLine = br.readLine();
-			Map<String, Integer> indexFromKey = createIndexFromKey(strLine);
-
-			while ((strLine = br.readLine()) != null){
-				if ( strLine.contains("\"")) throw new RuntimeException("cannot handle this character in parsing") ;
-
-				String[] inputArray = strLine.split(";");
-				String visumRtNr = inputArray[indexFromKey.get("VISUM_RT_NR")];
-				String hbefaRtName = (inputArray[indexFromKey.get("HBEFA_RT_NAME")]);
-
-				mapping.put(visumRtNr, hbefaRtName);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		logger.info("leaving createRoadTypeMapping ...") ;
-		return mapping;
 	}
 
 	private Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> createAvgHbefaWarmTable(String filename){
