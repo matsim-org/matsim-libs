@@ -33,4 +33,7 @@ public class EventsUtils {
     		return new SynchronizedEventsManagerImpl(events);
     	}
     }
+    public static void readEvents( EventsManager events, String filename ) {
+    	new MatsimEventsReader(events).readFile(filename) ;
+	}
 }

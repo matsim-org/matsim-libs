@@ -164,7 +164,8 @@ public final class VspConfigConsistencyCheckerImpl implements ConfigConsistencyC
 		if ( config.planCalcScore().getModes().get(TransportMode.car).getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 		}
-		if ( config.planCalcScore().getModes().get(TransportMode.pt).getMonetaryDistanceRate() > 0 ) {
+		final ModeParams modeParamsPt = config.planCalcScore().getModes().get(TransportMode.pt);
+		if ( modeParamsPt!=null && modeParamsPt.getMonetaryDistanceRate() > 0 ) {
 			problem = true ;
 			System.out.flush() ;
 			log.error("found monetary distance cost rate pt > 0.  You probably want a value < 0 here.  " +
