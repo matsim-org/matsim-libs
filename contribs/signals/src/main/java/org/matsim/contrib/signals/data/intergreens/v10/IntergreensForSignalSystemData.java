@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * IntergreenTimes
+ * IntergreensForSignalSystemDataImpl
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,29 +17,31 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.contrib.signals.data.ambertimes.v10;
+package org.matsim.contrib.signals.data.intergreens.v10;
 
+import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.core.utils.collections.Tuple;
+import org.matsim.contrib.signals.model.SignalGroup;
 import org.matsim.contrib.signals.model.SignalSystem;
-
 
 
 /**
  * @author dgrether
  *
  */
-public interface IntergreenTimesData extends MatsimToplevelContainer  {
+public interface IntergreensForSignalSystemData {
+
+	public Id<SignalSystem> getSignalSystemId();
 	
-	public IntergreensForSignalSystemData addIntergreensForSignalSystem(IntergreensForSignalSystemData intergreens);
-	
-	public Map<Id<SignalSystem>, IntergreensForSignalSystemData> getIntergreensForSignalSystemDataMap();
-	
-	@Override
-	public IntergreenTimesDataFactory getFactory() ;
-	
-	public void setFactory(IntergreenTimesDataFactory factory);
+	public Integer getIntergreenTime(Id<SignalGroup> endingSignalGroupId, Id<SignalGroup> beginningSignalGroupId);
+
+	public void setIntergreenTime(Integer timeSeconds, Id<SignalGroup> endingSignalGroupId, Id<SignalGroup> beginningSignalGroupId);
+
+	public List<Tuple<Id<SignalGroup>, Id<SignalGroup>>> getEndingBeginningSignalGroupKeys();
+
+	public Map<Id<SignalGroup>, Integer> getEndSignalGroupTimesForBeginningGroup(Id<SignalGroup> id);
 	
 }
