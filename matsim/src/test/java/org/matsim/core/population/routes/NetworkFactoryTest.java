@@ -30,7 +30,7 @@ import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 /**
  * @author mrieser

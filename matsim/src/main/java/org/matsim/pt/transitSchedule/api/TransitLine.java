@@ -24,13 +24,14 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
+import org.matsim.utils.objectattributes.attributable.Attributable;
 
 /**
  * Description of a single transit line. Can have multiple routes (e.g. from A to B and from B to A).
  * 
  * @author mrieser
  */
-public interface TransitLine extends Identifiable<TransitLine> {
+public interface TransitLine extends Identifiable<TransitLine>, Attributable {
 
 	/**
 	 * Adds the specified transit route to this line.
@@ -38,23 +39,23 @@ public interface TransitLine extends Identifiable<TransitLine> {
 	 * @param transitRoute
 	 * @throws IllegalArgumentException if there is already a route with the same Id
 	 */
-	public abstract void addRoute(final TransitRoute transitRoute);
+	void addRoute(final TransitRoute transitRoute);
 
 	
 	/**
 	 * @return immutable Map containing all transit routes assigned to this transit line
 	 */
-	public abstract Map<Id<TransitRoute>, TransitRoute> getRoutes();
+	Map<Id<TransitRoute>, TransitRoute> getRoutes();
 
 	/**
 	 * Removes the specified transit route from this transit line.
 	 * @param route
 	 * @return <code>true</code> if this line contained the specified route.
 	 */
-	public abstract boolean removeRoute(final TransitRoute route);
+	boolean removeRoute(final TransitRoute route);
 
-	public void setName(final String name);
+	void setName(final String name);
 	
-	public String getName();
+	String getName();
 	
 }

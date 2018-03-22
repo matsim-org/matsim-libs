@@ -21,7 +21,7 @@ package org.matsim.core.utils.io;
 
 import java.io.ByteArrayInputStream;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Rule;
 import org.junit.Test;

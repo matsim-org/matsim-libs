@@ -44,7 +44,6 @@ public class SquareGridSystem implements ZonalSystem {
 			Zone zone = zonalSystem.getZone(n);
 			zonesWithNodes.put(zone.getId(), zone);
 		}
-
 		return zonesWithNodes;
 	}
 

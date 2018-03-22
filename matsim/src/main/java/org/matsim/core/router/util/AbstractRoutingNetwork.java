@@ -34,8 +34,7 @@ public abstract class AbstractRoutingNetwork implements RoutingNetwork {
 	
 	/*package*/ final Map<Id<Node>, RoutingNetworkNode> nodes = new LinkedHashMap<>();	// needs to be a LinkedHashMap since the order is relevant for the router-preprocessing!
 	/*package*/ final Network network;
-	/*package*/ PreProcessDijkstra preProcessData;
-	
+
 	public AbstractRoutingNetwork(Network network) {
 		this.network = network;
 	}

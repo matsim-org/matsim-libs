@@ -27,12 +27,19 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.scenario.Lockable;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.utils.objectattributes.attributable.Attributes;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 /**
  * Design thoughts:<ul>
@@ -70,12 +77,13 @@ import java.util.*;
 //	private final Collection<NetworkChangeEvent> networkChangeEvents = new ArrayList<>();
 	
 	private final Queue<NetworkChangeEvent> networkChangeEvents
-			= new PriorityQueue<>(11, new Comparator<NetworkChangeEvent>() {
-		@Override
-		public int compare(NetworkChangeEvent arg0, NetworkChangeEvent arg1) {
-			return Double.compare(arg0.getStartTime(), arg1.getStartTime()) ;
-		}
-	});
+//			= new PriorityQueue<>(11, new Comparator<NetworkChangeEvent>() {
+//		@Override
+//		public int compare(NetworkChangeEvent arg0, NetworkChangeEvent arg1) {
+//			return Double.compare(arg0.getStartTime(), arg1.getStartTime()) ;
+//		}
+//	});
+			= new PriorityQueue<>(11, new NetworkChangeEvent.StartTimeComparator() ) ;
 	
 	private String name = null;
 
@@ -195,8 +203,8 @@ import java.util.*;
 			printNodesCount();
 		}
 
-		if ( this.locked && node instanceof Lockable ) {
-			((Lockable)node).setLocked() ;
+		if ( this.locked && nn instanceof Lockable ) {
+			((Lockable)nn).setLocked() ;
 		}
 	}
 	// ////////////////////////////////////////////////////////////////////

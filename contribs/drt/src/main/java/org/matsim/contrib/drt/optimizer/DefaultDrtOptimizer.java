@@ -120,6 +120,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	public void requestSubmitted(Request request) {
 		DrtRequest drtRequest = (DrtRequest)request;
 		if (!requestValidator.validateDrtRequest(drtRequest)) {
+			drtRequest.setRejected(true);
 			eventsManager.processEvent(new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), drtRequest.getId()));
 			return;
 		}

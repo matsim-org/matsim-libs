@@ -68,7 +68,7 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 			writer.write(" "+moduleNameAtt+"=\"" + moduleName + "\" >");
 			writer.write( this.newline );
 			
-			boolean lastHadComment = false;
+//			boolean lastHadComment = false;
 
 			for (Map.Entry<String, String> entry : params.entrySet()) {
 				
@@ -88,12 +88,12 @@ class ConfigWriterHandlerImplV2 implements ConfigWriterHandler {
 					writer.write( indent );
 					writer.write( "\t\t<!-- " + comments.get(entry.getKey()) + " -->");
 					writer.write( this.newline );
-					lastHadComment = true;
-				} else {
-					if (lastHadComment) {
+//					lastHadComment = true;
+//				} else {
+//					if (lastHadComment) {
 //						writer.write( this.newline );
-					}
-					lastHadComment = false;
+//					}
+//					lastHadComment = false;
 				}
 				writer.write( indent );
 				writer.write("\t\t<"+PARAMETER+" name=\"" + entry.getKey() + "\" value=\"" + actual + "\" />");

@@ -68,7 +68,8 @@ public class WagonSimQSimFactory implements MobsimFactory {
 	// to plug an own AgentFactory to the simulation.
 	// Although it is possible to plug another AgentSource to the QSim it is not possible to remove
 	// those that are inserted here. Hence, QSim will try to create TransitAgents AND 
-	//	WagonSimAgents. 
+	//	WagonSimAgents.
+	// yy I think that this is correct.  The mobsim architecture right now only allows to add, not to override.
 	@Override
 	public Mobsim createMobsim(Scenario scenario, EventsManager eventsManager) {
 
@@ -103,7 +104,7 @@ public class WagonSimQSimFactory implements MobsimFactory {
 		qSim.addAgentSource(transitEngine);
 		qSim.addMobsimEngine(transitEngine);
 		if (scenario.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+			qSim.addMobsimEngine(NetworkChangeEventsEngine.createNetworkChangeEventsEngine());
 		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
 		qSim.addAgentSource(agentSource);

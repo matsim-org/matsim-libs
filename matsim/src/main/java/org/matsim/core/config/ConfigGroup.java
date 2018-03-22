@@ -124,12 +124,16 @@ public class ConfigGroup implements MatsimExtensionPoint {
 
 	@Override
 	public final String toString() {
-		String str = "" ;
+		StringBuilder str = new StringBuilder();
 		for ( Entry<String, String> entry : this.getParams().entrySet() ) {
-			str += "[" + entry.getKey() + "=" + entry.getValue() + "]" ;
+			str.append('[');
+			str.append(entry.getKey());
+			str.append('=');
+			str.append(entry.getValue());
+			str.append(']');
 		}
 		return "[name=" + this.getName() + "]" +
-				"[nOfParams=" + this.getParams().size() + "]" + str ;
+				"[nOfParams=" + this.getParams().size() + "]" + str.toString();
 	}
 
 	// /////////////////////////////////////////////////////////////////////////

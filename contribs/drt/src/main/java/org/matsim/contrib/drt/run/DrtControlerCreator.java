@@ -39,7 +39,6 @@ import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
-import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpModule;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
@@ -68,21 +67,20 @@ public final class DrtControlerCreator {
 	public static Controler createControler(Config config, boolean otfvis) {
 		adjustConfig(config);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return adjustControler(otfvis, scenario);
+		return createControlerImpl(otfvis, scenario);
 	}
 
 	public static Controler createControler(Scenario scenario, boolean otfvis) {
 		// yy I know that this one breaks the sequential loading of the building blocks, but I would like to be able
 		// to modify the scenario before I pass it to the controler. kai, oct'17
 		adjustConfig(scenario.getConfig());
-		return adjustControler(otfvis, scenario);
+		return createControlerImpl(otfvis, scenario);
 	}
 
-	private static Controler adjustControler(boolean otfvis, Scenario scenario) {
-		DrtConfigGroup drtCfg = DrtConfigGroup.get(scenario.getConfig());
+	private static Controler createControlerImpl(boolean otfvis, Scenario scenario) {
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule(DrtControlerCreator.createModuleForQSimPlugin(drtCfg),
-				DrtOptimizer.class, DefaultUnplannedRequestInserter.class));
+		controler.addOverridingModule(new DvrpModule(DrtControlerCreator::createModuleForQSimPlugin, DrtOptimizer.class,
+				DefaultUnplannedRequestInserter.class, ParallelPathDataProvider.class));
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
 		if (otfvis) {
@@ -94,32 +92,34 @@ public final class DrtControlerCreator {
 
 	private static void adjustConfig(Config config) {
 		DrtConfigGroup drtCfg = DrtConfigGroup.get(config);
-		config.addConfigConsistencyChecker(new DvrpConfigConsistencyChecker());
-		config.checkConsistency();
-		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stationbased)) {
-			ActivityParams params = config.planCalcScore().getActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY);
-			if (params == null) {
-				params = new ActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY);
+		if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stopbased)) {
+			if (config.planCalcScore().getActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY) == null) {
+				ActivityParams params = new ActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY);
 				params.setTypicalDuration(1);
 				params.setScoringThisActivityAtAll(false);
+				config.planCalcScore().getScoringParametersPerSubpopulation().values().forEach(k->k.addActivityParams(params));
 				config.planCalcScore().addActivityParams(params);
 				Logger.getLogger(DrtControlerCreator.class).info(
 						"drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
 			}
-			if (!config.planCalcScore().getModes().containsKey(DrtStageActivityType.DRT_WALK)){
+			if (!config.planCalcScore().getModes().containsKey(DrtStageActivityType.DRT_WALK)) {
 				ModeParams drtWalk = new ModeParams(DrtStageActivityType.DRT_WALK);
-				ModeParams walk  = config.planCalcScore().getModes().get(TransportMode.walk);
+				ModeParams walk = config.planCalcScore().getModes().get(TransportMode.walk);
 				drtWalk.setConstant(walk.getConstant());
 				drtWalk.setMarginalUtilityOfDistance(walk.getMarginalUtilityOfDistance());
 				drtWalk.setMarginalUtilityOfTraveling(walk.getMarginalUtilityOfTraveling());
 				drtWalk.setMonetaryDistanceRate(walk.getMonetaryDistanceRate());
-				Logger.getLogger(DrtControlerCreator.class).info(
-						"drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
+				config.planCalcScore().getScoringParametersPerSubpopulation().values().forEach(k->k.addModeParams(drtWalk));
+				Logger.getLogger(DrtControlerCreator.class)
+						.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
 			}
 		}
+
+		config.addConfigConsistencyChecker(new DrtConfigConsistencyChecker());
+		config.checkConsistency();
 	}
 
-	public static com.google.inject.AbstractModule createModuleForQSimPlugin(DrtConfigGroup drtCfg) {
+	public static com.google.inject.Module createModuleForQSimPlugin(Config config) {
 		return new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
@@ -131,14 +131,8 @@ public final class DrtControlerCreator {
 				bind(DrtScheduler.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(DrtActionCreator.class).asEagerSingleton();
 				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
-				if (drtCfg.getOperationalScheme().equals(DrtConfigGroup.OperationalScheme.stationbased)) {
-					// StopBasedPathDataProvider consumes too much memory for larger networks with many stops
-					// still could be valuable for complex optimisers (more than just request insertion) 
-					// bind(PrecalculatablePathDataProvider.class).to(StopBasedPathDataProvider.class);
-					bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
-				} else {
-					bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
-				}
+				bind(ParallelPathDataProvider.class).asEagerSingleton();
+				bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
 			}
 
 			@Provides

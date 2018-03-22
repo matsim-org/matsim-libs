@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 
@@ -58,7 +59,7 @@ public class EarliestLinkExitTimeFilter implements AgentFilter {
 	@Override
 	public boolean applyAgentFilter(Id<Person> id, double time) {
 		Double earliestLinkExitTime = this.earliestLinkExitTimeProvider.getEarliestLinkExitTime(id);
-		if (earliestLinkExitTime == null) return false;
+		if (Time.isUndefinedTime(earliestLinkExitTime)) return false;
 		else if (earliestLinkExitTime <= time) return false;
 		else return true;
 	}
