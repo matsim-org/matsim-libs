@@ -250,14 +250,14 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	 * @param attributeValue
 	 * @return String with some characters replaced by their xml-encoding.
 	 */
-	protected static String encodeAttributeValue(final String attributeValue) {
+	public static String encodeAttributeValue(final String attributeValue) {
 		if (attributeValue.contains("&") || attributeValue.contains("\"") || attributeValue.contains("<") || attributeValue.contains(">")) {
 			return attributeValue.replace("&", "&amp;").replace("\"", "&quot;").replace("<", "&lt;").replace(">", "&gt;");
 		}
 		return attributeValue;
 	}
 
-	protected static String encodeContent(final String content) {
+	public static String encodeContent(final String content) {
 		if (content.contains("&") || content.contains("<") || content.contains(">")) {
 			return content.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
 		}
