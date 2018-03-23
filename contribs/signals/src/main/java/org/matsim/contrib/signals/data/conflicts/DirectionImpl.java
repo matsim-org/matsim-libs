@@ -35,15 +35,17 @@ public class DirectionImpl implements Direction {
 	private Id<SignalSystem> signalSystemId;
 	private Id<Link> fromLinkId;
 	private Id<Link> toLinkId;
-	private List<Direction> conflictingDirections = new ArrayList<>();
-	private List<Direction> directionsWithRightOfWay = new ArrayList<>();
-	private List<Direction> directionsWhichMustYield = new ArrayList<>();
-	private List<Direction> nonConflictingDirections = new ArrayList<>();
+	private Id<Direction> id;
+	private List<Id<Direction>> conflictingDirections = new ArrayList<>();
+	private List<Id<Direction>> directionsWithRightOfWay = new ArrayList<>();
+	private List<Id<Direction>> directionsWhichMustYield = new ArrayList<>();
+	private List<Id<Direction>> nonConflictingDirections = new ArrayList<>();
 	
-	DirectionImpl(Id<SignalSystem> signalSystemId, Id<Link> fromLinkId, Id<Link> toLinkId) {
+	DirectionImpl(Id<SignalSystem> signalSystemId, Id<Link> fromLinkId, Id<Link> toLinkId, Id<Direction> directionId) {
 		this.signalSystemId = signalSystemId;
 		this.fromLinkId = fromLinkId;
 		this.toLinkId = toLinkId;
+		this.id = directionId;
 	}
 	
 	@Override
@@ -62,43 +64,48 @@ public class DirectionImpl implements Direction {
 	}
 
 	@Override
-	public List<Direction> getConflictingDirections() {
+	public List<Id<Direction>> getConflictingDirections() {
 		return conflictingDirections;
 	}
 
 	@Override
-	public void addConflictingDirection(Direction direction) {
-		conflictingDirections.add(direction);
+	public void addConflictingDirection(Id<Direction> directionId) {
+		conflictingDirections.add(directionId);
 	}
 
 	@Override
-	public List<Direction> getDirectionsWithRightOfWay() {
+	public List<Id<Direction>> getDirectionsWithRightOfWay() {
 		return directionsWithRightOfWay;
 	}
 
 	@Override
-	public void addDirectionWithRightOfWay(Direction direction) {
-		directionsWithRightOfWay.add(direction);
+	public void addDirectionWithRightOfWay(Id<Direction> directionId) {
+		directionsWithRightOfWay.add(directionId);
 	}
 
 	@Override
-	public List<Direction> getDirectionsWhichMustYield() {
+	public List<Id<Direction>> getDirectionsWhichMustYield() {
 		return directionsWhichMustYield;
 	}
 
 	@Override
-	public void addDirectionWhichMustYield(Direction direction) {
-		directionsWhichMustYield.add(direction);
+	public void addDirectionWhichMustYield(Id<Direction> directionId) {
+		directionsWhichMustYield.add(directionId);
 	}
 
 	@Override
-	public List<Direction> getNonConflictingDirections() {
+	public List<Id<Direction>> getNonConflictingDirections() {
 		return nonConflictingDirections;
 	}
 
 	@Override
-	public void addNonConflictingDirection(Direction direction) {
-		nonConflictingDirections.add(direction);
+	public void addNonConflictingDirection(Id<Direction> directionId) {
+		nonConflictingDirections.add(directionId);
+	}
+
+	@Override
+	public Id<Direction> getId() {
+		return id;
 	}
 
 }

@@ -32,6 +32,6 @@ public interface ConflictDataFactory extends MatsimFactory{
 
 	public ConflictingDirections createConflictingDirectionsContainerForSignalSystem(Id<SignalSystem> signalSystemId);
 	
-	public Direction createDirection(Id<SignalSystem> signalSystemId, Id<Link> fromLinkId, Id<Link> toLinkId);
+	public Direction createDirection(Id<SignalSystem> signalSystemId, Id<Link> fromLinkId, Id<Link> toLinkId, Id<Direction> directionId);
 	
 }

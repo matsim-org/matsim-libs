@@ -35,8 +35,8 @@ public class ConflictDataFactoryImpl implements ConflictDataFactory {
 	}
 
 	@Override
-	public Direction createDirection(Id<SignalSystem> signalSystemId, Id<Link> fromLinkId, Id<Link> toLinkId) {
-		return new DirectionImpl(signalSystemId, fromLinkId, toLinkId);
+	public Direction createDirection(Id<SignalSystem> signalSystemId, Id<Link> fromLinkId, Id<Link> toLinkId, Id<Direction> directionId) {
+		return new DirectionImpl(signalSystemId, fromLinkId, toLinkId, directionId);
 	}
 
 }
