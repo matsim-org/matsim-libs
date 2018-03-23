@@ -92,7 +92,7 @@ public class QSimIntegrationTest {
 		eventsManager.addHandler(coll);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
-		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
+		QSim sim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -152,7 +152,7 @@ public class QSimIntegrationTest {
 		eventsManager.addHandler(coll);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
-		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
+		QSim sim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -228,7 +228,7 @@ public class QSimIntegrationTest {
 		eventsManager.addHandler(coll);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
-		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
+		QSim sim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -311,7 +311,7 @@ public class QSimIntegrationTest {
 		eventsManager.addHandler(coll);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
-		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
+		QSim sim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();
@@ -386,7 +386,7 @@ public class QSimIntegrationTest {
 		eventsManager.addHandler(coll);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(f.scenario).run();
-		QSim sim = QSimUtils.createDefaultQSim(f.scenario, eventsManager);
+		QSim sim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(f.scenario, eventsManager);
 		sim.run();
 
 		coll.printEvents();

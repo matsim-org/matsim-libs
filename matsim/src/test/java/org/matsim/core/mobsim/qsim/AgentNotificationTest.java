@@ -22,15 +22,19 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.jdeqsim.Message;
 import org.matsim.core.mobsim.jdeqsim.MessageQueue;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.messagequeueengine.MessageQueuePlugin;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEnginePlugin;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.Facility;
@@ -53,7 +57,13 @@ public class AgentNotificationTest {
 	private static class MyAgentFactory implements AgentFactory {
 
 		@Inject
-		Netsim simulation;
+		MobsimTimer mobsimTimer;
+		
+		@Inject
+		EventsManager eventsManager;
+		
+		@Inject
+		Scenario scenario;
 
 		@Inject
 		MessageQueue messageQueue;
@@ -68,7 +78,7 @@ public class AgentNotificationTest {
 			PersonDriverAgentImpl delegate;
 
 			MyAgent(Plan selectedPlan) {
-				delegate = new PersonDriverAgentImpl(selectedPlan, simulation);
+				delegate = new PersonDriverAgentImpl(selectedPlan, scenario, eventsManager, mobsimTimer);
 			}
 
 			@Override
@@ -165,7 +175,7 @@ public class AgentNotificationTest {
 			}
 
 			private void onTenMinutesAfterDeparting() {
-				simulation.getEventsManager().processEvent(new HomesicknessEvent());
+				eventsManager.processEvent(new HomesicknessEvent());
 			}
 
 			@Override
@@ -195,7 +205,7 @@ public class AgentNotificationTest {
 
 			class HomesicknessEvent extends Event {
 				public HomesicknessEvent() {
-					super(simulation.getSimTimer().getTimeOfDay());
+					super(mobsimTimer.getTimeOfDay());
 				}
 
 				@Override
@@ -238,6 +248,7 @@ public class AgentNotificationTest {
 		plugins.add(new MessageQueuePlugin(scenario.getConfig()));
 		plugins.add(new ActivityEnginePlugin(scenario.getConfig()));
 		plugins.add(new TeleportationPlugin(scenario.getConfig()));
+		plugins.add(new QNetsimEnginePlugin(scenario.getConfig())); // Added after refactoring to inject InternalInterface
 		plugins.add(new AbstractQSimPlugin(scenario.getConfig()) {
 			@Override
 			public Collection<? extends AbstractModule> modules() {
@@ -259,7 +270,11 @@ public class AgentNotificationTest {
 		EventsCollector handler = new EventsCollector();
 		eventsManager.addHandler(handler);
 		
-		QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins);
+		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
+		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+		
+		QSim qSim = QSimUtils.createQSim(scenario, eventsManager, plugins, mobsimTimer, agentCounter, activeQSimBridge);
 
 		qSim.run();
 		// yyyyyy I can comment out the above line and the test still passes (will say: "skipped"). ?????? kai, feb'16

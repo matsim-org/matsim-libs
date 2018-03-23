@@ -28,10 +28,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.SignalGroupState;
 import org.matsim.core.mobsim.qsim.interfaces.SignalizeableItem;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -54,15 +54,15 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(QLinkImpl.class);
 	
-	public static final class Builder {
-		private NetsimInternalInterface netsimEngine ;
+	public static class Builder {
+		private final InternalInterface internalInterface ;
 		private final NetsimEngineContext context;
 		private LaneFactory laneFactory;
-		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
+		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator();
 		
-		Builder(NetsimEngineContext context, NetsimInternalInterface netsimEngine2) {
+		Builder(NetsimEngineContext context, InternalInterface internalInterface) {
 			this.context = context ;
-			this.netsimEngine = netsimEngine2;
+			this.internalInterface = internalInterface;
 		} 
 		final void setLaneFactory( LaneFactory laneFactory ) {
 			this.laneFactory = laneFactory ;
@@ -71,11 +71,12 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 		public void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
 			this.linkSpeedCalculator = linkSpeedCalculator;
 		}
+		
 		QLinkImpl build( Link link, QNodeI toNode ) {
 			if ( laneFactory == null ) {
 				laneFactory = new QueueWithBuffer.Builder( context ) ;
 			}
-			return new QLinkImpl( link, toNode, laneFactory, context, netsimEngine, linkSpeedCalculator) ;
+			return new QLinkImpl( link, toNode, laneFactory, context, internalInterface, linkSpeedCalculator ) ;
 		}
 	}
 
@@ -96,9 +97,8 @@ public final class QLinkImpl extends AbstractQLink implements SignalizeableItem 
 	
 	private NetsimEngineContext context;
 	
-	private QLinkImpl(final Link link2, final QNodeI toNode, final LaneFactory roadFactory, NetsimEngineContext context,
-					  NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator) {
-		super(link2, toNode, context, netsimEngine, linkSpeedCalculator) ;
+	private QLinkImpl(final Link link2, final QNodeI toNode, final LaneFactory roadFactory, NetsimEngineContext context, InternalInterface internalInterface, LinkSpeedCalculator linkSpeedCalculator) {
+		super(link2, toNode, context, internalInterface, linkSpeedCalculator) ;
 		this.context = context ;
 		// The next line must must by contract stay within the constructor,
 		// so that the caller can use references to the created roads to wire them together,

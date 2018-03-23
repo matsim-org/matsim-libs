@@ -28,11 +28,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 
 class MultiModalQNodeExtension {
 	
 	private static final Logger log = Logger.getLogger(MultiModalQNodeExtension.class);
 	
+	private final InternalInterface internalInterface;
 	private MultiModalSimEngine simEngine;
 	private NetworkElementActivator activator = null;
 	private final MultiModalQLinkExtension[] inLinksArrayCache;
@@ -40,8 +42,9 @@ class MultiModalQNodeExtension {
 	// Is set to "true" if the MultiModalNodeExtension has active inLinks.
     private final AtomicBoolean isActive = new AtomicBoolean(false);
 	
-	/*package*/ MultiModalQNodeExtension(MultiModalSimEngine simEngine, int numInLinks) {	
+	/*package*/ MultiModalQNodeExtension(MultiModalSimEngine simEngine, int numInLinks, InternalInterface internalInterface) {	
 		this.simEngine = simEngine;
+		this.internalInterface = internalInterface;
 		
 		this.inLinksArrayCache = new MultiModalQLinkExtension[numInLinks];
 	}
@@ -153,6 +156,6 @@ class MultiModalQNodeExtension {
 				+ ". The agent is removed from the simulation.");
 		
 		mobsimAgent.setStateToAbort(now);
-		this.simEngine.internalInterface.arrangeNextAgentState(mobsimAgent);
+		internalInterface.arrangeNextAgentState(mobsimAgent);
 	}
 }

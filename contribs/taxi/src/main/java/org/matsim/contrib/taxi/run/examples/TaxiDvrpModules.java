@@ -72,11 +72,12 @@ public class TaxiDvrpModules {
 				install(taxiOptimizerModule);
 			}
 
-			@Provides
+			// This should have a binding automatically now. /shoerl, feb18
+			/*@Provides
 			@Singleton
 			private MobsimTimer provideTimer(QSim qSim) {
 				return qSim.getSimTimer();
-			}
+			}*/
 
 			@Provides
 			@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER)

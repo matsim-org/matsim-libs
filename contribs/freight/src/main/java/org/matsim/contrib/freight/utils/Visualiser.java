@@ -17,7 +17,11 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFFileWriter;
@@ -54,8 +58,12 @@ public class Visualiser {
 
 		CarrierConfig carrierConfig = new CarrierConfig();
 		carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
+		
+		MobsimTimer mobsimTimer = new MobsimTimer(config);
+		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 
-		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig);
+		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig, mobsimTimer, agentCounter, activeQSimBridge);
 
 		Mobsim mobsim = mobsimFactory.get();
 		
@@ -84,12 +92,16 @@ public class Visualiser {
 		CarrierConfig carrierConfig = new CarrierConfig();
 		carrierConfig.setPhysicallyEnforceTimeWindowBeginnings(true);
 
-		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig);
+		MobsimTimer mobsimTimer = new MobsimTimer(config);
+		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+		
+		FreightQSimFactory mobsimFactory = new FreightQSimFactory(scenario, events, carrierAgentTracker, carrierConfig, mobsimTimer, agentCounter, activeQSimBridge);
 
 		config.qsim().setSnapshotStyle(QSimConfigGroup.SnapshotStyle.queue);
 		Mobsim mobsim = mobsimFactory.get();
 
-		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, scenario, events, (QSim) mobsim);
+		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, scenario, events, (QSim) mobsim, mobsimTimer);
 		OTFClientLive.run(config, server);
 
 		mobsim.run();

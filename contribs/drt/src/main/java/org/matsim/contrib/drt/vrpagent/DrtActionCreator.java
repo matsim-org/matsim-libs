@@ -25,6 +25,7 @@ import org.matsim.contrib.dvrp.optimizer.*;
 import org.matsim.contrib.dvrp.passenger.*;
 import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.*;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
 
 import com.google.inject.Inject;
@@ -39,10 +40,10 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final VrpLegs.LegCreator legCreator;
 
 	@Inject
-	public DrtActionCreator(PassengerEngine passengerEngine, VrpOptimizer optimizer, QSim qSim) {
+	public DrtActionCreator(PassengerEngine passengerEngine, VrpOptimizer optimizer, MobsimTimer mobsimTimer) {
 		this.passengerEngine = passengerEngine;
 		legCreator = VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking)optimizer,
-				qSim.getSimTimer());
+				mobsimTimer);
 	}
 
 	@Override

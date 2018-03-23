@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.*;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.QSim;
 
 /**
@@ -36,9 +37,11 @@ import org.matsim.core.mobsim.qsim.QSim;
  */
 public class BeforeSimulationTripPrebooker implements MobsimInitializedListener {
 	private final PassengerEngine passengerEngine;
+	private final ActiveQSimBridge activeQSimBridge;
 
-	public BeforeSimulationTripPrebooker(PassengerEngine passengerEngine) {
+	public BeforeSimulationTripPrebooker(PassengerEngine passengerEngine, ActiveQSimBridge activeQSimBridge) {
 		this.passengerEngine = passengerEngine;
+		this.activeQSimBridge = activeQSimBridge;
 	}
 
 	/**
@@ -47,7 +50,10 @@ public class BeforeSimulationTripPrebooker implements MobsimInitializedListener 
 	 */
 	@Override
 	public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e) {
-		Collection<MobsimAgent> agents = ((QSim)e.getQueueSimulation()).getAgents().values();
+		// TODO This dependency on the QSim here should be removed. We probably need a Mobism-scope
+		// object that can be injected where one can access all agents instead of through the QSim
+		// itself. /shoerl, feb 18
+		Collection<MobsimAgent> agents = activeQSimBridge.getActiveQSim().getAgents().values();
 		String mode = passengerEngine.getMode();
 
 		for (MobsimAgent mobsimAgent : agents) {

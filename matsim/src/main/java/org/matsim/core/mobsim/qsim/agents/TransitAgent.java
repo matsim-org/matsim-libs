@@ -24,11 +24,14 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.HasPerson;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -52,14 +55,14 @@ public final class TransitAgent implements MobsimDriverPassengerAgent, PlanAgent
 	private PlanBasedDriverAgentImpl driverAgentDelegate ;
 	private TransitAgentImpl transitAgentDelegate ;
 
-	public static TransitAgent createTransitAgent(Person p, Netsim simulation) {
-		TransitAgent agent = new TransitAgent(p, simulation);
+	public static TransitAgent createTransitAgent(Person p, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer) {
+		TransitAgent agent = new TransitAgent(p, scenario, eventsManager, mobsimTimer);
 		return agent;
 	}
 
-	private TransitAgent(final Person p, final Netsim simulation) {
-		basicAgentDelegate = new BasicPlanAgentImpl( p.getSelectedPlan(), simulation.getScenario(), simulation.getEventsManager(), 
-				simulation.getSimTimer() ) ;
+	private TransitAgent(final Person p, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer) {
+		basicAgentDelegate = new BasicPlanAgentImpl( p.getSelectedPlan(), scenario, eventsManager, 
+				mobsimTimer ) ;
 		driverAgentDelegate = new PlanBasedDriverAgentImpl( basicAgentDelegate ) ;
 		transitAgentDelegate = new TransitAgentImpl( basicAgentDelegate );
 	}

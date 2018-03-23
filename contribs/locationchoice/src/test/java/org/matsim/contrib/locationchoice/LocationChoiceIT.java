@@ -51,8 +51,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.replanning.PlanStrategy;
@@ -414,8 +418,11 @@ public class LocationChoiceIT extends MatsimTestCase {
 	class FactoryForMobsimWithOTFVis implements MobsimFactory {
 		@Override
 		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-			QSim qSim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager);
-			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
+			MobsimTimer mobsimTimer = new MobsimTimer(sc.getConfig());
+			AgentCounter agentCounter = new AgentCounterImpl();
+			ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+			QSim qSim = (QSim) QSimUtils.createDefaultQSim(sc, eventsManager, mobsimTimer, agentCounter, activeQSimBridge);
+			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim, mobsimTimer);
 			OTFClientLive.run(sc.getConfig(), server);
 			return qSim ;
 		}

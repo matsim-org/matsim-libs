@@ -22,11 +22,20 @@ package org.matsim.contrib.hybridsim.simulation;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
+
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.hybridsim.utils.IdIntMapper;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -47,15 +56,19 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 	private final EventsManager em;
 	private final HybridNetworkFactory netFac;
     private final IdIntMapper mapper;
-
+    private final MobsimTimer mobsimTimer;
+    private final AgentCounter agentCounter;
+    private final ActiveQSimBridge activeQSimBridge;
 
     @Inject
-    HybridMobsimProvider(Scenario sc, EventsManager eventsManager, HybridNetworkFactory netFac, IdIntMapper mapper) {
+    HybridMobsimProvider(Scenario sc, EventsManager eventsManager, HybridNetworkFactory netFac, IdIntMapper mapper, AgentCounter agentCounter, MobsimTimer mobsimTimer, ActiveQSimBridge activeQSimBridge) {
         this.sc = sc;
 		this.em = eventsManager;
 		this.netFac = netFac;
         this.mapper = mapper;
-
+        this.mobsimTimer = mobsimTimer;
+        this.agentCounter = agentCounter;
+        this.activeQSimBridge = activeQSimBridge;
     }
 
 	@Override
@@ -67,18 +80,18 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 		}
 
 
-		QSim qSim = new QSim(this.sc, this.em);
-		ActivityEngine activityEngine = new ActivityEngine(this.em, qSim.getAgentCounter());
+		QSim qSim = new QSim(this.sc, this.em, agentCounter, mobsimTimer, activeQSimBridge);
+		ActivityEngine activityEngine = new ActivityEngine(this.em, agentCounter, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
-        ExternalEngine e = new ExternalEngine(this.em, qSim, mapper);
+        ExternalEngine e = new ExternalEngine(this.em, sc, mapper);
         this.netFac.setExternalEngine(e);
 //		HybridQSimExternalNetworkFactory eFac = new HybridQSimExternalNetworkFactory(e);
 //		this.netFac.putNetsimNetworkFactory("2ext", eFac);
 //		this.netFac.putNetsimNetworkFactory("ext2", eFac);
 		
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim, this.netFac );
+		QNetsimEngine netsimEngine = new QNetsimEngine(this.netFac, sc.getConfig(), sc, em, mobsimTimer, agentCounter, qSim.getInternalInterface());
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
@@ -93,28 +106,27 @@ public class HybridMobsimProvider implements Provider<Mobsim>{
 //		qSim.addDepartureHandler(cae.getDepartureHandler());
 
 
-		TeleportationEngine teleportationEngine = new DefaultTeleportationEngine(this.sc, this.em);
+		TeleportationEngine teleportationEngine = new DefaultTeleportationEngine(this.sc, this.em, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(teleportationEngine);
 
 		AgentFactory agentFactory;
 		if (this.sc.getConfig().transit().isUseTransit()) {
-			agentFactory = new TransitAgentFactory(qSim);
-			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+			agentFactory = new TransitAgentFactory(sc, em, mobsimTimer);
+			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim, sc.getConfig(), sc, em, mobsimTimer, agentCounter, qSim.getInternalInterface());
 			transitEngine
 					.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
 			qSim.addDepartureHandler(transitEngine);
 			qSim.addAgentSource(transitEngine);
 			qSim.addMobsimEngine(transitEngine);
 		} else {
-			agentFactory = new DefaultAgentFactory(qSim);
+			agentFactory = new DefaultAgentFactory(sc, em, mobsimTimer);
 		}
 		if (this.sc.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(NetworkChangeEventsEngine.createNetworkChangeEventsEngine());
+			qSim.addMobsimEngine(NetworkChangeEventsEngine.createNetworkChangeEventsEngine(sc.getNetwork(), netsimEngine.getNetsimNetwork()));
 		}
 		PopulationAgentSource agentSource = new PopulationAgentSource(
-				this.sc.getPopulation(), agentFactory, qSim);
+				this.sc.getPopulation(), agentFactory, sc.getConfig(), sc, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;
 	}
-
 }

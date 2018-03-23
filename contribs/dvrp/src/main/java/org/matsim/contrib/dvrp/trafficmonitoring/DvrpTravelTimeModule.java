@@ -41,7 +41,6 @@ public class DvrpTravelTimeModule extends AbstractModule {
 
 		if (DvrpConfigGroup.get(getConfig()).getTravelTimeEstimationBeta() > 0) {// online estimation
 			bind(DvrpOnlineTravelTimeEstimator.class).asEagerSingleton();
-			addMobsimListenerBinding().to(DvrpOnlineTravelTimeEstimator.class);
 			bind(DvrpTravelTimeEstimator.class).to(DvrpOnlineTravelTimeEstimator.class);
 
 			bind(WithinDayTravelTime.class).asEagerSingleton();

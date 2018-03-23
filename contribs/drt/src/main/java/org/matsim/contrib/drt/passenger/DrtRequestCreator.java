@@ -57,11 +57,12 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 	@Inject
 	public DrtRequestCreator(DrtConfigGroup drtCfg, @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime, QSim qSim,
-			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility) {
+			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility, EventsManager eventsManager,
+			MobsimTimer mobsimTimer) {
 		this.drtCfg = drtCfg;
 		this.travelTime = travelTime;
-		this.eventsManager = qSim.getEventsManager();
-		this.timer = qSim.getSimTimer();
+		this.eventsManager = eventsManager;
+		this.timer = mobsimTimer;
 
 		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}

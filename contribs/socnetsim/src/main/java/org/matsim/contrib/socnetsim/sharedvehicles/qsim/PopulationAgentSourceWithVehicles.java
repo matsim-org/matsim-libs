@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -61,12 +62,13 @@ public class PopulationAgentSourceWithVehicles implements AgentSource {
 	public PopulationAgentSourceWithVehicles(
 			final Population population,
 			final AgentFactory agentFactory,
-			final QSim qsim) {
+			final QSim qsim,
+			final Scenario scenario) {
 		this.population = population;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
 		this.modeVehicleTypes = new HashMap<String, VehicleType>();
-		this.mainModes = qsim.getScenario().getConfig().qsim().getMainModes();
+		this.mainModes = scenario.getConfig().qsim().getMainModes();
 		for (String mode : mainModes) {
 			modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
 		}

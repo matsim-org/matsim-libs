@@ -24,6 +24,7 @@ import java.util.*;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.*;
 import org.matsim.core.mobsim.framework.listeners.*;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -54,9 +55,11 @@ public class TripPrebookingManager implements MobsimInitializedListener, MobsimB
 
 	private final PassengerEngine passengerEngine;
 	private final Queue<PrebookingEntry> prebookingQueue = new PriorityQueue<>(111, BOOKING_COMPARATOR);
+	private final MobsimTimer mobsimTimer;
 
-	public TripPrebookingManager(PassengerEngine passengerEngine) {
+	public TripPrebookingManager(PassengerEngine passengerEngine, MobsimTimer mobsimTimer) {
 		this.passengerEngine = passengerEngine;
+		this.mobsimTimer = mobsimTimer;
 	}
 
 	public void scheduleTripPrebooking(double submissionTime, MobsimPassengerAgent passenger, Id<Link> fromLinkId,
@@ -72,7 +75,7 @@ public class TripPrebookingManager implements MobsimInitializedListener, MobsimB
 
 	@Override
 	public void notifyMobsimInitialized(@SuppressWarnings("rawtypes") MobsimInitializedEvent e) {
-		double startTime = ((QSim)e.getQueueSimulation()).getSimTimer().getSimStartTime();
+		double startTime = mobsimTimer.getSimStartTime();
 		prebookTrips(startTime - 1);
 	}
 

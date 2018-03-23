@@ -258,9 +258,9 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 		// do nothing
 	}
 
-	@Override
+	/*@Override
 	public void setInternalInterface(final InternalInterface internalInterface) {
-	}
+	}*/
 
 	// /////////////////////////////////////////////////////////////////////////
 	// nested classes

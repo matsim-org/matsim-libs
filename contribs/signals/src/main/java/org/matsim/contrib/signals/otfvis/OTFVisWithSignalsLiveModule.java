@@ -27,8 +27,10 @@ import javax.inject.Inject;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
@@ -42,10 +44,13 @@ public class OTFVisWithSignalsLiveModule extends AbstractModule {
 	private static class OTFVisMobsimListener implements MobsimInitializedListener{
 		@Inject Scenario scenario ;
 		@Inject EventsManager events ;
+		@Inject MobsimTimer mobsimTimer;
+		@Inject ActiveQSimBridge activeQSimBridge;
+		
 		@Override 
 		public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-			QSim qsim = (QSim) e.getQueueSimulation() ; 
-			OnTheFlyServer server = OTFVisWithSignals.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qsim);
+			QSim qsim = activeQSimBridge.getActiveQSim();
+			OnTheFlyServer server = OTFVisWithSignals.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, qsim, mobsimTimer);
 			OTFClientLiveWithSignals.run(scenario.getConfig(), server);
 		}
 	}

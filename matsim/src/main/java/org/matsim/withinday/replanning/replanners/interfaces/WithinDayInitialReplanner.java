@@ -31,8 +31,8 @@ import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
  */
 public abstract class WithinDayInitialReplanner extends WithinDayReplanner<InitialIdentifier> {
 
-	public WithinDayInitialReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface) {
-		super(id, scenario, internalInterface);
+	public WithinDayInitialReplanner(Id<WithinDayReplanner> id, Scenario scenario) {
+		super(id, scenario);
 	}
 	
 }

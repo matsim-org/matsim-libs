@@ -56,7 +56,6 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 	private final Map<String, QVehicle> vehicles = new HashMap<>();
 	private final Map<Id<Link>, QLinkInternalIAdapter> adapters = new HashMap<>();
 	private final EventsManager em;
-	private final Netsim sim;
 	private final Network net;
 	private final Scenario sc;
     private final IdIntMapper mapper;
@@ -64,13 +63,12 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 
 	private GRPCExternalClient client;
 
-    public ExternalEngine(EventsManager eventsManager, Netsim sim, IdIntMapper mapper) {
+    public ExternalEngine(EventsManager eventsManager, Scenario scenario, IdIntMapper mapper) {
         this.mapper = mapper;
         this.em = eventsManager;
-		this.sim = sim;
-		this.net = sim.getScenario().getNetwork();
+		this.net = scenario.getNetwork();
 		this.client = new GRPCExternalClient(RunExample.REMOTE_HOST, RunExample.REMOTE_PORT);
-		this.sc = sim.getScenario();
+		this.sc = scenario;
 	}
 
 	public void registerAdapter(QLinkInternalIAdapter external2qAdapterLink) {
@@ -143,11 +141,11 @@ public class ExternalEngine implements MobsimEngine {//, MATSimInterfaceServiceG
 
 	}
 
-	@Override
+	/*@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		// TODO Auto-generated method stub
 
-	}
+	}*/
 
 	public boolean hasSpace(Id<Node> id) {
 		//TODO: ask external sim if there is space

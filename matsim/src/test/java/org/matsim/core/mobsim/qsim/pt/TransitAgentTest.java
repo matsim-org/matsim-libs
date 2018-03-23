@@ -31,9 +31,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.agents.TransitAgent;
@@ -51,7 +53,8 @@ import org.matsim.pt.transitSchedule.api.*;
 public class TransitAgentTest extends TestCase {
 
 	public void testAcceptLineRoute() {
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = ConfigUtils.createConfig();
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		Network network = (Network) scenario.getNetwork();
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -88,8 +91,9 @@ public class TransitAgentTest extends TestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, eventsManager);
-		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
+		QSim sim = (QSim) QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
+		MobsimTimer mobsimTimer = new MobsimTimer(config);
+		TransitAgent agent = TransitAgent.createTransitAgent(person, scenario, eventsManager, mobsimTimer);
 		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndComputeNextState(10);
 
@@ -100,7 +104,8 @@ public class TransitAgentTest extends TestCase {
 	}
 
 	public void testArriveAtStop() {
-		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Config config = ConfigUtils.createConfig();
+		MutableScenario scenario = (MutableScenario) ScenarioUtils.createScenario(config);
 		
 		Network network = (Network) scenario.getNetwork();
 		Node node1 = NetworkUtils.createAndAddNode(network, Id.create("1", Node.class), new Coord((double) 0, (double) 0));
@@ -132,8 +137,9 @@ public class TransitAgentTest extends TestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim sim = (QSim) QSimUtils.createDefaultQSim(scenario, eventsManager);
-		TransitAgent agent = TransitAgent.createTransitAgent(person, sim);
+		QSim sim = (QSim) QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
+		MobsimTimer mobsimTimer = new MobsimTimer(config);
+		TransitAgent agent = TransitAgent.createTransitAgent(person, scenario, eventsManager, mobsimTimer);
 		sim.insertAgentIntoMobsim(agent);
 		agent.endActivityAndComputeNextState(10);
 

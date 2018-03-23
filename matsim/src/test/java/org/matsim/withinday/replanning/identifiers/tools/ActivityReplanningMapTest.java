@@ -23,22 +23,28 @@ package org.matsim.withinday.replanning.identifiers.tools;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.*;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.controller.WithinDayModule;
 import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.mobsim.WithinDayEngine;
+
+import com.sun.accessibility.internal.resources.accessibility;
 
 import javax.inject.Inject;
 import java.util.LinkedHashMap;
@@ -47,7 +53,8 @@ import java.util.Map;
 public class ActivityReplanningMapTest extends MatsimTestCase {
 
 	public void testGetTimeBin() {
-		ActivityReplanningMap arp = new ActivityReplanningMap(null, EventsUtils.createEventsManager());
+		MobsimTimer mobsimTimer = new MobsimTimer();
+		ActivityReplanningMap arp = new ActivityReplanningMap(null, EventsUtils.createEventsManager(), mobsimTimer);
 		
 		// test default setting with start time = 0.0 and time step size = 1.0
 		arp.simStartTime = 0.0;
@@ -129,11 +136,16 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		private static final int t5 = 6*3600 + 60;
 		private static final int t6 = 6*3600 + 120;
 		
+		final private EventsManager eventsManager;
+		private final ActiveQSimBridge activeQSimBridge;
+		
 		@Inject
-		MobsimListenerForTests(final ActivityReplanningMap arp, WithinDayEngine withinDayEngine) {
+		MobsimListenerForTests(final ActivityReplanningMap arp, WithinDayEngine withinDayEngine, EventsManager eventsManager, ActiveQSimBridge activeQSimBridge) {
 			this.arp = arp;
 			this.withinDayEngine = withinDayEngine;
 			this.agents = new LinkedHashMap<>();
+			this.eventsManager = eventsManager;
+			this.activeQSimBridge = activeQSimBridge;
 		}
 
 		@Override
@@ -141,7 +153,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 			assertEquals(100, this.arp.getActivityPerformingAgents().size());	// all agents perform an activity
 			assertEquals(0, this.arp.getActivityEndingAgents(0.0).size());		// no agent ends an activity
 			
-			QSim sim = (QSim) e.getQueueSimulation();
+			QSim sim = activeQSimBridge.getActiveQSim();
 			for (MobsimAgent agent : sim.getAgents().values()) this.agents.put(agent.getId(), agent);
 		}
 
@@ -171,14 +183,14 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
                 Activity currentActivity = (Activity) WithinDayAgentUtils.getCurrentPlanElement(agent);
 				currentActivity.setEndTime(e.getSimulationTime() + 60);
 				WithinDayAgentUtils.resetCaches(agent);
-				this.withinDayEngine.getActivityRescheduler().rescheduleActivityEnd(agent);
-				((QSim) e.getQueueSimulation()).getEventsManager().processEvent(new ReplanningEvent(e.getSimulationTime(), agent.getId(), "ActivityRescheduler"));
+				activeQSimBridge.getActiveQSim().getInternalInterface().rescheduleActivityEnd(agent);
+				eventsManager.processEvent(new ReplanningEvent(e.getSimulationTime(), agent.getId(), "ActivityRescheduler"));
 				
 				// reschedule a second time to check what happens if the agent is replanned multiple times in one time step
 				currentActivity.setEndTime(e.getSimulationTime() + 120);
 				WithinDayAgentUtils.resetCaches(agent);
-				this.withinDayEngine.getActivityRescheduler().rescheduleActivityEnd(agent);
-				((QSim) e.getQueueSimulation()).getEventsManager().processEvent(new ReplanningEvent(e.getSimulationTime(), agent.getId(), "ActivityRescheduler"));
+				activeQSimBridge.getActiveQSim().getInternalInterface().rescheduleActivityEnd(agent);
+				eventsManager.processEvent(new ReplanningEvent(e.getSimulationTime(), agent.getId(), "ActivityRescheduler"));
 			}
 			
 			if (e.getSimulationTime() == t5) {

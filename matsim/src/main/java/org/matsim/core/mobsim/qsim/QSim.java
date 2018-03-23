@@ -117,7 +117,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	private final Scenario scenario;
 	private final List<ActivityHandler> activityHandlers = new ArrayList<>();
 	private final List<DepartureHandler> departureHandlers = new ArrayList<>();
-	private final org.matsim.core.mobsim.qsim.AgentCounter agentCounter;
+	private final AgentCounter agentCounter;
 	private final Map<Id<Person>, MobsimAgent> agents = new LinkedHashMap<>();
 	private final Map<Id<Vehicle>,MobsimVehicle> vehicles = new LinkedHashMap<>() ;
 	private final List<AgentSource> agentSources = new ArrayList<>();
@@ -141,11 +141,6 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		@Override
 		public synchronized void arrangeNextAgentState(MobsimAgent agent) {
 			QSim.this.arrangeNextAgentAction(agent);
-		}
-
-		@Override
-		public Netsim getMobsim() {
-			return QSim.this;
 		}
 
 		@Override
@@ -176,8 +171,6 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 
 	private Collection<AgentTracker> agentTrackers = new ArrayList<>() ;
 
-	private Injector childInjector;
-
 	@Override
 	public final void rescheduleActivityEnd(MobsimAgent agent) {
 		this.activityEngine.rescheduleActivityEnd(agent);
@@ -191,12 +184,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	 * If you wish to use QSim as a product and run a simulation based on a Config file, rather use QSimFactory as your entry point.
 	 *
 	 */
-	@Inject
-	public QSim(final Scenario sc, EventsManager events, Injector childInjector ) {
+	/*public QSim(final Scenario sc, EventsManager events, Injector childInjector ) {
 		this( sc, events ) ;
-		this.childInjector = childInjector ;
-	}
-	public QSim(final Scenario sc, EventsManager events ) {
+	}*/
+	/*public QSim(final Scenario sc, EventsManager events ) {
 		this.scenario = sc;
 		if (sc.getConfig().qsim().getNumberOfThreads() > 1) {
 			this.events = EventsUtils.getParallelFeedableInstance(events);
@@ -207,6 +198,34 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		this.agentCounter = new org.matsim.core.mobsim.qsim.AgentCounter();
 		this.simTimer = new MobsimTimer(sc.getConfig().qsim().getTimeStepSize());
 		
+	}*/
+	
+	@Inject
+	public QSim(Scenario scenario, EventsManager events, AgentCounter agentCounter, MobsimTimer mobsimTimer, ActiveQSimBridge bridge) {
+		bridge.setActiveQSim(this);
+		
+		this.scenario = scenario;
+		
+		if (scenario.getConfig().qsim().getNumberOfThreads() > 1) {
+			this.events = EventsUtils.getParallelFeedableInstance(events);
+		} else {
+			this.events = events;
+		}
+		
+		this.agentCounter = agentCounter;
+		this.simTimer = mobsimTimer;
+		this.listenerManager = new MobsimListenerManager(this);
+		
+		
+		// TODO: Since the new injection scheme is not in place yet, AgentCounter and MobsimTimer live in the global scope.
+		// This means we need to reset them for the next iteration. When the cleaner injection scheme
+		// is in place, both objects should be initialized by Guice!
+		
+		while (agentCounter.isLiving()) {
+			agentCounter.decLiving();
+		}
+		
+		simTimer.setTime(0.0);
 	}
 
 	// ============================================================================================================================
@@ -338,7 +357,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	/*package*/ boolean doSimStep() {
 		if (analyzeRunTimes) this.startTime = System.nanoTime();
 
-		final double now = this.getSimTimer().getTimeOfDay();
+		final double now = simTimer.getTimeOfDay();
 
 		this.listenerManager.fireQueueSimulationBeforeSimStepEvent(now);
 		
@@ -438,7 +457,7 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	 *
 	 */
 	private void arrangeAgentDeparture(final MobsimAgent agent) {
-		double now = this.getSimTimer().getTimeOfDay();
+		double now = simTimer.getTimeOfDay();
 		Id<Link> linkId = agent.getCurrentLinkId();
 		Gbl.assertIf( linkId!=null );
 		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, agent.getMode()));
@@ -517,29 +536,14 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 	// no real functionality beyond this point
 	// ############################################################################################################################
 
-	@Override
-	public EventsManager getEventsManager() {
-		return events;
-	}
-
-	@Override
+	/*@Override
 	public NetsimNetwork getNetsimNetwork() {
 		return this.netEngine.getNetsimNetwork();
-	}
+	}*/
 
 	@Override
 	public VisNetwork getVisNetwork() {
 		return this.netEngine.getNetsimNetwork();
-	}
-
-	@Override
-	public Scenario getScenario() {
-		return this.scenario;
-	}
-
-	@Override
-	public MobsimTimer getSimTimer() {
-		return this.simTimer;
 	}
 
 	public void addMobsimEngine(MobsimEngine mobsimEngine) {
@@ -568,15 +572,10 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		if (mobsimEngine instanceof WithinDayEngine) {
 			this.withindayEngine = (WithinDayEngine) mobsimEngine;
 		}
-		mobsimEngine.setInternalInterface(this.internalInterface);
+		//mobsimEngine.setInternalInterface(this.internalInterface);
 		this.mobsimEngines.add(mobsimEngine);
 		
 		if (analyzeRunTimes) this.mobsimEngineRunTimes.put(mobsimEngine, new AtomicLong());
-	}
-
-	@Override
-	public AgentCounter getAgentCounter() {
-		return this.agentCounter;
 	}
 
 	public void addDepartureHandler(DepartureHandler departureHandler) {
@@ -644,8 +643,18 @@ public final class QSim extends Thread implements VisMobsim, Netsim, ActivityEnd
 		return Collections.unmodifiableCollection(agentTrackers) ;
 	}
 	
-	public Injector getChildInjector() {
-		return this.childInjector  ;
+	/**
+	 * Used for refactoring. Should be eliminated eventually. /shoerl, feb18
+	 */
+	public InternalInterface getInternalInterface() {
+		return internalInterface;
+	}
+	
+	/**
+	 * Used for refactoring. Should be eliminated eventually. /shoerl, feb18
+	 */
+	public NetsimNetwork getNetsimNetwork() {
+		return netEngine.getNetsimNetwork();
 	}
 	
 	public final void addNetworkChangeEvent( NetworkChangeEvent event ) {

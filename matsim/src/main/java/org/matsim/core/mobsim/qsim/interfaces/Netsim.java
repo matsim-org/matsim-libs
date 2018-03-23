@@ -26,13 +26,6 @@ import org.matsim.core.mobsim.framework.ObservableMobsim;
 
 public interface Netsim extends ObservableMobsim {
 
-	NetsimNetwork getNetsimNetwork();
+	//NetsimNetwork getNetsimNetwork();
 
-	EventsManager getEventsManager();
-
-	AgentCounter getAgentCounter();
-
-	Scenario getScenario();
-
-	MobsimTimer getSimTimer();
 }

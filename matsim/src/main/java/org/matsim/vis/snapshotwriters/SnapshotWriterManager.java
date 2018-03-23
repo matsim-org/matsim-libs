@@ -22,6 +22,7 @@ package org.matsim.vis.snapshotwriters;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ExternalMobimConfigGroup;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
@@ -29,6 +30,7 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import java.util.ArrayList;
@@ -43,9 +45,14 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 	private double snapshotTime = 0.0;
 
 	final private int snapshotPeriod;
+	
+	final private MobsimTimer mobsimTimer;
+	private final ActiveQSimBridge activeQSimBridge;
 
-	public SnapshotWriterManager(Config config) {
+	public SnapshotWriterManager(Config config, MobsimTimer mobsimTimer, ActiveQSimBridge activeQSimBridge) {
 		snapshotPeriod = findSnapshotPeriod(config);
+		this.mobsimTimer = mobsimTimer;
+		this.activeQSimBridge = activeQSimBridge;
 	}
 
 	// yuck
@@ -61,11 +68,10 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		Netsim mobsim = (Netsim) e.getQueueSimulation();
-		this.snapshotTime = Math.floor(mobsim.getSimTimer().getSimStartTime()
+		this.snapshotTime = Math.floor(mobsimTimer.getSimStartTime()
 				/ this.snapshotPeriod)
 				* this.snapshotPeriod;
-		if (this.snapshotTime < mobsim.getSimTimer().getSimStartTime()) {
+		if (this.snapshotTime < mobsimTimer.getSimStartTime()) {
 			this.snapshotTime += this.snapshotPeriod;
 		}
 	}
@@ -86,7 +92,7 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 		double time = e.getSimulationTime();
 		if (time >= this.snapshotTime) {
 			this.snapshotTime += this.snapshotPeriod;
-			doSnapshot(time, (VisMobsim) e.getQueueSimulation());
+			doSnapshot(time, (VisMobsim) activeQSimBridge.getActiveQSim());
 		}
 	}
 	

@@ -25,8 +25,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.multimodal.simengine.MultiModalQSimModule;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.router.util.TravelTime;
 
 import javax.inject.Inject;
@@ -37,18 +41,24 @@ public class MultimodalQSimFactory implements Provider<Mobsim> {
 	private Scenario scenario;
 	private EventsManager eventsManager;
 	private final Map<String, TravelTime> multiModalTravelTimes;
+    private final AgentCounter agentCounter;
+    private final MobsimTimer mobsimTimer;
+    private final ActiveQSimBridge activeQSimBridge;
 
 	@Inject
-	MultimodalQSimFactory(Scenario scenario, EventsManager eventsManager, Map<String, TravelTime> multiModalTravelTimes) {
+	MultimodalQSimFactory(Scenario scenario, EventsManager eventsManager, Map<String, TravelTime> multiModalTravelTimes, AgentCounter agentCounter, MobsimTimer mobsimTimer, ActiveQSimBridge activeQSimBridge) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
 		this.multiModalTravelTimes = multiModalTravelTimes;
+		this.agentCounter = agentCounter;
+		this.mobsimTimer = mobsimTimer;
+		this.activeQSimBridge = activeQSimBridge;
 	}
 
 	@Override
 	public Mobsim get() {
-		QSim qSim = QSimUtils.createDefaultQSim(scenario, eventsManager);
-		new MultiModalQSimModule(scenario.getConfig(), this.multiModalTravelTimes).configure(qSim);
+		QSim qSim = QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter, activeQSimBridge);
+		new MultiModalQSimModule(scenario.getConfig(), this.multiModalTravelTimes, eventsManager, scenario, agentCounter, mobsimTimer, qSim.getInternalInterface()).configure(qSim);
 		return qSim;
 	}
 }

@@ -45,8 +45,8 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
 	private final TripRouter tripRouter;
 	
-	/*package*/ NextLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface, TripRouter tripRouter) {
-		super(id, scenario, internalInterface);
+	/*package*/ NextLegReplanner(Id<WithinDayReplanner> id, Scenario scenario, TripRouter tripRouter) {
+		super(id, scenario);
 		this.tripRouter = tripRouter;
 	}
 

@@ -21,6 +21,7 @@ package org.matsim.contrib.signals.mobsim;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -47,15 +48,20 @@ public class QSimSignalEngine implements SignalEngine {
 	private static final Logger log = Logger.getLogger(QSimSignalEngine.class);
 
 	private SignalSystemsManager signalManager;
+	
+	private final MobsimTimer mobsimTimer;
+	private final NetsimNetwork netsimNetwork;
 
 	@Inject
-	public QSimSignalEngine(SignalSystemsManager signalManager) {
+	public QSimSignalEngine(SignalSystemsManager signalManager, MobsimTimer mobsimTimer, NetsimNetwork netsimNetwork) {
 		this.signalManager = signalManager;
+		this.mobsimTimer = mobsimTimer;
+		this.netsimNetwork = netsimNetwork;
 	}
 
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		this.initializeSignalizedItems(((Netsim)e.getQueueSimulation()));
+		this.initializeSignalizedItems();
 	}
 
 
@@ -64,12 +70,11 @@ public class QSimSignalEngine implements SignalEngine {
 		this.signalManager.requestControlUpdate(e.getSimulationTime());
 	}
 	
-	private void initializeSignalizedItems(Netsim qSim) {
-		NetsimNetwork net = qSim.getNetsimNetwork();
+	private void initializeSignalizedItems() {
 		for (SignalSystem system : this.signalManager.getSignalSystems().values()){
 			for (Signal signal : system.getSignals().values()){
 				log.debug("initializing signal " + signal.getId() + " on link " + signal.getLinkId());
-				NetsimLink link = net.getNetsimLinks().get(signal.getLinkId());
+				NetsimLink link = netsimNetwork.getNetsimLinks().get(signal.getLinkId());
 				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
 					QLinkImpl l = (QLinkImpl) link;
 					l.setSignalized(true);
@@ -86,7 +91,7 @@ public class QSimSignalEngine implements SignalEngine {
 					}
 				}
 			}
-			system.simulationInitialized(qSim.getSimTimer().getTimeOfDay());
+			system.simulationInitialized(mobsimTimer.getTimeOfDay());
 		}
 	}
 

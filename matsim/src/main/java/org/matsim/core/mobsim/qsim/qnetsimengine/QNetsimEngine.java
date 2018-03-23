@@ -72,24 +72,6 @@ import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
  */
 public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 
-	public interface NetsimInternalInterface {
-		QNetwork getNetsimNetwork();
-		void arrangeNextAgentState(MobsimAgent pp);
-		void letVehicleArrive(QVehicle veh);
-	}
-
-	NetsimInternalInterface ii = new NetsimInternalInterface(){
-		@Override public QNetwork getNetsimNetwork() {
-			return network ;
-		}
-		@Override public void arrangeNextAgentState(MobsimAgent driver) {
-			QNetsimEngine.this.arrangeNextAgentState(driver);
-		}
-		@Override public void letVehicleArrive(QVehicle veh) {
-			QNetsimEngine.this.letVehicleArrive( veh ) ;
-		}
-	} ;
-
 	private static final Logger log = Logger.getLogger(QNetsimEngine.class);
 
 	private static final int INFO_PERIOD = 3600;
@@ -97,8 +79,6 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 	private QNetwork network;
 
 	private final Map<Id<Vehicle>, QVehicle> vehicles = new HashMap<>();
-
-	private final QSim qsim;
 
 	private final VehicularDepartureHandler dpHandler;
 
@@ -113,8 +93,6 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 
 	private final Set<QLinkI> linksToActivateInitially = new HashSet<>();
 
-	private InternalInterface internalInterface = null;
-
 	private int numOfRunners;
 
 	private ExecutorService pool;
@@ -125,26 +103,25 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 	public static int numObservedTimeSteps = 24*3600;
 	public static boolean printRunTimesPerTimeStep = false;
 	
-	@Override
+	final private MobsimTimer mobsimTimer;
+	final private Config config;
+	
+	/*@Override
 	public void setInternalInterface( InternalInterface internalInterface) {
-		this.internalInterface = internalInterface;
-	}
-
-	public QNetsimEngine(final QSim sim) {
-		this(sim, null);
-	}
+		//this.internalInterface = internalInterface;
+	}*/
 
 	@Inject
-	public QNetsimEngine(final QSim sim, QNetworkFactory netsimNetworkFactory) {
-		this.qsim = sim;
+	public QNetsimEngine(QNetworkFactory netsimNetworkFactory, Config config, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter, InternalInterface internalInterface) {
+		this.mobsimTimer = mobsimTimer;
+		this.config = config;
 
-		final Config config = sim.getScenario().getConfig();
 		final QSimConfigGroup qsimConfigGroup = config.qsim();
 		this.usingThreadpool = qsimConfigGroup.isUsingThreadpool();
 
 
 		// configuring the car departure hander (including the vehicle behavior)
-		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().qsim();
+		QSimConfigGroup qSimConfigGroup = config.qsim();
 
 		VehicleBehavior vehicleBehavior = qSimConfigGroup.getVehicleBehavior();
 		switch(vehicleBehavior) {
@@ -164,20 +141,8 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 			}
 		}
 		
-		if (netsimNetworkFactory != null){
-			network = new QNetwork( sim.getScenario().getNetwork(), netsimNetworkFactory ) ;
-		} else {
-			Scenario scenario = sim.getScenario();
-			EventsManager events = sim.getEventsManager() ;
-			final DefaultQNetworkFactory netsimNetworkFactory2 = new DefaultQNetworkFactory( events, scenario );
-			MobsimTimer mobsimTimer = sim.getSimTimer() ;
-			AgentCounter agentCounter = sim.getAgentCounter() ;
-			netsimNetworkFactory2.initializeFactory(agentCounter, mobsimTimer, ii );
-			network = new QNetwork(sim.getScenario().getNetwork(), netsimNetworkFactory2 );
-		}
-		network.initialize(this, sim.getAgentCounter(), sim.getSimTimer() );
-
-		this.numOfThreads = sim.getScenario().getConfig().qsim().getNumberOfThreads();
+		this.network = new QNetwork(scenario.getNetwork(), netsimNetworkFactory, internalInterface);
+		this.numOfThreads = scenario.getConfig().qsim().getNumberOfThreads();
 	}
 
 	private static int wrnCnt = 0;
@@ -221,7 +186,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 	@Override
 	public void onPrepareSim() {
 		this.infoTime = 
-				Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD; 
+				Math.floor(mobsimTimer.getSimStartTime() / INFO_PERIOD) * INFO_PERIOD; 
 		/*
 		 * infoTime may be < simStartTime, this ensures to print out the
 		 * info at the very first timestep already 
@@ -405,15 +370,15 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		return qLink.unregisterAdditionalAgentOnLink(agentId);
 	}
 
-	private void letVehicleArrive(QVehicle veh) {
-		double now = this.qsim.getSimTimer().getTimeOfDay();
+	/*private void letVehicleArrive(QVehicle veh) {
+		double now = mobsimTimer.getTimeOfDay();
 		MobsimDriverAgent driver = veh.getDriver();
-		this.qsim.getEventsManager().processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));
+		eventsManager.processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));
 		// reset vehicles driver
 		veh.setDriver(null);
 		driver.endLegAndComputeNextState(now);
 		this.internalInterface.arrangeNextAgentState(driver);
-	}
+	}*/
 
 	private void initQSimEngineThreads() {
 
@@ -488,7 +453,7 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 				 * step, the link should be activated.
 				 */
 				if (linksToActivateInitially.remove(qLink) 
-						|| qsim.getScenario().getConfig().qsim().getSimStarttimeInterpretation()==StarttimeInterpretation.onlyUseStarttime) {
+						|| config.qsim().getSimStarttimeInterpretation()==StarttimeInterpretation.onlyUseStarttime) {
 					this.engines.get(i).registerLinkAsActive(qLink);
 				}
 
@@ -554,9 +519,5 @@ public class QNetsimEngine implements MobsimEngine, NetsimEngine {
 		public Thread newThread(Runnable r) {
 			return new Thread( r , "QNetsimEngine_PooledThread_" + count++);
 		}
-	}
-
-	private final void arrangeNextAgentState(MobsimAgent pp) {
-		internalInterface.arrangeNextAgentState(pp);
 	}
 }

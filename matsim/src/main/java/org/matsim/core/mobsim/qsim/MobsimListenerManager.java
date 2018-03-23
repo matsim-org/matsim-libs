@@ -68,7 +68,7 @@ class MobsimListenerManager implements MatsimManager {
 	 * Creates the event and notifies all listeners
 	 */
 	public void fireQueueSimulationInitializedEvent() {
-		MobsimInitializedEvent<Mobsim> event = new MobsimInitializedEvent<>(sim);
+		MobsimInitializedEvent event = new MobsimInitializedEvent();
 		MobsimInitializedListener[] listener = this.listenerList.getListeners(MobsimInitializedListener.class);
         for (MobsimInitializedListener aListener : listener) {
             aListener.notifyMobsimInitialized(event);
@@ -81,7 +81,7 @@ class MobsimListenerManager implements MatsimManager {
 	 * @param simTime the current time in the simulation
 	 */
 	public void fireQueueSimulationAfterSimStepEvent(final double simTime) {
-		MobsimAfterSimStepEvent<Mobsim> event = new MobsimAfterSimStepEvent<>(sim, simTime);
+		MobsimAfterSimStepEvent event = new MobsimAfterSimStepEvent(simTime);
 		MobsimAfterSimStepListener[] listener = this.listenerList.getListeners(MobsimAfterSimStepListener.class);
         for (MobsimAfterSimStepListener aListener : listener) {
             aListener.notifyMobsimAfterSimStep(event);
@@ -92,7 +92,7 @@ class MobsimListenerManager implements MatsimManager {
 	 * Creates the event and notifies all listeners
 	 */
 	public void fireQueueSimulationBeforeCleanupEvent(){
-		MobsimBeforeCleanupEvent<Mobsim> event = new MobsimBeforeCleanupEvent<>(this.sim);
+		MobsimBeforeCleanupEvent event = new MobsimBeforeCleanupEvent();
 		MobsimBeforeCleanupListener[] listener = this.listenerList.getListeners(MobsimBeforeCleanupListener.class);
         for (MobsimBeforeCleanupListener aListener : listener) {
             aListener.notifyMobsimBeforeCleanup(event);
@@ -100,7 +100,7 @@ class MobsimListenerManager implements MatsimManager {
 	}
 
 	public void fireQueueSimulationBeforeSimStepEvent(double time) {
-		MobsimBeforeSimStepEvent<Mobsim> event = new MobsimBeforeSimStepEvent<>(sim, time);
+		MobsimBeforeSimStepEvent event = new MobsimBeforeSimStepEvent(time);
 		MobsimBeforeSimStepListener[] listener = this.listenerList.getListeners(MobsimBeforeSimStepListener.class);
         for (MobsimBeforeSimStepListener aListener : listener) {
             aListener.notifyMobsimBeforeSimStep(event);

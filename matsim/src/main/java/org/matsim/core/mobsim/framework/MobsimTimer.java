@@ -19,11 +19,15 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework;
 
+import org.matsim.core.config.Config;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * @author dgrether
  */
+@Singleton
 public class MobsimTimer {
 	private double simStartTime = 24*3600; // initialized to 24h so as that the time can be successively
 	           // set down when an agent starts earlier until the earliest point of time an agent starts
@@ -32,6 +36,13 @@ public class MobsimTimer {
 
 	public MobsimTimer(){
 		this(1.0);
+	}
+	
+	@Inject
+	public MobsimTimer(Config config) {
+		// TODO: This has made been public for the test cases. Actually, there should be a 
+		// public interface for this implementation!
+		this(config.qsim().getTimeStepSize());
 	}
 
 

@@ -54,19 +54,25 @@ public class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAg
 	private final PlanAgent planDelegate;
 	private final QVehicleProvider vehicleProvider;
 	private final InternalInterface internalInterface;
+	private final EventsManager eventsManager;
+	private final MobsimTimer mobsimTimer;
 
 	private final List<PassengerAgent> passengersToBoard = new ArrayList<PassengerAgent>();
 
 	public PassengerUnboardingDriverAgent(
 			final MobsimAgent delegate,
 			final QVehicleProvider vehicleProvider,
-			final InternalInterface internalInterface) {
+			final InternalInterface internalInterface,
+			final EventsManager eventsManager,
+			final MobsimTimer mobsimTimer) {
 		if ( delegate == null ) throw new IllegalArgumentException( "delegate cannot be null" );
 		this.delegate = (MobsimDriverAgent) delegate;
 		this.ptDelegate = delegate instanceof PTPassengerAgent ? (PTPassengerAgent) delegate : null;
 		this.planDelegate = (PlanAgent) delegate;
 		this.vehicleProvider = vehicleProvider;
 		this.internalInterface = internalInterface;
+		this.mobsimTimer = mobsimTimer;
+		this.eventsManager = eventsManager;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -101,7 +107,6 @@ public class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAg
 				}
 			}
 
-			final EventsManager events = ((QSim) internalInterface.getMobsim()).getEventsManager();
 			for (PassengerAgent p : passengersToUnboard) {
 				assert p != this;
 				assert !p.getId().equals( getId() );
@@ -109,7 +114,7 @@ public class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAg
 				vehicle.removePassenger( p );
 				((MobsimAgent) p).notifyArrivalOnLinkByNonNetworkMode( delegate.getCurrentLinkId() );
 				((MobsimAgent) p).endLegAndComputeNextState( now );
-				events.processEvent(
+				eventsManager.processEvent(
 						new PersonLeavesVehicleEvent(now, p.getId(), vehicle.getId()));
 				internalInterface.arrangeNextAgentState( (MobsimAgent) p );
 			}
@@ -132,7 +137,6 @@ public class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAg
 		// It remains however problematic, as it is not clear whether agents will continue
 		// to be given the vehicle or not...
 		final MobsimVehicle vehicle = getVehicle();// vehicleProvider.getVehicle( delegate.getPlannedVehicleId() );
-		final EventsManager events = ((QSim) internalInterface.getMobsim()).getEventsManager();
 		for ( PassengerAgent passenger : passengersToBoard ) {
 			assert passenger.getCurrentLinkId().equals( getCurrentLinkId() ) : passenger+" is at "+passenger.getCurrentLinkId()+" instead of "+getCurrentLinkId()+" for driver "+this;
 			assert ((Leg) getCurrentPlanElement()).getMode().equals( JointActingTypes.DRIVER ) : getCurrentPlanElement();
@@ -145,8 +149,8 @@ public class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAg
 				throw new RuntimeException( passenger+" could not be added to vehicle "+vehicle );
 			}
 
-			events.processEvent(
-					new PersonEntersVehicleEvent(internalInterface.getMobsim().getSimTimer().getTimeOfDay(), passenger.getId(), vehicle.getId()));
+			eventsManager.processEvent(
+					new PersonEntersVehicleEvent(mobsimTimer.getTimeOfDay(), passenger.getId(), vehicle.getId()));
 		}
 		passengersToBoard.clear();
 

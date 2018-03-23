@@ -28,8 +28,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.lanes.data.ModelLane;
@@ -59,21 +59,25 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 
 	private Scenario scenario;
 
-	private NetsimInternalInterface netsimEngine;
+	private AgentCounter agentCounter;
+	private MobsimTimer mobsimTimer;
 	
 	@Inject 
-	public QLanesNetworkFactory( EventsManager events, Scenario scenario ) {
+	public QLanesNetworkFactory( EventsManager events, Scenario scenario, MobsimTimer mobsimTimer, AgentCounter agentCounter ) {
 		this.qsimConfig = scenario.getConfig().qsim();
 		this.events = events ;
 		this.network = scenario.getNetwork() ;
 		this.scenario = scenario ;
 		this.laneDefinitions = scenario.getLanes();
-		delegate = new DefaultQNetworkFactory( events, scenario ) ;
+		delegate = new DefaultQNetworkFactory( events, scenario, mobsimTimer, agentCounter ) ;
+		
+		this.agentCounter = agentCounter;
+		this.mobsimTimer = mobsimTimer;
+		
+		initializeFactory(); // TODO: Refactoring artifact. Draw in here.
 	}
 
-	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1) {
-		this.netsimEngine = netsimEngine1 ;
+	private void initializeFactory() {
 		double effectiveCellSize = network.getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
@@ -82,11 +86,11 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 		}
 		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
-		delegate.initializeFactory(agentCounter, mobsimTimer, netsimEngine1);
+		//delegate.initializeFactory();
 	}
 
 	@Override
-	public QLinkI createNetsimLink(Link link, QNodeI queueNode) {
+	public QLinkI createNetsimLink(Link link, QNodeI queueNode, InternalInterface internalInterface) {
 		QLinkI ql = null;
 		LanesToLinkAssignment l2l = this.laneDefinitions.getLanesToLinkAssignments().get(link.getId());
 		if (l2l != null){
@@ -94,18 +98,18 @@ public class QLanesNetworkFactory extends QNetworkFactory {
 //			LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
 //			// yyyyyy I don't think that this was set correctly for this execution path before I refactored this.  kai, feb'18
 //			ql = new QLinkLanesImpl(link, queueNode, lanes, context, netsimEngine, linkSpeedCalculator);
-			QLinkLanesImpl.Builder builder = new QLinkLanesImpl.Builder(context, netsimEngine) ;
+			QLinkLanesImpl.Builder builder = new QLinkLanesImpl.Builder(context, internalInterface) ;
 			ql = builder.build( link, queueNode, lanes ) ;
 		}
 		else {
-			ql = this.delegate.createNetsimLink(link, queueNode);
+			ql = this.delegate.createNetsimLink(link, queueNode, internalInterface);
 		}
 		return ql;
 	}
 
 	@Override
-	public QNodeI createNetsimNode(Node node) {
-		return this.delegate.createNetsimNode(node);
+	public QNodeI createNetsimNode(Node node, InternalInterface internalInterface) {
+		return this.delegate.createNetsimNode(node, internalInterface);
 	}
 
 }

@@ -42,12 +42,16 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
@@ -229,18 +233,22 @@ public class GroupCompositionPenalizerTest {
 	}
 
 	private QSim createQSim( final Scenario sc, final EventsManager events ) {
-		QSim qSim = new QSim(sc, events);
+		MobsimTimer mobsimTimer = new MobsimTimer(sc.getConfig());
+		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+		
+		QSim qSim = new QSim(sc, events, agentCounter, mobsimTimer, activeQSimBridge);
 
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
+		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 
         //QNetsimEngineModule.configure(qSim);
-		qSim.addMobsimEngine( new DefaultTeleportationEngine(sc, events) );
+		qSim.addMobsimEngine( new DefaultTeleportationEngine(sc, events, mobsimTimer, qSim.getInternalInterface()) );
 
-		AgentFactory agentFactory = new DefaultAgentFactory( qSim );
+		AgentFactory agentFactory = new DefaultAgentFactory( sc, events, mobsimTimer );
 
-		qSim.addAgentSource( new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim ) );
+		qSim.addAgentSource( new PopulationAgentSource(sc.getPopulation(), agentFactory, sc.getConfig(), sc, qSim ) );
 
 		return qSim;
 	}

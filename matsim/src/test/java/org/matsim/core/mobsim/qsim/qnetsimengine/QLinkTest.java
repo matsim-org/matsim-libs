@@ -49,9 +49,13 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.PrepareForSimUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimUtils;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.network.NetworkUtils;
@@ -119,7 +123,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 		Person p = PopulationUtils.getFactory().createPerson(Id.create("1", Person.class));
 		p.addPlan(PopulationUtils.createPlan());
-		v.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
+		v.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim, f.scenario, f.eventsManager, f.mobsimTimer));
 		
 		f.qlink1.getAcceptingQLane().addFromUpstream(v);
 		assertEquals(1, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size());
@@ -128,8 +132,8 @@ public final class QLinkTest extends MatsimTestCase {
 	}
 
 
-	private static PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(Person p, QSim simulation) {
-		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p.getSelectedPlan(), simulation);
+	private static PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(Person p, QSim simulation, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer) {
+		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p.getSelectedPlan(), scenario, eventsManager, mobsimTimer);
 		simulation.insertAgentIntoMobsim(agent); 
 		return agent;
 	}
@@ -154,7 +158,7 @@ public final class QLinkTest extends MatsimTestCase {
 		leg.setRoute(RouteUtils.createLinkNetworkRouteImpl(f.link1.getId(), f.link2.getId()));
 		plan.addLeg(leg);
 		plan.addActivity(PopulationUtils.createActivityFromLinkId("work", f.link2.getId()));
-		PersonDriverAgentImpl driver = createAndInsertPersonDriverAgentImpl(p, f.sim);
+		PersonDriverAgentImpl driver = createAndInsertPersonDriverAgentImpl(p, f.sim, f.scenario, f.eventsManager, f.mobsimTimer);
 		veh.setDriver(driver);
 		
 		double now = 0. ;
@@ -175,7 +179,7 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 
 		now = 1. ;
-		f.sim.getSimTimer().setTime(now);
+		f.mobsimTimer.setTime(now);
 
 		// time step 1, vehicle should be now in the buffer
 		f.qlink1.doSimStep();
@@ -186,12 +190,12 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next());
 		
 		now = 2. ;
-		f.sim.getSimTimer().setTime(now);
+		f.mobsimTimer.setTime(now);
 		f.qlink1.doSimStep();
 
         // time step 3, vehicle leaves link
         now = 3. ;
-        f.sim.getSimTimer().setTime(now);
+        f.mobsimTimer.setTime(now);
 		assertEquals(veh, f.qlink1.getOfferingQLanes().get(0).popFirstVehicle());
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 //		assertEquals(0, ((QueueWithBuffer) f.qlink1.qlane).vehInQueueCount());
@@ -213,7 +217,7 @@ public final class QLinkTest extends MatsimTestCase {
 		QVehicle veh = new QVehicle(f.basicVehicle);
 		Person p = PopulationUtils.getFactory().createPerson(Id.create(42, Person.class));
 		p.addPlan(PopulationUtils.createPlan());
-		veh.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
+		veh.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim, f.scenario, f.eventsManager, f.mobsimTimer));
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.isNotOfferingVehicle());
@@ -257,13 +261,13 @@ public final class QLinkTest extends MatsimTestCase {
 		leg.setRoute(route);
 		plan.addLeg(leg);
 		plan.addActivity(PopulationUtils.createActivityFromLinkId("work", f.link2.getId()));
-		PersonDriverAgentImpl driver = createAndInsertPersonDriverAgentImpl(pers, f.sim);
+		PersonDriverAgentImpl driver = createAndInsertPersonDriverAgentImpl(pers, f.sim, f.scenario, f.eventsManager, f.mobsimTimer);
 		veh.setDriver(driver);
 		driver.setVehicle(veh);
 		f.qlink1.addParkedVehicle(veh); // vehicle parked
 		
 		double now = 0. ;
-		f.sim.getSimTimer().setTime(now);
+		f.mobsimTimer.setTime(now);
 
 		// start test, check initial conditions
 		assertTrue(f.qlink1.isNotOfferingVehicle());
@@ -271,7 +275,7 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals(1, f.qlink1.getAllVehicles().size());
 
 		driver.endActivityAndComputeNextState(0); 
-		f.queueNetwork.simEngine.ii.arrangeNextAgentState(driver) ; // i.e. driver departs, should now be in wait queue 
+		f.sim.getInternalInterface().arrangeNextAgentState(driver) ; // i.e. driver departs, should now be in wait queue 
 		assertTrue(f.qlink1.isNotOfferingVehicle()); // veh not in buffer
 		assertEquals(0, ((QueueWithBuffer) f.qlink1.getAcceptingQLane()).getAllVehicles().size()); // veh not on lane
 		assertEquals("vehicle not found in waiting list.", veh, f.qlink1.getVehicle(id1)); // veh _should_ be on link (in waiting list)
@@ -279,7 +283,7 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals(veh, f.qlink1.getAllVehicles().iterator().next()); // dto
 		
 		now = 1. ;
-		f.sim.getSimTimer().setTime(now);
+		f.mobsimTimer.setTime(now);
 
 		// time step 1, vehicle should be now in the buffer
 		f.qlink1.doSimStep();
@@ -289,7 +293,7 @@ public final class QLinkTest extends MatsimTestCase {
 		assertEquals(1, f.qlink1.getAllVehicles().size()); // somewhere on link
 
         now = 2. ;
-        f.sim.getSimTimer().setTime(now);
+        f.mobsimTimer.setTime(now);
 
         // vehicle leaves link
 		assertEquals(veh, f.qlink1.getOfferingQLanes().get(0).popFirstVehicle());
@@ -326,21 +330,24 @@ public final class QLinkTest extends MatsimTestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim qsim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
+		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+		QSim qsim = QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter, activeQSimBridge);
 		NetsimNetwork queueNetwork = qsim.getNetsimNetwork();
 		dummify((QNetwork) queueNetwork);
 		QLinkImpl qlink = (QLinkImpl) queueNetwork.getNetsimLink(Id.create("1", Link.class));
 
 		QVehicle v1 = new QVehicle(new VehicleImpl(Id.create("1", Vehicle.class), new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class))));
 		Person p = createPerson(Id.createPersonId(1), scenario, link1, link2);
-		PersonDriverAgentImpl pa1 = createAndInsertPersonDriverAgentImpl(p, qsim);
+		PersonDriverAgentImpl pa1 = createAndInsertPersonDriverAgentImpl(p, qsim, scenario, eventsManager, mobsimTimer);
 		v1.setDriver(pa1);
 		pa1.setVehicle(v1);
 		pa1.endActivityAndComputeNextState(0);
 
 		QVehicle v2 = new QVehicle(new VehicleImpl(Id.create("2", Vehicle.class), new VehicleTypeImpl(Id.create("defaultVehicleType", VehicleType.class))));
 		Person p2 = createPerson( Id.createPersonId(2),scenario,link1, link2) ;
-		PersonDriverAgentImpl pa2 = createAndInsertPersonDriverAgentImpl(p2, qsim);
+		PersonDriverAgentImpl pa2 = createAndInsertPersonDriverAgentImpl(p2, qsim, scenario, eventsManager, mobsimTimer);
 		v2.setDriver(pa2);
 		pa2.setVehicle(v2);
 		
@@ -358,7 +365,7 @@ public final class QLinkTest extends MatsimTestCase {
 		assertTrue(qlink.isNotOfferingVehicle());
 		
 		now = 1. ;
-		qsim.getSimTimer().setTime(1.);
+		mobsimTimer.setTime(1.);
 		
 		// time step 1, v1 is moved to buffer
 		qlink.doSimStep();
@@ -370,7 +377,7 @@ public final class QLinkTest extends MatsimTestCase {
 		assertFalse(qlink.isNotOfferingVehicle());
 		
 		now = 2. ;
-		qsim.getSimTimer().setTime(2.);
+		mobsimTimer.setTime(2.);
 		
 		// time step 2, v1 still in buffer, v2 cannot enter buffer, so still on link
 		qlink.doSimStep( );
@@ -379,7 +386,7 @@ public final class QLinkTest extends MatsimTestCase {
 
 		//time step 3
         now = 3. ;
-        qsim.getSimTimer().setTime(3.);
+        mobsimTimer.setTime(3.);
 
 		// v1 leaves buffer
 		assertEquals(v1, qlink.getOfferingQLanes().get(0).popFirstVehicle());
@@ -393,7 +400,7 @@ public final class QLinkTest extends MatsimTestCase {
 		
         // time step 4
         now = 4. ;
-        qsim.getSimTimer().setTime(4.);
+        mobsimTimer.setTime(4.);
 
         // v2 leaves buffer
 		assertEquals(v2, qlink.getOfferingQLanes().get(0).popFirstVehicle());
@@ -433,23 +440,23 @@ public final class QLinkTest extends MatsimTestCase {
 		largeVehType.setPcuEquivalents(5);
 		
 		double now = 0.0 ;
-		f.sim.getSimTimer().setTime(now);
+		f.mobsimTimer.setTime(now);
 		
 		QVehicle veh1 = new QVehicle(new VehicleImpl(Id.create(1, Vehicle.class), defaultVehType));
 		Person p1 = createPerson2(Id.createPersonId(5), f);
-		PersonDriverAgentImpl driver1 = createAndInsertPersonDriverAgentImpl(p1, f.sim);
+		PersonDriverAgentImpl driver1 = createAndInsertPersonDriverAgentImpl(p1, f.sim, f.scenario, f.eventsManager, f.mobsimTimer);
 		veh1.setDriver(driver1);
 		driver1.setVehicle(veh1);
 		driver1.endActivityAndComputeNextState( now );
 		QVehicle veh25 = new QVehicle(new VehicleImpl(Id.create(2, Vehicle.class), mediumVehType));
 		Person p2 = createPerson2(Id.createPersonId(6), f);
-		PersonDriverAgentImpl driver25 = createAndInsertPersonDriverAgentImpl(p2, f.sim);
+		PersonDriverAgentImpl driver25 = createAndInsertPersonDriverAgentImpl(p2, f.sim, f.scenario, f.eventsManager, f.mobsimTimer);
 		veh25.setDriver(driver25);
 		driver25.setVehicle(veh25);
 		driver25.endActivityAndComputeNextState( now );
 		QVehicle veh5 = new QVehicle(new VehicleImpl(Id.create(3, Vehicle.class), largeVehType));
 		Person p3 = createPerson2(Id.createPersonId(7), f);
-		PersonDriverAgentImpl driver5 = createAndInsertPersonDriverAgentImpl(p3, f.sim);
+		PersonDriverAgentImpl driver5 = createAndInsertPersonDriverAgentImpl(p3, f.sim, f.scenario, f.eventsManager, f.mobsimTimer);
 		veh5.setDriver(driver5);
 		driver5.setVehicle(veh5);
 		driver5.endActivityAndComputeNextState( now );
@@ -463,18 +470,18 @@ public final class QLinkTest extends MatsimTestCase {
 
 		for (int t = 0; t < 5; t++) {
 	      now = t;
-	      f.sim.getSimTimer().setTime(now);
+	      f.mobsimTimer.setTime(now);
           f.qlink2.doSimStep();
 		}
 
 		now = 5.0 ;
-		f.sim.getSimTimer().setTime(now);
+		f.mobsimTimer.setTime(now);
 		f.qlink2.doSimStep(); // first veh moves to buffer, used vehicle equivalents: 5
 		assertTrue(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
 		assertFalse(f.qlink2.isNotOfferingVehicle());
 		
         now = 6.0 ;
-        f.sim.getSimTimer().setTime(now);
+        f.mobsimTimer.setTime(now);
         // popFirstVehicle() is a shortcut for moveNodes(), and therefore must be executed
         //!!BEFORE!! qlink.doSimStep() (within a sim step)
         f.qlink2.getOfferingQLanes().get(0).popFirstVehicle();  // first veh leaves buffer
@@ -490,13 +497,13 @@ public final class QLinkTest extends MatsimTestCase {
 		
         for (int i = 7; i < 10 ; i++) {
             now = i;
-            f.sim.getSimTimer().setTime(now);
+            f.mobsimTimer.setTime(now);
             f.qlink2.doSimStep();
             assertFalse(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
           }
         
         now = 10.0 ;
-        f.sim.getSimTimer().setTime(now);
+        f.mobsimTimer.setTime(now);
         f.qlink2.doSimStep(); // "2nd first" veh moves to buffer, used vehicle equivalents: 5.5
         
         assertTrue(f.qlink2.getAcceptingQLane().isAcceptingFromUpstream());
@@ -566,10 +573,10 @@ public final class QLinkTest extends MatsimTestCase {
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+		QSim sim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario, eventsManager);
 
 		EventsCollector collector = new EventsCollector();
-		sim.getEventsManager().addHandler(collector);
+		eventsManager.addHandler(collector);
 
 		sim.run();
 
@@ -598,12 +605,18 @@ public final class QLinkTest extends MatsimTestCase {
 		/*package*/ final QLinkImpl qlink2;
 		/*package*/ final Vehicle basicVehicle;
 		/*package*/ final QSim sim;
+		final EventsManager eventsManager;
+		final MobsimTimer mobsimTimer;
 
 		/*package*/ Fixture(boolean usingFastCapacityUpdate) {
 			this.scenario = (MutableScenario) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.scenario.getConfig().qsim().setStuckTime(100);
 			this.scenario.getConfig().qsim().setRemoveStuckVehicles(true);
 			this.scenario.getConfig().qsim().setUsingFastCapacityUpdate(usingFastCapacityUpdate);
+			
+			this.mobsimTimer = new MobsimTimer(scenario.getConfig());
+			AgentCounter agentCounter = new AgentCounterImpl();
+			ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 			
 			Network network = (Network) this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
@@ -616,9 +629,9 @@ public final class QLinkTest extends MatsimTestCase {
 			final Node fromNode1 = node2;
 			final Node toNode1 = node3;
 			this.link2 = NetworkUtils.createAndAddLink(network,Id.create("2", Link.class), fromNode1, toNode1, 10 * 7.5, 2.0 * 7.5, 3600.0, 1.0 );
-			EventsManager eventsManager = EventsUtils.createEventsManager();
+			eventsManager = EventsUtils.createEventsManager();
 			PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-			sim = QSimUtils.createDefaultQSim(scenario, eventsManager);
+			sim = QSimUtils.createDefaultQSim(scenario, eventsManager, mobsimTimer, agentCounter, activeQSimBridge);
 			this.queueNetwork = (QNetwork) sim.getNetsimNetwork();
 
             this.qlink1 = (QLinkImpl) this.queueNetwork.getNetsimLink(Id.create("1", Link.class));

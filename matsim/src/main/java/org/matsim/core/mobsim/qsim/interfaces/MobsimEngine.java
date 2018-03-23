@@ -44,6 +44,6 @@ public interface MobsimEngine extends Steppable {
    */
   void afterSim();
   
-  void setInternalInterface(InternalInterface internalInterface);
+  //void setInternalInterface(InternalInterface internalInterface);
 
 }

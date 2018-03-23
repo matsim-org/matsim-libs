@@ -29,8 +29,8 @@ import org.matsim.contrib.hybridsim.simulation.ExternalEngine;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
@@ -39,17 +39,20 @@ public class HybridNetworkFactory extends QNetworkFactory {
 	@Inject QSimConfigGroup qsimConfig ;
 	@Inject EventsManager events ;
 	@Inject Scenario scenario ;
+	@Inject Network network;
+	@Inject AgentCounter agentCounter;
+	@Inject MobsimTimer mobsimTimer;
 
-	private Network network ;
 	private NetsimEngineContext context;
-	private NetsimInternalInterface netsimEngine ;
 
 
 	private ExternalEngine externalEngine;
 
-	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface arg2) {
-		network = arg2.getNetsimNetwork().getNetwork();
+	public HybridNetworkFactory() {
+		initializeFactory(); // Refactoring artefact. Draw in here.
+	}
+	
+	private void initializeFactory() {
 		double effectiveCellSize = ( network).getEffectiveCellSize() ;
 
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -60,27 +63,24 @@ public class HybridNetworkFactory extends QNetworkFactory {
 		AbstractAgentSnapshotInfoBuilder snapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 
 		this.context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, snapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator ) ;
-		
-		this.netsimEngine = arg2 ;
-
 	}
 
 	@Override
-	public QNodeI createNetsimNode(Node node) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+	public QNodeI createNetsimNode(Node node, InternalInterface internalInterface) {
+		QNodeImpl.Builder builder = new QNodeImpl.Builder( internalInterface, context ) ;
 		return builder.build( node ) ;
 	}
 
 
 	@Override
-	public QLinkI createNetsimLink(Link link, QNodeI queueNode) {
+	public QLinkI createNetsimLink(Link link, QNodeI queueNode, InternalInterface internalInterface) {
 		if (link.getAllowedModes().contains("2ext")) {
 			LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
 			// yyyyyy I don't think that this would have been set correctly before I refactored this.  kai, feb'18
-			return new QSimExternalTransitionLink(link, this.externalEngine, context, netsimEngine, queueNode, linkSpeedCalculator);
+			return new QSimExternalTransitionLink(link, this.externalEngine, context, internalInterface, queueNode, linkSpeedCalculator);
 		}
 //		QLinkImpl ret = new QLinkImpl(link, network, queueNode, linkSpeedCalculator);
-		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine );
+		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, internalInterface );
 		QLinkImpl ret = linkBuilder.build(link, queueNode) ;
 		if (link.getAllowedModes().contains("ext2")) {
 			this.externalEngine.registerAdapter(new QLinkInternalIAdapter(ret));

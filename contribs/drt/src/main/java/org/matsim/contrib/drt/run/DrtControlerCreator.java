@@ -136,12 +136,6 @@ public final class DrtControlerCreator {
 			}
 
 			@Provides
-			@Singleton
-			private MobsimTimer provideTimer(QSim qSim) {
-				return qSim.getSimTimer();
-			}
-
-			@Provides
 			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER)
 			private TravelDisutility provideTravelDisutility(
 					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,

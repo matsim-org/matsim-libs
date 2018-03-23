@@ -127,7 +127,7 @@ public class FlowStorageSpillbackTest {
 		});
 
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
-		QSim sim = QSimUtils.createDefaultQSim(sc, events);
+		QSim sim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, events);
 		sim.run();
 
 		for (LinkLeaveEvent event : linkLeaveEvents) {

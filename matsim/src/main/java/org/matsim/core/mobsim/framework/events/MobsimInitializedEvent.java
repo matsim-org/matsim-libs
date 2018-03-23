@@ -19,16 +19,11 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.framework.events;
 
-import org.matsim.core.mobsim.framework.Mobsim;
-
 /**
+ * Event is broadcasted when a Mobsim is initialized.
+ * 
  * @author dgrether
  */
-public class MobsimInitializedEvent<T extends Mobsim> extends
-		AbstractMobsimEvent<T> {
-
-	public MobsimInitializedEvent(T queuesim) {
-		super(queuesim);
-	}
+public class MobsimInitializedEvent implements AbstractMobsimEvent {
 
 }

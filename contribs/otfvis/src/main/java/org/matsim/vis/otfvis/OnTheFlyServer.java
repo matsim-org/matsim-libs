@@ -116,7 +116,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 		@Override
 		public double getTime() {
-			return ((QSim) visMobsim).getSimTimer().getTimeOfDay();
+			return mobsimTimer.getTimeOfDay();
 		}
 	}
 	
@@ -142,6 +142,8 @@ public class OnTheFlyServer implements OTFLiveServer {
 	private final ByteBuffer buf = ByteBuffer.allocate(80000000);
 
 	private VisMobsim visMobsim;
+	
+	private MobsimTimer mobsimTimer;
 
 	private final CurrentTimeStepView currentTimeStepView = new CurrentTimeStepView();
 	
@@ -149,21 +151,22 @@ public class OnTheFlyServer implements OTFLiveServer {
 
 	private Scenario scenario;
 
-	OnTheFlyServer(Scenario scenario, EventsManager events, VisMobsim qSim, NonPlanAgentQueryHelper nonPlanAgentQueryHelper) {
+	OnTheFlyServer(Scenario scenario, EventsManager events, VisMobsim qSim, MobsimTimer mobsimTimer, NonPlanAgentQueryHelper nonPlanAgentQueryHelper) {
 		this.scenario = scenario;
 		this.events = events;
 		this.visMobsim = qSim;
+		this.mobsimTimer = mobsimTimer;
 		this.nonPlanAgentQueryHelper = nonPlanAgentQueryHelper;
 		playPauseSimulationControl = new PlayPauseSimulationControl(qSim);
 	}
 
-    public static OnTheFlyServer createInstance(Scenario scenario, EventsManager events, VisMobsim qSim) {
-        return createInstance(scenario, events, qSim, null);
+    public static OnTheFlyServer createInstance(Scenario scenario, EventsManager events, VisMobsim qSim, MobsimTimer mobsimTimer) {
+        return createInstance(scenario, events, qSim, mobsimTimer, null);
     }
 
-    public static OnTheFlyServer createInstance(Scenario scenario, EventsManager events, VisMobsim qSim,
+    public static OnTheFlyServer createInstance(Scenario scenario, EventsManager events, VisMobsim qSim, MobsimTimer mobsimTimer,
             NonPlanAgentQueryHelper nonPlanAgentQueryHelper) {
-        return new OnTheFlyServer(scenario, events, qSim, nonPlanAgentQueryHelper);
+        return new OnTheFlyServer(scenario, events, qSim, mobsimTimer, nonPlanAgentQueryHelper);
     }
 
 	@Override

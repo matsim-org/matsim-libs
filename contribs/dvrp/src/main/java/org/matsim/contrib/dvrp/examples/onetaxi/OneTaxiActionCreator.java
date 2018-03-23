@@ -37,9 +37,9 @@ final class OneTaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final MobsimTimer timer;
 
 	@Inject
-	public OneTaxiActionCreator(PassengerEngine passengerEngine, QSim qSim) {
+	public OneTaxiActionCreator(PassengerEngine passengerEngine, MobsimTimer mobsimTimer) {
 		this.passengerEngine = passengerEngine;
-		this.timer = qSim.getSimTimer();
+		this.timer = mobsimTimer;
 	}
 
 	@Override

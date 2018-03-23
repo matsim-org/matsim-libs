@@ -34,12 +34,19 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -97,14 +104,20 @@ public class PopulationAgentSourceWithVehiclesTest {
 		final NetworkRoute routeWithoutVeh = RouteUtils.createLinkNetworkRouteImpl(link, Collections.<Id<Link>>emptyList(), link);
 		legWithoutVeh.setRoute( routeWithoutVeh );
 		planWithoutVeh.addLeg( legWithoutVeh );
-
-		final QSim qSim = new QSim( scenario , EventsUtils.createEventsManager() );
-		qSim.addMobsimEngine( new QNetsimEngine( qSim ) );
+		
+		MobsimTimer mobsimTimer = new MobsimTimer(config);
+		AgentCounter agentCounter = new AgentCounterImpl();
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+		
+		final QSim qSim = new QSim( scenario , eventsManager, agentCounter, mobsimTimer, activeQSimBridge );
+		QNetworkFactory networkFactory = new DefaultQNetworkFactory(eventsManager, scenario, mobsimTimer, agentCounter);
+		qSim.addMobsimEngine( new QNetsimEngine( networkFactory, config, scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface() ) );
 		final PopulationAgentSourceWithVehicles testee =
 			new PopulationAgentSourceWithVehicles(
 					scenario.getPopulation(),
-					new DefaultAgentFactory( qSim ),
-					qSim );
+					new DefaultAgentFactory( scenario, eventsManager, mobsimTimer ),
+					qSim, scenario );
 
 		boolean gotException = false;
 		try {
@@ -176,13 +189,19 @@ public class PopulationAgentSourceWithVehiclesTest {
 		legWithoutVeh.setRoute( routeWithoutVeh );
 		planWithoutVeh.addLeg( legWithoutVeh );
 
-		final QSim qSim = new QSim( scenario , EventsUtils.createEventsManager() );
-		qSim.addMobsimEngine( new QNetsimEngine( qSim ) );
+		MobsimTimer mobsimTimer = new MobsimTimer(config);
+		AgentCounter agentCounter = new AgentCounterImpl();
+		EventsManager eventsManager = EventsUtils.createEventsManager();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+		
+		final QSim qSim = new QSim( scenario , eventsManager, agentCounter, mobsimTimer, activeQSimBridge );
+		QNetworkFactory networkFactory = new DefaultQNetworkFactory(eventsManager, scenario, mobsimTimer, agentCounter);
+		qSim.addMobsimEngine( new QNetsimEngine( networkFactory, config, scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface() ) );
 		final PopulationAgentSourceWithVehicles testee =
 			new PopulationAgentSourceWithVehicles(
 					scenario.getPopulation(),
-					new DefaultAgentFactory( qSim ),
-					qSim );
+					new DefaultAgentFactory( scenario, eventsManager, mobsimTimer ),
+					qSim, scenario );
 
 		boolean gotException = false;
 		try {

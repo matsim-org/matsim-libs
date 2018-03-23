@@ -153,7 +153,7 @@ public class WithinDayControlerListener implements StartupListener {
 	}
 
 	private void createAndInitMobsimDataProvider() {
-		this.getFixedOrderSimulationListener().addSimulationListener(this.mobsimDataProvider);
+		//this.getFixedOrderSimulationListener().addSimulationListener(this.mobsimDataProvider);
 	}
 
 	private void createAndInitActivityReplanningMap() {

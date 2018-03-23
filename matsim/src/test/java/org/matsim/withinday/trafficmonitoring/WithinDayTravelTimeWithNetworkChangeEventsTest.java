@@ -46,6 +46,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkUtils;
@@ -54,6 +56,9 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
+
+import com.google.inject.Provides;
+import com.google.inject.Singleton;
 
 /**
 * Tests if network change events are considered by {@link WithinDayTravelTime}.
@@ -107,23 +112,28 @@ public class WithinDayTravelTimeWithNetworkChangeEventsTest {
 		
 		final Controler controler = new Controler(scenario);
 		controler.getConfig().controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
-
+		
 		Set<String> analyzedModes = new HashSet<>();
 		analyzedModes.add(TransportMode.car);
-		final WithinDayTravelTime travelTime = new WithinDayTravelTime(controler.getScenario(), analyzedModes);
-		
+
 		final TtmobsimListener ttmobsimListener = new TtmobsimListener(nce);
 
 		controler.addOverridingModule( new AbstractModule() {
 			@Override public void install() {
 				
-				this.bind(TravelTime.class).toInstance(travelTime);
-				this.addEventHandlerBinding().toInstance(travelTime);
-				this.addMobsimListenerBinding().toInstance(travelTime);
+				this.bind(TravelTime.class).to(WithinDayTravelTime.class);
+				this.addEventHandlerBinding().to(WithinDayTravelTime.class);
+				this.addMobsimListenerBinding().to(WithinDayTravelTime.class);
 				
 				this.addMobsimListenerBinding().toInstance(ttmobsimListener);
 
 			}
+			
+			@Provides @Singleton
+			WithinDayTravelTime provideWithinDayTravelTime(Scenario scenario, MobsimTimer mobsimTimer, ActiveQSimBridge activeQSimBridge) {
+				return new WithinDayTravelTime(scenario, analyzedModes, mobsimTimer, activeQSimBridge);
+			}
+			
 		}) ;
 		
 		controler.run();

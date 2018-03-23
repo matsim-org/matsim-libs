@@ -10,6 +10,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.network.NetworkUtils;
@@ -43,16 +44,19 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		}
 	});
 	private final LinkedHashMap<Id<Person>, TeleportationVisData> teleportationData = new LinkedHashMap<>();
-	private InternalInterface internalInterface;
+	private final InternalInterface internalInterface;
 	private Scenario scenario;
 	private EventsManager eventsManager;
+	final private MobsimTimer mobsimTimer;
 	
 	private final boolean withTravelTimeCheck ;
 
 	@Inject
-	public DefaultTeleportationEngine(Scenario scenario, EventsManager eventsManager) {
+	public DefaultTeleportationEngine(Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, InternalInterface internalInterface) {
 		this.scenario = scenario;
 		this.eventsManager = eventsManager;
+		this.mobsimTimer = mobsimTimer;
+		this.internalInterface = internalInterface;
 		
 		withTravelTimeCheck = scenario.getConfig().qsim().isUsingTravelTimeCheckInTeleportation() ;
 	}
@@ -90,7 +94,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 
 	@Override
 	public Collection<AgentSnapshotInfo> addAgentSnapshotInfo(Collection<AgentSnapshotInfo> snapshotList) {
-		double time = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+		double time = mobsimTimer.getTimeOfDay();
 		for (TeleportationVisData teleportationVisData : teleportationData.values()) {
 			teleportationVisData.updatePosition(time);
 			snapshotList.add(teleportationVisData);
@@ -104,7 +108,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 	}
 
 	private void handleTeleportationArrivals() {
-		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+		double now = mobsimTimer.getTimeOfDay();
 		while (teleportationList.peek() != null) {
 			Tuple<Double, MobsimAgent> entry = teleportationList.peek();
 			if (entry.getFirst() <= now) {
@@ -113,7 +117,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 				personAgent.notifyArrivalOnLinkByNonNetworkMode(personAgent
 						.getDestinationLinkId());
 				double distance = personAgent.getExpectedTravelDistance();
-				this.eventsManager.processEvent(new TeleportationArrivalEvent(this.internalInterface.getMobsim().getSimTimer().getTimeOfDay(), personAgent.getId(), distance));
+				this.eventsManager.processEvent(new TeleportationArrivalEvent(mobsimTimer.getTimeOfDay(), personAgent.getId(), distance));
 				personAgent.endLegAndComputeNextState(now);
 				this.teleportationData.remove(personAgent.getId());
 				internalInterface.arrangeNextAgentState(personAgent);
@@ -130,7 +134,7 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 
 	@Override
 	public void afterSim() {
-		double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+		double now = mobsimTimer.getTimeOfDay();
 		for (Tuple<Double, MobsimAgent> entry : teleportationList) {
 			MobsimAgent agent = entry.getSecond();
 			eventsManager.processEvent(new PersonStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), agent.getMode()));
@@ -138,10 +142,10 @@ public final class DefaultTeleportationEngine implements TeleportationEngine {
 		teleportationList.clear();
 	}
 
-	@Override
+	/*@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-	}
+	}*/
 
 	private static Double travelTimeCheck(Double travelTime, Double speed, Facility<?> dpfac, Facility<?> arfac) {
 		if ( speed==null ) {

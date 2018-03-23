@@ -29,13 +29,17 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.DefaultTeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ConfigurableQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
@@ -77,25 +81,29 @@ public class WagonSimQSimFactory implements MobsimFactory {
 		if (conf == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}
+		
+		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
+		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
 
-		QSim qSim = new QSim(scenario, eventsManager);
-		ActivityEngine activityEngine = new ActivityEngine(eventsManager, qSim.getAgentCounter());
+		QSim qSim = new QSim(scenario, eventsManager, agentCounter, mobsimTimer, activeQSimBridge);
+		ActivityEngine activityEngine = new ActivityEngine(eventsManager, agentCounter, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		//
-		ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( eventsManager, scenario ) ;
+		ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( eventsManager, scenario, mobsimTimer, agentCounter ) ;
 		// add the vehicleLinkSpeedCalculator
 		factory.setLinkSpeedCalculator(new LocomotiveLinkSpeedCalculator(vehicleLinkSpeedAttributes));
-		QNetsimEngine netsimEngine = new QNetsimEngine(qSim,factory);
+		QNetsimEngine netsimEngine = new QNetsimEngine(factory, scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface());
 		//
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager);
+		DefaultTeleportationEngine teleportationEngine = new DefaultTeleportationEngine(scenario, eventsManager, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(teleportationEngine);
 
 		// use an own TransitStopHandlerFactory here
-		AgentFactory agentFactory = new TransitAgentFactory(qSim);
-		TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
+		AgentFactory agentFactory = new TransitAgentFactory(scenario, eventsManager, mobsimTimer);
+		TransitQSimEngine transitEngine = new TransitQSimEngine(qSim, scenario.getConfig(), scenario, eventsManager, mobsimTimer, agentCounter, qSim.getInternalInterface());
 		// use an own transitStopHandler.
 		transitEngine.setTransitStopHandlerFactory(new WagonSimTransitStopHandlerFactory(vehicleLoadListener,
 				scenario.getPopulation().getPersonAttributes(),
@@ -104,9 +112,9 @@ public class WagonSimQSimFactory implements MobsimFactory {
 		qSim.addAgentSource(transitEngine);
 		qSim.addMobsimEngine(transitEngine);
 		if (scenario.getConfig().network().isTimeVariantNetwork()) {
-			qSim.addMobsimEngine(NetworkChangeEventsEngine.createNetworkChangeEventsEngine());
+			qSim.addMobsimEngine(NetworkChangeEventsEngine.createNetworkChangeEventsEngine(scenario.getNetwork(), netsimEngine.getNetsimNetwork()));
 		}
-		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, scenario.getConfig(), scenario, qSim);
 		qSim.addAgentSource(agentSource);
 		return qSim;
 	}

@@ -60,7 +60,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	private TransitRouteStop currentStop = null;
 	protected TransitRouteStop nextStop;
 	private ListIterator<TransitRouteStop> stopIterator;
-	private final InternalInterface internalInterface;
+	//private final InternalInterface internalInterface;
 
 	private final PassengerAccessEgressImpl accessEgress;
 
@@ -80,12 +80,10 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 	@Override
 	public abstract double getActivityEndTime();
 
-	AbstractTransitDriverAgent(InternalInterface internalInterface, TransitStopAgentTracker agentTracker2) {
+	AbstractTransitDriverAgent(InternalInterface internalInterface, Scenario scenario, EventsManager eventsManager, TransitStopAgentTracker agentTracker2) {
 		super();
-		this.internalInterface = internalInterface;
-		Scenario scenario = internalInterface.getMobsim().getScenario();
-		this.eventsManager = internalInterface.getMobsim().getEventsManager();
-		accessEgress = new PassengerAccessEgressImpl(this.internalInterface, agentTracker2, scenario, eventsManager);
+		this.eventsManager = eventsManager;
+		accessEgress = new PassengerAccessEgressImpl(internalInterface, agentTracker2, scenario, eventsManager);
 	}
 
 	final void init() {
@@ -182,7 +180,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 		// A test initializes this Agent without internalInterface.
 		// Actually, I am not sure if agents should send Events (or just be reactive, so they can be
 		// tested / exercised as a unit, without a QSim.  michaz
-		if (internalInterface != null) {
+		//if (internalInterface != null) {
 			// check if "Wenden"
 			if(getTransitLine() == null){
 				eventsManager.processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
@@ -191,7 +189,7 @@ public abstract class AbstractTransitDriverAgent implements TransitDriverAgent, 
 				eventsManager.processEvent(new TransitDriverStartsEvent(now, this.dummyPerson.getId(),
 						this.vehicle.getId(), getTransitLine().getId(), getTransitRoute().getId(), getDeparture().getId()));
 			}
-		}
+		//}
 	}
 
 	@Override

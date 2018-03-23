@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
@@ -46,19 +46,23 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 	private Network network ;
 	private Scenario scenario ;
 	private NetsimEngineContext context;
-	private NetsimInternalInterface netsimEngine ;
 	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
 	private TurnAcceptanceLogic turnAcceptanceLogic = new DefaultTurnAcceptanceLogic() ;
+	private MobsimTimer mobsimTimer;
+	private AgentCounter agentCounter;
 
-	public ConfigurableQNetworkFactory( EventsManager events, Scenario scenario ) {
+	public ConfigurableQNetworkFactory( EventsManager events, Scenario scenario, MobsimTimer mobsimTimer, AgentCounter agentCounter ) {
 		this.events = events;
 		this.scenario = scenario;
 		this.network = scenario.getNetwork() ;
 		this.qsimConfig = scenario.getConfig().qsim() ;
+		this.mobsimTimer = mobsimTimer;
+		this.agentCounter = agentCounter;
+		
+		initializeFactory(); // TODO: Just refatoring, draw in here
 	}
-	@Override
-	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
-		this.netsimEngine = netsimEngine1;
+	
+	private void initializeFactory() {
 		double effectiveCellSize = network.getEffectiveCellSize() ;
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( qsimConfig.getLinkWidthForVis() );
@@ -69,18 +73,18 @@ public final class ConfigurableQNetworkFactory extends QNetworkFactory {
 		context = new NetsimEngineContext( events, effectiveCellSize, agentCounter, agentSnapshotInfoBuilder, qsimConfig, mobsimTimer, linkWidthCalculator );
 	}
 	@Override
-	QLinkI createNetsimLink(final Link link, final QNodeI toQueueNode) {
+	QLinkI createNetsimLink(final Link link, final QNodeI toQueueNode, InternalInterface internalInterface) {
 		QueueWithBuffer.Builder laneFactory = new QueueWithBuffer.Builder(context) ;
 
-		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
+		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, internalInterface) ;
 		linkBuilder.setLaneFactory(laneFactory);
 		linkBuilder.setLinkSpeedCalculator( linkSpeedCalculator ) ;
 
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override
-	QNodeI createNetsimNode(final Node node) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+	QNodeI createNetsimNode(final Node node,  InternalInterface internalInterface) {
+		QNodeImpl.Builder builder = new QNodeImpl.Builder( internalInterface, context ) ;
 
 		builder.setTurnAcceptanceLogic( this.turnAcceptanceLogic ) ;
 

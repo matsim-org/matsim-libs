@@ -11,10 +11,12 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.carsharing.manager.CarsharingManagerInterface;
 import org.matsim.contrib.carsharing.router.CarsharingRoute;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.agents.BasicPlanAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedDriverAgentImpl;
@@ -45,10 +47,10 @@ public class CarsharingPersonDriverAgentImpl implements MobsimDriverAgent, Mobsi
 	private final Scenario scenario;
 	private final Plan originalPlan;
 	private int carsharingTrips = 0;
-	public CarsharingPersonDriverAgentImpl(final Plan plan, final Netsim simulation, CarsharingManagerInterface carsharingManager) {
-		this.scenario = simulation.getScenario() ;
+	public CarsharingPersonDriverAgentImpl(final Plan plan, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer, CarsharingManagerInterface carsharingManager) {
+		this.scenario = scenario;
 		this.carsharingManager = carsharingManager;
-		this.basicAgentDelegate = new BasicPlanAgentImpl( plan, scenario, simulation.getEventsManager(), simulation.getSimTimer() ) ;
+		this.basicAgentDelegate = new BasicPlanAgentImpl( plan, scenario, eventsManager, mobsimTimer ) ;
 		this.transitAgentDelegate = new TransitAgentImpl( this.basicAgentDelegate ) ;
 		this.driverAgentDelegate = new PlanBasedDriverAgentImpl( this.basicAgentDelegate ) ;
 		this.originalPlan = this.scenario.getPopulation().getPersons().get(this.basicAgentDelegate.getId()).getSelectedPlan();

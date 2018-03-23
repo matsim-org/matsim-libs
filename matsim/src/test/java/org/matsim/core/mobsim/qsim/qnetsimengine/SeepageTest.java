@@ -142,7 +142,7 @@ public class SeepageTest {
 
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
 
-		QSim qSim = QSimUtils.createDefaultQSim(sc, manager);
+		QSim qSim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, manager);
 		qSim.run();
 
 		Map<Id<Link>, Double> travelTime1 = vehicleLinkTravelTimes.get(Id.createVehicleId("2"));

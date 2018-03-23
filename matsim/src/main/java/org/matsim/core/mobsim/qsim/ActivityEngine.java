@@ -34,6 +34,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.ActivityHandler;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -43,15 +44,24 @@ import javax.inject.Inject;
 
 public class ActivityEngine implements MobsimEngine, ActivityHandler {
 	private static final Logger log = Logger.getLogger( ActivityEngine.class ) ;
+	
+	final private MobsimTimer mobsimTimer;
+	final private AgentCounter agentCounter;
 
 	private EventsManager eventsManager;
 	@Inject
-	public ActivityEngine(EventsManager eventsManager) {
+	public ActivityEngine(EventsManager eventsManager, MobsimTimer mobsimTimer, AgentCounter agentCounter, InternalInterface internalInterface) {
 		this.eventsManager = eventsManager;
+		this.mobsimTimer = mobsimTimer;
+		this.agentCounter = agentCounter;
+		this.internalInterface = internalInterface;
 	}
 
-	public ActivityEngine(EventsManager eventsManager, AgentCounter agentCounter) {
+	public ActivityEngine(EventsManager eventsManager, AgentCounter agentCounter, MobsimTimer mobsimTimer, InternalInterface internalInterface) {
 		this.eventsManager = eventsManager;
+		this.mobsimTimer = mobsimTimer;
+		this.agentCounter = agentCounter;
+		this.internalInterface = internalInterface;
 	}
 
 	/**
@@ -72,7 +82,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		final double activityEndTime;
 	}
 
-	private InternalInterface internalInterface;
+	private final InternalInterface internalInterface;
 	
 	/**
 	 * This list needs to be a "blocking" queue since this is needed for
@@ -125,7 +135,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 
 	@Override
 	public void afterSim() {
-		double now = this.internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+		double now = mobsimTimer.getTimeOfDay();
 		for (AgentEntry entry : activityEndsList) {
 			if (entry.activityEndTime!=Double.POSITIVE_INFINITY && entry.activityEndTime!=Time.UNDEFINED_TIME) {
 				// since we are at an activity, it is not plausible to assume that the agents know mode or destination
@@ -136,10 +146,10 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		activityEndsList.clear();
 	}
 
-	@Override
+	/*@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-	}
+	}*/
 
 	
 	/**
@@ -157,11 +167,11 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 		if (agent.getActivityEndTime() == Double.POSITIVE_INFINITY) {
 			// This is the last planned activity.
 			// So the agent goes to sleep.
-			internalInterface.getMobsim().getAgentCounter().decLiving();
-		} else if (agent.getActivityEndTime() <= internalInterface.getMobsim().getSimTimer().getTimeOfDay() && !beforeFirstSimStep) {
+			agentCounter.decLiving();
+		} else if (agent.getActivityEndTime() <= mobsimTimer.getTimeOfDay() && !beforeFirstSimStep) {
 			// This activity is already over (planned for 0 duration)
 			// So we proceed immediately.
-			agent.endActivityAndComputeNextState(internalInterface.getMobsim().getSimTimer().getTimeOfDay());
+			agent.endActivityAndComputeNextState(mobsimTimer.getTimeOfDay());
 			internalInterface.arrangeNextAgentState(agent) ;
 		} else {
 			// The agent commences an activity on this link.
@@ -209,7 +219,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 				// re-activate the agent
 				activityEndsList.add(new AgentEntry(agent, newActivityEndTime));
 				internalInterface.registerAdditionalAgentOnLink(agent);
-				((org.matsim.core.mobsim.qsim.AgentCounter) internalInterface.getMobsim().getAgentCounter()).incLiving();
+				agentCounter.incLiving();
 			}
 		} else if (newActivityEndTime == Double.POSITIVE_INFINITY) {
 			/*
@@ -217,7 +227,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 			 * Therefore the agent is de-activated. cdobler, oct'11
 			 */
 			unregisterAgentAtActivityLocation(agent);
-			internalInterface.getMobsim().getAgentCounter().decLiving();
+			agentCounter.decLiving();
 		} else {
 			/*
 			 *  The activity is just rescheduled during the day, so we keep the agent active. cdobler, oct'11

@@ -21,13 +21,16 @@ package org.matsim.contrib.wagonSim.mobsim.qsim.agents;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimPassengerAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.agents.TransitAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -53,11 +56,11 @@ import java.util.List;
 @Deprecated
 class WagonSimAgent implements MobsimDriverAgent, MobsimPassengerAgent, PTPassengerAgent, HasPerson, PlanAgent{
 
-	private Netsim sim;
 	private TransitAgent delegate;
+	final private MobsimTimer mobsimTimer;
 
-	static WagonSimAgent createInstance(Person p, Netsim sim){
-		return new WagonSimAgent(p, p.getSelectedPlan(), sim);
+	static WagonSimAgent createInstance(Person p, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer){
+		return new WagonSimAgent(p, p.getSelectedPlan(), scenario, eventsManager, mobsimTimer);
 	}
 	
 	/**
@@ -71,7 +74,7 @@ class WagonSimAgent implements MobsimDriverAgent, MobsimPassengerAgent, PTPassen
 	 * @param plan
 	 * @param simulation
 	 */
-	private WagonSimAgent(final Person person, final Plan plan, final Netsim simulation) {
+	private WagonSimAgent(final Person person, final Plan plan, Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer) {
 		/*
 		 * When two agents are at the same stop and both want to enter and the remaining time is 
 		 * long enough for only one to enter, still both will enter... That is we are not
@@ -80,8 +83,8 @@ class WagonSimAgent implements MobsimDriverAgent, MobsimPassengerAgent, PTPassen
 		 */
 
 		// extending TransitAgent is not possible as the constructor is package-protected => delegate
-		this.delegate = TransitAgent.createTransitAgent(person, simulation);
-		this.sim = simulation;
+		this.delegate = TransitAgent.createTransitAgent(person, scenario, eventsManager, mobsimTimer);
+		this.mobsimTimer = mobsimTimer;
 	}
 
 	@SuppressWarnings("unused")
@@ -93,7 +96,7 @@ class WagonSimAgent implements MobsimDriverAgent, MobsimPassengerAgent, PTPassen
 			TransitVehicle transitVehicle) {
 		if(this.delegate.getEnterTransitRoute(line, transitRoute, stopsToCome, transitVehicle)){
 			// enter only when it is the correct route. Now check if the current time allows to enter...
-			double now = sim.getSimTimer().getTimeOfDay();
+			double now = mobsimTimer.getTimeOfDay();
 			// the time an agents needs to enter (don't know why this is deprecated, but I can't see any other way to to get the accesstime)
 			double access = transitVehicle.getVehicle().getType().getAccessTime();
 			Leg l = (Leg) delegate.getCurrentPlanElement();

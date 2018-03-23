@@ -47,10 +47,14 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.DefaultMobsimModule;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
@@ -109,8 +113,10 @@ public class LinkSpeedCalculatorIntegrationTest {
 			@Override public void install() {
 				bind( QNetworkFactory.class ).toProvider( new Provider<QNetworkFactory>(){
 					@Inject private EventsManager events ;
+					@Inject private MobsimTimer mobsimTimer;
+					@Inject private AgentCounter agentCounter;
 					@Override public QNetworkFactory get() {
-						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
+						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario, mobsimTimer, agentCounter ) ;
 						factory.setLinkSpeedCalculator(linkSpeedCalculator); 
 						return factory ;
 					}
@@ -164,8 +170,10 @@ public class LinkSpeedCalculatorIntegrationTest {
 			@Override public void install() {
 				bind( QNetworkFactory.class ).toProvider( new Provider<QNetworkFactory>(){
 					@Inject private EventsManager events ;
+					@Inject private MobsimTimer mobsimTimer;
+					@Inject private AgentCounter agentCounter;
 					@Override public QNetworkFactory get() {
-						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario ) ;
+						final ConfigurableQNetworkFactory factory = new ConfigurableQNetworkFactory( events, scenario, mobsimTimer, agentCounter ) ;
 						factory.setLinkSpeedCalculator(linkSpeedCalculator); 
 						return factory ;
 					}
@@ -201,21 +209,23 @@ public class LinkSpeedCalculatorIntegrationTest {
 	}
 	
 	private static QSim configureQSim(Fixture f, LinkSpeedCalculator linkSpeedCalculator) {
-		QSim qsim = new QSim(f.scenario, f.events);
+		QSim qsim = new QSim(f.scenario, f.events, f.agentCounter, f.mobsimTimer, f.activeQSimBridge);
 		
 		// handle activities
-		ActivityEngine activityEngine = new ActivityEngine(f.events, qsim.getAgentCounter());
+		ActivityEngine activityEngine = new ActivityEngine(f.events, f.agentCounter, f.mobsimTimer, qsim.getInternalInterface());
 		qsim.addMobsimEngine(activityEngine);
 		qsim.addActivityHandler(activityEngine);
-
-        QNetsimEngine netsimEngine = new QNetsimEngine(qsim);
+		
+		QNetworkFactory netsimNetworkFactory = new DefaultQNetworkFactory(f.events, f.scenario, f.mobsimTimer, f.agentCounter);
+		QNetsimEngine netsimEngine = new QNetsimEngine(netsimNetworkFactory, f.scenario.getConfig(), f.scenario, f.events, f.mobsimTimer, f.agentCounter, qsim.getInternalInterface());
+		
 		if (linkSpeedCalculator != null) {
 			throw new RuntimeException( "does not work like this any more") ;
 		}
 		qsim.addMobsimEngine(netsimEngine);
 		qsim.addDepartureHandler(netsimEngine.getDepartureHandler());
 		
-		PopulationAgentSource agentSource = new PopulationAgentSource(f.scenario.getPopulation(), new DefaultAgentFactory(qsim), qsim);
+		PopulationAgentSource agentSource = new PopulationAgentSource(f.scenario.getPopulation(), new DefaultAgentFactory(f.scenario, f.events, f.mobsimTimer), f.config, f.scenario, qsim);
 		qsim.addAgentSource(agentSource);
 		
 		return qsim;
@@ -243,10 +253,18 @@ public class LinkSpeedCalculatorIntegrationTest {
 	 */
 	static class Fixture {
 		EventsManager events = new EventsManagerImpl();
+		Config config;
 		Scenario scenario;
+		MobsimTimer mobsimTimer;
+		AgentCounter agentCounter;
+		ActiveQSimBridge activeQSimBridge;
 
 		public Fixture() {
-			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			this.config = ConfigUtils.createConfig();
+			this.scenario = ScenarioUtils.createScenario(config);
+			this.mobsimTimer = new MobsimTimer(config);
+			this.agentCounter = new AgentCounterImpl();
+			this.activeQSimBridge = new ActiveQSimBridge();
 
 			Id<Node>[] nodeIds = new Id[5];
 			for (int i = 0; i < nodeIds.length; i++) {

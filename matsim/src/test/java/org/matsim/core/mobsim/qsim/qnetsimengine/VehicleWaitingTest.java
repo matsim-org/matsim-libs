@@ -170,7 +170,7 @@ public class VehicleWaitingTest {
 		});
 
 		PrepareForSimUtils.createDefaultPrepareForSim(sc).run();
-		final Netsim qsim = QSimUtils.createDefaultQSim(sc, events);
+		final Netsim qsim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(sc, events);
 
 //		try {
 			qsim.run();

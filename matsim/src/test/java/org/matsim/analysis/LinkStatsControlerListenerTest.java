@@ -38,6 +38,10 @@ import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Injector;
 import org.matsim.core.events.EventsManagerModule;
 import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
+import org.matsim.core.mobsim.qsim.AgentCounterImpl;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.scenario.ScenarioByInstanceModule;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -296,6 +300,9 @@ public class LinkStatsControlerListenerTest {
 			public void install() {
 				if (getConfig().controler().getMobsim().equals("dummy")) {
 					bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
+					bind(MobsimTimer.class);
+					bind(AgentCounter.class).to(AgentCounterImpl.class);
+					bind(ActiveQSimBridge.class);
 				}
 			}
 		});
@@ -343,6 +350,9 @@ public class LinkStatsControlerListenerTest {
 			public void install() {
 				if (getConfig().controler().getMobsim().equals("dummy")) {
 					bind(Mobsim.class).toProvider(DummyMobsimFactory.class);
+					bind(MobsimTimer.class);
+					bind(AgentCounter.class).to(AgentCounterImpl.class);
+					bind(ActiveQSimBridge.class);
 				}
 			}
 		});

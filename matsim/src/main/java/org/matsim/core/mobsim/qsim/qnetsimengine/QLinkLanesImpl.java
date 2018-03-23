@@ -34,8 +34,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.DefaultLinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.FIFOVehicleQ;
@@ -117,12 +117,12 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	
 	/* public? */ static final class Builder {
 		private final NetsimEngineContext context;
-		private final NetsimInternalInterface netsimEngine;
+		private final InternalInterface internalInterface;
 		private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator() ;
 
-		public Builder(NetsimEngineContext context, NetsimInternalInterface netsimEngine ) {
+		public Builder(NetsimEngineContext context, InternalInterface internalInterface ) {
 			this.context = context;
-			this.netsimEngine = netsimEngine;
+			this.internalInterface = internalInterface;
 		}
 
 		public final void setLinkSpeedCalculator( LinkSpeedCalculator linkSpeedCalculator ) {
@@ -130,7 +130,7 @@ public final class QLinkLanesImpl extends AbstractQLink {
 		}
 
 		AbstractQLink build(Link link, QNodeI toNodeQ, List<ModelLane> lanes ) {
-			return new QLinkLanesImpl(link, toNodeQ, lanes, context, netsimEngine, linkSpeedCalculator ) ;
+			return new QLinkLanesImpl(link, toNodeQ, lanes, context, internalInterface, linkSpeedCalculator ) ;
 		}
 
 	}
@@ -169,9 +169,8 @@ public final class QLinkLanesImpl extends AbstractQLink {
 	 * @param netsimEngine TODO
 	 * @param linkSpeedCalculator
 	 */
-	private QLinkLanesImpl(final Link link, final QNodeI toNodeQ, List<ModelLane> lanes, NetsimEngineContext context,
-				   NetsimInternalInterface netsimEngine, LinkSpeedCalculator linkSpeedCalculator) {
-		super(link, toNodeQ, context, netsimEngine, linkSpeedCalculator);
+	private QLinkLanesImpl(final Link link, final QNodeI toNodeQ, List<ModelLane> lanes, NetsimEngineContext context, InternalInterface internalInterface, LinkSpeedCalculator linkSpeedCalculator) {
+		super(link, toNodeQ, context, internalInterface, linkSpeedCalculator);
 		this.context = context ;
 		this.toQueueNode = toNodeQ;
 		this.laneQueues = new LinkedHashMap<>();

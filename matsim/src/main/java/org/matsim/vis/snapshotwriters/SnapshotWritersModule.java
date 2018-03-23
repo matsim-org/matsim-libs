@@ -25,7 +25,9 @@ package org.matsim.vis.snapshotwriters;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.ActiveQSimBridge;
 import org.matsim.core.replanning.ReplanningContext;
 
 import javax.inject.Inject;
@@ -53,19 +55,23 @@ public class SnapshotWritersModule extends AbstractModule {
 		private final ControlerConfigGroup controlerConfigGroup;
 		private final ReplanningContext iterationContext;
 		private final Collection<com.google.inject.Provider<SnapshotWriter>> snapshotWriters;
+		final private MobsimTimer mobsimTimer;
+		private final ActiveQSimBridge activeQSimBridge;
 
 		@Inject
-		private SnapshotWriterManagerProvider(Config config, ControlerConfigGroup controlerConfigGroup, ReplanningContext iterationContext, Collection<com.google.inject.Provider<SnapshotWriter>> snapshotWriters) {
+		private SnapshotWriterManagerProvider(Config config, ControlerConfigGroup controlerConfigGroup, ReplanningContext iterationContext, Collection<com.google.inject.Provider<SnapshotWriter>> snapshotWriters, MobsimTimer mobsimTimer, ActiveQSimBridge activeQSimBridge) {
 			this.config = config;
 			this.controlerConfigGroup = controlerConfigGroup;
 			this.iterationContext = iterationContext;
 			this.snapshotWriters = snapshotWriters;
+			this.mobsimTimer = mobsimTimer;
+			this.activeQSimBridge = activeQSimBridge;
 		}
 
 		@Override
 		public MobsimListener get() {
 			if (iterationContext.getIteration() % controlerConfigGroup.getWriteSnapshotsInterval() == 0) {
-				SnapshotWriterManager manager = new SnapshotWriterManager(config);
+				SnapshotWriterManager manager = new SnapshotWriterManager(config, mobsimTimer, activeQSimBridge);
 				for (com.google.inject.Provider<SnapshotWriter> snapshotWriter : this.snapshotWriters) {
 					manager.addSnapshotWriter(snapshotWriter.get());
 				}

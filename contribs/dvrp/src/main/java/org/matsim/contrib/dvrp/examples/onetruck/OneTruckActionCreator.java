@@ -41,8 +41,8 @@ final class OneTruckActionCreator implements VrpAgentLogic.DynActionCreator {
 	private final MobsimTimer timer;
 
 	@Inject
-	public OneTruckActionCreator(QSim qSim) {
-		this.timer = qSim.getSimTimer();
+	public OneTruckActionCreator(MobsimTimer mobsimTimer) {
+		this.timer = mobsimTimer;
 	}
 
 	@Override

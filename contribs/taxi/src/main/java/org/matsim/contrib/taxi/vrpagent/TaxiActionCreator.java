@@ -26,6 +26,7 @@ import org.matsim.contrib.dvrp.vrpagent.*;
 import org.matsim.contrib.dynagent.*;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
 import org.matsim.contrib.taxi.schedule.*;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.QSim;
 
 import com.google.inject.Inject;
@@ -44,10 +45,10 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 
 	@Inject
 	public TaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, VrpOptimizer optimizer,
-			QSim qSim) {
+			MobsimTimer mobsimTimer) {
 		this(passengerEngine, taxiCfg.isOnlineVehicleTracker() ? //
-				VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking)optimizer, qSim.getSimTimer())
-				: VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer()), taxiCfg.getPickupDuration());
+				VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking)optimizer, mobsimTimer)
+				: VrpLegs.createLegWithOfflineTrackerCreator(mobsimTimer), taxiCfg.getPickupDuration());
 	}
 
 	public TaxiActionCreator(PassengerEngine passengerEngine, VrpLegs.LegCreator legCreator, double pickupDuration) {

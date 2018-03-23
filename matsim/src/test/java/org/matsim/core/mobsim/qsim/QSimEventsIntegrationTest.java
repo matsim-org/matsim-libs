@@ -10,10 +10,14 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQNetworkFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineModule;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetworkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -42,14 +46,18 @@ public class QSimEventsIntegrationTest {
 
 			}
 		});
-		QSim qSim = new QSim(scenario, events);
-		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
-		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
+		MobsimTimer mobsimTimer = new MobsimTimer(scenario.getConfig());
+		AgentCounter agentCounter = new AgentCounterImpl();
+		ActiveQSimBridge activeQSimBridge = new ActiveQSimBridge();
+		QSim qSim = new QSim(scenario, events, agentCounter, mobsimTimer, activeQSimBridge);
+		AgentFactory agentFactory = new DefaultAgentFactory(scenario, events, mobsimTimer);
+		PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, scenario.getConfig(), scenario, qSim);
 		qSim.addAgentSource(agentSource);
-		ActivityEngine activityEngine = new ActivityEngine(events, qSim.getAgentCounter());
+		ActivityEngine activityEngine = new ActivityEngine(events, agentCounter, mobsimTimer, qSim.getInternalInterface());
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
-		QNetsimEngineModule.configure(qSim);
+		QNetworkFactory networkFactory = new DefaultQNetworkFactory(events, scenario, mobsimTimer, agentCounter);
+		QNetsimEngineModule.configure(networkFactory, qSim, scenario.getConfig(), scenario, events, mobsimTimer, agentCounter, qSim.getInternalInterface());
 		try {
 			qSim.run();
 		} catch (RuntimeException e) {

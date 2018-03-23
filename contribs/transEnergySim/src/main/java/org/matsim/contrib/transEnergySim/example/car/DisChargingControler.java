@@ -27,6 +27,7 @@ import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsum
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import java.util.HashMap;
@@ -61,6 +62,7 @@ public class DisChargingControler {
 			@Override
 			public void install() {
 				addEventHandlerBinding().toInstance(handlerGroup);
+				bind(MobsimTimer.class);
 			}
 		});
 	}

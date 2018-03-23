@@ -71,7 +71,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		events.addHandler(writer);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim qSim = QSimUtils.createDefaultQSim(scenario,events);
+		QSim qSim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario,events);
 
 		log.info("START testOnePercent10s SIM");
 		qSim.run();
@@ -112,7 +112,7 @@ public class OnePercentBerlin10sIT extends MatsimTestCase {
 		eventsManager.addHandler(writer);
 
 		PrepareForSimUtils.createDefaultPrepareForSim(scenario).run();
-		QSim qSim = QSimUtils.createDefaultQSim(scenario,eventsManager);
+		QSim qSim = QSimUtils.createDefaultQSimWithDefaultTimerAndCounter(scenario,eventsManager);
 
 		log.info("START testOnePercent10s SIM");
 		qSim.run();

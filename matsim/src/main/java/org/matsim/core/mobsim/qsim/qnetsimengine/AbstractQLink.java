@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.VehicleAbortsEvent;
 import org.matsim.api.core.v01.network.Node;
@@ -47,9 +48,9 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.linkspeedcalculator.LinkSpeedCalculator;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.vehicles.Vehicle;
@@ -108,15 +109,14 @@ abstract class AbstractQLink implements QLinkI {
 	private final QNodeI toQNode ;
 
 	private final NetsimEngineContext context;
-
-	private final NetsimInternalInterface netsimEngine;
+	private final InternalInterface internalInterface;
 	private final LinkSpeedCalculator linkSpeedCalculator;
-	
-	AbstractQLink(Link link, QNodeI toNode, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, LinkSpeedCalculator linkSpeedCalculator) {
+
+	AbstractQLink(Link link, QNodeI toNode, NetsimEngineContext context, InternalInterface internalInterface, LinkSpeedCalculator linkSpeedCalculator) {
 		this.link = link ;
 		this.toQNode = toNode ;
 		this.context = context;
-		this.netsimEngine = netsimEngine2;
+		this.internalInterface = internalInterface;
 		this.linkSpeedCalculator = linkSpeedCalculator;
 	}
 
@@ -159,7 +159,15 @@ abstract class AbstractQLink implements QLinkI {
 		context.getEventsManager().processEvent(new VehicleLeavesTrafficEvent(now , qveh.getDriver().getId(), 
 				this.link.getId(), qveh.getId(), qveh.getDriver().getMode(), 1.0 ) ) ;
 		
-		this.netsimEngine.letVehicleArrive(qveh);
+		//this.netsimEngine.letVehicleArrive(qveh);
+		
+		MobsimDriverAgent driver = qveh.getDriver();
+		context.getEventsManager().processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), qveh.getId()));
+		// reset vehicles driver
+		qveh.setDriver(null);
+		driver.endLegAndComputeNextState(now);
+		
+		internalInterface.arrangeNextAgentState(driver);
 	}
 
 	@Override

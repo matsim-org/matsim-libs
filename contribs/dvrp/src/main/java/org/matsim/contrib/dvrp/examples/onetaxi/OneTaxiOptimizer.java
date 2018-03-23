@@ -63,8 +63,8 @@ final class OneTaxiOptimizer implements VrpOptimizer {
 	public static final double DROPOFF_DURATION = 60;
 
 	@Inject
-	public OneTaxiOptimizer(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, Fleet fleet, QSim qSim) {
-		timer = qSim.getSimTimer();
+	public OneTaxiOptimizer(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, Fleet fleet, MobsimTimer mobsimTimer) {
+		timer = mobsimTimer;
 		travelTime = new FreeSpeedTravelTime();
 		router = new DijkstraFactory().createPathCalculator(network, new TimeAsTravelDisutility(travelTime), travelTime);
 

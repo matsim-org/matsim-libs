@@ -29,9 +29,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
 import org.matsim.core.mobsim.qsim.pt.TransitStopAgentTracker;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.vehicleq.VehicleQ;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfoFactory;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
@@ -67,15 +67,20 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 	private Scenario scenario ;
 	// (vis needs network and may need population attributes and config; in consequence, makes sense to have scenario here. kai, apr'16)
 	private NetsimEngineContext context;
-	private NetsimInternalInterface netsimEngine ;
+	private final MobsimTimer mobsimTimer;
+	private final AgentCounter agentCounter;
+	
 	@Inject
-	DefaultQNetworkFactory( EventsManager events, Scenario scenario ) {
+	public DefaultQNetworkFactory( EventsManager events, Scenario scenario, MobsimTimer mobsimTimer, AgentCounter agentCounter ) {
 		this.events = events;
 		this.scenario = scenario;
+		this.mobsimTimer = mobsimTimer;
+		this.agentCounter = agentCounter;
+		
+		initializeFactory(); // TODO: Refactoring artifact. Draw in here.
 	}
-	@Override
-	void initializeFactory( AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface netsimEngine1 ) {
-		this.netsimEngine = netsimEngine1;
+	
+	private void initializeFactory() {
 		double effectiveCellSize = scenario.getNetwork().getEffectiveCellSize() ;
 
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
@@ -88,13 +93,13 @@ public final class DefaultQNetworkFactory extends QNetworkFactory {
 				mobsimTimer, linkWidthCalculator );
 	}
 	@Override
-	QLinkI createNetsimLink(final Link link, final QNodeI toQueueNode) {
-		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, netsimEngine) ;
+	QLinkI createNetsimLink(final Link link, final QNodeI toQueueNode, InternalInterface internalInterface) {
+		QLinkImpl.Builder linkBuilder = new QLinkImpl.Builder(context, internalInterface) ;
 		return linkBuilder.build(link, toQueueNode) ;
 	}
 	@Override
-	QNodeI createNetsimNode(final Node node) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+	QNodeI createNetsimNode(final Node node, InternalInterface internalInterface) {
+		QNodeImpl.Builder builder = new QNodeImpl.Builder( internalInterface, context ) ;
 		return builder.build( node ) ;
 	}
 }

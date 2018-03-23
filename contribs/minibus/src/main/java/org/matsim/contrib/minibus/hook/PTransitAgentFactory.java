@@ -19,7 +19,10 @@
 
 package org.matsim.contrib.minibus.hook;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
@@ -30,15 +33,19 @@ import org.matsim.core.mobsim.qsim.pt.MobsimDriverPassengerAgent;
  */
 class PTransitAgentFactory implements AgentFactory {
 
-	private final Netsim simulation;
+	private final EventsManager eventsManager;
+	private final Scenario scenario;
+	private final MobsimTimer mobsimTimer;
 
-    public PTransitAgentFactory(final Netsim simulation) {
-		this.simulation = simulation;
+    public PTransitAgentFactory(EventsManager eventsManager, Scenario scenario, MobsimTimer mobsimTimer) {
+		this.eventsManager = eventsManager;
+		this.scenario = scenario;
+		this.mobsimTimer = mobsimTimer;
     }
 
 	@Override
 	public MobsimDriverPassengerAgent createMobsimAgentFromPerson(final Person p) {
-		MobsimDriverPassengerAgent agent = PTransitAgent.createTransitAgent(p, this.simulation);
+		MobsimDriverPassengerAgent agent = PTransitAgent.createTransitAgent(p, scenario, eventsManager, mobsimTimer);
 		return agent;
 	}
 

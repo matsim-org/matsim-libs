@@ -76,7 +76,7 @@ public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProv
 	private Map<WithinDayDuringActivityReplannerFactory, Tuple<Double, Double>> duringActivityReplannerFactory;
 	private Map<WithinDayDuringLegReplannerFactory, Tuple<Double, Double>> duringLegReplannerFactory;
 	
-	private InternalInterface internalInterface;
+	//private final InternalInterface internalInterface;
 
 	@Inject
 	public WithinDayEngine(EventsManager eventsManager, GlobalConfigGroup globalConfigGroup) {
@@ -206,14 +206,14 @@ public class WithinDayEngine implements MobsimEngine, ActivityEndReschedulerProv
 		this.parallelDuringLegReplanner.afterSim();
 	}
 
-	@Override
+	/*@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
 		this.internalInterface = internalInterface;
-	}
+	}*/
 	
 	
-	@Override
+	/*@Override
 	public ActivityEndRescheduler getActivityRescheduler() {
 		return this.internalInterface;
-	}
+	}*/
 }

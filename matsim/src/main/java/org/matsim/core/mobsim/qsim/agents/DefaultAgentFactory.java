@@ -19,8 +19,11 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.PopulationUtils;
 
@@ -33,17 +36,21 @@ import javax.inject.Inject;
  */
 public final class DefaultAgentFactory implements AgentFactory {
 
-	private final Netsim simulation;
+	private final Scenario scenario;
+	private final EventsManager eventsManager;
+	private final MobsimTimer mobsimTimer;
 
 	@Inject
-	public DefaultAgentFactory(final Netsim simulation) {
-		this.simulation = simulation;
+	public DefaultAgentFactory(Scenario scenario, EventsManager eventsManager, MobsimTimer mobsimTimer) {
+		this.scenario = scenario;
+		this.eventsManager = eventsManager;
+		this.mobsimTimer = mobsimTimer;
 	}
 
 	@Override
 	public MobsimDriverAgent createMobsimAgentFromPerson(final Person p) {
 
-		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p.getSelectedPlan(), this.simulation); 
+		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p.getSelectedPlan(),scenario, eventsManager, mobsimTimer); 
 		// ( BasicPlanAgentImpl (inside PersonDriverAgentImpl) makes the plan unmodifiable. )
 		
 		return agent;

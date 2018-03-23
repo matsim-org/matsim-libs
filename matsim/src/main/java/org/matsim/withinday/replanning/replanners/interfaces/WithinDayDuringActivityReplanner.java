@@ -30,8 +30,8 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityAgen
  */
 public abstract class WithinDayDuringActivityReplanner extends WithinDayReplanner<DuringActivityAgentSelector> {
 
-	public WithinDayDuringActivityReplanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface) {
-		super(id, scenario, internalInterface);
+	public WithinDayDuringActivityReplanner(Id<WithinDayReplanner> id, Scenario scenario) {
+		super(id, scenario);
 	}
 	
 }

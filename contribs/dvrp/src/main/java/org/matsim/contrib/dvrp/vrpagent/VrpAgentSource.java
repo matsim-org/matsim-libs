@@ -26,6 +26,7 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
@@ -41,21 +42,23 @@ public class VrpAgentSource implements AgentSource {
 	private final Fleet fleet;
 	private final VrpOptimizer optimizer;
 	private final QSim qSim;
+	private final EventsManager eventsManager;
 
 	@Inject(optional = true)
 	private @Named(DVRP_VEHICLE_TYPE) VehicleType vehicleType;
 
 	@Inject
-	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, QSim qSim) {
+	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, QSim qSim, EventsManager eventsManager) {
 		this.nextActionCreator = nextActionCreator;
 		this.fleet = fleet;
 		this.optimizer = optimizer;
 		this.qSim = qSim;
+		this.eventsManager = eventsManager;
 	}
 
 	public VrpAgentSource(DynActionCreator nextActionCreator, Fleet fleet, VrpOptimizer optimizer, QSim qSim,
-			VehicleType vehicleType) {
-		this(nextActionCreator, fleet, optimizer, qSim);
+			VehicleType vehicleType, EventsManager eventsManager) {
+		this(nextActionCreator, fleet, optimizer, qSim, eventsManager);
 		this.vehicleType = vehicleType;
 	}
 
@@ -71,7 +74,7 @@ public class VrpAgentSource implements AgentSource {
 			Id<Link> startLinkId = vrpVeh.getStartLink().getId();
 
 			VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(optimizer, nextActionCreator, vrpVeh);
-			DynAgent vrpAgent = new DynAgent(Id.createPersonId(id), startLinkId, qSim.getEventsManager(),
+			DynAgent vrpAgent = new DynAgent(Id.createPersonId(id), startLinkId, eventsManager,
 					vrpAgentLogic);
 			QVehicle mobsimVehicle = new QVehicle(
 					vehicleFactory.createVehicle(Id.create(id, org.matsim.vehicles.Vehicle.class), vehicleType));

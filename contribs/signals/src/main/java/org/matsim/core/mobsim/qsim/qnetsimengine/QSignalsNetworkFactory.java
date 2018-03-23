@@ -26,8 +26,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.AgentCounter;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
 import org.matsim.vis.snapshotwriters.SnapshotLinkWidthCalculator;
 
 import com.google.inject.Inject;
@@ -45,44 +45,49 @@ public class QSignalsNetworkFactory extends QNetworkFactory{
 	private final Scenario scenario;
 	private final EventsManager events;
 	private NetsimEngineContext context;
-	private NetsimInternalInterface netsimEngine ;
+	
+	private final AgentCounter agentCounter;
+	private final MobsimTimer mobsimTimer;
 	
 	@Inject
-	public QSignalsNetworkFactory(Scenario scenario, EventsManager events) {
+	public QSignalsNetworkFactory(Scenario scenario, EventsManager events, MobsimTimer mobsimTimer, AgentCounter agentCounter) {
 		this.scenario = scenario;
 		this.events = events;
+		this.mobsimTimer = mobsimTimer;
+		this.agentCounter = agentCounter;
+		
 		if (scenario.getConfig().qsim().isUseLanes()) {
-			delegate = new QLanesNetworkFactory(events, scenario);
+			delegate = new QLanesNetworkFactory(events, scenario, mobsimTimer, agentCounter);
 		} else {
-			delegate = new DefaultQNetworkFactory(events, scenario);
+			delegate = new DefaultQNetworkFactory(events, scenario, mobsimTimer, agentCounter);
 		}
+		
+		initializeFactory();
 	}
 	
-	@Override
-	void initializeFactory(AgentCounter agentCounter, MobsimTimer mobsimTimer, NetsimInternalInterface simEngine1) {
+	private void initializeFactory() {
 		SnapshotLinkWidthCalculator linkWidthCalculator = new SnapshotLinkWidthCalculator();
 		linkWidthCalculator.setLinkWidthForVis( scenario.getConfig().qsim().getLinkWidthForVis() );
 		linkWidthCalculator.setLaneWidth( scenario.getNetwork().getEffectiveLaneWidth() );
 		
 		AbstractAgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QNetsimEngine.createAgentSnapshotInfoBuilder( scenario, linkWidthCalculator );
 		
-		this.netsimEngine = simEngine1;
 		this.context = new NetsimEngineContext( events, scenario.getNetwork().getEffectiveCellSize(), agentCounter, agentSnapshotInfoBuilder, 
 				scenario.getConfig().qsim(), mobsimTimer, linkWidthCalculator );
 		
-		delegate.initializeFactory(agentCounter, mobsimTimer, simEngine1);
+		//delegate.initializeFactory();
 	}
 
 	@Override
-	QNodeI createNetsimNode(Node node) {
-		QNodeImpl.Builder builder = new QNodeImpl.Builder( netsimEngine, context ) ;
+	QNodeI createNetsimNode(Node node, InternalInterface internalInterface) {
+		QNodeImpl.Builder builder = new QNodeImpl.Builder( internalInterface, context ) ;
 		builder.setTurnAcceptanceLogic( new SignalTurnAcceptanceLogic() ) ;
 		return builder.build( node ) ;
 	}
 
 	@Override
-	QLinkI createNetsimLink(Link link, QNodeI queueNode) {
-		return delegate.createNetsimLink(link, queueNode);
+	QLinkI createNetsimLink(Link link, QNodeI queueNode, InternalInterface internalInterface) {
+		return delegate.createNetsimLink(link, queueNode, internalInterface);
 	}
 
 }

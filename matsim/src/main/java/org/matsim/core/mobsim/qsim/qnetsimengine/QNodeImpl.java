@@ -37,8 +37,9 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.NetsimLink;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine.NetsimInternalInterface;
+import org.matsim.core.mobsim.qsim.interfaces.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.TurnAcceptanceLogic.AcceptTurn;
 
 /**
@@ -47,10 +48,10 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.TurnAcceptanceLogic.AcceptTurn;
 final class QNodeImpl implements QNodeI {
 	private static final Logger log = Logger.getLogger(QNodeImpl.class);
 	public static class Builder {
-		private final NetsimInternalInterface netsimEngine;
+		private final InternalInterface internalInterface;
 		private final NetsimEngineContext context;
-		public Builder( NetsimInternalInterface netsimEngine2, NetsimEngineContext context ) {
-			this.netsimEngine = netsimEngine2;
+		public Builder( InternalInterface internalInterface, NetsimEngineContext context ) {
+			this.internalInterface = internalInterface;
 			this.context = context;
 		}
 		private TurnAcceptanceLogic turnAcceptanceLogic = new DefaultTurnAcceptanceLogic() ;
@@ -58,7 +59,7 @@ final class QNodeImpl implements QNodeI {
 			this.turnAcceptanceLogic = turnAcceptanceLogic ;
 		}
 		public QNodeImpl build( Node n ) {
-			return new QNodeImpl( n, context, netsimEngine, turnAcceptanceLogic ) ;
+			return new QNodeImpl( n, context, internalInterface, turnAcceptanceLogic ) ;
 		}
 	}
 
@@ -83,13 +84,14 @@ final class QNodeImpl implements QNodeI {
 
 	private final Random random;
 	private final NetsimEngineContext context;
-	private final NetsimInternalInterface netsimEngine;
+	private final InternalInterface internalInterface;
+	private QNetwork network;
 	
 	private final TurnAcceptanceLogic turnAcceptanceLogic ;
 
-	private QNodeImpl(final Node n, NetsimEngineContext context, NetsimInternalInterface netsimEngine2, TurnAcceptanceLogic turnAcceptanceLogic) {
+	private QNodeImpl(final Node n, NetsimEngineContext context, InternalInterface internalInterface, TurnAcceptanceLogic turnAcceptanceLogic) {
 		this.node = n;
-		this.netsimEngine = netsimEngine2 ;
+		this.internalInterface = internalInterface ;
 		this.context = context ;
 		this.turnAcceptanceLogic = turnAcceptanceLogic;
 		int nofInLinks = this.node.getInLinks().size();
@@ -112,10 +114,11 @@ final class QNodeImpl implements QNodeI {
 	 * QueueNodes and QueueLinks.
 	 */
 	@Override
-	public void init() {
+	public void init(QNetwork network) {
+		this.network = network;
+		
 		int i = 0;
 		for (Link l : this.node.getInLinks().values()) {
-			QNetwork network = netsimEngine.getNetsimNetwork() ;
 			this.inLinksArrayCache[i] = network.getNetsimLinks().get(l.getId());
 			i++;
 		}
@@ -255,7 +258,7 @@ final class QNodeImpl implements QNodeI {
 		Id<Link> nextLinkId = veh.getDriver().chooseNextLinkId();
 		Link currentLink = veh.getCurrentLink();
 		
-		AcceptTurn turn = turnAcceptanceLogic.isAcceptingTurn(currentLink, fromLaneBuffer, nextLinkId, veh, this.netsimEngine.getNetsimNetwork());
+		AcceptTurn turn = turnAcceptanceLogic.isAcceptingTurn(currentLink, fromLaneBuffer, nextLinkId, veh, network);
 		if ( turn.equals(AcceptTurn.ABORT) ) {
 			moveVehicleFromInlinkToAbort( veh, fromLaneBuffer, now, currentLink.getId() ) ;
 			return true ;
@@ -263,7 +266,7 @@ final class QNodeImpl implements QNodeI {
 			return false;
 		}
 		
-		QLinkI nextQueueLink = this.netsimEngine.getNetsimNetwork().getNetsimLinks().get(nextLinkId);
+		QLinkI nextQueueLink = network.getNetsimLinks().get(nextLinkId);
 		QLaneI nextQueueLane = nextQueueLink.getAcceptingQLane() ;
 		if (nextQueueLane.isAcceptingFromUpstream()) {
 			moveVehicleFromInlinkToOutlink(veh, currentLink.getId(), fromLaneBuffer, nextLinkId, nextQueueLane);
@@ -301,7 +304,7 @@ final class QNodeImpl implements QNodeI {
 		for ( PassengerAgent pp : veh.getPassengers() ) {
 			if ( pp instanceof MobsimAgent ) {
 				((MobsimAgent)pp).setStateToAbort(now);
-				netsimEngine.arrangeNextAgentState((MobsimAgent)pp) ;
+				internalInterface.arrangeNextAgentState((MobsimAgent)pp) ;
 			} else if ( wrnCnt < 1 ) {
 				wrnCnt++ ; 
 				log.warn("encountering PassengerAgent that cannot be cast into a MobsimAgent; cannot say if this is a problem" ) ;
@@ -311,7 +314,7 @@ final class QNodeImpl implements QNodeI {
 
 		// now treat the driver:
 		veh.getDriver().setStateToAbort(now) ;
-		netsimEngine.arrangeNextAgentState(veh.getDriver()) ;
+		internalInterface.arrangeNextAgentState(veh.getDriver()) ;
 	
 	}
 

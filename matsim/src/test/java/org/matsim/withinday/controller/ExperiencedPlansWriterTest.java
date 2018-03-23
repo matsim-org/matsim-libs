@@ -198,8 +198,8 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 	 */
 	private static class Replanner extends WithinDayDuringActivityReplanner {
 
-		public Replanner(Id<WithinDayReplanner> id, Scenario scenario, ActivityEndRescheduler internalInterface) {
-			super(id, scenario, internalInterface);
+		public Replanner(Id<WithinDayReplanner> id, Scenario scenario) {
+			super(id, scenario);
 		}
 		
 		@Override
@@ -236,8 +236,7 @@ private static final Logger log = Logger.getLogger(ExperiencedPlansWriterTest.cl
 		@Override
 		public WithinDayDuringActivityReplanner createReplanner() {
 			Id<WithinDayReplanner> id = super.getId();
-			WithinDayDuringActivityReplanner replanner = new Replanner(id, scenario, 
-					this.getWithinDayEngine().getActivityRescheduler());
+			WithinDayDuringActivityReplanner replanner = new Replanner(id, scenario);
 			return replanner;
 		}
 	}
