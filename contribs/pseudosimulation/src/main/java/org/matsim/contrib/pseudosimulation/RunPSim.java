@@ -52,7 +52,6 @@ import org.matsim.pt.router.TransitRouter;
  * Run this class with no arguments to get printed help listing current command line options.
  */
 public class RunPSim {
-	private PSimConfigGroup pSimConfigGroup;
 	private Config config;
 	private Scenario scenario;
 	private TransitPerformanceRecorder transitPerformanceRecorder;
@@ -61,11 +60,9 @@ public class RunPSim {
 	private PlanCatcher plancatcher;
 	private PSimProvider pSimProvider;
 
-	private RunPSim(Scenario scenario) {
-		this.scenario = scenario;
-		this.config = scenario.getConfig();
-		pSimConfigGroup = new PSimConfigGroup();
-		config.addModule(pSimConfigGroup);
+	public RunPSim(Config config, PSimConfigGroup pSimConfigGroup) {
+		this.config = config;
+		this.scenario = ScenarioUtils.loadScenario(config);;
 
 		//The following line will make the controler use the events manager that doesn't check for event order.
 		//This is essential for pseudo-simulation as the PSim module generates events on a person-basis,
@@ -102,13 +99,18 @@ public class RunPSim {
 
 		}
 
-		config.controler().setCreateGraphs(false);
 
 
 	}
 
 	public static void main(String args[]) {
-		new RunPSim(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]))).run();
+		Config config = ConfigUtils.loadConfig(args[0]);
+		config.controler().setCreateGraphs(false);
+
+		PSimConfigGroup pSimConfigGroup = new PSimConfigGroup();
+		config.addModule(pSimConfigGroup);
+
+		new RunPSim(config,pSimConfigGroup).run();
 	}
 
 
