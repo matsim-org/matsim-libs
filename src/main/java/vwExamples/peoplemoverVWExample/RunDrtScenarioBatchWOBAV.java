@@ -23,6 +23,8 @@ package vwExamples.peoplemoverVWExample;
 import java.util.Arrays;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalModule;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 //import org.matsim.contrib.drt.optimizer.rebalancing.DemandBasedRebalancingStrategy;
@@ -34,6 +36,9 @@ import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 import peoplemover.ClosestStopBasedDrtRoutingModule;
 import vwExamples.peoplemoverVWExample.CustomRebalancing.DemandBasedRebalancingStrategyMy;
@@ -44,7 +49,7 @@ import vwExamples.peoplemoverVWExample.CustomRebalancing.ZonalRelocationAggregat
 
 /** * @author axer */
 
-public class RunDrtScenarioBatchWOBDetourTest {
+public class RunDrtScenarioBatchWOBAV {
 	
 	//Class to create the controller
 	public static Controler createControler(Config config, boolean otfvis) {
@@ -80,16 +85,24 @@ public class RunDrtScenarioBatchWOBDetourTest {
 			//Define the path to the config file and enable / disable otfvis
 			final Config config = ConfigUtils.loadConfig("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\input\\config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 			
+			Scenario scenario = ScenarioUtils.loadScenario(config);
+			
+            VehicleType avType = new VehicleTypeImpl(Id.create("drt", VehicleType.class));
+            double avFactor = 1.0;
+            avType.setFlowEfficiencyFactor(avFactor);
+            scenario.getVehicles().addVehicleType(avType);
 
 			//OTFVis is an open source, OpenGL-based visualizer for looking at MATSim scenarios and output.
 			//With this switch we could disable/enable the visualization.
 			boolean otfvis = false;
 			
 			//Overwrite existing configuration parameters
-			config.plans().setInputFile("population/vw218_it_"+i+"_sampleRate0.1replaceRate_0.5_pt_drt.xml.gz");
+			config.plans().setInputFile("population/vw218_it_"+i+"_sampleRate0.1replaceRate_1.0_pt_drt.xml.gz");
 			config.controler().setLastIteration(5); //Number of simulation iterations
 			config.controler().setWriteEventsInterval(1); //Write Events file every x-Iterations 
 			config.controler().setWritePlansInterval(1); //Write Plan file every x-Iterations
+			config.qsim().setFlowCapFactor(0.12);
+			config.qsim().setStorageCapFactor(0.24);
 
 			config.network().setInputFile("network/network_area_wob_withDRT_links.xml.gz");
 			
@@ -110,14 +123,14 @@ public class RunDrtScenarioBatchWOBDetourTest {
 			drt.setMaxWalkDistance(500.0);
 			
 			
-			String runId = "it_"+i+"_sampleRate0.1replaceRate_0.5_pt_drt_200veh";
+			String runId = "it_"+i+"_sampleRate0.1replaceRate_1.0_pt_drt_60veh_AV_"+avFactor;
 			config.controler().setRunId(runId);
 			
 			config.controler().setOutputDirectory("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\output\\"+runId); //Define dynamically the the output path
 			
 			
 			//For each demand scenario we are using a predefined drt vehicle fleet size 
-			drt.setVehiclesFile("fleets/fleet_200.xml.gz");
+			drt.setVehiclesFile("fleets/fleet_60.xml.gz");
 			
 			
 			//Define the MATSim Controler
