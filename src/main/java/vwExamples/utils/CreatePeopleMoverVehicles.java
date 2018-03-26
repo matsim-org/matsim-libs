@@ -55,7 +55,7 @@ public class CreatePeopleMoverVehicles {
 	static String networkfolder = networkfile.getParent();
 	static int increment = 10;
 	static String drtTag = "drt";
-	static int numberOfVehicles = 500;
+	static int numberOfVehicles = 800;
 
 	public static void main(String[] args) {
 		

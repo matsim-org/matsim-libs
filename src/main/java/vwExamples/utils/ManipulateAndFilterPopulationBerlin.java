@@ -58,12 +58,12 @@ public class ManipulateAndFilterPopulationBerlin {
 	Set<String> zones = new HashSet<>();
 	Map<String, Geometry> zoneMap = new HashMap<>();
 	String shapeFile = "D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\shapes\\Prognoseraum_EPSG_31468.shp";
-	String zoneList[] = {"0101"};
+	String zoneList[] = {"0101","0102","0201","0202","0203","0204","0307","0403","0405","0701","0702"};
 	static String[] serachMode = {"ptSlow","pt"};
 	static String newMode = "drt";
 	String shapeFeature = "SCHLUESSEL";
 	static double samplePct = 1.0; //Global sample ratio
-	static double replancementPct = 0.5; //Ratio of mode substitution 
+	static double replancementPct = 0.05; //Ratio of mode substitution 
 	
 	//Constructor which reads the shape file for later use!
 	public ManipulateAndFilterPopulationBerlin() {
@@ -80,8 +80,8 @@ public static void main(String[] args) {
 		//Create a Scenario
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		//Fill this Scenario with a population.
-		new PopulationReader(scenario).readFile("D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\population\\be_251.output_plans_selected.xml.gz");
-		String filteredPopDesination = ("D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\population\\be_251_it_"+i+"_sampleRate"+samplePct+"replaceRate_"+replancementPct+"_"+Arrays.toString(serachMode)+"_"+newMode+".xml.gz");
+		new PopulationReader(scenario).readFile("D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\population\\be_251.output_plans_selected_1.0upsampleWithRoutes.xml.gz");
+		String filteredPopDesination = ("D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\population\\be_251_wRoutes_1.0_it_"+i+"_sampleRate"+samplePct+"replaceRate_"+replancementPct+"_"+Arrays.toString(serachMode)+"_"+newMode+".xml.gz");
 		StreamingPopulationWriter filteredPop = new StreamingPopulationWriter();
 		filteredPop.startStreaming(filteredPopDesination);
 		int drtTrips = 0;
@@ -251,18 +251,21 @@ public static String getPtTransportMode(Leg leg, Map<Id<TransitLine>,TransitLine
 public static boolean isWithinZone(Coord coord, Map<String, Geometry> zoneMap, String[] zoneList){
 	//Function assumes EPSG:25832
 	
-	boolean relevantCoord = false;
+
 	for (String zone : zoneMap.keySet()) {
 		
-		//If the zone does  fit to the require zonePrefix
-		if(Arrays.asList(zoneList).contains(zone)) continue;
-		Geometry geometry = zoneMap.get(zone);
-		if(geometry.contains(MGC.coord2Point(coord))) relevantCoord=true;
-
+		//If the zone does fit to the require zoneList
+		if(Arrays.asList(zoneList).contains(zone)) {
+			Geometry geometry = zoneMap.get(zone);
+			if(geometry.intersects(MGC.coord2Point(coord)))
+				{
+				//System.out.println("Coordinate in "+ zone);
+				return true;
+				}
+		}
 	}
-	if (relevantCoord) return true;
-	else return false;
-		
+	
+	return false;	
 }
 
 

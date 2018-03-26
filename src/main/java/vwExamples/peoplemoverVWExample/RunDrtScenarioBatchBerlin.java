@@ -86,7 +86,7 @@ public class RunDrtScenarioBatchBerlin {
 			boolean otfvis = false;
 			
 			//Overwrite existing configuration parameters
-			config.plans().setInputFile("population/be_251_it_1_sampleRate1.0replaceRate_0.5_[ptSlow, pt]_drt.xml.gz");
+			config.plans().setInputFile("population/be_251_wRoutes_1.0_it_1_sampleRate1.0replaceRate_0.05_[ptSlow, pt]_drt.xml.gz");
 			config.controler().setLastIteration(5); //Number of simulation iterations
 			config.controler().setWriteEventsInterval(1); //Write Events file every x-Iterations 
 			config.controler().setWritePlansInterval(1); //Write Plan file every x-Iterations
@@ -107,7 +107,7 @@ public class RunDrtScenarioBatchBerlin {
 			drt.setMaxWaitTime(500);
 			drt.setStopDuration(stoptime);
 			drt.setTransitStopFile("../input/virtualstops/stopsGrid_600m.xml");
-			drt.setMaxWalkDistance(500.0);
+			drt.setMaxWalkDistance(1000.0);
 			
 			
 			String runId = "berlinTest";
@@ -117,7 +117,7 @@ public class RunDrtScenarioBatchBerlin {
 			
 			
 			//For each demand scenario we are using a predefined drt vehicle fleet size 
-			drt.setVehiclesFile("fleets/fleet_500.xml.gz");
+			drt.setVehiclesFile("fleets/fleet_100.xml.gz");
 			
 			
 			//Define the MATSim Controler

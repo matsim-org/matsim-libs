@@ -62,7 +62,7 @@ public class ManipulateAndFilterPopulationBSWOB {
 	static String newMode = "drt";
 	String shapeFeature = "NO";
 	static double samplePct = 0.10; //Global sample ratio
-	static double replancementPct = 0.5; //Ratio of mode substitution 
+	static double replancementPct = 1.0; //Ratio of mode substitution 
 	static int instanceNumber = 5;
 	
 	//Constructor which reads the shape file for later use!

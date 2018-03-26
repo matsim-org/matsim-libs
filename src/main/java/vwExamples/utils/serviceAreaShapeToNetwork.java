@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkWriter;
@@ -19,6 +20,7 @@ import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
+import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.networkEditor.utils.GeometryTools;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -37,8 +39,9 @@ public class serviceAreaShapeToNetwork {
 	static String drtTag = "drt";
 	Network network = NetworkUtils.createNetwork();
 	String shapeFeature = "SCHLUESSEL";
-	String zoneList[] = {"0101"};
-	double bufferRange = 500;
+	String zoneList[] = {"0101","0102","0201","0202","0203","0204","0307","0403","0405","0701","0702"};
+	double bufferRange = 700;
+	Map<Id<Link>,String> linkToZoneMap = new HashMap<>();
 
 
 	public serviceAreaShapeToNetwork() { 
@@ -54,17 +57,46 @@ public class serviceAreaShapeToNetwork {
 		serviceArea.assignServiceAreatoNetwork();
 	}
 	
-	
+	private void initalizeLinkMap()
+	{
+		
+		new MatsimNetworkReader(this.network).readFile(networkFile.toString());
+		int linkNumber = this.network.getLinks().values().size();
+		int linkCounter = 0;
+		for (Link l : this.network.getLinks().values())
+		{
+			//Construct a LineSegment from link coordinates
+			Coordinate start = new Coordinate(l.getFromNode().getCoord().getX(), l.getFromNode().getCoord().getY());
+			Coordinate end = new Coordinate(l.getToNode().getCoord().getX(), l.getToNode().getCoord().getY()); 
+			LineSegment lineSegment = new LineSegment(start, end);
+			
+			GeometryFactory f = new GeometryFactory();
+			
+			for (String z : Arrays.asList(zoneList) )
+			{
+				Geometry zone = this.zoneMap.get(z);
+				if (zone.buffer(this.bufferRange).intersects(lineSegment.toGeometry(f)))
+				{
+					//System.out.println("Put link: " +l.getId() + " to zone: " +z);
+					this.linkToZoneMap.put(l.getId(), z);
+					continue;
+				}
+			}
+			linkCounter+=1;
+			System.out.println(linkCounter + " out of " +linkNumber );
+		}
+	}
 	
 	private void assignServiceAreatoNetwork() {
-		//Load Network
-		new MatsimNetworkReader(this.network).readFile(networkFile.toString());
-				
+//		//Load Network
+//		new MatsimNetworkReader(this.network).readFile(networkFile.toString());
+		initalizeLinkMap();
+		
 		int i = 0;
 		for (Link l : this.network.getLinks().values())
 		{
 
-			if (isServiceAreaLink(l,this.zoneList))
+			if (isServiceAreaLinkMap(l,this.zoneList))
 			{ 
 				Set<String> modes = new HashSet<>();
 				modes.addAll(l.getAllowedModes());
@@ -100,8 +132,10 @@ public class serviceAreaShapeToNetwork {
 		
 		//1. Link needs to be in geographical area
 		
-		for (String z : zoneList)
+		boolean relevantLink = false;
+		for (String z : Arrays.asList(zoneList) )
 		{
+			//System.out.println("Check zone: "+z);
 			//Get geometry for zone 
 			Geometry zone = zoneMap.get(z);
 			
@@ -110,13 +144,26 @@ public class serviceAreaShapeToNetwork {
 				//2. Link needs to be already available for car
 				if (l.getAllowedModes().contains("car")) 
 				{
-					return true;
 					
-				} else return false;
+					relevantLink = true;
+					return relevantLink;
+					
+				} 
 				
-			} else return false;
+			}
+			
+			
 		}
 		
+		return relevantLink;
+		
+	}
+	
+	private boolean isServiceAreaLinkMap(Link l, String[] zoneList) {
+
+		String linkZone = this.linkToZoneMap.get(l.getId());
+		if(Arrays.asList(zoneList).contains(linkZone)) return true;
+				
 		return false;
 		
 	}
