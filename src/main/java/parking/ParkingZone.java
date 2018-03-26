@@ -20,7 +20,9 @@
 package parking;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
@@ -76,6 +78,12 @@ public class ParkingZone implements Identifiable<ParkingZone> {
             linkToParkingProbs.put( entry.getKey(), entry.getValue() / this.zoneParkingCapacity);
         }
         return linkToParkingProbs;
+    }
+    
+    public Set<Id<Link>> getLinksInZone(){
+    	Set<Id<Link>> links = new HashSet<Id<Link>>();
+    	links.addAll(this.linkToParkingCapacity.keySet());
+    	return links;
     }
 
     @Override

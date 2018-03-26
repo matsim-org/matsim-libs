@@ -6,6 +6,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ScoringParameterSe
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.scoring.functions.ScoringParameters;
 
+import parking.analysis.ParkingAnalysisListener;
+import parking.analysis.ParkingOccupancyEventHandler;
 import parking.capacityCalculation.LinkLengthBasedCapacityCalculator;
 import parking.capacityCalculation.LinkParkingCapacityCalculator;
 import parking.capacityCalculation.UseParkingCapacityFromNetwork;
@@ -38,5 +40,7 @@ public class ParkingRouterModule extends AbstractModule {
 	        }
 		    bind(ZonalLinkParkingInfo.class).asEagerSingleton();;
 		    addRoutingModuleBinding(TransportMode.car).toProvider(new ParkingRouterRoutingModuleProvider(TransportMode.car));
+		    bind(ParkingOccupancyEventHandler.class).asEagerSingleton();
+		    addControlerListenerBinding().to(ParkingAnalysisListener.class).asEagerSingleton();
 		}
 	}
