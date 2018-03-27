@@ -35,6 +35,7 @@ import lsp.LogisticsSolutionImpl;
 import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
 import lsp.controler.LSPModule;
+import lsp.events.EventUtils;
 import lsp.functions.Info;
 import lsp.functions.InfoFunctionValue;
 import lsp.replanning.LSPReplanningModuleImpl;
@@ -122,7 +123,7 @@ public static LSP createLSPWithTracker(Network network) {
 		Id<LSP> collectionLSPId = Id.create("CollectionLSP", LSP.class);
 		collectionLSPBuilder.setId(collectionLSPId);
 		
-		//The exogenous list of Resoruces for the SolutuionScheduler is compiled and the Scheduler is added to the LSPBuilder 
+		//The exogenous list of Resoruces for the SolutionScheduler is compiled and the Scheduler is added to the LSPBuilder 
 		ArrayList<Resource> resourcesList = new ArrayList<Resource>();
 		resourcesList.add(collectionAdapter);
 		SolutionScheduler simpleScheduler = new SimpleForwardSolutionScheduler(resourcesList);
@@ -195,7 +196,7 @@ public static LSP createLSPWithTracker(Network network) {
         ArrayList<LSP> lspList = new ArrayList<LSP>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);	
-		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps));
+		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
 
 	  //Start the Mobsim one iteration is sufficient for tracking
 		Controler controler = new Controler(config);

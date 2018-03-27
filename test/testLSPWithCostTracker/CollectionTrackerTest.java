@@ -1,5 +1,6 @@
 package testLSPWithCostTracker;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -15,19 +16,33 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities;
 import org.matsim.contrib.freight.carrier.CarrierImpl;
+import org.matsim.contrib.freight.carrier.CarrierPlan;
+import org.matsim.contrib.freight.carrier.CarrierService;
 import org.matsim.contrib.freight.carrier.CarrierVehicle;
 import org.matsim.contrib.freight.carrier.CarrierVehicleType;
+import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.carrier.Tour;
+import org.matsim.contrib.freight.carrier.Tour.End;
+import org.matsim.contrib.freight.carrier.Tour.Leg;
+import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
+import org.matsim.contrib.freight.carrier.Tour.Start;
+import org.matsim.contrib.freight.carrier.Tour.TourElement;
+import org.matsim.contrib.freight.jsprit.NetworkBasedTransportCosts;
+import org.matsim.contrib.freight.jsprit.NetworkRouter;
 import org.matsim.contrib.freight.carrier.CarrierCapabilities.FleetSize;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
+import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
 import lsp.controler.LSPModule;
+import lsp.events.EventUtils;
 import lsp.functions.Info;
 import lsp.functions.InfoFunctionValue;
 import lsp.LSP;
@@ -45,6 +60,7 @@ import lsp.resources.Resource;
 import lsp.scoring.LSPScoringModuleImpl;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
+import lsp.tracking.SimulationTracker;
 import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
 import lsp.usecase.DeterministicShipmentAssigner;
@@ -60,6 +76,7 @@ public class CollectionTrackerTest {
 	private Resource collectionAdapter;
 	private LogisticsSolutionElement collectionElement;
 	private LogisticsSolution collectionSolution;
+	private double shareOfFixedCosts;
 	
 	@Before
 	public void initialize() {
@@ -114,8 +131,8 @@ public class CollectionTrackerTest {
 		collectionSolutionBuilder.addSolutionElement(collectionElement);
 		collectionSolution = collectionSolutionBuilder.build();
 		
-		
-        LinearCostTracker tracker = new LinearCostTracker(0.2);
+		shareOfFixedCosts = 0.2;
+        LinearCostTracker tracker = new LinearCostTracker(shareOfFixedCosts);
 		tracker.getEventHandlers().add(new TourStartHandler());
 		tracker.getEventHandlers().add(new CollectionServiceHandler());
 		tracker.getEventHandlers().add(new DistanceAndTimeHandler(network));
@@ -180,7 +197,7 @@ public class CollectionTrackerTest {
 		
 		Controler controler = new Controler(config);
 		
-		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps));
+		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
 
 		controler.addOverridingModule(module);
 		config.controler().setFirstIteration(0);
@@ -192,6 +209,102 @@ public class CollectionTrackerTest {
 	
 	@Test
 	public void testCollectionTracker() {
+		assertTrue(collectionSolution.getSimulationTrackers().size() == 1);
+		SimulationTracker tracker = collectionSolution.getSimulationTrackers().iterator().next();
+		assertTrue(tracker instanceof LinearCostTracker);
+		LinearCostTracker linearTracker = (LinearCostTracker) tracker;
+		double totalScheduledCosts = 0;
+		double totalTrackedCosts = 0;
+		double totalScheduledWeight = 0;
+		double totalTrackedWeight = 0;
+		int totalNumberOfScheduledShipments = 0;
+		int totalNumberOfTrackedShipments = 0;
+		for(EventHandler handler : linearTracker.getEventHandlers()) {
+			if(handler instanceof TourStartHandler) {
+				TourStartHandler startHandler = (TourStartHandler) handler;
+				double scheduledCosts = 0;
+				for(ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+					scheduledCosts += scheduledTour.getVehicle().getVehicleType().getVehicleCostInformation().fix;
+					totalScheduledCosts += scheduledCosts;
+				}
+				double trackedCosts = startHandler.getVehicleFixedCosts();
+				totalTrackedCosts += trackedCosts;
+				assertEquals(trackedCosts, scheduledCosts, 0.1);
+			}
+			if(handler instanceof CollectionServiceHandler) {
+				CollectionServiceHandler serviceHandler = (CollectionServiceHandler) handler;
+				totalTrackedWeight = serviceHandler.getTotalWeightOfShipments();
+				totalNumberOfTrackedShipments = serviceHandler.getTotalNumberOfShipments();
+				double scheduledCosts = 0;
+				for(ScheduledTour scheduledTour: carrier.getSelectedPlan().getScheduledTours()) {
+					Tour tour = scheduledTour.getTour();
+					for(TourElement element : tour.getTourElements()) {
+						if(element instanceof ServiceActivity){
+							ServiceActivity activity = (ServiceActivity) element;
+							scheduledCosts += activity.getService().getServiceDuration() * scheduledTour.getVehicle().getVehicleType().getVehicleCostInformation().perTimeUnit;
+							totalScheduledCosts += scheduledCosts;
+							totalScheduledWeight += activity.getService().getCapacityDemand();
+							totalNumberOfScheduledShipments++;
+						}
+					}
+				}
+				double trackedCosts = serviceHandler.getTotalLoadingCosts();
+				totalTrackedCosts += trackedCosts;
+				assertEquals(trackedCosts, scheduledCosts, 0.1);
+			}
+			if(handler instanceof DistanceAndTimeHandler) {
+				DistanceAndTimeHandler distanceHandler = (DistanceAndTimeHandler) handler;
+				double trackedTimeCosts = distanceHandler.getTimeCosts();
+				totalTrackedCosts += trackedTimeCosts;
+				double scheduledTimeCosts = 0;			
+				for(ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {	
+					Tour tour = scheduledTour.getTour();
+					for(TourElement element : tour.getTourElements() ) {
+						if(element instanceof Leg) {
+							Leg leg = (Leg) element;
+							scheduledTimeCosts += leg.getExpectedTransportTime() * scheduledTour.getVehicle().getVehicleType().getVehicleCostInformation().perTimeUnit;
+						}
+					}
+				}
+				totalScheduledCosts += scheduledTimeCosts;
+				assertEquals(scheduledTimeCosts, trackedTimeCosts, Math.max(scheduledTimeCosts,trackedTimeCosts)*0.01);
+				
+				double scheduledDistanceCosts = 0;
+				double trackedDistanceCosts = distanceHandler.getDistanceCosts();
+				totalTrackedCosts += trackedDistanceCosts;
+				for(ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
+					scheduledDistanceCosts += network.getLinks().get(scheduledTour.getTour().getEndLinkId()).getLength() * scheduledTour.getVehicle().getVehicleType().getVehicleCostInformation().perDistanceUnit;
+					for(TourElement element : scheduledTour.getTour().getTourElements()) {
+						System.out.println(element);
+						if(element instanceof Leg) {
+							Leg leg = (Leg) element;
+							NetworkRoute linkRoute = (NetworkRoute) leg.getRoute();
+							for(Id<Link> linkId: linkRoute.getLinkIds()) {
+								scheduledDistanceCosts  += network.getLinks().get(linkId).getLength() * scheduledTour.getVehicle().getVehicleType().getVehicleCostInformation().perDistanceUnit;
+							}			
+						}
+						if(element instanceof ServiceActivity) {
+							ServiceActivity activity = (ServiceActivity) element;
+							scheduledDistanceCosts  += network.getLinks().get(activity.getLocation()).getLength() * scheduledTour.getVehicle().getVehicleType().getVehicleCostInformation().perDistanceUnit;
+						}					
+					}
+				}
+				totalScheduledCosts += scheduledDistanceCosts;
+				assertEquals(scheduledDistanceCosts, trackedDistanceCosts, Math.max(scheduledDistanceCosts,trackedDistanceCosts)*0.01);
+			}	
+		}	
+	
+		double linearTrackedCostsPerShipment = (totalTrackedCosts * (1-shareOfFixedCosts))/totalTrackedWeight;
+		double linearScheduledCostsPerShipment = (totalScheduledCosts * (1-shareOfFixedCosts))/totalScheduledWeight;
+		double fixedTrackedCostsPerShipment = (totalTrackedCosts * shareOfFixedCosts)/totalNumberOfTrackedShipments;
+		double fixedScheduledCostsPerShipment = (totalScheduledCosts * shareOfFixedCosts)/totalNumberOfScheduledShipments;
+		
+		assertEquals(totalTrackedWeight, totalTrackedWeight, 0);
+		assertEquals(totalNumberOfTrackedShipments, totalNumberOfScheduledShipments, 0);
+		assertEquals(totalTrackedCosts, totalScheduledCosts, Math.max(totalScheduledCosts, totalTrackedCosts)*0.01);
+		assertEquals(linearTrackedCostsPerShipment, linearScheduledCostsPerShipment, Math.max(linearTrackedCostsPerShipment, linearScheduledCostsPerShipment)*0.01);
+		assertEquals(fixedScheduledCostsPerShipment, fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment, fixedScheduledCostsPerShipment)*0.01);
+		
 		assertTrue(collectionSolution.getInfos().size() == 1);
 		Info info = collectionSolution.getInfos().iterator().next();
 		assertTrue(info instanceof CostInfo);
@@ -199,12 +312,17 @@ public class CollectionTrackerTest {
 		assertTrue(costInfo.getFunction() instanceof CostInfoFunction);
 		CostInfoFunction function = (CostInfoFunction) costInfo.getFunction();
 		ArrayList<InfoFunctionValue> values = new ArrayList<InfoFunctionValue>(function.getValues());
-		assertTrue(values.get(0).getDataType() == Double.class);
-		assertTrue(Double.valueOf(values.get(0).getValue()) > 0);
-		System.out.println(Double.valueOf(values.get(0).getValue()));
-		assertTrue(values.get(1).getDataType() == Double.class);
-		assertTrue(Double.valueOf(values.get(1).getValue()) > 0);
-		System.out.println(Double.valueOf(values.get(0).getValue()));
+		for(InfoFunctionValue value : values) {
+			if(value instanceof LinearCostFunctionValue) {
+				LinearCostFunctionValue linearValue = (LinearCostFunctionValue) value;
+				assertEquals(Double.parseDouble(linearValue.getValue()),linearTrackedCostsPerShipment, Math.max(linearTrackedCostsPerShipment,Double.parseDouble(linearValue.getValue())) * 0.01 );
+				assertEquals(Double.parseDouble(linearValue.getValue()),linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment,Double.parseDouble(linearValue.getValue())) * 0.01 );
+			}
+			if(value instanceof FixedCostFunctionValue) {
+				FixedCostFunctionValue fixedValue = (FixedCostFunctionValue) value;
+				assertEquals(Double.parseDouble(fixedValue.getValue()),fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment,Double.parseDouble(fixedValue.getValue())) * 0.01 );
+				assertEquals(Double.parseDouble(fixedValue.getValue()),fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment,Double.parseDouble(fixedValue.getValue())) * 0.01 );
+			}
+		}
 	}
-	
 }

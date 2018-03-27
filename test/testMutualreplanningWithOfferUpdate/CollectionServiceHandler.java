@@ -5,13 +5,13 @@ import java.util.Collection;
 
 import org.matsim.contrib.freight.carrier.CarrierService;
 
-import lsp.events.ServiceBeginsEvent;
-import lsp.events.ServiceBeginsEventHandler;
-import lsp.events.ServiceCompletedEvent;
-import lsp.events.ServiceCompletedEventHandler;
+import lsp.events.ServiceStartEvent;
+import lsp.events.ServiceStartEventHandler;
+import lsp.events.ServiceEndEvent;
+import lsp.events.ServiceEndEventHandler;
 
 
-public class CollectionServiceHandler implements ServiceBeginsEventHandler, ServiceCompletedEventHandler{
+public class CollectionServiceHandler implements ServiceStartEventHandler, ServiceEndEventHandler{
 
 	
 	
@@ -52,7 +52,7 @@ public class CollectionServiceHandler implements ServiceBeginsEventHandler, Serv
 	}
 
 	@Override
-	public void handleEvent(ServiceCompletedEvent event) {
+	public void handleEvent(ServiceEndEvent event) {
 		double loadingCosts = 0;
 		for(ServiceTuple tuple : tuples) {
 			if(tuple.getService() == event.getService()) {
@@ -66,7 +66,7 @@ public class CollectionServiceHandler implements ServiceBeginsEventHandler, Serv
 	}
 
 	@Override
-	public void handleEvent(ServiceBeginsEvent event) {
+	public void handleEvent(ServiceStartEvent event) {
 		totalNumberOfShipments++;
 		totalWeightOfShipments = totalWeightOfShipments + event.getService().getCapacityDemand();
 		tuples.add(new ServiceTuple(event.getService(), event.getTime()));

@@ -43,6 +43,7 @@ import lsp.LogisticsSolutionImpl;
 import lsp.ShipmentAssigner;
 import lsp.SolutionScheduler;
 import lsp.controler.LSPModule;
+import lsp.events.EventUtils;
 import lsp.replanning.LSPReplannerImpl;
 import lsp.replanning.LSPReplanningModuleImpl;
 import lsp.resources.Resource;
@@ -194,7 +195,7 @@ public class ExampleLSPReplanning {
         ArrayList<LSP> lspList = new ArrayList<LSP>();
 		lspList.add(lsp);
 		LSPs lsps = new LSPs(lspList);	
-		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps));
+		LSPModule module = new LSPModule(lsps, new LSPReplanningModuleImpl(lsps), new LSPScoringModuleImpl(lsps), EventUtils.getStandardEventCreators());
 
 	  //Start the Mobsim two iterations are necessary for replanning
 		Controler controler = new Controler(config);

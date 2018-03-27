@@ -259,10 +259,10 @@ public class CompleteLSPSchedulingTest {
 	
 		ArrayList <Link> linkList = new ArrayList<Link>(network.getLinks().values());
 		Random rand = new Random(1);
-		 for(int i = 1; i < 6; i++) {
+		 for(int i = 1; i < 2; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 	        	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
-	        	int capacityDemand = rand.nextInt(10);
+	        	int capacityDemand = rand.nextInt(4);
 	        	builder.setCapacityDemand(capacityDemand);
 	        	
 	        	while(true) {

@@ -21,6 +21,7 @@ import org.matsim.contrib.freight.carrier.CarrierVehicleType;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.carrier.ScheduledTour;
 import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.carrier.Tour;
 import org.matsim.contrib.freight.carrier.Tour.Leg;
 import org.matsim.contrib.freight.carrier.Tour.ServiceActivity;
 import org.matsim.contrib.freight.carrier.Tour.TourElement;
@@ -227,8 +228,6 @@ public class CollectionLSPSchedulingTest {
 			assertTrue(endHandler.getElement() == planElements.get(1).getSolutionElement());
 			assertTrue(endHandler.getLspShipment() == shipment);
 			assertTrue(endHandler.getResourceId() == planElements.get(0).getResourceId());
-		}
-	
+		}		
 	}
-
 }
