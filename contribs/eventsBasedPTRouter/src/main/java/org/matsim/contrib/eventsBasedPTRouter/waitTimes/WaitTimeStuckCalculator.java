@@ -58,7 +58,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * @author sergioo
  */
 @Singleton
-public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler, Provider<WaitTime> {
+public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler, WaitTimeCalculator {
 	
 	//Attributes
 	private final double timeSlot;
@@ -114,7 +114,7 @@ public class WaitTimeStuckCalculator implements PersonDepartureEventHandler, Per
 	}
 
 	//Methods
-	private double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
+	public double getRouteStopWaitTime(Id<TransitLine> lineId, Id<TransitRoute> routeId, Id<TransitStopFacility> stopId, double time) {
 		Tuple<Id<TransitLine>, Id<TransitRoute>> key = new Tuple<Id<TransitLine>, Id<TransitRoute>>(lineId, routeId);
 		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId);
 		if(waitTimeData.getNumData((int) (time/timeSlot))==0) {

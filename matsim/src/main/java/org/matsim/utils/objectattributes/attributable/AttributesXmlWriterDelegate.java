@@ -1,7 +1,7 @@
 package org.matsim.utils.objectattributes.attributable;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Writer;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.jaxb.lanedefinitions20.ObjectFactory;
 import org.matsim.jaxb.lanedefinitions20.XMLAttributeType;
@@ -41,13 +40,13 @@ public class AttributesXmlWriterDelegate {
 		this.converters.put(Long.class, new LongConverter());
 	}
 
-	public final void writeAttributes(final String indentation, final Writer writer, final Attributes attributes) {
+	public final void writeAttributes(final String indentation, final BufferedWriter writer, final Attributes attributes) {
 		if (attributes.keys.length == 0)
 			return;
 		try {
 			writer.write(indentation);
 			writer.write("<attributes>");
-			writer.write("\n");
+			writer.newLine();
 
 			// sort attributes by name
 			Map<String, Object> objAttributes = new TreeMap<>();
@@ -64,13 +63,13 @@ public class AttributesXmlWriterDelegate {
 				AttributeConverter<?> conv = this.converters.get(clazz);
 				if (conv != null) {
 					writer.write(indentation + "\t");
-					writer.write("<attribute name=\"" + MatsimXmlWriter.encodeAttributeValue(objAttribute.getKey()) + "\" ");
+					writer.write("<attribute name=\"" + objAttribute.getKey() + "\" ");
 					writer.write("class=\"" + clazz.getCanonicalName() + "\" >");
-					writer.write(MatsimXmlWriter.encodeContent(conv.convertToString(objAttribute.getValue())));
+					writer.write(conv.convertToString(objAttribute.getValue()));
 					writer.write("</attribute>");
-					writer.write("\n");
+					writer.newLine();
 				} else {
-					if (this.missingConverters.add(clazz)) {
+					if (missingConverters.add(clazz)) {
 						log.warn("No AttributeConverter found for class " + clazz.getCanonicalName() + ". Not all attribute values will be written.");
 					}
 				}
@@ -78,7 +77,7 @@ public class AttributesXmlWriterDelegate {
 
 			writer.write(indentation);
 			writer.write("</attributes>");
-			writer.write("\n");
+			writer.newLine();
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

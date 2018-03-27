@@ -39,7 +39,6 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.pt.transitSchedule.api.TransitStopArea;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.utils.objectattributes.attributable.Attributes;
 import org.matsim.utils.objectattributes.attributable.AttributesUtils;
 
 import java.io.ByteArrayInputStream;
@@ -70,7 +69,7 @@ public class TransitScheduleIOTest {
 
 			schedule.getMinimalTransferTimes().set(stop1.getId(), stop2.getId(), 300.0);
 			schedule.getMinimalTransferTimes().set(stop2.getId(), stop1.getId(), 360.0);
-
+;
 			TransitLine line1 = f.createTransitLine(Id.create("blue", TransitLine.class));
 			line1.getAttributes().putAttribute("color", "like the sky");
 			line1.getAttributes().putAttribute("operator", "higher being");
@@ -153,48 +152,6 @@ public class TransitScheduleIOTest {
 		Departure dep2 = route1.getDepartures().get(Id.create("last", Departure.class));
 		Assert.assertNotNull(dep2);
 		Assert.assertTrue(AttributesUtils.isEmpty(dep2.getAttributes()));
+
 	}
-
-	@Test
-	public void testWriteRead_V2_specialAttributes() {
-		TransitScheduleFactory f = new TransitScheduleFactoryImpl();
-		TransitSchedule schedule = f.createTransitSchedule();
-
-		addSpecialAttributes(schedule.getAttributes());
-		TransitStopFacility f1 = f.createTransitStopFacility(Id.create("1", TransitStopFacility.class), new Coord(123, 456), false);
-		schedule.addStopFacility(f1);
-		addSpecialAttributes(f1.getAttributes());
-
-		// write data
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		new TransitScheduleWriterV2(schedule).write(outputStream);
-
-		// to see the actual XML written:
-		String dataWritten = new String(outputStream.toByteArray());
-		System.out.println(dataWritten);
-
-		// read data
-		ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
-		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new TransitScheduleReader(scenario).readStream(inputStream);
-
-		TransitSchedule schedule2 = scenario.getTransitSchedule();
-		assertSpecialAttributes(schedule2.getAttributes());
-		assertSpecialAttributes(schedule2.getFacilities().get(f1.getId()).getAttributes());
-	}
-
-	private void addSpecialAttributes(Attributes attributes) {
-		attributes.putAttribute("normal", "one");
-		attributes.putAttribute("special", "two, three & four % five");
-		attributes.putAttribute("special&2", "six # seven");
-		attributes.putAttribute("special<3>\"'", "eight > nine < ten\"'");
-	}
-
-	private void assertSpecialAttributes(Attributes attributes) {
-		Assert.assertEquals("one", attributes.getAttribute("normal"));
-		Assert.assertEquals("two, three & four % five", attributes.getAttribute("special"));
-		Assert.assertEquals("six # seven", attributes.getAttribute("special&2"));
-		Assert.assertEquals("eight > nine < ten\"'", attributes.getAttribute("special<3>\"'"));
-	}
-
 }
