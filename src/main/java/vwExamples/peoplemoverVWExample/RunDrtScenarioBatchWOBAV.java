@@ -33,6 +33,7 @@ import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.core.config.*;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
@@ -40,6 +41,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleTypeImpl;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
+
+import com.google.inject.name.Names;
+
 import peoplemover.ClosestStopBasedDrtRoutingModule;
 import vwExamples.peoplemoverVWExample.CustomRebalancing.DemandBasedRebalancingStrategyMy;
 import vwExamples.peoplemoverVWExample.CustomRebalancing.RelocationWriter;
@@ -90,7 +94,6 @@ public class RunDrtScenarioBatchWOBAV {
             VehicleType avType = new VehicleTypeImpl(Id.create("drt", VehicleType.class));
             double avFactor = 1.0;
             avType.setFlowEfficiencyFactor(avFactor);
-            scenario.getVehicles().addVehicleType(avType);
 
 			//OTFVis is an open source, OpenGL-based visualizer for looking at MATSim scenarios and output.
 			//With this switch we could disable/enable the visualization.
@@ -187,7 +190,12 @@ public class RunDrtScenarioBatchWOBAV {
 				}
 			});
 			
-			
+			controler.addOverridingModule(new AbstractModule() {
+				@Override
+				public void install() {
+					bind(VehicleType.class).annotatedWith(Names.named(VrpAgentSource.DVRP_VEHICLE_TYPE)).toInstance(avType);
+				}
+			});
 			
 			//We finally run the controller to start MATSim
 			controler.run();
