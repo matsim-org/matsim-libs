@@ -26,6 +26,7 @@ import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.strategies.DefaultPlanStrategiesModule;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.examples.ExamplesUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -43,9 +44,7 @@ public class RunPSimTest {
 
 	Logger logger = Logger.getLogger(RunPSimTest.class);
 
-	String configFile = ExamplesUtils.getTestScenarioURL("pt-tutorial").getPath() + "0.config.xml";
-
-	Config config = ConfigUtils.loadConfig(configFile);
+	final Config config = ConfigUtils.loadConfig(IOUtils.newUrl(ExamplesUtils.getTestScenarioURL("pt-tutorial"),"0.config.xml"));
 
 	static double psimscore, qsimscore = Double.NEGATIVE_INFINITY;
 
