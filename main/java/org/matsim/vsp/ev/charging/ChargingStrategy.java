@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,19 +18,17 @@
 
 package org.matsim.vsp.ev.charging;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.vsp.ev.data.*;
+import org.matsim.vsp.ev.data.ElectricVehicle;
 
-public interface ChargingLogic {
-	void addVehicle(ElectricVehicle ev, double now);
+/**
+ * @author michalm
+ */
+public interface ChargingStrategy {
+	void chargeVehicle(ElectricVehicle ev, double chargePeriod);
 
-	void removeVehicle(ElectricVehicle ev, double now);
+	boolean isChargingCompleted(ElectricVehicle ev);
 
-	boolean isPlugged(ElectricVehicle ev);
+	double calcRemainingEnergyToCharge(ElectricVehicle ev);
 
-	void chargeVehicles(double chargePeriod, double now);
-
-	void reset();
-
-	void initEventsHandling(EventsManager eventsManager);
+	double calcRemainingTimeToCharge(ElectricVehicle ev);
 }

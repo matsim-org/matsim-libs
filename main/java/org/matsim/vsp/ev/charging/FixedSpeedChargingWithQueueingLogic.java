@@ -19,26 +19,31 @@
 
 package org.matsim.vsp.ev.charging;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vsp.ev.data.*;
+import org.matsim.vsp.ev.data.Charger;
+import org.matsim.vsp.ev.data.ElectricVehicle;
 
 import com.google.common.collect.Maps;
 
 public class FixedSpeedChargingWithQueueingLogic implements ChargingLogic {
+	private final ChargingStrategy chargingStrategy;
 	protected final Charger charger;
 	protected final Map<Id<Vehicle>, ElectricVehicle> pluggedVehicles;
 	protected final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
 
 	private EventsManager eventsManager;
 
-	public FixedSpeedChargingWithQueueingLogic(Charger charger) {
+	public FixedSpeedChargingWithQueueingLogic(Charger charger, ChargingStrategy chargingStrategy) {
 		this.charger = charger;
+		this.chargingStrategy = chargingStrategy;
 		pluggedVehicles = Maps.newHashMapWithExpectedSize(charger.getPlugs());
-		charger.setLogic(this);
 	}
 
 	@Override
@@ -53,9 +58,9 @@ public class FixedSpeedChargingWithQueueingLogic implements ChargingLogic {
 			ElectricVehicle ev = evIter.next();
 			// with fast charging, we charge around 4% of SOC per minute,
 			// so when updating SOC every 10 seconds, SOC increases by less then 1%
-			chargeVehicle(ev, chargePeriod);
+			chargingStrategy.chargeVehicle(ev, chargePeriod);
 
-			if (doStopCharging(ev)) {
+			if (chargingStrategy.isChargingCompleted(ev)) {
 				evIter.remove();
 				eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId()));
 				notifyChargingEnded(ev, now);
@@ -66,18 +71,6 @@ public class FixedSpeedChargingWithQueueingLogic implements ChargingLogic {
 		for (int i = 0; i < fromQueuedToPluggedCount; i++) {
 			plugVehicle(queuedVehicles.poll(), now);
 		}
-	}
-
-	protected void chargeVehicle(ElectricVehicle ev, double chargePeriod) {
-		Battery b = ev.getBattery();
-		double energy = charger.getPower() * chargePeriod;
-		double freeCapacity = b.getCapacity() - b.getSoc();
-		b.charge(Math.min(energy, freeCapacity));
-	}
-
-	protected boolean doStopCharging(ElectricVehicle ev) {
-		Battery b = ev.getBattery();
-		return b.getSoc() >= b.getCapacity();
 	}
 
 	@Override
@@ -130,11 +123,6 @@ public class FixedSpeedChargingWithQueueingLogic implements ChargingLogic {
 	@Override
 	public boolean isPlugged(ElectricVehicle ev) {
 		return pluggedVehicles.containsKey(ev.getId());
-	}
-
-	@Override
-	public Charger getCharger() {
-		return charger;
 	}
 
 	@Override

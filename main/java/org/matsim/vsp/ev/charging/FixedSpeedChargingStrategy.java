@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,19 +18,39 @@
 
 package org.matsim.vsp.ev.charging;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.vsp.ev.data.*;
+import org.matsim.vsp.ev.data.Battery;
+import org.matsim.vsp.ev.data.Charger;
+import org.matsim.vsp.ev.data.ElectricVehicle;
 
-public interface ChargingLogic {
-	void addVehicle(ElectricVehicle ev, double now);
+/**
+ * @author michalm
+ */
+public class FixedSpeedChargingStrategy implements ChargingStrategy {
+	private final double effectivePower;
 
-	void removeVehicle(ElectricVehicle ev, double now);
+	public FixedSpeedChargingStrategy(Charger charger, double chargingSpeedFactor) {
+		this.effectivePower = chargingSpeedFactor * charger.getPower();
+	}
 
-	boolean isPlugged(ElectricVehicle ev);
+	@Override
+	public void chargeVehicle(ElectricVehicle ev, double chargePeriod) {
+		double maxRechargedEnergy = effectivePower * chargePeriod;
+		ev.getBattery().charge(Math.min(maxRechargedEnergy, calcRemainingEnergyToCharge(ev)));
+	}
 
-	void chargeVehicles(double chargePeriod, double now);
+	@Override
+	public boolean isChargingCompleted(ElectricVehicle ev) {
+		return calcRemainingEnergyToCharge(ev) <= 0;
+	}
 
-	void reset();
+	@Override
+	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
+		Battery b = ev.getBattery();
+		return b.getCapacity() - b.getSoc();
+	}
 
-	void initEventsHandling(EventsManager eventsManager);
+	@Override
+	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
+		return calcRemainingEnergyToCharge(ev) / effectivePower;
+	}
 }
