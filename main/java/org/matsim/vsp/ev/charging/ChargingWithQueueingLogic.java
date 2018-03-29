@@ -73,8 +73,8 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			}
 		}
 
-		int fromQueuedToPluggedCount = Math.min(queuedVehicles.size(), charger.getPlugs() - pluggedVehicles.size());
-		for (int i = 0; i < fromQueuedToPluggedCount; i++) {
+		int queuedToPluggedCount = Math.min(queuedVehicles.size(), charger.getPlugs() - pluggedVehicles.size());
+		for (int i = 0; i < queuedToPluggedCount; i++) {
 			plugVehicle(queuedVehicles.poll(), now);
 		}
 	}
@@ -121,20 +121,15 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	}
 
 	@Override
-	public boolean isPlugged(ElectricVehicle ev) {
-		return pluggedVehicles.containsKey(ev.getId());
-	}
-
-	@Override
 	public void reset() {
 		queuedVehicles.clear();
 		pluggedVehicles.clear();
 	}
 
-	private final Map<Id<Vehicle>, ElectricVehicle> unmodifiablePluggedVehicles = Collections
-			.unmodifiableMap(pluggedVehicles);
+	private final Collection<ElectricVehicle> unmodifiablePluggedVehicles = Collections
+			.unmodifiableCollection(pluggedVehicles.values());
 
-	public Map<Id<Vehicle>, ElectricVehicle> getPluggedVehicles() {
+	public Collection<ElectricVehicle> getPluggedVehicles() {
 		return unmodifiablePluggedVehicles;
 	}
 

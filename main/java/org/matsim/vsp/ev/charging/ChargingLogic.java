@@ -27,8 +27,6 @@ public interface ChargingLogic {
 
 	void removeVehicle(ElectricVehicle ev, double now);
 
-	boolean isPlugged(ElectricVehicle ev);
-
 	void chargeVehicles(double chargePeriod, double now);
 
 	void reset();
