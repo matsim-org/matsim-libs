@@ -18,42 +18,15 @@
 
 package org.matsim.vsp.ev.charging;
 
-import org.matsim.vsp.ev.data.Battery;
-import org.matsim.vsp.ev.data.Charger;
 import org.matsim.vsp.ev.data.ElectricVehicle;
 
 /**
  * @author michalm
  */
-public class FixedSpeedChargingStrategy implements ChargingStrategy {
-	private final double effectivePower;
+public interface ChargingListener {
+	void notifyVehicleQueued(ElectricVehicle ev, double now);
 
-	public FixedSpeedChargingStrategy(Charger charger, double chargingSpeedFactor) {
-		this.effectivePower = chargingSpeedFactor * charger.getPower();
-	}
+	void notifyChargingStarted(ElectricVehicle ev, double now);
 
-	@Override
-	public void chargeVehicle(ElectricVehicle ev, double chargePeriod) {
-		ev.getBattery().charge(effectivePower * chargePeriod);
-	}
-
-	@Override
-	public boolean isChargingCompleted(ElectricVehicle ev) {
-		return calcRemainingEnergyToCharge(ev) <= 0;
-	}
-
-	@Override
-	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
-		Battery b = ev.getBattery();
-		return b.getCapacity() - b.getSoc();
-	}
-
-	@Override
-	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
-		return calcRemainingEnergyToCharge(ev) / effectivePower;
-	}
-
-	public double getEffectivePower() {
-		return effectivePower;
-	}
+	void notifyChargingEnded(ElectricVehicle ev, double now);
 }

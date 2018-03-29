@@ -19,6 +19,9 @@
 
 package org.matsim.vsp.ev.charging;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
@@ -30,20 +33,21 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vsp.ev.data.Charger;
 import org.matsim.vsp.ev.data.ElectricVehicle;
 
-import com.google.common.collect.Maps;
-
-public class FixedSpeedChargingWithQueueingLogic implements ChargingLogic {
+public class ChargingWithQueueingLogic implements ChargingLogic {
 	private final ChargingStrategy chargingStrategy;
-	protected final Charger charger;
-	protected final Map<Id<Vehicle>, ElectricVehicle> pluggedVehicles;
-	protected final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
+	private final ChargingListener chargingListener;
+
+	private final Charger charger;
+	private final Map<Id<Vehicle>, ElectricVehicle> pluggedVehicles = new HashMap<>();
+	private final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
 
 	private EventsManager eventsManager;
 
-	public FixedSpeedChargingWithQueueingLogic(Charger charger, ChargingStrategy chargingStrategy) {
-		this.charger = charger;
+	public ChargingWithQueueingLogic(Charger charger, ChargingStrategy chargingStrategy,
+			ChargingListener chargingListener) {
+		this.chargingListener = chargingListener;
 		this.chargingStrategy = chargingStrategy;
-		pluggedVehicles = Maps.newHashMapWithExpectedSize(charger.getPlugs());
+		this.charger = charger;
 	}
 
 	@Override
@@ -63,7 +67,9 @@ public class FixedSpeedChargingWithQueueingLogic implements ChargingLogic {
 			if (chargingStrategy.isChargingCompleted(ev)) {
 				evIter.remove();
 				eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId()));
-				notifyChargingEnded(ev, now);
+				if (chargingListener != null) {
+					chargingListener.notifyChargingEnded(ev, now);
+				}
 			}
 		}
 
@@ -86,7 +92,9 @@ public class FixedSpeedChargingWithQueueingLogic implements ChargingLogic {
 	public void removeVehicle(ElectricVehicle ev, double now) {
 		if (pluggedVehicles.remove(ev.getId()) != null) {// successfully removed
 			eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId()));
-			notifyChargingEnded(ev, now);
+			if (chargingListener != null) {
+				chargingListener.notifyChargingEnded(ev, now);
+			}
 
 			if (!queuedVehicles.isEmpty()) {
 				plugVehicle(queuedVehicles.poll(), now);
@@ -99,25 +107,17 @@ public class FixedSpeedChargingWithQueueingLogic implements ChargingLogic {
 
 	private void queueVehicle(ElectricVehicle ev, double now) {
 		queuedVehicles.add(ev);
-		notifyVehicleQueued(ev, now);
+		if (chargingListener != null) {
+			chargingListener.notifyVehicleQueued(ev, now);
+		}
 	}
 
 	private void plugVehicle(ElectricVehicle ev, double now) {
 		pluggedVehicles.put(ev.getId(), ev);
 		eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId()));
-		notifyChargingStarted(ev, now);
-	}
-
-	// meant for overriding
-	protected void notifyVehicleQueued(ElectricVehicle ev, double now) {
-	}
-
-	// meant for overriding
-	protected void notifyChargingStarted(ElectricVehicle ev, double now) {
-	}
-
-	// meant for overriding
-	protected void notifyChargingEnded(ElectricVehicle ev, double now) {
+		if (chargingListener != null) {
+			chargingListener.notifyChargingStarted(ev, now);
+		}
 	}
 
 	@Override
@@ -129,5 +129,19 @@ public class FixedSpeedChargingWithQueueingLogic implements ChargingLogic {
 	public void reset() {
 		queuedVehicles.clear();
 		pluggedVehicles.clear();
+	}
+
+	private final Map<Id<Vehicle>, ElectricVehicle> unmodifiablePluggedVehicles = Collections
+			.unmodifiableMap(pluggedVehicles);
+
+	public Map<Id<Vehicle>, ElectricVehicle> getPluggedVehicles() {
+		return unmodifiablePluggedVehicles;
+	}
+
+	private final Collection<ElectricVehicle> unmodifiableQueuedVehicles = Collections
+			.unmodifiableCollection(queuedVehicles);
+
+	public Collection<ElectricVehicle> getQueuedVehicles() {
+		return unmodifiableQueuedVehicles;
 	}
 }
