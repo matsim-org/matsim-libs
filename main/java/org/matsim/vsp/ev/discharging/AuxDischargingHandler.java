@@ -22,7 +22,8 @@ package org.matsim.vsp.ev.discharging;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.vsp.ev.EvConfigGroup;
-import org.matsim.vsp.ev.data.*;
+import org.matsim.vsp.ev.data.ElectricVehicle;
+import org.matsim.vsp.ev.data.EvData;
 
 import com.google.inject.Inject;
 

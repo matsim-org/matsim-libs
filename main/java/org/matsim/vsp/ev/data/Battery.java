@@ -24,9 +24,15 @@ public interface Battery {
 
 	double getSoc();
 
-	void charge(double energy);
+	void setSoc(double soc);
 
-	void discharge(double energy);
+	void resetSoc();// to the initial/start SOC
 
-	void resetSoc();
+	default void charge(double energy) {
+		setSoc(Math.min(getSoc() + energy, getCapacity()));
+	}
+
+	default void discharge(double energy) {
+		setSoc(Math.max(getSoc() - energy, 0));
+	}
 }

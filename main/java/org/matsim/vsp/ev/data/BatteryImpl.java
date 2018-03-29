@@ -19,7 +19,13 @@
 
 package org.matsim.vsp.ev.data;
 
+import java.util.logging.Logger;
+
+import org.geotools.util.logging.Logging;
+
 public class BatteryImpl implements Battery {
+	private static final Logger LOGGER = Logging.getLogger(BatteryImpl.class);
+
 	private final double capacity;
 	private final double initialSoc;
 	private double soc;
@@ -41,21 +47,14 @@ public class BatteryImpl implements Battery {
 	}
 
 	@Override
-	public void charge(double energy) {
-		if (energy < 0 || energy > capacity - soc) {
-			throw new IllegalArgumentException();
+	public void setSoc(double soc) {
+		if (soc < 0 || soc > capacity) {
+			throw new IllegalArgumentException("SoC=" + soc);
 		}
-
-		soc += energy;
-	}
-
-	@Override
-	public void discharge(double energy) {
-		if (energy < 0 || energy > soc) {
-			throw new IllegalStateException("energy=" + energy + ", SOC=" + soc);
+		this.soc = soc;
+		if (soc == 0) {
+			LOGGER.warning("Battery SoC has fallen to 0");
 		}
-
-		soc -= energy;
 	}
 
 	@Override

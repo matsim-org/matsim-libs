@@ -34,8 +34,7 @@ public class FixedSpeedChargingStrategy implements ChargingStrategy {
 
 	@Override
 	public void chargeVehicle(ElectricVehicle ev, double chargePeriod) {
-		double maxRechargedEnergy = effectivePower * chargePeriod;
-		ev.getBattery().charge(Math.min(maxRechargedEnergy, calcRemainingEnergyToCharge(ev)));
+		ev.getBattery().charge(effectivePower * chargePeriod);
 	}
 
 	@Override
