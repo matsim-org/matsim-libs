@@ -26,7 +26,5 @@ import org.matsim.api.core.v01.Id;
 public interface EvData {
 	public Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles();
 
-	public void addElectricVehicle(Id<ElectricVehicle> vehicleId, ElectricVehicle ev);
-
 	public void resetBatteries();
 }
