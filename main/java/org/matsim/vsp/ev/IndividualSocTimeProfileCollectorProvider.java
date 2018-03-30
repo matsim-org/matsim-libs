@@ -19,8 +19,8 @@
 
 package org.matsim.vsp.ev;
 
-import org.matsim.contrib.taxi.util.stats.TimeProfileCollector;
-import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
+import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
+import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.vsp.ev.data.EvData;

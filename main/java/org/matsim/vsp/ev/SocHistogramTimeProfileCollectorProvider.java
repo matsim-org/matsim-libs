@@ -19,17 +19,21 @@
 
 package org.matsim.vsp.ev;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Paint;
 
 import org.jfree.chart.JFreeChart;
-import org.matsim.contrib.taxi.util.stats.*;
-import org.matsim.contrib.taxi.util.stats.TimeProfileCharts.*;
-import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
+import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
+import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
+import org.matsim.contrib.util.timeprofile.TimeProfileCharts.Customizer;
+import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
+import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.vsp.ev.data.EvData;
 
-import com.google.inject.*;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class SocHistogramTimeProfileCollectorProvider implements Provider<MobsimListener> {
 	private final EvData evData;
