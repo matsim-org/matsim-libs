@@ -22,16 +22,15 @@ package org.matsim.vsp.ev.data;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.Vehicle;
 
 public interface EvData {
 	public Map<Id<Charger>, Charger> getChargers();
 
 	public void addCharger(Charger charger);
 
-	public Map<Id<Vehicle>, ElectricVehicle> getElectricVehicles();
+	public Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles();
 
-	public void addElectricVehicle(Id<Vehicle> vehicleId, ElectricVehicle ev);
+	public void addElectricVehicle(Id<ElectricVehicle> vehicleId, ElectricVehicle ev);
 
 	public void clearQueuesAndResetBatteries();
 }

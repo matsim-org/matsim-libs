@@ -54,7 +54,7 @@ public class DriveDischargingHandler
 	}
 
 	private final Network network;
-	private final Map<Id<Vehicle>, ? extends ElectricVehicle> eVehicles;
+	private final Map<Id<ElectricVehicle>, ? extends ElectricVehicle> eVehicles;
 	private final Map<Id<Vehicle>, EVDrive> evDrives;
 
 	@Inject

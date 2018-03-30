@@ -19,14 +19,15 @@
 
 package org.matsim.vsp.ev.data;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.Vehicle;
 
 public class EvDataImpl implements EvData {
 	private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();
-	private final Map<Id<Vehicle>, ElectricVehicle> eVehicles = new LinkedHashMap<>();
+	private final Map<Id<ElectricVehicle>, ElectricVehicle> eVehicles = new LinkedHashMap<>();
 
 	@Override
 	public Map<Id<Charger>, Charger> getChargers() {
@@ -39,12 +40,12 @@ public class EvDataImpl implements EvData {
 	}
 
 	@Override
-	public Map<Id<Vehicle>, ElectricVehicle> getElectricVehicles() {
+	public Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles() {
 		return Collections.unmodifiableMap(eVehicles);
 	}
 
 	@Override
-	public void addElectricVehicle(Id<Vehicle> vehicleId, ElectricVehicle ev) {
+	public void addElectricVehicle(Id<ElectricVehicle> vehicleId, ElectricVehicle ev) {
 		eVehicles.put(vehicleId, ev);
 	}
 
