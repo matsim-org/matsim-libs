@@ -27,9 +27,12 @@ import org.jfree.data.xy.DefaultTableXYDataset;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
-import org.matsim.contrib.taxi.util.stats.TimeProfileCharts.ChartType;
-import org.matsim.contrib.taxi.util.stats.TimeProfileCharts.Customizer;
-import org.matsim.contrib.taxi.util.stats.TimeProfileCollector.ProfileCalculator;
+import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
+import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
+import org.matsim.contrib.util.timeprofile.TimeProfiles;
+import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
+import org.matsim.contrib.util.timeprofile.TimeProfileCharts.Customizer;
+import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
@@ -52,7 +55,7 @@ public class TaxiStatusTimeProfileCollectorProvider implements Provider<MobsimLi
 	@Override
 	public MobsimListener get() {
 		ProfileCalculator calc = TimeProfiles.combineProfileCalculators(
-				TaxiTimeProfiles.createCurrentTaxiTaskOfTypeCounter(fleet), //
+				TaxiTimeProfiles.createCurrentTaxiTaskTypeCounter(fleet), //
 				TaxiTimeProfiles.createRequestsWithStatusCounter(requestCollector.getRequests().values(),
 						TaxiRequestStatus.UNPLANNED));
 
