@@ -19,13 +19,19 @@
 
 package org.matsim.vsp.ev;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
+import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.vsp.ev.data.ElectricVehicle;
 import org.matsim.vsp.ev.data.EvData;
 
-import com.google.inject.*;
+import com.google.inject.Inject;
+import com.google.inject.Provider;
 
 public class IndividualSocTimeProfileCollectorProvider implements Provider<MobsimListener> {
 	private final EvData evData;
@@ -39,7 +45,23 @@ public class IndividualSocTimeProfileCollectorProvider implements Provider<Mobsi
 
 	@Override
 	public MobsimListener get() {
-		ProfileCalculator calc = EvTimeProfiles.createIndividualSocCalculator(evData);
+		ProfileCalculator calc = createIndividualSocCalculator(evData);
 		return new TimeProfileCollector(calc, 300, "individual_soc_time_profiles", matsimServices);
 	}
+
+	private static final int MAX_VEHICLE_COLUMNS = 50;
+
+	public static ProfileCalculator createIndividualSocCalculator(final EvData evData) {
+		int columns = Math.min(evData.getElectricVehicles().size(), MAX_VEHICLE_COLUMNS);
+		List<ElectricVehicle> selectedEvs = evData.getElectricVehicles().values().stream().limit(columns)
+				.collect(Collectors.toList());
+		String[] header = selectedEvs.stream().map(ev -> ev.getId() + "").toArray(String[]::new);
+
+		return TimeProfiles.createProfileCalculator(header, () -> {
+			return selectedEvs.stream()//
+					.map(ev -> ev.getBattery().getSoc() / EvUnitConversions.J_PER_kWh)// in [kWh]
+					.toArray(Double[]::new);
+		});
+	}
+
 }
