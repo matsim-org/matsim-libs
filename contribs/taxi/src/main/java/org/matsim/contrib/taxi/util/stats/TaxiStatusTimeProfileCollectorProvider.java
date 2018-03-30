@@ -22,17 +22,15 @@ package org.matsim.contrib.taxi.util.stats;
 import java.awt.Color;
 import java.awt.Paint;
 
-import org.jfree.chart.JFreeChart;
 import org.jfree.data.xy.DefaultTableXYDataset;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.taxi.data.TaxiRequest.TaxiRequestStatus;
 import org.matsim.contrib.taxi.passenger.SubmittedTaxiRequestsCollector;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
-import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
-import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
-import org.matsim.contrib.util.timeprofile.TimeProfileCharts.Customizer;
+import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
+import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 
@@ -62,18 +60,16 @@ public class TaxiStatusTimeProfileCollectorProvider implements Provider<MobsimLi
 		TimeProfileCollector collector = new TimeProfileCollector(calc, 300, "taxi_status_time_profiles",
 				matsimServices);
 
-		collector.setChartCustomizer(new Customizer() {
-			public void customize(JFreeChart chart, ChartType chartType) {
-				TimeProfileCharts.changeSeriesColors(chart, new Paint[] { new Color(91, 155, 213), // EMPTY_DRIVE
-						new Color(237, 125, 49), // PICKUP
-						new Color(165, 165, 165), // OCCUPIED_DRIVE
-						new Color(255, 192, 0), // DROPOFF
-						new Color(112, 173, 71), // STAY
-						new Color(37, 94, 145) }); // UNPLANNED (requests)
-
-				if (chartType == ChartType.StackedArea) {
-					((DefaultTableXYDataset)chart.getXYPlot().getDataset()).removeSeries(5);
-				}
+		collector.setChartCustomizer((chart, chartType) -> {
+			TimeProfileCharts.changeSeriesColors(chart, new Paint[] { //
+					new Color(91, 155, 213), // EMPTY_DRIVE
+					new Color(237, 125, 49), // PICKUP
+					new Color(165, 165, 165), // OCCUPIED_DRIVE
+					new Color(255, 192, 0), // DROPOFF
+					new Color(112, 173, 71), // STAY
+					new Color(37, 94, 145) }); // UNPLANNED (requests)
+			if (chartType == ChartType.StackedArea) {
+				((DefaultTableXYDataset)chart.getXYPlot().getDataset()).removeSeries(5);
 			}
 		});
 

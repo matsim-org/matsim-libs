@@ -29,10 +29,6 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.*;
 
 public class TimeProfileCharts {
-	public interface Customizer {
-		void customize(JFreeChart chart, ChartType chartType);
-	}
-
 	public enum ChartType {
 		Line, StackedArea;
 	}
