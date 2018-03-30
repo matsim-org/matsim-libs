@@ -19,6 +19,8 @@
 
 package org.matsim.vsp.ev.charging;
 
+import java.util.Collection;
+
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.vsp.ev.data.ElectricVehicle;
 
@@ -34,4 +36,10 @@ public interface ChargingLogic {
 	void reset();
 
 	void initEventsHandling(EventsManager eventsManager);
+
+	Collection<ElectricVehicle> getPluggedVehicles();
+
+	Collection<ElectricVehicle> getQueuedVehicles();
+
+	ChargingStrategy getChargingStrategy();
 }

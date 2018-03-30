@@ -33,8 +33,8 @@ public class FixedSpeedChargingStrategy implements ChargingStrategy {
 	}
 
 	@Override
-	public void chargeVehicle(ElectricVehicle ev, double chargePeriod) {
-		ev.getBattery().charge(effectivePower * chargePeriod);
+	public double calcEnergyCharge(ElectricVehicle ev, double chargePeriod) {
+		return effectivePower * chargePeriod;
 	}
 
 	@Override

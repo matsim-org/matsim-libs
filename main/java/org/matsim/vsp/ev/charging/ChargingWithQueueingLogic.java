@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
@@ -36,7 +37,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	private final ChargingStrategy chargingStrategy;
 
 	private final Charger charger;
-	private final Map<Id<ElectricVehicle>, ElectricVehicle> pluggedVehicles = new HashMap<>();
+	private final Map<Id<ElectricVehicle>, ElectricVehicle> pluggedVehicles = new LinkedHashMap<>();
 	private final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
 	private final Map<Id<ElectricVehicle>, ChargingListener> listeners = new HashMap<>();
 
@@ -59,7 +60,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			ElectricVehicle ev = evIter.next();
 			// with fast charging, we charge around 4% of SOC per minute,
 			// so when updating SOC every 10 seconds, SOC increases by less then 1%
-			chargingStrategy.chargeVehicle(ev, chargePeriod);
+			ev.getBattery().charge(chargingStrategy.calcEnergyCharge(ev, chargePeriod));
 
 			if (chargingStrategy.isChargingCompleted(ev)) {
 				evIter.remove();
@@ -124,6 +125,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	private final Collection<ElectricVehicle> unmodifiablePluggedVehicles = Collections
 			.unmodifiableCollection(pluggedVehicles.values());
 
+	@Override
 	public Collection<ElectricVehicle> getPluggedVehicles() {
 		return unmodifiablePluggedVehicles;
 	}
@@ -131,7 +133,13 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	private final Collection<ElectricVehicle> unmodifiableQueuedVehicles = Collections
 			.unmodifiableCollection(queuedVehicles);
 
+	@Override
 	public Collection<ElectricVehicle> getQueuedVehicles() {
 		return unmodifiableQueuedVehicles;
+	}
+
+	@Override
+	public ChargingStrategy getChargingStrategy() {
+		return chargingStrategy;
 	}
 }

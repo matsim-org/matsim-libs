@@ -24,7 +24,7 @@ import org.matsim.vsp.ev.data.ElectricVehicle;
  * @author michalm
  */
 public interface ChargingStrategy {
-	void chargeVehicle(ElectricVehicle ev, double chargePeriod);
+	double calcEnergyCharge(ElectricVehicle ev, double chargePeriod);
 
 	boolean isChargingCompleted(ElectricVehicle ev);
 
