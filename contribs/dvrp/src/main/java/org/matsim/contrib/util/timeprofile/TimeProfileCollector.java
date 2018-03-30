@@ -21,13 +21,13 @@ package org.matsim.contrib.util.timeprofile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import org.jfree.chart.JFreeChart;
 import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
 import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
-import org.matsim.contrib.util.timeprofile.TimeProfileCharts.Customizer;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -51,7 +51,7 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 	private final MatsimServices matsimServices;
 
 	private Function<Object[], String[]> valuesToStringsConverter = TimeProfiles::combineValuesIntoStrings;
-	private Customizer chartCustomizer;
+	private BiConsumer<JFreeChart, ChartType> chartCustomizer;
 	private ChartType[] chartTypes = { ChartType.Line };
 
 	public TimeProfileCollector(ProfileCalculator calculator, int interval, String outputFile,
@@ -74,7 +74,7 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 		this.valuesToStringsConverter = valuesToStringsConverter;
 	}
 
-	public void setChartCustomizer(TimeProfileCharts.Customizer chartCustomizer) {
+	public void setChartCustomizer(BiConsumer<JFreeChart, ChartType> chartCustomizer) {
 		this.chartCustomizer = chartCustomizer;
 	}
 
@@ -104,7 +104,7 @@ public class TimeProfileCollector implements MobsimBeforeSimStepListener, Mobsim
 	private void generateImage(ChartType chartType) {
 		JFreeChart chart = TimeProfileCharts.chartProfile(calculator.getHeader(), times, timeProfile, chartType);
 		if (chartCustomizer != null) {
-			chartCustomizer.customize(chart, chartType);
+			chartCustomizer.accept(chart, chartType);
 		}
 
 		String imageFile = matsimServices.getControlerIO().getIterationFilename(matsimServices.getIterationNumber(),
