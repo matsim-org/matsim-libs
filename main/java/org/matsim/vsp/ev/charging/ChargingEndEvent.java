@@ -23,8 +23,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vsp.ev.data.Charger;
+import org.matsim.vsp.ev.data.ElectricVehicle;
 
 public class ChargingEndEvent extends Event {
 	public static final String EVENT_TYPE = "charging_end";
@@ -32,9 +32,9 @@ public class ChargingEndEvent extends Event {
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
 
 	private final Id<Charger> chargerId;
-	private final Id<Vehicle> vehicleId;
+	private final Id<ElectricVehicle> vehicleId;
 
-	public ChargingEndEvent(double time, Id<Charger> chargerId, Id<Vehicle> vehicleId) {
+	public ChargingEndEvent(double time, Id<Charger> chargerId, Id<ElectricVehicle> vehicleId) {
 		super(time);
 		this.chargerId = chargerId;
 		this.vehicleId = vehicleId;
@@ -44,7 +44,7 @@ public class ChargingEndEvent extends Event {
 		return chargerId;
 	}
 
-	public Id<Vehicle> getVehicleId() {
+	public Id<ElectricVehicle> getVehicleId() {
 		return vehicleId;
 	}
 

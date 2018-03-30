@@ -20,23 +20,23 @@
 package org.matsim.vsp.ev.data;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vsp.ev.discharging.*;
+import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
+import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
 
 public class ElectricVehicleImpl implements ElectricVehicle {
-	private final Id<Vehicle> vehicleId;
+	private final Id<ElectricVehicle> vehicleId;
 	private Battery battery;// not final -- can be swapped
 
 	private DriveEnergyConsumption driveEnergyConsumption;
 	private AuxEnergyConsumption auxEnergyConsumption;
 
-	public ElectricVehicleImpl(Id<Vehicle> vehicleId, Battery battery) {
+	public ElectricVehicleImpl(Id<ElectricVehicle> vehicleId, Battery battery) {
 		this.vehicleId = vehicleId;
 		this.battery = battery;
 	}
 
 	@Override
-	public Id<Vehicle> getId() {
+	public Id<ElectricVehicle> getId() {
 		return vehicleId;
 	}
 

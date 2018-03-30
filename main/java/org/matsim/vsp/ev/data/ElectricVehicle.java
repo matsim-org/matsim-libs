@@ -20,10 +20,10 @@
 package org.matsim.vsp.ev.data;
 
 import org.matsim.api.core.v01.Identifiable;
-import org.matsim.vehicles.Vehicle;
-import org.matsim.vsp.ev.discharging.*;
+import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
+import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
 
-public interface ElectricVehicle extends Identifiable<Vehicle> {
+public interface ElectricVehicle extends Identifiable<ElectricVehicle> {
 	DriveEnergyConsumption getDriveEnergyConsumption();
 
 	AuxEnergyConsumption getAuxEnergyConsumption();

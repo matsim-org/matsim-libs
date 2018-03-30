@@ -29,7 +29,6 @@ import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.vehicles.Vehicle;
 import org.matsim.vsp.ev.data.Charger;
 import org.matsim.vsp.ev.data.ElectricVehicle;
 
@@ -37,9 +36,9 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	private final ChargingStrategy chargingStrategy;
 
 	private final Charger charger;
-	private final Map<Id<Vehicle>, ElectricVehicle> pluggedVehicles = new HashMap<>();
+	private final Map<Id<ElectricVehicle>, ElectricVehicle> pluggedVehicles = new HashMap<>();
 	private final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
-	private final Map<Id<Vehicle>, ChargingListener> listeners = new HashMap<>();
+	private final Map<Id<ElectricVehicle>, ChargingListener> listeners = new HashMap<>();
 
 	private EventsManager eventsManager;
 
