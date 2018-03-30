@@ -19,12 +19,28 @@
 
 package org.matsim.vsp.ev.data;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-public interface EvData {
-	public Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles();
+public class EvFleetImpl implements EvFleet {
+	private final Map<Id<ElectricVehicle>, ElectricVehicle> eVehicles = new LinkedHashMap<>();
 
-	public void resetBatteries();
+	@Override
+	public Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles() {
+		return Collections.unmodifiableMap(eVehicles);
+	}
+
+	public void addElectricVehicle(Id<ElectricVehicle> vehicleId, ElectricVehicle ev) {
+		eVehicles.put(vehicleId, ev);
+	}
+
+	@Override
+	public void resetBatteries() {
+		for (ElectricVehicle ev : eVehicles.values()) {
+			ev.getBattery().resetSoc();
+		}
+	}
 }

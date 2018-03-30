@@ -23,7 +23,7 @@ import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.vsp.ev.EvConfigGroup;
 import org.matsim.vsp.ev.data.ElectricVehicle;
-import org.matsim.vsp.ev.data.EvData;
+import org.matsim.vsp.ev.data.EvFleet;
 
 import com.google.inject.Inject;
 
@@ -32,8 +32,8 @@ public class AuxDischargingHandler implements MobsimAfterSimStepListener {
 	private final int auxDischargeTimeStep;
 
 	@Inject
-	public AuxDischargingHandler(EvData evData, EvConfigGroup evConfig) {
-		this.eVehicles = evData.getElectricVehicles().values();
+	public AuxDischargingHandler(EvFleet evFleet, EvConfigGroup evConfig) {
+		this.eVehicles = evFleet.getElectricVehicles().values();
 		this.auxDischargeTimeStep = evConfig.getAuxDischargeTimeStep();
 	}
 

@@ -31,24 +31,24 @@ import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.vsp.ev.data.ElectricVehicle;
-import org.matsim.vsp.ev.data.EvData;
+import org.matsim.vsp.ev.data.EvFleet;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class SocHistogramTimeProfileCollectorProvider implements Provider<MobsimListener> {
-	private final EvData evData;
+	private final EvFleet evFleet;
 	private final MatsimServices matsimServices;
 
 	@Inject
-	public SocHistogramTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices) {
-		this.evData = evData;
+	public SocHistogramTimeProfileCollectorProvider(EvFleet evFleet, MatsimServices matsimServices) {
+		this.evFleet = evFleet;
 		this.matsimServices = matsimServices;
 	}
 
 	@Override
 	public MobsimListener get() {
-		ProfileCalculator calc = createSocHistogramCalculator(evData);
+		ProfileCalculator calc = createSocHistogramCalculator(evFleet);
 		TimeProfileCollector collector = new TimeProfileCollector(calc, 300, "soc_histogram_time_profiles",
 				matsimServices);
 
@@ -65,11 +65,11 @@ public class SocHistogramTimeProfileCollectorProvider implements Provider<Mobsim
 		return collector;
 	}
 
-	public static ProfileCalculator createSocHistogramCalculator(final EvData evData) {
+	public static ProfileCalculator createSocHistogramCalculator(final EvFleet evFleet) {
 		String[] header = { "0", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+", "0.8+", "0.9+" };
 		return TimeProfiles.createProfileCalculator(header, () -> {
 			UniformHistogram histogram = new UniformHistogram(0.1, header.length);
-			for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
+			for (ElectricVehicle ev : evFleet.getElectricVehicles().values()) {
 				histogram.addValue(ev.getBattery().getSoc() / ev.getBattery().getCapacity());
 			}
 

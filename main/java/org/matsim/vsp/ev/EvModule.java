@@ -24,24 +24,24 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.vsp.ev.charging.ChargingHandler;
 import org.matsim.vsp.ev.data.ChargingInfrastructure;
-import org.matsim.vsp.ev.data.EvData;
+import org.matsim.vsp.ev.data.EvFleet;
 import org.matsim.vsp.ev.discharging.AuxDischargingHandler;
 import org.matsim.vsp.ev.discharging.DriveDischargingHandler;
 import org.matsim.vsp.ev.stats.IndividualSocTimeProfileCollectorProvider;
 import org.matsim.vsp.ev.stats.SocHistogramTimeProfileCollectorProvider;
 
 public class EvModule extends AbstractModule {
-	private final EvData evData;
+	private final EvFleet evFleet;
 	private final ChargingInfrastructure chargingInfrastructure;
 
-	public EvModule(EvData evData, ChargingInfrastructure chargingInfrastructure) {
-		this.evData = evData;
+	public EvModule(EvFleet evFleet, ChargingInfrastructure chargingInfrastructure) {
+		this.evFleet = evFleet;
 		this.chargingInfrastructure = chargingInfrastructure;
 	}
 
 	@Override
 	public void install() {
-		bind(EvData.class).toInstance(evData);
+		bind(EvFleet.class).toInstance(evFleet);
 		bind(ChargingInfrastructure.class).toInstance(chargingInfrastructure);
 		bind(DriveDischargingHandler.class).asEagerSingleton();
 		addEventHandlerBinding().to(DriveDischargingHandler.class);
@@ -58,7 +58,7 @@ public class EvModule extends AbstractModule {
 
 		addControlerListenerBinding().toInstance(new IterationEndsListener() {
 			public void notifyIterationEnds(IterationEndsEvent event) {
-				evData.resetBatteries();
+				evFleet.resetBatteries();
 				chargingInfrastructure.resetChargingLogics();
 			}
 		});
