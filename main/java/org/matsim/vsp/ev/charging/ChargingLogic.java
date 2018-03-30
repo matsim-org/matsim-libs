@@ -20,10 +20,12 @@
 package org.matsim.vsp.ev.charging;
 
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.vsp.ev.data.*;
+import org.matsim.vsp.ev.data.ElectricVehicle;
 
 public interface ChargingLogic {
 	void addVehicle(ElectricVehicle ev, double now);
+
+	void addVehicle(ElectricVehicle ev, ChargingListener chargingListener, double now);
 
 	void removeVehicle(ElectricVehicle ev, double now);
 

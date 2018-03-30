@@ -35,17 +35,15 @@ import org.matsim.vsp.ev.data.ElectricVehicle;
 
 public class ChargingWithQueueingLogic implements ChargingLogic {
 	private final ChargingStrategy chargingStrategy;
-	private final ChargingListener chargingListener;
 
 	private final Charger charger;
 	private final Map<Id<Vehicle>, ElectricVehicle> pluggedVehicles = new HashMap<>();
 	private final Queue<ElectricVehicle> queuedVehicles = new LinkedList<>();
+	private final Map<Id<Vehicle>, ChargingListener> listeners = new HashMap<>();
 
 	private EventsManager eventsManager;
 
-	public ChargingWithQueueingLogic(Charger charger, ChargingStrategy chargingStrategy,
-			ChargingListener chargingListener) {
-		this.chargingListener = chargingListener;
+	public ChargingWithQueueingLogic(Charger charger, ChargingStrategy chargingStrategy) {
 		this.chargingStrategy = chargingStrategy;
 		this.charger = charger;
 	}
@@ -67,9 +65,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			if (chargingStrategy.isChargingCompleted(ev)) {
 				evIter.remove();
 				eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId()));
-				if (chargingListener != null) {
-					chargingListener.notifyChargingEnded(ev, now);
-				}
+				listeners.remove(ev.getId()).notifyChargingEnded(ev, now);
 			}
 		}
 
@@ -81,6 +77,12 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 
 	@Override
 	public void addVehicle(ElectricVehicle ev, double now) {
+		addVehicle(ev, new ChargingListener() {}, now);
+	}
+
+	@Override
+	public void addVehicle(ElectricVehicle ev, ChargingListener chargingListener, double now) {
+		listeners.put(ev.getId(), chargingListener);
 		if (pluggedVehicles.size() < charger.getPlugs()) {
 			plugVehicle(ev, now);
 		} else {
@@ -92,9 +94,7 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	public void removeVehicle(ElectricVehicle ev, double now) {
 		if (pluggedVehicles.remove(ev.getId()) != null) {// successfully removed
 			eventsManager.processEvent(new ChargingEndEvent(now, charger.getId(), ev.getId()));
-			if (chargingListener != null) {
-				chargingListener.notifyChargingEnded(ev, now);
-			}
+			listeners.remove(ev.getId()).notifyChargingEnded(ev, now);
 
 			if (!queuedVehicles.isEmpty()) {
 				plugVehicle(queuedVehicles.poll(), now);
@@ -107,17 +107,13 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 
 	private void queueVehicle(ElectricVehicle ev, double now) {
 		queuedVehicles.add(ev);
-		if (chargingListener != null) {
-			chargingListener.notifyVehicleQueued(ev, now);
-		}
+		listeners.get(ev.getId()).notifyVehicleQueued(ev, now);
 	}
 
 	private void plugVehicle(ElectricVehicle ev, double now) {
 		pluggedVehicles.put(ev.getId(), ev);
 		eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId()));
-		if (chargingListener != null) {
-			chargingListener.notifyChargingStarted(ev, now);
-		}
+		listeners.get(ev.getId()).notifyChargingStarted(ev, now);
 	}
 
 	@Override

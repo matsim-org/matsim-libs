@@ -24,9 +24,12 @@ import org.matsim.vsp.ev.data.ElectricVehicle;
  * @author michalm
  */
 public interface ChargingListener {
-	void notifyVehicleQueued(ElectricVehicle ev, double now);
+	default void notifyVehicleQueued(ElectricVehicle ev, double now) {
+	};
 
-	void notifyChargingStarted(ElectricVehicle ev, double now);
+	default void notifyChargingStarted(ElectricVehicle ev, double now) {
+	};
 
-	void notifyChargingEnded(ElectricVehicle ev, double now);
+	default void notifyChargingEnded(ElectricVehicle ev, double now) {
+	};
 }
