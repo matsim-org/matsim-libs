@@ -27,29 +27,31 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.vsp.ev.charging.ChargingLogic;
 import org.matsim.vsp.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.vsp.ev.data.Charger;
-import org.matsim.vsp.ev.data.EvData;
+import org.matsim.vsp.ev.data.ChargingInfrastructure;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class ChargerOccupancyXYDataProvider implements Provider<MobsimListener> {
-	private final EvData evData;
+	private final ChargingInfrastructure chargingInfrastructure;
 	private final MatsimServices matsimServices;
 
 	@Inject
-	public ChargerOccupancyXYDataProvider(EvData evData, MatsimServices matsimServices) {
-		this.evData = evData;
+	public ChargerOccupancyXYDataProvider(ChargingInfrastructure chargingInfrastructure,
+			MatsimServices matsimServices) {
+		this.chargingInfrastructure = chargingInfrastructure;
 		this.matsimServices = matsimServices;
 	}
 
 	@Override
 	public MobsimListener get() {
-		XYDataCalculator<Charger> calc = createChargerOccupancyCalculator(evData, false);
-		return new XYDataCollector<>(evData.getChargers().values(), calc, 300, "charger_occupancy_absolute",
-				matsimServices);
+		XYDataCalculator<Charger> calc = createChargerOccupancyCalculator(chargingInfrastructure, false);
+		return new XYDataCollector<>(chargingInfrastructure.getChargers().values(), calc, 300,
+				"charger_occupancy_absolute", matsimServices);
 	}
 
-	public static XYDataCalculator<Charger> createChargerOccupancyCalculator(final EvData evData, boolean relative) {
+	public static XYDataCalculator<Charger> createChargerOccupancyCalculator(
+			final ChargingInfrastructure chargingInfrastructure, boolean relative) {
 		String[] header = relative ? //
 				new String[] { "plugs", "plugged_rel", "queued_rel", "assigned_rel" } //
 				: new String[] { "plugs", "plugged", "queued", "assigned" };

@@ -19,14 +19,18 @@
 
 package org.matsim.vsp.ev.data.file;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.file.ReaderUtils;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.vsp.ev.EvUnitConversions;
-import org.matsim.vsp.ev.data.*;
+import org.matsim.vsp.ev.data.Charger;
+import org.matsim.vsp.ev.data.ChargerImpl;
+import org.matsim.vsp.ev.data.ChargingInfrastructureImpl;
 import org.xml.sax.Attributes;
 
 public class ChargerReader extends MatsimXmlParser {
@@ -35,18 +39,18 @@ public class ChargerReader extends MatsimXmlParser {
 	private final static int DEFAULT_CHARGER_CAPACITY = 1;
 	private final static int DEFAULT_CHARGER_POWER_kW = 50;// [kW]
 
-	private final EvData data;
+	private final ChargingInfrastructureImpl chargingInfrastructure;
 	private Map<Id<Link>, ? extends Link> links;
 
-	public ChargerReader(Network network, EvData data) {
-		this.data = data;
+	public ChargerReader(Network network, ChargingInfrastructureImpl chargingInfrastructure) {
+		this.chargingInfrastructure = chargingInfrastructure;
 		links = network.getLinks();
 	}
 
 	@Override
 	public void startTag(String name, Attributes atts, Stack<String> context) {
 		if (CHARGER.equals(name)) {
-			data.addCharger(createCharger(atts));
+			chargingInfrastructure.addCharger(createCharger(atts));
 		}
 	}
 

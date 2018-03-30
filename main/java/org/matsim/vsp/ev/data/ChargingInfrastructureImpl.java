@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,14 +18,31 @@
 
 package org.matsim.vsp.ev.data;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-public interface EvData {
-	public Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles();
+/**
+ * @author michalm
+ */
+public class ChargingInfrastructureImpl implements ChargingInfrastructure {
+	private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();
 
-	public void addElectricVehicle(Id<ElectricVehicle> vehicleId, ElectricVehicle ev);
+	@Override
+	public Map<Id<Charger>, Charger> getChargers() {
+		return Collections.unmodifiableMap(chargers);
+	}
 
-	public void resetBatteries();
+	public void addCharger(Charger charger) {
+		chargers.put(charger.getId(), charger);
+	}
+
+	@Override
+	public void resetChargingLogics() {
+		for (Charger c : chargers.values()) {
+			c.resetLogic();
+		}
+	}
 }

@@ -26,18 +26,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 
 public class EvDataImpl implements EvData {
-	private final Map<Id<Charger>, Charger> chargers = new LinkedHashMap<>();
 	private final Map<Id<ElectricVehicle>, ElectricVehicle> eVehicles = new LinkedHashMap<>();
-
-	@Override
-	public Map<Id<Charger>, Charger> getChargers() {
-		return Collections.unmodifiableMap(chargers);
-	}
-
-	@Override
-	public void addCharger(Charger charger) {
-		chargers.put(charger.getId(), charger);
-	}
 
 	@Override
 	public Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles() {
@@ -50,13 +39,9 @@ public class EvDataImpl implements EvData {
 	}
 
 	@Override
-	public void clearQueuesAndResetBatteries() {
+	public void resetBatteries() {
 		for (ElectricVehicle ev : eVehicles.values()) {
 			ev.getBattery().resetSoc();
-		}
-
-		for (Charger c : chargers.values()) {
-			c.resetLogic();
 		}
 	}
 }

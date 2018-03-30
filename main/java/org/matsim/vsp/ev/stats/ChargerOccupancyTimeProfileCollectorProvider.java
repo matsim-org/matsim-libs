@@ -28,37 +28,39 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.vsp.ev.charging.ChargingLogic;
 import org.matsim.vsp.ev.charging.ChargingWithQueueingAndAssignmentLogic;
 import org.matsim.vsp.ev.data.Charger;
-import org.matsim.vsp.ev.data.EvData;
+import org.matsim.vsp.ev.data.ChargingInfrastructure;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class ChargerOccupancyTimeProfileCollectorProvider implements Provider<MobsimListener> {
-	private final EvData evData;
+	private final ChargingInfrastructure chargingInfrastructure;
 	private final MatsimServices matsimServices;
 
 	@Inject
-	public ChargerOccupancyTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices) {
-		this.evData = evData;
+	public ChargerOccupancyTimeProfileCollectorProvider(ChargingInfrastructure chargingInfrastructure,
+			MatsimServices matsimServices) {
+		this.chargingInfrastructure = chargingInfrastructure;
 		this.matsimServices = matsimServices;
 	}
 
 	@Override
 	public MobsimListener get() {
-		ProfileCalculator calc = createChargerOccupancyCalculator(evData);
+		ProfileCalculator calc = createChargerOccupancyCalculator(chargingInfrastructure);
 		TimeProfileCollector collector = new TimeProfileCollector(calc, 300, "charger_occupancy_time_profiles",
 				matsimServices);
 		collector.setChartTypes(ChartType.Line, ChartType.StackedArea);
 		return collector;
 	}
 
-	public static ProfileCalculator createChargerOccupancyCalculator(final EvData evData) {
+	public static ProfileCalculator createChargerOccupancyCalculator(
+			final ChargingInfrastructure chargingInfrastructure) {
 		String[] header = { "plugged", "queued", "assigned" };
 		return TimeProfiles.createProfileCalculator(header, () -> {
 			int plugged = 0;
 			int queued = 0;
 			int assigned = 0;
-			for (Charger c : evData.getChargers().values()) {
+			for (Charger c : chargingInfrastructure.getChargers().values()) {
 				ChargingLogic logic = c.getLogic();
 				plugged += logic.getPluggedVehicles().size();
 				queued += logic.getQueuedVehicles().size();

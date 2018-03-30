@@ -23,17 +23,19 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.vsp.ev.EvConfigGroup;
-import org.matsim.vsp.ev.data.*;
+import org.matsim.vsp.ev.data.Charger;
+import org.matsim.vsp.ev.data.ChargingInfrastructure;
 
 import com.google.inject.Inject;
 
 public class ChargingHandler implements MobsimAfterSimStepListener {
-	private final Iterable<? extends Charger> chargers;
+	private final Iterable<Charger> chargers;
 	private final int chargeTimeStep;
 
 	@Inject
-	public ChargingHandler(EvData evData, EvConfigGroup evConfig, EventsManager eventsManager) {
-		this.chargers = evData.getChargers().values();
+	public ChargingHandler(ChargingInfrastructure chargingInfrastructure, EvConfigGroup evConfig,
+			EventsManager eventsManager) {
+		this.chargers = chargingInfrastructure.getChargers().values();
 		this.chargeTimeStep = evConfig.getChargeTimeStep();
 
 		for (Charger c : chargers) {

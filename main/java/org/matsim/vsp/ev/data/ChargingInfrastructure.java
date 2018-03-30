@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -23,10 +22,11 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-public interface EvData {
-	public Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles();
+/**
+ * @author michalm
+ */
+public interface ChargingInfrastructure {
+	Map<Id<Charger>, Charger> getChargers();
 
-	public void addElectricVehicle(Id<ElectricVehicle> vehicleId, ElectricVehicle ev);
-
-	public void resetBatteries();
+	void resetChargingLogics();
 }
