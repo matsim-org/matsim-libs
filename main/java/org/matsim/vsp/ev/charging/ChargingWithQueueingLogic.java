@@ -99,7 +99,8 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 			if (!queuedVehicles.isEmpty()) {
 				plugVehicle(queuedVehicles.poll(), now);
 			}
-		} else if (!queuedVehicles.remove(ev)) {// neither plugged nor queued
+		} else if (queuedVehicles.remove(ev)) {//
+		} else {// neither plugged nor queued
 			throw new IllegalArgumentException(
 					"Vehicle: " + ev.getId() + " is neither queued nor plugged at charger: " + charger.getId());
 		}
@@ -111,7 +112,9 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 	}
 
 	private void plugVehicle(ElectricVehicle ev, double now) {
-		pluggedVehicles.put(ev.getId(), ev);
+		if (pluggedVehicles.put(ev.getId(), ev) != null) {
+			throw new IllegalArgumentException();
+		}
 		eventsManager.processEvent(new ChargingStartEvent(now, charger.getId(), ev.getId()));
 		listeners.get(ev.getId()).notifyChargingStarted(ev, now);
 	}

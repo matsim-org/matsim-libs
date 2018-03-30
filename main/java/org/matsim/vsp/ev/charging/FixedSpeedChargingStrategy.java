@@ -52,8 +52,4 @@ public class FixedSpeedChargingStrategy implements ChargingStrategy {
 	public double calcRemainingTimeToCharge(ElectricVehicle ev) {
 		return calcRemainingEnergyToCharge(ev) / effectivePower;
 	}
-
-	public double getEffectivePower() {
-		return effectivePower;
-	}
 }
