@@ -17,17 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package org.matsim.contrib.util.timeprofile;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
 import org.jfree.chart.JFreeChart;
-import org.matsim.contrib.taxi.util.stats.TimeProfileCharts.ChartType;
-import org.matsim.contrib.taxi.util.stats.TimeProfileCharts.Customizer;
 import org.matsim.contrib.util.CompactCSVWriter;
 import org.matsim.contrib.util.chart.ChartSaveUtils;
+import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
+import org.matsim.contrib.util.timeprofile.TimeProfileCharts.Customizer;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
