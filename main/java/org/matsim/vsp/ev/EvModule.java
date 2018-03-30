@@ -25,6 +25,8 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.vsp.ev.charging.ChargingHandler;
 import org.matsim.vsp.ev.data.EvData;
 import org.matsim.vsp.ev.discharging.*;
+import org.matsim.vsp.ev.stats.IndividualSocTimeProfileCollectorProvider;
+import org.matsim.vsp.ev.stats.SocHistogramTimeProfileCollectorProvider;
 
 public class EvModule extends AbstractModule {
 	private final EvData evData;

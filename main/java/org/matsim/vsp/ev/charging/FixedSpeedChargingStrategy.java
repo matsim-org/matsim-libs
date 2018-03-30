@@ -19,7 +19,6 @@
 package org.matsim.vsp.ev.charging;
 
 import org.matsim.vsp.ev.data.Battery;
-import org.matsim.vsp.ev.data.Charger;
 import org.matsim.vsp.ev.data.ElectricVehicle;
 
 /**
@@ -27,9 +26,25 @@ import org.matsim.vsp.ev.data.ElectricVehicle;
  */
 public class FixedSpeedChargingStrategy implements ChargingStrategy {
 	private final double effectivePower;
+	private final double maxRelativeSoc;
 
-	public FixedSpeedChargingStrategy(Charger charger, double chargingSpeedFactor) {
-		this.effectivePower = chargingSpeedFactor * charger.getPower();
+	// XXX effectivePower may be lower than the nominal charger power (e.g. low-temp mode)
+	public FixedSpeedChargingStrategy(double effectivePower) {
+		this(effectivePower, 1);
+	}
+
+	// e.g. maxRelativeSoc = 0.8 to model linear (fast) charging up to 80% of the battery capacity
+	public FixedSpeedChargingStrategy(double effectivePower, double maxRelativeSoc) {
+		if (effectivePower <= 0) {
+			throw new IllegalArgumentException("effectivePower must be positive");
+		}
+
+		if (maxRelativeSoc <= 0 || maxRelativeSoc > 1) {
+			throw new IllegalArgumentException("maxRelativeSoc must be in (0,1]");
+		}
+
+		this.effectivePower = effectivePower;
+		this.maxRelativeSoc = maxRelativeSoc;
 	}
 
 	@Override
@@ -45,7 +60,7 @@ public class FixedSpeedChargingStrategy implements ChargingStrategy {
 	@Override
 	public double calcRemainingEnergyToCharge(ElectricVehicle ev) {
 		Battery b = ev.getBattery();
-		return b.getCapacity() - b.getSoc();
+		return maxRelativeSoc * b.getCapacity() - b.getSoc();
 	}
 
 	@Override

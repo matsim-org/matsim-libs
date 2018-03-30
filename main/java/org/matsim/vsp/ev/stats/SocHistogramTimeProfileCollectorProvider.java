@@ -17,11 +17,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.ev;
+package org.matsim.vsp.ev.stats;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.awt.Color;
+import java.awt.Paint;
 
+import org.matsim.contrib.util.histogram.UniformHistogram;
+import org.matsim.contrib.util.timeprofile.TimeProfileCharts;
+import org.matsim.contrib.util.timeprofile.TimeProfileCharts.ChartType;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector;
 import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculator;
 import org.matsim.contrib.util.timeprofile.TimeProfiles;
@@ -33,35 +36,48 @@ import org.matsim.vsp.ev.data.EvData;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
-public class IndividualSocTimeProfileCollectorProvider implements Provider<MobsimListener> {
+public class SocHistogramTimeProfileCollectorProvider implements Provider<MobsimListener> {
 	private final EvData evData;
 	private final MatsimServices matsimServices;
 
 	@Inject
-	public IndividualSocTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices) {
+	public SocHistogramTimeProfileCollectorProvider(EvData evData, MatsimServices matsimServices) {
 		this.evData = evData;
 		this.matsimServices = matsimServices;
 	}
 
 	@Override
 	public MobsimListener get() {
-		ProfileCalculator calc = createIndividualSocCalculator(evData);
-		return new TimeProfileCollector(calc, 300, "individual_soc_time_profiles", matsimServices);
+		ProfileCalculator calc = createSocHistogramCalculator(evData);
+		TimeProfileCollector collector = new TimeProfileCollector(calc, 300, "soc_histogram_time_profiles",
+				matsimServices);
+
+		collector.setChartCustomizer((chart, chartType) -> {
+			Paint[] paints = new Paint[10];
+			for (int i = 0; i < 10; i++) {
+				float f = (float)Math.sin(Math.PI * (9f - i) / 9 / 2);
+				paints[i] = new Color(f, (float)Math.sqrt(1 - f * f), 0f);
+			}
+			TimeProfileCharts.changeSeriesColors(chart, paints);
+		});
+
+		collector.setChartTypes(ChartType.StackedArea);
+		return collector;
 	}
 
-	private static final int MAX_VEHICLE_COLUMNS = 50;
-
-	public static ProfileCalculator createIndividualSocCalculator(final EvData evData) {
-		int columns = Math.min(evData.getElectricVehicles().size(), MAX_VEHICLE_COLUMNS);
-		List<ElectricVehicle> selectedEvs = evData.getElectricVehicles().values().stream().limit(columns)
-				.collect(Collectors.toList());
-		String[] header = selectedEvs.stream().map(ev -> ev.getId() + "").toArray(String[]::new);
-
+	public static ProfileCalculator createSocHistogramCalculator(final EvData evData) {
+		String[] header = { "0", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+", "0.8+", "0.9+" };
 		return TimeProfiles.createProfileCalculator(header, () -> {
-			return selectedEvs.stream()//
-					.map(ev -> ev.getBattery().getSoc() / EvUnitConversions.J_PER_kWh)// in [kWh]
-					.toArray(Double[]::new);
+			UniformHistogram histogram = new UniformHistogram(0.1, header.length);
+			for (ElectricVehicle ev : evData.getElectricVehicles().values()) {
+				histogram.addValue(ev.getBattery().getSoc() / ev.getBattery().getCapacity());
+			}
+
+			Long[] values = new Long[header.length];
+			for (int b = 0; b < header.length; b++) {
+				values[b] = histogram.getCount(b);
+			}
+			return values;
 		});
 	}
-
 }
