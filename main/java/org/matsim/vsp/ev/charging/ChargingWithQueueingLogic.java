@@ -119,12 +119,6 @@ public class ChargingWithQueueingLogic implements ChargingLogic {
 		listeners.get(ev.getId()).notifyChargingStarted(ev, now);
 	}
 
-	@Override
-	public void reset() {
-		queuedVehicles.clear();
-		pluggedVehicles.clear();
-	}
-
 	private final Collection<ElectricVehicle> unmodifiablePluggedVehicles = Collections
 			.unmodifiableCollection(pluggedVehicles.values());
 

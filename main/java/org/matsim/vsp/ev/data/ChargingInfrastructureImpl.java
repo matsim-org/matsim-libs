@@ -23,6 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vsp.ev.charging.ChargingLogic;
 
 /**
  * @author michalm
@@ -40,9 +42,11 @@ public class ChargingInfrastructureImpl implements ChargingInfrastructure {
 	}
 
 	@Override
-	public void resetChargingLogics() {
+	public void initChargingLogics(ChargingLogic.Factory logicFactory, EventsManager eventsManager) {
 		for (Charger c : chargers.values()) {
-			c.resetLogic();
+			ChargingLogic logic = logicFactory.create(c);
+			logic.initEventsHandling(eventsManager);
+			c.setLogic(logic);
 		}
 	}
 }

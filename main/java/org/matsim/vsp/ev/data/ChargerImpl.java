@@ -19,7 +19,8 @@
 
 package org.matsim.vsp.ev.data;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.vsp.ev.charging.ChargingLogic;
 
@@ -71,10 +72,5 @@ public class ChargerImpl implements Charger {
 	@Override
 	public Coord getCoord() {
 		return link.getCoord();
-	}
-
-	@Override
-	public void resetLogic() {
-		logic.reset();
 	}
 }

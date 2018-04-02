@@ -21,12 +21,16 @@ package org.matsim.vsp.ev.data;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vsp.ev.charging.ChargingLogic;
 
 /**
  * @author michalm
  */
 public interface ChargingInfrastructure {
+	public static final String CHARGERS = "chargers";
+
 	Map<Id<Charger>, Charger> getChargers();
 
-	void resetChargingLogics();
+	void initChargingLogics(ChargingLogic.Factory logicFactory, EventsManager eventsManager);
 }

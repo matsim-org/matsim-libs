@@ -22,9 +22,14 @@ package org.matsim.vsp.ev.charging;
 import java.util.Collection;
 
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.vsp.ev.data.Charger;
 import org.matsim.vsp.ev.data.ElectricVehicle;
 
 public interface ChargingLogic {
+	static interface Factory {
+		ChargingLogic create(Charger charger);
+	}
+
 	void addVehicle(ElectricVehicle ev, double now);
 
 	void addVehicle(ElectricVehicle ev, ChargingListener chargingListener, double now);
@@ -32,8 +37,6 @@ public interface ChargingLogic {
 	void removeVehicle(ElectricVehicle ev, double now);
 
 	void chargeVehicles(double chargePeriod, double now);
-
-	void reset();
 
 	void initEventsHandling(EventsManager eventsManager);
 

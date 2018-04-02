@@ -19,15 +19,12 @@
 
 package org.matsim.vsp.ev.discharging;
 
+import java.util.function.DoubleSupplier;
+import java.util.function.Predicate;
+
 import org.matsim.vsp.ev.data.ElectricVehicle;
 
-import com.google.common.base.Predicate;
-
 public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
-	public interface TemperatureProvider {
-		int getTemperature();
-	}
-
 	private static final double a = 1.3;// [W]
 	private static final double b = -63.4;// [W]
 	private static final double c = 1748.1;// [W]
@@ -36,25 +33,25 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 	private static final int minTemp = -20;
 	private static final int maxTemp = 40;
 
-	// t - air temp [oC]
+	// temp - air temp [oC]
 	// power - avg power [W]
-	private static double calcPower(int t) {
-		if (t < minTemp || t > maxTemp) {
+	private static double calcPower(double temp) {
+		if (temp < minTemp || temp > maxTemp) {
 			throw new IllegalArgumentException();
 		}
-		return (a * t + b) * t + c;
+		return (a * temp + b) * temp + c;
 	}
 
 	public static OhdeSlaskiAuxEnergyConsumption createConsumptionForFixedTemperatureAndAlwaysOn(ElectricVehicle ev,
 			int temperature) {
-		return new OhdeSlaskiAuxEnergyConsumption(ev, () -> temperature, (v) -> true);
+		return new OhdeSlaskiAuxEnergyConsumption(ev, () -> temperature, v -> true);
 	}
 
 	private final ElectricVehicle ev;
-	private final TemperatureProvider temperatureProvider;
+	private final DoubleSupplier temperatureProvider;
 	private final Predicate<ElectricVehicle> isTurnedOn;
 
-	public OhdeSlaskiAuxEnergyConsumption(ElectricVehicle ev, TemperatureProvider temperatureProvider,
+	public OhdeSlaskiAuxEnergyConsumption(ElectricVehicle ev, DoubleSupplier temperatureProvider,
 			Predicate<ElectricVehicle> isTurnedOn) {
 		this.ev = ev;
 		this.temperatureProvider = temperatureProvider;
@@ -63,6 +60,6 @@ public class OhdeSlaskiAuxEnergyConsumption implements AuxEnergyConsumption {
 
 	@Override
 	public double calcEnergyConsumption(double period) {
-		return isTurnedOn.apply(ev) ? calcPower(temperatureProvider.getTemperature()) * period : 0;
+		return isTurnedOn.test(ev) ? calcPower(temperatureProvider.getAsDouble()) * period : 0;
 	}
 }

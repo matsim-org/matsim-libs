@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +16,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.ev.charging;
+package org.matsim.vsp.ev.data.file;
 
-import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
-import org.matsim.vsp.ev.EvConfigGroup;
-import org.matsim.vsp.ev.data.Charger;
+import java.net.URL;
+
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.vsp.ev.data.ChargingInfrastructure;
+import org.matsim.vsp.ev.data.ChargingInfrastructureImpl;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
+import com.google.inject.name.Named;
 
-public class ChargingHandler implements MobsimAfterSimStepListener {
-	private final Iterable<Charger> chargers;
-	private final int chargeTimeStep;
-
+/**
+ * @author michalm
+ */
+public class ChargingInfrastructureProvider implements Provider<ChargingInfrastructure> {
 	@Inject
-	public ChargingHandler(ChargingInfrastructure chargingInfrastructure, EvConfigGroup evConfig) {
-		this.chargers = chargingInfrastructure.getChargers().values();
-		this.chargeTimeStep = evConfig.getChargeTimeStep();
+	@Named(ChargingInfrastructure.CHARGERS)
+	private Network network;
+
+	private final URL url;
+
+	public ChargingInfrastructureProvider(URL url) {
+		this.url = url;
 	}
 
 	@Override
-	public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
-		if ((e.getSimulationTime() + 1) % chargeTimeStep == 0) {
-			for (Charger c : chargers) {
-				c.getLogic().chargeVehicles(chargeTimeStep, e.getSimulationTime());
-			}
-		}
+	public ChargingInfrastructure get() {
+		ChargingInfrastructureImpl chargingInfrastructure = new ChargingInfrastructureImpl();
+		new ChargerReader(network, chargingInfrastructure).parse(url);
+		return chargingInfrastructure;
 	}
 }

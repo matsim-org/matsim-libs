@@ -39,6 +39,4 @@ public interface Charger extends BasicLocation<Charger> {
 	 * @return number of plugs
 	 */
 	int getPlugs();
-
-	void resetLogic();
 }
