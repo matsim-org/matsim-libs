@@ -45,11 +45,12 @@ public class RunBicycleExample {
 
 	public static void main(String[] args) {
 		// This works when the data is stored under "/matsim/contribs/bicycle/src/main/resources/bicycle_example"
+		Config config = ConfigUtils.loadConfig("bicycle_example/config.xml", new BicycleConfigGroup());
+		config.network().setInputFile("network_cobblestone.xml"); // change test cases
+		
+//		fillConfigWithBicycleStandardValues(config); // actually not necessary; does not really save anything
+		config.controler().setLastIteration(0); // modifiy if motorized interaction is used
 		boolean considerMotorizedInteraction = false;
-//		Config config = ConfigUtils.loadConfig("bicycle_example/config.xml", new BicycleConfigGroup());
-		Config config = ConfigUtils.loadConfig("/Users/dominik/Bicycle/fgcs/equil/config-b.xml", new BicycleConfigGroup());
-//		Config config = createStandardBicycleConfig();
-		config.controler().setLastIteration(0);
 		new RunBicycleExample().run(config, considerMotorizedInteraction);
 	}
 
@@ -81,24 +82,15 @@ public class RunBicycleExample {
 		controler.run();
 	}
 	
-	private static Config createStandardBicycleConfig() {
-		Config config = ConfigUtils.createConfig();
-		
-		config.addModule(new BicycleConfigGroup());
-		
-		config.controler().setOutputDirectory("./output");
+	private static void fillConfigWithBicycleStandardValues(Config config) {
 		config.controler().setWriteEventsInterval(1);
-		
-		config.plans().setInputFile("population_1200.xml");
-		
-		config.network().setInputFile("network_normal.xml");
 		
 		config.getModules().get("bicycle").getParams().put("marginalUtilityOfInfrastructure_m", "-0.0002");
 		config.getModules().get("bicycle").getParams().put("marginalUtilityOfComfort_m", "-0.0002");
 		config.getModules().get("bicycle").getParams().put("marginalUtilityOfGradient_m_100m", "-0.02");
 		
 		List<String> mainModeList = new ArrayList<>();
-		mainModeList.add("bibycle");
+		mainModeList.add("bicycle");
 		mainModeList.add(TransportMode.car);
 		config.qsim().setMainModes(mainModeList);
 		
@@ -131,7 +123,5 @@ public class RunBicycleExample {
 		config.planCalcScore().addModeParams(bicycle);
 		
 		config.plansCalcRoute().setNetworkModes(mainModeList);
-		
-		return config;
 	}
 }
