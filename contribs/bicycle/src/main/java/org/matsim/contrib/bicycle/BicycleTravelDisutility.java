@@ -54,7 +54,11 @@ public class BicycleTravelDisutility implements TravelDisutility {
 	private final TravelTime timeCalculator;
 
 	// "cache" of the random value
-	private double logNormalRnd;
+	private double normalRndLink;
+	private double logNormalRndDist;
+	private double logNormalRndInf;
+	private double logNormalRndComf;
+	private double logNormalRndGrad;
 	private Person prevPerson;
 
 	
@@ -92,9 +96,10 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		return getTravelDisutilityBasedOnTTime(link, time, person, vehicle, travelTime);
 	}
 
-	
+	// Keep these two methods separate for now because BicycleLinkScoring (currently not used) would need this)
 	public double getTravelDisutilityBasedOnTTime(Link link, double enterTime, Person person, Vehicle vehicle, double travelTime) {
 		// TODO Needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
+		// Also see comments in BicycleTravelDisutilityFactory
 		Link linkWithAttributes = network.getLinks().get(link.getId());
 		
 		String surface = (String) linkWithAttributes.getAttributes().getAttribute(BicycleLabels.SURFACE);
@@ -123,16 +128,23 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		// TODO Other influence factors
 		
 		// randomize if applicable:
-		if ( sigma != 0. ) {
-			if ( person==null ) {
+		if (sigma != 0.) {
+			if (person==null) {
 				throw new RuntimeException("you cannot use the randomzing travel disutility without person.  If you need this without a person, set"
 						+ "sigma to zero.") ;
 			}
-			if ( person != prevPerson ) {
-				prevPerson = person ;
+			normalRndLink = 0.05 * random.nextGaussian();
+			if (person != prevPerson) {
+				prevPerson = person;
 
-				logNormalRnd = Math.exp( sigma * random.nextGaussian() ) ;
-				logNormalRnd *= normalization ;
+				logNormalRndDist = Math.exp(sigma * random.nextGaussian());
+				logNormalRndInf = Math.exp(sigma * random.nextGaussian());
+				logNormalRndComf = Math.exp(sigma * random.nextGaussian());
+				logNormalRndGrad = Math.exp(sigma * random.nextGaussian());
+				logNormalRndDist *= normalization;
+				logNormalRndInf *= normalization;
+				logNormalRndComf *= normalization;
+				logNormalRndGrad *= normalization;
 				// this should be a log-normal distribution with sigma as the "width" parameter.   Instead of figuring out the "location"
 				// parameter mu, I rather just normalize (which should be the same, see next). kai, nov'13
 
@@ -144,24 +156,25 @@ public class BicycleTravelDisutility implements TravelDisutility {
 				 * </ul>
 				 * Should be tested. kai, jan'14 */
 			}
-			// do not use custom attributes in core??  but what would be a better solution here?? kai, mar'15
-			// Is this actually used anywhere? As far as I can see, this is at least no used in this class... td, Oct'15
-			person.getCustomAttributes().put("logNormalRnd", logNormalRnd ) ;
-			person.getAttributes().putAttribute("logNormalRnd", logNormalRnd);
 		} else {
-			logNormalRnd = 1. ;
+			normalRndLink = 1.;
+			logNormalRndDist = 1.;
+			logNormalRndInf = 1.;
+			logNormalRndComf = 1.;
+			logNormalRndGrad = 1.;
 		}
 
-		LOG.warn("person = " + person.getId() + " / link = " + linkWithAttributes.getId() + " / travelTimeDisutility = " + travelTimeDisutility
-				+ " / distanceDisutility = "+ distanceDisutility + " / infrastructureDisutility = " + infrastructureDisutility + " / comfortDisutility = "
-				+ comfortDisutility + " / gradientDisutility = " + gradientDisutility + " / randomfactor = " + logNormalRnd);
-		double disutility = travelTimeDisutility + logNormalRnd * (distanceDisutility + infrastructureDisutility + comfortDisutility + gradientDisutility);
-//		double disutility = travelTimeDisutility + logNormalRnd * distanceDisutility + (infrastructureDisutility + comfortDisutility + gradientDisutility);
-		LOG.warn("---------- disutility = " + disutility);
+		LOG.warn("Person = " + person.getId() + " / link = " + linkWithAttributes.getId() + " / ttD = " + travelTimeDisutility	+ " / dD = "+ distanceDisutility
+				+ " / infD = " + infrastructureDisutility + " / comfD = " + comfortDisutility + " / gradD = " + gradientDisutility + " / rnd = " + logNormalRndDist
+				+ " / rnd = " + logNormalRndDist + " / rndInf = "	+ logNormalRndInf + " / rndComf = " + logNormalRndComf + " / rndGrad = " + logNormalRndGrad);
+		double disutility = (1 + normalRndLink) * travelTimeDisutility + logNormalRndDist * distanceDisutility + logNormalRndInf * infrastructureDisutility
+				+ logNormalRndComf * comfortDisutility + logNormalRndGrad * gradientDisutility;
+//		double disutility = travelTimeDisutility + logNormalRndDist * distanceDisutility + (1 + normalRndLink) * logNormalRndInf * infrastructureDisutility
+//				+ (1 + normalRndLink) * logNormalRndComf * comfortDisutility + (1 + normalRndLink) * logNormalRndGrad * gradientDisutility;
+		LOG.warn("Disutility = " + disutility);
 		return disutility;
 	}
 
-	
 	@Override
 	public double getLinkMinimumTravelDisutility(Link link) {
 		return 0;
