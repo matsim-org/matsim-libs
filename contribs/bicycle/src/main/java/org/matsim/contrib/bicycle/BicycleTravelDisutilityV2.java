@@ -53,14 +53,15 @@ public class BicycleTravelDisutilityV2 implements TravelDisutility {
 		this.marginalCostOfComfort_m = -(bicycleConfigGroup.getMarginalUtilityOfComfort_m());
 		this.marginalCostOfGradient_m_100m = -(bicycleConfigGroup.getMarginalUtilityOfGradient_m_100m());
 		
-		// TODO only needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
+		// TODO Needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
+		// Also see comments in BicycleTravelDisutilityFactory
 		this.network = network;
 	}
 
 	
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-		// TODO only needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
+		// TODO Needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
 		Link linkWithAttributes = network.getLinks().get(link.getId());
 		
 		String surface = (String) linkWithAttributes.getAttributes().getAttribute(BicycleLabels.SURFACE);
