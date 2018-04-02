@@ -47,7 +47,8 @@ public class RunBicycleExample {
 		// This works when the data is stored under "/matsim/contribs/bicycle/src/main/resources/bicycle_example"
 		boolean considerMotorizedInteraction = false;
 //		Config config = ConfigUtils.loadConfig("bicycle_example/config.xml", new BicycleConfigGroup());
-		Config config = createStandardBicycleConfig();
+		Config config = ConfigUtils.loadConfig("/Users/dominik/Bicycle/fgcs/equil/config-b.xml", new BicycleConfigGroup());
+//		Config config = createStandardBicycleConfig();
 		config.controler().setLastIteration(0);
 		new RunBicycleExample().run(config, considerMotorizedInteraction);
 	}
