@@ -33,6 +33,7 @@ import org.matsim.vehicles.Vehicle;
 
 /**
  * @author smetzler, dziemke
+ * based on RandomizingTimeDistanceTravelDisutility and adding more components
  */
 public class BicycleTravelDisutility implements TravelDisutility {
 	private static final Logger LOG = Logger.getLogger(BicycleTravelDisutility.class);
@@ -84,13 +85,16 @@ public class BicycleTravelDisutility implements TravelDisutility {
 
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-		double travelTime = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
+		// TODO Needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
+		// Also see comments in BicycleTravelDisutilityFactory
+		Link linkWithAttributes = network.getLinks().get(link.getId());
+		double travelTime = timeCalculator.getLinkTravelTime(linkWithAttributes, time, person, vehicle);
 		return getTravelDisutilityBasedOnTTime(link, time, person, vehicle, travelTime);
 	}
 
 	
 	public double getTravelDisutilityBasedOnTTime(Link link, double enterTime, Person person, Vehicle vehicle, double travelTime) {
-		// TODO only needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
+		// TODO Needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
 		Link linkWithAttributes = network.getLinks().get(link.getId());
 		
 		String surface = (String) linkWithAttributes.getAttributes().getAttribute(BicycleLabels.SURFACE);
