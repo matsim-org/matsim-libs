@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.util.stats;
+package org.matsim.contrib.util.timeprofile;
 
 import java.awt.*;
 import java.util.List;
@@ -29,10 +29,6 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.data.xy.*;
 
 public class TimeProfileCharts {
-	public interface Customizer {
-		void customize(JFreeChart chart, ChartType chartType);
-	}
-
 	public enum ChartType {
 		Line, StackedArea;
 	}

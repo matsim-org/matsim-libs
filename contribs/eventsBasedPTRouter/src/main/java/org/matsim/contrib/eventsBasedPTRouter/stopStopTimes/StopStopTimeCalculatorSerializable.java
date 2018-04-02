@@ -1,5 +1,7 @@
 package org.matsim.contrib.eventsBasedPTRouter.stopStopTimes;
 
+import com.google.inject.Provider;
+import com.google.inject.Provides;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
@@ -20,7 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class StopStopTimeCalculatorSerializable implements VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler, Serializable {
+public class StopStopTimeCalculatorSerializable implements StopStopTimeCalculator, VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler, Serializable, Provider<StopStopTime> {
 
 	/**
 	 * 
@@ -108,7 +110,8 @@ public class StopStopTimeCalculatorSerializable implements VehicleArrivesAtFacil
 			}
 		};
 	}
-	private double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+	@Override
+	public double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
 		StopStopTimeData stopStopTimeData = stopStopTimes.get(stopOId.toString()).get(stopDId.toString());
 		totalCalls++;
 		if(stopStopTimeData.getNumData((int) (time/timeSlot))==0) {
@@ -120,13 +123,30 @@ public class StopStopTimeCalculatorSerializable implements VehicleArrivesAtFacil
 			return stopStopTimeData.getStopStopTime((int) (time / timeSlot));
 		}
 	}
-	private double getStopStopTimeVariance(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+	@Override
+	public double getStopStopTimeVariance(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
 		StopStopTimeData stopStopTimeData = stopStopTimes.get(stopOId.toString()).get(stopDId.toString());
 		if(stopStopTimeData.getNumData((int) (time/timeSlot))==0)
 			return 0;
 		else
 			return stopStopTimeData.getStopStopTimeVariance((int) (time/timeSlot));
 	}
+
+	@Provides
+	public StopStopTime get() {
+		return new StopStopTime() {
+			@Override
+			public double getStopStopTime(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+				return StopStopTimeCalculatorSerializable.this.getStopStopTime(stopOId,stopDId,time);
+			}
+
+			@Override
+			public double getStopStopTimeVariance(Id<TransitStopFacility> stopOId, Id<TransitStopFacility> stopDId, double time) {
+				return StopStopTimeCalculatorSerializable.this.getStopStopTimeVariance(stopOId,stopDId,time);
+			}
+		};
+	}
+
 	@Override
 	public void reset(int iteration) {
 		for(Map<String, StopStopTimeData> map:stopStopTimes.values())

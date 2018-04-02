@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE network SYSTEM "http://www.matsim.org/files/dtd/network_v2.dtd">
+<network>
+
+<!-- ====================================================================== -->
+
+	<nodes>
+		<node id="1" x="0.0" y="100.0" >
+		</node>
+		<node id="2" x="0.0" y="200.0" >
+		</node>
+		<node id="3" x="0.0" y="0.0" >
+		</node>
+		<node id="4" x="100.0" y="100.0" >
+		</node>
+		<node id="5" x="100.0" y="200.0" >
+		</node>
+		<node id="6" x="100.0" y="0.0" >
+		</node>
+		<node id="7" x="200.0" y="100.0" >
+		</node>
+		<node id="8" x="200.0" y="200.0" >
+		</node>
+		<node id="9" x="200.0" y="0.0" >
+		</node>
+	</nodes>
+
+<!-- ====================================================================== -->
+
+	<links capperiod="01:00:00" effectivecellsize="7.5" effectivelanewidth="3.75">
+		<link id="1" from="1" to="2" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="10" from="6" to="4" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="11" from="4" to="7" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="12" from="7" to="4" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="13" from="5" to="8" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="14" from="8" to="5" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="15" from="6" to="9" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="16" from="9" to="6" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="2" from="2" to="1" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="3" from="1" to="3" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="4" from="3" to="1" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="5" from="1" to="4" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="6" from="4" to="1" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="7" from="4" to="5" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="8" from="5" to="4" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+		<link id="9" from="4" to="6" length="100.0" freespeed="2.7" capacity="500.0" permlanes="1.0" oneway="1" modes="car" >
+		</link>
+	</links>
+
+<!-- ====================================================================== -->
+
+</network>
