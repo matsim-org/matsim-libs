@@ -39,6 +39,8 @@ import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
 import org.matsim.vsp.ev.discharging.DriveDischargingHandler;
 import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
 import org.matsim.vsp.ev.discharging.OhdeSlaskiDriveEnergyConsumption;
+import org.matsim.vsp.ev.stats.ChargerOccupancyTimeProfileCollectorProvider;
+import org.matsim.vsp.ev.stats.ChargerOccupancyXYDataProvider;
 import org.matsim.vsp.ev.stats.IndividualSocTimeProfileCollectorProvider;
 import org.matsim.vsp.ev.stats.SocHistogramTimeProfileCollectorProvider;
 
@@ -83,6 +85,8 @@ public class EvModule extends AbstractModule {
 		if (EvConfigGroup.get(getConfig()).getTimeProfiles()) {
 			addMobsimListenerBinding().toProvider(SocHistogramTimeProfileCollectorProvider.class);
 			addMobsimListenerBinding().toProvider(IndividualSocTimeProfileCollectorProvider.class);
+			addMobsimListenerBinding().toProvider(ChargerOccupancyTimeProfileCollectorProvider.class);
+			addMobsimListenerBinding().toProvider(ChargerOccupancyXYDataProvider.class);
 			// add more time profiles if necessary
 		}
 
@@ -90,7 +94,7 @@ public class EvModule extends AbstractModule {
 		addControlerListenerBinding().to(InitAtIterationStart.class);
 	}
 
-	static class InitAtIterationStart implements IterationStartsListener {
+	private static class InitAtIterationStart implements IterationStartsListener {
 		@Inject
 		private ElectricFleet evFleet;
 		@Inject
