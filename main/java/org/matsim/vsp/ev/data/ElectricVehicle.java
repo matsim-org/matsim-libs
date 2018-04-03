@@ -31,4 +31,8 @@ public interface ElectricVehicle extends Identifiable<ElectricVehicle> {
 	Battery getBattery();
 
 	Battery swapBattery(Battery battery);
+
+	void setDriveEnergyConsumption(DriveEnergyConsumption driveEnergyConsumption);
+
+	void setAuxEnergyConsumption(AuxEnergyConsumption auxEnergyConsumption);
 }

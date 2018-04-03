@@ -28,45 +28,41 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.vsp.ev.charging.ChargingHandler;
 import org.matsim.vsp.ev.charging.ChargingLogic;
-import org.matsim.vsp.ev.charging.ChargingLogic.Factory;
 import org.matsim.vsp.ev.charging.ChargingWithQueueingLogic;
 import org.matsim.vsp.ev.charging.FixedSpeedChargingStrategy;
-import org.matsim.vsp.ev.data.Charger;
 import org.matsim.vsp.ev.data.ChargingInfrastructure;
-import org.matsim.vsp.ev.data.EvFleet;
+import org.matsim.vsp.ev.data.ElectricFleet;
 import org.matsim.vsp.ev.data.file.ChargingInfrastructureProvider;
+import org.matsim.vsp.ev.data.file.ElectricFleetProvider;
 import org.matsim.vsp.ev.discharging.AuxDischargingHandler;
+import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
 import org.matsim.vsp.ev.discharging.DriveDischargingHandler;
+import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
+import org.matsim.vsp.ev.discharging.OhdeSlaskiDriveEnergyConsumption;
 import org.matsim.vsp.ev.stats.IndividualSocTimeProfileCollectorProvider;
 import org.matsim.vsp.ev.stats.SocHistogramTimeProfileCollectorProvider;
 
 import com.google.inject.name.Names;
 
 public class EvModule extends AbstractModule {
-	private static Factory DEFAULT_CHARGING_LOGIC_FACTORY = new Factory() {
-		@Override
-		public ChargingLogic create(Charger charger) {
-			return new ChargingWithQueueingLogic(charger, new FixedSpeedChargingStrategy(charger.getPower()));
-		}
-	};
+	private static ChargingLogic.Factory DEFAULT_CHARGING_LOGIC_FACTORY = charger -> new ChargingWithQueueingLogic(
+			charger, new FixedSpeedChargingStrategy(charger.getPower()));
 
-	private final EvFleet evFleet;
+	// Nissan Leaf
+	private static DriveEnergyConsumption.Factory DEFAULT_DRIVE_CONSUMPTION_FACTORY = electricVehicle -> new OhdeSlaskiDriveEnergyConsumption();
 
-	public EvModule(EvFleet evFleet) {
-		this.evFleet = evFleet;
-	}
-
-	public EvModule() {
-		this(null);
-	}
+	// no AUX consumption (TODO consider adding AUX to Drive for non-DVRP use cases...)
+	private static AuxEnergyConsumption.Factory DEFAULT_AUX_CONSUMPTION_FACTORY = electricVehicle -> (period -> 0);
 
 	@Override
 	public void install() {
 		EvConfigGroup evCfg = EvConfigGroup.get(getConfig());
 
-		if (evFleet != null) {
-			bind(EvFleet.class).toInstance(evFleet);
-		}
+		bind(ElectricFleet.class)
+				.toProvider(new ElectricFleetProvider(evCfg.getVehiclesFileUrl(getConfig().getContext())))
+				.asEagerSingleton();
+		bind(DriveEnergyConsumption.Factory.class).toInstance(DEFAULT_DRIVE_CONSUMPTION_FACTORY);
+		bind(AuxEnergyConsumption.Factory.class).toInstance(DEFAULT_AUX_CONSUMPTION_FACTORY);
 
 		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructure.CHARGERS)).to(Network.class)
 				.asEagerSingleton();
@@ -95,23 +91,22 @@ public class EvModule extends AbstractModule {
 	}
 
 	static class InitAtIterationStart implements IterationStartsListener {
-		private final EvFleet evFleet;
-		private final ChargingInfrastructure chargingInfrastructure;
-		private final ChargingLogic.Factory logicFactory;
-		private final EventsManager eventsManager;
-
 		@Inject
-		InitAtIterationStart(EvFleet evFleet, ChargingInfrastructure chargingInfrastructure,
-				ChargingLogic.Factory logicFactory, EventsManager eventsManager) {
-			this.evFleet = evFleet;
-			this.chargingInfrastructure = chargingInfrastructure;
-			this.logicFactory = logicFactory;
-			this.eventsManager = eventsManager;
-		}
+		private ElectricFleet evFleet;
+		@Inject
+		private ChargingInfrastructure chargingInfrastructure;
+		@Inject
+		private ChargingLogic.Factory logicFactory;
+		@Inject
+		private EventsManager eventsManager;
+		@Inject
+		private DriveEnergyConsumption.Factory driveConsumptionFactory;
+		@Inject
+		private AuxEnergyConsumption.Factory auxConsumptionFactory;
 
 		@Override
 		public void notifyIterationStarts(IterationStartsEvent event) {
-			evFleet.resetBatteries();
+			evFleet.resetBatteriesAndConsumptions(driveConsumptionFactory, auxConsumptionFactory);
 			chargingInfrastructure.initChargingLogics(logicFactory, eventsManager);
 		}
 	}

@@ -20,11 +20,16 @@
 package org.matsim.vsp.ev.discharging;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.vsp.ev.data.ElectricVehicle;
 
 /**
  * Net energy taken from the battery to propel the vehicle, i.e. consumed by the motor minus effectively regenerated
  * (returned back to the battery).
  */
 public interface DriveEnergyConsumption {
+	interface Factory {
+		DriveEnergyConsumption create(ElectricVehicle electricVehicle);
+	}
+
 	double calcEnergyConsumption(Link link, double travelTime);
 }

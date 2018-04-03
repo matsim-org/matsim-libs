@@ -31,17 +31,17 @@ import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.vsp.ev.data.ElectricVehicle;
-import org.matsim.vsp.ev.data.EvFleet;
+import org.matsim.vsp.ev.data.ElectricFleet;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class SocHistogramTimeProfileCollectorProvider implements Provider<MobsimListener> {
-	private final EvFleet evFleet;
+	private final ElectricFleet evFleet;
 	private final MatsimServices matsimServices;
 
 	@Inject
-	public SocHistogramTimeProfileCollectorProvider(EvFleet evFleet, MatsimServices matsimServices) {
+	public SocHistogramTimeProfileCollectorProvider(ElectricFleet evFleet, MatsimServices matsimServices) {
 		this.evFleet = evFleet;
 		this.matsimServices = matsimServices;
 	}
@@ -65,7 +65,7 @@ public class SocHistogramTimeProfileCollectorProvider implements Provider<Mobsim
 		return collector;
 	}
 
-	public static ProfileCalculator createSocHistogramCalculator(final EvFleet evFleet) {
+	public static ProfileCalculator createSocHistogramCalculator(final ElectricFleet evFleet) {
 		String[] header = { "0", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+", "0.8+", "0.9+" };
 		return TimeProfiles.createProfileCalculator(header, () -> {
 			UniformHistogram histogram = new UniformHistogram(0.1, header.length);

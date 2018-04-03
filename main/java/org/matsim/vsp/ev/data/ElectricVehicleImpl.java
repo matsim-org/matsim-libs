@@ -62,10 +62,12 @@ public class ElectricVehicleImpl implements ElectricVehicle {
 		return old;
 	}
 
+	@Override
 	public void setDriveEnergyConsumption(DriveEnergyConsumption driveEnergyConsumption) {
 		this.driveEnergyConsumption = driveEnergyConsumption;
 	}
 
+	@Override
 	public void setAuxEnergyConsumption(AuxEnergyConsumption auxEnergyConsumption) {
 		this.auxEnergyConsumption = auxEnergyConsumption;
 	}

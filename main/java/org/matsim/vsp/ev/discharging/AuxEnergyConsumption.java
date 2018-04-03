@@ -19,6 +19,12 @@
 
 package org.matsim.vsp.ev.discharging;
 
+import org.matsim.vsp.ev.data.ElectricVehicle;
+
 public interface AuxEnergyConsumption {
+	interface Factory {
+		AuxEnergyConsumption create(ElectricVehicle electricVehicle);
+	}
+
 	double calcEnergyConsumption(double period);
 }

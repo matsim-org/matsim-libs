@@ -58,7 +58,7 @@ public class DriveDischargingHandler
 	private final Map<Id<Vehicle>, EVDrive> evDrives;
 
 	@Inject
-	public DriveDischargingHandler(EvFleet data, Network network) {
+	public DriveDischargingHandler(ElectricFleet data, Network network) {
 		this.eVehicles = data.getElectricVehicles();
 		this.network = network;
 

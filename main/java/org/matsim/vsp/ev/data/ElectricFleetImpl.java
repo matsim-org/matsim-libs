@@ -19,12 +19,33 @@
 
 package org.matsim.vsp.ev.data;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
+import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
 
-public interface EvFleet {
-	public Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles();
+public class ElectricFleetImpl implements ElectricFleet {
+	private final Map<Id<ElectricVehicle>, ElectricVehicle> eVehicles = new LinkedHashMap<>();
 
-	public void resetBatteries();
+	@Override
+	public Map<Id<ElectricVehicle>, ElectricVehicle> getElectricVehicles() {
+		return Collections.unmodifiableMap(eVehicles);
+	}
+
+	public void addElectricVehicle(ElectricVehicle ev) {
+		eVehicles.put(ev.getId(), ev);
+	}
+
+	@Override
+	public void resetBatteriesAndConsumptions(DriveEnergyConsumption.Factory driveConsumptionFactory,
+			AuxEnergyConsumption.Factory auxConsumptionFactory) {
+		for (ElectricVehicle ev : eVehicles.values()) {
+			ev.getBattery().resetSoc();
+			ev.setDriveEnergyConsumption(driveConsumptionFactory.create(ev));
+			ev.setAuxEnergyConsumption(auxConsumptionFactory.create(ev));
+		}
+	}
 }

@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +16,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.vsp.ev.discharging;
+package org.matsim.vsp.ev.data.file;
 
-import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
-import org.matsim.vsp.ev.EvConfigGroup;
-import org.matsim.vsp.ev.data.ElectricVehicle;
+import java.net.URL;
+
 import org.matsim.vsp.ev.data.ElectricFleet;
+import org.matsim.vsp.ev.data.ElectricFleetImpl;
 
-import com.google.inject.Inject;
+import com.google.inject.Provider;
 
-public class AuxDischargingHandler implements MobsimAfterSimStepListener {
-	private final ElectricFleet evFleet;
-	private final int auxDischargeTimeStep;
+/**
+ * @author michalm
+ */
+public class ElectricFleetProvider implements Provider<ElectricFleet> {
+	private final URL url;
 
-	@Inject
-	public AuxDischargingHandler(ElectricFleet evFleet, EvConfigGroup evConfig) {
-		this.evFleet = evFleet;
-		this.auxDischargeTimeStep = evConfig.getAuxDischargeTimeStep();
+	public ElectricFleetProvider(URL url) {
+		this.url = url;
 	}
 
 	@Override
-	public void notifyMobsimAfterSimStep(@SuppressWarnings("rawtypes") MobsimAfterSimStepEvent e) {
-		if ((e.getSimulationTime() + 1) % auxDischargeTimeStep == 0) {
-			for (ElectricVehicle ev : evFleet.getElectricVehicles().values()) {
-				double energy = ev.getAuxEnergyConsumption().calcEnergyConsumption(auxDischargeTimeStep);
-				ev.getBattery().discharge(energy);
-			}
-		}
+	public ElectricFleet get() {
+		ElectricFleetImpl fleet = new ElectricFleetImpl();
+		new ElectricVehicleReader(fleet).parse(url);
+		return fleet;
 	}
 }

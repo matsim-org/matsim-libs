@@ -29,17 +29,17 @@ import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.vsp.ev.EvUnitConversions;
 import org.matsim.vsp.ev.data.ElectricVehicle;
-import org.matsim.vsp.ev.data.EvFleet;
+import org.matsim.vsp.ev.data.ElectricFleet;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 
 public class IndividualSocTimeProfileCollectorProvider implements Provider<MobsimListener> {
-	private final EvFleet evFleet;
+	private final ElectricFleet evFleet;
 	private final MatsimServices matsimServices;
 
 	@Inject
-	public IndividualSocTimeProfileCollectorProvider(EvFleet evFleet, MatsimServices matsimServices) {
+	public IndividualSocTimeProfileCollectorProvider(ElectricFleet evFleet, MatsimServices matsimServices) {
 		this.evFleet = evFleet;
 		this.matsimServices = matsimServices;
 	}
@@ -52,7 +52,7 @@ public class IndividualSocTimeProfileCollectorProvider implements Provider<Mobsi
 
 	private static final int MAX_VEHICLE_COLUMNS = 50;
 
-	public static ProfileCalculator createIndividualSocCalculator(final EvFleet evFleet) {
+	public static ProfileCalculator createIndividualSocCalculator(final ElectricFleet evFleet) {
 		int columns = Math.min(evFleet.getElectricVehicles().size(), MAX_VEHICLE_COLUMNS);
 		List<ElectricVehicle> selectedEvs = evFleet.getElectricVehicles().values().stream().limit(columns)
 				.collect(Collectors.toList());
