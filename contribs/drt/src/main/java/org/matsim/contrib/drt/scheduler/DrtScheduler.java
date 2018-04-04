@@ -38,20 +38,16 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.data.Vehicles;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
-import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
-import org.matsim.contrib.dvrp.schedule.Schedules;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
-import org.matsim.contrib.dvrp.tracker.TaskTrackers;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.misc.Time;
 
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -64,14 +60,17 @@ public class DrtScheduler implements ScheduleInquiry {
 	private final double stopDuration;
 	private final MobsimTimer timer;
 	private final TravelTime travelTime;
+	private final DrtScheduleTimingUpdater scheduleTimingUpdater;
 
 	@Inject
 	public DrtScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer,
-			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime) {
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+			DrtScheduleTimingUpdater scheduleTimingUpdater) {
 		this.fleet = fleet;
 		this.stopDuration = drtCfg.getStopDuration();
 		this.timer = timer;
 		this.travelTime = travelTime;
+		this.scheduleTimingUpdater = scheduleTimingUpdater;
 
 		initFleet(drtCfg);
 	}
@@ -100,96 +99,6 @@ public class DrtScheduler implements ScheduleInquiry {
 		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
 		return currentTask.getTaskIdx() == schedule.getTaskCount() - 1 // last task (because no prebooking)
 				&& currentTask.getDrtTaskType() == DrtTaskType.STAY;
-	}
-
-	/**
-	 * Check and decide if the schedule should be updated due to if vehicle is Update timings (i.e. beginTime and
-	 * endTime) of all tasks in the schedule.
-	 */
-	public void updateBeforeNextTask(Vehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		// Assumption: there is no delay as long as the schedule has not been started (PLANNED)
-		if (schedule.getStatus() != ScheduleStatus.STARTED) {
-			return;
-		}
-
-		updateTimingsStartingFromCurrentTask(vehicle, timer.getTimeOfDay());
-	}
-
-	public void updateTimings(Vehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		if (schedule.getStatus() != ScheduleStatus.STARTED) {
-			return;
-		}
-
-		double predictedEndTime = TaskTrackers.predictEndTime(schedule.getCurrentTask(), timer.getTimeOfDay());
-		updateTimingsStartingFromCurrentTask(vehicle, predictedEndTime);
-	}
-
-	private void updateTimingsStartingFromCurrentTask(Vehicle vehicle, double newEndTime) {
-		Schedule schedule = vehicle.getSchedule();
-		Task currentTask = schedule.getCurrentTask();
-		if (currentTask.getEndTime() != newEndTime) {
-			currentTask.setEndTime(newEndTime);
-			updateTimingsStartingFromTaskIdx(vehicle, currentTask.getTaskIdx() + 1, newEndTime);
-		}
-	}
-
-	private void updateTimingsStartingFromTaskIdx(Vehicle vehicle, int startIdx, double newBeginTime) {
-		Schedule schedule = vehicle.getSchedule();
-		List<? extends Task> tasks = schedule.getTasks();
-
-		for (int i = startIdx; i < tasks.size(); i++) {
-			DrtTask task = (DrtTask)tasks.get(i);
-			double calcEndTime = calcNewEndTime(vehicle, task, newBeginTime);
-
-			if (Time.isUndefinedTime(calcEndTime)) {
-				schedule.removeTask(task);
-				i--;
-			} else if (calcEndTime < newBeginTime) {// 0 s is fine (e.g. last 'wait')
-				throw new IllegalStateException();
-			} else {
-				task.setBeginTime(newBeginTime);
-				task.setEndTime(calcEndTime);
-				newBeginTime = calcEndTime;
-			}
-		}
-	}
-
-	private double calcNewEndTime(Vehicle vehicle, DrtTask task, double newBeginTime) {
-		switch (task.getDrtTaskType()) {
-			case STAY: {
-				if (Schedules.getLastTask(vehicle.getSchedule()).equals(task)) {// last task
-					// even if endTime=beginTime, do not remove this task!!! A DRT schedule should end with WAIT
-					return Math.max(newBeginTime, vehicle.getServiceEndTime());
-				} else {
-					// if this is not the last task then some other task (e.g. DRIVE or PICKUP)
-					// must have been added at time submissionTime <= t
-					double oldEndTime = task.getEndTime();
-					if (oldEndTime <= newBeginTime) {// may happen if the previous task is delayed
-						return Time.UNDEFINED_TIME;// remove the task
-					} else {
-						return oldEndTime;
-					}
-				}
-			}
-
-			case DRIVE: {
-				// cannot be shortened/lengthen, therefore must be moved forward/backward
-				VrpPathWithTravelData path = (VrpPathWithTravelData)((DriveTask)task).getPath();
-				// TODO one may consider recalculation of SP!!!!
-				return newBeginTime + path.getTravelTime();
-			}
-
-			case STOP: {
-				// TODO does not consider prebooking!!!
-				double duration = stopDuration;
-				return newBeginTime + duration;
-			}
-
-			default:
-				throw new IllegalStateException();
-		}
 	}
 
 	// =========================================================================================
@@ -272,8 +181,8 @@ public class DrtScheduler implements ScheduleInquiry {
 
 					// update timings
 					// TODO should be enough to update the timeline only till dropoffIdx...
-					updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle, stopTask.getTaskIdx() + 2,
-							driveFromPickupTask.getEndTime());
+					scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle,
+							stopTask.getTaskIdx() + 2, driveFromPickupTask.getEndTime());
 					///////
 				}
 
@@ -329,7 +238,8 @@ public class DrtScheduler implements ScheduleInquiry {
 
 		// update timings
 		// TODO should be enough to update the timeline only till dropoffIdx...
-		updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle, taskIdx + 2, driveFromPickupTask.getEndTime());
+		scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle, taskIdx + 2,
+				driveFromPickupTask.getEndTime());
 	}
 
 	private void insertDropoff(VehicleData.Entry vehicleEntry, DrtRequest request, InsertionWithPathData insertion) {
@@ -397,7 +307,8 @@ public class DrtScheduler implements ScheduleInquiry {
 			schedule.addTask(taskIdx + 1, driveFromDropoffTask);
 
 			// update timings
-			updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle, taskIdx + 2, driveFromDropoffTask.getEndTime());
+			scheduleTimingUpdater.updateTimingsStartingFromTaskIdx(vehicleEntry.vehicle, taskIdx + 2,
+					driveFromDropoffTask.getEndTime());
 		}
 	}
 

@@ -34,6 +34,7 @@ import org.matsim.contrib.drt.optimizer.insertion.PrecalculatablePathDataProvide
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
+import org.matsim.contrib.drt.scheduler.DrtScheduleTimingUpdater;
 import org.matsim.contrib.drt.scheduler.DrtScheduler;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
@@ -97,7 +98,8 @@ public final class DrtControlerCreator {
 				ActivityParams params = new ActivityParams(DrtStageActivityType.DRT_STAGE_ACTIVITY);
 				params.setTypicalDuration(1);
 				params.setScoringThisActivityAtAll(false);
-				config.planCalcScore().getScoringParametersPerSubpopulation().values().forEach(k->k.addActivityParams(params));
+				config.planCalcScore().getScoringParametersPerSubpopulation().values()
+						.forEach(k -> k.addActivityParams(params));
 				config.planCalcScore().addActivityParams(params);
 				Logger.getLogger(DrtControlerCreator.class).info(
 						"drt interaction scoring parameters not set. Adding default values (activity will not be scored).");
@@ -109,7 +111,8 @@ public final class DrtControlerCreator {
 				drtWalk.setMarginalUtilityOfDistance(walk.getMarginalUtilityOfDistance());
 				drtWalk.setMarginalUtilityOfTraveling(walk.getMarginalUtilityOfTraveling());
 				drtWalk.setMonetaryDistanceRate(walk.getMonetaryDistanceRate());
-				config.planCalcScore().getScoringParametersPerSubpopulation().values().forEach(k->k.addModeParams(drtWalk));
+				config.planCalcScore().getScoringParametersPerSubpopulation().values()
+						.forEach(k -> k.addModeParams(drtWalk));
 				Logger.getLogger(DrtControlerCreator.class)
 						.info("drt_walk scoring parameters not set. Adding default values (same as for walk mode).");
 			}
@@ -129,6 +132,7 @@ public final class DrtControlerCreator {
 				bind(UnplannedRequestInserter.class).to(DefaultUnplannedRequestInserter.class);
 				bind(EmptyVehicleRelocator.class).asEagerSingleton();
 				bind(DrtScheduler.class).asEagerSingleton();
+				bind(DrtScheduleTimingUpdater.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(DrtActionCreator.class).asEagerSingleton();
 				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
 				bind(ParallelPathDataProvider.class).asEagerSingleton();
