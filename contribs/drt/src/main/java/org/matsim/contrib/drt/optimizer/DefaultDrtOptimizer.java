@@ -35,6 +35,7 @@ import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocati
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.scheduler.DrtScheduleTimingUpdater;
 import org.matsim.contrib.drt.scheduler.DrtScheduler;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.dvrp.data.Fleet;
@@ -56,6 +57,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	private final DrtConfigGroup drtCfg;
 	private final Fleet fleet;
 	private final DrtScheduler scheduler;
+	private final DrtScheduleTimingUpdater scheduleTimingUpdater;
 	private final RebalancingStrategy rebalancingStrategy;
 	private final MobsimTimer mobsimTimer;
 	private final EventsManager eventsManager;
@@ -71,7 +73,8 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	@Inject
 	public DefaultDrtOptimizer(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer, EventsManager eventsManager,
 			DrtRequestValidator requestValidator, DepotFinder depotFinder, RebalancingStrategy rebalancingStrategy,
-			DrtScheduler scheduler, EmptyVehicleRelocator relocator, UnplannedRequestInserter requestInserter) {
+			DrtScheduler scheduler, DrtScheduleTimingUpdater scheduleTimingUpdater, EmptyVehicleRelocator relocator,
+			UnplannedRequestInserter requestInserter) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
@@ -80,6 +83,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		this.depotFinder = drtCfg.getIdleVehiclesReturnToDepots() ? depotFinder : null;
 		this.rebalancingStrategy = drtCfg.getRebalancingInterval() != 0 ? rebalancingStrategy : null;
 		this.scheduler = scheduler;
+		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.relocator = relocator;
 		this.requestInserter = requestInserter;
 	}
@@ -88,7 +92,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 	public void notifyMobsimBeforeSimStep(@SuppressWarnings("rawtypes") MobsimBeforeSimStepEvent e) {
 		if (requiresReoptimization) {
 			for (Vehicle v : fleet.getVehicles().values()) {
-				scheduler.updateTimings(v);
+				scheduleTimingUpdater.updateTimings(v);
 			}
 
 			requestInserter.scheduleUnplannedRequests(unplannedRequests);
@@ -131,7 +135,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 
 	@Override
 	public void nextTask(Vehicle vehicle) {
-		scheduler.updateBeforeNextTask(vehicle);
+		scheduleTimingUpdater.updateBeforeNextTask(vehicle);
 
 		vehicle.getSchedule().nextTask();
 
