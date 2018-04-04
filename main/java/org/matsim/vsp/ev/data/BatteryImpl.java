@@ -53,7 +53,7 @@ public class BatteryImpl implements Battery {
 		}
 		this.soc = soc;
 		if (soc == 0) {
-			LOGGER.warning("Battery SoC has fallen to 0");
+			LOGGER.warning("Battery SoC is 0");
 		}
 	}
 
