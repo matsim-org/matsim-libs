@@ -39,8 +39,6 @@ import org.matsim.contrib.dvrp.data.Vehicles;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
 import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
@@ -55,7 +53,7 @@ import com.google.inject.name.Named;
 /**
  * @author michalm
  */
-public class DrtScheduler implements ScheduleInquiry {
+public class DrtScheduler {
 	private final Fleet fleet;
 	private final double stopDuration;
 	private final MobsimTimer timer;
@@ -87,18 +85,6 @@ public class DrtScheduler implements ScheduleInquiry {
 			veh.getSchedule()
 					.addTask(new DrtStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
 		}
-	}
-
-	@Override
-	public boolean isIdle(Vehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		if (timer.getTimeOfDay() >= vehicle.getServiceEndTime() || schedule.getStatus() != ScheduleStatus.STARTED) {
-			return false;
-		}
-
-		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
-		return currentTask.getTaskIdx() == schedule.getTaskCount() - 1 // last task (because no prebooking)
-				&& currentTask.getDrtTaskType() == DrtTaskType.STAY;
 	}
 
 	// =========================================================================================

@@ -34,6 +34,7 @@ import org.matsim.contrib.drt.optimizer.insertion.PrecalculatablePathDataProvide
 import org.matsim.contrib.drt.optimizer.insertion.UnplannedRequestInserter;
 import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
+import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.DrtScheduleTimingUpdater;
 import org.matsim.contrib.drt.scheduler.DrtScheduler;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
@@ -131,6 +132,7 @@ public final class DrtControlerCreator {
 				bind(DefaultUnplannedRequestInserter.class).asEagerSingleton();
 				bind(UnplannedRequestInserter.class).to(DefaultUnplannedRequestInserter.class);
 				bind(EmptyVehicleRelocator.class).asEagerSingleton();
+				bind(DrtScheduleInquiry.class).asEagerSingleton();
 				bind(DrtScheduler.class).asEagerSingleton();
 				bind(DrtScheduleTimingUpdater.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(DrtActionCreator.class).asEagerSingleton();
