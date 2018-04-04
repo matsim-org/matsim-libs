@@ -63,12 +63,12 @@ public class EmptyVehicleRelocator {
 		if (currentLink != link) {
 			VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(currentLink, link, time, router, travelTime);
 			if (path.getArrivalTime() < vehicle.getServiceEndTime()) {
-				relocateEmptyVehicle(vehicle, path);
+				relocateVehicleImpl(vehicle, path);
 			}
 		}
 	}
 
-	private void relocateEmptyVehicle(Vehicle vehicle, VrpPathWithTravelData vrpPath) {
+	private void relocateVehicleImpl(Vehicle vehicle, VrpPathWithTravelData vrpPath) {
 		Schedule schedule = vehicle.getSchedule();
 		DrtStayTask stayTask = (DrtStayTask)schedule.getCurrentTask();
 		if (stayTask.getTaskIdx() != schedule.getTaskCount() - 1) {
