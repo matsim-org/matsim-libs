@@ -297,22 +297,4 @@ public class DrtScheduler {
 					driveFromDropoffTask.getEndTime());
 		}
 	}
-
-	public void relocateEmptyVehicle(Vehicle vehicle, VrpPathWithTravelData vrpPath) {
-		Schedule schedule = vehicle.getSchedule();
-		DrtStayTask stayTask = (DrtStayTask)schedule.getCurrentTask();
-		if (stayTask.getTaskIdx() != schedule.getTaskCount() - 1) {
-			throw new IllegalStateException("The current STAY task is not last. Not possible without prebooking");
-		}
-
-		if (vrpPath.getDepartureTime() < timer.getTimeOfDay()) {
-			throw new IllegalArgumentException("Too late. Planned departureTime=" + vrpPath.getDepartureTime()
-					+ " currentTime=" + timer.getTimeOfDay());
-		}
-
-		stayTask.setEndTime(vrpPath.getDepartureTime()); // finish STAY
-		schedule.addTask(new DrtDriveTask(vrpPath)); // add DRIVE
-		// append STAY
-		schedule.addTask(new DrtStayTask(vrpPath.getArrivalTime(), vehicle.getServiceEndTime(), vrpPath.getToLink()));
-	}
 }
