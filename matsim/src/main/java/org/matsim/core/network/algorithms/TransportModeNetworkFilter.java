@@ -91,6 +91,7 @@ public final class TransportModeNetworkFilter {
 				link2.setFreespeed(link.getFreespeed());
 				link2.setLength(link.getLength());
 				link2.setNumberOfLanes(link.getNumberOfLanes());
+				link2.getAttributes().putAttributes(link.getAttributes());
 				NetworkUtils.setType( ((Link) link2), NetworkUtils.getType(((Link) link)));
 				subNetwork.addLink(link2);
 			}

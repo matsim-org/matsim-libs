@@ -55,6 +55,15 @@ public final class Attributes {
 		return null;
 	}
 
+	public void putAttributes(Attributes attributes) {
+
+		String[] keys = attributes.getKeys();
+		Object[] values = attributes.getValues();
+		for (int i = 0; i < keys.length ; i++) {
+			putAttribute(keys[i], values[i]);
+		}
+	}
+
 	public Object getAttribute( final String attribute) {
 		final int insertion = Arrays.binarySearch( keys , attribute );
 
@@ -88,5 +97,13 @@ public final class Attributes {
 
 	int size() {
 		return keys.length;
+	}
+
+	public String[] getKeys() {
+		return keys;
+	}
+
+	public Object[] getValues() {
+		return values;
 	}
 }
