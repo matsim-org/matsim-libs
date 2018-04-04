@@ -30,7 +30,7 @@ import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.scheduler.DrtScheduler;
+import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -49,18 +49,19 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final Fleet fleet;
 	private final MobsimTimer mobsimTimer;
 	private final EventsManager eventsManager;
-	private final DrtScheduler scheduler;
+	private final RequestInsertionScheduler insertionScheduler;
 
 	private final ParallelMultiVehicleInsertionProblem insertionProblem;
 
 	@Inject
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
-			EventsManager eventsManager, DrtScheduler scheduler, PrecalculatablePathDataProvider pathDataProvider) {
+			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
+			PrecalculatablePathDataProvider pathDataProvider) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
 		this.eventsManager = eventsManager;
-		this.scheduler = scheduler;
+		this.insertionScheduler = insertionScheduler;
 
 		insertionProblem = new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer);
 	}
@@ -91,7 +92,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				}
 			} else {
 				BestInsertion bestInsertion = best.get();
-				scheduler.insertRequest(bestInsertion.vehicleEntry, req, bestInsertion.insertion);
+				insertionScheduler.scheduleRequest(bestInsertion.vehicleEntry, req, bestInsertion.insertion);
 				vData.updateEntry(bestInsertion.vehicleEntry.vehicle);
 				eventsManager.processEvent(new DrtRequestScheduledEvent(mobsimTimer.getTimeOfDay(), req.getId(),
 						bestInsertion.vehicleEntry.vehicle.getId(), req.getPickupTask().getEndTime(),

@@ -53,7 +53,7 @@ import com.google.inject.name.Named;
 /**
  * @author michalm
  */
-public class DrtScheduler {
+public class RequestInsertionScheduler {
 	private final Fleet fleet;
 	private final double stopDuration;
 	private final MobsimTimer timer;
@@ -61,7 +61,7 @@ public class DrtScheduler {
 	private final DrtScheduleTimingUpdater scheduleTimingUpdater;
 
 	@Inject
-	public DrtScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer,
+	public RequestInsertionScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			DrtScheduleTimingUpdater scheduleTimingUpdater) {
 		this.fleet = fleet;
@@ -89,7 +89,7 @@ public class DrtScheduler {
 
 	// =========================================================================================
 
-	public void insertRequest(VehicleData.Entry vehicleEntry, DrtRequest request, InsertionWithPathData insertion) {
+	public void scheduleRequest(VehicleData.Entry vehicleEntry, DrtRequest request, InsertionWithPathData insertion) {
 		insertPickup(vehicleEntry, request, insertion);
 		insertDropoff(vehicleEntry, request, insertion);
 	}

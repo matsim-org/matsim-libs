@@ -36,7 +36,7 @@ import org.matsim.contrib.drt.passenger.DrtRequestCreator;
 import org.matsim.contrib.drt.routing.DrtStageActivityType;
 import org.matsim.contrib.drt.scheduler.DrtScheduleInquiry;
 import org.matsim.contrib.drt.scheduler.DrtScheduleTimingUpdater;
-import org.matsim.contrib.drt.scheduler.DrtScheduler;
+import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.drt.scheduler.EmptyVehicleRelocator;
 import org.matsim.contrib.drt.vrpagent.DrtActionCreator;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
@@ -133,7 +133,7 @@ public final class DrtControlerCreator {
 				bind(UnplannedRequestInserter.class).to(DefaultUnplannedRequestInserter.class);
 				bind(EmptyVehicleRelocator.class).asEagerSingleton();
 				bind(DrtScheduleInquiry.class).asEagerSingleton();
-				bind(DrtScheduler.class).asEagerSingleton();
+				bind(RequestInsertionScheduler.class).asEagerSingleton();
 				bind(DrtScheduleTimingUpdater.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(DrtActionCreator.class).asEagerSingleton();
 				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
