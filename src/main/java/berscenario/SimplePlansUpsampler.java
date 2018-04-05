@@ -56,8 +56,8 @@ public class SimplePlansUpsampler {
 	static final int clonePlans = 9; 
 	static final int radius = 500;
 	static final int timeVariation = 900;
-	static final String inputPopulation = "D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\population\\be_251.output_plans_selected.xml.gz";
-	static final String outputPopulation = "D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\population\\be_251.output_plans_selected_1.0upsample.xml.gz";
+	static final String inputPopulation = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/berlin/be_251.output_plans_selected.xml.gz";
+	static final String outputPopulation = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/berlin/be_251.upsample.xml.gz";
 	
 	
 	public static void main(String[] args) {
