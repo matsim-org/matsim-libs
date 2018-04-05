@@ -1,4 +1,3 @@
-
 /* *********************************************************************** *
  * project: org.matsim.*
  *                                                                         *
@@ -81,7 +80,7 @@ public class RunDrtScenarioBatchWOBAV {
 //		List<Integer> setMaxTravelTimeBetaList = Arrays.asList(500);
 		
 		//for (Double demandScenario : demandScenarios){
-			int instanceNumber = 5;
+			int instanceNumber = 1;
 			for (int i = 1; i <= instanceNumber ; i++) {
 			//For each demandScenario we are generating a new config file
 			//Some config parameters will be taken from the provided config file
@@ -89,10 +88,10 @@ public class RunDrtScenarioBatchWOBAV {
 			//Define the path to the config file and enable / disable otfvis
 			final Config config = ConfigUtils.loadConfig("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\input\\config.xml",new DrtConfigGroup(), new DvrpConfigGroup(), new OTFVisConfigGroup());
 			
-			Scenario scenario = ScenarioUtils.loadScenario(config);
+			//Scenario scenario = ScenarioUtils.loadScenario(config);
 			
             VehicleType avType = new VehicleTypeImpl(Id.create("drt", VehicleType.class));
-            double avFactor = 1.0;
+            double avFactor = 0.1;
             avType.setFlowEfficiencyFactor(avFactor);
 
 			//OTFVis is an open source, OpenGL-based visualizer for looking at MATSim scenarios and output.
@@ -100,12 +99,12 @@ public class RunDrtScenarioBatchWOBAV {
 			boolean otfvis = false;
 			
 			//Overwrite existing configuration parameters
-			config.plans().setInputFile("population/vw218_it_"+i+"_sampleRate0.1replaceRate_1.0_pt_drt.xml.gz");
+			config.plans().setInputFile("population/vw219_it_"+i+"_sampleRate1.0replaceRate_1.0_pt_drt.xml.gz");
 			config.controler().setLastIteration(5); //Number of simulation iterations
 			config.controler().setWriteEventsInterval(1); //Write Events file every x-Iterations 
 			config.controler().setWritePlansInterval(1); //Write Plan file every x-Iterations
-			config.qsim().setFlowCapFactor(0.12);
-			config.qsim().setStorageCapFactor(0.24);
+			config.qsim().setFlowCapFactor(0.85);
+			config.qsim().setStorageCapFactor(1.0);
 
 			config.network().setInputFile("network/network_area_wob_withDRT_links.xml.gz");
 			
@@ -126,14 +125,14 @@ public class RunDrtScenarioBatchWOBAV {
 			drt.setMaxWalkDistance(500.0);
 			
 			
-			String runId = "it_"+i+"_sampleRate0.1replaceRate_1.0_pt_drt_60veh_AV_"+avFactor;
+			String runId = "it_"+i+"_sampleRate1.0replaceRate_1.0_pt_drt_600veh_AV_"+avFactor;
 			config.controler().setRunId(runId);
 			
 			config.controler().setOutputDirectory("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\output\\"+runId); //Define dynamically the the output path
 			
 			
 			//For each demand scenario we are using a predefined drt vehicle fleet size 
-			drt.setVehiclesFile("fleets/fleet_60.xml.gz");
+			drt.setVehiclesFile("fleets/fleet_600.xml.gz");
 			
 			
 			//Define the MATSim Controler
@@ -204,4 +203,5 @@ public class RunDrtScenarioBatchWOBAV {
 		//}
 	}
 }
+
 

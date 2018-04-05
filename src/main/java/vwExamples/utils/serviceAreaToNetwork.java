@@ -53,7 +53,7 @@ private final static double northernLimit =  52.497724;
 	private Network network = NetworkUtils.createNetwork();
 	//Set source for the initial network file
 	
-	static File inputNetworkFile = new File("D://Axer//MatsimDataStore//WOB_BS_DRT//WOB//input//network//vw208.1.0.output_network.xml.gz");
+	static File inputNetworkFile = new File("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\input\\network\\vw219.output_network.xml.gz");
 	static String networkfolder = inputNetworkFile.getParent();
 	
 	String outputNetworkFile = networkfolder+"/../network/network_area_wob_withDRT_links.xml.gz";

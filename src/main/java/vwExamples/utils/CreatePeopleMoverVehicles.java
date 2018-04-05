@@ -51,11 +51,11 @@ public class CreatePeopleMoverVehicles {
 	static double operationStartTime = 0.; //t0
 	static double operationEndTime = 36*3600.;	//t1
 	static int seats = 8;
-	static File networkfile = new File("D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\network\\modifiedNetwork.xml.gz");
+	static File networkfile = new File("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\input\\network\\network_area_wob_withDRT_links.xml.gz");
 	static String networkfolder = networkfile.getParent();
 	static int increment = 10;
 	static String drtTag = "drt";
-	static int numberOfVehicles = 800;
+	static int numberOfVehicles = 1000;
 
 	public static void main(String[] args) {
 		

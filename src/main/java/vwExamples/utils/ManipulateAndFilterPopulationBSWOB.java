@@ -61,7 +61,7 @@ public class ManipulateAndFilterPopulationBSWOB {
 	static String serachMode = "pt";
 	static String newMode = "drt";
 	String shapeFeature = "NO";
-	static double samplePct = 0.10; //Global sample ratio
+	static double samplePct = 1.0; //Global sample ratio
 	static double replancementPct = 1.0; //Ratio of mode substitution 
 	static int instanceNumber = 5;
 	
@@ -73,16 +73,15 @@ public class ManipulateAndFilterPopulationBSWOB {
 	
 public static void main(String[] args) {
 
-	int instanceNumber = 5;
-	for (int i = 1; i <= instanceNumber ; i++) {
+		for (int i = 1; i <= instanceNumber ; i++) {
 
 		ManipulateAndFilterPopulationBSWOB manipulateAndFilterPopulation = new ManipulateAndFilterPopulationBSWOB();
 		//Create a Scenario
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		//Fill this Scenario with a population.
-		new PopulationReader(scenario).readFile("D:\\Axer\\MatsimDataStore\\BaseCases\\vw218\\vw218.output_plans.xml.gz");
-		new TransitScheduleReader(scenario).readFile("D:\\Axer\\MatsimDataStore\\BaseCases\\vw218\\vw218.output_transitSchedule.xml.gz");
-		String filteredPopDesination = ("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\input\\population\\vw218_it_"+i+"_sampleRate"+samplePct+"replaceRate_"+replancementPct+"_"+serachMode+"_"+newMode+".xml.gz");
+		new PopulationReader(scenario).readFile("D:\\Axer\\MatsimDataStore\\BaseCases\\vw219\\vw219.output_plans.xml.gz");
+		new TransitScheduleReader(scenario).readFile("D:\\Axer\\MatsimDataStore\\BaseCases\\vw219\\vw219.output_transitSchedule.xml.gz");
+		String filteredPopDesination = ("D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\WOB\\input\\population\\vw219_it_"+i+"_sampleRate"+samplePct+"replaceRate_"+replancementPct+"_"+serachMode+"_"+newMode+".xml.gz");
 		StreamingPopulationWriter filteredPop = new StreamingPopulationWriter();
 		filteredPop.startStreaming(filteredPopDesination);
 		int drtTrips = 0;
