@@ -21,7 +21,7 @@ package org.matsim.contrib.taxi.run.examples;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.contrib.dvrp.run.DvrpModule.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;
@@ -29,16 +29,9 @@ import org.matsim.contrib.taxi.passenger.TaxiRequestCreator;
 import org.matsim.contrib.taxi.scheduler.TaxiScheduler;
 import org.matsim.contrib.taxi.vrpagent.TaxiActionCreator;
 import org.matsim.core.mobsim.framework.MobsimTimer;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 
 import com.google.inject.Module;
 import com.google.inject.Provider;
-import com.google.inject.Provides;
-import com.google.inject.Singleton;
-import com.google.inject.name.Named;
 
 /**
  * @author michalm
@@ -65,25 +58,13 @@ public class TaxiDvrpModules {
 		return new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
+				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
+				DvrpModule.bindTravelDisutilityForOptimizer(binder(), DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
 				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
 				bind(TaxiScheduler.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
 				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
 				install(taxiOptimizerModule);
-			}
-
-			@Provides
-			@Singleton
-			private MobsimTimer provideTimer(QSim qSim) {
-				return qSim.getSimTimer();
-			}
-
-			@Provides
-			@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER)
-			private TravelDisutility provideTravelDisutility(
-					@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-					@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER) TravelDisutilityFactory travelDisutilityFactory) {
-				return travelDisutilityFactory.createTravelDisutility(travelTime);
 			}
 		};
 	}
