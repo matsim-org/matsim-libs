@@ -48,6 +48,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationUtils;
 import org.matsim.core.population.algorithms.PersonAlgorithm;
 import org.matsim.core.population.io.StreamingPopulationReader;
+import org.matsim.core.population.io.StreamingPopulationWriter;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Subtour;
 import org.matsim.core.router.TripStructureUtils.Trip;
@@ -79,7 +80,7 @@ public class modalSplitEvaluator {
 	Set<String> zones = new HashSet<>();
 	static Map<String, Geometry> zoneMap = new HashMap<>();
 	static String zoneList[] = {"0101","0102","0201","0202","0203","0204","0307","0403","0405","0701","0702"};
-	String shapeFile = "C:\\Temp\\shapes\\Prognoseraum_EPSG_31468.shp" ;
+	String shapeFile = "C:\\Users\\Joschka\\Documents\\shared-svn\\projects\\vw_rufbus\\projekt2\\drt_test_Scenarios\\vw-berlin\\Prognoseraum_EPSG_31468.shp" ;
 	String shapeFeature = "SCHLUESSEL";
 	StageActivityTypes stageActs;
 
@@ -87,7 +88,7 @@ public class modalSplitEvaluator {
 	public static void main(String[] args) {
 		modalSplitEvaluator tde = new modalSplitEvaluator();
 	
-		tde.run("C:\\Users\\VWBIDGN\\Downloads\\be_251.output_plans_selected.xml.gz");
+		tde.run("C:\\Users\\Joschka\\Documents\\shared-svn\\projects\\vw_rufbus\\projekt2\\drt_test_Scenarios\\vw-berlin\\be_251.output_plans_selected.xml.gz");
 	
 	}
 	
@@ -280,7 +281,6 @@ public class modalSplitEvaluator {
 			//Iterate over each group
 			Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			StreamingPopulationReader spr = new StreamingPopulationReader(scenario);
-			//StreamingPopulationReader spw = new StreamingPopulationReader(scenario);
 			
 			//A hash map that stores the mode as key and the traveled distances
 			//ptSlow or any mode that contains pt will be casted to pt
@@ -450,6 +450,25 @@ public class modalSplitEvaluator {
 			//Initialize absolute numbers of trips
 			ModalShare allTrafficModalShare = new ModalShare(distanceActivityPerModeAllTraffic);
 			System.out.println(allTrafficModalShare.modeTripsMapRelative.toString());
+			
+			StreamingPopulationReader spr2 = new StreamingPopulationReader(scenario);
+			StreamingPopulationWriter spw = new StreamingPopulationWriter();
+			spw.startStreaming(" name des output files");
+			spr.addAlgorithm(new PersonAlgorithm() {
+				
+				@Override
+				public void run(Person person) {
+					// TODO Auto-generated method stub
+					// etwasmit der Person machen (mode ersetzen)
+					
+				}
+			});
+			spr.addAlgorithm(spw);
+			spr.readFile(populationFile);
+			spw.closeStreaming();
+			
+			
+			
 		}
 		
 		
