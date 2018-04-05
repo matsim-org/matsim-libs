@@ -71,19 +71,14 @@ public class RequestInsertionScheduler {
 		this.travelTime = travelTime;
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
 		this.taskFactory = taskFactory;
-
-		initFleet(drtCfg);
 	}
 
-	private void initFleet(DrtConfigGroup drtCfg) {
-		if (drtCfg.isChangeStartLinkToLastLinkInSchedule()) {
-			for (Vehicle veh : fleet.getVehicles().values()) {
-				Vehicles.changeStartLinkToLastLinkInSchedule(veh);
-			}
-		}
-
+	public void initSchedules(boolean changeStartLinkToLastLinkInSchedule) {
 		((FleetImpl)fleet).resetSchedules();
 		for (Vehicle veh : fleet.getVehicles().values()) {
+			if (changeStartLinkToLastLinkInSchedule) {
+				Vehicles.changeStartLinkToLastLinkInSchedule(veh);
+			}
 			veh.getSchedule().addTask(taskFactory.createStayTask(veh, veh.getServiceBeginTime(),
 					veh.getServiceEndTime(), veh.getStartLink()));
 		}
