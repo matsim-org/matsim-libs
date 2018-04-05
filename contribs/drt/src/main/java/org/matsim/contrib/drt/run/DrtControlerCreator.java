@@ -122,17 +122,24 @@ public final class DrtControlerCreator {
 			protected void configure() {
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
 				DvrpModule.bindTravelDisutilityForOptimizer(binder(), DefaultDrtOptimizer.DRT_OPTIMIZER);
+
 				bind(DrtOptimizer.class).to(DefaultDrtOptimizer.class).asEagerSingleton();
 				bind(VrpOptimizer.class).to(DrtOptimizer.class);
+
 				bind(DefaultUnplannedRequestInserter.class).asEagerSingleton();
 				bind(UnplannedRequestInserter.class).to(DefaultUnplannedRequestInserter.class);
+
 				bind(DrtTaskFactory.class).to(DrtTaskFactoryImpl.class).asEagerSingleton();
+
 				bind(EmptyVehicleRelocator.class).asEagerSingleton();
 				bind(DrtScheduleInquiry.class).asEagerSingleton();
 				bind(RequestInsertionScheduler.class).asEagerSingleton();
 				bind(DrtScheduleTimingUpdater.class).asEagerSingleton();
+
 				bind(DynActionCreator.class).to(DrtActionCreator.class).asEagerSingleton();
+
 				bind(PassengerRequestCreator.class).to(DrtRequestCreator.class).asEagerSingleton();
+
 				bind(ParallelPathDataProvider.class).asEagerSingleton();
 				bind(PrecalculatablePathDataProvider.class).to(ParallelPathDataProvider.class);
 			}
