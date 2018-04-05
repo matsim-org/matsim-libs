@@ -59,10 +59,10 @@ import com.vividsolutions.jts.geom.Geometry;
 public class CreateStopsFromGrid {
 	public static void main(String[] args) {
 
-		String networkFile = "D://Axer//MatsimDataStore//WOB_BS_DRT//BS//input//network//network_area_bs_withDRT_links.xml.gz";
-		final String networkModeDesignator = "drt";
-		double gridCellSize = 400;
-		String transitStopsOutputFile = "D:\\Axer\\MatsimDataStore\\WOB_BS_DRT\\BS\\input\\virtualstops\\stopsGrid_" + Math.round(gridCellSize) + "m.xml";
+		String networkFile = "D:/cemdap-vw/input/networkpt-av-nov17_cleaned.xml.gz";
+		final String networkModeDesignator = "av";
+		double gridCellSize = 1000;
+		String transitStopsOutputFile = "D:/cemdap-vw/input/stopsGrid_" + Math.round(gridCellSize) + "m.xml";
 		TransitScheduleFactory f = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule = f.createTransitSchedule();
 		Network network = NetworkUtils.createNetwork();
