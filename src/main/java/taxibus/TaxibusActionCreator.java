@@ -31,12 +31,12 @@ public class TaxibusActionCreator implements VrpAgentLogic.DynActionCreator {
 	public static final String TAXIBUS_DROPOFF_NAME = "TaxibusDropoff";
 	public final static String TAXIBUS_PICKUP_NAME = "TaxibusPickup";
 	private final PassengerEngine passengerEngine;
-	private final VrpLegs.LegCreator legCreator;
+	private final VrpLegFactory legFactory;
 	private final double pickupDuration;
 
-	public TaxibusActionCreator(PassengerEngine passengerEngine, VrpLegs.LegCreator legCreator, double pickupDuration) {
+	public TaxibusActionCreator(PassengerEngine passengerEngine, VrpLegFactory legFactory, double pickupDuration) {
 		this.passengerEngine = passengerEngine;
-		this.legCreator = legCreator;
+		this.legFactory = legFactory;
 		this.pickupDuration = pickupDuration;
 	}
 
@@ -46,7 +46,7 @@ public class TaxibusActionCreator implements VrpAgentLogic.DynActionCreator {
 		switch (task.getTaxibusTaskType()) {
 			case DRIVE_EMPTY:
 			case DRIVE_WITH_PASSENGERS:
-				return legCreator.createLeg(vehicle);
+				return legFactory.create(vehicle);
 
 			case PICKUP:
 				final TaxibusPickupTask pst = (TaxibusPickupTask)task;
