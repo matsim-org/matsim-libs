@@ -26,13 +26,11 @@ import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.vrpagent.*;
-import org.matsim.contrib.dvrp.vrpagent.VrpLegs.LegCreator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.router.util.*;
 
-import com.beust.jcommander.internal.Nullable;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 
@@ -89,8 +87,8 @@ public class TaxibusQSimProvider implements Provider<QSim> {
 			qSim.addQueueSimulationListeners((MobsimListener) orderManager);
 		}
 
-		LegCreator legCreator = vehicle -> VrpLegs.createLegWithOfflineTracker(vehicle, qSim.getSimTimer());
-		TaxibusActionCreator actionCreator = new TaxibusActionCreator(passengerEngine, legCreator,
+		VrpLegFactory legFactory = vehicle -> VrpLegFactory.createWithOfflineTracker(vehicle, qSim.getSimTimer());
+		TaxibusActionCreator actionCreator = new TaxibusActionCreator(passengerEngine, legFactory,
 				tbcg.getPickupDuration());
 		qSim.addAgentSource(new VrpAgentSource(actionCreator, fleetData, optimizer, qSim));
 
