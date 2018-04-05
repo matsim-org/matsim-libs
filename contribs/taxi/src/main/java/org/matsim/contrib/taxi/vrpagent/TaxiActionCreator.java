@@ -25,9 +25,9 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
 import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
+import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
@@ -48,20 +48,22 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 	public static final String STAY_ACTIVITY_TYPE = "TaxiStay";
 
 	private final PassengerEngine passengerEngine;
-	private final VrpLegs.LegCreator legCreator;
+	private final VrpLegFactory legFactory;
 	private final double pickupDuration;
 
 	@Inject
 	public TaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, VrpOptimizer optimizer,
 			MobsimTimer timer) {
-		this(passengerEngine, taxiCfg.isOnlineVehicleTracker() ? //
-				VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking)optimizer, timer)
-				: VrpLegs.createLegWithOfflineTrackerCreator(timer), taxiCfg.getPickupDuration());
+		this(passengerEngine, //
+				taxiCfg.isOnlineVehicleTracker() //
+						? v -> VrpLegFactory.createWithOnlineTracker(v, (VrpOptimizerWithOnlineTracking)optimizer, timer)
+						: v -> VrpLegFactory.createWithOfflineTracker(v, timer), //
+				taxiCfg.getPickupDuration());
 	}
 
-	public TaxiActionCreator(PassengerEngine passengerEngine, VrpLegs.LegCreator legCreator, double pickupDuration) {
+	public TaxiActionCreator(PassengerEngine passengerEngine, VrpLegFactory legFactory, double pickupDuration) {
 		this.passengerEngine = passengerEngine;
-		this.legCreator = legCreator;
+		this.legFactory = legFactory;
 		this.pickupDuration = pickupDuration;
 	}
 
@@ -71,7 +73,7 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 		switch (task.getTaxiTaskType()) {
 			case EMPTY_DRIVE:
 			case OCCUPIED_DRIVE:
-				return legCreator.createLeg(vehicle);
+				return legFactory.create(vehicle);
 
 			case PICKUP:
 				final TaxiPickupTask pst = (TaxiPickupTask)task;
