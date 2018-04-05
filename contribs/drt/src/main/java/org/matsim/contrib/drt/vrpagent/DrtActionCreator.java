@@ -27,9 +27,9 @@ import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
 import org.matsim.contrib.dvrp.passenger.BusStopActivity;
 import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
@@ -43,12 +43,12 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	public static final String DRT_STAY_NAME = "DrtStay";
 	public final static String DRT_STOP_NAME = "DrtBusStop";
 	private final PassengerEngine passengerEngine;
-	private final VrpLegs.LegCreator legCreator;
+	private final VrpLegFactory legFactory;
 
 	@Inject
 	public DrtActionCreator(PassengerEngine passengerEngine, VrpOptimizer optimizer, MobsimTimer timer) {
 		this.passengerEngine = passengerEngine;
-		legCreator = VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking)optimizer, timer);
+		legFactory = v -> VrpLegFactory.createWithOnlineTracker(v, (VrpOptimizerWithOnlineTracking)optimizer, timer);
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 		DrtTask task = (DrtTask)vehicle.getSchedule().getCurrentTask();
 		switch (task.getDrtTaskType()) {
 			case DRIVE:
-				return legCreator.createLeg(vehicle);
+				return legFactory.create(vehicle);
 
 			case STOP:
 				DrtStopTask t = (DrtStopTask)task;
