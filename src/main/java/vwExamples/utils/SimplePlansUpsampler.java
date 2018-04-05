@@ -20,7 +20,7 @@
 /**
  * 
  */
-package berscenario;
+package vwExamples.utils;
 
 import java.util.Random;
 

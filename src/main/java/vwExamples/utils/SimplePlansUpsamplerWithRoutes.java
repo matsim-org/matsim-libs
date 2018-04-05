@@ -20,7 +20,7 @@
 /**
  * 
  */
-package berscenario;
+package vwExamples.utils;
 
 import java.util.Random;
 
@@ -51,13 +51,13 @@ import org.matsim.pt.router.TransitActsRemover;
 /**
  *
  */
-public class SimplePlansUpsampler {
+public class SimplePlansUpsamplerWithRoutes {
 	
 	static final int clonePlans = 9; 
 	static final int radius = 500;
 	static final int timeVariation = 900;
 	static final String inputPopulation = "D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\population\\be_251.output_plans_selected.xml.gz";
-	static final String outputPopulation = "D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\population\\be_251.output_plans_selected_1.0upsample.xml.gz";
+	static final String outputPopulation = "D:\\Axer\\MatsimDataStore\\Berlin_DRT\\input\\population\\be_251.output_plans_selected_1.0upsampleWithRoutes.xml.gz";
 	
 	
 	public static void main(String[] args) {
@@ -74,16 +74,16 @@ public class SimplePlansUpsampler {
 			@Override
 			public void run(Person person) {
 				Plan plan = person.getSelectedPlan();
-				for (PlanElement pe : plan.getPlanElements()){
-					if (pe instanceof Leg){
-						((Leg) pe).setRoute(null);
-						((Leg) pe).setDepartureTime(Time.UNDEFINED_TIME);
-						
-					} else if (pe instanceof Activity){
-						Activity act = (Activity) pe;
-						act.setLinkId(null);
-					}
-					}
+//				for (PlanElement pe : plan.getPlanElements()){
+//					if (pe instanceof Leg){
+//						((Leg) pe).setRoute(null);
+//						((Leg) pe).setDepartureTime(Time.UNDEFINED_TIME);
+//						
+//					} else if (pe instanceof Activity){
+//						Activity act = (Activity) pe;
+//						act.setLinkId(null);
+//					}
+//					}
 				PersonUtils.removeUnselectedPlans(person);
 				
 				spw.run(person);
@@ -94,15 +94,15 @@ public class SimplePlansUpsampler {
 					PopulationUtils.copyFromTo(plan, clonePlan);
 					
 					cloneP.addPlan(clonePlan);
-					for (PlanElement pe : clonePlan.getPlanElements()){
-						 if (pe instanceof Activity){
-							Activity act = (Activity) pe;
-							act.setLinkId(null);
-							Coord newCoord = new Coord(act.getCoord().getX()-radius+r.nextInt(2*radius),act.getCoord().getY()-radius+r.nextInt(2*radius));
-							act.setCoord(newCoord);
-							act.setEndTime(act.getEndTime()-timeVariation+r.nextInt(2*timeVariation));
-						}
-					}
+//					for (PlanElement pe : clonePlan.getPlanElements()){
+//						 if (pe instanceof Activity){
+//							Activity act = (Activity) pe;
+//							act.setLinkId(null);
+//							Coord newCoord = new Coord(act.getCoord().getX()-radius+r.nextInt(2*radius),act.getCoord().getY()-radius+r.nextInt(2*radius));
+//							act.setCoord(newCoord);
+//							act.setEndTime(act.getEndTime()-timeVariation+r.nextInt(2*timeVariation));
+//						}
+//					}
 					
 
 					spw.run(cloneP);
