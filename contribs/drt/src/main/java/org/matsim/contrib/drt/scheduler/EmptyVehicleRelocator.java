@@ -86,7 +86,7 @@ public class EmptyVehicleRelocator {
 		stayTask.setEndTime(vrpPath.getDepartureTime()); // finish STAY
 		schedule.addTask(taskFactory.createDriveTask(vehicle, vrpPath)); // add DRIVE
 		// append STAY
-		schedule.addTask(
-				taskFactory.createStayTask(vehicle, vrpPath.getArrivalTime(), vehicle.getServiceEndTime(), vrpPath.getToLink()));
+		schedule.addTask(taskFactory.createStayTask(vehicle, vrpPath.getArrivalTime(), vehicle.getServiceEndTime(),
+				vrpPath.getToLink()));
 	}
 }
