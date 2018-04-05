@@ -29,7 +29,7 @@ import org.matsim.vsp.ev.data.ElectricVehicle;
  * @author michalm
  */
 public class EvDvrpVehicle implements Vehicle {
-	public static EvDvrpVehicle create(Vehicle vehicle, ElectricFleet evFleet) {
+	static EvDvrpVehicle create(Vehicle vehicle, ElectricFleet evFleet) {
 		return new EvDvrpVehicle(vehicle, evFleet.getElectricVehicles().get(vehicle.getId()));
 	}
 
@@ -39,10 +39,6 @@ public class EvDvrpVehicle implements Vehicle {
 	public EvDvrpVehicle(Vehicle vehicle, ElectricVehicle electricVehicle) {
 		this.vehicle = vehicle;
 		this.electricVehicle = electricVehicle;
-	}
-
-	public Vehicle getVehicle() {
-		return vehicle;
 	}
 
 	public ElectricVehicle getElectricVehicle() {
@@ -81,11 +77,11 @@ public class EvDvrpVehicle implements Vehicle {
 
 	@Override
 	public void setStartLink(Link link) {
-		throw new UnsupportedOperationException();
+		vehicle.setStartLink(link);
 	}
 
 	@Override
 	public void resetSchedule() {
-		throw new UnsupportedOperationException();
+		vehicle.resetSchedule();
 	}
 }
