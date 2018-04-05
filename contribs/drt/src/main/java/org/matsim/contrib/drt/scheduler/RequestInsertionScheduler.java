@@ -27,11 +27,11 @@ import org.matsim.contrib.drt.optimizer.VehicleData;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
 import org.matsim.contrib.drt.optimizer.insertion.InsertionWithPathData;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
+import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.FleetImpl;
 import org.matsim.contrib.dvrp.data.Vehicle;
@@ -59,35 +59,30 @@ public class RequestInsertionScheduler {
 	private final MobsimTimer timer;
 	private final TravelTime travelTime;
 	private final DrtScheduleTimingUpdater scheduleTimingUpdater;
+	private final DrtTaskFactory taskFactory;
 
 	@Inject
 	public RequestInsertionScheduler(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer timer,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			DrtScheduleTimingUpdater scheduleTimingUpdater) {
+			DrtScheduleTimingUpdater scheduleTimingUpdater, DrtTaskFactory taskFactory) {
 		this.fleet = fleet;
 		this.stopDuration = drtCfg.getStopDuration();
 		this.timer = timer;
 		this.travelTime = travelTime;
 		this.scheduleTimingUpdater = scheduleTimingUpdater;
-
-		initFleet(drtCfg);
+		this.taskFactory = taskFactory;
 	}
 
-	private void initFleet(DrtConfigGroup drtCfg) {
-		if (drtCfg.isChangeStartLinkToLastLinkInSchedule()) {
-			for (Vehicle veh : fleet.getVehicles().values()) {
-				Vehicles.changeStartLinkToLastLinkInSchedule(veh);
-			}
-		}
-
+	public void initSchedules(boolean changeStartLinkToLastLinkInSchedule) {
 		((FleetImpl)fleet).resetSchedules();
 		for (Vehicle veh : fleet.getVehicles().values()) {
-			veh.getSchedule()
-					.addTask(new DrtStayTask(veh.getServiceBeginTime(), veh.getServiceEndTime(), veh.getStartLink()));
+			if (changeStartLinkToLastLinkInSchedule) {
+				Vehicles.changeStartLinkToLastLinkInSchedule(veh);
+			}
+			veh.getSchedule().addTask(taskFactory.createStayTask(veh, veh.getServiceBeginTime(),
+					veh.getServiceEndTime(), veh.getStartLink()));
 		}
 	}
-
-	// =========================================================================================
 
 	public void scheduleRequest(VehicleData.Entry vehicleEntry, DrtRequest request, InsertionWithPathData insertion) {
 		insertPickup(vehicleEntry, request, insertion);
@@ -112,7 +107,7 @@ public class RequestInsertionScheduler {
 				if (request.getFromLink() != vehicleEntry.start.link) { // add a new drive task
 					VrpPathWithTravelData vrpPath = VrpPaths.createPath(vehicleEntry.start.link, request.getFromLink(),
 							vehicleEntry.start.time, insertion.pathToPickup, travelTime);
-					beforePickupTask = new DrtDriveTask(vrpPath);
+					beforePickupTask = taskFactory.createDriveTask(vehicleEntry.vehicle, vrpPath);
 					schedule.addTask(currentTask.getTaskIdx() + 1, beforePickupTask);
 				} else { // no need for a new drive task
 					beforePickupTask = currentTask;
@@ -162,7 +157,7 @@ public class RequestInsertionScheduler {
 
 					VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getFromLink(), toLink,
 							stopTask.getEndTime(), insertion.pathFromPickup, travelTime);
-					Task driveFromPickupTask = new DrtDriveTask(vrpPath);
+					Task driveFromPickupTask = taskFactory.createDriveTask(vehicleEntry.vehicle, vrpPath);
 					schedule.addTask(stopTask.getTaskIdx() + 1, driveFromPickupTask);
 
 					// update timings
@@ -199,7 +194,7 @@ public class RequestInsertionScheduler {
 					// insert drive i->pickup
 					VrpPathWithTravelData vrpPath = VrpPaths.createPath(stayOrStopTask.getLink(), request.getFromLink(),
 							stayOrStopTask.getEndTime(), insertion.pathToPickup, travelTime);
-					beforePickupTask = new DrtDriveTask(vrpPath);
+					beforePickupTask = taskFactory.createDriveTask(vehicleEntry.vehicle, vrpPath);
 					schedule.addTask(stayOrStopTask.getTaskIdx() + 1, beforePickupTask);
 				}
 			}
@@ -208,7 +203,8 @@ public class RequestInsertionScheduler {
 		// insert pickup stop task
 		double startTime = beforePickupTask.getEndTime();
 		int taskIdx = beforePickupTask.getTaskIdx() + 1;
-		DrtStopTask pickupStopTask = new DrtStopTask(startTime, startTime + stopDuration, request.getFromLink());
+		DrtStopTask pickupStopTask = taskFactory.createStopTask(vehicleEntry.vehicle, startTime,
+				startTime + stopDuration, request.getFromLink());
 		schedule.addTask(taskIdx, pickupStopTask);
 		pickupStopTask.addPickupRequest(request);
 		request.setPickupTask(pickupStopTask);
@@ -219,7 +215,7 @@ public class RequestInsertionScheduler {
 
 		VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getFromLink(), toLink, startTime + stopDuration,
 				insertion.pathFromPickup, travelTime);
-		Task driveFromPickupTask = new DrtDriveTask(vrpPath);
+		Task driveFromPickupTask = taskFactory.createDriveTask(vehicleEntry.vehicle, vrpPath);
 		schedule.addTask(taskIdx + 1, driveFromPickupTask);
 
 		// update timings
@@ -258,7 +254,7 @@ public class RequestInsertionScheduler {
 				// insert drive i->dropoff
 				VrpPathWithTravelData vrpPath = VrpPaths.createPath(stopTask.getLink(), request.getToLink(),
 						stopTask.getEndTime(), insertion.pathToDropoff, travelTime);
-				driveToDropoffTask = new DrtDriveTask(vrpPath);
+				driveToDropoffTask = taskFactory.createDriveTask(vehicleEntry.vehicle, vrpPath);
 				schedule.addTask(stopTask.getTaskIdx() + 1, driveToDropoffTask);
 			}
 		}
@@ -266,7 +262,8 @@ public class RequestInsertionScheduler {
 		// insert dropoff stop task
 		double startTime = driveToDropoffTask.getEndTime();
 		int taskIdx = driveToDropoffTask.getTaskIdx() + 1;
-		DrtStopTask dropoffStopTask = new DrtStopTask(startTime, startTime + stopDuration, request.getToLink());
+		DrtStopTask dropoffStopTask = taskFactory.createStopTask(vehicleEntry.vehicle, startTime,
+				startTime + stopDuration, request.getToLink());
 		schedule.addTask(taskIdx, dropoffStopTask);
 		dropoffStopTask.addDropoffRequest(request);
 		request.setDropoffTask(dropoffStopTask);
@@ -279,8 +276,8 @@ public class RequestInsertionScheduler {
 			}
 			if (taskIdx + 1 == schedule.getTaskCount()) {
 
-				schedule.addTask(new DrtStayTask(dropoffStopTask.getEndTime(), vehicleEntry.vehicle.getServiceEndTime(),
-						dropoffStopTask.getLink()));
+				schedule.addTask(taskFactory.createStayTask(vehicleEntry.vehicle, dropoffStopTask.getEndTime(),
+						vehicleEntry.vehicle.getServiceEndTime(), dropoffStopTask.getLink()));
 			} else {
 				throw new RuntimeException();
 			}
@@ -289,7 +286,7 @@ public class RequestInsertionScheduler {
 
 			VrpPathWithTravelData vrpPath = VrpPaths.createPath(request.getToLink(), toLink, startTime + stopDuration,
 					insertion.pathFromDropoff, travelTime);
-			Task driveFromDropoffTask = new DrtDriveTask(vrpPath);
+			Task driveFromDropoffTask = taskFactory.createDriveTask(vehicleEntry.vehicle, vrpPath);
 			schedule.addTask(taskIdx + 1, driveFromDropoffTask);
 
 			// update timings

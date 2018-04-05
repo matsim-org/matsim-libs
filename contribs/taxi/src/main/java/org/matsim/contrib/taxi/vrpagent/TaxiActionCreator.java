@@ -20,13 +20,22 @@
 package org.matsim.contrib.taxi.vrpagent;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.optimizer.*;
-import org.matsim.contrib.dvrp.passenger.*;
-import org.matsim.contrib.dvrp.vrpagent.*;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
+import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.passenger.SinglePassengerDropoffActivity;
+import org.matsim.contrib.dvrp.passenger.SinglePassengerPickupActivity;
+import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
+import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
+import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.taxi.run.TaxiConfigGroup;
-import org.matsim.contrib.taxi.schedule.*;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.contrib.taxi.schedule.TaxiDropoffTask;
+import org.matsim.contrib.taxi.schedule.TaxiPickupTask;
+import org.matsim.contrib.taxi.schedule.TaxiStayTask;
+import org.matsim.contrib.taxi.schedule.TaxiTask;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import com.google.inject.Inject;
 
@@ -44,10 +53,10 @@ public class TaxiActionCreator implements VrpAgentLogic.DynActionCreator {
 
 	@Inject
 	public TaxiActionCreator(PassengerEngine passengerEngine, TaxiConfigGroup taxiCfg, VrpOptimizer optimizer,
-			QSim qSim) {
+			MobsimTimer timer) {
 		this(passengerEngine, taxiCfg.isOnlineVehicleTracker() ? //
-				VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking)optimizer, qSim.getSimTimer())
-				: VrpLegs.createLegWithOfflineTrackerCreator(qSim.getSimTimer()), taxiCfg.getPickupDuration());
+				VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking)optimizer, timer)
+				: VrpLegs.createLegWithOfflineTrackerCreator(timer), taxiCfg.getPickupDuration());
 	}
 
 	public TaxiActionCreator(PassengerEngine passengerEngine, VrpLegs.LegCreator legCreator, double pickupDuration) {

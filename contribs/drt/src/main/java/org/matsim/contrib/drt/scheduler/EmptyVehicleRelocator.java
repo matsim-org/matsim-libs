@@ -22,8 +22,8 @@ package org.matsim.contrib.drt.scheduler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
-import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.schedule.DrtTaskFactory;
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 import org.matsim.contrib.dvrp.path.VrpPaths;
@@ -45,14 +45,17 @@ import com.google.inject.name.Named;
 public class EmptyVehicleRelocator {
 	private final TravelTime travelTime;
 	private final MobsimTimer timer;
+	private final DrtTaskFactory taskFactory;
 	private final LeastCostPathCalculator router;
 
 	@Inject
 	public EmptyVehicleRelocator(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
-			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility, MobsimTimer timer) {
+			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility, MobsimTimer timer,
+			DrtTaskFactory taskFactory) {
 		this.travelTime = travelTime;
 		this.timer = timer;
+		this.taskFactory = taskFactory;
 		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 
@@ -81,8 +84,9 @@ public class EmptyVehicleRelocator {
 		}
 
 		stayTask.setEndTime(vrpPath.getDepartureTime()); // finish STAY
-		schedule.addTask(new DrtDriveTask(vrpPath)); // add DRIVE
+		schedule.addTask(taskFactory.createDriveTask(vehicle, vrpPath)); // add DRIVE
 		// append STAY
-		schedule.addTask(new DrtStayTask(vrpPath.getArrivalTime(), vehicle.getServiceEndTime(), vrpPath.getToLink()));
+		schedule.addTask(taskFactory.createStayTask(vehicle, vrpPath.getArrivalTime(), vehicle.getServiceEndTime(),
+				vrpPath.getToLink()));
 	}
 }
