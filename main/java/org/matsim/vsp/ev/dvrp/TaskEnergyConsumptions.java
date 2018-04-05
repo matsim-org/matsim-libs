@@ -47,9 +47,13 @@ public class TaskEnergyConsumptions {
 	}
 
 	public static double calcDriveEnergy(ElectricVehicle ev, VrpPath path) {
+		return calcRemainingDriveEnergy(ev, path, 1);// skip first link
+	}
+
+	public static double calcRemainingDriveEnergy(ElectricVehicle ev, VrpPath path, int currentLinkIdx) {
 		DriveEnergyConsumption consumption = ev.getDriveEnergyConsumption();
 		double energy = 0;
-		for (int i = 1; i < path.getLinkCount(); i++) {
+		for (int i = Math.max(currentLinkIdx, 1); i < path.getLinkCount(); i++) {// skip first link
 			energy += consumption.calcEnergyConsumption(path.getLink(i), path.getLinkTravelTime(i));
 		}
 		return energy;
