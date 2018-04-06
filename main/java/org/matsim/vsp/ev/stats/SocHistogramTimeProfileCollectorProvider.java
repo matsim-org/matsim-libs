@@ -30,8 +30,8 @@ import org.matsim.contrib.util.timeprofile.TimeProfileCollector.ProfileCalculato
 import org.matsim.contrib.util.timeprofile.TimeProfiles;
 import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
-import org.matsim.vsp.ev.data.ElectricVehicle;
 import org.matsim.vsp.ev.data.ElectricFleet;
+import org.matsim.vsp.ev.data.ElectricVehicle;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -51,22 +51,26 @@ public class SocHistogramTimeProfileCollectorProvider implements Provider<Mobsim
 		ProfileCalculator calc = createSocHistogramCalculator(evFleet);
 		TimeProfileCollector collector = new TimeProfileCollector(calc, 300, "soc_histogram_time_profiles",
 				matsimServices);
-
-		collector.setChartCustomizer((chart, chartType) -> {
-			Paint[] paints = new Paint[10];
-			for (int i = 0; i < 10; i++) {
-				float f = (float)Math.sin(Math.PI * (9f - i) / 9 / 2);
-				paints[i] = new Color(f, (float)Math.sqrt(1 - f * f), 0f);
-			}
-			TimeProfileCharts.changeSeriesColors(chart, paints);
-		});
-
 		collector.setChartTypes(ChartType.StackedArea);
+		collector.setChartCustomizer((chart, chartType) -> {
+			TimeProfileCharts.changeSeriesColors(chart, new Paint[] { //
+					new Color(0, 0f, 0), // 0+
+					new Color(1, 0f, 0), // 0.1+
+					new Color(1, .25f, 0), // 0.2+
+					new Color(1, .5f, 0), // 0.3+
+					new Color(1, .75f, 0), // 0.4+
+					new Color(1f, 1, 0), // 0.5+
+					new Color(.75f, 1, 0), // 0.6+
+					new Color(.5f, 1, 0), // 0.7+
+					new Color(.25f, 1, 0), // 0.8+
+					new Color(0f, 1, 0) // 0.9+
+			});
+		});
 		return collector;
 	}
 
 	public static ProfileCalculator createSocHistogramCalculator(final ElectricFleet evFleet) {
-		String[] header = { "0", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+", "0.8+", "0.9+" };
+		String[] header = { "0+", "0.1+", "0.2+", "0.3+", "0.4+", "0.5+", "0.6+", "0.7+", "0.8+", "0.9+" };
 		return TimeProfiles.createProfileCalculator(header, () -> {
 			UniformHistogram histogram = new UniformHistogram(0.1, header.length);
 			for (ElectricVehicle ev : evFleet.getElectricVehicles().values()) {
