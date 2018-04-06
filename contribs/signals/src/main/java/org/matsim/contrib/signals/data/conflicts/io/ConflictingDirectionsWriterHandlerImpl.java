@@ -36,12 +36,6 @@ import org.matsim.contrib.signals.model.SignalSystem;
  */
 public class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirectionsWriterHandler {
 
-	private final String CONFLICTING_DIRECTIONS = "conflicting directions";
-	private final String DIRECTIONS_WITH_RIGHT_OF_WAY = "directions with right of way";
-	private final String DIRECTIONS_WHICH_MUST_YIELD = "directions which must yield";
-	private final String NON_CONFLICTING_DIRECTIONS = "non-conflicting directions";
-	
-	
 	@Override
 	public void writeHeaderAndStartElement(BufferedWriter out) throws IOException {
 		out.write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
@@ -87,21 +81,21 @@ public class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirect
 	public void writeDirection(Direction direction, BufferedWriter out) throws IOException {
 		this.startDirection(direction, out);
 		
-		this.startTag(CONFLICTING_DIRECTIONS, out);
+		this.startTag(ConflictingDirectionsReader.CONFLICTING_DIRECTIONS, out);
 		this.writeListOfDirections(direction.getConflictingDirections(), out);
-		this.endTag(CONFLICTING_DIRECTIONS, out);
+		this.endTag(ConflictingDirectionsReader.CONFLICTING_DIRECTIONS, out);
 		
-		this.startTag(DIRECTIONS_WITH_RIGHT_OF_WAY, out);
+		this.startTag(ConflictingDirectionsReader.DIRECTIONS_WITH_RIGHT_OF_WAY, out);
 		this.writeListOfDirections(direction.getDirectionsWithRightOfWay(), out);
-		this.endTag(DIRECTIONS_WITH_RIGHT_OF_WAY, out);
+		this.endTag(ConflictingDirectionsReader.DIRECTIONS_WITH_RIGHT_OF_WAY, out);
 		
-		this.startTag(DIRECTIONS_WHICH_MUST_YIELD, out);
+		this.startTag(ConflictingDirectionsReader.DIRECTIONS_WHICH_MUST_YIELD, out);
 		this.writeListOfDirections(direction.getDirectionsWhichMustYield(), out);
-		this.endTag(DIRECTIONS_WHICH_MUST_YIELD, out);
+		this.endTag(ConflictingDirectionsReader.DIRECTIONS_WHICH_MUST_YIELD, out);
 		
-		this.startTag(NON_CONFLICTING_DIRECTIONS, out);
+		this.startTag(ConflictingDirectionsReader.NON_CONFLICTING_DIRECTIONS, out);
 		this.writeListOfDirections(direction.getNonConflictingDirections(), out);
-		this.endTag(NON_CONFLICTING_DIRECTIONS, out);
+		this.endTag(ConflictingDirectionsReader.NON_CONFLICTING_DIRECTIONS, out);
 		
 		this.endDirection(out);
 		out.write("\n\n");
@@ -129,9 +123,7 @@ public class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirect
 	
 	private void writeListOfDirections(List<Id<Direction>> directionList, BufferedWriter out) throws IOException {
 		for (Id<Direction> directionId : directionList) {
-			out.write("\t\t<direction");
-			out.write(" refId=\"" + directionId + "\"");
-			out.write(" >\n");
+			out.write(directionId + " ");
 		}
 	}
 
