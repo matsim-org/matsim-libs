@@ -30,11 +30,18 @@ public class ChargingTaskImpl extends StayTaskImpl implements ChargingTask {
 	private final ChargingWithQueueingAndAssignmentLogic chargingLogic;
 	private final ElectricVehicle ev;
 	private double chargingStartedTime;
+	private double totalEnergy;
 
 	public ChargingTaskImpl(double beginTime, double endTime, Charger charger, ElectricVehicle ev) {
 		super(beginTime, endTime, charger.getLink());
 		this.chargingLogic = (ChargingWithQueueingAndAssignmentLogic)charger.getLogic();
 		this.ev = ev;
+		totalEnergy = -chargingLogic.getChargingStrategy().calcRemainingEnergyToCharge(ev);
+	}
+
+	@Override
+	public double getTotalEnergy() {
+		return totalEnergy;
 	}
 
 	@Override

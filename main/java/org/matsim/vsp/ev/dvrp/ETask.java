@@ -18,18 +18,11 @@
 
 package org.matsim.vsp.ev.dvrp;
 
-import org.matsim.vsp.ev.charging.ChargingWithQueueingAndAssignmentLogic;
-import org.matsim.vsp.ev.data.ElectricVehicle;
+import org.matsim.contrib.dvrp.schedule.Task;
 
 /**
  * @author michalm
  */
-public interface ChargingTask extends ETask {
-	ChargingWithQueueingAndAssignmentLogic getChargingLogic();
-
-	ElectricVehicle getElectricVehicle();
-
-	double getChargingStartedTime();
-
-	void setChargingStartedTime(double chargingStartedTime);
+public interface ETask extends Task {
+	double getTotalEnergy();
 }
