@@ -26,6 +26,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.vsp.ev.EvConfigGroup.AuxDischargingSimulation;
 import org.matsim.vsp.ev.charging.ChargingHandler;
 import org.matsim.vsp.ev.charging.ChargingLogic;
 import org.matsim.vsp.ev.charging.ChargingWithQueueingLogic;
@@ -76,8 +77,10 @@ public class EvModule extends AbstractModule {
 		bind(DriveDischargingHandler.class).asEagerSingleton();
 		addEventHandlerBinding().to(DriveDischargingHandler.class);
 
-		bind(AuxDischargingHandler.class).asEagerSingleton();
-		addMobsimListenerBinding().to(AuxDischargingHandler.class);
+		if (evCfg.getAuxDischargingSimulation() == AuxDischargingSimulation.SeperateAuxDischargingHandler) {
+			bind(AuxDischargingHandler.class).asEagerSingleton();
+			addMobsimListenerBinding().to(AuxDischargingHandler.class);
+		}
 
 		bind(ChargingHandler.class).asEagerSingleton();
 		addMobsimListenerBinding().to(ChargingHandler.class);

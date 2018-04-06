@@ -19,14 +19,23 @@
 
 package org.matsim.vsp.ev.discharging;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.*;
-import org.matsim.api.core.v01.events.handler.*;
-import org.matsim.api.core.v01.network.*;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.VehicleEntersTrafficEvent;
+import org.matsim.api.core.v01.events.VehicleLeavesTrafficEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleEntersTrafficEventHandler;
+import org.matsim.api.core.v01.events.handler.VehicleLeavesTrafficEventHandler;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vsp.ev.data.*;
+import org.matsim.vsp.ev.EvConfigGroup;
+import org.matsim.vsp.ev.EvConfigGroup.AuxDischargingSimulation;
+import org.matsim.vsp.ev.data.ElectricFleet;
+import org.matsim.vsp.ev.data.ElectricVehicle;
 
 import com.google.inject.Inject;
 
@@ -55,14 +64,15 @@ public class DriveDischargingHandler
 
 	private final Network network;
 	private final Map<Id<ElectricVehicle>, ? extends ElectricVehicle> eVehicles;
+	private final boolean handleAuxDischarging;
 	private final Map<Id<Vehicle>, EVDrive> evDrives;
 
 	@Inject
-	public DriveDischargingHandler(ElectricFleet data, Network network) {
-		this.eVehicles = data.getElectricVehicles();
+	public DriveDischargingHandler(ElectricFleet data, Network network, EvConfigGroup evCfg) {
 		this.network = network;
-
-		// at least 10% of vehicles are driving during peak
+		eVehicles = data.getElectricVehicles();
+		handleAuxDischarging = evCfg
+				.getAuxDischargingSimulation() == AuxDischargingSimulation.InsideDriveDischargingHandler;
 		evDrives = new HashMap<>(eVehicles.size() / 10);
 	}
 
@@ -96,8 +106,12 @@ public class DriveDischargingHandler
 		if (evDrive != null && !evDrive.isOnFirstLink()) {// handle only our EVs, except for the first link
 			Link link = network.getLinks().get(linkId);
 			double tt = eventTime - evDrive.movedOverNodeTime;
-			double energy = evDrive.ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt);
-			evDrive.ev.getBattery().discharge(energy);
+			ElectricVehicle ev = evDrive.ev;
+			double energy = ev.getDriveEnergyConsumption().calcEnergyConsumption(link, tt);
+			if (handleAuxDischarging) {
+				energy += ev.getAuxEnergyConsumption().calcEnergyConsumption(tt);
+			}
+			ev.getBattery().discharge(energy);
 		}
 		return evDrive;
 	}
