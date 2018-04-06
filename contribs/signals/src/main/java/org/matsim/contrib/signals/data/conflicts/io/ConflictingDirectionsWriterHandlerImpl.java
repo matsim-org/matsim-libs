@@ -57,7 +57,7 @@ public class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirect
 	public void writeIntersections(ConflictData conflictData, BufferedWriter out) throws IOException {
 		for (ConflictingDirections conflictingDirections : conflictData.getConflictsPerSignalSystem().values()) {
 			this.startIntersection(conflictingDirections.getNodeId(), conflictingDirections.getSignalSystemId(), out);
-			for (Direction direction : conflictingDirections.getDirections()) {
+			for (Direction direction : conflictingDirections.getDirections().values()) {
 				this.writeDirection(direction, out);
 			}
 			this.endIntersection(out);

@@ -20,7 +20,7 @@
  */
 package org.matsim.contrib.signals.data.conflicts;
 
-import java.util.List;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -40,6 +40,6 @@ public interface ConflictingDirections {
 	
 	public Direction getDirection(Id<Link> fromLink, Id<Link> toLink);
 	
-	public List<Direction> getDirections();
+	public Map<Id<Direction>, Direction> getDirections();
 	
 }

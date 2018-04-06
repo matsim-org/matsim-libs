@@ -20,8 +20,8 @@
  */
 package org.matsim.contrib.signals.data.conflicts;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -35,7 +35,7 @@ public class ConflictingDirectionsImpl implements ConflictingDirections {
 
 	private Id<SignalSystem> signalSystemId;
 	private Id<Node> nodeId;
-	private List<Direction> directionsOfThisIntersection = new ArrayList<>();
+	private Map<Id<Direction>, Direction> directionsOfThisIntersection = new HashMap<>();
 	
 	ConflictingDirectionsImpl(Id<SignalSystem> signalSystemId, Id<Node> nodeId) {
 		this.signalSystemId = signalSystemId;
@@ -54,12 +54,12 @@ public class ConflictingDirectionsImpl implements ConflictingDirections {
 
 	@Override
 	public void addDirection(Direction direction) {
-		this.directionsOfThisIntersection.add(direction);
+		this.directionsOfThisIntersection.put(direction.getId(), direction);
 	}
 
 	@Override
 	public Direction getDirection(Id<Link> fromLink, Id<Link> toLink) {
-		for (Direction d : directionsOfThisIntersection) {
+		for (Direction d : directionsOfThisIntersection.values()) {
 			if (d.getFromLink().equals(fromLink) && d.getToLink().equals(toLink)) {
 				return d;
 			}
@@ -68,7 +68,7 @@ public class ConflictingDirectionsImpl implements ConflictingDirections {
 	}
 
 	@Override
-	public List<Direction> getDirections() {
+	public Map<Id<Direction>, Direction> getDirections() {
 		return directionsOfThisIntersection;
 	}
 
