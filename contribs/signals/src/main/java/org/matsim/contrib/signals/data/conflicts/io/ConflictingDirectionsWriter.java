@@ -20,10 +20,13 @@
  */
 package org.matsim.contrib.signals.data.conflicts.io;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.signals.data.conflicts.ConflictData;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
  * @author tthunig
@@ -33,25 +36,33 @@ public class ConflictingDirectionsWriter extends MatsimXmlWriter implements Mats
 	private static final Logger LOG = Logger.getLogger(ConflictingDirectionsWriter.class);
 	
 	private ConflictData conflictData;
+	private ConflictingDirectionsWriterHandlerImpl handler;
+	
 	
 	public ConflictingDirectionsWriter(ConflictData conflictData) {
 		this.conflictData = conflictData;
+		this.handler = new ConflictingDirectionsWriterHandlerImpl();
 	}
 	
 	@Override
 	public void write(String filename) {
 		LOG.info("Writing conflicting direction data to file: " + filename + "...");
 		
-		String dtd = null; // TODO
-		ConflictingDirectionsWriterHandlerImpl handler = new ConflictingDirectionsWriterHandlerImpl();
-		writeFile(dtd, handler, filename);
+		try {
+			this.openFile(filename);
+			this.handler.writeHeaderAndStartElement(this.writer);
+			this.handler.startConflictData(this.writer);
+			this.handler.writeSeparator(this.writer);
+			this.handler.writeIntersections(this.conflictData, this.writer);
+			this.handler.endConflictData(this.writer);
+			LOG.info("Conflict data written to: " + filename);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		} finally {
+			this.close();
+		}
 		
 		LOG.info("done.");
-	}
-
-	private void writeFile(String dtd, ConflictingDirectionsWriterHandlerImpl handler, String filename) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

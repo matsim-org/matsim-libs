@@ -23,7 +23,6 @@ package org.matsim.contrib.signals.data.conflicts.io;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.data.conflicts.ConflictData;
 import org.matsim.contrib.signals.data.conflicts.Direction;
 
@@ -31,11 +30,13 @@ import org.matsim.contrib.signals.data.conflicts.Direction;
  * @author tthunig
  */
 public interface ConflictingDirectionsWriterHandler {
+	
+	public void writeHeaderAndStartElement(final BufferedWriter out) throws IOException;
 
 	//////////////////////////////////////////////////////////////////////
 	// <conflictData ... > ... </conflictData>
 	//////////////////////////////////////////////////////////////////////
-	public void startConflictData(final ConflictData conflictData, final BufferedWriter out) throws IOException;	
+	public void startConflictData(final BufferedWriter out) throws IOException;	
 	
 	public void endConflictData(final BufferedWriter out) throws IOException;
 
@@ -43,17 +44,14 @@ public interface ConflictingDirectionsWriterHandler {
 	// <signalSystem ... > ... </signalSystem>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startSignalSystem(final Node node, final BufferedWriter out) throws IOException;
-
-	public void endSignalSystem(final BufferedWriter out) throws IOException;
+	public void writeIntersections(final ConflictData conflictData, final BufferedWriter out) throws IOException;
 
 	//////////////////////////////////////////////////////////////////////
 	// <direction ... > ... </direction>
 	//////////////////////////////////////////////////////////////////////
 
-	public void startDirection(final Direction direction, final BufferedWriter out) throws IOException;
-
-	public void endDirection(final BufferedWriter out) throws IOException;
+	public void writeDirection(final Direction direction, final BufferedWriter out) throws IOException;
+	
 	
 	public void writeSeparator(final BufferedWriter out) throws IOException;
 	
