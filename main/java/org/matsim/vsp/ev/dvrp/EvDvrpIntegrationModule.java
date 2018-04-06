@@ -58,6 +58,11 @@ public class EvDvrpIntegrationModule extends AbstractModule {
 				throw new RuntimeException("turnedOnPredicate must not be set"
 						+ " if auxDischargingSimulation == 'insideDriveDischargingHandler'");
 			}
+		} else {
+			if (turnedOnPredicate == null) {
+				throw new RuntimeException("turnedOnPredicate must be set"
+						+ " if auxDischargingSimulation != 'insideDriveDischargingHandler'");
+			}
 		}
 
 		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructure.CHARGERS))//

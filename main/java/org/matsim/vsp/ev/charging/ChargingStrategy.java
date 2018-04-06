@@ -30,5 +30,6 @@ public interface ChargingStrategy {
 
 	double calcRemainingEnergyToCharge(ElectricVehicle ev);
 
+	// should include potentially longer charging if AUX remains turned on
 	double calcRemainingTimeToCharge(ElectricVehicle ev);
 }
