@@ -22,6 +22,7 @@ package org.matsim.contrib.signals.data.conflicts;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 /**
@@ -30,13 +31,14 @@ import org.matsim.contrib.signals.model.SignalSystem;
 public class ConflictDataFactoryImpl implements ConflictDataFactory {
 
 	@Override
-	public ConflictingDirections createConflictingDirectionsContainerForSignalSystem(Id<SignalSystem> signalSystemId) {
-		return new ConflictingDirectionsImpl(signalSystemId);
+	public ConflictingDirections createConflictingDirectionsContainerForIntersection(Id<SignalSystem> signalSystemId,
+			Id<Node> nodeId) {
+		return new ConflictingDirectionsImpl(signalSystemId, nodeId);
 	}
 
 	@Override
-	public Direction createDirection(Id<SignalSystem> signalSystemId, Id<Link> fromLinkId, Id<Link> toLinkId, Id<Direction> directionId) {
-		return new DirectionImpl(signalSystemId, fromLinkId, toLinkId, directionId);
+	public Direction createDirection(Id<SignalSystem> signalSystemId, Id<Node> nodeId, Id<Link> fromLinkId, Id<Link> toLinkId, Id<Direction> directionId) {
+		return new DirectionImpl(signalSystemId, nodeId, fromLinkId, toLinkId, directionId);
 	}
 
 }

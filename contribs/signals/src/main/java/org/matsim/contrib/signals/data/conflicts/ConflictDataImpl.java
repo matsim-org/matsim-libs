@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 /**
@@ -34,15 +35,23 @@ public class ConflictDataImpl implements ConflictData {
 	private ConflictDataFactory factory = new ConflictDataFactoryImpl();
 	
 	private Map<Id<SignalSystem>, ConflictingDirections> conflictsPerSignalSystem = new HashMap<>();
+	private Map<Id<Node>, ConflictingDirections> conflictsPerNode = new HashMap<>();
 	
 	@Override
-	public void addConflictingDirectionsForSignalSystem(Id<SignalSystem> signalSystemId, ConflictingDirections conflictingDirections) {
+	public void addConflictingDirectionsForIntersection(Id<SignalSystem> signalSystemId, Id<Node> nodeId,
+			ConflictingDirections conflictingDirections) {
 		conflictsPerSignalSystem.put(signalSystemId, conflictingDirections);
+		conflictsPerNode.put(nodeId, conflictingDirections);
 	}
 
 	@Override
 	public Map<Id<SignalSystem>, ConflictingDirections> getConflictsPerSignalSystem() {
 		return conflictsPerSignalSystem;
+	}
+
+	@Override
+	public Map<Id<Node>, ConflictingDirections> getConflictsPerNode() {
+		return conflictsPerNode;
 	}
 
 	@Override

@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 /**
@@ -33,15 +34,22 @@ import org.matsim.contrib.signals.model.SignalSystem;
 public class ConflictingDirectionsImpl implements ConflictingDirections {
 
 	private Id<SignalSystem> signalSystemId;
+	private Id<Node> nodeId;
 	private List<Direction> directionsOfThisIntersection = new ArrayList<>();
 	
-	ConflictingDirectionsImpl(Id<SignalSystem> signalSystemId) {
+	ConflictingDirectionsImpl(Id<SignalSystem> signalSystemId, Id<Node> nodeId) {
 		this.signalSystemId = signalSystemId;
+		this.nodeId = nodeId;
 	}
 	
 	@Override
 	public Id<SignalSystem> getSignalSystemId() {
 		return signalSystemId;
+	}
+
+	@Override
+	public Id<Node> getNodeId() {
+		return nodeId;
 	}
 
 	@Override

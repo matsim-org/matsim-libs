@@ -25,6 +25,7 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 /**
@@ -33,6 +34,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 public interface Direction extends Identifiable<Direction> {
 	
 	public Id<SignalSystem> getSignalSystemId();
+	public Id<Node> getNodeId();
 	public Id<Link> getFromLink();
 	public Id<Link> getToLink();
 	

@@ -22,6 +22,7 @@ package org.matsim.contrib.signals.data.conflicts;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.api.internal.MatsimFactory;
 
@@ -30,8 +31,8 @@ import org.matsim.core.api.internal.MatsimFactory;
  */
 public interface ConflictDataFactory extends MatsimFactory{
 
-	public ConflictingDirections createConflictingDirectionsContainerForSignalSystem(Id<SignalSystem> signalSystemId);
+	public ConflictingDirections createConflictingDirectionsContainerForIntersection(Id<SignalSystem> signalSystemId, Id<Node> nodeId);
 	
-	public Direction createDirection(Id<SignalSystem> signalSystemId, Id<Link> fromLinkId, Id<Link> toLinkId, Id<Direction> directionId);
+	public Direction createDirection(Id<SignalSystem> signalSystemId, Id<Node> nodeId, Id<Link> fromLinkId, Id<Link> toLinkId, Id<Direction> directionId);
 	
 }

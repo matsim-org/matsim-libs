@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 /**
@@ -33,6 +34,7 @@ import org.matsim.contrib.signals.model.SignalSystem;
 public class DirectionImpl implements Direction {
 
 	private Id<SignalSystem> signalSystemId;
+	private Id<Node> nodeId;
 	private Id<Link> fromLinkId;
 	private Id<Link> toLinkId;
 	private Id<Direction> id;
@@ -41,8 +43,9 @@ public class DirectionImpl implements Direction {
 	private List<Id<Direction>> directionsWhichMustYield = new ArrayList<>();
 	private List<Id<Direction>> nonConflictingDirections = new ArrayList<>();
 	
-	DirectionImpl(Id<SignalSystem> signalSystemId, Id<Link> fromLinkId, Id<Link> toLinkId, Id<Direction> directionId) {
+	DirectionImpl(Id<SignalSystem> signalSystemId, Id<Node> nodeId, Id<Link> fromLinkId, Id<Link> toLinkId, Id<Direction> directionId) {
 		this.signalSystemId = signalSystemId;
+		this.nodeId = nodeId;
 		this.fromLinkId = fromLinkId;
 		this.toLinkId = toLinkId;
 		this.id = directionId;
@@ -51,6 +54,11 @@ public class DirectionImpl implements Direction {
 	@Override
 	public Id<SignalSystem> getSignalSystemId() {
 		return signalSystemId;
+	}
+
+	@Override
+	public Id<Node> getNodeId() {
+		return nodeId;
 	}
 
 	@Override

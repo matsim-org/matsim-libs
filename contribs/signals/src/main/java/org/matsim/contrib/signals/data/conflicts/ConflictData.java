@@ -23,6 +23,7 @@ package org.matsim.contrib.signals.data.conflicts;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.model.SignalSystem;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 
@@ -31,9 +32,11 @@ import org.matsim.core.api.internal.MatsimToplevelContainer;
  */
 public interface ConflictData extends MatsimToplevelContainer {
 
-	public void addConflictingDirectionsForSignalSystem(Id<SignalSystem> signalSystemId, ConflictingDirections conflictingDirections);
+	public void addConflictingDirectionsForIntersection(Id<SignalSystem> signalSystemId, Id<Node> nodeId, ConflictingDirections conflictingDirections);
 	
 	public Map<Id<SignalSystem>, ConflictingDirections> getConflictsPerSignalSystem();
+	
+	public Map<Id<Node>, ConflictingDirections> getConflictsPerNode();
 	
 	@Override
 	public ConflictDataFactory getFactory() ;

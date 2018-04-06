@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.signals.model.SignalSystem;
 
 /**
@@ -32,6 +33,8 @@ import org.matsim.contrib.signals.model.SignalSystem;
 public interface ConflictingDirections {
 	
 	public Id<SignalSystem> getSignalSystemId();
+	
+	public Id<Node> getNodeId();
 	
 	public void addDirection(Direction direction);
 	
