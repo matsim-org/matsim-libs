@@ -23,9 +23,9 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.schedule.DriveTask;
 import org.matsim.contrib.dvrp.schedule.StayTask;
 import org.matsim.contrib.dvrp.schedule.Task;
+import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
 import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
-import org.matsim.contrib.dvrp.vrpagent.VrpLegs;
 import org.matsim.contrib.dynagent.DynAction;
 import org.matsim.contrib.dynagent.DynAgent;
 import org.matsim.contrib.dynagent.StaticDynActivity;
@@ -49,7 +49,7 @@ final class OneTruckActionCreator implements VrpAgentLogic.DynActionCreator {
 	public DynAction createAction(DynAgent dynAgent, Vehicle vehicle, double now) {
 		Task task = vehicle.getSchedule().getCurrentTask();
 		if (task instanceof DriveTask) {
-			return VrpLegs.createLegWithOfflineTracker(vehicle, timer);
+			return VrpLegFactory.createWithOfflineTracker(vehicle, timer);
 		} else if (task instanceof OneTruckServeTask) { // PICKUP or DROPOFF
 			return new StaticDynActivity(((OneTruckServeTask)task).isPickup() ? "pickup" : "dropoff", task.getEndTime());
 		} else { // WAIT

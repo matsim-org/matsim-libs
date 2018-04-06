@@ -64,6 +64,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		this.insertionScheduler = insertionScheduler;
 
 		insertionProblem = new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer);
+		insertionScheduler.initSchedules(drtCfg.isChangeStartLinkToLastLinkInSchedule());
 	}
 
 	@Override

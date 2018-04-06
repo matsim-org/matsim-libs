@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2014 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,16 +16,28 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.vrpagent;
+package org.matsim.contrib.drt.schedule;
 
-import org.matsim.contrib.dvrp.path.DivertedVrpPath;
-import org.matsim.contrib.dynagent.DriverDynLeg;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.path.VrpPathWithTravelData;
 
-public interface DivertibleLeg extends DriverDynLeg {
-	/**
-	 * @return true - yes, false - it is too late, the diversion is possible only at the next link
-	 */
-	boolean canChangeNextLink();
+/**
+ * @author michalm
+ */
+public class DrtTaskFactoryImpl implements DrtTaskFactory {
+	@Override
+	public DrtDriveTask createDriveTask(Vehicle vehicle, VrpPathWithTravelData path) {
+		return new DrtDriveTask(path);
+	}
 
-	void pathDiverted(DivertedVrpPath divertedPath);
+	@Override
+	public DrtStopTask createStopTask(Vehicle vehicle, double beginTime, double endTime, Link link) {
+		return new DrtStopTask(beginTime, endTime, link);
+	}
+
+	@Override
+	public DrtStayTask createStayTask(Vehicle vehicle, double beginTime, double endTime, Link link) {
+		return new DrtStayTask(beginTime, endTime, link);
+	}
 }

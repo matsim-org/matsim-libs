@@ -21,10 +21,13 @@ package org.matsim.contrib.dvrp.tracker;
 
 import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
-import org.matsim.contrib.dvrp.schedule.*;
+import org.matsim.contrib.dvrp.schedule.DriveTask;
+import org.matsim.contrib.dvrp.schedule.StayTask;
+import org.matsim.contrib.dvrp.schedule.Task;
 import org.matsim.contrib.dvrp.schedule.Task.TaskStatus;
 import org.matsim.contrib.dvrp.vrpagent.VrpLeg;
-import org.matsim.contrib.dynagent.*;
+import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.DynActivity;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 
 /**
@@ -39,7 +42,12 @@ import org.matsim.core.mobsim.framework.MobsimTimer;
 public class TaskTrackers {
 	public static void initOnlineDriveTaskTracking(Vehicle vehicle, VrpLeg vrpDynLeg,
 			VrpOptimizerWithOnlineTracking optimizer, MobsimTimer timer) {
-		OnlineDriveTaskTracker onlineTracker = new OnlineDriveTaskTrackerImpl(vehicle, vrpDynLeg, optimizer, timer);
+		initOnlineDriveTaskTracking(vehicle, vrpDynLeg,
+				new OnlineDriveTaskTrackerImpl(vehicle, vrpDynLeg, optimizer, timer));
+	}
+
+	public static void initOnlineDriveTaskTracking(Vehicle vehicle, VrpLeg vrpDynLeg,
+			OnlineDriveTaskTracker onlineTracker) {
 		DriveTask driveTask = (DriveTask)vehicle.getSchedule().getCurrentTask();
 		driveTask.initTaskTracker(onlineTracker);
 		vrpDynLeg.initOnlineTracking(onlineTracker);
