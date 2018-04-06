@@ -58,13 +58,13 @@ public class EvConfigGroup extends ReflectiveConfigGroup {
 
 	public static enum AuxDischargingSimulation {
 		// AuxDischargingHandler handles AUX consumption (every {@code auxDischargeTimeStep} seconds)
-		SeperateAuxDischargingHandler,
+		seperateAuxDischargingHandler,
 		// DriveDischargingHandler handles AUX consumption during drives
 		// an external handler needs to be used to simulate AUX consumption when a vehicle is parked
-		InsideDriveDischargingHandler,
+		insideDriveDischargingHandler,
 		// AUX consumption is not simulated directly
 		// an external handler needs to be used to simulate AUX consumption
-		None;
+		none;
 	}
 
 	@NotNull

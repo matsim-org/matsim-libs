@@ -39,6 +39,7 @@ import org.matsim.vsp.ev.discharging.AuxDischargingHandler;
 import org.matsim.vsp.ev.discharging.AuxEnergyConsumption;
 import org.matsim.vsp.ev.discharging.DriveDischargingHandler;
 import org.matsim.vsp.ev.discharging.DriveEnergyConsumption;
+import org.matsim.vsp.ev.discharging.OhdeSlaskiAuxEnergyConsumption;
 import org.matsim.vsp.ev.discharging.OhdeSlaskiDriveEnergyConsumption;
 import org.matsim.vsp.ev.stats.ChargerOccupancyTimeProfileCollectorProvider;
 import org.matsim.vsp.ev.stats.ChargerOccupancyXYDataProvider;
@@ -51,11 +52,13 @@ public class EvModule extends AbstractModule {
 	private static ChargingLogic.Factory DEFAULT_CHARGING_LOGIC_FACTORY = charger -> new ChargingWithQueueingLogic(
 			charger, new FixedSpeedChargingStrategy(charger.getPower()));
 
-	// Nissan Leaf
-	private static DriveEnergyConsumption.Factory DEFAULT_DRIVE_CONSUMPTION_FACTORY = electricVehicle -> new OhdeSlaskiDriveEnergyConsumption();
+	private static DriveEnergyConsumption.Factory DEFAULT_DRIVE_CONSUMPTION_FACTORY //
+			= ev -> new OhdeSlaskiDriveEnergyConsumption();
 
-	// no AUX consumption (TODO consider adding AUX to Drive for non-DVRP use cases...)
-	private static AuxEnergyConsumption.Factory DEFAULT_AUX_CONSUMPTION_FACTORY = electricVehicle -> (period -> 0);
+	// TODO fixed temperature 15 oC
+	// FIXME reintroduce TemperatureProvider
+	private static AuxEnergyConsumption.Factory DEFAULT_AUX_CONSUMPTION_FACTORY //
+			= ev -> new OhdeSlaskiAuxEnergyConsumption(ev, () -> 15, v -> true);
 
 	@Override
 	public void install() {
@@ -65,7 +68,11 @@ public class EvModule extends AbstractModule {
 				.toProvider(new ElectricFleetProvider(evCfg.getVehiclesFileUrl(getConfig().getContext())))
 				.asEagerSingleton();
 		bind(DriveEnergyConsumption.Factory.class).toInstance(DEFAULT_DRIVE_CONSUMPTION_FACTORY);
-		bind(AuxEnergyConsumption.Factory.class).toInstance(DEFAULT_AUX_CONSUMPTION_FACTORY);
+
+		if (evCfg.getAuxDischargingSimulation() != AuxDischargingSimulation.seperateAuxDischargingHandler) {
+			// "isTurnedOn" returns true ==> should not be used when for "seperateAuxDischargingHandler"
+			bind(AuxEnergyConsumption.Factory.class).toInstance(DEFAULT_AUX_CONSUMPTION_FACTORY);
+		}
 
 		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructure.CHARGERS)).to(Network.class)
 				.asEagerSingleton();
@@ -77,7 +84,7 @@ public class EvModule extends AbstractModule {
 		bind(DriveDischargingHandler.class).asEagerSingleton();
 		addEventHandlerBinding().to(DriveDischargingHandler.class);
 
-		if (evCfg.getAuxDischargingSimulation() == AuxDischargingSimulation.SeperateAuxDischargingHandler) {
+		if (evCfg.getAuxDischargingSimulation() == AuxDischargingSimulation.seperateAuxDischargingHandler) {
 			bind(AuxDischargingHandler.class).asEagerSingleton();
 			addMobsimListenerBinding().to(AuxDischargingHandler.class);
 		}

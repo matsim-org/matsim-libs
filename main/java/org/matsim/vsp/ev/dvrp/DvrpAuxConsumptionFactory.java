@@ -35,17 +35,17 @@ public class DvrpAuxConsumptionFactory implements AuxEnergyConsumption.Factory {
 	private Fleet fleet;
 
 	private final DoubleSupplier temperatureProvider;
-	private final Predicate<Vehicle> isTurnedOnPredicate;
+	private final Predicate<Vehicle> turnedOnPredicate;
 
-	public DvrpAuxConsumptionFactory(DoubleSupplier temperatureProvider, Predicate<Vehicle> isTurnedOnPredicate) {
+	public DvrpAuxConsumptionFactory(DoubleSupplier temperatureProvider, Predicate<Vehicle> turnedOnPredicate) {
 		this.temperatureProvider = temperatureProvider;
-		this.isTurnedOnPredicate = isTurnedOnPredicate;
+		this.turnedOnPredicate = turnedOnPredicate == null ? v -> true : turnedOnPredicate;
 	}
 
 	@Override
 	public AuxEnergyConsumption create(ElectricVehicle electricVehicle) {
 		Vehicle vehicle = fleet.getVehicles().get(electricVehicle.getId());
 		return new OhdeSlaskiAuxEnergyConsumption(electricVehicle, temperatureProvider,
-				ev -> isTurnedOnPredicate.test(vehicle));
+				ev -> turnedOnPredicate.test(vehicle));
 	}
 }

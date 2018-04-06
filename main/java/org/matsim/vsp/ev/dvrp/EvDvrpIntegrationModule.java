@@ -29,6 +29,8 @@ import org.matsim.contrib.dvrp.data.Vehicle;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
+import org.matsim.vsp.ev.EvConfigGroup;
+import org.matsim.vsp.ev.EvConfigGroup.AuxDischargingSimulation;
 import org.matsim.vsp.ev.charging.ChargingLogic;
 import org.matsim.vsp.ev.charging.ChargingStrategy;
 import org.matsim.vsp.ev.charging.ChargingWithQueueingAndAssignmentLogic;
@@ -45,17 +47,25 @@ import com.google.inject.name.Names;
 public class EvDvrpIntegrationModule extends AbstractModule {
 	private Function<Charger, ChargingStrategy> chargingStrategyFactory;
 	private DoubleSupplier temperatureProvider;
-	private Predicate<Vehicle> isTurnedOnPredicate;
+	private Predicate<Vehicle> turnedOnPredicate;
 	private Function<Config, URL> vehicleFileUrlGetter;
 
 	@Override
 	public void install() {
+		if (EvConfigGroup.get(getConfig())
+				.getAuxDischargingSimulation() == AuxDischargingSimulation.insideDriveDischargingHandler) {
+			if (turnedOnPredicate != null) {
+				throw new RuntimeException("turnedOnPredicate must not be set"
+						+ " if auxDischargingSimulation == 'insideDriveDischargingHandler'");
+			}
+		}
+
 		bind(Network.class).annotatedWith(Names.named(ChargingInfrastructure.CHARGERS))//
 				.to(Key.get(Network.class, Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))).asEagerSingleton();
 		bind(ChargingLogic.Factory.class).toInstance(
 				charger -> new ChargingWithQueueingAndAssignmentLogic(charger, chargingStrategyFactory.apply(charger)));
 		bind(AuxEnergyConsumption.Factory.class)
-				.toInstance(new DvrpAuxConsumptionFactory(temperatureProvider, isTurnedOnPredicate));
+				.toInstance(new DvrpAuxConsumptionFactory(temperatureProvider, turnedOnPredicate));
 		bind(Fleet.class).toProvider(new EvDvrpFleetProvider(vehicleFileUrlGetter.apply(getConfig())))
 				.asEagerSingleton();
 	}
@@ -71,8 +81,8 @@ public class EvDvrpIntegrationModule extends AbstractModule {
 		return this;
 	}
 
-	public EvDvrpIntegrationModule setIsTurnedOnPredicate(Predicate<Vehicle> isTurnedOnPredicate) {
-		this.isTurnedOnPredicate = isTurnedOnPredicate;
+	public EvDvrpIntegrationModule setTurnedOnPredicate(Predicate<Vehicle> turnedOnPredicate) {
+		this.turnedOnPredicate = turnedOnPredicate;
 		return this;
 	}
 

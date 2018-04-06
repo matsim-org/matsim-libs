@@ -72,7 +72,7 @@ public class DriveDischargingHandler
 		this.network = network;
 		eVehicles = data.getElectricVehicles();
 		handleAuxDischarging = evCfg
-				.getAuxDischargingSimulation() == AuxDischargingSimulation.InsideDriveDischargingHandler;
+				.getAuxDischargingSimulation() == AuxDischargingSimulation.insideDriveDischargingHandler;
 		evDrives = new HashMap<>(eVehicles.size() / 10);
 	}
 
