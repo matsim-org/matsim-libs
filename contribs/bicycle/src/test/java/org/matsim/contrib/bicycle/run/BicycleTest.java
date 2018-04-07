@@ -22,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.apache.log4j.Logger;
-import org.junit.Ignore;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,7 +46,6 @@ public class BicycleTest {
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 	
-	@Ignore
 	@Test
 	public void testNormal() {
 		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
@@ -80,7 +78,6 @@ public class BicycleTest {
 		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 	
-	//@Ignore
 	@Test
 	public void testCobblestone() {
 		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
@@ -108,7 +105,6 @@ public class BicycleTest {
 		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 	
-	@Ignore
 	@Test
 	public void testPedestrian() {
 		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
@@ -136,7 +132,6 @@ public class BicycleTest {
 		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 	
-	@Ignore
 	@Test
 	public void testLane() {
 		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
@@ -164,7 +159,6 @@ public class BicycleTest {
 		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 	
-	@Ignore
 	@Test
 	public void testGradient() {
 		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
@@ -192,7 +186,6 @@ public class BicycleTest {
 		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 	
-	@Ignore
 	@Test
 	public void testGradientLane() {
 		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
@@ -221,7 +214,6 @@ public class BicycleTest {
 		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 	
-	@Ignore
 	@Test
 	public void testNormal10It() {
 		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
@@ -250,7 +242,6 @@ public class BicycleTest {
 		assertTrue("Populations are different", PopulationUtils.equalPopulation(scenarioReference.getPopulation(), scenarioCurrent.getPopulation()));
 	}
 	
-	@Ignore
 	@Test
 	public void testMotorizedInteraction() {
 		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
