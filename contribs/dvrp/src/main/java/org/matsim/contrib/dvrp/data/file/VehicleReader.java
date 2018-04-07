@@ -37,8 +37,8 @@ public class VehicleReader extends MatsimXmlParser {
 	private static final double DEFAULT_T_0 = 0;
 	private static final double DEFAULT_T_1 = 24 * 60 * 60;
 
-	private FleetImpl fleet;
-	private Map<Id<Link>, ? extends Link> links;
+	private final FleetImpl fleet;
+	private final Map<Id<Link>, ? extends Link> links;
 
 	public VehicleReader(Network network, FleetImpl fleet) {
 		this.fleet = fleet;

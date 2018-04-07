@@ -19,13 +19,20 @@
 
 package org.matsim.contrib.drt.vrpagent;
 
-import org.matsim.contrib.drt.schedule.*;
+import org.matsim.contrib.drt.schedule.DrtStayTask;
+import org.matsim.contrib.drt.schedule.DrtStopTask;
+import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.optimizer.*;
-import org.matsim.contrib.dvrp.passenger.*;
-import org.matsim.contrib.dvrp.vrpagent.*;
-import org.matsim.contrib.dynagent.*;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
+import org.matsim.contrib.dvrp.passenger.BusStopActivity;
+import org.matsim.contrib.dvrp.passenger.PassengerEngine;
+import org.matsim.contrib.dvrp.vrpagent.VrpActivity;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic;
+import org.matsim.contrib.dvrp.vrpagent.VrpLegFactory;
+import org.matsim.contrib.dynagent.DynAction;
+import org.matsim.contrib.dynagent.DynAgent;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
 import com.google.inject.Inject;
 
@@ -36,13 +43,17 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 	public static final String DRT_STAY_NAME = "DrtStay";
 	public final static String DRT_STOP_NAME = "DrtBusStop";
 	private final PassengerEngine passengerEngine;
-	private final VrpLegs.LegCreator legCreator;
+	private final VrpLegFactory legFactory;
 
 	@Inject
-	public DrtActionCreator(PassengerEngine passengerEngine, VrpOptimizer optimizer, QSim qSim) {
+	public DrtActionCreator(PassengerEngine passengerEngine, VrpOptimizer optimizer, MobsimTimer timer) {
+		this(passengerEngine,
+				v -> VrpLegFactory.createWithOnlineTracker(v, (VrpOptimizerWithOnlineTracking)optimizer, timer));
+	}
+
+	public DrtActionCreator(PassengerEngine passengerEngine, VrpLegFactory legFactory) {
 		this.passengerEngine = passengerEngine;
-		legCreator = VrpLegs.createLegWithOnlineTrackerCreator((VrpOptimizerWithOnlineTracking)optimizer,
-				qSim.getSimTimer());
+		this.legFactory = legFactory;
 	}
 
 	@Override
@@ -50,7 +61,7 @@ public class DrtActionCreator implements VrpAgentLogic.DynActionCreator {
 		DrtTask task = (DrtTask)vehicle.getSchedule().getCurrentTask();
 		switch (task.getDrtTaskType()) {
 			case DRIVE:
-				return legCreator.createLeg(vehicle);
+				return legFactory.create(vehicle);
 
 			case STOP:
 				DrtStopTask t = (DrtStopTask)task;

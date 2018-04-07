@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +16,38 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util.distance;
+package org.matsim.contrib.drt.scheduler;
 
-import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.matrices.Matrix;
+import org.matsim.contrib.drt.schedule.DrtTask;
+import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
+import org.matsim.contrib.dvrp.data.Vehicle;
+import org.matsim.contrib.dvrp.schedule.Schedule;
+import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
+import org.matsim.contrib.dvrp.schedule.ScheduleInquiry;
+import org.matsim.core.mobsim.framework.MobsimTimer;
 
-public class DistanceMatrixUtils {
-	public static Matrix calculateDistanceMatrix(DistanceCalculator calculator,
-			Iterable<? extends BasicLocation<?>> fromLocations, Iterable<? extends BasicLocation<?>> toLocations) {
-		Matrix matrix = new Matrix("distance", "distance");
+import com.google.inject.Inject;
 
-		for (BasicLocation<?> from : fromLocations) {
-			for (BasicLocation<?> to : toLocations) {
-				double distance = calculator.calcDistance(from.getCoord(), to.getCoord());
-				matrix.createAndAddEntry(from.getId().toString(), to.getId().toString(), distance);
-			}
+/**
+ * @author michalm
+ */
+public class DrtScheduleInquiry implements ScheduleInquiry {
+	private final MobsimTimer timer;
+
+	@Inject
+	public DrtScheduleInquiry(MobsimTimer timer) {
+		this.timer = timer;
+	}
+
+	@Override
+	public boolean isIdle(Vehicle vehicle) {
+		Schedule schedule = vehicle.getSchedule();
+		if (timer.getTimeOfDay() >= vehicle.getServiceEndTime() || schedule.getStatus() != ScheduleStatus.STARTED) {
+			return false;
 		}
 
-		return matrix;
+		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
+		return currentTask.getTaskIdx() == schedule.getTaskCount() - 1 // last task (because no prebooking)
+				&& currentTask.getDrtTaskType() == DrtTaskType.STAY;
 	}
 }
