@@ -50,9 +50,13 @@ public class BicycleTest {
 	@Ignore
 	@Test
 	public void testNormal() {
-		String configFile = "./src/main/resources/bicycle_example/config.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		config.addModule(new BicycleConfigGroup());
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
+		
+		// Normal network
 		config.network().setInputFile("network_normal.xml");
+		config.plans().setInputFile("population_1200.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -79,10 +83,13 @@ public class BicycleTest {
 	//@Ignore
 	@Test
 	public void testCobblestone() {
-		String configFile = "./src/main/resources/bicycle_example/config.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		config.addModule(new BicycleConfigGroup());
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
+		
 		// Links 4-8 and 13-17 have cobblestones
 		config.network().setInputFile("network_cobblestone.xml");
+		config.plans().setInputFile("population_1200.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -104,10 +111,13 @@ public class BicycleTest {
 	@Ignore
 	@Test
 	public void testPedestrian() {
-		String configFile = "./src/main/resources/bicycle_example/config.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		config.addModule(new BicycleConfigGroup());
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
+		
 		// Links 4-8 and 13-17 are pedestrian zones
 		config.network().setInputFile("network_pedestrian.xml");
+		config.plans().setInputFile("population_1200.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -129,10 +139,13 @@ public class BicycleTest {
 	@Ignore
 	@Test
 	public void testLane() {
-		String configFile = "./src/main/resources/bicycle_example/config.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		config.addModule(new BicycleConfigGroup());
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
+		
 		// Links 2-4/8-10 and 11-13/17-19 have cycle lanes (cycleway=lane)
 		config.network().setInputFile("network_lane.xml");
+		config.plans().setInputFile("population_1200.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -154,10 +167,13 @@ public class BicycleTest {
 	@Ignore
 	@Test
 	public void testGradient() {
-		String configFile = "./src/main/resources/bicycle_example/config.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		config.addModule(new BicycleConfigGroup());
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
+		
 		// Nodes 5-9 have a z-coordinate > 0, i.e. the links leading to those nodes have a slope
 		config.network().setInputFile("network_gradient.xml");
+		config.plans().setInputFile("population_1200.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -179,11 +195,14 @@ public class BicycleTest {
 	@Ignore
 	@Test
 	public void testGradientLane() {
-		String configFile = "./src/main/resources/bicycle_example/config.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		config.addModule(new BicycleConfigGroup());
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
+		
 		// Nodes 5-9 have a z-coordinate > 0, i.e. the links leading to those nodes have a slope
 		// and links 4-5 and 13-14 have cycle lanes
 		config.network().setInputFile("network_gradient_lane.xml");
+		config.plans().setInputFile("population_1200.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -205,9 +224,13 @@ public class BicycleTest {
 	@Ignore
 	@Test
 	public void testNormal10It() {
-		String configFile = "./src/main/resources/bicycle_example/config.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		config.addModule(new BicycleConfigGroup());
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
+		
+		// Normal network
 		config.network().setInputFile("network_normal.xml");
+		config.plans().setInputFile("population_1200.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		// 10 iterations
@@ -230,9 +253,13 @@ public class BicycleTest {
 	@Ignore
 	@Test
 	public void testMotorizedInteraction() {
-		String configFile = "./src/main/resources/bicycle_example/config.xml";
-		Config config = ConfigUtils.loadConfig(configFile, new BicycleConfigGroup());
+		Config config = ConfigUtils.createConfig("./src/main/resources/bicycle_example/");
+		config.addModule(new BicycleConfigGroup());
+		RunBicycleExample.fillConfigWithBicycleStandardValues(config);
+		
+		// Normal network
 		config.network().setInputFile("network_normal.xml");
+		config.plans().setInputFile("population_1200.xml");
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(10);
