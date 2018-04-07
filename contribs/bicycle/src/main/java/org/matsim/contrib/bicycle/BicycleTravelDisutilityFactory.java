@@ -19,10 +19,8 @@
 package org.matsim.contrib.bicycle;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.router.costcalculators.RandomizingTimeDistanceTravelDisutilityFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -39,9 +37,6 @@ public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
 	@Inject	PlanCalcScoreConfigGroup cnScoringGroup;
 	@Inject	PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
 	
-	// TODO only needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
-	@Inject Scenario scenario;
-	
 	private static int normalisationWrnCnt = 0;
 	
 	@Override
@@ -57,7 +52,7 @@ public class BicycleTravelDisutilityFactory implements TravelDisutilityFactory {
 				LOG.info(" sigma: " + sigma + "; resulting normalization: " + normalization);
 			}
 		}
-		return new BicycleTravelDisutility(scenario.getNetwork(), bicycleConfigGroup, cnScoringGroup, plansCalcRouteConfigGroup, timeCalculator, normalization);
+		return new BicycleTravelDisutility(bicycleConfigGroup, cnScoringGroup, plansCalcRouteConfigGroup, timeCalculator, normalization);
 		//
 		
 		// V2 -- Delegation to RandomizingTimeDistanceTravelDisutilityFactory

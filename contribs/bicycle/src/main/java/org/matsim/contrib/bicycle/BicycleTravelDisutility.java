@@ -22,7 +22,6 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -44,8 +43,6 @@ public class BicycleTravelDisutility implements TravelDisutility {
 	private final double marginalCostOfComfort_m;
 	private final double marginalCostOfGradient_m_100m;
 	
-	private final Network network;
-	
 	private final double normalization;
 	private final double sigma;
 	
@@ -62,7 +59,7 @@ public class BicycleTravelDisutility implements TravelDisutility {
 	private Person prevPerson;
 
 	
-	BicycleTravelDisutility(Network network, BicycleConfigGroup bicycleConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup,
+	BicycleTravelDisutility(BicycleConfigGroup bicycleConfigGroup, PlanCalcScoreConfigGroup cnScoringGroup,
 			PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, TravelTime timeCalculator, double normalization) {
 		final PlanCalcScoreConfigGroup.ModeParams bicycleParams = cnScoringGroup.getModes().get("bicycle");
 		if (bicycleParams == null) {
@@ -79,9 +76,6 @@ public class BicycleTravelDisutility implements TravelDisutility {
 
 		this.timeCalculator = timeCalculator;
 		
-		// TODO only needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
-		this.network = network;
-		
 		this.normalization = normalization;
 		this.sigma = plansCalcRouteConfigGroup.getRoutingRandomness();
 		this.random = sigma != 0 ? MatsimRandom.getLocalInstance() : null;
@@ -89,24 +83,17 @@ public class BicycleTravelDisutility implements TravelDisutility {
 
 	@Override
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-		// TODO Needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
-		// Also see comments in BicycleTravelDisutilityFactory
-		Link linkWithAttributes = network.getLinks().get(link.getId());
-		double travelTime = timeCalculator.getLinkTravelTime(linkWithAttributes, time, person, vehicle);
+		double travelTime = timeCalculator.getLinkTravelTime(link, time, person, vehicle);
 		return getTravelDisutilityBasedOnTTime(link, time, person, vehicle, travelTime);
 	}
 
 	// Keep these two methods separate for now because BicycleLinkScoring (currently not used) would need this)
 	public double getTravelDisutilityBasedOnTTime(Link link, double enterTime, Person person, Vehicle vehicle, double travelTime) {
-		// TODO Needed as long as network mode filtering kicks out attributes; remove when possible, dz, sep'17
-		// Also see comments in BicycleTravelDisutilityFactory
-		Link linkWithAttributes = network.getLinks().get(link.getId());
-		
-		String surface = (String) linkWithAttributes.getAttributes().getAttribute(BicycleLabels.SURFACE);
-		String type = (String) linkWithAttributes.getAttributes().getAttribute("type");
-		String cyclewaytype = (String) linkWithAttributes.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
+		String surface = (String) link.getAttributes().getAttribute(BicycleLabels.SURFACE);
+		String type = (String) link.getAttributes().getAttribute("type");
+		String cyclewaytype = (String) link.getAttributes().getAttribute(BicycleLabels.CYCLEWAY);
 
-		double distance = linkWithAttributes.getLength();
+		double distance = link.getLength();
 		
 		double travelTimeDisutility = marginalCostOfTime_s * travelTime;
 		double distanceDisutility = marginalCostOfDistance_m * distance;
@@ -117,7 +104,7 @@ public class BicycleTravelDisutility implements TravelDisutility {
 		double infrastructureFactor = BicycleUtilityUtils.getInfrastructureFactor(type, cyclewaytype);
 		double infrastructureDisutility = marginalCostOfInfrastructure_m * (1. - infrastructureFactor) * distance;
 		
-		double gradientFactor = BicycleUtilityUtils.getGradientFactor(linkWithAttributes);
+		double gradientFactor = BicycleUtilityUtils.getGradientFactor(link);
 		double gradientDisutility = marginalCostOfGradient_m_100m * gradientFactor * distance;
 		
 //		LOG.warn("link = " + link.getId() + "-- travelTime = " + travelTime + " -- distance = " + distance + " -- comfortFactor = "
@@ -164,7 +151,7 @@ public class BicycleTravelDisutility implements TravelDisutility {
 			logNormalRndGrad = 1.;
 		}
 
-		LOG.warn("Person = " + person.getId() + " / link = " + linkWithAttributes.getId() + " / ttD = " + travelTimeDisutility	+ " / dD = "+ distanceDisutility
+		LOG.warn("Person = " + person.getId() + " / link = " + link.getId() + " / ttD = " + travelTimeDisutility	+ " / dD = "+ distanceDisutility
 				+ " / infD = " + infrastructureDisutility + " / comfD = " + comfortDisutility + " / gradD = " + gradientDisutility + " / rnd = " + logNormalRndDist
 				+ " / rnd = " + logNormalRndDist + " / rndInf = "	+ logNormalRndInf + " / rndComf = " + logNormalRndComf + " / rndGrad = " + logNormalRndGrad);
 		double disutility = (1 + normalRndLink) * travelTimeDisutility + logNormalRndDist * distanceDisutility + logNormalRndInf * infrastructureDisutility
