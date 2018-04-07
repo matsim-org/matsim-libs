@@ -35,7 +35,7 @@ import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.dvrp.path.ManyToManyPathData;
 import org.matsim.contrib.dvrp.path.OneToManyPathSearch.PathData;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.contrib.dvrp.util.TimeDiscretizer;
 import org.matsim.core.config.groups.TravelTimeCalculatorConfigGroup;
@@ -60,7 +60,7 @@ public class StopBasedPathDataProvider implements PrecalculatablePathDataProvide
 	private Map<Id<Link>, PathData> pathsFromDropoffMap;
 
 	@Inject
-	public StopBasedPathDataProvider(@Named(DvrpModule.DVRP_ROUTING) Network network,
+	public StopBasedPathDataProvider(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility,
 			@Named(DrtConfigGroup.DRT_MODE) TransitSchedule schedule, TravelTimeCalculatorConfigGroup ttcConfig,

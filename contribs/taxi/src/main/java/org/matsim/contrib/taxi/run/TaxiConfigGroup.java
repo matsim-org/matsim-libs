@@ -22,7 +22,13 @@ package org.matsim.contrib.taxi.run;
 import java.net.URL;
 import java.util.Map;
 
-import org.matsim.core.config.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigGroup;
+import org.matsim.core.config.ReflectiveConfigGroup;
 
 public class TaxiConfigGroup extends ReflectiveConfigGroup {
 	public static final String GROUP_NAME = "taxi";
@@ -55,12 +61,20 @@ public class TaxiConfigGroup extends ReflectiveConfigGroup {
 
 	private boolean destinationKnown = false;
 	private boolean vehicleDiversion = false;
-	private Double pickupDuration = null;// seconds
-	private Double dropoffDuration = null;// seconds
+	
+	@PositiveOrZero
+	private double pickupDuration = Double.NaN;// seconds
+
+	@PositiveOrZero
+	private double dropoffDuration = Double.NaN;// seconds
+	
+	@Min(1)
 	private double AStarEuclideanOverdoFactor = 1.;
+	
 	private boolean onlineVehicleTracker = false;
 	private boolean changeStartLinkToLastLinkInSchedule = false;
 
+	@NotNull
 	private String taxisFile = null;
 
 	private boolean timeProfiles = false;

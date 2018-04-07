@@ -4,7 +4,7 @@
 	<groupId>org.matsim</groupId>
 	<artifactId>matsim-examples</artifactId>
 	<packaging>jar</packaging>
-	<version>0.10.0-SNAPSHOT</version>
+	<version>0.11.0-SNAPSHOT</version>
 	<name>MATSim Examples</name>
 	<build>
 		<resources>

@@ -45,7 +45,7 @@ import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtTask;
 import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.schedule.Schedule;
 import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
 import org.matsim.contrib.util.distance.DistanceUtils;
@@ -72,7 +72,7 @@ public class DemandBasedRebalancingStrategy implements RebalancingStrategy {
 	@Inject
 	public DemandBasedRebalancingStrategy(ZonalIdleVehicleCollector idleVehicles,
 			ZonalDemandAggregator demandAggregator, DrtZonalSystem zonalSystem,
-			@Named(DvrpModule.DVRP_ROUTING) Network network) {
+			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network) {
 		this.idleVehicles = idleVehicles;
 		this.demandAggregator = demandAggregator;
 		this.zonalSystem = zonalSystem;

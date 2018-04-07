@@ -19,9 +19,6 @@
 
 package org.matsim.core.population.io;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -29,6 +26,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.PersonUtils;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 /**
  * @author mrieser
@@ -43,14 +43,11 @@ abstract class AbstractPopulationWriterHandler implements PopulationWriterHandle
 	@Override
 	public final void writePerson(final Person person, final BufferedWriter writer) throws IOException {
 		this.startPerson(person, writer);
-		if (person != null) {
-			Person p = person;
-			// travelcards
-			if (PersonUtils.getTravelcards(p) != null) {
-				for (String t : PersonUtils.getTravelcards(p)) {
-					this.startTravelCard(t, writer);
-					this.endTravelCard(writer);
-				}
+		// travelcards
+		if (PersonUtils.getTravelcards(person) != null) {
+			for (String t : PersonUtils.getTravelcards(person)) {
+				this.startTravelCard(t, writer);
+				this.endTravelCard(writer);
 			}
 		}
 		// plans

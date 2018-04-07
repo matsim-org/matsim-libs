@@ -20,9 +20,6 @@
 
 package org.matsim.core.population.io;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -38,6 +35,9 @@ import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 	/*package*/ class PopulationWriterHandlerImplV0 extends AbstractPopulationWriterHandler {
 
@@ -143,11 +143,8 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" link=\"" + act.getLinkId() + "\"");
 		if (act.getStartTime() != Integer.MIN_VALUE)
 			out.write(" start_time=\"" + Time.writeTime(act.getStartTime()) + "\"");
-		if (act != null){
-			Activity a = act;
-			if (a.getMaximumDuration() != Time.UNDEFINED_TIME)
-				out.write(" dur=\"" + Time.writeTime(a.getMaximumDuration()) + "\"");
-		}
+		if (!Time.isUndefinedTime(act.getMaximumDuration()))
+			out.write(" dur=\"" + Time.writeTime(act.getMaximumDuration()) + "\"");
 		if (act.getEndTime() != Integer.MIN_VALUE)
 			out.write(" end_time=\"" + Time.writeTime(act.getEndTime()) + "\"");
 		out.write(" />\n");

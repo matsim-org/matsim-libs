@@ -19,10 +19,8 @@
 
 package org.matsim.contrib.drt.optimizer;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -30,15 +28,8 @@ import java.util.stream.Stream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.drt.data.DrtRequest;
-import org.matsim.contrib.drt.schedule.DrtDriveTask;
-import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
-import org.matsim.contrib.drt.schedule.DrtTask;
-import org.matsim.contrib.drt.schedule.DrtTask.DrtTaskType;
 import org.matsim.contrib.dvrp.data.Vehicle;
-import org.matsim.contrib.dvrp.schedule.Schedule;
-import org.matsim.contrib.dvrp.schedule.Schedule.ScheduleStatus;
-import org.matsim.contrib.dvrp.tracker.OnlineDriveTaskTracker;
 import org.matsim.contrib.dvrp.util.LinkTimePair;
 
 import com.google.common.collect.ImmutableList;
@@ -66,11 +57,11 @@ public class VehicleData {
 		public final double maxArrivalTime;// relating to max pass drive time (for dropoff requests)
 		public final double maxDepartureTime;// relating to pass max wait time (for pickup requests)
 		public final int occupancyChange;// diff in pickups and dropoffs
-		public final int outputOccupancy;
+		public final int outgoingOccupancy;
 
 		public Stop(DrtStopTask task, int outputOccupancy) {
 			this.task = task;
-			this.outputOccupancy = outputOccupancy;
+			this.outgoingOccupancy = outputOccupancy;
 
 			maxArrivalTime = calcMaxArrivalTime();
 			maxDepartureTime = calcMaxDepartureTime();
@@ -105,85 +96,32 @@ public class VehicleData {
 		}
 	}
 
-	private final Map<Id<Vehicle>, Entry> entries;
+	public interface EntryFactory {
+		Entry create(Vehicle vehicle, double currentTime);
+	}
+
 	private final double currentTime;
+	private final EntryFactory entryFactory;
+	private final Map<Id<Vehicle>, Entry> entries;
 
 	public VehicleData(double currentTime, Stream<? extends Vehicle> vehicles) {
+		this(currentTime, vehicles, new VehicleDataEntryFactoryImpl());
+	}
+
+	public VehicleData(double currentTime, Stream<? extends Vehicle> vehicles, EntryFactory entryFactory) {
 		this.currentTime = currentTime;
-		entries = vehicles.map(this::createVehicleData).filter(Objects::nonNull)
+		this.entryFactory = entryFactory;
+		entries = vehicles.map(v -> entryFactory.create(v, currentTime)).filter(Objects::nonNull)
 				.collect(Collectors.toMap(e -> e.vehicle.getId(), e -> e));
 	}
 
 	public void updateEntry(Vehicle vehicle) {
-		Entry e = createVehicleData(vehicle);
+		Entry e = entryFactory.create(vehicle, currentTime);
 		if (e != null) {
 			entries.put(vehicle.getId(), e);
 		} else {
 			entries.remove(vehicle.getId());
 		}
-	}
-
-	private Entry createVehicleData(Vehicle vehicle) {
-		Schedule schedule = vehicle.getSchedule();
-		ScheduleStatus status = schedule.getStatus();
-		if (currentTime <= vehicle.getServiceBeginTime()) {
-			return null;
-		}
-		if (currentTime >= vehicle.getServiceEndTime() || status == ScheduleStatus.COMPLETED) {
-			return null;
-		}
-
-		@SuppressWarnings("unchecked")
-		List<DrtTask> tasks = (List<DrtTask>)schedule.getTasks();
-		DrtTask currentTask = (DrtTask)schedule.getCurrentTask();
-
-		LinkTimePair start;
-		int nextTaskIdx;
-		if (status == ScheduleStatus.STARTED) {
-			switch (currentTask.getDrtTaskType()) {
-				case DRIVE:
-					DrtDriveTask driveTask = (DrtDriveTask)currentTask;
-					start = ((OnlineDriveTaskTracker)driveTask.getTaskTracker()).getDiversionPoint();
-					if (start == null) { // too late to divert a vehicle
-						start = new LinkTimePair(driveTask.getPath().getToLink(), driveTask.getEndTime());
-					}
-					break;
-
-				case STOP:
-					DrtStopTask stopTask = (DrtStopTask)currentTask;
-					start = new LinkTimePair(stopTask.getLink(), stopTask.getEndTime());
-					break;
-
-				case STAY:
-					DrtStayTask stayTask = (DrtStayTask)currentTask;
-					start = new LinkTimePair(stayTask.getLink(), currentTime);
-					break;
-
-				default:
-					throw new RuntimeException();
-			}
-
-			nextTaskIdx = currentTask.getTaskIdx() + 1;
-		} else { // PLANNED
-			start = new LinkTimePair(vehicle.getStartLink(), vehicle.getServiceBeginTime());
-			nextTaskIdx = 0;
-		}
-
-		List<DrtStopTask> stopTasks = new ArrayList<>();
-		for (DrtTask task : tasks.subList(nextTaskIdx, tasks.size())) {
-			if (task.getDrtTaskType() == DrtTaskType.STOP) {
-				stopTasks.add((DrtStopTask)task);
-			}
-		}
-
-		Stop[] stops = new Stop[stopTasks.size()];
-		int outputOccupancy = 0;
-		for (int i = stops.length - 1; i >= 0; i--) {
-			Stop s = stops[i] = new Stop(stopTasks.get(i), outputOccupancy);
-			outputOccupancy -= s.occupancyChange;
-		}
-
-		return new Entry(vehicle, start, outputOccupancy, ImmutableList.copyOf(stops));
 	}
 
 	public int getSize() {

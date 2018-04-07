@@ -1,11 +1,11 @@
 package org.matsim.contrib.pseudosimulation.distributed;
 
+import com.google.inject.Inject;
 import org.apache.commons.cli.*;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.common.diversitygeneration.planselectors.DiversityGeneratingPlansRemover;
@@ -16,8 +16,7 @@ import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTime;
 import org.matsim.contrib.eventsBasedPTRouter.waitTimes.WaitTimeCalculatorSerializable;
 import org.matsim.contrib.pseudosimulation.distributed.instrumentation.scorestats.SlaveScoreStatsCalculator;
 import org.matsim.contrib.pseudosimulation.distributed.listeners.events.transit.TransitPerformance;
-import org.matsim.contrib.pseudosimulation.mobsim.PSimFactory;
-import org.matsim.contrib.pseudosimulation.mobsim.SwitchingMobsimProvider;
+import org.matsim.contrib.pseudosimulation.mobsim.PSimProvider;
 import org.matsim.contrib.pseudosimulation.replanning.DistributedPlanStrategyTranslationAndRegistration;
 import org.matsim.contrib.pseudosimulation.replanning.PlanCatcher;
 import org.matsim.contrib.pseudosimulation.util.CollectionUtils;
@@ -26,7 +25,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.MatsimServices;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.*;
 import org.matsim.core.controler.listener.*;
@@ -36,7 +34,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.pt.router.TransitRouter;
-import org.matsim.vehicles.Vehicle;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -55,7 +52,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private final boolean fullTransitPerformanceTransmission;
     private final boolean IntelligentRouters;
     private final Logger slaveLogger;
-    private final PlanCatcher plancatcher;
+    @Inject private  PlanCatcher plancatcher;
     private static double slaveMutationRate;
     private final int numberOfPlansOnSlave;
     private boolean initialRouting;
@@ -71,7 +68,7 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
     private StopStopTime stopStopTimes;
     private ObjectInputStream reader;
     private ObjectOutputStream writer;
-    private PSimFactory pSimFactory;
+    private PSimProvider pSimProvider;
     private List<Long> iterationTimes = new ArrayList<>();
     private long lastIterationStartTime;
     private boolean somethingWentWrong = false;
@@ -229,7 +226,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
 //        should rather be that PSim marks activities for execution in some other way
         DistributedPlanStrategyTranslationAndRegistration.substituteStrategies(config, quickReplannning, numberOfPSimIterationsPerCycle);
         matsimControler = new Controler(scenario);
-        plancatcher = new PlanCatcher();
         DistributedPlanStrategyTranslationAndRegistration.registerStrategiesWithControler(this.matsimControler, plancatcher, quickReplannning, numberOfPSimIterationsPerCycle);
         matsimControler.getConfig().controler().setOverwriteFileSetting(
                 true ?
@@ -242,11 +238,10 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         linkTravelTimes = new FreeSpeedTravelTime();
         travelTime.setTravelTime(linkTravelTimes);
 
-        pSimFactory = new PSimFactory(scenario, matsimControler.getEvents());
         matsimControler.addOverridingModule(new AbstractModule() {
             @Override
             public void install() {
-                bindMobsim().toProvider(pSimFactory);
+                bindMobsim().toProvider(pSimProvider);
             }
         });
 
@@ -269,9 +264,9 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
                 @Override
                 public void install() {
                     System.out.println("init routers");
-                    transitRouterEventsWSFactory = new TransitRouterEventsWSFactory(scenario,
-                            waitTimes,
-                            stopStopTimes);
+//                    transitRouterEventsWSFactory = new TransitRouterEventsWSFactory(scenario,
+//                            waitTimes,
+//                            stopStopTimes);
                     bind(TransitRouter.class).toProvider(transitRouterEventsWSFactory);
                 }
             });
@@ -369,14 +364,14 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         this.currentIteration = event.getIteration();
         lastIterationStartTime = System.currentTimeMillis();
         travelTime.setTravelTime(linkTravelTimes);
-        pSimFactory.setTravelTime(linkTravelTimes);
+        pSimProvider.setTravelTime(linkTravelTimes);
         if (config.transit().isUseTransit()) {
-            pSimFactory.setStopStopTime(stopStopTimes);
-            pSimFactory.setWaitTime(waitTimes);
-            pSimFactory.setTransitPerformance(transitPerformance);
+            pSimProvider.setStopStopTime(stopStopTimes);
+            pSimProvider.setWaitTime(waitTimes);
+            pSimProvider.setTransitPerformance(transitPerformance);
             if (transitRouterEventsWSFactory != null) {
-                transitRouterEventsWSFactory.setStopStopTime(stopStopTimes);
-                transitRouterEventsWSFactory.setWaitTime(waitTimes);
+//                transitRouterEventsWSFactory.setStopStopTimeCalculator(stopStopTimes);
+//                transitRouterEventsWSFactory.setWaitTimeCalculator(waitTimes);
             }
         }
         plancatcher.init();
@@ -598,7 +593,6 @@ public class SlaveControler implements IterationStartsListener, StartupListener,
         }
 
         executedPlanCount += plancatcher.getPlansForPSim().size();
-        pSimFactory.setPlans(plancatcher.getPlansForPSim());
     }
 
     @Override

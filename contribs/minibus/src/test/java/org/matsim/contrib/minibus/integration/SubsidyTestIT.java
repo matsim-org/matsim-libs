@@ -49,7 +49,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 public class SubsidyTestIT implements TabularFileHandler {
 	
-	private static final String gridScenarioDirectory = "http://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/atlantis/minibus/input/";
+	
 
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
@@ -59,20 +59,21 @@ public class SubsidyTestIT implements TabularFileHandler {
 	public final void testSubsidyPControler() {
 		
 		Config config = ConfigUtils.loadConfig( utils.getClassInputDirectory() + "config.xml", new PConfigGroup() ) ;
-		
+
 		PConfigGroup pConfig = (PConfigGroup) config.getModules().get(PConfigGroup.GROUP_NAME);
 		pConfig.setSubsidyApproach("perPassenger");
-		
+		String gridScenarioDirectory ="../../example-scenario/input/";
 		config.network().setInputFile(gridScenarioDirectory  + "network.xml");
 		config.transit().setVehiclesFile(gridScenarioDirectory + "transitVehicles.xml");
 		config.transit().setTransitScheduleFile(gridScenarioDirectory + "transitSchedule_10min.xml");
 		config.plans().setInputFile(gridScenarioDirectory + "population_1000_per_hour_each_from_6_to_10.xml.gz");
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		
+		config.controler().setWriteEventsInterval(0);
 		Scenario scenario = ScenarioUtils.loadScenario(config);	
 		Controler controler = new Controler(scenario);
 		
 		controler.getConfig().controler().setCreateGraphs(true);
+		
 		controler.getConfig().controler().setOverwriteFileSetting(OutputDirectoryHierarchy.OverwriteFileSetting.deleteDirectoryIfExists );
 		
 		controler.addOverridingModule(new PModule()) ;

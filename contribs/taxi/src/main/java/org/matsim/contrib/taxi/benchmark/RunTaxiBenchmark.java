@@ -22,9 +22,13 @@ package org.matsim.contrib.taxi.benchmark;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.contrib.taxi.run.*;
-import org.matsim.core.config.*;
-import org.matsim.core.controler.*;
+import org.matsim.contrib.taxi.run.TaxiConfigGroup;
+import org.matsim.contrib.taxi.run.TaxiModule;
+import org.matsim.contrib.taxi.run.examples.TaxiDvrpModules;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.network.FixedIntervalTimeVariantLinkFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scenario.ScenarioUtils.ScenarioBuilder;
@@ -47,7 +51,7 @@ public class RunTaxiBenchmark {
 
 	public static Controler createControler(Config config, int runs) {
 		config.controler().setLastIteration(runs - 1);
-		DvrpConfigGroup.get(config).setNetworkMode(null);//to switch off network filtering
+		DvrpConfigGroup.get(config).setNetworkMode(null);// to switch off network filtering
 		config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
 		config.checkConsistency();
 
@@ -55,13 +59,17 @@ public class RunTaxiBenchmark {
 
 		Controler controler = new Controler(scenario);
 		controler.setModules(new DvrpBenchmarkControlerModule());
-		controler.addOverridingModule(new TaxiOutputModule());
+		controler.addOverridingModule(TaxiDvrpModules.create());
 
 		controler.addOverridingModule(new TaxiModule());
 		controler.addOverridingModule(new AbstractModule() {
 			@Override
 			public void install() {
 				addControlerListenerBinding().to(TaxiBenchmarkStats.class).asEagerSingleton();
+				// FIXME DvrpOfflineTravelTimeEstimator is registered as a MobsimListener by default by DvrpModule via
+				// TaxiModule. TODO:
+				// 1. move DvrpModule outside TaxiModule
+				// 2. partition DvrpModule into smaller pieces
 				install(new DvrpBenchmarkTravelTimeModule());
 			};
 		});

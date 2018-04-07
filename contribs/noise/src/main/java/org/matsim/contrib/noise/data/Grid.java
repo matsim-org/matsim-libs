@@ -48,6 +48,8 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.PtConstants;
 
+
+
 /**
  * Computes a grid of receiver points and provides some basic spatial functionality,
  * e.g. the nearest receiver point for the coordinates of each 'considered' activity type. 
@@ -101,7 +103,7 @@ public class Grid {
 			this.consideredActivitiesForReceiverPointGrid.add(consideredActTypesForReceiverPointGridArray[i]);
 		}
 
-		this.noiseParams.checkGridParametersForConsistency();
+//		this.noiseParams.checkGridParametersForConsistency();
 		initialize();
 	}
 

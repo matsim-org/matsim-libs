@@ -235,10 +235,8 @@ public final class NetworkExpandNode {
 			l.setCapacity(inlink.getCapacity());
 			l.setNumberOfLanes(inlink.getNumberOfLanes());
 			l.setAllowedModes(inlink.getAllowedModes());
-			if (inlink instanceof Link) {
-				NetworkUtils.setOrigId( ((Link) l), NetworkUtils.getOrigId( ((Link) inlink) ) ) ;
-				NetworkUtils.setType( ((Link) l), NetworkUtils.getType(((Link) inlink)));
-			}
+			NetworkUtils.setOrigId( ((Link) l), NetworkUtils.getOrigId( ((Link) inlink) ) ) ;
+			NetworkUtils.setType( ((Link) l), NetworkUtils.getType(((Link) inlink)));
 			network.addLink(l);
 		}
 		for (Link outlink : outlinks.values()) {
@@ -292,10 +290,8 @@ public final class NetworkExpandNode {
 			} else {
 				l.setAllowedModes(turn.getModes());
 			}
-			if (fromLink instanceof Link) {
-				NetworkUtils.setOrigId( ((Link) l), NetworkUtils.getOrigId( ((Link) fromLink) ) ) ;
-				NetworkUtils.setType( ((Link) l), NetworkUtils.getType(((Link) fromLink)));
-			}
+			NetworkUtils.setOrigId( ((Link) l), NetworkUtils.getOrigId( ((Link) fromLink) ) ) ;
+			NetworkUtils.setType( ((Link) l), NetworkUtils.getType(((Link) fromLink)));
 			network.addLink(l);
 			newLinks.add(l);
 		}
@@ -306,7 +302,7 @@ public final class NetworkExpandNode {
 	 * Checks whether it makes sense to expand the node with turning links or not. For example, it might 
 	 * not make sense to expand the node if no real restrictions are given, but just all possible options
 	 * are listed -- the exact same turning options could be available without expanding the node.
-	 * Thus, it usually only makes sense to expand a node if {@link #turnsAreSameAsSingleNode(Id, List)}
+	 * Thus, it usually only makes sense to expand a node if {@link #turnsAreSameAsSingleNode(Id, List, boolean)}
 	 * returns <code>false</code>.
 	 * The algorithm can optionally ignore u-turns, that means that it is not checked if all u-turns are
 	 * allowed according to the given turning options. 

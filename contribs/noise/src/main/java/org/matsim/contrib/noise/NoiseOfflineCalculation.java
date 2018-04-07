@@ -19,9 +19,6 @@
 
 package org.matsim.contrib.noise;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.noise.data.NoiseContext;
@@ -29,10 +26,14 @@ import org.matsim.contrib.noise.handler.LinkSpeedCalculation;
 import org.matsim.contrib.noise.handler.NoiseTimeTracker;
 import org.matsim.contrib.noise.handler.PersonActivityTracker;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  * (1) Computes noise emissions, immissions, person activities and damages based on a standard events file.
@@ -58,7 +59,8 @@ public class NoiseOfflineCalculation {
 			outputDirectory = outputDirectory + "/";
 		}
 		
-		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
+//		NoiseConfigGroup noiseParameters = (NoiseConfigGroup) scenario.getConfig().getModules().get(NoiseConfigGroup.GROUP_NAME);
+		NoiseConfigGroup noiseParameters = ConfigUtils.addOrGetModule(scenario.getConfig(), NoiseConfigGroup.class) ;
 		if (noiseParameters.isInternalizeNoiseDamages()) {
 			log.warn("If you intend to internalize noise damages, please run the online noise computation."
 					+ " This is an offline noise calculation which can only be used for analysis purposes.");

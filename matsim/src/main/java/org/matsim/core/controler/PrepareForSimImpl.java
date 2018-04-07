@@ -1,7 +1,6 @@
 package org.matsim.core.controler;
 
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -117,6 +116,11 @@ class PrepareForSimImpl implements PrepareForSim {
 		// though the vehicles should be created before creating a route, however,
 		// as of now, it is not clear how to provide (store) vehicle id to the route afterwards. Amit may'17
 
+		// yyyyyy from a behavioral perspective, the vehicle must be somehow linked to
+		// the person (maybe via the household).  We also have the problem that it
+		// is not possible to switch to a mode that was not in the initial plans ...
+		// since there will be no vehicle for it.  Needs to be fixed somehow.  kai, feb'18
+
 		Map<String, VehicleType> modeVehicleTypes = getMode2VehicleType();
 		for(Person person : scenario.getPopulation().getPersons().values()) {
 			for (Plan plan : person.getPlans()) { // go through with all plans ( when it was in population agent source, then going through only with selected plan was sufficient.) Amit May'17
@@ -141,10 +145,10 @@ class PrepareForSimImpl implements PrepareForSim {
 								}
 
 								// so here we have a vehicle id, now try to find or create a physical vehicle:
-								Vehicle vehicle = createAndAddVehicleIfNotPresent( vehicleId, modeVehicleTypes.get(leg.getMode()));
+								createAndAddVehicleIfNotPresent( vehicleId, modeVehicleTypes.get(leg.getMode()));
 								seenModes.put(leg.getMode(), vehicleId);
 							} else {
-								if (vehicleId == null && route != null) {
+								if (vehicleId == null) {
 									vehicleId = seenModes.get(leg.getMode());
 									route.setVehicleId(vehicleId);
 								}
@@ -193,6 +197,8 @@ class PrepareForSimImpl implements PrepareForSim {
 
 	private void createVehiclesForEveyNetworkMode(final Map<String, VehicleType> modeVehicleTypes) {
 		// yyyy maybe better just take the modes from qsim.mainMode???  kai, dec'17
+		// agree. A network mode may not be main mode (e.g. ride) and in this case,
+		// creating vehicles for every network mode is not required. IK, AA (Apr'18).
 
 //		boolean isModeChoicePresent = false;
 //		Collection<StrategyConfigGroup.StrategySettings> strategySettings = scenario.getConfig().strategy().getStrategySettings();
@@ -217,9 +223,10 @@ class PrepareForSimImpl implements PrepareForSim {
 //		}
 
 //		if (isModeChoicePresent) {
-			Collection<String> networkModes = scenario.getConfig().plansCalcRoute().getNetworkModes();
+//			Collection<String> networkModes = scenario.getConfig().plansCalcRoute().getNetworkModes();
 			for (Id<Person> personId : scenario.getPopulation().getPersons().keySet()) {
-				for (String mode : networkModes) {
+//				for (String mode : networkModes) {
+				for (String mode : scenario.getConfig().qsim().getMainModes()) {
 					Id<Vehicle> vehicleId = createAutomaticVehicleId(personId, mode, null);
 					createAndAddVehicleIfNotPresent(vehicleId, modeVehicleTypes.get(mode));
 				}

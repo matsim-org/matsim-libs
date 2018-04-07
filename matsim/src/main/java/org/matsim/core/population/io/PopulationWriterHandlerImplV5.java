@@ -20,9 +20,6 @@
 
 package org.matsim.core.population.io;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Activity;
@@ -36,6 +33,9 @@ import org.matsim.core.population.PersonUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Time;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
 
 /**
  * @author mrieser
@@ -101,37 +101,34 @@ import org.matsim.core.utils.misc.Time;
 		out.write("</population>\n");
 	}
 
-	private static void startPerson(final Person p, final BufferedWriter out) throws IOException {
+	private static void startPerson(final Person person, final BufferedWriter out) throws IOException {
 		out.write("\t<person id=\"");
-		out.write(p.getId().toString());
+		out.write(person.getId().toString());
 		out.write("\"");
-		if (p != null){
-			Person person = p;
-			if (PersonUtils.getSex(person) != null) {
-				out.write(" sex=\"");
-				out.write(PersonUtils.getSex(person));
-				out.write("\"");
-			}
-			if (PersonUtils.getAge(person) != null) {
-				out.write(" age=\"");
-				out.write(Integer.toString(PersonUtils.getAge(person)));
-				out.write("\"");
-			}
-			if (PersonUtils.getLicense(person) != null) {
-				out.write(" license=\"");
-				out.write(PersonUtils.getLicense(person));
-				out.write("\"");
-			}
-			if (PersonUtils.getCarAvail(person) != null) {
-				out.write(" car_avail=\"");
-				out.write(PersonUtils.getCarAvail(person));
-				out.write("\"");
-			}
-			if (PersonUtils.isEmployed(person) != null) {
-				out.write(" employed=\"");
-				out.write((PersonUtils.isEmployed(person) ? "yes" : "no"));
-				out.write("\"");
-			}
+		if (PersonUtils.getSex(person) != null) {
+			out.write(" sex=\"");
+			out.write(PersonUtils.getSex(person));
+			out.write("\"");
+		}
+		if (PersonUtils.getAge(person) != null) {
+			out.write(" age=\"");
+			out.write(Integer.toString(PersonUtils.getAge(person)));
+			out.write("\"");
+		}
+		if (PersonUtils.getLicense(person) != null) {
+			out.write(" license=\"");
+			out.write(PersonUtils.getLicense(person));
+			out.write("\"");
+		}
+		if (PersonUtils.getCarAvail(person) != null) {
+			out.write(" car_avail=\"");
+			out.write(PersonUtils.getCarAvail(person));
+			out.write("\"");
+		}
+		if (PersonUtils.isEmployed(person) != null) {
+			out.write(" employed=\"");
+			out.write((PersonUtils.isEmployed(person) ? "yes" : "no"));
+			out.write("\"");
 		}
 		out.write(">\n");
 	}
@@ -151,13 +148,10 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" selected=\"yes\"");
 		else
 			out.write(" selected=\"no\"");
-		if (plan != null){
-			Plan p = plan;
-			if ((p.getType() != null)) {
-				out.write(" type=\"");
-				out.write(p.getType());
-				out.write("\"");
-			}
+		if ((plan.getType() != null)) {
+			out.write(" type=\"");
+			out.write(plan.getType());
+			out.write("\"");
 		}
 		out.write(">\n");
 	}
@@ -181,27 +175,24 @@ import org.matsim.core.utils.misc.Time;
 			out.write("\"");
 		}
 		if (act.getCoord() != null) {
-			final Coord coord = coordinateTransformation.transform( act.getCoord() );
+			final Coord coord = this.coordinateTransformation.transform( act.getCoord() );
 			out.write(" x=\"");
 			out.write(Double.toString( coord.getX() ));
 			out.write("\" y=\"");
 			out.write(Double.toString( coord.getY() ));
 			out.write("\"");
 		}
-		if (act.getStartTime() != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(act.getStartTime())) {
 			out.write(" start_time=\"");
 			out.write(Time.writeTime(act.getStartTime()));
 			out.write("\"");
 		}
-		if (act != null){
-			Activity a = act;
-			if (a.getMaximumDuration() != Time.UNDEFINED_TIME) {
-				out.write(" max_dur=\"");
-				out.write(Time.writeTime(a.getMaximumDuration()));
-				out.write("\"");
-			}
+		if (!Time.isUndefinedTime(act.getMaximumDuration())) {
+			out.write(" max_dur=\"");
+			out.write(Time.writeTime(act.getMaximumDuration()));
+			out.write("\"");
 		}
-		if (act.getEndTime() != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(act.getEndTime())) {
 			out.write(" end_time=\"");
 			out.write(Time.writeTime(act.getEndTime()));
 			out.write("\"");
@@ -213,12 +204,12 @@ import org.matsim.core.utils.misc.Time;
 		out.write("\t\t\t<leg mode=\"");
 		out.write(leg.getMode());
 		out.write("\"");
-		if (leg.getDepartureTime() != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(leg.getDepartureTime())) {
 			out.write(" dep_time=\"");
 			out.write(Time.writeTime(leg.getDepartureTime()));
 			out.write("\"");
 		}
-		if (leg.getTravelTime() != Time.UNDEFINED_TIME) {
+		if (!Time.isUndefinedTime(leg.getTravelTime())) {
 			out.write(" trav_time=\"");
 			out.write(Time.writeTime(leg.getTravelTime()));
 			out.write("\"");

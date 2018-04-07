@@ -25,7 +25,7 @@ package org.matsim.contrib.matrixbasedptrouter;
 import java.util.Collection;
 import java.util.Iterator;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;

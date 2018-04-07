@@ -221,12 +221,13 @@ public class QLinkLanesTest extends MatsimTestCase {
 		
 		// check link
 		QLinkLanesImpl ql = (QLinkLanesImpl) queueNetwork.getNetsimLink(Id.create(1, Link.class));
+
 		assertEquals(0.5, ql.getSimulatedFlowCapacity());
-		/* 900 m link, 2 lanes = 240 storage 
+
+		/* 900 m link, 2 lanes = 240 storage
 		 * + 105 m lane, 1 lane = 14 storage
 		 * + 105 m lane, 2 lane = 28 storage
-		 * + 105 m lane, 1 lane = 14 storage
-		 */
+		 * + 105 m lane, 1 lane = 14 storage */
 		assertEquals(296.0, ql.getSpaceCap());
 		
 		double totalStorageCapacity = 0.0;

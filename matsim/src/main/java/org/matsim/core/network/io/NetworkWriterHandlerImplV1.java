@@ -20,10 +20,6 @@
 
 package org.matsim.core.network.io;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Set;
-
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -32,6 +28,10 @@ import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.core.utils.misc.Time;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.util.Set;
 
 /*package*/ class NetworkWriterHandlerImplV1 implements NetworkWriterHandler {
 	private final CoordinateTransformation transformation;
@@ -57,8 +57,8 @@ import org.matsim.core.utils.misc.Time;
 	@Override
 	public void startNetwork(final Network network, final BufferedWriter out) throws IOException {
 		out.write("<network");
-		if (network instanceof Network && (((Network) network).getName() != null)) {
-			out.write(" name=\"" + ((Network) network).getName() + "\"");
+		if ((network.getName() != null)) {
+			out.write(" name=\"" + network.getName() + "\"");
 		}
 		out.write(">\n\n");
 	}
@@ -93,10 +93,8 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" capperiod=\"" + Time.writeTime(network.getCapacityPeriod()) + "\"");
 		}
 
-		if (network instanceof Network) {
-			out.write(" effectivecellsize=\"" + ((Network) network).getEffectiveCellSize() + "\"");
-			out.write(" effectivelanewidth=\"" + network.getEffectiveLaneWidth() + "\"");
-		}
+		out.write(" effectivecellsize=\"" + network.getEffectiveCellSize() + "\"");
+		out.write(" effectivelanewidth=\"" + network.getEffectiveLaneWidth() + "\"");
 
 		out.write(">\n");
 	}
@@ -168,14 +166,12 @@ import org.matsim.core.utils.misc.Time;
 			out.write(" modes=\"" + this.lastModes + "\"");
 		}
 
-		if (link instanceof Link) {
-			Link li = (Link) link;
-			if (NetworkUtils.getOrigId( li ) != null) {
-				out.write(" origid=\"" + NetworkUtils.getOrigId( li ) + "\"");
-			}
-			if (NetworkUtils.getType(li) != null) {
-				out.write(" type=\"" + NetworkUtils.getType(li) + "\"");
-			}
+		Link li = link;
+		if (NetworkUtils.getOrigId( li ) != null) {
+			out.write(" origid=\"" + NetworkUtils.getOrigId( li ) + "\"");
+		}
+		if (NetworkUtils.getType(li) != null) {
+			out.write(" type=\"" + NetworkUtils.getType(li) + "\"");
 		}
 		out.write(" />\n");
 	}

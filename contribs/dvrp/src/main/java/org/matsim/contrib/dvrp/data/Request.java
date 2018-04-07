@@ -42,7 +42,8 @@ public interface Request extends Identifiable<Request> {
 		return false;
 	}
 
-	public static String toString(Request request) {
-		return "[id=" + request.getId() + "][submissionTime=" + request.getSubmissionTime() + "]";
+	static String toString(Request request) {
+		return "[id=" + request.getId() + "][submissionTime=" + request.getSubmissionTime() + "][rejected="
+				+ request.isRejected() + "]";
 	}
 }

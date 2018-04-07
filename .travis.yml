@@ -75,8 +75,7 @@ env:
     - MODULE=contribs/socnetsim            
     - MODULE=contribs/socnetgen            
     - MODULE=contribs/transEnergySim       
-    - MODULE=contribs/roadpricing          
-    - MODULE=contribs/opdytsIntegration    
+    - MODULE=contribs/roadpricing              
     - MODULE=contribs/multimodal           
     - MODULE=contribs/integration          
     - MODULE=contribs/wagonSim             

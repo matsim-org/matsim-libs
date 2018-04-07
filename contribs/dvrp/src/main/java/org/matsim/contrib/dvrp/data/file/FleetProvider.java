@@ -23,7 +23,7 @@ import java.net.URL;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.FleetImpl;
-import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.core.controler.AbstractModule;
 
 import com.google.inject.Inject;
@@ -35,8 +35,8 @@ import com.google.inject.name.Named;
  */
 public class FleetProvider implements Provider<Fleet> {
 	@Inject
-	@Named(DvrpModule.DVRP_ROUTING)
-	Network network;
+	@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING)
+	private Network network;
 
 	private final URL url;
 

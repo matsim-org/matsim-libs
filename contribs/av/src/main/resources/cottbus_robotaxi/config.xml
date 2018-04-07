@@ -92,6 +92,8 @@
 
 	<module name="qsim">
 		<param name="simStarttimeInterpretation" value="onlyUseStarttime" />
+		<param name = "endTime" value="24:00:00"/>
+		
 		<param name="insertingWaitingVehiclesBeforeDrivingVehicles"
 			value="true" />
 		<param name="snapshotStyle" value="queue" />

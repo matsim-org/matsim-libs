@@ -30,13 +30,12 @@ import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
-import org.matsim.contrib.drt.scheduler.DrtScheduler;
+import org.matsim.contrib.drt.scheduler.RequestInsertionScheduler;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeCleanupListener;
-import org.matsim.core.utils.misc.Time;
 
 import com.google.inject.Inject;
 
@@ -44,24 +43,28 @@ import com.google.inject.Inject;
  * @author michalm
  */
 public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter, MobsimBeforeCleanupListener {
+	private static final Logger log = Logger.getLogger(DefaultUnplannedRequestInserter.class);
+
 	private final DrtConfigGroup drtCfg;
 	private final Fleet fleet;
 	private final MobsimTimer mobsimTimer;
 	private final EventsManager eventsManager;
-	private final DrtScheduler scheduler;
+	private final RequestInsertionScheduler insertionScheduler;
 
 	private final ParallelMultiVehicleInsertionProblem insertionProblem;
 
 	@Inject
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
-			EventsManager eventsManager, DrtScheduler scheduler, PrecalculatablePathDataProvider pathDataProvider) {
+			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
+			PrecalculatablePathDataProvider pathDataProvider) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
 		this.eventsManager = eventsManager;
-		this.scheduler = scheduler;
+		this.insertionScheduler = insertionScheduler;
 
 		insertionProblem = new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer);
+		insertionScheduler.initSchedules(drtCfg.isChangeStartLinkToLastLinkInSchedule());
 	}
 
 	@Override
@@ -85,14 +88,12 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 				req.setRejected(true);
 				eventsManager.processEvent(new DrtRequestRejectedEvent(mobsimTimer.getTimeOfDay(), req.getId()));
 				if (drtCfg.isPrintDetailedWarnings()) {
-					Logger.getLogger(getClass())
-							.warn("No vehicle found for drt request from passenger \t" + req.getPassenger().getId()
-									+ "\tat\t" + Time.writeTime(req.getSubmissionTime()) + "\tfrom Link\t"
-									+ req.getFromLink().getId());
+					log.warn("No vehicle found for drt request " + req + " from passenger id="
+							+ req.getPassenger().getId() + " fromLinkId=" + req.getFromLink().getId());
 				}
 			} else {
 				BestInsertion bestInsertion = best.get();
-				scheduler.insertRequest(bestInsertion.vehicleEntry, req, bestInsertion.insertion);
+				insertionScheduler.scheduleRequest(bestInsertion.vehicleEntry, req, bestInsertion.insertion);
 				vData.updateEntry(bestInsertion.vehicleEntry.vehicle);
 				eventsManager.processEvent(new DrtRequestScheduledEvent(mobsimTimer.getTimeOfDay(), req.getId(),
 						bestInsertion.vehicleEntry.vehicle.getId(), req.getPickupTask().getEndTime(),
