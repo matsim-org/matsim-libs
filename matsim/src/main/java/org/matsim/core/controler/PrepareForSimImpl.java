@@ -1,6 +1,11 @@
 package org.matsim.core.controler;
 
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -29,13 +34,6 @@ import org.matsim.facilities.FacilitiesFromPopulation;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 
 class PrepareForSimImpl implements PrepareForSim {
 
@@ -199,6 +197,8 @@ class PrepareForSimImpl implements PrepareForSim {
 
 	private void createVehiclesForEveyNetworkMode(final Map<String, VehicleType> modeVehicleTypes) {
 		// yyyy maybe better just take the modes from qsim.mainMode???  kai, dec'17
+		// agree. A network mode may not be main mode (e.g. ride) and in this case,
+		// creating vehicles for every network mode is not required. IK, AA (Apr'18).
 
 //		boolean isModeChoicePresent = false;
 //		Collection<StrategyConfigGroup.StrategySettings> strategySettings = scenario.getConfig().strategy().getStrategySettings();
@@ -223,9 +223,10 @@ class PrepareForSimImpl implements PrepareForSim {
 //		}
 
 //		if (isModeChoicePresent) {
-			Collection<String> networkModes = scenario.getConfig().plansCalcRoute().getNetworkModes();
+//			Collection<String> networkModes = scenario.getConfig().plansCalcRoute().getNetworkModes();
 			for (Id<Person> personId : scenario.getPopulation().getPersons().keySet()) {
-				for (String mode : networkModes) {
+//				for (String mode : networkModes) {
+				for (String mode : scenario.getConfig().qsim().getMainModes()) {
 					Id<Vehicle> vehicleId = createAutomaticVehicleId(personId, mode, null);
 					createAndAddVehicleIfNotPresent(vehicleId, modeVehicleTypes.get(mode));
 				}

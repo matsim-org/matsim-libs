@@ -179,9 +179,9 @@ public class SignalEvents2ViaCSVWriter implements SignalGroupStateChangedEventHa
 			// vertical link
 			deltaX = 0;
 			if (toNodeCoord.getY() < fromNodeCoord.getY()) {
-				deltaY = -1;
-			} else {
 				deltaY = 1;
+			} else {
+				deltaY = -1;
 			}
 
 		} else {

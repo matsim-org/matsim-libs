@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2015 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +16,41 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.util.distance;
+package org.matsim.contrib.util;
+
+import java.util.function.Function;
 
 import org.matsim.api.core.v01.BasicLocation;
-import org.matsim.matrices.Matrix;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Identifiable;
+import org.matsim.contrib.util.XYDataCollector.XYDataCalculator;
 
-public class DistanceMatrixUtils {
-	public static Matrix calculateDistanceMatrix(DistanceCalculator calculator,
-			Iterable<? extends BasicLocation<?>> fromLocations, Iterable<? extends BasicLocation<?>> toLocations) {
-		Matrix matrix = new Matrix("distance", "distance");
+/**
+ * @author michalm
+ */
+public class XYDataCollectors {
+	public static <T extends BasicLocation<T>> XYDataCalculator<T> createCalculator(String[] header,
+			Function<T, Object[]> valueCalculator) {
+		return createCalculator(header, BasicLocation::getCoord, valueCalculator);
+	}
 
-		for (BasicLocation<?> from : fromLocations) {
-			for (BasicLocation<?> to : toLocations) {
-				double distance = calculator.calcDistance(from.getCoord(), to.getCoord());
-				matrix.createAndAddEntry(from.getId().toString(), to.getId().toString(), distance);
+	public static <T extends Identifiable<T>> XYDataCalculator<T> createCalculator(String[] header,
+			Function<T, Coord> coordGetter, Function<T, Object[]> valueCalculator) {
+		return new XYDataCalculator<T>() {
+			@Override
+			public String[] getHeader() {
+				return header;
 			}
-		}
 
-		return matrix;
+			@Override
+			public Coord getCoord(T object) {
+				return coordGetter.apply(object);
+			}
+
+			@Override
+			public Object[] calculate(T object) {
+				return valueCalculator.apply(object);
+			}
+		};
 	}
 }

@@ -36,7 +36,7 @@ public class Counts<T> {
 	/**
 	 * @param linkId the link to which the counting station is assigned, must be unique
 	 * @param stationName some additional identifier for humans, e.g. the original name/id of the counting station
-	 * @return the created Count object, or null if it could not be created (maybe because it already exists)
+ 	 * @return the created Count object, or {@linkplain RuntimeException} if it could not be created because it already exists
 	 */
 	public final Count<T> createAndAddCount(final Id<T> linkId, final String stationName) {
 		// check id string for uniqueness

@@ -24,6 +24,7 @@ package org.matsim.contrib.av.robotaxi.scoring;
 
 import java.util.Map;
 
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ReflectiveConfigGroup;
 
 /**
@@ -51,6 +52,10 @@ public class TaxiFareConfigGroup extends ReflectiveConfigGroup {
 	public TaxiFareConfigGroup() {
 		super(GROUP_NAME);
 
+	}
+	@SuppressWarnings("deprecation")
+	public static TaxiFareConfigGroup get(Config config) {
+		return (TaxiFareConfigGroup)config.getModule(GROUP_NAME);
 	}
 	
     @Override
