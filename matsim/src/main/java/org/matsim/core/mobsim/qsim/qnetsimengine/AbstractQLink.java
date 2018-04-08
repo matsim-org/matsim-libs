@@ -536,7 +536,7 @@ abstract class AbstractQLink implements QLinkI {
 		}
 		
 		public Node getFromNode() {
-			return AbstractQLink.this.link.getToNode() ;
+			return AbstractQLink.this.link.getFromNode() ;
 		}
 		
 		public double getFreespeed(double now) {
