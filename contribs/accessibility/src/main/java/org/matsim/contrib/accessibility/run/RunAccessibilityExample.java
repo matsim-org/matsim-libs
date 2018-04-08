@@ -45,7 +45,7 @@ final public class RunAccessibilityExample {
 	public static void main(String[] args) {
 
 		if ( args.length==0 || args.length>1 ) {
-			throw new RuntimeException("useage: ... config.xml") ;
+			throw new RuntimeException("usage: ... config.xml") ;
 		}
 		Config config = ConfigUtils.loadConfig( args[0] ) ;
 		
