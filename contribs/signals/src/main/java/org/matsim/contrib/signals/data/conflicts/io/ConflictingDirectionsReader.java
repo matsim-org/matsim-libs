@@ -46,10 +46,10 @@ public class ConflictingDirectionsReader extends MatsimXmlParser {
 	final static String ID = "id";
 	final static String FROM_LINK_ID = "fromLinkId";
 	final static String TO_LINK_ID = "toLinkId";
-	final static String CONFLICTING_DIRECTIONS = "conflicting directions";
-	final static String DIRECTIONS_WITH_RIGHT_OF_WAY = "directions with right of way";
-	final static String DIRECTIONS_WHICH_MUST_YIELD = "directions which must yield";
-	final static String NON_CONFLICTING_DIRECTIONS = "non-conflicting directions";
+	final static String CONFLICTING_DIRECTIONS = "conflictingDirections";
+	final static String DIRECTIONS_WITH_RIGHT_OF_WAY = "directionsWithRightOfWay";
+	final static String DIRECTIONS_WHICH_MUST_YIELD = "directionsWhichMustYield";
+	final static String NON_CONFLICTING_DIRECTIONS = "nonConflictingDirections";
 	
 	private ConflictData conflictData;
 	

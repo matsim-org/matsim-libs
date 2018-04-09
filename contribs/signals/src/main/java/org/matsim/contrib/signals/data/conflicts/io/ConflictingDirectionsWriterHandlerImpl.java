@@ -44,13 +44,12 @@ public class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirect
 
 	@Override
 	public void startConflictData(BufferedWriter out) throws IOException {
-		out.write("\t\t<conflictData>\n");
-		out.write("\n\n");
+		out.write("<conflictData>\n\n");
 	}
 
 	@Override
 	public void endConflictData(BufferedWriter out) throws IOException {
-		out.write("\t\t</conflictData>\n");
+		out.write("</conflictData>\n");
 	}
 
 	@Override
@@ -65,14 +64,14 @@ public class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirect
 	}
 
 	private void startIntersection(Id<Node> nodeId, Id<SignalSystem> systemId, BufferedWriter out) throws IOException {
-		out.write("\t\t<intersection");
+		out.write("\t<intersection");
 		out.write(" nodeId=\"" + nodeId + "\"");
 		out.write(" signalSystemId=\"" + systemId + "\"");
 		out.write(" >\n");
 	}
 
 	private void endIntersection(BufferedWriter out) throws IOException {
-		out.write("\t\t</intersection>\n");
+		out.write("\t</intersection>\n");
 		this.writeSeparator(out);
 		out.flush();
 	}
@@ -98,7 +97,6 @@ public class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirect
 		this.endTag(ConflictingDirectionsReader.NON_CONFLICTING_DIRECTIONS, out);
 		
 		this.endDirection(out);
-		out.write("\n\n");
 	}
 
 	private void startDirection(Direction direction, BufferedWriter out) throws IOException {
@@ -110,20 +108,20 @@ public class ConflictingDirectionsWriterHandlerImpl implements ConflictingDirect
 	}
 
 	private void endDirection(BufferedWriter out) throws IOException {
-		out.write("\t\t</direction>\n");
+		out.write("\t\t</direction>\n\n");
 	}
 	
 	private void startTag(String tagName, BufferedWriter out) throws IOException {
-		out.write("\t\t<"+tagName);
+		out.write("\t\t\t<"+tagName+">");
 	}
 	
 	private void endTag(String tagName, BufferedWriter out) throws IOException {
-		out.write("\t\t</"+tagName+">\n");
+		out.write(" </"+tagName+">\n");
 	}
 	
 	private void writeListOfDirections(List<Id<Direction>> directionList, BufferedWriter out) throws IOException {
 		for (Id<Direction> directionId : directionList) {
-			out.write(directionId + " ");
+			out.write(" " + directionId);
 		}
 	}
 
