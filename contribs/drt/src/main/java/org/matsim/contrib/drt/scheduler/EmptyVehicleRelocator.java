@@ -59,12 +59,13 @@ public class EmptyVehicleRelocator {
 		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 
-	public void relocateVehicle(Vehicle vehicle, Link link, double time) {
+	public void relocateVehicle(Vehicle vehicle, Link link) {
 		DrtStayTask currentTask = (DrtStayTask)vehicle.getSchedule().getCurrentTask();
 		Link currentLink = currentTask.getLink();
 
 		if (currentLink != link) {
-			VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(currentLink, link, time, router, travelTime);
+			VrpPathWithTravelData path = VrpPaths.calcAndCreatePath(currentLink, link, timer.getTimeOfDay(), router,
+					travelTime);
 			if (path.getArrivalTime() < vehicle.getServiceEndTime()) {
 				relocateVehicleImpl(vehicle, path);
 			}
@@ -76,11 +77,6 @@ public class EmptyVehicleRelocator {
 		DrtStayTask stayTask = (DrtStayTask)schedule.getCurrentTask();
 		if (stayTask.getTaskIdx() != schedule.getTaskCount() - 1) {
 			throw new IllegalStateException("The current STAY task is not last. Not possible without prebooking");
-		}
-
-		if (vrpPath.getDepartureTime() < timer.getTimeOfDay()) {
-			throw new IllegalArgumentException("Too late. Planned departureTime=" + vrpPath.getDepartureTime()
-					+ " currentTime=" + timer.getTimeOfDay());
 		}
 
 		stayTask.setEndTime(vrpPath.getDepartureTime()); // finish STAY
