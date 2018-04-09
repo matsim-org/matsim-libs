@@ -32,11 +32,14 @@ public class ChargingTaskImpl extends StayTaskImpl implements ChargingTask {
 	private double chargingStartedTime;
 	private double totalEnergy;
 
-	public ChargingTaskImpl(double beginTime, double endTime, Charger charger, ElectricVehicle ev) {
+	public ChargingTaskImpl(double beginTime, double endTime, Charger charger, ElectricVehicle ev, double totalEnergy) {
 		super(beginTime, endTime, charger.getLink());
+		if (totalEnergy >= 0) {
+			throw new IllegalArgumentException("Total energy consuption must be negative");
+		}
 		this.chargingLogic = (ChargingWithQueueingAndAssignmentLogic)charger.getLogic();
 		this.ev = ev;
-		totalEnergy = -chargingLogic.getChargingStrategy().calcRemainingEnergyToCharge(ev);
+		this.totalEnergy = totalEnergy;
 	}
 
 	@Override
