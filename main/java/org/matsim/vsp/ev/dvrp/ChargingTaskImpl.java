@@ -29,7 +29,7 @@ import org.matsim.vsp.ev.data.ElectricVehicle;
 public class ChargingTaskImpl extends StayTaskImpl implements ChargingTask {
 	private final ChargingWithQueueingAndAssignmentLogic chargingLogic;
 	private final ElectricVehicle ev;
-	private double chargingStartedTime;
+	private Double chargingStartedTime;
 	private double totalEnergy;
 
 	public ChargingTaskImpl(double beginTime, double endTime, Charger charger, ElectricVehicle ev, double totalEnergy) {
