@@ -35,7 +35,7 @@ public class ControlerListenerExampleTest {
 	@Test
 	public final void testMain() {
 		
-		final String pathname = "./output/example7/";
+		final String pathname = "./output/example/";
 		try {
 			IOUtils.deleteDirectoryRecursively(new File(pathname).toPath());
 		} catch ( UncheckedIOException ee ) {
