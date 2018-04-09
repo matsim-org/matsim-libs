@@ -49,14 +49,20 @@ public class ExamplesByConfigfileTest {
 		filesToRun.add(new Object [] {"scenarios/equil/example1-config.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil/example2-config.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil/example5-config.xml"});
+ 		filesToRun.add(new Object [] {"scenarios/equil/example7-config.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil/pluggablePlanStrategy-config.xml"});
 
-		filesToRun.add(new Object [] {"scenarios/equil-extended/example5trips-config.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil-extended/config.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-lanes.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-network-change-events.xml"});
+
+		//		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-roadpricing.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil-extended/config-with-subpopulation.xml"});
+		filesToRun.add(new Object [] {"scenarios/equil-extended/example5trips-config.xml"});
 
 		filesToRun.add(new Object [] {"scenarios/equil-mixedTraffic/config-with-mode-vehicles.xml"});
 		filesToRun.add(new Object [] {"scenarios/equil-mixedTraffic/config-with-all-vehicles-from-file.xml"});
-		
+
 		return filesToRun;
 		
 		// the convention, I think, is that the output of the method marked by "@Parameters" is taken as input to the constructor
