@@ -73,7 +73,7 @@ public class ClosestStopBasedDrtRoutingModule implements RoutingModule {
 	 */
 	@Inject
 	public ClosestStopBasedDrtRoutingModule(@Named(TransportMode.walk) RoutingModule walkRouter,
-			@Named(DrtConfigGroup.DRT_MODE) TransitSchedule transitSchedule, Scenario scenario) {
+			@Named(TransportMode.drt) TransitSchedule transitSchedule, Scenario scenario) {
 		transitSchedule.getFacilities();
 		this.walkRouter = walkRouter;
 		this.stops = transitSchedule.getFacilities();
@@ -121,7 +121,7 @@ public class ClosestStopBasedDrtRoutingModule implements RoutingModule {
 
 		}
 
-		Leg drtLeg = PopulationUtils.createLeg(DrtConfigGroup.DRT_MODE);
+		Leg drtLeg = PopulationUtils.createLeg(TransportMode.drt);
 		drtLeg.setDepartureTime(departureTime + walkLeg.getTravelTime() + 1);
 		drtLeg.setTravelTime(drtRoute.getTravelTime());
 		drtLeg.setRoute(drtRoute);
