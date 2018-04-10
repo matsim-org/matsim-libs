@@ -22,7 +22,8 @@ package org.matsim.contrib.taxi.run;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.core.config.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
 
@@ -36,18 +37,8 @@ public class RunTaxiScenarioTestIT {
 	}
 
 	@Test
-	public void testRunMielecLowDemandHighSupply() {
-		runMielec("plans_taxi_1.0.xml.gz", "taxis-50.xml");
-	}
-
-	@Test
 	public void testRunMielecHighDemandLowSupply() {
 		runMielec("plans_taxi_4.0.xml.gz", "taxis-25.xml");
-	}
-
-	@Test
-	public void testRunMielecHighDemandHighSupply() {
-		runMielec("plans_taxi_4.0.xml.gz", "taxis-50.xml");
 	}
 
 	private void runMielec(String plansFile, String taxisFile) {
