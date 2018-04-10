@@ -24,6 +24,7 @@ import java.util.List;
 import org.matsim.contrib.drt.optimizer.VehicleData.Entry;
 import org.matsim.contrib.drt.optimizer.VehicleData.EntryFactory;
 import org.matsim.contrib.drt.optimizer.VehicleData.Stop;
+import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.schedule.DrtDriveTask;
 import org.matsim.contrib.drt.schedule.DrtStayTask;
 import org.matsim.contrib.drt.schedule.DrtStopTask;
@@ -41,17 +42,18 @@ import com.google.common.collect.ImmutableList;
  * @author michalm
  */
 public class VehicleDataEntryFactoryImpl implements EntryFactory {
-	public static boolean isOperating(Vehicle vehicle, double currentTime) {
-		if (currentTime <= vehicle.getServiceBeginTime()// TODO this can be removed (esp. if the vehicle begins soon)
-				|| currentTime >= vehicle.getServiceEndTime()//
-				|| vehicle.getSchedule().getStatus() == ScheduleStatus.COMPLETED) {
-			return false;
+	private final double lookAhead;
+
+	public VehicleDataEntryFactoryImpl(DrtConfigGroup drtCfg) {
+		lookAhead = drtCfg.getMaxWaitTime() - drtCfg.getStopDuration();
+		if (lookAhead < 0) {
+			throw new IllegalArgumentException(
+					DrtConfigGroup.MAX_WAIT_TIME + " must not be smaller than " + DrtConfigGroup.STOP_DURATION);
 		}
-		return true;
 	}
 
 	public Entry create(Vehicle vehicle, double currentTime) {
-		if (!isOperating(vehicle, currentTime)) {
+		if (!isOperatingNowOrSoon(vehicle, currentTime)) {
 			return null;
 		}
 
@@ -107,5 +109,14 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		}
 
 		return new Entry(vehicle, start, outputOccupancy, ImmutableList.copyOf(stops));
+	}
+
+	public boolean isOperatingNowOrSoon(Vehicle vehicle, double currentTime) {
+		if (currentTime + lookAhead < vehicle.getServiceBeginTime()//
+				|| currentTime >= vehicle.getServiceEndTime()//
+				|| vehicle.getSchedule().getStatus() == ScheduleStatus.COMPLETED) {
+			return false;
+		}
+		return true;
 	}
 }
