@@ -8,9 +8,11 @@ import org.matsim.contrib.drt.optimizer.depot.DepotFinder;
 import org.matsim.contrib.drt.optimizer.depot.NearestStartLinkAsDepot;
 import org.matsim.contrib.drt.optimizer.rebalancing.NoRebalancingStrategy;
 import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.routing.DefaultAccessEgressStopFinder;
 import org.matsim.contrib.drt.routing.DrtMainModeIdentifier;
 import org.matsim.contrib.drt.routing.DrtRoutingModule;
 import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule;
+import org.matsim.contrib.drt.routing.StopBasedDrtRoutingModule.AccessEgressStopFinder;
 import org.matsim.contrib.dvrp.data.Fleet;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
 import org.matsim.contrib.dvrp.router.TimeAsTravelDisutility;
@@ -50,6 +52,7 @@ public final class DrtModule extends AbstractModule {
 						.toInstance(scenario2.getTransitSchedule());
 				bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();
 				addRoutingModuleBinding(DrtConfigGroup.DRT_MODE).to(StopBasedDrtRoutingModule.class).asEagerSingleton();
+				bind(AccessEgressStopFinder.class).to(DefaultAccessEgressStopFinder.class).asEagerSingleton();
 				break;
 
 			default:
