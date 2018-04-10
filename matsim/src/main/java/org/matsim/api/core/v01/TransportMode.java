@@ -36,8 +36,8 @@ public final class TransportMode {
 	public static final String motorcycle = "motorcycle" ;
 	public static final String truck = "truck" ;
 	public static final String pt = "pt";
-	public static final String drt="drt" ;
-	public static final String taxi="taxi" ;
+	public static final String drt = "drt" ;
+	public static final String taxi = "taxi" ;
 	public static final String walk = "walk";
 	public static final String transit_walk = "transit_walk";
 	
