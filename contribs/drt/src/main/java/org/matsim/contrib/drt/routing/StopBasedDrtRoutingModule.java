@@ -115,7 +115,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 
 		}
 
-		Leg drtLeg = PopulationUtils.createLeg(DrtConfigGroup.DRT_MODE);
+		Leg drtLeg = PopulationUtils.createLeg(TransportMode.drt);
 		drtLeg.setDepartureTime(departureTime + walkLeg.getTravelTime() + 1);
 		drtLeg.setTravelTime(drtRoute.getTravelTime());
 		drtLeg.setRoute(drtRoute);
@@ -144,7 +144,7 @@ public class StopBasedDrtRoutingModule implements RoutingModule {
 	public StageActivityTypes getStageActivityTypes() {
 		return drtStageActivityType;
 	}
-	
+
 	static Coord getFacilityCoord(Facility<?> facility, Network network) {
 		Coord coord = facility.getCoord();
 		if (coord == null) {

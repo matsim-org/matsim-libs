@@ -52,7 +52,7 @@ public class DefaultAccessEgressStopFinder implements AccessEgressStopFinder {
 	private final double walkBeelineFactor;
 
 	@Inject
-	public DefaultAccessEgressStopFinder(@Named(DrtConfigGroup.DRT_MODE) TransitSchedule transitSchedule,
+	public DefaultAccessEgressStopFinder(@Named(TransportMode.drt) TransitSchedule transitSchedule,
 			DrtConfigGroup drtconfig, PlansCalcRouteConfigGroup planscCalcRouteCfg, Network network) {
 		this.network = network;
 		this.stops = transitSchedule.getFacilities();

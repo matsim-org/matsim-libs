@@ -35,7 +35,6 @@ import org.matsim.core.config.ReflectiveConfigGroup;
 public class DrtConfigGroup extends ReflectiveConfigGroup {
 	
 	public static final String GROUP_NAME = "drt";
-	public static final String DRT_MODE = "drt";
 
 	@SuppressWarnings("deprecation")
 	public static DrtConfigGroup get(Config config) {
