@@ -27,9 +27,6 @@
 		<!-- Bus stop duration. -->
 		<param name="stopDuration" value="60.0" />
 
-		<!-- Stop locations file (transit schedule format, but without lines) for DRT stops. Used only for the stopbased mode -->
-		<param name="transitStopFile" value="null" />
-
 		<!-- An XML file specifying the vehicle fleet. The file format according to dvrp_vehicles_v1.dtd -->
 		<param name="vehiclesFile" value="drtvehicles.xml" />
 
