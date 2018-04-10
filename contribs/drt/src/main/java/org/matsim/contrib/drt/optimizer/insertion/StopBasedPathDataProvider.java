@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.drt.data.DrtRequest;
@@ -63,7 +64,7 @@ public class StopBasedPathDataProvider implements PrecalculatablePathDataProvide
 	public StopBasedPathDataProvider(@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
 			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			@Named(DefaultDrtOptimizer.DRT_OPTIMIZER) TravelDisutility travelDisutility,
-			@Named(DrtConfigGroup.DRT_MODE) TransitSchedule schedule, TravelTimeCalculatorConfigGroup ttcConfig,
+			@Named(TransportMode.drt) TransitSchedule schedule, TravelTimeCalculatorConfigGroup ttcConfig,
 			DrtConfigGroup drtCfg) {
 		stopDuration = drtCfg.getStopDuration();
 
