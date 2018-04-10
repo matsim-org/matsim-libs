@@ -53,7 +53,7 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 	}
 
 	public Entry create(Vehicle vehicle, double currentTime) {
-		if (!isOperatingNowOrSoon(vehicle, currentTime)) {
+		if (!isEligibleForRequestInsertion(vehicle, currentTime)) {
 			return null;
 		}
 
@@ -111,12 +111,8 @@ public class VehicleDataEntryFactoryImpl implements EntryFactory {
 		return new Entry(vehicle, start, outputOccupancy, ImmutableList.copyOf(stops));
 	}
 
-	public boolean isOperatingNowOrSoon(Vehicle vehicle, double currentTime) {
-		if (currentTime + lookAhead < vehicle.getServiceBeginTime()//
-				|| currentTime >= vehicle.getServiceEndTime()//
-				|| vehicle.getSchedule().getStatus() == ScheduleStatus.COMPLETED) {
-			return false;
-		}
-		return true;
+	public boolean isEligibleForRequestInsertion(Vehicle vehicle, double currentTime) {
+		return !(currentTime + lookAhead < vehicle.getServiceBeginTime()//
+				|| currentTime >= vehicle.getServiceEndTime());
 	}
 }
