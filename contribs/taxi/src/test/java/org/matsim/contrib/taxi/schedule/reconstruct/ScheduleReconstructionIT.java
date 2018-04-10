@@ -57,6 +57,7 @@ public class ScheduleReconstructionIT {
 		Config config = ConfigUtils.loadConfig(configFile, new TaxiConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setDumpDataAtEnd(false);
 
 		Controler controler = RunTaxiBenchmark.createControler(config, 1);
 		controler.addOverridingModule(new AbstractModule() {

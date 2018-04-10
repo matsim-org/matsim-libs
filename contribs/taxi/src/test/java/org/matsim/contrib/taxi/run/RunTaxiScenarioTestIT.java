@@ -57,6 +57,7 @@ public class RunTaxiScenarioTestIT {
 		config.plans().setInputFile(plansFile);
 		taxiCfg.setTaxisFile(taxisFile);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setDumpDataAtEnd(false);
 		RunTaxiScenario.createControler(config, false).run();
 	}
 }
