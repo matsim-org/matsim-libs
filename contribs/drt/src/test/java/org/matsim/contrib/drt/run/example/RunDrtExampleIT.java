@@ -54,7 +54,7 @@ public class RunDrtExampleIT {
 	
 	@Test
 	public void testRunDrtStopbasedExample() {
-		String configFile = "./src/main/resources/drt_example/drtconfig_door2door.xml";
+		String configFile = "./src/main/resources/drt_example/drtconfig_stopbased.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.plans().setInputFile("cb-drtplans_test.xml.gz");
