@@ -51,6 +51,11 @@ public class RunTaxiBenchmark {
 
 	public static Controler createControler(Config config, int runs) {
 		config.controler().setLastIteration(runs - 1);
+		config.controler().setDumpDataAtEnd(false);
+		config.controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
+		config.controler().setCreateGraphs(false);
+
 		DvrpConfigGroup.get(config).setNetworkMode(null);// to switch off network filtering
 		config.addConfigConsistencyChecker(new TaxiBenchmarkConfigConsistencyChecker());
 		config.checkConsistency();
