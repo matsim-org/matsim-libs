@@ -71,8 +71,9 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 	private final LeastCostPathCalculator router;
 
 	@Inject
-	public TaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet, @Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network,
-			MobsimTimer timer, @Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
+	public TaxiScheduler(TaxiConfigGroup taxiCfg, Fleet fleet,
+			@Named(DvrpRoutingNetworkProvider.DVRP_ROUTING) Network network, MobsimTimer timer,
+			@Named(DvrpTravelTimeModule.DVRP_ESTIMATED) TravelTime travelTime,
 			@Named(DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER) TravelDisutility travelDisutility) {
 		this.taxiCfg = taxiCfg;
 		this.fleet = fleet;
@@ -180,7 +181,9 @@ public class TaxiScheduler implements TaxiScheduleInquiry {
 		}
 
 		Schedule schedule = veh.getSchedule();
-		if (/* context.getTime() >= veh.getT1() || */schedule.getStatus() != ScheduleStatus.STARTED) {
+		// timer.getTimeOfDay() >= veh.getServiceEndTime() is ALLOWED because we need to stop/divert delayed vehicles
+		// so do not return null
+		if (schedule.getStatus() != ScheduleStatus.STARTED) {
 			return null;
 		}
 
