@@ -1,6 +1,7 @@
 package org.matsim.contrib.drt.run;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.data.validator.DefaultDrtRequestValidator;
 import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
@@ -41,17 +42,17 @@ public final class DrtModule extends AbstractModule {
 
 		switch (drtCfg.getOperationalScheme()) {
 			case door2door:
-				addRoutingModuleBinding(DrtConfigGroup.DRT_MODE).to(DrtRoutingModule.class).asEagerSingleton();
+				addRoutingModuleBinding(TransportMode.drt).to(DrtRoutingModule.class).asEagerSingleton();
 				break;
 
 			case stopbased:
 				final Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 				new TransitScheduleReader(scenario2)
 						.readFile(drtCfg.getTransitStopsFileUrl(getConfig().getContext()).getFile());
-				bind(TransitSchedule.class).annotatedWith(Names.named(DrtConfigGroup.DRT_MODE))
+				bind(TransitSchedule.class).annotatedWith(Names.named(TransportMode.drt))
 						.toInstance(scenario2.getTransitSchedule());
 				bind(MainModeIdentifier.class).to(DrtMainModeIdentifier.class).asEagerSingleton();
-				addRoutingModuleBinding(DrtConfigGroup.DRT_MODE).to(StopBasedDrtRoutingModule.class).asEagerSingleton();
+				addRoutingModuleBinding(TransportMode.drt).to(StopBasedDrtRoutingModule.class).asEagerSingleton();
 				bind(AccessEgressStopFinder.class).to(DefaultAccessEgressStopFinder.class).asEagerSingleton();
 				break;
 
