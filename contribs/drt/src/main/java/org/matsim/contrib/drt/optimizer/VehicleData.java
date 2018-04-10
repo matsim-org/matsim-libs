@@ -104,10 +104,6 @@ public class VehicleData {
 	private final EntryFactory entryFactory;
 	private final Map<Id<Vehicle>, Entry> entries;
 
-	public VehicleData(double currentTime, Stream<? extends Vehicle> vehicles) {
-		this(currentTime, vehicles, new VehicleDataEntryFactoryImpl());
-	}
-
 	public VehicleData(double currentTime, Stream<? extends Vehicle> vehicles, EntryFactory entryFactory) {
 		this.currentTime = currentTime;
 		this.entryFactory = entryFactory;
