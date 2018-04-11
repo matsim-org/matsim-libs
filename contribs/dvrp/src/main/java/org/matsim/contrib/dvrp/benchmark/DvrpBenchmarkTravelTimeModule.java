@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.benchmark;
+package org.matsim.contrib.dvrp.benchmark;
 
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
 import org.matsim.core.controler.AbstractModule;

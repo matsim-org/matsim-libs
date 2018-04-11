@@ -23,6 +23,8 @@ import java.util.Collections;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkControlerModule;
+import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkModule;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
 import org.matsim.contrib.taxi.optimizer.TaxiOptimizer;

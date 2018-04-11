@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.benchmark;
+package org.matsim.contrib.dvrp.benchmark;
 
 import java.util.Collection;
 import java.util.function.Function;
