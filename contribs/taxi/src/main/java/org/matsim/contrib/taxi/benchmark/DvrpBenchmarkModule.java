@@ -23,10 +23,8 @@ import java.util.function.Function;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
-import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpQSimPluginsProvider;
 import org.matsim.contrib.dvrp.run.DvrpQSimPluginsProvider.DvrpQSimPluginsProviderFactory;
-import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
@@ -53,11 +51,7 @@ public class DvrpBenchmarkModule extends AbstractModule {
 
 	@Override
 	public void install() {
-		String mode = DvrpConfigGroup.get(getConfig()).getMode();
-		addRoutingModuleBinding(mode).toInstance(new DynRoutingModule(mode));
-
-		// VrpTravelTimeEstimator
-		install(new DvrpBenchmarkTravelTimeModule());
+		install(new DvrpBenchmarkTravelTimeModule());// fixed travel times
 
 		bind(Network.class).annotatedWith(Names.named(DvrpRoutingNetworkProvider.DVRP_ROUTING))
 				.toProvider(DvrpRoutingNetworkProvider.class).asEagerSingleton();
@@ -65,5 +59,4 @@ public class DvrpBenchmarkModule extends AbstractModule {
 		bind(new TypeLiteral<Collection<AbstractQSimPlugin>>() {})
 				.toProvider(qSimPluginProviderFactory.create(getConfig()));
 	}
-
 }
