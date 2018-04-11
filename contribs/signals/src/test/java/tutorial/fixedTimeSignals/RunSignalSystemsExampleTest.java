@@ -20,6 +20,7 @@ package tutorial.fixedTimeSignals;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.contrib.signals.run.RunSignalSystemsExample;
 
 /**
  * @author nagel
@@ -28,10 +29,21 @@ import org.junit.Test;
 public class RunSignalSystemsExampleTest {
 
 	@Test
-	public final void test() {
+	public final void testExampleWithHoles() {
 		boolean usingOTFVis = false ;
 		try {
-			RunSignalSystemsExample.run(usingOTFVis);
+			RunSignalSystemsExampleWithHoles.run(usingOTFVis);
+		} catch (Exception ee ) {
+			ee.printStackTrace();
+			Assert.fail("something went wrong") ;
+		}
+	}
+	
+	@Test
+	public final void testMinimalExample() {
+		try {
+			String[] args = {"../examples/tutorial/example90TrafficLights/useSignalInput/withLanes/config.xml"};
+			RunSignalSystemsExample.main(args);
 		} catch (Exception ee ) {
 			ee.printStackTrace();
 			Assert.fail("something went wrong") ;
