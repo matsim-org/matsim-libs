@@ -22,6 +22,8 @@
  */
 package org.matsim.contrib.drt.run;
 
+import java.util.Arrays;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -63,20 +65,21 @@ public final class DrtControlerCreator {
 	public static Controler createControler(Config config, boolean otfvis) {
 		adjustConfig(config);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		return createControlerImpl(otfvis, scenario);
+		Controler controler = new Controler(scenario);
+		return addDrtToControler(controler, otfvis);
 	}
 
 	public static Controler createControler(Scenario scenario, boolean otfvis) {
 		// yy I know that this one breaks the sequential loading of the building blocks, but I would like to be able
 		// to modify the scenario before I pass it to the controler. kai, oct'17
 		adjustConfig(scenario.getConfig());
-		return createControlerImpl(otfvis, scenario);
+		Controler controler = new Controler(scenario);
+		return addDrtToControler(controler, otfvis);
 	}
 
-	private static Controler createControlerImpl(boolean otfvis, Scenario scenario) {
-		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(new DvrpModule(DrtControlerCreator::createModuleForQSimPlugin, DrtOptimizer.class,
-				DefaultUnplannedRequestInserter.class, ParallelPathDataProvider.class));
+	public static Controler addDrtToControler(Controler controler, boolean otfvis) {
+		controler.addOverridingModule(new DvrpModule(DrtControlerCreator::createModuleForQSimPlugin, Arrays
+				.asList(DrtOptimizer.class, DefaultUnplannedRequestInserter.class, ParallelPathDataProvider.class)));
 		controler.addOverridingModule(new DrtModule());
 		controler.addOverridingModule(new DrtAnalysisModule());
 		if (otfvis) {

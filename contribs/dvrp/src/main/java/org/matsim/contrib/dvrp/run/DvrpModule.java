@@ -19,7 +19,6 @@
 
 package org.matsim.contrib.dvrp.run;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Function;
 
@@ -27,11 +26,9 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
-import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
+import org.matsim.contrib.dvrp.run.DvrpQSimPluginsProvider.DvrpQSimPluginsProviderFactory;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.core.config.Config;
@@ -54,37 +51,14 @@ import com.google.inject.name.Named;
 import com.google.inject.name.Names;
 
 public final class DvrpModule extends AbstractModule {
-	@SuppressWarnings("unchecked")
-	public static DvrpModule create(final Class<? extends VrpOptimizer> vrpOptimizerClass,
-			final Class<? extends PassengerRequestCreator> passengerRequestCreatorClass,
-			final Class<? extends DynActionCreator> dynActionCreatorClass) {
-		Module module = new com.google.inject.AbstractModule() {
-			@Override
-			protected void configure() {
-				bind(VrpOptimizer.class).to(vrpOptimizerClass).asEagerSingleton();
-				bind(PassengerRequestCreator.class).to(passengerRequestCreatorClass).asEagerSingleton();
-				bind(DynActionCreator.class).to(dynActionCreatorClass).asEagerSingleton();
-			}
-		};
+	private final DvrpQSimPluginsProviderFactory qSimPluginProviderFactory;
 
-		return MobsimListener.class.isAssignableFrom(vrpOptimizerClass)
-				? new DvrpModule(module, (Class<? extends MobsimListener>)vrpOptimizerClass) : new DvrpModule(module);
+	public DvrpModule(Function<Config, Module> moduleCreator, Collection<Class<? extends MobsimListener>> listeners) {
+		this(config -> new DvrpQSimPluginsProvider(config, moduleCreator).addListeners(listeners));
 	}
 
-	private final Function<Config, Provider<Collection<AbstractQSimPlugin>>> qSimPluginProviderCreator;
-
-	@SafeVarargs
-	public DvrpModule(Module module, Class<? extends MobsimListener>... listeners) {
-		this(config -> new DvrpQSimPluginsProvider(config, cfg -> module).addListeners(Arrays.asList(listeners)));
-	}
-
-	@SafeVarargs
-	public DvrpModule(Function<Config, Module> moduleCreator, Class<? extends MobsimListener>... listeners) {
-		this(config -> new DvrpQSimPluginsProvider(config, moduleCreator).addListeners(Arrays.asList(listeners)));
-	}
-
-	public DvrpModule(Function<Config, Provider<Collection<AbstractQSimPlugin>>> qSimPluginProviderCreator) {
-		this.qSimPluginProviderCreator = qSimPluginProviderCreator;
+	public DvrpModule(DvrpQSimPluginsProviderFactory qSimPluginProviderFactory) {
+		this.qSimPluginProviderFactory = qSimPluginProviderFactory;
 	}
 
 	@Override
@@ -102,7 +76,7 @@ public final class DvrpModule extends AbstractModule {
 				.toProvider(DvrpRoutingNetworkProvider.class).asEagerSingleton();
 
 		bind(new TypeLiteral<Collection<AbstractQSimPlugin>>() {})
-				.toProvider(qSimPluginProviderCreator.apply(getConfig()));
+				.toProvider(qSimPluginProviderFactory.create(getConfig()));
 	}
 
 	public static class MobsimTimerProvider implements Provider<MobsimTimer> {

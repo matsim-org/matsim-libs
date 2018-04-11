@@ -18,6 +18,8 @@
 
 package org.matsim.contrib.taxi.run.examples;
 
+import java.util.Collections;
+
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpModule;
@@ -51,7 +53,8 @@ public class TaxiDvrpModules {
 	}
 
 	public static DvrpModule create(Module taxiOptimizerModule) {
-		return new DvrpModule(createModuleForQSimPlugin(taxiOptimizerModule), TaxiOptimizer.class);
+		return new DvrpModule(cfg -> createModuleForQSimPlugin(taxiOptimizerModule),
+				Collections.singletonList(TaxiOptimizer.class));
 	}
 
 	public static Module createModuleForQSimPlugin(Module taxiOptimizerModule) {
