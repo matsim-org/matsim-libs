@@ -35,13 +35,15 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 public class RunExperiencedTripsAnalysis {
 	public static void main(String[] args) {
 		
-		String runDirectory = "";
-		String runId = "";
+		String runDirectory = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/drt_test_Scenarios/BS_DRT/output/0.1_drt_100veh";
+		String runId = "0.1_drt_100veh.";
 		String runPrefix = runDirectory+"/"+runId;
 		
 		Set<String> monitoredModes = new HashSet<>();
 		monitoredModes.add("pt");
 		monitoredModes.add("drt");
+		monitoredModes.add("drt_walk");
+		monitoredModes.add("transit_walk");
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario.getNetwork()).readFile(runPrefix+"output_network.xml.gz");
@@ -59,12 +61,12 @@ public class RunExperiencedTripsAnalysis {
 		events.addHandler(eventHandler);
 		new DrtEventsReader(events).readFile(runPrefix + "output_events.xml.gz");
 		System.out.println("Start writing trips of " + eventHandler.getPerson2ExperiencedTrips().size() + " agents.");
-		ExperiencedTripsWriter tripsWriter = new ExperiencedTripsWriter(args[1] +
-				"/experiencedTrips.csv", 
+		ExperiencedTripsWriter tripsWriter = new ExperiencedTripsWriter(runPrefix+
+				"experiencedTrips.csv", 
 				eventHandler.getPerson2ExperiencedTrips(), monitoredModes);
 		tripsWriter.writeExperiencedTrips();
-		ExperiencedTripsWriter legsWriter = new ExperiencedTripsWriter(args[1] + 
-				"/experiencedLegs.csv", 
+		ExperiencedTripsWriter legsWriter = new ExperiencedTripsWriter(runPrefix + 
+				"experiencedLegs.csv", 
 				eventHandler.getPerson2ExperiencedTrips(), monitoredModes);
 		legsWriter.writeExperiencedLegs();
 	}

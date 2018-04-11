@@ -71,7 +71,7 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 
 		// Overwrite existing configuration parameters
 		config.plans().setInputFile("population/vw219_it_1_sampleRate0.1replaceRate_bs_drt.xml.gz");
-		config.controler().setLastIteration(5); // Number of simulation iterations
+		config.controler().setLastIteration(1); // Number of simulation iterations
 		config.controler().setWriteEventsInterval(1); // Write Events file every x-Iterations
 		config.controler().setWritePlansInterval(1); // Write Plan file every x-Iterations
 
