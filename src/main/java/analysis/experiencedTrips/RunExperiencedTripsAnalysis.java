@@ -63,11 +63,11 @@ public class RunExperiencedTripsAnalysis {
 		System.out.println("Start writing trips of " + eventHandler.getPerson2ExperiencedTrips().size() + " agents.");
 		ExperiencedTripsWriter tripsWriter = new ExperiencedTripsWriter(runPrefix+
 				"experiencedTrips.csv", 
-				eventHandler.getPerson2ExperiencedTrips(), monitoredModes);
+				eventHandler.getPerson2ExperiencedTrips(), monitoredModes,scenario.getNetwork());
 		tripsWriter.writeExperiencedTrips();
 		ExperiencedTripsWriter legsWriter = new ExperiencedTripsWriter(runPrefix + 
 				"experiencedLegs.csv", 
-				eventHandler.getPerson2ExperiencedTrips(), monitoredModes);
+				eventHandler.getPerson2ExperiencedTrips(), monitoredModes,scenario.getNetwork());
 		legsWriter.writeExperiencedLegs();
 	}
 

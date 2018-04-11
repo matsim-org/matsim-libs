@@ -26,8 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -41,11 +43,13 @@ public class ExperiencedTripsWriter {
 	// second level separator
 	private String sep2 = ",";
 	private BufferedWriter bw;
+	private Network network;
 	
 	public ExperiencedTripsWriter(String path, Map<Id<Person>, List<ExperiencedTrip>> agent2trips, 
-			Set<String> monitoredModes){
+			Set<String> monitoredModes, Network network){
 		this.path = path;
 		this.agent2trips = agent2trips;
+		this.network  = network;
 		this.monitoredModes = monitoredModes;
 		try {
 			initialize();
@@ -59,7 +63,7 @@ public class ExperiencedTripsWriter {
 		bw = IOUtils.getBufferedWriter(path);
 		// write header
 		bw.write("tripId" + sep + "agent" + sep + "tripNumber" + sep + "activityBefore" + sep +
-				"activityAfter" + sep + "fromLinkId" + sep + "toLinkId" + sep +
+				"activityAfter" + sep + "fromLinkId" + sep + "fromX"+ sep + "fromY" + sep + "toLinkId" + sep + "toX" + sep+ "toY"+ sep+
 				"startTime" + sep + "endTime" + sep + "totalTravelTime" + sep + 
 				"numberOfLegs" + sep + "transitStopsVisited");
 		for(String mode: monitoredModes){
@@ -121,9 +125,13 @@ public class ExperiencedTripsWriter {
 
 	private void writeExperiencedTrip(ExperiencedTrip trip) {
 		try {
+			Coord from = network.getLinks().get(trip.getFromLinkId()).getCoord();
+			Coord to = network.getLinks().get(trip.getToLinkId()).getCoord();
 			bw.write(trip.getId() + sep + trip.getAgent() + sep + trip.getTripNumber() + sep +
 					trip.getActivityBefore() + sep + trip.getActivityAfter() + sep + 
-					trip.getFromLinkId() + sep + trip.getToLinkId() + sep + 
+					trip.getFromLinkId() + sep 
+					+ from.getX() + sep + from.getY()+ sep
+					+ trip.getToLinkId() + sep + to.getX() + sep + to.getY() +  sep+
 					convertSecondsToTimeString(trip.getStartTime()) + sep + 
 					convertSecondsToTimeString(trip.getEndTime()) + sep + 
 					trip.getTotalTravelTime() + sep + trip.getLegs().size());
