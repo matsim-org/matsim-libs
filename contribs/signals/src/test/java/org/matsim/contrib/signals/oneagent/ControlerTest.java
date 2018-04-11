@@ -65,6 +65,7 @@ public class ControlerTest {
 		scenario.getConfig().controler().setFirstIteration(0);
 		scenario.getConfig().controler().setLastIteration(1);
 		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
+		scenario.getConfig().controler().setWriteEventsInterval(1);
 		
 		Controler controler = new Controler(scenario);
         controler.getConfig().controler().setCreateGraphs(false);
