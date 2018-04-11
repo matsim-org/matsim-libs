@@ -42,7 +42,7 @@ public class RunSignalSystemsExampleTest {
 			RunSignalSystemsExampleWithHoles.run(usingOTFVis);
 		} catch (Exception ee ) {
 			ee.printStackTrace();
-			Assert.fail("something went wrong") ;
+			Assert.fail("something went wrong: " + ee.getMessage()) ;
 		}
 	}
 	
@@ -57,7 +57,7 @@ public class RunSignalSystemsExampleTest {
 			RunSignalSystemsExample.run(config);
 		} catch (Exception ee ) {
 			ee.printStackTrace();
-			Assert.fail("something went wrong") ;
+			Assert.fail("something went wrong: " + ee.getMessage()) ;
 		}
 	}
 
