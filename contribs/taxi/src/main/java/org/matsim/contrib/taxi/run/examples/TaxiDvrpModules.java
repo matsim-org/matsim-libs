@@ -44,20 +44,11 @@ public class TaxiDvrpModules {
 	}
 
 	public static DvrpModule create(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
-		return create(new com.google.inject.AbstractModule() {
-			@Override
-			protected void configure() {
-				bind(TaxiOptimizer.class).toProvider(providerClass).asEagerSingleton();
-			}
-		});
+		return new DvrpModule(cfg -> createModuleForQSimPlugin(providerClass),
+				Collections.singleton(TaxiOptimizer.class));
 	}
 
-	public static DvrpModule create(Module taxiOptimizerModule) {
-		return new DvrpModule(cfg -> createModuleForQSimPlugin(taxiOptimizerModule),
-				Collections.singletonList(TaxiOptimizer.class));
-	}
-
-	public static Module createModuleForQSimPlugin(Module taxiOptimizerModule) {
+	public static Module createModuleForQSimPlugin(Class<? extends Provider<? extends TaxiOptimizer>> providerClass) {
 		return new com.google.inject.AbstractModule() {
 			@Override
 			protected void configure() {
@@ -67,7 +58,12 @@ public class TaxiDvrpModules {
 				bind(TaxiScheduler.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
 				bind(PassengerRequestCreator.class).to(TaxiRequestCreator.class).asEagerSingleton();
-				install(taxiOptimizerModule);
+				install(new com.google.inject.AbstractModule() {
+					@Override
+					protected void configure() {
+						bind(TaxiOptimizer.class).toProvider(providerClass).asEagerSingleton();
+					}
+				});
 			}
 		};
 	}
