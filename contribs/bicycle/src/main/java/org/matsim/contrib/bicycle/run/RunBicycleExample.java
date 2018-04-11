@@ -21,6 +21,7 @@ package org.matsim.contrib.bicycle.run;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -42,15 +43,27 @@ import org.matsim.vehicles.VehicleUtils;
  * @author dziemke
  */
 public class RunBicycleExample {
+	private static final Logger LOG = Logger.getLogger(RunBicycleExample.class);
 
-	public static void main(String[] args) {	
-		// Setting the context like this works when the data is stored under "/matsim/contribs/bicycle/src/main/resources/bicycle_example"
-		Config config = ConfigUtils.createConfig("bicycle_example/");
-		config.addModule(new BicycleConfigGroup());
-		fillConfigWithBicycleStandardValues(config);
-		
-		config.network().setInputFile("network_cobblestone.xml"); // Modify this
-		config.plans().setInputFile("population_1200.xml");
+	public static void main(String[] args) {
+		Config config;
+		if (args.length == 1) {
+			LOG.info("A user-specified config.xml file was provided. Using it...");
+			config = ConfigUtils.loadConfig(args[0], new BicycleConfigGroup());
+			fillConfigWithBicycleStandardValues(config);
+		} else if (args.length == 0) {
+			LOG.info("No config.xml file was provided. Using 'standard' example files given in this contrib's resources folder.");
+			// Setting the context like this works when the data is stored under "/matsim/contribs/bicycle/src/main/resources/bicycle_example"
+			config = ConfigUtils.createConfig("bicycle_example/");
+			config.addModule(new BicycleConfigGroup());
+			fillConfigWithBicycleStandardValues(config);
+			
+			config.network().setInputFile("network_cobblestone.xml"); // Modify this
+			config.plans().setInputFile("population_1200.xml");
+		} else {
+			throw new RuntimeException("More than one argument was provided. There is no procedure for this situation. Thus aborting!"
+					+ " Provide either (1) only a suitable config file or (2) no argument at all to run example with given example of resources folder.");
+		}
 		config.controler().setLastIteration(0); // Modify if motorized interaction is used
 		boolean considerMotorizedInteraction = false;
 		
