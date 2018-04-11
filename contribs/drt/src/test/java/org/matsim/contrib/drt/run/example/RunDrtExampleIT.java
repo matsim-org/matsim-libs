@@ -49,18 +49,20 @@ public class RunDrtExampleIT {
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setDumpDataAtEnd(false);
 		RunDrtExample.run(config, false);
 	}
 	
 	@Test
 	public void testRunDrtStopbasedExample() {
-		String configFile = "./src/main/resources/drt_example/drtconfig_door2door.xml";
+		String configFile = "./src/main/resources/drt_example/drtconfig_stopbased.xml";
 		Config config = ConfigUtils.loadConfig(configFile, new DrtConfigGroup(), new DvrpConfigGroup(),
 				new OTFVisConfigGroup());
 		config.plans().setInputFile("cb-drtplans_test.xml.gz");
 		
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
+		config.controler().setDumpDataAtEnd(false);
 		RunDrtExample.run(config, false);
 	}
 }

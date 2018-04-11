@@ -36,7 +36,9 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup;
 public class RunDrtExample {
 	
 	private static final String COTTBUS_CONFIG_FILE_DOOR2DOOR = "drt_example/drtconfig_door2door.xml";
+	@SuppressWarnings("unused")
 	private static final String COTTBUS_CONFIG_FILE_STOPBASED = "drt_example/drtconfig_stopbased.xml";
+	@SuppressWarnings("unused")
 	private static final String MIELEC_CONFIG_FILE = "mielec_2014_02/mielec_drt_config.xml";
 
 	public static void run(Config config, boolean otfvis) {

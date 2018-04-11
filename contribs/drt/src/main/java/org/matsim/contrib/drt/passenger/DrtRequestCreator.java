@@ -61,6 +61,8 @@ public class DrtRequestCreator implements PassengerRequestCreator {
 		this.travelTime = travelTime;
 		this.eventsManager = eventsManager;
 		this.timer = timer;
+		// Euclidean with overdoFactor > 1.0 could lead to 'experiencedTT < unsharedRideTT',
+		// while the benefit would be a marginal reduction of computation time ==> so stick to 1.0
 		router = new FastAStarEuclideanFactory().createPathCalculator(network, travelDisutility, travelTime);
 	}
 

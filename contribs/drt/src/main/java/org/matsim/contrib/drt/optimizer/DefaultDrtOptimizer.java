@@ -115,7 +115,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		for (Relocation r : relocations) {
 			Link currentLink = ((DrtStayTask)r.vehicle.getSchedule().getCurrentTask()).getLink();
 			if (currentLink != r.link) {
-				relocator.relocateVehicle(r.vehicle, r.link, mobsimTimer.getTimeOfDay());
+				relocator.relocateVehicle(r.vehicle, r.link);
 			}
 		}
 	}
@@ -143,7 +143,7 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		if (depotFinder != null && Depots.isSwitchingFromStopToStay(vehicle)) {
 			Link depotLink = depotFinder.findDepot(vehicle);
 			if (depotLink != null) {
-				relocator.relocateVehicle(vehicle, depotLink, mobsimTimer.getTimeOfDay());
+				relocator.relocateVehicle(vehicle, depotLink);
 			}
 		}
 	}
