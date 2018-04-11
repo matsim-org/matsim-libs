@@ -19,11 +19,16 @@
 
 package org.matsim.contrib.dvrp.examples.onetaxi;
 
+import java.util.Collections;
+
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.dvrp.data.file.FleetProvider;
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
+import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigConsistencyChecker;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
 import org.matsim.contrib.dvrp.run.DvrpModule;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.otfvis.OTFVisLiveModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigGroup;
@@ -51,10 +56,20 @@ public final class RunOneTaxiExample {
 
 		// setup controler
 		Controler controler = new Controler(scenario);
-		controler.addOverridingModule(DvrpModule.create( //
-				OneTaxiOptimizer.class, // optimizer that dispatches taxis
-				OneTaxiRequestCreator.class, // converts departures of the "taxi" mode into taxi requests
-				OneTaxiActionCreator.class)); // converts scheduled tasks into simulated actions (legs and activities)
+		controler.addOverridingModule(new DvrpModule(//
+				cfg -> new com.google.inject.AbstractModule() {
+					@Override
+					protected void configure() {
+						// optimizer that dispatches taxis
+						bind(VrpOptimizer.class).to(OneTaxiOptimizer.class).asEagerSingleton();
+						// converts departures of the "taxi" mode into taxi requests
+						bind(PassengerRequestCreator.class).to(OneTaxiRequestCreator.class).asEagerSingleton();
+						// converts scheduled tasks into simulated actions (legs and activities)
+						bind(DynActionCreator.class).to(OneTaxiActionCreator.class).asEagerSingleton();
+					}
+				}, //
+				Collections.emptySet()));// no mobsim listeners necessary in OneTaxiExample
+
 		controler.addOverridingModule(
 				FleetProvider.createModule(ConfigGroup.getInputFileURL(config.getContext(), TAXIS_FILE)));
 
