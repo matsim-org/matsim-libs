@@ -25,8 +25,6 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 /**
- * This module overrides the bindings set up by DvrpTravelTimeModule
- * 
  * @author michalm
  */
 public class DvrpBenchmarkTravelTimeModule extends AbstractModule {
