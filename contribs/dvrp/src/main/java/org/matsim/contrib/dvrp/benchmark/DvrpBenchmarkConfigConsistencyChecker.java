@@ -41,7 +41,11 @@ public class DvrpBenchmarkConfigConsistencyChecker implements ConfigConsistencyC
 		}
 
 		if (config.qsim().getFlowCapFactor() < 100) {
-			log.warn("FlowCapFactor should be large enough (e.g. 100) to obtain deterministic travel times");
+			log.warn("FlowCapFactor should be large enough (e.g. 100) to obtain deterministic (fixed) travel times");
+		}
+
+		if (config.qsim().getStorageCapFactor() < 100) {
+			log.warn("StorageCapFactor should be large enough (e.g. 100) to obtain deterministic (fixed) travel times");
 		}
 
 		if (config.network().isTimeVariantNetwork() && DvrpConfigGroup.get(config).getNetworkMode() != null) {
