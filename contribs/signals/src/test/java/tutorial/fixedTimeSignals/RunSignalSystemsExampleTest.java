@@ -21,6 +21,9 @@ package tutorial.fixedTimeSignals;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.contrib.signals.run.RunSignalSystemsExample;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 
 /**
  * @author nagel
@@ -42,8 +45,11 @@ public class RunSignalSystemsExampleTest {
 	@Test
 	public final void testMinimalExample() {
 		try {
-			String[] args = {"../examples/tutorial/example90TrafficLights/useSignalInput/withLanes/config.xml"};
-			RunSignalSystemsExample.main(args);
+			Config config = ConfigUtils.loadConfig("./examples/tutorial/example90TrafficLights/useSignalInput/withLanes/config.xml");
+			config.controler().setOverwriteFileSetting(OverwriteFileSetting.deleteDirectoryIfExists);
+			config.controler().setLastIteration(0);
+			
+			RunSignalSystemsExample.run(config);
 		} catch (Exception ee ) {
 			ee.printStackTrace();
 			Assert.fail("something went wrong") ;

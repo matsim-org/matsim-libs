@@ -27,6 +27,7 @@ import org.matsim.contrib.signals.data.SignalsDataLoader;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryHierarchy.OverwriteFileSetting;
 import org.matsim.core.scenario.ScenarioUtils;
 
 /**
@@ -47,6 +48,10 @@ public class RunSignalSystemsExample {
 		// --- create the config
 		Config config = ConfigUtils.loadConfig(args[0]);
 
+		run(config); // The run method is extracted so that a test can operate on it.
+	}
+	
+	public static void run(Config config) {
 		// --- create the scenario
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		// load the information about signals data (i.e. fill the SignalsData object) and add it to the scenario as scenario element
