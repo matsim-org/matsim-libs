@@ -23,7 +23,7 @@ import java.util.Collections;
 import org.matsim.contrib.dvrp.optimizer.VrpOptimizer;
 import org.matsim.contrib.dvrp.passenger.PassengerRequestCreator;
 import org.matsim.contrib.dvrp.run.DvrpModule;
-import org.matsim.contrib.dvrp.run.DvrpModule.MobsimTimerProvider;
+import org.matsim.contrib.dvrp.run.MobsimTimerProvider;
 import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelDisutilityProvider;
 import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.DynActionCreator;
 import org.matsim.contrib.taxi.optimizer.DefaultTaxiOptimizerProvider;
@@ -54,7 +54,8 @@ public class TaxiDvrpModules {
 			@Override
 			protected void configure() {
 				bind(MobsimTimer.class).toProvider(MobsimTimerProvider.class).asEagerSingleton();
-				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(), DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
+				DvrpTravelDisutilityProvider.bindTravelDisutilityForOptimizer(binder(),
+						DefaultTaxiOptimizerProvider.TAXI_OPTIMIZER);
 				bind(VrpOptimizer.class).to(TaxiOptimizer.class);
 				bind(TaxiScheduler.class).asEagerSingleton();
 				bind(DynActionCreator.class).to(TaxiActionCreator.class).asEagerSingleton();
