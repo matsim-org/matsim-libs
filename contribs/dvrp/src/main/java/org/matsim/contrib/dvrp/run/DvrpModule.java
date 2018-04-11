@@ -22,9 +22,6 @@ package org.matsim.contrib.dvrp.run;
 import java.util.Collection;
 import java.util.function.Function;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.dvrp.router.DvrpRoutingNetworkProvider;
 import org.matsim.contrib.dvrp.run.DvrpQSimPluginsProvider.DvrpQSimPluginsProviderFactory;
@@ -33,10 +30,8 @@ import org.matsim.contrib.dvrp.vrpagent.VrpAgentQueryHelper;
 import org.matsim.contrib.dynagent.run.DynRoutingModule;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.AbstractQSimPlugin;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vis.otfvis.OnTheFlyServer.NonPlanAgentQueryHelper;
 
 import com.google.inject.Module;
@@ -70,14 +65,5 @@ public final class DvrpModule extends AbstractModule {
 
 		bind(new TypeLiteral<Collection<AbstractQSimPlugin>>() {})
 				.toProvider(qSimPluginProviderFactory.create(getConfig()));
-	}
-
-	public static class MobsimTimerProvider implements Provider<MobsimTimer> {
-		@Inject
-		private QSim qsim;
-
-		public MobsimTimer get() {
-			return qsim.getSimTimer();
-		}
 	}
 }
