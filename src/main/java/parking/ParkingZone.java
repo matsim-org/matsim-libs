@@ -76,7 +76,9 @@ public class ParkingZone implements Identifiable<ParkingZone> {
         SortedMap<Id<Link>, Double> linkToParkingProbs = new TreeMap<>();
         for (Map.Entry<Id<Link>,Double> entry : this.linkToParkingCapacity.entrySet()){
         	double cap = entry.getValue() / this.zoneParkingCapacity;
-        	if (Double.isInfinite(cap)) cap = 0;
+    		if (cap < 0 || !Double.isFinite(cap)) {
+        		cap = 0;
+        	}
             linkToParkingProbs.put( entry.getKey(), cap);
         }
         return linkToParkingProbs;
@@ -92,4 +94,5 @@ public class ParkingZone implements Identifiable<ParkingZone> {
     public Id<ParkingZone> getId() {
         return this.parkingZoneId;
     }
+    
 }

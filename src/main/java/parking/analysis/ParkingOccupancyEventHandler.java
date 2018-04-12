@@ -48,10 +48,14 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 	private ZonalLinkParkingInfo parkingInfo;
 	private LinkParkingCapacityCalculator calculator;
 	private Network network;
+	private final double storageCapacityFactor;
 	private Map<Id<ParkingZone>,int[]> zoneoccupancyPerBin = new HashMap<>();  
 	private int bins;
+	
+	
 	public ParkingOccupancyEventHandler(ZonalLinkParkingInfo parkingInfo, LinkParkingCapacityCalculator calculator,
-			Network network, double simEndTime) {
+			Network network, double simEndTime, double storageCapacityFactor) {
+		this.storageCapacityFactor = storageCapacityFactor;
 		this.parkingInfo = parkingInfo;
 		this.calculator = calculator;
 		this.network = network;
@@ -65,6 +69,7 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 	public ParkingOccupancyEventHandler(ZonalLinkParkingInfo parkingInfo, LinkParkingCapacityCalculator calculator,
 			Network network, Config config, EventsManager events) {
 		events.addHandler(this);
+		this.storageCapacityFactor = config.qsim().getStorageCapFactor();
 		this.parkingInfo = parkingInfo;
 		this.calculator = calculator;
 		this.network = network;
@@ -105,14 +110,16 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 	}
 	
 	private int getBin(double time) {
-		return Math.floorDiv((int) time, 900);
+		int b = Math.floorDiv((int) time, 900);
+		if (b>bins) b = bins-1;
+		return b;
 		
 	}
 	
 	public void writeParkingOccupancyStats(String file) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(file);
 		try {
-			bw.write("Zone;Capacity");
+			bw.write("Zone;Capacity;intialCapacity;");
 			for (int i = 0; i<bins; i++) {
 				bw.write(";"+Time.writeTime(i*900));
 			}
@@ -120,7 +127,9 @@ public class ParkingOccupancyEventHandler implements PersonArrivalEventHandler, 
 				bw.newLine();
 				final MutableInt parkingCapacity = new MutableInt();
 				this.parkingInfo.getParkingZones().get(e.getKey()).getLinksInZone().forEach(lid -> parkingCapacity.add(calculator.getLinkCapacity(network.getLinks().get(lid))));
-				bw.write(e.getKey()+";"+parkingCapacity.intValue());
+				int cap = (int) (parkingCapacity.intValue() * storageCapacityFactor);
+				int initialOcc =  cap - (int) this.parkingInfo.getParkingZones().get(e.getKey()).getZoneParkingCapacity();
+				bw.write(e.getKey()+";"+cap+";"+initialOcc);
 				int sum = 0;
 				for (int i = 0 ; i< e.getValue().length;i++) {
 					sum+=e.getValue()[i];

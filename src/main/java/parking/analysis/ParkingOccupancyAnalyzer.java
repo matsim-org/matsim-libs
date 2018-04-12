@@ -18,12 +18,16 @@
   
 package parking.analysis;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.NetworkUtils;
 import org.matsim.core.network.io.MatsimNetworkReader;
+import org.matsim.core.population.io.PopulationReader;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import parking.ZonalLinkParkingInfo;
 import parking.capacityCalculation.LinkLengthBasedCapacityCalculator;
@@ -33,6 +37,7 @@ public static void main(String[] args) {
 	String basefolder = "D:/runs-svn/vw_rufbus/";
 	String runId = "vw220park10";
 	String eventsFile = basefolder+runId+"/"+runId+".output_events.xml.gz";
+	String populationFile = basefolder+runId+"/"+runId+".output_plans.xml.gz";
 	String parkingOccupancyOutputFile = basefolder+runId+"/"+runId+".output_parkingOccupancy.csv";
 	String networkFile = basefolder+runId+"/"+runId+".output_network.xml.gz";
 	String shapeFile = "C:/Users/Joschka/Documents/shared-svn/projects/vw_rufbus/projekt2/parking/bc-run/shp/parking-bs.shp";
@@ -40,10 +45,13 @@ public static void main(String[] args) {
 	double endTime = 30*3600;
 	
 	Network network = NetworkUtils.createNetwork();
+	
+	Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	new PopulationReader(scenario).readFile(populationFile);
 	new MatsimNetworkReader(network).readFile(networkFile);
 	LinkLengthBasedCapacityCalculator  linkLengthBasedCapacityCalculator = new LinkLengthBasedCapacityCalculator();
-	ZonalLinkParkingInfo zonalLinkParkingInfo = new ZonalLinkParkingInfo(shapeFile, shapeString, 0.3, network, linkLengthBasedCapacityCalculator);
-	ParkingOccupancyEventHandler parkingOccupancyEventHandler = new ParkingOccupancyEventHandler(zonalLinkParkingInfo, linkLengthBasedCapacityCalculator, network, endTime);
+	ZonalLinkParkingInfo zonalLinkParkingInfo = new ZonalLinkParkingInfo(shapeFile, shapeString, 0.1, network, linkLengthBasedCapacityCalculator, scenario.getPopulation());
+	ParkingOccupancyEventHandler parkingOccupancyEventHandler = new ParkingOccupancyEventHandler(zonalLinkParkingInfo, linkLengthBasedCapacityCalculator, network, endTime,0.1);
 	
 	EventsManager events = EventsUtils.createEventsManager();
 	events.addHandler(parkingOccupancyEventHandler);

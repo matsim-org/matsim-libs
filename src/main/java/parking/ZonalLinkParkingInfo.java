@@ -21,15 +21,26 @@ package parking;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -46,6 +57,7 @@ import parking.capacityCalculation.LinkParkingCapacityCalculator;
 public class ZonalLinkParkingInfo {
 
     private final Network network;
+    private final Population population;
     private final Map<Id<ParkingZone>, ParkingZone> parkingZones = new HashMap<>();
 
     private final boolean useCarLinksOnly = true;
@@ -53,25 +65,62 @@ public class ZonalLinkParkingInfo {
     private final LinkParkingCapacityCalculator linkParkingCapacityCalculator;
 
     private final QSimConfigGroup qSimConfigGroup;
+    private final Random r = MatsimRandom.getRandom();
+    
 
     @Inject
-    public ZonalLinkParkingInfo(Config config,Network network, LinkParkingCapacityCalculator linkParkingCapacityCalculator) {
+    public ZonalLinkParkingInfo(Config config,Network network, LinkParkingCapacityCalculator linkParkingCapacityCalculator, Population population) {
         this.network = network;
         this.linkParkingCapacityCalculator = linkParkingCapacityCalculator;
         this.qSimConfigGroup = config.qsim();
+        this.population=population;
         ParkingRouterConfigGroup prc = ParkingRouterConfigGroup.get(config);
         init(prc.getShapeFileUrl(config.getContext()).getFile(), prc.getShapeKey());
+        initializeInitialParkingOccupancy();
     }
     
-    public ZonalLinkParkingInfo(String shapeFile, String shapeKey, double storageCapacityFactor, Network network, LinkParkingCapacityCalculator linkParkingCapacityCalculator) {
+
+	public ZonalLinkParkingInfo(String shapeFile, String shapeKey, double storageCapacityFactor, Network network, LinkParkingCapacityCalculator linkParkingCapacityCalculator, Population population) {
         this.network = network;
         this.linkParkingCapacityCalculator = linkParkingCapacityCalculator;
         this.qSimConfigGroup = new QSimConfigGroup();
+        this.population=population;
         qSimConfigGroup.setStorageCapFactor(storageCapacityFactor);
         ParkingRouterConfigGroup prc = null;
         init(shapeFile, shapeKey);
+        initializeInitialParkingOccupancy();
     }
 
+	private void initializeInitialParkingOccupancy() {
+		
+		Network net = this.network;
+		if (NetworkUtils.isMultimodal(network)) {
+			TransportModeNetworkFilter filter = new TransportModeNetworkFilter(network);
+			net = NetworkUtils.createNetwork();
+			HashSet<String> modes = new HashSet<String>();
+			modes.add(TransportMode.car);
+			filter.filter(net, modes);
+		}
+		for (Person p : population.getPersons().values()) {
+			MutableBoolean usesCar = new MutableBoolean(false);
+			p.getSelectedPlan().getPlanElements().stream().filter(Leg.class::isInstance).forEach(l->{
+				Leg leg = (Leg) l;
+				if (leg.getMode().equals(TransportMode.car)) {
+					usesCar.setTrue();
+				}
+			});
+			if(usesCar.isTrue()) {
+				Coord c = ((Activity)p.getSelectedPlan().getPlanElements().get(0)).getCoord();
+				Link l = NetworkUtils.getNearestLink(net, c);
+				ParkingZone z = getParkingZone(l);
+				if (z!=null) {
+					if (r.nextDouble()>z.getGarageProbability()) {
+					z.updateLinkParkingCapacity(l, -1);
+					}
+				}
+			}
+		}
+	}
     
     private void init(String shapeFile, String featureKey) {
         Collection<SimpleFeature> features = ShapeFileReader.getAllFeatures(shapeFile);
