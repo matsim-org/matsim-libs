@@ -92,7 +92,8 @@ public final class RunOneTruckExample {
 					bind(DynActionCreator.class).to(OneTruckActionCreator.class).asEagerSingleton();
 				}
 			};
-		}).addListener(OneTruckRequestCreator.class).setAddPassengerEnginePlugin(false);
+		}).addListener(OneTruckRequestCreator.class)//
+				.setAddPassengerEnginePlugin(false);
 	}
 
 	public static void main(String... args) {

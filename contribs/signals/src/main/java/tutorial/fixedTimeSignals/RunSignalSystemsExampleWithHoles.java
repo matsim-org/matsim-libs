@@ -44,7 +44,7 @@ import org.matsim.vis.otfvis.OTFVisConfigGroup.ColoringScheme;
  * 
  * @author dgrether, tthunig
  */
-public class RunSignalSystemsExample {
+public class RunSignalSystemsExampleWithHoles {
 	
 	public static void main(String[] args) {
 		run(true);

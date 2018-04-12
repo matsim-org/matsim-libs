@@ -39,6 +39,10 @@ import com.google.inject.Module;
  * @author michalm
  */
 public class DvrpQSimPluginsProvider implements Provider<Collection<AbstractQSimPlugin>> {
+	public interface DvrpQSimPluginsProviderFactory {
+		DvrpQSimPluginsProvider create(Config config);
+	}
+
 	private final Config config;
 	private final Function<Config, Module> moduleCreator;
 	private final List<Class<? extends MobsimListener>> listeners = new ArrayList<>();
@@ -55,7 +59,7 @@ public class DvrpQSimPluginsProvider implements Provider<Collection<AbstractQSim
 		return this;
 	}
 
-	public DvrpQSimPluginsProvider addListeners(List<Class<? extends MobsimListener>> listener) {
+	public DvrpQSimPluginsProvider addListeners(Collection<Class<? extends MobsimListener>> listener) {
 		listeners.addAll(listener);
 		return this;
 	}
