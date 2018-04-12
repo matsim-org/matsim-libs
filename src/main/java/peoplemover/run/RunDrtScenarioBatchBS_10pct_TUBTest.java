@@ -86,6 +86,7 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 		// drt.setkNearestVehicles(90);
 
 		// Use custom stop duration
+		drt.setOperationalScheme("stopBased");
 		drt.setMaxTravelTimeBeta(500);
 		drt.setMaxTravelTimeAlpha(1.3);
 		drt.setMaxWaitTime(500);
