@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,33 +16,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.benchmark;
+package org.matsim.contrib.dvrp.run;
 
-import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
-import org.matsim.core.controler.AbstractModule;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import javax.inject.Inject;
+import javax.inject.Provider;
+
+import org.matsim.core.mobsim.framework.MobsimTimer;
+import org.matsim.core.mobsim.qsim.QSim;
 
 /**
- * This module overrides the bindings set up by DvrpTravelTimeModule
- * 
  * @author michalm
  */
-public class DvrpBenchmarkTravelTimeModule extends AbstractModule {
-	private final TravelTime travelTime;
+public class MobsimTimerProvider implements Provider<MobsimTimer> {
+	@Inject
+	private QSim qsim;
 
-	public DvrpBenchmarkTravelTimeModule() {
-		this(new FreeSpeedTravelTime());
-	}
-
-	public DvrpBenchmarkTravelTimeModule(final TravelTime travelTime) {
-		this.travelTime = travelTime;
-	}
-
-	public void install() {
-		// Because TravelTimeCalculatorModule is not installed for benchmarking, we need to add a binding
-		// for the car mode
-		bindNetworkTravelTime().toInstance(travelTime);
-		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).toInstance(travelTime);
+	public MobsimTimer get() {
+		return qsim.getSimTimer();
 	}
 }
