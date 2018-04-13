@@ -69,6 +69,8 @@ public final class TransportModeNetworkFilter {
 		// first, clone all nodes to ensure their order is not changed
 		for (Node node : this.fullNetwork.getNodes().values()) {
 			Node newNode = factory.createNode(node.getId(), node.getCoord());
+			for (String key : node.getAttributes().getKeys())
+				newNode.getAttributes().putAttribute(key, newNode.getAttributes().getAttribute(key));
 			subNetwork.addNode(newNode);
 		}
 		
@@ -92,6 +94,8 @@ public final class TransportModeNetworkFilter {
 				link2.setLength(link.getLength());
 				link2.setNumberOfLanes(link.getNumberOfLanes());
 				NetworkUtils.setType( ((Link) link2), NetworkUtils.getType(((Link) link)));
+				for (String key : link.getAttributes().getKeys())
+					link2.getAttributes().putAttribute(key, link.getAttributes().getAttribute(key));
 				subNetwork.addLink(link2);
 			}
 		}
