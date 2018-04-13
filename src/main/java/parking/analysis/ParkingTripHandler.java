@@ -213,7 +213,7 @@ public class ParkingTripHandler implements LinkEnterEventHandler, PersonArrivalE
 	public void writeParkingTrips(String file){
 		BufferedWriter bw = IOUtils.getBufferedWriter(file);
 		try {
-			bw.write("personId"+s+"previousActivity"+s+"fromLink"+s+"fromX"+s+"fromY"+s+"nextActivity"+s+"toX"+s+"toY"+"toZone"+s+"departureTime"+
+			bw.write("personId"+s+"previousActivity"+s+"fromLink"+s+"fromX"+s+"fromY"+s+"nextActivity"+s+"toX"+s+"toY"+s+"toZone"+s+"departureTime"+
 					s+"arrivalTime"+s+"travelTime"+s+"accessWalkTime"+s+"accessWalkDistance"+s+"carTravelTime"+s+"carTravelDistance"+s+"parkSearchTime"+s+"parkSearchDistance"+s+"egressWalkTime"+
 					s+"egressWalkDistance");
 			for (ParkTrip trip : completedTrips) {
