@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2016 by the members listed in the COPYING,        *
+ * copyright       : (C) 2017 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,17 +17,31 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.taxi.benchmark;
+package org.matsim.contrib.dvrp.benchmark;
 
-import org.matsim.contrib.dvrp.benchmark.DvrpBenchmarkConfigConsistencyChecker;
-import org.matsim.contrib.taxi.run.TaxiConfigConsistencyChecker;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.consistency.ConfigConsistencyChecker;
+import org.matsim.contrib.dvrp.trafficmonitoring.DvrpTravelTimeModule;
+import org.matsim.core.controler.AbstractModule;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
-public class TaxiBenchmarkConfigConsistencyChecker implements ConfigConsistencyChecker {
-	@Override
-	public void checkConsistency(Config config) {
-		new TaxiConfigConsistencyChecker().checkConsistency(config);
-		new DvrpBenchmarkConfigConsistencyChecker().checkConsistency(config);
+/**
+ * @author michalm
+ */
+public class DvrpBenchmarkTravelTimeModule extends AbstractModule {
+	private final TravelTime travelTime;
+
+	public DvrpBenchmarkTravelTimeModule() {
+		this(new FreeSpeedTravelTime());
+	}
+
+	public DvrpBenchmarkTravelTimeModule(final TravelTime travelTime) {
+		this.travelTime = travelTime;
+	}
+
+	public void install() {
+		// Because TravelTimeCalculatorModule is not installed for benchmarking, we need to add a binding
+		// for the car mode
+		bindNetworkTravelTime().toInstance(travelTime);
+		addTravelTimeBinding(DvrpTravelTimeModule.DVRP_ESTIMATED).toInstance(travelTime);
 	}
 }

@@ -89,4 +89,8 @@ public final class Attributes {
 	int size() {
 		return keys.length;
 	}
+
+	public String[] getKeys() {
+		return keys;
+	}
 }
