@@ -350,7 +350,7 @@ public class DrtVehicleOccupancyEvaluator implements PersonEntersVehicleEventHan
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(statsFileName + "_plotdata.csv");
 		try {
-			bw.write("time;emptyDrive");
+			bw.write("time;idle;emptyDrive");
 			for (int i = 1; i <= maxcap; i++) {
 				bw.write(";" + i + "_pax");
 			}
