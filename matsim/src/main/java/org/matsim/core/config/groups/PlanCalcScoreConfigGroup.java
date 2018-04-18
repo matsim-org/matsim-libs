@@ -86,6 +86,7 @@ public final class PlanCalcScoreConfigGroup extends ConfigGroup {
 		{
 			ActivityParams params = new ActivityParams("dummy");
 			params.setTypicalDuration(2. * 3600.);
+			params.setScoringThisActivityAtAll(false);
 			this.addActivityParams(params);
 			// (this is there so that an empty config prints out at least one
 			// activity type,
