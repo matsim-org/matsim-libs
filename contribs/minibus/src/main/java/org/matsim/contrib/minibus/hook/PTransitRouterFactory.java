@@ -38,6 +38,13 @@ import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
+import ch.sbb.matsim.routing.pt.raptor.LeastCostRaptorRouteSelector;
+import ch.sbb.matsim.routing.pt.raptor.RaptorConfig;
+import ch.sbb.matsim.routing.pt.raptor.RaptorRouteSelector;
+import ch.sbb.matsim.routing.pt.raptor.RaptorUtils;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptor;
+import ch.sbb.matsim.routing.pt.raptor.SwissRailRaptorData;
+
 /**
  * 
  * @author aneumann
@@ -59,6 +66,11 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 	private Provider<TransitRouter> routerFactory = null;
 	@Inject private TransitSchedule schedule;
 	private RaptorDisutility raptorDisutility;
+	
+	// SwissRailRaptor
+    private SwissRailRaptorData swissRailRaptorData = null;
+    private final RaptorConfig swissRailRaptorConfig;
+    private final RaptorRouteSelector swissRailRaptorRouteSelector = new LeastCostRaptorRouteSelector();
 
 	public PTransitRouterFactory(Config config){
 		PConfigGroup pConfig = ConfigUtils.addOrGetModule(config, PConfigGroup.class) ;
@@ -68,6 +80,7 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 		this.costPerMeterTraveled = pConfig.getEarningsPerKilometerAndPassenger() ;
 		
 		this.createTransitRouterConfig(config);
+		this.swissRailRaptorConfig = RaptorUtils.createRaptorConfig(config);
 	}
 
 	private void createTransitRouterConfig(Config config) {
@@ -90,7 +103,7 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 			// okay update all routers
 			this.routerFactory = createSpeedyRouter();
 			if(this.routerFactory == null) {
-				if (this.ptRouter.equalsIgnoreCase("raptor")) {
+				if (this.ptRouter.equalsIgnoreCase("raptor") || this.ptRouter.equalsIgnoreCase("SwissRailRaptor")) {
 					// nothing to do here
 				} else {
 					log.info("Could not create speedy router, fall back to normal one.  This is so far not fatal.");
@@ -106,6 +119,9 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 			if (this.ptRouter.equalsIgnoreCase("raptor")) {
 				log.info("Using raptor routing");
 				return this.createRaptorRouter();
+			} else if (this.ptRouter.equalsIgnoreCase("SwissRailRaptor")) {
+				log.info("Using SwissRailRaptor routing");
+				return this.createSwissRailRaptor();
 			} else {
 				// no speedy router available - return old one
 				PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(schedule);
@@ -123,7 +139,29 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 		}
         return new Raptor(this.transitRouterConfig, this.schedule, this.raptorDisutility);
 	}
+	
+	private TransitRouter createSwissRailRaptor() {
+        SwissRailRaptorData data = getSwissRailRaptorData();
+		return new SwissRailRaptor(data, this.swissRailRaptorRouteSelector);
+	}
 
+    private SwissRailRaptorData getSwissRailRaptorData() {
+        if (this.swissRailRaptorData == null) {
+            this.swissRailRaptorData = prepareSwissRailRaptorData();
+        }
+        return this.swissRailRaptorData;
+    }
+
+    synchronized private SwissRailRaptorData prepareSwissRailRaptorData() {
+        if (this.swissRailRaptorData != null) {
+            // due to multithreading / race conditions, this could still happen.
+            // prevent doing the work twice.
+            return this.swissRailRaptorData;
+        }
+        this.swissRailRaptorData = SwissRailRaptorData.create(this.schedule, this.swissRailRaptorConfig);
+        return this.swissRailRaptorData;
+    }
+	
 	private Provider<TransitRouter> createSpeedyRouter() {
 		try {
 			Class<?> cls = Class.forName("com.senozon.matsim.pt.speedyrouter.SpeedyTransitRouterFactory");
