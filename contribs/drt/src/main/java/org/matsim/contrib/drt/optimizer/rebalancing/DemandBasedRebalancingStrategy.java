@@ -23,6 +23,7 @@
 package org.matsim.contrib.drt.optimizer.rebalancing;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -86,6 +87,10 @@ public class DemandBasedRebalancingStrategy implements RebalancingStrategy {
 		Map<Id<Vehicle>, Vehicle> idleVehiclesMap = rebalancableVehicles
 				.filter(v -> v.getServiceEndTime() > time + 3600).collect(Collectors.toMap(v -> v.getId(), v -> v));
 
+		if (idleVehiclesMap.isEmpty()) {
+			return Collections.emptyList();
+		}
+		
 		List<Relocation> relocations = new ArrayList<>();
 		Map<String, Integer> requiredAdditionalVehiclesPerZone = calculateZonalVehicleRequirements(idleVehiclesMap,
 				time);
