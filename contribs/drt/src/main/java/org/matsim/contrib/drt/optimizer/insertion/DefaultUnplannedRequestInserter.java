@@ -26,7 +26,6 @@ import java.util.Optional;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.optimizer.VehicleData;
-import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.optimizer.insertion.SingleVehicleInsertionProblem.BestInsertion;
 import org.matsim.contrib.drt.passenger.events.DrtRequestRejectedEvent;
 import org.matsim.contrib.drt.passenger.events.DrtRequestScheduledEvent;
@@ -51,18 +50,20 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 	private final MobsimTimer mobsimTimer;
 	private final EventsManager eventsManager;
 	private final RequestInsertionScheduler insertionScheduler;
+	private final VehicleData.EntryFactory vehicleDataEntryFactory;
 
 	private final ParallelMultiVehicleInsertionProblem insertionProblem;
 
 	@Inject
 	public DefaultUnplannedRequestInserter(DrtConfigGroup drtCfg, Fleet fleet, MobsimTimer mobsimTimer,
 			EventsManager eventsManager, RequestInsertionScheduler insertionScheduler,
-			PrecalculatablePathDataProvider pathDataProvider) {
+			VehicleData.EntryFactory vehicleDataEntryFactory, PrecalculatablePathDataProvider pathDataProvider) {
 		this.drtCfg = drtCfg;
 		this.fleet = fleet;
 		this.mobsimTimer = mobsimTimer;
 		this.eventsManager = eventsManager;
 		this.insertionScheduler = insertionScheduler;
+		this.vehicleDataEntryFactory = vehicleDataEntryFactory;
 
 		insertionProblem = new ParallelMultiVehicleInsertionProblem(pathDataProvider, drtCfg, mobsimTimer);
 		insertionScheduler.initSchedules(drtCfg.isChangeStartLinkToLastLinkInSchedule());
@@ -80,7 +81,7 @@ public class DefaultUnplannedRequestInserter implements UnplannedRequestInserter
 		}
 
 		VehicleData vData = new VehicleData(mobsimTimer.getTimeOfDay(), fleet.getVehicles().values().stream(),
-				new VehicleDataEntryFactoryImpl(drtCfg));
+				vehicleDataEntryFactory);
 
 		Iterator<DrtRequest> reqIter = unplannedRequests.iterator();
 		while (reqIter.hasNext()) {

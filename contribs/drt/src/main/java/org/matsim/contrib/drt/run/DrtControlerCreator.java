@@ -30,6 +30,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.drt.analysis.DrtAnalysisModule;
 import org.matsim.contrib.drt.optimizer.DefaultDrtOptimizer;
 import org.matsim.contrib.drt.optimizer.DrtOptimizer;
+import org.matsim.contrib.drt.optimizer.VehicleData;
+import org.matsim.contrib.drt.optimizer.VehicleDataEntryFactoryImpl;
 import org.matsim.contrib.drt.optimizer.insertion.DefaultUnplannedRequestInserter;
 import org.matsim.contrib.drt.optimizer.insertion.ParallelPathDataProvider;
 import org.matsim.contrib.drt.optimizer.insertion.PrecalculatablePathDataProvider;
@@ -133,6 +135,7 @@ public final class DrtControlerCreator {
 
 				bind(DefaultUnplannedRequestInserter.class).asEagerSingleton();
 				bind(UnplannedRequestInserter.class).to(DefaultUnplannedRequestInserter.class);
+				bind(VehicleData.EntryFactory.class).to(VehicleDataEntryFactoryImpl.class).asEagerSingleton();
 
 				bind(DrtTaskFactory.class).to(DrtTaskFactoryImpl.class).asEagerSingleton();
 
