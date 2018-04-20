@@ -20,21 +20,14 @@
 
 package peoplemover.run;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalModule;
 import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
-import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
-import org.matsim.contrib.drt.analysis.zonal.ZonalIdleVehicleCollector;
-import org.matsim.contrib.drt.optimizer.rebalancing.DemandBasedRebalancingStrategy;
-//import org.matsim.contrib.drt.optimizer.rebalancing.DemandBasedRebalancingStrategy;
-import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingModule;
 import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
 import org.matsim.contrib.drt.run.DrtControlerCreator;
 import org.matsim.contrib.dvrp.run.DvrpConfigGroup;
-import org.matsim.core.config.*;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.AbstractModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFVisConfigGroup;
@@ -126,17 +119,7 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 			DrtZonalSystem zones = new DrtZonalSystem(controler.getScenario().getNetwork(), 1000);
 
 			// In this stages we are adding new modules to the MATSim controler
-			controler.addOverridingModule(new DrtZonalModule());
-			controler.addOverridingModule(new AbstractModule() {
-
-				@Override
-				public void install() {
-					bind(DrtZonalSystem.class).toInstance(zones);
-					bind(RebalancingStrategy.class).to(DemandBasedRebalancingStrategy.class).asEagerSingleton();
-					bind(ZonalDemandAggregator.class).asEagerSingleton();
-					bind(ZonalIdleVehicleCollector.class).asEagerSingleton();
-				}
-			});
+			controler.addOverridingModule(new MinCostFlowRebalancingModule(zones));
 
 		}
 
