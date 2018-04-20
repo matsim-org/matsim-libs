@@ -30,7 +30,7 @@ public final class GenericRouteImpl extends AbstractRoute {
 	
 	private String routeDescription = null;
 
-	GenericRouteImpl(final Id<Link> startLinkId, final Id<Link> endLinkId) {
+	public GenericRouteImpl(final Id<Link> startLinkId, final Id<Link> endLinkId) {
 		super(startLinkId, endLinkId);
 	}
 
