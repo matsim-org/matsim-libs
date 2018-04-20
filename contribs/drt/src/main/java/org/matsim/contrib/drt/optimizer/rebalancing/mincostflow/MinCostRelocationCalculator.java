@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +16,19 @@
  *                                                                         *
  * *********************************************************************** */
 
+package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy.Relocation;
+import org.matsim.contrib.dvrp.data.Vehicle;
+
 /**
- * 
+ * @author michalm
  */
-package org.matsim.contrib.drt.analysis.zonal;
-
-import org.matsim.core.controler.AbstractModule;
-
-/**
- * @author  jbischoff
- * A module to analyse DRT trips based on a zonal grid system.
- */
-
-public class DrtZonalModule extends AbstractModule {
-
-	/* (non-Javadoc)
-	 * @see org.matsim.core.controler.AbstractModule#install()
-	 */
-	@Override
-	public void install() {
-		bind(ZonalDemandAggregator.class).asEagerSingleton();
-		//the MinCostFlowRebalancing does not need this collector
-		//bind(ZonalIdleVehicleCollector.class).asEagerSingleton();
-	}
-
+public interface MinCostRelocationCalculator {
+	List<Relocation> calcRelocations(List<Pair<String, Integer>> supply, List<Pair<String, Integer>> demand,
+			Map<String, List<Vehicle>> rebalancableVehiclesPerZone);
 }

@@ -1,9 +1,8 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2017 by the members listed in the COPYING,        *
+ * copyright       : (C) 2018 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,28 +16,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-/**
- * 
- */
-package org.matsim.contrib.drt.analysis.zonal;
+package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
+import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
+import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
+import org.matsim.contrib.drt.optimizer.rebalancing.RebalancingStrategy;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 import org.matsim.core.controler.AbstractModule;
 
 /**
- * @author  jbischoff
- * A module to analyse DRT trips based on a zonal grid system.
+ * @author michalm
  */
+public class MinCostFlowRebalancingModule extends AbstractModule {
+	private final DrtZonalSystem zones;// FIXME instantiate via injection to get the right network for zones
 
-public class DrtZonalModule extends AbstractModule {
-
-	/* (non-Javadoc)
-	 * @see org.matsim.core.controler.AbstractModule#install()
-	 */
-	@Override
-	public void install() {
-		bind(ZonalDemandAggregator.class).asEagerSingleton();
-		//the MinCostFlowRebalancing does not need this collector
-		//bind(ZonalIdleVehicleCollector.class).asEagerSingleton();
+	public MinCostFlowRebalancingModule(DrtZonalSystem zones) {
+		this.zones = zones;
 	}
 
+	@Override
+	public void install() {
+		bind(DrtZonalSystem.class).toInstance(zones);
+		bind(RebalancingStrategy.class).to(MinCostFlowRebalancingStrategy.class).asEagerSingleton();
+		bind(RebalancingTargetCalculator.class).to(LinearRebalancingTargetCalculator.class).asEagerSingleton();
+		bind(MinCostRelocationCalculator.class).to(AggregatedMinCostRelocationCalculator.class).asEagerSingleton();
+		bind(ZonalDemandAggregator.class).asEagerSingleton();
+	}
 }
