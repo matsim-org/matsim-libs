@@ -20,7 +20,6 @@
 
 package peoplemover.run;
 
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingModule;
 import org.matsim.contrib.drt.run.DrtConfigConsistencyChecker;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -114,12 +113,8 @@ public class RunDrtScenarioBatchBS_10pct_TUBTest {
 			System.out.println("Rebalancing Online");
 			drt.setRebalancingInterval(600);
 
-			// Our re-balancing requires a DrtZonalSystem
-			// DrtZonalSystem splits the network into squares with x=2000m
-			DrtZonalSystem zones = new DrtZonalSystem(controler.getScenario().getNetwork(), 1000);
-
 			// In this stages we are adding new modules to the MATSim controler
-			controler.addOverridingModule(new MinCostFlowRebalancingModule(zones));
+			controler.addOverridingModule(new MinCostFlowRebalancingModule(2000));
 
 		}
 

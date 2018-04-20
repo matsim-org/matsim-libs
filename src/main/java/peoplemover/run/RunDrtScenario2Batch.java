@@ -22,7 +22,6 @@ package peoplemover.run;
 import java.util.Arrays;
 import java.util.List;
 
-import org.matsim.contrib.drt.analysis.zonal.DrtZonalSystem;
 import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingModule;
 //import org.matsim.contrib.av.robotaxi.run.RunRobotaxiExample;
 import org.matsim.contrib.drt.run.DrtConfigGroup;
@@ -77,9 +76,7 @@ public class RunDrtScenario2Batch {
 
 			// erstellt ein Grid mit einer Kantenlänge von 2000m über das
 			// gesamte Netz. Ggf. einen höheren Parameter wählen.
-			DrtZonalSystem zones = new DrtZonalSystem(controler.getScenario().getNetwork(), 2000);
-
-			controler.addOverridingModule(new MinCostFlowRebalancingModule(zones));
+			controler.addOverridingModule(new MinCostFlowRebalancingModule(2000));
 
 			controler.addOverridingModule(new AbstractModule() {
 				@Override
