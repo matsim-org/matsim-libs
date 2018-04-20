@@ -3,12 +3,12 @@ package lspScoringTests;
 import lsp.functions.Info;
 import lsp.functions.InfoFunction;
 
-public class TrinkgeldInfo extends Info{
+public class TipInfo extends Info{
 
-	private TrinkgeldInfoFunction function;
-	private String name = "TRINKGELDINFO";
+	private InfoFunction function;
+	private String name = "TIPINFO";
 	
-	public TrinkgeldInfo (TrinkgeldInfoFunction function) {
+	public TipInfo (InfoFunction function) {
 		this.function = function;
 	}
 	
@@ -34,6 +34,12 @@ public class TrinkgeldInfo extends Info{
 
 	@Override
 	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setName(String name) {
 		// TODO Auto-generated method stub
 		
 	}

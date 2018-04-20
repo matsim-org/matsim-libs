@@ -29,6 +29,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
+import demand.controler.MutualModule;
 import demand.decoratedLSP.LSPDecorator;
 import demand.decoratedLSP.LSPDecorators;
 import demand.decoratedLSP.LSPPlanDecorator;
@@ -44,7 +45,6 @@ import demand.demandObject.DemandObjects;
 import demand.demandObject.DemandPlanImpl;
 import demand.demandObject.ShipperShipment;
 import demand.demandObject.ShipperShipmentImpl;
-import demand.mobsim.MutualModule;
 import demand.mutualReplanning.DemandPlanStrategyImpl;
 import demand.mutualReplanning.DemandReplannerImpl;
 import demand.mutualReplanning.LSPWithOffersReplanner;
@@ -64,6 +64,7 @@ import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
 import lsp.LogisticsSolutionElementImpl;
 import lsp.SolutionScheduler;
+import lsp.events.EventUtils;
 import lsp.resources.Resource;
 import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
@@ -76,11 +77,9 @@ import testMutualReplanning.SimpleOfferTransferrer;
 public class MutualReplanningAndOfferUpdateTest {
 
 	private LSPDecorator lsp;
-	private Collection<DemandObject> demandObjects;
 	private OfferFactoryImpl offerFactory;
 	private LinearCostTracker tracker;
 	private LinearOfferVisitor linearVisitor;
-	private LSPPlanDecorator collectionPlan;
 	private LogisticsSolutionDecorator  solution;
 	private double initialFixed;
 	private 
@@ -242,6 +241,7 @@ public class MutualReplanningAndOfferUpdateTest {
 		moduleBuilder.setLsps(new LSPDecorators(lspList));
 		moduleBuilder.setMutualReplanningModule(mutReplanModule);
 		moduleBuilder.setMutualScoringModule(mutScoreModule);
+		moduleBuilder.setEventCreators(EventUtils.getStandardEventCreators());
 		MutualModule mutualModule = moduleBuilder.build();
 
 		controler.addOverridingModule(mutualModule);

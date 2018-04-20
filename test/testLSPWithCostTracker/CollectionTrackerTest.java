@@ -311,17 +311,17 @@ public class CollectionTrackerTest {
 		CostInfo costInfo = (CostInfo) info;
 		assertTrue(costInfo.getFunction() instanceof CostInfoFunction);
 		CostInfoFunction function = (CostInfoFunction) costInfo.getFunction();
-		ArrayList<InfoFunctionValue> values = new ArrayList<InfoFunctionValue>(function.getValues());
-		for(InfoFunctionValue value : values) {
+		ArrayList<InfoFunctionValue<?>> values = new ArrayList<InfoFunctionValue<?>>(function.getValues());
+		for(InfoFunctionValue<?> value : values) {
 			if(value instanceof LinearCostFunctionValue) {
 				LinearCostFunctionValue linearValue = (LinearCostFunctionValue) value;
-				assertEquals(Double.parseDouble(linearValue.getValue()),linearTrackedCostsPerShipment, Math.max(linearTrackedCostsPerShipment,Double.parseDouble(linearValue.getValue())) * 0.01 );
-				assertEquals(Double.parseDouble(linearValue.getValue()),linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment,Double.parseDouble(linearValue.getValue())) * 0.01 );
+				assertEquals(linearValue.getValue(),linearTrackedCostsPerShipment, Math.max(linearTrackedCostsPerShipment,linearValue.getValue()) * 0.01 );
+				assertEquals(linearValue.getValue(),linearScheduledCostsPerShipment, Math.max(linearScheduledCostsPerShipment,linearValue.getValue()) * 0.01 );
 			}
 			if(value instanceof FixedCostFunctionValue) {
 				FixedCostFunctionValue fixedValue = (FixedCostFunctionValue) value;
-				assertEquals(Double.parseDouble(fixedValue.getValue()),fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment,Double.parseDouble(fixedValue.getValue())) * 0.01 );
-				assertEquals(Double.parseDouble(fixedValue.getValue()),fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment,Double.parseDouble(fixedValue.getValue())) * 0.01 );
+				assertEquals(fixedValue.getValue(),fixedTrackedCostsPerShipment, Math.max(fixedTrackedCostsPerShipment,fixedValue.getValue()) * 0.01 );
+				assertEquals(fixedValue.getValue(),fixedScheduledCostsPerShipment, Math.max(fixedScheduledCostsPerShipment,fixedValue.getValue()) * 0.01 );
 			}
 		}
 	}

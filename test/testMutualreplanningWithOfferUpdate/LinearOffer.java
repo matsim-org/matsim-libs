@@ -74,11 +74,11 @@ public class LinearOffer implements Offer{
 				for(InfoFunctionValue value : costFunction.getValues()) {
 					if(value instanceof FixedCostFunctionValue) {
 						fixedValue = (FixedCostFunctionValue) value;
-						this.fix = Double.parseDouble(fixedValue.getValue());
+						this.fix = fixedValue.getValue();
 					}
 					if(value instanceof LinearCostFunctionValue) {
 						linearValue = (LinearCostFunctionValue) value;
-						this.linear = Double.parseDouble(linearValue.getValue());
+						this.linear = linearValue.getValue();
 					}
 				}
 			}

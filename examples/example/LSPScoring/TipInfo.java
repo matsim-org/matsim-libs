@@ -5,10 +5,10 @@ import lsp.functions.InfoFunction;
 
 public class TipInfo extends Info{
 
-	private TipInfoFunction function;
-	private String name = "TRINKGELDINFO";
+	private InfoFunction function;
+	private String name = "TIPINFO";
 	
-	public TipInfo (TipInfoFunction function) {
+	public TipInfo (InfoFunction function) {
 		this.function = function;
 	}
 	
@@ -34,6 +34,12 @@ public class TipInfo extends Info{
 
 	@Override
 	public void update() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void setName(String name) {
 		// TODO Auto-generated method stub
 		
 	}

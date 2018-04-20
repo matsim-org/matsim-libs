@@ -2,28 +2,23 @@ package testLSPWithCostTracker;
 
 import lsp.functions.InfoFunctionValue;
 
-public class FixedCostFunctionValue implements InfoFunctionValue {
+public class FixedCostFunctionValue implements InfoFunctionValue<Double> {
 
-	private String value;
-		
+	private double value;
+
 	@Override
 	public String getName() {
 		return "fixed";
 	}
 
 	@Override
-	public Class<?> getDataType() {
-		return Double.class;
-	}
-
-	@Override
-	public String getValue() {
+	public Double getValue() {
 		return value;
 	}
 
 	@Override
-	public void setValue(String value) {
-		this.value = value;
+	public void setValue(Double value) {
+		this.value = value;	
 	}
-
+		
 }

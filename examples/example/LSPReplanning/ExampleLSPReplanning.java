@@ -25,12 +25,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
-import example.LSPScoring.TipEventHandler;
-import example.LSPScoring.TipInfo;
-import example.LSPScoring.TipInfoFunction;
-import example.LSPScoring.TipInfoFunctionValue;
-import example.LSPScoring.TipScorer;
-import example.LSPScoring.TipSimulationTracker;
+
 import lsp.LSP;
 import lsp.LSPImpl;
 import lsp.LSPPlan;

@@ -201,13 +201,13 @@ public class CascadingInfoTest {
 		assertTrue(averageElementFunction.getValues().size() == 1);
 		assertTrue(averageElementFunction.getValues().iterator().next() instanceof AverageTimeInfoFunctionValue);
 		AverageTimeInfoFunctionValue averageElementValue = (AverageTimeInfoFunctionValue) averageElementFunction.getValues().iterator().next();
-		assertTrue(Double.parseDouble(averageElementValue.getValue()) > 0);
+		assertTrue(averageElementFunction.getValues().iterator().next().getValue() instanceof Double);
 		assertTrue(elementInfo.getFunction() instanceof AverageTimeInfoFunction);
 		AverageTimeInfoFunction averageSolutionFunction = (AverageTimeInfoFunction) solutionInfo.getFunction();
 		assertTrue(averageSolutionFunction.getValues().size() == 1);
 		assertTrue(averageSolutionFunction.getValues().iterator().next() instanceof AverageTimeInfoFunctionValue);
 		AverageTimeInfoFunctionValue averageSolutionValue = (AverageTimeInfoFunctionValue) averageSolutionFunction.getValues().iterator().next();
-		assertTrue(Double.parseDouble(averageSolutionValue.getValue()) > 0);
+		assertTrue(averageSolutionValue.getValue() > 0);
 		assertTrue(averageElementValue.getValue() == averageSolutionValue.getValue());
 	}
 

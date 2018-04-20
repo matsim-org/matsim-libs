@@ -48,16 +48,9 @@ import lsp.SolutionScheduler;
 import lsp.resources.Resource;
 import lsp.replanning.LSPReplannerImpl;
 import lsp.replanning.LSPReplanningModuleImpl;
-import lsp.scoring.LSPScorer;
 import lsp.scoring.LSPScoringModuleImpl;
 import lsp.shipment.LSPShipment;
 import lsp.shipment.LSPShipmentImpl;
-import lspScoringTests.TrinkgeldEventHandler;
-import lspScoringTests.TrinkgeldInfo;
-import lspScoringTests.TrinkgeldInfoFunction;
-import lspScoringTests.TrinkgeldInfoFunctionValue;
-import lspScoringTests.TrinkgeldScorer;
-import lspScoringTests.TrinkgeldSimulationTracker;
 
 public class CollectionLSPReplanningTest {
 	private Network network;

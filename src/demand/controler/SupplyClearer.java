@@ -7,6 +7,7 @@ import demand.decoratedLSP.LSPDecorators;
 import lsp.LSP;
 import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
+import lsp.shipment.LSPShipment;
 
 public class SupplyClearer implements IterationEndsListener{
 	
@@ -27,6 +28,13 @@ public class SupplyClearer implements IterationEndsListener{
 						element.getOutgoingShipments().clear();
 					}
 				}	
+			
+				for(LSPShipment shipment : lsp.getShipments()) {
+					shipment.getSchedule().clear();
+					shipment.getLog().clear();
+					lsp.getSelectedPlan().getAssigner().assignShipment(shipment);
+				}
+			
 			}		
 	}
 						

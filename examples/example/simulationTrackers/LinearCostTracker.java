@@ -9,6 +9,12 @@ import org.matsim.core.events.handler.EventHandler;
 import lsp.functions.Info;
 import lsp.functions.InfoFunctionValue;
 import lsp.tracking.SimulationTracker;
+import testLSPWithCostTracker.CollectionServiceHandler;
+import testLSPWithCostTracker.CostInfo;
+import testLSPWithCostTracker.DistanceAndTimeHandler;
+import testLSPWithCostTracker.FixedCostFunctionValue;
+import testLSPWithCostTracker.LinearCostFunctionValue;
+import testLSPWithCostTracker.TourStartHandler;
 
 public class LinearCostTracker implements SimulationTracker{
 
@@ -73,10 +79,10 @@ public class LinearCostTracker implements SimulationTracker{
 		CostInfo info = (CostInfo) infos.iterator().next();
 		for(InfoFunctionValue value : info.getFunction().getValues()) {
 			if(value instanceof FixedCostFunctionValue) {		
-				((FixedCostFunctionValue)value).setValue(Double.toString(fixedUnitCosts));
+				((FixedCostFunctionValue)value).setValue(fixedUnitCosts);
 			}
 			if(value instanceof LinearCostFunctionValue) {
-				((LinearCostFunctionValue)value).setValue(Double.toString(linearUnitCosts));
+				((LinearCostFunctionValue)value).setValue(linearUnitCosts);
 			}
 		}
 		

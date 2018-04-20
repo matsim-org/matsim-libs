@@ -13,12 +13,14 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.ScoringEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.ScoringListener;
 import org.matsim.core.controler.listener.StartupListener;
@@ -43,7 +45,7 @@ import lsp.shipment.LSPShipment;
 import lsp.tracking.SimulationTracker;
 
 public class MutualControlerListener implements FreightControlerListener, BeforeMobsimListener, AfterMobsimListener,
-		ScoringListener, ReplanningListener, IterationEndsListener, StartupListener {
+		ScoringListener, ReplanningListener, IterationEndsListener, StartupListener, IterationStartsListener {
 
 	private CarrierResourceTracker carrierResourceTracker;
 	private Carriers carriers;
@@ -91,15 +93,12 @@ public class MutualControlerListener implements FreightControlerListener, Before
 			for (LogisticsSolution solution : selectedPlan.getSolutions()) {
 				for (EventHandler handler : solution.getEventHandlers()) {
 					eventsManager.addHandler(handler);
-					registeredHandlers.add(handler);
 				}
 				for (LogisticsSolutionElement element : solution.getSolutionElements()) {
 					for (EventHandler handler : element.getEventHandlers()) {
 						eventsManager.addHandler(handler);
-						registeredHandlers.add(handler);
 					}
-					ArrayList<EventHandler> resourceHandlers = (ArrayList<EventHandler>) element.getResource()
-							.getEventHandlers();
+					ArrayList<EventHandler> resourceHandlers = (ArrayList<EventHandler>) element.getResource().getEventHandlers();
 					for (EventHandler handler : resourceHandlers) {
 						if (!registeredHandlers.contains(handler)) {
 							eventsManager.addHandler(handler);
@@ -115,34 +114,8 @@ public class MutualControlerListener implements FreightControlerListener, Before
 	
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-
 		SupplyClearer supplyClearer = new SupplyClearer(lsps);
 		supplyClearer.notifyIterationEnds(event);
-
-		for (EventHandler handler : registeredHandlers) {
-			eventsManager.removeHandler(handler);
-		}
-
-		for (LSP lsp : lsps.getLSPs().values()) {
-			for (LSPShipment shipment : lsp.getShipments()) {
-				shipment.getEventHandlers().clear();
-			}
-
-			for (LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
-				for (EventHandler handler : solution.getEventHandlers()) {
-					handler.reset(event.getIteration());
-				}
-				for (LogisticsSolutionElement element : solution.getSolutionElements()) {
-					for (EventHandler handler : element.getEventHandlers()) {
-						handler.reset(event.getIteration());
-					}
-					for (EventHandler handler : element.getResource().getEventHandlers()) {
-						handler.reset(event.getIteration());
-					}
-				}
-			}
-		}
-
 	}
 
 	@Override
@@ -184,17 +157,14 @@ public class MutualControlerListener implements FreightControlerListener, Before
 						if (!alreadyUpdatedTrackers.contains(tracker)) {
 							tracker.notifyAfterMobsim(event);
 							alreadyUpdatedTrackers.add(tracker);
-							tracker.reset();
 						}
 					}
 					for (SimulationTracker tracker : element.getSimulationTrackers()) {
 						tracker.notifyAfterMobsim(event);
-						tracker.reset();
 					}
 				}
 				for (SimulationTracker tracker : solution.getSimulationTrackers()) {
 					tracker.notifyAfterMobsim(event);
-					tracker.reset();
 				}
 			}
 		}
@@ -247,6 +217,46 @@ public class MutualControlerListener implements FreightControlerListener, Before
 
 	public CarrierResourceTracker getCarrierResourceTracker() {
 		return carrierResourceTracker;
+	}
+
+
+	@Override
+	public void notifyIterationStarts(IterationStartsEvent event) {
+		if(event.getIteration() > 0) {
+			for(EventHandler handler : registeredHandlers) {
+				eventsManager.removeHandler(handler);
+			}
+		
+			for(LSP lsp : lsps.getLSPs().values()) {
+				for(LSPShipment shipment : lsp.getShipments()) {
+					shipment.getEventHandlers().clear();
+				}
+			
+				for(LogisticsSolution solution : lsp.getSelectedPlan().getSolutions()) {
+					for(EventHandler handler : solution.getEventHandlers()) {
+						handler.reset(event.getIteration());
+					}
+					for(SimulationTracker tracker : solution.getSimulationTrackers()) {
+						tracker.reset();
+					}			
+					for(LogisticsSolutionElement element : solution.getSolutionElements()) {
+						for(EventHandler handler : element.getEventHandlers()) {
+							handler.reset(event.getIteration());
+						}
+						for(SimulationTracker tracker : element.getSimulationTrackers()) {
+							tracker.reset();
+						}
+						for(EventHandler handler : element.getResource().getEventHandlers()) {
+							handler.reset(event.getIteration());
+						}		
+						for(SimulationTracker tracker : element.getResource().getSimulationTrackers()) {
+							tracker.reset();
+						}
+					}			
+				}		
+			}			
+		}	
+		
 	}
 	
 }

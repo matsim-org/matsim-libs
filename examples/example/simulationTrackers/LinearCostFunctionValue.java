@@ -2,28 +2,22 @@ package example.simulationTrackers;
 
 import lsp.functions.InfoFunctionValue;
 
-public class LinearCostFunctionValue implements InfoFunctionValue {
+public class LinearCostFunctionValue implements InfoFunctionValue<Double> {
 
-	private String value;
-	
+	private Double value;
+
 	@Override
 	public String getName() {
 		return "linear";
 	}
 
 	@Override
-	public Class<?> getDataType() {
-		return Double.class;
-	}
-
-	@Override
-	public String getValue() {
+	public Double getValue() {
 		return value;
 	}
 
 	@Override
-	public void setValue(String value) {
+	public void setValue(Double value) {
 		this.value = value;
 	}
-
 }

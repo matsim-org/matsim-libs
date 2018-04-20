@@ -30,6 +30,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleType;
 
+import demand.controler.MutualModule;
 import demand.decoratedLSP.LSPDecorator;
 import demand.decoratedLSP.LSPPlanDecorator;
 import demand.decoratedLSP.LSPPlanWithOfferTransferrer;
@@ -45,7 +46,6 @@ import demand.demandObject.DemandObjects;
 import demand.demandObject.DemandPlanImpl;
 import demand.demandObject.ShipperShipment;
 import demand.demandObject.ShipperShipmentImpl;
-import demand.mobsim.MutualModule;
 import demand.mutualReplanning.DemandPlanStrategyImpl;
 import demand.mutualReplanning.DemandReplannerImpl;
 import demand.mutualReplanning.MutualReplanningModule;
@@ -60,6 +60,7 @@ import lsp.LogisticsSolution;
 import lsp.LogisticsSolutionElement;
 import lsp.LogisticsSolutionElementImpl;
 import lsp.SolutionScheduler;
+import lsp.events.EventUtils;
 import lsp.resources.Resource;
 import lsp.usecase.CollectionCarrierAdapter;
 import lsp.usecase.CollectionCarrierScheduler;
@@ -215,12 +216,13 @@ public class MutualReplanningTest {
 		moduleBuilder.setLsps(new LSPDecorators(lsps));
 		moduleBuilder.setMutualReplanningModule(mutReplanModule);
 		moduleBuilder.setMutualScoringModule(mutScoreModule);
+		moduleBuilder.setEventCreators(EventUtils.getStandardEventCreators());
 		MutualModule mutualModule = moduleBuilder.build();
 		
 		Controler controler = new Controler(config);
 		controler.addOverridingModule(mutualModule);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(1);
+		config.controler().setLastIteration(2);
 		config.controler().setOverwriteFileSetting(OverwriteFileSetting.overwriteExistingFiles);
 		config.network().setInputFile("input\\lsp\\network\\2regions.xml");
 		controler.run();
