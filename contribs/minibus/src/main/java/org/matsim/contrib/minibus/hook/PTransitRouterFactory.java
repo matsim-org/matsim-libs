@@ -94,6 +94,8 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
 		if (this.ptRouter.equalsIgnoreCase("raptor")) {
 			// this could also hold updated prices
 			this.raptorDisutility = new RaptorDisutility(this.transitRouterConfig, this.costPerBoarding, this.costPerMeterTraveled);
+		} else if (this.ptRouter.equalsIgnoreCase("SwissRailRaptor")){
+			swissRailRaptorData = null;
 		}
 	}
 
@@ -158,6 +160,7 @@ class PTransitRouterFactory implements Provider<TransitRouter> {
             // prevent doing the work twice.
             return this.swissRailRaptorData;
         }
+        log.info("Updating SwissRailRaptor data to new minibus schedule");
         this.swissRailRaptorData = SwissRailRaptorData.create(this.schedule, this.swissRailRaptorConfig);
         return this.swissRailRaptorData;
     }
