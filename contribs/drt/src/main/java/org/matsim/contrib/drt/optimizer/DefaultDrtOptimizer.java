@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.TreeSet;
 import java.util.stream.Stream;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.drt.data.DrtRequest;
 import org.matsim.contrib.drt.data.validator.DrtRequestValidator;
@@ -52,6 +53,8 @@ import com.google.inject.Inject;
  * @author michalm
  */
 public class DefaultDrtOptimizer implements DrtOptimizer {
+	private static final Logger log = Logger.getLogger(DefaultDrtOptimizer.class);
+
 	public static final String DRT_OPTIMIZER = "drt_optimizer";
 
 	private final DrtConfigGroup drtCfg;
@@ -108,14 +111,16 @@ public class DefaultDrtOptimizer implements DrtOptimizer {
 		// right now we relocate only idle vehicles (vehicles that are being relocated cannot be relocated)
 		Stream<? extends Vehicle> rebalancableVehicles = fleet.getVehicles().values().stream()
 				.filter(scheduleInquiry::isIdle);
-
 		List<Relocation> relocations = rebalancingStrategy.calcRelocations(rebalancableVehicles,
 				mobsimTimer.getTimeOfDay());
 
-		for (Relocation r : relocations) {
-			Link currentLink = ((DrtStayTask)r.vehicle.getSchedule().getCurrentTask()).getLink();
-			if (currentLink != r.link) {
-				relocator.relocateVehicle(r.vehicle, r.link);
+		if (!relocations.isEmpty()) {
+			log.debug("Fleet rebalancing: #relocations=" + relocations.size());
+			for (Relocation r : relocations) {
+				Link currentLink = ((DrtStayTask)r.vehicle.getSchedule().getCurrentTask()).getLink();
+				if (currentLink != r.link) {
+					relocator.relocateVehicle(r.vehicle, r.link);
+				}
 			}
 		}
 	}
