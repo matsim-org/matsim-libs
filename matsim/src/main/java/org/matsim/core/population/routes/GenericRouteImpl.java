@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
 
-final class GenericRouteImpl extends AbstractRoute {
+public final class GenericRouteImpl extends AbstractRoute {
 
 	/*package*/ final static String ROUTE_TYPE = "generic";
 	
