@@ -32,9 +32,20 @@ public class ChargerImpl implements Charger {
 
 	private ChargingLogic logic;
 
-	public ChargerImpl(Id<Charger> id, double power, int plugs, Link link) {
+	/**
+	 * 
+	 * @param id
+	 *            chargerID
+	 * @param power_w
+	 *            Power per Charging Spot in watt
+	 * @param plugs
+	 *            Number of simultaneously usable charging outlets
+	 * @param link
+	 *            Associated Link Id
+	 */
+	public ChargerImpl(Id<Charger> id, double power_w, int plugs, Link link) {
 		this.id = id;
-		this.power = power;
+		this.power = power_w;
 		this.plugs = plugs;
 		this.link = link;
 	}
