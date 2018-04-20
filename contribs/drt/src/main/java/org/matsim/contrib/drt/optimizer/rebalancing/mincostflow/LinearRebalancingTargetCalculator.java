@@ -16,13 +16,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.optimizer.rebalancing;
+package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.matsim.contrib.drt.analysis.zonal.ZonalDemandAggregator;
-import org.matsim.contrib.drt.optimizer.rebalancing.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
+import org.matsim.contrib.drt.optimizer.rebalancing.mincostflow.MinCostFlowRebalancingStrategy.RebalancingTargetCalculator;
 
 /**
  * @author michalm

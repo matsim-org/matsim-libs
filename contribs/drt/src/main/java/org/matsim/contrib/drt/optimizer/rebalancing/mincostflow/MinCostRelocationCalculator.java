@@ -16,7 +16,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.drt.optimizer.rebalancing;
+package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
 import java.util.List;
 import java.util.Map;
