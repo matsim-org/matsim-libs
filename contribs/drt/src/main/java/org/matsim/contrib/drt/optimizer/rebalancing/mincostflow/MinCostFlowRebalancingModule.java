@@ -28,15 +28,15 @@ import org.matsim.core.controler.AbstractModule;
  * @author michalm
  */
 public class MinCostFlowRebalancingModule extends AbstractModule {
-	private final DrtZonalSystem zones;// FIXME instantiate via injection to get the right network for zones
+	private final double cellSize;
 
-	public MinCostFlowRebalancingModule(DrtZonalSystem zones) {
-		this.zones = zones;
+	public MinCostFlowRebalancingModule(double cellSize) {
+		this.cellSize = cellSize;
 	}
 
 	@Override
 	public void install() {
-		bind(DrtZonalSystem.class).toInstance(zones);
+		bind(DrtZonalSystem.class).toProvider(new DrtZonalSystem.DrtZonalSystemProvider(cellSize));
 		bind(RebalancingStrategy.class).to(MinCostFlowRebalancingStrategy.class).asEagerSingleton();
 		bind(RebalancingTargetCalculator.class).to(LinearRebalancingTargetCalculator.class).asEagerSingleton();
 		bind(MinCostRelocationCalculator.class).to(AggregatedMinCostRelocationCalculator.class).asEagerSingleton();
