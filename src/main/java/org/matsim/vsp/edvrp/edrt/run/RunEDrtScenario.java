@@ -54,8 +54,6 @@ public class RunEDrtScenario {
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		DvrpConfigGroup.get(config).setNetworkMode(null);// to switch off network filtering
-
 		Controler controler = EDrtControlerCreator.createControler(config, otfvis);
 		controler.addOverridingModule(new EvModule());
 		controler.addOverridingModule(createEvDvrpIntegrationModule());

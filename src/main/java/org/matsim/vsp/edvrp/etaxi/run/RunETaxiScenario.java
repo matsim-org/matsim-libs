@@ -51,7 +51,6 @@ public class RunETaxiScenario {
 	}
 
 	public static Controler createControler(Config config, boolean otfvis) {
-		DvrpConfigGroup.get(config).setNetworkMode(null);// to switch off network filtering
 		config.addConfigConsistencyChecker(new TaxiConfigConsistencyChecker());
 		config.checkConsistency();
 
