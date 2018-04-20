@@ -1,7 +1,7 @@
 language: java
 jdk: oraclejdk8
 script:
-  - mvn test failsafe:verify -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
+  - mvn test failsafe:integration-test failsafe:verify -B -Dmaven.test.redirectTestOutputToFile -Dmatsim.preferLocalDtds=true --fail-at-end
 
 deploy:
   provider: script

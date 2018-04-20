@@ -1,6 +1,6 @@
 .project
 .settings
 .classpath
-target
-test
-output 
+/target
+/test
+/output 
