@@ -19,6 +19,7 @@
 package org.matsim.contrib.drt.optimizer.rebalancing.mincostflow;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.ToIntBiFunction;
 import java.util.stream.Stream;
@@ -81,9 +82,10 @@ public class TransportProblem<P, C> {
 		}
 
 		// solve min cost flow problem
-		int[] res = MinCostFlow.minCostFlow(graph, 0, N - 1, Math.min(totalSupply, totalDemand), false);
-		System.out.println("flow=" + res[0]);
-		System.out.println("flowCost=" + res[1]);
+		int[] result = MinCostFlow.minCostFlow(graph, 0, N - 1, Math.min(totalSupply, totalDemand), false);
+		if (result[0] == 0) {
+			return Collections.emptyList();
+		}
 
 		// extract flows
 		List<Triple<P, C, Integer>> flows = new ArrayList<>();
@@ -98,7 +100,6 @@ public class TransportProblem<P, C> {
 				}
 			}
 		}
-
 		return flows;
 	}
 }
