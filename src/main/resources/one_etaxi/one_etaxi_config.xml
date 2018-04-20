@@ -1,0 +1,81 @@
+<?xml version="1.0" ?>
+<!DOCTYPE config SYSTEM "http://www.matsim.org/files/dtd/config_v2.dtd">
+<config>
+	<module name="dvrp">
+		<param name="mode" value="taxi" />
+	</module>
+
+	<module name="taxi">
+		<param name="destinationKnown" value="false" />
+		<param name="vehicleDiversion" value="false" />
+		<param name="pickupDuration" value="120" />
+		<param name="dropoffDuration" value="60" />
+		<param name="onlineVehicleTracker" value="false" />
+
+		<param name="taxisFile" value="../../contribs/dvrp/src/main/resources/one_taxi/one_taxi_vehicles.xml" />
+
+		<param name="timeProfiles" value="true" />
+		<param name="detailedStats" value="true" />
+
+		<parameterset type="optimizer">
+			<param name="type" value="E_RULE_BASED" />
+			<param name="id" value="example" />
+			<param name="goal" value="DEMAND_SUPPLY_EQUIL" />
+			<param name="nearestRequestsLimit" value="99999" />
+			<param name="nearestVehiclesLimit" value="99999" />
+			<param name="cellSize" value="1000" />
+
+			<param name="minRelativeSoc" value="0.7" />
+			<param name="socCheckTimeStep" value="60" />
+		</parameterset>
+	</module>
+
+
+	<module name="ev">
+		<param name="chargeTimeStep" value="5" />
+		<param name="auxDischargeTimeStep" value="60" />
+
+		<param name="chargersFile" value="src/main/resources/one_etaxi/one_etaxi_chargers.xml" />
+		<param name="timeProfiles" value="true" />
+	</module>
+
+	<module name="network">
+		<param name="inputNetworkFile" value="../../contribs/dvrp/src/main/resources/grid_network.xml" />
+		<!-- param name="timeVariantNetwork" value="false" / if timeVariantNetwork -->
+		<!-- param name="inputChangeEventsFile" value=""/ if timeVariantNetwork -->
+	</module>
+
+	<module name="plans">
+		<param name="inputPlansFile" value="../../contribs/dvrp/src/main/resources/one_taxi/one_taxi_population.xml" />
+	</module>
+
+	<module name="qsim">
+		<param name="simStarttimeInterpretation" value="onlyUseStarttime" />
+		<param name="insertingWaitingVehiclesBeforeDrivingVehicles" value="true" />
+		<param name="snapshotStyle" value="queue" />
+	</module>
+
+	<module name="otfvis">
+		<param name="coloringScheme" value="taxicab" />
+		<param name="drawNonMovingItems" value="true" />
+	</module>
+
+	<module name="controler">
+		<param name="outputDirectory" value="test/output/one_etaxi" />
+		<param name="overwriteFiles" value="deleteDirectoryIfExists" />
+		<param name="firstIteration" value="0" />
+		<param name="lastIteration" value="2" />
+	</module>
+
+	<module name="planCalcScore">
+		<param name="activityType_0" value="dummy" />
+		<param name="activityTypicalDuration_0" value="24:00:00" />
+	</module>
+
+	<module name="strategy">
+		<!-- We focus only on DynAgents. "Standard" agents do not change their behaviour -->
+		<param name="maxAgentPlanMemorySize" value="1" />
+		<param name="ModuleProbability_1" value="1.0" />
+		<param name="Module_1" value="KeepLastSelected" />
+	</module>
+</config>

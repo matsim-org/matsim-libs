@@ -4,4 +4,4 @@
 # Electric DVRP
 Electric DVRP for MATSim. Currently offers functionality for e-taxi and e-DRT (shared taxis and minibuses)
 
-CI is run on [travis](https://travis-ci.org/matsim-vsp/ev) and (snapshot) jars are deployed to [packagecloud](https://packagecloud.io/matsim-vsp/ev/)
+CI is run on [travis](https://travis-ci.org/matsim-vsp/edvrp) and (snapshot) jars are deployed to [packagecloud](https://packagecloud.io/matsim-vsp/edvrp/)
