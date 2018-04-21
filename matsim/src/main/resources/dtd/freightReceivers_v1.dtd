@@ -8,7 +8,7 @@
 <!-- agent                                                           -->
 <!-- =============================================================== -->
 
-<!ELEMENT freightReceivers	(attributes?, productTypes?, receiver*)> 
+<!ELEMENT freightReceivers	(attributes?, productTypes*, receiver*)> 
 <!ATTLIST freightReceivers
 			desc			CDATA			#IMPLIED>
 
@@ -19,8 +19,7 @@
           name        		CDATA 			#REQUIRED
           class       		CDATA 			#REQUIRED>
 
-<!ELEMENT productTypes      (productType?)>
-
+<!ELEMENT productTypes      (productType*)>
 
 <!ELEMENT productType       (#PCDATA)>
 <!ATTLIST productType  
@@ -28,7 +27,7 @@
 		descr				CDATA			#IMPLIED
 		weight				CDATA			#IMPLIED>
 
-<!ELEMENT receiver 			(attributes?, timeWindow?, product?)>
+<!ELEMENT receiver 			(attributes?, timeWindow*, product*, orders?)>
 <!ATTLIST receiver
 		id					CDATA			#REQUIRED
 		linkId				CDATA			#IMPLIED>
@@ -38,7 +37,7 @@
 		start				CDATA			#REQUIRED
 		end					CDATA			#REQUIRED>
 		
-<!ELEMENT product 			(reorderPolicy*, order?)>
+<!ELEMENT product 			(reorderPolicy?, order*)>
 <!ATTLIST product
 		id					CDATA			#REQUIRED
 		onHand				CDATA			#IMPLIED>
@@ -46,16 +45,18 @@
 <!ELEMENT reorderPolicy 	(attributes?)>
 <!ATTLIST reorderPolicy
 		name				CDATA			#REQUIRED>
-		
+
+<!ELEMENT orders			(order*)>
+
 <!ELEMENT order				(item*)>
 <!ATTLIST order
-		carrierId			ID				#REQUIRED>
+		carrierId			CDATA			#REQUIRED>
 
 <!ELEMENT item				(#PCDATA)>
 <!ATTLIST item
-		id					ID				#REQUIRED
+		id					CDATA			#REQUIRED
 		name				CDATA			#IMPLIED
-		productId			ID				#REQUIRED
+		productId			CDATA			#REQUIRED
 		quantity			CDATA			#IMPLIED
 		serviceTime			CDATA			#IMPLIED>
 	
