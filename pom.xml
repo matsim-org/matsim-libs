@@ -35,7 +35,14 @@
 		<repository>
 			<id>matsim-vsp-edvrp</id>
 			<url>https://packagecloud.io/matsim-vsp/edvrp/maven2</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
 		</repository>
+
 	</repositories>
 
 	<dependencies>
@@ -129,6 +136,7 @@
 			<artifactId>edvrp</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
 		</dependency>
+
 
 		<!-- https://mvnrepository.com/artifact/com.beust/jcommander -->
 		<dependency>
