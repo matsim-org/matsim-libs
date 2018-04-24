@@ -163,7 +163,8 @@ public class FirstReloadLSPSchedulingTest {
 		 for(int i = 1; i < 11; i++) {
 	        	Id<LSPShipment> id = Id.create(i, LSPShipment.class);
 	        	LSPShipmentImpl.Builder builder = LSPShipmentImpl.Builder.newInstance(id);
-	        	int capacityDemand = new Random().nextInt(10);
+	        	//Random random = new Random(1);
+	        	int capacityDemand = new Random().nextInt(4);
 	        	builder.setCapacityDemand(capacityDemand);
 	        	
 	        	while(true) {
